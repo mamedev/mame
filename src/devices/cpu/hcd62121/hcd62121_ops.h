@@ -185,7 +185,6 @@
 			{                                                                           \
 				UINT16 res = ( m_temp1[i] & 0x0f ) + ( m_temp2[i] & 0x0f ) + carry; \
 																						\
-				carry = 0;                                                              \
 				if ( res > 9 )                                                          \
 				{                                                                       \
 					res += 6;                                                           \

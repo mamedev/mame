@@ -30,7 +30,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(apple10_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(crystalc_get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(snookr10);
 	DECLARE_VIDEO_START(apple10);
 	DECLARE_VIDEO_START(crystalc);

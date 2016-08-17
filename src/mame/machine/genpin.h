@@ -21,7 +21,16 @@ const char *const genpin_sample_names[] =
 	"knocker",
 	"sling",
 	"coinin",
-	0   /* end of array */
+	"outhole",
+	"kickback",
+	"drop_target_reset",
+	"coil_coinlockout_engage",
+	"coil_coinlockout_release",
+	"relay_engage",
+	"relay_release",
+	"solenoid_engage",
+	"solenoid_release",
+	nullptr   /* end of array */
 };
 
 MACHINE_CONFIG_EXTERN( genpin_audio );

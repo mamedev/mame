@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/k051316.h"
 
 class tail2nos_state : public driver_device
@@ -20,7 +21,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k051316(*this, "k051316"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_txvideoram;
@@ -39,6 +41,7 @@ public:
 	required_device<k051316_device> m_k051316;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
@@ -46,12 +49,11 @@ public:
 	DECLARE_WRITE16_MEMBER(tail2nos_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tail2nos_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	K051316_CB_MEMBER(zoom_callback);
 };

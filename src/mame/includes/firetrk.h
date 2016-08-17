@@ -6,6 +6,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 
 #define FIRETRUCK_MOTOR_DATA    NODE_01
@@ -38,6 +39,7 @@ public:
 	firetrk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_discrete(*this, "discrete"),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
 		m_playfield_ram(*this, "playfield_ram"),
@@ -50,10 +52,16 @@ public:
 		m_drone_rot(*this, "drone_rot"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_bit_0(*this, "BIT_0"),
+		m_bit_6(*this, "BIT_6"),
+		m_bit_7(*this, "BIT_7"),
+		m_dips(*this, {"DIP_0", "DIP_1"}),
+		m_steer(*this, {"STEER_1", "STEER_2"})
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;
 	required_shared_ptr<UINT8> m_alpha_num_ram;
 	required_shared_ptr<UINT8> m_playfield_ram;
@@ -67,6 +75,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	optional_ioport m_bit_0;
+	optional_ioport m_bit_6;
+	optional_ioport m_bit_7;
+	required_ioport_array<2> m_dips;
+	optional_ioport_array<2> m_steer;
 
 	UINT8 m_in_service_mode;
 	UINT32 m_dial[2];
@@ -111,8 +125,8 @@ public:
 	TILE_GET_INFO_MEMBER(firetrk_get_tile_info2);
 	TILE_GET_INFO_MEMBER(superbug_get_tile_info2);
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info2);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(firetrk);
 	DECLARE_VIDEO_START(superbug);
 	DECLARE_VIDEO_START(montecar);

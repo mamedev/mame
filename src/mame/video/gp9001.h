@@ -26,7 +26,7 @@ struct gp9001tilemaplayer : gp9001layer
 struct gp9001spritelayer : gp9001layer
 {
 	bool use_sprite_buffer;
-	UINT16 *vram16_buffer; // vram buffer for this layer
+	std::unique_ptr<UINT16[]> vram16_buffer; // vram buffer for this layer
 };
 
 
@@ -85,10 +85,10 @@ public:
 	DECLARE_WRITE16_MEMBER( gp9001_top_tmap_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	address_space_config        m_space_config;
 

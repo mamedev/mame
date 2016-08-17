@@ -33,7 +33,7 @@ public:
 class mfmhd_trackimage_cache
 {
 public:
-	mfmhd_trackimage_cache();
+	mfmhd_trackimage_cache(running_machine &machine);
 	~mfmhd_trackimage_cache();
 	void        init(mfm_harddisk_device* mfmhd, int tracksize, int trackslots);
 	UINT16*     get_trackimage(int cylinder, int head);
@@ -44,6 +44,7 @@ public:
 private:
 	mfm_harddisk_device*        m_mfmhd;
 	mfmhd_trackimage*           m_tracks;
+	running_machine &           m_machine;
 };
 
 class mfm_harddisk_device : public harddisk_image_device,
@@ -87,8 +88,8 @@ public:
 	// Head select
 	void            headsel_w(int head) { m_current_head = head & 0x0f; }
 
-	bool            call_load();
-	void            call_unload();
+	image_init_result            call_load() override;
+	void            call_unload() override;
 
 	// Tells us the time when the track ends (next index pulse). Needed by the controller.
 	attotime        track_end_time();
@@ -101,10 +102,10 @@ public:
 	int             get_actual_heads();
 
 protected:
-	void                device_start();
-	void                device_stop();
-	void                device_reset();
-	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void                device_start() override;
+	void                device_stop() override;
+	void                device_reset() override;
+	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	std::string         tts(const attotime &t);
 
@@ -153,7 +154,6 @@ private:
 	mfmhd_trackimage_cache* m_cache;
 	mfmhd_image_format_t*   m_format;
 
-	void        prepare_track(int cylinder, int head);
 	void        head_move();
 	void        recalibrate();
 
@@ -217,8 +217,8 @@ public:
 	void configure(mfmhd_enc_t encoding, int spinupms, int cache, mfmhd_format_type format);
 
 protected:
-	void device_start() { };
-	void device_config_complete();
+	void device_start() override { };
+	void device_config_complete() override;
 
 private:
 	mfmhd_enc_t m_encoding;

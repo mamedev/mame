@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/hc55516.h"
 #include "sound/dac.h"
 
@@ -34,7 +34,7 @@ public:
 	required_device<dac_device> m_dac;
 	required_memory_bank m_cpubank;
 	required_memory_bank m_fixedbank;
-	memory_region* m_rom;
+	required_memory_region m_rom;
 
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
@@ -56,12 +56,11 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-	const char* m_regiontag;
 	UINT8 m_latch;
 	UINT8 m_reply;
 	bool m_reply_available;

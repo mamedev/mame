@@ -10,11 +10,6 @@
 #define NEC_INPUT_LINE_INTP2 12
 #define NEC_INPUT_LINE_POLL 20
 
-#define V25_PORT_P0 0x10000
-#define V25_PORT_P1 0x10002
-#define V25_PORT_P2 0x10004
-#define V25_PORT_PT 0x10006
-
 enum
 {
 	V25_PC=0,
@@ -28,6 +23,28 @@ enum
 	v25_common_device::set_decryption_table(*device, _table);
 
 
+#define MCFG_V25_PORT_PT_READ_CB(_devcb) \
+	devcb = &v25_common_device::set_pt_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P0_READ_CB(_devcb) \
+	devcb = &v25_common_device::set_p0_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P1_READ_CB(_devcb) \
+	devcb = &v25_common_device::set_p1_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P2_READ_CB(_devcb) \
+	devcb = &v25_common_device::set_p2_in_cb(*device, DEVCB_##_devcb);
+
+
+#define MCFG_V25_PORT_P0_WRITE_CB(_devcb) \
+	devcb = &v25_common_device::set_p0_out_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P1_WRITE_CB(_devcb) \
+	devcb = &v25_common_device::set_p1_out_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P2_WRITE_CB(_devcb) \
+	devcb = &v25_common_device::set_p2_out_cb(*device, DEVCB_##_devcb);
+
 class v25_common_device : public cpu_device
 {
 public:
@@ -37,36 +54,45 @@ public:
 	// static configuration helpers
 	static void set_decryption_table(device_t &device, const UINT8 *decryption_table) { downcast<v25_common_device &>(device).m_v25v35_decryptiontable = decryption_table; }
 
+	template<class _Object> static devcb_base & set_pt_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_pt_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_p0_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p0_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_p1_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p1_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_p2_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p2_in.set_callback(object); }
+
+	template<class _Object> static devcb_base & set_p0_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p0_out.set_callback(object); }
+	template<class _Object> static devcb_base & set_p1_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p1_out.set_callback(object); }
+	template<class _Object> static devcb_base & set_p2_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p2_out.set_callback(object); }
+
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load() { notify_clock_changed(); }
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { notify_clock_changed(); }
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return clocks / m_PCK; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return cycles * m_PCK; }
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 80; }
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual UINT32 execute_default_irq_vector() const { return 0xff; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return clocks / m_PCK; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return cycles * m_PCK; }
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 80; }
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual UINT32 execute_default_irq_vector() const override { return 0xff; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr); }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str);
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	address_space_config m_program_config;
@@ -117,6 +143,16 @@ union internalram
 	direct_read_data *m_direct;
 	address_space *m_io;
 	int     m_icount;
+
+	/* callbacks */
+	devcb_read8 m_pt_in;
+	devcb_read8 m_p0_in;
+	devcb_read8 m_p1_in;
+	devcb_read8 m_p2_in;
+
+	devcb_write8 m_p0_out;
+	devcb_write8 m_p1_out;
+	devcb_write8 m_p2_out;
 
 	UINT8   m_prefetch_size;
 	UINT8   m_prefetch_cycles;

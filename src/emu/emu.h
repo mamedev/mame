@@ -15,29 +15,36 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef __EMU_H__
 #define __EMU_H__
+
+#include <list>
+#include <vector>
+#include <memory>
+#include <map>
+#include <unordered_map>
+#include <unordered_set>
 
 // core emulator headers -- must be first
 #include "emucore.h"
 #include "eminline.h"
 #include "profiler.h"
 
-// commonly-referenecd utilities imported from lib/util
+// commonly-referenced utilities imported from lib/util
 #include "palette.h"
 #include "unicode.h"
+#include "strformat.h"
+#include "vecstream.h"
 
 // emulator-specific utilities
 #include "attotime.h"
 #include "hash.h"
-#include "fileio.h" // remove me once NVRAM is implemented as device
+#include "fileio.h"
 #include "delegate.h"
 #include "devdelegate.h"
 
 // memory and address spaces
-#include "memory.h"
+#include "emumem.h"
 #include "addrmap.h"
 #include "memarray.h"
 
@@ -55,14 +62,12 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "ioport.h"
 #include "output.h"
 
-// diimage requires uimenu
-#include "ui/menu.h"
-
 // devices and callbacks
 #include "device.h"
 #include "devfind.h"
 #include "distate.h"
 #include "dimemory.h"
+#include "dirom.h"
 #include "diexec.h"
 #include "opresolv.h"
 #include "digfx.h"
@@ -78,6 +83,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "schedule.h"
 #include "timer.h"
 #include "dinetwork.h"
+#include "dipty.h"
 
 // machine and driver configuration
 #include "mconfig.h"
@@ -87,18 +93,8 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 // timers, CPU and scheduling
 #include "devcpu.h"
 
-// image-related
-#include "softlist.h"
-#include "image.h"
-
-// networking
-#include "network.h"
-
-// lua engine
-#include "luaengine.h"
-
 // the running machine
-#include "mame.h"
+#include "main.h"
 #include "machine.h"
 #include "driver.h"
 
@@ -117,7 +113,10 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "devcb.h"
 #include "dispatch.h"
 #include "drivers/xtal.h"
-#include "machine/generic.h"
+#include "bookkeeping.h"
 #include "video/generic.h"
+
+// member templates that don't like incomplete types
+#include "device.ipp"
 
 #endif  /* __EMU_H__ */

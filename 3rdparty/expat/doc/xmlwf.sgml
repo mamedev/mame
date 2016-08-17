@@ -13,7 +13,7 @@ manpage.1: manpage.sgml
   <!ENTITY dhfirstname "<firstname>Scott</firstname>">
   <!ENTITY dhsurname   "<surname>Bronson</surname>">
   <!-- Please adjust the date whenever revising the manpage. -->
-  <!ENTITY dhdate      "<date>December  5, 2001</date>">
+  <!ENTITY dhdate      "<date>March 11, 2016</date>">
   <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
        allowed: see man(7), man(1). -->
   <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
@@ -213,7 +213,7 @@ supports both.
         <listitem>
 		<para>
   Outputs some strange sort of XML file that completely
-  describes the the input file, including character postitions.
+  describes the input file, including character positions.
   Requires <option>-d</option> to specify an output file.
 	   </para>
         </listitem>
@@ -286,8 +286,7 @@ supports both.
   This gives a fairly accurate idea of the raw speed of Expat itself
   without client overhead.
   <option>-t</option> turns off most of the output options
-  (<option>-d</option>, <option>-m</option>, <option>-c</option>,
-  ...).
+  (<option>-d</option>, <option>-m</option>, <option>-c</option>, ...).
 	   </para>
         </listitem>
       </varlistentry>

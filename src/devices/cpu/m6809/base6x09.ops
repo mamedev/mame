@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 NMI:
 	m_nmi_asserted = false;
 	m_cc |= CC_E;
@@ -354,7 +356,7 @@ ANDCC:
 	return;
 
 SEX:
-	m_d.w = set_flags<UINT16>(CC_NZ, (INT8) m_d.b.l);
+	m_q.r.d = set_flags<UINT16>(CC_NZ, (INT8) m_q.r.b);
 	eat(hd6309_native_mode() ? 0 : 1);
 	return;
 
@@ -398,7 +400,7 @@ JSR:
 GOTO_SUBROUTINE:
 	@write_memory(--m_s.w, m_pc.b.l);
 	@write_memory(--m_s.w, m_pc.b.h);
-	m_pc = m_ea;
+	m_pc.w = m_ea.w;
 	return;
 
 RTS:
@@ -408,7 +410,7 @@ RTS:
 	goto PULL_REGISTERS;
 
 ABX:
-	m_x.w += m_d.b.l;
+	m_x.w += m_q.r.b;
 	eat(hd6309_native_mode() ? 0 : 2);
 	return;
 

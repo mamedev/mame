@@ -123,19 +123,19 @@ public:
 	void write_to_dol(INT32 value);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void execute_set_input(int linenum, int state);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override;
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void execute_set_input(int linenum, int state) override;
 
 	INT32 alu_operation(UINT8 op, INT32 aValue, INT32 bValue, UINT8 &flags);
 	void alu_operation_end();

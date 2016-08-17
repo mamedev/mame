@@ -23,7 +23,7 @@
 
 	<software name="arcs">
 		<description>Archivers</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Archivers" />
@@ -35,7 +35,7 @@
 
 	<software name="editor">
 		<description>VDE 2.66</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="VDE 2.66" />
@@ -47,7 +47,7 @@
 
 	<software name="extrauti">
 		<description>Extra Utilities</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Extra Utilities" />
@@ -59,7 +59,7 @@
 
 	<software name="modems">
 		<description>Modem Sample &amp; M80 &amp; L80</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Modem Sample &amp; M80 &amp; L80" />
@@ -71,7 +71,7 @@
 
 	<software name="promprog">
 		<description>PROM Progs</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PROM Progs" />
@@ -83,7 +83,7 @@
 
 	<software name="px4util1">
 		<description>PX-4 Utils</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-4 Utils" />
@@ -95,7 +95,7 @@
 
 	<software name="px4util2">
 		<description>PX-4 Utility Disk</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-4 Utility Disk" />
@@ -107,7 +107,7 @@
 
 	<software name="px4util3">
 		<description>PX-4 Utility Disk 2</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-4 Utility Disk 2" />
@@ -119,7 +119,7 @@
 
 	<software name="px4wand">
 		<description>PX-4 Wanderer</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-4 Wanderer" />
@@ -131,7 +131,7 @@
 
 	<software name="px8epstf">
 		<description>PX-8 EPS (TF-20 bootdisk)</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-8 EPS (TF-20 bootdisk)" />
@@ -143,7 +143,7 @@
 
 	<software name="px8games">
 		<description>PX-8 Games</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-8 Games" />
@@ -155,7 +155,7 @@
 
 	<software name="scratch">
 		<description>Scratch</description>
-		<year>?????</year>
+		<year>????</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Scratch" />

@@ -21,7 +21,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_gfx2(*this,"gfx2")
 		{ }
 
 	optional_device<deco146_device> m_deco146;
@@ -38,9 +39,9 @@ public:
 	int m_lastScanline[9];
 	UINT32 m_colour_mask;
 
-	UINT16 *m_mlc_spriteram;
-	UINT16 *m_mlc_spriteram_spare;
-	UINT16 *m_mlc_buffered_spriteram;
+	std::unique_ptr<UINT16[]> m_mlc_spriteram;
+	std::unique_ptr<UINT16[]> m_mlc_spriteram_spare;
+	std::unique_ptr<UINT16[]> m_mlc_buffered_spriteram;
 	DECLARE_READ32_MEMBER(test2_r);
 	DECLARE_READ32_MEMBER(mlc_440008_r);
 	DECLARE_READ32_MEMBER(mlc_44001c_r);
@@ -68,7 +69,6 @@ public:
 	UINT32 screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mlc(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
-	void blitRaster(bitmap_rgb32 &bitmap, int rasterMode);
 	void draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest);
 	void descramble_sound(  );
 	required_device<cpu_device> m_maincpu;
@@ -78,6 +78,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_region_ptr<UINT8> m_gfx2;
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );

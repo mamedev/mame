@@ -28,8 +28,8 @@ public:
 	laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	std::vector<UINT8> m_ram;
@@ -44,8 +44,8 @@ public:
 	laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	std::vector<UINT8> m_ram;
@@ -60,8 +60,8 @@ public:
 	laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	std::vector<UINT8> m_ram;
@@ -78,8 +78,8 @@ public:
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	std::vector<UINT8> m_ram;

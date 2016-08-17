@@ -17,13 +17,11 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
 		<info name="serial" value="SD291C" />
-
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="flipper slipper.rom" size="32768" crc="f0c51214" sha1="7acd00c9053fbf7f7d698485759d170a483b123d" offset="0x0000" />
+				<rom name="flipper slipper.rom" size="32768" crc="f0c51214" sha1="7acd00c9053fbf7f7d698485759d170a483b123d" offset="0" />
 			</dataarea>
 		</part>
-
 	</software>
 
 	<software name="ffreddy">
@@ -34,10 +32,9 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="frantic freddy.rom" size="32768" crc="cb553ee5" sha1="60adadb294d5492dfe6ada4b0710c5c31ef3e69c" offset="0x0000" />
+				<rom name="frantic freddy.rom" size="32768" crc="cb553ee5" sha1="60adadb294d5492dfe6ada4b0710c5c31ef3e69c" offset="0" />
 			</dataarea>
 		</part>
-
 	</software>
 
 	<!-- According to the SVI Official Catalog this was released as a tape only, But a cart dump does exist
@@ -45,13 +42,11 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 	    <description>Music Mentor</description>
 	    <year>1983</year>
 	    <publisher>Spectravideo</publisher>
-
 	    <part name="cart" interface="svi318_cart">
 	        <dataarea name="rom" size="32768">
-	            <rom name="music mentor.rom" size="32768" crc="ba0c3d3c" sha1="0ebb91dcc99c0c361d8855387079bc62a41d05d8" offset="0x0000" />
+	            <rom name="music mentor.rom" size="32768" crc="ba0c3d3c" sha1="0ebb91dcc99c0c361d8855387079bc62a41d05d8" offset="0" />
 	        </dataarea>
 	    </part>
-
 	</software>
 	-->
 
@@ -60,13 +55,11 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
 		<info name="serial" value="SD220C" />
-
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="sector alpha.rom" size="32768" crc="015f29ff" sha1="c48266a71e940b903d446561f629b58f3fc9cc8c" offset="0x0000" />
+				<rom name="sector alpha.rom" size="32768" crc="015f29ff" sha1="c48266a71e940b903d446561f629b58f3fc9cc8c" offset="0" />
 			</dataarea>
 		</part>
-
 	</software>
 
 	<software name="supxfrce">
@@ -74,13 +67,23 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
 		<info name="serial" value="SD237C" />
-
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="supercross.rom" size="32768" crc="8d9d1db3" sha1="73f750d454b32d7bf6bb1c966135a022ce1de92a" offset="0x0000" />
+				<rom name="supercross.rom" size="32768" crc="8d9d1db3" sha1="73f750d454b32d7bf6bb1c966135a022ce1de92a" offset="0" />
 			</dataarea>
 		</part>
+	</software>
 
+	<!-- http://www.pouet.net/prod.php?which=65911 -->
+	<software name="prerelea">
+		<description>Pre-Release</description>
+		<year>2015</year>
+		<publisher>Five Finger Punch</publisher>
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="pre-release.rom" size="65536" crc="fa90692e" sha1="5b5fbc309ffe2608b2fed2a4fba8ef73ad68733d" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 </softwarelist>

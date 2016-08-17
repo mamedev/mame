@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_RENDERER_D3D_H_HEADER_GUARD
@@ -21,6 +21,12 @@
 
 namespace bgfx
 {
+#if BX_PLATFORM_XBOXONE
+	typedef ::IGraphicsUnknown IUnknown;
+#else
+	typedef ::IUnknown IUnknown;
+#endif // BX_PLATFORM_XBOXONE
+
 #define _DX_CHECK(_call) \
 			BX_MACRO_BLOCK_BEGIN \
 				HRESULT __hr__ = _call; \
@@ -96,7 +102,7 @@ namespace bgfx
 		return _interface->Release();
 	}
 
-	template <typename Ty>
+	template<typename Ty>
 	class StateCacheT
 	{
 	public:
@@ -104,6 +110,11 @@ namespace bgfx
 		{
 			invalidate(_key);
 			m_hashMap.insert(stl::make_pair(_key, _value) );
+			BX_CHECK(isGraphicsDebuggerPresent()
+				|| 1 == getRefCount(_value), "Interface ref count %d, hash %" PRIx64 "."
+				, getRefCount(_value)
+				, _key
+				);
 		}
 
 		Ty* find(uint64_t _key)

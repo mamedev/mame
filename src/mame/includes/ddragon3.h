@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
+
 /*************************************************************************
 
     Double Dragon 3 & The Combatribes
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 
@@ -22,8 +25,8 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{
 		vblank_level = 6;
 		raster_level = 5;
@@ -60,6 +63,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(ddragon3_io_w);
 	DECLARE_WRITE16_MEMBER(ddragon3_scroll_w);
@@ -69,9 +73,9 @@ public:
 	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_ddragon3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ctribe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_scanline);
@@ -103,7 +107,6 @@ public:
 
 	//required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE8_MEMBER(wwfwfest_priority_w);
-	DECLARE_WRITE16_MEMBER(wwfwfest_scroll_write);
 	DECLARE_WRITE16_MEMBER(wwfwfest_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(wwfwfest_flipscreen_w);
 	DECLARE_READ16_MEMBER(wwfwfest_paletteram_r);
@@ -114,7 +117,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw_c0_r);
 	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(wwfwfstb);
 	UINT32 screen_update_wwfwfest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

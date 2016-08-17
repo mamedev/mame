@@ -12,7 +12,7 @@
 #define __K033906_H__
 
 #include "emu.h"
-
+#include "video/voodoo.h"
 
 
 /***************************************************************************
@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 #define MCFG_K033906_VOODOO(_tag) \
-	k033906_device::set_voodoo_tag(*device, _tag);
+	k033906_device::set_voodoo_tag(*device, "^" _tag);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -35,7 +35,7 @@ public:
 	// construction/destruction
 	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_voodoo_tag(device_t &device, const char *tag) { downcast<k033906_device &>(device).m_voodoo_tag = tag; }
+	static void set_voodoo_tag(device_t &device, const char *tag) { downcast<k033906_device &>(device).m_voodoo.set_tag(tag); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -43,10 +43,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset() { }
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
+	virtual void device_start() override;
+	virtual void device_reset() override { }
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 
 private:
 
@@ -57,8 +57,7 @@ private:
 
 	int          m_reg_set; // 1 = access reg / 0 = access ram
 
-	const char   *m_voodoo_tag;
-	device_t     *m_voodoo;
+	required_device<voodoo_device> m_voodoo;
 
 	UINT32       m_reg[256];
 	UINT32       m_ram[32768];

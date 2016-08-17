@@ -29,20 +29,23 @@ public:
 	atari_vg_earom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 private:
-	int m_offset;
-	int m_data;
+	int m_old_ctrl;
+	int m_state;
+	int m_in_offset;
+	int m_in_data;
+	int m_out_data;
 	char m_rom[EAROM_SIZE];
 };
 

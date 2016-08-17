@@ -19,31 +19,32 @@ public:
 	e0c6200_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor program, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, 16, 13, -1, program)
-		, m_data_config("data", ENDIANNESS_BIG, 8, 12, 0, data)
+		, m_data_config("data", ENDIANNESS_BIG, 8, 12, 0, data), m_program(nullptr), m_data(nullptr), m_op(0), m_prev_op(0), m_irq_vector(0), m_irq_id(0), m_possible_irq(false), m_halt(false),
+		m_sleep(false), m_icount(0), m_pc(0), m_prev_pc(0), m_npc(0), m_jpc(0), m_a(0), m_b(0), m_xp(0), m_xh(0), m_xl(0), m_yp(0), m_yh(0), m_yl(0), m_sp(0), m_f(0)
 	{ }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 5; }
-	virtual UINT32 execute_max_cycles() const { return 14; } // longest opcode is 12 cycles, but interrupt service takes up to 14
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual void execute_run();
+	virtual UINT32 execute_min_cycles() const override { return 5; }
+	virtual UINT32 execute_max_cycles() const override { return 14; } // longest opcode is 12 cycles, but interrupt service takes up to 14
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual void execute_run() override;
 	virtual void execute_one();
 	virtual bool check_interrupt() { return false; } // nothing to do by default
 	virtual void do_interrupt();
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -71,26 +72,33 @@ protected:
 	UINT8 m_yp, m_yh, m_yl; // "
 	UINT8 m_sp;             // stackpointer (SPH, SPL)
 	UINT8 m_f;              // flags
+	enum
+	{
+		C_FLAG = 1,
+		Z_FLAG = 2,
+		D_FLAG = 4,
+		I_FLAG = 8
+	};
 
 	// internal data memory read/write
-	inline UINT8 read_mx();
-	inline UINT8 read_my();
-	inline UINT8 read_mn();
-	inline void write_mx(UINT8 data);
-	inline void write_my(UINT8 data);
-	inline void write_mn(UINT8 data);
+	UINT8 read_mx();
+	UINT8 read_my();
+	UINT8 read_mn();
+	void write_mx(UINT8 data);
+	void write_my(UINT8 data);
+	void write_mn(UINT8 data);
 
 	// common stack ops
-	inline void push(UINT8 data);
-	inline UINT8 pop();
-	inline void push_pc();
-	inline void pop_pc();
+	void push(UINT8 data);
+	UINT8 pop();
+	void push_pc();
+	void pop_pc();
 
 	// misc internal helpers
-	inline void set_cf(UINT8 data);
-	inline void set_zf(UINT8 data);
-	inline void inc_x();
-	inline void inc_y();
+	void set_cf(UINT8 data);
+	void set_zf(UINT8 data);
+	void inc_x();
+	void inc_y();
 	void do_branch(int condition = 1);
 
 	// opcode handlers

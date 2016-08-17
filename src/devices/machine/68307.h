@@ -109,21 +109,18 @@ public:
 	m68307_portb_write_delegate m_m68307_portb_w;
 
 	void init16_m68307(address_space &space);
-	void init_cpu_m68307(void);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
 
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 4; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
 	required_device<mc68681_device> m_duart;
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-
-private:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 static const device_type M68307 = &device_creator<m68307cpu_device>;

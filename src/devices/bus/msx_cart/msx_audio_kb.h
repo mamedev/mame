@@ -33,7 +33,7 @@ public:
 	msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// Physical connection simply consists of 8 input and 8 output lines split across 2 connectors
 	DECLARE_WRITE8_MEMBER(write);

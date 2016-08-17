@@ -3,6 +3,9 @@
 #ifndef __GBA_SLOT_H
 #define __GBA_SLOT_H
 
+#include "softlist_dev.h"
+
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -13,12 +16,19 @@ enum
 {
 	GBA_STD = 0,
 	GBA_SRAM,
+	GBA_DRILLDOZ,
+	GBA_WARIOTWS,
 	GBA_EEPROM,
 	GBA_EEPROM4,
+	GBA_YOSHIUG,
 	GBA_EEPROM64,
+	GBA_BOKTAI,
 	GBA_FLASH,
+	GBA_FLASH_RTC,
 	GBA_FLASH512,
-	GBA_FLASH1M
+	GBA_FLASH1M,
+	GBA_FLASH1M_RTC,
+	GBA_3DMATRIX
 };
 
 
@@ -34,13 +44,20 @@ public:
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_rom) { return 0xffffffff; }
 	virtual DECLARE_READ32_MEMBER(read_ram) { return 0xffffffff; }
+	virtual DECLARE_READ32_MEMBER(read_gpio) { return 0; }
+	virtual DECLARE_READ32_MEMBER(read_tilt) { return 0xffffffff; }
 	virtual DECLARE_WRITE32_MEMBER(write_ram) {};
+	virtual DECLARE_WRITE32_MEMBER(write_gpio) {};
+	virtual DECLARE_WRITE32_MEMBER(write_tilt) {};
+	virtual DECLARE_WRITE32_MEMBER(write_mapper) {};
 
 	void rom_alloc(UINT32 size, const char *tag);
 	void nvram_alloc(UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
+	UINT32* get_romhlp_base() { return m_romhlp; }
 	UINT32* get_nvram_base() { return &m_nvram[0]; }
 	UINT32 get_rom_size() { return m_rom_size; }
+	UINT32 get_romhlp_size() { return m_romhlp_size; }
 	UINT32 get_nvram_size() { return m_nvram.size()*sizeof(UINT32); }
 	void set_rom_size(UINT32 val) { m_rom_size = val; }
 
@@ -49,6 +66,8 @@ public:
 	// internal state
 	UINT32 *m_rom;  // this points to the cart rom region
 	UINT32 m_rom_size;  // this is the actual game size, not the rom region size!
+	UINT32 *m_romhlp;
+	UINT32 m_romhlp_size;
 	std::vector<UINT32> m_nvram;
 };
 
@@ -65,39 +84,43 @@ public:
 	virtual ~gba_cart_slot_device();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 
-	void setup_ram(UINT8 banks);
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
+	UINT32 get_rom_size()   { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-	virtual const char *image_interface() const { return "gba_cart"; }
-	virtual const char *file_extensions() const { return "gba,bin"; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const char *image_interface() const override { return "gba_cart"; }
+	virtual const char *file_extensions() const override { return "gba,bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_rom);
 	virtual DECLARE_READ32_MEMBER(read_ram);
+	virtual DECLARE_READ32_MEMBER(read_gpio);
+	virtual DECLARE_READ32_MEMBER(read_tilt) { if (m_cart) return m_cart->read_tilt(space, offset, mem_mask); else return 0xffffffff; }
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
+	virtual DECLARE_WRITE32_MEMBER(write_gpio);
+	virtual DECLARE_WRITE32_MEMBER(write_tilt) { if (m_cart) m_cart->write_tilt(space, offset, data, mem_mask); }
+	virtual DECLARE_WRITE32_MEMBER(write_mapper) { if (m_cart) m_cart->write_mapper(space, offset, data, mem_mask); }
 
 
 protected:
@@ -117,6 +140,7 @@ extern const device_type GBA_CART_SLOT;
  ***************************************************************************/
 
 #define GBASLOT_ROM_REGION_TAG ":cart:rom"
+#define GBAHELP_ROM_REGION_TAG ":cart:romhlp"
 
 #define MCFG_GBA_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, GBA_CART_SLOT, 0) \
@@ -185,12 +209,12 @@ static const gba_chip_fix_conflict_item gba_chip_fix_conflict_list[] =
 	{ "BYUJ", GBA_CHIP_EEPROM_64K }, // 2322 - Yggdra Union (JPN)
 };
 
-struct gba_chip_fix_eeprom_item
+struct gba_chip_fix_item
 {
 	char game_code[5];
 };
 
-static const gba_chip_fix_eeprom_item gba_chip_fix_eeprom_list[] =
+static const gba_chip_fix_item gba_chip_fix_eeprom_list[] =
 {
 	// gba scan no. 7
 	{ "AKTJ" }, // 0145 - Hello Kitty Collection - Miracle Fashion Maker (JPN)
@@ -579,5 +603,14 @@ static const gba_chip_fix_eeprom_item gba_chip_fix_eeprom_list[] =
 	{ "A9BP" }, // 0925 - Medabots - Rokusho Version (EUR)
 	{ "A3IJ" }, // bokura no taiyou - taiyou action rpg - kabunushi go-yuutai ban (japan) (demo)
 };
+
+static const gba_chip_fix_item gba_chip_fix_rumble_list[] =
+{
+	{ "KYGP" }, // Yoshi's Universal Gravitation (EUR)
+	{ "KYGE" }, // Yoshi - Topsy-Turvy (USA)
+	{ "KYGJ" }, // Yoshi no Banyuuinryoku (JPN)
+	{ "KHPJ" }  // Koro Koro Puzzle - Happy Panechu! (JPN)
+};
+
 
 #endif

@@ -67,6 +67,7 @@ public:
 	DECLARE_DRIVER_INIT(atlantol);
 	DECLARE_DRIVER_INIT(wizzquiz);
 	DECLARE_DRIVER_INIT(mastkin);
+	DECLARE_DRIVER_INIT(trackfldnz);
 
 	UINT8 m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };

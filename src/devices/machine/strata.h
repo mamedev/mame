@@ -19,13 +19,13 @@ public:
 
 protected:
 	// device-level overrides
-	void device_config_complete();
+	void device_config_complete() override;
 
-	void device_start();
+	void device_start() override;
 
-	void nvram_default();
-	void nvram_read(emu_file &file);
-	void nvram_write(emu_file &file);
+	void nvram_default() override;
+	void nvram_read(emu_file &file) override;
+	void nvram_write(emu_file &file) override;
 
 private:
 
@@ -64,7 +64,7 @@ private:
 	int         m_wrbuf_len;        // count converted into byte length in write buffer command
 	int         m_wrbuf_count;      // current count in write buffer command
 	UINT8*      m_wrbuf;            // write buffer used by write buffer command
-	UINT8*      m_flashmemory;      // main FEEPROM area
+	std::unique_ptr<UINT8[]>      m_flashmemory;      // main FEEPROM area
 	UINT8*      m_blocklock;        // block lock flags
 	UINT8*      m_prot_regs;        // protection registers
 };

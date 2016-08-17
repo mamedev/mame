@@ -9,6 +9,8 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
@@ -27,9 +29,6 @@ public:
 	// compare/timer chip callbacks
 	void timer_ack_callback();
 	void sound_data_w(UINT8 data);
-
-	// YM2151 chip callbacks
-	DECLARE_WRITE_LINE_MEMBER( sound_cpu_irq );
 
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( adc_r );
@@ -54,7 +53,7 @@ public:
 
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	// palette helpers
 	DECLARE_WRITE16_MEMBER( paletteram_w );
 
@@ -78,9 +77,9 @@ protected:
 	};
 
 	// device overrides
-//	virtual void machine_reset();
+//  virtual void machine_reset();
 	virtual void video_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal helpers
 	void update_main_irqs();
@@ -103,10 +102,13 @@ protected:
 	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_soundcpu2;
 	optional_device<i8751_device> m_mcu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_shared_ptr<UINT16> m_subram0;
 
 	// configuration
 	bool            m_adc_reverse[8];
@@ -136,25 +138,12 @@ protected:
 	UINT8       m_palette_hilight[32];      // RGB translations for hilighted pixels
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	UINT16                  m_latched_value[4];
-	UINT8                   m_latch_read[4];
-
-	UINT32 soundlatch_read(UINT8 index = 0) { m_latch_read[index] = 1; return m_latched_value[index]; };
-	void soundlatch_write(UINT8 index, UINT32 data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(segaxbd_state::soundlatch_sync_callback), this), index | (data << 8)); };
-	void soundlatch_write(UINT32 data) { soundlatch_write(0, data); }
-
-	void soundlatch_sync_callback(void *ptr, INT32 param)
-	{
-		UINT16 value = param >> 8;
-		int which = param & 0xff;
-		m_latched_value[which] = value;
-		m_latch_read[which] = 0;
-	};
+	optional_ioport_array<8> m_adc_ports;
+	optional_ioport_array<4> m_mux_ports;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -164,7 +153,7 @@ public:
 	segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
@@ -177,7 +166,7 @@ public:
 	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
@@ -188,10 +177,22 @@ public:
 	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
+
+class segaxbd_lastsurv_state :  public segaxbd_state
+{
+public:
+	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
 
 class segaxbd_smgp_fd1094_state :  public segaxbd_state
 {
@@ -199,10 +200,23 @@ public:
 	segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
+
+
+class segaxbd_smgp_state :  public segaxbd_state
+{
+public:
+	segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
 
 class segaxbd_rascot_state :  public segaxbd_state
 {
@@ -210,9 +224,7 @@ public:
 	segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
-
-

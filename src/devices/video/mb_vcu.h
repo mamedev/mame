@@ -42,10 +42,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 private:
 	inline UINT8 read_byte(offs_t address);
 	inline void write_byte(offs_t address, UINT8 data);
@@ -55,8 +55,8 @@ private:
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_paletteram_space_config;
 	UINT8 m_status;
-	UINT8 *m_ram;
-	UINT8 *m_palram;
+	std::unique_ptr<UINT8[]> m_ram;
+	std::unique_ptr<UINT8[]> m_palram;
 	UINT16 m_param_offset_latch;
 
 	INT16 m_xpos, m_ypos;

@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 
-NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+NOTE: This list is here only to document available dumps and it's not used (yet) by MAME
 
 Known as V.Flash in the USA, V.Smile Pro elsewhere
 
@@ -73,35 +73,23 @@ Language:
 
 
 -->
-<softwarelist name="vsmile_cd" description="VTech V.Flash/V.Smile Pro V.Disc images">
-	<!-- disk mounted as 93020 -->
-	<software name="incredib">
-		<description>The Incredibles - Mission Incredible (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093020" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093020"  sha1="84ba80f67d136cd742989dceebda1c8881d0f393"/>
-			</diskarea>
-		</part>
-	</software>
 
-	<!-- disk mounted as 93080_001 -->
-	<software name="scoobyaa">
-		<description>Scooby-Doo! Ancient Adventure (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093080" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093080"  sha1="3ec7e1ac4435666c3cc1b1844eac5f271b5357e8"/>
-			</diskarea>
-		</part>
-	</software>
+
+<!-- CloneCD images are not fully supported by CHDMAN, thus the following US images might need to be recreated at a later stage from the original disks -->
+
+
+<softwarelist name="vsmile_cd" description="VTech V.Flash/V.Smile Pro V.Disc images">
+
 
 	<!-- disk mounted as 93060_001 -->
-	<software name="spidey93">
+	<software name="spidermn" supported="no">
+		<!--
+		 Original files: unsure, maybe the following
+		 <rom name="amazing spider-man, the - countdown to doom (us).ccd" size="754" crc="b1e32fe8" sha1="b22bb98ca6e0e51d5056b27491ef91364a5d3611" />
+		 <rom name="amazing spider-man, the - countdown to doom (us).cue" size="967" crc="db64a43d" sha1="9bf0f640933d63b7971cb45f34bb34b5b5e88c4f" />
+		 <rom name="amazing spider-man, the - countdown to doom (us).img" size="377178480" crc="8b81146a" sha1="eb1627908b34bedfab60d61088d5ff67069ffb48" />
+		 <rom name="amazing spider-man, the - countdown to doom (us).sub" size="15395040" crc="cdece136" sha1="0d03f2a97d5d92079525a940630a7affc5e60a10" />
+		 -->
 		<description>The Amazing Spider-Man - Countdown to Doom (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -113,8 +101,264 @@ Language:
 		</part>
 	</software>
 
+	<software name="spidermng" cloneof="spidermn" supported="no">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93064_000.bin" size="378956592" crc="5039f062" sha1="80a0ae321273a4b7190ba79854b21fdfb96b75f4" />
+		<rom name="93064_000.cue" size="75" crc="625117d5" sha1="bf84b7e572d27fffa7b32a760a02fb3a1718832d" />
+		-->
+		<description>Spider-Man - Angriff der Super-Schurken (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093064" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="93064_000"  sha1="b0455f89a4ca9abd0351b7307a9b0702cc1344c3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bratz" supported="no">
+		<!--
+		 Original files:
+		 <rom name="bratz - fashion pixiez - the secret necklace (us).ccd" size="754" crc="97d7a3bf" sha1="6ddf210341cde9c0944e4cc3b04681d78e9db24f" />
+		 <rom name="bratz - fashion pixiez - the secret necklace (us).cue" size="968" crc="44b2cdec" sha1="26b413156226b0f089e4a79ccd43b7886d1b9fc1" />
+		 <rom name="bratz - fashion pixiez - the secret necklace (us).img" size="559354992" crc="46e8e1fd" sha1="d63b998729e990ceb7f1fa3842fd1c9e58f57bbe" />
+		 <rom name="bratz - fashion pixiez - the secret necklace (us).sub" size="22830816" crc="d003eb3b" sha1="7851b0b7c47fee6af38420439eecc91d0f0237db" />
+		 -->
+		<description>Bratz - Fashion Pixiez - The Secret Necklace (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="bratz - fashion pixiez - the secret necklace (us)"  sha1="3e7de8679810e35ae2d449aaef9117639c268d16"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cars" supported="no">
+		<!--
+		 Original files:
+		 <rom name="disney - pixar cars - in the fast lane (us).ccd" size="754" crc="741b37b3" sha1="f63cd8f1da67beec1decbf3983f0ecc1de8af95d" />
+		 <rom name="disney - pixar cars - in the fast lane (us).cue" size="962" crc="f9383e9e" sha1="a5cffb68bc0177828f5a3d9b3158739450f2baa3" />
+		 <rom name="disney - pixar cars - in the fast lane (us).img" size="506249184" crc="33b3b437" sha1="b7522abe11f1dab3e5adc56ae4cdc2c9f9957a3a" />
+		 <rom name="disney - pixar cars - in the fast lane (us).sub" size="20663232" crc="450daa44" sha1="c96a38c5a4cc8d1cad4c3a1f0d33cc68c3f0ad08" />
+		 -->
+		<description>Disney Pixar Cars - In the Fast Lane (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="disney - pixar cars - in the fast lane (us)"  sha1="b90f3a4752d3326639ba95c1c38fd7ac161e9a1a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="carsg" cloneof="cars" supported="no">
+		<!--
+		 Original files (from TeamEurope)
+		 <rom name="93104_000.bin" size="562353792" crc="e487ef85" sha1="2794bb37d03435c1318ee632d067d64aaecbbebf" />
+		 <rom name="93104_000.cue" size="75" crc="80141b8e" sha1="c2c1e974ee5e063ff320034a7ea82da346f303a9" />
+		 -->
+		<description>Cars - Auf der Überholspur (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093104" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093104_000"  sha1="7347c93144f06648973a60f0fef74c74db69ddf9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="princess" supported="no">
+		<!--
+		 Original files:
+		 <rom name="disney princess - the crystal ball adventure (us).ccd" size="754" crc="889c3811" sha1="64372e79d6c85a8987b5d05ddfee336c720e8c09" />
+		 <rom name="disney princess - the crystal ball adventure (us).cue" size="968" crc="c3c53542" sha1="24d7abd039a3f2e812c7bbea3b9b93335767178f" />
+		 <rom name="disney princess - the crystal ball adventure (us).img" size="470098944" crc="49f568d1" sha1="b5dd0d446da323db37b671a06d14ba4d6a900ea7" />
+		 <rom name="disney princess - the crystal ball adventure (us).sub" size="19187712" crc="fa6c622c" sha1="1d2ee95a8a4ce659dc35af363da42f26e24f22fa" />
+		 -->
+		<description>Disney Princess - The Crystal Ball Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="disney princess - the crystal ball adventure (us)"  sha1="c4e6c5a24cda03c721577ccb4f304932ed7486c6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="princessg" cloneof="princess" supported="no">
+		<!--
+		 Original files (from TeamEurope)
+		 <rom name="93004.bin" size="467570544" crc="f919071f" sha1="d50f91fb7c79b8851cb3b6fbb80b66d78def511e" />
+		 <rom name="93004.cue" size="71" crc="0af679dd" sha1="7e7e773aac1f9f8d2102cacbe5367340ac5198ba" />
+		 -->
+		<description>Disney Princess - Das zauberhafte Märchen-Abenteuer (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093004" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="93004"  sha1="62d5ed13ddf7ccb2b32613e4ef44399957535355"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- disk mounted as 93020 -->
+	<software name="incredib" supported="no">
+		<!--
+		 Original files: unsure, maybe the following
+		 <rom name="incredibles, the - mission incredible (us).ccd" size="754" crc="e2868c5d" sha1="e6fcb78b07de68e555a8bf972c11dbfd878970a2" />
+		 <rom name="incredibles, the - mission incredible (us).cue" size="961" crc="aadbe385" sha1="c2673c402d9d22aea16be45ff333e94501ba7314" />
+		 <rom name="incredibles, the - mission incredible (us).img" size="358705872" crc="8fffffeb" sha1="859bab005788a5c23bb7c40c0e729eed04da6750" />
+		 <rom name="incredibles, the - mission incredible (us).sub" size="14641056" crc="3b26b5f3" sha1="d771cd5fa8326bb65c67ef466b906d637cda4323" />
+		 -->
+		<description>The Incredibles - Mission Incredible (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093020" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093020"  sha1="84ba80f67d136cd742989dceebda1c8881d0f393"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="incredibg" cloneof="incredib" supported="no">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93024.bin" size="365481984" crc="4ac35678" sha1="6745971dab69942f85d32a4e1484b9d79c2163ee" />
+		<rom name="93024.cue" size="71" crc="bdb0bf7c" sha1="c88846f050ef65c9e8655e7d47c07f3f11a9c493" />
+		-->
+		<description>Die Unglaublichen - In unglaublicher Mission (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093024" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="93024"  sha1="09b80c8899a3c18776626225d662d7f084a44d2d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msportg" supported="no">
+		<!--
+		 Original files (from TeamEurope)
+		 <rom name="93204_000.bin" size="295248912" crc="fd73e33a" sha1="091567e473d996182c5157f2f34b729f2bc7dcff" />
+		 <rom name="93204_000.cue" size="75" crc="cca73127" sha1="faf73ec0967f7811a58293e7eac8c29e52ca06e4" />
+		 -->
+		<description>Multisports (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093204" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093204_000"  sha1="eb89c8b5cacb619c1fbcb700b971ad2791f1c5b6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- disk mounted as 93080_001 -->
+	<software name="scooby" supported="no">
+		<!--
+		 Original files: unsure, maybe the following
+		 <rom name="scooby-doo! ancient adventure (us).ccd" size="753" crc="1a45cfda" sha1="1c2a5593dc64656cedeb0851db829242e37b93f0" />
+		 <rom name="scooby-doo! ancient adventure (us).cue" size="953" crc="05956f43" sha1="5b31fb89130c1489c3f009c9c4293ac7dce56026" />
+		 <rom name="scooby-doo! ancient adventure (us).img" size="638582112" crc="d6d3c531" sha1="24e753c394d8a6d9aed462be4c0c2b41dd6e79e6" />
+		 <rom name="scooby-doo! ancient adventure (us).sub" size="26064576" crc="72632c94" sha1="36fb895c8e8a224f028788e5f5e86f39562a7b2c" />
+		 -->
+		<description>Scooby-Doo! Ancient Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093080" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093080"  sha1="3ec7e1ac4435666c3cc1b1844eac5f271b5357e8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shrek3" supported="no">
+		<!--
+		 Original files:
+		 <rom name="shrek the third - the search for arthur (us).ccd" size="753" crc="89fd984d" sha1="15decf11c48c4e13ac9d9b2219977f38cdf1b09b" />
+		 <rom name="shrek the third - the search for arthur (us).cue" size="963" crc="ac930eb5" sha1="1e3d7f9fe17223c94c159d2ae33bd3c913b976fb" />
+		 <rom name="shrek the third - the search for arthur (us).img" size="614031936" crc="6c27be68" sha1="e671b64b248cbe976a131c6e5bc229d26f0c60c6" />
+		 <rom name="shrek the third - the search for arthur (us).sub" size="25062528" crc="6da65891" sha1="25dac0246d8f0b87b6b9402125bc339d5365f0b6" />
+		 -->
+		<description>Shrek the Third - The Search for Arthur (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="shrek the third - the search for arthur (us)"  sha1="be3d6ed22526dbbfc7cc781c8d6f1443d62560ad"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shrek3g" cloneof="shrek3" supported="no">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93144_000.bin" size="623663376" crc="968ff493" sha1="28c486e6b5b9c6e4e79aa3151be82534f0f1245f" />
+		<rom name="93144_000.cue" size="75" crc="7cc3a9b3" sha1="3741a362931c0aa19b110490fd368c862fdc334f" />
+		-->
+		<description>Shrek Der Dritte - Die Suche nach Arthus (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093144" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093144_000"  sha1="ab7f8d57e235a12c23cc2e72dc263530d0deb016" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="spongeis" supported="no">
+		<!--
+		 Original files:
+		 <rom name="spongebob squarepants - idea sponge (us).ccd" size="754" crc="51c96a38" sha1="bbd5f937a3a358d0db724492d265018911cc05ad" />
+		 <rom name="spongebob squarepants - idea sponge (us).cue" size="959" crc="065b5760" sha1="8c2dced3caa84c264194806f501ed4788bf772b0" />
+		 <rom name="spongebob squarepants - idea sponge (us).img" size="373038960" crc="f3dcd059" sha1="bc70d3a4017b6282bea065e4ed8a05c601471069" />
+		 <rom name="spongebob squarepants - idea sponge (us).sub" size="15226080" crc="f8ef603f" sha1="84515fb53c4de9a0072dc051d365b1cbc1065b0f" />
+		 -->
+		<description>SpongeBob Squarepants - Idea Sponge (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="spongebob squarepants - idea sponge (us)"  sha1="2ede68aa9df7712a1060e8f3b1be3307c38abd80"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hupfbohn" supported="no">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93124_000.bin" size="457901472" crc="92a0ebe0" sha1="a3a8e54d5f12094bfc0c89954987cc793d83d3f9" />
+		<rom name="93124_000.cue" size="75" crc="13c741b0" sha1="7a5b6a928922cee744fc579a7f8a785c0537a5ac" />
+		-->
+		<description>Das verrückte Rennen der Hüpf-Bohnel Insel (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093124" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="93124_000"  sha1="90b2723c68da81de677b82d565c7e0364a7cbb53"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- disk mounted as 93120_003 -->
-	<software name="wacky931">
+	<software name="wackyrac" supported="no">
+		<!--
+		 Original files: unsure, maybe the following
+		 <rom name="wacky race on jumpin' bean island (console 80-70010) (us).ccd" size="754" crc="d6a6247e" sha1="86ff6701988f4f163816d80f9094a61fda61290e" />
+		 <rom name="wacky race on jumpin' bean island (console 80-70010) (us).cue" size="976" crc="d8310d43" sha1="2e9caa99f4e5a861edd060b1e180a4dab4ace171" />
+		 <rom name="wacky race on jumpin' bean island (console 80-70010) (us).img" size="394752624" crc="6af8435e" sha1="b643d8fd3f0f46459d2313e2c256bc6b5f33fd54" />
+		 <rom name="wacky race on jumpin' bean island (console 80-70010) (us).sub" size="16112352" crc="f2f1b667" sha1="d4321d7d6ed2c4bae699d1e06752c893dac0af1c" />
+		 -->
 		<description>Wacky Race on Jumpin' Bean Island (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -126,40 +370,5 @@ Language:
 		</part>
 	</software>
 
-	<software name="carsg">
-		<description>Cars - Auf der Überholspur (Ger)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093104" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093104" sha1="3b627613a40e22028902e1569099bc67a5ed97be" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="shrekg">
-		<description>Shrek - Der Dritte (Ger)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093144" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093144" sha1="4d5b671f26a8ed4ab58444848428210c44b81c45" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="msportg">
-		<description>Multisports (Ger)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093204" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093204" sha1="ddabd616d8d00bd02c6313a524a2dcef299362b3" />
-			</diskarea>
-		</part>
-	</software>
 
 </softwarelist>

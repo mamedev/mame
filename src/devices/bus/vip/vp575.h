@@ -38,7 +38,7 @@ public:
 	vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( exp1_int_w ) { m_int[0] = state; update_interrupts(); }
@@ -63,22 +63,22 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh);
-	virtual UINT8 vip_io_r(address_space &space, offs_t offset);
-	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT8 vip_dma_r(address_space &space, offs_t offset);
-	virtual void vip_dma_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual int vip_ef1_r();
-	virtual int vip_ef3_r();
-	virtual int vip_ef4_r();
-	virtual void vip_sc_w(int data);
-	virtual void vip_q_w(int state);
-	virtual void vip_run_w(int state);
+	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
+	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh) override;
+	virtual UINT8 vip_io_r(address_space &space, offs_t offset) override;
+	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual UINT8 vip_dma_r(address_space &space, offs_t offset) override;
+	virtual void vip_dma_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual int vip_ef1_r() override;
+	virtual int vip_ef3_r() override;
+	virtual int vip_ef4_r() override;
+	virtual void vip_sc_w(int data) override;
+	virtual void vip_q_w(int state) override;
+	virtual void vip_run_w(int state) override;
 
 private:
 	vip_expansion_slot_device *m_expansion_slot[MAX_SLOTS];

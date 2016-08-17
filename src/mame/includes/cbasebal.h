@@ -22,8 +22,9 @@ public:
 	/* video-related */
 	tilemap_t    *m_fg_tilemap;
 	tilemap_t    *m_bg_tilemap;
-	UINT8      *m_textram;
-	UINT8      *m_scrollram;
+	std::unique_ptr<UINT8[]>    m_textram;
+	std::unique_ptr<UINT8[]>      m_scrollram;
+	std::unique_ptr<UINT8[]>    m_decoded;
 	UINT8      m_scroll_x[2];
 	UINT8      m_scroll_y[2];
 	int        m_tilebank;
@@ -49,9 +50,9 @@ public:
 	DECLARE_DRIVER_INIT(cbasebal);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cbasebal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

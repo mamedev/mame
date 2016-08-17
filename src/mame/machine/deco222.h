@@ -14,11 +14,11 @@ protected:
 		bool had_written;
 
 		virtual ~mi_decrypt() {}
-		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr) override;
 	};
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 };
 
@@ -36,11 +36,11 @@ protected:
 		bool had_written;
 
 		virtual ~mi_decrypt() {}
-		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr) override;
 	};
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 };
 

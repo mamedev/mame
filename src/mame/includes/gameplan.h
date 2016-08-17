@@ -10,6 +10,7 @@ driver by Chris Moore
 
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
+#include "machine/gen_latch.h"
 
 #define GAMEPLAN_MAIN_MASTER_CLOCK       (XTAL_3_579545MHz)
 #define GAMEPLAN_AUDIO_MASTER_CLOCK      (XTAL_3_579545MHz)
@@ -43,14 +44,15 @@ public:
 			m_via_0(*this, "via6522_0"),
 			m_via_1(*this, "via6522_1"),
 			m_via_2(*this, "via6522_2"),
-			m_screen(*this, "screen") { }
+			m_screen(*this, "screen"),
+			m_soundlatch(*this, "soundlatch") { }
 
 	/* machine state */
 	UINT8   m_current_port;
 	optional_shared_ptr<UINT8> m_trvquest_question;
 
 	/* video state */
-	UINT8   *m_videoram;
+	std::unique_ptr<UINT8[]>   m_videoram;
 	size_t   m_videoram_size;
 	UINT8    m_video_x;
 	UINT8    m_video_y;
@@ -66,6 +68,9 @@ public:
 	required_device<via6522_device> m_via_1;
 	required_device<via6522_device> m_via_2;
 	required_device<screen_device> m_screen;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+
 	DECLARE_WRITE8_MEMBER(io_select_w);
 	DECLARE_READ8_MEMBER(io_port_r);
 	DECLARE_WRITE_LINE_MEMBER(coin_w);
@@ -102,7 +107,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in video/gameplan.c -----------*/

@@ -1273,6 +1273,11 @@ inline void emit_op(x86code *&emitptr, UINT32 op, UINT8 opsize, UINT8 reg, UINT8
 	if (opsize == OP_16BIT)
 		emit_byte(emitptr, PREFIX_OPSIZE);
 
+	bool has_prefix = (op & 0xff0000) == 0x660000 || (op & 0xff0000) == 0xf20000 || (op & 0xff0000) == 0xf30000;
+
+	if (has_prefix)
+		emit_byte(emitptr, op >> 16);
+
 #if (X86EMIT_SIZE == 64)
 {
 	UINT8 rex;
@@ -1287,7 +1292,7 @@ inline void emit_op(x86code *&emitptr, UINT32 op, UINT8 opsize, UINT8 reg, UINT8
 	assert(opsize != OP_64BIT);
 #endif
 
-	if ((op & 0xff0000) != 0)
+	if ((op & 0xff0000) != 0 && !has_prefix)
 		emit_byte(emitptr, op >> 16);
 	if ((op & 0xff00) != 0)
 		emit_byte(emitptr, op >> 8);
@@ -2943,6 +2948,10 @@ inline void emit_movq_m64_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg)
 
 #endif
 
+inline void emit_movdqa_r128_m128(x86code *&emitptr, UINT8 dreg, x86_memref memref) { emit_op_modrm_mem(emitptr, OP_MOVDQA_Vdq_Wdq, OP_32BIT, dreg, memref); }
+inline void emit_movdqa_m128_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg) { emit_op_modrm_mem(emitptr, OP_MOVDQA_Wdq_Vdq, OP_32BIT, sreg, memref); }
+inline void emit_movdqu_r128_m128(x86code *&emitptr, UINT8 dreg, x86_memref memref) { emit_op_modrm_mem(emitptr, OP_MOVDQU_Vdq_Wdq, OP_32BIT, dreg, memref); }
+inline void emit_movdqu_m128_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg) { emit_op_modrm_mem(emitptr, OP_MOVDQU_Wdq_Vdq, OP_32BIT, sreg, memref); }
 
 
 //**************************************************************************

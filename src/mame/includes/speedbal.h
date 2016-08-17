@@ -28,8 +28,8 @@ public:
 
 	DECLARE_DRIVER_INIT(speedbal);
 	DECLARE_DRIVER_INIT(musicbal);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(foreground_videoram_w);

@@ -1,5 +1,5 @@
 The template family tree is an attempt to ease the pain to write CPUs/drivers/devices
-from scratch (especially for smaller projects).
+from scratch (useful especially for smaller targets).
 
 ===
 Usage:
@@ -38,3 +38,6 @@ TODO:
 - Write template drivers for different endianesses;
 - Write template header for drivers;
 - Write tool program that auto-generate contents;
+- Fix SCREEN_RAW_PARAMS, perhaps actually link to a framework class/macro list, a couple of references are:
+ http://www.ntsc-tv.com/ntsc-index-02.htm
+ http://www.intersil.com/content/dam/Intersil/documents/tb36/tb368.pdf

@@ -26,9 +26,9 @@ public:
 	DECLARE_READ8_MEMBER(runaway_pot_r);
 	TILE_GET_INFO_MEMBER(runaway_get_tile_info);
 	TILE_GET_INFO_MEMBER(qwak_get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(qwak);
 	UINT32 screen_update_runaway(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_qwak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

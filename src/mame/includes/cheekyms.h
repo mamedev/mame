@@ -35,7 +35,7 @@ public:
 
 	/* video-related */
 	tilemap_t        *m_cm_tilemap;
-	bitmap_ind16       *m_bitmap_buffer;
+	std::unique_ptr<bitmap_ind16>       m_bitmap_buffer;
 
 	UINT8          m_irq_mask;
 
@@ -47,8 +47,8 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cheekyms);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

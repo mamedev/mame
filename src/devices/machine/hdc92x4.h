@@ -115,8 +115,8 @@ public:
 	void connect_hard_drive(mfm_harddisk_device *harddisk);
 
 protected:
-	void device_start();
-	void device_reset();
+	void device_start() override;
+	void device_reset() override;
 
 	bool m_is_hdc9234;
 
@@ -173,7 +173,7 @@ protected:
 	// emu_timer *m_live_timer;
 
 	// Timer callback
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// Handlers for incoming signals
 	void ready_handler();
@@ -231,6 +231,9 @@ protected:
 
 	live_info m_live_state, m_checkpoint_state;
 	int m_last_live_state;
+
+	// Presets CRC.
+	void preset_crc(live_info& live, int value);
 
 	// Starts the live run
 	void live_start(int state);
@@ -378,6 +381,9 @@ protected:
 	// Read/write logical or physical?
 	bool m_logical;
 
+	// Shall bad sectors be bypassed or shall the command be terminated in error?
+	bool m_bypass;
+
 	// Signals to abort writing
 	bool m_stopwrite;
 
@@ -433,16 +439,25 @@ protected:
 	UINT8 current_command();
 
 	// Step time (minus pulse width)
-	int step_time();
+	virtual int step_time() =0;
 
 	// Step pulse width
 	int pulse_width();
 
-	// Sector size as read from the track
-	int calc_sector_size();
+	// Sector size as read from the track or given by register A (PC-AT mode)
+	int sector_size();
+
+	// Returns the sector header length
+	virtual int header_length() =0;
+
+	// Returns the index of the register for the header field
+	int register_number(int slot);
 
 	// Is the currently selected drive a floppy drive?
 	bool using_floppy();
+
+	// Was the Bad Sector flag set for the recently read sector header?
+	bool bad_sector();
 
 	// Common subprograms READ ID, VERIFY, and DATA TRANSFER
 	void read_id(int& cont, bool implied_seek, bool wait_seek_complete);
@@ -476,12 +491,20 @@ class hdc9224_device : public hdc92x4_device
 {
 public:
 	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	int step_time() override;
+	int header_length() override;
 };
 
 class hdc9234_device : public hdc92x4_device
 {
 public:
 	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	int step_time() override;
+	int header_length() override;
 };
 
 #endif

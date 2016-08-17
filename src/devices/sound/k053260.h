@@ -22,7 +22,7 @@
 	MCFG_DEVICE_REPLACE(_tag, K053260, _clock)
 
 #define MCFG_K053260_REGION(_tag) \
-	k053260_device::set_region_tag(*device, _tag);
+	k053260_device::set_region_tag(*device, "^" _tag);
 
 
 //**************************************************************************
@@ -38,7 +38,7 @@ public:
 	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k053260_device() { }
 
-	static void set_region_tag(device_t &device, const char *tag) { downcast<k053260_device &>(device).m_rgnoverride = tag; }
+	static void set_region_tag(device_t &device, const char *tag) { downcast<k053260_device &>(device).m_rom.set_tag(tag); }
 
 	DECLARE_READ8_MEMBER( main_read );
 	DECLARE_WRITE8_MEMBER( main_write );
@@ -47,19 +47,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// configuration
-	const char *    m_rgnoverride;
-
 	sound_stream *  m_stream;
-	UINT8 *         m_rom;
-	UINT32          m_rom_size;
+	required_region_ptr<UINT8> m_rom;
 
 	// live state
 	UINT8           m_portdata[4];
@@ -70,6 +67,10 @@ private:
 	class KDSC_Voice
 	{
 	public:
+		KDSC_Voice() : m_device(nullptr), m_position(0), m_counter(0), m_output(0), m_playing(false), m_start(0), m_length(0), m_pitch(0), m_volume(0), m_pan(0), m_loop(false), m_kadpcm(false)
+		{
+		}
+
 		inline void voice_start(k053260_device &device, int index);
 		inline void voice_reset();
 		inline void set_register(offs_t offset, UINT8 data);

@@ -22,6 +22,7 @@
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "formats/afs_dsk.h"
 
 class e01_device : public device_t,
 	public device_econet_interface
@@ -37,6 +38,8 @@ public:
 		TYPE_E01S
 	};
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats_afs);
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( ram_select_r );
@@ -47,7 +50,6 @@ public:
 	DECLARE_WRITE8_MEMBER( network_irq_enable_w );
 	DECLARE_READ8_MEMBER( hdc_data_r );
 	DECLARE_WRITE8_MEMBER( hdc_data_w );
-	DECLARE_READ8_MEMBER( hdc_status_r );
 	DECLARE_WRITE8_MEMBER( hdc_select_w );
 	DECLARE_WRITE8_MEMBER( hdc_irq_enable_w );
 	DECLARE_READ8_MEMBER( rtc_address_r );
@@ -66,18 +68,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_econet_interface overrides
-	virtual void econet_data(int state);
-	virtual void econet_clk(int state);
+	virtual void econet_data(int state) override;
+	virtual void econet_clk(int state) override;
 
 	required_device<m65c02_device> m_maincpu;
 	required_device<wd2793_t> m_fdc;

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_PROCESS_H_HEADER_GUARD
@@ -9,16 +9,16 @@
 #include "string.h"
 #include "uint32_t.h"
 
-#if BX_PLATFORM_LINUX
+#if BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 #	include <unistd.h>
-#endif // BX_PLATFORM_LINUX
+#endif // BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 
 namespace bx
 {
 	///
 	inline void* exec(const char* const* _argv)
 	{
-#if BX_PLATFORM_LINUX
+#if BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 		pid_t pid = fork();
 
 		if (0 == pid)
@@ -72,7 +72,7 @@ namespace bx
 		return NULL;
 #else
 		return NULL;
-#endif // BX_PLATFORM_LINUX
+#endif // BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 	}
 
 } // namespace bx

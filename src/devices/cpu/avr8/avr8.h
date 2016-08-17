@@ -20,20 +20,20 @@
       - Fixed V and C flags in SBIW opcode
 
       30 Oct. 2012
-      - Added FMUL, FMULS, FMULSU opcodes [MooglyGuy]
-      - Fixed incorrect flag calculation in ROR opcode [MooglyGuy]
-      - Fixed incorrect bit testing in SBIC/SBIS opcodes [MooglyGuy]
+      - Added FMUL, FMULS, FMULSU opcodes [Ryan Holtz]
+      - Fixed incorrect flag calculation in ROR opcode [Ryan Holtz]
+      - Fixed incorrect bit testing in SBIC/SBIS opcodes [Ryan Holtz]
 
       25 Oct. 2012
-      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [MooglyGuy]
-      - Corrected cycle counts for LD and ST opcodes [MooglyGuy]
+      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [Ryan Holtz]
+      - Corrected cycle counts for LD and ST opcodes [Ryan Holtz]
       - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
-        all subsequent 1-cycle opcodes to be 2 or 3 cycles [MooglyGuy]
-      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [MooglyGuy]
+        all subsequent 1-cycle opcodes to be 2 or 3 cycles [Ryan Holtz]
+      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [Ryan Holtz]
 
       18 Oct. 2012
-      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [MooglyGuy]
-      - Fixed COM, NEG, LSR opcodes [MooglyGuy]
+      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [Ryan Holtz]
+      - Fixed COM, NEG, LSR opcodes [Ryan Holtz]
 
 */
 
@@ -64,7 +64,7 @@
 //**************************************************************************
 
 #define MCFG_CPU_AVR8_EEPROM(_tag) \
-	avr8_device::set_eeprom_tag(*device, _tag);
+	avr8_device::set_eeprom_tag(*device, "^" _tag);
 
 
 //**************************************************************************
@@ -79,11 +79,8 @@ class avr8_device;
 class avr8_device : public cpu_device
 {
 public:
-	// construction/destruction
-	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask);
-
 	// inline configuration helpers
-	static void set_eeprom_tag(device_t &device, const char *tag) { downcast<avr8_device &>(device).m_eeprom_tag = tag; }
+	static void set_eeprom_tag(device_t &device, const char *tag) { downcast<avr8_device &>(device).m_eeprom.set_tag(tag); }
 
 	// fuse configs
 	void set_low_fuses(UINT8 byte);
@@ -115,33 +112,32 @@ protected:
 	avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// address spaces
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 	const address_space_config m_io_config;
-	const char *m_eeprom_tag;
-	UINT8 *m_eeprom;
+	required_region_ptr<UINT8> m_eeprom;
 
 	// bootloader
 	UINT16 m_boot_size;
@@ -188,13 +184,6 @@ protected:
 	UINT64 m_elapsed_cycles;
 
 	// memory access
-	inline UINT8 program_read8(UINT32 addr);
-	inline UINT16 program_read16(UINT32 addr);
-	inline void program_write8(UINT32 addr, UINT8 data);
-	inline void program_write16(UINT32 addr, UINT16 data);
-	inline UINT8 io_read8(UINT16 addr);
-	inline void io_write8(UINT16 addr, UINT8 data);
-	inline UINT16 opcode_read();
 	inline void push(UINT8 val);
 	inline UINT8 pop();
 	inline bool is_long_opcode(UINT16 op);
@@ -204,7 +193,6 @@ protected:
 
 	// interrupts
 	void set_irq_line(UINT16 vector, int state);
-	void update_interrupt_internal(int source);
 
 	// timers
 	void timer_tick(int cycles);
@@ -285,7 +273,7 @@ public:
 	// construction/destruction
 	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void update_interrupt(int source);
+	virtual void update_interrupt(int source) override;
 };
 
 // ======================> atmega1280_device
@@ -296,7 +284,7 @@ public:
 	// construction/destruction
 	atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void update_interrupt(int source);
+	virtual void update_interrupt(int source) override;
 };
 
 // ======================> atmega2560_device
@@ -307,7 +295,7 @@ public:
 	// construction/destruction
 	atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void update_interrupt(int source);
+	virtual void update_interrupt(int source) override;
 };
 
 /***************************************************************************

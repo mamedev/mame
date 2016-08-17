@@ -53,7 +53,7 @@ public:
 	a1bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_a1bus_slot(device_t &device, const char *tag, const char *slottag);
@@ -87,15 +87,15 @@ public:
 	void set_nmi_line(int state);
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal state
 	cpu_device   *m_maincpu;
@@ -132,7 +132,7 @@ public:
 	void lower_slot_nmi() { m_a1bus->set_nmi_line(CLEAR_LINE); }
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, char *tag, UINT8 *data);
 
 	// inline configuration
 	static void static_set_a1bus_tag(device_t &device, const char *tag, const char *slottag);

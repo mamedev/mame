@@ -84,10 +84,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	DECLARE_READ16_MEMBER( rf5c400_r );
@@ -109,6 +109,9 @@ private:
 	double m_env_rr_table[0x9f];
 
 	rf5c400_channel m_channels[32];
+
+	UINT32 m_ext_mem_address;
+	UINT16 m_ext_mem_data;
 };
 
 extern const device_type RF5C400;

@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Downsample Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture DiffuseTexture;
@@ -31,7 +35,7 @@ struct VS_OUTPUT
 
 struct VS_INPUT
 {
-	float3 Position : POSITION;
+	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
 };
@@ -48,45 +52,35 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-uniform float2 TargetSize;
+uniform float2 TargetDims;
+uniform float2 QuadDims;
 
-uniform float2 Prescale = float2(8.0f, 8.0f);
-
-uniform float BloomRescale;
-
-uniform bool PrepareVector = false;
+static const float2 Coord0Offset = float2(-0.5f, -0.5f);
+static const float2 Coord1Offset = float2( 0.5f, -0.5f);
+static const float2 Coord2Offset = float2(-0.5f,  0.5f);
+static const float2 Coord3Offset = float2( 0.5f,  0.5f);
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 TargetTexelSize = 1.0f / TargetSize;
+	float2 HalfTargetTexelDims = 0.5f / TargetDims;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 
 	Output.Color = Input.Color;
 
-	float2 TexCoord = Input.Position.xy / ScreenDims;
+	float2 TexCoord = Input.TexCoord;
+	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	// Vector graphics is not prescaled it has the size of the screen
-	if (PrepareVector)
-	{
-		Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelSize;
-		Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelSize;
-		Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelSize;
-		Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelSize;
-	}
-	else
-	{
-		Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelSize * Prescale;
-		Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelSize * Prescale;
-		Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelSize * Prescale;
-		Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelSize * Prescale;
-	}
+	Output.TexCoord01.xy = TexCoord + Coord0Offset * HalfTargetTexelDims;
+	Output.TexCoord01.zw = TexCoord + Coord1Offset * HalfTargetTexelDims;
+	Output.TexCoord23.xy = TexCoord + Coord2Offset * HalfTargetTexelDims;
+	Output.TexCoord23.zw = TexCoord + Coord3Offset * HalfTargetTexelDims;
 
 	return Output;
 }
@@ -97,27 +91,25 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 texel0 = tex2D(DiffuseSampler, Input.TexCoord01.xy);
-	float4 texel1 = tex2D(DiffuseSampler, Input.TexCoord01.zw);
-	float4 texel2 = tex2D(DiffuseSampler, Input.TexCoord23.xy);
-	float4 texel3 = tex2D(DiffuseSampler, Input.TexCoord23.zw);
+	float3 texel0 = tex2D(DiffuseSampler, Input.TexCoord01.xy).rgb;
+	float3 texel1 = tex2D(DiffuseSampler, Input.TexCoord01.zw).rgb;
+	float3 texel2 = tex2D(DiffuseSampler, Input.TexCoord23.xy).rgb;
+	float3 texel3 = tex2D(DiffuseSampler, Input.TexCoord23.zw).rgb;
 
-	float4 outTexel = (texel0 + texel1 + texel2 + texel3) / 4.0 * BloomRescale;
+	float3 outTexel = (texel0 + texel1 + texel2 + texel3) / 4.0;
 
-	return float4(outTexel.rgb, 1.0f);
+	return float4(outTexel, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
-// Downsample Effect
+// Downsample Technique
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_2_0 vs_main();
 		PixelShader = compile ps_2_0 ps_main();

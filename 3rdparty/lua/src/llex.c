@@ -1,5 +1,5 @@
 /*
-** $Id: llex.c,v 2.89 2014/11/14 16:06:09 roberto Exp $
+** $Id: llex.c,v 2.95 2015/11/19 19:16:22 roberto Exp $
 ** Lexical Analyzer
 ** See Copyright Notice in lua.h
 */
@@ -16,6 +16,7 @@
 #include "lua.h"
 
 #include "lctype.h"
+#include "ldebug.h"
 #include "ldo.h"
 #include "lgc.h"
 #include "llex.h"
@@ -68,7 +69,7 @@ static void save (LexState *ls, int c) {
 
 void luaX_init (lua_State *L) {
   int i;
-  TString *e = luaS_new(L, LUA_ENV);  /* create env name */
+  TString *e = luaS_newliteral(L, LUA_ENV);  /* create env name */
   luaC_fix(L, obj2gco(e));  /* never collect this name */
   for (i=0; i<NUM_RESERVED; i++) {
     TString *ts = luaS_new(L, luaX_tokens[i]);
@@ -106,9 +107,7 @@ static const char *txtToken (LexState *ls, int token) {
 
 
 static l_noret lexerror (LexState *ls, const char *msg, int token) {
-  char buff[LUA_IDSIZE];
-  luaO_chunkid(buff, getstr(ls->source), LUA_IDSIZE);
-  msg = luaO_pushfstring(ls->L, "%s:%d: %s", buff, ls->linenumber, msg);
+  msg = luaG_addinfo(ls->L, msg, ls->source, ls->linenumber);
   if (token)
     luaO_pushfstring(ls->L, "%s near %s", msg, txtToken(ls, token));
   luaD_throw(ls->L, LUA_ERRSYNTAX);
@@ -172,7 +171,7 @@ void luaX_setinput (lua_State *L, LexState *ls, ZIO *z, TString *source,
   ls->linenumber = 1;
   ls->lastline = 1;
   ls->source = source;
-  ls->envn = luaS_new(L, LUA_ENV);  /* get env name */
+  ls->envn = luaS_newliteral(L, LUA_ENV);  /* get env name */
   luaZ_resizebuffer(ls->L, ls->buff, LUA_MINBUFFER);  /* initialize buffer */
 }
 
@@ -221,22 +220,15 @@ static void buffreplace (LexState *ls, char from, char to) {
 }
 
 
-#if !defined(l_getlocaledecpoint)
-#define l_getlocaledecpoint()	(localeconv()->decimal_point[0])
-#endif
-
-
-#define buff2num(b,o)	(luaO_str2num(luaZ_buffer(b), o) != 0)
-
 /*
 ** in case of format error, try to change decimal point separator to
 ** the one defined in the current locale and check again
 */
 static void trydecpoint (LexState *ls, TValue *o) {
   char old = ls->decpoint;
-  ls->decpoint = l_getlocaledecpoint();
+  ls->decpoint = lua_getlocaledecpoint();
   buffreplace(ls, old, ls->decpoint);  /* try new decimal separator */
-  if (!buff2num(ls->buff, o)) {
+  if (luaO_str2num(luaZ_buffer(ls->buff), o) == 0) {
     /* format error with correct decimal point: no more options */
     buffreplace(ls, ls->decpoint, '.');  /* undo change (for error message) */
     lexerror(ls, "malformed number", TK_FLT);
@@ -268,7 +260,7 @@ static int read_numeral (LexState *ls, SemInfo *seminfo) {
   }
   save(ls, '\0');
   buffreplace(ls, '.', ls->decpoint);  /* follow locale for decimal point */
-  if (!buff2num(ls->buff, &obj))  /* format error? */
+  if (luaO_str2num(luaZ_buffer(ls->buff), &obj) == 0)  /* format error? */
     trydecpoint(ls, &obj); /* try to update decimal point separator */
   if (ttisinteger(&obj)) {
     seminfo->i = ivalue(&obj);
@@ -283,8 +275,9 @@ static int read_numeral (LexState *ls, SemInfo *seminfo) {
 
 
 /*
-** skip a sequence '[=*[' or ']=*]' and return its number of '='s or
-** -1 if sequence is malformed
+** skip a sequence '[=*[' or ']=*]'; if sequence is well formed, return
+** its number of '='s; otherwise, return a negative number (-1 iff there
+** are no '='s after initial bracket)
 */
 static int skip_sep (LexState *ls) {
   int count = 0;
@@ -501,8 +494,9 @@ static int llex (LexState *ls, SemInfo *seminfo) {
           read_long_string(ls, seminfo, sep);
           return TK_STRING;
         }
-        else if (sep == -1) return '[';
-        else lexerror(ls, "invalid long string delimiter", TK_STRING);
+        else if (sep != -1)  /* '[=...' missing second bracket */
+          lexerror(ls, "invalid long string delimiter", TK_STRING);
+        return '[';
       }
       case '=': {
         next(ls);

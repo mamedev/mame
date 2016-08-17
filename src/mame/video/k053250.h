@@ -34,14 +34,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// configuration
 	int m_offx, m_offy;
 
 	// internal state
+	required_region_ptr<UINT8> m_rom;
 	dynamic_buffer m_unpacked_rom;
 	std::vector<UINT16> m_ram;
 	UINT16 *m_buffer[2];

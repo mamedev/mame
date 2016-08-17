@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi,Brad Oliver
 #include "machine/rp5h01.h"
-#include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 
 struct chr_bank
@@ -14,20 +13,20 @@ class playch10_state : public driver_device
 {
 public:
 	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_nesapu(*this, "nesapu"),
-		m_ppu(*this, "ppu"),
-		m_rp5h01(*this, "rp5h01"),
-		m_ram_8w(*this, "ram_8w"),
-		m_videoram(*this, "videoram"),
-		m_timedata(*this, "timedata"),
-		m_work_ram(*this, "work_ram"),
-		m_gfxdecode(*this, "gfxdecode")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppu(*this, "ppu")
+		, m_rp5h01(*this, "rp5h01")
+		, m_ram_8w(*this, "ram_8w")
+		, m_videoram(*this, "videoram")
+		, m_timedata(*this, "timedata")
+		, m_work_ram(*this, "work_ram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_vrom_region(*this, "gfx2")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
-	required_device<nesapu_device> m_nesapu;
 	required_device<ppu2c0x_device> m_ppu;
 	optional_device<rp5h01_device> m_rp5h01;
 
@@ -36,6 +35,8 @@ public:
 	required_shared_ptr<UINT8> m_timedata;
 	required_shared_ptr<UINT8> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	optional_memory_region m_vrom_region;
 
 	int m_up_8w;
 	int m_pc10_nmi_enable;
@@ -53,9 +54,9 @@ public:
 	int m_MMC2_bank[4];
 	int m_MMC2_bank_latch[2];
 	UINT8* m_vrom;
-	UINT8* m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 	UINT8* m_nametable[4];
-	UINT8* m_nt_ram;
+	std::unique_ptr<UINT8[]> m_nt_ram;
 	chr_bank m_chr_page[8];
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;
@@ -107,9 +108,6 @@ public:
 	void pc10_set_mirroring(int mirroring);
 	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
-	DECLARE_READ8_MEMBER(psg_4015_r);
-	DECLARE_WRITE8_MEMBER(psg_4015_w);
-	DECLARE_WRITE8_MEMBER(psg_4017_w);
 	DECLARE_DRIVER_INIT(playch10);
 	DECLARE_DRIVER_INIT(pc_gun);
 	DECLARE_DRIVER_INIT(pcaboard);
@@ -121,6 +119,7 @@ public:
 	DECLARE_DRIVER_INIT(pcfboard);
 	DECLARE_DRIVER_INIT(pcfboard_2);
 	DECLARE_DRIVER_INIT(virus);
+	DECLARE_DRIVER_INIT(ttoon);
 	DECLARE_DRIVER_INIT(pcgboard);
 	DECLARE_DRIVER_INIT(pcgboard_type2);
 	DECLARE_DRIVER_INIT(pchboard);
@@ -128,9 +127,9 @@ public:
 	DECLARE_DRIVER_INIT(pckboard);
 	DECLARE_DRIVER_INIT(pc_hrz);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(playch10);
 	DECLARE_MACHINE_START(playch10_hboard);
 	DECLARE_VIDEO_START(playch10_hboard);

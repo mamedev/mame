@@ -72,20 +72,17 @@ public:
 	void set_external_interrupt_in_line(int level);
 	void set_priority_in_line(int level);
 
+	TIMER_CALLBACK_MEMBER(timer_callback);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
-
-	static TIMER_CALLBACK( f3853_timer_callback );
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 private:
 
 	void set_interrupt_request_line();
 	void timer_start(UINT8 value);
-	void timer();
 
 	f3853_interrupt_req_delegate m_interrupt_req_cb;
 	UINT8 m_high;

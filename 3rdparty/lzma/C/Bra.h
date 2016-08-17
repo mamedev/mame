@@ -1,14 +1,12 @@
 /* Bra.h -- Branch converters for executables
-2009-02-07 : Igor Pavlov : Public domain */
+2013-01-18 : Igor Pavlov : Public domain */
 
 #ifndef __BRA_H
 #define __BRA_H
 
-#include "Types.h"
+#include "7zTypes.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 /*
 These functions convert relative addresses to absolute addresses
@@ -61,8 +59,6 @@ SizeT PPC_Convert(Byte *data, SizeT size, UInt32 ip, int encoding);
 SizeT SPARC_Convert(Byte *data, SizeT size, UInt32 ip, int encoding);
 SizeT IA64_Convert(Byte *data, SizeT size, UInt32 ip, int encoding);
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END
 
 #endif

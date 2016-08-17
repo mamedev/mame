@@ -62,7 +62,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(boogwing);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( boogwing_protection_region_0_104_r );

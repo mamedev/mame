@@ -56,9 +56,11 @@ enum
 	XTAL_2_4576MHz      = 2457600,      /* Atari ST MFP, NEC PC-98xx */
 	XTAL_2_5MHz         = 2500000,      /* Janken Man units */
 	XTAL_3MHz           = 3000000,      /* Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
+	XTAL_3_072MHz       = 3072000,      /* INS 8520 input clock rate */
 	XTAL_3_12MHz        = 3120000,      /* SP0250 clock on Gottlieb games */
 	XTAL_3_5MHz         = 3500000,      /* Reported by Commodore 65 document, true xtal unchecked on PCB */
 	XTAL_3_52128MHz     = 3521280,      /* RCA COSMAC VIP */
+	XTAL_3_57864MHz		= 3578640,		/* Atari Portfolio PCD3311T */
 	XTAL_3_579545MHz    = 3579545,      /* NTSC color subcarrier, extremely common, used on 100's of PCBs (Keytronic custom part #48-300-010 is equivalent) */
 	XTAL_3_6864MHz      = 3686400,      /* CPS3 */
 	XTAL_4MHz           = 4000000,
@@ -80,7 +82,7 @@ enum
 	XTAL_5_911MHz       = 5911000,      /* Philips Videopac Plus G7400 */
 	XTAL_5_9904MHz      = 5990400,      /* Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	XTAL_6MHz           = 6000000,      /* American Poker II */
-	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board and Casio FP-200 main CPU */
+	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco System 16 */
 	XTAL_6_5MHz         = 6500000,      /* Jupiter Ace */
 	XTAL_6_9MHz         = 6900000,      /* BBN BitGraph CPU */
 	XTAL_7MHz           = 7000000,      /* Jaleco Mega System PCBs */
@@ -143,6 +145,8 @@ enum
 	XTAL_15_8976MHz     = 15897600,     /* IAI Swyft */
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_16_384MHz      = 16384000,
+	XTAL_16_5888MHz     = 16588800,     /* SM 7238 */
+	XTAL_16_777216MHz   = 16777216,     /* Nintendo Game Boy Advance */
 	XTAL_16_9344MHz     = 16934400,     /* Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
 	XTAL_17_36MHz       = 17360000,     /* OMTI Series 10 SCSI controller */
 	XTAL_17_73447MHz    = 17734470,     /* (~4x PAL subcarrier) */
@@ -158,6 +162,7 @@ enum
 	XTAL_20MHz          = 20000000,
 	XTAL_20_16MHz       = 20160000,     /* Nintendo 8080 */
 	XTAL_20_079MHz      = 20790000,     /* Blockade-hardware Gremlin games */
+	XTAL_20_625MHz      = 20625000,     /* SM 7238 */
 	XTAL_21MHz          = 21000000,     /* Lock-On pixel clock */
 	XTAL_21_3MHz        = 21300000,
 	XTAL_21_4772MHz     = 21477272,     /* BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
@@ -223,6 +228,7 @@ enum
 	XTAL_64MHz          = 64000000,     /* BattleToads */
 	XTAL_66_6667MHz     = 66666700,     /* Later Midway games */
 	XTAL_67_7376MHz     = 67737600,     /* PSX-based h/w, Sony ZN1-2-based */
+	XTAL_72MHz          = 72000000,     /* Aristocrat MKV */
 	XTAL_72_576MHz      = 72576000,     /* Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	XTAL_73_728MHz      = 73728000,     /* Ms. Pac-Man/Galaga 20th Anniversary */
 	XTAL_100MHz         = 100000000,    /* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
@@ -238,6 +244,7 @@ enum
 	XTAL_512kHz         = 512000,       /* Toshiba TC8830F */
 	XTAL_600kHz         = 600000,
 	XTAL_640kHz         = 640000,       /* NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
+	XTAL_960kHz         = 960000,       /* Xerox Notetaker Keyboard UART */
 	XTAL_1_056MHz       = 1056000       /* OKI M6295 on Trio The Punch h/w */
 };
 

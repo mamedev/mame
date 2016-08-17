@@ -27,35 +27,35 @@ extern const device_type MSX_SLOT_DISK6;
 
 #define MCFG_MSX_SLOT_DISK1_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK1, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 #define MCFG_MSX_SLOT_DISK2_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK2, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 #define MCFG_MSX_SLOT_DISK3_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK3, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 #define MCFG_MSX_SLOT_DISK4_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK4, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 #define MCFG_MSX_SLOT_DISK5_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag, _floppy2_tag, _floppy3_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK5, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag); \
@@ -64,7 +64,7 @@ extern const device_type MSX_SLOT_DISK6;
 
 #define MCFG_MSX_SLOT_DISK6_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK6, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
@@ -75,7 +75,7 @@ class msx_slot_disk_device : public msx_slot_rom_device
 public:
 	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// static configuration helpers
 	static void set_fdc_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_disk_device &>(device).m_fdc_tag = tag; }
@@ -104,7 +104,7 @@ class msx_slot_wd_disk_device : public msx_slot_disk_device
 public:
 	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual void device_start();
+	virtual void device_start() override;
 
 protected:
 	wd_fdc_analog_t *m_fdc;
@@ -116,7 +116,7 @@ class msx_slot_tc8566_disk_device : public msx_slot_disk_device
 public:
 	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual void device_start();
+	virtual void device_start() override;
 
 protected:
 	tc8566af_device *m_fdc;
@@ -128,11 +128,11 @@ class msx_slot_disk1_device : public msx_slot_wd_disk_device
 public:
 	msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	void post_load();
 
@@ -150,11 +150,11 @@ class msx_slot_disk2_device : public msx_slot_wd_disk_device
 public:
 	msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	void post_load();
 
@@ -170,8 +170,8 @@ class msx_slot_disk3_device : public msx_slot_tc8566_disk_device
 public:
 	msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 };
 
 
@@ -180,8 +180,8 @@ class msx_slot_disk4_device : public msx_slot_tc8566_disk_device
 public:
 	msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 };
 
 
@@ -190,8 +190,8 @@ class msx_slot_disk5_device : public msx_slot_wd_disk_device
 public:
 	msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
@@ -210,11 +210,11 @@ class msx_slot_disk6_device : public msx_slot_wd_disk_device
 public:
 	msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	void post_load();
 

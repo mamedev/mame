@@ -38,7 +38,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	UINT8 m_byte_data[13];
 	UINT8 m_pixel_data[100];

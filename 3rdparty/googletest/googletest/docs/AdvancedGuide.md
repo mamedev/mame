@@ -44,7 +44,7 @@ switch(expression) {
 }
 ```
 
-Note: you can only use `FAIL()` in functions that return `void`. See the [Assertion Placement section](#Assertion_Placement.md) for more information.
+Note: you can only use `FAIL()` in functions that return `void`. See the [Assertion Placement section](#assertion-placement) for more information.
 
 _Availability_: Linux, Windows, Mac.
 
@@ -125,7 +125,7 @@ c is 10<br>
 
 **Notes:**
 
-  1. If you see a compiler error "no matching function to call" when using `ASSERT_PRED*` or `EXPECT_PRED*`, please see [this](http://code.google.com/p/googletest/wiki/FAQ#The_compiler_complains_%22no_matching_function_to_call%22) for how to resolve it.
+  1. If you see a compiler error "no matching function to call" when using `ASSERT_PRED*` or `EXPECT_PRED*`, please see [this FAQ](FAQ.md#the-compiler-complains-no-matching-function-to-call-when-i-use-assert_predn-how-do-i-fix-it) for how to resolve it.
   1. Currently we only provide predicate assertions of arity <= 5. If you need a higher-arity assertion, let us know.
 
 _Availability_: Linux, Windows, Mac
@@ -230,7 +230,7 @@ message is formatted:
 
 | **Fatal assertion** | **Nonfatal assertion** | **Verifies** |
 |:--------------------|:-----------------------|:-------------|
-| `ASSERT_PRED_FORMAT1(`_pred\_format1, val1_`);`        | `EXPECT_PRED_FORMAT1(`_pred\_format1, val1_`); | _pred\_format1(val1)_ is successful |
+| `ASSERT_PRED_FORMAT1(`_pred\_format1, val1_`);`        | `EXPECT_PRED_FORMAT1(`_pred\_format1, val1_`);` | _pred\_format1(val1)_ is successful |
 | `ASSERT_PRED_FORMAT2(`_pred\_format2, val1, val2_`);` | `EXPECT_PRED_FORMAT2(`_pred\_format2, val1, val2_`);` | _pred\_format2(val1, val2)_ is successful |
 | `...`               | `...`                  | `...`        |
 
@@ -265,7 +265,7 @@ int SmallestPrimeCommonDivisor(int m, int n) { ... }
                                                int n) {
   if (MutuallyPrime(m, n))
     return ::testing::AssertionSuccess();
- 
+
   return ::testing::AssertionFailure()
       << m_expr << " and " << n_expr << " (" << m << " and " << n
       << ") are not mutually prime, " << "as they have a common divisor "
@@ -312,8 +312,8 @@ want to learn more, see
 
 | **Fatal assertion** | **Nonfatal assertion** | **Verifies** |
 |:--------------------|:-----------------------|:-------------|
-| `ASSERT_FLOAT_EQ(`_expected, actual_`);`  | `EXPECT_FLOAT_EQ(`_expected, actual_`);` | the two `float` values are almost equal |
-| `ASSERT_DOUBLE_EQ(`_expected, actual_`);` | `EXPECT_DOUBLE_EQ(`_expected, actual_`);` | the two `double` values are almost equal |
+| `ASSERT_FLOAT_EQ(`_val1, val2_`);`  | `EXPECT_FLOAT_EQ(`_val1, val2_`);` | the two `float` values are almost equal |
+| `ASSERT_DOUBLE_EQ(`_val1, val2_`);` | `EXPECT_DOUBLE_EQ(`_val1, val2_`);` | the two `double` values are almost equal |
 
 By "almost equal", we mean the two values are within 4 ULP's from each
 other.
@@ -517,9 +517,9 @@ _death tests_. More generally, any test that checks that a program terminates
 Note that if a piece of code throws an exception, we don't consider it "death"
 for the purpose of death tests, as the caller of the code could catch the exception
 and avoid the crash. If you want to verify exceptions thrown by your code,
-see [Exception Assertions](#Exception_Assertions.md).
+see [Exception Assertions](#exception-assertions).
 
-If you want to test `EXPECT_*()/ASSERT_*()` failures in your test code, see [Catching Failures](#Catching_Failures.md).
+If you want to test `EXPECT_*()/ASSERT_*()` failures in your test code, see [Catching Failures](#catching-failures).
 
 ## How to Write a Death Test ##
 
@@ -527,9 +527,9 @@ Google Test has the following macros to support death tests:
 
 | **Fatal assertion** | **Nonfatal assertion** | **Verifies** |
 |:--------------------|:-----------------------|:-------------|
-| `ASSERT_DEATH(`_statement, regex_`); | `EXPECT_DEATH(`_statement, regex_`); | _statement_ crashes with the given error |
-| `ASSERT_DEATH_IF_SUPPORTED(`_statement, regex_`); | `EXPECT_DEATH_IF_SUPPORTED(`_statement, regex_`); | if death tests are supported, verifies that _statement_ crashes with the given error; otherwise verifies nothing |
-| `ASSERT_EXIT(`_statement, predicate, regex_`); | `EXPECT_EXIT(`_statement, predicate, regex_`); |_statement_ exits with the given error and its exit code matches _predicate_ |
+| `ASSERT_DEATH(`_statement, regex_`);` | `EXPECT_DEATH(`_statement, regex_`);` | _statement_ crashes with the given error |
+| `ASSERT_DEATH_IF_SUPPORTED(`_statement, regex_`);` | `EXPECT_DEATH_IF_SUPPORTED(`_statement, regex_`);` | if death tests are supported, verifies that _statement_ crashes with the given error; otherwise verifies nothing |
+| `ASSERT_EXIT(`_statement, predicate, regex_`);` | `EXPECT_EXIT(`_statement, predicate, regex_`);` |_statement_ exits with the given error and its exit code matches _predicate_ |
 
 where _statement_ is a statement that is expected to cause the process to
 die, _predicate_ is a function or function object that evaluates an integer
@@ -804,7 +804,7 @@ For example,
 11:   EXPECT_EQ(1, Bar(n));
 12:   EXPECT_EQ(2, Bar(n + 1));
 13: }
-14: 
+14:
 15: TEST(FooTest, Bar) {
 16:   {
 17:     SCOPED_TRACE("A");  // This trace point will be included in
@@ -1199,9 +1199,9 @@ which are all in the `testing` namespace:
 | `Values(v1, v2, ..., vN)`   | Yields values `{v1, v2, ..., vN}`.                                                                                |
 | `ValuesIn(container)` and `ValuesIn(begin, end)` | Yields values from a C-style array, an STL-style container, or an iterator range `[begin, end)`. `container`, `begin`, and `end` can be expressions whose values are determined at run time.  |
 | `Bool()`                    | Yields sequence `{false, true}`.                                                                                  |
-| `Combine(g1, g2, ..., gN)`  | Yields all combinations (the Cartesian product for the math savvy) of the values generated by the `N` generators. This is only available if your system provides the `<tr1/tuple>` header. If you are sure your system does, and Google Test disagrees, you can override it by defining `GTEST_HAS_TR1_TUPLE=1`. See comments in [include/gtest/internal/gtest-port.h](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/internal/gtest-port.h) for more information. |
+| `Combine(g1, g2, ..., gN)`  | Yields all combinations (the Cartesian product for the math savvy) of the values generated by the `N` generators. This is only available if your system provides the `<tr1/tuple>` header. If you are sure your system does, and Google Test disagrees, you can override it by defining `GTEST_HAS_TR1_TUPLE=1`. See comments in [include/gtest/internal/gtest-port.h](../include/gtest/internal/gtest-port.h) for more information. |
 
-For more details, see the comments at the definitions of these functions in the [source code](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/gtest-param-test.h).
+For more details, see the comments at the definitions of these functions in the [source code](../include/gtest/gtest-param-test.h).
 
 The following statement will instantiate tests from the `FooTest` test case
 each with parameter values `"meeny"`, `"miny"`, and `"moe"`.
@@ -1226,7 +1226,7 @@ names:
   * `InstantiationName/FooTest.HasBlahBlah/1` for `"miny"`
   * `InstantiationName/FooTest.HasBlahBlah/2` for `"moe"`
 
-You can use these names in [--gtest\_filter](#Running_a_Subset_of_the_Tests.md).
+You can use these names in [--gtest\_filter](#running-a-subset-of-the-tests).
 
 This statement will instantiate all tests from `FooTest` again, each
 with parameter values `"cat"` and `"dog"`:
@@ -1249,8 +1249,8 @@ tests in the given test case, whether their definitions come before or
 _after_ the `INSTANTIATE_TEST_CASE_P` statement.
 
 You can see
-[these](http://code.google.com/p/googletest/source/browse/trunk/samples/sample7_unittest.cc)
-[files](http://code.google.com/p/googletest/source/browse/trunk/samples/sample8_unittest.cc) for more examples.
+[these](../samples/sample7_unittest.cc)
+[files](../samples/sample8_unittest.cc) for more examples.
 
 _Availability_: Linux, Windows (requires MSVC 8.0 or above), Mac; since version 1.2.0.
 
@@ -1450,7 +1450,7 @@ two cases to consider:
 
 Both static functions and definitions/declarations in an unnamed namespace are
 only visible within the same translation unit. To test them, you can `#include`
-the entire `.cc` file being tested in your `*_test.cc` file. (#including `.cc`
+the entire `.cc` file being tested in your `*_test.cc` file. (`#include`ing `.cc`
 files is not a good way to reuse code - you should not do this in production
 code!)
 
@@ -1551,8 +1551,8 @@ exception, you could catch the exception and assert on it.  But Google
 Test doesn't use exceptions, so how do we test that a piece of code
 generates an expected failure?
 
-`"gtest/gtest-spi.h"` contains some constructs to do this.  After
-#including this header, you can use
+`"gtest/gtest-spi.h"` contains some constructs to do this.  After 
+`#include`ing this header, you can use
 
 | `EXPECT_FATAL_FAILURE(`_statement, substring_`);` |
 |:--------------------------------------------------|
@@ -1571,15 +1571,14 @@ For technical reasons, there are some caveats:
   1. _statement_ in `EXPECT_FATAL_FAILURE()` cannot reference local non-static variables or non-static members of `this` object.
   1. _statement_ in `EXPECT_FATAL_FAILURE()` cannot return a value.
 
-_Note:_ Google Test is designed with threads in mind.  Once the
+_Note:_ Google Test is designed with threads in mind. Once the
 synchronization primitives in `"gtest/internal/gtest-port.h"` have
 been implemented, Google Test will become thread-safe, meaning that
-you can then use assertions in multiple threads concurrently.  Before
-
-that, however, Google Test only supports single-threaded usage.  Once
+you can then use assertions in multiple threads concurrently. Before
+that, however, Google Test only supports single-threaded usage. Once
 thread-safe, `EXPECT_FATAL_FAILURE()` and `EXPECT_NONFATAL_FAILURE()`
 will capture failures in the current thread only. If _statement_
-creates new threads, failures in these threads will be ignored.  If
+creates new threads, failures in these threads will be ignored. If
 you want to capture failures from all threads instead, you should use
 the following macros:
 
@@ -1646,8 +1645,8 @@ _Availability:_ Linux, Windows, Mac; since v1.4.0.
 ## Defining Event Listeners ##
 
 To define a event listener, you subclass either
-[testing::TestEventListener](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/gtest.h#855)
-or [testing::EmptyTestEventListener](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/gtest.h#905).
+[testing::TestEventListener](../include/gtest/gtest.h#L991)
+or [testing::EmptyTestEventListener](../include/gtest/gtest.h#L1044).
 The former is an (abstract) interface, where <i>each pure virtual method<br>
 can be overridden to handle a test event</i> (For example, when a test
 starts, the `OnTestStart()` method will be called.). The latter provides
@@ -1656,10 +1655,10 @@ subclass only needs to override the methods it cares about.
 
 When an event is fired, its context is passed to the handler function
 as an argument. The following argument types are used:
-  * [UnitTest](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/gtest.h#1007) reflects the state of the entire test program,
-  * [TestCase](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/gtest.h#689) has information about a test case, which can contain one or more tests,
-  * [TestInfo](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/gtest.h#599) contains the state of a test, and
-  * [TestPartResult](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/gtest-test-part.h#42) represents the result of a test assertion.
+  * [UnitTest](../include/gtest/gtest.h#L1151) reflects the state of the entire test program,
+  * [TestCase](../include/gtest/gtest.h#L778) has information about a test case, which can contain one or more tests,
+  * [TestInfo](../include/gtest/gtest.h#L644) contains the state of a test, and
+  * [TestPartResult](../include/gtest/gtest-test-part.h#L47) represents the result of a test assertion.
 
 An event handler function can examine the argument it receives to find
 out interesting information about the event and the test program's
@@ -1695,7 +1694,7 @@ state.  Here's an example:
 
 To use the event listener you have defined, add an instance of it to
 the Google Test event listener list (represented by class
-[TestEventListeners](http://code.google.com/p/googletest/source/browse/trunk/include/gtest/gtest.h#929)
+[TestEventListeners](../include/gtest/gtest.h#L1064)
 - note the "s" at the end of the name) in your
 `main()` function, before calling `RUN_ALL_TESTS()`:
 ```
@@ -1723,7 +1722,7 @@ event listener list and delete it. You can do so by adding one line:
 
 Now, sit back and enjoy a completely different output from your
 tests. For more details, you can read this
-[sample](http://code.google.com/p/googletest/source/browse/trunk/samples/sample9_unittest.cc).
+[sample](../samples/sample9_unittest.cc).
 
 You may append more than one listener to the list. When an `On*Start()`
 or `OnTestPartResult()` event is fired, the listeners will receive it in
@@ -1748,7 +1747,7 @@ failures. This ensures that failures generated by the latter are
 attributed to the right test by the former.
 
 We have a sample of failure-raising listener
-[here](http://code.google.com/p/googletest/source/browse/trunk/samples/sample10_unittest.cc).
+[here](../samples/sample10_unittest.cc).
 
 # Running Test Programs: Advanced Options #
 
@@ -1868,12 +1867,12 @@ _Availability:_ Linux, Windows, Mac.
 
 ### Temporarily Enabling Disabled Tests ###
 
-To include [disabled tests](#Temporarily_Disabling_Tests.md) in test
+To include [disabled tests](#temporarily-disabling-tests) in test
 execution, just invoke the test program with the
 `--gtest_also_run_disabled_tests` flag or set the
 `GTEST_ALSO_RUN_DISABLED_TESTS` environment variable to a value other
 than `0`.  You can combine this with the
-[--gtest\_filter](#Running_a_Subset_of_the_Tests.md) flag to further select
+[--gtest\_filter](#running-a-subset-of-the-tests) flag to further select
 which disabled tests to run.
 
 _Availability:_ Linux, Windows, Mac; since version 1.3.0.
@@ -2173,7 +2172,7 @@ and you should see an `OUTPUT_DIR` directory being created with files
 `gtest/gtest.h` and `gtest/gtest-all.cc` in it.  These files contain
 everything you need to use Google Test.  Just copy them to anywhere
 you want and you are ready to write tests.  You can use the
-[scripts/test/Makefile](http://code.google.com/p/googletest/source/browse/trunk/scripts/test/Makefile)
+[scripts/test/Makefile](../scripts/test/Makefile)
 file as an example on how to compile your tests against them.
 
 # Where to Go from Here #

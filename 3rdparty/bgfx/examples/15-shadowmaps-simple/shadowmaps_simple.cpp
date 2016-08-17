@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014 Dario Manesku. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <string>
@@ -9,7 +9,7 @@
 
 #include "common.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/timer.h>
 #include <bx/readerwriter.h>
 #include <bx/fpumath.h>
@@ -66,14 +66,16 @@ static const uint16_t s_planeIndices[] =
 	1, 3, 2,
 };
 
-int _main_(int /*_argc*/, char** /*_argv*/)
+int _main_(int _argc, char** _argv)
 {
+	Args args(_argc, _argv);
+
 	uint32_t width = 1280;
 	uint32_t height = 720;
 	uint32_t debug = BGFX_DEBUG_TEXT;
 	uint32_t reset = BGFX_RESET_VSYNC;
 
-	bgfx::init();
+	bgfx::init(args.m_type, args.m_pciId);
 	bgfx::reset(width, height, reset);
 
 	bgfx::RendererType::Enum renderer = bgfx::getRendererType();
@@ -89,6 +91,13 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	bgfx::UniformHandle u_shadowMap = bgfx::createUniform("u_shadowMap", bgfx::UniformType::Int1);
 	bgfx::UniformHandle u_lightPos  = bgfx::createUniform("u_lightPos",  bgfx::UniformType::Vec4);
 	bgfx::UniformHandle u_lightMtx  = bgfx::createUniform("u_lightMtx",  bgfx::UniformType::Mat4);
+	// When using GL clip space depth range [-1, 1] and packing depth into color buffer, we need to
+	// adjust the depth range to be [0, 1] for writing to the color buffer
+	bgfx::UniformHandle u_depthScaleOffset = bgfx::createUniform("u_depthScaleOffset",  bgfx::UniformType::Vec4);
+	const float depthScale = flipV ? 0.5f : 1.0f;
+	const float depthOffset = flipV ? 0.5f : 0.0f;
+	float depthScaleOffset[4] = {depthScale, depthOffset, 0.0f, 0.0f};
+	bgfx::setUniform(u_depthScaleOffset, depthScaleOffset);
 
 	// Vertex declarations.
 	bgfx::VertexDecl PosNormalDecl;
@@ -131,7 +140,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		progShadow = loadProgram("vs_sms_shadow", "fs_sms_shadow");
 		progMesh   = loadProgram("vs_sms_mesh",   "fs_sms_mesh");
 
-		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_COMPARE_LEQUAL);
+		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT | BGFX_TEXTURE_COMPARE_LEQUAL);
 		bgfx::TextureHandle fbtextures[] = { shadowMapTexture };
 		shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 	}
@@ -146,7 +155,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		bgfx::TextureHandle fbtextures[] =
 		{
 			shadowMapTexture,
-			bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY),
+			bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY),
 		};
 		shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 	}
@@ -272,7 +281,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		bx::mtxLookAt(lightView, eye, at);
 
 		const float area = 30.0f;
-		bx::mtxOrtho(lightProj, -area, area, -area, area, -100.0f, 100.0f);
+		bx::mtxOrtho(lightProj, -area, area, -area, area, -100.0f, 100.0f, 0.0f, flipV);
 
 		bgfx::setViewRect(RENDER_SHADOW_PASS_ID, 0, 0, shadowMapSize, shadowMapSize);
 		bgfx::setViewFrameBuffer(RENDER_SHADOW_PASS_ID, shadowMapFB);
@@ -301,8 +310,8 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		{
 			0.5f, 0.0f, 0.0f, 0.0f,
 			0.0f,   sy, 0.0f, 0.0f,
-			0.0f, 0.0f, 0.5f, 0.0f,
-			0.5f, 0.5f, 0.5f, 1.0f,
+			0.0f, 0.0f, depthScale, 0.0f,
+			0.5f, 0.5f, depthOffset, 1.0f,
 		};
 
 		float mtxTmp[16];
@@ -311,7 +320,6 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 		// Floor.
 		bx::mtxMul(lightMtx, mtxFloor, mtxShadow);
-		bgfx::setUniform(u_lightMtx, lightMtx);
 		uint32_t cached = bgfx::setTransform(mtxFloor);
 		for (uint32_t pass = 0; pass < 2; ++pass)
 		{

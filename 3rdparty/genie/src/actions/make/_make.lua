@@ -134,11 +134,12 @@
 
 		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib" },
 
-		valid_languages = { "C", "C++", "C#" },
+		valid_languages = { "C", "C++", "C#", "Vala" },
 
 		valid_tools     = {
-			cc     = { "gcc" },
+			cc     = { "gcc", "ghs" },
 			dotnet = { "mono", "msnet", "pnet" },
+			valac  = { "valac" },
 		},
 
 		onsolution = function(sln)
@@ -149,8 +150,10 @@
 			local makefile = _MAKE.getmakefilename(prj, true)
 			if premake.isdotnetproject(prj) then
 				premake.generate(prj, makefile, premake.make_csharp)
-			else
+			elseif premake.iscppproject(prj) then
 				premake.generate(prj, makefile, premake.make_cpp)
+			else
+				premake.generate(prj, makefile, premake.make_vala)
 			end
 		end,
 

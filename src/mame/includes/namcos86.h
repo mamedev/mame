@@ -1,29 +1,36 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#include "machine/watchdog.h"
 #include "sound/namco.h"
 
 class namcos86_state : public driver_device
 {
 public:
 	namcos86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cpu1(*this, "cpu1"),
-		m_cpu2(*this, "cpu2"),
-		m_cus30(*this, "namco"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_rthunder_videoram1(*this, "videoram1"),
-		m_rthunder_videoram2(*this, "videoram2"),
-		m_rthunder_spriteram(*this, "spriteram") { }
+		: driver_device(mconfig, type, tag)
+		, m_cpu1(*this, "cpu1")
+		, m_cpu2(*this, "cpu2")
+		, m_watchdog(*this, "watchdog")
+		, m_cus30(*this, "namco")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_rthunder_videoram1(*this, "videoram1")
+		, m_rthunder_videoram2(*this, "videoram2")
+		, m_rthunder_spriteram(*this, "spriteram")
+		, m_user1_ptr(*this, "user1")
+	{
+	}
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_rthunder_videoram1;
 	required_shared_ptr<UINT8> m_rthunder_videoram2;
 	required_shared_ptr<UINT8> m_rthunder_spriteram;
+	optional_region_ptr<UINT8> m_user1_ptr;
 
 	UINT8 *m_spriteram;
 	int m_wdog;
@@ -64,8 +71,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info3);
 
 	DECLARE_DRIVER_INIT(namco86);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(namcos86);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

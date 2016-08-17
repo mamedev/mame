@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_ADDRESS_MAP(map, 16);
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
@@ -57,8 +58,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 

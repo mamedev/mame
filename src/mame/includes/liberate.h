@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "machine/gen_latch.h"
+
 class liberate_state : public driver_device
 {
 public:
@@ -10,20 +13,22 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_scratchram(*this, "scratchram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_soundlatch(*this, "soundlatch") { }
 
 	optional_shared_ptr<UINT8> m_bg_vram; /* prosport */
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_scratchram;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	UINT8 *m_fg_gfx;   /* prosoccr */
-	UINT8 *m_charram;   /* prosoccr */
+	std::unique_ptr<UINT8[]> m_charram;   /* prosoccr */
 	UINT8 m_io_ram[16];
 
 	int m_bank;
@@ -39,7 +44,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ8_MEMBER(deco16_bank_r);
 	DECLARE_READ8_MEMBER(deco16_io_r);
@@ -77,8 +82,6 @@ public:
 	UINT32 screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco16_interrupt);
-	INTERRUPT_GEN_MEMBER(prosport_interrupt);
-	void debug_print(bitmap_ind16 &bitmap);
 	void liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );

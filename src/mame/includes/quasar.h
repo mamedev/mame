@@ -14,7 +14,7 @@ public:
 	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cvs_state(mconfig, type, tag) { }
 
-	UINT8 *    m_effectram;
+	std::unique_ptr<UINT8[]>    m_effectram;
 	UINT8      m_effectcontrol;
 	UINT8      m_page;
 	UINT8      m_io_page;

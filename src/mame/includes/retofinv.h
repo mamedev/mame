@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Andrea Mazzoleni
+
+#include "machine/gen_latch.h"
+
 class retofinv_state : public driver_device
 {
 public:
@@ -11,6 +14,7 @@ public:
 		m_68705(*this, "68705"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_sharedram(*this, "sharedram"),
 		m_bg_videoram(*this, "bg_videoram") { }
@@ -21,6 +25,7 @@ public:
 	optional_device<cpu_device> m_68705;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_sharedram;
@@ -77,8 +82,8 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(retofinv);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

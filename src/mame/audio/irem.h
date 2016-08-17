@@ -2,7 +2,9 @@
 // copyright-holders:Couriersud
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "machine/gen_latch.h"
 #include "machine/netlist.h"
+#include "audio/nl_kidniki.h"
 
 class irem_audio_device : public device_t
 {
@@ -27,14 +29,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 private:
 	// internal state
 	UINT8           m_port1;
 	UINT8           m_port2;
 
+	required_device<generic_latch_8_device> m_soundlatch;
 	/* FIXME: using required / optional device would be better */
 	// required_device<ay8910_device> m_ay_45L;
 	// required_device<ay8910_device> m_ay_45M;
@@ -53,21 +56,21 @@ class m62_audio_device : public irem_audio_device
 {
 public:
 	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class m52_soundc_audio_device : public irem_audio_device
 {
 public:
 	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class m52_large_audio_device : public irem_audio_device
 {
 public:
 	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 //MACHINE_CONFIG_EXTERN( m52_sound_c_audio );

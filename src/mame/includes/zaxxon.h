@@ -73,15 +73,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
 	DECLARE_DRIVER_INIT(razmataz);
-	DECLARE_DRIVER_INIT(futspy);
 	DECLARE_DRIVER_INIT(zaxxonj);
-	DECLARE_DRIVER_INIT(szaxxon);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(congo_get_fg_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zaxxon);
 	DECLARE_VIDEO_START(razmataz);
 	DECLARE_VIDEO_START(congo);
@@ -100,7 +98,6 @@ public:
 	inline int find_minimum_y(UINT8 value, int flip);
 	inline int find_minimum_x(UINT8 value, int flip);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask);
-	void zaxxonj_decode(const char *cputag);
 };
 
 

@@ -8,7 +8,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/upd7759.h"
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
@@ -51,6 +51,7 @@ static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 
 static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
+//reel info
 #define STANDARD_REEL  0    // As originally designed 3/4 reels
 #define FIVE_REEL_5TO8 1    // Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel
 #define FIVE_REEL_8TO5 2    // Mounted backwards for space reasons, but different board
@@ -60,16 +61,19 @@ static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14
 #define SEVEN_REEL     6    // Mainly club machines, significant reworking of reel hardware
 #define FLUTTERBOX     7    // Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel
 
+//Lamp extension
 #define NO_EXTENDER         0 // As originally designed
 #define SMALL_CARD          1
 #define LARGE_CARD_A        2 //96 Lamps
 #define LARGE_CARD_B        3 //96 Lamps, 16 LEDs - as used by BwB
 #define LARGE_CARD_C        4 //Identical to B, no built in LED support
 
+//LED cards
 #define CARD_A          1
 #define CARD_B          2
 #define CARD_C          3
 
+//Hopper info
 #define TUBES               0
 #define HOPPER_DUART_A      1
 #define HOPPER_DUART_B      2
@@ -105,12 +109,7 @@ public:
 			m_pia6(*this, "pia_ic6"),
 			m_pia7(*this, "pia_ic7"),
 			m_pia8(*this, "pia_ic8"),
-			m_orange1_port(*this, "ORANGE1"),
-			m_orange2_port(*this, "ORANGE2"),
-			m_black1_port(*this, "BLACK1"),
-			m_black2_port(*this, "BLACK2"),
-			m_dil1_port(*this, "DIL1"),
-			m_dil2_port(*this, "DIL2"),
+			m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"}),
 			m_aux1_port(*this, "AUX1"),
 			m_aux2_port(*this, "AUX2"),
 			m_bank1(*this, "bank1"),
@@ -123,7 +122,8 @@ public:
 			m_reel5(*this, "reel5"),
 			m_reel6(*this, "reel6"),
 			m_reel7(*this, "reel7"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_meters(*this, "meters")
 	{}
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -189,6 +189,27 @@ public:
 	DECLARE_DRIVER_INIT(m4default);
 	DECLARE_DRIVER_INIT(m4default_banks);
 	DECLARE_DRIVER_INIT(m4default_reels);
+	DECLARE_DRIVER_INIT(m4_low_volt_alt);
+	DECLARE_DRIVER_INIT(m4_five_reel_std);
+	DECLARE_DRIVER_INIT(m4_five_reel_rev);
+	DECLARE_DRIVER_INIT(m4_five_reel_alt);
+	DECLARE_DRIVER_INIT(m4_six_reel_std);
+	DECLARE_DRIVER_INIT(m4_six_reel_alt);
+	DECLARE_DRIVER_INIT(m4_seven_reel);	
+	DECLARE_DRIVER_INIT(m4_small_extender);
+	DECLARE_DRIVER_INIT(m4_large_extender_a);
+	DECLARE_DRIVER_INIT(m4_large_extender_b);
+	DECLARE_DRIVER_INIT(m4_large_extender_c);
+	DECLARE_DRIVER_INIT(m4_hopper_tubes);
+	DECLARE_DRIVER_INIT(m4_hopper_duart_a);
+	DECLARE_DRIVER_INIT(m4_hopper_duart_b);
+	DECLARE_DRIVER_INIT(m4_hopper_duart_c);
+	DECLARE_DRIVER_INIT(m4_hopper_nonduart_a);
+	DECLARE_DRIVER_INIT(m4_hopper_nonduart_b);
+	DECLARE_DRIVER_INIT(m4_led_a);
+	DECLARE_DRIVER_INIT(m4_led_b);
+	DECLARE_DRIVER_INIT(m4_led_c);
+	DECLARE_DRIVER_INIT(m4_andycp10c);
 	DECLARE_DRIVER_INIT(m_blsbys);
 	DECLARE_DRIVER_INIT(m_oldtmr);
 	DECLARE_DRIVER_INIT(m4tst);
@@ -203,7 +224,7 @@ public:
 	DECLARE_DRIVER_INIT(m4_showstring_big);
 	DECLARE_DRIVER_INIT(m_grtecpss);
 	DECLARE_DRIVER_INIT(connect4);
-	DECLARE_DRIVER_INIT(m4altreels);
+	DECLARE_DRIVER_INIT(m4altreels);//legacy, will be removed once things are sorted out
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
 	DECLARE_MACHINE_START(mpu4yam);
@@ -223,7 +244,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
 	DECLARE_WRITE_LINE_MEMBER(reel7_optic_cb) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
@@ -237,7 +258,6 @@ protected:
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_install_mod4bwb_space(address_space &space);
 	void mpu4_config_common();
-	void mpu4_config_common_reels(int reels);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<roc10937_t> m_vfd;
@@ -248,12 +268,7 @@ protected:
 	optional_device<pia6821_device> m_pia6;
 	optional_device<pia6821_device> m_pia7;
 	optional_device<pia6821_device> m_pia8;
-	required_ioport m_orange1_port;
-	required_ioport m_orange2_port;
-	required_ioport m_black1_port;
-	required_ioport m_black2_port;
-	required_ioport m_dil1_port;
-	required_ioport m_dil2_port;
+	required_ioport_array<8> m_port_mux;
 	required_ioport m_aux1_port;
 	required_ioport m_aux2_port;
 	optional_memory_bank m_bank1;
@@ -266,6 +281,8 @@ protected:
 	optional_device<stepper_device> m_reel5;
 	optional_device<stepper_device> m_reel6;
 	optional_device<stepper_device> m_reel7;
+	optional_device<palette_device> m_palette;
+	required_device<meters_device> m_meters;
 
 	enum
 	{
@@ -293,6 +310,7 @@ protected:
 	int m_ic23_active;
 	int m_led_lamp;
 	int m_link7a_connected;
+	int m_low_volt_detect_disable;
 	emu_timer *m_ic24_timer;
 	int m_expansion_latch;
 	int m_global_volume;
@@ -330,7 +348,6 @@ protected:
 	UINT8 m_numbanks;
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
-	optional_device<palette_device> m_palette;
 };
 
 MACHINE_CONFIG_EXTERN( mpu4_common );

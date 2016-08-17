@@ -1,11 +1,12 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
-#include <bgfx.h>
+#include <bx/bx.h>
+#include <bgfx/bgfx.h>
 #include <bx/string.h>
-#include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
 
 #include <time.h>
 
@@ -17,6 +18,9 @@
 #include "cmd.h"
 #include "input.h"
 
+#define RMT_ENABLED ENTRY_CONFIG_PROFILER
+#include <remotery/lib/Remotery.h>
+
 extern "C" int _main_(int _argc, char** _argv);
 
 namespace entry
@@ -24,14 +28,32 @@ namespace entry
 	static uint32_t s_debug = BGFX_DEBUG_NONE;
 	static uint32_t s_reset = BGFX_RESET_NONE;
 	static bool s_exit = false;
+
+	static Remotery* s_rmt = NULL;
+
 	static bx::FileReaderI* s_fileReader = NULL;
 	static bx::FileWriterI* s_fileWriter = NULL;
 
-	extern bx::ReallocatorI* getDefaultAllocator();
-	static bx::ReallocatorI* s_allocator = getDefaultAllocator();
+	extern bx::AllocatorI* getDefaultAllocator();
+	static bx::AllocatorI* s_allocator = getDefaultAllocator();
+
+	void* rmtMalloc(void* /*_context*/, rmtU32 _size)
+	{
+		return BX_ALLOC(s_allocator, _size);
+	}
+
+	void* rmtRealloc(void* /*_context*/, void* _ptr, rmtU32 _size)
+	{
+		return BX_REALLOC(s_allocator, _ptr, _size);
+	}
+
+	void rmtFree(void* /*_context*/, void* _ptr)
+	{
+		BX_FREE(s_allocator, _ptr);
+	}
 
 #if ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR
-	bx::ReallocatorI* getDefaultAllocator()
+	bx::AllocatorI* getDefaultAllocator()
 	{
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4459); // warning C4459: declaration of 's_allocator' hides global declaration
@@ -166,7 +188,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		const bool isNumber = (Key::Key0 <= _key && _key <= Key::Key9);
 		if (isNumber)
 		{
-			return '0' + (_key - Key::Key0);
+			return '0' + char(_key - Key::Key0);
 		}
 
 		const bool isChar = (Key::KeyA <= _key && _key <= Key::KeyZ);
@@ -175,7 +197,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			enum { ShiftMask = Modifier::LeftShift|Modifier::RightShift };
 
 			const bool shift = !!(_modifiers&ShiftMask);
-			return (shift ? 'A' : 'a') + (_key - Key::KeyA);
+			return (shift ? 'A' : 'a') + char(_key - Key::KeyA);
 		}
 
 		switch (_key)
@@ -238,6 +260,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			||  setOrToggle(s_reset, "flush",       BGFX_RESET_FLUSH_AFTER_RENDER, 1, _argc, _argv)
 			||  setOrToggle(s_reset, "flip",        BGFX_RESET_FLIP_AFTER_RENDER,  1, _argc, _argv)
 			||  setOrToggle(s_reset, "hidpi",       BGFX_RESET_HIDPI,              1, _argc, _argv)
+			||  setOrToggle(s_reset, "depthclamp",  BGFX_RESET_DEPTH_CLAMP,        1, _argc, _argv)
 			   )
 			{
 				return 0;
@@ -319,6 +342,10 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 	int runApp(AppI* _app, int _argc, char** _argv)
 	{
 		_app->init(_argc, _argv);
+		bgfx::frame();
+
+		WindowHandle defaultWindow = { 0 };
+		setWindowSize(defaultWindow, ENTRY_DEFAULT_WIDTH, ENTRY_DEFAULT_HEIGHT);
 
 #if BX_PLATFORM_EMSCRIPTEN
 		s_app = _app;
@@ -333,6 +360,29 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 	int main(int _argc, char** _argv)
 	{
 		//DBG(BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME);
+
+		if (BX_ENABLED(ENTRY_CONFIG_PROFILER) )
+		{
+			rmtSettings* settings = rmt_Settings();
+			BX_WARN(NULL != settings, "Remotery is not enabled.");
+			if (NULL != settings)
+			{
+				settings->malloc  = rmtMalloc;
+				settings->realloc = rmtRealloc;
+				settings->free    = rmtFree;
+
+				rmtError err = rmt_CreateGlobalInstance(&s_rmt);
+				BX_WARN(RMT_ERROR_NONE != err, "Remotery failed to create global instance.");
+				if (RMT_ERROR_NONE == err)
+				{
+					rmt_SetCurrentThreadName("Main");
+				}
+				else
+				{
+					s_rmt = NULL;
+				}
+			}
+		}
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
 		s_fileReader = new bx::CrtFileReader;
@@ -349,6 +399,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 		entry::WindowHandle defaultWindow = { 0 };
 		entry::setWindowTitle(defaultWindow, bx::baseName(_argv[0]) );
+		setWindowSize(defaultWindow, ENTRY_DEFAULT_WIDTH, ENTRY_DEFAULT_HEIGHT);
 
 		int32_t result = ::_main_(_argc, _argv);
 
@@ -364,6 +415,12 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		delete s_fileWriter;
 		s_fileWriter = NULL;
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
+
+		if (BX_ENABLED(ENTRY_CONFIG_PROFILER)
+		&&  NULL != s_rmt)
+		{
+			rmt_DestroyGlobalInstance(s_rmt);
+		}
 
 		return result;
 	}
@@ -406,8 +463,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 				case Event::Gamepad:
 					{
-						const GamepadEvent* gev = static_cast<const GamepadEvent*>(ev);
-						DBG("gamepad %d, %d", gev->m_gamepad.idx, gev->m_connected);
+//						const GamepadEvent* gev = static_cast<const GamepadEvent*>(ev);
+//						DBG("gamepad %d, %d", gev->m_gamepad.idx, gev->m_connected);
 					}
 					break;
 
@@ -416,11 +473,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 						const MouseEvent* mouse = static_cast<const MouseEvent*>(ev);
 						handle = mouse->m_handle;
 
-						if (mouse->m_move)
-						{
-							inputSetMousePos(mouse->m_mx, mouse->m_my, mouse->m_mz);
-						}
-						else
+						inputSetMousePos(mouse->m_mx, mouse->m_my, mouse->m_mz);
+						if (!mouse->m_move)
 						{
 							inputSetMouseButtonState(mouse->m_button, mouse->m_down);
 						}
@@ -428,13 +482,10 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 						if (NULL != _mouse
 						&&  !mouseLock)
 						{
-							if (mouse->m_move)
-							{
-								_mouse->m_mx = mouse->m_mx;
-								_mouse->m_my = mouse->m_my;
-								_mouse->m_mz = mouse->m_mz;
-							}
-							else
+							_mouse->m_mx = mouse->m_mx;
+							_mouse->m_my = mouse->m_my;
+							_mouse->m_mz = mouse->m_mz;
+							if (!mouse->m_move) 
 							{
 								_mouse->m_buttons[mouse->m_button] = mouse->m_down;
 							}
@@ -464,10 +515,10 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				case Event::Window:
 					break;
 
-                case Event::Suspend:
-                    break;
+				case Event::Suspend:
+					break;
 
-                    default:
+				default:
 					break;
 				}
 			}
@@ -481,7 +532,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{
 			_reset = s_reset;
 			bgfx::reset(_width, _height, _reset);
-			inputSetMouseResolution(_width, _height);
+			inputSetMouseResolution(uint16_t(_width), uint16_t(_height) );
 		}
 
 		_debug = s_debug;
@@ -616,6 +667,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					}
 					break;
 
+				case Event::Suspend:
+					break;
+
 				default:
 					break;
 				}
@@ -632,7 +686,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 			if (handle.idx == 0)
 			{
-				inputSetMouseResolution(win.m_width, win.m_height);
+				inputSetMouseResolution(uint16_t(win.m_width), uint16_t(win.m_height) );
 			}
 		}
 
@@ -640,7 +694,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{
 			_reset = s_reset;
 			bgfx::reset(s_window[0].m_width, s_window[0].m_height, _reset);
-			inputSetMouseResolution(s_window[0].m_width, s_window[0].m_height);
+			inputSetMouseResolution(uint16_t(s_window[0].m_width), uint16_t(s_window[0].m_height) );
 		}
 
 		_debug = s_debug;
@@ -658,7 +712,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		return s_fileWriter;
 	}
 
-	bx::ReallocatorI* getAllocator()
+	bx::AllocatorI* getAllocator()
 	{
 		return s_allocator;
 	}

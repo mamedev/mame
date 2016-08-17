@@ -31,7 +31,7 @@
 #define __COLECOVISION_CARTRIDGE_SLOT__
 
 #include "emu.h"
-
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -74,26 +74,25 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start();
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual image_init_result call_load() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return "coleco_cart"; }
-	virtual const char *file_extensions() const { return "rom,col,bin"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const char *image_interface() const override { return ":coleco_cart"; }
+	virtual const char *file_extensions() const override { return "rom,col,bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 
 	device_colecovision_cartridge_interface *m_card;
 };

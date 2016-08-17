@@ -47,9 +47,8 @@ public:
 	DECLARE_WRITE32_MEMBER( dsio_idma_addr_w );
 	DECLARE_WRITE32_MEMBER( dsio_idma_data_w );
 	DECLARE_READ32_MEMBER( dsio_idma_data_r );
-
-	DECLARE_READ32_MEMBER(de_r);
-	DECLARE_WRITE32_MEMBER(de_w);
+	void dmovlay_remap_memory();
+	WRITE32_MEMBER(dmovlay_callback);
 
 	// non public
 	void dcs_boot();
@@ -59,8 +58,6 @@ public:
 	DECLARE_WRITE16_MEMBER( dcs_dataram_w );
 	DECLARE_WRITE16_MEMBER( dcs_data_bank_select_w );
 	DECLARE_WRITE16_MEMBER( dcs_data_bank_select2_w );
-	DECLARE_READ16_MEMBER( dcs_dataram_bank_select_r );
-	DECLARE_WRITE16_MEMBER( dcs_dataram_bank_select_w );
 	inline void sdrc_update_bank_pointers();
 	void sdrc_remap_memory();
 	void sdrc_reset();
@@ -109,8 +106,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 protected:
 	struct sdrc_state
@@ -170,6 +167,10 @@ protected:
 	UINT32      m_sounddata_banks;
 	UINT16      m_sounddata_bank;
 
+	optional_memory_bank    m_data_bank;
+	memory_bank *           m_rom_page;
+	memory_bank *           m_dram_page;
+
 	/* I/O with the host */
 	UINT8       m_auto_ack;
 	UINT16      m_latch_control;
@@ -203,11 +204,15 @@ protected:
 	UINT32 *m_internal_program_ram;
 	UINT32 *m_external_program_ram;
 
+	int m_dmovlay_val;
+
 	sdrc_state m_sdrc;
 	dsio_state m_dsio;
 	hle_transfer_state m_transfer;
 
 	int m_dram_in_mb;
+
+	optional_shared_ptr<UINT16> m_iram;
 };
 
 
@@ -220,7 +225,7 @@ public:
 	dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -236,7 +241,7 @@ public:
 	dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -252,7 +257,7 @@ public:
 	dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -268,7 +273,7 @@ public:
 	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 // device type definition
@@ -285,7 +290,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 // dcs2_audio_2115_device
@@ -297,7 +302,7 @@ public:
 	dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -313,7 +318,7 @@ public:
 	dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -329,7 +334,7 @@ public:
 	dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -345,7 +350,7 @@ public:
 	dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 

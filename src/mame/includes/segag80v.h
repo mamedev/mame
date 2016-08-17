@@ -68,8 +68,8 @@ public:
 	DECLARE_DRIVER_INIT(elim2);
 	DECLARE_DRIVER_INIT(tacscan);
 	DECLARE_DRIVER_INIT(spacfury);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline int adjust_xy(int rawx, int rawy, int *outx, int *outy);
 	void sega_generate_vector_list();

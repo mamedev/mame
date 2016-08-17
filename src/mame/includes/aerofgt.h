@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "video/vsystem_spr.h"
 #include "video/vsystem_spr2.h"
 #include "sound/okim6295.h"
+#include "sound/upd7759.h"
 
 class aerofgt_state : public driver_device
 {
@@ -17,14 +20,16 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram3(*this, "spriteram3"),
 		m_tx_tilemap_ram(*this, "tx_tilemap_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki"),
+		m_upd7759(*this, "upd"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_spr(*this, "vsystem_spr"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_spr_old2(*this, "vsystem_spr_ol2"),
-		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1videoram;
@@ -37,9 +42,17 @@ public:
 	optional_shared_ptr<UINT16> m_tx_tilemap_ram;
 
 	/* devices referenced above */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<upd7759_device> m_upd7759; // karatblzbl
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	optional_device<vsystem_spr_device> m_spr; // only the aerofgt parent uses this chip
 	optional_device<vsystem_spr2_device> m_spr_old; // every other (non-bootleg) uses this
 	optional_device<vsystem_spr2_device> m_spr_old2; //  or a pair of them..
+	optional_device<generic_latch_8_device> m_soundlatch;
+
 
 
 	/* video-related */
@@ -63,9 +76,6 @@ public:
 
 	/* misc */
 	int       m_pending_command;
-
-	/* other devices */
-	optional_device<cpu_device> m_audiocpu;
 
 	/* handlers */
 	DECLARE_WRITE16_MEMBER(sound_command_w);
@@ -92,6 +102,8 @@ public:
 	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
 	DECLARE_WRITE16_MEMBER(pspikesb_oki_banking_w);
 	DECLARE_WRITE16_MEMBER(aerfboo2_okim6295_banking_w);
+	DECLARE_WRITE8_MEMBER(karatblzbl_d7759_write_port_0_w);
+	DECLARE_WRITE8_MEMBER(karatblzbl_d7759_reset_w);
 	TILE_GET_INFO_MEMBER(get_pspikes_tile_info);
 	TILE_GET_INFO_MEMBER(karatblz_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(karatblz_bg2_tile_info);
@@ -107,6 +119,7 @@ public:
 	DECLARE_VIDEO_START(spinlbrk);
 	DECLARE_VIDEO_START(turbofrc);
 	DECLARE_VIDEO_START(wbbc97);
+	DECLARE_DRIVER_INIT(banked_oki);
 	UINT32 screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -124,8 +137,4 @@ public:
 	void spikes91_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void wbbc97_draw_bitmap( bitmap_rgb32 &bitmap );
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };

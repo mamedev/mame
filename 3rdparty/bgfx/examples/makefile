@@ -1,5 +1,5 @@
 #
-# Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2016 Branimir Karadzic. All rights reserved.
 # License: http://www.opensource.org/licenses/BSD-2-Clause
 #
 
@@ -27,6 +27,10 @@ rebuild:
 	@make -s --no-print-directory rebuild -C 21-deferred
 	@make -s --no-print-directory rebuild -C 23-vectordisplay
 	@make -s --no-print-directory rebuild -C 24-nbody
+#	@make -s --no-print-directory rebuild -C 25-c99
+#	@make -s --no-print-directory rebuild -C 26-occlusion
+	@make -s --no-print-directory rebuild -C 27-terrain
+	@make -s --no-print-directory rebuild -C 28-wireframe
 	@make -s --no-print-directory rebuild -C common/font
 	@make -s --no-print-directory rebuild -C common/imgui
 	@make -s --no-print-directory rebuild -C common/nanovg

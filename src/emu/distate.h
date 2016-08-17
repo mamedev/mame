@@ -44,9 +44,7 @@ enum
 class device_state_entry
 {
 	friend class device_state_interface;
-	friend class simple_list<device_state_entry>;
-
-private:
+public:
 	// construction/destruction
 	device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size, device_state_interface *dev);
 	device_state_entry(int index, device_state_interface *dev);
@@ -59,9 +57,6 @@ public:
 	device_state_entry &callimport() { m_flags |= DSF_IMPORT; return *this; }
 	device_state_entry &callexport() { m_flags |= DSF_EXPORT; return *this; }
 	device_state_entry &noshow() { m_flags |= DSF_NOSHOW; return *this; }
-
-	// iteration helpers
-	const device_state_entry *next() const { return m_next; }
 
 	// query information
 	int index() const { return m_index; }
@@ -87,7 +82,7 @@ protected:
 	// return the current value -- only for our friends who handle export
 	bool needs_export() const { return ((m_flags & DSF_EXPORT) != 0); }
 	UINT64 value() const;
-	std::string &format(std::string &dest, const char *string, bool maxout = false) const;
+	std::string format(const char *string, bool maxout = false) const;
 
 	// set the current value -- only for our friends who handle import
 	bool needs_import() const { return ((m_flags & DSF_IMPORT) != 0); }
@@ -99,7 +94,6 @@ protected:
 
 	// public state description
 	device_state_interface *m_device_state;         // link to parent device state
-	device_state_entry *    m_next;                 // link to next item
 	UINT32                  m_index;                // index by which this item is referred
 	generic_ptr             m_dataptr;              // pointer to where the data lives
 	UINT64                  m_datamask;             // mask that applies to the data
@@ -124,11 +118,11 @@ public:
 	virtual ~device_state_interface();
 
 	// configuration access
-	const device_state_entry *state_first() const { return m_state_list.first(); }
+	const std::vector<std::unique_ptr<device_state_entry>> &state_entries() const { return m_state_list; }
 
 	// state getters
 	UINT64 state_int(int index);
-	std::string &state_string(int index, std::string &dest);
+	std::string state_string(int index) const;
 	int state_string_max_length(int index);
 	offs_t pc() { return state_int(STATE_GENPC); }
 	offs_t pcbase() { return state_int(STATE_GENPCBASE); }
@@ -163,20 +157,20 @@ protected:
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
 	virtual void state_string_import(const device_state_entry &entry, std::string &str);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const;
 
 	// internal operation overrides
-	virtual void interface_post_start();
+	virtual void interface_post_start() override;
 
 	// find the entry for a given index
-	const device_state_entry *state_find_entry(int index);
+	const device_state_entry *state_find_entry(int index) const;
 
 	// constants
 	static const int FAST_STATE_MIN = -4;                           // range for fast state
 	static const int FAST_STATE_MAX = 256;                          // lookups
 
 	// state
-	simple_list<device_state_entry>         m_state_list;           // head of state list
+	std::vector<std::unique_ptr<device_state_entry>>       m_state_list;           // head of state list
 	device_state_entry *                    m_fast_state[FAST_STATE_MAX + 1 - FAST_STATE_MIN];
 																	// fast access to common entries
 };
@@ -195,9 +189,9 @@ typedef device_interface_iterator<device_state_interface> state_interface_iterat
 //  or 0 if no state object exists
 //-------------------------------------------------
 
-inline offs_t device_t::safe_pc()
+inline offs_t device_t::safe_pc() const
 {
-	return (m_state != NULL) ? m_state->pc() : 0;
+	return (m_interfaces.m_state != nullptr) ? m_interfaces.m_state->pc() : 0;
 }
 
 
@@ -206,9 +200,9 @@ inline offs_t device_t::safe_pc()
 //  base or 0 if no state object exists
 //-------------------------------------------------
 
-inline offs_t device_t::safe_pcbase()
+inline offs_t device_t::safe_pcbase() const
 {
-	return (m_state != NULL) ? m_state->pcbase() : 0;
+	return (m_interfaces.m_state != nullptr) ? m_interfaces.m_state->pcbase() : 0;
 }
 
 

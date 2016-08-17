@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+
+#include "machine/gen_latch.h"
+
 class wwfsstar_state : public driver_device
 {
 public:
@@ -10,6 +13,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_fg0_videoram(*this, "fg0_videoram"),
 		m_bg0_videoram(*this, "bg0_videoram") { }
@@ -19,6 +23,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_fg0_videoram;
@@ -45,7 +50,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(bg0_scan);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

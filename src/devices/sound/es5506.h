@@ -129,12 +129,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
 	sound_stream *m_stream;               /* which stream are we using */
@@ -154,10 +154,10 @@ protected:
 
 	es550x_voice m_voice[32];             /* the 32 voices */
 
-	INT32 *     m_scratch;
+	std::unique_ptr<INT32[]>     m_scratch;
 
-	INT16 *     m_ulaw_lookup;
-	UINT16 *    m_volume_lookup;
+	std::unique_ptr<INT16[]>     m_ulaw_lookup;
+	std::unique_ptr<UINT16[]>    m_volume_lookup;
 
 	#if MAKE_WAVS
 	void *      m_wavraw;                 /* raw waveform */
@@ -195,10 +195,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 
 	void generate_samples(INT32 **outputs, int offset, int samples);
@@ -226,9 +226,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	void generate_samples(INT32 **outputs, int offset, int samples);
 

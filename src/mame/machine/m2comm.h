@@ -11,7 +11,7 @@
 
 #define MCFG_M2COMM_ADD(_tag ) \
 	MCFG_DEVICE_ADD(_tag, M2COMM, 0)
-	
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -23,7 +23,7 @@ public:
 	m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// single bit registers (74LS74)
 	DECLARE_READ8_MEMBER(zfg_r);
@@ -45,7 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(fg_r);
 	DECLARE_WRITE8_MEMBER(fg_w);
 
-  // IRQ logic - 5 = VINT, 7 = DLC
+	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
 #ifdef __M2COMM_SIMULATION__
 	void set_linktype(UINT16 linktype);
@@ -53,21 +53,21 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 m_shared[0x4000]; // 16k shared memory
-	UINT8	m_zfg;						// z80 flip gate? purpose unknown, bit0 is stored
-	UINT8	m_cn;							// bit0 is used to enable/disable the comm board
-	UINT8	m_fg;							// flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
-	
+	UINT8   m_zfg;                      // z80 flip gate? purpose unknown, bit0 is stored
+	UINT8   m_cn;                           // bit0 is used to enable/disable the comm board
+	UINT8   m_fg;                           // flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
+
 	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
 	emu_file m_line_tx;    // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
 	UINT8 m_buffer[0x4000];
-	
+
 #ifdef __M2COMM_SIMULATION__
 	UINT8 m_linkenable;
 	UINT16 m_linktimer;
@@ -76,10 +76,9 @@ private:
 	UINT8 m_linkcount;
 
 	UINT16 m_linktype;
-	
+
+	void comm_init();
 	void comm_tick();
-	
-	void comm_tick_16726();
 #endif
 };
 

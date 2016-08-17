@@ -30,14 +30,14 @@ public:
 	d64_format();
 	d64_format(const format *formats);
 
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	virtual bool save(io_generic *io, floppy_image *image);
-	virtual bool supports_save() const { return true; }
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+	virtual bool save(io_generic *io, floppy_image *image) override;
+	virtual bool supports_save() const override { return true; }
 
 protected:
 	enum
@@ -58,7 +58,7 @@ protected:
 
 	const format *formats;
 
-	int find_size(io_generic *io, UINT32 form_factor);
+	int find_size(io_generic *io, UINT32 form_factor) const;
 	virtual int get_physical_track(const format &f, int head, int track);
 	virtual UINT32 get_cell_size(const format &f, int track);
 	virtual int get_sectors_per_track(const format &f, int track);

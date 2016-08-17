@@ -46,7 +46,7 @@ public:
 	DECLARE_WRITE16_MEMBER(nvram_data_w);
 	DECLARE_WRITE16_MEMBER(nvram_thrash_data_w);
 	DECLARE_WRITE16_MEMBER(amerdart_misc_w);
-	DECLARE_READ16_MEMBER(amerdart_dsp_bio_line_r);
+	DECLARE_READ_LINE_MEMBER(amerdart_dsp_bio_line_r);
 	DECLARE_READ16_MEMBER(amerdart_iop_r);
 	DECLARE_WRITE16_MEMBER(amerdart_iop_w);
 	DECLARE_READ16_MEMBER(amerdart_dsp_cmd_r);

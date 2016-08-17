@@ -13,7 +13,7 @@ public:
 	lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
 	DECLARE_READ16_MEMBER( pm1_sts_r);
 	DECLARE_WRITE16_MEMBER(pm1_sts_w);
@@ -70,8 +70,8 @@ public:
 	DECLARE_WRITE8_MEMBER( sw_irq_gen_w);
 
 protected:
-	void device_start();
-	void device_reset();
+	void device_start() override;
+	void device_reset() override;
 
 private:
 	UINT32 pm1_cnt, proc_cnt, gpe0_sts, gpe0_en, smi_en, smi_sts;

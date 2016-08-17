@@ -2236,7 +2236,7 @@
 
 	<software name="startrek">
 		<!-- Star Trek - Strategic Operations Simulator (1984)(Coleco).bin -->
-		<description>Star Trek: Strategic Operations Simulator </description>
+		<description>Star Trek: Strategic Operations Simulator</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Sega" />

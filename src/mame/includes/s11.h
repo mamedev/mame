@@ -60,10 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pia40_pa_w);
 	DECLARE_WRITE8_MEMBER(pia40_pb_w);
 	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
-	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ8_MEMBER(pia28_w7_r);
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
@@ -109,7 +107,7 @@ protected:
 	void set_segment2(UINT32 s) { m_segment2 = s; }
 	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 private:
 	UINT8 m_sound_data;
@@ -121,76 +119,5 @@ private:
 	emu_timer* m_irq_timer;
 	bool m_irq_active;
 };
-
-class s11a_state : public s11_state
-{
-public:
-	s11a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: s11_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_WRITE8_MEMBER(bgbank_w);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_MACHINE_RESET(s11a);
-	DECLARE_DRIVER_INIT(s11a);
-
-protected:
-
-private:
-
-};
-
-class s11b_state : public s11a_state
-{
-public:
-	s11b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: s11a_state(mconfig, type, tag),
-		m_bg_hc55516(*this, "hc55516_bg")
-
-	{ }
-
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia40_ca2_w);
-
-	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
-	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
-
-	DECLARE_MACHINE_RESET(s11b);
-	DECLARE_DRIVER_INIT(s11b);
-	DECLARE_DRIVER_INIT(s11b_invert);
-
-protected:
-	optional_device<hc55516_device> m_bg_hc55516;
-
-	void set_invert(bool inv) { m_invert = inv; }
-
-private:
-	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
-
-
-};
-
-class s11c_state : public s11b_state
-{
-public:
-	s11c_state(const machine_config &mconfig, device_type type, const char *tag)
-		: s11b_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_WRITE8_MEMBER(bgbank_w);
-
-	DECLARE_MACHINE_RESET(s11c);
-	DECLARE_DRIVER_INIT(s11c);
-
-protected:
-
-private:
-
-
-};
-
 
 #endif /* S11_H_ */

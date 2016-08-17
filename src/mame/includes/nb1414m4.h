@@ -11,8 +11,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	void dma(UINT16 src, UINT16 dst, UINT16 size, UINT8 condition, UINT8 *vram);
@@ -24,7 +24,7 @@ private:
 	void _0600(UINT8 is2p, UINT8 *vram);
 	void _0e00(UINT16 mcu_cmd, UINT8 *vram);
 
-	UINT8 *m_data;
+	required_region_ptr<UINT8> m_data;
 
 };
 

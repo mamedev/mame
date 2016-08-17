@@ -27,8 +27,8 @@ public:
 	UINT8           m_playfield_tile_bank;
 	UINT16          m_playfield_xscroll;
 	UINT16          m_playfield_yscroll;
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(port1_r);
 	DECLARE_DRIVER_INIT(vindictr);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

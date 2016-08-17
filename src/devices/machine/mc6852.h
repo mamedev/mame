@@ -89,16 +89,67 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr) override;
 
 	// device_serial_interface overrides
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void rcv_complete();
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_complete() override;
 
 private:
+	enum
+	{
+		S_IRQ = 0x80,
+		S_PE = 0x40,
+		S_RX_OVRN = 0x20,
+		S_TUF = 0x10,
+		S_CTS = 0x08,
+		S_DCD = 0x04,
+		S_TDRA = 0x02,
+		S_RDA = 0x01
+	};
+
+	enum
+	{
+		C1_AC_MASK = 0xc0,
+		C1_AC_C2 = 0x00,
+		C1_AC_C3 = 0x40,
+		C1_AC_SYNC = 0x80,
+		C1_AC_TX_FIFO = 0xc0,
+		C1_AC2 = 0x80,
+		C1_AC1 = 0x40,
+		C1_RIE = 0x20,
+		C1_TIE = 0x10,
+		C1_CLEAR_SYNC = 0x08,
+		C1_STRIP_SYNC = 0x04,
+		C1_TX_RS = 0x02,
+		C1_RX_RS = 0x01
+	};
+
+	enum
+	{
+		C2_EIE = 0x80,
+		C2_TX_SYNC = 0x40,
+		C2_WS_MASK = 0x38,
+		C2_WS3 = 0x20,
+		C2_WS2 = 0x10,
+		C2_WS1 = 0x08,
+		C2_1_2_BYTE = 0x04,
+		C2_PC_MASK = 0x03,
+		C2_PC2 = 0x02,
+		C2_PC1 = 0x01
+	};
+
+	enum
+	{
+		C3_CTUF = 0x08,
+		C3_CTS = 0x04,
+		C3_1_2_SYNC = 0x02,
+		C3_E_I_SYNC = 0x01
+	};
+
 	devcb_write_line       m_write_tx_data;
 	devcb_write_line       m_write_irq;
 	devcb_write_line       m_write_sm_dtr;

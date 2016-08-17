@@ -4,9 +4,8 @@
 #define _INCLUDES_N64_H_
 
 #include "cpu/rsp/rsp.h"
+#include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-
-/*----------- forward decls -----------*/
 
 /*----------- driver state -----------*/
 
@@ -16,20 +15,42 @@ class n64_state : public driver_device
 {
 public:
 	n64_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_vr4300(*this, "maincpu")
+		, m_rsp(*this, "rsp")
+		, m_sram(*this, "sram")
+		, m_rdram(*this, "rdram")
+		, m_rsp_imem(*this, "rsp_imem")
+		, m_rsp_dmem(*this, "rsp_dmem")
+	{
+	}
 
-	/* video-related */
-	n64_rdp *m_rdp;
-
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void n64_machine_stop();
 
 	UINT32 screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_n64(screen_device &screen, bool state);
-	required_device<cpu_device> m_maincpu;
+
+	// Getters
+	n64_rdp* rdp() { return m_rdp; }
+	UINT32* rdram() { return m_rdram; }
+	UINT32* sram() { return m_sram; }
+	UINT32* rsp_imem() { return m_rsp_imem; }
+	UINT32* rsp_dmem() { return m_rsp_dmem; }
+
+protected:
+	required_device<mips3_device> m_vr4300;
+	required_device<rsp_device> m_rsp;
+
+	optional_shared_ptr<UINT32> m_sram;
+	required_shared_ptr<UINT32> m_rdram;
+	required_shared_ptr<UINT32> m_rsp_imem;
+	required_shared_ptr<UINT32> m_rsp_dmem;
+
+	/* video-related */
+	n64_rdp *m_rdp;
 };
 
 /*----------- devices -----------*/
@@ -98,8 +119,8 @@ public:
 	void ai_timer_tick();
 	void pi_dma_tick();
 	void si_dma_tick();
-	void vi_scanline_tick();
 	void reset_tick();
+	void video_update(bitmap_rgb32 &bitmap);
 
 	// Video Interface (VI) registers
 	UINT32 vi_width;
@@ -116,6 +137,7 @@ public:
 	UINT32 vi_leap;
 	UINT32 vi_intr;
 	UINT32 vi_vburst;
+	UINT8 field;
 
 	/* nvram-specific for MESS */
 	device_t *m_nvram_image;
@@ -135,15 +157,22 @@ public:
 	void poll_reset_button(bool button);
 
 	UINT32 dp_clock;
+
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
-	address_space *mem_map;
-	device_t *maincpu;
-	device_t *rspcpu;
+	n64_state* m_n64;
+	address_space *m_mem_map;
+	mips3_device *m_vr4300;
+	rsp_device *m_rsp;
+
+	UINT32 *m_rdram;
+	UINT32 *m_sram;
+	UINT32 *m_rsp_imem;
+	UINT32 *m_rsp_dmem;
 
 	void clear_rcp_interrupt(int interrupt);
 
@@ -226,7 +255,6 @@ private:
 	UINT32 dd_track_offset;
 
 	// Peripheral Interface (PI) registers and functions
-	void pi_dma();
 	emu_timer *pi_dma_timer;
 	UINT32 pi_dram_addr;
 	UINT32 pi_cart_addr;
@@ -255,7 +283,8 @@ private:
 	UINT32 si_pif_addr;
 	UINT32 si_pif_addr_rd64b;
 	UINT32 si_pif_addr_wr64b;
-	UINT32 si_status;
+	UINT32 si_status_val;
+	UINT32 si_dma_dir;
 	UINT32 cic_status;
 	int cic_type;
 
@@ -263,6 +292,14 @@ private:
 
 	// Video Interface (VI) functions
 	void vi_recalculate_resolution();
+	void video_update16(bitmap_rgb32 &bitmap);
+	void video_update32(bitmap_rgb32 &bitmap);
+	UINT8 random_seed;        // %HACK%, adds 19 each time it's read and is more or less random
+	UINT8 get_random() { return random_seed += 0x13; }
+
+	INT32 m_gamma_table[256];
+	INT32 m_gamma_dither_table[0x4000];
+
 };
 
 // device type definition
@@ -302,6 +339,7 @@ extern const device_type N64PERIPH;
 #define DP_STATUS_XBUS_DMA      0x01
 #define DP_STATUS_FREEZE        0x02
 #define DP_STATUS_FLUSH         0x04
+#define DP_STATUS_START_VALID   0x400
 
 #define DD_ASIC_STATUS_DISK_CHANGE   0x00010000
 #define DD_ASIC_STATUS_MECHA_ERR     0x00020000
@@ -359,13 +397,6 @@ const unsigned int ddZoneTrackSize[16] = {158,158,149,149,149,149,149,114,
 const unsigned int ddStartOffset[16] =
 	{0x0,0x5F15E0,0xB79D00,0x10801A0,0x1523720,0x1963D80,0x1D414C0,0x20BBCE0,
 		0x23196E0,0x28A1E00,0x2DF5DC0,0x3299340,0x36D99A0,0x3AB70E0,0x3E31900,0x4149200};
-
-
-
-extern UINT32 *n64_sram;
-extern UINT32 *rdram;
-extern UINT32 *rsp_imem;
-extern UINT32 *rsp_dmem;
 
 extern void dp_full_sync(running_machine &machine);
 

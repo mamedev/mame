@@ -42,7 +42,8 @@ public:
 			m_attributesram(*this,"attributesram"),
 			m_bulletsram(*this,"bulletsram"),
 			m_rockclim_videoram(*this,"rockclim_vram"),
-			m_racknrol_tiles_bank(*this,"racknrol_tbank")
+			m_racknrol_tiles_bank(*this,"racknrol_tbank"),
+			m_leftclip(2)
 	{
 	}
 
@@ -74,7 +75,8 @@ public:
 	UINT8 m_flipscreen_y;
 	UINT8 m_color_mask;
 	tilemap_t *m_dambustr_tilemap2;
-	UINT8 *m_dambustr_videoram2;
+	std::unique_ptr<UINT8[]> m_dambustr_videoram2;
+	int m_leftclip;
 
 	void (galaxold_state::*m_modify_charcode)(UINT16 *code, UINT8 x);     /* function to call to do character banking */
 	void (galaxold_state::*m_modify_spritecode)(UINT8 *spriteram, int*, int*, int*, int); /* function to call to do sprite banking */
@@ -97,7 +99,7 @@ public:
 	int m_dambustr_bg_color_2;
 	int m_dambustr_bg_priority;
 	int m_dambustr_char_bank;
-	bitmap_ind16 *m_dambustr_tmpbitmap;
+	std::unique_ptr<bitmap_ind16> m_dambustr_tmpbitmap;
 
 	void (galaxold_state::*m_draw_stars)(bitmap_ind16 &, const rectangle &);      /* function to call to draw the star layer */
 	int m_stars_colors_start;
@@ -131,8 +133,6 @@ public:
 	DECLARE_WRITE8_MEMBER(galaxold_attributesram_w);
 	DECLARE_WRITE8_MEMBER(galaxold_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(galaxold_flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(gteikob2_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(gteikob2_flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(hotshock_flip_screen_w);
 	DECLARE_WRITE8_MEMBER(scrambold_background_enable_w);
 	DECLARE_WRITE8_MEMBER(scrambold_background_red_w);
@@ -149,7 +149,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dambustr_bg_color_w);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
-
+	DECLARE_READ8_MEMBER(rescueb_a002_r) { return 0xfc; }
 	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
@@ -189,6 +189,7 @@ public:
 	DECLARE_VIDEO_START(batman2);
 	DECLARE_VIDEO_START(mooncrst);
 	DECLARE_VIDEO_START(scrambold);
+	DECLARE_VIDEO_START(newsin7);
 	DECLARE_VIDEO_START(pisces);
 	DECLARE_VIDEO_START(dkongjrm);
 	DECLARE_VIDEO_START(rockclim);
@@ -220,7 +221,6 @@ public:
 	void state_save_register();
 	void video_start_common();
 	void pisces_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void theend_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void mooncrst_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void batman2_modify_charcode(UINT16 *code, UINT8 x);
 	void rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

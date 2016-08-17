@@ -14,8 +14,10 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __VIDEO_H__
-#define __VIDEO_H__
+#ifndef MAME_EMU_VIDEO_H
+#define MAME_EMU_VIDEO_H
+
+#include "aviio.h"
 
 
 //**************************************************************************
@@ -35,7 +37,7 @@ const int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 // forward references
 class render_target;
 class screen_device;
-struct avi_file;
+class avi_file;
 
 
 
@@ -64,7 +66,7 @@ public:
 	bool throttled() const { return m_throttled; }
 	float throttle_rate() const { return m_throttle_rate; }
 	bool fastforward() const { return m_fastforward; }
-	bool is_recording() const { return (m_mng_file != NULL || m_avi_file != NULL); }
+	bool is_recording() const { return (m_mng_file || m_avi_file); }
 
 	// setters
 	void set_frameskip(int frameskip);
@@ -76,22 +78,35 @@ public:
 	// misc
 	void toggle_throttle();
 	void toggle_record_movie();
+	osd_file::error open_next(emu_file &file, const char *extension);
 
 	// render a frame
-	void frame_update(bool debug = false);
+	void frame_update(bool from_debugger = false);
 
 	// current speed helpers
-	std::string &speed_text(std::string &str);
+	std::string speed_text();
 	double speed_percent() const { return m_speed_percent; }
 
 	// snapshots
 	void save_snapshot(screen_device *screen, emu_file &file);
 	void save_active_screen_snapshots();
+	void save_input_timecode();
 
 	// movies
 	void begin_recording(const char *name, movie_format format);
 	void end_recording(movie_format format);
 	void add_sound_to_recording(const INT16 *sound, int numsamples);
+
+	void set_timecode_enabled(bool value) { m_timecode_enabled = value; }
+	bool get_timecode_enabled() { return m_timecode_enabled; }
+	bool get_timecode_write() { return m_timecode_write; }
+	void set_timecode_write(bool value) { m_timecode_write = value; }
+	void set_timecode_text(std::string &str) { m_timecode_text = str; }
+	void set_timecode_start(attotime time) { m_timecode_start = time; }
+	void add_to_total_time(attotime time) { m_timecode_total += time; }
+	std::string &timecode_text(std::string &str);
+	std::string &timecode_total_text(std::string &str);
+
 
 private:
 	// internal helpers
@@ -100,7 +115,7 @@ private:
 	void postload();
 
 	// effective value helpers
-	int effective_autoframeskip() const;
+	bool effective_autoframeskip() const;
 	int effective_frameskip() const;
 	bool effective_throttle() const;
 
@@ -115,7 +130,6 @@ private:
 
 	// snapshot/movie helpers
 	void create_snapshot_bitmap(screen_device *screen);
-	file_error open_next(emu_file &file, const char *extension);
 	void record_frame();
 
 	// internal state
@@ -166,13 +180,13 @@ private:
 	INT32               m_snap_height;              // height of snapshots (0 == auto)
 
 	// movie recording - MNG
-	auto_pointer<emu_file> m_mng_file;              // handle to the open movie file
+	std::unique_ptr<emu_file> m_mng_file;              // handle to the open movie file
 	attotime            m_mng_frame_period;         // period of a single movie frame
 	attotime            m_mng_next_frame_time;      // time of next frame
 	UINT32              m_mng_frame;                // current movie frame number
 
 	// movie recording - AVI
-	avi_file *          m_avi_file;                 // handle to the open movie file
+	avi_file::ptr       m_avi_file;                 // handle to the open movie file
 	attotime            m_avi_frame_period;         // period of a single movie frame
 	attotime            m_avi_next_frame_time;      // time of next frame
 	UINT32              m_avi_frame;                // current movie frame number
@@ -184,6 +198,13 @@ private:
 
 	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
 	static const int PAUSED_REFRESH_RATE = 30;
+
+	bool                    m_timecode_enabled;     // inp.timecode record enabled
+	bool                    m_timecode_write;       // Show/hide timer at right (partial time)
+	std::string             m_timecode_text;        // Message for that video part (intro, gameplay, extra)
+	attotime                m_timecode_start;       // Starting timer for that video part (intro, gameplay, extra)
+	attotime                m_timecode_total;       // Show/hide timer at left (total elapsed on resulting video preview)
+
 };
 
-#endif  /* __VIDEO_H__ */
+#endif // MAME_EMU_VIDEO_H

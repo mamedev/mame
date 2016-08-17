@@ -58,9 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(galpani2_oki1_bank_w);
 	DECLARE_WRITE8_MEMBER(galpani2_oki2_bank_w);
 	DECLARE_WRITE16_MEMBER(subdatabank_select_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(galpani2);
 	UINT32 screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);

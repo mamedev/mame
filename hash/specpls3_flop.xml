@@ -144,7 +144,7 @@
 		<!-- SPS (CAPS) release 3557 -->
 		<description>Butcher Hill</description>
 		<year>1989</year>
-		<publisher>Gremlin Graphics Software </publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
@@ -339,7 +339,7 @@
 		<!-- SPS (CAPS) release 3568 -->
 		<description>Espionage</description>
 		<year>1988</year>
-		<publisher>Grandslam Entertainments </publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<info name="alt_title" value="Espionage - The Computer Game (Box)" />
 
 		<part name="flop1" interface="floppy_3">
@@ -417,7 +417,7 @@
 		<!-- SPS (CAPS) release 3572 -->
 		<description>Footballer of the Year 2</description>
 		<year>1989</year>
-		<publisher>Gremlin Graphics Software </publisher>
+		<publisher>Gremlin Graphics Software</publisher>
 
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="259471">
@@ -926,7 +926,7 @@
 		<!-- SPS (CAPS) release 3595 -->
 		<description>Pac-Land</description>
 		<year>1989</year>
-		<publisher>Grandslam Entertainments </publisher>
+		<publisher>Grandslam Entertainments</publisher>
 
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="114805">

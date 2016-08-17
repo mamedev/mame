@@ -44,8 +44,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
@@ -55,8 +55,6 @@ private:
 	UINT32 m_LastPalUpdate;
 
 	RenderStateInfo m_RenderState;
-
-	UINT16 Alpha(UINT16 Src, UINT16 Dst);
 };
 
 extern const device_type VIDEO_VRENDER0;

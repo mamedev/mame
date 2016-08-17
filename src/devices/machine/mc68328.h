@@ -4,8 +4,7 @@
 
  Motorola 68328 ("DragonBall") System-on-a-Chip implementation
 
- By MooglyGuy
- contact mooglyguy@gmail.com with licensing and usage questions.
+ By Ryan Holtz
 
  **********************************************************************/
 
@@ -646,8 +645,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

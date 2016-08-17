@@ -28,7 +28,7 @@ public:
 	UINT8 m_gain_control;
 	emu_timer *m_interrupt_timer;
 	int m_flipscreen;
-	UINT32 *m_prom_tab;
+	std::unique_ptr<UINT32[]> m_prom_tab;
 	bitmap_ind16 m_bitmap;
 	DECLARE_WRITE16_MEMBER(magmax_sound_w);
 	DECLARE_READ8_MEMBER(magmax_sound_irq_ack);
@@ -36,9 +36,9 @@ public:
 	DECLARE_WRITE16_MEMBER(magmax_vreg_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(magmax);
 	UINT32 screen_update_magmax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);

@@ -37,12 +37,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_gg_ext_port_interface overrides
-	virtual UINT8 peripheral_r();
-	virtual void peripheral_w(UINT8 data);
+	virtual UINT8 peripheral_r() override;
+	virtual void peripheral_w(UINT8 data) override;
 
 private:
 	required_device<sms_control_port_device> m_subctrl_port;

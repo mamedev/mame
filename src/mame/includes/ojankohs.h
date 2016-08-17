@@ -73,7 +73,7 @@ public:
 	DECLARE_READ8_MEMBER(ojankohs_ay8910_1_r);
 	TILE_GET_INFO_MEMBER(ojankohs_get_tile_info);
 	TILE_GET_INFO_MEMBER(ojankoy_get_tile_info);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(ojankohs);
 	DECLARE_VIDEO_START(ojankohs);
 	DECLARE_MACHINE_START(ojankoy);

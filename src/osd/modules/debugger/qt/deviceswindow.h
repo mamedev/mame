@@ -3,7 +3,7 @@
 #ifndef __DEBUG_QT_DEVICES_WINDOW_H__
 #define __DEBUG_QT_DEVICES_WINDOW_H__
 
-#include <QtGui/QtGui>
+#include <QtWidgets/QTreeView>
 
 #include "windowqt.h"
 
@@ -42,7 +42,7 @@ class DevicesWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DevicesWindow(running_machine* machine, QWidget* parent=NULL);
+	DevicesWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~DevicesWindow();
 
 public slots:

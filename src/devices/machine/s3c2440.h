@@ -493,8 +493,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	// internal state
 	required_device<palette_device> m_palette;
@@ -1006,7 +1006,7 @@ public:
 	{
 		s3c24xx_lcd_regs_t regs;
 		emu_timer *timer;
-		bitmap_rgb32 *bitmap[2];
+		std::unique_ptr<bitmap_rgb32> bitmap[2];
 		UINT32 vramaddr_cur;
 		UINT32 vramaddr_max;
 		UINT32 offsize;

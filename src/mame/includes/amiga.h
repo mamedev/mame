@@ -22,6 +22,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "machine/akiko.h"
 #include "machine/i2cmem.h"
 #include "sound/amiga.h"
+#include "video/amigaaga.h"
 
 
 /*************************************
@@ -346,8 +347,7 @@ public:
 	m_potgo_port(*this, "potgo"),
 	m_pot0dat_port(*this, "POT0DAT"),
 	m_pot1dat_port(*this, "POT1DAT"),
-	m_p1joy_port(*this, "p1_joy"),
-	m_p2joy_port(*this, "p2_joy"),
+	m_joy_ports(*this, {"p1_joy", "p2_joy"}),
 	m_p1_mouse_x(*this, "p1_mouse_x"),
 	m_p1_mouse_y(*this, "p1_mouse_y"),
 	m_p2_mouse_x(*this, "p2_mouse_x"),
@@ -529,11 +529,11 @@ protected:
 	};
 
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// device_t overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void custom_chip_reset();
 
@@ -575,8 +575,7 @@ protected:
 	optional_ioport m_potgo_port;
 	optional_ioport m_pot0dat_port;
 	optional_ioport m_pot1dat_port;
-	optional_ioport m_p1joy_port;
-	optional_ioport m_p2joy_port;
+	optional_ioport_array<2> m_joy_ports;
 	optional_ioport m_p1_mouse_x;
 	optional_ioport m_p1_mouse_y;
 	optional_ioport m_p2_mouse_x;
@@ -685,9 +684,5 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
 
 MACHINE_CONFIG_EXTERN( pal_video );
 MACHINE_CONFIG_EXTERN( ntsc_video );
-
-/*----------- defined in video/amigaaga.c -----------*/
-
-void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);
 
 #endif /* __AMIGA_H__ */

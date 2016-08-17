@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Jarek Burczynski, Aaron Giles, Jonathan Gevaryahu, Couriersud
 #pragma once
 
@@ -66,19 +66,15 @@ public:
 	DECLARE_READ8_MEMBER( romclk_hack_r );
 
 	void set_frequency(int frequency);
-
-	int _speech_rom_read_bit();
-	void _speech_rom_set_addr(int addr);
-
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	void set_variant(int variant);
 
@@ -101,6 +97,9 @@ private:
 	void parse_frame();
 
 	// internal state
+	/* table */
+	optional_region_ptr<UINT8> m_table;
+
 	/* coefficient tables */
 	int m_variant;                /* Variant of the 5110 - see tms5110.h */
 
@@ -195,7 +194,6 @@ private:
 	UINT8 m_romclk_hack_state;
 
 	emu_timer *m_romclk_hack_timer;
-	const UINT8 *m_table;
 };
 
 extern const device_type TMS5110;
@@ -206,7 +204,7 @@ public:
 	tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMS5100;
@@ -217,7 +215,7 @@ public:
 	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMC0281;
@@ -228,7 +226,7 @@ public:
 	tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMS5100A;
@@ -239,7 +237,7 @@ public:
 	tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMC0281D;
@@ -250,7 +248,7 @@ public:
 	cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type CD2801;
@@ -261,7 +259,7 @@ public:
 	cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type CD2802;
@@ -272,7 +270,7 @@ public:
 	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMS5110A;
@@ -286,7 +284,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type M58817;
@@ -300,7 +298,7 @@ class tmsprom_device : public device_t
 public:
 	tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_region(device_t &device, const char *region) { downcast<tmsprom_device &>(device).m_prom_region = region; }
+	static void set_region(device_t &device, const char *region) { downcast<tmsprom_device &>(device).m_prom.set_tag(region); }
 	static void set_rom_size(device_t &device, UINT32 rom_size) { downcast<tmsprom_device &>(device).m_rom_size = rom_size; }
 	static void set_pdc_bit(device_t &device, UINT8 pdc_bit) { downcast<tmsprom_device &>(device).m_pdc_bit = pdc_bit; }
 	static void set_ctl1_bit(device_t &device, UINT8 ctl1_bit) { downcast<tmsprom_device &>(device).m_ctl1_bit = ctl1_bit; }
@@ -322,9 +320,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void register_for_save_states();
@@ -341,7 +339,8 @@ private:
 
 	int m_prom_cnt;
 
-	const char *m_prom_region;        /* prom memory region - sound region is automatically assigned */
+	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<UINT8> m_prom;
 	UINT32 m_rom_size;                /* individual rom_size */
 	UINT8 m_pdc_bit;                  /* bit # of pdc line */
 	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
@@ -355,14 +354,12 @@ private:
 	devcb_write8 m_ctl_cb;          /* tms ctl func */
 
 	emu_timer *m_romclk_timer;
-	const UINT8 *m_rom;
-	const UINT8 *m_prom;
 };
 
 extern const device_type TMSPROM;
 
 #define MCFG_TMSPROM_REGION(_region) \
-	tmsprom_device::set_region(*device, _region);
+	tmsprom_device::set_region(*device, "^" _region);
 
 #define MCFG_TMSPROM_ROM_SIZE(_size) \
 	tmsprom_device::set_rom_size(*device, _size);

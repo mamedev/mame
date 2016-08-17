@@ -54,7 +54,7 @@ public:
 	optional_region_ptr<UINT8> m_bgcolorrom;
 
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_sprite_position;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
@@ -63,10 +63,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 
-	UINT8 *     m_buckrog_bitmap_ram;
+	std::unique_ptr<UINT8[]>     m_buckrog_bitmap_ram;
 
 	/* machine states */
 	UINT8       m_i8279_scanlines;
+	UINT8       m_alt_spriteram[0x80];
 
 	/* sound state */
 	UINT8       m_turbo_osel;
@@ -149,8 +150,10 @@ public:
 	DECLARE_WRITE8_MEMBER(buckrog_ppi1c_w);
 	DECLARE_READ8_MEMBER(turbo_analog_r);
 	DECLARE_WRITE8_MEMBER(buckrog_i8255_0_w);
-	DECLARE_DRIVER_INIT(buckrog_enc);
+	DECLARE_READ8_MEMBER(spriteram_r);
+	DECLARE_WRITE8_MEMBER(spriteram_w);
 	DECLARE_DRIVER_INIT(turbo_enc);
+	DECLARE_DRIVER_INIT(turbo_noenc);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(turbo);
 	DECLARE_PALETTE_INIT(turbo);
@@ -162,7 +165,6 @@ public:
 	UINT32 screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(delayed_i8255_w);
-	TIMER_CALLBACK_MEMBER(update_sound_a);
 	DECLARE_WRITE8_MEMBER(turbo_sound_a_w);
 	DECLARE_WRITE8_MEMBER(turbo_sound_b_w);
 	DECLARE_WRITE8_MEMBER(turbo_sound_c_w);

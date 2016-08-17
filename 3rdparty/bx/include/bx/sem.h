@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_SEM_H_HEADER_GUARD
@@ -16,7 +16,9 @@
 #	include <semaphore.h>
 #	include <time.h>
 #	include <pthread.h>
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#elif BX_PLATFORM_XBOXONE
+#	include <synchapi.h>
+#elif BX_PLATFORM_XBOX360 || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
 #	include <limits.h>
 #endif // BX_PLATFORM_
@@ -83,13 +85,34 @@ namespace bx
 			int result = pthread_mutex_lock(&m_mutex);
 			BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
 
-#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX || BX_PLATFORM_IOS
+#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
 			BX_UNUSED(_msecs);
-			BX_CHECK(-1 == _msecs, "NaCl, iOS and OSX don't support pthread_cond_timedwait at this moment.");
+			BX_CHECK(-1 == _msecs, "NaCl and OSX don't support pthread_cond_timedwait at this moment.");
 			while (0 == result
-			&&     0 >= m_count)
+			&&	 0 >= m_count)
 			{
 				result = pthread_cond_wait(&m_cond, &m_mutex);
+			}
+#		elif BX_PLATFORM_IOS
+			if (-1 == _msecs)
+			{
+				while (0 == result
+				&&     0 >= m_count)
+				{
+					result = pthread_cond_wait(&m_cond, &m_mutex);
+				}
+			}
+			else
+			{
+				timespec ts;
+				ts.tv_sec = _msecs/1000;
+				ts.tv_nsec = (_msecs%1000)*1000;
+
+				while (0 == result
+				&&     0 >= m_count)
+				{
+					result = pthread_cond_timedwait_relative_np(&m_cond, &m_mutex, &ts);
+				}
 			}
 #		else
 			timespec ts;
@@ -190,7 +213,7 @@ namespace bx
 	};
 #	endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#elif BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 
 	class Semaphore
 	{
@@ -202,10 +225,10 @@ namespace bx
 	public:
 		Semaphore()
 		{
-#if BX_PLATFORM_WINRT
-			m_handle = CreateSemaphoreEx(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
+#if BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+			m_handle = CreateSemaphoreExW(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
 #else
-			m_handle = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
+			m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
 #endif
 			BX_CHECK(NULL != m_handle, "Failed to create Semaphore!");
 		}
@@ -223,7 +246,7 @@ namespace bx
 		bool wait(int32_t _msecs = -1) const
 		{
 			DWORD milliseconds = (0 > _msecs) ? INFINITE : _msecs;
-#if BX_PLATFORM_WINRT
+#if BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 			return WAIT_OBJECT_0 == WaitForSingleObjectEx(m_handle, milliseconds, FALSE);
 #else
 			return WAIT_OBJECT_0 == WaitForSingleObject(m_handle, milliseconds);

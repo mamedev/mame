@@ -9,7 +9,6 @@
 	local cpp = premake.make.cpp
 	local make = premake.make
 
-
 	function premake.make_cpp(prj)
 
 		-- create a shortcut to the compiler interface
@@ -26,27 +25,29 @@
 			end
 		end
 
+		table.sort(prj.files)
+
 		-- list object directories
 		local objdirs = {}
 		local additionalobjdirs = {}
 		for _, file in ipairs(prj.files) do
-			if path.iscppfile(file) then
+			if path.isSourceFile(file) then
 				objdirs[_MAKE.esc(path.getdirectory(path.trimdots(file)))] = 1
 			end
 		end
-		
+
 		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
 			for _, buildtask in ipairs(custombuildtask or {}) do
 				additionalobjdirs[_MAKE.esc(path.getdirectory(path.getrelative(prj.location,buildtask[2])))] = 1
 			end
 		end
-		
+
 		_p('OBJDIRS := \\')
 		_p('\t$(OBJDIR) \\')
-		for dir, _ in pairs(objdirs) do
+		for dir, _ in iter.sortByKeys(objdirs) do
 			_p('\t$(OBJDIR)/%s \\', dir)
 		end
-		for dir, _ in pairs(additionalobjdirs) do
+		for dir, _ in iter.sortByKeys(additionalobjdirs) do
 			_p('\t%s \\', dir)
 		end
 		_p('')
@@ -64,9 +65,9 @@
 		_p('')
 
 		if os.is("MacOSX") and prj.kind == "WindowedApp" then
-			_p('all: $(TARGETDIR) $(OBJDIRS) prebuild prelink $(TARGET) $(dir $(TARGETDIR))PkgInfo $(dir $(TARGETDIR))Info.plist')
+			_p('all: $(OBJDIRS) prebuild prelink $(TARGET) $(dir $(TARGETDIR))PkgInfo $(dir $(TARGETDIR))Info.plist | $(TARGETDIR)')
 		else
-			_p('all: $(TARGETDIR) $(OBJDIRS) prebuild prelink $(TARGET)')
+			_p('all: $(OBJDIRS) prebuild prelink $(TARGET) | $(TARGETDIR)')
 		end
 		_p('\t@:')
 		_p('')
@@ -86,7 +87,7 @@
 		end
 
 		-- target build rule
-		_p('$(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)')
+		_p('$(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(EXTERNAL_LIBS) $(RESOURCES) | $(TARGETDIR) $(OBJDIRS)')
 
 		if prj.kind == "StaticLib" then
 			if prj.msgarchiving then
@@ -98,10 +99,10 @@
 				prj.archivesplit_size=200
 			end
 			if (not prj.options.ArchiveSplit) then
-				_p('\t$(SILENT) $(LINKCMD) $(OBJECTS)')
+				_p('\t$(SILENT) $(LINKCMD) $(OBJECTS)' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
 			else
 				_p('\t$(call RM,$(TARGET))')
-				_p('\t@$(call max_args,$(LINKCMD),'.. prj.archivesplit_size ..',$(OBJECTS))')
+				_p('\t@$(call max_args,$(LINKCMD),'.. prj.archivesplit_size ..',$(OBJECTS))' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
 				_p('\t$(SILENT) $(LINKCMD_NDX)')
 			end
 		else
@@ -162,7 +163,7 @@
 
 		-- per-file build rules
 		cpp.fileRules(prj)
-		
+
 		-- per-dependency build rules
 		cpp.dependencyRules(prj)
 
@@ -172,7 +173,7 @@
 				for _, depdata in ipairs(buildtask[3] or {}) do
 					deps = deps .. string.format("%s ",path.getrelative(prj.location,depdata))
 				end
-				_p('%s: %s'
+				_p('%s: %s | $(TARGETDIR) $(OBJDIRS)'
 					,path.getrelative(prj.location,buildtask[2])
 					, deps
 					)
@@ -185,14 +186,14 @@
 					end
 					cmd = string.gsub(cmd, "%$%(<%)", "$<")
 					cmd = string.gsub(cmd, "%$%(@%)", "$@")
-					 
+
 					_p('\t$(SILENT) %s',cmd)
-					
+
 				end
 				_p('')
 			end
 		end
-		
+
 		-- include the dependencies, built by GCC (with the -MMD flag)
 		_p('-include $(OBJECTS:%%.o=%%.d)')
 		_p('ifneq (,$(PCH))')
@@ -236,7 +237,7 @@
 		_p('ifeq (posix,$(SHELLTYPE))')
 		_p('  MKDIR = $(SILENT) mkdir -p "$(1)"')
 		_p('  COPY  = $(SILENT) cp -fR "$(1)" "$(2)"')
-		_p('  RM	= $(SILENT) rm -f "$(1)"')
+		_p('  RM    = $(SILENT) rm -f "$(1)"')
 		_p('else')
 		_p('  MKDIR = $(SILENT) mkdir "$(subst /,\\\\,$(1))" 2> nul || exit 0')
 		_p('  COPY  = $(SILENT) copy /Y "$(subst /,\\\\,$(1))" "$(subst /,\\\\,$(2))"')
@@ -270,11 +271,13 @@
 		-- if this platform requires a special compiler or linker, list it here
 		cpp.platformtools(cfg, cc)
 
-		_p('  ' .. (table.contains(premake.make.override,"OBJDIR") and "override " or "") ..    'OBJDIR     = %s', _MAKE.esc(cfg.objectsdir))
-		_p('  ' .. (table.contains(premake.make.override,"TARGETDIR") and "override " or "") .. 'TARGETDIR  = %s', _MAKE.esc(cfg.buildtarget.directory))
-		_p('  ' .. (table.contains(premake.make.override,"TARGET") and "override " or "") ..    'TARGET     = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
-		_p('  DEFINES   +=%s', make.list(cc.getdefines(cfg.defines)))
-		_p('  INCLUDES  +=%s', make.list(cc.getincludedirs(cfg.includedirs)))
+		_p('  ' .. (table.contains(premake.make.override,"OBJDIR") and "override " or "") ..    'OBJDIR         = %s', _MAKE.esc(cfg.objectsdir))
+		_p('  ' .. (table.contains(premake.make.override,"TARGETDIR") and "override " or "") .. 'TARGETDIR      = %s', _MAKE.esc(cfg.buildtarget.directory))
+		_p('  ' .. (table.contains(premake.make.override,"TARGET") and "override " or "") ..    'TARGET         = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
+		_p('  DEFINES       +=%s', make.list(cc.getdefines(cfg.defines)))
+		_p('  INCLUDES      +=%s', make.list(cc.getincludedirs(cfg.includedirs)))
+		_p('  INCLUDES      +=%s', make.list(cc.getquoteincludedirs(cfg.userincludedirs)))
+
 
 		-- set up precompiled headers
 		cpp.pchconfig(cfg)
@@ -285,10 +288,12 @@
 		-- write out libraries, linker flags, and the link command
 		cpp.linker(prj, cfg, cc)
 
+		table.sort(prj.files)
+
 		-- add objects for compilation, and remove any that are excluded per config.
 		_p('  OBJECTS := \\')
 		for _, file in ipairs(prj.files) do
-			if path.iscppfile(file) then
+			if path.isSourceFile(file) then
 				-- check if file is excluded.
 				if not table.icontains(cfg.excludes, file) then
 					-- if not excluded, add it.
@@ -359,7 +364,7 @@
 
 		if #cfg.forcedincludes > 0 then
 			_p('  FORCE_INCLUDE += -include %s'
-					,premake.esc(table.concat(cfg.forcedincludes, ";")))
+					,_MAKE.esc(table.concat(cfg.forcedincludes, ";")))
 		end
 
 		_p('  ALL_CPPFLAGS  += $(CPPFLAGS) %s $(DEFINES) $(INCLUDES)', table.concat(cc.getcppflags(cfg), " "))
@@ -383,28 +388,16 @@
 		-- Patch #3401184 changed the order
 		_p('  ALL_LDFLAGS   += $(LDFLAGS)%s', make.list(table.join(cc.getlibdirflags(cfg), cc.getldflags(cfg), cfg.linkoptions)))
 
-		_p('  LDDEPS    +=%s', make.list(_MAKE.esc(premake.getlinks(cfg, "siblings", "fullpath"))))
-		_p('  LIBS      += $(LDDEPS)%s', make.list(cc.getlinkflags(cfg)))
+		_p('  LDDEPS        +=%s', make.list(_MAKE.esc(premake.getlinks(cfg, "siblings", "fullpath"))))
+		_p('  LIBS          += $(LDDEPS)%s', make.list(cc.getlinkflags(cfg)))
+		_p('  EXTERNAL_LIBS +=%s', make.list(cc.getlibfiles(cfg)))
 
 		if cfg.kind == "StaticLib" then
-			if cfg.platform:startswith("Universal") then
-				_p('  LINKCMD    = libtool -o $(TARGET)')
+			if (not prj.options.ArchiveSplit) then
+				_p('  LINKCMD        = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
 			else
-				if (not prj.options.ArchiveSplit) then
-					if cc.llvm then
-						_p('  LINKCMD    = $(AR) rcs $(TARGET)')
-					else
-						_p('  LINKCMD    = $(AR) -rcs $(TARGET)')
-					end
-				else
-					if cc.llvm then
-						_p('  LINKCMD    = $(AR) qc $(TARGET)')
-						_p('  LINKCMD_NDX= $(AR) cs $(TARGET)')
-					else
-						_p('  LINKCMD    = $(AR) -qc $(TARGET)')
-						_p('  LINKCMD_NDX= $(AR) -cs $(TARGET)')
-					end
-				end
+				_p('  LINKCMD        = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
+				_p('  LINKCMD_NDX    = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, true)))
 			end
 		else
 
@@ -414,7 +407,7 @@
 			-- $(LIBS) moved to end (http://sourceforge.net/p/premake/bugs/279/)
 
 			local tool = iif(cfg.language == "C", "CC", "CXX")
-			_p('  LINKCMD    = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)', tool)
+			_p('  LINKCMD        = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)', tool)
 
 		end
 	end
@@ -456,19 +449,23 @@
 			end
 		end
 
-		_p('  PCH        = %s', _MAKE.esc(pch))
-		_p('  GCH        = $(OBJDIR)/$(notdir $(PCH)).gch')
+		_p('  PCH            = %s', _MAKE.esc(pch))
+		_p('  GCH            = $(OBJDIR)/$(notdir $(PCH)).gch')
 
 	end
 
 
 	function cpp.pchrules(prj)
 		_p('ifneq (,$(PCH))')
-		_p('$(GCH): $(PCH)')
-		_p('\t@echo $(notdir $<)')
+		_p('$(GCH): $(PCH) | $(OBJDIR)')
+		if prj.msgprecompile then
+			_p('\t@echo ' .. prj.msgprecompile)
+		else
+			_p('\t@echo $(notdir $<)')
+		end
 
-		local cmd = iif(prj.language == "C", "$(CC) -x c-header $(ALL_CFLAGS)", "$(CXX) -x c++-header $(ALL_CXXFLAGS)")
-		_p('\t$(SILENT) %s -MMD -MP $(DEFINES) $(INCLUDES) -o "$@" -MF "$(@:%%.gch=%%.d)" -c "$<"', cmd)
+		local cmd = iif(prj.language == "C", "$(CC) $(ALL_CFLAGS) -x c-header", "$(CXX) $(ALL_CXXFLAGS) -x c++-header")
+		_p('\t$(SILENT) %s $(DEFINES) $(INCLUDES) -o "$@" -c "$<"', cmd)
 
 		_p('endif')
 		_p('')
@@ -480,9 +477,10 @@
 --
 
 	function cpp.fileRules(prj)
+		table.sort(prj.files)
 		for _, file in ipairs(prj.files or {}) do
-			if path.iscppfile(file) then
-				_p('$(OBJDIR)/%s.o: %s'
+			if path.isSourceFile(file) then
+				_p('$(OBJDIR)/%s.o: %s $(GCH)'
 					, _MAKE.esc(path.trimdots(path.removeext(file)))
 					, _MAKE.esc(file)
 					)
@@ -494,7 +492,7 @@
 					_p('\t@echo $(notdir $<)')
 				end
 				if (path.isobjcfile(file)) then
-					_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.o=%%.d) -c "$<"')
+					_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"')
 				else
 					cpp.buildcommand(path.iscfile(file) and not prj.options.ForceCPP, "o")
 				end
@@ -502,7 +500,7 @@
 					_p('\t$(SILENT) %s', task)
 					_p('')
 				end
-				
+
 				_p('')
 			elseif (path.getextension(file) == ".rc") then
 				_p('$(OBJDIR)/%s.res: %s', _MAKE.esc(path.getbasename(file)), _MAKE.esc(file))
@@ -516,7 +514,7 @@
 			end
 		end
 	end
-	
+
 	function cpp.dependencyRules(prj)
 		for _, dependency in ipairs(prj.dependency or {}) do
 			for _, dep in ipairs(dependency or {}) do
@@ -535,9 +533,9 @@
 			end
 		end
 	end
-	
+
 
 	function cpp.buildcommand(iscfile, objext)
 		local flags = iif(iscfile, '$(CC) $(ALL_CFLAGS)', '$(CXX) $(ALL_CXXFLAGS)')
-		_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.%s=%%.d) -c "$<"', flags, objext)
+		_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -c "$<"', flags, objext)
 	end

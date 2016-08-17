@@ -16,6 +16,7 @@
 
 class iq151_video32_device :
 		public device_t,
+		public device_gfx_interface,
 		public device_iq151cart_interface
 {
 public:
@@ -23,24 +24,21 @@ public:
 	iq151_video32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// iq151cart_interface overrides
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual void write(offs_t offset, UINT8 data);
-	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void read(offs_t offset, UINT8 &data) override;
+	virtual void write(offs_t offset, UINT8 data) override;
+	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
 	UINT8 *     m_videoram;
 	UINT8 *     m_chargen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 

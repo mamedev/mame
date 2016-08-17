@@ -24,7 +24,7 @@
 	MCFG_DEVICE_ADD(_tag, MC146818, _xtal)
 
 #define MCFG_MC146818_IRQ_HANDLER(_irq) \
-	downcast<mc146818_device *>(device)->set_irq_callback(DEVCB_##_irq);
+	devcb = &mc146818_device::set_irq_callback(*device, DEVCB_##_irq);
 
 // The MC146818 doesn't have century support, but when syncing the date & time at startup we can optionally store the century.
 #define MCFG_MC146818_CENTURY_INDEX(_century_index) \
@@ -33,6 +33,18 @@
 // The MC146818 doesn't have UTC support, but when syncing the data & time at startup we can use UTC instead of local time.
 #define MCFG_MC146818_UTC(_utc) \
 	downcast<mc146818_device *>(device)->set_use_utc(_utc);
+
+#define MCFG_MC146818_BINARY(_bin) \
+	downcast<mc146818_device *>(device)->set_binary(_bin);
+
+#define MCFG_MC146818_24_12(_hour) \
+	downcast<mc146818_device *>(device)->set_hour(_hour);
+
+#define MCFG_MC146818_EPOCH(_epoch) \
+	downcast<mc146818_device *>(device)->set_epoch(_epoch);
+
+#define MCFG_MC146818_BINARY_YEAR(_bin) \
+	downcast<mc146818_device *>(device)->set_binary_year(_bin);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -49,9 +61,13 @@ public:
 	mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// callbacks
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<mc146818_device &>(device).m_write_irq.set_callback(object); }
 	void set_century_index(int century_index) { m_century_index = century_index; }
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
+	void set_binary(bool binary) { m_binary = binary; }
+	void set_hour(bool hour) { m_hour = hour; }
+	void set_epoch(int epoch) { m_epoch = epoch; }
+	void set_binary_year(int bin) { m_binyear = bin; }
 
 	// read/write access
 	DECLARE_READ8_MEMBER( read );
@@ -59,14 +75,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 	static const unsigned char ALARM_DONTCARE = 0xc0;
 	static const unsigned char HOURS_PM = 0x80;
@@ -151,6 +167,8 @@ private:
 	int get_year();
 	void set_year(int year);
 
+	optional_memory_region m_region;
+
 	// internal state
 
 	UINT8           m_index;
@@ -165,8 +183,8 @@ private:
 	emu_timer *m_periodic_timer;
 
 	devcb_write_line m_write_irq;
-	int m_century_index;
-	bool m_use_utc;
+	int m_century_index, m_epoch;
+	bool m_use_utc, m_binary, m_hour, m_binyear;
 };
 
 

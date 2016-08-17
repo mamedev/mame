@@ -111,12 +111,6 @@ enum cop400_cko_bond {
 	COP400_CKO_GENERAL_PURPOSE_INPUT
 };
 
-/* microbus bonding options */
-enum cop400_microbus {
-	COP400_MICROBUS_DISABLED = 0,
-	COP400_MICROBUS_ENABLED
-};
-
 
 #define MCFG_COP400_CONFIG(_cki, _cko, _microbus) \
 	cop400_cpu_device::set_cki(*device, _cki); \
@@ -130,7 +124,7 @@ public:
 	// construction/destruction
 	cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_l_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_l.set_callback(object); }
@@ -146,36 +140,39 @@ public:
 
 	static void set_cki(device_t &device, cop400_cki_bond cki) { downcast<cop400_cpu_device &>(device).m_cki = cki; }
 	static void set_cko(device_t &device, cop400_cko_bond cko) { downcast<cop400_cpu_device &>(device).m_cko = cko; }
-	static void set_microbus(device_t &device, cop400_microbus microbus) { downcast<cop400_cpu_device &>(device).m_microbus = microbus; }
+	static void set_microbus(device_t &device, bool has_microbus) { downcast<cop400_cpu_device &>(device).m_has_microbus = has_microbus; }
+
+	DECLARE_READ8_MEMBER( microbus_rd );
+	DECLARE_WRITE8_MEMBER( microbus_wr );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + m_cki - 1) / m_cki; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * m_cki); }
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 2; }
-	virtual UINT32 execute_input_lines() const { return 0; }
-	virtual void execute_run();
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + m_cki - 1) / m_cki; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * m_cki); }
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 2; }
+	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL );
+		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr );
 	}
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -194,7 +191,7 @@ protected:
 
 	cop400_cki_bond m_cki;
 	cop400_cko_bond m_cko;
-	cop400_microbus m_microbus;
+	bool m_has_microbus;
 
 	bool m_has_counter;
 	bool m_has_inil;
@@ -241,9 +238,6 @@ protected:
 	int m_halt;               /* halt mode */
 	int m_idle;               /* idle mode */
 
-	/* microbus */
-	int m_microbus_int;       /* microbus interrupt */
-
 	/* execution logic */
 	int m_InstLen[256];       /* instruction length in bytes */
 	int m_icount;             /* instruction counter */
@@ -252,7 +246,6 @@ protected:
 	emu_timer *m_serial_timer;
 	emu_timer *m_counter_timer;
 	emu_timer *m_inil_timer;
-	emu_timer *m_microbus_timer;
 
 	typedef void ( cop400_cpu_device::*cop400_opcode_func ) (UINT8 opcode);
 
@@ -277,7 +270,6 @@ protected:
 	void serial_tick();
 	void counter_tick();
 	void inil_tick();
-	void microbus_tick();
 
 	void PUSH(UINT16 data);
 	void POP();

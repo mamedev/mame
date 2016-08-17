@@ -51,16 +51,17 @@ public:
 	~nesapu_device() {}
 
 	static void set_cpu_tag(device_t &device, const char *tag) { downcast<nesapu_device &>(device).m_cpu_tag = tag; }
+	void set_tag_memory(const char *tag);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state

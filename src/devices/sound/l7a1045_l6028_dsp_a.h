@@ -6,9 +6,9 @@
 
 struct l7a1045_voice
 {
-	l7a1045_voice() :
-		pos(0),
-		frac(0)
+	l7a1045_voice() : end(0), mode(false),
+						pos(0),
+		frac(0), l_volume(0), r_volume(0)
 	{
 		//memset(regs, 0, sizeof(UINT32)*8);
 		start = 0;
@@ -39,17 +39,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	sound_stream *m_stream;
 	l7a1045_voice m_voice[32];
 	UINT32    m_key;
-	UINT8 *m_rom;
-	INT32 m_rom_size;
+	required_region_ptr<UINT8> m_rom;
 
 	UINT8 m_audiochannel;
 	UINT8 m_audioregister;

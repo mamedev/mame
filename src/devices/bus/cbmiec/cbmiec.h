@@ -54,11 +54,11 @@
 
 
 #define MCFG_CBM_IEC_ADD(_default_drive) \
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, nullptr) \
 	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, _default_drive) \
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL) \
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL) \
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, nullptr) \
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, nullptr) \
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, nullptr) \
 	MCFG_CBM_IEC_BUS_ADD()
 
 
@@ -119,9 +119,9 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	class daisy_entry
 	{
@@ -165,7 +165,7 @@ public:
 	int get_address() { return m_address; }
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 protected:
 	int m_address;

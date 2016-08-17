@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Steve Baines, Frank Palazzolo
 /***************************************************************************
 
@@ -28,8 +28,6 @@ public:
 	UINT8 *m_slapstic_source;
 	UINT8 *m_slapstic_base;
 	UINT8 m_slapstic_current_bank;
-	offs_t m_slapstic_last_pc;
-	offs_t m_slapstic_last_address;
 	UINT8 m_is_esb;
 	required_shared_ptr<UINT8> m_mathram;
 	UINT8 m_control_num;
@@ -39,9 +37,9 @@ public:
 	UINT16 m_quotient_shift;
 	UINT16 m_divisor;
 	UINT16 m_dividend;
-	UINT8 *m_PROM_STR;
-	UINT8 *m_PROM_MAS;
-	UINT8 *m_PROM_AM;
+	std::unique_ptr<UINT8[]> m_PROM_STR;
+	std::unique_ptr<UINT8[]> m_PROM_MAS;
+	std::unique_ptr<UINT8[]> m_PROM_AM;
 	int m_math_run;
 	emu_timer *m_math_timer;
 	INT16 m_A;
@@ -67,10 +65,9 @@ public:
 	DECLARE_WRITE8_MEMBER(starwars_main_wr_w);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_DIRECT_UPDATE_MEMBER(esb_setdirect);
 	DECLARE_DRIVER_INIT(esb);
 	DECLARE_DRIVER_INIT(starwars);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
 	TIMER_CALLBACK_MEMBER(main_callback);
 	TIMER_CALLBACK_MEMBER(sound_callback);

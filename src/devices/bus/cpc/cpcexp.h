@@ -33,7 +33,7 @@
  *      GND  49  50  CLOCK
  *
  *  Aleste 520EX expansion port is 62-pin.  Same as the CPC above, except that pin 40 is not connected, plus the following:
- *  
+ *
  *    MAP14  A26  B26  MAP15
  *    MAP16  A27  B27  MAP17
  *    MAP18  A28  B28  MAPBLK
@@ -56,7 +56,12 @@
 
 #define CPC_EXP_SLOT_TAG        "cpcexp"
 
-
+enum
+{
+	MAP_LOWER = 0,  // special lower ROM handling
+	MAP_UPPER,      // special upper ROM handling
+	MAP_OTHER       // custom ROM handling (eg: Brunword MK4)
+};
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -98,7 +103,7 @@ public:
 
 	void set_rom_bank(UINT8 sel) { m_rom_sel = sel; }  // tell device the currently selected ROM
 	UINT8 get_rom_bank() { return m_rom_sel; }
-	virtual void set_mapping() { };
+	virtual void set_mapping(UINT8 type) { };
 
 private:
 	UINT8 m_rom_sel;  // currently selected ROM
@@ -128,14 +133,14 @@ public:
 	DECLARE_WRITE8_MEMBER( rom_select );
 
 	void set_rom_bank(UINT8 sel) { if(m_card) m_card->set_rom_bank(sel); }  // tell device the currently selected ROM
-	void set_mapping() { if(m_card) m_card->set_mapping(); }  // tell device to enable any ROM or RAM mapping
+	void set_mapping(UINT8 type) { if(m_card) m_card->set_mapping(type); }  // tell device to enable any ROM or RAM mapping
 	DECLARE_WRITE_LINE_MEMBER( cursor_w ) { if(m_card) m_card->cursor_w(state); }  // pass on CRTC Cursor signal
 	DECLARE_WRITE_LINE_MEMBER( romen_w ) { if(m_card) m_card->romen_w(state); }  // pass on /ROMEN signal
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;

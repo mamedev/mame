@@ -11,7 +11,7 @@ typedef device_delegate<UINT16 (UINT32)> sega_m2_read_delegate;
 extern const device_type SEGA315_5881_CRYPT;
 
 #define MCFG_SET_READ_CALLBACK( _class, _method) \
-	sega_315_5881_crypt_device::set_read_cb(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	sega_315_5881_crypt_device::set_read_cb(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 class sega_315_5881_crypt_device :  public device_t
@@ -35,8 +35,8 @@ public:
 	}
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 
@@ -48,7 +48,9 @@ private:
 
 	UINT32 key;
 
-	UINT8 *buffer, *line_buffer, *line_buffer_prev;
+	std::unique_ptr<UINT8[]> buffer;
+	std::unique_ptr<UINT8[]> line_buffer;
+	std::unique_ptr<UINT8[]> line_buffer_prev;
 	UINT32 prot_cur_address;
 	UINT16 subkey, dec_hist;
 	UINT32 dec_header;

@@ -192,6 +192,9 @@ enum
 #define MCFG_ADSP21XX_TIMER_FIRED_CB(_devcb) \
 	devcb = &adsp21xx_device::set_timer_fired_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_ADSP21XX_DMOVLAY_CB(_devcb) \
+	devcb = &adsp21xx_device::set_dmovlay_callback(*device, DEVCB_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -220,29 +223,30 @@ public:
 	template<class _Object> static devcb_base &set_sport_rx_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_sport_rx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_sport_tx_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_sport_tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_timer_fired_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_timer_fired_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_dmovlay_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_dmovlay_cb.set_callback(object); }
 
 	// public interfaces
 	void load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// helpers
 	void create_tables();
@@ -459,6 +463,7 @@ protected:
 	devcb_read32            m_sport_rx_cb;    // callback for serial receive
 	devcb_write32           m_sport_tx_cb;    // callback for serial transmit
 	devcb_write_line        m_timer_fired_cb;          // callback for timer fired
+	devcb_write_line        m_dmovlay_cb;          // callback for DMOVLAY instruction
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS
@@ -487,14 +492,14 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
+	virtual UINT32 execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// interrupts
-	virtual bool generate_irq(int which, int indx);
-	virtual void check_irqs();
+	virtual bool generate_irq(int which, int indx) override;
+	virtual void check_irqs() override;
 };
 
 
@@ -510,14 +515,14 @@ protected:
 	adsp2101_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source);
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
+	virtual UINT32 execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// interrupts
-	virtual bool generate_irq(int which, int indx);
-	virtual void check_irqs();
+	virtual bool generate_irq(int which, int indx) override;
+	virtual void check_irqs() override;
 };
 
 
@@ -531,14 +536,14 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
+	virtual UINT32 execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// interrupts
-	virtual bool generate_irq(int which, int indx);
-	virtual void check_irqs();
+	virtual bool generate_irq(int which, int indx) override;
+	virtual void check_irqs() override;
 
 	// address spaces
 	const address_space_config      m_io_config;

@@ -1,0 +1,46 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.\"
+.TH LDRESAMPLE 1 2016-07-21 0.176 "MAME laserdisc audio manipulation tool"
+.\"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH "NAME"
+ldresample \- MAME laserdisc audio manipulation tool
+.SH "SYNOPSIS"
+.B ldresample
+.I source.chd
+.br
+.B ldresample
+.I source.chd
+.I output.chd
+.B offset
+.B [slope]
+.SH "DESCRIPTION"
+Assists in resynchronizing audio tracks in a CHD (Compressed Hunks of Data)
+file with frames.
+.PP
+.B Offset
+parameter and \fBslope\fR option make a linear equation f(x) which
+describes the sample offset from the source as a function of field number.
+.SH "COPYRIGHT"
+Copyright \(co 2008 Aaron Giles. BSD License.
+.SH "SEE ALSO"
+ldverify(1), mame(6), mess(6)
+.SH "AUTHORS"
+Written by Aaron Giles.
+.PP
+This manual page was written by Ludovic Lechapt <ludomatic@gmail.com>,
+for the Debian project but may be used by others.

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Stephh
+// copyright-holders:David Haywood
 
+#include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 
@@ -16,6 +17,7 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_mixer(*this, "mixer"),
+		m_soundlatch(*this, "soundlatch"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_spvideoram(*this, "spvideoram"),
@@ -30,6 +32,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<tecmo_spr_device> m_sprgen;
 	required_device<tecmo_mix_device> m_mixer;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_bgvideoram;
 	required_shared_ptr<UINT16> m_fgvideoram;

@@ -15,29 +15,7 @@
 
 #include "options.h"
 
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// option priorities
-enum
-{
-	// command-line options are HIGH priority
-	OPTION_PRIORITY_CMDLINE = OPTION_PRIORITY_HIGH,
-
-	// INI-based options are NORMAL priority, in increasing order:
-	OPTION_PRIORITY_INI = OPTION_PRIORITY_NORMAL,
-	OPTION_PRIORITY_MAME_INI,
-	OPTION_PRIORITY_DEBUG_INI,
-	OPTION_PRIORITY_ORIENTATION_INI,
-	OPTION_PRIORITY_SYSTYPE_INI,
-	OPTION_PRIORITY_VECTOR_INI,
-	OPTION_PRIORITY_SOURCE_INI,
-	OPTION_PRIORITY_GPARENT_INI,
-	OPTION_PRIORITY_PARENT_INI,
-	OPTION_PRIORITY_DRIVER_INI
-};
-
+#define OPTION_PRIORITY_CMDLINE     OPTION_PRIORITY_HIGH + 1
 // core options
 #define OPTION_SYSTEMNAME           core_options::unadorned(0)
 #define OPTION_SOFTWARENAME         core_options::unadorned(1)
@@ -56,6 +34,8 @@ enum
 #define OPTION_FONTPATH             "fontpath"
 #define OPTION_CHEATPATH            "cheatpath"
 #define OPTION_CROSSHAIRPATH        "crosshairpath"
+#define OPTION_PLUGINSPATH          "pluginspath"
+#define OPTION_LANGUAGEPATH         "languagepath"
 
 // core directory options
 #define OPTION_CFG_DIRECTORY        "cfg_directory"
@@ -71,6 +51,8 @@ enum
 #define OPTION_AUTOSAVE             "autosave"
 #define OPTION_PLAYBACK             "playback"
 #define OPTION_RECORD               "record"
+#define OPTION_RECORD_TIMECODE      "record_timecode"
+#define OPTION_EXIT_AFTER_PLAYBACK  "exit_after_playback"
 #define OPTION_MNGWRITE             "mngwrite"
 #define OPTION_AVIWRITE             "aviwrite"
 #ifdef MAME_DEBUG
@@ -92,6 +74,14 @@ enum
 #define OPTION_SLEEP                "sleep"
 #define OPTION_SPEED                "speed"
 #define OPTION_REFRESHSPEED         "refreshspeed"
+
+// core render options
+#define OPTION_KEEPASPECT           "keepaspect"
+#define OPTION_UNEVENSTRETCH        "unevenstretch"
+#define OPTION_UNEVENSTRETCHX       "unevenstretchx"
+#define OPTION_INTOVERSCAN          "intoverscan"
+#define OPTION_INTSCALEX            "intscalex"
+#define OPTION_INTSCALEY            "intscaley"
 
 // core rotation options
 #define OPTION_ROTATE               "rotate"
@@ -118,8 +108,9 @@ enum
 #define OPTION_EFFECT               "effect"
 
 // core vector options
-#define OPTION_ANTIALIAS            "antialias"
-#define OPTION_BEAM                 "beam"
+#define OPTION_BEAM_WIDTH_MIN       "beam_width_min"
+#define OPTION_BEAM_WIDTH_MAX       "beam_width_max"
+#define OPTION_BEAM_INTENSITY_WEIGHT   "beam_intensity_weight"
 #define OPTION_FLICKER              "flicker"
 
 // core sound options
@@ -172,6 +163,7 @@ enum
 #define OPTION_CHEAT                "cheat"
 #define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
 #define OPTION_UI_FONT              "uifont"
+#define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
 
 // core comm options
@@ -187,37 +179,32 @@ enum
 #define OPTION_AUTOBOOT_DELAY       "autoboot_delay"
 #define OPTION_AUTOBOOT_SCRIPT      "autoboot_script"
 
-#define OPTION_HTTP                 "http"
-#define OPTION_HTTP_PORT            "http_port"
-#define OPTION_HTTP_PATH            "http_path"
 #define OPTION_CONSOLE              "console"
+#define OPTION_PLUGINS              "plugins"
+#define OPTION_PLUGIN               "plugin"
+#define OPTION_NO_PLUGIN            "noplugin"
+
+#define OPTION_LANGUAGE             "language"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward references
-struct game_driver;
-
-
 class emu_options : public core_options
 {
-	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
-
 public:
+	enum ui_option
+	{
+		UI_CABINET,
+		UI_SIMPLE
+	};
+
 	// construction/destruction
 	emu_options();
-
-	// parsing wrappers
-	bool parse_command_line(int argc, char *argv[], std::string &error_string);
-	void parse_standard_inis(std::string &error_string);
-	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value);
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
 	const char *software_name() const { return value(OPTION_SOFTWARENAME); }
-	const game_driver *system() const;
-	void set_system_name(const char *name);
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
@@ -233,6 +220,8 @@ public:
 	const char *font_path() const { return value(OPTION_FONTPATH); }
 	const char *cheat_path() const { return value(OPTION_CHEATPATH); }
 	const char *crosshair_path() const { return value(OPTION_CROSSHAIRPATH); }
+	const char *plugins_path() const { return value(OPTION_PLUGINSPATH); }
+	const char *language_path() const { return value(OPTION_LANGUAGEPATH); }
 
 	// core directory options
 	const char *cfg_directory() const { return value(OPTION_CFG_DIRECTORY); }
@@ -248,6 +237,8 @@ public:
 	bool autosave() const { return bool_value(OPTION_AUTOSAVE); }
 	const char *playback() const { return value(OPTION_PLAYBACK); }
 	const char *record() const { return value(OPTION_RECORD); }
+	bool record_timecode() const { return bool_value(OPTION_RECORD_TIMECODE); }
+	bool exit_after_playback() const { return bool_value(OPTION_EXIT_AFTER_PLAYBACK); }
 	const char *mng_write() const { return value(OPTION_MNGWRITE); }
 	const char *avi_write() const { return value(OPTION_AVIWRITE); }
 #ifdef MAME_DEBUG
@@ -269,6 +260,14 @@ public:
 	bool sleep() const { return m_sleep; }
 	float speed() const { return float_value(OPTION_SPEED); }
 	bool refresh_speed() const { return m_refresh_speed; }
+
+	// core render options
+	bool keep_aspect() const { return bool_value(OPTION_KEEPASPECT); }
+	bool uneven_stretch() const { return bool_value(OPTION_UNEVENSTRETCH); }
+	bool uneven_stretch_x() const { return bool_value(OPTION_UNEVENSTRETCHX); }
+	bool int_overscan() const { return bool_value(OPTION_INTOVERSCAN); }
+	int int_scale_x() const { return int_value(OPTION_INTSCALEX); }
+	int int_scale_y() const { return int_value(OPTION_INTSCALEY); }
 
 	// core rotation options
 	bool rotate() const { return bool_value(OPTION_ROTATE); }
@@ -295,8 +294,9 @@ public:
 	const char *effect() const { return value(OPTION_EFFECT); }
 
 	// core vector options
-	bool antialias() const { return bool_value(OPTION_ANTIALIAS); }
-	float beam() const { return float_value(OPTION_BEAM); }
+	float beam_width_min() const { return float_value(OPTION_BEAM_WIDTH_MIN); }
+	float beam_width_max() const { return float_value(OPTION_BEAM_WIDTH_MAX); }
+	float beam_intensity_weight() const { return float_value(OPTION_BEAM_INTENSITY_WEIGHT); }
 	float flicker() const { return float_value(OPTION_FLICKER); }
 
 	// core sound options
@@ -347,6 +347,7 @@ public:
 	bool cheat() const { return bool_value(OPTION_CHEAT); }
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
+	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 
 	// core comm options
@@ -355,6 +356,7 @@ public:
 	const char *comm_remotehost() const { return value(OPTION_COMM_REMOTE_HOST); }
 	const char *comm_remoteport() const { return value(OPTION_COMM_REMOTE_PORT); }
 
+
 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
 
@@ -362,29 +364,21 @@ public:
 	int autoboot_delay() const { return int_value(OPTION_AUTOBOOT_DELAY); }
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
 
-	bool http() const { return bool_value(OPTION_HTTP); }
-	const char *http_port() const { return value(OPTION_HTTP_PORT); }
-	const char *http_path() const { return value(OPTION_HTTP_PATH); }
 	bool console() const { return bool_value(OPTION_CONSOLE); }
 
-	// FIXME: Couriersud: This should be in image_device_exit
-	void remove_device_options();
+	bool plugins() const { return bool_value(OPTION_PLUGINS); }
 
-	const char *main_value(std::string &buffer, const char *option) const;
-	const char *sub_value(std::string &buffer, const char *name, const char *subname) const;
-	bool add_slot_options(bool isfirst);
+	const char *plugin() const { return value(OPTION_PLUGIN); }
+	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
-private:
-	// device-specific option handling
-	void add_device_options(bool isfirst);
-	void update_slot_options();
-
-	// INI parsing helper
-	bool parse_one_ini(const char *basename, int priority, std::string *error_string = NULL);
+	const char *language() const { return value(OPTION_LANGUAGE); }
 
 	// cache frequently used options in members
 	void update_cached_options();
 
+	std::string main_value(const char *option) const;
+	std::string sub_value(const char *name, const char *subname) const;
+private:
 	static const options_entry s_option_entries[];
 
 	// cached options
@@ -392,6 +386,7 @@ private:
 	bool m_joystick_contradictory;
 	bool m_sleep;
 	bool m_refresh_speed;
+	ui_option m_ui;
 };
 
 

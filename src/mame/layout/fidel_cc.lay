@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+	</element>
+
+	<element name="txt_check">
+		<text string="CHECK"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+	<element name="txt_lose">
+		<text string="I LOSE"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+
+	<element name="txt_from">
+		<text string="FROM"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+	<element name="txt_to">
+		<text string="TO"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="47" top="0" bottom="25" />
+
+		<bezel element="txt_check">
+			<bounds x="1" y="1" width="20" height="3" />
+		</bezel>
+		<bezel element="txt_lose">
+			<bounds x="26" y="1" width="20" height="3" />
+		</bezel>
+		<bezel name="1.7" element="led">
+			<bounds x="2" y="1" width="3" height="3" />
+		</bezel>
+		<bezel name="0.7" element="led">
+			<bounds x="27" y="1" width="3" height="3" />
+		</bezel>
+
+		<bezel element="txt_from">
+			<bounds x="1" y="21" width="20" height="3" />
+		</bezel>
+		<bezel element="txt_to">
+			<bounds x="26" y="21" width="20" height="3" />
+		</bezel>
+
+		<bezel name="digit0" element="digit">
+			<bounds x="1" y="5" width="10" height="15" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="11" y="5" width="10" height="15" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="26" y="5" width="10" height="15" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="36" y="5" width="10" height="15" />
+		</bezel>
+
+	</view>
+</mamelayout>

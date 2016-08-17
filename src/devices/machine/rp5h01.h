@@ -36,6 +36,8 @@ enum {
 
 class rp5h01_device : public device_t
 {
+	static UINT8 s_initial_data[0x10];
+
 public:
 	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -49,9 +51,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
 	// internal state
 	int m_counter;
@@ -59,7 +62,7 @@ private:
 	int m_enabled;        /* chip enable */
 	int m_old_reset;      /* reset pin state (level-triggered) */
 	int m_old_clock;      /* clock pin state (level-triggered) */
-	const UINT8 *m_data;
+	optional_region_ptr<UINT8> m_data;
 };
 
 extern const device_type RP5H01;

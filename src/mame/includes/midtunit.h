@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Ernesto Corvi, Aaron Giles
+// thanks-to:Kurt Mahan
 /*************************************************************************
 
     Driver for Midway T-unit games.
@@ -40,7 +41,6 @@ public:
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);
 	DECLARE_READ16_MEMBER(midtunit_cmos_r);
-	DECLARE_READ16_MEMBER(midtunit_input_r);
 	DECLARE_READ16_MEMBER(midtunit_sound_state_r);
 	DECLARE_READ16_MEMBER(midtunit_sound_r);
 	DECLARE_WRITE16_MEMBER(midtunit_sound_w);
@@ -55,7 +55,6 @@ public:
 	DECLARE_WRITE16_MEMBER(nbajam_prot_w);
 	DECLARE_WRITE16_MEMBER(jdredd_prot_w);
 	DECLARE_READ16_MEMBER(jdredd_prot_r);
-	DECLARE_READ16_MEMBER(jdredd_hack_r);
 	DECLARE_READ16_MEMBER(midtunit_gfxrom_r);
 	DECLARE_READ16_MEMBER(midwunit_gfxrom_r);
 	DECLARE_WRITE16_MEMBER(midtunit_vram_w);
@@ -112,5 +111,5 @@ public:
 	UINT8 m_gfx_rom_large;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

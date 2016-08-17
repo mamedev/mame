@@ -82,7 +82,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(fastfred);
 	DECLARE_MACHINE_START(imago);
 	DECLARE_VIDEO_START(fastfred);

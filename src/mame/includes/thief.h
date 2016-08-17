@@ -4,9 +4,9 @@
 #include "video/tms9927.h"
 
 struct coprocessor_t {
-	UINT8 *context_ram;
+	std::unique_ptr<UINT8[]> context_ram;
 	UINT8 bank;
-	UINT8 *image_ram;
+	std::unique_ptr<UINT8[]> image_ram;
 	UINT8 param[0x9];
 };
 
@@ -20,7 +20,7 @@ public:
 		m_tms(*this, "tms"),
 		m_palette(*this, "palette") { }
 
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 m_input_select;
 	UINT8 m_read_mask;
 	UINT8 m_write_mask;
@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(thief_coprocessor_w);
 	DECLARE_WRITE8_MEMBER(tape_control_w);
 	DECLARE_DRIVER_INIT(thief);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(thief_interrupt);
 	UINT16 fetch_image_addr( coprocessor_t &thief_coprocessor );

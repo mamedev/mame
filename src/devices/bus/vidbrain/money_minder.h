@@ -31,11 +31,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_videobrain_expansion_card_interface overrides
-	virtual UINT8 videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2);
-	virtual void videobrain_bo_w(address_space &space, offs_t offset, UINT8 data, int cs1, int cs2);
+	virtual UINT8 videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2) override;
+	virtual void videobrain_bo_w(address_space &space, offs_t offset, UINT8 data, int cs1, int cs2) override;
 };
 
 

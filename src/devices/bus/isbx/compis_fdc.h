@@ -32,7 +32,7 @@ public:
 	compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
@@ -40,16 +40,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_isbx_card_interface overrides
-	virtual UINT8 mcs0_r(address_space &space, offs_t offset);
-	virtual void mcs0_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT8 mdack_r(address_space &space, offs_t offset);
-	virtual void mdack_w(address_space &space, offs_t offset, UINT8 data);
-	virtual void opt0_w(int state);
-	virtual void opt1_w(int state);
+	virtual UINT8 mcs0_r(address_space &space, offs_t offset) override;
+	virtual void mcs0_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual UINT8 mdack_r(address_space &space, offs_t offset) override;
+	virtual void mdack_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void opt0_w(int state) override;
+	virtual void opt1_w(int state) override;
 
 private:
 	required_device<i8272a_device> m_fdc;

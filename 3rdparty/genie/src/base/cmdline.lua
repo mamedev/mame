@@ -9,7 +9,7 @@
 -- Built-in command line options
 --
 
-	newoption 
+	newoption
 	{
 		trigger     = "cc",
 		value       = "VALUE",
@@ -17,6 +17,7 @@
 		allowed = {
 			{ "gcc", "GNU GCC (gcc/g++)" },
 			{ "ow",  "OpenWatcom"        },
+			{ "ghs", "Green Hills Software" },
 		}
 	}
 
@@ -38,13 +39,13 @@
 		value       = "FILE",
 		description = "Read FILE as a Premake script; default is 'premake4.lua'"
 	}
-	
+
 	newoption
 	{
 		trigger     = "help",
 		description = "Display this information"
 	}
-		
+
 	newoption
 	{
 		trigger     = "os",
@@ -70,23 +71,30 @@
 			{ "universal",   "Mac OS X Universal, 32- and 64-bit" },
 			{ "universal32", "Mac OS X Universal, 32-bit only" },
 			{ "universal64", "Mac OS X Universal, 64-bit only" },
-			{ "ps3",         "Playstation 3 (experimental)" },
+			{ "ps3",         "Playstation 3" },
 			{ "orbis",       "Playstation 4" },
-			{ "xbox360",     "Xbox 360 (experimental)" },
-			{ "ARM",         "ARM (Microsoft)" },
+			{ "xbox360",     "Xbox 360" },
+			{ "durango",     "Xbox One" },
+			{ "ARM",         "ARM" },
+			{ "PowerPC",     "PowerPC" },
 		}
 	}
-	
+
 	newoption
 	{
 		trigger     = "scripts",
 		value       = "path",
 		description = "Search for additional scripts on the given path"
 	}
-	
+
+	newoption
+	{
+		trigger     = "debug-profiler",
+		description = "GENie script generation profiler."
+	}
+
 	newoption
 	{
 		trigger     = "version",
 		description = "Display version information"
 	}
-	

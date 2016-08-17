@@ -57,8 +57,8 @@ protected:
 	UINT16 iscr;
 	int icr_filter, ipr_filter;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const;
 	void update_irq_state();
@@ -87,10 +87,10 @@ protected:
 
 	UINT32 icr;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const;
+	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const override;
 	void update_irq_types();
 };
 
@@ -102,15 +102,12 @@ public:
 	DECLARE_WRITE8_MEMBER(ipr_w);
 	DECLARE_READ8_MEMBER(iprk_r);
 	DECLARE_WRITE8_MEMBER(iprk_w);
-
-	void set_mode_8(bool mode_8);
-
 private:
 	static const int vector_to_slot[];
 	UINT8 ipr[11];
 
-	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const;
-	virtual void device_reset();
+	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const override;
+	virtual void device_reset() override;
 };
 
 extern const device_type H8_INTC;

@@ -26,14 +26,18 @@
 		"base/api.lua",
 		"base/cmdline.lua",
 		"base/inspect.lua",
+		"base/profiler.lua",
 		"tools/dotnet.lua",
 		"tools/gcc.lua",
+		"tools/ghs.lua",
 		"tools/msc.lua",
 		"tools/ow.lua",
 		"tools/snc.lua",
+		"tools/valac.lua",
 		"base/validate.lua",
 		"base/help.lua",
 		"base/premake.lua",
+		"base/iter.lua",
 
 		-- CodeBlocks action
 		"actions/codeblocks/_codeblocks.lua",
@@ -45,11 +49,17 @@
 		"actions/codelite/codelite_workspace.lua",
 		"actions/codelite/codelite_project.lua",
 
+		-- CMake action
+		"actions/cmake/_cmake.lua",
+		"actions/cmake/cmake_workspace.lua",
+		"actions/cmake/cmake_project.lua",
+
 		-- GNU make action
 		"actions/make/_make.lua",
 		"actions/make/make_solution.lua",
 		"actions/make/make_cpp.lua",
 		"actions/make/make_csharp.lua",
+		"actions/make/make_vala.lua",
 
 		-- Visual Studio actions
 		"actions/vstudio/_vstudio.lua",
@@ -63,6 +73,7 @@
 		"actions/vstudio/vs2012.lua",
 		"actions/vstudio/vs2013.lua",
 		"actions/vstudio/vs2015.lua",
+		"actions/vstudio/vs15.lua",
 
 		-- Xcode action
 		"actions/xcode/_xcode.lua",
@@ -74,4 +85,15 @@
 
 		-- Clean action
 		"actions/clean/_clean.lua",
+
+		--FASTBuild action
+		"actions/fastbuild/_fastbuild.lua",
+		"actions/fastbuild/fastbuild_project.lua",
+		"actions/fastbuild/fastbuild_solution.lua",
+		
+		-- ninja action
+		"actions/ninja/_ninja.lua",
+		"actions/ninja/ninja_base.lua",
+		"actions/ninja/ninja_solution.lua",
+		"actions/ninja/ninja_cpp.lua",
 	}

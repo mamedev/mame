@@ -66,7 +66,7 @@ enum laserdisc_field_code
 #define MCFG_LASERDISC_OVERLAY_STATIC(_width, _height, _func) \
 	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
 #define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL));
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, nullptr));
 #define MCFG_LASERDISC_OVERLAY_DEVICE(_width, _height, _device, _class, _method) \
 	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
 #define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
@@ -79,6 +79,8 @@ enum laserdisc_field_code
 	laserdisc_device::static_set_overlay_palette(*device, "^" _palette_tag);
 
 // use these to add laserdisc screens with proper video update parameters
+// TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header
+// TODO: someday we'll kill the pixel clock hack ...
 #define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _ldtag) \
 	MCFG_DEVICE_MODIFY(_ldtag) \
 	laserdisc_device::static_set_screen(*device, _tag); \
@@ -86,13 +88,13 @@ enum laserdisc_field_code
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
-// not correct yet; fix me...
+
 #define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _ldtag) \
 	MCFG_DEVICE_MODIFY(_ldtag) \
 	laserdisc_device::static_set_screen(*device, _tag); \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 704, 525.0/2, 0, 480/2) \
+	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz*2, 1135, 0, 768, 625, 48, 624) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 
 
@@ -237,14 +239,14 @@ protected:
 	virtual void player_overlay(bitmap_yuy16 &bitmap) = 0;
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// subclass helpers
 	void set_audio_squelch(bool squelchleft, bool squelchright) { m_stream->update(); m_audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0); }
@@ -276,7 +278,7 @@ private:
 	void init_disc();
 	void init_video();
 	void init_audio();
-	void add_and_clamp_track(INT32 delta) { m_curtrack += delta; m_curtrack = MAX(m_curtrack, 1); m_curtrack = MIN(m_curtrack, m_maxtrack - 1); }
+	void add_and_clamp_track(INT32 delta) { m_curtrack += delta; m_curtrack = std::max(m_curtrack, 1); m_curtrack = std::min(m_curtrack, INT32(m_maxtrack) - 1); }
 	void fillbitmap_yuy16(bitmap_yuy16 &bitmap, UINT8 yval, UINT8 cr, UINT8 cb);
 	void update_slider_pos();
 	void vblank_state_changed(screen_device &screen, bool vblank_state);
@@ -284,8 +286,8 @@ private:
 	void read_track_data();
 	static void *read_async_static(void *param, int threadid);
 	void process_track_data();
-	void config_load(int config_type, xml_data_node *parentnode);
-	void config_save(int config_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
 	// configuration
 	laserdisc_get_disc_delegate m_getdisc_callback;

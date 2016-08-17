@@ -2348,7 +2348,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain2">
+	<software name="aressh2">
 		<description>A Ressha de Ikou II</description>
 		<year>1988</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2368,7 +2368,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain2g" cloneof="atrain2">
+	<software name="aressh2g" cloneof="aressh2">
 		<description>A Ressha de Ikou II - 5 Shuunen Kinen Tokubetsu Gentei Version</description>
 		<year>1990</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2400,7 +2400,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain3">
+	<software name="aressh3">
 		<description>A Ressha de Ikou III</description>
 		<year>1990</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2420,7 +2420,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain3log" cloneof="atrain3">
+	<software name="aressh3log" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Login Tokubetsu Map Shuu</description>
 		<year>199?</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2432,7 +2432,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain3mc" cloneof="atrain3">
+	<software name="aressh3mc" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Map Construction</description>
 		<year>1991</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2452,7 +2452,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain3oms" cloneof="atrain3">
+	<software name="aressh3oms" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Original Meitetsu Sharyou Disk</description>
 		<year>1991</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2464,7 +2464,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atran3mv">
+	<software name="aresh3mv">
 		<description>A Ressha de Ikou III - Memorial Version</description>
 		<year>1993</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2484,7 +2484,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain4">
+	<software name="aressh4">
 		<description>A Ressha de Ikou 4 ~ Take the A-Train IV</description>
 		<year>1993</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2510,7 +2510,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrainf">
+	<software name="aresshaf">
 		<description>A Ressha de Ikou Fukkokuban</description>
 		<year>1994</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -4481,6 +4481,48 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="aress">
+		<description>Aress Ou no Monogatari - The Story of King Aress</description>
+		<year>1994</year>
+		<publisher>ガスト (Gust)</publisher>
+		<info name="alt_title" value="アレス王の物語" />
+		<info name="release" value="19940318" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_1.dip" size="1261824" crc="9f77a0bc" sha1="ec734291f8753e1f0838df8edd69b6fafd67daa9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_2.dip" size="1261824" crc="b9c32182" sha1="ff3cf49bfbf0479c571467e7267c3b076c80d53c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_3.dip" size="1261824" crc="bbafdc61" sha1="0aeb049d9e324b298e822dd92975e928f35f0f8f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_4.dip" size="1261824" crc="00f1c759" sha1="6ed99eefdde5e80fbe558e69bbd4fe6e27d74455" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_5.dip" size="1261824" crc="a50ff292" sha1="02eaac4a38a6ec7960b9a1b94afebb0094db19d8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_6.dip" size="1261824" crc="e0b79654" sha1="2d142970c69a716adcb6a69770e0b82ad3ba11a5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_7.dip" size="1261824" crc="d8420bd8" sha1="29422b02c0c5628bd2362ef3a66ac9537d19c13c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- 2dd image -->
 	<software name="arkanoid" supported="yes">
@@ -5140,7 +5182,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="ballade">
+	<software name="bfmaria">
 		<description>Ballade for Maria</description>
 		<year>1995</year>
 		<publisher>フェアリーテール ハードカバー (Fairytale Hardcover)</publisher>
@@ -13884,7 +13926,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master</description>
 		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -13897,7 +13939,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dngmstera" cloneof="dngmster">
+	<software name="dmastera" cloneof="dmaster">
 		<description>Dungeon Master (Alt Format)</description>
 		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -13910,7 +13952,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dngmstr2">
+	<software name="dmaster2">
 		<description>Dungeon Master II - Skullkeep</description>
 		<year>1993</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
@@ -13942,7 +13984,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dngmstr2a" cloneof="dngmstr2">
+	<software name="dmaster2a" cloneof="dmaster2">
 		<description>Dungeon Master II - Skullkeep (Alt Save Disk)</description>
 		<year>1993</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
@@ -21391,7 +21433,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="dismix1">
 		<description>Kikan Dismix Soukan-gou</description>
 		<year>1990</year>
@@ -21444,7 +21486,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="dismix2">
 		<description>Kikan Dismix Dai-2-Gou</description>
 		<year>1990?</year>
@@ -21693,7 +21735,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="kingsbty">
+	<software name="kbounty">
 		<description>King's Bounty</description>
 		<year>1994</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -22609,7 +22651,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="kyrandi2">
+	<software name="kyrand2">
 		<description>Kyrandia 2 - The Hand of Fate</description>
 		<year>1995</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -23756,7 +23798,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="lunatic2">
+	<software name="ldawn2">
 		<description>Lunatic Dawn II</description>
 		<year>1994</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -23815,7 +23857,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="mparadox">
-		<description>Mad·Paradox</description>
+		<description>Mad Paradox</description>
 		<year>1992</year>
 		<publisher>クィーンソフト (Queensoft)</publisher>
 		<info name="alt_title" value="マッドパラドックス" />
@@ -23858,7 +23900,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou1">
+	<software name="madoum1">
 		<description>Madou Monogatari 1</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -23878,7 +23920,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou2">
+	<software name="madoum2">
 		<description>Madou Monogatari 2</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -23898,7 +23940,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou3">
+	<software name="madoum3">
 		<description>Madou Monogatari 3</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -26997,7 +27039,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="moonligh">
+	<software name="moonchan">
 		<description>Moonlight Chan Rin Shan</description>
 		<year>1993</year>
 		<publisher>ディー・オー (D.O.)</publisher>
@@ -27795,6 +27837,27 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+<!-- confirmed as good by peter_j -->
+	<software name="3dgolfb" cloneof="3dgolf">
+		<description>New 3D Golf Simulation - Harukanaru Augusta (Alt Format)</description>
+		<year>1989</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="alt_title" value="３Ｄゴルフシュミレーション スーパーバージョン 遙かなるオーガスタ" />
+		<info name="release" value="19891020" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="new3dgolf.hdm" size="1261568" crc="8e447d00" sha1="c793efb25bdc6773e9a2ceec40d3412ecc338af8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Course Disk (Harukanaru Augusta)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="new3dgolf_augustamasters.hdm" size="1261568" crc="9bfb26f2" sha1="76ece544361e74010213cc65b08dc0d584a90f12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3dgolf8l" cloneof="3dgolf">
 		<description>New 3D Golf Simulation - Eight Lakes G.C.</description>
 		<year>1990</year>
@@ -27806,6 +27869,22 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			<feature name="part_id" value="Course Disk (Eight Lakes G.C.)"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="eight lakes g.c. - new 3d golf simulation - harukanaru augusta expansion 1.fdi" size="1265664" crc="e02c4e94" sha1="7f55ca3f729ce3e02d88579fbae05843465719ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- confirmed as good by peter_j -->
+	<software name="3dgolf8la" cloneof="3dgolf">
+		<description>New 3D Golf Simulation - Eight Lakes G.C. (Alt Format)</description>
+		<year>1990</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="alt_title" value="エイトレイクス ゴルフクラブ" />
+		<info name="release" value="19900323" />
+		<info name="usage" value="Requires &quot;NEW 3D Golf Simulation&quot; to work" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Course Disk (Eight Lakes G.C.)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="new3dgolf_eightlakes.hdm" size="1261568" crc="462a0e93" sha1="d66e541fb995ca2380f34cbec4923fb98d179482" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -27835,6 +27914,21 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			<feature name="part_id" value="Course Disk (Waialae no Kiseki)"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="waialae no kiseki - harukanaru augusta expansion 4.fdi" size="1265664" crc="c40af1f5" sha1="f63067482ad01191d7dbcea8743c55ac0fcba117" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- confirmed as good by peter_j -->
+	<software name="3dgolfwka" cloneof="3dgolf">
+		<description>New 3D Golf Simulation - Waialae no Kiseki (Alt Format)</description>
+		<year>1991</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="alt_title" value="ワイアラエの奇蹟" />
+		<info name="usage" value="Requires &quot;NEW 3D Golf Simulation&quot; to work" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Course Disk (Waialae no Kiseki)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="new3dgolf_waialae.hdm" size="1261568" crc="0731b826" sha1="4193d9a861e005deca3fc604dd2e0baff86a9d0c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -28044,7 +28138,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ningyout">
+	<software name="ningytsu">
 		<description>Ningyou Tsukai</description>
 		<year>1992</year>
 		<publisher>フォレスト (Forest)</publisher>
@@ -28070,7 +28164,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ningyou2">
+	<software name="ningyts2">
 		<description>Ningyou Tsukai 2</description>
 		<year>1996</year>
 		<publisher>フォレスト (Forest)</publisher>
@@ -31454,7 +31548,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="provvidn">
+	<software name="provvdnz">
 		<description>Provvidenza - Legenda la Spada di Alfa</description>
 		<year>1991</year>
 		<publisher>きんぷくりん (Kinpukurin)</publisher>
@@ -31796,7 +31890,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="qnduelst">
+	<software name="tqod">
 		<description>The Queen of Duellist</description>
 		<year>1993</year>
 		<publisher>アグミックス (Agumix)</publisher>
@@ -31816,7 +31910,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="qnduelstap" cloneof="qnduelst">
+	<software name="tqodap" cloneof="tqod">
 		<description>The Queen of Duellist Gaiden α+</description>
 		<year>19??</year>
 		<publisher>アグミックス (Agumix)</publisher>
@@ -40134,7 +40228,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="tunnelst">
+	<software name="tuntroll">
 		<description>Tunnels &amp; Trolls - Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -40976,7 +41070,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ultimauw">
+	<software name="ultuw">
 		<description>Ultima Underworld - The Stygian Abyss</description>
 		<year>1993</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
@@ -41556,6 +41650,38 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="vg1_d.fdi" size="1265664" crc="c1af613b" sha1="3f71de2d8f7fbff4adcdcf9854c8078bdb4f7142" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vga" cloneof="vg">
+		<description>V.G. - Variable Geo (Alt)</description>
+		<year>1993</year>
+		<publisher>戯画 (Giga)</publisher>
+		<info name="alt_title" value="ヴァリアブル・ジオ" />
+		<info name="release" value="19930709" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="variable geo (1993)(giga)(a).fdi" size="1265664" crc="3a8a263d" sha1="3ca67357f1821fd49543ee7c3c972d16eae01bac" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="variable geo (1993)(giga)(b).fdi" size="1265664" crc="645ab1e3" sha1="de994b6a4f949acfdc2ee69c5b2d1e8c444020ff" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="variable geo (1993)(giga)(c).fdi" size="1265664" crc="0d016f6b" sha1="4fc826e43296d7f5c3d60307ca74c6f395af7500" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="variable geo (1993)(giga)(d).fdi" size="1265664" crc="07be9e68" sha1="69cb688f030efab51e08a4d546cbf83ad6513788" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -44140,7 +44266,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="yuugiri">
+	<software name="yugiri">
 		<description>Yuugiri - Ningyoushi no Isan</description>
 		<year>1996</year>
 		<publisher>デザイアー (Desire)</publisher>
@@ -44908,7 +45034,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="atrain" supported="no">
+	<software name="aressha" supported="no">
 		<description>A Ressha de Ikou 98 ~ Take the A Train.</description>
 		<year>1987</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -45668,7 +45794,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="nankaisha" cloneof="nankaish" supported="no">
 		<description>Daikairei - Nankai no Shitou (Alt Format)</description>
 		<year>1989</year>
@@ -46194,7 +46320,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="fundatna" cloneof="fundatn" supported="no">
 		<description>Fundation - Shinjuku Story (Alt Format)</description>
 		<year>1990</year>
@@ -48370,7 +48496,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="microms2" supported="no">
-		<description>Micro Musician II </description>
+		<description>Micro Musician II</description>
 		<year>19??</year>
 		<publisher>Music Network</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -49083,7 +49209,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="prinmakr" supported="no">
+	<software name="prinmak" supported="no">
 		<description>Princess Maker</description>
 		<year>1991</year>
 		<publisher>ガイナックス (Gainax)</publisher>
@@ -49153,7 +49279,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="puyopuyob" cloneof="puyopuyo" supported="no">
 		<description>Puyo Puyo (Alt Format 2)</description>
 		<year>1993</year>
@@ -49794,7 +49920,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="slayersa" cloneof="slayers" supported="no">
 		<description>Slayers (Alt Format)</description>
 		<year>1994</year>
@@ -49897,7 +50023,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="slipst93a" cloneof="slipst93" supported="no">
 		<description>Slip Stream '93 Rev-LIMIT (Alt Format)</description>
 		<year>1994</year>
@@ -50202,7 +50328,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="tenchia" cloneof="tenchi" supported="no">
 		<description>Tenchi Muyo! - Ryououki (Alt Format)</description>
 		<year>1994</year>
@@ -50509,7 +50635,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="trial4" supported="no">
 		<description>Trial of Fours</description>
 		<year>1992</year>
@@ -51471,7 +51597,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="alondark" supported="no">
+	<software name="aitd" supported="no">
 		<description>Alone in the Dark</description>
 		<year>1994</year>
 		<publisher>アローマイクロテックス (Arrow Micro-Techs)</publisher>
@@ -55367,7 +55493,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="kawaraza" supported="no">
+	<software name="kawaichi" supported="no">
 		<description>Kawarazaki-ke no Ichizoku</description>
 		<year>1992</year>
 		<publisher>シルキーズ (Silky's)</publisher>
@@ -56083,7 +56209,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="lunatic" supported="no">
+	<software name="ldawn" supported="no">
 		<description>Lunatic Dawn</description>
 		<year>1993</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -56109,8 +56235,8 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="madparad" supported="no">
-		<description>Mad Paradox</description>
+	<software name="mparadoxa" cloneof="mparadox" supported="no">
+		<description>Mad Paradox (Alt Format)</description>
 		<year>1992</year>
 		<publisher>クィーンソフト (Queensoft)</publisher>
 		<info name="alt_title" value="マッドパラドックス" />
@@ -57629,7 +57755,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="shanglia" supported="no">
+	<software name="shangrl" supported="no">
 		<description>Shangrlia</description>
 		<year>1991</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -60543,7 +60669,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="bio100a" cloneof="bio100" supported="no">
 		<description>Bio 100% Free Games Collection (Alt Format)</description>
 		<year>199?</year>
@@ -63959,6 +64085,25 @@ doujin?!?
 		</part>
 	</software>
 
+	<software name="yumeyare">
+		<description>Yume de Yaretara</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="author" value="ソフトさーくる　クレージュ ~ Soft Circle Courreges" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="yume de yaretara disk a.fdi" size="1265664" crc="368bbe1b" sha1="cab3763ebd8e258c4865c810a1be3d79a0f7f4bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="yume de yaretara disk b.fdi" size="1265664" crc="4077888c" sha1="d8588f87536174f7280b408f020d53daa22e2807" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zettmj">
 		<description>Zettai Mahjong</description>
 		<year>1994?</year>
@@ -64101,7 +64246,7 @@ doujin?!?
 	</software>
 
 <!-- this should contain 4 disks. it was accompanied by an HDI image -->
-	<software name="kouryuu" supported="no">
+	<software name="koryuki" supported="no">
 		<description>Kouryuuki (Incomplete)</description>
 		<year>1993</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -64444,7 +64589,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="madoumi">
+	<software name="madoummi">
 		<description>Madou Monogatari - Michikusa Ibun</description>
 		<year>19??</year>
 		<publisher>コンパイル (Compile)</publisher>

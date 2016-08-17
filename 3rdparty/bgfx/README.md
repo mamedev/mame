@@ -1,6 +1,11 @@
 [bgfx](https://github.com/bkaradzic/bgfx) - Cross-platform rendering library
 ============================================================================
 
+[![Build Status](https://travis-ci.org/bkaradzic/bgfx.svg?branch=master)](https://travis-ci.org/bkaradzic/bgfx)
+[![Build status](https://ci.appveyor.com/api/projects/status/ipa3ojgeaet1oko5?svg=true)](https://ci.appveyor.com/project/bkaradzic/bgfx)
+[![License](https://img.shields.io/badge/license-BSD--2%20clause-blue.svg)](https://bkaradzic.github.io/bgfx/license.html)
+[![Join the chat at https://gitter.im/bkaradzic/bgfx](https://badges.gitter.im/bkaradzic/bgfx.svg)](https://gitter.im/bkaradzic/bgfx)
+
 [What is it?](https://bkaradzic.github.io/bgfx/overview.html)
 -------------------------------------------------------------
 
@@ -18,22 +23,25 @@ Supported rendering backends:
  * OpenGL ES 2
  * OpenGL ES 3.1
  * WebGL 1.0
+ * WebGL 2.0
 
 Supported HMD:
 
- * OculusVR (0.4.2+)
+ * OculusVR (1.3.0)
 
 Supported platforms:
 
  * Android (14+, ARM, x86, MIPS)
  * asm.js/Emscripten (1.25.0)
  * FreeBSD
- * iOS
- * Linux ![](https://tc27.draster.com/app/rest/builds/buildType:(id:Bgfx_Linux)/statusIcon)
+ * iOS (iPhone, iPad, AppleTV)
+ * Linux
+ * MIPS Creator CI20
  * Native Client (PPAPI 37+, ARM, x86, x64, PNaCl)
- * OSX (10.9)
+ * OSX (10.9+)
  * RaspberryPi
- * Windows (XP, Vista, 7, 8, 10) ![](https://tc27.draster.com/app/rest/builds/buildType:(id:Bgfx_Windows)/statusIcon)
+ * SteamLink
+ * Windows (XP, Vista, 7, 8, 10)
  * WinRT (WinPhone 8.0+)
 
 Supported compilers:
@@ -48,31 +56,48 @@ Languages:
  * [C#/VB/F# language API bindings](https://github.com/MikePopoloski/SharpBgfx)
  * [D language API bindings](https://github.com/DerelictOrg/DerelictBgfx)
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
+ * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
  * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
+ * [Lua language API bindings](https://github.com/excessive/lua-bgfx)
+ * [Python language API bindings](https://github.com/jnadro/pybgfx#pybgf)
+ * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
+ * [Swift language API bindings](https://github.com/stuartcarnie/SwiftBGFX)
 
-Build status
-------------
+[Building](https://bkaradzic.github.io/bgfx/build.html)
+----------------------------------------------------
 
-https://tc27.draster.com/guestAuth/overview.html
+ - AppVeyor https://ci.appveyor.com/project/bkaradzic/bgfx
+ - TravisCI https://travis-ci.org/bkaradzic/bgfx
+
+[Examples](https://bkaradzic.github.io/bgfx/examples.html)
+----------------------------------------------------------
+
+[API Reference](https://bkaradzic.github.io/bgfx/bgfx.html)
+-----------------------------------------------------------
+
+[Tools](https://bkaradzic.github.io/bgfx/tools.html)
+----------------------------------------------------
 
 Who is using it?
 ----------------
 
 http://airmech.com/ AirMech is a free-to-play futuristic action real-time
-strategy video game developed and published by Carbon Games.
+strategy video game developed and published by Carbon Games.  
+![airmech](https://www.mobygames.com/images/shots/l/830630-airmech-playstation-4-screenshot-blue-bar-on-your-mech-indicates.jpg)
 
 https://github.com/dariomanesku/cmftStudio cmftStudio - cubemap filtering tool.  
 ![cmftStudio](https://github.com/dariomanesku/cmftStudio/raw/master/screenshots/cmftStudio_small.jpg)
 
 https://github.com/taylor001/crown Crown is a general purpose data-driven game
 engine, written from scratch with a minimalistic and data-oriented design
-philosophy in mind.
+philosophy in mind.  
+![Crown screenshot](https://raw.githubusercontent.com/taylor001/crown/master/docs/shots/level-editor.png)
 
 https://github.com/emoon/ProDBG - ProDBG is a new debugger under development
 that will support a variety of targets and operating systems. Currently it's in
 very early development and primary focusing on Mac as primary target. This is
 how it currently looks.  
-![mac_screenshot](https://raw.githubusercontent.com/emoon/ProDBG/master/data/screens/mac_screenshot.png)
+![ProDBG_screenshot](https://raw.githubusercontent.com/emoon/ProDBG/master/data/screens/mac_screenshot.png)
 
 http://www.dogbytegames.com/ Dogbyte Games is an indie mobile developer studio
 focusing on racing games.  
@@ -90,22 +115,50 @@ JavaScript for desktop/mobile apps. Idea is to combine the fast workflow and
 deployment model of web with the performance of native code and GPU acceleration.
 
 https://github.com/nem0/LumixEngine LumixEngine is a MIT licensed 3D engine.
-The main goal is performance and Unity-like usability.
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=eyqk61Yw52E
-" target="_blank"><img src="http://img.youtube.com/vi/eyqk61Yw52E/0.jpg" 
-alt="LumixEngine Terrain Editor" width="640" height="480" border="0" /></a>
+The main goal is performance and Unity-like usability.  
+![LumixEngine screenshot](https://cloud.githubusercontent.com/assets/153526/12904252/3fcf130e-cece-11e5-878b-c9fe24c1b11a.png)
 
-[Building](https://bkaradzic.github.io/bgfx/build.html)
--------------------------------------------------------
+https://github.com/podgorskiy/KeplerOrbits KeplerOrbits - Tool that calculates
+positions of celestial bodies using their orbital elements. [Web Demo](http://podgorskiy.com/KeplerOrbits/KeplerOrbits.html)
 
-[Examples](https://bkaradzic.github.io/bgfx/examples.html)
-----------------------------------------------------------
+https://github.com/cyberegoorg/cetech - CETech is Data-Driven game engine and
+toolbox inspired by Bitsquid/Stingray engine.  
+![CETech screenshot](https://github.com/cyberegoorg/cetech/raw/master/docs/img/prototyp.png)
 
-[API Reference](https://bkaradzic.github.io/bgfx/bgfx.html)
------------------------------------------------------------
+https://github.com/jpcy/ioq3-renderer-bgfx - A renderer for ioquake3 written in
+C++ and using bgfx to support multiple rendering APIs.  
+![ioq3-renderer-bgfx screenshot](https://camo.githubusercontent.com/052aa40c05120e56306294d3a1bb5f99f97de8c8/687474703a2f2f692e696d6775722e636f6d2f64364f6856594b2e6a7067)
 
-[Tools](https://bkaradzic.github.io/bgfx/tools.html)
-----------------------------------------------------
+http://makingartstudios.itch.io/dls - DLS the digital logic simulator game.  
+![dls-screenshot](https://img.itch.io/aW1hZ2UvMzk3MTgvMTc5MjQ4LnBuZw==/original/kA%2FQPb.png)
+
+https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
+[Try MAME in Browser!](http://fos.textfiles.com/dfjustin/pacman/pacman/)  
+![mame-screenshot](https://raw.githubusercontent.com/mamedev/www.mamedev.org/d8d716dbb63919a11964b5d47b9b7f6cfa006b56/bgfx/Raiden.png)
+
+https://blackshift.itch.io/blackshift - Blackshift is a grid-based, space-themed
+action puzzle game which isn't afraid of complexity — think Chip's Challenge on
+crack. 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=PUl8612Y-ds
+" target="_blank"><img src="http://img.youtube.com/vi/PUl8612Y-ds/0.jpg" 
+alt="Blackshift Trailer, May 2016"
+width="640" height="480" border="0" /></a>
+
+https://eheitzresearch.wordpress.com/415-2/ - Real-Time Polygonal-Light Shading
+with Linearly Transformed Cosines, Eric Heitz, Jonathan Dupuy, Stephen Hill and
+David Neubelt, ACM SIGGRAPH 2016
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=ZLRgEN7AQgM
+" target="_blank"><img src="http://img.youtube.com/vi/ZLRgEN7AQgM/0.jpg" 
+alt="Real-Time Polygonal-Light Shading with Linearly Transformed Cosines"
+width="640" height="480" border="0" /></a>
+
+http://www.dogbytegames.com/dead_venture.html - Dead Venture is a new Drive 'N
+Gun game where you help a handful of survivals reach the safe haven: a military
+base on a far island.
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=CgMr1g12yXw
+" target="_blank"><img src="http://img.youtube.com/vi/CgMr1g12yXw/0.jpg" 
+alt="Dead Venture - Gameplay Teaser (iOS / Android)"
+width="640" height="480" border="0" /></a>
 
 [License (BSD 2-clause)](https://bkaradzic.github.io/bgfx/license.html)
 -----------------------------------------------------------------------
@@ -114,7 +167,7 @@ alt="LumixEngine Terrain Editor" width="640" height="480" border="0" /></a>
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-	Copyright 2010-2015 Branimir Karadzic. All rights reserved.
+	Copyright 2010-2016 Branimir Karadzic. All rights reserved.
 	
 	https://github.com/bkaradzic/bgfx
 	

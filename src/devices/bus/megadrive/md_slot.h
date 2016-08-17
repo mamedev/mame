@@ -3,6 +3,8 @@
 #ifndef __MD_SLOT_H
 #define __MD_SLOT_H
 
+#include "softlist_dev.h"
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -26,10 +28,12 @@ enum
 	XINQIG,                   /* Xin Qigai Wangzi uses different sram start address and has no valid header */
 	BEGGARP,                     /* Beggar Prince uses different sram start address + bankswitch tricks */
 	WUKONG,                      /* Legend of Wukong uses different sram start address + bankswitch trick for last 128K of ROM */
+	STARODYS,                    /* Star Odyssey */
 
 	// EEPROM
 	SEGA_EEPROM,                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */
 	NBA_JAM,                     /* NBA Jam */
+	NBA_JAM_ALT,                     /* NBA Jam */
 	NBA_JAM_TE,                  /* NBA Jam TE / NFL Quarterback Club */
 	NFL_QB_96,                   /* NFL Quarterback Club '96 */
 	C_SLAM,                      /* College Slam / Frank Thomas Big Hurt Baseball */
@@ -59,6 +63,7 @@ enum
 	LIONK3,                      /* Lion King 3, Super Donkey Kong 99, Super King Kong 99 */
 	MC_PIRATE,                   /* Super 19 in 1, Super 15 in 1, 12 in 1 and a few more multicarts */
 	MJLOVER,                     /* Mahjong Lover */
+	CJMJCLUB,                    /* Super Mahjong Club */
 	POKEMONA,                    /* Pocket Monster Alt Protection */
 	REALTEC,                     /* Whac a Critter/Mallet legend, Defend the Earth, Funnyworld/Ballonboy */
 	REDCLIFF,                    /* Romance of the Three Kingdoms - Battle of Red Cliffs, already decoded from .mdx format */
@@ -100,7 +105,7 @@ public:
 	virtual int read_test() { return 0; }   // used by Virtua Racing test
 
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
-	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
+	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { m_device.logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
 
 	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
@@ -144,29 +149,28 @@ public:
 	virtual ~base_md_cart_slot_device();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const override { return 1; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 
 	int get_type() { return m_type; }
 
-	int load_list();
-	int load_nonlist();
+	image_init_result load_list();
+	image_init_result load_nonlist();
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 
 	void setup_custom_mappers();
@@ -202,8 +206,8 @@ class md_cart_slot_device :  public base_md_cart_slot_device
 public:
 	// construction/destruction
 	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "megadriv_cart"; }
-	virtual const char *file_extensions() const { return "smd,bin,md,gen"; }
+	virtual const char *image_interface() const override { return "megadriv_cart"; }
+	virtual const char *file_extensions() const override { return "smd,bin,md,gen"; }
 };
 
 // ======================> pico_cart_slot_device
@@ -213,8 +217,8 @@ class pico_cart_slot_device :  public base_md_cart_slot_device
 public:
 	// construction/destruction
 	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "pico_cart"; }
-	virtual const char *file_extensions() const { return "bin,md"; }
+	virtual const char *image_interface() const override { return "pico_cart"; }
+	virtual const char *file_extensions() const override { return "bin,md"; }
 };
 
 // ======================> copera_cart_slot_device
@@ -224,8 +228,8 @@ class copera_cart_slot_device :  public base_md_cart_slot_device
 public:
 	// construction/destruction
 	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "copera_cart"; }
-	virtual const char *file_extensions() const { return "bin,md"; }
+	virtual const char *image_interface() const override { return "copera_cart"; }
+	virtual const char *file_extensions() const override { return "bin,md"; }
 };
 
 

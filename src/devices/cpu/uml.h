@@ -189,6 +189,7 @@ namespace uml
 		OP_OR,                      // OR      dst,src1,src2[,f]
 		OP_XOR,                     // XOR     dst,src1,src2[,f]
 		OP_LZCNT,                   // LZCNT   dst,src
+		OP_TZCNT,                   // TZCNT   dst,src
 		OP_BSWAP,                   // BSWAP   dst,src
 		OP_SHL,                     // SHL     dst,src,count[,f]
 		OP_SHR,                     // SHR     dst,src,count[,f]
@@ -218,6 +219,8 @@ namespace uml
 		OP_FSQRT,                   // FSQRT   dst,src1
 		OP_FRECIP,                  // FRECIP  dst,src1
 		OP_FRSQRT,                  // FRSQRT  dst,src1
+		OP_FCOPYI,                  // FCOPYI  dst,src
+		OP_ICOPYF,                  // ICOPYF  dst,src
 
 		OP_MAX
 	};
@@ -409,7 +412,7 @@ namespace uml
 		void set_mapvar(int paramnum, UINT32 value) { assert(paramnum < m_numparams); assert(m_param[paramnum].is_mapvar()); m_param[paramnum] = value; }
 
 		// misc
-		const char *disasm(std::string &str, drcuml_state *drcuml = NULL) const;
+		std::string disasm(drcuml_state *drcuml = nullptr) const;
 		UINT8 input_flags() const;
 		UINT8 output_flags() const;
 		UINT8 modified_flags() const;
@@ -477,6 +480,7 @@ namespace uml
 		void _or(parameter dst, parameter src1, parameter src2) { configure(OP_OR, 4, dst, src1, src2); }
 		void _xor(parameter dst, parameter src1, parameter src2) { configure(OP_XOR, 4, dst, src1, src2); }
 		void lzcnt(parameter dst, parameter src) { configure(OP_LZCNT, 4, dst, src); }
+		void tzcnt(parameter dst, parameter src) { configure(OP_TZCNT, 4, dst, src); }
 		void bswap(parameter dst, parameter src) { configure(OP_BSWAP, 4, dst, src); }
 		void shl(parameter dst, parameter src, parameter count) { configure(OP_SHL, 4, dst, src, count); }
 		void shr(parameter dst, parameter src, parameter count) { configure(OP_SHR, 4, dst, src, count); }
@@ -515,6 +519,7 @@ namespace uml
 		void dor(parameter dst, parameter src1, parameter src2) { configure(OP_OR, 8, dst, src1, src2); }
 		void dxor(parameter dst, parameter src1, parameter src2) { configure(OP_XOR, 8, dst, src1, src2); }
 		void dlzcnt(parameter dst, parameter src) { configure(OP_LZCNT, 8, dst, src); }
+		void dtzcnt(parameter dst, parameter src) { configure(OP_TZCNT, 8, dst, src); }
 		void dbswap(parameter dst, parameter src) { configure(OP_BSWAP, 8, dst, src); }
 		void dshl(parameter dst, parameter src, parameter count) { configure(OP_SHL, 8, dst, src, count); }
 		void dshr(parameter dst, parameter src, parameter count) { configure(OP_SHR, 8, dst, src, count); }
@@ -544,6 +549,8 @@ namespace uml
 		void fssqrt(parameter dst, parameter src1) { configure(OP_FSQRT, 4, dst, src1); }
 		void fsrecip(parameter dst, parameter src1) { configure(OP_FRECIP, 4, dst, src1); }
 		void fsrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 4, dst, src1); }
+		void fscopyi(parameter dst, parameter src) { configure(OP_FCOPYI, 4, dst, src); }
+		void icopyfs(parameter dst, parameter src) { configure(OP_ICOPYF, 4, dst, src); }
 
 		// 64-bit floating point operations
 		void fdload(parameter dst, const void *base, parameter index) { configure(OP_FLOAD, 8, dst, parameter::make_memory(base), index); }
@@ -566,6 +573,8 @@ namespace uml
 		void fdsqrt(parameter dst, parameter src1) { configure(OP_FSQRT, 8, dst, src1); }
 		void fdrecip(parameter dst, parameter src1) { configure(OP_FRECIP, 8, dst, src1); }
 		void fdrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 8, dst, src1); }
+		void fdcopyi(parameter dst, parameter src) { configure(OP_FCOPYI, 8, dst, src); }
+		void icopyfd(parameter dst, parameter src) { configure(OP_ICOPYF, 8, dst, src); }
 
 		// constants
 		static const int MAX_PARAMS = 4;

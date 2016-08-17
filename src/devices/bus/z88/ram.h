@@ -24,13 +24,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// z88cart_interface overrides
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual UINT8* get_cart_base();
-	virtual UINT32 get_cart_size() { return 0x8000; }
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual UINT8* get_cart_base() override;
+	virtual UINT32 get_cart_size() override { return 0x8000; }
 
 protected:
 	// internal state
@@ -47,7 +47,7 @@ public:
 
 protected:
 	// z88cart_interface overrides
-	virtual UINT32 get_cart_size() { return 0x20000; }
+	virtual UINT32 get_cart_size() override { return 0x20000; }
 };
 
 // ======================> z88_512k_ram_device
@@ -60,7 +60,7 @@ public:
 
 protected:
 	// z88cart_interface overrides
-	virtual UINT32 get_cart_size() { return 0x80000; }
+	virtual UINT32 get_cart_size() override { return 0x80000; }
 };
 
 // ======================> z88_1024k_ram_device
@@ -73,7 +73,7 @@ public:
 
 protected:
 	// z88cart_interface overrides
-	virtual UINT32 get_cart_size() { return 0x100000; }
+	virtual UINT32 get_cart_size() override { return 0x100000; }
 };
 
 // device type definition

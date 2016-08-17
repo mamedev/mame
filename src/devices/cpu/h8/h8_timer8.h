@@ -89,8 +89,8 @@ protected:
 	int clock_type, clock_divider, clear_type, counter_cycle;
 	UINT64 last_clock_update, event_time;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void update_counter(UINT64 cur_time = 0);
 	void recalc_event(UINT64 cur_time = 0);

@@ -28,7 +28,6 @@
 
 #include <tinystl/allocator.h>
 #include <tinystl/unordered_set.h>
-#include <UnitTest++.h>
 
 TEST(uoset_pod_compiles) {
 

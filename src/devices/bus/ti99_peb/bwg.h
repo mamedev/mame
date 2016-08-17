@@ -17,6 +17,7 @@
 #include "imagedev/flopdrv.h"
 #include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_BWG;
 
@@ -24,15 +25,12 @@ class snug_bwg_device : public ti_expansion_card_device
 {
 public:
 	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
-
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -40,16 +38,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 protected:
-	void device_start();
-	void device_reset();
-	void device_config_complete();
+	void device_start() override;
+	void device_reset() override;
+	void device_config_complete() override;
 
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
+	const tiny_rom_entry *device_rom_region() const override;
+	machine_config_constructor device_mconfig_additions() const override;
+	ioport_constructor device_input_ports() const override;
 
 private:
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// Debugger accessors
 	void debug_read(offs_t offset, UINT8* value);
@@ -122,7 +120,7 @@ private:
 	UINT8*          m_dsrrom;
 
 	// Buffer RAM
-	UINT8*          m_buffer_ram;
+	required_device<ram_device> m_buffer_ram;
 
 	// Link to the attached floppy drives
 	floppy_image_device*    m_floppy[4];

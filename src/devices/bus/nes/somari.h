@@ -15,15 +15,15 @@ public:
 	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_l) { write_m(space, offset + 0x100, data, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override { write_m(space, offset + 0x100, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 	virtual DECLARE_WRITE8_MEMBER(mmc1_w);
 	virtual DECLARE_WRITE8_MEMBER(mmc3_w);
 	virtual DECLARE_WRITE8_MEMBER(vrc2_w);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 private:
 	void update_prg();
 	void update_chr();

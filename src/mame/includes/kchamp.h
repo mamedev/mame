@@ -5,6 +5,8 @@
     Karate Champ
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
 class kchamp_state : public driver_device
@@ -15,17 +17,19 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
-		m_audiocpu(*this, "audiocpu"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -38,7 +42,13 @@ public:
 	int        m_counter;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
@@ -52,8 +62,8 @@ public:
 	DECLARE_DRIVER_INIT(kchampvs);
 	DECLARE_DRIVER_INIT(kchampvs2);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(kchamp);
 	DECLARE_MACHINE_START(kchampvs);
 	DECLARE_MACHINE_START(kchamp);
@@ -65,9 +75,4 @@ public:
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void decrypt_code();
 	DECLARE_WRITE_LINE_MEMBER(msmint);
-	required_device<cpu_device> m_maincpu;
-	optional_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 };

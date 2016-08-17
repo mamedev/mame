@@ -27,14 +27,13 @@ public:
 	void control_w(UINT8 data);
 	UINT8 control_r();
 	void data_w(UINT8 data);
-	UINT8 data_r();
 
 	// Character n bits are at bytes n*16..n*16+7 when 8-high, +10 when 11-high.  Only the low 5 bits are used.
 	// In one line mode n = 0..79.  In two line mode first line is 0..39 and second is 40..79.
 	const UINT8 *render();
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT8 cgram[8*8];
@@ -42,7 +41,8 @@ private:
 	UINT8 render_buf[80*16];
 	bool cursor_direction, cursor_blinking, two_line, shift_on_write, double_height, cursor_on, display_on;
 	UINT8 adc, shift;
-	const UINT8 *cgrom;
+protected:
+	optional_region_ptr<UINT8> m_cgrom;
 
 	void cursor_step(bool direction);
 	void shift_step(bool direction);
@@ -54,7 +54,7 @@ public:
 	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 extern const device_type MSM6222B;

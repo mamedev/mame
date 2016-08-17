@@ -1,9 +1,9 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#include <bgfx.c99.h>
+#include <bgfx/c99/bgfx.h>
 #include "../00-helloworld/logo.h"
 
 extern bool entry_process_events(uint32_t* _width, uint32_t* _height, uint32_t* _debug, uint32_t* _reset);
@@ -63,7 +63,7 @@ int _main_(int _argc, char** _argv)
 
 		// Advance to next frame. Rendering thread will be kicked to
 		// process submitted rendering primitives.
-		bgfx_frame();
+		bgfx_frame(false);
 	}
 
 	// Shutdown bgfx.

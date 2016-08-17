@@ -50,7 +50,8 @@ protected:
 	acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual void update_irq();
 	int calculate_txirq();

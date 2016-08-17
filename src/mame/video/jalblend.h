@@ -17,12 +17,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	/* each palette entry contains a fourth 'alpha' value */
-	UINT8 *m_table;
+	std::unique_ptr<UINT8[]> m_table;
 
 	template<class _BitmapClass>
 	void drawgfx_common(palette_device &palette,_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,

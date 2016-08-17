@@ -6,7 +6,8 @@
 
 *************************************************************************/
 
-#include "sound/2151intf.h"
+#include "machine/gen_latch.h"
+#include "sound/ym2151.h"
 
 class amspdwy_state : public driver_device
 {
@@ -21,7 +22,8 @@ public:
 		m_ym2151(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */
@@ -36,6 +38,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -59,7 +62,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	UINT8 amspdwy_wheel_r( int index );
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 };

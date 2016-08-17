@@ -1,40 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef __RS232_KEYBOARD_H__
-#define __RS232_KEYBOARD_H__
+#ifndef MAME_BUS_RS232_KEYBOARD_H
+#define MAME_BUS_RS232_KEYBOARD_H
 
 #pragma once
 
 #include "rs232.h"
 #include "machine/keyboard.h"
 
-class serial_keyboard_device :
-	public generic_keyboard_device,
-	public device_serial_interface,
-	public device_rs232_port_interface
+class serial_keyboard_device
+	: public generic_keyboard_device
+	, public device_buffered_serial_interface<16U>
+	, public device_rs232_port_interface
 {
 public:
 	serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	serial_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { device_serial_interface::rx_w(state); }
-	DECLARE_READ_LINE_MEMBER(tx_r);
+	virtual ioport_constructor device_input_ports() const override;
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
 
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void send_key(UINT8 code);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void tra_callback() override;
+	virtual void send_key(UINT8 code) override;
 
 private:
-	UINT8 m_curr_key;
-	bool m_key_valid;
+	virtual void received_byte(UINT8 byte) override;
 
 	required_ioport m_rs232_txbaud;
 	required_ioport m_rs232_startbits;
@@ -45,4 +42,4 @@ private:
 
 extern const device_type SERIAL_KEYBOARD;
 
-#endif /* __RS232_KEYBOARD_H__ */
+#endif // MAME_BUS_RS232_KEYBOARD_H

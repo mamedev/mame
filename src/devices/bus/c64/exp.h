@@ -37,6 +37,7 @@
 #define __C64_EXPANSION_SLOT__
 
 #include "emu.h"
+#include "softlist_dev.h"
 #include "formats/cbm_crt.h"
 
 
@@ -58,7 +59,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, c64_expansion_cards, NULL) \
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, c64_expansion_cards, nullptr) \
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, irq_w)) \
 	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, nmi_w)) \
 	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)) \
@@ -129,27 +130,26 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual image_init_result call_load() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return "c64_cart,vic10_cart"; }
-	virtual const char *file_extensions() const { return "80,a0,e0,crt"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const char *image_interface() const override { return "c64_cart,vic10_cart"; }
+	virtual const char *file_extensions() const override { return "80,a0,e0,crt"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 
 	devcb_read8        m_read_dma_cd;
 	devcb_write8       m_write_dma_cd;

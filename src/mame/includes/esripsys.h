@@ -29,9 +29,9 @@
 
 struct line_buffer_t
 {
-	UINT8 *colour_buf;
-	UINT8 *intensity_buf;
-	UINT8 *priority_buf;
+	std::unique_ptr<UINT8[]> colour_buf;
+	std::unique_ptr<UINT8[]> intensity_buf;
+	std::unique_ptr<UINT8[]> priority_buf;
 };
 
 class esripsys_state : public driver_device
@@ -63,7 +63,7 @@ public:
 	int m_io_firq_status;
 	UINT8 m_cmos_ram_a2_0;
 	UINT8 m_cmos_ram_a10_3;
-	UINT8 *m_cmos_ram;
+	std::unique_ptr<UINT8[]> m_cmos_ram;
 	UINT8 m_u56a;
 	UINT8 m_u56b;
 	UINT8 m_g_to_s_latch1;
@@ -73,8 +73,8 @@ public:
 	UINT8 m_dac_msb;
 	UINT8 m_dac_vol;
 	UINT8 m_tms_data;
-	UINT8 *m_fdt_a;
-	UINT8 *m_fdt_b;
+	std::unique_ptr<UINT8[]> m_fdt_a;
+	std::unique_ptr<UINT8[]> m_fdt_b;
 	struct line_buffer_t m_line_buffer[2];
 	int m_fasel;
 	int m_fbsel;
@@ -85,8 +85,8 @@ public:
 	int m_video_firq_en;
 	emu_timer *m_hblank_end_timer;
 	emu_timer *m_hblank_start_timer;
-	UINT8 *m_fig_scale_table;
-	UINT8 *m_scale_table;
+	std::unique_ptr<UINT8[]> m_fig_scale_table;
+	std::unique_ptr<UINT8[]> m_scale_table;
 	int m_video_firq;
 	UINT8 m_bg_intensity;
 	DECLARE_WRITE8_MEMBER(uart_w);
@@ -118,7 +118,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
 	DECLARE_DRIVER_INIT(esripsys);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);

@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/watchdog.h"
 #include "abckb.h"
 #include "sound/discrete.h"
 #include "sound/speaker.h"
@@ -34,12 +35,12 @@ public:
 	abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// abc_keyboard_interface overrides
-	virtual void txd_w(int state);
+	virtual void txd_w(int state) override;
 
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
 
@@ -51,9 +52,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
 	{
@@ -66,6 +67,7 @@ protected:
 	inline void key_down(int state);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_sound_device> m_discrete;
 	required_ioport m_x0;
 	required_ioport m_x1;
@@ -103,7 +105,7 @@ public:
 	abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 

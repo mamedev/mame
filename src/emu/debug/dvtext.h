@@ -31,8 +31,8 @@ protected:
 
 protected:
 	// view overrides
-	virtual void view_update();
-	virtual void view_notify(debug_view_notification type);
+	virtual void view_update() override;
+	virtual void view_notify(debug_view_notification type) override;
 
 private:
 	// internal state

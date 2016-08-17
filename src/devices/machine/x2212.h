@@ -49,7 +49,7 @@ class x2212_device :    public device_t,
 public:
 	// construction/destruction
 	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size_data);
 
 	// inline configuration helpers
 	static void static_set_auto_save(device_t &device);
@@ -67,17 +67,15 @@ protected:
 	void recall();
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
-
-	int SIZE_DATA;
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 	// configuration state
 	bool                        m_auto_save;
@@ -92,16 +90,15 @@ protected:
 
 	bool        m_store;
 	bool        m_array_recall;
+
+	int m_size_data;
+	optional_region_ptr<UINT8> m_default_data;
 };
 
 class x2210_device :    public x2212_device
 {
 public:
 	x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
 };
 
 

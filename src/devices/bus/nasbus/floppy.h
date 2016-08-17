@@ -35,10 +35,10 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_reset_after_children();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 
 private:
 	TIMER_CALLBACK_MEMBER(motor_off);

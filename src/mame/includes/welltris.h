@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+
+#include "machine/gen_latch.h"
 #include "video/vsystem_spr2.h"
 
 class welltris_state : public driver_device
@@ -11,6 +13,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_pixelram(*this, "pixelram"),
 		m_charvideoram(*this, "charvideoram") { }
@@ -20,6 +23,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<vsystem_spr2_device> m_spr_old;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pixelram;
@@ -41,14 +45,13 @@ public:
 	DECLARE_WRITE16_MEMBER(gfxbank_w);
 	DECLARE_WRITE16_MEMBER(scrollreg_w);
 	DECLARE_WRITE16_MEMBER(charvideoram_w);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
 
 	DECLARE_DRIVER_INIT(quiz18k);
 	DECLARE_DRIVER_INIT(welltris);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

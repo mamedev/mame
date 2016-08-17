@@ -23,16 +23,31 @@ public:
 	atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
+	UINT16 *identify_device_buffer() { return m_identify_buffer; }
+
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void perform_diagnostic();
-	virtual void identify_packet_device();
+	virtual void perform_diagnostic() override;
+	virtual void identify_packet_device() override;
+	virtual void process_buffer() override;
+	virtual void ExecCommand() override;
+	bool m_media_change;
+};
+
+class atapi_fixed_cdrom_device : public atapi_cdrom_device
+{
+public:
+	atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	virtual void device_reset() override;
 };
 
 // device type definition
 extern const device_type ATAPI_CDROM;
+extern const device_type ATAPI_FIXED_CDROM;
 
 #endif

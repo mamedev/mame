@@ -30,10 +30,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 read_bit0();
+	virtual UINT8 read_bit0() override;
 
 protected:
 	UINT32 m_latch;
@@ -47,10 +47,10 @@ public:
 	// construction/destruction
 	nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual void write(UINT8 data);
+	virtual void write(UINT8 data) override;
 
 private:
 	required_ioport m_joypad1;
@@ -65,10 +65,10 @@ public:
 	// construction/destruction
 	nes_4score_p2p4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual void write(UINT8 data);
+	virtual void write(UINT8 data) override;
 
 private:
 	required_ioport m_joypad2;

@@ -8,9 +8,10 @@
 
 #include "sound/dac.h"
 #include "sound/tms5110.h"
+#include "machine/gen_latch.h"
 #include "machine/s2636.h"
 
-#define CVS_S2636_Y_OFFSET     (3)
+#define CVS_S2636_Y_OFFSET     (-5)
 #define CVS_S2636_X_OFFSET     (-26)
 #define CVS_MAX_STARS          250
 
@@ -39,7 +40,8 @@ public:
 			m_s2636_2(*this, "s2636_2"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_soundlatch(*this, "soundlatch")
 	{
 	}
 
@@ -82,17 +84,18 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory */
 	UINT8      m_color_ram[0x400];
 	UINT8      m_palette_ram[0x10];
 	UINT8      m_character_ram[3 * 0x800];  /* only half is used, but
-                                               by allocating twice the amount,
-                                               we can use the same gfx_layout */
+	                                           by allocating twice the amount,
+	                                           we can use the same gfx_layout */
 	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
 	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag);
+	DECLARE_WRITE_LINE_MEMBER(cvs_slave_cpu_interrupt);
 	DECLARE_READ8_MEMBER(cvs_input_r);
-	DECLARE_READ8_MEMBER(cvs_393hz_clock_r);
 	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_lo_w);
 	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_hi_w);
 	DECLARE_READ8_MEMBER(cvs_speech_command_r);

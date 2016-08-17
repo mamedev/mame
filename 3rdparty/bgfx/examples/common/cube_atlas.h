@@ -1,6 +1,6 @@
 ﻿/*
  * Copyright 2013 Jeremie Roy. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef CUBE_ATLAS_H_HEADER_GUARD
@@ -15,7 +15,7 @@
 /// algorithm based on C++ sources provided by Jukka Jylänki at:
 /// http://clb.demon.fi/files/RectangleBinPack/
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 
 struct AtlasRegion
 {

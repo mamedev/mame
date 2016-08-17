@@ -1,6 +1,8 @@
-// license:???
-// copyright-holders:Ed Mueller, Mike Balfour, Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Mike Balfour, Zsolt Vasvari
+
 #include "machine/buggychl.h"
+#include "machine/gen_latch.h"
 
 class bking_state : public driver_device
 {
@@ -13,7 +15,8 @@ public:
 		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_playfield_ram;
@@ -53,6 +56,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 #if 0
 	/* 68705 */
@@ -70,13 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bking3_addr_h_w);
 	DECLARE_READ8_MEMBER(bking3_extrarom_r);
 	DECLARE_READ8_MEMBER(bking3_ext_check_r);
-	DECLARE_READ8_MEMBER(bking3_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(bking3_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(bking3_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(bking3_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(bking3_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(bking3_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(bking3_68705_port_c_r);
 	DECLARE_WRITE8_MEMBER(bking_xld1_w);
 	DECLARE_WRITE8_MEMBER(bking_yld1_w);
 	DECLARE_WRITE8_MEMBER(bking_xld2_w);
@@ -95,9 +92,9 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(bking);
 	DECLARE_MACHINE_START(bking3);
 	DECLARE_MACHINE_RESET(bking3);

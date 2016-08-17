@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
+#include "machine/gen_latch.h"
+
 class cclimber_state : public driver_device
 {
 public:
@@ -9,6 +12,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_bigsprite_videoram(*this, "bigspriteram"),
 		m_videoram(*this, "videoram"),
 		m_column_scroll(*this, "column_scroll"),
@@ -27,6 +31,7 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_bigsprite_videoram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -49,6 +54,7 @@ public:
 	tilemap_t *m_pf_tilemap;
 	tilemap_t *m_bs_tilemap;
 	tilemap_t *m_toproller_bg_tilemap;
+	std::unique_ptr<UINT8[]> m_opcodes;
 
 	DECLARE_WRITE8_MEMBER(swimmer_sh_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(yamato_p0_w);
@@ -60,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cclimber_colorram_w);
 	DECLARE_WRITE8_MEMBER(cannonb_flip_screen_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(cclimber);
 	DECLARE_DRIVER_INIT(yamato);
 	DECLARE_DRIVER_INIT(ckongb);
@@ -69,6 +75,7 @@ public:
 	DECLARE_DRIVER_INIT(cannonb2);
 	DECLARE_DRIVER_INIT(cannonb);
 	DECLARE_DRIVER_INIT(dking);
+	DECLARE_DRIVER_INIT(rpatrol);
 	DECLARE_MACHINE_RESET(cclimber);
 	DECLARE_VIDEO_START(cclimber);
 	DECLARE_PALETTE_INIT(cclimber);
@@ -97,7 +104,7 @@ public:
 	void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const UINT8 convtable[8][16]);
-	void cannonb_patch();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(bagmanf_vblank_irq);
 };

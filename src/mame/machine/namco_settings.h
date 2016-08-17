@@ -18,8 +18,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	int ce, clk, data;

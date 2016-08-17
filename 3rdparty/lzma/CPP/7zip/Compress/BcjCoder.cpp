@@ -4,12 +4,21 @@
 
 #include "BcjCoder.h"
 
-UInt32 CBCJ_x86_Encoder::SubFilter(Byte *data, UInt32 size)
+namespace NCompress {
+namespace NBcj {
+
+STDMETHODIMP CCoder::Init()
 {
-  return (UInt32)::x86_Convert(data, size, _bufferPos, &_prevMask, 1);
+  _bufferPos = 0;
+  x86_Convert_Init(_prevMask);
+  return S_OK;
 }
 
-UInt32 CBCJ_x86_Decoder::SubFilter(Byte *data, UInt32 size)
+STDMETHODIMP_(UInt32) CCoder::Filter(Byte *data, UInt32 size)
 {
-  return (UInt32)::x86_Convert(data, size, _bufferPos, &_prevMask, 0);
+  UInt32 processed = (UInt32)::x86_Convert(data, size, _bufferPos, &_prevMask, _encode);
+  _bufferPos += processed;
+  return processed;
 }
+
+}}

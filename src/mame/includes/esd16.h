@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "video/decospr.h"
 
 class esd16_state : public driver_device
@@ -26,7 +27,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_sprgen(*this, "spritegen"),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"),
+		m_soundlatch(*this, "soundlatch")
 		{}
 
 	/* memory pointers */
@@ -53,6 +55,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<decospr_device> m_sprgen;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(esd16_sound_command_w);
 	DECLARE_WRITE16_MEMBER(hedpanic_platform_w);
@@ -68,9 +71,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0_16x16);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_1_16x16);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECOSPR_PRIORITY_CB_MEMBER(hedpanic_pri_callback);
 };

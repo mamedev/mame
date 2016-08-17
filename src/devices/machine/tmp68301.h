@@ -54,9 +54,9 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 private:
 	devcb_read16         m_in_parallel_cb;

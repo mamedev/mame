@@ -25,11 +25,11 @@ public:
 	UINT8 m_bitmap_videoram_selected;
 	UINT8 m_bitmap_videoram_address_x;
 	UINT8 m_bitmap_videoram_address_y;
-	UINT8 *m_bitmap_videoram1;
-	UINT8 *m_bitmap_videoram2;
+	std::unique_ptr<UINT8[]> m_bitmap_videoram1;
+	std::unique_ptr<UINT8[]> m_bitmap_videoram2;
 	UINT8 *m_current_bitmap_videoram_accessed;
 	UINT8 *m_current_bitmap_videoram_displayed;
-	UINT16 *m_palette_ram;
+	std::unique_ptr<UINT16[]>  m_palette_ram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(cloak_led_w);
 	DECLARE_WRITE8_MEMBER(cloak_coin_counter_w);
@@ -46,7 +46,7 @@ public:
 	void set_current_bitmap_videoram_pointer();
 	void adjust_xy(int offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_cloak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_pen(int i);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="md2_flop" description="MD-2 disk images">
+
+	<software name="momd2r21">
+		<description>CP/M 2.2 System Disk rev 2.1</description>
+		<year>1983</year>
+		<publisher>Morrow Designs</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="80734">
+				<rom name="momd2r21.tdo" size="80734" crc="5d265d5b" sha1="68d036c1b055a1ee95679bb70e169029cb825e23" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="momd2r16" cloneof="momd2r21">
+		<description>CP/M 2.2 System Disk rev 1.6</description>
+		<year>198?</year>
+		<publisher>Morrow Designs</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79928">
+				<rom name="momd2r16.tdo" size="79928" crc="3e5ba26d" sha1="c9de296ea18904f8de984b9f71b43a7988a8facc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="momd2r13" cloneof="momd2r21">
+		<description>CP/M 2.2 System Disk rev 1.3</description>
+		<year>198?</year>
+		<publisher>Morrow Designs</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="76008">
+				<rom name="momd2r13.tdo" size="76008" crc="dc649f14" sha1="fb37b54d2acf99f38109482a2c7953a39754e27c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="momd2r1x" cloneof="momd2r21">
+		<description>CP/M 2.2 System Disk rev 1.x</description>
+		<year>198?</year>
+		<publisher>Morrow Designs</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="75924">
+				<rom name="momd2r1x.tdo" size="75924" crc="5ba9aa27" sha1="2915d45c04b7185b7d8494730928afb327664204" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="softdist">
+		<description>Software Distribution Disks</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Correct-It"/>
+			<dataarea name="flop" size="165597">
+				<rom name="distr_disk_1.imd" size="165597" crc="bf6d2ba2" sha1="4d8f95ee638894789b23abb8c72974db2cd59651" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="BASIC-80 &amp; BAZIC"/>
+			<dataarea name="flop" size="112445">
+				<rom name="6distr_disk_2.imd" size="112445" crc="899a6a8a" sha1="8c6192a3106c00d927a6da886b5ea837ea608656" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="LogiCalc"/>
+			<dataarea name="flop" size="152331">
+				<rom name="distr_disk_3.imd" size="152331" crc="7f1bbdf6" sha1="8faaab8be8123ffd49f5f9acae520faf05f699f5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

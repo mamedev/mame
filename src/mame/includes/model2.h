@@ -8,6 +8,7 @@
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
+#include "machine/m2comm.h"
 
 class model2_renderer;
 struct raster_state;
@@ -30,6 +31,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_m1audio(*this, "m1audio"),
+		m_m2comm(*this, "m2comm"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tgp(*this, "tgp"),
 		m_dsp(*this, "dsp"),
@@ -40,24 +42,28 @@ public:
 		m_palette(*this, "palette"),
 		m_scsp(*this, "scsp"),
 		m_cryptdevice(*this, "315_5881"),
-		m_0229crypt(*this, "317_0229")
-
+		m_0229crypt(*this, "317_0229"),
+		m_in0(*this, "IN0"),
+		m_gears(*this, "GEARS"),
+		m_analog_ports(*this, {"ANA0", "ANA1", "ANA2", "ANA3"}),
+		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
 		{ }
 
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_bufferram;
-	UINT16 *m_palram;
+	std::unique_ptr<UINT16[]> m_palram;
 	required_shared_ptr<UINT32> m_colorxlat;
 	required_shared_ptr<UINT32> m_textureram0;
 	required_shared_ptr<UINT32> m_textureram1;
 	required_shared_ptr<UINT32> m_lumaram;
 	optional_shared_ptr<UINT16> m_soundram;
 	optional_shared_ptr<UINT32> m_tgp_program;
-	optional_shared_ptr<UINT32> m_tgpx4_program;
+	optional_shared_ptr<UINT64> m_tgpx4_program;
 
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
+	optional_device<m2comm_device> m_m2comm;        // Model 2 communication board
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_tgp;
 	optional_device<cpu_device> m_dsp;
@@ -69,6 +75,11 @@ public:
 	optional_device<scsp_device> m_scsp;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
+
+	required_ioport m_in0;
+	optional_ioport m_gears;
+	optional_ioport_array<4> m_analog_ports;
+	optional_ioport_array<4> m_lightgun_ports;
 
 	UINT32 m_intreq;
 	UINT32 m_intena;
@@ -85,11 +96,11 @@ public:
 	int m_dsp_type;
 	int m_copro_fifoin_rpos;
 	int m_copro_fifoin_wpos;
-	UINT32 *m_copro_fifoin_data;
+	std::unique_ptr<UINT32[]> m_copro_fifoin_data;
 	int m_copro_fifoin_num;
 	int m_copro_fifoout_rpos;
 	int m_copro_fifoout_wpos;
-	UINT32 *m_copro_fifoout_data;
+	std::unique_ptr<UINT32[]> m_copro_fifoout_data;
 	int m_copro_fifoout_num;
 	UINT16 m_cmd_data;
 	UINT8 m_driveio_comm_data;
@@ -100,11 +111,6 @@ public:
 	int m_to_68k;
 
 	int m_maxxstate;
-	UINT32 m_netram[0x8000/4];
-	int m_zflagi;
-	int m_zflag;
-	int m_sysres;
-	int m_jnet_time_out;
 	UINT32 m_geo_read_start_address;
 	UINT32 m_geo_write_start_address;
 	model2_renderer *m_poly;
@@ -143,19 +149,13 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_fifo_w);
 	DECLARE_WRITE32_MEMBER(copro_sharc_iop_w);
 	DECLARE_WRITE32_MEMBER(geo_ctl1_w);
-	DECLARE_WRITE32_MEMBER(geo_sharc_ctl1_w);
-	DECLARE_READ32_MEMBER(geo_sharc_fifo_r);
-	DECLARE_WRITE32_MEMBER(geo_sharc_fifo_w);
-	DECLARE_WRITE32_MEMBER(geo_sharc_iop_w);
 	DECLARE_READ32_MEMBER(geo_prg_r);
 	DECLARE_WRITE32_MEMBER(geo_prg_w);
 	DECLARE_READ32_MEMBER(geo_r);
 	DECLARE_WRITE32_MEMBER(geo_w);
 	DECLARE_READ32_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
-	DECLARE_READ32_MEMBER(sonic_unk_r);
 	DECLARE_READ32_MEMBER(daytona_unk_r);
-	DECLARE_READ32_MEMBER(desert_unk_r);
 	DECLARE_READ32_MEMBER(model2_irq_r);
 	DECLARE_WRITE32_MEMBER(model2_irq_w);
 	DECLARE_READ32_MEMBER(model2_serial_r);
@@ -166,18 +166,11 @@ public:
 	int first_read;
 
 	DECLARE_READ32_MEMBER(maxx_r);
-	DECLARE_READ32_MEMBER(network_r);
-	DECLARE_WRITE32_MEMBER(network_w);
-	DECLARE_WRITE32_MEMBER(copro_w);
 	DECLARE_WRITE32_MEMBER(mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
 	DECLARE_WRITE32_MEMBER(model2o_luma_w);
 	DECLARE_WRITE32_MEMBER(model2_3d_zclip_w);
-	DECLARE_READ16_MEMBER(m1_snd_68k_latch_r);
-	DECLARE_READ16_MEMBER(m1_snd_v60_ready_r);
-	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch2_w);
 	DECLARE_WRITE16_MEMBER(model2snd_ctrl);
 	DECLARE_READ32_MEMBER(copro_sharc_input_fifo_r);
 	DECLARE_WRITE32_MEMBER(copro_sharc_output_fifo_w);
@@ -192,11 +185,7 @@ public:
 	DECLARE_READ8_MEMBER(driveio_port_r);
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
 	DECLARE_READ8_MEMBER(driveio_port_str_r);
-	DECLARE_READ32_MEMBER(jaleco_network_r);
-	DECLARE_WRITE32_MEMBER(jaleco_network_w);
 	void push_geo_data(UINT32 data);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
 	DECLARE_DRIVER_INIT(overrev);
 	DECLARE_DRIVER_INIT(pltkids);
 	DECLARE_DRIVER_INIT(rchase2);
@@ -257,7 +246,7 @@ struct m2_poly_extra_data
 };
 
 
-INLINE UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
+static inline UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
 {
 	UINT32  baseoffs = ((base_y/2)*512)+(base_x/2);
 	UINT32  texeloffs = ((y/2)*512)+(x/2);
@@ -280,91 +269,90 @@ struct triangle;
 
 class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 4000>
 {
-    
 public:
-    typedef void (model2_renderer::*scanline_render_func)(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
-    
-public:
-    model2_renderer(model2_state& state)
-        : poly_manager<float, m2_poly_extra_data, 4, 4000>(state.machine())
-        , m_state(state)
-        , m_destmap(state.m_screen->width(), state.m_screen->height())
-    {
-        m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
-        m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;
-        m_renderfuncs[2] = &model2_renderer::model2_3d_render_2;
-        m_renderfuncs[3] = &model2_renderer::model2_3d_render_3;
-        m_renderfuncs[4] = &model2_renderer::model2_3d_render_4;
-        m_renderfuncs[5] = &model2_renderer::model2_3d_render_5;
-        m_renderfuncs[6] = &model2_renderer::model2_3d_render_6;
-        m_renderfuncs[7] = &model2_renderer::model2_3d_render_7;
-    }
-    
-    bitmap_rgb32& destmap() { return m_destmap; }
-    
-    void model2_3d_render(triangle *tri, const rectangle &cliprect);
-    
-    /* checker = 0, textured = 0, transparent = 0 */
-    #define MODEL2_FUNC 0
-    #define MODEL2_FUNC_NAME    model2_3d_render_0
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 0, textured = 0, translucent = 1 */
-    #define MODEL2_FUNC 1
-    #define MODEL2_FUNC_NAME    model2_3d_render_1
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 0, textured = 1, translucent = 0 */
-    #define MODEL2_FUNC 2
-    #define MODEL2_FUNC_NAME    model2_3d_render_2
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 0, textured = 1, translucent = 1 */
-    #define MODEL2_FUNC 3
-    #define MODEL2_FUNC_NAME    model2_3d_render_3
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 1, textured = 0, translucent = 0 */
-    #define MODEL2_FUNC 4
-    #define MODEL2_FUNC_NAME    model2_3d_render_4
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 1, textured = 0, translucent = 1 */
-    #define MODEL2_FUNC 5
-    #define MODEL2_FUNC_NAME    model2_3d_render_5
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 1, textured = 1, translucent = 0 */
-    #define MODEL2_FUNC 6
-    #define MODEL2_FUNC_NAME    model2_3d_render_6
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
-    
-    /* checker = 1, textured = 1, translucent = 1 */
-    #define MODEL2_FUNC 7
-    #define MODEL2_FUNC_NAME    model2_3d_render_7
-    #include "video/model2rd.inc"
-    #undef MODEL2_FUNC
-    #undef MODEL2_FUNC_NAME
+	typedef void (model2_renderer::*scanline_render_func)(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
-    scanline_render_func m_renderfuncs[8];
-    
+public:
+	model2_renderer(model2_state& state)
+		: poly_manager<float, m2_poly_extra_data, 4, 4000>(state.machine())
+		, m_state(state)
+		, m_destmap(state.m_screen->width(), state.m_screen->height())
+	{
+		m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
+		m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;
+		m_renderfuncs[2] = &model2_renderer::model2_3d_render_2;
+		m_renderfuncs[3] = &model2_renderer::model2_3d_render_3;
+		m_renderfuncs[4] = &model2_renderer::model2_3d_render_4;
+		m_renderfuncs[5] = &model2_renderer::model2_3d_render_5;
+		m_renderfuncs[6] = &model2_renderer::model2_3d_render_6;
+		m_renderfuncs[7] = &model2_renderer::model2_3d_render_7;
+	}
+
+	bitmap_rgb32& destmap() { return m_destmap; }
+
+	void model2_3d_render(triangle *tri, const rectangle &cliprect);
+
+	/* checker = 0, textured = 0, transparent = 0 */
+	#define MODEL2_FUNC 0
+	#define MODEL2_FUNC_NAME    model2_3d_render_0
+	#include "video/model2rd.hxx"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 0, textured = 0, translucent = 1 */
+	#define MODEL2_FUNC 1
+	#define MODEL2_FUNC_NAME    model2_3d_render_1
+	#include "video/model2rd.hxx"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 0, textured = 1, translucent = 0 */
+	#define MODEL2_FUNC 2
+	#define MODEL2_FUNC_NAME    model2_3d_render_2
+	#include "video/model2rd.hxx"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 0, textured = 1, translucent = 1 */
+	#define MODEL2_FUNC 3
+	#define MODEL2_FUNC_NAME    model2_3d_render_3
+	#include "video/model2rd.hxx"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 1, textured = 0, translucent = 0 */
+	#define MODEL2_FUNC 4
+	#define MODEL2_FUNC_NAME    model2_3d_render_4
+	#include "video/model2rd.hxx"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 1, textured = 0, translucent = 1 */
+	#define MODEL2_FUNC 5
+	#define MODEL2_FUNC_NAME    model2_3d_render_5
+	#include "video/model2rd.hxx"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 1, textured = 1, translucent = 0 */
+	#define MODEL2_FUNC 6
+	#define MODEL2_FUNC_NAME    model2_3d_render_6
+	#include "video/model2rd.hxx"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	/* checker = 1, textured = 1, translucent = 1 */
+	#define MODEL2_FUNC 7
+	#define MODEL2_FUNC_NAME    model2_3d_render_7
+	#include "video/model2rd.hxx"
+	#undef MODEL2_FUNC
+	#undef MODEL2_FUNC_NAME
+
+	scanline_render_func m_renderfuncs[8];
+
 private:
-    model2_state& m_state;
-    bitmap_rgb32 m_destmap;
+	model2_state& m_state;
+	bitmap_rgb32 m_destmap;
 };
 
 typedef model2_renderer::vertex_t poly_vertex;

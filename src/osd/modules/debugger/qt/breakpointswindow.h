@@ -3,8 +3,6 @@
 #ifndef __DEBUG_QT_BREAK_POINTS_WINDOW_H__
 #define __DEBUG_QT_BREAK_POINTS_WINDOW_H__
 
-#include <QtGui/QtGui>
-
 #include "debuggerview.h"
 #include "windowqt.h"
 
@@ -17,7 +15,7 @@ class BreakpointsWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	BreakpointsWindow(running_machine* machine, QWidget* parent=NULL);
+	BreakpointsWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~BreakpointsWindow();
 
 

@@ -1,5 +1,5 @@
 #
-# Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2016 Branimir Karadzic. All rights reserved.
 # License: http://www.opensource.org/licenses/BSD-2-Clause
 #
 
@@ -24,3 +24,4 @@ endif
 
 SHADERC:="$(THISDIR)../tools/bin/$(OS)/shaderc"
 GEOMETRYC:="$(THISDIR)../tools/bin/$(OS)/geometryc"
+TEXTUREC:="$(THISDIR)../tools/bin/$(OS)/texturec"

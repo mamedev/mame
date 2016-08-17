@@ -65,9 +65,9 @@
 		</screen>
 
 <!--
-		<bezel element="panel">
-			<bounds left="-59" top="0" right="0" bottom="248" />
-		</bezel>
+        <bezel element="panel">
+            <bounds left="-59" top="0" right="0" bottom="248" />
+        </bezel>
 -->
 		<bezel name="speed" element="speed">
 			<bounds left="-51" top="218" right="-8" bottom="231" />

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
 
+#include "machine/gen_latch.h"
+
 class matmania_state : public driver_device
 {
 public:
@@ -21,7 +23,8 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */
@@ -43,10 +46,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
-	bitmap_ind16 *m_tmpbitmap;
-	bitmap_ind16 *m_tmpbitmap2;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
 
 	/* maniach 68705 protection */
 	UINT8 m_port_a_in;
@@ -79,7 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
 	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
 	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(matmania);
 	DECLARE_MACHINE_START(maniach);
 	DECLARE_MACHINE_RESET(maniach);

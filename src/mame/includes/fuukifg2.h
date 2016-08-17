@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,Paul Priest
+
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/fuukifg.h"
 
@@ -22,6 +24,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_fuukivid(*this, "fuukivid"),
+		m_soundlatch(*this, "soundlatch"),
 		m_vram(*this, "vram"),
 		m_vregs(*this, "vregs"),
 		m_unknown(*this, "unknown"),
@@ -36,6 +39,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<fuukivid_device> m_fuukivid;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_shared_ptr_array<UINT16,4> m_vram;
@@ -65,9 +69,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
@@ -75,5 +79,5 @@ public:
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

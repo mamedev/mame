@@ -24,14 +24,14 @@ class mecmouse_device : public joyport_attached_device
 public:
 	mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	UINT8 read_dev();
-	void  write_dev(UINT8 data);
+	UINT8 read_dev() override;
+	void  write_dev(UINT8 data) override;
 
 protected:
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	int     m_last_select;

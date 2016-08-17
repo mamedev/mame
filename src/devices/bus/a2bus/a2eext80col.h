@@ -28,14 +28,14 @@ public:
 	a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 read_auxram(UINT16 offset);
-	virtual void write_auxram(UINT16 offset, UINT8 data);
-	virtual UINT8 *get_vram_ptr();
-	virtual UINT8 *get_auxbank_ptr();
-	virtual bool allow_dhr() { return true; }
+	virtual UINT8 read_auxram(UINT16 offset) override;
+	virtual void write_auxram(UINT16 offset, UINT8 data) override;
+	virtual UINT8 *get_vram_ptr() override;
+	virtual UINT8 *get_auxbank_ptr() override;
+	virtual bool allow_dhr() override { return true; }
 
 private:
 	UINT8 m_ram[64*1024];

@@ -15,6 +15,8 @@ class atarisy1_state : public atarigen_state
 public:
 	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_audiocpu(*this, "audiocpu"),
+			m_soundcomm(*this, "soundcomm"),
 			m_bankselect(*this, "bankselect"),
 			m_mob(*this, "mob"),
 			m_joystick_timer(*this, "joystick_timer"),
@@ -24,6 +26,9 @@ public:
 			m_scanline_timer(*this, "scan_timer"),
 			m_int3off_timer(*this, "int3off_timer"),
 			m_tms(*this, "tms") { }
+
+	required_device<cpu_device> m_audiocpu;
+	required_device<atari_sound_comm_device> m_soundcomm;
 
 	required_shared_ptr<UINT16> m_bankselect;
 	required_device<atari_motion_objects_device> m_mob;
@@ -57,19 +62,17 @@ public:
 	UINT8           m_bank_color_shift[MAX_GFX_ELEMENTS];
 
 	UINT8           m_cur[2][2];
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(joystick_r);
 	DECLARE_WRITE16_MEMBER(joystick_w);
 	DECLARE_READ16_MEMBER(trakball_r);
-	DECLARE_READ16_MEMBER(port4_r);
 	DECLARE_READ8_MEMBER(switch_6502_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(via_pa_w);
 	DECLARE_READ8_MEMBER(via_pa_r);
 	DECLARE_WRITE8_MEMBER(via_pb_w);
 	DECLARE_READ8_MEMBER(via_pb_r);
-	DECLARE_DRIVER_INIT(roadb110);
-	DECLARE_DRIVER_INIT(roadb109);
+	DECLARE_DRIVER_INIT(roadblst);
 	DECLARE_DRIVER_INIT(peterpak);
 	DECLARE_DRIVER_INIT(marble);
 	DECLARE_DRIVER_INIT(roadrunn);

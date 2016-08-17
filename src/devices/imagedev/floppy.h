@@ -19,8 +19,8 @@
 #include "formats/td0_dsk.h"
 #include "formats/cqm_dsk.h"
 #include "formats/dsk_dsk.h"
-#include "ui/imgcntrl.h"
 #include "sound/samples.h"
+#include "softlist_dev.h"
 
 #define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _formats)  \
 	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
@@ -35,6 +35,9 @@
 
 #define FLOPPY_FORMATS_MEMBER(_member) \
 	const floppy_format_type _member [] = {
+#define FLOPPY_FORMATS_END0 \
+		, \
+		nullptr };
 #define FLOPPY_FORMATS_END \
 		, \
 		FLOPPY_D88_FORMAT, \
@@ -45,8 +48,8 @@
 		FLOPPY_MFM_FORMAT, \
 		FLOPPY_TD0_FORMAT, \
 		FLOPPY_CQM_FORMAT, \
-		FLOPPY_DSK_FORMAT, \
-		NULL };
+		FLOPPY_DSK_FORMAT \
+	FLOPPY_FORMATS_END0
 
 class floppy_sound_device;
 
@@ -59,7 +62,7 @@ class floppy_image_device : public device_t,
 							public device_slot_card_interface
 {
 public:
-	typedef delegate<int (floppy_image_device *)> load_cb;
+	typedef delegate<image_init_result (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
 	typedef delegate<void (floppy_image_device *, int)> ready_cb;
@@ -78,20 +81,19 @@ public:
 	void set_rpm(float rpm);
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_create(int format_type, option_resolution *format_options);
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
-	virtual const char *image_interface() const = 0;
-	virtual iodevice_t image_type() const { return IO_FLOPPY; }
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+	virtual const char *image_interface() const override = 0;
+	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
 
-	virtual bool is_readable()  const { return true; }
-	virtual bool is_writeable() const { return true; }
-	virtual bool is_creatable() const { return true; }
-	virtual bool must_be_loaded() const { return false; }
-	virtual bool is_reset_on_load() const { return false; }
-	virtual const char *file_extensions() const { return extension_list; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return true; }
+	virtual bool is_writeable() const override { return true; }
+	virtual bool is_creatable() const override { return true; }
+	virtual bool must_be_loaded() const override { return false; }
+	virtual bool is_reset_on_load() const override { return false; }
+	virtual const char *file_extensions() const override { return extension_list; }
 	void setup_write(floppy_image_format_t *output_format);
 
 	void setup_load_cb(load_cb cb);
@@ -130,8 +132,6 @@ public:
 	UINT32 get_form_factor() const;
 	UINT32 get_variant() const;
 
-	virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
-
 	static const floppy_format_type default_floppy_formats[];
 
 	// Enable sound
@@ -139,12 +139,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual void setup_characteristics() = 0;
 
@@ -203,34 +203,15 @@ protected:
 	floppy_sound_device* m_sound_out;
 };
 
-class ui_menu_control_floppy_image : public ui_menu_control_device_image {
-public:
-	ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *image);
-	virtual ~ui_menu_control_floppy_image();
-
-	virtual void handle();
-
-protected:
-	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_RW };
-
-	floppy_image_format_t **format_array;
-	floppy_image_format_t *input_format, *output_format;
-	std::string input_filename, output_filename;
-
-	void do_load_create();
-	virtual void hook_load(std::string filename, bool softlist);
-};
-
-
 #define DECLARE_FLOPPY_IMAGE_DEVICE(_name, _interface) \
 	class _name : public floppy_image_device { \
 	public: \
 		_name(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
 		virtual ~_name(); \
-		virtual void handled_variants(UINT32 *variants, int &var_count) const; \
-		virtual const char *image_interface() const { return _interface; } \
+		virtual void handled_variants(UINT32 *variants, int &var_count) const override; \
+		virtual const char *image_interface() const override { return _interface; } \
 	protected: \
-		virtual void setup_characteristics(); \
+		virtual void setup_characteristics() override; \
 	};
 
 DECLARE_FLOPPY_IMAGE_DEVICE(floppy_3_ssdd, "floppy_3")
@@ -265,9 +246,13 @@ DECLARE_FLOPPY_IMAGE_DEVICE(alps_3255190x, "floppy_5_25")
 
 extern const device_type FLOPPYSOUND;
 
+
 /*
     Floppy drive sound
 */
+
+#define MAX_STEP_SAMPLES 5
+
 class floppy_sound_device : public samples_device
 {
 public:
@@ -278,28 +263,33 @@ public:
 	void register_for_save_states();
 
 protected:
-	void device_start();
+	void device_start() override;
 
 private:
 	// device_sound_interface overrides
-	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	sound_stream*   m_sound;
 	bool            m_loaded;
+	bool            m_is525; // true if this is a 5.25" floppy drive
 
-	int             m_sampleend_motor;
+	int             m_sampleindex_motor_start;
+	int             m_sampleindex_motor_loop;
+	int             m_sampleindex_motor_end;
+	int             m_samplesize_motor_start;
+	int             m_samplesize_motor_loop;
+	int             m_samplesize_motor_end;
 	int             m_samplepos_motor;
-	int             m_samplestart_motor;
-	int             m_motor_mintime;        // min time for the samples; sound persists for that time
-	int             m_motor_time;
-	bool            m_motor;
+	int             m_motor_playback_state;
+	bool            m_motor_on;
 
-	int             m_sampleend_step;
-	int             m_samplestart_step;
+	int             m_step_samples;
+	int             m_sampleindex_step1;
+	int             m_samplesize_step[MAX_STEP_SAMPLES];
 	int             m_samplepos_step;
-	int             m_step_mintime;
-	int             m_step_time;
+	int             m_step_playback_state;
 };
+
 
 class floppy_connector: public device_t,
 						public device_slot_interface
@@ -313,12 +303,12 @@ public:
 	void enable_sound(bool doit) { m_enable_sound = doit; }
 
 protected:
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 private:
 	const floppy_format_type *formats;
-	bool    m_enable_sound;
+	bool m_enable_sound;
 };
 
 

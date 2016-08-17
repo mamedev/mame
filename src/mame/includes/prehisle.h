@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 
 class prehisle_state : public driver_device
@@ -15,7 +17,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_upd7759(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 
 	required_shared_ptr<UINT16> m_tx_vram;
@@ -38,7 +41,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_prehisle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -47,4 +50,5 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };

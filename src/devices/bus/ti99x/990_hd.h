@@ -26,8 +26,8 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hd );
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	int get_id_from_device( device_t *device );
 

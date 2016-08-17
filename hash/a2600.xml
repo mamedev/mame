@@ -6,6 +6,58 @@ Info from Atariage and Atarimania
 
 <softwarelist name="a2600" description="Atari 2600 cartridges">
 
+	<software name="adventp">
+		<description>Adventure +</description>
+		<year>2003</year>
+		<publisher>Homebrew</publisher>
+		<info name="programmer" value="Steve Engelhardt" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="Adventure Plus.a26" size="4096" crc="0a25900b" sha1="cf0efc58ffc8ae2ac49d96177cc8b3e299e95160" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elfadven">
+		<description>Elf Adventure (Prototype)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="Elf Adventure.bin" size="4096" crc="91647218" sha1="93cf13c16d995c69c78085effb555f17105f8b01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ret2hh">
+		<description>Return to Haunted House (Flashback 2)</description>
+		<year>2005</year>
+		<publisher>Syzygy Company</publisher>
+		<info name="programmer" value="Curt Vensel" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="ret2hh.bin" size="4096" crc="95d29756" sha1="70a5f2a6a21b970a60d531ca23ef20336a0058ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advent2" supported="no">
+		<description>Adventure II (Flashback 2)</description>
+		<year>2005</year>
+		<publisher>Syzygy Company</publisher>
+		<info name="programmer" value="Curt Vensel" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="Adventure 2.a26" size="8192" crc="bfd846c5" sha1="48d3b94e41371dd7f41d96e1195c324913c228bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2pakblac">
 		<description>2 Pak Special: Challenge + Surfing (PAL)</description>
 		<year>1990</year>
@@ -11211,8 +11263,8 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="pitfallsg" cloneof="pitfall">
-		<description>Pitfall (Star Game)</description>
+	<software name="pitfallsg" cloneof="pitfall">   <!-- significant visual changes -->
+		<description>Pitfall (Star Game) (aka Tom Boy)</description>
 		<year>19??</year>
 		<publisher>Star Game</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17940,4 +17992,142 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- The AtariAge logo looks incorrect, but games function, there are probably other version too, YouTube shows a 2007 version. -->
+	<software name="stelstok">
+		<description>Stella's Stocking 2008</description>
+		<year>2008</year>
+		<publisher>AtariAge</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_x07" />
+			<dataarea name="rom" size="65536">
+				<rom name="m27c512.bin" size="65536" crc="c1da7d3b" sha1="4d9c06940754ba03e2eca2d88ea4201b8d9e7805" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This was released by the author, also available via Atariage, are both versions the same? needs HARMONY/MELODY emulation -->
+	<software name="stayfr2" supported="no">
+		<description>Stay Frosty 2 (NTSC)</description>
+		<year>2013</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="SF2_20131217_RC8_NTSC.bin" size="0x8000" crc="4eb739ab" sha1="5eceaf8e90bd9a002f4935f082df7b25716dceb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stayfr2d" cloneof="stayfr2" supported="no">
+		<description>Stay Frosty 2 (NTSC, demo)</description>
+		<year>2013</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="SF2_demo_NTSC.bin" size="0x8000" crc="fd850bd6" sha1="bd8166da7777c66e6bb3ab0c77563193d8289f5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="stayfr2e" cloneof="stayfr2" supported="no">
+		<description>Stay Frosty 2 (PAL)</description>
+		<year>2013</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="SF2_20131217_RC8_PAL.bin" size="0x8000" crc="7b495dc3" sha1="1625ef74b0a48c2968fad832ab8e2edc8187a53f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stayfr2de" cloneof="stayfr2" supported="no">
+		<description>Stay Frosty 2 (PAL, demo)</description>
+		<year>2013</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="SF2_demo_PAL.bin" size="0x8000" crc="b47582f3" sha1="73625429e73f1b354e0cbe6a360d79590032de2b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcrocks" supported="no">
+		<description>Space Rocks (RC7, NTSC)</description>
+		<year>2012</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="spacerocks20121129_NTSC.bin" size="0x8000" crc="c5d8eb83" sha1="bf3af5c76bb4dded5cb9c9b232c369250ad20ac4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcrockse" cloneof="spcrocks" supported="no">
+		<description>Space Rocks (RC7, PAL)</description>
+		<year>2012</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="spacerocks20121129_PAL.bin" size="0x8000" crc="133cb923" sha1="0511a35ee435227fbb5665e8488590eb993256f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frantic" supported="no">
+		<description>Frantic (20140305, NTSC)</description>
+		<year>2014</year>
+		<publisher>Spiceware</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="frantic20140305.bin" size="0x8000" crc="04d0f558" sha1="ee2a004a50861c5fdfbdabfa5ed4bf825333ec43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harmbios" supported="no">  <!-- I think these are the bios roms if you're using it as a multi-game cart? -->
+		<description>Harmony Bios Updater</description>
+		<year>2014</year>
+		<publisher>Harmony</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_harmony" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="bios_updater_NTSC.cu" size="0x8000" crc="03153eb2" sha1="cd9ee1d820737b3887ebe5fc6fe96a2a043ab009" offset="0" />
+			</dataarea>
+			<dataarea name="bios" size="0x21400">
+				<rom name="hbios_106_NTSC_official_beta.bin" size="0x21400" crc="1e1d237b" sha1="8fd74e0119bce43a89bcc4998b750bc6884971da" offset="0" />
+				<rom name="hbios_106_NTSC_beta_2.bin"        size="0x21400" crc="807b86bd" sha1="633960295c30e7430b3ce58f6244495f4b708e9d" offset="0" />
+				<rom name="hbios_106_NTSC.bin"               size="0x21400" crc="48664301" sha1="aaa5e839f307734306c2a9ccbe38482579c70391" offset="0" />
+
+				<rom name="hbios_105_NTSC.bin"  size="0x19400" crc="c0b8aae9" sha1="68b10153695da505756eb7dc7cc4a7e93fe68860" offset="0" />
+				<rom name="hbios_105_PAL50.bin" size="0x19400" crc="fb942c80" sha1="81bba9d9c245d23cc4b9503180ebe2d67bf1e117" offset="0" />
+				<rom name="hbios_105_PAL60.bin" size="0x19400" crc="b59ebe6d" sha1="873830286c66935fd23e3ea7c192e6573e056cbd" offset="0" />
+
+				<rom name="eeloader_104e_NTSC.bin"  size="0x36f8" crc="ad04a8d9" sha1="c83d724299875cd5ea8d6be05db12d688ce8eff1" offset="0" />
+				<rom name="eeloader_104e_PAL50.bin" size="0x36f8" crc="4868ba51" sha1="e6a65523824ecf4f2a5145e2c5118cfb4bee059d" offset="0" />
+				<rom name="eeloader_104e_PAL60.bin" size="0x36f8" crc="58845532" sha1="255b5c9f4f2f7322c20d2619126cd150a1b8f71c" offset="0" />
+
+			</dataarea>
+
+		</part>
+	</software>
+
 </softwarelist>
+
+

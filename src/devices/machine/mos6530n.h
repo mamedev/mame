@@ -248,9 +248,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
 	{
@@ -268,7 +268,7 @@ protected:
 	void timer_w(offs_t offset, UINT8 data, bool ie);
 	UINT8 timer_r(bool ie);
 
-	DECLARE_READ8_MEMBER( rom_r ) { return m_region->base()[offset]; }
+	DECLARE_READ8_MEMBER( rom_r ) { return m_rom[offset]; }
 	DECLARE_READ8_MEMBER( ram_r ) { return m_ram[offset]; }
 	DECLARE_WRITE8_MEMBER( ram_w ) { m_ram[offset] = data; }
 	DECLARE_READ8_MEMBER( pa_data_r );
@@ -287,6 +287,7 @@ protected:
 	DECLARE_WRITE8_MEMBER( edge_w );
 
 	optional_shared_ptr<UINT8> m_ram;
+	optional_region_ptr<UINT8> m_rom;
 
 	devcb_write_line m_irq_cb;
 	devcb_read8    m_in_pa_cb;
@@ -383,11 +384,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
-	void update_pb();
-	void update_irq();
-	UINT8 get_irq_flags();
+	void update_pb() override;
+	void update_irq() override;
+	UINT8 get_irq_flags() override;
 };
 
 
@@ -400,9 +401,13 @@ public:
 	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 
+	// is there a better way to access the memory map when not using AM_DEVICE?
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
+
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 

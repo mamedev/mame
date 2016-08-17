@@ -26,7 +26,7 @@ public:
 	required_device<atari_motion_objects_device> m_mob;
 
 	UINT16          m_h256;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_DRIVER_INIT(xybots);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

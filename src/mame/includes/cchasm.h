@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Mathis Rosenhauer
+
 /*************************************************************************
 
     Cinematronics Cosmic Chasm hardware
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "machine/z80ctc.h"
 #include "sound/dac.h"
 #include "video/vector.h"
@@ -27,6 +29,10 @@ public:
 		m_dac2(*this, "dac2"),
 		m_vector(*this, "vector"),
 		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3"),
+		m_soundlatch4(*this, "soundlatch4"),
 		m_ram(*this, "ram") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -36,6 +42,10 @@ public:
 	required_device<dac_device> m_dac2;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<generic_latch_8_device> m_soundlatch3;
+	required_device<generic_latch_8_device> m_soundlatch4;
 
 	required_shared_ptr<UINT16> m_ram;
 
@@ -60,11 +70,11 @@ public:
 
 	INPUT_CHANGED_MEMBER(set_coin_flag);
 
-	virtual void video_start();
-	virtual void sound_start();
+	virtual void video_start() override;
+	virtual void sound_start() override;
 
 	void refresh();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

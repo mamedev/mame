@@ -91,7 +91,7 @@ public:
 	UINT8 m_vidc_interlace;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 protected:
 	required_device<cpu_device> m_maincpu;

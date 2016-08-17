@@ -68,7 +68,7 @@ enum
 
 class okim9810_device : public device_t,
 						public device_sound_interface,
-						public device_memory_interface
+						public device_rom_interface
 {
 public:
 	// construction/destruction
@@ -84,23 +84,20 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
-	virtual void device_clock_changed();
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// a single voice
 	class okim_voice
 	{
 	public:
 		okim_voice();
-		void generate_audio(direct_read_data &direct,
+		void generate_audio(device_rom_interface &rom,
 							stream_sample_t **buffers,
 							int samples,
 							const UINT8 global_volume,
@@ -137,10 +134,8 @@ protected:
 	};
 
 	// internal state
-	const address_space_config  m_space_config;
 
 	sound_stream* m_stream;
-	direct_read_data* m_direct;
 
 	UINT8 m_TMP_register;
 

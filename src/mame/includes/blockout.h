@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 /***************************************************************************
 
     Blockout
 
 ***************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class blockout_state : public driver_device
 {
@@ -17,7 +20,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -33,6 +37,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 	DECLARE_WRITE16_MEMBER(blockout_sound_command_w);
@@ -41,9 +46,9 @@ public:
 	DECLARE_WRITE16_MEMBER(blockout_paletteram_w);
 	DECLARE_WRITE16_MEMBER(blockout_frontcolor_w);
 	DECLARE_WRITE16_MEMBER(blockout_videoram_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(blockout_scanline);
 	void setcolor( int color, int rgb );

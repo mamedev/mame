@@ -2,6 +2,7 @@
 // copyright-holders:Mathis Rosenhauer
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 
 class beezer_sound_device;
 
@@ -13,6 +14,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_watchdog(*this, "watchdog"),
 		m_custom(*this, "custom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
@@ -23,6 +25,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<beezer_sound_device> m_custom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -31,7 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER(beezer_map_w);
 	DECLARE_READ8_MEMBER(beezer_line_r);
 	DECLARE_DRIVER_INIT(beezer);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(beezer_interrupt);
 	DECLARE_READ8_MEMBER(b_via_0_pa_r);
@@ -83,12 +86,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
 	// internal state
 	cpu_device *m_maincpu;

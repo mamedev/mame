@@ -24,6 +24,10 @@
 class gte
 {
 public:
+	gte() : m_sf(0), m_mac0(0), m_mac1(0), m_mac2(0), m_mac3(0)
+	{
+	}
+
 	PAIR m_cp2cr[ 32 ];
 	PAIR m_cp2dr[ 32 ];
 

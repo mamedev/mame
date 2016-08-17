@@ -223,7 +223,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 		</part>
 	</software>
 
-	<software name="prmaker2">
+	<software name="prinmak2">
 		<description>Princess Maker 2 (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>

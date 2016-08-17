@@ -42,9 +42,6 @@ const int AUTO_ALLOC_INPUT  = 65535;
 #define MCFG_SOUND_REPLACE(_tag, _type, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
 
-#define MCFG_SOUND_CONFIG(_config) \
-	MCFG_DEVICE_CONFIG(_config)
-
 #define MCFG_SOUND_ROUTE(_output, _target, _gain) \
 	device_sound_interface::static_add_route(*device, _output, _target, _gain);
 #define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
@@ -73,9 +70,6 @@ public:
 	public:
 		sound_route(int output, int input, float gain, const char *target, UINT32 mixoutput);
 
-		const sound_route *next() const { return m_next; }
-
-		sound_route *       m_next;             // pointer to next route
 		UINT32              m_output;           // output index, or ALL_OUTPUTS
 		UINT32              m_input;            // target input index
 		UINT32              m_mixoutput;        // target mixer output
@@ -88,10 +82,10 @@ public:
 	virtual ~device_sound_interface();
 
 	// configuration access
-	const sound_route *first_route() const { return m_route_list.first(); }
+	const std::vector<std::unique_ptr<sound_route>> &routes() const { return m_route_list; }
 
 	// static inline configuration helpers
-	static sound_route &static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);
+	static void static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);
 	static void static_reset_routes(device_t &device);
 
 	// sound stream update overrides
@@ -111,13 +105,13 @@ public:
 
 protected:
 	// optional operation overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
-	virtual void interface_pre_start();
-	virtual void interface_post_start();
-	virtual void interface_pre_reset();
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
+	virtual void interface_pre_reset() override;
 
 	// internal state
-	simple_list<sound_route> m_route_list;      // list of sound routes
+	std::vector<std::unique_ptr<sound_route>> m_route_list;      // list of sound routes
 	int             m_outputs;                  // number of outputs from this instance
 	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
 };
@@ -138,11 +132,11 @@ public:
 
 protected:
 	// optional operation overrides
-	virtual void interface_pre_start();
-	virtual void interface_post_load();
+	virtual void interface_pre_start() override;
+	virtual void interface_post_load() override;
 
 	// sound interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
 	UINT8               m_outputs;              // number of outputs

@@ -885,12 +885,6 @@ Compiled by K1W1
 				<rom name="microsoft basic ii programming language.rom" size="16384" crc="24391ffb" sha1="9f0ee797e07bbc74d5d7b664157a80019634172d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
-		<!-- Adds 10 more BASIC commands that could not fit on the cartridge. -->
-			<dataarea name="flop" size="92176">
-				<rom name="microsoft basic ii extension disk.atr" size="92176" crc="9d6c44ea" sha1="8f305bf916fc6df9cf469a413686de8933ac36e8" offset="0" />
-			</dataarea>
-		</part>
 	</software>
 
 	<software name="aartist">
@@ -903,6 +897,18 @@ Compiled by K1W1
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="atariartist.rom" size="16384" crc="bbe37542" sha1="f7a8923c1e72b346a69b858bdd1f01c31b7c8dee" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atarinet">
+		<description>AtariNet v1.0</description>
+		<year>2015</year>
+		<publisher>Slorsoft</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="atarinet v1.0 (2015)(slorsoft)(us)[!].rom" size="16384" crc="f483b0e1" sha1="0e875d5a4aec426641b22f6db4d89010799622e1" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1063,12 +1069,6 @@ Compiled by K1W1
 			<feature name="slot" value="a800_ossm091" />
 			<dataarea name="rom" size="16384">
 				<rom name="basic xe programming language v7.2.rom" size="16384" crc="3f06b111" sha1="ac80e12fcd7e228e0329ba1a2f3408b37af0b7ff" offset="0" />
-			</dataarea>
-		</part>
-			<part name="flop1" interface="floppy_5_25">
-			<!-- Adds BASIC commands for Player/Missile graphics control. -->
-			<dataarea name="flop" size="92176">
-				<rom name="basic xe v4.1 extension disk.atr" size="92176" crc="e1c6d065" sha1="8749107e28cfa7add26a5628562c708fa62e0ce0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1874,6 +1874,20 @@ Compiled by K1W1
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="defender.rom" size="16384" crc="782a81e4" sha1="eda6e6b875a76176384e356e7b9ded3bb7699ba2" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defendr2" cloneof="defender">
+		<description>Defender Rev. 2</description>
+		<!-- Appears to be an ealier prototype version. -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CXL4025" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="defender rev. 2 (1982)(atari)(us).rom" size="16384" crc="fcb4b36f" sha1="8a214df9a4aa245fe6394697800d91af157c6606" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2705,7 +2719,31 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="is3000">
+	<software name="is7000" supported="partial">
+		<description>INFO/soft 7000 Graphic Generator v7.1</description>
+		<year>1988</year>
+		<publisher>INFO/soft</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="info-soft 7000.rom" size="16384" crc="a96f1401" sha1="6dcb65646dbbcb17b9b2a5d70ce63acb407c4cb6" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="is5000" cloneof="is7000">
+		<description>INFO/soft 5000 Graphic Generator v5.3</description>
+		<year>1986</year>
+		<publisher>INFO/soft</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="info-soft 5000.rom" size="16384" crc="66a53fa1" sha1="7be942cf2c66305bbf9575f57c7155953f50e8a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="is3000" cloneof="is7000">
 		<description>INFO/soft 3000 Text Generator v3.3</description>
 		<year>1986</year>
 		<publisher>INFO/soft</publisher>
@@ -2717,14 +2755,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="is5000">
-		<description>INFO/soft 5000 Graphic Generator v5.3</description>
-		<year>1986</year>
-		<publisher>INFO/soft</publisher>
+	<software name="infogen" cloneof="is7000">
+		<description>Info/Gen</description>
+		<year>1984</year>
+		<publisher>Cable Graphics Sciences</publisher>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="info-soft 5000.rom" size="16384" crc="66a53fa1" sha1="7be942cf2c66305bbf9575f57c7155953f50e8a8" offset="0" />
+			<dataarea name="rom" size="8192">
+				<rom name="info-gen (cable graphic sciences)(1984).rom" size="8192" crc="2dd21df1" sha1="c92d484103766711fdaa59b9dbae7b3857d996d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4984,6 +5022,30 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="spart447" supported="no">
+		<description>Sparta DOS X v4.47</description>
+		<year>2015</year>
+		<publisher>DLT</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_sparta" />
+			<dataarea name="rom" size="131072">
+				<rom name="spartados x v4.47.rom" size="131072" crc="fb0fa6d7" sha1="2bd2ad3ea6c4d5bad6042f42f75edeee555d4fdc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spectra2">
+		<description>Spectraview II</description>
+		<year>198?</year>
+		<publisher>Display Systems International</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_oss034m" />
+			<dataarea name="rom" size="16384">
+				<rom name="spectraview-ii v201 (198x)(display systems international).rom" size="16384" crc="77c75598" sha1="e7e8d8919c420770bde5da39cbb47d9d1e89a40b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spedwayb">
 		<description>Speedway Blast</description>
 		<year>1982</year>
@@ -5257,16 +5319,29 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="synass">
-		<description>Synassembler</description>
-		<!-- Possible bad dump -->
+	<software name="synassxl">
+		<description>Synassembler XL v4.0</description>
+		<!-- This cartridge was a special order product and available on EPROM only -->
+		<year>1982</year>
+		<publisher>Synapse</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="synassembler xl v4.0 (1982)(synapse software).rom" size="8192" crc="b89ad267" sha1="1e0fc8ed6e230eca9434c5c241e07367ba6d720a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synass" cloneof="synassxl">
+		<description>Synassembler v4.0</description>
+		<!-- This cartridge was a special order product and available on EPROM only -->
 		<year>1982</year>
 		<publisher>Synapse</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="synassmbler.rom" size="8192" crc="6aa6b6d6" sha1="4a7232b4e121a546cbb6b7e11a2d7cf7ebd7a300" offset="0" status="baddump" />
+				<rom name="synassembler v4.0 (1982)(synapse software).rom" size="8192" crc="db1283ef" sha1="8685cf928773a1506150d31c969e4e6aa457e005" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5493,8 +5568,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="writers" supported="no">
-		<description>The Writer's Tool</description>
+	<software name="writerd" supported="no">
+		<description>The Writer's Tool (Dongle)</description>
 		<!-- This cartridge requires the Writer's Tool disk software. It's basic function appears to be as a copy protection dongle for the disk software. -->
 		<year>1985</year>
 		<publisher>OSS</publisher>
@@ -5502,16 +5577,6 @@ Compiled by K1W1
 			<feature name="slot" value="a800_oss8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="the writer's tool.rom" size="8192" crc="13bcf201" sha1="7de7b160c60f162b19f45789db07ddfd13836da2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="92176">
-				<rom name="writer's tool extension.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="92176">
-				<rom name="writer's tool dictionary.atr" size="92176" crc="18c875b0" sha1="7c727bcc488892dfd83cfbc09b3e1e642d1beff9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5957,6 +6022,18 @@ Compiled by K1W1
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="whiz kid.rom" size="8192" crc="11c2c963" sha1="aee11312bf19153e0f20ee0c19b1ce4f0f87b79c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmd">
+		<description>Wilcox Message Display</description>
+		<year>1986</year>
+		<publisher>The Wilcox Company</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="wilcox message display (1986)(the wilcox company).rom" size="8192" crc="35459d5c" sha1="262355cc616d575790060bc2f4b5a392ccc7c3de" offset="0" />
 			</dataarea>
 		</part>
 	</software>

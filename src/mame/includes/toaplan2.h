@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
+
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
@@ -9,7 +10,9 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "machine/nmk112.h"
+#include "machine/ticket.h"
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
@@ -43,7 +46,10 @@ public:
 		m_rtc(*this, "rtc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_hopper(*this, "hopper") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
@@ -66,6 +72,9 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // batrider and bgaregga and batsugun
+	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<ticket_dispenser_device> m_hopper;
 
 	UINT16 m_mcu_data;
 	INT8 m_old_p1_paddle_h; /* For Ghox */
@@ -94,9 +103,6 @@ public:
 	DECLARE_WRITE16_MEMBER(ghox_shared_ram_w);
 	DECLARE_WRITE16_MEMBER(fixeight_subcpu_ctrl_w);
 	DECLARE_WRITE16_MEMBER(fixeightbl_oki_bankswitch_w);
-	DECLARE_READ8_MEMBER(v25_dswa_r);
-	DECLARE_READ8_MEMBER(v25_dswb_r);
-	DECLARE_READ8_MEMBER(v25_jmpr_r);
 	DECLARE_READ8_MEMBER(fixeight_region_r);
 	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
@@ -151,16 +157,14 @@ public:
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
-	TIMER_CALLBACK_MEMBER(toaplan2_raise_irq);
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	void toaplan2_vblank_irq(int irq_line);
 
-	UINT8 m_pwrkick_hopper;
-	DECLARE_CUSTOM_INPUT_MEMBER(pwrkick_hopper_status_r);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
+	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

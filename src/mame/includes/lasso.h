@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "sound/sn76496.h"
 
 class lasso_state : public driver_device
@@ -26,7 +27,8 @@ public:
 		m_sn_1(*this, "sn76489.1"),
 		m_sn_2(*this, "sn76489.2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -51,6 +53,7 @@ public:
 	optional_device<sn76489_device> m_sn_2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
@@ -65,9 +68,9 @@ public:
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lasso);
 	DECLARE_MACHINE_START(wwjgtin);
 	DECLARE_MACHINE_RESET(wwjgtin);

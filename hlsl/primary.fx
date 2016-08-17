@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Primary Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
@@ -33,7 +37,6 @@ struct VS_INPUT
 	float3 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 Unused : TEXCOORD1;
 };
 
 struct PS_INPUT
@@ -43,52 +46,128 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// Simple Vertex Shader
+// Primary Vertex Shaders
 //-----------------------------------------------------------------------------
 
-uniform float2 ScreenDims;
-uniform float PostPass;
-uniform float FixedAlpha;
-uniform float Brighten;
+static const float Epsilon = 1.0e-7f;
 
-VS_OUTPUT vs_main(VS_INPUT Input)
+uniform float2 ScreenDims;
+uniform float2 TargetDims;
+uniform float2 QuadDims;
+
+VS_OUTPUT vs_screen_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-	
+
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
+
+	Output.TexCoord = Input.TexCoord;
+	// Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
 	Output.Color = Input.Color;
-	Output.TexCoord = lerp(Input.TexCoord, Input.Position.xy / ScreenDims, PostPass);
+
+	return Output;
+}
+
+VS_OUTPUT vs_vector_buffer_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0;
+
+	Output.Position = float4(Input.Position.xyz, 1.0f);
+	Output.Position.xy /= ScreenDims;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
+
+	Output.TexCoord = Input.TexCoord;
+	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
+	Output.Color = Input.Color;
+
+	return Output;
+}
+
+VS_OUTPUT vs_ui_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0;
+
+	Output.Position = float4(Input.Position.xyz, 1.0f);
+	Output.Position.xy /= ScreenDims;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
+
+	Output.TexCoord = Input.TexCoord;
+	// Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
+	Output.Color = Input.Color;
 
 	return Output;
 }
 
 //-----------------------------------------------------------------------------
-// Simple Pixel Shader
+// Primary Pixel Shaders
 //-----------------------------------------------------------------------------
 
-float4 ps_main(PS_INPUT Input) : COLOR
+float4 ps_screen_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
-	return BaseTexel * (Input.Color + float4(Brighten, Brighten, Brighten, 0.0f));
+
+	return BaseTexel;
+}
+
+float4 ps_vector_buffer_main(PS_INPUT Input) : COLOR
+{
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
+
+	return BaseTexel;
+}
+
+float4 ps_ui_main(PS_INPUT Input) : COLOR
+{
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
+	BaseTexel *= Input.Color;
+
+	return BaseTexel;
 }
 
 //-----------------------------------------------------------------------------
-// Simple Effect
+// Primary Techniques
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique ScreenTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
 
-		//Sampler[0] = <DiffuseSampler>;
+		VertexShader = compile vs_2_0 vs_screen_main();
+		PixelShader  = compile ps_2_0 ps_screen_main();
+	}
+}
 
-		VertexShader = compile vs_2_0 vs_main();
-		PixelShader  = compile ps_2_0 ps_main();
+technique VectorBufferTechnique
+{
+	pass Pass0
+	{
+		Lighting = FALSE;
+
+		VertexShader = compile vs_2_0 vs_vector_buffer_main();
+		PixelShader  = compile ps_2_0 ps_vector_buffer_main();
+	}
+}
+
+technique UiTechnique
+{
+	pass Pass0
+	{
+		Lighting = FALSE;
+
+		VertexShader = compile vs_2_0 vs_ui_main();
+		PixelShader  = compile ps_2_0 ps_ui_main();
 	}
 }

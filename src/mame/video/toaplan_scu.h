@@ -20,8 +20,8 @@ public:
 	void alloc_sprite_bitmap(screen_device &screen);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	bitmap_ind16 m_temp_spritebitmap;

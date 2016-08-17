@@ -31,15 +31,15 @@ public:
 	nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 read_bit34();
-	virtual void write(UINT8 data);
+	virtual UINT8 read_bit34() override;
+	virtual void write(UINT8 data) override;
 
 	required_ioport m_paddle;
 	required_ioport m_button;
@@ -57,8 +57,8 @@ public:
 	nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual UINT8 read_bit34() { return 0; }
-	virtual UINT8 read_exp(offs_t offset);
+	virtual UINT8 read_bit34() override { return 0; }
+	virtual UINT8 read_exp(offs_t offset) override;
 };
 
 

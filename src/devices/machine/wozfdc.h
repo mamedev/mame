@@ -33,15 +33,15 @@ public:
 	wozfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	floppy_connector *floppy0, *floppy1, *floppy2, *floppy3;
 	floppy_image_device *floppy;
@@ -51,15 +51,12 @@ private:
 		MODE_IDLE, MODE_ACTIVE, MODE_DELAY
 	};
 
-	struct lss {
-		attotime tm;
-		UINT64 cycles;
-		UINT8 data_reg, address;
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
-		bool write_line_active;
-	};
+	UINT64 cycles;
+	UINT8 data_reg, address;
+	attotime write_start_time;
+	attotime write_buffer[32];
+	int write_position;
+	bool write_line_active;
 
 	const UINT8 *m_rom_p6;
 	UINT8 last_6502_write;
@@ -69,8 +66,6 @@ private:
 	emu_timer *timer, *delay_timer;
 	bool external_drive_select;
 	bool external_io_select;
-
-	lss cur_lss, predicted_lss;
 
 	int drvsel;
 	int enable1;
@@ -82,11 +77,7 @@ private:
 	void a3_update_drive_sel();
 
 	void lss_start();
-	void lss_delay(UINT64 cycles, const attotime &tm, UINT8 data_reg, UINT8 address, bool write_line_active);
-	void lss_delay(UINT64 cycles, UINT8 data_reg, UINT8 address, bool write_line_active);
 	void lss_sync();
-	void lss_predict(attotime limit = attotime::never);
-	void commit_predicted();
 };
 
 class diskii_fdc : public wozfdc_device
@@ -94,7 +85,7 @@ class diskii_fdc : public wozfdc_device
 public:
 	diskii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	void set_floppies(floppy_connector *f0, floppy_connector *f1);
 };
@@ -104,7 +95,7 @@ class appleiii_fdc : public wozfdc_device
 public:
 	appleiii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	void set_floppies_4(floppy_connector *f0, floppy_connector *f1, floppy_connector *f2, floppy_connector *f3);
 

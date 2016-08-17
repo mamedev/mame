@@ -49,8 +49,6 @@ public:
 	UINT32 vud2;      /* v-counter up or down (stored in L2) */
 	UINT32 hc1;       /* use h- or v-counter in L1 mode */
 	UINT32 ven;       /* vector intensity enable */
-
-private:
 };
 
 struct microcode
@@ -122,8 +120,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vertigo_motor_w);
 	DECLARE_READ16_MEMBER(vertigo_pit8254_lsb_r);
 	DECLARE_WRITE16_MEMBER(vertigo_pit8254_lsb_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(vertigo_interrupt);
 	TIMER_CALLBACK_MEMBER(sound_command_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq4_w);

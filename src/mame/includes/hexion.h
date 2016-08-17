@@ -38,7 +38,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *ram);

@@ -13,10 +13,10 @@ typedef device_delegate<UINT16 (UINT32)> sega_dec_read_delegate;
 extern const device_type SEGA315_5838_COMP;
 
 #define MCFG_SET_5838_READ_CALLBACK_CH1( _class, _method) \
-	sega_315_5838_comp_device::set_read_cb_ch1(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	sega_315_5838_comp_device::set_read_cb_ch1(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_SET_5838_READ_CALLBACK_CH2( _class, _method) \
-	sega_315_5838_comp_device::set_read_cb_ch2(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	sega_315_5838_comp_device::set_read_cb_ch2(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 class sega_315_5838_comp_device :  public device_t
 {
@@ -61,21 +61,23 @@ public:
 	DECLARE_WRITE32_MEMBER(doa_prot_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
+	UINT16 m_decathlt_prottable1[24];
+	UINT16 m_decathlt_dictionaryy[128];
+
+	UINT32 m_srcoffset;
+
+	UINT32 m_decathlt_lastcount;
+	UINT32 m_decathlt_prot_uploadmode;
+	UINT32 m_decathlt_prot_uploadoffset;
+
 
 	// Decathlete specific variables and functions (see machine/decathlt.c)
 	struct channel_type
 	{
-		UINT32 m_srcoffset;
-		UINT16 m_decathlt_prottable1[24];
-		UINT16 m_decathlt_dictionary[128];
-
-		UINT32 m_decathlt_lastcount;
-		UINT32 m_decathlt_prot_uploadmode;
-		UINT32 m_decathlt_prot_uploadoffset;
 		sega_dec_read_delegate m_read_ch;
 
 	};

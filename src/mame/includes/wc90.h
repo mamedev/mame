@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+
+#include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
 
 class wc90_state : public driver_device
@@ -12,6 +14,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
+		m_soundlatch(*this, "soundlatch"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_txvideoram(*this, "txvideoram"),
@@ -36,6 +39,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<tecmo_spr_device> m_sprgen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_bgvideoram;
@@ -71,8 +75,8 @@ public:
 	TILE_GET_INFO_MEMBER(track_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(track_get_fg_tile_info);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(wc90t);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

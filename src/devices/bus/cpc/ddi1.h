@@ -23,22 +23,28 @@ public:
 	cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void set_mapping(UINT8 type) override;
+	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
 
 	DECLARE_WRITE8_MEMBER(motor_w);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(rombank_w);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	cpc_expansion_slot_device *m_slot;
 
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_connector;
+
+	bool m_rom_active;
+	bool m_romen;
 };
 
 // device type definition

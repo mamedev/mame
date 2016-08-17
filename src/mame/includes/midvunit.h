@@ -9,6 +9,7 @@
 #include "video/poly.h"
 #include "audio/dcs.h"
 #include "machine/midwayic.h"
+#include "machine/watchdog.h"
 
 #define MIDVUNIT_VIDEO_CLOCK    33000000
 
@@ -56,7 +57,9 @@ public:
 			m_midvplus_misc(*this, "midvplus_misc"),
 			m_videoram(*this, "videoram", 32),
 			m_textureram(*this, "textureram") ,
+		m_adc_ports(*this, {"WHEEL", "ACCEL", "BRAKE"}),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_midway_serial_pic(*this, "serial_pic"),
@@ -72,6 +75,8 @@ public:
 	optional_shared_ptr<UINT32> m_midvplus_misc;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT32> m_textureram;
+
+	optional_ioport_array<3> m_adc_ports;
 
 	UINT8 m_cmos_protected;
 	UINT16 m_control_data;
@@ -90,7 +95,7 @@ public:
 	UINT16 m_page_control;
 	UINT8 m_video_changed;
 	emu_timer *m_scanline_timer;
-	midvunit_renderer *m_poly;
+	std::unique_ptr<midvunit_renderer> m_poly;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
@@ -134,13 +139,14 @@ public:
 	DECLARE_DRIVER_INIT(crusnusa);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(midvplus);
 	UINT32 screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
@@ -151,5 +157,5 @@ public:
 	void postload();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

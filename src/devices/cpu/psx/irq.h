@@ -43,9 +43,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( intin10 );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	void psx_irq_update( void );

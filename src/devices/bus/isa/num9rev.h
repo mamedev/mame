@@ -25,7 +25,7 @@ public:
 		isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 
 		UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_display_pixels);
 		DECLARE_READ8_MEMBER(pal8_r);
@@ -44,8 +44,8 @@ public:
 		UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+		virtual void device_start() override;
+		virtual void device_reset() override;
 private:
 		required_device<upd7220_device> m_upd7220;
 		required_device<palette_device> m_palette;

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_TIMER_H_HEADER_GUARD
@@ -12,7 +12,7 @@
 #	include <time.h> // clock, clock_gettime
 #elif BX_PLATFORM_EMSCRIPTEN
 #	include <emscripten.h>
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 #	include <windows.h>
 #else
 #	include <sys/time.h> // gettimeofday
@@ -22,7 +22,7 @@ namespace bx
 {
 	inline int64_t getHPCounter()
 	{
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 		LARGE_INTEGER li;
 		// Performance counter value may unexpectedly leap forward
 		// http://support.microsoft.com/kb/274323
@@ -44,7 +44,7 @@ namespace bx
 
 	inline int64_t getHPFrequency()
 	{
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 		LARGE_INTEGER li;
 		QueryPerformanceFrequency(&li);
 		return li.QuadPart;

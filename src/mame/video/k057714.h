@@ -25,9 +25,9 @@ public:
 	};
 
 protected:
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
 private:
 	void execute_command(UINT32 *cmd);
@@ -37,7 +37,7 @@ private:
 	void draw_character(UINT32 *cmd);
 	void fb_config(UINT32 *cmd);
 
-	UINT32 *m_vram;
+	std::unique_ptr<UINT32[]> m_vram;
 	UINT32 m_vram_read_addr;
 	UINT32 m_vram_fifo0_addr;
 	UINT32 m_vram_fifo1_addr;

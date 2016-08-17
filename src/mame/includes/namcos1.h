@@ -123,9 +123,9 @@ public:
 	DECLARE_DRIVER_INIT(ws89);
 	DECLARE_DRIVER_INIT(dspirit);
 	DECLARE_DRIVER_INIT(pistoldm);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void driver_init();
 
 	TILE_GET_INFO_MEMBER(bg_get_info0);

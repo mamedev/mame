@@ -34,10 +34,6 @@ public:
 	// construction/destruction
 	m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider, const char *shortname, const char *source);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_line );
-	DECLARE_WRITE_LINE_MEMBER( firq_line );
-	DECLARE_WRITE_LINE_MEMBER( nmi_line );
-
 protected:
 	class memory_interface {
 	public:
@@ -54,37 +50,39 @@ protected:
 	class mi_default : public memory_interface {
 	public:
 		virtual ~mi_default() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_opcode(UINT16 adr);
-		virtual UINT8 read_opcode_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_opcode(UINT16 adr) override;
+		virtual UINT8 read_opcode_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_pre_save();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	virtual bool is_6809() { return true; };
 
 	// addressing modes
 	enum
@@ -140,13 +138,33 @@ protected:
 		VECTOR_RESET_FFFE   = 0xFFFE
 	};
 
+	union M6809Q
+	{
+		#ifdef LSB_FIRST
+			union
+			{
+				struct { UINT8 f, e, b, a; };
+				struct { UINT16 w, d; };
+			} r;
+			struct { PAIR16 w, d; } p;
+		#else
+			union
+			{
+				struct { UINT8 a, b, e, f; };
+				struct { UINT16 d, w; };
+			} r;
+			struct { PAIR16 d, w; } p;
+		#endif
+		UINT32 q;
+	};
+
 	// Memory interface
 	memory_interface *          m_mintf;
 
 	// CPU registers
 	PAIR16                      m_pc;               // program counter
 	PAIR16                      m_ppc;              // previous program counter
-	PAIR16                      m_d;                // accumulator a and b
+	M6809Q                      m_q;                // accumulator a and b (plus e and f on 6309)
 	PAIR16                      m_x, m_y;           // index registers
 	PAIR16                      m_u, m_s;           // stack pointers
 	UINT8                       m_dp;               // direct page register
@@ -223,11 +241,11 @@ protected:
 	void set_b()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_B; }
 	void set_d()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_D; }
 	void set_imm()                                  { m_addressing_mode = ADDRESSING_MODE_IMMEDIATE; }
-	void set_regop8(UINT8 &reg)                     { m_reg8 = &reg; m_reg16 = NULL; }
-	void set_regop16(PAIR16 &reg)                   { m_reg16 = &reg; m_reg8 = NULL; }
-	UINT8 &regop8()                                 { assert(m_reg8 != NULL); return *m_reg8; }
-	PAIR16 &regop16()                               { assert(m_reg16 != NULL); return *m_reg16; }
-	bool is_register_register_op_16_bit()           { return m_reg16 != NULL; }
+	void set_regop8(UINT8 &reg)                     { m_reg8 = &reg; m_reg16 = nullptr; }
+	void set_regop16(PAIR16 &reg)                   { m_reg16 = &reg; m_reg8 = nullptr; }
+	UINT8 &regop8()                                 { assert(m_reg8 != nullptr); return *m_reg8; }
+	PAIR16 &regop16()                               { assert(m_reg16 != nullptr); return *m_reg16; }
+	bool is_register_register_op_16_bit()           { return m_reg16 != nullptr; }
 	bool add8_sets_h()                              { return true; }
 	bool hd6309_native_mode()                       { return false; }
 

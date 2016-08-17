@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Stephh
+// copyright-holders:David Haywood
 class xyonix_state : public driver_device
 {
 public:
@@ -26,8 +26,8 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_WRITE8_MEMBER(vidram_w);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_PALETTE_INIT(xyonix);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

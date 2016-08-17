@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 
-
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
@@ -47,7 +46,6 @@ struct buf_t
 
 struct shmem_t
 {
-	volatile INT32  lock;
 	buf_t               buf[2];
 };
 
@@ -88,9 +86,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
@@ -106,6 +104,7 @@ private:
 	buf_t *m_out_ptr;
 	osd_shared_mem *m_os_shmem;
 	shmem_t *m_shmem;
+	std::mutex m_mutex;
 
 	TIMER_CALLBACK_MEMBER( set_status_cb );
 	TIMER_CALLBACK_MEMBER( link_cb );

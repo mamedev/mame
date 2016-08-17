@@ -31,7 +31,7 @@ public:
 	double          m_brightness;
 	bitmap_ind16 m_pfbitmap;
 
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 
 	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);

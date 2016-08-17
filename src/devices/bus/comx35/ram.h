@@ -31,13 +31,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_comx_expansion_card_interface overrides
-	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
-	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data);
-	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
+	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data) override;
 
 private:
 	optional_shared_ptr<UINT8> m_ram;

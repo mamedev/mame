@@ -30,7 +30,7 @@ public:
 	DECLARE_DRIVER_INIT(cashquiz);
 	DECLARE_DRIVER_INIT(merlinmm);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pingpong);
 	UINT32 screen_update_pingpong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pingpong_interrupt);

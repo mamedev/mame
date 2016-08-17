@@ -72,10 +72,10 @@ public:
 protected:
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	void internal_reg_write(UINT8 reg, UINT8 data);
 
@@ -86,8 +86,7 @@ protected:
 	UINT8 m_vlma;         // overall AAM volume
 	UINT8 m_bsl;          // boost level
 	UINT8 m_cpl;          // clip limiter
-	UINT8 *m_rom_base;
-	int m_rom_limit;
+	required_region_ptr<UINT8> m_rom;
 
 	ymz_channel m_channels[8];
 };

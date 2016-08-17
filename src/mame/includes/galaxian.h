@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -50,11 +51,14 @@ public:
 			m_ppi8255_0(*this, "ppi8255_0"),
 			m_ppi8255_1(*this, "ppi8255_1"),
 			m_ppi8255_2(*this, "ppi8255_2"),
-			m_spriteram(*this, "spriteram"),
-			m_videoram(*this, "videoram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
+			m_soundlatch(*this, "soundlatch"),
+			m_fake_select(*this, "FAKE_SELECT"),
+			m_tenspot_game_dsw(*this, {"IN2_GAME0", "IN2_GAME1", "IN2_GAME2", "IN2_GAME3", "IN2_GAME4", "IN2_GAME5", "IN2_GAME6", "IN2_GAME7", "IN2_GAME8", "IN2_GAME9"}),
+			m_spriteram(*this, "spriteram"),
+			m_videoram(*this, "videoram"),
 			m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -66,14 +70,19 @@ public:
 	optional_device<ay8910_device> m_ay8910_2;
 	optional_device<ay8910_device> m_ay8910_cclimber;
 	optional_device<digitalker_device> m_digitalker;
-	optional_device<i8255_device>  m_ppi8255_0;
-	optional_device<i8255_device>  m_ppi8255_1;
-	optional_device<i8255_device>  m_ppi8255_2;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
+	optional_device<i8255_device> m_ppi8255_0;
+	optional_device<i8255_device> m_ppi8255_1;
+	optional_device<i8255_device> m_ppi8255_2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+	optional_ioport m_fake_select;
+	optional_ioport_array<10> m_tenspot_game_dsw;
+
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	int m_bullets_base;
@@ -118,7 +127,7 @@ public:
 	UINT32 m_star_rng_origin;
 	UINT32 m_star_rng_origin_frame;
 	rgb_t m_star_color[64];
-	UINT8 *m_stars;
+	std::unique_ptr<UINT8[]> m_stars;
 	UINT8 m_stars_enabled;
 	UINT8 m_stars_blink_state;
 	rgb_t m_bullet_color[8];
@@ -158,7 +167,8 @@ public:
 	DECLARE_WRITE8_MEMBER(frogger_ppi8255_w);
 	DECLARE_READ8_MEMBER(frogger_ay8910_r);
 	DECLARE_WRITE8_MEMBER(frogger_ay8910_w);
-	DECLARE_WRITE8_MEMBER(froggrmc_sound_control_w);
+	IRQ_CALLBACK_MEMBER(froggermc_audiocpu_irq_ack);
+	DECLARE_WRITE8_MEMBER(froggermc_sound_control_w);
 	DECLARE_READ8_MEMBER(frogf_ppi8255_r);
 	DECLARE_WRITE8_MEMBER(frogf_ppi8255_w);
 	DECLARE_READ8_MEMBER(turtles_ppi8255_0_r);
@@ -238,14 +248,13 @@ public:
 	DECLARE_DRIVER_INIT(thepitm);
 	DECLARE_DRIVER_INIT(theend);
 	DECLARE_DRIVER_INIT(scramble);
-	DECLARE_DRIVER_INIT(explorer);
 	DECLARE_DRIVER_INIT(sfx);
 	DECLARE_DRIVER_INIT(atlantis);
 	DECLARE_DRIVER_INIT(scobra);
 	DECLARE_DRIVER_INIT(scobrae);
 	DECLARE_DRIVER_INIT(losttomb);
 	DECLARE_DRIVER_INIT(frogger);
-	DECLARE_DRIVER_INIT(froggrmc);
+	DECLARE_DRIVER_INIT(froggermc);
 	DECLARE_DRIVER_INIT(froggers);
 	DECLARE_DRIVER_INIT(quaak);
 	DECLARE_DRIVER_INIT(turtles);
@@ -257,8 +266,9 @@ public:
 	DECLARE_DRIVER_INIT(moonwar);
 	DECLARE_DRIVER_INIT(ghostmun);
 	DECLARE_DRIVER_INIT(froggrs);
+	DECLARE_DRIVER_INIT(warofbugg);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(galaxian);
 	DECLARE_PALETTE_INIT(moonwar);
 	void tenspot_set_game_bank(int bank, int from_game);
@@ -283,8 +293,6 @@ public:
 	void turtles_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void frogger_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void quaak_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	int flip_and_clip(rectangle &draw, int xstart, int xend, const rectangle &cliprect);
-	void amidar_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, rgb_t color);
 	void galaxian_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void mshuttle_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
@@ -313,6 +321,7 @@ public:
 	void decode_checkman();
 	void decode_dingoe();
 	void decode_frogger_sound();
+	void decode_froggermc_sound();
 	void decode_frogger_gfx();
 	void decode_anteater_gfx();
 	void decode_losttomb_gfx();

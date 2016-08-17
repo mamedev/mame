@@ -36,7 +36,7 @@ function dorelease()
 
 
 	print("Generating project files...")
-	
+
 	exec("genie /to=../build/gmake.windows /os=windows gmake")
 	exec("genie /to=../build/gmake.linux /os=linux gmake")
 	exec("genie /to=../build/gmake.darwin /os=macosx /platform=universal32 gmake")

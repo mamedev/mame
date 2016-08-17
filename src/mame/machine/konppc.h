@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE32_MEMBER(nwk_voodoo_1_w);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	UINT32 dsp_comm_sharc_r(int board, int offset);
 	void dsp_comm_sharc_w(address_space &space, int board, int offset, UINT32 data);
@@ -78,7 +78,7 @@ private:
 	INT32 cgboard_type;
 	INT32 num_cgboards;
 
-	UINT32 *dsp_shared_ram[MAX_CG_BOARDS];
+	std::unique_ptr<UINT32[]> dsp_shared_ram[MAX_CG_BOARDS];
 
 	UINT32 dsp_state[MAX_CG_BOARDS];
 	UINT32 nwk_device_sel[MAX_CG_BOARDS];
@@ -89,11 +89,11 @@ private:
 	int nwk_fifo_full;
 	int nwk_fifo_mask;
 
-	UINT32 *nwk_fifo[MAX_CG_BOARDS];
+	std::unique_ptr<UINT32[]> nwk_fifo[MAX_CG_BOARDS];
 	INT32 nwk_fifo_read_ptr[MAX_CG_BOARDS];
 	INT32 nwk_fifo_write_ptr[MAX_CG_BOARDS];
 
-	UINT32 *nwk_ram[MAX_CG_BOARDS];
+	std::unique_ptr<UINT32[]> nwk_ram[MAX_CG_BOARDS];
 };
 
 

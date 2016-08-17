@@ -7,10 +7,11 @@
 *************************************************************************/
 
 #include "sound/okim6295.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/es8712.h"
 #include "video/k053936.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 
 class metro_state : public driver_device
 {
@@ -30,6 +31,11 @@ public:
 		m_ymsnd(*this, "ymsnd"),
 		m_essnd(*this, "essnd"),
 		m_k053936(*this, "k053936") ,
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
 		m_vram_2(*this, "vram_2"),
@@ -45,11 +51,7 @@ public:
 		m_videoregs(*this, "videoregs"),
 		m_screenctrl(*this, "screenctrl"),
 		m_input_sel(*this, "input_sel"),
-		m_k053936_ram(*this, "k053936_ram"),
-		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_k053936_ram(*this, "k053936_ram")
 	{ }
 
 	/* devices */
@@ -59,6 +61,12 @@ public:
 	optional_device<device_t> m_ymsnd; // TODO set correct type
 	optional_device<es8712_device> m_essnd;
 	optional_device<k053936_device> m_k053936;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_vram_0;
 	optional_shared_ptr<UINT16> m_vram_1;
@@ -77,11 +85,6 @@ public:
 	optional_shared_ptr<UINT16> m_input_sel;
 	optional_shared_ptr<UINT16> m_k053936_ram;
 
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
 	int         m_flip_screen;
 
 	/* video-related */
@@ -95,7 +98,7 @@ public:
 	int         m_sprite_yoffs;
 	int         m_sprite_xoffs_dx;
 
-	UINT8       *m_expanded_gfx1;
+	std::unique_ptr<UINT8[]>      m_expanded_gfx1;
 
 	/* irq_related */
 	int         m_vblank_bit;
@@ -192,8 +195,6 @@ public:
 	INTERRUPT_GEN_MEMBER(metro_periodic_interrupt);
 	INTERRUPT_GEN_MEMBER(karatour_interrupt);
 	INTERRUPT_GEN_MEMBER(puzzlet_interrupt);
-	TIMER_CALLBACK_MEMBER(karatour_irq_callback);
-	TIMER_CALLBACK_MEMBER(mouja_irq_callback);
 	TIMER_CALLBACK_MEMBER(metro_blit_done);
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(metro_irq_callback);
@@ -208,6 +209,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(metro_rxd_r);
 
 protected:
-	virtual void machine_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

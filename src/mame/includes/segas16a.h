@@ -10,11 +10,13 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
-#include "sound/2151intf.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 
@@ -35,7 +37,9 @@ public:
 			m_n7751(*this, "n7751"),
 			m_n7751_i8243(*this, "n7751_8243"),
 			m_nvram(*this, "nvram"),
+			m_watchdog(*this, "watchdog"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_soundlatch(*this, "soundlatch"),
 			m_sprites(*this, "sprites"),
 			m_workram(*this, "nvram"),
 			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
@@ -46,7 +50,8 @@ public:
 			m_last_buttons1(0),
 			m_last_buttons2(0),
 			m_read_port(0),
-			m_mj_input_num(0)
+			m_mj_input_num(0),
+			m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
 	{ }
 
 	// PPI read/write callbacks
@@ -107,9 +112,9 @@ protected:
 	};
 
 	// driver overrides
-	virtual void video_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();
@@ -132,7 +137,9 @@ protected:
 	optional_device<n7751_device> m_n7751;
 	optional_device<i8243_device> m_n7751_i8243;
 	required_device<nvram_device> m_nvram;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<segaic16_video_device> m_segaic16vid;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<sega_sys16a_sprite_device> m_sprites;
 
 	// memory pointers
@@ -154,4 +161,5 @@ protected:
 	UINT8                   m_last_buttons2;
 	UINT8                   m_read_port;
 	UINT8                   m_mj_input_num;
+	optional_ioport_array<6> m_mj_inputs;
 };

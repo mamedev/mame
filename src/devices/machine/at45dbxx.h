@@ -56,13 +56,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 protected:
 	virtual int num_pages() const { return 2048; }
@@ -120,11 +120,11 @@ public:
 	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int num_pages() const { return 4096; }
-	virtual int page_size() const { return 264;  }
-	virtual UINT8 device_id() const { return 0x20; }
+	virtual int num_pages() const override { return 4096; }
+	virtual int page_size() const override { return 264;  }
+	virtual UINT8 device_id() const override { return 0x20; }
 
-	virtual UINT32 flash_get_page_addr();
+	virtual UINT32 flash_get_page_addr() override;
 };
 
 // ======================> at45db161_device
@@ -135,12 +135,12 @@ public:
 	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int num_pages() const { return 4096; }
-	virtual int page_size() const { return 528;  }
-	virtual UINT8 device_id() const { return 0x28; }
+	virtual int num_pages() const override { return 4096; }
+	virtual int page_size() const override { return 528;  }
+	virtual UINT8 device_id() const override { return 0x28; }
 
-	virtual UINT32 flash_get_page_addr();
-	virtual UINT32 flash_get_byte_addr();
+	virtual UINT32 flash_get_page_addr() override;
+	virtual UINT32 flash_get_byte_addr() override;
 };
 
 

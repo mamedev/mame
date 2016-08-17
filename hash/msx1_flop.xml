@@ -881,7 +881,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sony</publisher>
@@ -3333,7 +3333,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="odysseyk">
-		<description>Odyssey-K </description>
+		<description>Odyssey-K</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4454,7 +4454,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="aburner">
-		<description>Afterburner(Euro)</description>
+		<description>Afterburner (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4465,7 +4465,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="aburnera" cloneof="aburner">
-		<description>Afterburner(Euro, Alt)</description>
+		<description>Afterburner (Euro, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -7369,7 +7369,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;cart2disk hack&gt;</publisher>
@@ -7887,7 +7887,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="flashgor">
-		<description>Flash Gordon </description>
+		<description>Flash Gordon</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -9504,7 +9504,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="jumpland">
-		<description>Jump Land </description>
+		<description>Jump Land</description>
 		<year>19??</year>
 		<publisher>&lt;cart2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -14685,7 +14685,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="wbells">
-		<description>Wedding Bells </description>
+		<description>Wedding Bells</description>
 		<year>19??</year>
 		<publisher>&lt;cart2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">

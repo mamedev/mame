@@ -1,11 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
 /***************************************************************************
 
     Cave hardware
 
 ***************************************************************************/
+
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 
@@ -46,7 +49,8 @@ public:
 			m_eeprom(*this, "eeprom"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
-			m_palette(*this, "palette") { }
+			m_palette(*this, "palette"),
+			m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	optional_shared_ptr_array<UINT16, 4> m_videoregs;
@@ -85,7 +89,7 @@ public:
 	int          m_spriteram_bank[4];
 	int          m_spriteram_bank_delay[4];
 
-	UINT16       *m_palette_map[4];
+	std::unique_ptr<UINT16[]>      m_palette_map[4];
 
 	int          m_layers_offs_x;
 	int          m_layers_offs_y;
@@ -131,6 +135,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_16_device> m_soundlatch;
+
 	int m_rasflag;
 	int m_old_rasflag;
 	DECLARE_READ16_MEMBER(cave_irq_cause_r);
@@ -161,7 +167,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sailormn_rombank_w);
 	DECLARE_WRITE8_MEMBER(sailormn_okibank_w);
 	DECLARE_WRITE8_MEMBER(sailormn_oki2bank_w);
-	DECLARE_WRITE16_MEMBER(donpachi_videoregs_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_0_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_1_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_2_w);
@@ -211,6 +216,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
 	DECLARE_MACHINE_START(cave);
 	DECLARE_MACHINE_RESET(cave);
+	DECLARE_MACHINE_RESET(sailormn);
 	DECLARE_VIDEO_START(cave_2_layers);
 	DECLARE_PALETTE_INIT(dfeveron);
 	DECLARE_VIDEO_START(cave_3_layers);
@@ -236,10 +242,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start_left);
 	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start_right);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_lev2_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(sailormn_startup);
 	void cave_get_sprite_info(int chip);
 	void cave_get_sprite_info_all();
 	void sailormn_tilebank_w(int bank);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	void update_irq_state();
 	void unpack_sprites(const char *region);

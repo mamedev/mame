@@ -315,9 +315,9 @@ static bool CheckGLSL (bool vertex, bool gles, const std::string& testName, cons
 
 static bool CheckMetal (bool vertex, bool gles, const std::string& testName, const char* prefix, const std::string& source)
 {
-#if !GOT_GFX
+#if !GOT_GFX || !defined(__APPLE__)
 	return true; // just assume it's ok
-#endif
+#else
 	
 	FILE* f = fopen ("metalTemp.metal", "wb");
 	fwrite (source.c_str(), source.size(), 1, f);
@@ -333,6 +333,7 @@ static bool CheckMetal (bool vertex, bool gles, const std::string& testName, con
 #endif //
 
 	return true;
+#endif
 }
 
 
@@ -460,6 +461,8 @@ static const char* kGlslTypeNames[kGlslTypeCount] = {
 	"2d",
 	"3d",
 	"cube",
+	"2dshadow",
+	"2darray",
 	"other",
 };
 static const char* kGlslPrecNames[kGlslPrecCount] = {

@@ -37,7 +37,7 @@
 
 class bsmt2000_device : public device_t,
 						public device_sound_interface,
-						public device_memory_interface
+						public device_rom_interface
 {
 	typedef void (*ready_callback)(bsmt2000_device &device);
 
@@ -55,17 +55,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	// internal TMS I/O callbacks
@@ -76,7 +73,7 @@ public:
 	DECLARE_WRITE16_MEMBER( tms_rom_bank_w );
 	DECLARE_WRITE16_MEMBER( tms_left_w );
 	DECLARE_WRITE16_MEMBER( tms_right_w );
-	DECLARE_READ16_MEMBER( tms_write_pending_r );
+	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
 
 private:
 	// timers
@@ -88,12 +85,10 @@ private:
 	};
 
 	// configuration state
-	const address_space_config  m_space_config;
 	ready_callback              m_ready_callback;
 
 	// internal state
 	sound_stream *              m_stream;
-	direct_read_data *          m_direct;
 	tms32015_device *           m_cpu;
 	UINT16                      m_register_select;
 	UINT16                      m_write_data;

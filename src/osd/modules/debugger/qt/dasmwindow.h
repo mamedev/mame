@@ -3,7 +3,8 @@
 #ifndef __DEBUG_QT_DASM_WINDOW_H__
 #define __DEBUG_QT_DASM_WINDOW_H__
 
-#include <QtGui/QtGui>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QComboBox>
 
 #include "debuggerview.h"
 #include "windowqt.h"
@@ -17,7 +18,7 @@ class DasmWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DasmWindow(running_machine* machine, QWidget* parent=NULL);
+	DasmWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~DasmWindow();
 
 

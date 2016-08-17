@@ -5,7 +5,7 @@
 typedef device_delegate<UINT32 (UINT32)> vsystem_tile2_indirection_delegate;
 
 #define MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( _class, _method) \
-	vsystem_spr2_device::set_tile_indirect_cb(*device, vsystem_tile2_indirection_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	vsystem_spr2_device::set_tile_indirect_cb(*device, vsystem_tile2_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_VSYSTEM_SPR2_SET_PRITYPE( _val) \
 	vsystem_spr2_device::set_pritype(*device, _val);
 #define MCFG_VSYSTEM_SPR2_SET_GFXREGION( _rgn ) \
@@ -14,8 +14,6 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile2_indirection_delegate;
 	vsystem_spr2_device::set_offsets(*device, _xoffs,_yoffs);
 #define MCFG_VSYSTEM_SPR2_GFXDECODE(_gfxtag) \
 	vsystem_spr2_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-#define MCFG_VSYSTEM_SPR2_PALETTE(_palette_tag) \
-	vsystem_spr2_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 class vsystem_spr2_device : public device_t
 {
@@ -24,7 +22,6 @@ public:
 
 		// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_tile_indirect_cb(device_t &device,vsystem_tile2_indirection_delegate newtilecb);
 	static void set_pritype(device_t &device, int pritype);
 	static void set_gfx_region(device_t &device, int gfx_region);
@@ -62,13 +59,12 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 

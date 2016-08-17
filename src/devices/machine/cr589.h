@@ -22,19 +22,21 @@ class matsushita_cr589_device : public atapi_cdrom_device,
 public:
 	matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void ExecCommand();
-	virtual void WriteData( UINT8 *data, int dataLength );
-	virtual void ReadData( UINT8 *data, int dataLength );
+	virtual void ExecCommand() override;
+	virtual void WriteData( UINT8 *data, int dataLength ) override;
+	virtual void ReadData( UINT8 *data, int dataLength ) override;
+	// ksys573 changes discs without telling the cdrom_image_device
+	virtual void process_buffer() override { atapi_hle_device::process_buffer(); }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 private:
 	int download;

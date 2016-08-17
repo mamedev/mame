@@ -17,11 +17,11 @@ public:
 	sns_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
 };
 
 // ======================> sns_rom_obc1_device
@@ -33,12 +33,12 @@ public:
 	sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	int m_address;
 	int m_offset;
@@ -57,12 +57,12 @@ public:
 	sns_rom_pokemon_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write);  // protection device
+	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
 	UINT8 m_latch;
 };
 
@@ -75,12 +75,12 @@ public:
 	sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write);  // protection device
+	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
 
 	void update_prot(UINT32 offset);
 
@@ -98,7 +98,7 @@ public:
 	sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
+	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
 };
 
 // ======================> sns_rom_mcpirate1_device
@@ -110,13 +110,13 @@ public:
 	sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);  // bankswitch device
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
 	UINT8 m_base_bank;
 };
 
@@ -129,13 +129,13 @@ public:
 	sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);  // bankswitch device
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
 	UINT8 m_base_bank;
 };
 
@@ -148,12 +148,12 @@ public:
 	sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);  // bankswitch device
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
 	UINT8 m_base_bank;
 };
 
@@ -170,8 +170,8 @@ public:
 //  virtual void device_reset();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write);  // protection device
+	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
 	UINT8 m_latch[16];
 };
 
@@ -184,12 +184,12 @@ public:
 	sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write);  // protection device
+	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
 	UINT8 m_latch[0x800];
 };
 

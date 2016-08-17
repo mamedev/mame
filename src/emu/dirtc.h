@@ -55,8 +55,8 @@ public:
 	void set_current_time(running_machine &machine);
 
 protected:
-	UINT8 convert_to_bcd(int val);
-	int bcd_to_integer(UINT8 val);
+	static UINT8 convert_to_bcd(int val);
+	static int bcd_to_integer(UINT8 val);
 
 	void set_clock_register(int register, int value);
 	int get_clock_register(int register);

@@ -55,7 +55,7 @@
 
 class qs1000_device :   public device_t,
 						public device_sound_interface,
-						public device_memory_interface
+						public device_rom_interface
 {
 public:
 	// construction/destruction
@@ -76,19 +76,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	DECLARE_READ8_MEMBER( data_to_i8052 );
 public:
 	DECLARE_WRITE8_MEMBER( wave_w );
 
@@ -104,6 +100,8 @@ public:
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 
+	DECLARE_READ8_MEMBER( data_to_i8052 );
+
 	enum
 	{
 		QS1000_KEYON   = 1,
@@ -112,7 +110,6 @@ public:
 	};
 
 	void start_voice(int ch);
-	void set_voice_regs(int ch);
 
 	bool                    m_external_rom;
 
@@ -128,9 +125,7 @@ public:
 	//devcb_write8            m_serial_w_cb;
 
 	// Internal state
-	const address_space_config      m_space_config;
 	sound_stream *                  m_stream;
-	direct_read_data *              m_direct;
 	required_device<i8052_device>   m_cpu;
 
 	// Wavetable engine

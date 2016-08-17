@@ -440,8 +440,12 @@ static bool propagate_precision(exec_list* list, bool assign_high_to_undefined)
 static void do_optimization_passes(exec_list* ir, bool linked, _mesa_glsl_parse_state* state, void* mem_ctx)
 {
 	bool progress;
+	// FIXME: Shouldn't need to bound the number of passes
+	int passes = 0,
+		kMaximumPasses = 1000;
 	do {
 		progress = false;
+		++passes;
 		bool progress2;
 		debug_print_ir ("Initial", ir, state, mem_ctx);
 		if (linked) {
@@ -454,10 +458,6 @@ static void do_optimization_passes(exec_list* ir, bool linked, _mesa_glsl_parse_
 		progress2 = propagate_precision (ir, state->metal_target); progress |= progress2; if (progress2) debug_print_ir ("After prec propagation", ir, state, mem_ctx);
 		progress2 = do_copy_propagation(ir); progress |= progress2; if (progress2) debug_print_ir ("After copy propagation", ir, state, mem_ctx);
 		progress2 = do_copy_propagation_elements(ir); progress |= progress2; if (progress2) debug_print_ir ("After copy propagation elems", ir, state, mem_ctx);
-		if (state->es_shader && linked)
-		{
-			progress2 = optimize_split_vectors(ir, linked, OPT_SPLIT_ONLY_LOOP_INDUCTORS); progress |= progress2; if (progress2) debug_print_ir("After split vectors", ir, state, mem_ctx);
-		}
 
 		if (linked)
 		{
@@ -488,7 +488,6 @@ static void do_optimization_passes(exec_list* ir, bool linked, _mesa_glsl_parse_
 		progress2 = do_swizzle_swizzle(ir); progress |= progress2; if (progress2) debug_print_ir ("After swizzle swizzle", ir, state, mem_ctx);
 		progress2 = do_noop_swizzle(ir); progress |= progress2; if (progress2) debug_print_ir ("After noop swizzle", ir, state, mem_ctx);
 		progress2 = optimize_split_arrays(ir, linked, state->metal_target && state->stage == MESA_SHADER_FRAGMENT); progress |= progress2; if (progress2) debug_print_ir ("After split arrays", ir, state, mem_ctx);
-		progress2 = optimize_split_vectors(ir, linked, OPT_SPLIT_ONLY_UNUSED); progress |= progress2; if (progress2) debug_print_ir("After split unused vectors", ir, state, mem_ctx);
 		progress2 = optimize_redundant_jumps(ir); progress |= progress2; if (progress2) debug_print_ir ("After redundant jumps", ir, state, mem_ctx);
 
 		// do loop stuff only when linked; otherwise causes duplicate loop induction variable
@@ -502,7 +501,7 @@ static void do_optimization_passes(exec_list* ir, bool linked, _mesa_glsl_parse_
 			}
 			delete ls;
 		}
-	} while (progress);
+	} while (progress && passes < kMaximumPasses);
 
 	if (!state->metal_target)
 	{
@@ -528,7 +527,14 @@ static void glsl_type_to_optimizer_desc(const glsl_type* type, glsl_precision pr
 	else if (type->is_sampler())
 	{
 		if (type->sampler_dimensionality == GLSL_SAMPLER_DIM_2D)
-			out->type = kGlslTypeTex2D;
+		{
+			if (type->sampler_shadow)
+				out->type = kGlslTypeTex2DShadow;
+			else if (type->sampler_array)
+				out->type = kGlslTypeTex2DArray;
+			else
+				out->type = kGlslTypeTex2D;
+		}
 		else if (type->sampler_dimensionality == GLSL_SAMPLER_DIM_3D)
 			out->type = kGlslTypeTex3D;
 		else if (type->sampler_dimensionality == GLSL_SAMPLER_DIM_CUBE)

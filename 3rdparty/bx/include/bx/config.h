@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_CONFIG_H_HEADER_GUARD
@@ -21,19 +21,17 @@
 #endif // BX_CONFIG_SPSCQUEUE_USE_MUTEX
 
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
-#	define BX_CONFIG_CRT_FILE_READER_WRITER (0 \
-				|| BX_PLATFORM_ANDROID \
-				|| BX_PLATFORM_FREEBSD \
-				|| BX_PLATFORM_EMSCRIPTEN \
-				|| BX_PLATFORM_IOS \
-				|| BX_PLATFORM_LINUX \
-				|| BX_PLATFORM_OSX \
-				|| BX_PLATFORM_QNX \
-				|| BX_PLATFORM_RPI \
-				|| BX_PLATFORM_WINDOWS \
-				|| BX_PLATFORM_WINRT \
-				? 1 : 0)
+#	define BX_CONFIG_CRT_FILE_READER_WRITER !(BX_PLATFORM_NACL)
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
+
+#ifndef BX_CONFIG_CRT_PROCESS
+#	define BX_CONFIG_CRT_PROCESS !(0 \
+			|| BX_PLATFORM_EMSCRIPTEN \
+			|| BX_PLATFORM_NACL \
+			|| BX_PLATFORM_WINRT \
+			|| BX_PLATFORM_XBOXONE \
+			)
+#endif // BX_CONFIG_CRT_PROCESS
 
 #ifndef BX_CONFIG_SEMAPHORE_PTHREAD
 #	define BX_CONFIG_SEMAPHORE_PTHREAD (BX_PLATFORM_OSX || BX_PLATFORM_IOS)

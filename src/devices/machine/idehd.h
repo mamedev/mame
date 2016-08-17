@@ -27,17 +27,17 @@ public:
 	void set_master_password(const UINT8 *password)
 	{
 		m_master_password = password;
-		m_master_password_enable = (password != NULL);
+		m_master_password_enable = (password != nullptr);
 	}
 
 	void set_user_password(const UINT8 *password)
 	{
 		m_user_password = password;
-		m_user_password_enable = (password != NULL);
+		m_user_password_enable = (password != nullptr);
 	}
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 	virtual int read_sector(UINT32 lba, void *buffer) = 0;
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
@@ -46,14 +46,14 @@ protected:
 	void ide_build_identify_device();
 
 	static const int IDE_DISK_SECTOR_SIZE = 512;
-	virtual int sector_length() { return IDE_DISK_SECTOR_SIZE; }
-	virtual void process_buffer();
-	virtual void fill_buffer();
-	virtual bool is_ready() { return true; }
-	virtual void process_command();
-	virtual void finished_command();
-	virtual void perform_diagnostic();
-	virtual void signature();
+	virtual int sector_length() override { return IDE_DISK_SECTOR_SIZE; }
+	virtual void process_buffer() override;
+	virtual void fill_buffer() override;
+	virtual bool is_ready() override { return true; }
+	virtual void process_command() override;
+	virtual void finished_command() override;
+	virtual void perform_diagnostic() override;
+	virtual void signature() override;
 
 	int m_can_identify_device;
 	UINT16          m_num_cylinders;
@@ -69,7 +69,7 @@ private:
 	void next_sector();
 	void security_error();
 	void read_first_sector();
-	void soft_reset();
+	void soft_reset() override;
 
 	UINT32          m_cur_lba;
 	UINT16          m_block_count;
@@ -92,15 +92,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual int read_sector(UINT32 lba, void *buffer) { if (m_disk == NULL) return 0; return hard_disk_read(m_disk, lba, buffer); }
-	virtual int write_sector(UINT32 lba, const void *buffer) { if (m_disk == NULL) return 0; return hard_disk_write(m_disk, lba, buffer); }
-	virtual UINT8 calculate_status();
+	virtual int read_sector(UINT32 lba, void *buffer) override { if (m_disk == nullptr) return 0; return hard_disk_read(m_disk, lba, buffer); }
+	virtual int write_sector(UINT32 lba, const void *buffer) override { if (m_disk == nullptr) return 0; return hard_disk_write(m_disk, lba, buffer); }
+	virtual UINT8 calculate_status() override;
 
 	chd_file       *m_handle;
 	hard_disk_file *m_disk;

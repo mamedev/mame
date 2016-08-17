@@ -60,7 +60,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	INT32 m_mux_bits;
 

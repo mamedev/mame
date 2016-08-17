@@ -55,11 +55,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	DECLARE_READ8_MEMBER( okim6258_status_r );
@@ -87,7 +87,7 @@ private:
 	sound_stream *m_stream;   /* which stream are we playing on? */
 
 	UINT8 m_output_bits;      /* D/A precision is 10-bits but 12-bit data can be
-                               output serially to an external DAC */
+	                           output serially to an external DAC */
 
 	INT32 m_signal;
 	INT32 m_step;

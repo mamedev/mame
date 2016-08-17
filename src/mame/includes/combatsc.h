@@ -5,6 +5,8 @@
     Combat School
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "sound/msm5205.h"
 #include "video/k007121.h"
@@ -14,20 +16,24 @@ class combatsc_state : public driver_device
 public:
 	combatsc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
-		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "upd"),
 		m_msm5205(*this, "msm5205"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_track_ports(*this, {"TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X"})
+	{
+	}
 
 	/* memory pointers */
 	UINT8 *    m_videoram;
 	UINT8 *    m_scrollram;
 	UINT8 *    m_io_ram;
-	UINT8 *    m_spriteram[2];
+	std::unique_ptr<UINT8[]>    m_spriteram[2];
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap[2];
@@ -50,14 +56,17 @@ public:
 
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<k007121_device> m_k007121_1;
 	optional_device<k007121_device> m_k007121_2;
-	required_device<cpu_device> m_maincpu;
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<msm5205_device> m_msm5205;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	optional_ioport_array<4> m_track_ports;
 
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);
@@ -89,7 +98,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info0_bootleg);
 	TILE_GET_INFO_MEMBER(get_tile_info1_bootleg);
 	TILE_GET_INFO_MEMBER(get_text_info_bootleg);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(combatsc);
 	DECLARE_VIDEO_START(combatsc);
 	DECLARE_PALETTE_INIT(combatsc);

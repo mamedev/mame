@@ -1,13 +1,13 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "entry_p.h"
 
 #if ENTRY_CONFIG_USE_NATIVE && BX_PLATFORM_NACL
 
-#include <bgfxplatform.h>
+#include <bgfx/bgfxplatform.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -29,7 +29,7 @@
 #include <ppapi/c/ppp_instance.h>
 #include <ppapi/gles2/gl2ext_ppapi.h>
 
-#include <bgfxplatform.h>
+#include <bgfx/bgfxplatform.h>
 #include <bx/thread.h>
 
 #include "entry.h"

@@ -36,13 +36,13 @@ class debug_view_watchpoints : public debug_view
 
 protected:
 	// view overrides
-	virtual void view_update();
-	virtual void view_click(const int button, const debug_view_xy& pos);
+	virtual void view_update() override;
+	virtual void view_click(const int button, const debug_view_xy& pos) override;
 
 private:
 	// internal helpers
 	void enumerate_sources();
-	void pad_astring_to_length(std::string& str, int len);
+	void pad_ostream_to_length(std::ostream& str, int len);
 	void gather_watchpoints();
 
 

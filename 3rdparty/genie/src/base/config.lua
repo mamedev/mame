@@ -18,14 +18,25 @@
 --
 
 	function premake.config.isdebugbuild(cfg)
+		-- If any of the specific runtime flags are set
+		if cfg.flags.DebugRuntime then
+			return true
+		end
+
+		if cfg.flags.ReleaseRuntime then
+			return false
+		end
+
 		-- If any of the optimize flags are set, it's a release a build
 		if cfg.flags.Optimize or cfg.flags.OptimizeSize or cfg.flags.OptimizeSpeed then
 			return false
 		end
+
 		-- If symbols are not defined, it's a release build
 		if not cfg.flags.Symbols then
 			return false
 		end
+
 		return true
 	end
 

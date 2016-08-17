@@ -24,7 +24,7 @@ public:
 	required_device<cpu_device> m_extra;
 
 	UINT8           m_alpha_tile_bank;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(thunderj);

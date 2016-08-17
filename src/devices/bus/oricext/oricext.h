@@ -35,8 +35,8 @@ public:
 protected:
 	devcb_write_line irq_handler;
 	const char *cputag;
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 };
 
 class oricext_device : public device_t,
@@ -56,7 +56,7 @@ protected:
 	UINT8 *rom, *ram;
 	UINT8 junk_read[8192], junk_write[8192];
 
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type ORICEXT_CONNECTOR;

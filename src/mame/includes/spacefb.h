@@ -46,7 +46,7 @@ public:
 
 	UINT8 m_sound_latch;
 	emu_timer *m_interrupt_timer;
-	UINT8 *m_object_present_map;
+	std::unique_ptr<UINT8[]> m_object_present_map;
 	UINT8 m_port_0;
 	UINT8 m_port_2;
 	UINT32 m_star_shift_reg;
@@ -60,9 +60,9 @@ public:
 	DECLARE_READ8_MEMBER(audio_t0_r);
 	DECLARE_READ8_MEMBER(audio_t1_r);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void start_interrupt_timer();
@@ -83,7 +83,7 @@ protected:
 		TIMER_INTERRUPT
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in audio/spacefb.c -----------*/

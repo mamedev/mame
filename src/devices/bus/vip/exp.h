@@ -109,7 +109,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	devcb_write_line m_write_int;
 	devcb_write_line m_write_dma_out;

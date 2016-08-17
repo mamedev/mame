@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 // This code is based on:
@@ -28,6 +28,7 @@
 #include <bx/uint32_t.h>
 #include <bx/fpumath.h>
 #include <bx/handlealloc.h>
+#include <bx/crtimpl.h>
 
 #include "imgui.h"
 #include "ocornut_imgui.h"
@@ -47,7 +48,7 @@
 #include "fs_imgui_image_swizz.bin.h"
 
 // embedded font
-#include "droidsans.ttf.h"
+#include "roboto_regular.ttf.h"
 
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4244); // warning C4244: '=' : conversion from '' to '', possible loss of data
 
@@ -450,26 +451,22 @@ struct Imgui
 		return bgfx::createTexture2D(uint16_t(_width), uint16_t(_height), 0, bgfx::TextureFormat::BGRA8, 0, mem);
 	}
 
-	ImguiFontHandle create(const void* _data, uint32_t _size, float _fontSize, bx::AllocatorI* _allocator)
+	ImguiFontHandle create(float _fontSize, bx::AllocatorI* _allocator)
 	{
 		m_allocator = _allocator;
 
-		if (NULL == m_allocator)
+#if BX_CONFIG_ALLOCATOR_CRT
+		if (NULL == _allocator)
 		{
 			static bx::CrtAllocator allocator;
 			m_allocator = &allocator;
 		}
+#endif // BX_CONFIG_ALLOCATOR_CRT
 
-		if (NULL == _data)
-		{
-			_data = s_droidSansTtf;
-			_size = sizeof(s_droidSansTtf);
-		}
+		IMGUI_create(_fontSize, m_allocator);
 
-		IMGUI_create(_data, _size, _fontSize, _allocator);
-
-		m_nvg = nvgCreate(1, m_view);
- 		nvgCreateFontMem(m_nvg, "default", (unsigned char*)_data, INT32_MAX, 0);
+		m_nvg = nvgCreate(1, m_view, m_allocator);
+ 		nvgCreateFontMem(m_nvg, "default", (unsigned char*)s_robotoRegularTtf, INT32_MAX, 0);
  		nvgFontSize(m_nvg, _fontSize);
  		nvgFontFace(m_nvg, "default");
 
@@ -532,7 +529,7 @@ struct Imgui
 			fs_imgui_image       = bgfx::makeRef(fs_imgui_image_dx11, sizeof(fs_imgui_image_dx11) );
 			fs_imgui_image_swizz = bgfx::makeRef(fs_imgui_image_swizz_dx11, sizeof(fs_imgui_image_swizz_dx11) );
 			break;
-				
+
 		case bgfx::RendererType::Metal:
 			vs_imgui_color       = bgfx::makeRef(vs_imgui_color_mtl, sizeof(vs_imgui_color_mtl) );
 			fs_imgui_color       = bgfx::makeRef(fs_imgui_color_mtl, sizeof(fs_imgui_color_mtl) );
@@ -603,7 +600,7 @@ struct Imgui
 		m_missingTexture = genMissingTexture(256, 256, 0.04f);
 
 #if !USE_NANOVG_FONT
-		const ImguiFontHandle handle = createFont(_data, _fontSize);
+		const ImguiFontHandle handle = createFont(s_robotoRegularTtf, _fontSize);
 		m_currentFontIdx = handle.idx;
 #else
 		const ImguiFontHandle handle = { bgfx::invalidHandle };
@@ -838,7 +835,7 @@ struct Imgui
 		const int32_t my = int32_t(float(_my)*yscale);
 
 		IMGUI_beginFrame(mx, my, _button, _scroll, _width, _height, _inputChar, _view);
-		nvgBeginFrameScaled(m_nvg, m_viewWidth, m_viewHeight, m_surfaceWidth, m_surfaceHeight, 1.0f);
+		nvgBeginFrame(m_nvg, m_viewWidth, m_viewHeight, 1.0f);
 		nvgViewId(m_nvg, _view);
 
 		bgfx::setViewName(_view, "IMGUI");
@@ -876,7 +873,10 @@ struct Imgui
 			bgfx::setViewRect(_view, 0, 0, _width, _height);
 		}
 
-		updateInput(mx, my, _button, _scroll, _inputChar);
+		if (!ImGui::IsMouseHoveringAnyWindow() )
+		{
+			updateInput(mx, my, _button, _scroll, _inputChar);
+		}
 
 		m_hot = m_hotToBe;
 		m_hotToBe = 0;
@@ -1488,7 +1488,7 @@ struct Imgui
 		}
 	}
 
-	uint8_t tabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, uint8_t _nEnabled, va_list _argList)
+	uint8_t tabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, uint32_t _nEnabled, va_list _argList)
 	{
 		const char* titles[16];
 		bool tabEnabled[16];
@@ -3080,8 +3080,8 @@ struct Imgui
 
 	bool visible(int32_t _elemY, int32_t _elemHeight, int32_t _scissorY, int32_t _scissorHeight)
 	{
-		return _elemY > _scissorY
-			&& (_elemY+_elemHeight) < (_scissorY+_scissorHeight);
+		return (_elemY+_elemHeight) > _scissorY
+		    && (_elemY) < (_scissorY+_scissorHeight);
 	}
 
 	inline Area& getCurrentArea()
@@ -3259,9 +3259,9 @@ void imguiFree(void* _ptr, void*)
 	BX_FREE(s_imgui.m_allocator, _ptr);
 }
 
-ImguiFontHandle imguiCreate(const void* _data, uint32_t _size, float _fontSize, bx::AllocatorI* _allocator)
+ImguiFontHandle imguiCreate(const void*, uint32_t, float _fontSize, bx::AllocatorI* _allocator)
 {
-	return s_imgui.create(_data, _size, _fontSize, _allocator);
+	return s_imgui.create(_fontSize, _allocator);
 }
 
 void imguiDestroy()
@@ -3415,12 +3415,14 @@ bool imguiCheck(const char* _text, bool _checked, bool _enabled)
 	return s_imgui.check(_text, _checked, _enabled);
 }
 
-void imguiBool(const char* _text, bool& _flag, bool _enabled)
+bool imguiBool(const char* _text, bool& _flag, bool _enabled)
 {
-	if (imguiCheck(_text, _flag, _enabled) )
+	bool result = imguiCheck(_text, _flag, _enabled);
+	if (result)
 	{
 		_flag = !_flag;
 	}
+	return result;
 }
 
 bool imguiCollapse(const char* _text, const char* _subtext, bool _checked, bool _enabled)
@@ -3467,7 +3469,7 @@ void imguiInput(const char* _label, char* _str, uint32_t _len, bool _enabled, Im
 	s_imgui.input(_label, _str, _len, _enabled, _align, _r);
 }
 
-uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, uint8_t _nEnabled, ...)
+uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, uint32_t _nEnabled, ...)
 {
 	va_list argList;
 	va_start(argList, _nEnabled);
@@ -3477,7 +3479,7 @@ uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int
 	return result;
 }
 
-uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, ...)
+uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, ...)
 {
 	va_list argList;
 	va_start(argList, _nTabs);
@@ -3568,5 +3570,15 @@ float imguiGetTextLength(const char* _text, ImguiFontHandle _handle)
 
 bool imguiMouseOverArea()
 {
-	return s_imgui.m_insideArea;
+	return s_imgui.m_insideArea
+		|| ImGui::IsAnyItemHovered()
+		|| ImGui::IsMouseHoveringAnyWindow()
+		;
+}
+
+bgfx::ProgramHandle imguiGetImageProgram(uint8_t _mip)
+{
+	const float lodEnabled[4] = { float(_mip), 1.0f, 0.0f, 0.0f };
+	bgfx::setUniform(s_imgui.u_imageLodEnabled, lodEnabled);
+	return s_imgui.m_imageProgram;
 }

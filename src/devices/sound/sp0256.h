@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
 /**********************************************************************
 
@@ -27,19 +27,6 @@
    GI SP0256 Narrator Speech Processor
 
    By Joe Zbiciak. Ported to MESS by tim lindner.
-
- Copyright Joseph Zbiciak, all rights reserved.
- Copyright tim lindner, all rights reserved.
-
- - This source code is released as freeware for non-commercial purposes.
- - You are free to use and redistribute this code in modified or
-   unmodified form, provided you list us in the credits.
- - If you modify this source code, you must add a notice to each
-   modified source file that it has been changed.  If you're a nice
-   person, you will clearly mark each change too.  :)
- - If you wish to use this for commercial purposes, please contact us at
-   intvnut@gmail.com (Joe Zbiciak), tlindner@macmess.org (tim lindner)
- - This entire notice must remain in the source code.
 
 */
 
@@ -89,11 +76,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	UINT32 getb(int len);
@@ -108,7 +95,7 @@ private:
 
 	int            m_silent;          /* Flag: SP0256 is silent.                      */
 
-	INT16         *m_scratch;         /* Scratch buffer for audio.                    */
+	std::unique_ptr<INT16[]>    m_scratch;         /* Scratch buffer for audio.                    */
 	UINT32         m_sc_head;         /* Head pointer into scratch circular buf       */
 	UINT32         m_sc_tail;         /* Tail pointer into scratch circular buf       */
 

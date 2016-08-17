@@ -25,7 +25,7 @@ public:
 	dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
@@ -44,13 +44,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
 
 	// dmvcart_interface overrides
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data);
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data);
+	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data) override;
+	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data) override;
 
 private:
 	required_device<i8255_device> m_ppi;

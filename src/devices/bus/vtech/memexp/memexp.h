@@ -45,7 +45,7 @@
 
 #define MCFG_MEMEXP_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MEMEXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(memexp_slot_carts, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(memexp_slot_carts, nullptr, false)
 
 #define MCFG_MEMEXP_SLOT_INT_HANDLER(_devcb) \
 	devcb = &memexp_device::set_int_handler(*device, DEVCB_##_devcb);
@@ -93,8 +93,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	device_memexp_interface *m_cart;
 

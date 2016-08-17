@@ -1,8 +1,16 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   main.lua
+--
+--   Rules for building main binary
+--
+---------------------------------------------------------------------------
+
 function mainProject(_target, _subtarget)
-if (_OPTIONS["DRIVERS"] == nil) then 
+if (_OPTIONS["SOURCES"] == nil) then
 	if (_target == _subtarget) then
 		project (_target)
 	else
@@ -11,19 +19,41 @@ if (_OPTIONS["DRIVERS"] == nil) then
 		else
 			project (_target .. _subtarget)
 		end
-	end	
+	end
 else
 	project (_subtarget)
-end	
+end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
-	options {
-		"ForceCPP",
-	}
+	configuration { "android*" }
+		targetprefix "lib"
+		targetname "main"
+		targetextension ".so"
+		linkoptions {
+			"-shared",
+			"-Wl,-soname,libmain.so"
+		}
+		links {
+			"EGL",
+			"GLESv1_CM",
+			"GLESv2",
+			"SDL2",
+		}
+	configuration { "pnacl" }
+		kind "ConsoleApp"
+		targetextension ".pexe"
+		links {
+			"ppapi",
+			"ppapi_gles2",
+			"pthread",
+		}
+	configuration {  }
+
+	addprojectflags()
 	flags {
 		"NoManifest",
-		"Symbols", -- always include minimum symbols for executables 
+		"Symbols", -- always include minimum symbols for executables
 	}
 
 	if _OPTIONS["SYMBOLS"] then
@@ -33,12 +63,12 @@ end
 				"$(SILENT) objdump --section=.text --line-numbers --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
 			}
 	end
-	
+
 	configuration { "vs*" }
 	flags {
 		"Unicode",
 	}
-if (_OPTIONS["DRIVERS"] == nil) then 
+
 	configuration { "x64", "Release" }
 		targetsuffix "64"
 		if _OPTIONS["PROFILE"] then
@@ -74,91 +104,153 @@ if (_OPTIONS["DRIVERS"] == nil) then
 		if _OPTIONS["PROFILE"] then
 			targetsuffix "dp"
 		end
-end
+
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
+	configuration { "rpi" }
+		targetextension ""
+
 	configuration { "asmjs" }
-		targetextension ".bc"  
+		targetextension ".bc"
+		if os.getenv("EMSCRIPTEN") then
+			local emccopts = ""
+				.. " -O" .. _OPTIONS["OPTIMIZE"]
+				.. " -s USE_SDL=2"
+				.. " -s USE_SDL_TTF=2"
+				.. " --memory-init-file 0"
+				.. " -s ALLOW_MEMORY_GROWTH=0"
+				.. " -s TOTAL_MEMORY=268435456"
+				.. " -s DISABLE_EXCEPTION_CATCHING=2"
+				.. " -s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\",\"__ZN12cli_frontend7executeEiPPc\"]'"
+				.. " -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey']\""
+				.. " --pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js"
+				.. " --post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js"
+				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains"
+				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects"
+				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/gles@bgfx/shaders/gles"
+				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png"
+
+			if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
+				emccopts = emccopts
+					.. " -g" .. _OPTIONS["SYMLEVEL"]
+					.. " -s DEMANGLE_SUPPORT=1"
+			end
+
+			if _OPTIONS["ARCHOPTS"] then
+				emccopts = emccopts .. " " .. _OPTIONS["ARCHOPTS"]
+			end
+
+			postbuildcommands {
+				os.getenv("EMSCRIPTEN") .. "/emcc " .. emccopts .. " $(TARGET) -o " .. _MAKE.esc(MAME_DIR) .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".js",
+			}
+		end
 
 	configuration { }
 
-	if _OPTIONS["SEPARATE_BIN"]~="1" then 
-		targetdir(MAME_DIR)
+	if _OPTIONS["targetos"]=="android" then
+		includedirs {
+			MAME_DIR .. "3rdparty/SDL2/include",
+		}
+
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/main/android/SDL_android_main.c",
+		}
+		targetsuffix ""
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
+			if _OPTIONS["PLATFORM"]=="arm" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
+			end
+			if _OPTIONS["PLATFORM"]=="arm64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
+			end
+			if _OPTIONS["PLATFORM"]=="mips" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
+			end
+			if _OPTIONS["PLATFORM"]=="mips64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
+			end
+			if _OPTIONS["PLATFORM"]=="x86" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
+			end
+			if _OPTIONS["PLATFORM"]=="x64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
+			end
+		end
+	else
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
+			targetdir(MAME_DIR)
+		end
 	end
-	
+
+if (STANDALONE~=true) then
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
+end
 	links {
 		"osd_" .. _OPTIONS["osd"],
 	}
-	if (_OPTIONS["DRIVERS"] == nil) then 
+	links {
+		"qtdbg_" .. _OPTIONS["osd"],
+	}
+if (STANDALONE~=true) then
+	links {
+		"frontend",
+	}
+end
+if (MACHINES["NETLIST"]~=null) then
+	links {
+		"netlist",
+	}
+end
+	links {
+		"optional",
+		"emu",
+	}
+--if (STANDALONE~=true) then
+	links {
+		"formats",
+	}
+--end
+if #disasm_files > 0 then
+	links {
+		"dasm",
+	}
+end
+	links {
+		"utils",
+		ext_lib("expat"),
+		"softfloat",
+		ext_lib("jpeg"),
+		"7z",
+	}
+if (STANDALONE~=true) then		
+	links {
+		ext_lib("lua"),
+		"lualibs",
+	}
+end
+	if _OPTIONS["USE_LIBUV"]=="1" then
 		links {
-			"bus",
+			ext_lib("uv"),
 		}
 	end
 	links {
-		"netlist",
-		"optional",
-		"emu",
-		"formats",
-		"dasm",
-		"utils",
-		"expat",
-		"softfloat",
-		"jpeg",
-		"7z",
-		"lua",
-		"lsqlite3",
-		"jsoncpp",
-		"mongoose",
+		ext_lib("zlib"),
+		ext_lib("flac"),
 	}
-
-	if _OPTIONS["with-bundled-zlib"] then
-		links {
-			"zlib",
-		}
-	else
-		links {
-			"z",
-		}
-	end
-
-	if _OPTIONS["with-bundled-flac"] then
-		links {
-			"flac",
-		}
-	else
-		links {
-			"FLAC",
-		}
-	end
-
-	if _OPTIONS["with-bundled-sqlite3"] then
-		links {
-			"sqllite3",
-		}
-	else
-		links {
-			"sqlite3",
-		}
-	end
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {
-			"portmidi",
+			ext_lib("portmidi"),
 		}
 	end
-	if (USE_BGFX == 1) then
-		links {
-			"bgfx"
-		}
-	end
-	links{
+	links {
+		"bgfx",
 		"ocore_" .. _OPTIONS["osd"],
 	}
-	
+
 	override_resources = false;
-	
+
 	maintargetosdoptions(_target,_subtarget)
 
 	includedirs {
@@ -171,93 +263,121 @@ end
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. _target .. "/layout",
 		GEN_DIR  .. "resource",
+		ext_includedir("zlib"),
+		ext_includedir("flac"),
 	}
 
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
-
+	
+if (STANDALONE==true) then
+	standalone();
+end
+		
+if (STANDALONE~=true) then
 	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
 		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _subtarget .. "-Info.plist"
+			"-sectcreate __TEXT __info_plist " .. _MAKE.esc(GEN_DIR) .. "resource/" .. _subtarget .. "-Info.plist"
 		}
 		custombuildtask {
-			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "-Info.plist",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _subtarget .. "-Info.plist" .. "...",    PYTHON .. " $(1)  -p -b " .. _subtarget .. " $(<) > $(@)" }},
+			{ GEN_DIR .. "version.cpp" ,  GEN_DIR .. "resource/" .. _subtarget .. "-Info.plist",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. _subtarget .. "-Info.plist" .. "...",    PYTHON .. " $(1)  -p -b " .. _subtarget .. " $(<) > $(@)" }},
 		}
 		dependency {
-			{ "$(TARGET)" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "-Info.plist", true  },
+			{ "$(TARGET)" ,  GEN_DIR  .. "resource/" .. _subtarget .. "-Info.plist", true  },
 		}
 
 	end
 	local rctarget = _subtarget
 
 	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
-		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/"  .. _subtarget .. "/" .. rctarget ..".rc"
-		if not os.isfile(rcfile) then
-			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _subtarget .. "/" .. rctarget ..".rc"
-		end
+		rcfile = MAME_DIR .. "scripts/resources/windows/" .. _subtarget .. "/" .. rctarget ..".rc"
 		if os.isfile(rcfile) then
 			files {
 				rcfile,
 			}
 			dependency {
-				{ "$(OBJDIR)/".._subtarget ..".res" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc", true  },
+				{ "$(OBJDIR)/".._subtarget ..".res" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", true  },
 			}
 		else
 			rctarget = "mame"
 			files {
-				MAME_DIR .. "src/mame/osd/windows/mame/mame.rc",
+				MAME_DIR .. "scripts/resources/windows/mame/mame.rc",
 			}
 			dependency {
-				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc", true  },
+				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", true  },
 			}
-		end	
+		end
 	end
 
-	local mainfile = MAME_DIR .. "src/".._target .."/" .. _subtarget ..".c"
+	local mainfile = MAME_DIR .. "src/".._target .."/" .. _subtarget ..".cpp"
 	if not os.isfile(mainfile) then
-		mainfile = MAME_DIR .. "src/".._target .."/" .. _target ..".c"
+		mainfile = MAME_DIR .. "src/".._target .."/" .. _target ..".cpp"
 	end
 	files {
 		mainfile,
-		MAME_DIR .. "src/version.c",
-		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",
+		GEN_DIR .. "version.cpp",
+		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",
 	}
-	
-if (_OPTIONS["DRIVERS"] == nil) then 	
-	dependency {
-		{ "../../../../generated/mame/mame/drivlist.c",  MAME_DIR .. "src/mame/mess.lst", true },
-		{ "../../../../generated/mame/mame/drivlist.c" , MAME_DIR .. "src/mame/arcade.lst", true},
-	}
-	custombuildtask {
-		{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",    {  MAME_DIR .. "src/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
-	}
-end	
 
-if _OPTIONS["FORCE_VERSION_COMPILE"]=="1" then
-	configuration { "gmake" }
-		dependency {
-			{ ".PHONY", ".FORCE", true },
-			{ "$(OBJDIR)/src/version.o", ".FORCE", true },
+	if (_OPTIONS["SOURCES"] == nil) then
+
+		if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt") then
+			dependency {
+			{
+				GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+			}
+			custombuildtask {
+				{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) $(2) $(<) > $(@)" }},
+			}
+		else
+			if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst") then
+				custombuildtask {
+					{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
+				}
+			else
+				dependency {
+				{
+					GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+				}
+				custombuildtask {
+					{ MAME_DIR .. "src/".._target .."/" .. _target ..".lst" ,  GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
+				}
+			end
+		end
+	end
+
+	if (_OPTIONS["SOURCES"] ~= nil) then
+			dependency {
+			{
+				GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+			}
+			custombuildtask {
+				{ GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) $(2) $(<) > $(@)" }},
+			}
+	end
+
+	configuration { "mingw*" }
+		custombuildtask {
+			{ GEN_DIR .. "version.cpp" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
+		}
+
+	configuration { "vs*" }
+		prebuildcommands {
+			"mkdir " .. path.translate(GEN_DIR  .. "resource/","\\") .. " 2>NUL",
+			"@echo Emitting ".. rctarget .. "vers.rc...",
+			PYTHON .. " " .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(GEN_DIR .. "version.cpp","\\") .. " > " .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") ,
 		}
 end
-	configuration { "mingw*" }
-		custombuildtask {	
-			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
-		}	
-	
-	configuration { "vs*" }
-		prebuildcommands {	
-			"mkdir " .. path.translate(GEN_DIR  .. "/resource/","\\") .. " 2>NUL",
-			"@echo Emitting ".. rctarget .. "vers.rc...",
-			PYTHON .. " " .. path.translate(MAME_DIR .. "src/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(MAME_DIR .. "src/version.c","\\") .. " > " .. path.translate(GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc", "\\") ,
-		}	
-	
-	 
+
 	configuration { }
 
-	debugdir (MAME_DIR)
-	debugargs ("-window")
+	if _OPTIONS["DEBUG_DIR"]~=nil then
+		debugdir(_OPTIONS["DEBUG_DIR"])
+	else
+		debugdir (MAME_DIR)
+	end
+	if _OPTIONS["DEBUG_ARGS"]~=nil then
+		debugargs (_OPTIONS["DEBUG_ARGS"])
+	else
+		debugargs ("-window")
+	end	
+	
 end

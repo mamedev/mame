@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   devices.lua
+--
+--   Rules for building device cores
+--
+---------------------------------------------------------------------------
+
 function devicesProject(_target, _subtarget)
 
 	disasm_files = { }
@@ -11,10 +19,15 @@ function devicesProject(_target, _subtarget)
 	uuid (os.uuid("optional-" .. _target .."_" .. _subtarget))
 	kind (LIBTYPE)
 	targetsubdir(_target .."_" .. _subtarget)
-	options {
-		"ForceCPP",
-		"ArchiveSplit",
-	}
+
+	if (_OPTIONS["targetos"] ~= "asmjs") then
+		options {
+			"ArchiveSplit",
+		}
+	end
+
+	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -27,17 +40,9 @@ function devicesProject(_target, _subtarget)
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
+		ext_includedir("expat"),
+		ext_includedir("flac"),
 	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
 
 	dofile(path.join("src", "cpu.lua"))
 
@@ -47,52 +52,15 @@ function devicesProject(_target, _subtarget)
 
 	dofile(path.join("src", "machine.lua"))
 
-if (_OPTIONS["DRIVERS"] == nil) then
-	project ("bus")
-	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
-	kind (LIBTYPE)
-	targetsubdir(_target .."_" .. _subtarget)
-	options {
-		"ForceCPP",
-		"ArchiveSplit",
-	}
-
-	includedirs {
-		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/emu",
-		MAME_DIR .. "src/devices",
-		MAME_DIR .. "src/lib/netlist",
-		MAME_DIR .. "src/lib",
-		MAME_DIR .. "src/lib/util",
-		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "src/mess", -- some mess bus devices need this
-		MAME_DIR .. "src/mame", -- used for nes bus devices
-		GEN_DIR  .. "emu",
-		GEN_DIR  .. "emu/layout",
-	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
-
 	dofile(path.join("src", "bus.lua"))
-else
-	dofile(path.join("src", "bus.lua"))
-end
 
+if #disasm_files > 0 then
 	project ("dasm")
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
 	kind (LIBTYPE)
 	targetsubdir(_target .."_" .. _subtarget)
-	options {
-		"ForceCPP",
-	}
+	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -102,17 +70,8 @@ end
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "emu",
+		ext_includedir("expat"),
 	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
 
 	files {
 		disasm_files
@@ -129,4 +88,6 @@ end
 			disasm_custombuildtask[1]
 		}
 	end
+end
+
 end

@@ -50,9 +50,9 @@ public:
 	template<class _Object> static devcb_base &set_update(device_t &device, _Object object) { return downcast<r10788_device &>(device).m_display.set_callback(object); }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	static const device_timer_id TIMER_DISPLAY = 0;

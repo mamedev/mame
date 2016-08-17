@@ -382,7 +382,7 @@
 	<software name="zcom20"> <!-- CP/M-80 -->
 		<description>Z-Com v2.0</description>
 		<year>1988</year>
-		<publisher>Alpha Systems </publisher>
+		<publisher>Alpha Systems</publisher>
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="235708">
 				<rom name="580nzbk.td0" size="235708" crc="a5b9fab9" sha1="d96c46c32227b4959844729cb54602b809e45d04" offset="0" />

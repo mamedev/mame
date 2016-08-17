@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -113,15 +113,28 @@ namespace bgfx { namespace noop
 		{
 		}
 
-		void resizeTexture(TextureHandle /*_handle*/, uint16_t /*_width*/, uint16_t /*_height*/) BX_OVERRIDE
+		void readTexture(TextureHandle /*_handle*/, void* /*_data*/) BX_OVERRIDE
 		{
+		}
+
+		void resizeTexture(TextureHandle /*_handle*/, uint16_t /*_width*/, uint16_t /*_height*/, uint8_t /*_numMips*/) BX_OVERRIDE
+		{
+		}
+
+		void overrideInternal(TextureHandle /*_handle*/, uintptr_t /*_ptr*/) BX_OVERRIDE
+		{
+		}
+
+		uintptr_t getInternal(TextureHandle /*_handle*/) BX_OVERRIDE
+		{
+			return 0;
 		}
 
 		void destroyTexture(TextureHandle /*_handle*/) BX_OVERRIDE
 		{
 		}
 
-		void createFrameBuffer(FrameBufferHandle /*_handle*/, uint8_t /*_num*/, const TextureHandle* /*_textureHandles*/) BX_OVERRIDE
+		void createFrameBuffer(FrameBufferHandle /*_handle*/, uint8_t /*_num*/, const Attachment* /*_attachment*/) BX_OVERRIDE
 		{
 		}
 

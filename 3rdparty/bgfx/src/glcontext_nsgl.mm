@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -115,6 +115,8 @@ namespace bgfx { namespace gl
 		}
 
 		import();
+
+		g_internalData.context = m_context;
 	}
 
 	void GlContext::destroy()
@@ -125,8 +127,8 @@ namespace bgfx { namespace gl
 			[glView release];
 		}
 
-		m_view    = 0;
-		m_context = 0;
+		m_view    = NULL;
+		m_context = NULL;
 		bx::dlclose(s_opengl);
 	}
 
@@ -134,9 +136,12 @@ namespace bgfx { namespace gl
 	{
 		BX_UNUSED(_width, _height);
 
+#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED >= 1070)
 		bool hidpi = !!(_flags&BGFX_RESET_HIDPI);
 		NSOpenGLView* glView = (NSOpenGLView*)m_view;
-		[glView setWantsBestResolutionOpenGLSurface:hidpi];
+		if ([glView respondsToSelector:@selector(setWantsBestResolutionOpenGLSurface:)])
+			[glView setWantsBestResolutionOpenGLSurface:hidpi];
+#endif // defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED >= 1070)
 
 		bool vsync = !!(_flags&BGFX_RESET_VSYNC);
 		GLint interval = vsync ? 1 : 0;
@@ -147,11 +152,12 @@ namespace bgfx { namespace gl
 
 	uint64_t GlContext::getCaps() const
 	{
+		uint64_t caps = 0;
+#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED >= 1070)
 		NSWindow* nsWindow = (NSWindow*)g_platformData.nwh;
-		uint64_t caps = 1.0f < [nsWindow backingScaleFactor]
-			? BGFX_CAPS_HIDPI
-			: 0
-			;
+		if ([nsWindow respondsToSelector:@selector(backingScaleFactor)] && (1.0f < [nsWindow backingScaleFactor]))
+			caps |= BGFX_CAPS_HIDPI;
+#endif // defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED >= 1070)
 		return caps;
 	}
 
@@ -203,11 +209,21 @@ namespace bgfx { namespace gl
 						_func = (_proto)bx::dlsym(s_opengl, #_import); \
 						BX_TRACE("%p " #_func " (" #_import ")", _func); \
 					} \
-					BGFX_FATAL(_optional || NULL != _func, Fatal::UnableToInitialize, "Failed to create OpenGL context. NSGLGetProcAddress(\"%s\")", #_import); \
+					BGFX_FATAL(_optional || NULL != _func, Fatal::UnableToInitialize, "Failed to create OpenGL context. GetProcAddress(\"%s\")", #_import); \
 				}
 #	include "glimports.h"
 	}
 
 } /* namespace gl */ } // namespace bgfx
+
+void* nsglGetProcAddress(const GLubyte* _name)
+{
+	using namespace bgfx::gl;
+	if (NULL == s_opengl)
+	{
+		s_opengl = bx::dlopen("/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL");
+	}
+	return bx::dlsym(s_opengl, (const char*)_name);
+}
 
 #endif // BX_PLATFORM_OSX && (BGFX_CONFIG_RENDERER_OPENGLES2|BGFX_CONFIG_RENDERER_OPENGLES3|BGFX_CONFIG_RENDERER_OPENGL)

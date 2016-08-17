@@ -31,8 +31,8 @@ public:
 	ata_device_interface *dev() { return m_dev; }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 private:
 	ata_device_interface *m_dev;
@@ -95,8 +95,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual void set_irq(int state);
 	virtual void set_dmarq(int state);

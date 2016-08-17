@@ -42,16 +42,15 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(control2_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(le_bankswitch_w);
 	DECLARE_READ8_MEMBER(guns_r);
 	DECLARE_READ8_MEMBER(gunsaux_r);
 	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);

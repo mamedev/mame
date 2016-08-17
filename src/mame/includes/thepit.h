@@ -27,7 +27,7 @@ public:
 	UINT8 m_flip_y;
 	tilemap_t *m_solid_tilemap;
 	tilemap_t *m_tilemap;
-	UINT8 *m_dummy_tile;
+	std::unique_ptr<UINT8[]> m_dummy_tile;
 	UINT8 m_nmi_mask;
 
 	int m_question_address;
@@ -51,8 +51,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	DECLARE_DRIVER_INIT(rtriv);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(thepit);
 	DECLARE_PALETTE_INIT(suprmous);
 

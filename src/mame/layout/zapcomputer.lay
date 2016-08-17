@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<!-- Black background -->
+		<bezel element="background">
+			<bounds left="00" top="00" right="450" bottom="120" />
+		</bezel>
+
+		<!-- PLAYER1 -->
+		<bezel name="digit0" element="digit">
+			<bounds x="20" y="20" width="50" height="80" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="80" y="20" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit2" element="digit">
+			<bounds x="140" y="20" width="50" height="80" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="200" y="20" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit4" element="digit">
+			<bounds x="320" y="20" width="50" height="80" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds x="380" y="20" width="50" height="80" />
+		</bezel>
+	</view>
+</mamelayout>

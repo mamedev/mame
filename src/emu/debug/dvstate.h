@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __DVSTATE_H__
-#define __DVSTATE_H__
+#ifndef MAME_EMU_DEBUG_DVSTATE_H
+#define MAME_EMU_DEBUG_DVSTATE_H
+
+#pragma once
 
 #include "debugvw.h"
 
@@ -25,14 +27,8 @@ class debug_view_state_source : public debug_view_source
 
 	// construction/destruction
 	debug_view_state_source(const char *name, device_t &device);
-
-public:
-	// getters
-	device_t &device() const { return m_device; }
-
 private:
 	// internal state
-	device_t &          m_device;               // underlying device
 	device_state_interface *m_stateintf;        // state interface
 	device_execute_interface *m_execintf;       // execution interface
 };
@@ -50,20 +46,34 @@ class debug_view_state : public debug_view
 
 protected:
 	// view overrides
-	virtual void view_update();
-	virtual void view_notify(debug_view_notification type);
+	virtual void view_update() override;
+	virtual void view_notify(debug_view_notification type) override;
 
 private:
-	struct state_item
+	class state_item
 	{
+	public:
 		state_item(int index, const char *name, UINT8 valuechars);
+		state_item(const state_item &) = default;
+		state_item(state_item &&) = default;
+		state_item &operator=(const state_item &) = default;
+		state_item &operator=(state_item &&) = default;
 
-		state_item *        m_next;             // next item
-		UINT64              m_lastval;          // last value
-		UINT64              m_currval;          // current value
-		int                 m_index;            // index
-		UINT8               m_vallen;           // number of value chars
-		std::string         m_symbol;           // symbol
+		UINT64 value() const { return m_currval; }
+		bool changed() const { return m_lastval != m_currval; }
+		int index() const { return m_index; }
+		UINT8 value_length() const { return m_vallen; }
+
+		void update(UINT64 newval, bool save);
+
+	private:
+		UINT64      m_lastval;          // last value
+		UINT64      m_currval;          // current value
+		int         m_index;            // index
+		UINT8       m_vallen;           // number of value chars
+
+	public:
+		std::string m_symbol;           // symbol
 	};
 
 	// internal helpers
@@ -72,9 +82,9 @@ private:
 	void recompute();
 
 	// internal state
-	int                 m_divider;              // dividing column
-	UINT64              m_last_update;          // execution counter at last update
-	state_item *        m_state_list;           // state data
+	int                     m_divider;              // dividing column
+	UINT64                  m_last_update;          // execution counter at last update
+	std::vector<state_item> m_state_list;           // state data
 
 	// constants
 	static const int REG_DIVIDER    = -10;
@@ -85,4 +95,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_EMU_DEBUG_DVSTATE_H

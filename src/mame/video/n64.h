@@ -69,26 +69,26 @@
 #endif
 
 #if RDP_RANGE_CHECK
-#define RREADADDR8(in) ((rdp_range_check((in))) ? 0 : (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR]))
-#define RREADIDX16(in) ((rdp_range_check((in) << 1)) ? 0 : (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR]))
-#define RREADIDX32(in) ((rdp_range_check((in) << 2)) ? 0 : rdram[(in)])
+#define RREADADDR8(in) ((rdp_range_check((in))) ? 0 : (((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR]))
+#define RREADIDX16(in) ((rdp_range_check((in) << 1)) ? 0 : (((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR]))
+#define RREADIDX32(in) ((rdp_range_check((in) << 2)) ? 0 : m_rdram[(in)])
 
-#define RWRITEADDR8(in, val)    if(rdp_range_check((in))) { printf("Write8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); } else { ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
-#define RWRITEIDX16(in, val)    if(rdp_range_check((in) << 1)) { printf("Write16: Address %08x out of range!\n", ((object.m_misc_state.m_fb_address >> 1) + curpixel) << 1); fflush(stdout); fatalerror("Address out of range\n"); } else { ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
-#define RWRITEIDX32(in, val)    if(rdp_range_check((in) << 2)) { printf("Write32: Address %08x out of range!\n", (in) << 2); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 2); } else { rdram[(in)] = val;}
+#define RWRITEADDR8(in, val)    if(rdp_range_check((in))) { printf("Write8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); } else { ((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
+#define RWRITEIDX16(in, val)    if(rdp_range_check((in) << 1)) { printf("Write16: Address %08x out of range!\n", ((object.m_misc_state.m_fb_address >> 1) + curpixel) << 1); fflush(stdout); fatalerror("Address out of range\n"); } else { ((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR] = val;}
+#define RWRITEIDX32(in, val)    if(rdp_range_check((in) << 2)) { printf("Write32: Address %08x out of range!\n", (in) << 2); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 2); } else { m_rdram[(in)] = val;}
 #else
-#define RREADADDR8(in) (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR])
-#define RREADIDX16(in) (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR])
-#define RREADIDX32(in) (rdram[(in)])
+#define RREADADDR8(in) (((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR])
+#define RREADIDX16(in) (((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR])
+#define RREADIDX32(in) (m_rdram[(in)])
 
-#define RWRITEADDR8(in, val)    ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;
-#define RWRITEIDX16(in, val)    ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;
-#define RWRITEIDX32(in, val)    rdram[(in)] = val
+#define RWRITEADDR8(in, val)    ((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR] = val;
+#define RWRITEIDX16(in, val)    ((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR] = val;
+#define RWRITEIDX32(in, val)    m_rdram[(in)] = val
 #endif
 
-#define U_RREADADDR8(in) (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR])
-#define U_RREADIDX16(in) (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR])
-#define U_RREADIDX32(in) (rdram[(in)])
+#define U_RREADADDR8(in) (((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR])
+#define U_RREADIDX16(in) (((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR])
+#define U_RREADIDX32(in) (m_rdram[(in)])
 
 #define GETLOWCOL(x)    (((x) & 0x3e) << 2)
 #define GETMEDCOL(x)    (((x) & 0x7c0) >> 3)
@@ -133,14 +133,14 @@ typedef void (*rdp_command_t)(UINT32 w1, UINT32 w2);
 class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 {
 public:
-	n64_rdp(n64_state &state);
+	n64_rdp(n64_state &state, UINT32* rdram, UINT32* dmem);
 
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
 	void init_internal_state()
 	{
-		m_tmem = auto_alloc_array(machine(), UINT8, 0x1000);
-		memset(m_tmem, 0, 0x1000);
+		m_tmem = std::make_unique<UINT8[]>(0x1000);
+		memset(m_tmem.get(), 0, 0x1000);
 
 		UINT8* normpoint = machine().root_device().memregion("normpoint")->base();
 		UINT8* normslope = machine().root_device().memregion("normslope")->base();
@@ -192,11 +192,8 @@ public:
 	void        set_mul_input_alpha(color_t** input, INT32 code, rdp_span_aux* userdata);
 
 	// Texture memory
-	UINT8*      get_tmem8() { return m_tmem; }
-	UINT16*     get_tmem16() { return (UINT16*)m_tmem; }
-
-	// Emulation Accelerators
-	UINT8       get_random() { return m_misc_state.m_random_seed += 0x13; }
+	UINT8*      get_tmem8() { return m_tmem.get(); }
+	UINT16*     get_tmem16() { return (UINT16*)m_tmem.get(); }
 
 	// YUV Factors
 	void        set_yuv_factors(color_t k023, color_t k1, color_t k4, color_t k5) { m_k023 = k023; m_k1 = k1; m_k4 = k4; m_k5 = k5; }
@@ -225,9 +222,6 @@ public:
 	UINT32          dz_compress(UINT32 value);
 	INT32           normalize_dzpix(INT32 sum);
 	bool            z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix, rdp_span_aux* userdata, const rdp_poly_state &object);
-
-	// Fullscreen update-related
-	void            video_update(n64_periphs* n64, bitmap_rgb32 &bitmap);
 
 	// Commands
 	void        cmd_invalid(UINT32 w1, UINT32 w2);
@@ -311,11 +305,9 @@ public:
 	rectangle_t     m_scissor;
 	span_base_t     m_span_base;
 
-	rectangle       m_visarea;
-
 	void            draw_triangle(bool shade, bool texture, bool zbuffer, bool rect);
 
-	void*           m_aux_buf;
+	std::unique_ptr<UINT8[]>  m_aux_buf;
 	UINT32          m_aux_buf_ptr;
 	UINT32          m_aux_buf_index;
 
@@ -335,13 +327,12 @@ private:
 	void    precalc_cvmask_derivatives(void);
 	void    z_build_com_table(void);
 
-	void    video_update16(n64_periphs* n64, bitmap_rgb32 &bitmap);
-	void    video_update32(n64_periphs* n64, bitmap_rgb32 &bitmap);
-
 	typedef void (n64_rdp::*compute_cvg_t) (extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
 	compute_cvg_t   m_compute_cvg[2];
 
 	running_machine* m_machine;
+	UINT32*         m_rdram;
+	UINT32*         m_dmem;
 
 	combine_modes_t m_combine;
 	bool            m_pending_mode_block;
@@ -364,7 +355,7 @@ private:
 	UINT32  m_current;
 	UINT32  m_status;
 
-	UINT8*  m_tmem;
+	std::unique_ptr<UINT8[]>  m_tmem;
 
 	// YUV factors
 	color_t m_k023;
@@ -375,9 +366,6 @@ private:
 	// Texture perspective division
 	INT32 m_norm_point_rom[64];
 	INT32 m_norm_slope_rom[64];
-
-	INT32 m_gamma_table[256];
-	INT32 m_gamma_dither_table[0x4000];
 
 	static UINT32 s_special_9bit_clamptable[512];
 	static const z_decompress_entry_t m_z_dec_table[8];

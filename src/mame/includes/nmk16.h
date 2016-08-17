@@ -1,8 +1,11 @@
-// license:???
-// copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
+// thanks-to:Richard Bush
+
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "machine/nmk004.h"
+#include "machine/gen_latch.h"
 
 class nmk16_state : public driver_device
 {
@@ -13,6 +16,10 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_nmk004(*this, "nmk004"),
+		m_soundlatch(*this, "soundlatch"),
 		m_nmk_bgvideoram0(*this, "nmk_bgvideoram0"),
 		m_nmk_txvideoram(*this, "nmk_txvideoram"),
 		m_mainram(*this, "mainram"),
@@ -25,9 +32,6 @@ public:
 		m_nmk_bgvideoram3(*this, "nmk_bgvideoram3"),
 		m_afega_scroll_0(*this, "afega_scroll_0"),
 		m_afega_scroll_1(*this, "afega_scroll_1"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_nmk004(*this, "nmk004"),
 		m_sprdma_base(0x8000)
 	{}
 
@@ -35,6 +39,11 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<nmk004_device> m_nmk004;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
 	required_shared_ptr<UINT16> m_nmk_bgvideoram0;
 	optional_shared_ptr<UINT16> m_nmk_txvideoram;
 	required_shared_ptr<UINT16> m_mainram;
@@ -47,15 +56,14 @@ public:
 	optional_shared_ptr<UINT16> m_nmk_bgvideoram3;
 	optional_shared_ptr<UINT16> m_afega_scroll_0;
 	optional_shared_ptr<UINT16> m_afega_scroll_1;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	optional_device<nmk004_device> m_nmk004;
+
+
 	int m_sprdma_base;
 	int mask[4*2];
 	int m_simple_scroll;
 	int m_redraw_bitmap;
-	UINT16 *m_spriteram_old;
-	UINT16 *m_spriteram_old2;
+	std::unique_ptr<UINT16[]> m_spriteram_old;
+	std::unique_ptr<UINT16[]> m_spriteram_old2;
 	int m_bgbank;
 	int m_videoshift;
 	int m_bioship_background_bank;
@@ -66,7 +74,7 @@ public:
 	tilemap_t *m_bg_tilemap3;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
-	bitmap_ind16 *m_background_bitmap;
+	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	int m_mustang_bg_xscroll;
 	UINT8 m_scroll[4];
 	UINT8 m_scroll_2[4];
@@ -87,19 +95,13 @@ public:
 	DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_0_w);
 	DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_1_w);
 	DECLARE_WRITE16_MEMBER(afega_soundlatch_w);
-	DECLARE_READ16_MEMBER(mcu_shared_r);
 	DECLARE_WRITE16_MEMBER(hachamf_mainram_w);
 	DECLARE_WRITE16_MEMBER(tdragon_mainram_w);
-	DECLARE_WRITE8_MEMBER(okibank_w);
-	DECLARE_WRITE8_MEMBER(raphero_sound_rombank_w);
 	DECLARE_READ16_MEMBER(vandykeb_r);
 	DECLARE_READ16_MEMBER(tdragonb_prot_r);
 	DECLARE_READ16_MEMBER(afega_unknown_r);
 	DECLARE_WRITE16_MEMBER(afega_scroll0_w);
 	DECLARE_WRITE16_MEMBER(afega_scroll1_w);
-	DECLARE_WRITE16_MEMBER(twinactn_scroll0_w);
-	DECLARE_WRITE16_MEMBER(twinactn_scroll1_w);
-	DECLARE_WRITE16_MEMBER(twinactn_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(nmk_bgvideoram0_w);
 	DECLARE_WRITE16_MEMBER(nmk_bgvideoram1_w);
 	DECLARE_WRITE16_MEMBER(nmk_bgvideoram2_w);
@@ -123,6 +125,7 @@ public:
 	DECLARE_WRITE16_MEMBER(nmk16_x0016_w);
 	DECLARE_WRITE16_MEMBER(nmk16_bioship_x0016_w);
 	DECLARE_DRIVER_INIT(nmk);
+	DECLARE_DRIVER_INIT(tharrier);
 	DECLARE_DRIVER_INIT(vandykeb);
 	DECLARE_DRIVER_INIT(tdragonb);
 	DECLARE_DRIVER_INIT(ssmissin);
@@ -130,6 +133,7 @@ public:
 	DECLARE_DRIVER_INIT(redhawk);
 	DECLARE_DRIVER_INIT(tdragon_prot);
 	DECLARE_DRIVER_INIT(bubl2000);
+	DECLARE_DRIVER_INIT(banked_audiocpu);
 	DECLARE_DRIVER_INIT(grdnstrm);
 	DECLARE_DRIVER_INIT(spec2k);
 	DECLARE_DRIVER_INIT(redfoxwp2a);

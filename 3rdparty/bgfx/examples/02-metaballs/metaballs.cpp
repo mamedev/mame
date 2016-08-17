@@ -1,10 +1,10 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
-#include <bgfx.h>
+#include "bgfx_utils.h"
 
 // embedded shaders
 #include "vs_metaballs.bin.h"
@@ -462,16 +462,18 @@ uint32_t triangulate(uint8_t* _result, uint32_t _stride, const float* __restrict
 
 #define DIMS 32
 
-class Metaballs : public entry::AppI
+class ExampleMetaballs : public entry::AppI
 {
-	void init(int /*_argc*/, char** /*_argv*/) BX_OVERRIDE
+	void init(int _argc, char** _argv) BX_OVERRIDE
 	{
-		m_width = 1280;
-		m_height = 720;
-		m_debug = BGFX_DEBUG_TEXT;
-		m_reset = BGFX_RESET_VSYNC;
+		Args args(_argc, _argv);
 
-		bgfx::init();
+		m_width  = 1280;
+		m_height = 720;
+		m_debug  = BGFX_DEBUG_TEXT;
+		m_reset  = BGFX_RESET_VSYNC;
+
+		bgfx::init(args.m_type, args.m_pciId);
 		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable debug text.
@@ -502,6 +504,11 @@ class Metaballs : public entry::AppI
 			case bgfx::RendererType::Direct3D12:
 				vs_metaballs = bgfx::makeRef(vs_metaballs_dx11, sizeof(vs_metaballs_dx11) );
 				fs_metaballs = bgfx::makeRef(fs_metaballs_dx11, sizeof(fs_metaballs_dx11) );
+				break;
+
+			case bgfx::RendererType::Metal:
+				vs_metaballs = bgfx::makeRef(vs_metaballs_mtl, sizeof(vs_metaballs_mtl) );
+				fs_metaballs = bgfx::makeRef(fs_metaballs_mtl, sizeof(fs_metaballs_mtl) );
 				break;
 
 			default:
@@ -542,7 +549,7 @@ class Metaballs : public entry::AppI
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset) )
 		{
 			// Set view 0 default viewport.
-			bgfx::setViewRect(0, 0, 0, m_width, m_height);
+			bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 
 			// This dummy draw call is here to make sure that view 0 is cleared
 			// if no other draw calls are submitted to view 0.
@@ -570,11 +577,7 @@ class Metaballs : public entry::AppI
 			{
 				float view[16];
 				bx::mtxQuatTranslationHMD(view, hmd->eye[0].rotation, eye);
-
-				float proj[16];
-				bx::mtxProj(proj, hmd->eye[0].fov, 0.1f, 100.0f);
-
-				bgfx::setViewTransform(0, view, proj);
+				bgfx::setViewTransform(0, view, hmd->eye[0].projection, BGFX_VIEW_STEREO, hmd->eye[1].projection);
 
 				// Set view 0 default viewport.
 				//
@@ -592,7 +595,7 @@ class Metaballs : public entry::AppI
 				bgfx::setViewTransform(0, view, proj);
 
 				// Set view 0 default viewport.
-				bgfx::setViewRect(0, 0, 0, m_width, m_height);
+				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 			}
 
 			// Stats.
@@ -771,7 +774,6 @@ class Metaballs : public entry::AppI
 
 	Grid* m_grid;
 	int64_t m_timeOffset;
-
 };
 
-ENTRY_IMPLEMENT_MAIN(Metaballs);
+ENTRY_IMPLEMENT_MAIN(ExampleMetaballs);

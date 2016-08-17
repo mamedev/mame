@@ -26,6 +26,8 @@
 	{
 		EnableSSE      = "-msse",
 		EnableSSE2     = "-msse2",
+		EnableAVX      = "-mavx",
+		EnableAVX2     = "-mavx2",
 		ExtraWarnings  = "-Wall -Wextra",
 		FatalWarnings  = "-Werror",
 		FloatFast      = "-ffast-math",
@@ -52,33 +54,36 @@
 	premake.gcc.platforms =
 	{
 		Native = {
-			cppflags = "-MMD",
+			cppflags = "-MMD -MP",
 		},
 		x32 = {
-			cppflags = "-MMD",
+			cppflags = "-MMD -MP",
 			flags    = "-m32",
 		},
 		x64 = {
-			cppflags = "-MMD",
+			cppflags = "-MMD -MP",
 			flags    = "-m64",
 		},
 		Universal = {
-			cppflags = "",
+			ar       = "libtool",
+			cppflags = "-MMD -MP",
 			flags    = "-arch i386 -arch x86_64 -arch ppc -arch ppc64",
 		},
 		Universal32 = {
-			cppflags = "",
+			ar       = "libtool",
+			cppflags = "-MMD -MP",
 			flags    = "-arch i386 -arch ppc",
 		},
 		Universal64 = {
-			cppflags = "",
+			ar       = "libtool",
+			cppflags = "-MMD -MP",
 			flags    = "-arch x86_64 -arch ppc64",
 		},
 		PS3 = {
 			cc         = "ppu-lv2-g++",
 			cxx        = "ppu-lv2-g++",
 			ar         = "ppu-lv2-ar",
-			cppflags   = "-MMD",
+			cppflags   = "-MMD -MP",
 		},
 		WiiDev = {
 			cppflags    = "-MMD -MP -I$(LIBOGC_INC) $(MACHDEP)",
@@ -190,7 +195,35 @@
 		return result
 	end
 
+--
+-- Given a path, return true if it's considered a real path
+-- to a library file, false otherwise.
+--  p: path
+--
+	function premake.gcc.islibfile(p)
+		if path.getextension(p) == ".a" then
+			return true
+		end
+		return false
+	end
 
+--
+-- Returns a list of project-relative paths to external library files.
+-- This function examines the linker flags and returns any that seem to be
+-- a real path to a library file (e.g. "path/to/a/library.a", but not "GL").
+-- Useful for adding to targets to trigger a relink when an external static
+-- library gets updated.
+--  cfg: configuration
+--
+	function premake.gcc.getlibfiles(cfg)
+		local result = {}
+		for _, value in ipairs(premake.getlinks(cfg, "system", "fullpath")) do
+			if premake.gcc.islibfile(value) then
+				table.insert(result, _MAKE.esc(value))
+			end
+		end
+		return result
+	end
 
 --
 -- This is poorly named: returns a list of linker flags for external
@@ -200,16 +233,57 @@
 
 	function premake.gcc.getlinkflags(cfg)
 		local result = {}
-		for _, value in ipairs(premake.getlinks(cfg, "system", "name")) do
-			if path.getextension(value) == ".framework" then
+		for _, value in ipairs(premake.getlinks(cfg, "system", "fullpath")) do
+			if premake.gcc.islibfile(value) then
+				table.insert(result, _MAKE.esc(value))
+			elseif path.getextension(value) == ".framework" then
 				table.insert(result, '-framework ' .. _MAKE.esc(path.getbasename(value)))
 			else
-				table.insert(result, '-l' .. _MAKE.esc(value))
+				table.insert(result, '-l' .. _MAKE.esc(path.getname(value)))
 			end
 		end
 		return result
 	end
 
+--
+-- Get flags for passing to AR before the target is appended to the commandline
+--  prj: project
+--  cfg: configuration
+--  ndx: true if the final step of a split archive
+--
+
+	function premake.gcc.getarchiveflags(prj, cfg, ndx)
+		local result = {}
+		if cfg.platform:startswith("Universal") then
+				if prj.options.ArchiveSplit then
+					error("gcc tool 'Universal*' platforms do not support split archives")
+				end
+				table.insert(result, '-o')
+		else
+			if (not prj.options.ArchiveSplit) then
+				if premake.gcc.llvm then
+					table.insert(result, 'rcs')
+				else
+					table.insert(result, '-rcs')
+				end
+			else
+				if premake.gcc.llvm then
+					if (not ndx) then
+						table.insert(result, 'qc')
+					else
+						table.insert(result, 'cs')
+					end
+				else
+					if (not ndx) then
+						table.insert(result, '-qc')
+					else
+						table.insert(result, '-cs')
+					end
+				end
+			end
+		end
+		return result
+	end
 
 
 --
@@ -238,6 +312,17 @@
 		return result
 	end
 
+--
+-- Decorate user include file search paths for the GCC command line.
+--
+
+	function premake.gcc.getquoteincludedirs(includedirs)
+		local result = { }
+		for _,dir in ipairs(includedirs) do
+			table.insert(result, "-iquote " .. _MAKE.esc(dir))
+		end
+		return result
+	end
 
 --
 -- Return platform specific project and configuration level

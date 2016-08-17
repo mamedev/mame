@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Jeremie Roy. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
+#include "bgfx_utils.h"
 
-#include <bgfx.h>
 #include <bx/timer.h>
 #include <bx/string.h>
 #include <bx/fpumath.h>
@@ -13,6 +13,9 @@
 #include "font/font_manager.h"
 #include "font/text_buffer_manager.h"
 #include "entry/input.h"
+
+#include <iconfontheaders/icons_font_awesome.h>
+#include <iconfontheaders/icons_kenney.h>
 
 #include <stdio.h>
 #include <wchar.h>
@@ -46,15 +49,16 @@ TrueTypeHandle loadTtf(FontManager* _fm, const char* _filePath)
 	return invalid;
 }
 
-int _main_(int /*_argc*/, char** /*_argv*/)
+int _main_(int _argc, char** _argv)
 {
+	Args args(_argc, _argv);
+
 	uint32_t width = 1280;
 	uint32_t height = 720;
 	uint32_t debug = BGFX_DEBUG_TEXT;
 	uint32_t reset = BGFX_RESET_VSYNC;
 
-	bgfx::init();
-
+	bgfx::init(args.m_type, args.m_pciId);
 	bgfx::reset(width, height, reset);
 
 	// Enable debug text.
@@ -104,10 +108,12 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	}
 
 	TrueTypeHandle fontAwesomeTtf = loadTtf(fontManager, "font/fontawesome-webfont.ttf");
+	TrueTypeHandle fontKenneyTtf  = loadTtf(fontManager, "font/kenney-icon-font.ttf");
 
 	// This font doesn't have any preloaded glyph's but the truetype file
 	// is loaded so glyph will be generated as needed.
 	FontHandle fontAwesome72 = fontManager->createFontByPixelSize(fontAwesomeTtf, 0, 72);
+	FontHandle fontKenney64  = fontManager->createFontByPixelSize(fontKenneyTtf,  0, 64);
 
 	TrueTypeHandle visitorTtf = loadTtf(fontManager, "font/visitor1.ttf");
 
@@ -159,7 +165,24 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	textBufferManager->appendText(staticText, fonts[0], L"dog\n");
 
 	textBufferManager->setStyle(staticText, STYLE_NORMAL);
-	textBufferManager->appendText(staticText, fontAwesome72, L"\xf011 \xf02e \xf061 \xf087 \xf0d9 \xf099 \xf05c \xf021 \xf113\n");
+	textBufferManager->appendText(staticText, fontAwesome72,
+			" " ICON_FA_POWER_OFF
+			" " ICON_FA_TWITTER_SQUARE
+			" " ICON_FA_CERTIFICATE
+			" " ICON_FA_FLOPPY_O
+			" " ICON_FA_GITHUB
+			" " ICON_FA_GITHUB_ALT
+			"\n"
+			);
+	textBufferManager->appendText(staticText, fontKenney64,
+			" " ICON_KI_COMPUTER
+			" " ICON_KI_JOYSTICK
+			" " ICON_KI_EXLAMATION
+			" " ICON_KI_STAR
+			" " ICON_KI_BUTTON_START
+			" " ICON_KI_DOWNLOAD
+			"\n"
+			);
 
 	// Create a transient buffer for real-time data.
 	TextBufferHandle transientText = textBufferManager->createTextBuffer(FONT_TYPE_ALPHA, BufferType::Transient);
@@ -227,7 +250,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 			float ortho[16];
 			bx::mtxOrtho(ortho, centering, width + centering, height + centering, centering, -1.0f, 1.0f);
 			bgfx::setViewTransform(0, view, ortho);
-			bgfx::setViewRect(0, 0, 0, width, height);
+			bgfx::setViewRect(0, 0, 0, uint16_t(width), uint16_t(height) );
 		}
 
 		// Submit the debug text.
@@ -241,10 +264,12 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		bgfx::frame();
 	}
 
+	fontManager->destroyTtf(fontKenneyTtf);
 	fontManager->destroyTtf(fontAwesomeTtf);
 	fontManager->destroyTtf(visitorTtf);
 
 	// Destroy the fonts.
+	fontManager->destroyFont(fontKenney64);
 	fontManager->destroyFont(fontAwesome72);
 	fontManager->destroyFont(visitor10);
 	for (uint32_t ii = 0; ii < numFonts; ++ii)

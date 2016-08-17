@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
+
 class pbaction_state : public driver_device
 {
 public:
@@ -21,6 +23,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
@@ -41,6 +44,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	UINT8      m_nmi_mask;
@@ -54,12 +58,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pbaction_scroll_w);
 	DECLARE_WRITE8_MEMBER(pbaction_flipscreen_w);
 	DECLARE_DRIVER_INIT(pbactio3);
-	DECLARE_DRIVER_INIT(pbactio4);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_pbaction(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pbaction_interrupt);
 	INTERRUPT_GEN_MEMBER(vblank_irq);

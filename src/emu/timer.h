@@ -35,27 +35,27 @@
 	timer_device::static_configure_generic(*device, timer_device_expired_delegate());
 #define MCFG_TIMER_DRIVER_ADD(_tag, _class, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0));
+	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr));
 #define MCFG_TIMER_DEVICE_ADD(_tag, _devtag, _class, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)0));
+	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr));
 #define MCFG_TIMER_DRIVER_ADD_PERIODIC(_tag, _class, _callback, _period) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0), _period);
+	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _period);
 #define MCFG_TIMER_DEVICE_ADD_PERIODIC(_tag, _devtag, _class, _callback, _period) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)0), _period);
+	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr), _period);
 #define MCFG_TIMER_DRIVER_ADD_SCANLINE(_tag, _class, _callback, _screen, _first_vpos, _increment) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0), _screen, _first_vpos, _increment);
+	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _screen, _first_vpos, _increment);
 #define MCFG_TIMER_DEVICE_ADD_SCANLINE(_tag, _devtag, _class, _callback, _screen, _first_vpos, _increment) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)0), _screen, _first_vpos, _increment);
+	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr), _screen, _first_vpos, _increment);
 #define MCFG_TIMER_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_TIMER_DRIVER_CALLBACK(_class, _callback) \
-	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0));
+	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr));
 #define MCFG_TIMER_START_DELAY(_start_delay) \
 	timer_device::static_set_start_delay(*device, _start_delay);
 #define MCFG_TIMER_PARAM(_param) \
@@ -98,13 +98,13 @@ public:
 	bool enabled() const { return m_timer->enabled(); }
 
 	// property setters
-	void set_param(int param) { assert(m_type == TIMER_TYPE_GENERIC); m_timer->set_param(param); }
+	void set_param(int param) const { assert(m_type == TIMER_TYPE_GENERIC); m_timer->set_param(param); }
 	void set_ptr(void *ptr) { m_ptr = ptr; }
-	void enable(bool enable = true) { m_timer->enable(enable); }
+	void enable(bool enable = true) const { m_timer->enable(enable); }
 
 	// adjustments
 	void reset() { adjust(attotime::never, 0, attotime::never); }
-	void adjust(const attotime &duration, INT32 param = 0, const attotime &period = attotime::never) { assert(m_type == TIMER_TYPE_GENERIC); m_timer->adjust(duration, param, period); }
+	void adjust(const attotime &duration, INT32 param = 0, const attotime &period = attotime::never) const { assert(m_type == TIMER_TYPE_GENERIC); m_timer->adjust(duration, param, period); }
 
 	// timing information
 	attotime time_elapsed() const { return m_timer->elapsed(); }
@@ -114,10 +114,10 @@ public:
 
 private:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// timer types
 	enum timer_type

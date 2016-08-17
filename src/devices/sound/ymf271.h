@@ -16,8 +16,7 @@
 #define MCFG_YMF271_EXT_WRITE_HANDLER(_devcb) \
 	devcb = &ymf271_device::set_ext_write_handler(*device, DEVCB_##_devcb);
 
-class ymf271_device : public device_t,
-									public device_sound_interface
+class ymf271_device : public device_t, public device_sound_interface
 {
 public:
 	ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -32,13 +31,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
 	struct YMF271Slot
 	{
@@ -121,9 +120,9 @@ private:
 	inline bool check_envelope_end(YMF271Slot *slot);
 
 	// lookup tables
-	INT16 *m_lut_waves[8];
-	double *m_lut_plfo[4][8];
-	int *m_lut_alfo[4];
+	std::unique_ptr<INT16[]> m_lut_waves[8];
+	std::unique_ptr<double[]> m_lut_plfo[4][8];
+	std::unique_ptr<int[]> m_lut_alfo[4];
 	double m_lut_ar[64];
 	double m_lut_dc[64];
 	double m_lut_lfo[256];
@@ -147,13 +146,14 @@ private:
 	UINT8 m_ext_rw;
 	UINT8 m_ext_readlatch;
 
-	UINT8 *m_mem_base;
+	optional_region_ptr<UINT8> m_mem_base;
 	UINT32 m_mem_size;
 	UINT32 m_clock;
 
-	emu_timer *m_timA, *m_timB;
+	emu_timer *m_timA;
+	emu_timer *m_timB;
 	sound_stream *m_stream;
-	INT32 *m_mix_buffer;
+	std::unique_ptr<INT32[]> m_mix_buffer;
 
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_ext_read_handler;

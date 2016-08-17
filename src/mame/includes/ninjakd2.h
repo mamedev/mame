@@ -16,6 +16,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_pcm(*this, "pcm"),
+		m_pcm_region(*this, "pcm"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -28,6 +29,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<samples_device> m_pcm;
+	optional_memory_region m_pcm_region;
 	optional_shared_ptr<UINT8> m_bg_videoram;
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -54,9 +56,9 @@ public:
 	UINT8 m_robokid_bg0_bank;
 	UINT8 m_robokid_bg1_bank;
 	UINT8 m_robokid_bg2_bank;
-	UINT8* m_robokid_bg0_videoram;
-	UINT8* m_robokid_bg1_videoram;
-	UINT8* m_robokid_bg2_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg0_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg1_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg2_videoram;
 	UINT8 m_rom_bank_mask;
 
 	void omegaf_io_protection_start();
@@ -100,9 +102,9 @@ public:
 	TILE_GET_INFO_MEMBER(robokid_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg2_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(mnight);
 	DECLARE_VIDEO_START(arkarea);
 	DECLARE_VIDEO_START(robokid);
@@ -121,5 +123,4 @@ public:
 	void update_sprites();
 	void lineswap_gfx_roms(const char *region, const int bit);
 	void gfx_unscramble();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

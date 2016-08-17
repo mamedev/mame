@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_reg);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state

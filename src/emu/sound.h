@@ -52,7 +52,6 @@ struct mixer_input
 
 class sound_stream
 {
-	friend class simple_list<sound_stream>;
 	friend class sound_manager;
 
 	typedef void (*stream_update_func)(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -94,10 +93,10 @@ class sound_stream
 	static const UINT32 FRAC_ONE                = 1 << FRAC_BITS;
 	static const UINT32 FRAC_MASK               = FRAC_ONE - 1;
 
+public:
 	// construction/destruction
 	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback);
 
-public:
 	// getters
 	sound_stream *next() const { return m_next; }
 	device_t &device() const { return m_device; }
@@ -106,7 +105,7 @@ public:
 	attotime sample_period() const { return attotime(0, m_attoseconds_per_sample); }
 	int input_count() const { return m_input.size(); }
 	int output_count() const { return m_output.size(); }
-	const char *input_name(int inputnum, std::string &str) const;
+	std::string input_name(int inputnum) const;
 	device_t *input_source_device(int inputnum) const;
 	int input_source_outputnum(int inputnum) const;
 	float user_gain(int inputnum) const;
@@ -199,7 +198,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	int attenuation() const { return m_attenuation; }
-	sound_stream *first_stream() const { return m_stream_list.first(); }
+	const std::vector<std::unique_ptr<sound_stream>> &streams() const { return m_stream_list; }
 	attotime last_update() const { return m_last_update; }
 	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
 
@@ -207,6 +206,8 @@ public:
 	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback = stream_update_delegate());
 
 	// global controls
+	void start_recording();
+	void stop_recording();
 	void set_attenuation(int attenuation);
 	void ui_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_UI); }
 	void debugger_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_DEBUGGER); }
@@ -222,10 +223,10 @@ private:
 	void reset();
 	void pause();
 	void resume();
-	void config_load(int config_type, xml_data_node *parentnode);
-	void config_save(int config_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
-	void update(void *ptr = NULL, INT32 param = 0);
+	void update(void *ptr = nullptr, INT32 param = 0);
 
 	// internal state
 	running_machine &   m_machine;              // reference to our machine
@@ -243,7 +244,7 @@ private:
 	wav_file *          m_wavfile;
 
 	// streams data
-	simple_list<sound_stream> m_stream_list;    // list of streams
+	std::vector<std::unique_ptr<sound_stream>> m_stream_list;    // list of streams
 	attoseconds_t       m_update_attoseconds;   // attoseconds between global updates
 	attotime            m_last_update;          // last update time
 };

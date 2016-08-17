@@ -23,15 +23,23 @@
 #define __TMS32025_H__
 
 
+#define MCFG_TMS32025_BIO_IN_CB(_devcb) \
+	devcb = &tms32025_device::set_bio_in_cb(*device, DEVCB_##_devcb); /* BIO input  */
 
+#define MCFG_TMS32025_HOLD_IN_CB(_devcb) \
+	devcb = &tms32025_device::set_hold_in_cb(*device, DEVCB_##_devcb); /* HOLD input */
 
-#define TMS32025_BIO        0x10000     /* BIO input  */
-#define TMS32025_HOLD       0x10001     /* HOLD input */
-#define TMS32025_HOLDA      0x10001     /* HOLD Acknowledge output */
-#define TMS32025_XF         0x10002     /* XF output  */
-#define TMS32025_DR         0x10003     /* Serial Data  Receive  input  */
-#define TMS32025_DX         0x10003     /* Serial Data  Transmit output */
+#define MCFG_TMS32025_HOLD_ACK_OUT_CB(_devcb) \
+	devcb = &tms32025_device::set_hold_ack_out_cb(*device, DEVCB_##_devcb); /* HOLD Acknowledge output */
 
+#define MCFG_TMS32025_XF_OUT_CB(_devcb) \
+	devcb = &tms32025_device::set_xf_out_cb(*device, DEVCB_##_devcb); /* XF output  */
+
+#define MCFG_TMS32025_DR_IN_CB(_devcb) \
+	devcb = &tms32025_device::set_dr_in_cb(*device, DEVCB_##_devcb); /* Serial Data  Receive  input  */
+
+#define MCFG_TMS32025_DX_OUT_CB(_devcb) \
+	devcb = &tms32025_device::set_dx_out_cb(*device, DEVCB_##_devcb); /* Serial Data  Transmit output */
 
 
 /****************************************************************************
@@ -76,33 +84,41 @@ public:
 	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
+	// static configuration helpers
+	template<class _Object> static devcb_base & set_bio_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_bio_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_hold_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_hold_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_hold_ack_out_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_hold_ack_out.set_callback(object); }
+	template<class _Object> static devcb_base & set_xf_out_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_xf_out.set_callback(object); }
+	template<class _Object> static devcb_base & set_dr_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_dr_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_dx_out_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_dx_out.set_callback(object); }
+
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 4; }
-	virtual UINT32 execute_max_cycles() const { return 20; }
-	virtual UINT32 execute_input_lines() const { return 6; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 4; }
+	virtual UINT32 execute_max_cycles() const override { return 20; }
+	virtual UINT32 execute_input_lines() const override { return 6; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
-	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value);
-	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) ); }
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value) override;
+	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value) override;
+	virtual bool memory_readop(offs_t offset, int size, UINT64 &value) override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	address_space_config m_program_config;
@@ -118,6 +134,13 @@ private:
 	static const tms32025_opcode s_opcode_main[256];
 	static const tms32025_opcode s_opcode_CE_subset[256];
 	static const tms32025_opcode s_opcode_Dx_subset[8];
+
+	devcb_read16 m_bio_in;
+	devcb_read16 m_hold_in;
+	devcb_write16 m_hold_ack_out;
+	devcb_write16 m_xf_out;
+	devcb_read16 m_dr_in;
+	devcb_write16 m_dx_out;
 
 
 	/******************** CPU Internal Registers *******************/
@@ -276,7 +299,6 @@ private:
 	void mpys();
 	void mpyu();
 	void neg();
-	void nop();
 	void norm();
 	void or_();
 	void ork();
@@ -357,7 +379,7 @@ public:
 	tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_reset();
+	virtual void device_reset() override;
 };
 
 

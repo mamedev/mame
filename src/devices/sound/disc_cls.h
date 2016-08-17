@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:K.Wilkins, Derrick Renaud, F.Palazzolo, Couriersud
+// license:BSD-3-Clause
+// copyright-holders:K.Wilkins,Couriersud,Derrick Renaud,Frank Palazzolo
 #pragma once
 
 #ifndef __DISC_CLS_H__
@@ -40,9 +40,9 @@ class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_ste
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)                             \
 	DISCRETE_CLASS_DESTRUCTOR(_name)                                    \
 public:                                                                 \
-	void step(void);                                                    \
-	void reset(void);                                                   \
-	int max_output(void) { return _maxout; }                    \
+	virtual void step(void) override;                                                    \
+	virtual void reset(void) override;                                                   \
+	virtual int max_output(void) override { return _maxout; }                    \
 private:                                                                \
 	_priv                                                               \
 }
@@ -53,9 +53,9 @@ class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_ste
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)                             \
 	DISCRETE_CLASS_DESTRUCTOR(_name)                                    \
 public:                                                                 \
-	void step(void);                                                    \
-	void reset(void)            { this->step(); }                       \
-	int max_output(void) { return _maxout; }                    \
+	virtual void step(void) override;                                   \
+	virtual void reset(void) override  { this->step(); }                \
+	virtual int max_output(void) override { return _maxout; }           \
 private:                                                                \
 	_priv                                                               \
 }
@@ -66,8 +66,8 @@ class DISCRETE_CLASS_NAME(_name): public discrete_base_node             \
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)                             \
 	DISCRETE_CLASS_DESTRUCTOR(_name)                                    \
 public:                                                                 \
-	void reset(void);                                                   \
-	int max_output(void) { return _maxout; }                    \
+	virtual void reset(void) override;                                                    \
+	virtual int max_output(void) override { return _maxout; }                    \
 }
 
 #define  DISCRETE_CLASS(_name, _maxout, _priv)                      \
@@ -76,11 +76,11 @@ class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_ste
 	DISCRETE_CLASS_DESTRUCTOR(_name)                                    \
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)                             \
 public:                                                                 \
-	void step(void);                                                    \
-	void reset(void);                                                   \
-	void start(void);                                                   \
-	void stop(void);                                                    \
-	int max_output(void) { return _maxout; }                    \
+	virtual void step(void) override;                                                    \
+	virtual void reset(void) override;                                                   \
+	virtual void start(void) override;                                                   \
+	virtual void stop(void) override;                                                    \
+	virtual int max_output(void) override { return _maxout; }                    \
 private:                                                                \
 	_priv                                                               \
 }
@@ -90,7 +90,7 @@ class DISCRETE_CLASS_NAME(special): public discrete_base_node
 	DISCRETE_CLASS_CONSTRUCTOR(special, base)
 	DISCRETE_CLASS_DESTRUCTOR(special)
 public:
-	int max_output(void) { return 0; }
+	virtual int max_output(void) override { return 0; }
 };
 
 class DISCRETE_CLASS_NAME(unimplemented): public discrete_base_node
@@ -98,7 +98,7 @@ class DISCRETE_CLASS_NAME(unimplemented): public discrete_base_node
 	DISCRETE_CLASS_CONSTRUCTOR(unimplemented, base)
 	DISCRETE_CLASS_DESTRUCTOR(unimplemented)
 public:
-	int max_output(void) { return 0; }
+	virtual int max_output(void) override { return 0; }
 };
 
 /*************************************
@@ -114,14 +114,14 @@ class DISCRETE_CLASS_NAME(dso_output):  public discrete_base_node,
 	DISCRETE_CLASS_CONSTRUCTOR(dso_output, base)
 	DISCRETE_CLASS_DESTRUCTOR(dso_output)
 public:
-	void step(void) {
+	virtual void step(void) override {
 		/* Add gain to the output and put into the buffers */
 		/* Clipping will be handled by the main sound system */
 		double val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
 		*m_ptr++ = val;
 	}
-	int max_output(void) { return 0; }
-	void set_output_ptr(stream_sample_t *ptr) { m_ptr = ptr; }
+	virtual int max_output(void) override { return 0; }
+	virtual void set_output_ptr(stream_sample_t *ptr) override { m_ptr = ptr; }
 private:
 	stream_sample_t     *m_ptr;
 };
@@ -148,8 +148,8 @@ class DISCRETE_CLASS_NAME(dss_adjustment): public discrete_base_node, public dis
 	DISCRETE_CLASS_CONSTRUCTOR(dss_adjustment, base)
 	DISCRETE_CLASS_DESTRUCTOR(dss_adjustment)
 public:
-	void step(void);
-	void reset(void);
+	virtual void step(void) override;
+	virtual void reset(void) override;
 private:
 	ioport_port *m_port;
 	INT32                   m_lastpval;
@@ -166,8 +166,8 @@ class DISCRETE_CLASS_NAME(dss_input_data): public discrete_base_node, public dis
 	DISCRETE_CLASS_DESTRUCTOR(dss_input_data)
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_data, base)
 public:
-	void reset(void);
-	void input_write(int sub_node, UINT8 data );
+	virtual void reset(void) override;
+	virtual void input_write(int sub_node, UINT8 data ) override;
 private:
 	double      m_gain;             /* node gain */
 	double      m_offset;           /* node offset */
@@ -179,8 +179,8 @@ class DISCRETE_CLASS_NAME(dss_input_logic): public discrete_base_node, public di
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_logic, base)
 	DISCRETE_CLASS_DESTRUCTOR(dss_input_logic)
 public:
-	void reset(void);
-	void input_write(int sub_node, UINT8 data );
+	virtual void reset(void) override;
+	virtual void input_write(int sub_node, UINT8 data ) override;
 private:
 	double      m_gain;             /* node gain */
 	double      m_offset;           /* node offset */
@@ -192,8 +192,8 @@ class DISCRETE_CLASS_NAME(dss_input_not): public discrete_base_node, public disc
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_not, base)
 	DISCRETE_CLASS_DESTRUCTOR(dss_input_not)
 public:
-	void reset(void);
-	void input_write(int sub_node, UINT8 data );
+	virtual void reset(void) override;
+	virtual void input_write(int sub_node, UINT8 data ) override;
 private:
 	double      m_gain;             /* node gain */
 	double      m_offset;           /* node offset */
@@ -205,9 +205,9 @@ class DISCRETE_CLASS_NAME(dss_input_pulse): public discrete_base_node, public di
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_pulse, base)
 	DISCRETE_CLASS_DESTRUCTOR(dss_input_pulse)
 public:
-	void step(void);
-	void reset(void);
-	void input_write(int sub_node, UINT8 data );
+	virtual void step(void) override;
+	virtual void reset(void) override;
+	virtual void input_write(int sub_node, UINT8 data ) override;
 private:
 	//double      m_gain;             /* node gain */
 	//double      m_offset;           /* node offset */
@@ -219,10 +219,10 @@ class DISCRETE_CLASS_NAME(dss_input_stream): public discrete_base_node, public d
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_stream, base)
 	DISCRETE_CLASS_DESTRUCTOR(dss_input_stream)
 public:
-	void step(void);
-	void reset(void);
-	void start(void);
-	void input_write(int sub_node, UINT8 data );
+	virtual void step(void) override;
+	virtual void reset(void) override;
+	virtual void start(void) override;
+	virtual void input_write(int sub_node, UINT8 data ) override;
 	virtual bool is_buffered(void) { return false; }
 
 	/* This is called by discrete_sound_device */
@@ -247,7 +247,7 @@ class DISCRETE_CLASS_NAME(dss_input_buffer): public DISCRETE_CLASS_NAME(dss_inpu
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_buffer, dss_input_stream)
 	DISCRETE_CLASS_DESTRUCTOR(dss_input_buffer)
 public:
-	bool is_buffered(void) { return true; }
+	virtual bool is_buffered(void) override { return true; }
 };
 
 #include "disc_wav.h"

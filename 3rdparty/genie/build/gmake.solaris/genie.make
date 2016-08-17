@@ -56,7 +56,6 @@ ifeq ($(config),release)
 	$(OBJDIR)/src/host/os_chdir.o \
 	$(OBJDIR)/src/host/os_copyfile.o \
 	$(OBJDIR)/src/host/os_getcwd.o \
-	$(OBJDIR)/src/host/os_getversion.o \
 	$(OBJDIR)/src/host/os_is64bit.o \
 	$(OBJDIR)/src/host/os_isdir.o \
 	$(OBJDIR)/src/host/os_isfile.o \
@@ -134,7 +133,6 @@ ifeq ($(config),debug)
 	$(OBJDIR)/src/host/os_chdir.o \
 	$(OBJDIR)/src/host/os_copyfile.o \
 	$(OBJDIR)/src/host/os_getcwd.o \
-	$(OBJDIR)/src/host/os_getversion.o \
 	$(OBJDIR)/src/host/os_is64bit.o \
 	$(OBJDIR)/src/host/os_isdir.o \
 	$(OBJDIR)/src/host/os_isfile.o \
@@ -249,10 +247,6 @@ $(OBJDIR)/src/host/os_copyfile.o: ../../src/host/os_copyfile.c
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 
 $(OBJDIR)/src/host/os_getcwd.o: ../../src/host/os_getcwd.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%.o=%.d) -c "$<"
-
-$(OBJDIR)/src/host/os_getversion.o: ../../src/host/os_getversion.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 

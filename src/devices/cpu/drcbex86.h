@@ -22,6 +22,7 @@
 
 
 
+namespace drc {
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -36,12 +37,12 @@ public:
 	virtual ~drcbe_x86();
 
 	// required overrides
-	virtual void reset();
-	virtual int execute(uml::code_handle &entry);
-	virtual void generate(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst);
-	virtual bool hash_exists(UINT32 mode, UINT32 pc);
-	virtual void get_info(drcbe_info &info);
-	virtual bool logging() const { return m_log != NULL; }
+	virtual void reset() override;
+	virtual int execute(uml::code_handle &entry) override;
+	virtual void generate(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst) override;
+	virtual bool hash_exists(UINT32 mode, UINT32 pc) override;
+	virtual void get_info(drcbe_info &info) override;
+	virtual bool logging() const override { return m_log != nullptr; }
 
 private:
 	// a be_parameter is similar to a uml::parameter but maps to native registers/memory
@@ -127,7 +128,6 @@ private:
 	void fixup_exception(drccodeptr *codeptr, void *param1, void *param2);
 
 	static void debug_log_hashjmp(int mode, offs_t pc);
-	static void debug_log_hashjmp_fail();
 
 	// code generators
 	void op_handle(x86code *&dst, const uml::instruction &inst);
@@ -181,6 +181,7 @@ private:
 	void op_or(x86code *&dst, const uml::instruction &inst);
 	void op_xor(x86code *&dst, const uml::instruction &inst);
 	void op_lzcnt(x86code *&dst, const uml::instruction &inst);
+	void op_tzcnt(x86code *&dst, const uml::instruction &inst);
 	void op_bswap(x86code *&dst, const uml::instruction &inst);
 	void op_shl(x86code *&dst, const uml::instruction &inst);
 	void op_shr(x86code *&dst, const uml::instruction &inst);
@@ -209,6 +210,8 @@ private:
 	void op_fsqrt(x86code *&dst, const uml::instruction &inst);
 	void op_frecip(x86code *&dst, const uml::instruction &inst);
 	void op_frsqrt(x86code *&dst, const uml::instruction &inst);
+	void op_fcopyi(x86code *&dst, const uml::instruction &inst);
+	void op_icopyf(x86code *&dst, const uml::instruction &inst);
 
 	// 32-bit code emission helpers
 	void emit_mov_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param);
@@ -262,7 +265,6 @@ private:
 	void emit_sbb_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_sbb_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_cmp_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_cmp_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_and_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_and_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_test_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
@@ -272,19 +274,12 @@ private:
 	void emit_xor_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_xor_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_shl_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_shl_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_shr_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_shr_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_sar_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_sar_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_rol_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rol_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_ror_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_ror_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_rcl_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rcl_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_rcr_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rcr_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 
 	// floating-point code emission helpers
 	void emit_fld_p(x86code *&dst, int size, const be_parameter &param);
@@ -342,5 +337,8 @@ private:
 	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 };
 
+} // namespace drc
 
-#endif /* __DRCBEC_H__ */
+using drc::drcbe_x86;
+
+#endif /* __DRCBEX86_H__ */

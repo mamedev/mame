@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+
 #include "sound/dac.h"
+#include "machine/gen_latch.h"
 #include "machine/tmp68301.h"
+
 #define VRAM_MAX    3
 
 class niyanpai_state : public driver_device
@@ -19,7 +22,8 @@ public:
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
@@ -27,6 +31,7 @@ public:
 	required_device<dac_device> m_dac2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// common
 	int m_scrollx[VRAM_MAX];
@@ -47,10 +52,10 @@ public:
 	int m_nb19010_busyctr;
 	int m_nb19010_busyflag;
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
-	UINT16 *m_videoram[VRAM_MAX];
-	UINT16 *m_videoworkram[VRAM_MAX];
-	UINT16 *m_palette_ptr;
-	UINT8 *m_clut[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_videoram[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_videoworkram[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_palette_ptr;
+	std::unique_ptr<UINT8[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer;
 
@@ -86,7 +91,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
 
 	DECLARE_DRIVER_INIT(niyanpai);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(musobana);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -101,5 +106,5 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

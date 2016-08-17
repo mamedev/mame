@@ -27,41 +27,17 @@
 #ifndef NLD_4020_H_
 #define NLD_4020_H_
 
-#include "nl_base.h"
-#include "nld_cmos.h"
+#include "nl_setup.h"
 
 /* FIXME: only used in mario.c */
-#define CD4020_WI(_name, _IP, _RESET, _VDD, _VSS)                              \
-		NET_REGISTER_DEV(CD4020_WI, _name)                                        \
-		NET_CONNECT(_name, IP, _IP)                                            \
-		NET_CONNECT(_name, RESET,  _RESET)                                     \
-		NET_CONNECT(_name, VDD,  _VDD)                                         \
-		NET_CONNECT(_name, VSS,  _VSS)
+#define CD4020_WI(name, cIP, cRESET, cVDD, cVSS)                                \
+		NET_REGISTER_DEV(CD4020_WI, name)                                       \
+		NET_CONNECT(name, IP, cIP)                                              \
+		NET_CONNECT(name, RESET,  cRESET)                                       \
+		NET_CONNECT(name, VDD,  cVDD)                                           \
+		NET_CONNECT(name, VSS,  cVSS)
 
-#define CD4020(_name)                                                          \
-		NET_REGISTER_DEV(CD4020, _name)
-
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_SUBDEVICE(CD4020_sub,
-
-	NETLIB_LOGIC_FAMILY(CD4XXX)
-	ATTR_HOT void update_outputs(const UINT16 cnt);
-
-	logic_input_t m_IP;
-
-	UINT16 m_cnt;
-
-	logic_output_t m_Q[14];
-);
-
-NETLIB_DEVICE(CD4020,
-	NETLIB_LOGIC_FAMILY(CD4XXX)
-	NETLIB_NAME(CD4020_sub) sub;
-	NETLIB_NAME(vdd_vss) m_supply;
-	logic_input_t m_RESET;
-);
-
-NETLIB_NAMESPACE_DEVICES_END()
+#define CD4020(name)                                                            \
+		NET_REGISTER_DEV(CD4020, name)
 
 #endif /* NLD_4020_H_ */

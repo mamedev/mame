@@ -54,12 +54,16 @@ public:
 	// READY input line. When asserted (high), the memory is ready for data exchange.
 	// We chose to use a direct method instead of a delegate to keep performance
 	// footprint low; this method may be called very frequently.
-	void set_ready(int state);
+	DECLARE_WRITE_LINE_MEMBER( ready_line );
 
 	// HOLD input line. When asserted (low), the CPU is requested to release the
 	// data and address bus and enter the HOLD state. The entrance of this state
 	// is acknowledged by the HOLDA output line.
-	void set_hold(int state);
+	DECLARE_WRITE_LINE_MEMBER( hold_line );
+
+	// RESET input line. Unlike the standard set_input_line, this input method
+	// is synchronous and will immediately lead to a reset of the CPU.
+	DECLARE_WRITE_LINE_MEMBER( reset_line );
 
 	// Callbacks
 	template<class _Object> static devcb_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_external_operation.set_callback(object); }
@@ -76,26 +80,26 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void        device_start();
-	virtual void        device_stop();
-	virtual void        device_reset();
+	virtual void        device_start() override;
+	virtual void        device_stop() override;
+	virtual void        device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32      execute_min_cycles() const;
-	virtual UINT32      execute_max_cycles() const;
-	virtual UINT32      execute_input_lines() const;
-	virtual void        execute_set_input(int irqline, int state);
-	virtual void        execute_run();
+	virtual UINT32      execute_min_cycles() const override;
+	virtual UINT32      execute_max_cycles() const override;
+	virtual UINT32      execute_input_lines() const override;
+	virtual void        execute_set_input(int irqline, int state) override;
+	virtual void        execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual UINT32      disasm_min_opcode_bytes() const;
-	virtual UINT32      disasm_max_opcode_bytes() const;
-	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32      disasm_min_opcode_bytes() const override;
+	virtual UINT32      disasm_max_opcode_bytes() const override;
+	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	const address_space_config* memory_space_config(address_spacenum spacenum) const;
+	const address_space_config* memory_space_config(address_spacenum spacenum) const override;
 
-	UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return clocks / 4.0; }
-	UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return cycles * 4.0; }
+	UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return clocks / 4.0; }
+	UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return cycles * 4.0; }
 
 	// Variant of the TMS9995 without internal RAM and decrementer
 	bool    m_mp9537;
@@ -104,9 +108,9 @@ private:
 	// State / debug management
 	UINT16  m_state_any;
 	static const char* s_statename[];
-	void    state_import(const device_state_entry &entry);
-	void    state_export(const device_state_entry &entry);
-	void    state_string_export(const device_state_entry &entry, std::string &str);
+	void    state_import(const device_state_entry &entry) override;
+	void    state_export(const device_state_entry &entry) override;
+	void    state_string_export(const device_state_entry &entry, std::string &str) const override;
 	UINT16  read_workspace_register_debug(int reg);
 	void    write_workspace_register_debug(int reg, UINT16 data);
 
@@ -131,8 +135,9 @@ private:
 	// Processor states
 	bool    m_idle_state;
 	bool    m_nmi_state;
-	bool    m_irq_state;
+//  bool    m_irq_state;
 	bool    m_hold_state;
+	bool    m_hold_requested;
 
 	// READY handling. The READY line is operated before the clock
 	// pulse falls. As the ready line is only set once in this emulation we
@@ -205,7 +210,7 @@ private:
 	inline void pulse_clock(int count);
 
 	// Signal the hold state via the external line
-	inline void set_hold_state(bool state);
+	void set_hold_state(bool state);
 
 	// Only used for the DIV(S) operations. It seems sufficient to let the
 	// command terminate at this point, so this method just calls command_terminated.
@@ -382,7 +387,7 @@ private:
 	void alu_lst_lwp();
 	void alu_mov();
 	void alu_multiply();
-	void alu_multiply_signed();
+//  void alu_multiply_signed();
 	void alu_rtwp();
 	void alu_sbo_sbz();
 	void alu_shift();

@@ -44,6 +44,7 @@ const UINT32 MACHINE_TYPE_COMPUTER             = 0x00100000;   // any kind of co
 const UINT32 MACHINE_TYPE_OTHER                = 0x00200000;   // any other emulated system that doesn't fit above (ex. clock, satelite receiver,...)
 const UINT32 MACHINE_IMPERFECT_KEYBOARD        = 0x00400000;   // keyboard is known to be wrong
 const UINT32 MACHINE_CLICKABLE_ARTWORK         = 0x00800000;   // marking that artwork is clickable and require mouse cursor
+const UINT32 MACHINE_IS_INCOMPLETE             = 0x01000000;   // any official game/system with blantantly incomplete HW or SW should be marked with this
 
 // useful combinations of flags
 const UINT32 MACHINE_IS_SKELETON               = MACHINE_NO_SOUND | MACHINE_NOT_WORKING; // mask for skelly games
@@ -70,10 +71,10 @@ struct game_driver
 	machine_config_constructor machine_config;      // machine driver tokens
 	ioport_constructor  ipt;                        // pointer to constructor for input ports
 	void                (*driver_init)(running_machine &machine); // DRIVER_INIT callback
-	const rom_entry *   rom;                        // pointer to list of ROMs for the game
+	const tiny_rom_entry *   rom;                        // pointer to list of ROMs for the game
 	const char *        compatible_with;
 	UINT32              flags;                      // orientation and other flags; see defines below
-	const char *        default_layout;             // default internally defined layout
+	const internal_layout *        default_layout;             // default internally defined layout
 };
 
 
@@ -94,7 +95,22 @@ struct game_driver
 
 // standard GAME() macro
 #define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)  \
-	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
+extern const game_driver GAME_NAME(NAME) =  \
+{                                           \
+	__FILE__,                               \
+	#PARENT,                                \
+	#NAME,                                  \
+	FULLNAME,                               \
+	#YEAR,                                  \
+	COMPANY,                                \
+	MACHINE_CONFIG_NAME(MACHINE),           \
+	INPUT_PORTS_NAME(INPUT),                \
+	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
+	ROM_NAME(NAME),                         \
+	nullptr,                                   \
+	(MONITOR)|(FLAGS)|MACHINE_TYPE_ARCADE,     \
+	nullptr                             \
+};
 
 // standard macro with additional layout
 #define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)  \
@@ -110,9 +126,9 @@ extern const game_driver GAME_NAME(NAME) =  \
 	INPUT_PORTS_NAME(INPUT),                \
 	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
 	ROM_NAME(NAME),                         \
-	NULL,                                   \
+	nullptr,                                   \
 	(MONITOR)|(FLAGS)|MACHINE_TYPE_ARCADE,     \
-	&LAYOUT[0]                              \
+	&LAYOUT                              \
 };
 
 // standard console definition macro
@@ -131,7 +147,7 @@ extern const game_driver GAME_NAME(NAME) =  \
 	ROM_NAME(NAME),                         \
 	#COMPAT,                                \
 	ROT0|(FLAGS)|MACHINE_TYPE_CONSOLE,         \
-	NULL                                    \
+	nullptr                                    \
 };
 
 // standard computer definition macro
@@ -150,7 +166,7 @@ extern const game_driver GAME_NAME(NAME) =  \
 	ROM_NAME(NAME),                         \
 	#COMPAT,                                \
 	ROT0|(FLAGS)|MACHINE_TYPE_COMPUTER,        \
-	NULL                                    \
+	nullptr                                    \
 };
 
 // standard system definition macro
@@ -169,14 +185,8 @@ extern const game_driver GAME_NAME(NAME) =  \
 	ROM_NAME(NAME),                         \
 	#COMPAT,                                \
 	ROT0|(FLAGS)|MACHINE_TYPE_OTHER,           \
-	NULL                                    \
+	nullptr                                    \
 };
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-GAME_EXTERN(___empty);
 
 #endif

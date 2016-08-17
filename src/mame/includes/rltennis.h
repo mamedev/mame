@@ -29,7 +29,7 @@ public:
 	INT32 m_sample_rom_offset_2;
 	INT32 m_offset_shift;
 	INT32 m_unk_counter;
-	bitmap_ind16 *m_tmp_bitmap[RLT_NUM_BITMAPS];
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[RLT_NUM_BITMAPS];
 	UINT8 *m_samples_1;
 	UINT8 *m_samples_2;
 	UINT8 *m_gfx;
@@ -40,9 +40,9 @@ public:
 	DECLARE_WRITE16_MEMBER(snd2_w);
 	DECLARE_WRITE16_MEMBER(blitter_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

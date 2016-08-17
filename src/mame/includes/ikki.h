@@ -40,9 +40,9 @@ public:
 	DECLARE_READ8_MEMBER(ikki_e000_r);
 	DECLARE_WRITE8_MEMBER(ikki_coin_counters);
 	DECLARE_WRITE8_MEMBER(ikki_scrn_ctrl_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ikki);
 	UINT32 screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ikki_irq);

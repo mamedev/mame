@@ -3,6 +3,9 @@
 #ifndef __NES_SLOT_H__
 #define __NES_SLOT_H__
 
+#include "softlist_dev.h"
+
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -102,7 +105,7 @@ enum
 	UNL_SF3, UNL_RACERMATE, UNL_EDU2K, UNL_LH53, UNL_LH32, UNL_LH10,
 	UNL_STUDYNGAME, UNL_603_5052, UNL_H2288, UNL_2708,
 	UNL_MALISB, UNL_BB, UNL_AC08, UNL_A9746, UNL_WORLDHERO,
-	UNL_43272, UNL_TF1201, UNL_CITYFIGHT,
+	UNL_43272, UNL_TF1201, UNL_CITYFIGHT, UNL_RT01,
 	/* Bootleg boards */
 	BTL_SMB2JA, BTL_MARIOBABY, BTL_AISENSHINICOL, BTL_TOBIDASE,
 	BTL_SMB2JB, BTL_09034A, BTL_SMB3, BTL_SBROS11, BTL_DRAGONNINJA,
@@ -113,6 +116,7 @@ enum
 	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, SUBOR_TYPE0, SUBOR_TYPE1,
 	KAISER_KS7058, KAISER_KS7032, KAISER_KS7022, KAISER_KS7017,
 	KAISER_KS7012, KAISER_KS7013B, KAISER_KS202, KAISER_KS7031,
+	KAISER_KS7016, KAISER_KS7037,
 	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, CONY_BOARD, YOKO_BOARD,
 	RCM_GS2015, RCM_GS2004, RCM_GS2013, RCM_TF9IN1, RCM_3DBLOCK,
 	WAIXING_TYPE_A, WAIXING_TYPE_A1, WAIXING_TYPE_B, WAIXING_TYPE_C, WAIXING_TYPE_D,
@@ -325,7 +329,7 @@ protected:
 	std::vector<UINT16> m_prg_bank_map;
 };
 
-void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
+void nes_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 // ======================> nes_cart_slot_device
 
@@ -339,31 +343,30 @@ public:
 	virtual ~nes_cart_slot_device();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	void call_load_ines();
 	void call_load_unif();
 	void call_load_pcb();
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return "nes_cart"; }
-	virtual const char *file_extensions() const { return "nes,unf,unif"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-	virtual device_image_partialhash_func get_partial_hash() const { return &nes_partialhash; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const char *image_interface() const override { return "nes_cart"; }
+	virtual const char *file_extensions() const override { return "nes,unf,unif"; }
+	virtual device_image_partialhash_func get_partial_hash() const override { return &nes_partialhash; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 	const char * get_default_card_ines(UINT8 *ROM, UINT32 len);
 	const char * get_default_card_unif(UINT8 *ROM, UINT32 len);
 	const char * nes_get_slot(int pcb_id);

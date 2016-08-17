@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Bryan McPhail
 
+#include "machine/gen_latch.h"
 #include "video/decospr.h"
 #include "sound/okim6295.h"
 
@@ -14,12 +15,13 @@ public:
 		m_pf1_data(*this, "pf1_data"),
 		m_pf2_data(*this, "pf2_data"),
 		m_control(*this, "control"),
-		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_sprgen(*this, "spritegen"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */
@@ -28,7 +30,6 @@ public:
 	required_shared_ptr<UINT16> m_pf1_data;
 	required_shared_ptr<UINT16> m_pf2_data;
 	optional_shared_ptr<UINT16> m_control;
-	optional_device<decospr_device> m_sprgen;
 
 	/* misc */
 	int         m_music_command;
@@ -49,6 +50,8 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<decospr_device> m_sprgen;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	UINT8 m_semicom_prot_offset;
 	UINT16 m_protbase;
@@ -126,7 +129,6 @@ public:
 	void tumbleb2_set_music_bank( int bank );
 	void tumbleb2_play_sound( okim6295_device *oki, int data );
 	void process_tumbleb2_music_command( okim6295_device *oki, int data );
-	void tumblepb_patch_code(UINT16 offset);
 	void tumblepb_gfx_rearrange(int rgn);
 	void suprtrio_decrypt_code();
 	void suprtrio_decrypt_gfx();

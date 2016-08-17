@@ -63,7 +63,7 @@ size_t jedbin_output(const jed_data *data, void *result, size_t length);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE int jed_get_fuse(const jed_data *data, UINT32 fusenum)
+static inline int jed_get_fuse(const jed_data *data, UINT32 fusenum)
 {
 	if (fusenum < JED_MAX_FUSES)
 		return (data->fusemap[fusenum / 8] >> (fusenum % 8)) & 1;
@@ -72,7 +72,7 @@ INLINE int jed_get_fuse(const jed_data *data, UINT32 fusenum)
 }
 
 
-INLINE void jed_set_fuse(jed_data *data, UINT32 fusenum, UINT8 value)
+static inline void jed_set_fuse(jed_data *data, UINT32 fusenum, UINT8 value)
 {
 	if (fusenum < JED_MAX_FUSES)
 	{

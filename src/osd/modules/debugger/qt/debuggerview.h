@@ -3,7 +3,7 @@
 #ifndef __DEBUG_QT_DEBUGGER_VIEW_H__
 #define __DEBUG_QT_DEBUGGER_VIEW_H__
 
-#include <QtGui/QtGui>
+#include <QtWidgets/QAbstractScrollArea>
 
 #include "debug/debugvw.h"
 
@@ -15,7 +15,7 @@ class DebuggerView : public QAbstractScrollArea
 public:
 	DebuggerView(const debug_view_type& type,
 					running_machine* machine,
-					QWidget* parent=NULL);
+					QWidget* parent=nullptr);
 	virtual ~DebuggerView();
 
 	void paintEvent(QPaintEvent* event);

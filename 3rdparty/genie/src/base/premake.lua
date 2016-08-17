@@ -4,6 +4,7 @@
 -- Copyright (c) 2002-2009 Jason Perkins and the Premake project
 --
 
+	premake._filelevelconfig = false
 
 --
 -- Open a file for output, and call a function to actually do the writing.
@@ -33,8 +34,7 @@
 		f:close()
 	end
 
-
--- 
+--
 -- Finds a valid premake build file in the specified directory
 -- Used by both the main genie process, and include commands
 --

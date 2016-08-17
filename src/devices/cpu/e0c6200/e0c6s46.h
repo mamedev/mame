@@ -93,14 +93,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const { return 8; }
-	virtual void execute_set_input(int line, int state);
-	virtual void execute_one();
-	virtual bool check_interrupt();
+	virtual UINT32 execute_input_lines() const override { return 8; }
+	virtual void execute_set_input(int line, int state) override;
+	virtual void execute_one() override;
+	virtual bool check_interrupt() override;
 
 private:
 	required_shared_ptr<UINT8> m_vram1;

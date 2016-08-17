@@ -1,0 +1,29 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  gui_opaque.json: Generic opaque shader for GUI elements.
+//
+//============================================================
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "1",
+    	"dstColor": "0",
+    	"srcAlpha": "1",
+    	"dstAlpha": "0"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "vs_gui",
+    "fragment": "fs_gui",
+    "uniforms": [
+    	{ "name": "s_tex", "type": "int",  "values": [ 1.0 ] }
+    ]
+}

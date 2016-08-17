@@ -180,6 +180,7 @@ public:
 		UINT8 select_pri[5];
 	};
 	struct DEBUGOPTS m_debug_options;
+	UINT8 dbg_video( UINT16 curline );
 #endif
 
 	UINT8 m_mosaic_size;
@@ -189,7 +190,7 @@ public:
 	UINT8 m_bg3_priority_bit;
 	UINT8 m_direct_color;
 	UINT8 m_ppu_last_scroll;      /* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
-                                   'previous' scroll value */
+	                               'previous' scroll value */
 	UINT8 m_mode7_last_scroll;    /* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
 
 	UINT8 m_ppu1_open_bus, m_ppu2_open_bus;
@@ -256,7 +257,6 @@ public:
 	void set_latch_hv(INT16 x, INT16 y);
 	void dynamic_res_change();
 	inline UINT32 get_vram_address();
-	UINT8 dbg_video(UINT16 curline);
 
 	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
 	void write(address_space &space, UINT32 offset, UINT8 data);
@@ -267,17 +267,22 @@ public:
 	DECLARE_WRITE8_MEMBER( cgram_write );
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
-	UINT16 *m_oam_ram;     /* Object Attribute Memory */
-	UINT16 *m_cgram;   /* Palette RAM */
-	UINT8  *m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
+	std::unique_ptr<UINT16[]> m_oam_ram;     /* Object Attribute Memory */
+	std::unique_ptr<UINT16[]> m_cgram;   /* Palette RAM */
+	std::unique_ptr<UINT8[]> m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_read16  m_openbus_cb;
+	optional_ioport m_options;
+	optional_ioport m_debug1;
+	optional_ioport m_debug2;
+	optional_ioport m_debug3;
+	optional_ioport m_debug4;
 };
 
 

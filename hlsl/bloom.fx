@@ -1,24 +1,36 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Bloom Effect
 //-----------------------------------------------------------------------------
 
-texture DiffuseA;
-texture DiffuseB;
-texture DiffuseC;
-texture DiffuseD;
-texture DiffuseE;
-texture DiffuseF;
-texture DiffuseG;
-texture DiffuseH;
-texture DiffuseI;
-texture DiffuseJ;
-texture DiffuseK;
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
 
-sampler DiffuseSampler0 = sampler_state
+texture DiffuseTexture;
+
+texture BloomTextureA;
+texture BloomTextureB;
+texture BloomTextureC;
+texture BloomTextureD;
+texture BloomTextureE;
+texture BloomTextureF;
+texture BloomTextureG;
+texture BloomTextureH;
+
+// vector screen uses twice -1 as many bloom levels
+texture BloomTextureI;
+texture BloomTextureJ;
+texture BloomTextureK;
+texture BloomTextureL;
+texture BloomTextureM;
+texture BloomTextureN;
+texture BloomTextureO;
+
+sampler DiffuseSampler = sampler_state
 {
-	Texture = <DiffuseA>;
+	Texture = <DiffuseTexture>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -27,9 +39,9 @@ sampler DiffuseSampler0 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler1 = sampler_state
+sampler BloomSamplerA = sampler_state
 {
-	Texture = <DiffuseB>;
+	Texture = <BloomTextureA>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -38,9 +50,9 @@ sampler DiffuseSampler1 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler2 = sampler_state
+sampler BloomSamplerB = sampler_state
 {
-	Texture = <DiffuseC>;
+	Texture = <BloomTextureB>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -49,9 +61,9 @@ sampler DiffuseSampler2 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler3 = sampler_state
+sampler BloomSamplerC = sampler_state
 {
-	Texture = <DiffuseD>;
+	Texture = <BloomTextureC>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -60,9 +72,9 @@ sampler DiffuseSampler3 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler4 = sampler_state
+sampler BloomSamplerD = sampler_state
 {
-	Texture = <DiffuseE>;
+	Texture = <BloomTextureD>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -71,9 +83,9 @@ sampler DiffuseSampler4 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler5 = sampler_state
+sampler BloomSamplerE = sampler_state
 {
-	Texture = <DiffuseF>;
+	Texture = <BloomTextureE>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -82,9 +94,9 @@ sampler DiffuseSampler5 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler6 = sampler_state
+sampler BloomSamplerF = sampler_state
 {
-	Texture = <DiffuseG>;
+	Texture = <BloomTextureF>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -93,9 +105,9 @@ sampler DiffuseSampler6 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler7 = sampler_state
+sampler BloomSamplerG = sampler_state
 {
-	Texture = <DiffuseH>;
+	Texture = <BloomTextureG>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -104,9 +116,9 @@ sampler DiffuseSampler7 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler8 = sampler_state
+sampler BloomSamplerH = sampler_state
 {
-	Texture = <DiffuseI>;
+	Texture = <BloomTextureH>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -115,9 +127,9 @@ sampler DiffuseSampler8 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler9 = sampler_state
+sampler BloomSamplerI = sampler_state
 {
-	Texture = <DiffuseJ>;
+	Texture = <BloomTextureI>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -126,9 +138,64 @@ sampler DiffuseSampler9 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSamplerA = sampler_state
+sampler BloomSamplerJ = sampler_state
 {
-	Texture = <DiffuseK>;
+	Texture = <BloomTextureJ>;
+	MipFilter = LINEAR;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+sampler BloomSamplerK = sampler_state
+{
+	Texture = <BloomTextureK>;
+	MipFilter = LINEAR;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+sampler BloomSamplerL = sampler_state
+{
+	Texture = <BloomTextureL>;
+	MipFilter = LINEAR;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+sampler BloomSamplerM = sampler_state
+{
+	Texture = <BloomTextureM>;
+	MipFilter = LINEAR;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+sampler BloomSamplerN = sampler_state
+{
+	Texture = <BloomTextureN>;
+	MipFilter = LINEAR;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+sampler BloomSamplerO = sampler_state
+{
+	Texture = <BloomTextureO>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -145,17 +212,13 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	float4 TexCoord01 : TEXCOORD0;
-	float4 TexCoord23 : TEXCOORD1;
-	float4 TexCoord45 : TEXCOORD2;
-	float4 TexCoord67 : TEXCOORD3;
-	float4 TexCoord89 : TEXCOORD4;
-	float2 TexCoordA : TEXCOORD5;
+	float2 TexCoord : TEXCOORD0;
+	float2 BloomCoord : TEXCOORD1;
 };
 
 struct VS_INPUT
 {
-	float3 Position : POSITION;
+	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
 };
@@ -163,66 +226,58 @@ struct VS_INPUT
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	float4 TexCoord01 : TEXCOORD0;
-	float4 TexCoord23 : TEXCOORD1;
-	float4 TexCoord45 : TEXCOORD2;
-	float4 TexCoord67 : TEXCOORD3;
-	float4 TexCoord89 : TEXCOORD4;
-	float2 TexCoordA : TEXCOORD5;
+	float2 TexCoord : TEXCOORD0;
+	float2 BloomCoord : TEXCOORD1;
 };
+
+//-----------------------------------------------------------------------------
+// Constants
+//-----------------------------------------------------------------------------
+
+static const float E = 2.7182817f;
+static const float Gelfond = 23.140692f; // e^pi (Gelfond constant)
+static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneider constant)
+
+//-----------------------------------------------------------------------------
+// Funcions
+//-----------------------------------------------------------------------------
+
+// www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
+float random(float2 seed)
+{
+	// irrationals for pseudo randomness
+	float2 i = float2(Gelfond, GelfondSchneider);
+
+	return frac(cos(dot(seed, i)) * 123456.0f);
+}
 
 //-----------------------------------------------------------------------------
 // Bloom Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
+uniform float2 TargetDims;
+uniform float2 SourceDims;
 
-uniform float2 Prescale = float2(8.0f, 8.0f);
-
-uniform float4 Level01Size;
-uniform float4 Level23Size;
-uniform float4 Level45Size;
-uniform float4 Level67Size;
-uniform float4 Level89Size;
-uniform float2 LevelASize;
-
-uniform bool PrepareVector = false;
+uniform bool VectorScreen = false;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 ScreenDimsTexel = 1.0f / ScreenDims;
-
-	float2 HalfPrescale = Prescale * 0.5f;
-
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 
 	Output.Color = Input.Color;
 
-	// Vector graphics is not prescaled it has the size of the screen
-	if (PrepareVector)
-	{
-		Output.TexCoord01 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level01Size;
-		Output.TexCoord23 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level23Size;
-		Output.TexCoord45 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level45Size;
-		Output.TexCoord67 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level67Size;
-		Output.TexCoord89 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level89Size;
-		Output.TexCoordA  = Input.Position.xy   / ScreenDims.xy   + 1.0f / LevelASize;
-	}
-	else
-	{
-		Output.TexCoord01 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level01Size;
-		Output.TexCoord23 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level23Size;
-		Output.TexCoord45 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level45Size;
-		Output.TexCoord67 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level67Size;
-		Output.TexCoord89 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level89Size;
-		Output.TexCoordA  = Input.Position.xy   / ScreenDims.xy   + HalfPrescale.xy   / LevelASize;
-	}
+	Output.TexCoord = Input.TexCoord;
+	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
+	Output.BloomCoord = Output.TexCoord;
+	Output.BloomCoord += 0.5f / SourceDims;
 
 	return Output;
 }
@@ -231,72 +286,151 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Bloom Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform float4 Level0123Weight;
-uniform float4 Level4567Weight;
-uniform float3 Level89AWeight;
+uniform float Level0Weight;
+uniform float Level1Weight;
+uniform float Level2Weight;
+uniform float Level3Weight;
+uniform float Level4Weight;
+uniform float Level5Weight;
+uniform float Level6Weight;
+uniform float Level7Weight;
+uniform float Level8Weight;
+
+uniform int BloomBlendMode = 0; // 0 brighten, 1 darken
+uniform float BloomScale;
+uniform float3 BloomOverdrive;
+
+float3 GetNoiseFactor(float3 n, float random)
+{
+	// smaller n become more noisy
+	return 1.0f + random * max(0.0f, 0.25f * pow(E, -8 * n));
+}
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float3 texel0 = tex2D(DiffuseSampler0, Input.TexCoord01.xy).rgb;
-	float3 texel1 = tex2D(DiffuseSampler1, Input.TexCoord01.zw).rgb;
-	float3 texel2 = tex2D(DiffuseSampler2, Input.TexCoord23.xy).rgb;
-	float3 texel3 = tex2D(DiffuseSampler3, Input.TexCoord23.zw).rgb;
-	float3 texel4 = tex2D(DiffuseSampler4, Input.TexCoord45.xy).rgb;
-	float3 texel5 = tex2D(DiffuseSampler5, Input.TexCoord45.zw).rgb;
-	float3 texel6 = tex2D(DiffuseSampler6, Input.TexCoord67.xy).rgb;
-	float3 texel7 = tex2D(DiffuseSampler7, Input.TexCoord67.zw).rgb;
-	float3 texel8 = tex2D(DiffuseSampler8, Input.TexCoord89.xy).rgb;
-	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord89.zw).rgb;
-	float3 texelA = tex2D(DiffuseSamplerA, Input.TexCoordA).rgb;
+	float3 texel = tex2D(DiffuseSampler, Input.TexCoord).rgb;
 
-	texel0 = texel0 * Level0123Weight.x;
-	texel1 = texel1 * Level0123Weight.y;
-	texel2 = texel2 * Level0123Weight.z;
-	texel3 = texel3 * Level0123Weight.w;
-	texel4 = texel4 * Level4567Weight.x;
-	texel5 = texel5 * Level4567Weight.y;
-	texel6 = texel6 * Level4567Weight.z;
-	texel7 = texel7 * Level4567Weight.w;
-	texel8 = texel8 * Level89AWeight.x;
-	texel9 = texel9 * Level89AWeight.y;
-	texelA = texelA * Level89AWeight.z;
+	float3 texelA = tex2D(BloomSamplerA, Input.BloomCoord.xy).rgb;
+	float3 texelB = tex2D(BloomSamplerB, Input.BloomCoord.xy).rgb;
+	float3 texelC = tex2D(BloomSamplerC, Input.BloomCoord.xy).rgb;
+	float3 texelD = tex2D(BloomSamplerD, Input.BloomCoord.xy).rgb;
+	float3 texelE = tex2D(BloomSamplerE, Input.BloomCoord.xy).rgb;
+	float3 texelF = tex2D(BloomSamplerF, Input.BloomCoord.xy).rgb;
+	float3 texelG = tex2D(BloomSamplerG, Input.BloomCoord.xy).rgb;
+	float3 texelH = tex2D(BloomSamplerH, Input.BloomCoord.xy).rgb;
 
-	float4 sum = float4(
-		texel0 + 
-		texel1 + 
-		texel2 + 
-		texel3 + 
-		texel4 +
-		texel5 + 
-		texel6 + 
-		texel7 + 
-		texel8 + 
-		texel9 + 
-		texelA, 1.0f);
-	return sum;
+	float3 texelI = float3(0.0f, 0.0f, 0.0f);
+	float3 texelJ = float3(0.0f, 0.0f, 0.0f);
+	float3 texelK = float3(0.0f, 0.0f, 0.0f);
+	float3 texelL = float3(0.0f, 0.0f, 0.0f);
+	float3 texelM = float3(0.0f, 0.0f, 0.0f);
+	float3 texelN = float3(0.0f, 0.0f, 0.0f);
+	float3 texelO = float3(0.0f, 0.0f, 0.0f);
+
+	// vector screen uses twice -1 as many bloom levels
+	if (VectorScreen)
+	{
+		texelI = tex2D(BloomSamplerI, Input.BloomCoord.xy).rgb;
+		texelJ = tex2D(BloomSamplerJ, Input.BloomCoord.xy).rgb;
+		texelK = tex2D(BloomSamplerK, Input.BloomCoord.xy).rgb;
+		texelL = tex2D(BloomSamplerL, Input.BloomCoord.xy).rgb;
+		texelM = tex2D(BloomSamplerM, Input.BloomCoord.xy).rgb;
+		texelN = tex2D(BloomSamplerN, Input.BloomCoord.xy).rgb;
+		texelO = tex2D(BloomSamplerO, Input.BloomCoord.xy).rgb;
+	}
+
+	float3 blend;
+
+	// brighten
+	if (BloomBlendMode == 0)
+	{
+		float3 bloom = float3(0.0f, 0.0f, 0.0f);
+
+		texel *= Level0Weight;
+
+		if (!VectorScreen)
+		{
+			bloom += texelA * Level1Weight;
+			bloom += texelB * Level2Weight;
+			bloom += texelC * Level3Weight;
+			bloom += texelD * Level4Weight;
+			bloom += texelE * Level5Weight;
+			bloom += texelF * Level6Weight;
+			bloom += texelG * Level7Weight;
+			bloom += texelH * Level8Weight;
+		}
+		// vector screen uses twice -1 as many bloom levels
+		else
+		{
+			bloom += texelA * (Level1Weight);
+			bloom += texelB * (Level1Weight + Level2Weight) * 0.5f;
+			bloom += texelC * (Level2Weight);
+			bloom += texelD * (Level2Weight + Level3Weight) * 0.5f;
+			bloom += texelE * (Level3Weight);
+			bloom += texelF * (Level3Weight + Level4Weight) * 0.5f;
+			bloom += texelG * (Level4Weight);
+			bloom += texelH * (Level4Weight + Level5Weight) * 0.5f;
+			bloom += texelI * (Level5Weight);
+			bloom += texelJ * (Level5Weight + Level6Weight) * 0.5f;
+			bloom += texelK * (Level6Weight);
+			bloom += texelL * (Level6Weight + Level7Weight) * 0.5f;
+			bloom += texelM * (Level7Weight);
+			bloom += texelN * (Level7Weight + Level8Weight) * 0.5f;
+			bloom += texelO * (Level8Weight);
+		}
+
+		bloom *= BloomScale;
+
+		float3 bloomOverdrive = max(0.0f, texel + bloom - 1.0f) * BloomOverdrive;
+
+		bloom.r += bloomOverdrive.g * 0.5f;
+		bloom.r += bloomOverdrive.b * 0.5f;
+		bloom.g += bloomOverdrive.r * 0.5f;
+		bloom.g += bloomOverdrive.b * 0.5f;
+		bloom.b += bloomOverdrive.r * 0.5f;
+		bloom.b += bloomOverdrive.g * 0.5f;
+
+		float2 NoiseCoord = Input.TexCoord;
+		float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
+
+		blend = texel + bloom * NoiseFactor;
+	}
+
+	// darken
+	else
+	{
+		texelA = min(texel, texelA);
+		texelB = min(texel, texelB);
+		texelC = min(texel, texelC);
+		texelD = min(texel, texelD);
+		texelE = min(texel, texelE);
+		texelF = min(texel, texelF);
+		texelG = min(texel, texelG);
+		texelH = min(texel, texelH);
+
+		blend = texel * Level0Weight;
+		blend = lerp(blend, texelA, Level1Weight * BloomScale);
+		blend = lerp(blend, texelB, Level2Weight * BloomScale);
+		blend = lerp(blend, texelC, Level3Weight * BloomScale);
+		blend = lerp(blend, texelD, Level4Weight * BloomScale);
+		blend = lerp(blend, texelE, Level5Weight * BloomScale);
+		blend = lerp(blend, texelF, Level6Weight * BloomScale);
+		blend = lerp(blend, texelG, Level7Weight * BloomScale);
+		blend = lerp(blend, texelH, Level8Weight * BloomScale);
+	}
+
+	return float4(blend, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
-// Downsample Effect
+// Bloom Technique
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler0>; // 2048x2048
-		Sampler[1] = <DiffuseSampler1>; // 1024x1024
-		Sampler[2] = <DiffuseSampler2>; // 512x512
-		Sampler[3] = <DiffuseSampler3>; // 256x256
-		Sampler[4] = <DiffuseSampler4>; // 128x128
-		Sampler[5] = <DiffuseSampler5>; // 64x64
-		Sampler[6] = <DiffuseSampler6>; // 32x32
-		Sampler[7] = <DiffuseSampler7>; // 16x16
-		Sampler[8] = <DiffuseSampler8>; // 8x8
-		Sampler[9] = <DiffuseSampler9>; // 4x4
-		Sampler[10] = <DiffuseSamplerA>; // 2x2
 
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader = compile ps_3_0 ps_main();

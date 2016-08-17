@@ -11,11 +11,9 @@
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
 
-extern UINT8 macs_cart_slot;
-
-#define ISMACS  (st0016_game&0x80)
-#define ISMACS1 (((st0016_game&0x180)==0x180))
-#define ISMACS2 (((st0016_game&0x180)==0x080))
+#define ISMACS  (m_game_flag & 0x80)
+#define ISMACS1 (((m_game_flag & 0x180) == 0x180))
+#define ISMACS2 (((m_game_flag & 0x180) == 0x080))
 
 
 #define ST0016_MAX_SPR_BANK   0x10
@@ -33,11 +31,19 @@ extern UINT8 macs_cart_slot;
 #define ST0016_PAL_BANK_MASK  (ST0016_MAX_PAL_BANK-1)
 
 
+typedef device_delegate<UINT8 (void)> st0016_dma_offs_delegate;
+#define ST0016_DMA_OFFS_CB(name)  UINT8 name(void)
 
-class st0016_cpu_device : public z80_device
+#define MCFG_ST0016_DMA_OFFS_CB(_class, _method) \
+	st0016_cpu_device::set_dma_offs_callback(*device, st0016_dma_offs_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+
+class st0016_cpu_device : public z80_device, public device_gfx_interface
 {
 public:
 	st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+
+	static void set_dma_offs_callback(device_t &device, st0016_dma_offs_delegate callback) { downcast<st0016_cpu_device &>(device).m_dma_offs_cb = callback; }
 
 	DECLARE_WRITE8_MEMBER(st0016_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(st0016_palette_bank_w);
@@ -55,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(st0016_vregs_w);
 	DECLARE_READ8_MEMBER(soundram_read);
 
+	void set_st0016_game_flag(UINT32 flag) { m_game_flag = flag; }
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void st0016_save_init();
@@ -64,9 +71,8 @@ public:
 	UINT32 update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *st0016_spriteram,*st0016_paletteram;
-
-	UINT32 st0016_game;
+	std::unique_ptr<UINT8[]> st0016_spriteram;
+	std::unique_ptr<UINT8[]> st0016_paletteram;
 
 
 	INT32 st0016_spr_bank,st0016_spr2_bank,st0016_pal_bank,st0016_char_bank;
@@ -74,19 +80,19 @@ public:
 
 	UINT8 st0016_vregs[0xc0];
 	int st0016_ramgfx;
-	UINT8 *m_charram;
+	std::unique_ptr<UINT8[]> m_charram;
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	const address_space_config m_io_space_config;
 	const address_space_config m_space_config;
 
 
-	const address_space_config *memory_space_config(address_spacenum spacenum) const
+	const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		switch (spacenum)
 		{
@@ -96,13 +102,11 @@ protected:
 		}
 	};
 	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
-
-public: // speglsht needs to access this for mixing
-	required_device<palette_device> m_palette;
 
 private:
-
+	UINT8 m_dma_offset;
+	st0016_dma_offs_delegate m_dma_offs_cb;
+	UINT32 m_game_flag;
 };
 
 

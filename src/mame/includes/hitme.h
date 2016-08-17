@@ -41,9 +41,9 @@ public:
 	DECLARE_WRITE8_MEMBER(output_port_0_w);
 	DECLARE_WRITE8_MEMBER(output_port_1_w);
 	TILE_GET_INFO_MEMBER(get_hitme_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(barricad);
 	UINT32 screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

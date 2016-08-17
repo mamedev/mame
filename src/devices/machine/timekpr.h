@@ -10,6 +10,7 @@
         - M48T37
         - M48T58
         - MK48T08
+        - MK48T12
 
 ***************************************************************************/
 
@@ -41,6 +42,9 @@
 #define MCFG_MK48T08_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MK48T08, 0)
 
+#define MCFG_MK48T12_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MK48T12, 0)
+
 
 
 //**************************************************************************
@@ -55,7 +59,7 @@ class timekeeper_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size);
 
 public:
 	DECLARE_WRITE8_MEMBER( write );
@@ -63,14 +67,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 private:
 	void counters_to_ram();
@@ -88,7 +92,7 @@ private:
 	UINT8 m_century;
 
 	dynamic_buffer m_data;
-	UINT8 *m_default_data;
+	optional_region_ptr<UINT8> m_default_data;
 
 protected:
 	int m_size;
@@ -134,11 +138,18 @@ public:
 	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class mk48t12_device : public timekeeper_device
+{
+public:
+	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 // device type definition
 extern const device_type M48T02;
 extern const device_type M48T35;
 extern const device_type M48T37;
 extern const device_type M48T58;
 extern const device_type MK48T08;
+extern const device_type MK48T12;
 
 #endif // __TIMEKPR_H__

@@ -148,10 +148,10 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void execute_run();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void execute_run() override;
 
 	int m_icount;
 	int m_variant;
@@ -269,7 +269,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
-	virtual inline void clock_tod();
+	virtual inline void clock_tod() override;
 };
 
 

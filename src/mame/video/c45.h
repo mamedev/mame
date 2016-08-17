@@ -48,8 +48,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_start() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 private:
 	// internal helpers

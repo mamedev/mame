@@ -43,15 +43,15 @@ public:
 	UINT8 m_vimana_credits;
 	UINT8 m_vimana_latch;
 
-	UINT16 *m_pf4_tilevram16;   /*  ||  Drawn in this order */
-	UINT16 *m_pf3_tilevram16;   /*  ||  */
-	UINT16 *m_pf2_tilevram16;   /* \||/ */
-	UINT16 *m_pf1_tilevram16;   /*  \/  */
+	std::unique_ptr<UINT16[]> m_pf4_tilevram16;   /*  ||  Drawn in this order */
+	std::unique_ptr<UINT16[]> m_pf3_tilevram16;   /*  ||  */
+	std::unique_ptr<UINT16[]> m_pf2_tilevram16;   /* \||/ */
+	std::unique_ptr<UINT16[]> m_pf1_tilevram16;   /*  \/  */
 
 	optional_shared_ptr<UINT16> m_spriteram;
-	UINT16 *m_buffered_spriteram;
-	UINT16 *m_spritesizeram16;
-	UINT16 *m_buffered_spritesizeram16;
+	std::unique_ptr<UINT16[]> m_buffered_spriteram;
+	std::unique_ptr<UINT16[]> m_spritesizeram16;
+	std::unique_ptr<UINT16[]> m_buffered_spritesizeram16;
 
 	INT32 m_bcu_flipscreen;     /* Tile   controller flip flag */
 	INT32 m_fcu_flipscreen;     /* Sprite controller flip flag */
@@ -89,7 +89,7 @@ public:
 	DECLARE_READ16_MEMBER(demonwld_dsp_r);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_w);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_bio_w);
-	DECLARE_READ16_MEMBER(demonwld_BIO_r);
+	DECLARE_READ_LINE_MEMBER(demonwld_BIO_r);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_ctrl_w);
 	DECLARE_READ16_MEMBER(samesame_port_6_word_r);
 	DECLARE_READ16_MEMBER(vimana_system_port_r);

@@ -63,7 +63,7 @@
 	sn76477_device::set_amp_res(*device, _amp_res);
 
 #define MCFG_SN76477_FEEDBACK_RES(_feedback_res) \
-	sn76477_device::set_feedack_res(*device, _feedback_res);
+	sn76477_device::set_feedback_res(*device, _feedback_res);
 
 #define MCFG_SN76477_VCO_PARAMS(_volt, _cap, _res) \
 	sn76477_device::set_vco_params(*device, _volt, _cap, _res);
@@ -111,7 +111,7 @@ public:
 		dev.m_attack_res = res;
 	}
 	static void set_amp_res(device_t &device, double amp_res) { downcast<sn76477_device &>(device).m_amplitude_res = amp_res; }
-	static void set_feedack_res(device_t &device, double feedback_res) { downcast<sn76477_device &>(device).m_feedback_res = feedback_res; }
+	static void set_feedback_res(device_t &device, double feedback_res) { downcast<sn76477_device &>(device).m_feedback_res = feedback_res; }
 	static void set_vco_params(device_t &device, double volt, double cap, double res)
 	{
 		sn76477_device &dev = downcast<sn76477_device &>(device);
@@ -172,8 +172,8 @@ public:
 
 	/* these functions take a capacitor value in Farads or the voltage on it in Volts */
 	#define SN76477_EXTERNAL_VOLTAGE_DISCONNECT   (-1.0)    /* indicates that the voltage is internally computed,
-                                                               can be used in all the functions that take a
-                                                               voltage on a capacitor */
+	                                                           can be used in all the functions that take a
+	                                                           voltage on a capacitor */
 	void one_shot_cap_w(double data);
 	void one_shot_cap_voltage_w(double data);
 	void slf_cap_w(double data);
@@ -191,11 +191,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_stop() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	/* chip's external interface */
@@ -304,31 +304,6 @@ private:
 	inline UINT32 generate_next_real_noise_bit();
 
 	void state_save_register();
-
-	void _SN76477_enable_w(UINT32 data);
-	void _SN76477_vco_w(UINT32 data);
-	void _SN76477_mixer_a_w(UINT32 data);
-	void _SN76477_mixer_b_w(UINT32 data);
-	void _SN76477_mixer_c_w(UINT32 data);
-	void _SN76477_envelope_1_w(UINT32 data);
-	void _SN76477_envelope_2_w(UINT32 data);
-	void _SN76477_one_shot_res_w(double data);
-	void _SN76477_one_shot_cap_w(double data);
-	void _SN76477_slf_res_w(double data);
-	void _SN76477_slf_cap_w(double data);
-	void _SN76477_vco_res_w(double data);
-	void _SN76477_vco_cap_w(double data);
-	void _SN76477_vco_voltage_w(double data);
-	void _SN76477_noise_clock_res_w(double data);
-	void _SN76477_noise_filter_res_w(double data);
-	void _SN76477_noise_filter_cap_w(double data);
-	void _SN76477_decay_res_w(double data);
-	void _SN76477_attack_res_w(double data);
-	void _SN76477_attack_decay_cap_w(double data);
-	void _SN76477_amplitude_res_w(double data);
-	void _SN76477_feedback_res_w(double data);
-	void _SN76477_pitch_voltage_w(double data);
-	void SN76477_test_enable_w(UINT32 data);
 };
 
 extern const device_type SN76477;

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "machine/gen_latch.h"
+
 class mugsmash_state : public driver_device
 {
 public:
@@ -14,7 +16,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_shared_ptr<UINT16> m_videoram1;
 	required_shared_ptr<UINT16> m_videoram2;
@@ -29,16 +32,16 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
-	DECLARE_READ16_MEMBER(mugsmash_input_ports_r);
 	DECLARE_WRITE16_MEMBER(mugsmash_videoram1_w);
 	DECLARE_WRITE16_MEMBER(mugsmash_videoram2_w);
 	DECLARE_WRITE16_MEMBER(mugsmash_reg_w);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info1);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info2);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_mugsmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

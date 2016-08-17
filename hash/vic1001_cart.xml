@@ -2423,7 +2423,7 @@
 	</software>
 
 	<software name="progaid">
-		<description>Programmer's Aid Cartridge </description>
+		<description>Programmer's Aid Cartridge</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1212" />

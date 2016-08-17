@@ -1,0 +1,1429 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--The purpose of this list is to document the .raw files of e-reader, which may be supported later in GBA driver-->
+<!--It's based in No-Intro e-reader set-->
+<!--ereader interface is dummy yet-->
+<!--Author: Shideravan-->
+<softwarelist name="gba_ereader" description="Nintendo Game Boy Advance (e-cards)">
+	<software name="acrs1adm">
+		<description>Animal Crossing-e - Series 1 - Admiral (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - admiral (usa).raw" size="2912" crc="683bf051" sha1="661d50882467f2cce94f33528171dca3e8be31ca"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acrs1ank">
+		<description>Animal Crossing-e - Series 1 - Ankha (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - ankha (usa).raw" size="2912" crc="8023fbdc" sha1="43383c0f519ae94d7b5ae11f5c5cf103f8975774"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acroapl">
+		<description>Animal Crossing-e - Series 1 - Apollo (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+					<rom name="animal crossing-e - series 1 - apollo (usa).raw" size="2912" crc="f8deff39" sha1="6b3b9edb8fe574244a2f7a395856529fc9c39993"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acrs1ban">
+		<description>Animal Crossing-e - Series 1 - Bangle (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - bangle (usa).raw" size="2912" crc="90aa9849" sha1="6f6a92f33b131c148141bd5d45341fdeacb9c911"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acrs1bif">
+		<description>Animal Crossing-e - Series 1 - Biff (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - biff (usa).raw" size="2912" crc="f1b5f848" sha1="16ad121b9b4857831a5811ba51d7e1780ffed527"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acrs1bil">
+		<description>Animal Crossing-e - Series 1 - Bill (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - bill (usa).raw" size="2912" crc="897291d1" sha1="bd6f7d6fa66cd0b1d138b3ff453e7cdceb44aa38"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acrs1bla">
+		<description>Animal Crossing-e - Series 1 - Blathers (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - blathers (usa).raw" size="2912" crc="139070c8" sha1="fd0b0638f3c1fdf29fed7f2349a74d5a62616161"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acrs1bss">
+		<description>Animal Crossing-e - Series 1 - Bliss (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - bliss (usa).raw" size="2912" crc="03ae014a" sha1="b96e799358fb0a718802d0a78996fb061faa234b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acrs1bbr">
+		<description>Animal Crossing-e - Series 1 - Bluebear (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - bluebear (usa).raw" size="2912" crc="45cd3fcc" sha1="61a40cefaed10060bcd4292dada41f0cef379c84"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acrs1bob">
+		<description>Animal Crossing-e - Series 1 - Bob (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - bob (usa).raw" size="2912" crc="164b8207" sha1="d5c8a02dc73b2fc8a7cf7e4602d507567d6b01b5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1bon">
+		<description>Animal Crossing-e - Series 1 - Bones (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - bones (usa).raw" size="2912" crc="c9262b40" sha1="bbeab0a791ea4c17128dde0d1a79bbade52b3534"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1bor">
+		<description>Animal Crossing-e - Series 1 - Boris (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - boris (usa).raw" size="2912" crc="ea911e24" sha1="d0a77500b605cfd23dd9d76e91f79bd1878c1c8d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1buc">
+		<description>Animal Crossing-e - Series 1 - Buck (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - buck (usa).raw" size="2912" crc="6c5f3677" sha1="5981ba54116690b4ecb73abf802e36a2cb37f8ef"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1bud">
+		<description>Animal Crossing-e - Series 1 - Bud (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - bud (usa).raw" size="2912" crc="be4aeefc" sha1="b84455b537e56548e2f2d56e4e0c4f819edf7920"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1bun">
+		<description>Animal Crossing-e - Series 1 - Bunnie (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - bunnie (usa).raw" size="2912" crc="6dd5e074" sha1="13209e6f30e4a16e5d469b14f8ea5ce6feb6fb29"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1che">
+		<description>Animal Crossing-e - Series 1 - Cheri (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - cheri (usa).raw" size="2912" crc="043e919d" sha1="3c26969ef22cbe7b74e026c3d4ce6d5b2b541707"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1chv">
+		<description>Animal Crossing-e - Series 1 - Chevre (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - chevre (usa).raw" size="2912" crc="2513a9b4" sha1="88a649e2eb140903ebbd60429605c7372a50b5d1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1cub">
+		<description>Animal Crossing-e - Series 1 - Cube (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - cube (usa).raw" size="2912" crc="48b25b5d" sha1="2d8b9798b43b18c26ff45738589ff87d03e48dc6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1dkk">
+		<description>Animal Crossing-e - Series 1 - DJ K.K. (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - dj k.k. (usa).raw" size="2912" crc="dbfb157b" sha1="3655f2f39133ae418472402aa9fb892366d12126"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1dor">
+		<description>Animal Crossing-e - Series 1 - Dora (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - dora (usa).raw" size="2912" crc="e29227f0" sha1="49ba303db531b16c3648baeee5e94c0678cd06d6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1dot">
+		<description>Animal Crossing-e - Series 1 - Dotty (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - dotty (usa).raw" size="2912" crc="b08da343" sha1="c8d06e7f1c219f328d234ad081663af07e0cb71c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1dft">
+		<description>Animal Crossing-e - Series 1 - Drift (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - drift (usa).raw" size="2912" crc="b58bd658" sha1="079b20123159f2e239bb135abebfdb289ebc77e3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1fai">
+		<description>Animal Crossing-e - Series 1 - Faith (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - faith (usa).raw" size="2912" crc="16bc27d4" sha1="678649ec79c132f9c93256c982fb8e2cbb1bc5fe"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1fsh">
+		<description>Animal Crossing-e - Series 1 - Flash (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - flash (usa).raw" size="2912" crc="d72df2da" sha1="64491bf8d02c8f44b9fc222796c58a5dd5241842"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1fls">
+		<description>Animal Crossing-e - Series 1 - Flossie (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - flossie (usa).raw" size="2912" crc="a3365706" sha1="dcf0d64c1c07709f38157747a438a692815653a6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1goo">
+		<description>Animal Crossing-e - Series 1 - Goose (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - goose (usa).raw" size="2912" crc="7e62d63a" sha1="14417eed63a1cc840f8500a5fbde288fad5e4d0e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1jan">
+		<description>Animal Crossing-e - Series 1 - Jane (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - jane (usa).raw" size="2912" crc="6fd4bb7e" sha1="1cae269fd119a11f9166a81795f353ca1fb9b4d9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1joe">
+		<description>Animal Crossing-e - Series 1 - Joey (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - joey (usa).raw" size="2912" crc="4f61cc28" sha1="f19d968251929d0874e448e0213e300b6b43afba"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1jmm">
+		<description>Animal Crossing-e - Series 1 - Jumpman Mario (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - jumpman mario (usa).raw" size="2912" crc="980db850" sha1="f71fb336d7a5e3dc6a28688a492b3cb6d3355e05"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1jne">
+		<description>Animal Crossing-e - Series 1 - June (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - june (usa).raw" size="2912" crc="e009c90f" sha1="e755ee45f68adbb3e684d33be5a2b2933394e6c6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1kkf">
+		<description>Animal Crossing-e - Series 1 - K.K. Faire (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - k.k. faire (usa).raw" size="2912" crc="a89d7dd4" sha1="ebf882b80d8687301419decc835cbe64e49df41d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1kks">
+		<description>Animal Crossing-e - Series 1 - K.K. Slider (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - k.k. slider (usa).raw" size="2912" crc="00555866" sha1="dcd1280943bd0451755e7e2a4c1a5146673b2d3a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1kko">
+		<description>Animal Crossing-e - Series 1 - K.K. Slider's Only Me (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - k.k. slider's only me (usa).raw" size="2912" crc="61a46ea1" sha1="3be6004e290082d7e28f5bc9c5dda6d70e313c6b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1kpn">
+		<description>Animal Crossing-e - Series 1 - Kapp'n (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - kapp'n (usa).raw" size="2912" crc="36939bec" sha1="4196122d1da5c1baa93bdf8ba7793ceca3152c97"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1kdy">
+		<description>Animal Crossing-e - Series 1 - Kody (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - kody (usa).raw" size="2912" crc="7cc54bb1" sha1="5cf7b9a1bb033a22c6dc5c7916f0ca29e2373bc2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1lob">
+		<description>Animal Crossing-e - Series 1 - Lobo (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - lobo (usa).raw" size="2912" crc="5d5030be" sha1="1e8e344511f967980b100316b065bf40db9dec03"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1mba">
+		<description>Animal Crossing-e - Series 1 - Mabel Able (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - mabel able (usa).raw" size="2912" crc="a5c0fcaa" sha1="fd7891776fd43ef8f893970ef5574fdff267cda2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1mae">
+		<description>Animal Crossing-e - Series 1 - Maelle (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - maelle (usa).raw" size="2912" crc="e637a1fc" sha1="c86c5d46d60922e04f73511bd7d2d24e0018bae3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1mit">
+		<description>Animal Crossing-e - Series 1 - Mitzi (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - mitzi (usa).raw" size="2912" crc="e72d8f99" sha1="7362679d710639807d3a7680b6a3006757d27c93"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1mkk">
+		<description>Animal Crossing-e - Series 1 - Mr. K.K. (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - mr. k.k. (usa).raw" size="2912" crc="0260752e" sha1="40cd3dce47be521e544595b625e1aeebcfca1fa2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1mrs">
+		<description>Animal Crossing-e - Series 1 - Mr. Resetti (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - mr. resetti (usa).raw" size="2912" crc="d8071ce7" sha1="acf7db5129bd1aa14bbafe85240b1d5bf42768ce"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1nib">
+		<description>Animal Crossing-e - Series 1 - Nibbles (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - nibbles (usa).raw" size="2912" crc="b5eb8e91" sha1="1ea1fd93340b55d25aa9176060641f64e770709a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1ohr">
+		<description>Animal Crossing-e - Series 1 - O'Hare (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - o'hare (usa).raw" size="2912" crc="81f537a1" sha1="e38f808f374e3223ae8a93e9b161b76ef8c1091b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1pal">
+		<description>Animal Crossing-e - Series 1 - Paolo (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - paolo (usa).raw" size="2912" crc="7323c95d" sha1="105b5d0feca5dd97b0cdaabd94378ed23b0279c3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1pnt">
+		<description>Animal Crossing-e - Series 1 - Peanut (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - peanut (usa).raw" size="2912" crc="8cedf3a8" sha1="704a0a4df3c38ce9b9bd9b3d0b8eff4134be1fb6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1prc">
+		<description>Animal Crossing-e - Series 1 - Pierce (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - pierce (usa).raw" size="2912" crc="ac1e0e44" sha1="f917b2ad8b90307993f7c2cd450881f7cd924ccc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1plg">
+		<description>Animal Crossing-e - Series 1 - Pigleg (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - pigleg (usa).raw" size="2912" crc="ca9b9666" sha1="90c6a17b21d6db86f5d12503aa08ac40af60498a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1pnk">
+		<description>Animal Crossing-e - Series 1 - Pinky (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - pinky (usa).raw" size="2912" crc="d4d13480" sha1="41182ea17b41a4a70d2d7cc757aa4ddedd156eb2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1plk">
+		<description>Animal Crossing-e - Series 1 - Plucky (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - plucky (usa).raw" size="2912" crc="de4a7c09" sha1="e29877e9122e58ea0e48bfb4f24dd96460426a13"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1por">
+		<description>Animal Crossing-e - Series 1 - Porter (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - porter (usa).raw" size="2912" crc="43d7b31c" sha1="05a5afce9ccda74f9da37ced4fafc7abdc2d5532"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1pta">
+		<description>Animal Crossing-e - Series 1 - Portia (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - portia (usa).raw" size="2912" crc="5e610bc7" sha1="9de14a2c0b3cdb237e86fb66eeb3f0f54e9b4dcf"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1puk">
+		<description>Animal Crossing-e - Series 1 - Puck (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - puck (usa).raw" size="2912" crc="04bdad41" sha1="6e4e387c5445e54403e8a8dffb0acbe7a7307f9b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1pun">
+		<description>Animal Crossing-e - Series 1 - Punchy (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - punchy (usa).raw" size="2912" crc="c96daf04" sha1="da55afc2ef08a34f105dfd0f12c384ffd6442b69"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1ras">
+		<description>Animal Crossing-e - Series 1 - Rasher (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - rasher (usa).raw" size="2912" crc="5cce02d5" sha1="89361d9ef6f8ea09d5116d2695d7d699db577c8c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1rhd">
+		<description>Animal Crossing-e - Series 1 - Rhoda (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - rhoda (usa).raw" size="2912" crc="c4000de3" sha1="a27ea67aec9200c1316b2d4fc67afae5a6eb58e5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1rov">
+		<description>Animal Crossing-e - Series 1 - Rover (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - rover (usa).raw" size="2912" crc="ff0f6291" sha1="bf59b6a80d60eff8bd3378126f6cab5abc0db81b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1row">
+		<description>Animal Crossing-e - Series 1 - Rowan (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - rowan (usa).raw" size="2912" crc="dc415e54" sha1="1a553a4817a80fa90abc99be9f6960584a78a64f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1sab">
+		<description>Animal Crossing-e - Series 1 - Sable Able (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - sable able (usa).raw" size="2912" crc="c05c4946" sha1="de0c6553e18c2bd7f16ac3cfcdaed4b8cc3c3f27"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1sct">
+		<description>Animal Crossing-e - Series 1 - Scoot (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - scoot (usa).raw" size="2912" crc="cf78af0f" sha1="d32fb220ee44a78502710af9efe43e057f97eb22"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1ssp">
+		<description>Animal Crossing-e - Series 1 - Shine Sprite (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - shine sprite (usa).raw" size="2912" crc="09d56d32" sha1="872b1039f77d0a303e9b8ad7ecf352476516755f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1spk">
+		<description>Animal Crossing-e - Series 1 - Spike (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - spike (usa).raw" size="2912" crc="5f728ca7" sha1="fea0e296ff141f69062ad27aa89ccc1d59d78dbb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1tad">
+		<description>Animal Crossing-e - Series 1 - Tad (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - tad (usa).raw" size="2912" crc="4b988198" sha1="cc378e7ecd4db4a2a144b0aff7586ad9e4622d4d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1ted">
+		<description>Animal Crossing-e - Series 1 - Teddy (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - teddy (usa).raw" size="2912" crc="b67b68c3" sha1="d0fef0beee188b07ab60d58b903845ee97188645"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1tnk">
+		<description>Animal Crossing-e - Series 1 - Tom Nook (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - tom nook (usa).raw" size="2911" crc="c2e0d74f" sha1="5fab234f6fb3f5b9ff7ffdbed584a7ee883b1fbf"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1ttm">
+		<description>Animal Crossing-e - Series 1 - Tortimer (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - tortimer (usa).raw" size="2912" crc="a3fa18c1" sha1="604bd9c14e6bbe7b0f573c8e22a7a02975eb6569"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr1yod">
+		<description>Animal Crossing-e - Series 1 - Yodel (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 1 - yodel (usa).raw" size="2912" crc="52eddc0b" sha1="ebce66b2d87960cf29f19033ac025b3aafbff7d2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2aur">
+		<description>Animal Crossing-e - Series 2 - Aurora (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - aurora (usa).raw" size="2912" crc="38c85d95" sha1="6ab2b61ba96061e63f1fc1b4c9f46af23215b6e4"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2ava">
+		<description>Animal Crossing-e - Series 2 - Ava (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - ava (usa).raw" size="2912" crc="dcdf934f" sha1="99c2873b3eada94016596f271814c8c2d6e707ab"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2baa">
+		<description>Animal Crossing-e - Series 2 - Baabara (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - baabara (usa).raw" size="2912" crc="8c3af4dc" sha1="d75edffe87836e5ca55ba316344197dddb4720ef"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2boo">
+		<description>Animal Crossing-e - Series 2 - Boots (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - boots (usa).raw" size="2912" crc="9eef86bf" sha1="4e504c01ec552522d77ab35b97b5d095790414a3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2b1s1">
+		<description>Animal Crossing-e - Series 2 - Boy (USA) (1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - boy (usa) (1) (strip 1).raw" size="2912" crc="a32bff1d" sha1="b97cbbbb199952de43b451e8e4fc6acf77377d34"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2b1s2">
+		<description>Animal Crossing-e - Series 2 - Boy (USA) (1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - boy (usa) (1) (strip 2).raw" size="2912" crc="16549ce7" sha1="278a77bb0f1a5bd4724cdf35c357c9e19c2ddb67"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2b2s1">
+		<description>Animal Crossing-e - Series 2 - Boy (USA) (2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - boy (usa) (2) (strip 1).raw" size="2912" crc="c64e5198" sha1="44578f7669bcec78d4bb5eacdd088627240c2866"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2b2s2">
+		<description>Animal Crossing-e - Series 2 - Boy (USA) (2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - boy (usa) (2) (strip 2).raw" size="2912" crc="e9d5936f" sha1="199ec17b9356e48bdb73121725db36dc0a76a9a6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2bub">
+		<description>Animal Crossing-e - Series 2 - Bubbles (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - bubbles (usa).raw" size="2912" crc="67a5f694" sha1="763053da694b1422bc63aa38037770c754c7e8a1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2but">
+		<description>Animal Crossing-e - Series 2 - Butch (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - butch (usa).raw" size="2912" crc="a7e35290" sha1="7eff1fcf6c411fb24b69aba98bbb0c2d554f902a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2buz">
+		<description>Animal Crossing-e - Series 2 - Buzz (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - buzz (usa).raw" size="2912" crc="0b5af35c" sha1="f7a462fa4766f3c3987318250d9ec15c6752c1bd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2cam">
+		<description>Animal Crossing-e - Series 2 - Camofrog (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - camofrog (usa).raw" size="2912" crc="62b8f974" sha1="95f3c4e4b18c9f236ad4be788289905a58288179"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2chf">
+		<description>Animal Crossing-e - Series 2 - Chief (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - chief (usa).raw" size="2912" crc="66c73842" sha1="ceb669e269cae9e5927194aa03905845e12e2d7a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2chk">
+		<description>Animal Crossing-e - Series 2 - Chuck (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - chuck (usa).raw" size="2912" crc="9ded6b34" sha1="9197c43ddb5410f220e9d99c3332eeccfedb8cb3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2coc">
+		<description>Animal Crossing-e - Series 2 - Coco (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - coco (usa).raw" size="2912" crc="278333e6" sha1="79e9a3216c3afbc2f53346664aef0dd822da2507"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2coo">
+		<description>Animal Crossing-e - Series 2 - Cookie (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - cookie (usa).raw" size="2912" crc="e31b686b" sha1="d4977e185eded6ed42c400c2eb54f68f80927d98"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2cop">
+		<description>Animal Crossing-e - Series 2 - Copper (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - copper (usa).raw" size="2912" crc="4e7b6ab0" sha1="c302bf3b60beb2af9e6f4141d35307a46258ec82"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2cur">
+		<description>Animal Crossing-e - Series 2 - Curly (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - curly (usa).raw" size="2912" crc="192ad690" sha1="82860776a93374b171f0df4607ebef8797f7c4c9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2cyr">
+		<description>Animal Crossing-e - Series 2 - Cyrano (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - cyrano (usa).raw" size="2912" crc="e773dc6a" sha1="3572936533f3dc463b1230e23017834869ab83b0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2der">
+		<description>Animal Crossing-e - Series 2 - Derwin (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - derwin (usa).raw" size="2912" crc="21fad46f" sha1="ff99d6cf53043443602f99647ab0626f86654b0b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2dob">
+		<description>Animal Crossing-e - Series 2 - Dobie (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - dobie (usa).raw" size="2912" crc="abb108a1" sha1="35a87de0518b526af6a4de83cecc7e9515b57a5d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2doc">
+		<description>Animal Crossing-e - Series 2 - Doc (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - doc (usa).raw" size="2912" crc="57b84c56" sha1="369405c33d149cf4209d037e4a27fa0d8e3be9d6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2doz">
+		<description>Animal Crossing-e - Series 2 - Dozer (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - dozer (usa).raw" size="2912" crc="b2c4ffa6" sha1="9e4b0024c3eab0b885ef0cb12f8f41c7578410d9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2eli">
+		<description>Animal Crossing-e - Series 2 - Elina (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - elina (usa).raw" size="2912" crc="aea9cbb4" sha1="36fc0300043e887a77f9fc1577989811a6a20f12"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2elm">
+		<description>Animal Crossing-e - Series 2 - Elmer (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - elmer (usa).raw" size="2912" crc="aa22e27a" sha1="78cd3ab27584de5e866c6866e278b8bb3625ee2f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2els">
+		<description>Animal Crossing-e - Series 2 - Eloise (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - eloise (usa).raw" size="2912" crc="0463010e" sha1="aee2787c95eb2d5d626987bea6e39e61bb78e0b3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2eun">
+		<description>Animal Crossing-e - Series 2 - Eunice (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - eunice (usa).raw" size="2912" crc="24a35f24" sha1="5809fad05793a2204ad7a50792e35da5497d71c2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2fil">
+		<description>Animal Crossing-e - Series 2 - Filbert (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - filbert (usa).raw" size="2912" crc="dcc89976" sha1="092d3b77108290cc192dbe92141324a215a9eb63"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2frk">
+		<description>Animal Crossing-e - Series 2 - Franklin (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - franklin (usa).raw" size="2912" crc="a7e4cad5" sha1="2efe2686a502797f8eaed654277849a935f53be7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2g1s1">
+		<description>Animal Crossing-e - Series 2 - Girl (USA) (1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - girl (usa) (1) (strip 1).raw" size="2912" crc="27e38e20" sha1="937ab380085321c8d3d337e79848bb2fb3fed285"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2g1s2">
+		<description>Animal Crossing-e - Series 2 - Girl (USA) (1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - girl (usa) (1) (strip 2).raw" size="2912" crc="96b9df74" sha1="7d3c796b59767bdc282b89a59a7acc1e8c079d5c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2g2s1">
+		<description>Animal Crossing-e - Series 2 - Girl (USA) (2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - girl (usa) (2) (strip 1).raw" size="2912" crc="456ed245" sha1="b7fbd6b5536649678860c16b50c0f7f21a423ed4"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2g2s2">
+		<description>Animal Crossing-e - Series 2 - Girl (USA) (2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - girl (usa) (2) (strip 2).raw" size="2912" crc="03fdb9cd" sha1="7c462d356c83a687ee5c7e8fca07f8b97d2249e0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2gzz">
+		<description>Animal Crossing-e - Series 2 - Grizzly (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - grizzly (usa).raw" size="2912" crc="0cfc574b" sha1="af171442d52c455789fd7cdb02cb594657e991a9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2igg">
+		<description>Animal Crossing-e - Series 2 - Iggy (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - iggy (usa).raw" size="2912" crc="40137e18" sha1="cd4d287251bd7df73fa3cb3064bcb57e6358ce7e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2jay">
+		<description>Animal Crossing-e - Series 2 - Jay (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - jay (usa).raw" size="2912" crc="66540fac" sha1="6c14ce6d2927d56ec7a285aa4e63205af54e8dc0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2jin">
+		<description>Animal Crossing-e - Series 2 - Jingle (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - jingle (usa).raw" size="2912" crc="5e84583e" sha1="91b2db8765287c753f53e6b3ed08d5c2a8fb6eb2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2joa">
+		<description>Animal Crossing-e - Series 2 - Joan (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - joan (usa).raw" size="2912" crc="7b8d8b65" sha1="d13e97edec9f0ed365068326b0238163eadee286"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2kka">
+		<description>Animal Crossing-e - Series 2 - K.K. Aria (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - k.k. aria (usa).raw" size="2912" crc="4db6b6ea" sha1="13a4eb65b8a2a476d30850cefc114e14ae8e2df6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2kkc">
+		<description>Animal Crossing-e - Series 2 - K.K. Country (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - k.k. country (usa).raw" size="2912" crc="de23c787" sha1="cb7670e889bf2aba1e58165ac1e2a6468a8da599"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2kkp">
+		<description>Animal Crossing-e - Series 2 - K.K. Parade (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - k.k. parade (usa).raw" size="2912" crc="835e9360" sha1="dc99577ebaa08d7c5de1c252cd034bc3fbf79010"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2kkt">
+		<description>Animal Crossing-e - Series 2 - K.K. Tour Tee (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - k.k. tour tee (usa).raw" size="2912" crc="906dc501" sha1="798d478d476df837aa8e828122a4144679c4d8b1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2ktt">
+		<description>Animal Crossing-e - Series 2 - Kitt (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - kitt (usa).raw" size="2912" crc="4a71d444" sha1="4724055a2f8f2eca6726513586320514bba87440"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2lei">
+		<description>Animal Crossing-e - Series 2 - Leigh (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - leigh (usa).raw" size="2912" crc="daacc5df" sha1="71089b7417c63f173106f8b226e2459007ead0c2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2lil">
+		<description>Animal Crossing-e - Series 2 - Lily (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - lily (usa).raw" size="2912" crc="8ba25bc0" sha1="ff43f1447af02d40c3a7acfe31ee5a3c182ed8a5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2lim">
+		<description>Animal Crossing-e - Series 2 - Limberg (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - limberg (usa).raw" size="2912" crc="7747d647" sha1="2ad5e7ec5fc0736bc0411d16582c7a27138a5fcd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2luc">
+		<description>Animal Crossing-e - Series 2 - Lucy (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - lucy (usa).raw" size="2912" crc="0201a561" sha1="3fe649689c5d1d91841bff1133a9d0f194b25d04"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2mar">
+		<description>Animal Crossing-e - Series 2 - Marcy (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - marcy (usa).raw" size="2912" crc="7bd7e3c8" sha1="4d9253b57be0728c0567bc2d6cf4d5b630613977"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2mid">
+		<description>Animal Crossing-e - Series 2 - Midge (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - midge (usa).raw" size="2912" crc="4a6d2f29" sha1="5065d7306303b7671648c5004b7c23db6efda2bd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2mrs1">
+		<description>Animal Crossing-e - Series 2 - Mr. Resetti &amp; Don (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - mr. resetti &amp; don (usa) (strip 1).raw" size="2912" crc="6c85c841" sha1="035f95ef32934337bb544a8582fe937986c2e3be"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2mrs2">
+		<description>Animal Crossing-e - Series 2 - Mr. Resetti &amp; Don (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - mr. resetti &amp; don (usa) (strip 2).raw" size="2912" crc="26534129" sha1="a080c96199f3719eaab722e217c13e2cac0790fb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2ole">
+		<description>Animal Crossing-e - Series 2 - Olive (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - olive (usa).raw" size="2912" crc="3f9b5305" sha1="031235409c01ee835ed55500efc3bcd0eeb2cd76"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2ola">
+		<description>Animal Crossing-e - Series 2 - Olivia (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - olivia (usa).raw" size="2912" crc="88147295" sha1="c2e8fe17793fa7a7a345d266e1939d51c21d5a04"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pat">
+		<description>Animal Crossing-e - Series 2 - Patty (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - patty (usa).raw" size="2912" crc="896000f8" sha1="61f295688280480d90b7c042555859f5af066a51"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pea">
+		<description>Animal Crossing-e - Series 2 - Peaches (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - peaches (usa).raw" size="2912" crc="8738ba1b" sha1="3db5b4d855e8151a7dabf9abedf6b507832591ee"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pwe">
+		<description>Animal Crossing-e - Series 2 - Peewee (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - peewee (usa).raw" size="2912" crc="a7013b3e" sha1="0bc2a72b0dfcbf1d95d21944e7354da7b418723e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pel">
+		<description>Animal Crossing-e - Series 2 - Pelly (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - pelly (usa).raw" size="2912" crc="cffd5011" sha1="ee16844dc312a07978bd671b1883c3781b77c86a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pik">
+		<description>Animal Crossing-e - Series 2 - Pikmin Pattern (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - pikmin pattern (usa).raw" size="2912" crc="26fe981b" sha1="820a6275625f7182d0c5863b5debbc9d8ac15c88"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pom">
+		<description>Animal Crossing-e - Series 2 - Pompom (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - pompom (usa).raw" size="2912" crc="22cb6bfe" sha1="4bfd8dc0cffc0fad1181977f9e193ecd29d0e9a3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pon">
+		<description>Animal Crossing-e - Series 2 - Poncho (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - poncho (usa).raw" size="2912" crc="4b75882c" sha1="cf6e322ba84bc2344b504f46094068c575013bab"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pud">
+		<description>Animal Crossing-e - Series 2 - Puddles (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - puddles (usa).raw" size="2912" crc="8dc13a20" sha1="6a684a2149cf89ff819009a02bb5308188c2c761"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2pur">
+		<description>Animal Crossing-e - Series 2 - Purrl (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - purrl (usa).raw" size="2912" crc="42e535b8" sha1="3447db8d568cc2c0088e42a26946786a910580e9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2rdd">
+		<description>Animal Crossing-e - Series 2 - Redd (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - redd (usa).raw" size="2912" crc="1e351a17" sha1="7aa49e3b43965079e0a9d9fe3add68f043dae9db"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2roa">
+		<description>Animal Crossing-e - Series 2 - Roald (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - roald (usa).raw" size="2912" crc="c75e8195" sha1="efa78955164f22edfd09bbf79705e0c64e8bc6fb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2sah">
+		<description>Animal Crossing-e - Series 2 - Saharah (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - saharah (usa).raw" size="2912" crc="5a787b1e" sha1="aac16200c94ef37b18a34f1d464ce0a73c269b7f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2sal">
+		<description>Animal Crossing-e - Series 2 - Sally (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - sally (usa).raw" size="2912" crc="107d4b63" sha1="3484c1c7d3399e5c690532b6b63831f1033ea364"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2sam">
+		<description>Animal Crossing-e - Series 2 - Samson (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - samson (usa).raw" size="2912" crc="9bb9ccf5" sha1="5a1699f6553c6d00049e4549e9118bd4c189b5de"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2sst">
+		<description>Animal Crossing-e - Series 2 - Samus's Suit (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - samus's suit (usa).raw" size="2912" crc="e80f5a1b" sha1="340484d5063ad4160509bb6ca62c1cdacaaca3ef"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2skk">
+		<description>Animal Crossing-e - Series 2 - Senor K.K. (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - senor k.k. (usa).raw" size="2912" crc="ecbff8c7" sha1="2a7fc271f33a633af542ea2b65fdba2a169fe814"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2spk">
+		<description>Animal Crossing-e - Series 2 - Sprocket (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - sprocket (usa).raw" size="2912" crc="1682efae" sha1="431d4702f9faf6ecb26b3516bce31b92013d49ad"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2sfe">
+		<description>Animal Crossing-e - Series 2 - Star Fox Emblem (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - star fox emblem (usa).raw" size="2912" crc="f81b95bb" sha1="148f1aaff84e5a7fcd2f5a582de64680ffd6cdeb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2stk">
+		<description>Animal Crossing-e - Series 2 - Stinky (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - stinky (usa).raw" size="2912" crc="2fbac448" sha1="b043159aefad09c9d4ca40564767e72c86a68b71"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2tnk">
+		<description>Animal Crossing-e - Series 2 - Tom Nook (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - tom nook (usa).raw" size="2912" crc="4558aa94" sha1="8daca760de3baf011a9342f7f068024474c64a33"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2tyb">
+		<description>Animal Crossing-e - Series 2 - Tybalt (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - tybalt (usa).raw" size="2912" crc="478c971f" sha1="e3ec6f87bda1f899b8e7fb6d32a7e31169a31a11"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2vld">
+		<description>Animal Crossing-e - Series 2 - Vladimir (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - vladimir (usa).raw" size="2912" crc="00184e21" sha1="094198b1c87e2a4ddc7a168f3cd75f609573593f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="acr2yuk">
+		<description>Animal Crossing-e - Series 2 - Yuka (USA)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="animal crossing-e - series 2 - yuka (usa).raw" size="2912" crc="4138a036" sha1="983ef1058ce3a477ca9692ea0ac7870aed096176"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

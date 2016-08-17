@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
+
 #include "includes/nb1414m4.h"
+#include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 
 class armedf_state : public driver_device
@@ -14,6 +16,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spr_pal_clut(*this, "spr_pal_clut"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram")
@@ -26,9 +29,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	UINT8 *m_text_videoram;
+	std::unique_ptr<UINT8[]> m_text_videoram;
 	required_shared_ptr<UINT16> m_spr_pal_clut;
 	required_shared_ptr<UINT16> m_fg_videoram;
 	required_shared_ptr<UINT16> m_bg_videoram;

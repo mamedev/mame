@@ -68,11 +68,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	bitmap_ind16 *m_sprite_sprite_collision_bitmap1;
-	bitmap_ind16 *m_sprite_sprite_collision_bitmap2;
-	bitmap_ind16 *m_sprite_goal_collision_bitmap1;
-	bitmap_ind16 *m_sprite_goal_collision_bitmap2;
-	bitmap_ind16 *m_sprite_border_collision_bitmap;
+	std::unique_ptr<bitmap_ind16> m_sprite_sprite_collision_bitmap1;
+	std::unique_ptr<bitmap_ind16> m_sprite_sprite_collision_bitmap2;
+	std::unique_ptr<bitmap_ind16> m_sprite_goal_collision_bitmap1;
+	std::unique_ptr<bitmap_ind16> m_sprite_goal_collision_bitmap2;
+	std::unique_ptr<bitmap_ind16> m_sprite_border_collision_bitmap;
 	DECLARE_READ8_MEMBER(carpolo_ball_screen_collision_cause_r);
 	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_x_r);
 	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_y_r);
@@ -88,9 +88,9 @@ public:
 	DECLARE_WRITE8_MEMBER(carpolo_car_border_interrupt_clear_w);
 	DECLARE_WRITE8_MEMBER(carpolo_timer_interrupt_clear_w);
 	DECLARE_DRIVER_INIT(carpolo);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(carpolo);
 	UINT32 screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_carpolo(screen_device &screen, bool state);

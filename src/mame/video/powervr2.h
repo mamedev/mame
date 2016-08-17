@@ -55,17 +55,19 @@ public:
 
 	// the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
 	//  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
-	bitmap_rgb32 *fake_accumulationbuffer_bitmap;
+	std::unique_ptr<bitmap_rgb32> fake_accumulationbuffer_bitmap;
 
 	struct texinfo  {
 		UINT32 address, vqbase;
 		UINT32 nontextured_pal_int;
 		UINT8 nontextured_fpal_a,nontextured_fpal_r,nontextured_fpal_g,nontextured_fpal_b;
-		int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
+		int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode;
 		int coltype;
 
 		UINT32 (powervr2_device::*r)(struct texinfo *t, float x, float y);
 		UINT32 (*blend)(UINT32 s, UINT32 d);
+		int (*u_func)(float uv, int size);
+		int (*v_func)(float uv, int size);
 		int palbase, cd;
 	};
 
@@ -220,7 +222,6 @@ public:
 	DECLARE_WRITE32_MEMBER( ta_yuv_tex_ctrl_w );
 	DECLARE_READ32_MEMBER(  ta_yuv_tex_cnt_r );
 	DECLARE_WRITE32_MEMBER( ta_yuv_tex_cnt_w );
-	DECLARE_READ32_MEMBER(  ta_list_cont_r );
 	DECLARE_WRITE32_MEMBER( ta_list_cont_w );
 	DECLARE_READ32_MEMBER(  ta_next_opb_init_r );
 	DECLARE_WRITE32_MEMBER( ta_next_opb_init_w );
@@ -248,11 +249,8 @@ public:
 	DECLARE_READ32_MEMBER(  sb_pdapro_r );
 	DECLARE_WRITE32_MEMBER( sb_pdapro_w );
 
-	DECLARE_READ32_MEMBER(  pvr_ta_r );
-	DECLARE_WRITE32_MEMBER( pvr_ta_w );
 	DECLARE_READ32_MEMBER(  pvr2_ta_r );
 	DECLARE_WRITE32_MEMBER( pvr2_ta_w );
-	DECLARE_READ32_MEMBER(  pvrs_ta_r );
 	DECLARE_WRITE32_MEMBER( pvrs_ta_w );
 	DECLARE_READ32_MEMBER(  elan_regs_r );
 	DECLARE_WRITE32_MEMBER( elan_regs_w );
@@ -280,8 +278,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write8 irq_cb;
@@ -316,6 +314,10 @@ private:
 	UINT32 sb_pdstap, sb_pdstar, sb_pdlen, sb_pddir, sb_pdtsel, sb_pden, sb_pdst, sb_pdapro;
 
 	static UINT32 (*const blend_functions[64])(UINT32 s, UINT32 d);
+
+	static int uv_wrap(float uv, int size);
+	static int uv_flip(float uv, int size);
+	static int uv_clamp(float uv, int size);
 
 	static inline INT32 clamp(INT32 in, INT32 min, INT32 max);
 	static inline UINT32 bilinear_filter(UINT32 c0, UINT32 c1, UINT32 c2, UINT32 c3, float u, float v);
@@ -452,7 +454,6 @@ private:
 	void computedilated();
 	void pvr_build_parameterconfig();
 	void process_ta_fifo();
-	void debug_paletteram();
 	void update_screen_format();
 
 	void fb_convert_0555krgb_to_555rgb(address_space &space, int x, int y);

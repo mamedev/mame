@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
+
 class brkthru_state : public driver_device
 {
 public:
@@ -17,7 +19,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_fg_videoram;
@@ -37,6 +40,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	UINT8   m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(brkthru_1803_w);
@@ -49,12 +53,11 @@ public:
 	DECLARE_DRIVER_INIT(brkthru);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(brkthru);
 	UINT32 screen_update_brkthru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void show_register( bitmap_ind16 &bitmap, int x, int y, UINT32 data );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int prio );
 };

@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 
@@ -17,29 +18,28 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_deco_tilegen1(*this, "tilegen1")
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_sprgen(*this, "spritegen"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
-	optional_device<decospr_device> m_sprgen;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
-	DECLARE_READ16_MEMBER(tumblep_prot_r);
+	required_device<decospr_device> m_sprgen;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_WRITE16_MEMBER(tumblep_sound_w);
-	DECLARE_WRITE16_MEMBER(jumppop_sound_w);
 	DECLARE_READ16_MEMBER(tumblepop_controls_r);
-	DECLARE_WRITE16_MEMBER(tumblep_oki_w);
 	DECLARE_DRIVER_INIT(tumblep);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tumblep_patch_code(UINT16 offset);
 };

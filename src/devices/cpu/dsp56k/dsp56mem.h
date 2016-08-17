@@ -13,10 +13,10 @@ namespace DSP56K
 void mem_reset(dsp56k_core* cpustate);
 
 // Adjusts the documented address to match the offset in peripheral RAM
-#define A2O(a) (a-0xffc0)
+#define A2O(a) (a - 0xffc0)
 
 // Adjusts the offset in peripheral RAM to match the documented address
-#define O2A(a) (a+0xffc0)
+#define O2A(a) (a + 0xffc0)
 
 // The memory 'registers'
 #define PBC      (cpustate->peripheral_ram[A2O(0xffc0)])

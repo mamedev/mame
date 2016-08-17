@@ -50,15 +50,15 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	virtual void scsi_ctrl_changed();
+	virtual void scsi_ctrl_changed() override;
 
 	UINT8 dma_r();
 	void dma_w(UINT8 val);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum { MODE_D, MODE_T, MODE_I };

@@ -505,7 +505,7 @@ struct s3c44b0_lcd_t
 {
 	s3c44b0_lcd_regs_t regs;
 	emu_timer *timer;
-	UINT8 *bitmap;
+	std::unique_ptr<UINT8[]> bitmap;
 	UINT32 vramaddr_cur;
 	UINT32 vramaddr_max;
 	UINT32 offsize;
@@ -652,8 +652,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

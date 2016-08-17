@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:David Graves, Jarek Burczynski
 /*************************************************************************
 
@@ -61,6 +61,17 @@ public:
 	UINT8        m_c588;
 	UINT8        m_c589;
 	UINT8        m_c58a; // These variables derived from the bootleg
+	UINT8        m_triggeredLevel1b; // These variables derived from comparison to unprotection version
+	UINT8        m_triggeredLevel2;
+	UINT8        m_triggeredLevel2b;
+	UINT8        m_triggeredLevel2c;
+	UINT8        m_triggeredLevel3b;
+	UINT8        m_triggeredLevel13b;
+	UINT8        m_triggeredLevel4;
+	UINT8        m_triggeredLevel5;
+	UINT8        m_triggeredLevel7;
+	UINT8        m_triggeredLevel8;
+	UINT8        m_triggeredLevel9;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +100,14 @@ public:
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
 	DECLARE_DRIVER_INIT(opwolf);
 	DECLARE_DRIVER_INIT(opwolfb);
-	virtual void machine_start();
+	DECLARE_DRIVER_INIT(opwolfp);
+
+
+	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
+
+
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(opwolf);
 	UINT32 screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
@@ -101,5 +119,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_2);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

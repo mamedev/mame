@@ -28,7 +28,7 @@ public:
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
 	tilemap_t *m_tilemap4;
-	UINT8 *m_buffer_spriteram;
+	std::unique_ptr<UINT8[]> m_buffer_spriteram;
 
 	DECLARE_READ8_MEMBER(wheel_r);
 	DECLARE_WRITE8_MEMBER(vram1_w);
@@ -39,9 +39,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info4);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ssrj);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

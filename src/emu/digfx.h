@@ -71,7 +71,8 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 #define STEP1024(START,STEP)    STEP512(START,STEP),STEP512((START)+512*(STEP),STEP)
 #define STEP2048(START,STEP)    STEP1024(START,STEP),STEP1024((START)+1024*(STEP),STEP)
 
-
+#define STEP2_INV(START,STEP)   (START)+(STEP),(START)
+#define STEP4_INV(START,STEP)    STEP2_INV(START+2*STEP,STEP),STEP2_INV(START,STEP)
 
 //**************************************************************************
 //  GRAPHICS INFO MACROS
@@ -159,8 +160,8 @@ class palette_device;
 
 struct gfx_layout
 {
-	UINT32 xoffs(int x) const { return (extxoffs != NULL) ? extxoffs[x] : xoffset[x]; }
-	UINT32 yoffs(int y) const { return (extyoffs != NULL) ? extyoffs[y] : yoffset[y]; }
+	UINT32 xoffs(int x) const { return (extxoffs != nullptr) ? extxoffs[x] : xoffset[x]; }
+	UINT32 yoffs(int y) const { return (extyoffs != nullptr) ? extyoffs[y] : yoffset[y]; }
 
 	UINT16          width;              // pixel width of each element
 	UINT16          height;             // pixel height of each element
@@ -178,7 +179,7 @@ struct gfx_decode_entry
 {
 	const char *    memory_region;      // memory region where the data resides
 	UINT32          start;              // offset of beginning of data to decode
-	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; NULL marks the end of the array
+	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; nullptr marks the end of the array
 	UINT16          color_codes_start;  // offset in the color lookup table where color codes start
 	UINT16          total_color_codes;  // total number of color codes
 	UINT32          flags;              // flags and optional scaling factors
@@ -191,7 +192,7 @@ class device_gfx_interface : public device_interface
 public:
 	// construction/destruction
 	device_gfx_interface(const machine_config &mconfig, device_t &device,
-						const gfx_decode_entry *gfxinfo = NULL, const char *palette_tag = NULL);
+						const gfx_decode_entry *gfxinfo = nullptr, const char *palette_tag = nullptr);
 	virtual ~device_gfx_interface();
 
 	// static configuration
@@ -199,25 +200,25 @@ public:
 	static void static_set_palette(device_t &device, const char *tag);
 
 	// getters
-	palette_device *palette() const { return m_palette; }
-	gfx_element *gfx(int index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index]; }
+	palette_device &palette() const { return *m_palette; }
+	gfx_element *gfx(int index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
 
 	// decoding
 	void decode_gfx(const gfx_decode_entry *gfxdecodeinfo);
 	void decode_gfx() { decode_gfx(m_gfxdecodeinfo); }
 
-	void set_gfx(int index, gfx_element *element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index].reset(element); }
+	void set_gfx(int index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
 
 protected:
 	// interface-level overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
-	virtual void interface_pre_start();
-	virtual void interface_post_start();
-
-	palette_device *            m_palette;                  // pointer to the palette device
-	auto_pointer<gfx_element>   m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
 
 private:
+	palette_device *            m_palette;                  // pointer to the palette device
+	std::unique_ptr<gfx_element>  m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
+
 	// configuration
 	const gfx_decode_entry *    m_gfxdecodeinfo;        // pointer to array of gfx decode information
 	const char *                m_palette_tag;          // configured tag for palette device

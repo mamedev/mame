@@ -59,9 +59,9 @@ protected:
 	UINT16 m_user_data;             // user defined character data (16 bit)
 	UINT16 m_user_def;          // user defined character state
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 };
 

@@ -50,8 +50,8 @@ public:
 
 protected:
 	// optional operation overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
-	virtual void interface_pre_start();
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
 
 	// configuration state
 	bool            m_screen_required;          // is a screen required?

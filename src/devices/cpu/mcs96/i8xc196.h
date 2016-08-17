@@ -19,14 +19,14 @@ public:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
-	virtual void io_w8(UINT8 adr, UINT8 data);
-	virtual void io_w16(UINT8 adr, UINT16 data);
-	virtual UINT8 io_r8(UINT8 adr);
-	virtual UINT16 io_r16(UINT8 adr);
+	virtual void io_w8(UINT8 adr, UINT8 data) override;
+	virtual void io_w16(UINT8 adr, UINT16 data) override;
+	virtual UINT8 io_r8(UINT8 adr) override;
+	virtual UINT16 io_r16(UINT8 adr) override;
 
 #define O(o) void o ## _196_full(); void o ## _196_partial()
 

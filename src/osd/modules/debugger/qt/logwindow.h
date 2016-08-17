@@ -3,8 +3,6 @@
 #ifndef __DEBUG_QT_LOG_WINDOW_H__
 #define __DEBUG_QT_LOG_WINDOW_H__
 
-#include <QtGui/QtGui>
-
 #include "debuggerview.h"
 #include "windowqt.h"
 
@@ -17,7 +15,7 @@ class LogWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	LogWindow(running_machine* machine, QWidget* parent=NULL);
+	LogWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~LogWindow();
 
 

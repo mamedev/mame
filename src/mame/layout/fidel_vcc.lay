@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_bg"><rect><color red="0.5" green="0.5" blue="0.5" /></rect></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+	</element>
+
+	<element name="txt_from">
+		<rect><color red="0.5" green="0.5" blue="0.5" /></rect>
+		<text string="FROM"><color red="0.03" green="0.03" blue="0.03" /></text>
+	</element>
+	<element name="txt_to">
+		<rect><color red="0.5" green="0.5" blue="0.5" /></rect>
+		<text string="TO"><color red="0.03" green="0.03" blue="0.03" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="47" top="0" bottom="25" />
+		<bezel element="static_bg">
+			<bounds left="-1" right="48" top="-1" bottom="26" />
+		</bezel>
+
+		<bezel element="txt_from">
+			<bounds x="1" y="21" width="20" height="3" />
+		</bezel>
+		<bezel element="txt_to">
+			<bounds x="26" y="21" width="20" height="3" />
+		</bezel>
+
+		<bezel element="static_black">
+			<bounds left="-2" right="49" top="4" bottom="21" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="1" y="5" width="10" height="15" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="11" y="5" width="10" height="15" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="26" y="5" width="10" height="15" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="36" y="5" width="10" height="15" />
+		</bezel>
+
+		<bezel name="1.7" element="led">
+			<bounds x="23.25" y="6.5" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="0.7" element="led">
+			<bounds x="22.25" y="17" width="1.5" height="1.5" />
+		</bezel>
+
+	</view>
+</mamelayout>

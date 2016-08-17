@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -22,6 +23,7 @@ public:
 		m_k007232(*this, "k007232"),
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
+		m_soundlatch(*this, "soundlatch"),
 		m_rombank(*this, "rombank") { }
 
 	/* devices */
@@ -31,6 +33,7 @@ public:
 	required_device<k007232_device> m_k007232;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_rombank;
 
 	DECLARE_WRITE8_MEMBER(aliens_coin_counter_w);
@@ -38,8 +41,8 @@ public:
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 	DECLARE_WRITE8_MEMBER(aliens_snd_bankswitch_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);

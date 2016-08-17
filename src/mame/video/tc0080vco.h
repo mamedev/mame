@@ -11,7 +11,6 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxnum) { downcast<tc0080vco_device &>(device).m_gfxnum = gfxnum; }
 	static void set_tx_region(device_t &device, int txnum) { downcast<tc0080vco_device &>(device).m_txnum = txnum; }
 	static void set_offsets(device_t &device, int x_offset, int y_offset)
@@ -39,11 +38,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state
-	UINT16 *       m_ram;
+	std::unique_ptr<UINT16[]>       m_ram;
 	UINT16 *       m_bg0_ram_0;
 	UINT16 *       m_bg0_ram_1;
 	UINT16 *       m_bg1_ram_0;
@@ -75,7 +74,6 @@ private:
 	int            m_has_fg0; // for debug, it can be enabled with set_fg0_debug(true)
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
@@ -100,8 +98,5 @@ extern const device_type TC0080VCO;
 
 #define MCFG_TC0080VCO_GFXDECODE(_gfxtag) \
 	tc0080vco_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_TC0080VCO_PALETTE(_palette_tag) \
-	tc0080vco_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

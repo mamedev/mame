@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari
+// thanks-to:Michael Strutts, Marco Cassili
 /***************************************************************************
 
     8080-based black and white hardware
@@ -26,7 +27,9 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_sn(*this, "snsnd"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_gunx(*this, "GUNX"),
+		m_guny(*this, "GUNY")
 	{ }
 
 	/* devices/memory pointers */
@@ -40,6 +43,8 @@ public:
 	optional_device<palette_device> m_palette;
 
 	/* misc game specific */
+	optional_ioport m_gunx;
+	optional_ioport m_guny;
 	UINT8 m_color_map;
 	UINT8 m_screen_red;
 	UINT8 m_fleet_step;
@@ -54,9 +59,6 @@ public:
 	UINT8 m_schaser_background_disable;
 	UINT8 m_schaser_background_select;
 	UINT16 m_claybust_gun_pos;
-
-	int m_invmulti_bank;
-
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
 	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
@@ -108,18 +110,26 @@ public:
 	DECLARE_WRITE8_MEMBER(invmulti_eeprom_w);
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
 
+	DECLARE_READ8_MEMBER(rollingc_scattered_colorram_r);
+	DECLARE_WRITE8_MEMBER(rollingc_scattered_colorram_w);
+	DECLARE_READ8_MEMBER(rollingc_scattered_colorram2_r);
+	DECLARE_WRITE8_MEMBER(rollingc_scattered_colorram2_w);
+	DECLARE_READ8_MEMBER(schaser_scattered_colorram_r);
+	DECLARE_WRITE8_MEMBER(schaser_scattered_colorram_w);
+
 	DECLARE_DRIVER_INIT(invmulti);
 	DECLARE_DRIVER_INIT(spacecom);
 	DECLARE_DRIVER_INIT(vortex);
 	DECLARE_DRIVER_INIT(attackfc);
 
 	DECLARE_MACHINE_START(extra_8080bw);
+	DECLARE_MACHINE_START(rollingc);
+	DECLARE_MACHINE_START(sflush);
 	DECLARE_MACHINE_START(schaser);
 	DECLARE_MACHINE_RESET(schaser);
 	DECLARE_MACHINE_START(polaris);
 	DECLARE_MACHINE_START(darthvdr);
 	DECLARE_MACHINE_RESET(darthvdr);
-	DECLARE_MACHINE_RESET(invmulti);
 	DECLARE_MACHINE_START(extra_8080bw_sh);
 	DECLARE_MACHINE_START(extra_8080bw_vh);
 	DECLARE_MACHINE_START(schaser_sh);
@@ -154,7 +164,6 @@ public:
 	inline void set_pixel( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, int color );
 	inline void set_8_pixels( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, int fore_color, int back_color );
 	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
-	void invmulti_bankswitch_restore();
 };
 
 

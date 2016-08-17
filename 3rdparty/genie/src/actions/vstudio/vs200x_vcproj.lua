@@ -128,7 +128,7 @@
 						local cfg = premake.getconfig(prj, cfginfo.src_buildcfg, cfginfo.src_platform)
 
 						local usePCH = (not prj.flags.NoPCH and prj.pchsource == node.cfg.name)
-						local isSourceCode = path.iscppfile(fname)
+						local isSourceCode = path.isSourceFile(fname)
 						local needsCompileAs = (path.iscfile(fname) ~= premake.project.iscproject(prj))
 
 						if usePCH or isSourceCode then
@@ -241,8 +241,11 @@
 			_p(4,'OmitFramePointers="%s"', bool(true))
 		end
 
-		if #cfg.includedirs > 0 then
-			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(cfg.includedirs, ";"), '\\')))
+
+		local includedirs = table.join(cfg.userincludedirs, cfg.includedirs)
+
+		if #includedirs > 0 then
+			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(includedirs, ";"), '\\')))
 		end
 
 		if #cfg.defines > 0 then
@@ -276,7 +279,7 @@
 
 		_p(4,'EnableFunctionLevelLinking="%s"', bool(true))
 
-		if cfg.platform ~= "Xbox360" and cfg.platform ~= "x64" then
+		if cfg.platform ~= "Xbox360" and cfg.platform ~= "x64" and cfg.platform ~= "Durango" then
 			if cfg.flags.EnableSSE then
 				_p(4,'EnableEnhancedInstructionSet="1"')
 			elseif cfg.flags.EnableSSE2 then
@@ -313,7 +316,13 @@
 			_p(4,'UsePrecompiledHeader="%s"', iif(cfg.flags.NoPCH, 0, 2))
 		end
 
-		_p(4,'WarningLevel="%s"', iif(cfg.flags.ExtraWarnings, 4, 3))
+		if cfg.flags.ExtraWarnings then
+			_p(4,'WarningLevel="%s"', 4)
+		elseif cfg.flags.MinimumWarnings then
+			_p(4,'WarningLevel="%s"', 1)
+		else
+			_p(4,'WarningLevel="%s"', 3)
+		end
 
 		if cfg.flags.FatalWarnings then
 			_p(4,'WarnAsError="%s"', bool(true))
@@ -442,8 +451,10 @@
 
 		_p(4,'AdditionalOptions="%s"', premake.esc(table.concat(buildoptions, " ")))
 
-		if #cfg.includedirs > 0 then
-			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(cfg.includedirs, ";"), '\\')))
+		local includedirs = table.join(cfg.userincludedirs, cfg.includedirs)
+
+		if #includedirs > 0 then
+			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(includedirs, ";"), '\\')))
 		end
 
 		if #cfg.defines > 0 then
@@ -518,9 +529,10 @@
 			_p(4,'PreprocessorDefinitions="%s"', table.concat(premake.esc(table.join(cfg.defines, cfg.resdefines)), ";"))
 		end
 
-		if #cfg.includedirs > 0 or #cfg.resincludedirs > 0 then
-			local dirs = table.join(cfg.includedirs, cfg.resincludedirs)
-			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(dirs, ";"), '\\')))
+		local includedirs = table.join(cfg.userincludedir, cfg.includedirs, cfg.resincludedirs)
+
+		if #includedirs > 0 then
+			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(includedirs, ";"), '\\')))
 		end
 
 		_p(3,'/>')

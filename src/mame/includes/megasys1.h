@@ -15,6 +15,7 @@
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 
 
@@ -31,15 +32,20 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch_z(*this, "soundlatch_z"),
 		m_rom_maincpu(*this, "maincpu"),
 		m_io_system(*this, "SYSTEM"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
 		m_io_dsw(*this, "DSW"),
 		m_io_dsw1(*this, "DSW1"),
-		m_io_dsw2(*this, "DSW2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_io_dsw2(*this, "DSW2")
+		{ }
 
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_objectram;
@@ -49,6 +55,12 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	optional_device<generic_latch_16_device> m_soundlatch;
+	optional_device<generic_latch_16_device> m_soundlatch2;
+	optional_device<generic_latch_8_device> m_soundlatch_z;
 	required_region_ptr<UINT16> m_rom_maincpu;
 	required_ioport m_io_system;
 	required_ioport m_io_p1;
@@ -56,12 +68,12 @@ public:
 	optional_ioport m_io_dsw;
 	optional_ioport m_io_dsw1;
 	optional_ioport m_io_dsw2;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
+	bitmap_ind16 m_sprite_buffer_bitmap;
 
 	UINT16 *m_spriteram;
-	UINT16 m_ip_select;
-	UINT16 m_ip_select_values[5];
+	UINT16 m_ip_select_values[7];
+	UINT16 m_ip_latched;
 	UINT8 m_ignore_oki_status;
 	UINT16 m_protection_val;
 	int m_scrollx[3];
@@ -77,10 +89,10 @@ public:
 	tilemap_t *m_tmap[3];
 	tilemap_t *m_tilemap[3][2][4];
 	int m_hardware_type_z;
-	UINT16 *m_buffer_objectram;
-	UINT16 *m_buffer2_objectram;
-	UINT16 *m_buffer_spriteram16;
-	UINT16 *m_buffer2_spriteram16;
+	std::unique_ptr<UINT16[]> m_buffer_objectram;
+	std::unique_ptr<UINT16[]> m_buffer2_objectram;
+	std::unique_ptr<UINT16[]> m_buffer_spriteram16;
+	std::unique_ptr<UINT16[]> m_buffer2_spriteram16;
 	int m_layers_order[16];
 
 	int m_mcu_hs;
@@ -92,14 +104,12 @@ public:
 	DECLARE_WRITE16_MEMBER(protection_peekaboo_w);
 	DECLARE_READ16_MEMBER(megasys1A_mcu_hs_r);
 	DECLARE_WRITE16_MEMBER(megasys1A_mcu_hs_w);
-	DECLARE_READ16_MEMBER(edfbl_input_r);
 	DECLARE_READ16_MEMBER(iganinju_mcu_hs_r);
 	DECLARE_WRITE16_MEMBER(iganinju_mcu_hs_w);
 	DECLARE_READ16_MEMBER(soldamj_spriteram16_r);
 	DECLARE_WRITE16_MEMBER(soldamj_spriteram16_w);
 	DECLARE_READ16_MEMBER(stdragon_mcu_hs_r);
 	DECLARE_WRITE16_MEMBER(stdragon_mcu_hs_w);
-	DECLARE_READ16_MEMBER(monkelf_input_r);
 	DECLARE_WRITE16_MEMBER(megasys1_scrollram_0_w);
 	DECLARE_WRITE16_MEMBER(megasys1_scrollram_1_w);
 	DECLARE_WRITE16_MEMBER(megasys1_scrollram_2_w);
@@ -131,11 +141,13 @@ public:
 	DECLARE_DRIVER_INIT(avspirit);
 	DECLARE_DRIVER_INIT(monkelf);
 	DECLARE_DRIVER_INIT(edf);
+	DECLARE_DRIVER_INIT(edfp);
 	DECLARE_DRIVER_INIT(bigstrik);
 	DECLARE_DRIVER_INIT(rodland);
 	DECLARE_DRIVER_INIT(edfbl);
 	DECLARE_DRIVER_INIT(stdragona);
 	DECLARE_DRIVER_INIT(stdragonb);
+	DECLARE_DRIVER_INIT(systemz);
 	TILEMAP_MAPPER_MEMBER(megasys1_scan_8x8);
 	TILEMAP_MAPPER_MEMBER(megasys1_scan_16x16);
 	TILE_GET_INFO_MEMBER(megasys1_get_scroll_tile_info_8x8);
@@ -148,13 +160,18 @@ public:
 	void screen_eof_megasys1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
+	DECLARE_WRITE16_MEMBER(ms1_ram_w);
+
 	inline void scrollram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int which);
 	void create_tilemaps();
 	void megasys1_priority_create();
+	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 param);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, INT32 code, INT32 color, INT32 sx, INT32 sy, INT32 flipx, INT32 flipy, UINT8 mosaic, UINT8 mosaicsol, INT32 priority);
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

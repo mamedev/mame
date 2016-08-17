@@ -46,7 +46,7 @@ public:
 	UINT16 m_palette_intensity;
 
 	// argus specific
-	UINT8 *m_dummy_bg0ram;
+	std::unique_ptr<UINT8[]> m_dummy_bg0ram;
 	int m_lowbitscroll;
 	int m_prvscrollx;
 
@@ -55,7 +55,7 @@ public:
 	UINT8 *m_butasan_bg0ram;
 	UINT8 *m_butasan_bg0backram;
 	UINT8 *m_butasan_txbackram;
-	UINT8 *m_butasan_pagedram[2];
+	std::unique_ptr<UINT8[]> m_butasan_pagedram[2];
 	UINT8 m_butasan_page_latch;
 	UINT8 m_butasan_bg1_status;
 	UINT8 m_butasan_unknown;
@@ -85,7 +85,6 @@ public:
 	DECLARE_WRITE8_MEMBER(butasan_bg0_status_w);
 	DECLARE_WRITE8_MEMBER(butasan_bg1_status_w);
 	DECLARE_WRITE8_MEMBER(butasan_paletteram_w);
-	DECLARE_READ8_MEMBER(butasan_bg1ram_r);
 	DECLARE_WRITE8_MEMBER(butasan_bg1ram_w);
 	DECLARE_WRITE8_MEMBER(butasan_pageselect_w);
 	DECLARE_READ8_MEMBER(butasan_pagedram_r);
@@ -106,7 +105,7 @@ public:
 	TILE_GET_INFO_MEMBER(butasan_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_bg1_tile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(argus);
 	DECLARE_VIDEO_RESET(argus);
 	DECLARE_VIDEO_START(valtric);

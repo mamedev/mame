@@ -1,0 +1,35 @@
+<!-- mirage.lay -->
+<!-- 2016-01-09: Initial version.  [R. Belmont] -->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.85" green="0.10" blue="0.10" />
+		</led7seg>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+
+		<!-- Background -->
+		<backdrop element="background">
+			<bounds left="0" top="0" right="42" bottom="28" />
+		</backdrop>
+
+		<!-- LEDs -->
+		<bezel name="digit0" element="digit">
+			<bounds left="2" top="0" right="20" bottom="23" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="22" top="0" right="40" bottom="23" />
+		</bezel>
+	</view>
+
+</mamelayout>

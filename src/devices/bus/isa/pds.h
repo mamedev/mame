@@ -24,14 +24,14 @@ public:
 		DECLARE_WRITE8_MEMBER(ppi_w);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 
 		required_device<i8255_device> m_ppi;
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
-		virtual void device_stop();
+		virtual void device_start() override;
+		virtual void device_reset() override;
+		virtual void device_stop() override;
 
 };
 

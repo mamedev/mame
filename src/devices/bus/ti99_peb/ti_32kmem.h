@@ -14,23 +14,28 @@
 #ifndef __TI32K__
 #define __TI32K__
 
+#include "emu.h"
+#include "peribox.h"
+#include "machine/ram.h"
+
 extern const device_type TI_32KMEM;
 
 class ti_32k_expcard_device : public ti_expansion_card_device
 {
 public:
 	ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz) { };
-	DECLARE_WRITE8_MEMBER(cruwrite) { };
+	DECLARE_READ8Z_MEMBER(crureadz) override { };
+	DECLARE_WRITE8_MEMBER(cruwrite) override { };
 
 protected:
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
+	void device_start() override;
+	machine_config_constructor device_mconfig_additions() const override;
+
 private:
-	UINT8*  m_ram_ptr;
+	required_device<ram_device> m_ram;
 };
 
 #endif

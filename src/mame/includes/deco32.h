@@ -5,6 +5,7 @@
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
@@ -33,6 +34,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll32(*this, "pf1_rowscroll32"),
 		m_pf2_rowscroll32(*this, "pf2_rowscroll32"),
@@ -60,6 +62,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT32> m_ram;
 	// we use the pointers below to store a 32-bit copy..
@@ -83,9 +86,9 @@ public:
 	int m_byteAddr; // tattass
 	int m_ace_ram_dirty; // nslasher and tattass
 	int m_has_ace_ram; // all - config
-	UINT8 *m_dirty_palette; // all but captaven
+	std::unique_ptr<UINT8[]> m_dirty_palette; // all but captaven
 	int m_pri; // captaven, fghthist, nslasher and tattass
-	bitmap_ind16 *m_tilemap_alpha_bitmap; // nslasher
+	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap; // nslasher
 	UINT16 m_spriteram16[0x1000]; // captaven, fghthist, nslasher and tattass
 	UINT16 m_spriteram16_buffered[0x1000]; // captaven, fghthist, nslasher and tattass
 	UINT16 m_spriteram16_2[0x1000]; //nslasher and tattass
@@ -151,7 +154,7 @@ public:
 	DECLARE_READ16_MEMBER(dg_protection_region_0_146_r);
 	DECLARE_WRITE16_MEMBER(dg_protection_region_0_146_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(tattass);
 	DECLARE_DRIVER_INIT(nslasher);
 	DECLARE_DRIVER_INIT(captaven);
@@ -216,7 +219,7 @@ public:
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(dragngun);
 	DECLARE_DRIVER_INIT(dragngunj);
 	DECLARE_DRIVER_INIT(lockload);

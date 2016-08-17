@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
+// copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria,Stephane Humbert
 /*******************************************************************************
 
     Input port macros used by many games in multiple Taito drivers

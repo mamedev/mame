@@ -1,6 +1,6 @@
 /*
  * Copyright 2013 Jeremie Roy. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #define USE_EDTAA3 0
@@ -25,7 +25,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 #include "../common.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <math.h>
 
 #if USE_EDTAA3

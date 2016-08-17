@@ -30,8 +30,6 @@ public:
 	required_device<ram_device> m_ram;
 	memory_region* m_rom;
 
-	UINT32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(crtc_address_w);
 	DECLARE_WRITE8_MEMBER(crtc_register_w);
@@ -49,9 +47,9 @@ public:
 	static void static_set_gfxregion(device_t &device, const char *tag);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 m_crtc_index;

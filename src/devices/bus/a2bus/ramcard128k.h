@@ -28,17 +28,17 @@ public:
 	a2bus_ssramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
-	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset);
-	virtual void write_inh_rom(address_space &space, UINT16 offset, UINT8 data);
-	virtual UINT16 inh_start() { return 0xd000; }
-	virtual UINT16 inh_end() { return 0xffff; }
-	virtual int inh_type();
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset) override;
+	virtual void write_inh_rom(address_space &space, UINT16 offset, UINT8 data) override;
+	virtual UINT16 inh_start() override { return 0xd000; }
+	virtual UINT16 inh_end() override { return 0xffff; }
+	virtual int inh_type() override;
 
 private:
 	void do_io(int offset);

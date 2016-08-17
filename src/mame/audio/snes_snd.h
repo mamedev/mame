@@ -79,12 +79,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 
@@ -97,7 +97,7 @@ private:
 	void state_register();
 
 	// internal state
-	UINT8                   *m_ram;
+	std::unique_ptr<UINT8[]>                   m_ram;
 	sound_stream            *m_channel;
 	UINT8                   m_dsp_regs[256];      /* DSP registers */
 	UINT8                   m_ipl_region[64];     /* SPC top 64 bytes */

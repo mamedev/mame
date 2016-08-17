@@ -22,7 +22,6 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_gx400_shared_ram(*this, "gx400_shared"),
-		m_voiceram(*this, "voiceram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_filter1(*this, "filter1"),
@@ -49,7 +48,6 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT8> m_gx400_shared_ram;
-	optional_shared_ptr<UINT8> m_voiceram;
 
 	/* video-related */
 	tilemap_t *m_background;
@@ -112,9 +110,9 @@ public:
 	DECLARE_WRITE8_MEMBER(city_sound_bank_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nemesis_interrupt);
 	INTERRUPT_GEN_MEMBER(blkpnthr_interrupt);

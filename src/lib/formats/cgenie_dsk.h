@@ -20,13 +20,13 @@ class cgenie_format : public wd177x_format
 public:
 	cgenie_format();
 
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 protected:
-	virtual int get_track_dam_fm(const format &f, int head, int track);
-	virtual int get_track_dam_mfm(const format &f, int head, int track);
+	virtual int get_track_dam_fm(const format &f, int head, int track) override;
+	virtual int get_track_dam_mfm(const format &f, int head, int track) override;
 
 private:
 	static const format formats[];

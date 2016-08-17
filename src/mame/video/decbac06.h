@@ -2,6 +2,15 @@
 // copyright-holders:Bryan McPhail, David Haywood
 /* BAC06 */
 
+#define MCFG_BAC06_BOOTLEG_DISABLE_8x8 \
+	deco_bac06_device::disable_8x8(*device);
+
+#define MCFG_BAC06_BOOTLEG_DISABLE_16x16 \
+	deco_bac06_device::disable_16x16(*device);
+
+#define MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL \
+	deco_bac06_device::disable_rc_scroll(*device);
+
 
 class deco_bac06_device : public device_t
 {
@@ -12,12 +21,38 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide);
 
-	UINT16* m_pf_data;
-	UINT16* m_pf_rowscroll, *m_pf_colscroll;
+	std::unique_ptr<UINT16[]> m_pf_data;
+	std::unique_ptr<UINT16[]> m_pf_rowscroll;
+	std::unique_ptr<UINT16[]> m_pf_colscroll;
 
 	tilemap_t* m_pf8x8_tilemap[3];
 	tilemap_t* m_pf16x16_tilemap[3];
-	int    m_tile_region;
+	int    m_tile_region_8;
+	int    m_tile_region_16;
+
+	// some bootlegs (eg midresb / midresbj) don't appear to actually support the alt modes, they set them and end up with broken gfx on later levels.
+	bool    m_supports_8x8;
+	bool    m_supports_16x16;
+	bool    m_supports_rc_scroll;
+
+	static void disable_8x8(device_t &device)
+	{
+		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
+		dev.m_supports_8x8 = false;
+	}
+
+	static void disable_16x16(device_t &device)
+	{
+		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
+		dev.m_supports_16x16 = false;
+	}
+
+	static void disable_rc_scroll(device_t &device)
+	{
+		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
+		dev.m_supports_rc_scroll = false;
+	}
+
 	void create_tilemaps(int region8x8,int region16x16);
 	UINT16 m_pf_control_0[8];
 	UINT16 m_pf_control_1[8];
@@ -81,8 +116,8 @@ public:
 	DECLARE_WRITE8_MEMBER( pf_rowscroll_8bit_swap_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_gfxregion8x8;
 	UINT8 m_gfxregion16x16;
@@ -117,3 +152,6 @@ extern const device_type DECO_BAC06;
 
 #define MCFG_DECO_BAC06_GFXDECODE(_gfxtag) \
 	deco_bac06_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_DECO_BAC06_GFX_REGION_WIDE(_8x8, _16x16, _wide) \
+	deco_bac06_device::set_gfx_region_wide(*device, _8x8, _16x16, _wide);

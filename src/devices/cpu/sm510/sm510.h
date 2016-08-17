@@ -21,7 +21,7 @@
 // driver is required to use execute_set_input(SM510_INPUT_LINE_K, state)
 #define SM510_INPUT_LINE_K 0
 
-// 1-bit BA input pin (pull-up)
+// 1-bit BA(aka alpha) input pin (pull-up)
 #define MCFG_SM510_READ_BA_CB(_devcb) \
 	sm510_base_device::set_read_ba_callback(*device, DEVCB_##_devcb);
 
@@ -62,6 +62,30 @@ enum
 
 /*
 
+        b2 a3 b3 a4 b4 a5 b5 GNDa6 b6 a7 b7 a8 b8 a9
+        45 44 43 42 41 40 39 38 37 36 35 34 33 32 31
+       ______________________________________________
+      |                                              |
+a2 46 |                                              | 30 b9
+b1 47 |                                              | 29 a10
+a1 48 |                                              | 28 b10
+H4 49 |                                              | 27 a11
+H3 50 |                                              | 26 b11
+H2 51 |                                              | 25 a12
+H1 52 |                    SM510                     | 24 b12
+S1 53 |                    SM511                     | 23 a13
+S2 54 |                                              | 22 b13
+S3 55 |                                              | 21 a14
+S4 56 |                                              | 20 b14
+S5 57 |                                              | 19 a15
+S6 58 |                                              | 18 b15
+S7 59 |                                              | 17 a16
+S8 60 | *                                            | 16 b16
+      |______________________________________________/
+
+         1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+         T K1 K2 K3 K4 ACL | GND |OSCin| bt R1 R2 bs   note: bt = beta symbol
+                           BA  OSCout Vdd
 */
 
 class sm510_base_device : public cpu_device
@@ -98,25 +122,25 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 2 - 1) / 2; } // default 2 cycles per machine cycle
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); } // "
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 2; }
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual void execute_set_input(int line, int state);
-	virtual void execute_run();
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 2 - 1) / 2; } // default 2 cycles per machine cycle
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 2); } // "
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 2; }
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual void execute_set_input(int line, int state) override;
+	virtual void execute_run() override;
 	virtual void execute_one() { } // -> child class
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 0x40; } // actually 2, but debugger doesn't like non-linear pc
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 0x40; } // actually 2, but debugger doesn't like non-linear pc
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -138,6 +162,7 @@ protected:
 	UINT8 m_acc;
 	UINT8 m_bl;
 	UINT8 m_bm;
+	bool m_sbm;
 	UINT8 m_c;
 	bool m_skip;
 	UINT8 m_w;
@@ -156,7 +181,7 @@ protected:
 
 	UINT16 get_lcd_row(int column, UINT8* ram);
 	TIMER_CALLBACK_MEMBER(lcd_timer_cb);
-	void init_lcd_driver();
+	virtual void init_lcd_driver();
 
 	// melody controller
 	optional_region_ptr<UINT8> m_melody_rom;
@@ -198,68 +223,70 @@ protected:
 	UINT8 bitmask(UINT16 param);
 
 	// opcode handlers
-	void op_lb();
-	void op_lbl();
-	void op_sbm();
-	void op_exbla();
-	void op_incb();
-	void op_decb();
+	virtual void op_lb();
+	virtual void op_lbl();
+	virtual void op_sbm();
+	virtual void op_exbla();
+	virtual void op_incb();
+	virtual void op_decb();
 
-	void op_atpl();
-	void op_rtn0();
-	void op_rtn1();
-	void op_tl();
-	void op_tml();
-	void op_tm();
-	void op_t();
+	virtual void op_atpl();
+	virtual void op_rtn0();
+	virtual void op_rtn1();
+	virtual void op_tl();
+	virtual void op_tml();
+	virtual void op_tm();
+	virtual void op_t();
 
-	void op_exc();
-	void op_bdc();
-	void op_exci();
-	void op_excd();
-	void op_lda();
-	void op_lax();
-	void op_ptw();
-	void op_wr();
-	void op_ws();
+	virtual void op_exc();
+	virtual void op_bdc();
+	virtual void op_exci();
+	virtual void op_excd();
+	virtual void op_lda();
+	virtual void op_lax();
+	virtual void op_ptw();
+	virtual void op_wr();
+	virtual void op_ws();
 
-	void op_kta();
-	void op_atbp();
-	void op_atx();
-	void op_atl();
-	void op_atfc();
-	void op_atr();
+	virtual void op_kta();
+	virtual void op_atbp();
+	virtual void op_atx();
+	virtual void op_atl();
+	virtual void op_atfc();
+	virtual void op_atr();
 
-	void op_add();
-	void op_add11();
-	void op_adx();
-	void op_coma();
-	void op_rot();
-	void op_rc();
-	void op_sc();
+	virtual void op_add();
+	virtual void op_add11();
+	virtual void op_adx();
+	virtual void op_coma();
+	virtual void op_rot();
+	virtual void op_rc();
+	virtual void op_sc();
 
-	void op_tb();
-	void op_tc();
-	void op_tam();
-	void op_tmi();
-	void op_ta0();
-	void op_tabl();
-	void op_tis();
-	void op_tal();
-	void op_tf1();
-	void op_tf4();
+	virtual void op_tb();
+	virtual void op_tc();
+	virtual void op_tam();
+	virtual void op_tmi();
+	virtual void op_ta0();
+	virtual void op_tabl();
+	virtual void op_tis();
+	virtual void op_tal();
+	virtual void op_tf1();
+	virtual void op_tf4();
 
-	void op_rm();
-	void op_sm();
+	virtual void op_rm();
+	virtual void op_sm();
 
-	void op_pre();
-	void op_sme();
-	void op_rme();
-	void op_tmel();
+	virtual void op_pre();
+	virtual void op_sme();
+	virtual void op_rme();
+	virtual void op_tmel();
 
-	void op_skip();
-	void op_cend();
-	void op_idiv();
+	virtual void op_skip();
+	virtual void op_cend();
+	virtual void op_idiv();
+	virtual void op_dr();
+	virtual void op_dta();
 
 	void op_illegal();
 };
@@ -271,11 +298,11 @@ public:
 	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void execute_one();
-	virtual void get_opcode_param();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void execute_one() override;
+	virtual void get_opcode_param() override;
 
-	virtual void update_w_latch() { m_write_s(0, m_w, 0xff); } // W is connected directly to S
+	virtual void update_w_latch() override { m_write_s(0, m_w, 0xff); } // W is connected directly to S
 };
 
 
@@ -286,9 +313,9 @@ public:
 	sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void execute_one();
-	virtual void get_opcode_param();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void execute_one() override;
+	virtual void get_opcode_param() override;
 };
 
 class sm512_device : public sm511_device

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins
+// copyright-holders:K.Wilkins,Stephane Humbert
 /***************************************************************************
 
   Toaplan Slap Fight hardware
@@ -129,8 +129,8 @@ public:
 	DECLARE_READ8_MEMBER(tigerhb1_prot_r);
 	DECLARE_WRITE8_MEMBER(tigerhb1_prot_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(getstar);
 
 	void init_banks();

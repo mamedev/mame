@@ -581,7 +581,7 @@
 	</software>
 
 	<software name="macwrk3">
-		<description>Lisa Macworks XL 3.0 </description>
+		<description>Lisa Macworks XL 3.0</description>
 		<year>1985</year>
 		<publisher>Apple Computer Inc.</publisher>
 		<info name="finder" value="4.1" />

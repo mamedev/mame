@@ -4,21 +4,23 @@
 #ifndef __DECO146_H__
 #define __DECO146_H__
 
+#include "machine/gen_latch.h"
+
 typedef device_delegate<UINT16 (int unused)> deco146_port_read_cb;
 typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask)> deco146_port_write_cb;
 
 
 #define MCFG_DECO146_SET_PORTA_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_a_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	deco_146_base_device::set_port_a_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_DECO146_SET_PORTB_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_b_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	deco_146_base_device::set_port_b_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_DECO146_SET_PORTC_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_c_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	deco_146_base_device::set_port_c_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_DECO146_SET_SOUNDLATCH_CALLBACK( _class, _method) \
-	deco_146_base_device::set_soundlatch_cb(*device, deco146_port_write_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	deco_146_base_device::set_soundlatch_cb(*device, deco146_port_write_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 // there are some standard ways the chip gets hooked up, so have them here ready to use
@@ -131,9 +133,9 @@ public:
 
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT16 read_protport(UINT16 address, UINT16 mem_mask);
 	virtual void write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask);
@@ -156,6 +158,7 @@ protected:
 	int m_latchflag;
 private:
 	UINT8 region_selects[6];
+	optional_device<generic_latch_8_device> m_sound_latch;
 
 };
 

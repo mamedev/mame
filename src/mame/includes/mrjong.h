@@ -28,7 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mrjong_colorram_w);
 	DECLARE_WRITE8_MEMBER(mrjong_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mrjong);
 	UINT32 screen_update_mrjong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

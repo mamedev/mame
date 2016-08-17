@@ -81,6 +81,8 @@ public:
 	// construction/destruction
 	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void static_set_reset_param(device_t &device, const pdp1_reset_param_t *param) { downcast<pdp1_device &>(device).m_reset_param = param; }
+
 	void pulse_start_clear();
 	void io_complete() { m_ios = 1; }
 	void pdp1_null_iot(int op2, int nac, int mb, int *io, int ac);
@@ -90,29 +92,29 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 5; }
-	virtual UINT32 execute_max_cycles() const { return 31; }
-	virtual UINT32 execute_input_lines() const { return 16; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 5; }
+	virtual UINT32 execute_max_cycles() const override { return 31; }
+	virtual UINT32 execute_input_lines() const override { return 16; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	address_space_config m_program_config;
@@ -190,10 +192,15 @@ private:
 	void field_interrupt();
 	void execute_instruction();
 
+	const pdp1_reset_param_t *m_reset_param;
 };
 
 
 extern const device_type PDP1;
+
+
+#define MCFG_PDP1_RESET_PARAM(_param) \
+	pdp1_device::static_set_reset_param(*device, &(_param));
 
 
 #endif /* __PDP1_H__ */

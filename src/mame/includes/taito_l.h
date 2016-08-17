@@ -92,7 +92,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_control_w);
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_control_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(mux_ctrl_w);
@@ -154,6 +153,5 @@ public:
 	void state_register(  );
 	void taito_machine_reset();
 	void bank_w(address_space &space, offs_t offset, UINT8 data, int banknum );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(champwr_msm5205_vck);
 };

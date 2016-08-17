@@ -13,6 +13,8 @@
 
 #include "debugvw.h"
 
+#include "vecstream.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -43,12 +45,10 @@ class debug_view_disasm_source : public debug_view_source
 
 public:
 	// getters
-	device_t &device() const { return m_device; }
 	address_space &space() const { return m_space; }
 
 private:
 	// internal state
-	device_t &          m_device;               // underlying device
 	device_disasm_interface *m_disasmintf;      // disassembly interface
 	address_space &     m_space;                // address space to display
 	address_space &     m_decrypted_space;      // address space to display for decrypted opcodes
@@ -82,16 +82,16 @@ public:
 
 protected:
 	// view overrides
-	virtual void view_update();
-	virtual void view_notify(debug_view_notification type);
-	virtual void view_char(int chval);
-	virtual void view_click(const int button, const debug_view_xy& pos);
+	virtual void view_update() override;
+	virtual void view_notify(debug_view_notification type) override;
+	virtual void view_char(int chval) override;
+	virtual void view_click(const int button, const debug_view_xy& pos) override;
 
 private:
 	// internal helpers
 	void enumerate_sources();
 	offs_t find_pc_backwards(offs_t targetpc, int numinstrs);
-	void generate_bytes(offs_t pcbyte, int numbytes, int minbytes, char *string, int maxchars, bool encrypted);
+	void generate_bytes(offs_t pcbyte, int numbytes, int minbytes, int maxchars, bool encrypted);
 	bool recompute(offs_t pc, int startline, int lines);
 
 	// internal state
@@ -106,12 +106,12 @@ private:
 	int                 m_divider3;             // comment divider column
 	debug_view_expression m_expression;         // expression-related information
 	std::vector<offs_t> m_byteaddress;               // addresses of the instructions
-	std::vector<char> m_dasm;                        // disassembled instructions
+	util::ovectorstream m_dasm;                 // disassembled instructions
 
 	// constants
-	static const int DEFAULT_DASM_LINES = 1000;
-	static const int DEFAULT_DASM_WIDTH = 50;
-	static const int DASM_MAX_BYTES = 16;
+	static constexpr int DEFAULT_DASM_LINES = 1000;
+	static constexpr int DEFAULT_DASM_WIDTH = 50;
+	static constexpr int DASM_MAX_BYTES = 16;
 };
 
 

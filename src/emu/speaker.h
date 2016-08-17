@@ -68,7 +68,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// inline configuration state
 	double              m_x;

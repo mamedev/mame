@@ -1,13 +1,16 @@
-// license:???
-// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Ernesto Corvi, Aaron Giles
+// thanks-to:Kurt Mahan
 /*************************************************************************
 
     Williams/Midway Y/Z-unit system
 
 **************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "cpu/tms34010/tms34010.h"
 #include "audio/williams.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 
@@ -49,8 +52,10 @@ public:
 			m_narc_sound(*this, "narcsnd"),
 			m_cvsd_sound(*this, "cvsd"),
 			m_adpcm_sound(*this, "adpcm"),
+			m_soundlatch(*this, "soundlatch"),
 			m_generic_paletteram_16(*this, "paletteram"),
 			m_gfx_rom(*this, "gfx_rom", 16),
+			m_mainram(*this, "mainram"),
 			m_ports(*this, ports) { }
 
 	required_device<cpu_device> m_maincpu;
@@ -60,15 +65,16 @@ public:
 	optional_device<williams_narc_sound_device> m_narc_sound;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	optional_shared_ptr<UINT8> m_gfx_rom;
-
+	required_shared_ptr<UINT16> m_mainram;
 	optional_ioport_array<6> m_ports;
 
 	DECLARE_IOPORT_ARRAY(ports);
 
-	UINT16 *m_cmos_ram;
+	std::unique_ptr<UINT16[]> m_cmos_ram;
 	UINT32 m_cmos_page;
 	UINT16 m_prot_result;
 	UINT16 m_prot_sequence[3];
@@ -81,8 +87,8 @@ public:
 	UINT8 *m_cvsd_protection_base;
 	UINT8 m_autoerase_enable;
 	UINT32 m_palette_mask;
-	pen_t * m_pen_map;
-	UINT16 *    m_local_videoram;
+	std::unique_ptr<pen_t[]> m_pen_map;
+	std::unique_ptr<UINT16[]>   m_local_videoram;
 	UINT8 m_videobank_select;
 	UINT8 m_yawdim_dma;
 	UINT16 m_dma_register[16];
@@ -139,7 +145,7 @@ public:
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void dma_draw(UINT16 command);
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
 	void term2_init_common(write16_delegate hack_w);

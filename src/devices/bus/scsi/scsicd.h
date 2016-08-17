@@ -19,10 +19,10 @@ public:
 	// construction/destruction
 	scsicd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	scsicd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 // device type definition

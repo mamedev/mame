@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_ALLOCATOR_H_HEADER_GUARD
@@ -11,10 +11,6 @@
 #include <memory.h>
 #include <string.h> //::memmove
 #include <new>
-
-#if BX_CONFIG_ALLOCATOR_CRT
-#	include <malloc.h>
-#endif // BX_CONFIG_ALLOCATOR_CRT
 
 #if BX_CONFIG_ALLOCATOR_DEBUG
 #	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size, 0, __FILE__, __LINE__)
@@ -61,30 +57,32 @@ namespace bx
 	struct BX_NO_VTABLE AllocatorI
 	{
 		virtual ~AllocatorI() = 0;
-		virtual void* alloc(size_t _size, size_t _align, const char* _file, uint32_t _line) = 0;
-		virtual void free(void* _ptr, size_t _align, const char* _file, uint32_t _line) = 0;
+
+		/// Allocated, resizes memory block or frees memory.
+		///
+		/// @param[in] _ptr If _ptr is NULL new block will be allocated.
+		/// @param[in] _size If _ptr is set, and _size is 0, memory will be freed.
+		/// @param[in] _align Alignment.
+		/// @param[in] _file Debug file path info.
+		/// @param[in] _line Debug file line info.
+		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) = 0;
 	};
 
 	inline AllocatorI::~AllocatorI()
 	{
 	}
 
-	struct BX_NO_VTABLE ReallocatorI : public AllocatorI
-	{
-		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) = 0;
-	};
-
 	inline void* alloc(AllocatorI* _allocator, size_t _size, size_t _align = 0, const char* _file = NULL, uint32_t _line = 0)
 	{
-		return _allocator->alloc(_size, _align, _file, _line);
+		return _allocator->realloc(NULL, _size, _align, _file, _line);
 	}
 
 	inline void free(AllocatorI* _allocator, void* _ptr, size_t _align = 0, const char* _file = NULL, uint32_t _line = 0)
 	{
-		_allocator->free(_ptr, _align, _file, _line);
+		_allocator->realloc(_ptr, 0, _align, _file, _line);
 	}
 
-	inline void* realloc(ReallocatorI* _allocator, void* _ptr, size_t _size, size_t _align = 0, const char* _file = NULL, uint32_t _line = 0)
+	inline void* realloc(AllocatorI* _allocator, void* _ptr, size_t _size, size_t _align = 0, const char* _file = NULL, uint32_t _line = 0)
 	{
 		return _allocator->realloc(_ptr, _size, _align, _file, _line);
 	}
@@ -107,7 +105,7 @@ namespace bx
 		free(_allocator, ptr, 0, _file, _line);
 	}
 
-	static inline void* alignedRealloc(ReallocatorI* _allocator, void* _ptr, size_t _size, size_t _align, const char* _file = NULL, uint32_t _line = 0)
+	static inline void* alignedRealloc(AllocatorI* _allocator, void* _ptr, size_t _size, size_t _align, const char* _file = NULL, uint32_t _line = 0)
 	{
 		if (NULL == _ptr)
 		{
@@ -142,66 +140,6 @@ namespace bx
 			free(_allocator, _object, _align, _file, _line);
 		}
 	}
-
-#if BX_CONFIG_ALLOCATOR_CRT
-	class CrtAllocator : public ReallocatorI
-	{
-	public:
-		CrtAllocator()
-		{
-		}
-
-		virtual ~CrtAllocator()
-		{
-		}
-
-		virtual void* alloc(size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE
-		{
-			if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-			{
-				return ::malloc(_size);
-			}
-
-#	if BX_COMPILER_MSVC
-			BX_UNUSED(_file, _line);
-			return _aligned_malloc(_size, _align);
-#	else
-			return bx::alignedAlloc(this, _size, _align, _file, _line);
-#	endif // BX_
-		}
-
-		virtual void free(void* _ptr, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE
-		{
-			if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-			{
-				::free(_ptr);
-				return;
-			}
-
-#	if BX_COMPILER_MSVC
-			BX_UNUSED(_file, _line);
-			_aligned_free(_ptr);
-#	else
-			bx::alignedFree(this, _ptr, _align, _file, _line);
-#	endif // BX_
-		}
-
-		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE
-		{
-			if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-			{
-				return ::realloc(_ptr, _size);
-			}
-
-#	if BX_COMPILER_MSVC
-			BX_UNUSED(_file, _line);
-			return _aligned_realloc(_ptr, _size, _align);
-#	else
-			return bx::alignedRealloc(this, _ptr, _size, _align, _file, _line);
-#	endif // BX_
-		}
-	};
-#endif // BX_CONFIG_ALLOCATOR_CRT
 
 } // namespace bx
 

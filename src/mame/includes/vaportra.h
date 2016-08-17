@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "video/deco16ic.h"
 #include "video/decmxc06.h"
@@ -22,6 +23,7 @@ public:
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_generic_paletteram2_16(*this, "paletteram2") { }
 
@@ -33,6 +35,7 @@ public:
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	required_shared_ptr<UINT16> m_generic_paletteram2_16;
@@ -48,8 +51,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_b_w);
 
 	DECLARE_DRIVER_INIT(vaportra);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol( int offset );

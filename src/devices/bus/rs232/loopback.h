@@ -12,12 +12,12 @@ class rs232_loopback_device : public device_t,
 public:
 	rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual WRITE_LINE_MEMBER( input_txd );
-	virtual WRITE_LINE_MEMBER( input_rts );
-	virtual WRITE_LINE_MEMBER( input_dtr );
+	virtual WRITE_LINE_MEMBER( input_txd ) override;
+	virtual WRITE_LINE_MEMBER( input_rts ) override;
+	virtual WRITE_LINE_MEMBER( input_dtr ) override;
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type RS232_LOOPBACK;

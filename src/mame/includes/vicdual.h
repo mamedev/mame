@@ -63,6 +63,7 @@ public:
 	int m_port1State;
 	int m_port2State;
 	int m_psgData;
+	int m_psgBus;
 	emu_timer *m_frogs_croak_timer;
 
 	void coin_in();
@@ -110,13 +111,13 @@ public:
 	DECLARE_WRITE8_MEMBER( invho2_audio_w );
 	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
 
-
 	/*----------- defined in audio/carnival.c -----------*/
 	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
 	DECLARE_READ8_MEMBER( carnival_music_port_t1_r );
 	DECLARE_WRITE8_MEMBER( carnival_music_port_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_music_port_2_w );
+	void carnival_psg_latch(address_space &space);
 
 	/*----------- defined in audio/depthch.c -----------*/
 	DECLARE_WRITE8_MEMBER( depthch_audio_w );
@@ -146,7 +147,7 @@ public:
 	DECLARE_MACHINE_RESET(nsub);
 	DECLARE_MACHINE_START(frogs_audio);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -154,10 +155,3 @@ public:
 	int get_vcounter();
 	int is_cabinet_color();
 };
-
-MACHINE_CONFIG_EXTERN( carnival_audio );
-MACHINE_CONFIG_EXTERN( depthch_audio );
-MACHINE_CONFIG_EXTERN( frogs_audio );
-MACHINE_CONFIG_EXTERN( headon_audio );
-MACHINE_CONFIG_EXTERN( invinco_audio );
-MACHINE_CONFIG_EXTERN( pulsar_audio );

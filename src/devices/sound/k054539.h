@@ -18,7 +18,7 @@ typedef device_delegate<void (double left, double right)> k054539_cb_delegate;
 	k054539_device::set_analog_callback(*device, k054539_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_K054539_REGION_OVERRRIDE(_region) \
-	k054539_device::set_override(*device, _region);
+	k054539_device::set_override(*device, "^" _region);
 
 #define MCFG_K054539_TIMER_HANDLER(_devcb) \
 	devcb = &k054539_device::set_timer_handler(*device, DEVCB_##_devcb);
@@ -46,7 +46,7 @@ public:
 
 	// static configuration helpers
 	static void set_analog_callback(device_t &device, k054539_cb_delegate callback) { downcast<k054539_device &>(device).m_apan_cb = callback; }
-	static void set_override(device_t &device, const char *rgnoverride) { downcast<k054539_device &>(device).m_rgnoverride = rgnoverride; }
+	static void set_override(device_t &device, const char *rgnoverride) { downcast<k054539_device &>(device).m_rom.set_tag(rgnoverride); }
 	template<class _Object> static devcb_base &set_timer_handler(device_t &device, _Object object) { return downcast<k054539_device &>(device).m_timer_handler.set_callback(object); }
 
 
@@ -70,13 +70,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	struct channel {
@@ -94,14 +94,13 @@ private:
 	int flags;
 
 	unsigned char regs[0x230];
-	unsigned char *ram;
+	std::unique_ptr<UINT8[]> ram;
 	int reverb_pos;
 
 	INT32 cur_ptr;
 	int cur_limit;
 	unsigned char *cur_zone;
-	unsigned char *rom;
-	UINT32 rom_size;
+	required_region_ptr<UINT8> m_rom;
 	UINT32 rom_mask;
 
 	channel channels[8];
@@ -110,7 +109,6 @@ private:
 	emu_timer          *m_timer;
 	UINT32             m_timer_state;
 	devcb_write_line   m_timer_handler;
-	const char         *m_rgnoverride;
 	k054539_cb_delegate m_apan_cb;
 
 	bool regupdate();

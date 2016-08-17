@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Michael Soderstrom, Marc LaFontaine, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*************************************************************************
 
     Driver for early Williams games
@@ -7,6 +7,12 @@
 **************************************************************************/
 
 
+#include "cpu/m6809/m6809.h"
+#include "cpu/m6800/m6800.h"
+#include "sound/dac.h"
+#include "sound/hc55516.h"
+#include "machine/ticket.h"
+#include "machine/watchdog.h"
 #include "machine/6821pia.h"
 #include "machine/bankdev.h"
 #include "audio/williams.h"
@@ -21,6 +27,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_bankc000(*this, "bankc000"),
+		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram") { }
@@ -46,12 +53,12 @@ public:
 	UINT8 m_blitter_window_enable;
 	UINT8 m_cocktail;
 	UINT8 m_port_select;
-	rgb_t *m_palette_lookup;
+	std::unique_ptr<rgb_t[]> m_palette_lookup;
 	UINT8 m_blitterram[8];
 	UINT8 m_blitter_xor;
 	UINT8 m_blitter_remap_index;
 	const UINT8 *m_blitter_remap;
-	UINT8 *m_blitter_remap_lookup;
+	std::unique_ptr<UINT8[]> m_blitter_remap_lookup;
 	DECLARE_WRITE8_MEMBER(williams_vram_select_w);
 	DECLARE_WRITE8_MEMBER(williams_cmos_w);
 	DECLARE_WRITE8_MEMBER(bubbles_cmos_w);
@@ -109,6 +116,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<address_map_bank_device> m_bankc000;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;

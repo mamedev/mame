@@ -175,10 +175,14 @@
 	end
 
 	local function removevalues(tbl, removes)
-		for i=#tbl,1,-1 do
+		for k, v in pairs(tbl) do
 			for _, pattern in ipairs(removes) do
-				if pattern == tbl[i] then
-					table.remove(tbl, i)
+				if pattern == tbl[k] then
+					if type(k) == "number" then 
+						table.remove(tbl, k) 
+					else 
+						tbl[k] = nil 
+					end
 					break
 				end
 			end
@@ -703,7 +707,7 @@
 
 		-- remove excluded files from the file list
 		local removefiles = cfg.removefiles
-		if _ACTION == 'gmake' then
+		if _ACTION == 'gmake' or _ACTION == 'ninja' then
 			removefiles = table.join(removefiles, cfg.excludes)
 		end
 		local files = {}
@@ -724,9 +728,26 @@
 		end
 
 		-- build configuration objects for all files
+		-- TODO: can I build this as a tree instead, and avoid the extra
+		-- step of building it later?
 		cfg.__fileconfigs = { }
 		for _, fname in ipairs(cfg.files) do
-			local fcfg = { }
+			local fcfg = {}
+
+			-- Only do this if the script has called enablefilelevelconfig()
+			if premake._filelevelconfig then
+				cfg.terms.required = fname:lower()
+				for _, blk in ipairs(cfg.project.blocks) do
+					-- BK - `iskeywordsmatch` call is super slow for large projects...
+					if (premake.iskeywordsmatch(blk.keywords, cfg.terms)) then
+						mergeobject(fcfg, blk)
+					end
+				end
+			end
+
+			-- add indexed by name and integer
+			-- TODO: when everything is converted to trees I won't need
+			-- to index by name any longer
 			fcfg.name = fname
 			cfg.__fileconfigs[fname] = fcfg
 			table.insert(cfg.__fileconfigs, fcfg)

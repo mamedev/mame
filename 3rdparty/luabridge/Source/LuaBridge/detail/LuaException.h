@@ -63,7 +63,7 @@ public:
 
   //----------------------------------------------------------------------------
 
-  char const* what() const throw ()
+  char const* what() const throw () override
   {
     return m_what.c_str();
   }

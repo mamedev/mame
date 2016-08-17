@@ -34,6 +34,15 @@ public:
 		m_mcu(*this, "mcu"),
 		m_c116(*this, "c116"),
 		m_eeprom(*this, "eeprom"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_p3(*this, "P3"),
+		m_p4(*this, "P4"),
+		m_misc(*this, "MISC"),
+		m_light0_x(*this, "LIGHT0_X"),
+		m_light0_y(*this, "LIGHT0_Y"),
+		m_light1_x(*this, "LIGHT1_X"),
+		m_light1_y(*this, "LIGHT1_Y"),
 		m_spritebank32(*this, "spritebank32"),
 		m_tilebank32(*this, "tilebank32"),
 		m_namconb_shareram(*this, "namconb_share") { }
@@ -42,6 +51,15 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
+	required_ioport m_p1;
+	required_ioport m_p2;
+	optional_ioport m_p3;
+	optional_ioport m_p4;
+	required_ioport m_misc;
+	optional_ioport m_light0_x;
+	optional_ioport m_light0_y;
+	optional_ioport m_light1_x;
+	optional_ioport m_light1_y;
 	required_shared_ptr<UINT32> m_spritebank32;
 	optional_shared_ptr<UINT32> m_tilebank32;
 	required_shared_ptr<UINT16> m_namconb_shareram;
@@ -50,7 +68,7 @@ public:
 	UINT8 m_pos_irq_level;
 	UINT8 m_unk_irq_level;
 	UINT16 m_count;
-	UINT8 m_nbx_port6;
+	UINT8 m_port6;
 	UINT32 m_tilemap_tile_bank[4];
 
 	DECLARE_READ32_MEMBER(randgen_r);
@@ -61,9 +79,9 @@ public:
 	DECLARE_READ8_MEMBER(namconb2_cpureg_r);
 	DECLARE_READ32_MEMBER(custom_key_r);
 	DECLARE_READ32_MEMBER(gunbulet_gun_r);
-	DECLARE_READ32_MEMBER(namconb_share_r);
-	DECLARE_WRITE32_MEMBER(namconb_share_w);
-	DECLARE_WRITE16_MEMBER(nbmcu_shared_w);
+	DECLARE_READ32_MEMBER(share_r);
+	DECLARE_WRITE32_MEMBER(share_w);
+	DECLARE_WRITE16_MEMBER(mcu_shared_w);
 	DECLARE_READ8_MEMBER(port6_r);
 	DECLARE_WRITE8_MEMBER(port6_w);
 	DECLARE_READ8_MEMBER(port7_r);
@@ -76,6 +94,7 @@ public:
 	DECLARE_READ8_MEMBER(dac1_r);
 	DECLARE_READ8_MEMBER(dac0_r);
 
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(sws95);
 	DECLARE_DRIVER_INIT(machbrkr);
 	DECLARE_DRIVER_INIT(sws97);
@@ -89,8 +108,12 @@ public:
 	DECLARE_MACHINE_RESET(namconb);
 	DECLARE_VIDEO_START(namconb1);
 	DECLARE_VIDEO_START(namconb2);
+	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ);
 	UINT32 screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(namconb_scantimer);
+	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
+
+	int NB1objcode2tile(int code);
+	int NB2objcode2tile(int code);
 };

@@ -71,8 +71,8 @@ public:
 	void write(UINT8 data);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write_line m_output_line_0_cb;

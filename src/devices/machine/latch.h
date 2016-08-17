@@ -45,7 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write) { write(data); }
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	bool m_resolved;

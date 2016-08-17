@@ -166,7 +166,7 @@ public:
 	isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_isa8_slot(device_t &device, device_t *owner, const char *isa_tag);
@@ -203,7 +203,7 @@ public:
 	template<class _Object> static devcb_base &set_out_drq3_callback(device_t &device, _Object object) { return downcast<isa8_device &>(device).m_out_drq3_cb.set_callback(object); }
 
 	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		switch (spacenum)
 		{
@@ -215,17 +215,17 @@ public:
 		}
 	}
 
-	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
+	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map, device_t &device), int bits = 8, UINT64 unitmask = U64(0xffffffffffffffff))
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);
 	}
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
-	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
-	void install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
+	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
+	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
+	void install_memory(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
-	void unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror);
-	void unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror);
+	void unmap_bank(offs_t start, offs_t end);
+	void unmap_rom(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
@@ -257,12 +257,12 @@ public:
 	const address_space_config m_program_config, m_io_config, m_program16_config, m_io16_config;
 
 protected:
-	void install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
+	void install_space(address_spacenum spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 
 	// internal state
 	cpu_device   *m_maincpu;
@@ -330,7 +330,7 @@ public:
 	// construction/destruction
 	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_isa16_slot(device_t &device, device_t *owner, const char *isa_tag);
@@ -357,10 +357,10 @@ public:
 	template<class _Object> static devcb_base &set_out_drq6_callback(device_t &device, _Object object) { return downcast<isa16_device &>(device).m_out_drq6_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_drq7_callback(device_t &device, _Object object) { return downcast<isa16_device &>(device).m_out_drq7_cb.set_callback(object); }
 
-	void install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
+	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 
 	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		switch (spacenum)
 		{
@@ -399,8 +399,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 private:
 	// internal state

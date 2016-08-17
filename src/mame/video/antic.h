@@ -369,9 +369,9 @@ public:
 	antic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	static void set_gtia_tag(device_t &device, const char *tag) { downcast<antic_device &>(device).m_gtia_tag = tag; }
 
@@ -435,9 +435,9 @@ private:
 	ANTIC_W m_w;                  /* ANTIC write registers */
 	UINT8   m_cclock[256+32];     /* color clock buffer filled by ANTIC */
 	UINT8   m_pmbits[256+32];     /* player missile buffer filled by GTIA */
-	UINT8   *m_prio_table[64];    /* player/missile priority tables */
+	std::unique_ptr<UINT8[]>   m_prio_table[64];    /* player/missile priority tables */
 	VIDEO   *m_video[312];        /* video buffer */
-	UINT32  *m_cclk_expand;       /* shared buffer for the following: */
+	std::unique_ptr<UINT32[]>  m_cclk_expand;       /* shared buffer for the following: */
 	UINT32  *m_pf_21;             /* 1cclk 2 color txt 2,3 */
 	UINT32  *m_pf_x10b;           /* 1cclk 4 color txt 4,5, gfx D,E */
 	UINT32  *m_pf_3210b2;         /* 1cclk 5 color txt 6,7, gfx 9,B,C */
@@ -447,7 +447,7 @@ private:
 	UINT32  *m_pf_gtia1;          /* 1cclk gtia mode 1 */
 	UINT32  *m_pf_gtia2;          /* 1cclk gtia mode 2 */
 	UINT32  *m_pf_gtia3;          /* 1cclk gtia mode 3 */
-	UINT8   *m_used_colors;       /* shared buffer for the following: */
+	std::unique_ptr<UINT8[]>   m_used_colors;       /* shared buffer for the following: */
 	UINT8   *m_uc_21;             /* used colors for txt (2,3) */
 	UINT8   *m_uc_x10b;           /* used colors for txt 4,5, gfx D,E */
 	UINT8   *m_uc_3210b2;         /* used colors for txt 6,7, gfx 9,B,C */
@@ -457,7 +457,7 @@ private:
 	UINT8   *m_uc_g1;             /* used colors for gfx GTIA 1 */
 	UINT8   *m_uc_g2;             /* used colors for gfx GTIA 2 */
 	UINT8   *m_uc_g3;             /* used colors for gfx GTIA 3 */
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	void prio_init();
 	void cclk_init();

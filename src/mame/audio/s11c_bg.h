@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "machine/6821pia.h"
@@ -50,9 +50,9 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	const char* m_regiontag;

@@ -22,12 +22,14 @@
 #define __H8S2245_H__
 
 #include "h8s2000.h"
-#include "h8_adc.h"
-#include "h8_port.h"
 #include "h8_intc.h"
-#include "h8_sci.h"
+#include "h8_adc.h"
+#include "h8_dtc.h"
+#include "h8_port.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
+#include "h8_sci.h"
+#include "h8_watchdog.h"
 
 class h8s2245_device : public h8s2000_device {
 public:
@@ -36,10 +38,13 @@ public:
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
+	DECLARE_READ16_MEMBER(mstpcr_r);
+	DECLARE_WRITE16_MEMBER(mstpcr_w);
 
 protected:
 	required_device<h8s_intc_device> intc;
 	required_device<h8_adc_device> adc;
+	required_device<h8_dtc_device> dtc;
 	required_device<h8_port_device> port1;
 	required_device<h8_port_device> port2;
 	required_device<h8_port_device> port3;
@@ -61,22 +66,24 @@ protected:
 	required_device<h8_sci_device> sci0;
 	required_device<h8_sci_device> sci1;
 	required_device<h8_sci_device> sci2;
+	required_device<h8_watchdog_device> watchdog;
 
 	UINT32 ram_start;
+	UINT16 mstpcr;
 	UINT8 syscr;
 
-	virtual bool exr_in_stack() const;
-	virtual void update_irq_filter();
-	virtual void interrupt_taken();
-	virtual int trapa_setup();
-	virtual void irq_setup();
-	virtual void internal_update(UINT64 current_time);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual bool exr_in_stack() const override;
+	virtual void update_irq_filter() override;
+	virtual void interrupt_taken() override;
+	virtual int trapa_setup() override;
+	virtual void irq_setup() override;
+	virtual void internal_update(UINT64 current_time) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_ADDRESS_MAP(map, 16);
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 };
 
 class h8s2241_device : public h8s2245_device {

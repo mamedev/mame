@@ -2823,7 +2823,7 @@
 	</software>
 
 	<software name="kingqst4">
-		<description>King's Quest IV </description>
+		<description>King's Quest IV</description>
 		<year>1989</year>
 		<publisher>Sierra</publisher>
 
@@ -3203,7 +3203,7 @@
 	<software name="mathblst">
 		<description>Math Blaster Plus!</description>
 		<year>1989</year>
-		<publisher>Davidson and Associates </publisher>
+		<publisher>Davidson and Associates</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">

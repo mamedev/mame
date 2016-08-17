@@ -88,6 +88,8 @@
 		_p(2,'<Build>')
 		for _, platform in ipairs(platforms) do		
 			for cfg in premake.eachconfig(prj, platform) do
+				local includedirs = table.join(cfg.userincludedirs, cfg.includedirs)
+
 				_p(3,'<Target title="%s">', premake.esc(cfg.longname))
 				
 				_p(4,'<Option output="%s" prefix_auto="0" extension_auto="0" />', premake.esc(cfg.buildtarget.fullpath))
@@ -118,7 +120,7 @@
 					_p(5,'<Add option="-Winvalid-pch" />')
 					_p(5,'<Add option="-include &quot;%s&quot;" />', premake.esc(cfg.pchheader))
 				end
-				for _,v in ipairs(cfg.includedirs) do
+				for _,v in ipairs(includedirs) do
 					_p(5,'<Add directory="%s" />', premake.esc(v))
 				end
 				_p(4,'</Compiler>')
@@ -141,7 +143,7 @@
 				-- begin resource compiler block --
 				if premake.findfile(cfg, ".rc") then
 					_p(4,'<ResourceCompiler>')
-					for _,v in ipairs(cfg.includedirs) do
+					for _,v in ipairs(includedirs) do
 						_p(5,'<Add directory="%s" />', premake.esc(v))
 					end
 					for _,v in ipairs(cfg.resincludedirs) do

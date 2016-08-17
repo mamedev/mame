@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
+
 /***************************************************************************
 
- Espial hardware games (drivers: espial.c)
+ Espial hardware games (drivers: espial.cpp)
 
 ***************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class espial_state : public driver_device
 {
@@ -21,7 +24,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_attributeram;
@@ -45,6 +49,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
@@ -55,9 +60,9 @@ public:
 	DECLARE_WRITE8_MEMBER(espial_scrollram_w);
 	DECLARE_WRITE8_MEMBER(espial_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(espial);
 	DECLARE_VIDEO_START(netwars);
 	UINT32 screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

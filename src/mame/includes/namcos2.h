@@ -105,7 +105,7 @@ public:
 			m_gametype(0),
 			m_c169_roz_videoram(*this, "rozvideoram", 0),
 			m_c169_roz_gfxbank(0),
-			m_c169_roz_mask(NULL),
+			m_c169_roz_mask(nullptr),
 			m_c355_obj_gfxbank(0),
 			m_c355_obj_palxor(0),
 			m_maincpu(*this, "maincpu"),
@@ -129,13 +129,13 @@ public:
 	int m_mcu_analog_ctrl;
 	int m_mcu_analog_data;
 	int m_mcu_analog_complete;
-	UINT8 *m_eeprom;
+	std::unique_ptr<UINT8[]> m_eeprom;
 	UINT16  m_68k_master_C148[0x20];
 	UINT16  m_68k_slave_C148[0x20];
 	UINT16  m_68k_gpu_C148[0x20];
 
 	// C123 Tilemap Emulation
-	// TODO: merge with namcos1.c implementation and convert to device
+	// TODO: merge with namcos1.cpp implementation and convert to device
 public:
 	DECLARE_WRITE16_MEMBER( c123_tilemap_videoram_w );
 	DECLARE_READ16_MEMBER( c123_tilemap_videoram_r );
@@ -312,7 +312,7 @@ public:
 	DECLARE_DRIVER_INIT(marvland);
 	DECLARE_DRIVER_INIT(rthun2);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	void video_start_finallap();
 	void video_start_luckywld();
 	void video_start_metlhawk();
@@ -363,6 +363,11 @@ public:
 	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
 	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
 	DECLARE_READ16_MEMBER( namcos2_finallap_prot_r );
+	void GollyGhostUpdateLED_c4( int data );
+	void GollyGhostUpdateLED_c6( int data );
+	void GollyGhostUpdateLED_c8( int data );
+	void GollyGhostUpdateLED_ca( int data );
+	void GollyGhostUpdateDiorama_c0( int data );
 
 };
 

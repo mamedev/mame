@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <CoreAudio/HostTime.h>
 
-#import <mach/mach.h>
-#import <mach/mach_error.h>
-#import <mach/mach_time.h>
-#import <mach/clock.h>
+#include <mach/mach.h>
+#include <mach/mach_error.h>
+#include <mach/mach_time.h>
+#include <mach/clock.h>
 #include <unistd.h>
 
 #include "porttime.h"

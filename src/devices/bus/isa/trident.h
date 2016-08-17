@@ -16,30 +16,30 @@ class trident_vga_device :  public svga_device
 {
 public:
 	// construction/destruction
-	trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	trident_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(port_03c0_r) override;
+	virtual WRITE8_MEMBER(port_03c0_w) override;
+	virtual READ8_MEMBER(port_03d0_r) override;
+	virtual WRITE8_MEMBER(port_03d0_w) override;
 	DECLARE_READ8_MEMBER(port_83c6_r);
 	DECLARE_WRITE8_MEMBER(port_83c6_w);
 	DECLARE_READ8_MEMBER(port_43c6_r);
 	DECLARE_WRITE8_MEMBER(port_43c6_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
-	virtual UINT16 offset();
+	virtual READ8_MEMBER(mem_r) override;
+	virtual WRITE8_MEMBER(mem_w) override;
+	virtual UINT16 offset() override;
 
 	DECLARE_READ8_MEMBER(accel_r);
 	DECLARE_WRITE8_MEMBER(accel_w);
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	struct
 	{
@@ -113,6 +113,7 @@ protected:
 		INT16 accel_mem_y;
 		UINT32 accel_transfer;
 	} tri;
+	UINT8 m_version;
 private:
 	UINT8 trident_seq_reg_read(UINT8 index);
 	void trident_seq_reg_write(UINT8 index, UINT8 data);
@@ -146,8 +147,20 @@ private:
 	UINT32 handle_rop(UINT32 src, UINT32 dst);
 };
 
+class tgui9860_device : public trident_vga_device
+{
+public:
+	tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class tvga9000_device : public trident_vga_device
+{
+public:
+	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 // device type definition
 extern const device_type TRIDENT_VGA;
+extern const device_type TVGA9000_VGA;
 
 #endif /* TRIDENT_H_ */

@@ -21,10 +21,10 @@ public:
 	static void set_total_size(device_t &device, UINT32 total_size) { dynamic_cast<msx_slot_ram_mm_device &>(device).m_total_size = total_size; }
 	static void set_ramio_set_bits(device_t &device, UINT8 ramio_set_bits) { dynamic_cast<msx_slot_ram_mm_device &>(device).m_ramio_set_bits = ramio_set_bits; }
 
-	virtual void device_start();
+	virtual void device_start() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	DECLARE_READ8_MEMBER(read_mapper_bank);
 	DECLARE_WRITE8_MEMBER(write_mapper_bank);

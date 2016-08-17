@@ -19,7 +19,6 @@ public:
 		char name[256];
 		char description[256];
 		create_netdev func;
-		entry_t *m_next;
 	};
 	osd_netdev(class device_network_interface *ifdev, int rate);
 	virtual ~osd_netdev();
@@ -45,6 +44,6 @@ private:
 class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int rate);
 void add_netdev(const char *name, const char *description, create_netdev func);
 void clear_netdev();
-const osd_netdev::entry_t *netdev_first();
+const std::vector<std::unique_ptr<osd_netdev::entry_t>>& get_netdev_list();
 int netdev_count();
 #endif

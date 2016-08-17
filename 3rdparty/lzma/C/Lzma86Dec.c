@@ -1,5 +1,7 @@
 /* Lzma86Dec.c -- LZMA + x86 (BCJ) Filter Decoder
-2009-08-14 : Igor Pavlov : Public domain */
+2015-11-08 : Igor Pavlov : Public domain */
+
+#include "Precomp.h"
 
 #include "Lzma86.h"
 
@@ -7,8 +9,8 @@
 #include "Bra.h"
 #include "LzmaDec.h"
 
-static void *SzAlloc(void *p, size_t size) { p = p; return MyAlloc(size); }
-static void SzFree(void *p, void *address) { p = p; MyFree(address); }
+static void *SzAlloc(void *p, size_t size) { UNUSED_VAR(p); return MyAlloc(size); }
+static void SzFree(void *p, void *address) { UNUSED_VAR(p); MyFree(address); }
 
 SRes Lzma86_GetUnpackSize(const Byte *src, SizeT srcLen, UInt64 *unpackSize)
 {

@@ -14,20 +14,22 @@ class badlands_state : public atarigen_state
 public:
 	badlands_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_audiocpu(*this, "audiocpu"),
+			m_soundcomm(*this, "soundcomm"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_mob(*this, "mob") { }
+
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<atari_sound_comm_device> m_soundcomm;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 
 	UINT8           m_pedal_value[2];
-
-	UINT8 *         m_bank_base;
-	UINT8 *         m_bank_source_data;
-
 	UINT8           m_playfield_tile_bank;
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(sound_busy_r);
 	DECLARE_READ16_MEMBER(pedal_0_r);
 	DECLARE_READ16_MEMBER(pedal_1_r);

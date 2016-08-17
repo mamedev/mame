@@ -1,5 +1,5 @@
 /*
-** $Id: luaconf.h,v 1.238 2014/12/29 13:27:55 roberto Exp $
+** $Id: luaconf.h,v 1.254 2015/10/21 18:17:40 roberto Exp $
 ** Configuration file for Lua
 ** See Copyright Notice in lua.h
 */
@@ -96,10 +96,8 @@
 
 
 /*
-@@ LUA_INT_INT / LUA_INT_LONG / LUA_INT_LONGLONG defines the type for
-** Lua integers.
-@@ LUA_REAL_FLOAT / LUA_REAL_DOUBLE / LUA_REAL_LONGDOUBLE defines
-** the type for Lua floats.
+@@ LUA_INT_TYPE defines the type for Lua integers.
+@@ LUA_FLOAT_TYPE defines the type for Lua floats.
 ** Lua should work fine with any mix of these options (if supported
 ** by your C compiler). The usual configurations are 64-bit integers
 ** and 'double' (the default), 32-bit integers and 'float' (for
@@ -107,32 +105,47 @@
 ** compliant with C99, which may not have support for 'long long').
 */
 
+/* predefined options for LUA_INT_TYPE */
+#define LUA_INT_INT		1
+#define LUA_INT_LONG		2
+#define LUA_INT_LONGLONG	3
+
+/* predefined options for LUA_FLOAT_TYPE */
+#define LUA_FLOAT_FLOAT		1
+#define LUA_FLOAT_DOUBLE	2
+#define LUA_FLOAT_LONGDOUBLE	3
+
 #if defined(LUA_32BITS)		/* { */
 /*
 ** 32-bit integers and 'float'
 */
 #if LUAI_BITSINT >= 32  /* use 'int' if big enough */
-#define LUA_INT_INT
+#define LUA_INT_TYPE	LUA_INT_INT
 #else  /* otherwise use 'long' */
-#define LUA_INT_LONG
+#define LUA_INT_TYPE	LUA_INT_LONG
 #endif
-#define LUA_REAL_FLOAT
+#define LUA_FLOAT_TYPE	LUA_FLOAT_FLOAT
 
 #elif defined(LUA_C89_NUMBERS)	/* }{ */
 /*
 ** largest types available for C89 ('long' and 'double')
 */
-#define LUA_INT_LONG
-#define LUA_REAL_DOUBLE
+#define LUA_INT_TYPE	LUA_INT_LONG
+#define LUA_FLOAT_TYPE	LUA_FLOAT_DOUBLE
 
-#else				/* }{ */
+#endif				/* } */
+
+
 /*
 ** default configuration for 64-bit Lua ('long long' and 'double')
 */
-#define LUA_INT_LONGLONG
-#define LUA_REAL_DOUBLE
+#if !defined(LUA_INT_TYPE)
+#define LUA_INT_TYPE	LUA_INT_LONGLONG
+#endif
 
-#endif								/* } */
+#if !defined(LUA_FLOAT_TYPE)
+#define LUA_FLOAT_TYPE	LUA_FLOAT_DOUBLE
+#endif
 
 /* }================================================================== */
 
@@ -155,7 +168,7 @@
 ** non-conventional directories.
 */
 #define LUA_VDIR	LUA_VERSION_MAJOR "." LUA_VERSION_MINOR
-#if defined(_WIN32) 	/* { */
+#if defined(_WIN32)	/* { */
 /*
 ** In Windows, any exclamation mark ('!') in the path is replaced by the
 ** path of the directory of the executable file of the current process.
@@ -300,19 +313,14 @@
 */
 #define LUA_COMPAT_APIINTCASTS
 
-
-/*
-@@ LUA_COMPAT_FLOATSTRING makes Lua format integral floats without a
-@@ a float mark ('.0').
-** This macro is not on by default even in compatibility mode,
-** because this is not really an incompatibility.
-*/
-/* #define LUA_COMPAT_FLOATSTRING */
-
 #endif				/* } */
 
 
 #if defined(LUA_COMPAT_5_1)	/* { */
+
+/* Incompatibilities from 5.2 -> 5.3 */
+#define LUA_COMPAT_MATHLIB
+#define LUA_COMPAT_APIINTCASTS
 
 /*
 @@ LUA_COMPAT_UNPACK controls the presence of global 'unpack'.
@@ -373,6 +381,15 @@
 
 #endif				/* } */
 
+
+/*
+@@ LUA_COMPAT_FLOATSTRING makes Lua format integral floats without a
+@@ a float mark ('.0').
+** This macro is not on by default even in compatibility mode,
+** because this is not really an incompatibility.
+*/
+/* #define LUA_COMPAT_FLOATSTRING */
+
 /* }================================================================== */
 
 
@@ -380,77 +397,31 @@
 /*
 ** {==================================================================
 ** Configuration for Numbers.
-** Change these definitions if no predefined LUA_REAL_* / LUA_INT_*
+** Change these definitions if no predefined LUA_FLOAT_* / LUA_INT_*
 ** satisfy your needs.
 ** ===================================================================
 */
 
 /*
 @@ LUA_NUMBER is the floating-point type used by Lua.
-**
 @@ LUAI_UACNUMBER is the result of an 'usual argument conversion'
 @@ over a floating number.
-**
+@@ l_mathlim(x) corrects limit name 'x' to the proper float type
+** by prefixing it with one of FLT/DBL/LDBL.
 @@ LUA_NUMBER_FRMLEN is the length modifier for writing floats.
 @@ LUA_NUMBER_FMT is the format for writing floats.
 @@ lua_number2str converts a float to a string.
-**
 @@ l_mathop allows the addition of an 'l' or 'f' to all math operations.
-**
+@@ l_floor takes the floor of a float.
 @@ lua_str2number converts a decimal numeric string to a number.
 */
 
-#if defined(LUA_REAL_FLOAT)		/* { single float */
 
-#define LUA_NUMBER	float
-
-#define LUAI_UACNUMBER	double
-
-#define LUA_NUMBER_FRMLEN	""
-#define LUA_NUMBER_FMT		"%.7g"
-
-#define l_mathop(op)		op##f
-
-#define lua_str2number(s,p)	strtof((s), (p))
-
-
-#elif defined(LUA_REAL_LONGDOUBLE)	/* }{ long double */
-
-#define LUA_NUMBER	long double
-
-#define LUAI_UACNUMBER	long double
-
-#define LUA_NUMBER_FRMLEN	"L"
-#define LUA_NUMBER_FMT		"%.19Lg"
-
-#define l_mathop(op)		op##l
-
-#define lua_str2number(s,p)	strtold((s), (p))
-
-#elif defined(LUA_REAL_DOUBLE)		/* }{ double */
-
-#define LUA_NUMBER	double
-
-#define LUAI_UACNUMBER	double
-
-#define LUA_NUMBER_FRMLEN	""
-#define LUA_NUMBER_FMT		"%.14g"
-
-#define l_mathop(op)		op
-
-#define lua_str2number(s,p)	strtod((s), (p))
-
-#else					/* }{ */
-
-#error "numeric real type not defined"
-
-#endif					/* } */
-
+/* The following definitions are good for most cases here */
 
 #define l_floor(x)		(l_mathop(floor)(x))
 
-#define lua_number2str(s,n)	sprintf((s), LUA_NUMBER_FMT, (n))
-
+#define lua_number2str(s,sz,n)	l_sprintf((s), sz, LUA_NUMBER_FMT, (n))
 
 /*
 @@ lua_numbertointeger converts a float number to an integer, or
@@ -466,45 +437,60 @@
       (*(p) = (LUA_INTEGER)(n), 1))
 
 
-/*
-@@ The luai_num* macros define the primitive operations over numbers.
-** They should work for any size of floating numbers.
-*/
+/* now the variable definitions */
 
-/* the following operations need the math library */
-#if defined(lobject_c) || defined(lvm_c)
-#include <math.h>
+#if LUA_FLOAT_TYPE == LUA_FLOAT_FLOAT		/* { single float */
 
-/* floor division (defined as 'floor(a/b)') */
-#define luai_numidiv(L,a,b)	((void)L, l_mathop(floor)(luai_numdiv(L,a,b)))
+#define LUA_NUMBER	float
 
-/*
-** module: defined as 'a - floor(a/b)*b'; the previous definition gives
-** NaN when 'b' is huge, but the result should be 'a'. 'fmod' gives the
-** result of 'a - trunc(a/b)*b', and therefore must be corrected when
-** 'trunc(a/b) ~= floor(a/b)'. That happens when the division has a
-** non-integer negative result, which is equivalent to the test below
-*/
-#define luai_nummod(L,a,b,m)  \
-  { (m) = l_mathop(fmod)(a,b); if ((m)*(b) < 0) (m) += (b); }
+#define l_mathlim(n)		(FLT_##n)
 
-/* exponentiation */
-#define luai_numpow(L,a,b)	((void)L, l_mathop(pow)(a,b))
+#define LUAI_UACNUMBER	double
 
-#endif
+#define LUA_NUMBER_FRMLEN	""
+#define LUA_NUMBER_FMT		"%.7g"
 
-/* these are quite standard operations */
-#if defined(LUA_CORE)
-#define luai_numadd(L,a,b)	((a)+(b))
-#define luai_numsub(L,a,b)	((a)-(b))
-#define luai_nummul(L,a,b)	((a)*(b))
-#define luai_numdiv(L,a,b)	((a)/(b))
-#define luai_numunm(L,a)	(-(a))
-#define luai_numeq(a,b)		((a)==(b))
-#define luai_numlt(a,b)		((a)<(b))
-#define luai_numle(a,b)		((a)<=(b))
-#define luai_numisnan(a)	(!luai_numeq((a), (a)))
-#endif
+#define l_mathop(op)		op##f
+
+#define lua_str2number(s,p)	strtof((s), (p))
+
+
+#elif LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE	/* }{ long double */
+
+#define LUA_NUMBER	long double
+
+#define l_mathlim(n)		(LDBL_##n)
+
+#define LUAI_UACNUMBER	long double
+
+#define LUA_NUMBER_FRMLEN	"L"
+#define LUA_NUMBER_FMT		"%.19Lg"
+
+#define l_mathop(op)		op##l
+
+#define lua_str2number(s,p)	strtold((s), (p))
+
+#elif LUA_FLOAT_TYPE == LUA_FLOAT_DOUBLE	/* }{ double */
+
+#define LUA_NUMBER	double
+
+#define l_mathlim(n)		(DBL_##n)
+
+#define LUAI_UACNUMBER	double
+
+#define LUA_NUMBER_FRMLEN	""
+#define LUA_NUMBER_FMT		"%.14g"
+
+#define l_mathop(op)		op
+
+#define lua_str2number(s,p)	strtod((s), (p))
+
+#else						/* }{ */
+
+#error "numeric float type not defined"
+
+#endif					/* } */
+
 
 
 /*
@@ -525,7 +511,7 @@
 /* The following definitions are good for most cases here */
 
 #define LUA_INTEGER_FMT		"%" LUA_INTEGER_FRMLEN "d"
-#define lua_integer2str(s,n)	sprintf((s), LUA_INTEGER_FMT, (n))
+#define lua_integer2str(s,sz,n)	l_sprintf((s), sz, LUA_INTEGER_FMT, (n))
 
 #define LUAI_UACINT		LUA_INTEGER
 
@@ -538,7 +524,7 @@
 
 /* now the variable definitions */
 
-#if defined(LUA_INT_INT)		/* { int */
+#if LUA_INT_TYPE == LUA_INT_INT		/* { int */
 
 #define LUA_INTEGER		int
 #define LUA_INTEGER_FRMLEN	""
@@ -546,7 +532,7 @@
 #define LUA_MAXINTEGER		INT_MAX
 #define LUA_MININTEGER		INT_MIN
 
-#elif defined(LUA_INT_LONG)	/* }{ long */
+#elif LUA_INT_TYPE == LUA_INT_LONG	/* }{ long */
 
 #define LUA_INTEGER		long
 #define LUA_INTEGER_FRMLEN	"l"
@@ -554,8 +540,9 @@
 #define LUA_MAXINTEGER		LONG_MAX
 #define LUA_MININTEGER		LONG_MIN
 
-#elif defined(LUA_INT_LONGLONG)	/* }{ long long */
+#elif LUA_INT_TYPE == LUA_INT_LONGLONG	/* }{ long long */
 
+/* use presence of macro LLONG_MAX as proxy for C99 compliance */
 #if defined(LLONG_MAX)		/* { */
 /* use ISO C99 stuff */
 
@@ -592,28 +579,40 @@
 
 /*
 ** {==================================================================
-** Dependencies with C99
+** Dependencies with C99 and other C details
 ** ===================================================================
 */
 
 /*
-@@ lua_strx2number converts an hexadecimal numeric string to a number.
-** In C99, 'strtod' does both conversions. Otherwise, you can
-** leave 'lua_strx2number' undefined and Lua will provide its own
-** implementation.
+@@ l_sprintf is equivalent to 'snprintf' or 'sprintf' in C89.
+** (All uses in Lua have only one format item.)
 */
 #if !defined(LUA_USE_C89)
-#define lua_strx2number(s,p)	lua_str2number(s,p)
+#define l_sprintf(s,sz,f,i)	snprintf(s,sz,f,i)
+#else
+#define l_sprintf(s,sz,f,i)	((void)(sz), sprintf(s,f,i))
 #endif
 
 
 /*
-@@ LUA_USE_AFORMAT allows '%a'/'%A' specifiers in 'string.format'
-** Enable it if the C function 'printf' supports these specifiers.
-** (C99 demands it and Windows also supports it.)
+@@ lua_strx2number converts an hexadecimal numeric string to a number.
+** In C99, 'strtod' does that conversion. Otherwise, you can
+** leave 'lua_strx2number' undefined and Lua will provide its own
+** implementation.
 */
-#if !defined(LUA_USE_C89) || defined(LUA_USE_WINDOWS)
-#define LUA_USE_AFORMAT
+#if !defined(LUA_USE_C89)
+#define lua_strx2number(s,p)		lua_str2number(s,p)
+#endif
+
+
+/*
+@@ lua_number2strx converts a float to an hexadecimal numeric string. 
+** In C99, 'sprintf' (with format specifiers '%a'/'%A') does that.
+** Otherwise, you can leave 'lua_number2strx' undefined and Lua will
+** provide its own implementation.
+*/
+#if !defined(LUA_USE_C89)
+#define lua_number2strx(L,b,sz,f,n)	l_sprintf(b,sz,f,n)
 #endif
 
 
@@ -642,10 +641,48 @@
 #if !defined(LUA_USE_C89) && defined(__STDC_VERSION__) && \
     __STDC_VERSION__ >= 199901L
 #include <stdint.h>
-#if defined (INTPTR_MAX)  /* even in C99 this type is optional */
+#if defined(INTPTR_MAX)  /* even in C99 this type is optional */
 #undef LUA_KCONTEXT
 #define LUA_KCONTEXT	intptr_t
 #endif
+#endif
+
+
+/*
+@@ lua_getlocaledecpoint gets the locale "radix character" (decimal point).
+** Change that if you do not want to use C locales. (Code using this
+** macro must include header 'locale.h'.)
+*/
+#if !defined(lua_getlocaledecpoint)
+#define lua_getlocaledecpoint()		(localeconv()->decimal_point[0])
+#endif
+
+/* }================================================================== */
+
+
+/*
+** {==================================================================
+** Language Variations
+** =====================================================================
+*/
+
+/*
+@@ LUA_NOCVTN2S/LUA_NOCVTS2N control how Lua performs some
+** coercions. Define LUA_NOCVTN2S to turn off automatic coercion from
+** numbers to strings. Define LUA_NOCVTS2N to turn off automatic
+** coercion from strings to numbers.
+*/
+/* #define LUA_NOCVTN2S */
+/* #define LUA_NOCVTS2N */
+
+
+/*
+@@ LUA_USE_APICHECK turns on several consistency checks on the C API.
+** Define it as a help when debugging C code.
+*/
+#if defined(LUA_USE_APICHECK)
+#include <assert.h>
+#define luai_apicheck(l,e)	assert(e)
 #endif
 
 /* }================================================================== */
@@ -671,9 +708,6 @@
 #define LUAI_MAXSTACK		15000
 #endif
 
-/* reserve some space for error handling */
-#define LUAI_FIRSTPSEUDOIDX	(-LUAI_MAXSTACK - 1000)
-
 
 /*
 @@ LUA_EXTRASPACE defines the size of a raw memory area associated with
@@ -692,19 +726,17 @@
 
 
 /*
-@@ LUAI_MAXSHORTLEN is the maximum length for short strings, that is,
-** strings that are internalized. (Cannot be smaller than reserved words
-** or tags for metamethods, as these strings must be internalized;
-** #("function") = 8, #("__newindex") = 10.)
-*/
-#define LUAI_MAXSHORTLEN        40
-
-
-/*
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.
-** CHANGE it if it uses too much C-stack space.
+** CHANGE it if it uses too much C-stack space. (For long double,
+** 'string.format("%.99f", 1e4932)' needs ~5030 bytes, so a
+** smaller buffer would force a memory allocation for each call to
+** 'string.format'.)
 */
-#define LUAL_BUFFERSIZE	((int)(0x80 * sizeof(void*) * sizeof(lua_Integer)))
+#if defined(LUA_FLOAT_LONGDOUBLE)
+#define LUAL_BUFFERSIZE		8192
+#else
+#define LUAL_BUFFERSIZE   ((int)(0x80 * sizeof(void*) * sizeof(lua_Integer)))
+#endif
 
 /* }================================================================== */
 
@@ -729,9 +761,6 @@
 
 
 
-#ifdef __ANDROID__
-#define l_getlocaledecpoint() '.'
-#endif
 
 
 #endif

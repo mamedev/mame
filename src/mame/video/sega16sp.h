@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "sprite.h"
+#include "video/sprite.h"
 #include "segaic16.h"
 
 #ifndef __SEGA16SP_H__
@@ -40,16 +40,18 @@
 	bootleg_sys16a_sprite_device::static_set_remap(*device, _0,_1,_2,_3,_4,_5,_6,_7);
 
 #define MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(_xorigin) \
-	bootleg_sys16a_sprite_device::static_set_xorigin(*device, _xorigin);
+	bootleg_sys16a_sprite_device::set_local_originx(*device, _xorigin);
 
 #define MCFG_BOOTLEG_SYS16A_SPRITES_YORIGIN(_yorigin) \
-	bootleg_sys16a_sprite_device::static_set_yorigin(*device, _yorigin);
+	bootleg_sys16a_sprite_device::set_local_originy(*device, _yorigin);
 
 
 #define MCFG_BOOTLEG_SYS16B_SPRITES_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_SYS16B_SPRITES, 0)
 #define MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(_xorigin) \
-	bootleg_sys16a_sprite_device::static_set_xorigin(*device, _xorigin);
+	sega_sys16b_sprite_device::set_local_originx(*device, _xorigin);
+#define MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(_yorigin) \
+	sega_sys16b_sprite_device::set_local_originy(*device, _yorigin);
 
 
 
@@ -70,17 +72,50 @@ public:
 	// live configuration
 	void set_bank(int banknum, int offset) { m_bank[banknum] = offset; }
 	void set_flip(bool flip) { m_flip = flip; }
+	void set_local_origin(int x, int y)
+	{
+		m_xoffs_flipped = m_xoffs = x;
+		m_yoffs_flipped = m_yoffs = y;
+		set_origin(x, y);
+	}
+
+	void set_local_origin(int x, int y, int xf, int yf)
+	{
+		m_xoffs = x;
+		m_yoffs = y;
+		m_xoffs_flipped = xf;
+		m_yoffs_flipped = yf;
+		set_origin(x, y);
+	}
+
+	void set_local_originx_(int x)  { m_xoffs_flipped = m_xoffs = x; set_origin(x, m_yoffs); }
+	void set_local_originy_(int y) { m_yoffs_flipped = m_yoffs = y; set_origin(m_xoffs, y); }
+
+	static void set_local_originx(device_t &device, int x)
+	{
+		sega_16bit_sprite_device &dev = downcast<sega_16bit_sprite_device &>(device);
+		dev.set_local_originx_(x);
+	};
+
+	static void set_local_originy(device_t &device, int y)
+	{
+		sega_16bit_sprite_device &dev = downcast<sega_16bit_sprite_device &>(device);
+		dev.set_local_originy_(y);
+	};
 
 	// write trigger memory handler
 	DECLARE_WRITE16_MEMBER( draw_write );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// internal state
 	bool                        m_flip;                 // screen flip?
 	UINT8                       m_bank[16];             // banking redirection
+	int m_xoffs, m_yoffs;
+	int m_xoffs_flipped, m_yoffs_flipped;
+
 };
 
 
@@ -94,7 +129,10 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT16> m_sprite_region_ptr;
 };
 
 
@@ -108,7 +146,10 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT32> m_sprite_region_ptr;
 };
 
 
@@ -122,11 +163,13 @@ public:
 protected:
 	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source);
 
+protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// configuration
 	bool            m_is_xboard;
+	required_region_ptr<UINT32> m_sprite_region_ptr;
 };
 
 class sega_xboard_sprite_device : public sega_outrun_sprite_device
@@ -147,7 +190,10 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT16> m_sprite_region_ptr;
 };
 
 
@@ -164,7 +210,10 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT16> m_sprite_region_ptr;
 
 	// internal state
 	UINT8       m_addrmap[8];
@@ -181,7 +230,10 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT16> m_sprite_region_ptr;
 };
 
 
@@ -196,9 +248,10 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
-	rotate_info*                        m_segaic16_rotate;
+	required_region_ptr<UINT64>     m_sprite_region_ptr;
+	rotate_info*                    m_segaic16_rotate;
 };
 
 

@@ -42,9 +42,9 @@ public:
 	DECLARE_WRITE8_MEMBER(marineb_flipscreen_x_w);
 	DECLARE_WRITE8_MEMBER(marineb_flipscreen_y_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(marineb);
 	DECLARE_MACHINE_RESET(springer);
 	UINT32 screen_update_marineb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

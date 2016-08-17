@@ -17,10 +17,12 @@ public:
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_vad(*this, "vad"),
+			m_mainram(*this, "mainram"),
 			m_bankrom_base(*this, "bankrom_base") { }
 
 	required_device<atari_jsa_iii_device> m_jsa;
 	required_device<atari_vad_device> m_vad;
+	required_shared_ptr<UINT16> m_mainram;
 
 	UINT16 *m_bankswitch_base;
 	required_shared_ptr<UINT16> m_bankrom_base;
@@ -28,7 +30,7 @@ public:
 
 	UINT16 *m_spritecache_count;
 	UINT16 *m_unknown_verify_base;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(io_latch_w);
 	DECLARE_READ16_MEMBER(bankswitch_r);
 	DECLARE_READ16_MEMBER(bankrom_r);

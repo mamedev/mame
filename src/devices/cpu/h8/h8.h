@@ -12,6 +12,11 @@
 #ifndef __H8_H__
 #define __H8_H__
 
+class h8_dma_device;
+class h8_dtc_device;
+struct h8_dma_state;
+struct h8_dtc_state;
+
 class h8_device : public cpu_device {
 public:
 	enum {
@@ -46,11 +51,25 @@ public:
 		ADC_7
 	};
 
+	enum {
+		STATE_RESET              = 0x10000,
+		STATE_IRQ                = 0x10001,
+		STATE_TRACE              = 0x10002,
+		STATE_DMA                = 0x10003,
+		STATE_DTC                = 0x10004,
+		STATE_DTC_VECTOR         = 0x10005,
+		STATE_DTC_WRITEBACK      = 0x10006
+	};
+
 	h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate);
 
 	void internal_update();
-
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
+	bool trigger_dma(int vector);
+	void set_current_dma(h8_dma_state *state);
+	void set_current_dtc(h8_dtc_state *state);
+	void request_state(int state);
+	bool access_is_dma() const { return inst_state == STATE_DMA || inst_state == STATE_DTC; }
 
 protected:
 	struct disasm_entry {
@@ -60,12 +79,6 @@ protected:
 		const char *opcode;
 		int am1, am2;
 		offs_t flags;
-	};
-
-	enum {
-		STATE_RESET = 0x10000,
-		STATE_IRQ   = 0x10001,
-		STATE_TRACE = 0x10002
 	};
 
 	enum {
@@ -142,31 +155,35 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	address_space_config program_config, io_config;
 	address_space *program, *io;
 	direct_read_data *direct;
+	h8_dma_device *dma_device;
+	h8_dtc_device *dtc_device;
+	h8_dma_state *current_dma;
+	h8_dtc_state *current_dtc;
 
 	UINT32  PPC;                    /* previous program counter */
 	UINT32  NPC;                    /* next start-of-instruction program counter */
@@ -183,8 +200,8 @@ protected:
 
 	bool has_exr, has_trace, supports_advanced, mode_advanced, mac_saturating;
 
-	int inst_state, inst_substate;
-	int icount, bcount;
+	int inst_state, inst_substate, requested_state;
+	int icount, bcount, count_before_instruction_step;
 	int irq_vector, taken_irq_vector;
 	int irq_level, taken_irq_level;
 	bool irq_required, irq_nmi;
@@ -192,7 +209,7 @@ protected:
 	static const disasm_entry disasm_entries[];
 
 	offs_t disassemble_generic(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options, const disasm_entry *table);
-	void disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *oprom, UINT32 opcode, int offset);
+	void disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *oprom, UINT32 opcode, int slot, int offset);
 
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
@@ -447,6 +464,7 @@ protected:
 
 	O(state_reset);
 	O(state_irq);
+	O(state_dma);
 #undef O
 };
 

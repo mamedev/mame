@@ -50,7 +50,7 @@ enum floperr_t
 	FLOPPY_ERROR_INTERNAL,          /* fatal internal error */
 	FLOPPY_ERROR_UNSUPPORTED,       /* this operation is unsupported */
 	FLOPPY_ERROR_OUTOFMEMORY,       /* ran out of memory */
-	FLOPPY_ERROR_SEEKERROR,         /* attempted to seek to nonexistant location */
+	FLOPPY_ERROR_SEEKERROR,         /* attempted to seek to nonexistent location */
 	FLOPPY_ERROR_INVALIDIMAGE,      /* this image in invalid */
 	FLOPPY_ERROR_READONLY,          /* attempt to write to read-only image */
 	FLOPPY_ERROR_NOSPACE,
@@ -68,8 +68,8 @@ struct FloppyCallbacks
 	floperr_t (*write_indexed_sector)(floppy_image_legacy *floppy, int head, int track, int sector_index, const void *buffer, size_t buflen, int ddam);
 	floperr_t (*read_track)(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen);
 	floperr_t (*write_track)(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen);
-	floperr_t (*format_track)(floppy_image_legacy *floppy, int head, int track, option_resolution *params);
-	floperr_t (*post_format)(floppy_image_legacy *floppy, option_resolution *params);
+	floperr_t (*format_track)(floppy_image_legacy *floppy, int head, int track, util::option_resolution *params);
+	floperr_t (*post_format)(floppy_image_legacy *floppy, util::option_resolution *params);
 	int (*get_heads_per_disk)(floppy_image_legacy *floppy);
 	int (*get_tracks_per_disk)(floppy_image_legacy *floppy);
 	int (*get_sectors_per_track)(floppy_image_legacy *floppy, int head, int track);
@@ -87,13 +87,13 @@ struct FloppyFormat
 	const char *extensions;
 	const char *description;
 	floperr_t (*identify)(floppy_image_legacy *floppy, const struct FloppyFormat *format, int *vote);
-	floperr_t (*construct)(floppy_image_legacy *floppy, const struct FloppyFormat *format, option_resolution *params);
+	floperr_t (*construct)(floppy_image_legacy *floppy, const struct FloppyFormat *format, util::option_resolution *params);
 	floperr_t (*destruct)(floppy_image_legacy *floppy, const struct FloppyFormat *format);
 	const char *param_guidelines;
 };
 
 #define FLOPPY_IDENTIFY(name)   floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format, int *vote)
-#define FLOPPY_CONSTRUCT(name)  floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format, option_resolution *params)
+#define FLOPPY_CONSTRUCT(name)  floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format, util::option_resolution *params)
 #define FLOPPY_DESTRUCT(name)   floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format)
 
 FLOPPY_IDENTIFY(td0_dsk_identify);
@@ -121,7 +121,7 @@ FLOPPY_CONSTRUCT(fdi_dsk_construct);
 	const struct FloppyFormat floppyoptions_##name[] =                              \
 	{
 #define LEGACY_FLOPPY_OPTIONS_END0 \
-		{ NULL }                            \
+		{ nullptr }                            \
 	};
 
 #define LEGACY_FLOPPY_OPTIONS_EXTERN(name)                                              \
@@ -129,12 +129,12 @@ FLOPPY_CONSTRUCT(fdi_dsk_construct);
 #define LEGACY_FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, destruct_, ranges_)\
 	{ #name, extensions_, description_, identify_, construct_, destruct_, ranges_ },
 #define LEGACY_FLOPPY_OPTIONS_END                                                       \
-		LEGACY_FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL) \
-		LEGACY_FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",  imd_dsk_identify, imd_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",   cqm_dsk_identify, cqm_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",  dsk_dsk_identify, dsk_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( d88, "d77,d88,1dd", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, nullptr, nullptr) \
+		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, nullptr) \
+		LEGACY_FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",  imd_dsk_identify, imd_dsk_construct, nullptr, nullptr) \
+		LEGACY_FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",   cqm_dsk_identify, cqm_dsk_construct, nullptr, nullptr) \
+		LEGACY_FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",  dsk_dsk_identify, dsk_dsk_construct, nullptr, nullptr) \
+		LEGACY_FLOPPY_OPTION( d88, "d77,d88,1dd", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, nullptr, nullptr) \
 	LEGACY_FLOPPY_OPTIONS_END0
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(default);
@@ -166,7 +166,7 @@ OPTION_GUIDE_EXTERN(floppy_option_guide);
 /* opening, closing and creating of floppy images */
 floperr_t floppy_open(void *fp, const struct io_procs *procs, const char *extension, const struct FloppyFormat *format, int flags, floppy_image_legacy **outfloppy);
 floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const char *extension, const struct FloppyFormat *formats, int flags, floppy_image_legacy **outfloppy);
-floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct FloppyFormat *format, option_resolution *parameters, floppy_image_legacy **outfloppy);
+floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct FloppyFormat *format, util::option_resolution *parameters, floppy_image_legacy **outfloppy);
 void floppy_close(floppy_image_legacy *floppy);
 
 /* useful for identifying a floppy image */
@@ -189,7 +189,7 @@ floperr_t floppy_read_track(floppy_image_legacy *floppy, int head, int track, vo
 floperr_t floppy_write_track(floppy_image_legacy *floppy, int head, int track, const void *buffer, size_t buffer_len);
 floperr_t floppy_read_track_data(floppy_image_legacy *floppy, int head, int track, void *buffer, size_t buffer_len);
 floperr_t floppy_write_track_data(floppy_image_legacy *floppy, int head, int track, const void *buffer, size_t buffer_len);
-floperr_t floppy_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params);
+floperr_t floppy_format_track(floppy_image_legacy *floppy, int head, int track, util::option_resolution *params);
 int floppy_get_tracks_per_disk(floppy_image_legacy *floppy);
 int floppy_get_heads_per_disk(floppy_image_legacy *floppy);
 UINT32 floppy_get_track_size(floppy_image_legacy *floppy, int head, int track);
@@ -607,7 +607,7 @@ private:
 	void fixup_crc_victor_header(std::vector<UINT32> &buffer, const gen_crc_info *crc);
 	void fixup_crc_victor_data(std::vector<UINT32> &buffer, const gen_crc_info *crc);
 	void fixup_crcs(std::vector<UINT32> &buffer, gen_crc_info *crcs);
-	void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
+	void collect_crcs(const desc_e *desc, gen_crc_info *crcs) const;
 
 	int sbit_r(const UINT8 *bitstream, int pos);
 	int sbit_rp(const UINT8 *bitstream, int &pos, int track_size);
@@ -721,9 +721,9 @@ public:
 	virtual ~floppy_image();
 
 	//! @return the form factor.
-	UINT32 get_form_factor() { return form_factor; }
+	UINT32 get_form_factor() const { return form_factor; }
 	//! @return the variant.
-	UINT32 get_variant() { return variant; }
+	UINT32 get_variant() const { return variant; }
 	//! @param v the variant.
 	void set_variant(UINT32 v) { variant = v; }
 
@@ -751,7 +751,7 @@ public:
 	//! @return the current write splice position.
 	UINT32 get_write_splice_position(int track, int head, int subtrack = 0) const { return track_array[track*4+subtrack][head].write_splice; }
 	//! @return the maximal geometry supported by this format.
-	void get_maximal_geometry(int &tracks, int &heads);
+	void get_maximal_geometry(int &tracks, int &heads) const;
 
 	//! @return the current geometry of the loaded image.
 	void get_actual_geometry(int &tracks, int &heads);

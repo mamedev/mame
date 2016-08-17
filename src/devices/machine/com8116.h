@@ -63,14 +63,20 @@ public:
 	DECLARE_WRITE8_MEMBER( stt_w );
 
 	static const int divisors_16X_5_0688MHz[];
+	static const int divisors_16X_6_01835MHz[];
 	static const int divisors_16X_4_9152MHz[];
 	static const int divisors_32X_5_0688MHz[];
+	static const int divisors_16X_2_7648MHz[];
+	static const int divisors_16X_5_0688MHz_030[];
+	static const int divisors_16X_4_6080MHz[];
+	static const int divisors_16X_4_9152MHz_SY2661_1[];
+	static const int divisors_16X_4_9152MHz_SY2661_2[];
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr) override;
 
 private:
 	enum

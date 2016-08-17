@@ -1,13 +1,13 @@
 /*
 * Copyright 2014 Stanlo Slasinski. All rights reserved.
-* License: http://www.opensource.org/licenses/BSD-2-Clause
+* License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 */
 
 #include "common.h"
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
 #include "camera.h"
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 
 struct u_paramsDataStruct
 {
@@ -96,14 +96,16 @@ static const float s_quadVertices[] =
 
 static const uint16_t s_quadIndices[] = { 0, 1, 2, 2, 3, 0, };
 
-int _main_(int /*_argc*/, char** /*_argv*/)
+int _main_(int _argc, char** _argv)
 {
+	Args args(_argc, _argv);
+
 	uint32_t width  = 1280;
 	uint32_t height = 720;
 	uint32_t debug  = BGFX_DEBUG_TEXT;
 	uint32_t reset  = BGFX_RESET_VSYNC;
 
-	bgfx::init();
+	bgfx::init(args.m_type, args.m_pciId);
 	bgfx::reset(width, height, reset);
 
 	// Enable debug text.
@@ -303,11 +305,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 				float tmp[16];
 				bx::mtxMul(tmp, view, viewHead);
-
-				float proj[16];
-				bx::mtxProj(proj, hmd->eye[0].fov, 0.1f, 10000.0f);
-
-				bgfx::setViewTransform(0, tmp, proj);
+				bgfx::setViewTransform(0, tmp, hmd->eye[0].projection, BGFX_VIEW_STEREO, hmd->eye[1].projection);
 
 				// Set view 0 default viewport.
 				//

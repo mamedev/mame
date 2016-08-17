@@ -40,8 +40,6 @@ public:
 	DECLARE_WRITE32_MEMBER(video_w);
 	DECLARE_READ32_MEMBER(int_r);
 	DECLARE_WRITE32_MEMBER(int_w);
-	DECLARE_READ32_MEMBER(sound_r);
-	DECLARE_WRITE32_MEMBER(sound_w);
 	INPUT_CHANGED_MEMBER(ipt_change);
 	DECLARE_READ_LINE_MEMBER(sbrc2_r);
 	DECLARE_READ_LINE_MEMBER(sbrc3_r);
@@ -59,7 +57,7 @@ public:
 	// members
 	emu_timer *m_dma_timer;
 	UINT32  m_inputs_active;
-	UINT16  *m_video_ram[2];
+	std::unique_ptr<UINT16[]>  m_video_ram[2];
 	UINT16  m_last_pixel;
 	INT32   m_video_ctrl;
 	UINT16  m_video_fade;
@@ -83,8 +81,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 };
 
 
@@ -103,14 +101,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	const address_space_config  m_space_config;
 

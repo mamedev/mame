@@ -22,9 +22,9 @@
 
 #define MCFG_SEGA_315_5195_MAPPER_ADD(_tag, _cputag, _class, _mapper, _read, _write) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5195_MEM_MAPPER, 0) \
-	sega_315_5195_mapper_device::static_set_cputag(*device, _cputag); \
-	sega_315_5195_mapper_device::static_set_mapper(*device, sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, NULL, (_class *)0)); \
-	sega_315_5195_mapper_device::static_set_sound_readwrite(*device, sega_315_5195_mapper_device::sound_read_delegate(&_class::_read, #_class "::" #_read, NULL, (_class *)0), sega_315_5195_mapper_device::sound_write_delegate(&_class::_write, #_class "::" #_write, NULL, (_class *)0));
+	sega_315_5195_mapper_device::static_set_cputag(*device, "^" _cputag); \
+	sega_315_5195_mapper_device::static_set_mapper(*device, sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr)); \
+	sega_315_5195_mapper_device::static_set_sound_readwrite(*device, sega_315_5195_mapper_device::sound_read_delegate(&_class::_read, #_class "::" #_read, nullptr, (_class *)nullptr), sega_315_5195_mapper_device::sound_write_delegate(&_class::_write, #_class "::" #_write, nullptr, (_class *)nullptr));
 
 #define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
@@ -35,9 +35,9 @@
 #define MCFG_SEGA_315_5250_COMPARE_TIMER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5250_COMPARE_TIMER, 0)
 #define MCFG_SEGA_315_5250_TIMER_ACK(_class, _func) \
-	sega_315_5250_compare_timer_device::static_set_timer_ack(*device, sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, NULL, (_class *)0));
+	sega_315_5250_compare_timer_device::static_set_timer_ack(*device, sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
 #define MCFG_SEGA_315_5250_SOUND_WRITE(_class, _func) \
-	sega_315_5250_compare_timer_device::static_set_sound_write(*device, sega_315_5250_compare_timer_device::sound_write_delegate(&_class::_func, #_class "::" #_func, NULL, (_class *)0));
+	sega_315_5250_compare_timer_device::static_set_sound_write(*device, sega_315_5250_compare_timer_device::sound_write_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
 
 
 //**************************************************************************
@@ -58,6 +58,7 @@ public:
 
 	// palette helpers
 	DECLARE_WRITE16_MEMBER( paletteram_w );
+	DECLARE_WRITE16_MEMBER( philko_paletteram_w );
 
 protected:
 	// internal helpers
@@ -110,8 +111,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal region struct
@@ -135,12 +136,12 @@ private:
 		// configuration
 		void set_decrypt(fd1089_base_device *fd1089);
 		void set_decrypt(fd1094_device *fd1094);
-		void clear() { set(NULL, NULL, 0, 0, ~0, NULL); }
+		void clear() { set(nullptr, nullptr, 0, 0, ~0, nullptr); }
 		void set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, UINT8 *src);
 
 		// updating
 		void update();
-		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != NULL) m_fd1094_cache->reset(); }
+		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != nullptr) m_fd1094_cache->reset(); }
 
 	private:
 		// internal state
@@ -152,7 +153,7 @@ private:
 		UINT8 *                 m_srcptr;
 		fd1089_base_device *    m_fd1089;
 		std::vector<UINT16>   m_fd1089_decrypted;
-		auto_pointer<fd1094_decryption_cache> m_fd1094_cache;
+		std::unique_ptr<fd1094_decryption_cache> m_fd1094_cache;
 	};
 
 	// internal helpers
@@ -161,13 +162,13 @@ private:
 	void fd1094_state_change(UINT8 state);
 
 	// configuration
-	const char *                m_cputag;
+	required_device<m68000_device> m_cpu;
+	required_memory_region      m_cpuregion;
 	mapper_delegate             m_mapper;
 	sound_read_delegate         m_sound_read;
 	sound_write_delegate        m_sound_write;
 
 	// internal state
-	m68000_device *             m_cpu;
 	address_space *             m_space;
 	address_space *             m_decrypted_space;
 	UINT8                       m_regs[0x20];
@@ -190,8 +191,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
@@ -213,8 +214,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal helpers
@@ -247,8 +248,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal helpers

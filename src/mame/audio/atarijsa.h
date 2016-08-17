@@ -15,7 +15,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
 #include "machine/atarigen.h"
@@ -106,8 +106,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal helpers
 	virtual void update_all_volumes() = 0;
@@ -116,6 +116,9 @@ protected:
 	required_device<atari_sound_comm_device> m_soundcomm;
 	required_device<m6502_device> m_jsacpu;
 	required_device<ym2151_device> m_ym2151;
+
+	// memory regions
+	required_memory_region m_cpu_region;
 
 	// memory banks
 	required_memory_bank m_cpu_bank;
@@ -149,15 +152,19 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal helpers
-	virtual void update_all_volumes();
+	virtual void update_all_volumes() override;
 
 	// devices
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;    // JSA IIIs only
+
+	// memory regions
+	optional_memory_region m_oki1_region;
+	optional_memory_region m_oki2_region;
 
 	// memory banks
 	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
@@ -189,13 +196,13 @@ public:
 
 protected:
 	// device level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal helpers
-	virtual void update_all_volumes();
+	virtual void update_all_volumes() override;
 
 	// devices
 	optional_device<pokey_device> m_pokey;
@@ -221,8 +228,8 @@ public:
 
 protected:
 	// device level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_ioport m_jsaii;
 };
@@ -246,8 +253,8 @@ public:
 
 protected:
 	// device level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_ioport m_jsaiii;
 };
@@ -263,7 +270,7 @@ public:
 
 protected:
 	// device level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

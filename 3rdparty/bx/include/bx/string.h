@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_STRING_H_HEADER_GUARD
@@ -14,22 +14,26 @@
 #include <string.h>
 #include <wchar.h>  // wchar_t
 
+#ifndef va_copy
+#	define va_copy(_a, _b) (_a) = (_b)
+#endif // va_copy
+
 namespace bx
 {
 	///
 	inline bool toBool(const char* _str)
 	{
-		char ch = (char)tolower(_str[0]);
+		char ch = (char)::tolower(_str[0]);
 		return ch == 't' ||  ch == '1';
 	}
 
 	/// Case insensitive string compare.
 	inline int32_t stricmp(const char* _a, const char* _b)
 	{
-#if BX_COMPILER_MSVC_COMPATIBLE
-		return _stricmp(_a, _b);
+#if BX_CRT_MSVC
+		return ::_stricmp(_a, _b);
 #else
-		return strcasecmp(_a, _b);
+		return ::strcasecmp(_a, _b);
 #endif // BX_COMPILER_
 	}
 
@@ -307,7 +311,10 @@ namespace bx
 	inline int32_t vsnprintf(char* _str, size_t _count, const char* _format, va_list _argList)
 	{
 #if BX_COMPILER_MSVC
-		int32_t len = ::vsnprintf_s(_str, _count, size_t(-1), _format, _argList);
+		va_list argListCopy;
+		va_copy(argListCopy, _argList);
+		int32_t len = ::vsnprintf_s(_str, _count, size_t(-1), _format, argListCopy);
+		va_end(argListCopy);
 		return -1 == len ? ::_vscprintf(_format, _argList) : len;
 #else
 		return ::vsnprintf(_str, _count, _format, _argList);
@@ -320,7 +327,10 @@ namespace bx
 	inline int32_t vsnwprintf(wchar_t* _str, size_t _count, const wchar_t* _format, va_list _argList)
 	{
 #if BX_COMPILER_MSVC
-		int32_t len = ::_vsnwprintf_s(_str, _count, size_t(-1), _format, _argList);
+		va_list argListCopy;
+		va_copy(argListCopy, _argList);
+		int32_t len = ::_vsnwprintf_s(_str, _count, size_t(-1), _format, argListCopy);
+		va_end(argListCopy);
 		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
 #elif defined(__MINGW32__)
 		return ::vsnwprintf(_str, _count, _format, _argList);
@@ -374,6 +384,23 @@ namespace bx
 		va_start(argList, _format);
 		stringPrintfVargs(_out, _format, argList);
 		va_end(argList);
+	}
+
+	/// Replace all instances of substring.
+	template <typename Ty>
+	inline Ty replaceAll(const Ty& _str, const char* _from, const char* _to)
+	{
+		Ty str = _str;
+		size_t startPos = 0;
+		const size_t fromLen = strlen(_from);
+		const size_t toLen   = strlen(_to);
+		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
+		{
+			str.replace(startPos, fromLen, _to);
+			startPos += toLen;
+		}
+
+		return str;
 	}
 
 	/// Extract base file name from file path.

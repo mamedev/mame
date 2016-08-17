@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:Carl, Miodrag Milanovic
+// copyright-holders:Carl, Miodrag Milanovic, Vas Crabb
 #pragma once
 
 #ifndef __EMU_H__
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DISERIAL_H__
-#define __DISERIAL_H__
+#ifndef MAME_EMU_DISERIAL_H
+#define MAME_EMU_DISERIAL_H
 
 // Windows headers are crap, let me count the ways
 #undef PARITY_NONE
@@ -109,12 +109,12 @@ protected:
 
 	bool is_receive_register_full();
 	bool is_transmit_register_empty();
-	bool is_receive_register_synchronized() { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
-	bool is_receive_register_shifting() { return m_rcv_bit_count_received > 0; }
-	bool is_receive_framing_error() { return m_rcv_framing_error; }
-	bool is_receive_parity_error() { return m_rcv_parity_error; }
+	bool is_receive_register_synchronized() const { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
+	bool is_receive_register_shifting() const { return m_rcv_bit_count_received > 0; }
+	bool is_receive_framing_error() const { return m_rcv_framing_error; }
+	bool is_receive_parity_error() const { return m_rcv_parity_error; }
 
-	UINT8 get_received_char() { return m_rcv_byte_received; }
+	UINT8 get_received_char() const { return m_rcv_byte_received; }
 
 	virtual void tra_callback() { }
 	virtual void rcv_callback() { receive_register_update_bit(m_rcv_line); }
@@ -122,7 +122,7 @@ protected:
 	virtual void rcv_complete() { }
 
 	// interface-level overrides
-	virtual void interface_pre_start();
+	virtual void interface_pre_start() override;
 
 	// Must be called from device_timer in the underlying device
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -186,4 +186,85 @@ private:
 	void rcv_edge();
 };
 
-#endif  /* __DISERIAL_H__ */
+
+template <UINT32 FIFO_LENGTH>
+class device_buffered_serial_interface : public device_serial_interface
+{
+protected:
+	using device_serial_interface::device_serial_interface;
+
+	virtual void tra_complete() override
+	{
+		assert(!m_empty || (m_head == m_tail));
+		assert(m_head < ARRAY_LENGTH(m_fifo));
+		assert(m_tail < ARRAY_LENGTH(m_fifo));
+
+		if (!m_empty)
+		{
+			transmit_register_setup(m_fifo[m_head]);
+			m_head = (m_head + 1U) % FIFO_LENGTH;
+			m_empty = (m_head == m_tail) ? 1U : 0U;
+		}
+	}
+
+	virtual void rcv_complete() override
+	{
+		receive_register_extract();
+		received_byte(get_received_char());
+	}
+
+	void clear_fifo()
+	{
+		m_head = m_tail = 0U;
+		m_empty = 1U;
+	}
+
+	void transmit_byte(UINT8 byte)
+	{
+		assert(!m_empty || (m_head == m_tail));
+		assert(m_head < ARRAY_LENGTH(m_fifo));
+		assert(m_tail < ARRAY_LENGTH(m_fifo));
+
+		if (m_empty && is_transmit_register_empty())
+		{
+			transmit_register_setup(byte);
+		}
+		else if (m_empty || (m_head != m_tail))
+		{
+			m_fifo[m_tail] = byte;
+			m_tail = (m_tail + 1U) % FIFO_LENGTH;
+			m_empty = 0U;
+		}
+		else
+		{
+			device().logerror("FIFO overrun (byte = 0x%02x)", byte);
+		}
+	}
+
+	bool fifo_full() const
+	{
+		return !m_empty && (m_head == m_tail);
+	}
+
+	void register_save_state(save_manager &save, device_t *device)
+	{
+		device_serial_interface::register_save_state(save, device);
+
+		char const *const module(device->name());
+		char const *const tag(device->tag());
+
+		save.save_item(device, module, tag, 0, NAME(m_fifo));
+		save.save_item(device, module, tag, 0, NAME(m_head));
+		save.save_item(device, module, tag, 0, NAME(m_tail));
+		save.save_item(device, module, tag, 0, NAME(m_empty));
+	}
+
+private:
+	virtual void received_byte(UINT8 byte) = 0;
+
+	UINT8   m_fifo[FIFO_LENGTH];
+	UINT32  m_head = 0U, m_tail = 0U;
+	UINT8   m_empty = 1U;
+};
+
+#endif  // MAME_EMU_DISERIAL_H

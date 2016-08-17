@@ -48,7 +48,7 @@ public:
 	template<class _line> void set_sel_callback(_line line) { m_write_sel.set_callback(line); }
 	template<class _line> void set_bsy_callback(_line line) { m_write_bsy.set_callback(line); }
 
-	virtual void scsi_ctrl_changed();
+	virtual void scsi_ctrl_changed() override;
 
 	UINT8 read() { return scsi_bus->data_r(); }
 	DECLARE_READ8_MEMBER( read ) { return read(); }
@@ -76,8 +76,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( bsy_w ) { scsi_bus->ctrl_w(scsi_refid, state ? S_BSY : 0, S_BSY); }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	devcb_write_line m_write_rst;
 	devcb_write_line m_write_atn;

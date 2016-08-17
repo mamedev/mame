@@ -42,7 +42,7 @@ inline UINT32 m37710_cpu_device::m37710i_read_16_normal(UINT32 address)
 
 inline UINT32 m37710_cpu_device::m37710i_read_16_immediate(UINT32 address)
 {
-	if (address & 1)
+	if (!WORD_ALIGNED(address))
 		return m37710_read_8_immediate(address) | (m37710_read_8_immediate(address+1)<<8);
 	else
 		return m37710_read_16_immediate(address);
@@ -65,7 +65,7 @@ inline void m37710_cpu_device::m37710i_write_16_direct(UINT32 address, UINT32 va
 
 inline UINT32 m37710_cpu_device::m37710i_read_24_normal(UINT32 address)
 {
-	if (address & 1)
+	if (!WORD_ALIGNED(address))
 		return m37710_read_8(address) | (m37710_read_16(address+1)<<8);
 	else
 		return m37710_read_16(address) | (m37710_read_8(address+2)<<16);
@@ -73,7 +73,7 @@ inline UINT32 m37710_cpu_device::m37710i_read_24_normal(UINT32 address)
 
 inline UINT32 m37710_cpu_device::m37710i_read_24_immediate(UINT32 address)
 {
-	if (address & 1)
+	if (!WORD_ALIGNED(address))
 		return m37710_read_8_immediate(address) | (m37710_read_16_immediate(address+1)<<8);
 	else
 		return m37710_read_16_immediate(address) | (m37710_read_8_immediate(address+2)<<16);
@@ -81,7 +81,7 @@ inline UINT32 m37710_cpu_device::m37710i_read_24_immediate(UINT32 address)
 
 inline UINT32 m37710_cpu_device::m37710i_read_24_direct(UINT32 address)
 {
-	if (address & 1)
+	if (!WORD_ALIGNED(address))
 		return m37710_read_8(address) | (m37710_read_16(address+1)<<8);
 	else
 		return m37710_read_16(address) | (m37710_read_8(address+2)<<16);

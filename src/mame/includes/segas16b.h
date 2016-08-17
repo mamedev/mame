@@ -9,10 +9,11 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
-#include "sound/2151intf.h"
-#include "sound/2413intf.h"
+#include "sound/ym2151.h"
+#include "sound/ym2413.h"
 #include "sound/upd7759.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
@@ -39,18 +40,27 @@ public:
 			m_nvram(*this, "nvram"),
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_soundlatch(*this, "soundlatch"),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_tilemap_type(SEGAIC16_TILEMAP_16B),
 			m_disable_screen_blanking(false),
-			m_i8751_initial_config(NULL),
+			m_i8751_initial_config(nullptr),
 			m_atomicp_sound_divisor(0),
 			m_atomicp_sound_count(0),
 			m_hwc_input_value(0),
+			m_hwc_monitor(*this, "MONITOR"),
+			m_hwc_left(*this, "LEFT"),
+			m_hwc_right(*this, "RIGHT"),
 			m_mj_input_num(0),
 			m_mj_last_val(0),
+			m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"}),
+			m_spritepalbase(0x400),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
+			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
+			m_decrypted_opcodes(*this, "decrypted_opcodes"),
+			m_bootleg_scroll(*this, "bootleg_scroll"),
+			m_bootleg_page(*this, "bootleg_page")
 	{ }
 
 	// memory mapping
@@ -68,9 +78,13 @@ public:
 	DECLARE_WRITE16_MEMBER( standard_io_w );
 	DECLARE_WRITE16_MEMBER( atomicp_sound_w );
 
+	DECLARE_READ16_MEMBER( bootleg_custom_io_r );
+	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
+
 	// sound CPU read/write handlers
 	DECLARE_WRITE8_MEMBER( upd7759_control_w );
 	DECLARE_READ8_MEMBER( upd7759_status_r );
+	DECLARE_WRITE16_MEMBER( sound_w16 );
 
 	// other callbacks
 	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
@@ -83,7 +97,8 @@ public:
 	DECLARE_DRIVER_INIT(generic_5358_small);
 	DECLARE_DRIVER_INIT(generic_5797);
 	DECLARE_DRIVER_INIT(generic_korean);
-
+	DECLARE_DRIVER_INIT(generic_bootleg);
+	DECLARE_DRIVER_INIT(lockonph);
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(isgsm);
 	DECLARE_DRIVER_INIT(tturf_5704);
@@ -118,6 +133,9 @@ public:
 	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
 	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
 
+	// bootleg stuff
+	void tilemap_16b_fpointbl_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram);
+
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
@@ -142,9 +160,9 @@ protected:
 	};
 
 	// device overrides
-	virtual void video_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal helpers
 	void init_generic(segas16b_rom_board rom_board);
@@ -169,6 +187,7 @@ protected:
 	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
 	DECLARE_WRITE16_MEMBER( sjryuko_custom_io_w );
 
+	protected:
 	// devices
 	optional_device<sega_315_5195_mapper_device> m_mapper;
 	required_device<m68000_device> m_maincpu;
@@ -181,8 +200,9 @@ protected:
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_2;
 	required_device<nvram_device> m_nvram;
-	required_device<sega_sys16b_sprite_device> m_sprites;
+	optional_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
+	optional_device<generic_latch_8_device> m_soundlatch; // not for atomicp
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
@@ -200,11 +220,21 @@ protected:
 	// game-specific state
 	UINT8               m_atomicp_sound_count;
 	UINT8               m_hwc_input_value;
+	optional_ioport     m_hwc_monitor;
+	optional_ioport     m_hwc_left;
+	optional_ioport     m_hwc_right;
 	UINT8               m_mj_input_num;
 	UINT8               m_mj_last_val;
+	optional_ioport_array<6> m_mj_inputs;
+	int                 m_spritepalbase;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;
+	optional_shared_ptr<UINT16> m_decrypted_opcodes;
+	optional_shared_ptr<UINT16> m_bootleg_scroll;
+	optional_shared_ptr<UINT16> m_bootleg_page;
+
+
 };
 
 
@@ -237,7 +267,6 @@ public:
 	void init_tetrbx();
 
 	// read/write handlers
-	DECLARE_WRITE16_MEMBER( sound_w16 );
 	DECLARE_WRITE16_MEMBER( cart_addr_high_w );
 	DECLARE_WRITE16_MEMBER( cart_addr_low_w );
 	DECLARE_READ16_MEMBER( cart_data_r );
@@ -258,7 +287,7 @@ public:
 
 //protected:
 	// driver overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// configuration
 	UINT8           m_read_xor;

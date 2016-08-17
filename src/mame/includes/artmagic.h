@@ -20,6 +20,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
+		m_oki_region(*this, "oki"),
 		m_tms(*this, "tms"),
 		m_tlc34076(*this, "tlc34076"),
 		m_control(*this, "control"),
@@ -28,6 +29,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_memory_region m_oki_region;
 	required_device<tms34010_device> m_tms;
 	required_device<tlc34076_device> m_tlc34076;
 
@@ -72,9 +74,9 @@ public:
 	DECLARE_DRIVER_INIT(cheesech);
 	DECLARE_DRIVER_INIT(ultennis);
 	DECLARE_DRIVER_INIT(stonebal);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void decrypt_cheesech();
 	void decrypt_ultennis();
 	void execute_blit();
@@ -82,5 +84,5 @@ public:
 	inline UINT16 *address_to_vram(offs_t *address);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

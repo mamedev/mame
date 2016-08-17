@@ -15,9 +15,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	/* regions within the virtual tape */
@@ -64,6 +64,7 @@ private:
 	UINT32              m_clockpos;           /* the current clock position of the tape */
 	UINT32              m_numclocks;          /* total number of clocks on the entire tape */
 	UINT16              m_crc16[256];         /* CRC16 for each block */
+	optional_region_ptr<UINT8> m_tape_data;
 
 	const char *describe_state();
 	TIMER_CALLBACK_MEMBER( tape_clock_callback );

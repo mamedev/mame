@@ -49,10 +49,7 @@ public:
 		m_ay8912(*this, "ay8912"),
 		m_vector(*this, "vector"),
 		m_cart(*this, "cartslot"),
-		m_io_contr1x(*this, "CONTR1X"),
-		m_io_contr1y(*this, "CONTR1Y"),
-		m_io_contr2x(*this, "CONTR2X"),
-		m_io_contr2y(*this, "CONTR2Y"),
+		m_io_contr(*this, {"CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y"}),
 		m_io_buttons(*this, "BUTTONS"),
 		m_io_3dconf(*this, "3DCONF"),
 		m_io_lpenconf(*this, "LPENCONF"),
@@ -103,8 +100,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vectrex_via_w);
 	DECLARE_WRITE8_MEMBER(raaspec_led_w);
 	DECLARE_DRIVER_INIT(vectrex);
-	virtual void video_start();
-	virtual void machine_start();
+	virtual void video_start() override;
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(raaspec);
 	UINT32 screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
@@ -125,7 +122,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via6522_0;
@@ -133,10 +130,7 @@ protected:
 	required_device<ay8910_device> m_ay8912;
 	required_device<vector_device> m_vector;
 	optional_device<vectrex_cart_slot_device> m_cart;
-	optional_ioport m_io_contr1x;
-	optional_ioport m_io_contr1y;
-	optional_ioport m_io_contr2x;
-	optional_ioport m_io_contr2y;
+	optional_ioport_array<4> m_io_contr;
 	required_ioport m_io_buttons;
 	required_ioport m_io_3dconf;
 	required_ioport m_io_lpenconf;

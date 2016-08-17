@@ -87,12 +87,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// internal helpers
@@ -103,6 +103,9 @@ private:
 	required_device<z80_device> m_cpu;
 	required_device<ay8910_device> m_ay0;
 	required_device<ay8910_device> m_ay1;
+
+	// I/O ports
+	optional_ioport_array<5> m_ports;
 
 	// internal state
 	UINT8 m_data[4];
@@ -144,10 +147,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices
@@ -182,10 +185,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices
@@ -220,10 +223,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices
@@ -259,10 +262,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices
@@ -282,7 +285,7 @@ private:
 #define SSIO_INPUT_PORTS(ssio) \
 	AM_RANGE(0x00, 0x04) AM_MIRROR(0x18) AM_DEVREAD(ssio, midway_ssio_device, ioport_read) \
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ssio, midway_ssio_device, read) \
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0x03) AM_DEVWRITE(ssio, midway_ssio_device, ioport_write) \
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE(ssio, midway_ssio_device, ioport_write) \
 	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE(ssio, midway_ssio_device, write)
 
 

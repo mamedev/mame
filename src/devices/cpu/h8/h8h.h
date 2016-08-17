@@ -23,10 +23,10 @@ public:
 protected:
 	static const disasm_entry disasm_entries[];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
 	inline void r32_w(int reg, UINT32 val) { R[reg & 7] = val; R[(reg & 7) | 8] = val >> 16; }
 	inline UINT32 r32_r(int reg) const { return R[reg & 7] | (R[(reg & 7) | 8] << 16); }

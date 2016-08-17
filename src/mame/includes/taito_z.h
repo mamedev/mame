@@ -40,7 +40,7 @@ public:
 		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_steer(*this, "STEER") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -68,12 +68,12 @@ public:
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	optional_ioport m_steer;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
-	DECLARE_READ16_MEMBER(eep_latch_r);
 	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
 	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
 	DECLARE_READ8_MEMBER(chasehq_input_bypass_r);
@@ -93,8 +93,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(taitoz_sound_w);
 	DECLARE_READ16_MEMBER(taitoz_sound_r);
-	DECLARE_WRITE16_MEMBER(taitoz_msb_sound_w);
-	DECLARE_READ16_MEMBER(taitoz_msb_sound_r);
 	DECLARE_WRITE8_MEMBER(taitoz_pancontrol);
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
@@ -121,10 +119,8 @@ public:
 	void sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	void aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
-	void parse_cpu_control(  );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(irqhandlerb);
+	void parse_cpu_control();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

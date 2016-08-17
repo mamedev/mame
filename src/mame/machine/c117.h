@@ -6,6 +6,8 @@
 #ifndef __C117_H__
 #define __C117_H__
 
+#include "machine/watchdog.h"
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -46,11 +48,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 private:
 	// internal helpers
@@ -76,6 +79,8 @@ private:
 	// configuration
 	const char *               m_maincpu_tag;
 	const char *               m_subcpu_tag;
+
+	required_device<watchdog_timer_device> m_watchdog;
 };
 
 // device type definition

@@ -23,7 +23,7 @@
 
 class es5503_device : public device_t,
 						public device_sound_interface,
-						public device_memory_interface
+						public device_rom_interface
 {
 public:
 	// construction/destruction
@@ -43,17 +43,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	const address_space_config  m_space_config;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	devcb_write_line   m_irq_func;
 	devcb_read8        m_adc_func;
@@ -95,8 +90,6 @@ private:
 	UINT32 output_rate;
 
 	emu_timer *m_timer;
-
-	direct_read_data *m_direct;
 
 	void halt_osc(int onum, int type, UINT32 *accumulator, int resshift);
 };

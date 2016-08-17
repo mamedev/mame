@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins
+// copyright-holders:K.Wilkins,Couriersud,Derrick Renaud,Frank Palazzolo
 #pragma once
 
 #ifndef __DISC_MTH_H__
@@ -129,9 +129,8 @@ public:
 		TOK_OR,          /* Bitwise OR */
 		TOK_XOR          /* Bitwise XOR */
 	};
-	void step(void);
-	void reset(void);
-protected:
+	void step(void) override;
+	void reset(void) override;
 private:
 	DISCRETE_CLASS_INPUT(I_IN0,     0);
 	DISCRETE_CLASS_INPUT(I_IN1,     1);
@@ -175,7 +174,7 @@ DISCRETE_CLASS_STEP_RESET(dst_mixer, 1,
 	int             m_r_node_bit_flag;
 	int             m_c_bit_flag;
 	double          m_r_total;
-	const double *  m_r_node[DISC_MIXER_MAX_INPS];      /* Either pointer to resistance node output OR NULL */
+	const double *  m_r_node[DISC_MIXER_MAX_INPS];      /* Either pointer to resistance node output OR nullptr */
 	double          m_r_last[DISC_MIXER_MAX_INPS];
 	double          m_exponent_rc[DISC_MIXER_MAX_INPS]; /* For high pass filtering cause by cIn */
 	double          m_v_cap[DISC_MIXER_MAX_INPS];       /* cap voltage of each input */

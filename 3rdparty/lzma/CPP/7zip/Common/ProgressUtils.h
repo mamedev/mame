@@ -1,7 +1,7 @@
 // ProgressUtils.h
 
-#ifndef __PROGRESSUTILS_H
-#define __PROGRESSUTILS_H
+#ifndef __PROGRESS_UTILS_H
+#define __PROGRESS_UTILS_H
 
 #include "../../Common/MyCom.h"
 
@@ -23,10 +23,11 @@ public:
   bool SendProgress;
 
   CLocalProgress();
+
   void Init(IProgress *progress, bool inSizeIsMain);
   HRESULT SetCur();
 
-  MY_UNKNOWN_IMP
+  MY_UNKNOWN_IMP1(ICompressProgressInfo)
 
   STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize);
 };

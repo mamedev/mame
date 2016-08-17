@@ -141,7 +141,7 @@ public:
 	INT32 rowbytes() const { return m_rowpixels * m_bpp / 8; }
 	UINT8 bpp() const { return m_bpp; }
 	bitmap_format format() const { return m_format; }
-	bool valid() const { return (m_base != NULL); }
+	bool valid() const { return (m_base != nullptr); }
 	palette_t *palette() const { return m_palette; }
 	const rectangle &cliprect() const { return m_cliprect; }
 

@@ -33,7 +33,7 @@
 
 #define MCFG_PARALLEL_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PARALLEL_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(parallel_slot_carts, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(parallel_slot_carts, nullptr, false)
 
 
 //**************************************************************************
@@ -59,12 +59,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	device_parallel_interface *m_cart;
-
-private:
 };
 
 // class representing interface-specific live parallel device

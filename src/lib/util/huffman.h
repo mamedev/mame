@@ -98,7 +98,7 @@ class huffman_encoder : public huffman_context_base
 public:
 	// pass through to the underlying constructor
 	huffman_encoder()
-		: huffman_context_base(_NumCodes, _MaxBits, NULL, m_datahisto_array, m_huffnode_array) { histo_reset(); }
+		: huffman_context_base(_NumCodes, _MaxBits, nullptr, m_datahisto_array, m_huffnode_array) { histo_reset(); }
 
 	// single item operations
 	void histo_reset() { memset(m_datahisto_array, 0, sizeof(m_datahisto_array)); }
@@ -126,7 +126,7 @@ class huffman_decoder : public huffman_context_base
 public:
 	// pass through to the underlying constructor
 	huffman_decoder()
-		: huffman_context_base(_NumCodes, _MaxBits, m_lookup_array, NULL, m_huffnode_array) { }
+		: huffman_context_base(_NumCodes, _MaxBits, m_lookup_array, nullptr, m_huffnode_array) { }
 
 	// single item operations
 	UINT32 decode_one(bitstream_in &bitbuf);

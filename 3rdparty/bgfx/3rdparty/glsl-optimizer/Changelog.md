@@ -1,6 +1,43 @@
 GLSL optimizer Change Log
 =========================
 
+2016 06
+-------
+
+Fixed:
+
+* Fixed Metal translation in some cases having wrong precision on constants or constant arrays.
+
+
+2016 05
+-------
+
+Fixed:
+
+* Fixed Metal translation in some cases having wrong precision on struct members.
+* Fixed Metal translation in some cases emitting struct declarations vs. constant initializers in wrong order.
+
+
+2016 03
+-------
+
+Fixed:
+
+* Fixed translation performance regression in loop analysis (regressed in 2015 06 fixes).
+
+
+2015 08
+-------
+
+Changes:
+
+* 2D shadow and 2D array uniforms got their own glslopt_basic_type entries.
+
+Fixes:
+
+* Fixed translation of 2D texture arrays (GLSL with EXT_texture_array, GLES3 and Metal).
+
+
 2015 06
 -------
 
@@ -23,6 +60,7 @@ Fixes:
 -------
 
 Goodies:
+
 * GLES2: support EXT_draw_instanced / gl_InstanceIDEXT.
 * Support gl_VertexID in GLSL < 1.30 when EXT_gpu_shader4 is used.
 

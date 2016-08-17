@@ -1,10 +1,9 @@
-// license:???
-// copyright-holders:John Butler, Ed Mueller, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles, Zsolt Vasvari
+// thanks-to: John Butler, Ed Mueller
 /***************************************************************************
 
     Taito Qix hardware
-
-    driver by John Butler, Ed Mueller, Aaron Giles
 
 ***************************************************************************/
 
@@ -114,7 +113,7 @@ public:
 	DECLARE_DRIVER_INIT(slither);
 	DECLARE_DRIVER_INIT(zookeep);
 	DECLARE_DRIVER_INIT(kram3);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(qixmcu);
 	DECLARE_VIDEO_START(qix);
 	TIMER_CALLBACK_MEMBER(pia_w_callback);

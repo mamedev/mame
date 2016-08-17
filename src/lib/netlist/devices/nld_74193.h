@@ -26,39 +26,12 @@
 #ifndef NLD_74193_H_
 #define NLD_74193_H_
 
-#include "nl_base.h"
+#include "nl_setup.h"
 
-#define TTL_74193(_name)                                              \
-		NET_REGISTER_DEV(TTL_74193, _name)
+#define TTL_74193(name)                                                         \
+		NET_REGISTER_DEV(TTL_74193, name)
 
-#define TTL_74193_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_74193_DIP, _name)
-
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_DEVICE(74193,
-	ATTR_HOT void update_outputs();
-
-	logic_input_t m_A;
-	logic_input_t m_B;
-	logic_input_t m_C;
-	logic_input_t m_D;
-	logic_input_t m_CLEAR;
-	logic_input_t m_LOADQ;
-	logic_input_t m_CU;
-	logic_input_t m_CD;
-
-	INT8 m_cnt;
-	UINT8 m_last_CU;
-	UINT8 m_last_CD;
-
-	logic_output_t m_Q[4];
-	logic_output_t m_BORROWQ;
-	logic_output_t m_CARRYQ;
-);
-
-NETLIB_DEVICE_DERIVED_PURE(74193_dip, 74193);
-
-NETLIB_NAMESPACE_DEVICES_END()
+#define TTL_74193_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74193_DIP, name)
 
 #endif /* NLD_74193_H_ */

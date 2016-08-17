@@ -1,0 +1,2200 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<!-- This list is exclusively for Italian MO5 and MO6 software -->
+<softwarelist name="pro128_cass" description="Olivetti Prodest PC 128 cassettes">
+
+<!-- Applications -->
+
+	<software name="assemble">
+		<description>Assembler</description>
+		<year>1986</year>
+		<publisher>Infogrames?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="13318">
+				<rom name="ass-desass - assembler (infogrames) (william hennebois) (1985) (pc128).k7" size="13318" crc="ed0f4d12" sha1="464bc31b7238fddc35aadad621d33531ed458cc9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="assemblea" cloneof="assemble">
+		<description>Assembler (Alt)</description>
+		<year>1986</year>
+		<publisher>Infogrames?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="13318">
+				<rom name="assembler (it) (infogrames) (william hennebois) (1986).k7" size="13318" crc="06c3565d" sha1="33bf19bd751c0b80ccb5fcfb6dd21031c2156267" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="assembleb" cloneof="assemble">
+		<description>Assembler (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Infogrames?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="14038">
+				<rom name="assembler_pc128.k7" size="14038" crc="bbed8b4e" sha1="ee566ee3145173865afcb03b571dfd1660dd0d05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fontmngr">
+		<description>Font Manager</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25306">
+				<rom name="font manager (inconnus) (pc128).k7" size="25306" crc="c1eff55d" sha1="74dcb72155737e34be4a967d727b061ad6972c16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fontmngra" cloneof="fontmngr">
+		<description>Font Manager (Alt)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25306">
+				<rom name="font manager (it).k7" size="25306" crc="9f5bf49e" sha1="20b40582dd54c1822fd45ebfd554da1947ff81f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fontmngrb" cloneof="fontmngr">
+		<description>Font Manager (Alt 2)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25306">
+				<rom name="font-manager_pc128.k7" size="25306" crc="6308368f" sha1="1a12a32227f250d6d72be2fdca065c290ef22075" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Compilations (Applications) -->
+
+	<software name="produkit">
+		<description>Productivity Kit - Introduzione al software integrato</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Tape 1 (Arcobaleno)"/>
+			<dataarea name="cass" size="3885372">
+				<rom name="productivity kit (it) (infogrames) (gilles blanchard, bernard tahon, alain nakache) (1987) (pc128) (arcobaleno).wav" size="3885372" crc="2afc021a" sha1="3ea1a5eb41bf43aca05d3a4deb1c8eadb9d86d98" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Tape 2 (PC Calc)"/>
+			<dataarea name="cass" size="6484122">
+				<rom name="productivity kit (it) (infogrames) (gilles blanchard, bernard tahon, alain nakache) (1987) (pc128) (pc calc).wav" size="6484122" crc="aab73a41" sha1="3bd9b755eb340696cd81dbdfe641f7c336bef762" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mo_cass">
+			<feature name="part_id" value="Tape 3 (Scritto)"/>
+			<dataarea name="cass" size="9079748">
+				<rom name="productivity kit (it) (infogrames) (gilles blanchard, bernard tahon, alain nakache) (1987) (pc128) (scritto).wav" size="9079748" crc="bfb44556" sha1="4522ae25aa182fcff34ce2c0150f9908597ee66a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="produkita" cloneof="produkit">
+		<description>Productivity Kit - Introduzione al software integrato (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Tape 1 (Arcobaleno)"/>
+			<dataarea name="cass" size="8404">
+				<rom name="productivity kit (it) (infogrames) (gilles blanchard, bernard tahon, alain nakache) (1987) (pc128) (arcobaleno).k7" size="8404" crc="b887c9ed" sha1="cc60f89eba6b554a7809f2196cd725de45d36105" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Tape 2 (PC Calc)"/>
+			<dataarea name="cass" size="17826">
+				<rom name="productivity kit (it) (infogrames) (gilles blanchard, bernard tahon, alain nakache) (1987) (pc128) (pc calc).k7" size="17826" crc="210e9341" sha1="fa611cf4aed5d43d598ed9d59569327a94691b71" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mo_cass">
+			<feature name="part_id" value="Tape 3 (Scritto)"/>
+			<dataarea name="cass" size="26577">
+				<rom name="productivity kit (it) (infogrames) (gilles blanchard, bernard tahon, alain nakache) (1987) (pc128) (scritto).k7" size="26577" crc="6928bb76" sha1="859500986a48c5c28de34029f762d26bd8a145ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="produkitb" cloneof="produkit">
+		<description>Productivity Kit - Introduzione al software integrato (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Tape 1 (Arcobaleno)"/>
+			<dataarea name="cass" size="8404">
+				<rom name="arcobaleno (it) (infogrames) (alain nakache) (1987).k7" size="8404" crc="83f61b38" sha1="719eb58360cd4d2fb633b17342dc7dc8aeab9eab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Tape 2 (PC Calc)"/>
+			<dataarea name="cass" size="17826">
+				<rom name="pc-calc (it) (infogrames) (gilles blanchard) (1987).k7" size="17826" crc="db9913c8" sha1="2e7d737899a70a3f9f97785fef3ce9c227bab46d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mo_cass">
+			<feature name="part_id" value="Tape 3 (Scritto)"/>
+			<dataarea name="cass" size="26577">
+				<rom name="scritto (it) (infogrames) (bernard tahon) (1987).k7" size="26577" crc="670f7252" sha1="a711ea9f9fc0d9dfa703fb56f72596df97e4f63d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="produkitc" cloneof="produkit">
+		<description>Productivity Kit - Introduzione al software integrato (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Tape 1 (Arcobaleno)"/>
+			<dataarea name="cass" size="8304">
+				<rom name="arcobaleno_pc128.k7" size="8304" crc="69d54ed0" sha1="ebbb774d2c00a03b7aedbde2101ec45832b67aa8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Tape 2 (PC Calc)"/>
+			<dataarea name="cass" size="18157">
+				<rom name="pc-calc_pc128.k7" size="18157" crc="889d57c4" sha1="fc9ddc46a748e27bae111a1b28d334d4c4d9c84d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mo_cass">
+			<feature name="part_id" value="Tape 3 (Scritto)"/>
+			<dataarea name="cass" size="26577">
+				<rom name="scritto_pc128.k7" size="26577" crc="aa7638df" sha1="ee26d64fbf26e96a0d8a027a01671002c53f6738" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Compilations (Games) -->
+
+	<software name="classiq1">
+		<description>Classiques Volume 1</description>
+		<year>1989</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="43925">
+				<rom name="classiques volume 1 (titus software) (inconnus) (1987) (mo5).k7" size="43925" crc="64d48ed2" sha1="1dde3126a834e45603126eed4945520568b734a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="classiq2">
+		<description>Classiques Volume 2</description>
+		<year>1989</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="43204">
+				<rom name="classiques volume 2 (titus software) (inconnus) (1987) (pc128).k7" size="43204" crc="eaacc4c5" sha1="7c9ec26e40f930eed06e318add59ab8e05deaf65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compil2">
+		<description>Compilation II</description>
+		<year>1986</year>
+		<publisher>Olivetti</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="30996">
+				<rom name="compilation ii (olivetti) (divers) (1986) (pc128 k7) (compilation2-a_pc128).k7" size="30996" crc="14c455b5" sha1="16e8953ea0c7b74034ebd23e4263d94f77a6b501" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="18801">
+				<rom name="compilation ii (olivetti) (divers) (1986) (pc128 k7) (compilation2-b_pc128).k7" size="18801" crc="29cf6f73" sha1="080c86ce3cd6bef863da2848d24c4e86cdc9747a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="malthpos">
+		<description>Maledizione di Thaar/Poseidone</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A? (Maledisione di Thaar)"/>
+			<dataarea name="cass" size="52842">
+				<rom name="maledizione di thaar, la (1986)(coktel vision)(fr)(it).k7" size="52842" crc="3622aa86" sha1="6a3adac796ad7003fc2a0ca4f04321a5b58c4ba7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B? (Poseidone)"/>
+			<dataarea name="cass" size="33216">
+				<rom name="poseidone (1986)(coktel vision)(fr)(it).k7" size="33216" crc="8b3a6857" sha1="c9d9c6dcf3dfb2028ee2083d47faf665231ccb35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="malthposa" cloneof="malthpos">
+		<description>Maledizione di Thaar/Poseidone (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A? (Maledisione di Thaar)"/>
+			<dataarea name="cass" size="52842">
+				<rom name="la malediction de thaar (coktel vision) (inconnus) (1986) (pc128).k7" size="52842" crc="3702eeab" sha1="a1c6bbde44f02f902c5a427359b214e0a692f1de" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B? (Poseidone)"/>
+			<dataarea name="cass" size="33216">
+				<rom name="poseidon (1986)(coktel vision)(fr)(it).k7" size="33216" crc="6e37d397" sha1="a5094d4d639ddca64405fa276c46e5cc18498bcd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="malthposb" cloneof="malthpos">
+		<description>Maledizione di Thaar/Poseidone (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A? (Maledisione di Thaar)"/>
+			<dataarea name="cass" size="52842">
+				<rom name="la maledizione di thaar (it) (coktel vision) (1986).k7" size="52842" crc="80f7598f" sha1="b370ee25ceec27ed11b1d671d523a80f3a080dc7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B? (Poseidone)"/>
+			<dataarea name="cass" size="33216">
+				<rom name="poseidon - poseidone (coktel vision) (inconnus) (1986) (pc128).k7" size="33216" crc="d067674f" sha1="dce8cc5d7b5d4525a51585f8b34c7eb10f0c754d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="malthposc" cloneof="malthpos">
+		<description>Maledizione di Thaar/Poseidone (Alt 3)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A? (Maledisione di Thaar)"/>
+			<dataarea name="cass" size="52842">
+				<rom name="la-maledizione-di-thaar_pc128.k7" size="52842" crc="81c7c76e" sha1="6f58ba7c2f9bc86d1d19315cc5f85a4846bad32f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B? (Poseidone)"/>
+			<dataarea name="cass" size="33216">
+				<rom name="poseidone_pc128.k7" size="33216" crc="f0b0b2e9" sha1="2a977cc9d697d65754dcdcb4cb0414a72035c1df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- incomplete dump
+    <software name="malthaarc" cloneof="malthaar">
+        <description>La Maledizione di Thaar (Ita, Bad)</description>
+        <year>1986</year>
+        <publisher>Olivetti Prodest</publisher>
+
+        <part name="cass1" interface="mo_cass">
+            <dataarea name="cass" size="8192">
+                <rom name="maledizione di thaar, la (1986)(coktel vision)(fr)(it)[b].k7" size="8192" crc="cc00a47f" sha1="be459394dad467df2cbcb76ca94586b6e942187b" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+-->
+
+<!-- Covertapes -->
+
+	<software name="pcuser9">
+		<description>PC User #9 Cassette</description>
+		<year>1987</year>
+		<publisher>PC User</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="31447">
+				<rom name="pc user #9 cassette (it) (pc user) (seg, forkappa) (1987) (pc128).k7" size="31447" crc="191a1268" sha1="f4c93a3c2bfec9bdc8a97a84e39807f96791013c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcuser9a" cloneof="pcuser9">
+		<description>PC User #9 Cassette (Alt)</description>
+		<year>1987</year>
+		<publisher>PC User</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="31423">
+				<rom name="pcuser9-pc128 (k7).k7" size="31423" crc="4fbf8214" sha1="a3614a3149fc75904fdaf7aab26e8c274e80c95a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- this dump will probably need modification to work
+    <software name="pcuser9b" cloneof="pcuser9">
+        <description>PC User #9 Cassette (Bad)</description>
+        <year>1987</year>
+        <publisher>PC User</publisher>
+
+        <part name="cass1" interface="mo_cass">
+            <dataarea name="cass" size="31423">
+                <rom name="pc user #9 cassette (1987)(pc user)(it)[b].k7" size="31423" crc="d0b2941c" sha1="20426faba84bf5d70e153c469806aa580ea6764d" offset="0" status="baddump" />
+            </dataarea>
+        </part>
+    </software>
+-->
+
+<!-- Educational -->
+
+	<software name="astronom">
+		<description>Astronomia - Sky Map</description>
+		<year>1986?</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="28756">
+				<rom name="astronomia - sky map (fil) (christian colongo) (1983) (pc128).k7" size="28756" crc="f170ab48" sha1="746f95203cb2bd2f401d8ad7afd139879437ad4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astronoma" cloneof="astronom">
+		<description>Astronomia - Sky Map (Alt)</description>
+		<year>1986?</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="28756">
+				<rom name="astronomia (it) (answare) (christian colongo) (1986).k7" size="28756" crc="a5ed138b" sha1="fe1457a03b0e5817973c2516cb4b2deb585a8074" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astronomb" cloneof="astronom">
+		<description>Astronomia - Sky Map (Alt 2)</description>
+		<year>1986?</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="28756">
+				<rom name="astronomia-sky-map_pc128.k7" size="28756" crc="d9f8eb33" sha1="76238cae1a49388ea5dc01b57f9560162f1b12b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="introbas">
+		<description>Introduzione al BASIC</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Tape 1 Side A"/>
+			<dataarea name="cass" size="49465">
+				<rom name="introduzione al basic (infogrames) (inconnus) (1984) (pc128) (side 1a).k7" size="49465" crc="5b3b7f9e" sha1="89fc7181663d95e04fdc7380473116dfadb65e11" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Tape 1 Side B"/>
+			<dataarea name="cass" size="20764">
+				<rom name="introduzione al basic (infogrames) (inconnus) (1984) (pc128) (side 1b).k7" size="20764" crc="b2d3fa22" sha1="cdfc0795eb91322fde3f98ecc892a107cb77bd7d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mo_cass">
+			<feature name="part_id" value="Tape 2 Side A"/>
+			<dataarea name="cass" size="46388">
+				<rom name="introduzione al basic (infogrames) (inconnus) (1984) (pc128) (side 2a).k7" size="46388" crc="24706724" sha1="4e6da0bcf3c2f954fffdc781ee84b337fa3a883d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="mo_cass">
+			<feature name="part_id" value="Tape 2 Side B"/>
+			<dataarea name="cass" size="22348">
+				<rom name="introduzione al basic (infogrames) (inconnus) (1984) (pc128) (side 2b).k7" size="22348" crc="3521331a" sha1="332b91e25a4c431fdd4d9cd029199e5ab63e8ff8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+
+	<software name="android">
+		<description>Androides</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="7973874">
+				<rom name="androides (version italienne) (infogrames) (william hennebois) (1987) (pc128).wav" size="7973874" crc="36281511" sha1="096cecc83512ab4204735060f8e499dc2bf71d1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="androida" cloneof="android" supported="no">
+		<description>Androides (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="21759">
+				<rom name="androides (version italienne) (infogrames) (william hennebois) (1987) (pc128).k7" size="21759" crc="4e65a0be" sha1="6e86dbac5b0810eaf42ad91c99fd051900e8a9d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="androidb" cloneof="android" supported="no">
+		<description>Androides (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="21039">
+				<rom name="androides (it) (infogrames) (william hennebois) (1985).k7" size="21039" crc="d7f13bd5" sha1="fdd3bfca5609c9374af5e26a161fea760c2a38b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="androidc" cloneof="android" supported="no">
+		<description>Androides (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="21039">
+				<rom name="androides-pc128 (k7).k7" size="21039" crc="1e308caa" sha1="b9154b27a0c14e4fb45a577113fe8b64e2cdd5fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroid">
+		<description>Asteroidi (from issue 11/87)</description>
+		<year>1987</year>
+		<publisher>LIST Magazine</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="3736">
+				<rom name="asteroidi (list) (giulio vannini, angelo coccettini (betasoft)) (1987) (pc128).k7" size="3736" crc="70562394" sha1="e15af9915371d9fbd6f4983752070efa68ed4e17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroida" cloneof="asteroid">
+		<description>Asteroidi (from issue 11/87) (Alt)</description>
+		<year>1987</year>
+		<publisher>LIST Magazine</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="3736">
+				<rom name="asteroidi_a_pc128.k7" size="3736" crc="a1a39f70" sha1="6ece57c9545f88c598e8044c9b49ff6432d354ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avenger">
+		<description>Avenger</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="51390">
+				<rom name="avenger (fil) (c.kerry, p.harrap, s.hollingworth, g.holmes) (1986) (pc128).k7" size="51390" crc="b1c35437" sha1="2376b0dda1bf92cf3adb308dd9a56528f3dfd390" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beachead">
+		<description>Beach-Head</description>
+		<year>1985</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="29874">
+				<rom name="beach head (fil) (access software) (1985) (pc128).k7" size="29874" crc="f022a740" sha1="8e24e54263e01070ca8711906ab9ed6991145463" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bidul">
+		<description>Bidul</description>
+		<year>198?</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="9688">
+				<rom name="bidul (infogrames) (antoine leca, eric canton) (1984) (pc128).k7" size="9688" crc="3876dd29" sha1="b45ee0e1729158c2f899d4ffc17b491c480039e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bidula" cloneof="bidul">
+		<description>Bidul (Alt)</description>
+		<year>198?</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="9688">
+				<rom name="bidul (it) (infogrames) (antoine leca) (1984).k7" size="9688" crc="27510498" sha1="93c62ac06a2f27b416b3f793489a02099dd553cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bidulb" cloneof="bidul">
+		<description>Bidul (Alt 2)</description>
+		<year>198?</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="9688">
+				<rom name="bidul_pc128.k7" size="9688" crc="c2c14d04" sha1="7586e3594eb4d06e912817b5840d5e897a2f8faa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluewar2">
+		<description>Blue War II</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="118072">
+				<rom name="blue war ii (free game blot) (alain guiri) (1986) (pc128).k7" size="118072" crc="537b1c32" sha1="e3f28470c27a5f48ab384b3a62b2d595ac869834" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluewar2a" cloneof="bluewar2">
+		<description>Blue War II (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="118072">
+				<rom name="blue-war-pc128 (k7).k7" size="118072" crc="d72bcfb8" sha1="ba1e22ac330596171797fca887a66858b4d50dc9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moraneca">
+		<description>Bob Morane Cavalleria</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="27220260">
+				<rom name="bob morane cavalleria (olivetti) (tuan do cao, najib el maadani, philippe nottoli, pascal burel) (1988) (pc128 wav).wav" size="27220260" crc="e94fbb53" sha1="9f00b79686b6ff67e629684ec3a824b3d7b3cd6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moranecaa" cloneof="moraneca">
+		<description>Bob Morane Cavalleria (Alt)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="123906">
+				<rom name="bob morane cavalleria (olivetti) (tuan do cao, najib el maadani, philippe nottoli, pascal burel) (1988) (pc128 k7).k7" size="123906" crc="14332fe0" sha1="e8ea8332be1f8624796e0f1af38b63c2a4c4efec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moranecab" cloneof="moraneca">
+		<description>Bob Morane Cavalleria (Alt 2)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="123906">
+				<rom name="bob-morane-cavalleria_a_pc128.k7" size="123906" crc="f9e99b46" sha1="deb05f1d7a84c5470b716d01b09df54e770559b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moranegi">
+		<description>Bob Morane Giungla</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="27230434">
+				<rom name="bob morane giungla (olivetti) (kamel bala, daniel charpy, pascal burel, laurent salmeron) (1988) (pc128 wav).wav" size="27230434" crc="aaee3d98" sha1="b4400c288376f634fa19ea35a9c654c98faef8ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moranegia" cloneof="moranegi">
+		<description>Bob Morane Giungla (Alt)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="119058">
+				<rom name="bob morane giungla (olivetti) (kamel bala, daniel charpy, pascal burel, laurent salmeron) (1988) (pc128 k7).k7" size="119058" crc="f1dfa4a2" sha1="4c0c35c676734462163a28f30d271ae1e26c70a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moranegib" cloneof="moranegi">
+		<description>Bob Morane Giungla (Alt 2)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="119058">
+				<rom name="bob morane giungla (it) (infogrames) (kamel bala) (1987).k7" size="119058" crc="035d8513" sha1="b214b696bcb434ef933a22fbbfe8387cee2c0067" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moranegic" cloneof="moranegi">
+		<description>Bob Morane Giungla (Alt 3)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="121458">
+				<rom name="bob-morane-giungla_pc128.k7" size="121458" crc="76ad4c4c" sha1="f96b5f118077102e5a0b058718fefb96ad7c53db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="business">
+		<description>Business+</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25672">
+				<rom name="business+ (fil) (inconnus) (1986) (pc128).k7" size="25672" crc="6023876b" sha1="0ea34394c89267255df314f6d4e007fbc5046bc8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="businessa" cloneof="business">
+		<description>Business+ (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25672">
+				<rom name="business+ (it) (fil) (1986).k7" size="25672" crc="74030f15" sha1="2fca627b5e1114c720f3c4ae39cacae5afbc302a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="businessb" cloneof="business">
+		<description>Business+ (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25672">
+				<rom name="business-pc128 (k7).k7" size="25672" crc="6b85b49e" sha1="4aa5c8f831a0193866467abc118de99a7d181d89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="capblood" supported="no">
+		<description>Captain Blood</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="104732">
+				<rom name="captain blood (ere informatique) (didier bouchon, nicolas massonnat) (1988) (pc128 k7).k7" size="104732" crc="5177e279" sha1="f7cfd852bda0d69d459d0d44b7c55c4a81ca0c73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="capblooda" cloneof="capblood" supported="no">
+		<description>Captain Blood (Alt)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="104732">
+				<rom name="captain blood (it) (ere) (didier bouchon).k7" size="104732" crc="db4795f0" sha1="e840347bdc42c1c69558177d59676671a2abc82d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="capbloodb" cloneof="capblood" supported="no">
+		<description>Captain Blood (Alt 2)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="111692">
+				<rom name="captain-blood_pc128.k7" size="111692" crc="bd969d94" sha1="9b9eb301a3f63ca6b94eabbb095f2b6fc7cfdd24" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chamonix">
+		<description>Chamonix Challenge - Quota 2000</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="41708968">
+				<rom name="chamonix challenge - quota 2000 (infogrames) (alain vialon) (1988) (pc128).wav" size="41708968" crc="515e80ad" sha1="718bc2d4623f33db3e906d1a73e96d848da61108" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chamonixa" cloneof="chamonix">
+		<description>Chamonix Challenge - Quota 2000 (Alt)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="166060">
+				<rom name="chamonix challenge - quota 2000 (infogrames) (alain vialon) (1988) (pc128).k7" size="166060" crc="b51e0ba4" sha1="1acd2236fc2425bed2891f5097d0d4abbd476cd4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chamonixb" cloneof="chamonix">
+		<description>Chamonix Challenge - Quota 2000 (Alt 2)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="159542">
+				<rom name="chamonix-challenge-pc128 (k7).k7" size="159542" crc="a0df0926" sha1="b73efeca7fa9c16c03e66975a505866d752fc020" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chamonixc" cloneof="chamonix">
+		<description>Chamonix Challenge - Quota 2000 (Alt 3)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="159542">
+				<rom name="chamonix challenge (it) (infogrames) (alain vialon) (1987).k7" size="159542" crc="8f92069a" sha1="c578fa501600ee2b562272fb68271e59597bc5c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chicago">
+		<description>Chicago 90</description>
+		<year>1990</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass2" interface="mo_cass">
+			<dataarea name="cass" size="94292756">
+				<rom name="chicago 90 (microids) (inconnus) (1989) (pc128).wav" size="94292756" crc="dfcfcb97" sha1="66b02bd74afeb87386e2a35c1ad80e59bb49af2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="chicagoa" cloneof="chicago" supported="no">
+		<description>Chicago 90 (Alt)</description>
+		<year>1990</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="151340">
+				<rom name="chicago 90 (microids) (inconnus) (1989) (pc128).k7" size="151340" crc="e251e4a9" sha1="b8386feca952feb0c78fe30eda31c57ed8ab35e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dakar4x4">
+		<description>Dakar 4x4</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="47188">
+				<rom name="dakar 4x4 (1987)(coktel vision)(fr)(it).k7" size="47188" crc="09591357" sha1="e1ab73089ffe2c0a4a31e3b52326479a88c35e67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dakar4x4a" cloneof="dakar4x4">
+		<description>Dakar 4x4 (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="47188">
+				<rom name="dakar 4x4 (coktel vision) (inconnus) (1987) (pc128).k7" size="47188" crc="bf010781" sha1="10ff9e440eb316c2b77166ecd7ef4c01a3b80043" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dakar4x4b" cloneof="dakar4x4">
+		<description>Dakar 4x4 (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="47188">
+				<rom name="dakar-4x4_pc128.k7" size="47188" crc="c657e03b" sha1="ec56ef90f58c2fc9a0b44455d938125ca32633cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dakarmot">
+		<description>Dakar Moto</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="47458">
+				<rom name="dakar moto (coktel vision) (inconnus) (1987) (pc128).k7" size="47458" crc="9ce01699" sha1="62316bbb2dc4b9690a3bf3b7f8436adf59234e70" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="domcamil">
+		<description>Dom Camillo</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="11810531">
+				<rom name="dom camillo (free game blot) (inconnus) (1987) (pc128).wav" size="11810531" crc="2c7937ed" sha1="ea9a51753649e4bad94b42b9c40b7129d9ed4098" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="domcamila" cloneof="domcamil">
+		<description>Dom Camillo (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="67984">
+				<rom name="dom camillo (free game blot) (inconnus) (1987) (pc128).k7" size="67984" crc="6bc661da" sha1="c7e2d7ee59810ff35669cbd620db88f1974399cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="domcamilb" cloneof="domcamil">
+		<description>Dom Camillo (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="67400">
+				<rom name="dom camillo (it) (free game blot) (1987).k7" size="67400" crc="b72d3541" sha1="6ee14fab7f30e3d92f03d4ca970854315fef82a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="domcamilc" cloneof="domcamil">
+		<description>Dom Camillo (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="67400">
+				<rom name="dom-camillo-pc128 (k7).k7" size="67400" crc="66d2342b" sha1="ec8af28d3c42079d85e9c9b4b233b5e64496b392" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duel2000">
+		<description>Duel 2000</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="46785">
+				<rom name="duel 2000 (coktel vision) (inconnus) (1986) (pc128).k7" size="46785" crc="3f26a452" sha1="432b5bb91c4cfed647f41f2dbfc50c4e80314b45" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="entropie">
+		<description>Entropie</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="18686810">
+				<rom name="entropie (infogrames) (william hennebois) (1987) (pc128).wav" size="18686810" crc="16d1f38e" sha1="52e0eb6f4230605f5e7131d8bdd416f92689b431" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="entropiea" cloneof="entropie">
+		<description>Entropie (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="77858">
+				<rom name="entropie (infogrames) (william hennebois) (1987) (pc128).k7" size="77858" crc="599b60ad" sha1="f98d5514c8e69ebd14c2402be76b82c837519b02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="entropieb" cloneof="entropie">
+		<description>Entropie (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="75698">
+				<rom name="entropie (it) (infogrames) (william hennebois) (1987).k7" size="75698" crc="d67b7ef9" sha1="00b86a9b6131fbb32f1f08641e7d89006293596f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="entropiec" cloneof="entropie">
+		<description>Entropie (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="75698">
+				<rom name="entropie-pc128 (k7).k7" size="75698" crc="b941921e" sha1="ef33ce5680fe2b1886a376192df45fe98428a888" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogs">
+		<description>Frogs (from Jackson Soft Compilation n. 5)</description>
+		<year>198?</year>
+		<publisher>Gruppo Editoriale Jackson</publisher>
+		<info name="alt_title" value="Jump for Survival" />
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="22147">
+				<rom name="jump for survival (198x)(free game blot)(fr).k7" size="22147" crc="67bb2a71" sha1="a86dc2aaa39b5001468d7347e2938362101886a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogsa" cloneof="frogs">
+		<description>Frogs (from Jackson Soft Compilation n. 5) (Alt)</description>
+		<year>198?</year>
+		<publisher>Gruppo Editoriale Jackson</publisher>
+		<info name="alt_title" value="Jump for Survival" />
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="22147">
+				<rom name="frogs (jump for survival) (jackson soft) (reiner ost) (pc128).k7" size="22147" crc="63b9689e" sha1="d59b91f0d2e721b0836731aec62400e888e45479" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogsb" cloneof="frogs">
+		<description>Frogs (from Jackson Soft Compilation n. 5) (Alt 2)</description>
+		<year>198?</year>
+		<publisher>Gruppo Editoriale Jackson</publisher>
+		<info name="alt_title" value="Jump for Survival" />
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="22147">
+				<rom name="frogs_pc128.k7" size="22147" crc="5b38869d" sha1="0c1c7ff55bb80cd3f75c361ae8481b8d711414c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giochcar">
+		<description>Giochi di Carte</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="14179">
+				<rom name="giochi di carte (fil) (inconnus) (1987) (pc128).k7" size="14179" crc="6eadf550" sha1="0556bb2ea148e568b48367538adc0f8ac6ade7d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giochcara" cloneof="giochcar">
+		<description>Giochi di Carte (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="14179">
+				<rom name="giochi di carte (it) (fil) (1987).k7" size="14179" crc="8d37fd98" sha1="885a490113ecb9bf4b42445568ae1d3609c6625e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giochcarb" cloneof="giochcar">
+		<description>Giochi di Carte (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="14179">
+				<rom name="giochi-di-carte_pc128.k7" size="14179" crc="c4a7502b" sha1="da9180839d076f2b3838905c1863e1f0ba27369c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giocholi">
+		<description>Giochi Olimpici (I/II)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A (Giochi Olimpici I)"/>
+			<dataarea name="cass" size="7441050">
+				<rom name="giochi olimpici (infogrames) (kamel bala, emile nguyen, josyane girard) (1988) (pc128) (side 1).wav" size="7441050" crc="452391b4" sha1="3e01da220b88d7c0239b172d6d0841cd7357c7d0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B (Giochi Olimpici II)"/>
+			<dataarea name="cass" size="33298628">
+				<rom name="giochi olimpici (infogrames) (kamel bala, emile nguyen, josyane girard) (1988) (pc128) (side 2).wav" size="33298628" crc="511cf2e0" sha1="7011ed58098254af55c4beeaa73778949117c8b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giocholia" cloneof="giocholi">
+		<description>Giochi Olimpici (I/II) (Alt)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A (Giochi Olimpici I)"/>
+			<dataarea name="cass" size="26429">
+				<rom name="giochi olimpici (infogrames) (kamel bala, emile nguyen, josyane girard) (1988) (pc128) (side 1).k7" size="26429" crc="0308ed12" sha1="e858485876a9f502f1eae9461cfa4b6a4ff9dc78" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B (Giochi Olimpici II)"/>
+			<dataarea name="cass" size="124865">
+				<rom name="giochi olimpici (infogrames) (kamel bala, emile nguyen, josyane girard) (1988) (pc128) (side 2).k7" size="124865" crc="bc9fb2b8" sha1="a3c3a7f24f2da41b630af6b270d464ad5494f22b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giocholib" cloneof="giocholi">
+		<description>Giochi Olimpici I/II (Alt 2)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A (Giochi Olimpici I)"/>
+			<dataarea name="cass" size="25229">
+				<rom name="giochi olimpici 1 (it) (infogrames) (1988).k7" size="25229" crc="4d65e79a" sha1="8f5c8240bc4976cef2412214d887eabb4e9cc451" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B (Giochi Olimpici II)"/>
+			<dataarea name="cass" size="124865">
+				<rom name="giochi olimpici (infogrames) (kamel bala, emile nguyen, josyane girard) (1988) (pc128) (side 2).k7" size="124865" crc="bc9fb2b8" sha1="a3c3a7f24f2da41b630af6b270d464ad5494f22b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giocholic" cloneof="giocholi">
+		<description>Giochi Olimpici I/II (Alt 3)</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A (Giochi Olimpici I)"/>
+			<dataarea name="cass" size="25229">
+				<rom name="giochi-olimpici1-pc128 (k7).k7" size="25229" crc="5726bc14" sha1="dfbb8d57299effe67acac30e8fa46ec4254d4bb9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B (Giochi Olimpici II)"/>
+			<dataarea name="cass" size="124865">
+				<rom name="giochi olimpici (infogrames) (kamel bala, emile nguyen, josyane girard) (1988) (pc128) (side 2).k7" size="124865" crc="bc9fb2b8" sha1="a3c3a7f24f2da41b630af6b270d464ad5494f22b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greenber">
+		<description>Green Beret</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="33399">
+				<rom name="green beret (fil) (james higgins) (1986) (pc128).k7" size="33399" crc="7b4204c2" sha1="1a94fbde5a1b5fb141b80975eb4b23ba36f83f3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greenbera" cloneof="greenber">
+		<description>Green Beret (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="33399">
+				<rom name="green beret (en) (fil) (james higgins) (1986).k7" size="33399" crc="b2a6e3f7" sha1="2df13967d13641eef0acc852876fe2b292b0a52e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greenberb" cloneof="greenber">
+		<description>Green Beret (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="33399">
+				<rom name="green-beret_pc128.k7" size="33399" crc="8531a6d2" sha1="72ccd5b3e09d98c002f0dd701b8bbbd56549ec51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eredita">
+		<description>L'Eredita</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="10810326">
+				<rom name="l'eredita (infogrames) (pierre bayle) (1986) (pc128).wav" size="10810326" crc="4ac1e46e" sha1="c4d73cb9c1f8efca929cabc31b877147c82bc478" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="ereditaa" cloneof="eredita" supported="no">
+		<description>L'Eredita (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="40561">
+				<rom name="l'eredita (infogrames) (pierre bayle) (1986) (pc128).k7" size="40561" crc="b83deecc" sha1="e1e1237e881e76bd5d251d05e84c6b12209efba6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="ereditab" cloneof="eredita" supported="no">
+		<description>L'Eredita (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="38881">
+				<rom name="l'eredita (it) (infogrames) (pierre bayle) (1986).k7" size="38881" crc="325c173f" sha1="6a72a7056ec6d804e6f0f9cb4c18a9ff03e3ae76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="ereditac" cloneof="eredita" supported="no">
+		<description>L'Eredita (Alt 3)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="38881">
+				<rom name="eredita-pc128.k7" size="38881" crc="3690e9c6" sha1="fc57329b71649fac385bf68c8706f76275d79d78" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imperial">
+		<description>Imperialis</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25151">
+				<rom name="imperialis (1986)(coktel vision)(fr)(it).k7" size="25151" crc="16cdede3" sha1="1314b51244231b0d0b974f215b2e3bc86fb89fbe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imperiala" cloneof="imperial">
+		<description>Imperialis (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25151">
+				<rom name="imperialis (coktel vision) (inconnus) (1986) (pc128).k7" size="25151" crc="79cc0476" sha1="378cc34d6042ef579e7724ad823bdbe7f3924e87" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imperialb" cloneof="imperial">
+		<description>Imperialis (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25151">
+				<rom name="imperialis_pc128.k7" size="25151" crc="f4262641" sha1="d6fd01518c5e33c2b82bcf65754362bcf99ba6bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intrigo">
+		<description>Intrigo a Parigi</description>
+		<year>1986</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass2" interface="mo_cass">
+			<dataarea name="cass" size="21283834">
+				<rom name="intrigo a parigi (infogrames) (pierre bayle, roger granier) (1986) (pc128).wav" size="21283834" crc="01354560" sha1="a7ec96cc5fae04f7df8357872b88816f132a4736" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="intrigoa" cloneof="intrigo" supported="no">
+		<description>Intrigo a Parigi (Alt)</description>
+		<year>1986</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="67875">
+				<rom name="intrigo a parigi (infogrames) (pierre bayle, roger granier) (1986) (pc128).k7" size="67875" crc="8e6a9862" sha1="c3354d848e5c5c0eafb0b682ed990f65217720c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="intrigob" cloneof="intrigo" supported="no">
+		<description>Intrigo a Parigi (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="65475">
+				<rom name="intrigo a parigi (1986)(infogrames)[b].k7" size="65475" crc="601680fd" sha1="e134b3a3b6705eacb0fedbe003043884ed5603ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="intrigoc" cloneof="intrigo" supported="no">
+		<description>Intrigo a Parigi (Alt 3)</description>
+		<year>1986</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="65475">
+				<rom name="intrigo-a-parigi-pc128 (k7).k7" size="65475" crc="fb0a01ab" sha1="8199497c578f5a00203b97179c8d2ca885e0bdad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jamesdeb">
+		<description>James Debug - Le Grand Saut</description>
+		<year>1989</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="45944">
+				<rom name="le grand saut (coktel vision) (marianne rougeulle) (1987) (pc128).k7" size="45944" crc="4b6d43a0" sha1="608472ff6924eddac8fa7b290461eb88a93ae692" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karate">
+		<description>Karate</description>
+		<year>1987?</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="10365808">
+				<rom name="karate (infogrames) (eric mottet) (1985) (pc128).wav" size="10365808" crc="4f6f5af2" sha1="9b0220781f12d54048b94d94200c5777557582dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karatea" cloneof="karate">
+		<description>Karate (Alt)</description>
+		<year>1987?</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="38104">
+				<rom name="karate (infogrames) (eric mottet) (1985) (pc128).k7" size="38104" crc="57e214fd" sha1="f722af50f98ddfe1ff80f6b0a964be7ea41b2c06" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasvegas">
+		<description>Las Vegas</description>
+		<year>1985</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="16528972">
+				<rom name="las vegas (infogrames) (pierre bayle, roger granier) (1985) (pc128) (side a).wav" size="16528972" crc="4b01a51d" sha1="064a087b1afdf756f70aeb5e1e0d49694ee24fa9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="10350956">
+				<rom name="las vegas (infogrames) (pierre bayle, roger granier) (1985) (pc128) (side b).wav" size="10350956" crc="ed01b3d5" sha1="e0a46927bccbe983a181a1cbde0bfdbe91f0b391" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasvegasa" cloneof="lasvegas">
+		<description>Las Vegas (Alt)</description>
+		<year>1985</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="57705">
+				<rom name="las vegas (infogrames) (pierre bayle, roger granier) (1985) (pc128) (side a).k7" size="57705" crc="b2da71e5" sha1="fd611ef8c2508e6489f05714971e3b144c0a138f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="33008">
+				<rom name="las vegas (infogrames) (pierre bayle, roger granier) (1985) (pc128) (side b).k7" size="33008" crc="3e9fcf04" sha1="a127d1e8e83595e857ed6bf6d14b54040d7a11b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasvegasb" cloneof="lasvegas">
+		<description>Las Vegas (Single Tape)</description>
+		<year>1985</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="85913">
+				<rom name="las vegas (it) (infogrames) (pierre bayle) (1985).k7" size="85913" crc="cc2ab880" sha1="540a88a0108cf4a49293e82df872d2a3d117ba65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasvegasc" cloneof="lasvegas">
+		<description>Las Vegas (Single Tape, Alt)</description>
+		<year>1985</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="85913">
+				<rom name="lasvegas-pc128.k7" size="85913" crc="285f5cbd" sha1="b0096790246402c938575454a0468c0955176304" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="luckyluk">
+		<description>Lucky Luke - Nitroglycerine</description>
+		<year>1989</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="105049">
+				<rom name="lucky luke - nitroglycerine (coktel vision) (inconnus) (1987) (pc128).k7" size="105049" crc="2337a6ae" sha1="c08addf1997b907539468b23d66d61877bde250d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maddog">
+		<description>Mad Dog</description>
+		<year>1989</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="14966612">
+				<rom name="mad dog (eh services) (1986) (pc128).wav" size="14966612" crc="df88d9d2" sha1="f96924575ccde21d38bfa5dc36e6fbae61bee6f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maddoga" cloneof="maddog">
+		<description>Mad Dog (Alt)</description>
+		<year>1989</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="46347">
+				<rom name="mad dog (eh services) (1986) (pc128).k7" size="46347" crc="0842c18a" sha1="20d40d5fd9eaad2001f77dae903b8a3530f21eb3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteo7">
+		<description>Meteo-7</description>
+		<year>198?</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="10121">
+				<rom name="meteo-7 (infogrames) (eric mottet) (1984) (pc128).k7" size="10121" crc="376169f6" sha1="ae9cccaa9b7977ede6cfc03f2f311a82cbb95c9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniera">
+		<description>La Miniera di Diamanti</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="9439696">
+				<rom name="la mine aux diamants (infogrames) (philippe bruneel, christian lemaire) (1986) (pc128).wav" size="9439696" crc="f900f79b" sha1="e0d25af33b6a072146b3f77e64e38337dfdab4be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minieraa" cloneof="miniera">
+		<description>La Miniera di Diamanti (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="32842">
+				<rom name="la mine aux diamants (infogrames) (philippe bruneel, christian lemaire) (1986) (pc128).k7" size="32842" crc="0ac0d65a" sha1="3403e97835c18b91edf467c95eeb341e5590d455" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minierab" cloneof="miniera">
+		<description>La Miniera di Diamanti (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="31374">
+				<rom name="la mine aux diamants (infogrames) (p. bruneel) (1986).k7" size="31374" crc="67e92968" sha1="650a66e022d0d953d81ec0a771ab0d4127a43fed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misstorn">
+		<description>Missioni In Tornado</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="31675">
+				<rom name="missioni in tornado (fil) (christian colongo) (1987) (pc128).k7" size="31675" crc="490cea9e" sha1="712991b7ef42e6397ab3f997b219d731963fa810" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nottetmp">
+		<description>La Notte dei Templari</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="30524">
+				<rom name="notte dei templari, la (1986)(fil)(fr)(it).k7" size="30524" crc="9a2c6a34" sha1="798624970fc70b6a635b78e1f705bad29ef27176" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nottetmpa" cloneof="nottetmp">
+		<description>La Notte dei Templari (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="30524">
+				<rom name="la notte dei templari (fil) (coktel vision) (1986) (pc128).k7" size="30524" crc="12c72eab" sha1="83aa4c614c2b71acd0e1206dc88de8f668a75cc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nottetmpb" cloneof="nottetmp">
+		<description>La Notte dei Templari (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="30524">
+				<rom name="la-nuit-des-templiers-pc128 (k7).k7" size="30524" crc="dafe722c" sha1="737d1f6be0510dd8c37fd0e5a8e25847ac59b108" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numero10">
+		<description>Numero 10</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="23140">
+				<rom name="numero 10 (fil) (albert loridan, bruno duriez, joel sana) (1985) (pc128).k7" size="23140" crc="dbb88f8c" sha1="91a9d6dcaf9dc97f21df02cd0d269916ae25b496" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numero10a" cloneof="numero10">
+		<description>Numero 10 (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="23140">
+				<rom name="numero 10 (it) (fil) (albert loridan) (1985).k7" size="23140" crc="59066852" sha1="52ac48c1457dfe0cc82bafab2bac3f96b2b2d6b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numero10b" cloneof="numero10">
+		<description>Numero 10 (Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="23140">
+				<rom name="numero-10_pc128.k7" size="23140" crc="0040062d" sha1="f719cc7429e1b999ff5332812f006e49626a547d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="okcowboy">
+		<description>OK Cowboy</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass2" interface="mo_cass">
+			<dataarea name="cass" size="26816544">
+				<rom name="ok cowboy (infogrames) (pierre bayle, roger granier) (1987) (pc128).wav" size="26816544" crc="0a6f12d2" sha1="467f77042d1c2ec3ac8599b0a849ea79ce36aed8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="okcowboya" cloneof="okcowboy" supported="no">
+		<description>OK Cowboy (Alt)</description>
+		<year>1987</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="121574">
+				<rom name="ok cowboy (1987)(infogrames)[b].k7" size="121574" crc="dfaae0ac" sha1="eef06391ac615a60072e2e64d14775b993f928eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="okcowboyb" cloneof="okcowboy" supported="no">
+		<description>OK Cowboy (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="123974">
+				<rom name="ok cowboy (infogrames) (pierre bayle, roger granier) (1987) (pc128).k7" size="123974" crc="1e894b1a" sha1="d75e06cdbfb67c4eea256b6e20b654ea3e0e8c0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="okcowboyc" cloneof="okcowboy" supported="no">
+		<description>OK Cowboy (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="121574">
+				<rom name="ok cowboy (it) (infogrames) (pierre bayle) (1987).k7" size="121574" crc="01f9afbd" sha1="f56bab450bdb32574f9e1a9e34be3f0284cfb2c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olimpinv">
+		<description>Olimpiadi Invernali</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="23327344">
+				<rom name="olimpiadi invernali (infogrames) (kamel bala, alain vialon) (1986) (pc128) (side a).wav" size="23327344" crc="dde7f22a" sha1="eba8854d530b82332061cf9a2c1b102eb14e103f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="16477376">
+				<rom name="olimpiadi invernali (infogrames) (kamel bala, alain vialon) (1986) (pc128) (side b).wav" size="16477376" crc="e8cce6e5" sha1="6c83987e18779d7f80e8ae007b8725ec5197b640" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olimpinva" cloneof="olimpinv">
+		<description>Olimpiadi Invernali (Single Tape)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="172225">
+				<rom name="olimpiadi invernali (infogrames) (kamel bala, alain vialon) (1986) (pc128).k7" size="172225" crc="12f0fc1d" sha1="d4411257fac8fb2462b4adf7d203a971c7c9c8a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olimpinvb" cloneof="olimpinv">
+		<description>Olimpiadi Invernali (Single Tape, Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="167425">
+				<rom name="olimpiadi invernali (it) (infogrames) (1986).k7" size="167425" crc="c13d2008" sha1="e49d42b322892ac9cc11d3102f8f7eeec8d1da66" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olimpinvc" cloneof="olimpinv">
+		<description>Olimpiadi Invernali (Single Tape, Alt 2)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="167425">
+				<rom name="olimpiadi-invernali-pc128.k7" size="167425" crc="d9eef4e8" sha1="ec3f3d64683f460b625a4a23331a96a1718b0757" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prohibit">
+		<description>Prohibition</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="22790280">
+				<rom name="prohibition pc128 (olivetti) (william hennebois) (1987) (pc128 wav).wav" size="22790280" crc="96c8081b" sha1="f2614c4311558b7a23440e2f440720af80336c4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prohibita" cloneof="prohibit">
+		<description>Prohibition (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="99985">
+				<rom name="prohibition (infogrames) (william hennebois) (1987) (pc128).k7" size="99985" crc="e9a3aca2" sha1="734f990eb23ceacd155bda321129656b80a4f847" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prohibitb" cloneof="prohibit">
+		<description>Prohibition (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="99985">
+				<rom name="prohibition (it) (infogrames) (william hennebois) (1987).k7" size="99985" crc="18d1afc9" sha1="0c2dc1cbab9d0ad0fd868f0236dc9ea4514bd616" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prohibitc" cloneof="prohibit">
+		<description>Prohibition (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="102145">
+				<rom name="prohibition_pc128.k7" size="102145" crc="5e92a241" sha1="e5b9d042785b4a4cfb5635a5baabdebcf87c937d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qrisp">
+		<description>Qrisp (from Jackson Soft Compilation n. 4)</description>
+		<year>198?</year>
+		<publisher>Gruppo Editoriale Jackson</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="20328">
+				<rom name="qrisp (ere informatique) (inconnus) (pc128).k7" size="20328" crc="9f89b892" sha1="9176353946539d8c8bfdac6a7f695551c56c3402" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qrispa" cloneof="qrisp">
+		<description>Qrisp (from Jackson Soft Compilation n. 4) (Alt)</description>
+		<year>198?</year>
+		<publisher>Gruppo Editoriale Jackson</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="20328">
+				<rom name="qrisp_pc128.k7" size="20328" crc="38f55ee0" sha1="064ee455007b62dbe1a81ab86280cb51c2f07744" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runway">
+		<description>Runway</description>
+		<year>1985</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="14718">
+				<rom name="runway (fil) (pierre morel-fourrier) (1985) (pc128).k7" size="14718" crc="e55c5cf3" sha1="4a31f273959f1a011e2fd5a215bc6e4f685feb3b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runway2">
+		<description>Runway II</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25522">
+				<rom name="runway ii pc128 (olivetti) (pierre morel-fourrier) (1986) (pc128 k7).k7" size="25522" crc="5f804df2" sha1="54bd76099549e755a178eed9eb4a4a6d60e1f989" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saphir">
+		<description>Saphir</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Tape 1 (Game)"/>
+			<dataarea name="cass" size="8704964">
+				<rom name="saphir + editeur (infogrames) (eric szymkowiak) (1986) (pc128) (game).wav" size="8704964" crc="d99a2866" sha1="f10021f429d0a401ba170da80b9282605bd42133" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Tape 2 (Editor)"/>
+			<dataarea name="cass" size="6760198">
+				<rom name="saphir + editeur (infogrames) (eric szymkowiak) (1986) (pc128) (editor).wav" size="6760198" crc="27c93b60" sha1="e73023bf50a50105af4712111b951c9939416c3b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="saphira" cloneof="saphir" supported="no">
+		<description>Saphir (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<feature name="part_id" value="Tape 1 (Game)"/>
+			<dataarea name="cass" size="33679">
+				<rom name="saphir + editeur (infogrames) (eric szymkowiak) (1986) (pc128) (game).k7" size="33679" crc="ccc53e0e" sha1="b42ad7612174e70a354ad0b0530da317a043d6a8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mo_cass">
+			<feature name="part_id" value="Tape 2 (Editor)"/>
+			<dataarea name="cass" size="25135">
+				<rom name="saphir + editeur (infogrames) (eric szymkowiak) (1986) (pc128) (editor).k7" size="25135" crc="03a170c1" sha1="29c07f26a35b8b8dd321e2dfba651f72b6a1b281" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scarfing">
+		<description>Scarfinger</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="7661612">
+				<rom name="scarfinger - la moto infernale (infogrames) (nice ideas) (1985) (pc128).wav" size="7661612" crc="3eee391d" sha1="a51e074b1be88b5c3163b1e2393dda1e428a0c67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scarfinga" cloneof="scarfing">
+		<description>Scarfinger (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="30188">
+				<rom name="scarfinger - la moto infernale (infogrames) (nice ideas) (1985) (pc128).k7" size="30188" crc="8d90a952" sha1="1accb23f6bfc046262b41f42da199958b5fa36c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scarfingb" cloneof="scarfing">
+		<description>Scarfinger (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="29228">
+				<rom name="scarfinger - la moto infernale (it) (infogrames) (1985).k7" size="29228" crc="1a826b4b" sha1="430914889eb7523dac11c7dc094b1405192f025e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scarfingc" cloneof="scarfing">
+		<description>Scarfinger (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="29228">
+				<rom name="scarfinger-pc128 (k7).k7" size="29228" crc="35b057f4" sha1="6f4bddc8dff328a261f610a5706acea6ae7120ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sservice">
+		<description>Silent Service</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="48491">
+				<rom name="silent service (fil) (joel sana) (1987) (pc128).k7" size="48491" crc="19848556" sha1="6bef7de7e4069e15da13c5b7134d194d8587a886" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sservicea" cloneof="sservice">
+		<description>Silent Service (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="48491">
+				<rom name="silent service (it) (fil) (joel sana) (1987).k7" size="48491" crc="0a474378" sha1="d3d1a8c396bb35bbd2a1317d3f34fca553d05a22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sserviceb" cloneof="sservice">
+		<description>Silent Service (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="48491">
+				<rom name="silent-service_pc128.k7" size="48491" crc="15813f75" sha1="e81ed6ac94763bbebeb1f83b859da88cd6610abb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sorcery">
+		<description>Sorcery</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="10215570">
+				<rom name="sorcery (virgin games) (inconnus) (1986) (pc128).wav" size="10215570" crc="fde32be1" sha1="ededa55bf4971c1f1c06c75558a1d61fab1ee58d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="sorcerya" cloneof="sorcery" supported="no">
+		<description>Sorcery (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="39774">
+				<rom name="sorcery (virgin games) (inconnus) (1986) (pc128).k7" size="39774" crc="125650df" sha1="baba926af280f00a409ba436c17b24fd71070970" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sortileg">
+		<description>Sortileges</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="8262970">
+				<rom name="sortileges (infogrames) (william hennebois, alain vialon, laurent droulez) (1986) (pc128).wav" size="8262970" crc="ffe17edc" sha1="2764cf1672b294aa0a2f7a0a0f37bf303750fa31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="sortilega" cloneof="sortileg" supported="no">
+		<description>Sortileges (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="29899">
+				<rom name="sortileges (infogrames) (william hennebois, alain vialon, laurent droulez) (1986) (pc128).k7" size="29899" crc="e2052357" sha1="74f48056ebb0c658ee7e4c758ffc76e9418a01c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="sortilegb" cloneof="sortileg" supported="no">
+		<description>Sortileges (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="29899">
+				<rom name="sortileges (it) (infogrames) (william hennebois) (1986).k7" size="29899" crc="33d304e7" sha1="931bed7e8271fd3291ad6b711f08d04d2c59739c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="sortilegc" cloneof="sortileg" supported="no">
+		<description>Sortileges (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="31099">
+				<rom name="sortileges_pc128.k7" size="31099" crc="2e71aa22" sha1="2e1ecd29dc8eb665b1e03b72b6e0d9ef6ef32d39" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spix">
+		<description>Spix</description>
+		<year>198?</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="8621">
+				<rom name="spix (infogrames) (patrick princ) (1984) (pc128).k7" size="8621" crc="abcf4b30" sha1="77f41ee19ddafd333f3ef7d21f0d15643089423f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sflipard">
+		<description>Super Flippard</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="63155">
+				<rom name="super flippard (free game blot) (d. arnaud) (1987) (pc128).k7" size="63155" crc="64d73820" sha1="09b1fdadf397880b1b07979eb05fe49751459fb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfliparda" cloneof="sflipard">
+		<description>Super Flippard (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="63155">
+				<rom name="super flippard (it) (free game blot) (d. arnaud) (1987).k7" size="63155" crc="fd855e7f" sha1="7b1ad91df2b2752789eed62ad3bb4da577851ca6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sflipardb" cloneof="sflipard">
+		<description>Super Flippard (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="63155">
+				<rom name="super-flippard_pc128.k7" size="63155" crc="970d47d0" sha1="c2754a4ba97768b14745b820e92a2d2c6366753a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stennis">
+		<description>Super Tennis</description>
+		<year>198?</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="28824">
+				<rom name="super tennis fil (fil) (inconnus) (1986) (pc128).k7" size="28824" crc="79e084b3" sha1="ee36ad57655d5d746b153d7c9fbcc9434f7a3210" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnt">
+		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="16646640">
+				<rom name="t.n.t. pc128 (olivetti) (najib el maadani, dominique girou) (1987) (pc128 wav).wav" size="16646640" crc="53cf4a84" sha1="9db2e99f2a01cc10a694ea688b1f9a663493f9ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="tnta" cloneof="tnt" supported="no">
+		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (Alt)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="56191">
+				<rom name="t.n.t. (infogrames) (najib el maadani, dominique girou) (1986) (pc128).k7" size="56191" crc="652ba136" sha1="5d936e43c22845a8c36bb900fbacfa4dd28747a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="tntb" cloneof="tnt" supported="no">
+		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (Alt 2)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="56191">
+				<rom name="t.n.t. (it) (infogrames) (1986).k7" size="56191" crc="06b288bc" sha1="27b034dbac4222713cd5aa8df3a8d3998d86d949" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="tntc" cloneof="tnt" supported="no">
+		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (Alt 3)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="58831">
+				<rom name="t.n.t. pc128 (olivetti) (najib el maadani, dominique girou) (1987) (pc128 k7).k7" size="58831" crc="93c500bc" sha1="84faa837236efcaa35c99c9d10cb62a1a317df8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>1991</year>
+		<publisher>Michele Alessandrini</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="13884">
+				<rom name="tetris ma (michele alessandrini) (1991) (pc128).k7" size="13884" crc="4c2e20bd" sha1="9be601a71c768271aa265ea3f3c8278ab77671d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrisa" cloneof="tetris">
+		<description>Tetris (Alt)</description>
+		<year>1991</year>
+		<publisher>Michele Alessandrini</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="13884">
+				<rom name="tetris (it) (michele alessandrini) (1991).k7" size="13884" crc="dcde3cd0" sha1="4a6b73f40c2dbdf1bd0c99c91951e302c60947cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrisb" cloneof="tetris">
+		<description>Tetris (Alt 2)</description>
+		<year>1991</year>
+		<publisher>Michele Alessandrini</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="13884">
+				<rom name="tetris-ma_pc128.k7" size="13884" crc="fe2d3619" sha1="8e1ddc1445ba7e407505b75710f95e309681c9cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="troff">
+		<description>Troff</description>
+		<year>198?</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="5676">
+				<rom name="troff (1983)(infogrames)(fr)(it).k7" size="5676" crc="ea092ad2" sha1="eda32ec372d18db23c83e34931e1767fc534270f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="troffa" cloneof="troff">
+		<description>Troff (Alt)</description>
+		<year>1983</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="6461">
+				<rom name="troff (infogrames) (gregory ruck) (1983) (pc128).k7" size="6461" crc="0a33639a" sha1="4b053c586a97635dc32045a38e2d449a30868d89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="troffb" cloneof="troff">
+		<description>Troff (Alt 2)</description>
+		<year>1983</year>
+		<publisher>Olivetti Prodest?</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="6461">
+				<rom name="troff_pc128.k7" size="6461" crc="c9ce2f91" sha1="cbc7576b67cdcff052685fab34f6614196bf5650" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vampire">
+		<description>Vampire</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="10501362">
+				<rom name="vampire (infogrames) (alain vialon, philippe nottoli, dominique girou) (1986) (pc128).wav" size="10501362" crc="fe6b2bea" sha1="1a24695a6280c00fdff36c976efcb1e631acf8c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- protection, works in dcmoto -->
+	<software name="vampirea" cloneof="vampire" supported="no">
+		<description>Vampire (Alt)</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="41380">
+				<rom name="vampire (infogrames) (alain vialon, philippe nottoli, dominique girou) (1986) (pc128).k7" size="41380" crc="4edf32e5" sha1="8e486d45dde9f1b37f53b4689b55bbb08e730d40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volsolo">
+		<description>Vol Solo</description>
+		<year>1986</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="25348">
+				<rom name="vol solo (fil) (joel sana) (1985) (pc128).k7" size="25348" crc="85fbe6e7" sha1="d25af04fe6fce60a1edeca49a87f445aec03e216" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yiear2">
+		<description>Yie Ar Kung Fu II</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="cass1" interface="mo_cass">
+			<dataarea name="cass" size="33186">
+				<rom name="yie ar kung fu ii (fil) (james higgins) (1986) (pc128).k7" size="33186" crc="c23adfbc" sha1="d2dbe1567460968b0421a6f608749caa1fdcbc8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

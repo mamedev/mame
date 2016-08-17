@@ -78,6 +78,9 @@
 #define MCFG_INTEL_TE28F160_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INTEL_TE28F160, 0)
 
+#define MCFG_INTEL_TE28F320_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_TE28F320, 0)
+
 #define MCFG_SHARP_UNK128MBIT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SHARP_UNK128MBIT, 0)
 
@@ -103,7 +106,6 @@ class intelfsh_device;
 // ======================> intelfsh_device
 
 class intelfsh_device : public device_t,
-						public device_memory_interface,
 						public device_nvram_interface
 {
 public:
@@ -135,11 +137,14 @@ public:
 		FLASH_SHARP_LH28F400 = 0x1000,
 		FLASH_INTEL_E28F400B,
 		FLASH_INTEL_TE28F160,
+		FLASH_INTEL_TE28F320,
 		FLASH_SHARP_UNK128MBIT,
 		FLASH_INTEL_28F320J3D,
 		FLASH_INTEL_28F320J5,
 		FLASH_SST_39VF400A
 	};
+
+	UINT8 *base() { return &m_data[0]; }
 
 protected:
 	// construction/destruction
@@ -147,42 +152,41 @@ protected:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 	// derived helpers
 	UINT32 read_full(UINT32 offset);
 	void write_full(UINT32 offset, UINT32 data);
 
+	optional_memory_region   m_region;
+
 	// configuration state
-	address_space_config    m_space_config;
-	UINT32                  m_type;
-	INT32                   m_size;
-	UINT8                   m_bits;
-	UINT32                  m_addrmask;
-	UINT16                  m_device_id;
-	UINT8                   m_maker_id;
-	bool                    m_sector_is_4k;
-	bool                    m_sector_is_16k;
-	bool                    m_top_boot_sector;
-	UINT8                   m_page_size;
+	UINT32                   m_type;
+	INT32                    m_size;
+	UINT8                    m_bits;
+	UINT32                   m_addrmask;
+	UINT16                   m_device_id;
+	UINT8                    m_maker_id;
+	bool                     m_sector_is_4k;
+	bool                     m_sector_is_16k;
+	bool                     m_top_boot_sector;
+	UINT8                    m_page_size;
 
 	// internal state
-	UINT8                   m_status;
-	INT32                   m_erase_sector;
-	INT32                   m_flash_mode;
-	bool                    m_flash_master_lock;
-	emu_timer *             m_timer;
-	INT32                   m_bank;
-	UINT8                   m_byte_count;
+	std::unique_ptr<UINT8[]> m_data;
+	UINT8                    m_status;
+	INT32                    m_erase_sector;
+	INT32                    m_flash_mode;
+	bool                     m_flash_master_lock;
+	emu_timer *              m_timer;
+	INT32                    m_bank;
+	UINT8                    m_byte_count;
 };
 
 
@@ -201,8 +205,8 @@ public:
 	DECLARE_READ8_MEMBER(read) { return read_full(offset); }
 	DECLARE_WRITE8_MEMBER(write) { write_full(offset, data); }
 
-	UINT8 read_raw(offs_t offset) { return m_addrspace[0]->read_byte(offset); }
-	void write_raw(offs_t offset, UINT8 data) { m_addrspace[0]->write_byte(offset, data); }
+	UINT8 read_raw(offs_t offset) { return m_data[offset]; }
+	void write_raw(offs_t offset, UINT8 data) { m_data[offset] = data; }
 };
 
 
@@ -221,8 +225,8 @@ public:
 	DECLARE_READ16_MEMBER(read) { return read_full(offset); }
 	DECLARE_WRITE16_MEMBER(write) { write_full(offset, data); }
 
-	UINT16 read_raw(offs_t offset) { return m_addrspace[0]->read_word(offset * 2); }
-	void write_raw(offs_t offset, UINT16 data) { m_addrspace[0]->write_word(offset * 2, data); }
+	UINT16 read_raw(offs_t offset) { return m_data[offset*2] | (m_data[offset*2+1] << 8); }
+	void write_raw(offs_t offset, UINT16 data) { m_data[offset*2] = data; m_data[offset*2+1] = data >> 8; }
 };
 
 
@@ -362,6 +366,12 @@ public:
 	intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class intel_te28f320_device : public intelfsh16_device
+{
+public:
+	intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class intel_e28f400b_device : public intelfsh16_device
 {
 public:
@@ -419,6 +429,7 @@ extern const device_type SST_39VF020;
 extern const device_type SHARP_LH28F400;
 extern const device_type INTEL_E28F008SA;
 extern const device_type INTEL_TE28F160;
+extern const device_type INTEL_TE28F320;
 extern const device_type SHARP_UNK128MBIT;
 extern const device_type INTEL_28F320J3D;
 extern const device_type INTEL_28F320J5;

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
+// copyright-holders:Luca Elia, David Haywood,Stephane Humbert
 /* Kaneko Hit protection */
+
+#include "machine/watchdog.h"
 
 
 struct calc1_hit_t
@@ -48,10 +50,12 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko_hit_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
+	required_device<watchdog_timer_device> m_watchdog;
+
 	calc1_hit_t m_hit;
 	calc3_hit_t m_hit3;
 

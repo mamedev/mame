@@ -16,6 +16,7 @@
 #define __H8S2000_H__
 
 #include "h8h.h"
+#include "h8_dtc.h"
 
 class h8s2000_device : public h8h_device {
 public:
@@ -24,10 +25,10 @@ public:
 protected:
 	static const disasm_entry disasm_entries[];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
 #define O(o) void o ## _full(); void o ## _partial()
 	O(ldc_imm8_exr); O(ldc_r8l_exr); O(ldc_w_abs16_exr); O(ldc_w_abs32_exr); O(ldc_w_r32d16h_exr); O(ldc_w_r32d32hh_exr); O(ldc_w_r32ih_exr); O(ldc_w_r32ph_exr);
@@ -45,6 +46,9 @@ protected:
 	O(tas_r32ih);
 
 	O(state_trace);
+	O(state_dtc);
+	O(state_dtc_vector);
+	O(state_dtc_writeback);
 #undef O
 };
 

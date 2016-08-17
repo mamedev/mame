@@ -16,10 +16,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	bitmap_ind16 *m_ship1_vid;
-	bitmap_ind16 *m_ship2_vid;
-	bitmap_ind16 *m_proj1_vid;
-	bitmap_ind16 *m_proj2_vid;
+	std::unique_ptr<bitmap_ind16> m_ship1_vid;
+	std::unique_ptr<bitmap_ind16> m_ship2_vid;
+	std::unique_ptr<bitmap_ind16> m_proj1_vid;
+	std::unique_ptr<bitmap_ind16> m_proj2_vid;
 
 	int m_s1_x;
 	int m_s1_y;
@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(proj_parm_2_w);
 	DECLARE_READ8_MEMBER(coll_det_r);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int collision_check_s1s2();

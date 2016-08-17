@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2015 Branimir Karadzic. All rights reserved.
--- License: http://www.opensource.org/licenses/BSD-2-Clause
+-- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
 project "bin2c"
@@ -16,4 +16,9 @@ project "bin2c"
 		"../tools/bin2c/**.h",
 	}
 
+	configuration { "mingw-*" }
+		targetextension ".exe"
+
 	configuration {}
+
+	strip()

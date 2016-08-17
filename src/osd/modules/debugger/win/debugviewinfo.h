@@ -35,7 +35,7 @@ public:
 	void send_vscroll(int delta);
 	void send_pageup();
 	void send_pagedown();
-	void set_focus() { SetFocus(m_wnd); }
+	void set_focus() const { SetFocus(m_wnd); }
 
 	debug_view_type type() const { return m_view->type(); }
 	debug_view_xy total_size() const { return m_view->total_size(); }

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_MUTEX_H_HEADER_GUARD
@@ -21,7 +21,7 @@
 
 namespace bx
 {
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 	typedef CRITICAL_SECTION pthread_mutex_t;
 	typedef unsigned pthread_mutexattr_t;
 
@@ -69,7 +69,13 @@ namespace bx
 	public:
 		Mutex()
 		{
-			pthread_mutex_init(&m_handle, NULL);
+			pthread_mutexattr_t attr;
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+#else
+			pthread_mutexattr_init(&attr);
+			pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+			pthread_mutex_init(&m_handle, &attr);
 		}
 
 		~Mutex()

@@ -39,7 +39,7 @@ public:
 
 
 	DECLARE_DRIVER_INIT(firebatl);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(firebatl);
 	DECLARE_PALETTE_INIT(firebatl);
 	DECLARE_VIDEO_START(clshroad);

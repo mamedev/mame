@@ -23,41 +23,42 @@
 #define MCFG_LINE_DISPATCH_FWD_CB(_entry, _count, _devcb) \
 	devcb = &devcb_line_dispatch_device<_count>::set_fwd_cb(*device, _entry, DEVCB_##_devcb);
 
-template<int N> class devcb_line_dispatch_device : public device_t {
-public:
-	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	void init_fwd() {
-		for(int i=0; i<N; i++)
-			fwd_cb[i] = new devcb_write_line(*this);
-	}
-
-	virtual ~devcb_line_dispatch_device() {
-		for(int i=0; i<N; i++)
-			delete fwd_cb[i];
-	}
-
-	template<class _Object> static devcb_base &set_fwd_cb(device_t &device, int entry, _Object object) { return downcast<devcb_line_dispatch_device<N> &>(device).fwd_cb[entry]->set_callback(object); }
-
-	WRITE_LINE_MEMBER( in_w ) {
-		for(int i=0; i<N; i++)
-			(*(fwd_cb[i]))(state);
-	}
-
-protected:
-	virtual void device_start() {
-		for(int i=0; i<N; i++)
-			fwd_cb[i]->resolve_safe();
-	}
-
-private:
-	devcb_write_line *fwd_cb[N];
-};
-
 extern const device_type DEVCB_LINE_DISPATCH_2;
 extern const device_type DEVCB_LINE_DISPATCH_3;
 extern const device_type DEVCB_LINE_DISPATCH_4;
 extern const device_type DEVCB_LINE_DISPATCH_5;
 extern const device_type DEVCB_LINE_DISPATCH_6;
+
+template<int N> class devcb_line_dispatch_device : public device_t {
+public:
+	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, DEVCB_LINE_DISPATCH_2, "DEVCB_LINE_DISPATCH_2", tag, owner, clock, "devcb_line_dispatch_2", __FILE__) { }
+
+	void init_fwd() {
+		for(auto & elem : fwd_cb)
+			elem = new devcb_write_line(*this);
+	}
+
+	virtual ~devcb_line_dispatch_device() {
+		for(auto & elem : fwd_cb)
+			delete elem;
+	}
+
+	template<class _Object> static devcb_base &set_fwd_cb(device_t &device, int entry, _Object object) { return downcast<devcb_line_dispatch_device<N> &>(device).fwd_cb[entry]->set_callback(object); }
+
+	WRITE_LINE_MEMBER( in_w ) {
+		for(auto & elem : fwd_cb)
+			(*(elem))(state);
+	}
+
+protected:
+	virtual void device_start() override {
+		for(auto & elem : fwd_cb)
+			elem->resolve_safe();
+	}
+
+private:
+	devcb_write_line *fwd_cb[N];
+};
 
 #endif

@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 
 class shadfrce_state : public driver_device
@@ -13,6 +15,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
 		m_io_dsw1(*this, "DSW1"),
@@ -32,6 +35,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
@@ -47,7 +51,7 @@ public:
 	required_shared_ptr<UINT16> m_bg1videoram;
 	required_shared_ptr<UINT16> m_spvideoram;
 
-	UINT16 *m_spvideoram_old;
+	std::unique_ptr<UINT16[]> m_spvideoram_old;
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_bg0tilemap;
 	tilemap_t *m_bg1tilemap;
@@ -77,11 +81,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg0tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offset );
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

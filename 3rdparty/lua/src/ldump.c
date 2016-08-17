@@ -1,5 +1,5 @@
 /*
-** $Id: ldump.c,v 2.34 2014/11/02 19:19:04 roberto Exp $
+** $Id: ldump.c,v 2.37 2015/10/08 15:53:49 roberto Exp $
 ** save precompiled Lua chunks
 ** See Copyright Notice in lua.h
 */
@@ -38,7 +38,7 @@ typedef struct {
 
 
 static void DumpBlock (const void *b, size_t size, DumpState *D) {
-  if (D->status == 0) {
+  if (D->status == 0 && size > 0) {
     lua_unlock(D->L);
     D->status = (*D->writer)(D->L, b, size, D->data);
     lua_lock(D->L);
@@ -74,14 +74,15 @@ static void DumpString (const TString *s, DumpState *D) {
   if (s == NULL)
     DumpByte(0, D);
   else {
-    size_t size = s->len + 1;  /* include trailing '\0' */
+    size_t size = tsslen(s) + 1;  /* include trailing '\0' */
+    const char *str = getstr(s);
     if (size < 0xFF)
       DumpByte(cast_int(size), D);
     else {
       DumpByte(0xFF, D);
       DumpVar(size, D);
     }
-    DumpVector(getstr(s), size - 1, D);  /* no need to save '\0' */
+    DumpVector(str, size - 1, D);  /* no need to save '\0' */
   }
 }
 

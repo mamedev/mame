@@ -1,15 +1,19 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_RENDERER_D3D12_H_HEADER_GUARD
 #define BGFX_RENDERER_D3D12_H_HEADER_GUARD
 
-#define USE_D3D12_DYNAMIC_LIB 1
+#define USE_D3D12_DYNAMIC_LIB BX_PLATFORM_WINDOWS
 
 #include <sal.h>
-#include <d3d12.h>
+#if BX_PLATFORM_XBOXONE
+#	include <d3d12_x.h>
+#else
+#	include <d3d12.h>
+#endif // BX_PLATFORM_XBOXONE
 
 #if defined(__MINGW32__) // BK - temp workaround for MinGW until I nuke d3dx12 usage.
 extern "C++" {
@@ -27,10 +31,20 @@ extern "C++" {
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wmissing-field-initializers");
-#include <d3dx12.h>
+#if BX_PLATFORM_XBOXONE
+#	include <d3dx12_x.h>
+#else
+#	include <d3dx12.h>
+#endif // BX_PLATFORM_XBOXONE
 BX_PRAGMA_DIAGNOSTIC_POP();
 
-#include <dxgi1_4.h>
+#if BX_PLATFORM_WINDOWS
+#	include <dxgi1_4.h>
+#endif // BX_PLATFORM_WINDOWS
+
+#ifndef D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
+#	define D3D12_TEXTURE_DATA_PITCH_ALIGNMENT 1024
+#endif // D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
 
 #include "renderer.h"
 #include "renderer_d3d.h"
@@ -64,15 +78,15 @@ namespace bgfx { namespace d3d12
 
 		void create(uint32_t _size, uint32_t _maxDescriptors);
 		void destroy();
-		void reset(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
+		void reset(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle);
 
-		void* allocCbv(D3D12_GPU_VIRTUAL_ADDRESS& gpuAddress, uint32_t _size);
+		void* allocCbv(D3D12_GPU_VIRTUAL_ADDRESS& _gpuAddress, uint32_t _size);
 
-		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
-		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct BufferD3D12& _buffer);
+		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
+		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle, struct BufferD3D12& _buffer);
 
-		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
-		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct BufferD3D12& _buffer);
+		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
+		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle, struct BufferD3D12& _buffer);
 
 		ID3D12DescriptorHeap* getHeap()
 		{
@@ -107,7 +121,7 @@ namespace bgfx { namespace d3d12
 		void destroy();
 
 		uint16_t alloc(ID3D12Resource* _ptr, const D3D12_SHADER_RESOURCE_VIEW_DESC* _desc);
-		uint16_t alloc(const uint32_t* _flags, uint32_t _num = BGFX_CONFIG_MAX_TEXTURE_SAMPLERS);
+		uint16_t alloc(const uint32_t* _flags, uint32_t _num, const float _palette[][4]);
 		void free(uint16_t _handle);
 		void reset();
 
@@ -173,13 +187,12 @@ namespace bgfx { namespace d3d12
 		}
 
 		void create(const Memory* _mem);
-		DWORD* getShaderCode(uint8_t _fragmentBit, const Memory* _mem);
 
 		void destroy()
 		{
 			if (NULL != m_constantBuffer)
 			{
-				ConstantBuffer::destroy(m_constantBuffer);
+				UniformBuffer::destroy(m_constantBuffer);
 				m_constantBuffer = NULL;
 			}
 
@@ -194,7 +207,7 @@ namespace bgfx { namespace d3d12
 		}
 
 		const Memory* m_code;
-		ConstantBuffer* m_constantBuffer;
+		UniformBuffer* m_constantBuffer;
 
 		PredefinedUniform m_predefined[PredefinedUniform::Count];
 		uint16_t m_attrMask[Attrib::Count];
@@ -272,6 +285,9 @@ namespace bgfx { namespace d3d12
 		ID3D12Resource* m_ptr;
 		D3D12_RESOURCE_STATES m_state;
 		uint32_t m_flags;
+		uint32_t m_width;
+		uint32_t m_height;
+		uint32_t m_depth;
 		uint16_t m_samplerIdx;
 		uint8_t m_type;
 		uint8_t m_requestedFormat;
@@ -292,7 +308,7 @@ namespace bgfx { namespace d3d12
 			m_depth.idx = bgfx::invalidHandle;
 		}
 
-		void create(uint8_t _num, const TextureHandle* _handles);
+		void create(uint8_t _num, const Attachment* _attachment);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
 		void preReset();
@@ -308,7 +324,7 @@ namespace bgfx { namespace d3d12
 		uint16_t m_denseIdx;
 		uint8_t m_num;
 		uint8_t m_numTh;
-		TextureHandle m_th[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 	};
 
 	struct CommandQueueD3D12
@@ -341,9 +357,9 @@ namespace bgfx { namespace d3d12
 		uint64_t m_currentFence;
 		uint64_t m_completedFence;
 		ID3D12Fence* m_fence;
-		CommandList m_commandList[32];
+		CommandList m_commandList[256];
 		typedef stl::vector<ID3D12Resource*> ResourceArray;
-		ResourceArray m_release[32];
+		ResourceArray m_release[256];
 		bx::RingBufferControl m_control;
 	};
 
@@ -427,6 +443,49 @@ namespace bgfx { namespace d3d12
 		uint32_t m_maxDrawPerBatch;
 		uint32_t m_minIndirect;
 		uint32_t m_flushPerBatch;
+	};
+
+	struct TimerQueryD3D12
+	{
+		TimerQueryD3D12()
+			: m_control(4)
+		{
+		}
+
+		void init();
+		void shutdown();
+		void begin(ID3D12GraphicsCommandList* _commandList);
+		void end(ID3D12GraphicsCommandList* _commandList);
+		bool get();
+
+		uint64_t m_begin;
+		uint64_t m_end;
+		uint64_t m_elapsed;
+		uint64_t m_frequency;
+
+		ID3D12Resource*  m_readback;
+		ID3D12QueryHeap* m_queryHeap;
+		uint64_t* m_result;
+		bx::RingBufferControl m_control;
+	};
+
+	struct OcclusionQueryD3D12
+	{
+		OcclusionQueryD3D12()
+			: m_control(BX_COUNTOF(m_handle) )
+		{
+		}
+
+		void init();
+		void shutdown();
+		void begin(ID3D12GraphicsCommandList* _commandList, Frame* _render, OcclusionQueryHandle _handle);
+		void end(ID3D12GraphicsCommandList* _commandList);
+
+		ID3D12Resource*  m_readback;
+		ID3D12QueryHeap* m_queryHeap;
+		OcclusionQueryHandle m_handle[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		uint64_t* m_result;
+		bx::RingBufferControl m_control;
 	};
 
 } /* namespace d3d12 */ } // namespace bgfx

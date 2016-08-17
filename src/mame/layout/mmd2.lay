@@ -1,0 +1,204 @@
+<!-- Basic display of LEDs for the MMD-2 -->
+
+<mamelayout version="2">
+
+	<element name="r_led">
+		<disk>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="g_led">
+		<disk>
+			<color red="0.0" green="1.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="o_led">
+		<disk>
+			<color red="1.0" green="0.50" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="r_digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="PORT0">
+		<text string="PORT 0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="PORT1">
+		<text string="PORT 1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="PORT2">
+		<text string="PORT 2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="HALT">
+		<text string="HALT">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="HOLD">
+		<text string="HOLD">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="INTE">
+		<text string="INTE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<bezel element="background">
+			<bounds left="0" top="20" right="926" bottom="350" />
+		</bezel>
+
+		<bezel name="port1" element="PORT1">
+			<bounds left="140" right="220" top="40" bottom="80" />
+		</bezel>
+		<bezel name="p1_7" element="r_led">
+			<bounds left="40" right="60" top="100" bottom="120" />
+		</bezel>
+		<bezel name="p1_6" element="r_led">
+			<bounds left="80" right="100" top="100" bottom="120" />
+		</bezel>
+		<bezel name="p1_5" element="r_led">
+			<bounds left="120" right="140" top="100" bottom="120" />
+		</bezel>
+		<bezel name="p1_4" element="r_led">
+			<bounds left="160" right="180" top="100" bottom="120" />
+		</bezel>
+		<bezel name="p1_3" element="r_led">
+			<bounds left="200" right="220" top="100" bottom="120" />
+		</bezel>
+		<bezel name="p1_2" element="r_led">
+			<bounds left="240" right="260" top="100" bottom="120" />
+		</bezel>
+		<bezel name="p1_1" element="r_led">
+			<bounds left="280" right="300" top="100" bottom="120" />
+		</bezel>
+		<bezel name="p1_0" element="r_led">
+			<bounds left="320" right="340" top="100" bottom="120" />
+		</bezel>
+
+		<bezel name="port0" element="PORT0">
+			<bounds left="140" right="220" top="140" bottom="180" />
+		</bezel>
+		<bezel name="p0_7" element="r_led">
+			<bounds left="40" right="60" top="200" bottom="220" />
+		</bezel>
+		<bezel name="p0_6" element="r_led">
+			<bounds left="80" right="100" top="200" bottom="220" />
+		</bezel>
+		<bezel name="p0_5" element="r_led">
+			<bounds left="120" right="140" top="200" bottom="220" />
+		</bezel>
+		<bezel name="p0_4" element="r_led">
+			<bounds left="160" right="180" top="200" bottom="220" />
+		</bezel>
+		<bezel name="p0_3" element="r_led">
+			<bounds left="200" right="220" top="200" bottom="220" />
+		</bezel>
+		<bezel name="p0_2" element="r_led">
+			<bounds left="240" right="260" top="200" bottom="220" />
+		</bezel>
+		<bezel name="p0_1" element="r_led">
+			<bounds left="280" right="300" top="200" bottom="220" />
+		</bezel>
+		<bezel name="p0_0" element="r_led">
+			<bounds left="320" right="340" top="200" bottom="220" />
+		</bezel>
+
+		<bezel name="port2" element="PORT2">
+			<bounds left="140" right="220" top="240" bottom="280" />
+		</bezel>
+		<bezel name="p2_7" element="r_led">
+			<bounds left="40" right="60" top="300" bottom="320" />
+		</bezel>
+		<bezel name="p2_6" element="r_led">
+			<bounds left="80" right="100" top="300" bottom="320" />
+		</bezel>
+		<bezel name="p2_5" element="r_led">
+			<bounds left="120" right="140" top="300" bottom="320" />
+		</bezel>
+		<bezel name="p2_4" element="r_led">
+			<bounds left="160" right="180" top="300" bottom="320" />
+		</bezel>
+		<bezel name="p2_3" element="r_led">
+			<bounds left="200" right="220" top="300" bottom="320" />
+		</bezel>
+		<bezel name="p2_2" element="r_led">
+			<bounds left="240" right="260" top="300" bottom="320" />
+		</bezel>
+		<bezel name="p2_1" element="r_led">
+			<bounds left="280" right="300" top="300" bottom="320" />
+		</bezel>
+		<bezel name="p2_0" element="r_led">
+			<bounds left="320" right="340" top="300" bottom="320" />
+		</bezel>
+
+		<bezel name="digit0" element="r_digit">
+			<bounds left="407" top="075" right="454" bottom="146" />
+		</bezel>
+		<bezel name="digit1" element="r_digit">
+			<bounds left="455" top="075" right="502" bottom="146" />
+		</bezel>
+		<bezel name="digit2" element="r_digit">
+			<bounds left="503" top="075" right="550" bottom="146" />
+		</bezel>
+		<bezel name="digit3" element="r_digit">
+			<bounds left="575" top="075" right="622" bottom="146" />
+		</bezel>
+		<bezel name="digit4" element="r_digit">
+			<bounds left="623" top="075" right="670" bottom="146" />
+		</bezel>
+		<bezel name="digit5" element="r_digit">
+			<bounds left="671" top="075" right="718" bottom="146" />
+		</bezel>
+		<bezel name="digit6" element="r_digit">
+			<bounds left="743" top="075" right="790" bottom="146" />
+		</bezel>
+		<bezel name="digit7" element="r_digit">
+			<bounds left="791" top="075" right="838" bottom="146" />
+		</bezel>
+		<bezel name="digit8" element="r_digit">
+			<bounds left="839" top="075" right="886" bottom="146" />
+		</bezel>
+
+		<bezel name="txt_halt" element="HALT">
+			<bounds left="840" right="880" top="220" bottom="240" />
+		</bezel>
+		<bezel name="txt_hold" element="HOLD">
+			<bounds left="840" right="880" top="260" bottom="280" />
+		</bezel>
+		<bezel name="txt_inte" element="INTE">
+			<bounds left="840" right="880" top="300" bottom="320" />
+		</bezel>
+
+		<bezel name="led_halt" element="r_led">
+			<bounds left="800" right="820" top="220" bottom="240" />
+		</bezel>
+		<bezel name="led_hold" element="o_led">
+			<bounds left="800" right="820" top="260" bottom="280" />
+		</bezel>
+		<bezel name="led_inte" element="g_led">
+			<bounds left="800" right="820" top="300" bottom="320" />
+		</bezel>
+	</view>
+
+</mamelayout>

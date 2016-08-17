@@ -10,13 +10,19 @@
 #define __WIN_D3DCOMM__
 
 //============================================================
+//  CONSTANTS
+//============================================================
+
+#define MAX_BLOOM_COUNT 15 // shader model 3.0 support up to 16 samplers, but we need the last for the original texture
+#define HALF_BLOOM_COUNT 8
+
+//============================================================
 //  FORWARD DECLARATIONS
 //============================================================
 
-namespace d3d
-{
 class texture_info;
-class renderer;
+class renderer_d3d9;
+struct d3d_base;
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -35,12 +41,12 @@ public:
 		c.y = y;
 	}
 
-	vec2f operator+(const vec2f& a)
+	vec2f operator+(const vec2f& a) const
 	{
 		return vec2f(c.x + a.c.x, c.y + a.c.y);
 	}
 
-	vec2f operator-(const vec2f& a)
+	vec2f operator-(const vec2f& a) const
 	{
 		return vec2f(c.x - a.c.x, c.y - a.c.y);
 	}
@@ -51,12 +57,13 @@ public:
 	} c;
 };
 
-class texture_manager
+class d3d_texture_manager
 {
 public:
-	texture_manager() { }
-	texture_manager(renderer *d3d);
-	~texture_manager();
+	d3d_texture_manager(): m_renderer(nullptr), m_dynamic_supported(0), m_stretch_supported(0), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_default_texture(nullptr)
+	{ }
+
+	d3d_texture_manager(renderer_d3d9 *d3d);
 
 	void                    update_textures();
 
@@ -66,27 +73,24 @@ public:
 	texture_info *          find_texinfo(const render_texinfo *texture, UINT32 flags);
 	UINT32                  texture_compute_hash(const render_texinfo *texture, UINT32 flags);
 
-	texture_info *          get_texlist() { return m_texlist; }
-	void                    set_texlist(texture_info *texlist) { m_texlist = texlist; }
-	bool                    is_dynamic_supported() { return (bool)m_dynamic_supported; }
+	bool                    is_dynamic_supported() const { return (bool)m_dynamic_supported; }
 	void                    set_dynamic_supported(bool dynamic_supported) { m_dynamic_supported = dynamic_supported; }
-	bool                    is_stretch_supported() { return (bool)m_stretch_supported; }
-	D3DFORMAT               get_yuv_format() { return m_yuv_format; }
+	bool                    is_stretch_supported() const { return (bool)m_stretch_supported; }
+	D3DFORMAT               get_yuv_format() const { return m_yuv_format; }
 
-	DWORD                   get_texture_caps() { return m_texture_caps; }
-	DWORD                   get_max_texture_aspect() { return m_texture_max_aspect; }
-	DWORD                   get_max_texture_width() { return m_texture_max_width; }
-	DWORD                   get_max_texture_height() { return m_texture_max_height; }
+	DWORD                   get_texture_caps() const { return m_texture_caps; }
+	DWORD                   get_max_texture_aspect() const { return m_texture_max_aspect; }
+	DWORD                   get_max_texture_width() const { return m_texture_max_width; }
+	DWORD                   get_max_texture_height() const { return m_texture_max_height; }
 
-	texture_info *          get_default_texture() { return m_default_texture; }
-	texture_info *          get_vector_texture() { return m_vector_texture; }
+	texture_info *          get_default_texture() const { return m_default_texture; }
 
-	renderer *              get_d3d() { return m_renderer; }
+	renderer_d3d9 *         get_d3d() const { return m_renderer; }
+
+	std::vector<std::unique_ptr<texture_info>> m_texture_list;  // list of active textures
 
 private:
-	renderer *              m_renderer;
-
-	texture_info *          m_texlist;                  // list of active textures
+	renderer_d3d9 *         m_renderer;
 	int                     m_dynamic_supported;        // are dynamic textures supported?
 	int                     m_stretch_supported;        // is StretchRect with point filtering supported?
 	D3DFORMAT               m_yuv_format;               // format to use for YUV textures
@@ -95,9 +99,6 @@ private:
 	DWORD                   m_texture_max_aspect;       // texture maximum aspect ratio
 	DWORD                   m_texture_max_width;        // texture maximum width
 	DWORD                   m_texture_max_height;       // texture maximum height
-
-	bitmap_argb32           m_vector_bitmap;            // experimental: bitmap for vectors
-	texture_info *          m_vector_texture;           // experimental: texture for vectors
 
 	bitmap_rgb32            m_default_bitmap;           // experimental: default bitmap
 	texture_info *          m_default_texture;          // experimental: default texture
@@ -108,39 +109,30 @@ private:
 class texture_info
 {
 public:
-	texture_info(texture_manager *manager, const render_texinfo *texsource, int prescale, UINT32 flags);
+	texture_info(d3d_texture_manager *manager, const render_texinfo *texsource, int prescale, UINT32 flags);
 	~texture_info();
 
 	render_texinfo &        get_texinfo() { return m_texinfo; }
 
-	int                     get_width() { return m_rawdims.c.x; }
-	int                     get_height() { return m_rawdims.c.y; }
-	int                     get_xscale() { return m_xprescale; }
-	int                     get_yscale() { return m_yprescale; }
+	int                     get_width() const { return m_rawdims.c.x; }
+	int                     get_height() const { return m_rawdims.c.y; }
+	int                     get_xscale() const { return m_xprescale; }
+	int                     get_yscale() const { return m_yprescale; }
 
-	UINT32                  get_flags() { return m_flags; }
+	UINT32                  get_flags() const { return m_flags; }
 
 	void                    set_data(const render_texinfo *texsource, UINT32 flags);
 
-	texture_info *          get_next() { return m_next; }
-	texture_info *          get_prev() { return m_prev; }
+	UINT32                  get_hash() const { return m_hash; }
 
-	UINT32                  get_hash() { return m_hash; }
-
-	void                    set_next(texture_info *next) { m_next = next; }
-	void                    set_prev(texture_info *prev) { m_prev = prev; }
-
-	bool                    paused() { return m_cur_frame == m_prev_frame; }
-	void                    advance_frame() { m_prev_frame = m_cur_frame; }
 	void                    increment_frame_count() { m_cur_frame++; }
 	void                    mask_frame_count(int mask) { m_cur_frame %= mask; }
 
-	int                     get_cur_frame() { return m_cur_frame; }
-	int                     get_prev_frame() { return m_prev_frame; }
+	int                     get_cur_frame() const { return m_cur_frame; }
 
-	texture *               get_tex() { return m_d3dtex; }
-	surface *               get_surface() { return m_d3dsurface; }
-	texture *               get_finaltex() { return m_d3dfinaltex; }
+	IDirect3DTexture9 *     get_tex() const { return m_d3dtex; }
+	IDirect3DSurface9 *     get_surface() const { return m_d3dsurface; }
+	IDirect3DTexture9 *     get_finaltex() const { return m_d3dfinaltex; }
 
 	vec2f &                 get_uvstart() { return m_start; }
 	vec2f &                 get_uvstop() { return m_stop; }
@@ -151,12 +143,9 @@ private:
 	void compute_size(int texwidth, int texheight);
 	void compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height);
 
-	texture_manager *       m_texture_manager;          // texture manager pointer
+	d3d_texture_manager *   m_texture_manager;          // texture manager pointer
 
-	renderer *              m_renderer;                 // renderer pointer
-
-	texture_info *          m_next;                     // next texture in the list
-	texture_info *          m_prev;                     // prev texture in the list
+	renderer_d3d9 *         m_renderer;                 // renderer pointer
 
 	UINT32                  m_hash;                     // hash value for the texture
 	UINT32                  m_flags;                    // rendering flags
@@ -168,76 +157,137 @@ private:
 	int                     m_xborderpix, m_yborderpix; // number of border pixels on X/Y
 	int                     m_xprescale, m_yprescale;   // X/Y prescale factor
 	int                     m_cur_frame;                // what is our current frame?
-	int                     m_prev_frame;               // what was our last frame? (used to determine pause state)
-	texture *               m_d3dtex;                   // Direct3D texture pointer
-	surface *               m_d3dsurface;               // Direct3D offscreen plain surface pointer
-	texture *               m_d3dfinaltex;              // Direct3D final (post-scaled) texture
+	IDirect3DTexture9 *     m_d3dtex;                   // Direct3D texture pointer
+	IDirect3DSurface9 *     m_d3dsurface;               // Direct3D offscreen plain surface pointer
+	IDirect3DTexture9 *     m_d3dfinaltex;              // Direct3D final (post-scaled) texture
 };
 
-/* d3d::poly_info holds information about a single polygon/d3d primitive */
+/* poly_info holds information about a single polygon/d3d primitive */
 class poly_info
 {
 public:
-	poly_info() { }
-
 	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-			UINT32 flags, d3d::texture_info *texture, UINT32 modmode,
-			float prim_width, float prim_height);
-	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-			UINT32 flags, d3d::texture_info *texture, UINT32 modmode,
-			float line_time, float line_length,
-			float prim_width, float prim_height);
+				UINT32 flags, texture_info *texture, UINT32 modmode,
+				float prim_width, float prim_height)
+	{
+		m_type = type;
+		m_count = count;
+		m_numverts = numverts;
+		m_flags = flags;
+		m_texture = texture;
+		m_modmode = modmode;
+		m_prim_width = prim_width;
+		m_prim_height = prim_height;
+	}
 
-	D3DPRIMITIVETYPE        get_type() { return m_type; }
-	UINT32                  get_count() { return m_count; }
-	UINT32                  get_vertcount() { return m_numverts; }
-	UINT32                  get_flags() { return m_flags; }
+	D3DPRIMITIVETYPE        type() const { return m_type; }
+	UINT32                  count() const { return m_count; }
+	UINT32                  numverts() const { return m_numverts; }
+	UINT32                  flags() const { return m_flags; }
 
-	d3d::texture_info *     get_texture() { return m_texture; }
-	DWORD                   get_modmode() { return m_modmode; }
+	texture_info *          texture() const { return m_texture; }
+	DWORD                   modmode() const { return m_modmode; }
 
-	float                   get_line_time() { return m_line_time; }
-	float                   get_line_length() { return m_line_length; }
-
-	float                   get_prim_width() { return m_prim_width; }
-	float                   get_prim_height() { return m_prim_height; }
+	float                   prim_width() const { return m_prim_width; }
+	float                   prim_height() const { return m_prim_height; }
 
 private:
+	D3DPRIMITIVETYPE        m_type;         // type of primitive
+	UINT32                  m_count;        // total number of primitives
+	UINT32                  m_numverts;     // total number of vertices
+	UINT32                  m_flags;        // rendering flags
 
-	D3DPRIMITIVETYPE        m_type;                       // type of primitive
-	UINT32                  m_count;                      // total number of primitives
-	UINT32                  m_numverts;                   // total number of vertices
-	UINT32                  m_flags;                      // rendering flags
+	texture_info *          m_texture;      // pointer to texture info
+	DWORD                   m_modmode;      // texture modulation mode
 
-	texture_info *          m_texture;                    // pointer to texture info
-	DWORD                   m_modmode;                    // texture modulation mode
-
-	float                   m_line_time;                  // used by vectors
-	float                   m_line_length;                // used by vectors
-
-	float                   m_prim_width;                 // used by quads
-	float                   m_prim_height;                // used by quads
+	float                   m_prim_width;   // used by quads
+	float                   m_prim_height;  // used by quads
 };
-
-} // d3d
 
 /* vertex describes a single vertex */
 struct vertex
 {
-	float                   x, y, z;                    // X,Y,Z coordinates
-	float                   rhw;                        // RHW when no HLSL, padding when HLSL
-	D3DCOLOR                color;                      // diffuse color
-	float                   u0, v0;                     // texture stage 0 coordinates
-	float                   u1, v1;                     // additional info for vector data
+	float       x, y, z;                    // X,Y,Z coordinates
+	float       rhw;                        // RHW when no HLSL, padding when HLSL
+	D3DCOLOR    color;                      // diffuse color
+	float       u0, v0;                     // texture stage 0 coordinates
+	float       u1, v1;                     // additional info for vector data
 };
 
 
-/* line_aa_step is used for drawing antialiased lines */
-struct line_aa_step
+/* cache_target is a simple linked list containing only a renderable target and texture, used for phosphor effects */
+class cache_target
 {
-	float                   xoffs, yoffs;               // X/Y deltas
-	float                   weight;                     // weight contribution
+public:
+	// construction/destruction
+	cache_target(): target(nullptr), texture(nullptr), target_width(0), target_height(0), width(0), height(0), screen_index(0)
+	{ }
+
+	~cache_target();
+
+	bool init(renderer_d3d9 *d3d, int source_width, int source_height, int target_width, int target_height, int screen_index);
+
+	IDirect3DSurface9 *target;
+	IDirect3DTexture9 *texture;
+
+	int target_width;
+	int target_height;
+
+	int width;
+	int height;
+
+	int screen_index;
 };
 
+/* d3d_render_target is the information about a Direct3D render target chain */
+class d3d_render_target
+{
+public:
+	// construction/destruction
+	d3d_render_target(): target_width(0), target_height(0), width(0), height(0), screen_index(0), page_index(0), bloom_count(0)
+	{
+		for (int index = 0; index < MAX_BLOOM_COUNT; index++)
+		{
+			bloom_texture[index] = nullptr;
+			bloom_surface[index] = nullptr;
+		}
+
+		for (int index = 0; index < 2; index++)
+		{
+			source_texture[index] = nullptr;
+			source_surface[index] = nullptr;
+			target_texture[index] = nullptr;
+			target_surface[index] = nullptr;
+		}
+	}
+
+	~d3d_render_target();
+
+	bool init(renderer_d3d9 *d3d, int source_width, int source_height, int target_width, int target_height, int screen_index, int page_index);
+	int next_index(int index) { return ++index > 1 ? 0 : index; }
+
+	// real target dimension
+	int target_width;
+	int target_height;
+
+	// only used to identify/find the render target
+	int width;
+	int height;
+
+	int screen_index;
+	int page_index;
+
+	IDirect3DSurface9 *target_surface[2];
+	IDirect3DTexture9 *target_texture[2];
+	IDirect3DSurface9 *source_surface[2];
+	IDirect3DTexture9 *source_texture[2];
+
+	IDirect3DSurface9 *bloom_surface[MAX_BLOOM_COUNT];
+	IDirect3DTexture9 *bloom_texture[MAX_BLOOM_COUNT];
+
+	float bloom_dims[MAX_BLOOM_COUNT][2];
+
+	int bloom_count;
+};
 
 #endif

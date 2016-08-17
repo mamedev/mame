@@ -35,7 +35,7 @@ class rgb_t
 {
 public:
 	// construction/destruction
-	rgb_t() { }
+	rgb_t(): m_data(0) { }
 	rgb_t(UINT32 data) { m_data = data; }
 	rgb_t(UINT8 r, UINT8 g, UINT8 b) { m_data = (255 << 24) | (r << 16) | (g << 8) | b; }
 	rgb_t(UINT8 a, UINT8 r, UINT8 g, UINT8 b) { m_data = (a << 24) | (r << 16) | (g << 8) | b; }
@@ -67,8 +67,8 @@ public:
 	rgb_t &operator-=(const rgb_t &rhs) { m_data = rgb_t(clamplo(a() - rhs.a()), clamplo(r() - rhs.r()), clamplo(g() - rhs.g()), clamplo(b() - rhs.b())); return *this; }
 
 	// arithmetic operators
-	const rgb_t operator+(const rgb_t &rhs) const { rgb_t result = *this; result += rhs; return result; }
-	const rgb_t operator-(const rgb_t &rhs) const { rgb_t result = *this; result -= rhs; return result; }
+	rgb_t operator+(const rgb_t &rhs) const { rgb_t result = *this; result += rhs; return result; }
+	rgb_t operator-(const rgb_t &rhs) const { rgb_t result = *this; result -= rhs; return result; }
 
 	// static helpers
 	static UINT8 clamp(INT32 value) { return (value < 0) ? 0 : (value > 255) ? 255 : value; }
@@ -78,6 +78,9 @@ public:
 	// constants
 	static const rgb_t black;
 	static const rgb_t white;
+	static const rgb_t green;
+	static const rgb_t amber;
+	static const rgb_t transparent;
 
 private:
 	UINT32  m_data;

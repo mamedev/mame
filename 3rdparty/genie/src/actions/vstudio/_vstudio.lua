@@ -14,7 +14,8 @@
 		vs2010 = "v100",
 		vs2012 = "v110",
 		vs2013 = "v120",
-		vs2015 = "v140"
+		vs2015 = "v140",
+		vs15   = "v140",
 	}
 	premake.vstudio.toolset = toolsets[_ACTION] or "unknown?"
 	premake.vstudio.splashpath = ''
@@ -37,7 +38,8 @@
 		PS3     = "PS3",
 		Xbox360 = "Xbox 360",
 		ARM     = "ARM",
-		Orbis	= "Orbis"
+		Orbis	= "Orbis",
+		Durango = "Durango",
 	}
 
 
@@ -192,7 +194,11 @@
 		if prj.language == "C#" then
 			pattern = "%%.csproj"
 		else
-			pattern = iif(_ACTION > "vs2008", "%%.vcxproj", "%%.vcproj")
+			if _ACTION == "vs15" then
+				pattern = "%%.vcxproj"
+			else
+				pattern = iif(_ACTION > "vs2008", "%%.vcxproj", "%%.vcproj")
+			end
 		end
 
 		local fname = premake.project.getbasename(prj.name, pattern)
@@ -255,6 +261,7 @@
 			productVersion  = "9.0.21022",
 			solutionVersion = "10",
 			toolsVersion    = "3.5",
+			supports64bitEditContinue = false,
 		}
 	}
 
@@ -303,5 +310,6 @@
 			solutionVersion = "11",
 			targetFramework = "4.0",
 			toolsVersion    = "4.0",
+			supports64bitEditContinue = false,
 		}
 	}

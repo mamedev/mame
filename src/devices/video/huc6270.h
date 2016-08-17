@@ -42,8 +42,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	inline void fetch_bat_tile_row();
 	void add_sprite( int index, int x, int pattern, int line, int flip_x, int palette, int priority, int sat_lsb );
@@ -128,7 +128,7 @@ private:
 	int m_sprites_this_line;
 	int m_sprite_row_index;
 	UINT16  m_sprite_row[1024];
-	UINT16  *m_vram;
+	std::unique_ptr<UINT16[]>  m_vram;
 	UINT16  m_vram_mask;
 
 	const static UINT8 vram_increments[4];

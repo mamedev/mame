@@ -42,18 +42,18 @@ public:
 	// writers
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( inflection_w );
-	DECLARE_READ_LINE_MEMBER( request ) { return m_request_state; }
+	DECLARE_READ_LINE_MEMBER( request ) { m_stream->update(); return m_request_state; }
 
 protected:
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_clock_changed();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal helpers
@@ -98,10 +98,10 @@ private:
 	UINT8                       m_latch_92;             // 2-bit latch @ 92
 
 	// low parameter clocking
-	UINT8                       m_srff_132;             // S/R flip-flop @ 132
-	UINT8                       m_srff_114;             // S/R flip-flop @ 114
-	UINT8                       m_srff_112;             // S/R flip-flop @ 112
-	UINT8                       m_srff_142;             // S/R flip-flop @ 142
+	bool                        m_srff_132;             // S/R flip-flop @ 132
+	bool                        m_srff_114;             // S/R flip-flop @ 114
+	bool                        m_srff_112;             // S/R flip-flop @ 112
+	bool                        m_srff_142;             // S/R flip-flop @ 142
 	UINT8                       m_latch_80;             // phoneme timing latch @ 80
 
 	// glottal circuit

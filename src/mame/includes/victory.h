@@ -50,11 +50,11 @@ public:
 	required_shared_ptr<UINT8> m_charram;
 
 	UINT16 m_paletteram[0x40];
-	UINT8 *m_bgbitmap;
-	UINT8 *m_fgbitmap;
-	UINT8 *m_rram;
-	UINT8 *m_gram;
-	UINT8 *m_bram;
+	std::unique_ptr<UINT8[]> m_bgbitmap;
+	std::unique_ptr<UINT8[]> m_fgbitmap;
+	std::unique_ptr<UINT8[]> m_rram;
+	std::unique_ptr<UINT8[]> m_gram;
+	std::unique_ptr<UINT8[]> m_bram;
 	UINT8 m_vblank_irq;
 	UINT8 m_fgcoll;
 	UINT8 m_fgcollx;
@@ -72,7 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(video_control_r);
 	DECLARE_WRITE8_MEMBER(video_control_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

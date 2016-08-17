@@ -10,6 +10,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/gen_latch.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
@@ -33,9 +34,11 @@ public:
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_segaic16road(*this, "segaic16road"),
+			m_soundlatch(*this, "soundlatch"),
 			m_workram(*this, "workram"),
 			m_sharrier_video(false),
 			m_adc_select(0),
+			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"}),
 			m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
@@ -53,7 +56,6 @@ public:
 
 	// Z80 sound CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
-	DECLARE_WRITE_LINE_MEMBER( sound_irq );
 
 	// I8751-related VBLANK interrupt hanlders
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
@@ -80,9 +82,9 @@ protected:
 	};
 
 	// driver overrides
-	virtual void video_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// I8751 simulations
 	void sharrier_i8751_sim();
@@ -97,6 +99,7 @@ protected:
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
@@ -107,7 +110,7 @@ protected:
 
 	// internal state
 	UINT8                   m_adc_select;
+	optional_ioport_array<4> m_adc_ports;
 	bool                    m_shadow;
 	optional_shared_ptr<UINT16> m_decrypted_opcodes;
-	TIMER_DEVICE_CALLBACK_MEMBER(hangon_irq);
 };

@@ -7,10 +7,10 @@
     General core utilities and macros used throughout the emulator.
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_EMUCORE_H
+#define MAME_EMU_EMUCORE_H
 
-#ifndef __EMUCORE_H__
-#define __EMUCORE_H__
+#pragma once
 
 // standard C includes
 #include <assert.h>
@@ -27,7 +27,9 @@
 #endif
 
 // standard C++ includes
+#include <cassert>
 #include <exception>
+#include <type_traits>
 #include <typeinfo>
 
 // core system includes
@@ -35,8 +37,6 @@
 #include "emualloc.h"
 #include "corestr.h"
 #include "bitmap.h"
-#include "tagmap.h"
-
 
 
 //**************************************************************************
@@ -191,17 +191,16 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 //**************************************************************************
 
 // macro for defining a copy constructor and assignment operator to prevent copying
-#define DISABLE_COPYING(_Type) \
-private: \
-	_Type(const _Type &); \
-	_Type &operator=(const _Type &)
+#define DISABLE_COPYING(TYPE) \
+	TYPE(const TYPE &) = delete; \
+	TYPE &operator=(const TYPE &) = delete
 
 // macro for declaring enumerator operators that increment/decrement like plain old C
-#define DECLARE_ENUM_OPERATORS(_Type) \
-inline void operator++(_Type &value) { value = (_Type)((int)value + 1); } \
-inline void operator++(_Type &value, int) { value = (_Type)((int)value + 1); } \
-inline void operator--(_Type &value) { value = (_Type)((int)value - 1); } \
-inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
+#define DECLARE_ENUM_OPERATORS(TYPE) \
+inline TYPE &operator++(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) + 1); } \
+inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
+inline TYPE &operator--(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) - 1); } \
+inline TYPE operator--(TYPE &value, int) { TYPE const old(value); --value; return old; }
 
 
 // this macro passes an item followed by a string version of itself as two consecutive parameters
@@ -209,7 +208,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 
 // this macro wraps a function 'x' and can be used to pass a function followed by its name
 #define FUNC(x) &x, #x
-#define FUNC_NULL NULL, "(null)"
 
 
 // standard assertion macros
@@ -243,36 +241,28 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #define ENDIAN_VALUE_NE_NNE(endian,neval,nneval) (((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
 
 
-// useful macros to deal with bit shuffling encryptions
-#define BIT(x,n) (((x)>>(n))&1)
+// useful functions to deal with bit shuffling encryptions
+#define BIT(x, n) (((x) >> (n)) & 1)
 
-#define BITSWAP8(val,B7,B6,B5,B4,B3,B2,B1,B0) \
-	((BIT(val,B7) << 7) | (BIT(val,B6) << 6) | (BIT(val,B5) << 5) | (BIT(val,B4) << 4) | \
-		(BIT(val,B3) << 3) | (BIT(val,B2) << 2) | (BIT(val,B1) << 1) | (BIT(val,B0) << 0))
+template <typename T, typename U> constexpr T bitswap(T val, U b)
+{
+	return BIT(val, b) << 0U;
+}
 
-#define BITSWAP16(val,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	((BIT(val,B15) << 15) | (BIT(val,B14) << 14) | (BIT(val,B13) << 13) | (BIT(val,B12) << 12) | \
-		(BIT(val,B11) << 11) | (BIT(val,B10) << 10) | (BIT(val, B9) <<  9) | (BIT(val, B8) <<  8) | \
-		(BIT(val, B7) <<  7) | (BIT(val, B6) <<  6) | (BIT(val, B5) <<  5) | (BIT(val, B4) <<  4) | \
-		(BIT(val, B3) <<  3) | (BIT(val, B2) <<  2) | (BIT(val, B1) <<  1) | (BIT(val, B0) <<  0))
+template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b, V... c)
+{
+	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
+}
 
-#define BITSWAP24(val,B23,B22,B21,B20,B19,B18,B17,B16,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	((BIT(val,B23) << 23) | (BIT(val,B22) << 22) | (BIT(val,B21) << 21) | (BIT(val,B20) << 20) | \
-		(BIT(val,B19) << 19) | (BIT(val,B18) << 18) | (BIT(val,B17) << 17) | (BIT(val,B16) << 16) | \
-		(BIT(val,B15) << 15) | (BIT(val,B14) << 14) | (BIT(val,B13) << 13) | (BIT(val,B12) << 12) | \
-		(BIT(val,B11) << 11) | (BIT(val,B10) << 10) | (BIT(val, B9) <<  9) | (BIT(val, B8) <<  8) | \
-		(BIT(val, B7) <<  7) | (BIT(val, B6) <<  6) | (BIT(val, B5) <<  5) | (BIT(val, B4) <<  4) | \
-		(BIT(val, B3) <<  3) | (BIT(val, B2) <<  2) | (BIT(val, B1) <<  1) | (BIT(val, B0) <<  0))
-
-#define BITSWAP32(val,B31,B30,B29,B28,B27,B26,B25,B24,B23,B22,B21,B20,B19,B18,B17,B16,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	((BIT(val,B31) << 31) | (BIT(val,B30) << 30) | (BIT(val,B29) << 29) | (BIT(val,B28) << 28) | \
-		(BIT(val,B27) << 27) | (BIT(val,B26) << 26) | (BIT(val,B25) << 25) | (BIT(val,B24) << 24) | \
-		(BIT(val,B23) << 23) | (BIT(val,B22) << 22) | (BIT(val,B21) << 21) | (BIT(val,B20) << 20) | \
-		(BIT(val,B19) << 19) | (BIT(val,B18) << 18) | (BIT(val,B17) << 17) | (BIT(val,B16) << 16) | \
-		(BIT(val,B15) << 15) | (BIT(val,B14) << 14) | (BIT(val,B13) << 13) | (BIT(val,B12) << 12) | \
-		(BIT(val,B11) << 11) | (BIT(val,B10) << 10) | (BIT(val, B9) <<  9) | (BIT(val, B8) <<  8) | \
-		(BIT(val, B7) <<  7) | (BIT(val, B6) <<  6) | (BIT(val, B5) <<  5) | (BIT(val, B4) <<  4) | \
-		(BIT(val, B3) <<  3) | (BIT(val, B2) <<  2) | (BIT(val, B1) <<  1) | (BIT(val, B0) <<  0))
+// explicit versions that check number of bit position arguments
+template <typename T, typename... U> constexpr T BITSWAP8(T val, U... b) { static_assert(sizeof...(b) == 8U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP16(T val, U... b) { static_assert(sizeof...(b) == 16U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP24(T val, U... b) { static_assert(sizeof...(b) == 24U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP32(T val, U... b) { static_assert(sizeof...(b) == 32U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP40(T val, U... b) { static_assert(sizeof...(b) == 40U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP48(T val, U... b) { static_assert(sizeof...(b) == 48U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP56(T val, U... b) { static_assert(sizeof...(b) == 56U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP64(T val, U... b) { static_assert(sizeof...(b) == 64U, "wrong number of bits"); return bitswap(val, b...); }
 
 
 
@@ -301,7 +291,14 @@ private:
 	int code;
 };
 
-
+class tag_add_exception
+{
+public:
+	tag_add_exception(const char *tag) : m_tag(tag) { }
+	const char *tag() const { return m_tag.c_str(); }
+private:
+	std::string m_tag;
+};
 
 //**************************************************************************
 //  CASTING TEMPLATES
@@ -312,48 +309,41 @@ class device_t;
 void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type);
 void report_bad_device_cast(const device_t *dev, const std::type_info &src_type, const std::type_info &dst_type);
 
-// template function for casting from a base class to a derived class that is checked
-// in debug builds and fast in release builds
-template<class _Dest, class _Source>
-inline _Dest downcast(_Source *src)
+template <typename Dest, typename Source>
+inline std::enable_if_t<std::is_base_of<device_t, Source>::value> report_bad_cast(Source *const src)
 {
-#if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
-	try {
-		if (dynamic_cast<_Dest>(src) != src)
-		{
-			if (dynamic_cast<const device_t *>(src) != NULL)
-				report_bad_device_cast(dynamic_cast<const device_t *>(src), typeid(src), typeid(_Dest));
-			else
-				report_bad_cast(typeid(src), typeid(_Dest));
-		}
-	}
-	catch (std::bad_cast &)
-	{
-		report_bad_cast(typeid(src), typeid(_Dest));
-	}
-#endif
-	return static_cast<_Dest>(src);
+	if (src) report_bad_device_cast(src, typeid(Source), typeid(Dest));
+	else report_bad_cast(typeid(Source), typeid(Dest));
 }
 
-template<class _Dest, class _Source>
-inline _Dest downcast(_Source &src)
+template <typename Dest, typename Source>
+inline std::enable_if_t<!std::is_base_of<device_t, Source>::value> report_bad_cast(Source *const src)
+{
+	device_t const *dev(dynamic_cast<device_t const *>(src));
+	if (dev) report_bad_device_cast(dev, typeid(Source), typeid(Dest));
+	else report_bad_cast(typeid(Source), typeid(Dest));
+}
+
+// template function for casting from a base class to a derived class that is checked
+// in debug builds and fast in release builds
+template <typename Dest, typename Source>
+inline Dest downcast(Source *src)
 {
 #if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
-	try {
-		if (&dynamic_cast<_Dest>(src) != &src)
-		{
-			if (dynamic_cast<const device_t *>(&src) != NULL)
-				report_bad_device_cast(dynamic_cast<const device_t *>(&src), typeid(src), typeid(_Dest));
-			else
-				report_bad_cast(typeid(src), typeid(_Dest));
-		}
-	}
-	catch (std::bad_cast &)
-	{
-		report_bad_cast(typeid(src), typeid(_Dest));
-	}
+	Dest const chk(dynamic_cast<Dest>(src));
+	if (chk != src) report_bad_cast<std::remove_pointer_t<Dest>, Source>(src);
 #endif
-	return static_cast<_Dest>(src);
+	return static_cast<Dest>(src);
+}
+
+template<class Dest, class Source>
+inline Dest downcast(Source &src)
+{
+#if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
+	std::remove_reference_t<Dest> *const chk(dynamic_cast<std::remove_reference_t<Dest> *>(&src));
+	if (chk != &src) report_bad_cast<std::remove_reference_t<Dest>, Source>(&src);
+#endif
+	return static_cast<Dest>(src);
 }
 
 
@@ -429,4 +419,4 @@ inline UINT64 d2u(double d)
 	return u.vv;
 }
 
-#endif  /* __EMUCORE_H__ */
+#endif  /* MAME_EMU_EMUCORE_H */

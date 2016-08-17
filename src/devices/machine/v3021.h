@@ -45,18 +45,13 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	void timer_callback();
+	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-
-	inline UINT8 rtc_read(UINT8 offset);
-	inline void rtc_write(UINT8 offset,UINT8 data);
-
-	static TIMER_CALLBACK( rtc_inc_callback );
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_cal_mask,m_cal_com,m_cal_cnt,m_cal_val;
 

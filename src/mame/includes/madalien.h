@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "sound/discrete.h"
 
 
@@ -33,7 +34,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_charram;
@@ -49,7 +52,7 @@ public:
 	tilemap_t *m_tilemap_fg;
 	tilemap_t *m_tilemap_edge1[4];
 	tilemap_t *m_tilemap_edge2[4];
-	bitmap_ind16 *m_headlight_bitmap;
+	std::unique_ptr<bitmap_ind16> m_headlight_bitmap;
 	DECLARE_READ8_MEMBER(shift_r);
 	DECLARE_READ8_MEMBER(shift_rev_r);
 	DECLARE_WRITE8_MEMBER(madalien_output_w);
@@ -80,6 +83,8 @@ public:
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 };
 /*----------- defined in video/madalien.c -----------*/
 

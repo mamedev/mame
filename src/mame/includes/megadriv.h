@@ -8,6 +8,12 @@
 #include "sound/sn76496.h"
 #include "video/315_5313.h"
 
+/* Megadrive Console Specific */
+#include "bus/megadrive/md_slot.h"
+#include "bus/megadrive/md_carts.h"
+#include "machine/mega32x.h"
+#include "machine/megacd.h"
+
 #define MASTER_CLOCK_NTSC 53693175
 #define MASTER_CLOCK_PAL  53203424
 
@@ -33,7 +39,7 @@ struct genesis_z80_vars
 	int z80_is_reset;
 	int z80_has_bus;
 	UINT32 z80_bank_addr;
-	UINT8* z80_prgram;
+	std::unique_ptr<UINT8[]> z80_prgram;
 };
 
 
@@ -47,7 +53,8 @@ public:
 		m_ymsnd(*this,"ymsnd"),
 		m_vdp(*this,"gen_vdp"),
 		m_snsnd(*this, "snsnd"),
-		m_megadrive_ram(*this,"megadrive_ram")
+		m_megadrive_ram(*this,"megadrive_ram"),
+		m_io_reset(*this, "RESET")
 	{ }
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
@@ -56,7 +63,8 @@ public:
 	required_device<sn76496_base_device> m_snsnd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
 
-	ioport_port *m_io_reset;
+
+	optional_ioport m_io_reset;
 	ioport_port *m_io_pad_3b[4];
 	ioport_port *m_io_pad_6b[4];
 
@@ -130,36 +138,49 @@ public:
 	DECLARE_WRITE8_MEMBER(megadriv_tas_callback);
 };
 
-
-class md_boot_state : public md_base_state
+class md_cons_state : public md_base_state
 {
 public:
-	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { m_protcount = 0;}
+	md_cons_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag),
+	m_32x(*this,"sega32x"),
+	m_segacd(*this,"segacd"),
+	m_cart(*this, "mdslot"),
+	m_tmss(*this, "tmss")
+	{ }
 
-	// bootleg specific
-	int m_aladmdb_mcu_port;
+	ioport_port *m_io_ctrlr;
+	ioport_port *m_io_pad3b[4];
+	ioport_port *m_io_pad6b[2][4];
 
-	int m_protcount;
+	optional_device<sega_32x_device> m_32x;
+	optional_device<sega_segacd_device> m_segacd;
+	optional_device<md_cart_slot_device> m_cart;
+	optional_region_ptr<UINT16> m_tmss;
 
-	DECLARE_DRIVER_INIT(aladmdb);
-	DECLARE_DRIVER_INIT(mk3mdb);
-	DECLARE_DRIVER_INIT(ssf2mdb);
-	DECLARE_DRIVER_INIT(srmdb);
-	DECLARE_DRIVER_INIT(topshoot);
-	DECLARE_DRIVER_INIT(puckpkmn);
-	DECLARE_DRIVER_INIT(hshavoc);
-	DECLARE_WRITE16_MEMBER(bl_710000_w);
-	DECLARE_READ16_MEMBER(bl_710000_r);
-	DECLARE_WRITE16_MEMBER(aladmdb_w);
-	DECLARE_READ16_MEMBER(aladmdb_r);
-	DECLARE_READ16_MEMBER(mk3mdb_dsw_r);
-	DECLARE_READ16_MEMBER(ssf2mdb_dsw_r);
-	DECLARE_READ16_MEMBER(srmdb_dsw_r);
-	DECLARE_READ16_MEMBER(topshoot_200051_r);
-	DECLARE_READ16_MEMBER(puckpkmna_70001c_r);
-	DECLARE_READ16_MEMBER(puckpkmna_4b2476_r);
+	DECLARE_DRIVER_INIT(mess_md_common);
+	DECLARE_DRIVER_INIT(genesis);
+	DECLARE_DRIVER_INIT(md_eur);
+	DECLARE_DRIVER_INIT(md_jpn);
 
-	DECLARE_MACHINE_START(md_bootleg) { MACHINE_START_CALL_MEMBER(megadriv); m_vdp->stop_timers(); }
-	DECLARE_MACHINE_START(md_6button);
+	READ8_MEMBER(mess_md_io_read_data_port);
+	WRITE16_MEMBER(mess_md_io_write_data_port);
+
+	DECLARE_MACHINE_START( md_common );     // setup ioport_port
+	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
+	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
+	DECLARE_MACHINE_RESET( ms_megadriv );
+
+	void screen_eof_console(screen_device &screen, bool state);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
+
+	void _32x_scanline_callback(int x, UINT32 priority, UINT16 &lineptr);
+	void _32x_interrupt_callback(int scanline, int irq6);
+	void _32x_scanline_helper_callback(int scanline);
+
+	void install_cartslot();
+	void install_tmss();
+	DECLARE_READ16_MEMBER(tmss_r);
+	DECLARE_WRITE16_MEMBER(tmss_swap_w);
 };

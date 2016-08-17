@@ -11,11 +11,13 @@
 
 #pragma once
 
-#ifndef __OSDCOMM_H__
-#define __OSDCOMM_H__
+#ifndef MAME_OSD_OSDCOMM_H
+#define MAME_OSD_OSDCOMM_H
 
 #include <stdio.h>
 #include <string.h>
+#include <cstdint>
+#include <type_traits>
 
 
 /***************************************************************************
@@ -29,38 +31,23 @@
 
 
 /* Some optimizations/warnings cleanups for GCC */
-#if defined(__GNUC__) && (__GNUC__ >= 3)
+#if defined(__GNUC__)
 #define ATTR_UNUSED             __attribute__((__unused__))
 #define ATTR_NORETURN           __attribute__((noreturn))
 #define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
-#define ATTR_MALLOC             __attribute__((malloc))
-#define ATTR_PURE               __attribute__((pure))
 #define ATTR_CONST              __attribute__((const))
 #define ATTR_FORCE_INLINE       __attribute__((always_inline))
 #define ATTR_NONNULL(...)       __attribute__((nonnull(__VA_ARGS__)))
 #define ATTR_DEPRECATED         __attribute__((deprecated))
-/* not supported in GCC prior to 4.4.x */
-#if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 4)
 #define ATTR_HOT                __attribute__((hot))
 #define ATTR_COLD               __attribute__((cold))
-#else
-#define ATTR_HOT
-#define ATTR_COLD
-#endif
 #define UNEXPECTED(exp)         __builtin_expect(!!(exp), 0)
 #define EXPECTED(exp)           __builtin_expect(!!(exp), 1)
 #define RESTRICT                __restrict__
-#define SETJMP_GNUC_PROTECT()   (void)__builtin_return_address(1)
 #else
 #define ATTR_UNUSED
-#if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #define ATTR_NORETURN           __declspec(noreturn)
-#else
-#define ATTR_NORETURN
-#endif
 #define ATTR_PRINTF(x,y)
-#define ATTR_MALLOC
-#define ATTR_PURE
 #define ATTR_CONST
 #define ATTR_FORCE_INLINE       __forceinline
 #define ATTR_NONNULL(...)
@@ -70,7 +57,6 @@
 #define UNEXPECTED(exp)         (exp)
 #define EXPECTED(exp)           (exp)
 #define RESTRICT
-#define SETJMP_GNUC_PROTECT()   do {} while (0)
 #endif
 
 
@@ -79,44 +65,30 @@
     FUNDAMENTAL TYPES
 ***************************************************************************/
 
-/* These types work on most modern compilers; however, OSD code can
-   define their own by setting OSD_TYPES_DEFINED */
-
-#ifndef OSD_TYPES_DEFINED
 
 /* 8-bit values */
-typedef unsigned char                       UINT8;
-typedef signed char                         INT8;
+using UINT8 = std::uint8_t;
+using INT8 = std::int8_t;
 
 /* 16-bit values */
-typedef unsigned short                      UINT16;
-typedef signed short                        INT16;
+using UINT16 = std::uint16_t;
+using INT16 = std::int16_t;
 
 /* 32-bit values */
-#ifndef _WINDOWS_H
-typedef unsigned int                        UINT32;
-typedef signed int                          INT32;
-#endif
+using UINT32 = std::uint32_t;
+using INT32 = std::int32_t;
 
 /* 64-bit values */
-#ifndef _WINDOWS_H
-#ifdef _MSC_VER
-typedef signed __int64                      INT64;
-typedef unsigned __int64                    UINT64;
-#else
-__extension__ typedef unsigned long long    UINT64;
-__extension__ typedef signed long long      INT64;
-#endif
-#endif
-
-#endif
+using UINT64 = std::uint64_t;
+using INT64 = std::int64_t;
 
 /* pointer-sized values */
-#ifdef PTR64
-typedef UINT64                              FPTR;
-#else
-typedef UINT32                              FPTR;
-#endif
+using FPTR = uintptr_t;
+
+/* unicode types */
+using utf16_char = std::uint16_t;
+using unicode_char = std::uint32_t;
+
 
 
 
@@ -139,15 +111,6 @@ typedef UINT32                              FPTR;
     FUNDAMENTAL MACROS
 ***************************************************************************/
 
-/* Standard MIN/MAX macros */
-#ifndef MIN
-#define MIN(x,y)            ((x) < (y) ? (x) : (y))
-#endif
-#ifndef MAX
-#define MAX(x,y)            ((x) > (y) ? (x) : (y))
-#endif
-
-
 /* U64 and S64 are used to wrap long integer constants. */
 #if defined(__GNUC__) || defined(_MSC_VER)
 #define U64(val) val##ULL
@@ -159,87 +122,57 @@ typedef UINT32                              FPTR;
 
 
 /* Concatenate/extract 32-bit halves of 64-bit values */
-#define CONCAT_64(hi,lo)    (((UINT64)(hi) << 32) | (UINT32)(lo))
-#define EXTRACT_64HI(val)   ((UINT32)((val) >> 32))
-#define EXTRACT_64LO(val)   ((UINT32)(val))
+constexpr UINT64 concat_64(UINT32 hi, UINT32 lo) { return (UINT64(hi) << 32) | UINT32(lo); }
+constexpr UINT32 extract_64hi(UINT64 val) { return UINT32(val >> 32); }
+constexpr UINT32 extract_64lo(UINT64 val) { return UINT32(val); }
 
+// Highly useful template for compile-time knowledge of an array size
+template <typename T, size_t N> constexpr size_t ARRAY_LENGTH(T (&)[N]) { return N;}
 
-/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
-#if (defined(__MINGW32__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))) || defined(_MSC_VER)
-#define I64FMT   "I64"
-#else
-#define I64FMT   "ll"
-#endif
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-#ifdef PTR64
-#define SIZETFMT   "I64u"
-#else
-#define SIZETFMT   "u"
-#endif
-#else
-#define SIZETFMT   "zu"
-#endif
-
-
-/* Highly useful macro for compile-time knowledge of an array size */
-#define ARRAY_LENGTH(x)     (sizeof(x) / sizeof(x[0]))
-
+// For declaring an array of the same dimensions as another array (including multi-dimensional arrays)
+template <typename T, typename U> struct equivalent_array_or_type { typedef T type; };
+template <typename T, typename U, std::size_t N> struct equivalent_array_or_type<T, U[N]> { typedef typename equivalent_array_or_type<T, U>::type type[N]; };
+template <typename T, typename U> using equivalent_array_or_type_t = typename equivalent_array_or_type<T, U>::type;
+template <typename T, typename U> struct equivalent_array { };
+template <typename T, typename U, std::size_t N> struct equivalent_array<T, U[N]> { typedef equivalent_array_or_type_t<T, U> type[N]; };
+template <typename T, typename U> using equivalent_array_t = typename equivalent_array<T, U>::type;
+#define EQUIVALENT_ARRAY(a, T) equivalent_array_t<T, std::remove_reference_t<decltype(a)> >
 
 /* Macros for normalizing data into big or little endian formats */
-#define FLIPENDIAN_INT16(x) (((((UINT16) (x)) >> 8) | ((x) << 8)) & 0xffff)
-#define FLIPENDIAN_INT32(x) ((((UINT32) (x)) << 24) | (((UINT32) (x)) >> 24) | \
-	(( ((UINT32) (x)) & 0x0000ff00) << 8) | (( ((UINT32) (x)) & 0x00ff0000) >> 8))
-#define FLIPENDIAN_INT64(x) \
-	(                                               \
-		(((((UINT64) (x)) >> 56) & ((UINT64) 0xFF)) <<  0)  |   \
-		(((((UINT64) (x)) >> 48) & ((UINT64) 0xFF)) <<  8)  |   \
-		(((((UINT64) (x)) >> 40) & ((UINT64) 0xFF)) << 16)  |   \
-		(((((UINT64) (x)) >> 32) & ((UINT64) 0xFF)) << 24)  |   \
-		(((((UINT64) (x)) >> 24) & ((UINT64) 0xFF)) << 32)  |   \
-		(((((UINT64) (x)) >> 16) & ((UINT64) 0xFF)) << 40)  |   \
-		(((((UINT64) (x)) >>  8) & ((UINT64) 0xFF)) << 48)  |   \
-		(((((UINT64) (x)) >>  0) & ((UINT64) 0xFF)) << 56)      \
-	)
+constexpr UINT16 flipendian_int16(UINT16 val) { return (val << 8) | (val >> 8); }
+
+constexpr UINT32 flipendian_int32_partial16(UINT32 val) { return ((val << 8) & 0xFF00FF00U) | ((val >> 8) & 0x00FF00FFU); }
+constexpr UINT32 flipendian_int32(UINT32 val) { return (flipendian_int32_partial16(val) << 16) | (flipendian_int32_partial16(val) >> 16); }
+
+constexpr UINT64 flipendian_int64_partial16(UINT64 val) { return ((val << 8) & U64(0xFF00FF00FF00FF00)) | ((val >> 8) & U64(0x00FF00FF00FF00FF)); }
+constexpr UINT64 flipendian_int64_partial32(UINT64 val) { return ((flipendian_int64_partial16(val) << 16) & U64(0xFFFF0000FFFF0000)) | ((flipendian_int64_partial16(val) >> 16) & U64(0x0000FFFF0000FFFF)); }
+constexpr UINT64 flipendian_int64(UINT64 val) { return (flipendian_int64_partial32(val) << 32) | (flipendian_int64_partial32(val) >> 32); }
 
 #ifdef LSB_FIRST
-#define BIG_ENDIANIZE_INT16(x)      (FLIPENDIAN_INT16(x))
-#define BIG_ENDIANIZE_INT32(x)      (FLIPENDIAN_INT32(x))
-#define BIG_ENDIANIZE_INT64(x)      (FLIPENDIAN_INT64(x))
-#define LITTLE_ENDIANIZE_INT16(x)   (x)
-#define LITTLE_ENDIANIZE_INT32(x)   (x)
-#define LITTLE_ENDIANIZE_INT64(x)   (x)
+constexpr UINT16 big_endianize_int16(UINT16 x) { return flipendian_int16(x); }
+constexpr UINT32 big_endianize_int32(UINT32 x) { return flipendian_int32(x); }
+constexpr UINT64 big_endianize_int64(UINT64 x) { return flipendian_int64(x); }
+constexpr UINT16 little_endianize_int16(UINT16 x) { return x; }
+constexpr UINT32 little_endianize_int32(UINT32 x) { return x; }
+constexpr UINT64 little_endianize_int64(UINT64 x) { return x; }
 #else
-#define BIG_ENDIANIZE_INT16(x)      (x)
-#define BIG_ENDIANIZE_INT32(x)      (x)
-#define BIG_ENDIANIZE_INT64(x)      (x)
-#define LITTLE_ENDIANIZE_INT16(x)   (FLIPENDIAN_INT16(x))
-#define LITTLE_ENDIANIZE_INT32(x)   (FLIPENDIAN_INT32(x))
-#define LITTLE_ENDIANIZE_INT64(x)   (FLIPENDIAN_INT64(x))
+constexpr UINT16 big_endianize_int16(UINT16 x) { return x; }
+constexpr UINT32 big_endianize_int32(UINT32 x) { return x; }
+constexpr UINT64 big_endianize_int64(UINT64 x) { return x; }
+constexpr UINT16 little_endianize_int16(UINT16 x) { return flipendian_int16(x); }
+constexpr UINT32 little_endianize_int32(UINT32 x) { return flipendian_int32(x); }
+constexpr UINT64 little_endianize_int64(UINT64 x) { return flipendian_int64(x); }
 #endif /* LSB_FIRST */
-
-// compatibility with non-clang compilers
-#ifndef __has_feature
-	#define __has_feature(x) 0
-#endif
 
 #ifdef _MSC_VER
 #include <malloc.h>
-#if _MSC_VER == 1900 // < VS2015
+using ssize_t = std::make_signed_t<size_t>;
+#if _MSC_VER == 1900 // VS2015
 #define __LINE__Var 0
-#endif
-#if _MSC_VER < 1900 // < VS2015
+#endif // VS2015
+#if _MSC_VER < 1900 // VS2013 or earlier
 #define snprintf _snprintf
-#if _MSC_VER < 1800 // VS2013 or earlier
-#define alloca _alloca
-#define round(x) floor((x) + 0.5)
-#define strtoll _strtoi64
-#define _USE_MATH_DEFINES
-#include <math.h>
-static __inline double fmin(double x, double y){ return (x < y) ? x : y; }
-static __inline double fmax(double x, double y){ return (x > y) ? x : y; }
-static __inline double log2(double x) { return log(x) * M_LOG2E; }
-#endif // VS2013
+#define __func__ __FUNCTION__
 #else // VS2015
 #define _CRT_STDIO_LEGACY_WIDE_SPECIFIERS
 #endif
@@ -251,4 +184,4 @@ static __inline double log2(double x) { return log(x) * M_LOG2E; }
 #endif
 #endif
 
-#endif  /* __OSDCOMM_H__ */
+#endif  /* MAME_OSD_OSDCOMM_H */

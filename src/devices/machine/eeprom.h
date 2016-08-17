@@ -44,7 +44,6 @@
 // ======================> eeprom_base_device
 
 class eeprom_base_device :  public device_t,
-							public device_memory_interface,
 							public device_nvram_interface
 {
 protected:
@@ -79,29 +78,29 @@ public:
 	// status
 	bool ready() const { return machine().time() >= m_completion_time; }
 
-protected:
-	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
-
 	// internal read/write without side-effects
 	UINT32 internal_read(offs_t address);
 	void internal_write(offs_t address, UINT32 data);
+
+protected:
+	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_nvram_interface overrides
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
+
+	optional_memory_region  m_region;
+
+	std::unique_ptr<UINT8 []> m_data;
 
 	// configuration state
 	UINT32                  m_cells;
 	UINT8                   m_address_bits;
 	UINT8                   m_data_bits;
-	address_space_config    m_space_config;
 	generic_ptr             m_default_data;
 	UINT32                  m_default_data_size;
 	UINT32                  m_default_value;

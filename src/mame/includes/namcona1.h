@@ -130,9 +130,9 @@ public:
 	DECLARE_DRIVER_INIT(xday2);
 	DECLARE_DRIVER_INIT(exbania);
 	DECLARE_DRIVER_INIT(emeraldj);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(tilemap_get_info0);
 	TILE_GET_INFO_MEMBER(tilemap_get_info1);

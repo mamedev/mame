@@ -29,16 +29,16 @@ public:
 	// construction/destruction
 	nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 read_exp(offs_t offset);
-	virtual void write(UINT8 data);
+	virtual UINT8 read_exp(offs_t offset) override;
+	virtual void write(UINT8 data) override;
 
 private:
 	required_device<cassette_image_device> m_cassette;

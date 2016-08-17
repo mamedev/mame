@@ -1,12 +1,12 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_RENDERER_D3D11_H_HEADER_GUARD
 #define BGFX_RENDERER_D3D11_H_HEADER_GUARD
 
-#define USE_D3D11_DYNAMIC_LIB !BX_PLATFORM_WINRT
+#define USE_D3D11_DYNAMIC_LIB BX_PLATFORM_WINDOWS
 
 #if !USE_D3D11_DYNAMIC_LIB
 #	undef  BGFX_CONFIG_DEBUG_PIX
@@ -19,18 +19,22 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wpragmas");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4005) // warning C4005: '' : macro redefinition
 #include <sal.h>
 #define D3D11_NO_HELPERS
-#if BX_PLATFORM_WINRT
-#	include <d3d11_2.h>
+#if BX_PLATFORM_WINDOWS
+#	include <d3d11_3.h>
+#	include <dxgi1_3.h>
+#elif BX_PLATFORM_WINRT
+#	include <d3d11_3.h>
 #else
-#	include <d3d11.h>
-#endif // BX_PLATFORM_WINRT
+#	include <d3d11_x.h>
+#endif // BX_PLATFORM_*
 BX_PRAGMA_DIAGNOSTIC_POP()
 
 #include "renderer.h"
 #include "renderer_d3d.h"
 #include "shader_dxbc.h"
-#include "ovr.h"
-#include "renderdoc.h"
+#include "hmd_ovr.h"
+#include "hmd_openvr.h"
+#include "debug_renderdoc.h"
 
 #ifndef D3DCOLOR_ARGB
 #	define D3DCOLOR_ARGB(_a, _r, _g, _b) ( (DWORD)( ( ( (_a)&0xff)<<24)|( ( (_r)&0xff)<<16)|( ( (_g)&0xff)<<8)|( (_b)&0xff) ) )
@@ -44,6 +48,7 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 			| BGFX_STATE_BLEND_MASK \
 			| BGFX_STATE_BLEND_EQUATION_MASK \
 			| BGFX_STATE_BLEND_INDEPENDENT \
+			| BGFX_STATE_BLEND_ALPHA_TO_COVERAGE \
 			| BGFX_STATE_ALPHA_WRITE \
 			| BGFX_STATE_RGB_WRITE \
 			)
@@ -55,6 +60,29 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 
 namespace bgfx { namespace d3d11
 {
+#if BGFX_CONFIG_USE_OVR
+	struct OVRBufferD3D11 : public OVRBufferI
+	{
+		virtual void create(const ovrSession& _session, int _eyeIdx, int _msaaSamples) BX_OVERRIDE;
+		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
+		virtual void render(const ovrSession& _session) BX_OVERRIDE;
+		virtual void postRender(const ovrSession& _session) BX_OVERRIDE;
+
+		ID3D11RenderTargetView* m_eyeRtv[4];
+		ID3D11DepthStencilView* m_depthBuffer;
+		ID3D11Texture2D* m_msaaTexture;
+		ID3D11ShaderResourceView* m_msaaSv;
+		ID3D11RenderTargetView* m_msaaRtv;
+	};
+
+	struct OVRMirrorD3D11 : public OVRMirrorI
+	{
+		virtual void create(const ovrSession& _session, int _width, int _height) BX_OVERRIDE;
+		virtual void destroy(const ovrSession& session) BX_OVERRIDE;
+		virtual void blit(const ovrSession& session) BX_OVERRIDE;
+	};
+#endif // BGFX_CONFIG_USE_OVR
+
 	struct BufferD3D11
 	{
 		BufferD3D11()
@@ -118,13 +146,12 @@ namespace bgfx { namespace d3d11
 		}
 
 		void create(const Memory* _mem);
-		DWORD* getShaderCode(uint8_t _fragmentBit, const Memory* _mem);
 
 		void destroy()
 		{
 			if (NULL != m_constantBuffer)
 			{
-				ConstantBuffer::destroy(m_constantBuffer);
+				UniformBuffer::destroy(m_constantBuffer);
 				m_constantBuffer = NULL;
 			}
 
@@ -154,7 +181,7 @@ namespace bgfx { namespace d3d11
 		};
 		const Memory* m_code;
 		ID3D11Buffer* m_buffer;
-		ConstantBuffer* m_constantBuffer;
+		UniformBuffer* m_constantBuffer;
 
 		PredefinedUniform m_predefined[PredefinedUniform::Count];
 		uint16_t m_attrMask[Attrib::Count];
@@ -215,18 +242,19 @@ namespace bgfx { namespace d3d11
 
 		TextureD3D11()
 			: m_ptr(NULL)
+			, m_rt(NULL)
 			, m_srv(NULL)
 			, m_uav(NULL)
-			, m_sampler(NULL)
 			, m_numMips(0)
 		{
 		}
 
 		void create(const Memory* _mem, uint32_t _flags, uint8_t _skip);
 		void destroy();
+		void overrideInternal(uintptr_t _ptr);
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
-		void commit(uint8_t _stage, uint32_t _flags = BGFX_SAMPLER_DEFAULT_FLAGS);
-		void resolve();
+		void commit(uint8_t _stage, uint32_t _flags, const float _palette[][4]);
+		void resolve() const;
 		TextureHandle getHandle() const;
 
 		union
@@ -236,10 +264,18 @@ namespace bgfx { namespace d3d11
 			ID3D11Texture3D* m_texture3d;
 		};
 
+		union
+		{
+			ID3D11Resource* m_rt;
+			ID3D11Texture2D* m_rt2d;
+		};
+
 		ID3D11ShaderResourceView*  m_srv;
 		ID3D11UnorderedAccessView* m_uav;
-		ID3D11SamplerState* m_sampler;
 		uint32_t m_flags;
+		uint32_t m_width;
+		uint32_t m_height;
+		uint32_t m_depth;
 		uint8_t  m_type;
 		uint8_t  m_requestedFormat;
 		uint8_t  m_textureFormat;
@@ -250,6 +286,7 @@ namespace bgfx { namespace d3d11
 	{
 		FrameBufferD3D11()
 			: m_dsv(NULL)
+			, m_swapChain(NULL)
 			, m_width(0)
 			, m_height(0)
 			, m_denseIdx(UINT16_MAX)
@@ -258,7 +295,7 @@ namespace bgfx { namespace d3d11
 		{
 		}
 
-		void create(uint8_t _num, const TextureHandle* _handles);
+		void create(uint8_t _num, const Attachment* _attachment);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
 		void preReset(bool _force = false);
@@ -272,10 +309,11 @@ namespace bgfx { namespace d3d11
 		IDXGISwapChain* m_swapChain;
 		uint32_t m_width;
 		uint32_t m_height;
+
+		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 		uint16_t m_denseIdx;
 		uint8_t m_num;
 		uint8_t m_numTh;
-		TextureHandle m_th[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 	};
 
 	struct TimerQueryD3D11
@@ -294,14 +332,39 @@ namespace bgfx { namespace d3d11
 		struct Frame
 		{
 			ID3D11Query* m_disjoint;
-			ID3D11Query* m_start;
+			ID3D11Query* m_begin;
 			ID3D11Query* m_end;
 		};
 
+		uint64_t m_begin;
+		uint64_t m_end;
 		uint64_t m_elapsed;
 		uint64_t m_frequency;
 
 		Frame m_frame[4];
+		bx::RingBufferControl m_control;
+	};
+
+	struct OcclusionQueryD3D11
+	{
+		OcclusionQueryD3D11()
+			: m_control(BX_COUNTOF(m_query) )
+		{
+		}
+
+		void postReset();
+		void preReset();
+		void begin(Frame* _render, OcclusionQueryHandle _handle);
+		void end();
+		void resolve(Frame* _render, bool _wait = false);
+
+		struct Query
+		{
+			ID3D11Query* m_ptr;
+			OcclusionQueryHandle m_handle;
+		};
+
+		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

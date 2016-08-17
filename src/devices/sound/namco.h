@@ -45,13 +45,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// internal state
 
 	void build_decoded_waveform( UINT8 *rgnbase );
 	void update_namco_waveform(int offset, UINT8 data);
 	UINT32 namco_update_one(stream_sample_t *buffer, int length, const INT16 *wave, UINT32 counter, UINT32 freq);
+
+	/* waveform region */
+	optional_region_ptr<UINT8> m_wave_ptr;
 
 	/* data about the sound system */
 	sound_channel m_channel_list[MAX_VOICES];
@@ -73,7 +76,7 @@ protected:
 	/* decoded waveform table */
 	INT16 *m_waveform[MAX_VOLUME];
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 class namco_device : public namco_audio_device
@@ -90,7 +93,7 @@ public:
 	DECLARE_WRITE8_MEMBER( polepos_sound_w );
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 extern const device_type NAMCO;
@@ -107,7 +110,7 @@ public:
 	void mappy_sound_enable(int enable);
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 extern const device_type NAMCO_15XX;
@@ -124,7 +127,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pacman_sound_w );
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 extern const device_type NAMCO_CUS30;

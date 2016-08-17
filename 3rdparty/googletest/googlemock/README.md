@@ -62,14 +62,14 @@ You can also watch Zhanyong's [talk](http://www.youtube.com/watch?v=sYpCyLI47rM)
 
 Once you understand the basics, check out the rest of the docs:
 
-  * [CheatSheet](googlemock/docs/CheatSheet.md) - all the commonly used stuff
+  * [CheatSheet](docs/CheatSheet.md) - all the commonly used stuff
     at a glance.
-  * [CookBook](googlemock/docs/CookBook.md) - recipes for getting things done,
+  * [CookBook](docs/CookBook.md) - recipes for getting things done,
     including advanced techniques.
 
 If you need help, please check the
-[KnownIssues](googlemock/docs/KnownIssues.md) and
-[FrequentlyAskedQuestions](googlemock/docs/frequentlyaskedquestions.md) before
+[KnownIssues](docs/KnownIssues.md) and
+[FrequentlyAskedQuestions](docs/FrequentlyAskedQuestions.md) before
 posting a question on the
 [discussion group](http://groups.google.com/group/googlemock).
 
@@ -78,7 +78,7 @@ posting a question on the
 
 Google Mock is not a testing framework itself.  Instead, it needs a
 testing framework for writing tests.  Google Mock works seamlessly
-with [Google Test](http://code.google.com/p/googletest/), butj
+with [Google Test](http://code.google.com/p/googletest/), but
 you can also use it with [any C++ testing framework](googlemock/ForDummies.md#Using_Google_Mock_with_Any_Testing_Framework).
 
 ### Requirements for End Users ###

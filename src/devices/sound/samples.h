@@ -85,12 +85,12 @@ protected:
 	samples_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal classes
 	struct channel_t
@@ -137,13 +137,13 @@ public:
 			m_current(-1) { }
 
 	// getters
-	const char *altbasename() const { return (m_samples.m_names != NULL && m_samples.m_names[0] != NULL && m_samples.m_names[0][0] == '*') ? &m_samples.m_names[0][1] : NULL; }
+	const char *altbasename() const { return (m_samples.m_names != nullptr && m_samples.m_names[0] != nullptr && m_samples.m_names[0][0] == '*') ? &m_samples.m_names[0][1] : nullptr; }
 
 	// iteration
 	const char *first()
 	{
-		if (m_samples.m_names == NULL || m_samples.m_names[0] == NULL)
-			return NULL;
+		if (m_samples.m_names == nullptr || m_samples.m_names[0] == nullptr)
+			return nullptr;
 		m_current = 0;
 		if (m_samples.m_names[0][0] == '*')
 			m_current++;
@@ -152,8 +152,8 @@ public:
 
 	const char *next()
 	{
-		if (m_current == -1 || m_samples.m_names[m_current] == NULL)
-			return NULL;
+		if (m_current == -1 || m_samples.m_names[m_current] == nullptr)
+			return nullptr;
 		return m_samples.m_names[m_current++];
 	}
 
@@ -162,7 +162,7 @@ public:
 	{
 		int save = m_current;
 		int result = 0;
-		for (const char *scan = first(); scan != NULL; scan = next())
+		for (const char *scan = first(); scan != nullptr; scan = next())
 			result++;
 		m_current = save;
 		return result;

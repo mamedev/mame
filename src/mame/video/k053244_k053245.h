@@ -59,15 +59,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT16    *m_ram;
-	UINT16    *m_buffer;
-	UINT8     *m_sprite_rom;
-	UINT32    m_sprite_size;
+	std::unique_ptr<UINT16[]>  m_ram;
+	std::unique_ptr<UINT16[]>  m_buffer;
+	required_region_ptr<UINT8> m_sprite_rom;
 
 	int m_dx, m_dy;
 	k05324x_cb_delegate m_k05324x_cb;

@@ -26,20 +26,20 @@ public:
 	void serial_w(UINT8 val);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
-	virtual void internal_update(UINT64 current_time);
-	virtual void io_w8(UINT8 adr, UINT8 data);
-	virtual void io_w16(UINT8 adr, UINT16 data);
-	virtual UINT8 io_r8(UINT8 adr);
-	virtual UINT16 io_r16(UINT8 adr);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
+	virtual void internal_update(UINT64 current_time) override;
+	virtual void io_w8(UINT8 adr, UINT8 data) override;
+	virtual void io_w16(UINT8 adr, UINT16 data) override;
+	virtual UINT8 io_r8(UINT8 adr) override;
+	virtual UINT16 io_r16(UINT8 adr) override;
 
 private:
 	enum {

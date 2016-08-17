@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+
 #include "includes/nb1413m3.h"
+#include "machine/gen_latch.h"
 
 class nbmj8991_state : public driver_device
 {
@@ -12,6 +14,7 @@ public:
 		m_nb1413m3(*this, "nb1413m3"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_generic_paletteram_8(*this, "paletteram") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -19,6 +22,7 @@ public:
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
 
@@ -42,8 +46,8 @@ public:
 	int m_clutsel;
 	int m_screen_refresh;
 	bitmap_ind16 m_tmpbitmap;
-	UINT8 *m_videoram;
-	UINT8 *m_clut;
+	std::unique_ptr<UINT8[]> m_videoram;
+	std::unique_ptr<UINT8[]> m_clut;
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
@@ -60,8 +64,8 @@ public:
 	DECLARE_DRIVER_INIT(tokimbsj);
 	DECLARE_DRIVER_INIT(tokyogal);
 	DECLARE_DRIVER_INIT(finalbny);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update_type1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_type2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,5 +76,5 @@ public:
 	void postload();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

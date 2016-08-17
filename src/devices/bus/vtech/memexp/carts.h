@@ -16,6 +16,7 @@
 #include "floppy.h"
 #include "memory.h"
 #include "rs232.h"
+#include "rtty.h"
 #include "wordpro.h"
 
 SLOT_INTERFACE_EXTERN( memexp_slot_carts );

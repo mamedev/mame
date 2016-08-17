@@ -35,8 +35,8 @@ public:
 	DECLARE_READ16_MEMBER(cuskey_r);
 	DECLARE_WRITE16_MEMBER(cuskey_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 };

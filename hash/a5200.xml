@@ -1472,4 +1472,18 @@ Possible Undumped protos: -
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="5200temp">
+		<description>5200 Tempest</description>
+		<year>2012</year>
+		<publisher>Atariage</publisher> <!-- unlicensed? -->
+		<info name="developer" value="Keithen" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
+			<dataarea name="rom" size="32768">
+				<rom name="tempest (atariage).bin" size="32768" crc="a6400e17" sha1="0cb2bd6ed89ce6710ac092533a24f1248688c88c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

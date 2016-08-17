@@ -33,16 +33,13 @@ class omti_disk_image_device;
 class omti8621_device : public device_t, public device_isa16_card_interface
 {
 public:
-	omti8621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	omti8621_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
 	~omti8621_device() {}
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
 	static void set_verbose(int on_off);
-
-	// get sector diskaddr of logical unit lun into data_buffer
-	UINT32 get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun);
 
 	required_device<pc_fdc_interface> m_fdc;
 	required_ioport m_iobase;
@@ -54,23 +51,23 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const rom_entry *device_rom_region() const;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
-	virtual UINT8 dack_r(int line);
-	virtual void dack_w(int line, UINT8 data);
-	virtual void eop_w(int state);
+	virtual UINT8 dack_r(int line) override;
+	virtual void dack_w(int line, UINT8 data) override;
+	virtual void eop_w(int state) override;
 
 	void set_interrupt(enum line_state line_state);
 
-private:
 	omti_disk_image_device *our_disks[OMTI_MAX_LUN+1];
 
+private:
 	UINT16 jumper;
 
 	UINT8 omti_state;
@@ -117,6 +114,9 @@ private:
 	void copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, UINT8 lun);
 	void format_track(const UINT8 * cdb);
 	void set_esdi_defect_list(UINT8 lun, UINT8 head);
+
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
+
 	void log_command(const UINT8 cdb[], const UINT16 cdb_length);
 	void log_data();
 	void do_command(const UINT8 cdb[], const UINT16 cdb_length);
@@ -128,7 +128,30 @@ private:
 	DECLARE_WRITE8_MEMBER(write8);
 };
 
+/* ----- omti8621 for PC device interface ----- */
+
+class omti8621_pc_device : public omti8621_device
+{
+public:
+	omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 extern const device_type ISA16_OMTI8621;
+
+/* ----- omti8621 for apollo device interface ----- */
+
+class omti8621_apollo_device : public omti8621_device
+{
+public:
+	omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// get sector diskaddr of logical unit lun into data_buffer
+	UINT32 get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun);
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+extern const device_type ISA16_OMTI8621_APOLLO;
 
 //###############################################################
 

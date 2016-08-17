@@ -26,7 +26,7 @@ public:
 		m_k053251(*this, "k053251") { }
 
 	/* memory pointers */
-	UINT16 *   m_spriteram;
+	std::unique_ptr<UINT16[]>   m_spriteram;
 
 	/* video-related */
 	int        m_sprite_colorbase;
@@ -54,19 +54,16 @@ public:
 	DECLARE_WRITE8_MEMBER(simpsons_k052109_w);
 	DECLARE_READ8_MEMBER(simpsons_k053247_r);
 	DECLARE_WRITE8_MEMBER(simpsons_k053247_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(simpsons_irq);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
-	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	void simpsons_video_banking(int bank);
-	void sound_nmi_callback(int param);
 	void simpsons_objdma();
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 	K053246_CB_MEMBER(sprite_callback);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

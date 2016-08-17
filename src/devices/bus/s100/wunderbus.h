@@ -32,8 +32,8 @@ public:
 	s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
@@ -41,15 +41,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_s100_card_interface overrides
-	virtual void s100_vi0_w(int state);
-	virtual void s100_vi1_w(int state);
-	virtual void s100_vi2_w(int state);
-	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset);
-	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data);
+	virtual void s100_vi0_w(int state) override;
+	virtual void s100_vi1_w(int state) override;
+	virtual void s100_vi2_w(int state) override;
+	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset) override;
+	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data) override;
 
 private:
 	required_device<pic8259_device> m_pic;

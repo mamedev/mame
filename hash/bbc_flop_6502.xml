@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro - 6502 Co-Processor Discs -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+-->
+
+<softwarelist name="bbc_flop_6502" description="6502 Co-Processor Discs">
+
+	<software name="6502dev" supported="no">
+		<description>6502 Development Package</description>
+		<year>1985</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNL05" />
+		<info name="compatibility" value="6502 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="53760">
+				<rom name="6502development.ssd" size="53760" crc="219eefd1" sha1="d408d6d14d442c9e77be78fecef4b223e0c2404f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitstik1" supported="no">
+		<description>Bitstik Graphics System</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="release" value="ANF04" />
+		<info name="compatibility" value="6502 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Master Disc"/>
+			<dataarea name="flop" size="204800">
+				<rom name="bitstik1.0_system_master.ssd" size="204800" crc="77996ac8" sha1="0de49dc2535dfe27915a58dfc71729ecd14f7515" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Buffer Disc"/>
+			<dataarea name="flop" size="204800">
+				<rom name="bitstik1.0_buffer.ssd" size="204800" crc="2a58f413" sha1="2ab1f5da153d40517a9e68bcaf3e579b373d2dc6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Introductory Library Disc 252/253"/>
+			<dataarea name="flop" size="409600">
+				<rom name="bitstik1.0_introductory_library.ssd" size="409600" crc="bba2cbdc" sha1="ec73cc3225b3d35285377b143c5d34213a46716d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitstik2" supported="no">
+		<description>Bitstik 2</description>
+		<year>1985</year>
+		<publisher>Robo Systems</publisher>
+		<info name="compatibility" value="6502 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Introductory Library Disc Vol.1"/>
+			<dataarea name="flop" size="204800">
+				<rom name="bitstik2.0_library_vol1.ssd" size="204800" crc="2d2ece29" sha1="390fcfee6efb7bf980d1a94dee03db42b8a34cba" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Introductory Library Disc Vol.2"/>
+			<dataarea name="flop" size="204800">
+				<rom name="bitstik2.0_library_vol2.ssd" size="204800" crc="ddda8667" sha1="268799856bd19c06f4a3125d1f4164429d15e0dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="l2fsutil" supported="no">
+		<description>Econet Level 2 Fileserver Software</description>
+		<year>1985</year>
+		<publisher>Acorn</publisher>
+		<info name="release" value="AES21" />
+		<info name="compatibility" value="6502 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="econet_level_2_utils.ssd" size="204800" crc="c7039167" sha1="37a52b17138c1d84301ed23a04456939810f103c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

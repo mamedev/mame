@@ -31,6 +31,8 @@ enum
 #define MCFG_T11_INITIAL_MODE(_mode) \
 	t11_device::set_initial_mode(*device, _mode);
 
+#define MCFG_T11_RESET(_devcb) \
+	t11_device::set_out_reset_func(*device, DEVCB_##_devcb);
 
 class t11_device :  public cpu_device
 {
@@ -41,30 +43,31 @@ public:
 
 	// static configuration helpers
 	static void set_initial_mode(device_t &device, const UINT16 mode) { downcast<t11_device &>(device).c_initial_mode = mode; }
+	template<class _Object> static devcb_base &set_out_reset_func(device_t &device, _Object object) { return downcast<t11_device &>(device).m_out_reset_func.set_callback(object); }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 12; }
-	virtual UINT32 execute_max_cycles() const { return 110; }
-	virtual UINT32 execute_input_lines() const { return 4; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_min_cycles() const override { return 12; }
+	virtual UINT32 execute_max_cycles() const override { return 110; }
+	virtual UINT32 execute_input_lines() const override { return 4; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 6; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 protected:
 	address_space_config m_program_config;
@@ -76,10 +79,11 @@ protected:
 	PAIR                m_psw;
 	UINT16              m_initial_pc;
 	UINT8               m_wait_state;
-	UINT8               m_irq_state;
+	UINT16              m_irq_state;
 	int                 m_icount;
 	address_space *m_program;
 	direct_read_data *m_direct;
+	devcb_write_line   m_out_reset_func;
 
 	inline int ROPCODE();
 	inline int RBYTE(int addr);
@@ -88,7 +92,7 @@ protected:
 	inline void WWORD(int addr, int data);
 	inline void PUSH(int val);
 	inline int POP();
-	void t11_check_irqs();
+	void t11_check_irqs(int prio = 0);
 
 	typedef void ( t11_device::*opcode_func )(UINT16 op);
 	static const opcode_func s_opcode_table[65536 >> 3];
@@ -1142,10 +1146,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 };
 
 

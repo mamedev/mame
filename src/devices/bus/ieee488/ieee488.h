@@ -64,15 +64,15 @@
 
 
 #define MCFG_CBM_IEEE488_ADD(_default_drive) \
-	MCFG_IEEE488_SLOT_ADD("ieee4", 4, cbm_ieee488_devices, NULL) \
+	MCFG_IEEE488_SLOT_ADD("ieee4", 4, cbm_ieee488_devices, nullptr) \
 	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, _default_drive) \
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee12", 12, cbm_ieee488_devices, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee13", 13, cbm_ieee488_devices, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee14", 14, cbm_ieee488_devices, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee15", 15, cbm_ieee488_devices, NULL) \
+	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, nullptr) \
+	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, nullptr) \
+	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, nullptr) \
+	MCFG_IEEE488_SLOT_ADD("ieee12", 12, cbm_ieee488_devices, nullptr) \
+	MCFG_IEEE488_SLOT_ADD("ieee13", 13, cbm_ieee488_devices, nullptr) \
+	MCFG_IEEE488_SLOT_ADD("ieee14", 14, cbm_ieee488_devices, nullptr) \
+	MCFG_IEEE488_SLOT_ADD("ieee15", 15, cbm_ieee488_devices, nullptr) \
 	MCFG_IEEE488_BUS_ADD()
 
 
@@ -153,8 +153,8 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_stop() override;
 
 	class daisy_entry
 	{
@@ -205,7 +205,7 @@ public:
 	int get_address() { return m_address; }
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 protected:
 	int m_address;

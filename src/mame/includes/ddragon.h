@@ -1,10 +1,12 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Philip Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
 /*************************************************************************
 
     Double Dragon & Double Dragon II (but also China Gate)
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
 class ddragon_state : public driver_device
@@ -27,7 +29,8 @@ public:
 		m_adpcm2(*this, "adpcm2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_rambase;
@@ -77,6 +80,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 
 	int scanline_to_vcount(int scanline);

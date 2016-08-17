@@ -9,17 +9,16 @@
 #define NL_PARSER_H_
 
 #include "nl_setup.h"
-#include "nl_util.h"
 #include "plib/pparser.h"
 
 namespace netlist
 {
-	class parser_t : public ptokenizer
+	class parser_t : public plib::ptokenizer
 	{
 		P_PREVENT_COPYING(parser_t)
 	public:
-		parser_t(pistream &strm, setup_t &setup)
-		: ptokenizer(strm), m_setup(setup), m_buf(NULL) {}
+		parser_t(plib::pistream &strm, setup_t &setup)
+		: plib::ptokenizer(strm), m_setup(setup), m_buf(nullptr) {}
 
 		bool parse(const pstring nlname = "");
 
@@ -28,6 +27,7 @@ namespace netlist
 		void net_alias();
 		void dippins();
 		void netdev_param();
+		void netdev_hint();
 		void net_c();
 		void frontier();
 		void device(const pstring &dev_type);
@@ -42,7 +42,7 @@ namespace netlist
 		/* for debugging messages */
 		netlist_t &netlist() { return m_setup.netlist(); }
 
-		virtual void verror(const pstring &msg, int line_num, const pstring &line);
+		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
 	private:
 
 		nl_double eval_param(const token_t tok);
@@ -55,6 +55,7 @@ namespace netlist
 		token_id_t m_tok_DIPPINS;
 		token_id_t m_tok_FRONTIER;
 		token_id_t m_tok_PARAM;
+		token_id_t m_tok_HINT;
 		token_id_t m_tok_NET_MODEL;
 		token_id_t m_tok_NETLIST_START;
 		token_id_t m_tok_NETLIST_END;

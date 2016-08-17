@@ -37,12 +37,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rx_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void rcv_complete();
-	virtual void tra_complete();
-	virtual void tra_callback();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void rcv_complete() override;
+	virtual void tra_complete() override;
+	virtual void tra_callback() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void set_fcr(UINT8 data) {}
 	virtual void push_tx(UINT8 data) {}
@@ -110,14 +110,14 @@ class ns16550_device : public ins8250_uart_device
 public:
 	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void rcv_complete();
-	virtual void tra_complete();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void set_fcr(UINT8 data);
-	virtual void push_tx(UINT8 data);
-	virtual UINT8 pop_rx();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void rcv_complete() override;
+	virtual void tra_complete() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void set_fcr(UINT8 data) override;
+	virtual void push_tx(UINT8 data) override;
+	virtual UINT8 pop_rx() override;
 private:
 	void set_timer() { m_timeout->adjust(attotime::from_hz((clock()*4*8)/(m_regs.dl*16))); }
 	int m_rintlvl;
@@ -137,7 +137,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write) { ((offset & 8) ? m_chan1 : m_chan0)->ins8250_w(space, offset & 7, data, mem_mask); }
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	ns16550_device *m_chan0;

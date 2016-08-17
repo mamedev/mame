@@ -3,6 +3,9 @@
 #ifndef __GENERIC_SLOT_H
 #define __GENERIC_SLOT_H
 
+#include "softlist_dev.h"
+
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -31,6 +34,9 @@ public:
 	UINT8* get_rom_base()  { return m_rom; }
 	UINT32 get_rom_size() { return m_rom_size; }
 
+	UINT8* get_region_base()  { if (m_region.found()) return m_region->base(); return nullptr; }
+	UINT32 get_region_size() { if (m_region.found()) return m_region->bytes(); return 0; }
+
 	UINT8* get_ram_base() { return &m_ram[0]; }
 	UINT32 get_ram_size() { return m_ram.size(); }
 
@@ -40,6 +46,9 @@ public:
 	UINT8  *m_rom;
 	UINT32  m_rom_size;
 	dynamic_buffer m_ram;
+
+	// this replaces m_rom for non-user configurable carts!
+	optional_memory_region  m_region;
 };
 
 
@@ -102,29 +111,28 @@ public:
 	void set_endian(endianness_t end) { m_endianness = end; }
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	UINT32 common_get_size(const char *region);
 	void common_load_rom(UINT8 *ROM, UINT32 len, const char *region);
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-	virtual const char *image_interface() const { return m_interface; }
-	virtual const char *file_extensions() const { return m_extensions; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const char *image_interface() const override { return m_interface; }
+	virtual const char *file_extensions() const override { return m_extensions; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -137,9 +145,27 @@ public:
 	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
 	virtual void ram_alloc(UINT32 size)  { if (m_cart) m_cart->ram_alloc(size); }
 
-	UINT8* get_rom_base()  { if (m_cart) return m_cart->get_rom_base(); return NULL; }
-	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return NULL; }
-	UINT32 get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
+	UINT8* get_rom_base()  {
+		if (m_cart)
+		{
+			if (!user_loadable())
+				return m_cart->get_region_base();
+			else
+				return m_cart->get_rom_base();
+		}
+		return nullptr;
+	}
+	UINT32 get_rom_size()   {
+		if (m_cart)
+		{
+			if (!user_loadable())
+				return m_cart->get_region_size();
+			else
+				return m_cart->get_rom_size();
+		}
+		return 0;
+	}
+	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return nullptr; }
 
 	void save_ram()   { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
@@ -167,10 +193,15 @@ extern const device_type GENERIC_SOCKET;
 
 #define MCFG_GENERIC_CARTSLOT_ADD(_tag, _slot_intf, _dev_intf) \
 	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false) \
 	MCFG_GENERIC_INTERFACE(_dev_intf)
 #define MCFG_GENERIC_SOCKET_ADD(_tag, _slot_intf, _dev_intf) \
 	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false) \
+	MCFG_GENERIC_INTERFACE(_dev_intf)
+
+#define MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT(_tag, _slot_intf, _dev_intf, _default) \
+	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false) \
 	MCFG_GENERIC_INTERFACE(_dev_intf)
 #endif

@@ -26,57 +26,25 @@
 
 #include "nl_base.h"
 
-#define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)                      \
-		NET_REGISTER_DEV(TTL_7448, _name)                                               \
-		NET_CONNECT(_name, A, _A0)                                                  \
-		NET_CONNECT(_name, B, _A1)                                                  \
-		NET_CONNECT(_name, C, _A2)                                                  \
-		NET_CONNECT(_name, D, _A3)                                                  \
-		NET_CONNECT(_name, LTQ, _LTQ)                                               \
-		NET_CONNECT(_name, BIQ, _BIQ)                                               \
-		NET_CONNECT(_name, RBIQ, _RBIQ)
-
-#define TTL_7448_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_7448_DIP, _name)
-
 /*
  * FIXME: Using truthtable is a lot slower than the explicit device
+ *        in breakout. Performance drops by 20%. This can be fixed by
+ *        setting param USE_DEACTIVATE for the device.
  */
-#if (0 && USE_TRUTHTABLE)
-#include "nld_truthtable.h"
 
-NETLIB_TRUTHTABLE(7448, 7, 7, 0);
-#else
+#define USE_TRUTHTABLE_7448 (0)
 
-NETLIB_NAMESPACE_DEVICES_START()
+#define TTL_7448(name, cA0, cA1, cA2, cA3, cLTQ, cBIQ, cRBIQ)                   \
+		NET_REGISTER_DEV(TTL_7448, name)                                        \
+		NET_CONNECT(name, A, cA0)                                               \
+		NET_CONNECT(name, B, cA1)                                               \
+		NET_CONNECT(name, C, cA2)                                               \
+		NET_CONNECT(name, D, cA3)                                               \
+		NET_CONNECT(name, LTQ, cLTQ)                                            \
+		NET_CONNECT(name, BIQ, cBIQ)                                            \
+		NET_CONNECT(name, RBIQ, cRBIQ)
 
-NETLIB_SUBDEVICE(7448_sub,
-	ATTR_HOT void update_outputs(UINT8 v);
-	static const UINT8 tab7448[16][7];
-
-	logic_input_t m_A;
-	logic_input_t m_B;
-	logic_input_t m_C;
-	logic_input_t m_D;
-	logic_input_t m_RBIQ;
-
-	UINT8 m_state;
-
-	logic_output_t m_Q[7];  /* a .. g */
-
-);
-
-NETLIB_DEVICE(7448,
-public:
-	NETLIB_NAME(7448_sub) sub;
-
-	logic_input_t m_LTQ;
-	logic_input_t m_BIQ;
-);
-#endif
-
-NETLIB_DEVICE_DERIVED_PURE(7448_dip, 7448);
-
-NETLIB_NAMESPACE_DEVICES_END()
+#define TTL_7448_DIP(name)                                                      \
+		NET_REGISTER_DEV(TTL_7448_DIP, name)
 
 #endif /* NLD_7448_H_ */

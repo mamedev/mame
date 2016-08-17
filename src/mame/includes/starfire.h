@@ -29,12 +29,14 @@ public:
 		m_starfire_colorram(*this, "colorram"),
 		m_starfire_videoram(*this, "videoram"),
 		m_samples(*this, "samples"),
+		m_nmi(*this, "NMI"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
 	required_shared_ptr<UINT8> m_starfire_colorram;
 	required_shared_ptr<UINT8> m_starfire_videoram;
 	optional_device<samples_device> m_samples;
+	optional_ioport m_nmi;
 
 	UINT8 m_prev_sound;
 	UINT8 m_fireone_select;
@@ -61,7 +63,7 @@ public:
 	DECLARE_READ8_MEMBER(starfire_videoram_r);
 	DECLARE_DRIVER_INIT(starfire);
 	DECLARE_DRIVER_INIT(fireone);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);
 	INTERRUPT_GEN_MEMBER(vblank_int);

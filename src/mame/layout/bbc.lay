@@ -1,0 +1,84 @@
+<!-- Basic display of keyboard LEDs for the BBC Micro series -->
+
+<mamelayout version="2">
+
+	<element name="red_led">
+		<disk>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="label_cassette">
+		<text string="cassette">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_motor">
+		<text string="motor">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_caps">
+		<text string="caps">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_shift">
+		<text string="shift">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_lock">
+		<text string="lock">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Keyboard LED's">
+		<bounds left="0" right="400" top="0" bottom="330" />
+		<screen index="0">
+			<bounds left="0" right="400" top="0" bottom="300" />
+		</screen>
+
+		<bezel name="label_cassette" element="label_cassette">
+			<bounds x="10" y="305" width="24" height="7" />
+		</bezel>
+
+		<bezel name="label_motor" element="label_motor">
+			<bounds x="10" y="312" width="24" height="7" />
+		</bezel>
+
+		<bezel name="motor_led" element="red_led">
+			<bounds x="20" y="320" width="5" height="5" />
+		</bezel>
+
+		<bezel name="label_caps" element="label_caps">
+			<bounds x="40" y="305" width="24" height="7" />
+		</bezel>
+
+		<bezel name="label_lock" element="label_lock">
+			<bounds x="40" y="312" width="24" height="7" />
+		</bezel>
+
+		<bezel name="capslock_led" element="red_led">
+			<bounds x="50" y="320" width="5" height="5" />
+		</bezel>
+
+		<bezel name="label_shift" element="label_shift">
+			<bounds x="70" y="305" width="24" height="7" />
+		</bezel>
+
+		<bezel name="label_lock" element="label_lock">
+			<bounds x="70" y="312" width="24" height="7" />
+		</bezel>
+
+		<bezel name="shiftlock_led" element="red_led">
+			<bounds x="80" y="320" width="5" height="5" />
+		</bezel>
+	</view>
+
+</mamelayout>

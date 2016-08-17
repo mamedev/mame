@@ -43,29 +43,26 @@
 
 ***************************************************************************/
 
-#ifndef __RENDER_H__
-#define __RENDER_H__
+#ifndef MAME_EMU_RENDER_H
+#define MAME_EMU_RENDER_H
 
 //#include "osdepend.h"
 
-#include <math.h>
+#include "emu.h"
+//#include "bitmap.h"
+//#include "screen.h"
 
+#include <math.h>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-// texture formats
-enum texture_format
-{
-	TEXFORMAT_UNDEFINED = 0,                            // require a format to be specified
-	TEXFORMAT_PALETTE16,                                // 16bpp palettized, alpha ignored
-	TEXFORMAT_PALETTEA16,                               // 16bpp palettized, alpha respected
-	TEXFORMAT_RGB32,                                    // 32bpp 8-8-8 RGB
-	TEXFORMAT_ARGB32,                                   // 32bpp 8-8-8-8 ARGB
-	TEXFORMAT_YUY16                                     // 16bpp 8-8 Y/Cb, Y/Cr in sequence
-};
 
 // blending modes
 enum
@@ -73,7 +70,9 @@ enum
 	BLENDMODE_NONE = 0,                                 // no blending
 	BLENDMODE_ALPHA,                                    // standard alpha blend
 	BLENDMODE_RGB_MULTIPLY,                             // apply source alpha to source pix, then multiply RGB values
-	BLENDMODE_ADD                                       // apply source alpha to source pix, then add to destination
+	BLENDMODE_ADD,                                      // apply source alpha to source pix, then add to destination
+
+	BLENDMODE_COUNT
 };
 
 
@@ -82,6 +81,13 @@ const UINT8 RENDER_CREATE_NO_ART        = 0x01;         // ignore any views that
 const UINT8 RENDER_CREATE_SINGLE_FILE   = 0x02;         // only load views from the file specified
 const UINT8 RENDER_CREATE_HIDDEN        = 0x04;         // don't make this target visible
 
+// render scaling modes
+enum
+{
+	SCALE_FRACTIONAL = 0,                               // compute fractional scaling factors for both axes
+	SCALE_FRACTIONAL_X,                                 // compute fractional scaling factor for x-axis, and integer factor for y-axis
+	SCALE_INTEGER                                       // compute integer scaling factors for both axes, based on target dimensions
+};
 
 // flags for primitives
 const int PRIMFLAG_TEXORIENT_SHIFT = 0;
@@ -95,7 +101,6 @@ const UINT32 PRIMFLAG_BLENDMODE_MASK = 15 << PRIMFLAG_BLENDMODE_SHIFT;
 
 const int PRIMFLAG_ANTIALIAS_SHIFT = 12;
 const UINT32 PRIMFLAG_ANTIALIAS_MASK = 1 << PRIMFLAG_ANTIALIAS_SHIFT;
-
 const int PRIMFLAG_SCREENTEX_SHIFT = 13;
 const UINT32 PRIMFLAG_SCREENTEX_MASK = 1 << PRIMFLAG_SCREENTEX_SHIFT;
 
@@ -115,6 +120,9 @@ const int PRIMFLAG_TYPE_SHIFT = 19;
 const UINT32 PRIMFLAG_TYPE_MASK = 3 << PRIMFLAG_TYPE_SHIFT;
 const UINT32 PRIMFLAG_TYPE_LINE = 0 << PRIMFLAG_TYPE_SHIFT;
 const UINT32 PRIMFLAG_TYPE_QUAD = 1 << PRIMFLAG_TYPE_SHIFT;
+
+const int PRIMFLAG_PACKABLE_SHIFT = 21;
+const UINT32 PRIMFLAG_PACKABLE = 1 << PRIMFLAG_PACKABLE_SHIFT;
 
 //**************************************************************************
 //  MACROS
@@ -235,7 +243,7 @@ class render_screen_list
 	public:
 		// construction/destruction
 		item(screen_device &screen)
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_screen(screen) { }
 
 		// state
@@ -255,7 +263,7 @@ public:
 	int contains(screen_device &screen) const
 	{
 		int count = 0;
-		for (item *curitem = m_list.first(); curitem != NULL; curitem = curitem->m_next)
+		for (item *curitem = m_list.first(); curitem != nullptr; curitem = curitem->m_next)
 			if (&curitem->m_screen == &screen) count++;
 		return count;
 	}
@@ -316,6 +324,14 @@ class render_primitive
 	friend class simple_list<render_primitive>;
 
 public:
+	render_primitive():
+		type(),
+		flags(0),
+		width(0),
+		container(nullptr),
+		m_next(nullptr)
+	{}
+
 	// render primitive types
 	enum primitive_type
 	{
@@ -326,6 +342,9 @@ public:
 
 	// getters
 	render_primitive *next() const { return m_next; }
+	bool packable(const INT32 pack_size) const { return (flags & PRIMFLAG_PACKABLE) && texture.base != nullptr && texture.width <= pack_size && texture.height <= pack_size; }
+	float get_quad_width() const { return bounds.x1 - bounds.x0; }
+	float get_quad_height() const { return bounds.y1 - bounds.y0; }
 
 	// reset to prepare for re-use
 	void reset();
@@ -361,9 +380,14 @@ public:
 	// getters
 	render_primitive *first() const { return m_primlist.first(); }
 
+	// range iterators
+	using auto_iterator = simple_list<render_primitive>::auto_iterator;
+	auto_iterator begin() const { return m_primlist.begin(); }
+	auto_iterator end() const { return m_primlist.end(); }
+
 	// lock management
-	void acquire_lock() { osd_lock_acquire(m_lock); }
-	void release_lock() { osd_lock_release(m_lock); }
+	void acquire_lock() { m_lock.lock(); }
+	void release_lock() { m_lock.unlock(); }
 
 	// reference management
 	void add_reference(void *refptr);
@@ -392,7 +416,7 @@ private:
 	fixed_allocator<render_primitive> m_primitive_allocator;// allocator for primitives
 	fixed_allocator<reference> m_reference_allocator;       // allocator for references
 
-	osd_lock *          m_lock;                             // lock to protect list accesses
+	std::recursive_mutex     m_lock;                             // lock to protect list accesses
 };
 
 
@@ -412,7 +436,7 @@ class render_texture
 	~render_texture();
 
 	// reset before re-use
-	void reset(render_manager &manager, texture_scaler_func scaler = NULL, void *param = NULL);
+	void reset(render_manager &manager, texture_scaler_func scaler = nullptr, void *param = nullptr);
 
 	// release resources when freed
 	void release();
@@ -433,7 +457,7 @@ public:
 
 private:
 	// internal helpers
-	void get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist);
+	void get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags = 0);
 	const rgb_t *get_adjusted_palette(render_container &container);
 
 	static const int MAX_TEXTURE_SCALES = 16;
@@ -472,7 +496,7 @@ class render_container
 	friend class render_target;
 
 	// construction/destruction
-	render_container(render_manager &manager, screen_device *screen = NULL);
+	render_container(render_manager &manager, screen_device *screen = nullptr);
 	~render_container();
 
 public:
@@ -518,13 +542,13 @@ public:
 	void add_quad(float x0, float y0, float x1, float y1, rgb_t argb, render_texture *texture, UINT32 flags);
 	void add_char(float x0, float y0, float height, float aspect, rgb_t argb, render_font &font, UINT16 ch);
 	void add_point(float x0, float y0, float diameter, rgb_t argb, UINT32 flags) { add_line(x0, y0, x0, y0, diameter, argb, flags); }
-	void add_rect(float x0, float y0, float x1, float y1, rgb_t argb, UINT32 flags) { add_quad(x0, y0, x1, y1, argb, NULL, flags); }
+	void add_rect(float x0, float y0, float x1, float y1, rgb_t argb, UINT32 flags) { add_quad(x0, y0, x1, y1, argb, nullptr, flags); }
 
 	// brightness/contrast/gamma helpers
 	bool has_brightness_contrast_gamma_changes() const { return (m_user.m_brightness != 1.0f || m_user.m_contrast != 1.0f || m_user.m_gamma != 1.0f); }
 	UINT8 apply_brightness_contrast_gamma(UINT8 value);
 	float apply_brightness_contrast_gamma_fp(float value);
-	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = NULL);
+	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = nullptr);
 
 private:
 	// an item describes a high level primitive that is added to a container
@@ -534,6 +558,8 @@ private:
 		friend class simple_list<item>;
 
 	public:
+		item() : m_next(nullptr), m_type(0), m_flags(0), m_internal(0), m_width(0), m_texture(nullptr) { }
+
 		// getters
 		item *next() const { return m_next; }
 		UINT8 type() const { return m_type; }
@@ -560,7 +586,7 @@ private:
 	static void overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 	// internal helpers
-	item *first_item() const { return m_itemlist.first(); }
+	const simple_list<item> &items() const { return m_itemlist; }
 	item &add_generic(UINT8 type, float x0, float y0, float x1, float y1, rgb_t argb);
 	void recompute_lookups();
 	void update_palette();
@@ -574,13 +600,471 @@ private:
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
-	auto_pointer<palette_client> m_palclient;       // client to the screen palette
+	std::unique_ptr<palette_client> m_palclient;       // client to the screen palette
 	std::vector<rgb_t>           m_bcglookup;            // copy of screen palette with bcg adjustment
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 };
 
 
-#include "rendlay.h"
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+enum item_layer
+{
+	ITEM_LAYER_FIRST = 0,
+	ITEM_LAYER_BACKDROP = ITEM_LAYER_FIRST,
+	ITEM_LAYER_SCREEN,
+	ITEM_LAYER_OVERLAY,
+	ITEM_LAYER_BEZEL,
+	ITEM_LAYER_CPANEL,
+	ITEM_LAYER_MARQUEE,
+	ITEM_LAYER_MAX
+};
+DECLARE_ENUM_OPERATORS(item_layer)
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+
+// ======================> layout_element
+
+// a layout_element is a single named element, which may have multiple components
+class layout_element
+{
+	friend class simple_list<layout_element>;
+
+public:
+	// construction/destruction
+	layout_element(running_machine &machine, xml_data_node &elemnode, const char *dirname);
+	virtual ~layout_element();
+
+	// getters
+	layout_element *next() const { return m_next; }
+	const char *name() const { return m_name.c_str(); }
+	running_machine &machine() const { return m_machine; }
+	int default_state() const { return m_defstate; }
+	int maxstate() const { return m_maxstate; }
+	render_texture *state_texture(int state);
+
+private:
+	// a component represents an image, rectangle, or disk in an element
+	class component
+	{
+	public:
+		typedef std::unique_ptr<component> ptr;
+
+		// construction/destruction
+		component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+		virtual ~component() = default;
+
+		// setup
+		void normalize_bounds(float xoffs, float yoffs, float xscale, float yscale);
+
+		// getters
+		int state() const { return m_state; }
+		virtual int maxstate() const { return m_state; }
+		const render_bounds &bounds() const { return m_bounds; }
+		const render_color &color() const { return m_color; }
+
+		// operations
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
+
+	protected:
+		// helpers
+		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align);
+		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
+		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
+		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
+		void draw_segment_vertical(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, rgb_t color);
+		void draw_segment_diagonal_1(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		void draw_segment_diagonal_2(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		void draw_segment_decimal(bitmap_argb32 &dest, int midx, int midy, int width, rgb_t color);
+		void draw_segment_comma(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		void apply_skew(bitmap_argb32 &dest, int skewwidth);
+
+	private:
+		// internal state
+		int                 m_state;                    // state where this component is visible (-1 means all states)
+		render_bounds       m_bounds;                   // bounds of the element
+		render_color        m_color;                    // color of the element
+	};
+
+	// image
+	class image_component : public component
+	{
+	public:
+		// construction/destruction
+		image_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal helpers
+		void load_bitmap();
+
+		// internal state
+		bitmap_argb32       m_bitmap;                   // source bitmap for images
+		std::string         m_dirname;                  // directory name of image file (for lazy loading)
+		std::unique_ptr<emu_file> m_file;               // file object for reading image/alpha files
+		std::string         m_imagefile;                // name of the image file (for lazy loading)
+		std::string         m_alphafile;                // name of the alpha file (for lazy loading)
+		bool                m_hasalpha;                 // is there any alpha component present?
+	};
+
+	// rectangle
+	class rect_component : public component
+	{
+	public:
+		// construction/destruction
+		rect_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// ellipse
+	class disk_component : public component
+	{
+	public:
+		// construction/destruction
+		disk_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// text string
+	class text_component : public component
+	{
+	public:
+		// construction/destruction
+		text_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal state
+		std::string         m_string;                   // string for text components
+		int                 m_textalign;                // text alignment to box
+	};
+
+	// 7-segment LCD
+	class led7seg_component : public component
+	{
+	public:
+		// construction/destruction
+		led7seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 255; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 8-segment fluorescent (Gottlieb System 1)
+	class led8seg_gts1_component : public component
+	{
+	public:
+		// construction/destruction
+		led8seg_gts1_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 255; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 14-segment LCD
+	class led14seg_component : public component
+	{
+	public:
+		// construction/destruction
+		led14seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 16383; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 16-segment LCD
+	class led16seg_component : public component
+	{
+	public:
+		// construction/destruction
+		led16seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 65535; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 14-segment LCD with semicolon (2 extra segments)
+	class led14segsc_component : public component
+	{
+	public:
+		// construction/destruction
+		led14segsc_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 65535; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 16-segment LCD with semicolon (2 extra segments)
+	class led16segsc_component : public component
+	{
+	public:
+		// construction/destruction
+		led16segsc_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 262143; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// row of dots for a dotmatrix
+	class dotmatrix_component : public component
+	{
+	public:
+		// construction/destruction
+		dotmatrix_component(int dots, running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return (1 << m_dots) - 1; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal state
+		int                 m_dots;
+	};
+
+	// simple counter
+	class simplecounter_component : public component
+	{
+	public:
+		// construction/destruction
+		simplecounter_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return m_maxstate; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal state
+		int                 m_digits;                   // number of digits for simple counters
+		int                 m_textalign;                // text alignment to box
+		int                 m_maxstate;
+	};
+
+	// fruit machine reel
+	class reel_component : public component
+	{
+		static constexpr unsigned MAX_BITMAPS = 32;
+
+	public:
+		// construction/destruction
+		reel_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 65535; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal helpers
+		void draw_beltreel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
+		void load_reel_bitmap(int number);
+
+		// internal state
+		bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
+		std::string         m_dirname;                  // directory name of image file (for lazy loading)
+		std::unique_ptr<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
+		std::string         m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
+		std::string         m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
+		bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?
+
+		// basically made up of multiple text strings / gfx
+		int                 m_numstops;
+		std::string         m_stopnames[MAX_BITMAPS];
+		int                 m_stateoffset;
+		int                 m_reelreversed;
+		int                 m_numsymbolsvisible;
+		int                 m_beltreel;
+	};
+
+	// a texture encapsulates a texture for a given element in a given state
+	class texture
+	{
+	public:
+		texture();
+		texture(texture const &that) = delete;
+		texture(texture &&that);
+
+		~texture();
+
+		texture &operator=(texture const &that) = delete;
+		texture &operator=(texture &&that);
+
+		layout_element *    m_element;      // pointer back to the element
+		render_texture *    m_texture;      // texture for this state
+		int                 m_state;        // associated state number
+	};
+
+	typedef component::ptr (*make_component_func)(running_machine &machine, xml_data_node &compnode, const char *dirname);
+	typedef std::map<std::string, make_component_func> make_component_map;
+
+	// internal helpers
+	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
+	template <typename T> static component::ptr make_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+	template <int D> static component::ptr make_dotmatrix_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	static make_component_map const s_make_component; // maps component XML names to creator functions
+
+	// internal state
+	layout_element *            m_next;         // link to next element
+	running_machine &           m_machine;      // reference to the owning machine
+	std::string                 m_name;         // name of this element
+	std::vector<component::ptr> m_complist;     // list of components
+	int                         m_defstate;     // default state of this element
+	int                         m_maxstate;     // maximum state value for all components
+	std::vector<texture>        m_elemtex;      // array of element textures used for managing the scaled bitmaps
+};
+
+
+// ======================> layout_view
+
+// a layout_view encapsulates a named list of items
+class layout_view
+{
+	friend class simple_list<layout_view>;
+
+public:
+	// an item is a single backdrop, screen, overlay, bezel, cpanel, or marquee item
+	class item
+	{
+		friend class layout_view;
+		friend class simple_list<item>;
+
+	public:
+		// construction/destruction
+		item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist);
+		virtual ~item();
+
+		// getters
+		item *next() const { return m_next; }
+		layout_element *element() const { return m_element; }
+		screen_device *screen() { return m_screen; }
+		const render_bounds &bounds() const { return m_bounds; }
+		const render_color &color() const { return m_color; }
+		int orientation() const { return m_orientation; }
+		render_container *screen_container(running_machine &machine) const;
+		bool has_input() const { return !m_input_tag.empty(); }
+		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
+
+		// fetch state based on configured source
+		int state() const;
+
+		// resolve tags, if any
+		void resolve_tags();
+
+	private:
+		// internal state
+		item *              m_next;             // link to next item
+		layout_element *    m_element;          // pointer to the associated element (non-screens only)
+		std::string         m_output_name;      // name of this item
+		std::string         m_input_tag;        // input tag of this item
+		ioport_port *       m_input_port;       // input port of this item
+		ioport_value        m_input_mask;       // input mask of this item
+		screen_device *     m_screen;           // pointer to screen
+		int                 m_orientation;      // orientation of this item
+		render_bounds       m_bounds;           // bounds of the item
+		render_bounds       m_rawbounds;        // raw (original) bounds of the item
+		render_color        m_color;            // color of the item
+	};
+
+	// construction/destruction
+	layout_view(running_machine &machine, xml_data_node &viewnode, simple_list<layout_element> &elemlist);
+	virtual ~layout_view();
+
+	// getters
+	layout_view *next() const { return m_next; }
+	const simple_list<item> &items(item_layer layer) const;
+	const char *name() const { return m_name.c_str(); }
+	const render_bounds &bounds() const { return m_bounds; }
+	const render_bounds &screen_bounds() const { return m_scrbounds; }
+	const render_screen_list &screens() const { return m_screens; }
+	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
+
+	//
+	bool has_art() const { return (m_backdrop_list.count() + m_overlay_list.count() + m_bezel_list.count() + m_cpanel_list.count() + m_marquee_list.count() != 0); }
+	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && m_screens.count() != 0) ? m_scraspect : m_aspect; }
+
+	// operations
+	void recompute(render_layer_config layerconfig);
+
+	// resolve tags, if any
+	void resolve_tags();
+
+private:
+	// internal state
+	layout_view *       m_next;             // pointer to next layout in the list
+	std::string         m_name;             // name of the layout
+	float               m_aspect;           // X/Y of the layout
+	float               m_scraspect;        // X/Y of the screen areas
+	render_screen_list  m_screens;          // list of active screens
+	render_bounds       m_bounds;           // computed bounds of the view
+	render_bounds       m_scrbounds;        // computed bounds of the screens within the view
+	render_bounds       m_expbounds;        // explicit bounds of the view
+	bool                m_layenabled[ITEM_LAYER_MAX]; // is this layer enabled?
+	simple_list<item>   m_backdrop_list;    // list of backdrop items
+	simple_list<item>   m_screen_list;      // list of screen items
+	simple_list<item>   m_overlay_list;     // list of overlay items
+	simple_list<item>   m_bezel_list;       // list of bezel items
+	simple_list<item>   m_cpanel_list;      // list of marquee items
+	simple_list<item>   m_marquee_list;     // list of marquee items
+};
+
+
+// ======================> layout_file
+
+// a layout_file consists of a list of elements and a list of views
+class layout_file
+{
+	friend class simple_list<layout_file>;
+
+public:
+	// construction/destruction
+	layout_file(running_machine &machine, xml_data_node &rootnode, const char *dirname);
+	virtual ~layout_file();
+
+	// getters
+	layout_file *next() const { return m_next; }
+	const simple_list<layout_element> &elements() const { return m_elemlist; }
+	const simple_list<layout_view> &views() const { return m_viewlist; }
+
+private:
+	// internal state
+	layout_file *       m_next;             // pointer to the next file in the list
+	simple_list<layout_element> m_elemlist; // list of shared layout elements
+	simple_list<layout_view> m_viewlist;    // list of views
+};
 
 // ======================> render_target
 
@@ -592,7 +1076,7 @@ class render_target
 	friend class render_manager;
 
 	// construction/destruction
-	render_target(render_manager &manager, const char *layoutfile = NULL, UINT32 flags = 0);
+	render_target(render_manager &manager, const internal_layout *layoutfile = nullptr, UINT32 flags = 0);
 	~render_target();
 
 public:
@@ -602,9 +1086,11 @@ public:
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
+	int scale_mode() const { return m_scale_mode; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }
 	render_layer_config layer_config() const { return m_layerconfig; }
+	layout_view *current_view() const { return m_curview; }
 	int view() const { return view_index(*m_curview); }
 	bool hidden() const { return ((m_flags & RENDER_CREATE_HIDDEN) != 0); }
 	bool is_ui_target() const;
@@ -616,6 +1102,9 @@ public:
 	void set_orientation(int orientation) { m_orientation = orientation; }
 	void set_view(int viewindex);
 	void set_max_texture_size(int maxwidth, int maxheight);
+	void set_transform_container(bool transform_container) { m_transform_container = transform_container; }
+	void set_keepaspect(bool keepaspect) { m_keepaspect = keepaspect; }
+	void set_scale_mode(bool scale_mode) { m_scale_mode = scale_mode; }
 
 	// layer config getters
 	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }
@@ -659,7 +1148,7 @@ public:
 	// debug containers
 	render_container *debug_alloc();
 	void debug_free(render_container &container);
-	void debug_top(render_container &container);
+	void debug_append(render_container &container);
 
 	// resolve tag lookups
 	void resolve_tags();
@@ -667,9 +1156,10 @@ public:
 private:
 	// internal helpers
 	void update_layer_config();
-	void load_layout_files(const char *layoutfile, bool singlefile);
+	void load_layout_files(const internal_layout *layoutfile, bool singlefile);
 	bool load_layout_file(const char *dirname, const char *filename);
-	void add_container_primitives(render_primitive_list &list, const object_transform &xform, render_container &container, int blendmode);
+	bool load_layout_file(const char *dirname, const internal_layout *layout_data);
+	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
 	bool map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask);
 
@@ -702,7 +1192,12 @@ private:
 	INT32                   m_width;                    // width in pixels
 	INT32                   m_height;                   // height in pixels
 	render_bounds           m_bounds;                   // bounds of the target
+	bool                    m_keepaspect;               // constrain aspect ratio
+	bool                    m_int_overscan;             // allow overscan on integer scaled targets
 	float                   m_pixel_aspect;             // aspect ratio of individual pixels
+	int                     m_scale_mode;               // type of scale to apply
+	int                     m_int_scale_x;              // horizontal integer scale factor
+	int                     m_int_scale_y;              // vertical integer scale factor
 	float                   m_max_refresh;              // maximum refresh rate, 0 or if none
 	int                     m_orientation;              // orientation
 	render_layer_config     m_layerconfig;              // layer configuration
@@ -714,6 +1209,8 @@ private:
 	simple_list<render_container> m_debug_containers;   // list of debug containers
 	INT32                   m_clear_extent_count;       // number of clear extents
 	INT32                   m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
+	bool                    m_transform_container;      // determines whether the screen container is transformed by the core renderer,
+														// otherwise the respective render API will handle the transformation (scale, offset)
 
 	static render_screen_list s_empty_screen_list;
 };
@@ -739,25 +1236,26 @@ public:
 	float max_update_rate() const;
 
 	// targets
-	render_target *target_alloc(const char *layoutfile = NULL, UINT32 flags = 0);
+	render_target *target_alloc(const internal_layout *layoutfile = nullptr, UINT32 flags = 0);
 	void target_free(render_target *target);
+	const simple_list<render_target> &targets() const { return m_targetlist; }
 	render_target *first_target() const { return m_targetlist.first(); }
 	render_target *target_by_index(int index) const;
 
 	// UI targets
-	render_target &ui_target() const { assert(m_ui_target != NULL); return *m_ui_target; }
+	render_target &ui_target() const { assert(m_ui_target != nullptr); return *m_ui_target; }
 	void set_ui_target(render_target &target) { m_ui_target = &target; }
-	float ui_aspect(render_container *rc = NULL);
+	float ui_aspect(render_container *rc = nullptr);
 
 	// UI containers
-	render_container &ui_container() const { assert(m_ui_container != NULL); return *m_ui_container; }
+	render_container &ui_container() const { assert(m_ui_container != nullptr); return *m_ui_container; }
 
 	// textures
-	render_texture *texture_alloc(texture_scaler_func scaler = NULL, void *param = NULL);
+	render_texture *texture_alloc(texture_scaler_func scaler = nullptr, void *param = nullptr);
 	void texture_free(render_texture *texture);
 
 	// fonts
-	render_font *font_alloc(const char *filename = NULL);
+	render_font *font_alloc(const char *filename = nullptr);
 	void font_free(render_font *font);
 
 	// reference tracking
@@ -768,12 +1266,12 @@ public:
 
 private:
 	// containers
-	render_container *container_alloc(screen_device *screen = NULL);
+	render_container *container_alloc(screen_device *screen = nullptr);
 	void container_free(render_container *container);
 
 	// config callbacks
-	void config_load(int config_type, xml_data_node *parentnode);
-	void config_save(int config_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
 	// internal state
 	running_machine &               m_machine;          // reference back to the machine
@@ -791,5 +1289,4 @@ private:
 	simple_list<render_container>   m_screen_container_list; // list of containers for the screen
 };
 
-
-#endif  // __RENDER_H__
+#endif  // MAME_EMU_RENDER_H

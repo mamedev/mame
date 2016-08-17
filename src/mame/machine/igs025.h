@@ -8,7 +8,7 @@
 typedef device_delegate<void (void)> igs025_execute_external;
 
 #define MCFG_IGS025_SET_EXTERNAL_EXECUTE( _class, _method) \
-	igs025_device::set_external_cb(*device, igs025_execute_external(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	igs025_device::set_external_cb(*device, igs025_execute_external(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 class igs025_device : public device_t
 {
@@ -31,10 +31,10 @@ public:
 
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 
 	UINT16        m_kb_prot_hold;

@@ -16,7 +16,8 @@ public:
 		m_k055555(*this, "k055555"),
 		m_ata(*this, "ata"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_turntable(*this, {"TT1", "TT2"})
 	{
 	}
 
@@ -60,9 +61,9 @@ public:
 	DECLARE_DRIVER_INIT(bmcompm2);
 	DECLARE_DRIVER_INIT(bmcorerm);
 	DECLARE_DRIVER_INIT(bmclubmx);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
@@ -75,4 +76,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	K056832_CB_MEMBER(tile_callback);
+	optional_ioport_array<2> m_turntable;
 };

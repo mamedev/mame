@@ -165,8 +165,8 @@ public:
 	void eop_w(int state);
 
 	// optional information overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// voice-specific registers
 	gus_voice m_voice[32];
@@ -195,11 +195,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
-	virtual void update_irq();
+	virtual void update_irq() override;
 
 private:
 	// internal state
@@ -295,19 +295,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 	// DMA overrides
-	virtual UINT8 dack_r(int line);
-	virtual void dack_w(int line,UINT8 data);
-	virtual void eop_w(int state);
+	virtual UINT8 dack_r(int line) override;
+	virtual void dack_w(int line,UINT8 data) override;
+	virtual void eop_w(int state) override;
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 private:
 	required_device<gf1_device> m_gf1;

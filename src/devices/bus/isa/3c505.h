@@ -136,23 +136,24 @@ public:
 	required_ioport m_irqdrq;
 	required_ioport m_romopts;
 
-	virtual void recv_cb(UINT8 *data, int length);
+	virtual void recv_cb(UINT8 *data, int length) override;
 
 protected:
 	virtual int tx_data(device_t *, const UINT8 *, int);
 	virtual int setfilter(device_t *, int);
 
 	const char *cpu_context();
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 	// device-level overrides
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	// device-level overrides
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	class data_buffer_fifo;
 
@@ -212,8 +213,6 @@ private:
 
 	void log_command();
 	void log_response();
-	void log_tx_data();
-	void log_rx_data();
 
 	void do_receive_command();
 	void set_command_pending(int onoff);

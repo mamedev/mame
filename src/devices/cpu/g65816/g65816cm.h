@@ -46,7 +46,7 @@
 #define MAKE_INT_8(A) (int8)((A)&0xff)
 #else
 #define int8   int
-INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
+static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #endif /* UCHAR_MAX == 0xff */
 
 #define MAKE_UINT_8(A) ((A)&0xff)
@@ -186,7 +186,7 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define CLK_W_S         2
 #define CLK_W_SIY       5
 
-#define CLK(A)          CLOCKS -= (m_cpu_type == CPU_TYPE_G65816 ? A : A*6)
+#define CLK(A)          CLOCKS -= A
 #define CLK_BUS(A)      CLOCKS -= A
 #define USE_ALL_CLKS()  CLOCKS = 0
 

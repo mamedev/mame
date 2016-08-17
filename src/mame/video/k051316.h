@@ -70,13 +70,13 @@ public:
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
 	void wraparound_enable(int status);
 
-	void mark_gfx_dirty(offs_t byteoffset) { m_gfx[0]->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
+	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
 	void mark_tmap_dirty() { m_tmap->mark_all_dirty(); }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
@@ -84,8 +84,7 @@ private:
 	UINT8 m_ctrlram[16];
 	tilemap_t *m_tmap;
 
-	UINT8 *m_zoom_rom;
-	UINT32 m_zoom_size;
+	optional_region_ptr<UINT8> m_zoom_rom;
 
 	int m_dx, m_dy;
 	int m_wrap;

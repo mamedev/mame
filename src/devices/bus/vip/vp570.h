@@ -30,15 +30,15 @@ public:
 	vp570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh);
+	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
+	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh) override;
 
 private:
 	optional_shared_ptr<UINT8> m_ram;

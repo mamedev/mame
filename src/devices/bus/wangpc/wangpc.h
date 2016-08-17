@@ -86,7 +86,7 @@ public:
 	wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_wangpcbus_slot(device_t &device, int sid);
@@ -162,7 +162,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	devcb_write_line   m_write_irq2;

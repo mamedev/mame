@@ -26,8 +26,8 @@ protected:
 	void handle_output(ioport_port *port, UINT8 id, UINT8 val);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// JVS device overrides
 	virtual const char *device_id();

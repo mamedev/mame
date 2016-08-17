@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "cpu/z80/tmpz84c011.h"
+#include "machine/gen_latch.h"
 #include "sound/dac.h"
 
 #define VRAM_MAX    2
@@ -30,6 +31,7 @@ public:
 		m_dac2(*this, "dac2"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_palette_ptr(*this, "paletteram")
 	{ }
 
@@ -38,6 +40,7 @@ public:
 	required_device<dac_device> m_dac2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	optional_shared_ptr<UINT8> m_palette_ptr; //shabdama doesn't use it at least for now
 
@@ -67,9 +70,9 @@ public:
 	int m_nb19010_busyctr;
 	int m_nb19010_busyflag;
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
-	UINT16 *m_videoram[VRAM_MAX];
-	UINT16 *m_videoworkram[VRAM_MAX];
-	UINT8 *m_clut[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_videoram[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_videoworkram[VRAM_MAX];
+	std::unique_ptr<UINT8[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer;
 
@@ -98,9 +101,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mscoutm_inputportsel_w);
 
 	DECLARE_DRIVER_INIT(nbmj9195);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(_1layer);
 	DECLARE_VIDEO_START(nb22090);
 
@@ -117,5 +120,5 @@ public:
 	void postload();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

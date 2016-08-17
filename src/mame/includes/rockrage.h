@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "sound/vlm5030.h"
 #include "video/k007342.h"
 #include "video/k007420.h"
@@ -22,6 +23,7 @@ public:
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_rombank(*this, "rombank") { }
 
 	/* devices */
@@ -32,6 +34,7 @@ public:
 	required_device<vlm5030_device> m_vlm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_memory_bank m_rombank;
@@ -44,8 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER(rockrage_vreg_w);
 	DECLARE_READ8_MEMBER(rockrage_VLM5030_busy_r);
 	DECLARE_WRITE8_MEMBER(rockrage_speech_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(rockrage);
 	UINT32 screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rockrage_interrupt);

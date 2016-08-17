@@ -11,6 +11,8 @@
 #ifndef __TAITOIO_H__
 #define __TAITOIO_H__
 
+#include "machine/watchdog.h"
+
 
 class tc0220ioc_device : public device_t
 {
@@ -33,13 +35,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	// internal state
 	UINT8      m_regs[8];
 	UINT8      m_port;
+
+	required_device<watchdog_timer_device> m_watchdog;
 
 	devcb_read8 m_read_0_cb;
 	devcb_read8 m_read_1_cb;
@@ -71,12 +76,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	// internal state
 	UINT8   m_regs[8];
+
+	required_device<watchdog_timer_device> m_watchdog;
 
 	devcb_read8 m_read_0_cb;
 	devcb_read8 m_read_1_cb;
@@ -109,12 +117,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	private:
 	// internal state
 	UINT8   m_regs[8];
+
+	required_device<watchdog_timer_device> m_watchdog;
 
 	devcb_read8 m_read_0_cb;
 	devcb_read8 m_read_1_cb;

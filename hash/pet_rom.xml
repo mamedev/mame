@@ -412,4 +412,17 @@
 		</part>
 	</software>
 
+	<software name="monjana1">
+		<description>MONJANA/1</description>
+		<year>1980</year>
+		<publisher>Elcomp Publishing</publisher>
+		<info name="usage" value="SYS38000"/>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="mon 697b.ud3" size="0x800" crc="4b34723a" sha1="b9b27a989e2ac059d84a23a64345e75dbcd5fa14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

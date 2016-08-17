@@ -17,14 +17,14 @@ class naslite_format : public upd765_format {
 public:
 	naslite_format();
 
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 protected:
 	static const format formats[];
 
-	virtual void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors, int track, int head) const;
+	virtual void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors, int track, int head) const override;
 };
 
 extern const floppy_format_type FLOPPY_NASLITE_FORMAT;

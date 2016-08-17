@@ -48,7 +48,7 @@ Custom Chips:                       Final Lap   Assault     LuckyWld    System21
 General Support
 ---------------
 C65  - This is the I/O Microcontroller, handles all input/output devices. 63705 uC, CPU4 in Namco System2.
-C137 - Takes System clock and generates all sub-system clocks, doesnt need emulation, not accessed via CPU
+C137 - Takes System clock and generates all sub-system clocks, doesn't need emulation, not accessed via CPU
 C139 - Serial Interface Controller
 C148 - Does some Memory Decode, Interrupt Handling, 3 bit PIO port, Bus Controller
 C149 - Does decoding of mouse/trackball input streams for the I/O Controller. (Offset Square wave)
@@ -69,7 +69,7 @@ These two devices take the pixel streams from the tilefield generator and the as
 and combine them to form an RGB data stream that is fed to the monitor.
 
 C156 - Pixel stream combiner
-Takes tile field & graphics board streams and generates the priorisied pixel, then does the lookup to
+Takes tile field & graphics board streams and generates the prioritized pixel, then does the lookup to
 go from palettised to 24bit RGB pixel.
 
 C116 - Screen Waveform Generator

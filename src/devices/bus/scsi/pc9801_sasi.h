@@ -11,7 +11,7 @@ public:
 	// construction/destruction
 	pc9801_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void ExecCommand();
+	virtual void ExecCommand() override;
 };
 
 // device type definition

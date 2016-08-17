@@ -13,7 +13,8 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_audio(*this, "m72"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_shared_ptr<UINT16> m_video_data;
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -23,6 +24,7 @@ public:
 	optional_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	UINT16 m_video_control_data[8];
 	tilemap_t *m_pf1_layer;
@@ -34,7 +36,6 @@ public:
 	DECLARE_WRITE16_MEMBER(m90_coincounter_w);
 	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(dynablsb_sound_command_w);
-	DECLARE_WRITE16_MEMBER(unknown_w);
 	DECLARE_WRITE16_MEMBER(m90_video_control_w);
 	DECLARE_WRITE16_MEMBER(m90_video_w);
 	DECLARE_DRIVER_INIT(bomblord);
@@ -51,8 +52,8 @@ public:
 	TILE_GET_INFO_MEMBER(dynablsb_get_pf1w_tile_info);
 	TILE_GET_INFO_MEMBER(dynablsb_get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(dynablsb_get_pf2w_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(bomblord);
 	DECLARE_VIDEO_START(dynablsb);
 	UINT32 screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

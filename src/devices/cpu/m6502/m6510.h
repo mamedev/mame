@@ -25,7 +25,6 @@ public:
 	m6510_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	UINT8 get_port();
-	void set_port(UINT8 val);
 	void set_pulls(UINT8 pullup, UINT8 pulldown);
 
 	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
@@ -35,9 +34,9 @@ public:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
 protected:
 	class mi_6510_normal : public memory_interface {
@@ -46,18 +45,18 @@ protected:
 
 		mi_6510_normal(m6510_device *base);
 		virtual ~mi_6510_normal() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
 	class mi_6510_nd : public mi_6510_normal {
 	public:
 		mi_6510_nd(m6510_device *base);
 		virtual ~mi_6510_nd() {}
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
 	};
 
 	devcb_read8  read_port;
@@ -65,8 +64,8 @@ protected:
 
 	UINT8 pullup, floating, dir, port, drive;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 dir_r();
 	void dir_w(UINT8 data);

@@ -41,9 +41,19 @@ const UINT32 DASMFLAG_LENGTHMASK    = 0x0000ffff;   // the low 16-bits contain t
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_DEVICE_DISASSEMBLE_OVERRIDE(_class, _func) \
+	device_disasm_interface::static_set_dasm_override(*device, dasm_override_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+typedef device_delegate<offs_t (device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)> dasm_override_delegate;
 
 // ======================> device_disasm_interface
 
@@ -59,14 +69,23 @@ public:
 	UINT32 min_opcode_bytes() const { return disasm_min_opcode_bytes(); }
 	UINT32 max_opcode_bytes() const { return disasm_max_opcode_bytes(); }
 
+	// static inline configuration helpers
+	static void static_set_dasm_override(device_t &device, dasm_override_delegate dasm_override);
+
 	// interface for disassembly
-	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options = 0) { return disasm_disassemble(buffer, pc, oprom, opram, options); }
+	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options = 0);
 
 protected:
 	// required operation overrides
 	virtual UINT32 disasm_min_opcode_bytes() const = 0;
 	virtual UINT32 disasm_max_opcode_bytes() const = 0;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) = 0;
+
+	// interface-level overrides
+	virtual void interface_pre_start() override;
+
+private:
+	dasm_override_delegate  m_dasm_override;            // provided override function
 };
 
 // iterator

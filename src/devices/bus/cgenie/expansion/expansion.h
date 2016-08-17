@@ -48,7 +48,7 @@
 
 #define MCFG_EXPANSION_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(expansion_slot_carts, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(expansion_slot_carts, nullptr, false)
 
 #define MCFG_EXPANSION_SLOT_INT_HANDLER(_devcb) \
 	devcb = &expansion_slot_device::set_int_handler(*device, DEVCB_##_devcb);
@@ -96,8 +96,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	device_expansion_interface *m_cart;
 

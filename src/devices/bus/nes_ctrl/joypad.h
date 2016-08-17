@@ -29,15 +29,15 @@ public:
 	nes_joypad_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 read_bit0();
-	virtual void write(UINT8 data);
+	virtual UINT8 read_bit0() override;
+	virtual void write(UINT8 data) override;
 
 	required_ioport m_joypad;
 	UINT32 m_latch;
@@ -51,11 +51,11 @@ public:
 	// construction/destruction
 	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual UINT8 read_exp(offs_t offset);
-	virtual void write(UINT8 data);
+	virtual UINT8 read_exp(offs_t offset) override;
+	virtual void write(UINT8 data) override;
 };
 
 // ======================> nes_ccpadl_device
@@ -66,7 +66,7 @@ public:
 	// construction/destruction
 	nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 // ======================> nes_ccpadr_device
@@ -77,7 +77,7 @@ public:
 	// construction/destruction
 	nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 // ======================> nes_arcstick_device
@@ -88,13 +88,13 @@ public:
 	// construction/destruction
 	nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
-	virtual UINT8 read_bit0() { return 0; }
-	virtual UINT8 read_exp(offs_t offset);
-	virtual void write(UINT8 data);
+	virtual UINT8 read_bit0() override { return 0; }
+	virtual UINT8 read_exp(offs_t offset) override;
+	virtual void write(UINT8 data) override;
 
 	required_device<nes_control_port_device> m_daisychain;
 	required_ioport m_cfg;

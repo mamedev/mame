@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/flt_vol.h"
 
 /* Calculated from CRT controller writes */
@@ -33,6 +34,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_ground(*this, "ground"),
 		m_object(*this, "object"),
+		m_watchdog(*this, "watchdog"),
 		m_f2203_1l(*this, "f2203.1l"),
 		m_f2203_2l(*this, "f2203.2l"),
 		m_f2203_3l(*this, "f2203.3l"),
@@ -55,8 +57,8 @@ public:
 	UINT8           m_ground_ctrl;
 	UINT16          m_scroll_h;
 	UINT16          m_scroll_v;
-	bitmap_ind16    *m_front_buffer;
-	bitmap_ind16    *m_back_buffer;
+	std::unique_ptr<bitmap_ind16> m_front_buffer;
+	std::unique_ptr<bitmap_ind16> m_back_buffer;
 	emu_timer       *m_bufend_timer;
 	emu_timer       *m_cursor_timer;
 
@@ -72,7 +74,7 @@ public:
 
 	/* Object palette RAM control */
 	UINT32      m_iden;
-	UINT8       *m_obj_pal_ram;
+	std::unique_ptr<UINT8[]>       m_obj_pal_ram;
 	UINT32      m_obj_pal_latch;
 	UINT32      m_obj_pal_addr;
 
@@ -85,6 +87,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_ground;
 	required_device<cpu_device> m_object;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<filter_volume_device> m_f2203_1l;
 	required_device<filter_volume_device> m_f2203_2l;
 	required_device<filter_volume_device> m_f2203_3l;
@@ -120,9 +123,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_vol);
 	DECLARE_WRITE8_MEMBER(ym2203_out_b);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lockon);
 	UINT32 screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_lockon(screen_device &screen, bool state);

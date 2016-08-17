@@ -22,10 +22,7 @@ public:
 		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
 		m_gdfs_st0020(*this, "st0020_spr"),
 		m_input_sel(*this, "input_sel"),
-		m_io_gunx1(*this, "GUNX1"),
-		m_io_guny1(*this, "GUNY1"),
-		m_io_gunx2(*this, "GUNX2"),
-		m_io_guny2(*this, "GUNY2"),
+		m_io_gun(*this, {"GUNX1", "GUNY1", "GUNX2", "GUNY2"}),
 		m_io_key0(*this, "KEY0"),
 		m_io_key1(*this, "KEY1"),
 		m_io_key2(*this, "KEY2"),
@@ -59,7 +56,7 @@ public:
 	int m_shadow_pen_shift;
 	UINT8 m_requested_int;
 	UINT16 m_irq_enable;
-	UINT16 *m_eaglshot_gfxram;
+	std::unique_ptr<UINT16[]> m_eaglshot_gfxram;
 	tilemap_t *m_gdfs_tmap;
 	int m_interrupt_ultrax;
 	int m_gdfs_lightgun_select;
@@ -77,12 +74,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp_dr_w);
 	DECLARE_READ16_MEMBER(dsp_r);
 	DECLARE_WRITE16_MEMBER(dsp_w);
-	DECLARE_READ16_MEMBER(fake_r);
 	DECLARE_READ16_MEMBER(drifto94_unknown_r);
-	DECLARE_READ16_MEMBER(gdfs_gfxram_r);
-	DECLARE_WRITE16_MEMBER(gdfs_gfxram_w);
-	DECLARE_READ16_MEMBER(gdfs_blitram_r);
-	DECLARE_WRITE16_MEMBER(gdfs_blitram_w);
 	DECLARE_READ16_MEMBER(hypreact_input_r);
 	DECLARE_READ16_MEMBER(mainram_r);
 	DECLARE_WRITE16_MEMBER(mainram_w);
@@ -133,8 +125,8 @@ public:
 	DECLARE_DRIVER_INIT(jsk);
 	DECLARE_DRIVER_INIT(twineag2);
 	DECLARE_DRIVER_INIT(mslider);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(gdfs);
 	DECLARE_VIDEO_START(eaglshot);
 
@@ -158,10 +150,7 @@ public:
 	void init_st010();
 
 protected:
-	optional_ioport m_io_gunx1;
-	optional_ioport m_io_guny1;
-	optional_ioport m_io_gunx2;
-	optional_ioport m_io_guny2;
+	optional_ioport_array<4> m_io_gun;
 	optional_ioport m_io_key0;
 	optional_ioport m_io_key1;
 	optional_ioport m_io_key2;

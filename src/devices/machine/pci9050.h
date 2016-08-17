@@ -19,6 +19,12 @@
 #define MCFG_PCI9050_SET_MAP(id, map) \
 	downcast<pci9050_device *>(device)->set_map(id, ADDRESS_MAP_NAME(map), #map, owner);
 
+#define MCFG_PCI9050_USER_INPUT_CALLBACK(_write) \
+	devcb = &pci9050_device::set_user_input_callback(*device, DEVCB_##_write);
+
+#define MCFG_PCI9050_USER_OUTPUT_CALLBACK(_read) \
+	devcb = &pci9050_device::set_user_output_callback(*device, DEVCB_##_read);
+
 class pci9050_device :
 	public pci_device
 {
@@ -45,12 +51,15 @@ public:
 	DECLARE_READ32_MEMBER( cntrl_r  );
 	DECLARE_WRITE32_MEMBER(cntrl_w  );
 
+	template<class _Object> static devcb_base &set_user_input_callback(device_t &device, _Object object) { return downcast<pci9050_device &>(device).m_user_input_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_user_output_callback(device_t &device, _Object object) { return downcast<pci9050_device &>(device).m_user_output_handler.set_callback(object); }
+
 	void set_map(int id, address_map_constructor map, const char *name, device_t *device);
 
 protected:
-	virtual void device_start();
-	virtual void device_config_complete();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);
@@ -69,6 +78,10 @@ private:
 	template<int id> void map_trampoline(address_map &map, device_t &device) {
 		m_maps[id](map, *m_devices[id]);
 	}
+
+	devcb_read32 m_user_input_handler;
+	devcb_write32 m_user_output_handler;
+
 };
 
 extern const device_type PCI9050;

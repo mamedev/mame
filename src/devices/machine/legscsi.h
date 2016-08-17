@@ -18,7 +18,7 @@ public:
 	static void set_scsi_port(device_t &device, const char *tag) { downcast<legacy_scsi_host_adapter &>(device).m_scsi_port.set_tag(tag); }
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 	void reset_bus();
 	bool select(int id);

@@ -6,41 +6,8 @@
 
 *************************************************************************/
 
-#include "video/poly.h"
+#include "video/tc0780fpa.h"
 #include "machine/taitoio.h"
-
-#define TAITOJC_POLYGON_FIFO_SIZE       0x20000
-
-struct taitojc_polydata
-{
-	int tex_base_x;
-	int tex_base_y;
-	int tex_wrap_x;
-	int tex_wrap_y;
-};
-
-class taitojc_renderer : public poly_manager<float, taitojc_polydata, 6, 10000>
-{
-public:
-	taitojc_renderer(running_machine &machine, bitmap_ind16 *fb, bitmap_ind16 *zb, const UINT8 *texture_ram)
-		: poly_manager<float, taitojc_polydata, 6, 10000>(machine)
-	{
-		m_framebuffer = fb;
-		m_zbuffer = zb;
-		m_texture = texture_ram;
-	}
-
-	void render_solid_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid);
-	void render_shade_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid);
-	void render_texture_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid);
-
-	void render_polygons(UINT16 *polygon_fifo, int length);
-
-private:
-	bitmap_ind16 *m_framebuffer;
-	bitmap_ind16 *m_zbuffer;
-	const UINT8 *m_texture;
-};
 
 class taitojc_state : public driver_device
 {
@@ -60,7 +27,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_analog_ports(*this, "AN")
+		m_analog_ports(*this, "AN"),
+		m_tc0780fpa(*this, "tc0780fpa")
 	{
 		m_mcu_output = 0;
 		m_speed_meter = 0;
@@ -85,32 +53,20 @@ public:
 	required_device<palette_device> m_palette;
 	optional_ioport_array<8> m_analog_ports;
 
-	taitojc_renderer *m_renderer;
-
-	int m_texture_x;
-	int m_texture_y;
+	required_device<tc0780fpa_device> m_tc0780fpa;
 
 	UINT32 m_dsp_rom_pos;
-	UINT16 m_dsp_tex_address;
-	UINT16 m_dsp_tex_offset;
 
 	int m_first_dsp_reset;
 	INT16 m_viewport_data[3];
 	INT16 m_projection_data[3];
 	INT16 m_intersection_data[3];
 
-	UINT8 *m_texture;
-	bitmap_ind16 m_framebuffer;
-	bitmap_ind16 m_zbuffer;
-
 	int m_gfx_index;
 
-	UINT32 *m_char_ram;
-	UINT32 *m_tile_ram;
+	std::unique_ptr<UINT32[]> m_char_ram;
+	std::unique_ptr<UINT32[]> m_tile_ram;
 	tilemap_t *m_tilemap;
-
-	UINT16 *m_polygon_fifo;
-	int m_polygon_fifo_ptr;
 
 	UINT8 m_mcu_comm_main;
 	UINT8 m_mcu_comm_hc11;
@@ -150,11 +106,6 @@ public:
 
 	DECLARE_READ16_MEMBER(dsp_rom_r);
 	DECLARE_WRITE16_MEMBER(dsp_rom_w);
-	DECLARE_WRITE16_MEMBER(dsp_texture_w);
-	DECLARE_READ16_MEMBER(dsp_texaddr_r);
-	DECLARE_WRITE16_MEMBER(dsp_texaddr_w);
-	DECLARE_WRITE16_MEMBER(dsp_polygon_fifo_w);
-	DECLARE_WRITE16_MEMBER(dsp_unk2_w);
 
 	DECLARE_WRITE16_MEMBER(dsp_math_viewport_w);
 	DECLARE_WRITE16_MEMBER(dsp_math_projection_w);
@@ -177,13 +128,12 @@ public:
 	DECLARE_DRIVER_INIT(dangcurv);
 	DECLARE_DRIVER_INIT(taitojc);
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitojc_vblank);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type);
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri);
-	void taitojc_clear_frame();
 };

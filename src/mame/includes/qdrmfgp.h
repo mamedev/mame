@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Eisuke Watanabe
+// license:BSD-3-Clause
+// copyright-holders:Hau
 #include "machine/ataintf.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
@@ -53,7 +53,7 @@ public:
 	DECLARE_READ16_MEMBER(inputs_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_MACHINE_START(qdrmfgp);
 	DECLARE_VIDEO_START(qdrmfgp);

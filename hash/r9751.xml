@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+    ROLM 9751 CBX Software
+
+    Releases known: 9004, 9005
+
+    9005.6.84 - Last software release (1998)
+        Install disks (7) - MN 19584
+        Disktool - MN 19584
+        Mini Patch Volume MPV4-84 - MN 19274, 19584-36, 19684-35
+            Additional fixes up to year 2000
+        RPDN Loadware Version 6 - MN 19293-35
+
+    9005.6.82 (1995)
+        Install disks (7) - MN 19582
+        Disktool (missing)
+        Mini Patch Volume 2 - MN 19270
+            Additional fixes up to year 1996
+        RPDN Loadware Version 3.0 - MN 19293-35 PN 51D0553
+
+    9005.2.79 (1993)
+        Install disks (7) - MN 19579
+        Disktool - MN 19579
+        Mini Patch Volume 2 - MN 19268
+           Additional fixes up to year 1993
+        Mini Patch Volume 3 - MN (Unknown)
+           Additional fixes up to year 1994
+        DFE II Loadware Release 13
+-->
+
+<!-- System Software -->
+<softwarelist name="r9751" description="ROLM CBX 9751 floppy disk images">
+	<software name="cbxr5684">
+		<description>Siemens ROLM 9751 CBX 9005.6.84</description>
+		<year>1998</year>
+		<publisher>Siemens Rolm Communications Inc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk1.img" size="1474560" crc="b5d349b5" sha1="9e7e4f13723f54eed7bcbabd6c4fe5670ee1aa96" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk2.img" size="1474560" crc="3f18aa3d" sha1="8d8558833465dee0d4768696e50ab8cc48b2eec8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk3.img" size="1474560" crc="2c0226e2" sha1="08fca05de78e6325881deb3f062235a7bcc4ea10" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk4.img" size="1474560" crc="685be02e" sha1="2ffe5c1c9c73ae1fbaffbe957c6bd2fa09471338" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk5.img" size="1474560" crc="e2ffdece" sha1="86bae983f7c9a763f5cfc8de172fa871f2ae84db" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk6.img" size="1474560" crc="b1aef71e" sha1="2d6bacfa45a2f35998a69b7b4b7212076ffd6523" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk7.img" size="1474560" crc="fd12e3e4" sha1="031bfab7d525bf9584eb32c3da41d5d567616cda" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disktool" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disktool.img" size="1474560" crc="99746f7c" sha1="84dcdc0fe5645e3ae72d5209a9c2b4368859eaa9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Mini Patch Volume MPV4-84" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.Mini.Patch.Volume.MPV4-84.img" size="1474560" crc="b73fd1ee" sha1="9d374ca33bd731334ba32c2febc206134a45bcb1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="RPDN Loadware" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.84.RPDN.Loadware.img" size="1474560" crc="5f5a0990" sha1="95cd0a38c447eeb6096edb5f4377df2920ba9a89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbxr5682">
+		<description>Siemens ROLM 9751 CBX 9005.6.82</description>
+		<year>1995</year>
+		<publisher>Siemens Rolm Communications Inc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk1.img" size="1474560" crc="e9600226" sha1="89d18c6b16e66a6dcb74850bca972e54dc89f043" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk2.img" size="1474560" crc="7a8053b5" sha1="fa439bf102143114bd27501619b63d02268e9788" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk3.img" size="1474560" crc="03b4d15a" sha1="1cbdea2407ae1ff1eaa8c08ecadd92cca39a5f00" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk4.img" size="1474560" crc="28377232" sha1="81a1bd74dff32381aefe12faffdf08d4e6532f67" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk5.img" size="1474560" crc="8a8eb36e" sha1="e31ac428d4775d22fbf911f3abb8cf7a416159c1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk6.img" size="1474560" crc="b2bd782f" sha1="dcd982467132c32ed04a53fe1327272cf1ba8320" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk7.img" size="1474560" crc="1695649f" sha1="dd5a9e5af910237f9a4b7e12d5fade15d1e1ceeb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Mini Patch Volume 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Mini.Patch.Volume.2.img" size="1474560" crc="65d5021d" sha1="57a11686805f3873a4dde231a260943f2e2ab1b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="RPDN Loadware Version 3.0" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.RPDN.Loadware.img" size="1474560" crc="f082df1f" sha1="ccfce632a2433b6c5ad6cd75130e999ce98daaea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbxr5279">
+		<description>ROLM 9751 CBX 9005.2.79</description>
+		<year>1993</year>
+		<publisher>ROLM - A Siemens Company</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk1.img" size="1474560" crc="43baedc0" sha1="ee9580169db69f469165317ad22377f949faa73c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk2.img" size="1474560" crc="c4602fd3" sha1="07f440d3e24be737e1dbdf24f4a8d5d6240e4fdb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk3.img" size="1474560" crc="c81d7904" sha1="9f2a1c0c9b8b0274a6ffb46b2a879cc6d8a78724" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk4.img" size="1474560" crc="0d2d311a" sha1="10c841a180b1bf14a225fb49ea6a7a796192b1c0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk5.img" size="1474560" crc="f2cf4908" sha1="607176c4da51305175d6facce298c1d28b970084" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+					<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk6.img" size="1474560" crc="e750915c" sha1="70cd126b465ce38520808fd9e8285411c9d4875c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk7.img" size="1474560" crc="d6d44413" sha1="defcf6ed7308f02fae2e041af6e48fd4b1a7feb9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disktool" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Disktool.img" size="1474560" crc="455a9af9" sha1="81b77d47a8b2b02fc4cc2437b0418af7f93622f2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Mini Patch Volume 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Mini.Patch.Volume.2.img" size="1474560" crc="46553352" sha1="4c8542f9bfdfd602db846f209ac089de6a33f528" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Mini Patch Volume 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Mini.Patch.Volume.3.img" size="1474560" crc="ee4c2e2b" sha1="8e980936f0bc4330a13343133eb8097a024524b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="DFE II Loadware Release 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.DFE.II.Loadware.Release.13.img" size="1474560" crc="1a1cc762" sha1="298720dc71f787cd5a58d0baa151a3b12215b788" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

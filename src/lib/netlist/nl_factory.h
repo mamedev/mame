@@ -9,10 +9,15 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
+#include <type_traits>
+
 #include "nl_config.h"
 #include "plib/palloc.h"
 #include "plib/plists.h"
+#include "plib/putil.h"
 #include "nl_base.h"
+
+#define NETLIB_DEVICE_IMPL(chip) factory_creator_ptr_t decl_ ## chip = factory_creator_t< NETLIB_NAME(chip) >;
 
 namespace netlist
 {
@@ -24,20 +29,20 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(base_factory_t)
 	public:
-		ATTR_COLD base_factory_t(const pstring &name, const pstring &classname,
+		base_factory_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		: m_name(name), m_classname(classname), m_def_param(def_param)
 		{}
 
 		virtual ~base_factory_t() {}
 
-		virtual device_t *Create() = 0;
+		virtual plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
 
-		ATTR_COLD const pstring &name() const { return m_name; }
-		ATTR_COLD const pstring &classname() const { return m_classname; }
-		ATTR_COLD const pstring &param_desc() const { return m_def_param; }
-		ATTR_COLD const pstring_list_t term_param_list();
-		ATTR_COLD const pstring_list_t def_params();
+		const pstring &name() const { return m_name; }
+		const pstring &classname() const { return m_classname; }
+		const pstring &param_desc() const { return m_def_param; }
+		const plib::pstring_vector_t term_param_list();
+		const plib::pstring_vector_t def_params();
 
 	protected:
 		pstring m_name;                             /* device name */
@@ -50,47 +55,64 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(factory_t)
 	public:
-		ATTR_COLD factory_t(const pstring &name, const pstring &classname,
+		factory_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		: base_factory_t(name, classname, def_param) { }
 
-		ATTR_COLD device_t *Create()
+		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 		{
-			device_t *r = palloc(C);
-			//r->init(setup, name);
-			return r;
+			return plib::owned_ptr<device_t>::Create<C>(anetlist, name);
 		}
 	};
 
-	class factory_list_t : public phashmap_t<pstring, base_factory_t *>
+	class factory_list_t : public std::vector<std::unique_ptr<base_factory_t>>
 	{
 	public:
 		factory_list_t(setup_t &m_setup);
 		~factory_list_t();
 
-		template<class _C>
-		ATTR_COLD void register_device(const pstring &name, const pstring &classname,
+		template<class device_class>
+		void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			if (!add(name, palloc(factory_t< _C >(name, classname, def_param))))
-				error("factory already contains " + name);
+			register_device(std::unique_ptr<base_factory_t>(new factory_t<device_class>(name, classname, def_param)));
 		}
 
-		ATTR_COLD void register_device(base_factory_t *factory)
+		void register_device(std::unique_ptr<base_factory_t> factory)
 		{
-			if (!add(factory->name(), factory))
-				error("factory already contains " + factory->name());
+			for (auto & e : *this)
+				if (e->name() == factory->name())
+					error("factory already contains " + factory->name());
+			push_back(std::move(factory));
 		}
 
-		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
-		ATTR_COLD device_t *new_device_by_name(const pstring &name);
-		ATTR_COLD base_factory_t * factory_by_name(const pstring &name);
+		base_factory_t * factory_by_name(const pstring &devname);
+
+		template <class C>
+		bool is_class(base_factory_t *f)
+		{
+			return dynamic_cast<factory_t<C> *>(f) != nullptr;
+		}
 
 	private:
 		void error(const pstring &s);
 
 		setup_t &m_setup;
 	};
+
+	// -----------------------------------------------------------------------------
+	// factory_creator_ptr_t
+	// -----------------------------------------------------------------------------
+
+	using factory_creator_ptr_t = std::unique_ptr<base_factory_t> (*)(const pstring &name, const pstring &classname,
+			const pstring &def_param);
+
+	template <typename T>
+	std::unique_ptr<base_factory_t> factory_creator_t(const pstring &name, const pstring &classname,
+			const pstring &def_param)
+	{
+		return std::unique_ptr<base_factory_t>(new factory_t<T>(name, classname, def_param));
+	}
 
 }
 

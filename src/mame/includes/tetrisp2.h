@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
+#include "machine/gen_latch.h"
+
 class tetrisp2_state : public driver_device
 {
 public:
@@ -45,7 +48,7 @@ public:
 	required_shared_ptr<UINT16> m_scroll_fg;
 	required_shared_ptr<UINT16> m_scroll_bg;
 	required_shared_ptr<UINT16> m_rotregs;
-	UINT8 *m_priority;
+	std::unique_ptr<UINT8[]> m_priority;
 	optional_shared_ptr<UINT16> m_rocknms_sub_priority;
 	optional_shared_ptr<UINT16> m_rocknms_sub_vram_rot;
 	optional_shared_ptr<UINT16> m_rocknms_sub_vram_fg;
@@ -140,9 +143,11 @@ class stepstag_state : public tetrisp2_state
 public:
 	stepstag_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tetrisp2_state(mconfig, type, tag),
-			m_spriteram3(*this, "spriteram3") { }
+			m_spriteram3(*this, "spriteram3"),
+			m_soundlatch(*this, "soundlatch") { }
 
 	required_shared_ptr<UINT16> m_spriteram3;
+	required_device<generic_latch_16_device> m_soundlatch;
 	DECLARE_READ16_MEMBER(stepstag_coins_r);
 	DECLARE_READ16_MEMBER(unknown_read_0xc00000);
 	DECLARE_READ16_MEMBER(unknown_read_0xffff00);

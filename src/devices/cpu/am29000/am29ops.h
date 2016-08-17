@@ -956,22 +956,22 @@ void am29000_cpu_device::LOAD()
 
 	if (!FREEZE_MODE)
 	{
-		m_chc = ((m_exec_ir << 8) & 0xff) |
-						CHC_LS |
-						RA << CHC_TR_SHIFT |
-						CHC_CV;
-
+		m_chc = ((m_exec_ir << 8) & 0xff) | CHC_LS | RA << CHC_TR_SHIFT | CHC_CV;
 		m_cha = addr;
 		m_chd = r;
 
-		if (!(m_cfg & CFG_DW) && (m_exec_ir & INST_SB_BIT))
-			SET_ALU_BP(addr & 3);
+		if (!(m_cfg & CFG_DW) && INST_SB_BIT)
+		{
+			SET_ALU_BP(addr);
+		}
 	}
 
 	m_r[RA] = r;
 
 	if (m_cfg & CFG_DW)
+	{
 		logerror("DW ON A STORE");
+	}
 }
 
 void am29000_cpu_device::LOADL()
@@ -987,11 +987,13 @@ void am29000_cpu_device::LOADSET()
 void am29000_cpu_device::LOADM()
 {
 	UINT32 addr = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r;
 
 	if (INST_UA_BIT)
+	{
 		fatalerror("Am29000: UA bit set on LOAD\n");
+	}
 
+	UINT32 r;
 	if (INST_CE_BIT)
 	{
 		logerror("Am29000: Attempting a co-processor LOAD!\n");
@@ -1019,30 +1021,28 @@ void am29000_cpu_device::LOADM()
 	{
 		// TODO
 		m_chc &= (CHC_CR_MASK << CHC_CR_SHIFT);
-		m_chc |= ((m_exec_ir << 8) & 0xff) |
-						RA << CHC_TR_SHIFT |
-						CHC_CV;
-
+		m_chc |= ((m_exec_ir << 8) & 0xff) | RA << CHC_TR_SHIFT | CHC_CV;
 		m_cha = addr;
 		m_chd = r; // ?????
 
-		if (!(m_cfg & CFG_DW) && (m_exec_ir & INST_SB_BIT))
-			SET_ALU_BP(addr & 3);
+		if (!(m_cfg & CFG_DW) && INST_SB_BIT)
+		{
+			SET_ALU_BP(addr);
+		}
 	}
 
 	r = RA;
 
+	for (INT32 cnt = 0; cnt <= GET_CHC_CR; ++cnt)
 	{
-		int cnt;
-		for (cnt = 0; cnt <= GET_CHC_CR; ++cnt)
-		{
-			m_r[r] = m_data->read_dword(addr);
+		m_r[r] = m_data->read_dword(addr);
 
 //          SET_CHC_CR(cnt - 1);
-			addr += 4;
+		addr += 4;
 
-			if (++r == 256)
-				r = 128;
+		if (++r == 256)
+		{
+			r = 128;
 		}
 	}
 }
@@ -1050,15 +1050,15 @@ void am29000_cpu_device::LOADM()
 void am29000_cpu_device::STORE()
 {
 	UINT32 addr = INST_M_BIT ? I8: GET_RB_VAL;
-//  UINT32 r;
 
 	if (INST_UA_BIT)
+	{
 		fatalerror("Am29000: UA bit set on LOAD\n");
+	}
 
 	if (INST_CE_BIT)
 	{
 		logerror("Am29000: Attempting a co-processor LOAD!\n");
-//      r = 0;
 	}
 	else
 	{
@@ -1073,7 +1073,6 @@ void am29000_cpu_device::STORE()
 				SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
 				return;
 			}
-
 		}
 	}
 
@@ -1081,18 +1080,19 @@ void am29000_cpu_device::STORE()
 
 	if (!FREEZE_MODE)
 	{
-		m_chc = ((m_exec_ir << 8) & 0xff) |
-						RA << CHC_TR_SHIFT |
-						CHC_CV;
-
+		m_chc = ((m_exec_ir << 8) & 0xff) | RA << CHC_TR_SHIFT | CHC_CV;
 		m_cha = addr;
 
-		if (!(m_cfg & CFG_DW) && (m_exec_ir & INST_SB_BIT))
-			SET_ALU_BP(addr & 3);
+		if (!(m_cfg & CFG_DW) && INST_SB_BIT)
+		{
+			SET_ALU_BP(addr);
+		}
 	}
 
 	if (m_cfg & CFG_DW)
+	{
 		logerror("DW ON A STORE");
+	}
 }
 
 void am29000_cpu_device::STOREL()
@@ -1103,11 +1103,13 @@ void am29000_cpu_device::STOREL()
 void am29000_cpu_device::STOREM()
 {
 	UINT32 addr = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r;
 
 	if (INST_UA_BIT)
+	{
 		fatalerror("Am29000: UA bit set on LOAD\n");
+	}
 
+	UINT32 r;
 	if (INST_CE_BIT)
 	{
 		logerror("Am29000: Attempting a co-processor LOAD!\n");
@@ -1126,7 +1128,6 @@ void am29000_cpu_device::STOREM()
 				SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
 				return;
 			}
-
 		}
 	}
 
@@ -1134,29 +1135,26 @@ void am29000_cpu_device::STOREM()
 	{
 		// TODO
 		m_chc &= (CHC_CR_MASK << CHC_CR_SHIFT);
-		m_chc |= ((m_exec_ir << 8) & 0xff) |
-						RA << CHC_TR_SHIFT |
-						CHC_CV;
-
+		m_chc |= ((m_exec_ir << 8) & 0xff) | RA << CHC_TR_SHIFT | CHC_CV;
 		m_cha = addr;
 
-		if (!(m_cfg & CFG_DW) && (m_exec_ir & INST_SB_BIT))
-			SET_ALU_BP(addr & 3);
+		if (!(m_cfg & CFG_DW) && INST_SB_BIT)
+		{
+			SET_ALU_BP(addr);
+		}
 	}
 
 	r = RA;
 
+	for (INT32 cnt = 0; cnt <= GET_CHC_CR; ++cnt)
 	{
-		int cnt;
-		for (cnt = 0; cnt <= GET_CHC_CR; ++cnt)
+		m_data->write_dword(addr, m_r[r]);
+
+		addr += 4;
+
+		if (++r == 256)
 		{
-			m_data->write_dword(addr, m_r[r]);
-
-//          SET_CHC_CR(cnt - 1);
-			addr += 4;
-
-			if (++r == 256)
-				r = 128;
+			r = 128;
 		}
 	}
 }

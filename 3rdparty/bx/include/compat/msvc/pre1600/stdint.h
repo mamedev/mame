@@ -37,6 +37,23 @@
 #ifndef _MSC_STDINT_H_ // [
 #define _MSC_STDINT_H_
 
+#define _In_reads_(size)
+#define _In_reads_opt_(size)
+#define _In_reads_bytes_(size)
+#define _In_reads_bytes_opt_(size)
+#define _Out_writes_(size)
+#define _Out_writes_opt_(size)
+#define _Out_writes_to_opt_(size,count)
+#define _Out_writes_bytes_(size)
+#define _Out_writes_bytes_opt_(size)
+#define _Outptr_
+#define _Outptr_result_maybenull_
+#define _Outptr_opt_result_maybenull_
+#define _COM_Outptr_
+#define _COM_Outptr_opt_
+#define _COM_Outptr_opt_result_maybenull_
+#define _Field_size_bytes_full_(size)
+
 #if _MSC_VER > 1000
 #pragma once
 #endif

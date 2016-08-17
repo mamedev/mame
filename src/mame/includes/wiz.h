@@ -57,7 +57,6 @@ public:
 	int m_dsc0;
 	int m_dsc1;
 
-	DECLARE_WRITE8_MEMBER(wiz_soundlatch_w);
 	DECLARE_READ8_MEMBER(wiz_protection_r);
 	DECLARE_WRITE8_MEMBER(wiz_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(wiz_main_nmi_mask_w);
@@ -68,14 +67,13 @@ public:
 	DECLARE_WRITE8_MEMBER(wiz_char_bank_w);
 	DECLARE_WRITE8_MEMBER(wiz_flipx_w);
 	DECLARE_WRITE8_MEMBER(wiz_flipy_w);
-	DECLARE_READ8_MEMBER(wiz_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(stinger_explosion_w);
 	DECLARE_WRITE8_MEMBER(stinger_shot_w);
 
 	DECLARE_DRIVER_INIT(stinger);
 
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(wiz);
 	UINT32 screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

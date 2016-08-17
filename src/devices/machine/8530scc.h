@@ -43,10 +43,13 @@ public:
 	DECLARE_READ8_MEMBER(reg_r);
 	DECLARE_WRITE8_MEMBER(reg_w);
 
+	void write_reg(int offset, UINT8 data);
+	UINT8 read_reg(int offset);
+
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	struct Chan {

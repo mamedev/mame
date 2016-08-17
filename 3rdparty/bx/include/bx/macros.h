@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_MACROS_H_HEADER_GUARD
@@ -48,10 +48,22 @@
 
 #define BX_ALIGNOF(_type) __alignof(_type)
 
+#if defined(__has_feature)
+#	define BX_CLANG_HAS_FEATURE(_x) __has_feature(_x)
+#else
+#	define BX_CLANG_HAS_FEATURE(_x) 0
+#endif // defined(__has_feature)
+
+#if defined(__has_extension)
+#	define BX_CLANG_HAS_EXTENSION(_x) __has_extension(_x)
+#else
+#	define BX_CLANG_HAS_EXTENSION(_x) 0
+#endif // defined(__has_extension)
+
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 #	define BX_ALIGN_DECL(_align, _decl) _decl __attribute__( (aligned(_align) ) )
 #	define BX_ALLOW_UNUSED __attribute__( (unused) )
-#	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
+#	define BX_FORCE_INLINE inline __attribute__( (__always_inline__) )
 #	define BX_FUNCTION __PRETTY_FUNCTION__
 #	define BX_LIKELY(_x)   __builtin_expect(!!(_x), 1)
 #	define BX_UNLIKELY(_x) __builtin_expect(!!(_x), 0)
@@ -59,16 +71,17 @@
 #	define BX_NO_RETURN __attribute__( (noreturn) )
 #	define BX_NO_VTABLE
 #	define BX_OVERRIDE
-#	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
-#	if BX_COMPILER_CLANG && (BX_PLATFORM_OSX || BX_PLATFORM_IOS)
-#		define BX_THREAD /* not supported right now */
-#	else
-#		define BX_THREAD __thread
+#	define BX_PRINTF_ARGS(_format, _args) __attribute__( (format(__printf__, _format, _args) ) )
+#	if BX_CLANG_HAS_FEATURE(cxx_thread_local)
+#		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_CLANG
+#	if (!BX_PLATFORM_OSX && (BX_COMPILER_GCC >= 40200)) || (BX_COMPILER_GCC >= 40500)
+#		define BX_THREAD_LOCAL __thread
+#	endif // BX_COMPILER_GCC
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
-#	if BX_COMPILER_MSVC_COMPATIBLE
+#	if BX_CRT_MSVC
 #		define __stdcall
-#	endif // BX_COMPILER_MSVC_COMPATIBLE
+#	endif // BX_CRT_MSVC
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED
@@ -81,17 +94,11 @@
 #	define BX_NO_VTABLE __declspec(novtable)
 #	define BX_OVERRIDE override
 #	define BX_PRINTF_ARGS(_format, _args)
-#	define BX_THREAD __declspec(thread)
+#	define BX_THREAD_LOCAL __declspec(thread)
 #	define BX_ATTRIBUTE(_x)
 #else
 #	error "Unknown BX_COMPILER_?"
 #endif
-
-#if defined(__has_extension)
-#	define BX_CLANG_HAS_EXTENSION(_x) __has_extension(_x)
-#else
-#	define BX_CLANG_HAS_EXTENSION(_x) 0
-#endif // defined(__has_extension)
 
 // #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 #define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)] BX_ATTRIBUTE(unused)

@@ -21,6 +21,7 @@
 
 #include "machine/mm58274c.h"
 #include "machine/hdc92x4.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_HFDC;
 
@@ -32,11 +33,11 @@ class myarc_hfdc_device : public ti_expansion_card_device
 public:
 	myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 	DECLARE_WRITE_LINE_MEMBER( dmarq_w );
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
@@ -48,16 +49,16 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
-	void device_config_complete();
+	void device_config_complete() override;
 
 private:
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	void device_start();
-	void device_reset();
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void device_start() override;
+	void device_reset() override;
 
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
+	const tiny_rom_entry *device_rom_region() const override;
+	machine_config_constructor device_mconfig_additions() const override;
+	ioport_constructor device_input_ports() const override;
 
 	// Debug accessors
 	void debug_read(offs_t offset, UINT8* value);
@@ -139,9 +140,6 @@ private:
 	// Recent address
 	int m_address;
 
-	// DMA in progress
-	bool m_dma_in_progress;
-
 	// Wait for HD. This was an addition in later cards.
 	bool m_wait_for_hd1;
 
@@ -152,7 +150,7 @@ private:
 	int     m_rom_page;
 
 	// HFDC on-board SRAM (8K or 32K)
-	UINT8*  m_buffer_ram;
+	required_device<ram_device> m_buffer_ram;
 
 	// RAM page registers
 	int     m_ram_page[4];
@@ -182,7 +180,6 @@ private:
 	void set_bits(UINT8& byte, int mask, bool set);
 
 	// Joined ready line towards the controller
-	void set_ready(int dev, bool ready);
 	int  m_readyflags;
 };
 #endif

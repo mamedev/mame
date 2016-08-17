@@ -119,13 +119,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT16 *m_pf1_data, *m_pf2_data;
-	UINT16 *m_pf12_control;
+	std::unique_ptr<UINT16[]> m_pf1_data;
+	std::unique_ptr<UINT16[]> m_pf2_data;
+	std::unique_ptr<UINT16[]> m_pf12_control;
 
 	const UINT16 *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
 
@@ -153,7 +154,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info_b);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info_b);
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 extern const device_type DECO16IC;
@@ -204,9 +204,6 @@ extern const device_type DECO16IC;
 
 #define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
 	deco16ic_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_DECO16IC_PALETTE(_palette_tag) \
-	deco16ic_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)

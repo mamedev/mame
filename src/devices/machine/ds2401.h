@@ -30,7 +30,8 @@ protected:
 	enum {
 		SIZE_DATA = 8,
 
-		COMMAND_READROM = 0x33
+		COMMAND_READROM = 0x33,
+		COMMAND_READROM_COMPAT = 0x0f
 	};
 
 	enum {
@@ -48,9 +49,9 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal state
 	int m_state, m_bit, m_shift;

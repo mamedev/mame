@@ -3,11 +3,9 @@
 -- Functions to generate the different sections of an Xcode project.
 -- Copyright (c) 2009-2011 Jason Perkins and the Premake project
 --
-
+	premake.xcode.parameters = { }
 	local xcode = premake.xcode
 	local tree  = premake.tree
-
-
 --
 -- Return the Xcode build category for a given file, based on the file extension.
 --
@@ -26,6 +24,7 @@
 			[".cxx"] = "Sources",
 			[".dylib"] = "Frameworks",
 			[".framework"] = "Frameworks",
+			[".tbd"] = "Frameworks",
 			[".m"] = "Sources",
 			[".mm"] = "Sources",
 			[".strings"] = "Resources",
@@ -34,6 +33,8 @@
 			[".icns"] = "Resources",
 			[".bmp"] = "Resources",
 			[".wav"] = "Resources",
+			[".xcassets"]  = "Resources",
+			[".xcdatamodeld"] = "Sources",
 		}
 		return categories[path.getextension(node.name)]
 	end
@@ -74,7 +75,9 @@
 			[".cpp"]       = "sourcecode.cpp.cpp",
 			[".css"]       = "text.css",
 			[".cxx"]       = "sourcecode.cpp.cpp",
+			[".entitlements"] = "text.xml",
 			[".framework"] = "wrapper.framework",
+			[".tbd"]       = "sourcecode.text-based-dylib-definition",
 			[".gif"]       = "image.gif",
 			[".h"]         = "sourcecode.c.h",
 			[".html"]      = "text.html",
@@ -89,6 +92,8 @@
 			[".icns"]      = "image.icns",
 			[".bmp"]       = "image.bmp",
 			[".wav"]       = "audio.wav",
+			[".xcassets"]  = "folder.assetcatalog",
+			[".xcdatamodeld"] = "wrapper.xcdatamodeld",
 		}
 		return types[path.getextension(node.path)] or "text"
 	end
@@ -109,7 +114,9 @@
 			[".cpp"]       = "sourcecode.cpp.cpp",
 			[".css"]       = "text.css",
 			[".cxx"]       = "sourcecode.cpp.cpp",
+			[".entitlements"] = "text.xml",
 			[".framework"] = "wrapper.framework",
+			[".tbd"]       = "wrapper.framework",
 			[".gif"]       = "image.gif",
 			[".h"]         = "sourcecode.cpp.h",
 			[".html"]      = "text.html",
@@ -124,6 +131,8 @@
 			[".icns"]      = "image.icns",
 			[".bmp"]       = "image.bmp",
 			[".wav"]       = "audio.wav",
+			[".xcassets"]  = "folder.assetcatalog",
+			[".xcdatamodeld"] = "wrapper.xcdatamodeld",
 		}
 		return types[path.getextension(node.path)] or "text"
 	end
@@ -194,7 +203,7 @@
 --
 
 	function xcode.isframework(fname)
-		return (path.getextension(fname) == ".framework")
+		return (path.getextension(fname) == ".framework" or path.getextension(fname) == ".tbd")
 	end
 
 
@@ -365,6 +374,8 @@
 								error('relative paths are not currently supported for frameworks')
 							end
 							pth = nodePath
+						elseif path.getextension(nodePath)=='.tbd' then
+							pth = "/usr/lib/" .. nodePath
 						else
 							pth = "/System/Library/Frameworks/" .. nodePath
 						end
@@ -643,7 +654,9 @@
 				if #cfgcmds > #prjcmds then
 					table.insert(commands, 'if [ "${CONFIGURATION}" = "' .. xcode.getconfigname(cfg) .. '" ]; then')
 					for i = #prjcmds + 1, #cfgcmds do
-						table.insert(commands, cfgcmds[i])
+						local cmd = cfgcmds[i]
+						cmd = cmd:gsub('\\','\\\\')
+						table.insert(commands, cmd)
 					end
 					table.insert(commands, 'fi')
 				end
@@ -681,7 +694,7 @@
 	end
 	
 	
-	function xcode.PBXSourcesBuildPhase(tr)
+	function xcode.PBXSourcesBuildPhase(tr,prj)
 		_p('/* Begin PBXSourcesBuildPhase section */')
 		for _, target in ipairs(tr.products.children) do
 			_p(2,'%s /* Sources */ = {', target.sourcesid)
@@ -691,7 +704,9 @@
 			tree.traverse(tr, {
 				onleaf = function(node)
 					if xcode.getbuildcategory(node) == "Sources" then
+        				if not table.icontains(prj.excludes, node.cfg.name) then -- if not excluded
 						_p(4,'%s /* %s in Sources */,', node.buildid, node.name)
+                        end
 					end
 				end
 			})
@@ -826,6 +841,10 @@
 
 		_p(4,'SDKROOT = "%s";', xcode.toolset)
 		
+		if tr.entitlements then
+			_p(4,'CODE_SIGN_ENTITLEMENTS = "%s";', tr.entitlements.cfg.name)
+		end
+
 		local targetdir = path.getdirectory(cfg.buildtarget.bundlepath)
 		if targetdir ~= "." then
 			_p(4,'CONFIGURATION_BUILD_DIR = "$(SYMROOT)";');
@@ -880,6 +899,7 @@
 		_p(4,'GCC_WARN_UNUSED_VARIABLE = YES;')
 
 		xcode.printlist(cfg.includedirs, 'HEADER_SEARCH_PATHS')
+		xcode.printlist(cfg.userincludedirs, 'USER_HEADER_SEARCH_PATHS')
 		xcode.printlist(cfg.libdirs, 'LIBRARY_SEARCH_PATHS')
 		
 		_p(4,'OBJROOT = "%s";', cfg.objectsdir)
@@ -899,7 +919,13 @@
 				table.insert(flags, flag)
 			end
 		end
-		xcode.printlist(table.join(flags, cfg.buildoptions), 'OTHER_CFLAGS')
+
+		for _, val in ipairs(premake.xcode.parameters) do
+			_p(4, val ..';')
+		end
+
+		xcode.printlist(table.join(flags, cfg.buildoptions, cfg.buildoptions_c), 'OTHER_CFLAGS')
+		xcode.printlist(table.join(flags, cfg.buildoptions, cfg.buildoptions_cpp), 'OTHER_CPLUSPLUSFLAGS')
 
 		-- build list of "other" linked flags. All libraries that aren't frameworks
 		-- are listed here, so I don't have to try and figure out if they are ".a"

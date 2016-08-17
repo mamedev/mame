@@ -27,8 +27,6 @@ struct misc_state_t
 	INT32 m_ti_width;           // Width (in pixels) of TI transfers
 	UINT32 m_ti_address;        // Destination address for TI transfers
 
-	UINT8 m_random_seed;        // %HACK%, adds 19 each time it's read and is more or less random
-
 	UINT32 m_max_level;         // Maximum LOD level for texture filtering
 	UINT32 m_min_level;         // Minimum LOD level for texture filtering
 

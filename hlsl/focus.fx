@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Defocus Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
@@ -25,14 +29,7 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	float2 TexCoord0 : TEXCOORD0;
-	float2 TexCoord1 : TEXCOORD1;
-	float2 TexCoord2 : TEXCOORD2;
-	float2 TexCoord3 : TEXCOORD3;
-	float2 TexCoord4 : TEXCOORD4;
-	float2 TexCoord5 : TEXCOORD5;
-	float2 TexCoord6 : TEXCOORD6;
-	float2 TexCoord7 : TEXCOORD7;
+	float2 TexCoord : TEXCOORD0;
 };
 
 struct VS_INPUT
@@ -40,67 +37,35 @@ struct VS_INPUT
 	float3 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 Unused : TEXCOORD1;
 };
 
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	float2 TexCoord0 : TEXCOORD0;
-	float2 TexCoord1 : TEXCOORD1;
-	float2 TexCoord2 : TEXCOORD2;
-	float2 TexCoord3 : TEXCOORD3;
-	float2 TexCoord4 : TEXCOORD4;
-	float2 TexCoord5 : TEXCOORD5;
-	float2 TexCoord6 : TEXCOORD6;
-	float2 TexCoord7 : TEXCOORD7;
+	float2 TexCoord : TEXCOORD0;
 };
 
 //-----------------------------------------------------------------------------
-// Simple Vertex Shader
+// Defocus Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-
-uniform float2 Defocus = float2(0.0f, 0.0f);
-
-uniform float2 Prescale = float2(8.0f, 8.0f);
-
-float2 Coord0Offset = float2( 0.0f,  0.0f);
-float2 Coord1Offset = float2(-0.2f, -0.6f);
-float2 Coord2Offset = float2( 0.4f, -0.4f);
-float2 Coord3Offset = float2( 0.6f,  0.2f);
-float2 Coord4Offset = float2( 0.2f,  0.6f);
-float2 Coord5Offset = float2(-0.4f,  0.6f);
-float2 Coord6Offset = float2(-0.6f,  0.2f);
-float2 Coord7Offset = float2(-0.6f, -0.4f);
+uniform float2 TargetDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 ScreenTexelDims = 1.0f / ScreenDims;
-
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 
-	// todo: there is an offset which can be noticed at lower prescale in high-resolution
-	float2 FocusPrescaleOffset = ScreenTexelDims / Prescale;
-	
 	float2 TexCoord = Input.TexCoord;
-	TexCoord += FocusPrescaleOffset;
+	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	Output.TexCoord0 = TexCoord + Coord0Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord1 = TexCoord + Coord1Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord2 = TexCoord + Coord2Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord3 = TexCoord + Coord3Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord4 = TexCoord + Coord4Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord5 = TexCoord + Coord5Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord6 = TexCoord + Coord6Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord7 = TexCoord + Coord7Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord = TexCoord;
 
 	Output.Color = Input.Color;
 
@@ -108,41 +73,52 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Simple Pixel Shader
+// Defocus Pixel Shader
 //-----------------------------------------------------------------------------
+
+uniform float2 Defocus = float2(0.0f, 0.0f);
+
+static const float2 Coord1Offset = float2( 0.75f,  0.50f);
+static const float2 Coord2Offset = float2( 0.25f,  1.00f);
+static const float2 Coord3Offset = float2(-0.50f,  0.75f);
+static const float2 Coord4Offset = float2(-1.00f,  0.25f);
+static const float2 Coord5Offset = float2(-0.75f, -0.50f);
+static const float2 Coord6Offset = float2(-0.25f, -1.00f);
+static const float2 Coord7Offset = float2( 0.50f, -0.75f);
+static const float2 Coord8Offset = float2( 1.00f, -0.25f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 d0 = tex2D(DiffuseSampler, Input.TexCoord0);
-	float3 d1 = tex2D(DiffuseSampler, Input.TexCoord1).rgb;
-	float3 d2 = tex2D(DiffuseSampler, Input.TexCoord2).rgb;
-	float3 d3 = tex2D(DiffuseSampler, Input.TexCoord3).rgb;
-	float3 d4 = tex2D(DiffuseSampler, Input.TexCoord4).rgb;
-	float3 d5 = tex2D(DiffuseSampler, Input.TexCoord5).rgb;
-	float3 d6 = tex2D(DiffuseSampler, Input.TexCoord6).rgb;
-	float3 d7 = tex2D(DiffuseSampler, Input.TexCoord7).rgb;
+	// imaginary texel dimensions independed from screen dimension, but ratio
+	float2 TexelDims = (1.0f / 1024);
 
-	float3 blurred = (d0.rgb + d1 + d2 + d3 + d4 + d5 + d6 + d7) / 8.0f;
+	float2 DefocusTexelDims = Defocus * TexelDims;
 
-	blurred = lerp(d0.rgb, blurred, 1.0f);
-	return float4(blurred, d0.a);
+	float4 d = tex2D(DiffuseSampler, Input.TexCoord);
+	float3 d1 = tex2D(DiffuseSampler, Input.TexCoord + Coord1Offset * DefocusTexelDims).rgb;
+	float3 d2 = tex2D(DiffuseSampler, Input.TexCoord + Coord2Offset * DefocusTexelDims).rgb;
+	float3 d3 = tex2D(DiffuseSampler, Input.TexCoord + Coord3Offset * DefocusTexelDims).rgb;
+	float3 d4 = tex2D(DiffuseSampler, Input.TexCoord + Coord4Offset * DefocusTexelDims).rgb;
+	float3 d5 = tex2D(DiffuseSampler, Input.TexCoord + Coord5Offset * DefocusTexelDims).rgb;
+	float3 d6 = tex2D(DiffuseSampler, Input.TexCoord + Coord6Offset * DefocusTexelDims).rgb;
+	float3 d7 = tex2D(DiffuseSampler, Input.TexCoord + Coord7Offset * DefocusTexelDims).rgb;
+	float3 d8 = tex2D(DiffuseSampler, Input.TexCoord + Coord8Offset * DefocusTexelDims).rgb;
 
-	// float4 texel = tex2D(DiffuseSampler, Input.TexCoord0);
+	float3 blurred = (d.rgb + d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8) / 9.0f;
+	blurred = lerp(d.rgb, blurred, 1.0f);
 
-	// return float4(texel.rgb, 1.0f);
+	return float4(blurred, d.a);
 }
 
 //-----------------------------------------------------------------------------
-// Simple Effect
+// Defocus Technique
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_2_0 vs_main();
 		PixelShader = compile ps_2_0 ps_main();

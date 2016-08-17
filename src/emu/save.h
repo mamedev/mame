@@ -64,17 +64,13 @@ public:
 	// construction/destruction
 	state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, UINT8 size, UINT32 count);
 
-	// getters
-	state_entry *next() const { return m_next; }
-
 	// helpers
 	void flip_data();
 
 	// state
-	state_entry *       m_next;                 // pointer to next entry
 	void *              m_data;                 // pointer to the memory to save/restore
 	std::string         m_name;                 // full name
-	device_t *          m_device;               // associated device, NULL if none
+	device_t *          m_device;               // associated device, nullptr if none
 	std::string         m_module;               // module name
 	std::string         m_tag;                  // tag name
 	int                 m_index;                // index
@@ -95,7 +91,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	int registration_count() const { return m_entry_list.count(); }
+	int registration_count() const { return m_entry_list.size(); }
 	bool registration_allowed() const { return m_reg_allowed; }
 
 	// registration control
@@ -148,9 +144,9 @@ public:
 
 	// global memory registration
 	template<typename _ItemType>
-	void save_item(_ItemType &value, const char *valname, int index = 0) { save_item(NULL, "global", NULL, index, value, valname); }
+	void save_item(_ItemType &value, const char *valname, int index = 0) { save_item(nullptr, "global", nullptr, index, value, valname); }
 	template<typename _ItemType>
-	void save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { save_pointer(NULL, "global", NULL, index, value, valname, count); }
+	void save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
 
 	// file processing
 	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
@@ -170,11 +166,6 @@ private:
 		// construction/destruction
 		state_callback(save_prepost_delegate callback);
 
-		// getters
-		state_callback *next() const { return m_next; }
-
-		// state
-		state_callback *    m_next;                 // pointer to next entry
 		save_prepost_delegate m_func;               // delegate
 	};
 
@@ -183,9 +174,9 @@ private:
 	bool                    m_reg_allowed;          // are registrations allowed?
 	int                     m_illegal_regs;         // number of illegal registrations
 
-	simple_list<state_entry> m_entry_list;          // list of reigstered entries
-	simple_list<state_callback> m_presave_list;     // list of pre-save functions
-	simple_list<state_callback> m_postload_list;    // list of post-load functions
+	std::vector<std::unique_ptr<state_entry>> m_entry_list;          // list of reigstered entries
+	std::vector<std::unique_ptr<state_callback>> m_presave_list;     // list of pre-save functions
+	std::vector<std::unique_ptr<state_callback>> m_postload_list;    // list of post-load functions
 };
 
 

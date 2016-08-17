@@ -114,8 +114,10 @@ enum
 	ppu2c0x_device::set_color_base(*device, _color);
 
 #define MCFG_PPU2C0X_SET_NMI(_class, _method) \
-	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
+#define MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT \
+	ppu2c0x_device::use_sprite_write_limitation_disable(*device);
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -142,11 +144,11 @@ public:
 	DECLARE_READ8_MEMBER( palette_read );
 	DECLARE_WRITE8_MEMBER( palette_write );
 
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_config_complete() override;
 	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 	// address space configurations
 	const address_space_config      m_space_config;
 
@@ -186,10 +188,10 @@ public:
 
 	required_device<cpu_device> m_cpu;
 
-	bitmap_ind16                *m_bitmap;          /* target bitmap */
-	UINT8                       *m_spriteram;           /* sprite ram */
-	pen_t                       *m_colortable;          /* color table modified at run time */
-	pen_t                       *m_colortable_mono;     /* monochromatic color table modified at run time */
+	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
+	std::unique_ptr<UINT8[]>    m_spriteram;           /* sprite ram */
+	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
+	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 	int                         m_scanline;         /* scanline count */
 	ppu2c0x_scanline_delegate   m_scanline_callback_proc;   /* optional scanline callback */
 	ppu2c0x_hblank_delegate     m_hblank_callback_proc; /* optional hblank callback */
@@ -221,6 +223,14 @@ public:
 	emu_timer                   *m_nmi_timer;           /* NMI timer */
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
 
+	// some bootleg / clone hardware appears to ignore this
+	static void use_sprite_write_limitation_disable(device_t &device)
+	{
+		ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
+		dev.m_use_sprite_write_limitation = false;
+	}
+
+	bool m_use_sprite_write_limitation;
 private:
 	static const device_timer_id TIMER_HBLANK = 0;
 	static const device_timer_id TIMER_NMI = 1;

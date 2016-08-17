@@ -581,7 +581,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 <!-- According to http://mercenaryforce.web.fc2.com/x68k/x68000/00013.html there should be a 3rd disk -->
-	<software name="aressha2">
+	<software name="aressh2">
 		<description>A Ressha de Ikou II X68000</description>
 		<year>1988</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -631,7 +631,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3">
+	<software name="aressh3">
 		<description>A Ressha de Ikou III</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
@@ -651,7 +651,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3mc" cloneof="aressha3">
+	<software name="aressh3mc" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Map Construction</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
@@ -671,7 +671,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3mc1" cloneof="aressha3">
+	<software name="aressh3mc1" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Map Construction (Alt?)</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
@@ -682,7 +682,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3log" cloneof="aressha3">
+	<software name="aressh3log" cloneof="aressh3">
 		<description>A Ressha de Ikou III - LOGiN Map</description>
 		<year>1991</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -693,7 +693,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3oms" cloneof="aressha3">
+	<software name="aressh3oms" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Original Meitetsu Sharyou Disk</description>
 		<year>1991</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -4527,7 +4527,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master</description>
 		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -6407,7 +6407,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt1">
+	<software name="hhunt01">
 		<description>Houma Hunter Lime Dai-1-wa</description>
 		<year>1993</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -6427,7 +6427,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt2">
+	<software name="hhunt02">
 		<description>Houma Hunter Lime Dai-2-wa</description>
 		<year>1993</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -6447,7 +6447,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt3">
+	<software name="hhunt03">
 		<description>Houma Hunter Lime Dai-3-wa</description>
 		<year>1993</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -6467,7 +6467,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt6">
+	<software name="hhunt06">
 		<description>Houma Hunter Lime Dai-6-wa</description>
 		<year>1994</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -7650,7 +7650,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="kouryuuk">
+	<software name="koryuki">
 		<description>Kouryuuki</description>
 		<year>1993</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -13994,7 +13994,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="tunnelst">
+	<software name="tuntroll">
 		<description>Tunnels &amp; Trolls - Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -14678,7 +14678,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="wrestan3">
+	<software name="wang3">
 		<description>Wrestle Angels 3</description>
 		<year>1994</year>
 		<publisher>エクシング (Xing)</publisher>
@@ -14722,7 +14722,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="wrestans">
+	<software name="wangsp">
 		<description>Wrestle Angels Special - Mouhitori no Top Eventer</description>
 		<year>1994</year>
 		<publisher>エクシング (Xing)</publisher>

@@ -1,18 +1,19 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "entry_p.h"
 
 #if ENTRY_CONFIG_USE_NATIVE && BX_PLATFORM_WINDOWS
 
-#include <bgfxplatform.h>
+#include <bgfx/bgfxplatform.h>
 
 #include <bx/uint32_t.h>
 #include <bx/thread.h>
 #include <bx/mutex.h>
 #include <bx/handlealloc.h>
+#include <bx/timer.h>
 #include <tinystl/allocator.h>
 #include <tinystl/string.h>
 
@@ -116,6 +117,17 @@ namespace entry
 
 		void update(EventQueue& _eventQueue)
 		{
+			int64_t now = bx::getHPCounter();
+			static int64_t next = now;
+
+			if (now < next)
+			{
+				return;
+			}
+
+			const int64_t timerFreq = bx::getHPFrequency();
+			next = now + timerFreq/60;
+
 			if (NULL == m_xinputdll)
 			{
 				return;
@@ -346,7 +358,7 @@ namespace entry
 			s_translateKey[VK_HOME]       = Key::Home;
 			s_translateKey[VK_END]        = Key::End;
 			s_translateKey[VK_PRIOR]      = Key::PageUp;
-			s_translateKey[VK_NEXT]       = Key::PageUp;
+			s_translateKey[VK_NEXT]       = Key::PageDown;
 			s_translateKey[VK_SNAPSHOT]   = Key::Print;
 			s_translateKey[VK_OEM_PLUS]   = Key::Plus;
 			s_translateKey[VK_OEM_MINUS]  = Key::Minus;
@@ -356,6 +368,7 @@ namespace entry
 			s_translateKey[VK_OEM_7]      = Key::Quote;
 			s_translateKey[VK_OEM_COMMA]  = Key::Comma;
 			s_translateKey[VK_OEM_PERIOD] = Key::Period;
+			s_translateKey[VK_DECIMAL] 	  = Key::Period;
 			s_translateKey[VK_OEM_2]      = Key::Slash;
 			s_translateKey[VK_OEM_5]      = Key::Backslash;
 			s_translateKey[VK_OEM_3]      = Key::Tilde;
@@ -518,7 +531,7 @@ namespace entry
 							, msg->m_y
 							, msg->m_width
 							, msg->m_height
-							, m_hwnd[0]
+							, NULL
 							, NULL
 							, (HINSTANCE)GetModuleHandle(NULL)
 							, 0
@@ -810,7 +823,7 @@ namespace entry
 		WindowHandle findHandle(HWND _hwnd)
 		{
 			bx::LwMutexScope scope(m_lock);
-			for (uint32_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
+			for (uint16_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
 			{
 				uint16_t idx = m_windowAlloc.getHandleAt(ii);
 				if (_hwnd == m_hwnd[idx])
@@ -900,33 +913,6 @@ namespace entry
 
 				left   = newrect.left+(newrect.right -newrect.left-width)/2;
 				top    = newrect.top +(newrect.bottom-newrect.top-height)/2;
-			}
-
-			HWND parent = GetWindow(_hwnd, GW_OWNER);
-			if (NULL != parent)
-			{
-				if (_windowFrame)
-				{
-					SetWindowPos(parent
-						, HWND_TOP
-						, -32000
-						, -32000
-						, 0
-						, 0
-						, SWP_SHOWWINDOW
-						);
-				}
-				else
-				{
-					SetWindowPos(parent
-						, HWND_TOP
-						, newrect.left
-						, newrect.top
-						, newrect.right-newrect.left
-						, newrect.bottom-newrect.top
-						, SWP_SHOWWINDOW
-						);
-				}
 			}
 
 			SetWindowPos(_hwnd

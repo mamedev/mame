@@ -42,10 +42,10 @@ struct xml_data_node;
 
 // ======================> device_debug
 
+// [TODO] This whole thing is terrible.
+
 class device_debug
 {
-	typedef offs_t (*dasm_override_func)(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
-
 public:
 	// breakpoint class
 	class breakpoint
@@ -58,8 +58,8 @@ public:
 					symbol_table &symbols,
 					int index,
 					offs_t address,
-					const char *condition = NULL,
-					const char *action = NULL);
+					const char *condition = nullptr,
+					const char *action = nullptr);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
@@ -100,8 +100,8 @@ public:
 					int type,
 					offs_t address,
 					offs_t length,
-					const char *condition = NULL,
-					const char *action = NULL);
+					const char *condition = nullptr,
+					const char *action = nullptr);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
@@ -118,10 +118,10 @@ public:
 		// setters
 		void setEnabled(bool value) { m_enabled = value; }
 
-	private:
 		// internals
 		bool hit(int type, offs_t address, int size);
 
+	private:
 		const device_debug * m_debugInterface;           // the interface we were created from
 		watchpoint *         m_next;                     // next in the list
 		address_space &      m_space;                    // address space
@@ -141,7 +141,7 @@ public:
 
 	public:
 		// construction/destruction
-		registerpoint(symbol_table &symbols, int index, const char *condition, const char *action = NULL);
+		registerpoint(symbol_table &symbols, int index, const char *condition, const char *action = nullptr);
 
 		// getters
 		registerpoint *next() const { return m_next; }
@@ -170,12 +170,8 @@ public:
 	symbol_table &symtable() { return m_symtable; }
 
 	// commonly-used pass-throughs
-	offs_t pc() const { return (m_state != NULL) ? m_state->pc() : 0; }
-	int logaddrchars(address_spacenum spacenum = AS_0) const { return (m_memory != NULL && m_memory->has_space(spacenum)) ? m_memory->space(spacenum).logaddrchars() : 8; }
-	int min_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
-	int max_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
+	int logaddrchars() const { return (m_memory != nullptr && m_memory->has_space(AS_PROGRAM)) ? m_memory->space(AS_PROGRAM).logaddrchars() : 8; }
 	device_t& device() const { return m_device; }
-
 
 	// hooks used by the rest of the system
 	void start_hook(const attotime &endtime);
@@ -188,10 +184,6 @@ public:
 
 	// hooks into our operations
 	void set_instruction_hook(debug_instruction_hook_func hook);
-	void set_dasm_override(dasm_override_func dasm_override) { m_dasm_override = dasm_override; }
-
-	// disassembly
-	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) const;
 
 	// debugger focus
 	void ignore(bool ignore = true);
@@ -209,11 +201,16 @@ public:
 	void go_exception(int exception);
 	void go_milliseconds(UINT64 milliseconds);
 	void go_next_device();
-	void halt_on_next_instruction(const char *fmt, ...) ATTR_PRINTF(2,3);
+
+	template <typename Format, typename... Params>
+	void halt_on_next_instruction(Format &&fmt, Params &&... args)
+	{
+		halt_on_next_instruction_impl(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
 
 	// breakpoints
 	breakpoint *breakpoint_first() const { return m_bplist; }
-	int breakpoint_set(offs_t address, const char *condition = NULL, const char *action = NULL);
+	int breakpoint_set(offs_t address, const char *condition = nullptr, const char *action = nullptr);
 	bool breakpoint_clear(int index);
 	void breakpoint_clear_all();
 	bool breakpoint_enable(int index, bool enable = true);
@@ -229,7 +226,7 @@ public:
 
 	// registerpoints
 	registerpoint *registerpoint_first() const { return m_rplist; }
-	int registerpoint_set(const char *condition, const char *action = NULL);
+	int registerpoint_set(const char *condition, const char *action = nullptr);
 	bool registerpoint_clear(int index);
 	void registerpoint_clear_all();
 	bool registerpoint_enable(int index, bool enable = true);
@@ -246,7 +243,7 @@ public:
 	UINT32 comment_count() const { return m_comment_set.size(); }
 	UINT32 comment_change_count() const { return m_comment_change; }
 	bool comment_export(xml_data_node &node);
-	bool comment_import(xml_data_node &node);
+	bool comment_import(xml_data_node &node,bool is_inline);
 	UINT32 compute_opcode_crc32(offs_t pc) const;
 
 	// history
@@ -266,17 +263,21 @@ public:
 	void track_mem_data_clear() { m_track_mem_set.clear(); }
 
 	// tracing
-	void trace(FILE *file, bool trace_over, const char *action);
+	void trace(FILE *file, bool trace_over, bool detect_loops, const char *action);
 	void trace_printf(const char *fmt, ...) ATTR_PRINTF(2,3);
-	void trace_flush() { if (m_trace != NULL) m_trace->flush(); }
+	void trace_flush() { if (m_trace != nullptr) m_trace->flush(); }
 
 	void reset_transient_flag() { m_flags &= ~DEBUG_FLAG_TRANSIENT; }
 
 	static const int HISTORY_SIZE = 256;
 
-private:
-	// internal helpers
+	// debugger_cpu helpers
 	void compute_debug_flags();
+
+private:
+	void halt_on_next_instruction_impl(util::format_argument_pack<std::ostream> &&args);
+
+	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
 	UINT32 dasm_wrapped(std::string &buffer, offs_t pc);
 
@@ -309,10 +310,6 @@ private:
 	symbol_table                m_symtable;             // symbol table for expression evaluation
 	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
 
-	// disassembly
-	dasm_override_func      m_dasm_override;            // pointer to provided override function
-	UINT8                   m_opwidth;                  // width of an opcode
-
 	// stepping information
 	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER
 	int                     m_stepsleft;                // number of steps left until done
@@ -339,7 +336,7 @@ private:
 	class tracer
 	{
 	public:
-		tracer(device_debug &debug, FILE &file, bool trace_over, const char *action);
+		tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, const char *action);
 		~tracer();
 
 		void update(offs_t pc);
@@ -353,6 +350,7 @@ private:
 		FILE &              m_file;                     // tracing file for this CPU
 		std::string         m_action;                   // action to perform during a trace
 		offs_t              m_history[TRACE_LOOPS];     // history of recent PCs
+		bool                m_detect_loops;             // whether or not we should detect loops
 		int                 m_loops;                    // number of instructions in a loop
 		int                 m_nextdex;                  // next index
 		bool                m_trace_over;               // true if we're tracing over
@@ -360,7 +358,7 @@ private:
 														//    (0 = not tracing over,
 														//    ~0 = not currently tracing over)
 	};
-	tracer *                m_trace;                    // tracer state
+	std::unique_ptr<tracer>                m_trace;                    // tracer state
 
 	// hotspots
 	struct hotspot_entry
@@ -456,100 +454,173 @@ private:
 			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
 };
 
-
-
 //**************************************************************************
-//  FUNCTION PROTOTYPES
+//  CPU DEBUGGING
 //**************************************************************************
 
-/* ----- initialization and cleanup ----- */
+class debugger_cpu
+{
+public:
+	debugger_cpu(running_machine &machine);
 
-/* initialize the CPU tracking for the debugger */
-void debug_cpu_init(running_machine &machine);
-void debug_cpu_configure_memory(running_machine &machine, symbol_table &table);
+	/* ----- initialization and cleanup ----- */
 
-/* flushes all traces; this is useful if a trace is going on when we fatalerror */
-void debug_cpu_flush_traces(running_machine &machine);
+	/* flushes all traces; this is useful if a trace is going on when we fatalerror */
+	void flush_traces();
 
-
-
-/* ----- debugging status & information ----- */
-
-/* return the visible CPU device (the one that commands should apply to) */
-device_t *debug_cpu_get_visible_cpu(running_machine &machine);
-
-/* TRUE if the debugger is currently stopped within an instruction hook callback */
-int debug_cpu_within_instruction_hook(running_machine &machine);
-
-/* return TRUE if the current execution state is stopped */
-int debug_cpu_is_stopped(running_machine &machine);
+	void configure_memory(symbol_table &table);
 
 
+	/* ----- debugging status & information ----- */
 
-/* ----- symbol table interfaces ----- */
+	/* return the visible CPU device (the one that commands should apply to) */
+	device_t *get_visible_cpu();
 
-/* return the global symbol table */
-symbol_table *debug_cpu_get_global_symtable(running_machine &machine);
+	/* true if the debugger is currently stopped within an instruction hook callback */
+	bool within_instruction_hook();
 
-/* return the locally-visible symbol table */
-symbol_table *debug_cpu_get_visible_symtable(running_machine &machine);
-
-
-
-/* ----- misc debugger functions ----- */
-
-/* specifies a debug command script to execute */
-void debug_cpu_source_script(running_machine &machine, const char *file);
+	/* return true if the current execution state is stopped */
+	bool is_stopped();
 
 
+	/* ----- symbol table interfaces ----- */
 
-/* ----- debugger comment helpers ----- */
+	/* return the global symbol table */
+	symbol_table *get_global_symtable();
 
-// save all comments for a given machine
-bool debug_comment_save(running_machine &machine);
-
-// load all comments for a given machine
-bool debug_comment_load(running_machine &machine);
-
+	/* return the locally-visible symbol table */
+	symbol_table *get_visible_symtable();
 
 
-/* ----- debugger memory accessors ----- */
+	/* ----- misc debugger functions ----- */
 
-/* return the physical address corresponding to the given logical address */
-int debug_cpu_translate(address_space &space, int intention, offs_t *address);
+	/* specifies a debug command script to execute */
+	void source_script(const char *file);
 
-/* return a byte from the specified memory space */
-UINT8 debug_read_byte(address_space &space, offs_t address, int apply_translation);
 
-/* return a word from the specified memory space */
-UINT16 debug_read_word(address_space &space, offs_t address, int apply_translation);
+	/* ----- debugger comment helpers ----- */
 
-/* return a dword from the specified memory space */
-UINT32 debug_read_dword(address_space &space, offs_t address, int apply_translation);
+	// save all comments for a given machine
+	bool comment_save();
 
-/* return a qword from the specified memory space */
-UINT64 debug_read_qword(address_space &space, offs_t address, int apply_translation);
+	// load all comments for a given machine
+	bool comment_load(bool is_inline);
 
-/* return 1,2,4 or 8 bytes from the specified memory space */
-UINT64 debug_read_memory(address_space &space, offs_t address, int size, int apply_translation);
 
-/* write a byte to the specified memory space */
-void debug_write_byte(address_space &space, offs_t address, UINT8 data, int apply_translation);
+	/* ----- debugger memory accessors ----- */
 
-/* write a word to the specified memory space */
-void debug_write_word(address_space &space, offs_t address, UINT16 data, int apply_translation);
+	/* return a byte from the specified memory space */
+	UINT8 read_byte(address_space &space, offs_t address, int apply_translation);
 
-/* write a dword to the specified memory space */
-void debug_write_dword(address_space &space, offs_t address, UINT32 data, int apply_translation);
+	/* return a word from the specified memory space */
+	UINT16 read_word(address_space &space, offs_t address, int apply_translation);
 
-/* write a qword to the specified memory space */
-void debug_write_qword(address_space &space, offs_t address, UINT64 data, int apply_translation);
+	/* return a dword from the specified memory space */
+	UINT32 read_dword(address_space &space, offs_t address, int apply_translation);
 
-/* write 1,2,4 or 8 bytes to the specified memory space */
-void debug_write_memory(address_space &space, offs_t address, UINT64 data, int size, int apply_translation);
+	/* return a qword from the specified memory space */
+	UINT64 read_qword(address_space &space, offs_t address, int apply_translation);
 
-/* read 1,2,4 or 8 bytes at the given offset from opcode space */
-UINT64 debug_read_opcode(address_space &space, offs_t offset, int size);
+	/* return 1,2,4 or 8 bytes from the specified memory space */
+	UINT64 read_memory(address_space &space, offs_t address, int size, int apply_translation);
 
+	/* write a byte to the specified memory space */
+	void write_byte(address_space &space, offs_t address, UINT8 data, int apply_translation);
+
+	/* write a word to the specified memory space */
+	void write_word(address_space &space, offs_t address, UINT16 data, int apply_translation);
+
+	/* write a dword to the specified memory space */
+	void write_dword(address_space &space, offs_t address, UINT32 data, int apply_translation);
+
+	/* write a qword to the specified memory space */
+	void write_qword(address_space &space, offs_t address, UINT64 data, int apply_translation);
+
+	/* write 1,2,4 or 8 bytes to the specified memory space */
+	void write_memory(address_space &space, offs_t address, UINT64 data, int size, int apply_translation);
+
+	/* read 1,2,4 or 8 bytes at the given offset from opcode space */
+	UINT64 read_opcode(address_space &space, offs_t offset, int size);
+
+	// getters
+	bool within_instruction_hook() const { return m_within_instruction_hook; }
+	bool memory_modified() const { return m_memory_modified; }
+	int execution_state() const { return m_execution_state; }
+	device_t *live_cpu() { return m_livecpu; }
+	UINT32 get_breakpoint_index() { return m_bpindex++; }
+	UINT32 get_watchpoint_index() { return m_wpindex++; }
+	UINT32 get_registerpoint_index() { return m_rpindex++; }
+
+	// setters
+	void set_visible_cpu(device_t * visiblecpu) { m_visiblecpu = visiblecpu; }
+	void set_break_cpu(device_t * breakcpu) { m_breakcpu = breakcpu; }
+	void set_within_instruction(bool within_instruction) { m_within_instruction_hook = within_instruction; }
+	void set_memory_modified(bool memory_modified) { m_memory_modified = memory_modified; }
+	void set_execution_state(int execution_state) { m_execution_state = execution_state; }
+
+	// device_debug helpers
+	// [TODO] [RH]: Look into this more later, can possibly merge these two classes
+	void start_hook(device_t *device, bool stop_on_vblank);
+	void stop_hook(device_t *device);
+	void go_next_device(device_t *device);
+	void go_vblank();
+	void halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args);
+	void ensure_comments_loaded();
+	void reset_transient_flags();
+	void process_source_file();
+	void watchpoint_check(address_space& space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask, device_debug::watchpoint** wplist);
+
+private:
+	static const size_t NUM_TEMP_VARIABLES;
+
+	/* expression handlers */
+	UINT64 expression_read_memory(void *param, const char *name, expression_space space, UINT32 address, int size);
+	UINT64 expression_read_program_direct(address_space &space, int opcode, offs_t address, int size);
+	UINT64 expression_read_memory_region(const char *rgntag, offs_t address, int size);
+	void expression_write_memory(void *param, const char *name, expression_space space, UINT32 address, int size, UINT64 data);
+	void expression_write_program_direct(address_space &space, int opcode, offs_t address, int size, UINT64 data);
+	void expression_write_memory_region(const char *rgntag, offs_t address, int size, UINT64 data);
+	expression_error::error_code expression_validate(void *param, const char *name, expression_space space);
+	device_t* expression_get_device(const char *tag);
+
+	/* variable getters/setters */
+	UINT64 get_cpunum(symbol_table &table, void *ref);
+	UINT64 get_beamx(symbol_table &table, void *ref);
+	UINT64 get_beamy(symbol_table &table, void *ref);
+	UINT64 get_frame(symbol_table &table, void *ref);
+
+	/* internal helpers */
+	void on_vblank(screen_device &device, bool vblank_state);
+
+	running_machine&    m_machine;
+
+	device_t *  m_livecpu;
+	device_t *  m_visiblecpu;
+	device_t *  m_breakcpu;
+
+	FILE *      m_source_file;          // script source file
+
+	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
+
+	bool    m_within_instruction_hook;
+	bool    m_vblank_occurred;
+	bool    m_memory_modified;
+	bool    m_debugger_access;
+
+	int         m_execution_state;
+	device_t *  m_stop_when_not_device; // stop execution when the device ceases to be this
+
+	UINT32      m_bpindex;
+	UINT32      m_wpindex;
+	UINT32      m_rpindex;
+
+	UINT64      m_wpdata;
+	UINT64      m_wpaddr;
+	std::unique_ptr<UINT64[]> m_tempvar;
+
+	osd_ticks_t m_last_periodic_update_time;
+
+	bool        m_comments_loaded;
+};
 
 #endif

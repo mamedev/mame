@@ -14,6 +14,7 @@
 #define __CHDCODEC_H__
 
 #include "osdcore.h"
+#include "coretmpl.h"
 
 
 #define CHDCODEC_VERIFY_COMPRESSION 0
@@ -108,7 +109,7 @@ public:
 	static chd_decompressor *new_decompressor(chd_codec_type type, chd_file &file);
 
 	// utilities
-	static bool codec_exists(chd_codec_type type) { return (find_in_list(type) != NULL); }
+	static bool codec_exists(chd_codec_type type) { return (find_in_list(type) != nullptr); }
 	static const char *codec_name(chd_codec_type type);
 
 private:

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_HASH_H_HEADER_GUARD
@@ -103,7 +103,7 @@ namespace bx
 		static void readUnaligned(const void* _data, uint32_t& _out)
 		{
 			const uint8_t* data = (const uint8_t*)_data;
-			if (BX_ENABLED(BX_CPU_ENDIAN_LITTLE) )
+			if (BX_ENABLED(BX_CPU_ENDIAN_BIG) )
 			{
 				_out = 0
 					| data[0]<<24

@@ -9,6 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "machine/315_5296.h"
@@ -27,6 +28,7 @@ public:
 		: sega_16bit_common_base(mconfig, type, tag),
 			m_mapper(*this, "mapper"),
 			m_maincpu(*this, "maincpu"),
+			m_maincpu_region(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
 			m_mcu(*this, "mcu"),
 			m_vdp(*this, "gen_vdp"),
@@ -35,6 +37,7 @@ public:
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_gfxdecode(*this, "gfxdecode"),
+			m_soundlatch(*this, "soundlatch"),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_grayscale_enable(false),
@@ -115,9 +118,10 @@ protected:
 	};
 
 	// device overrides
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal helpers
 	void init_generic(segas18_rom_board rom_board);
@@ -127,6 +131,7 @@ protected:
 	// devices
 	required_device<sega_315_5195_mapper_device> m_mapper;
 	required_device<m68000_device> m_maincpu;
+	required_memory_region m_maincpu_region;
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
 	required_device<sega315_5313_device> m_vdp;
@@ -135,6 +140,7 @@ protected:
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;

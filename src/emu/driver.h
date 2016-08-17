@@ -106,7 +106,7 @@ public:
 	virtual ~driver_device();
 
 	// getters
-	const game_driver &system() const { assert(m_system != NULL); return *m_system; }
+	const game_driver &system() const { assert(m_system != nullptr); return *m_system; }
 
 	// indexes into our generic callbacks
 	enum callback_type
@@ -136,6 +136,9 @@ public:
 
 	// memory helpers
 	address_space &generic_space() const { return space(AS_PROGRAM); }
+
+	// output heler
+	output_manager &output() const { return machine().output(); }
 
 	// generic interrupt generators
 	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
@@ -176,46 +179,6 @@ public:
 	INTERRUPT_GEN_MEMBER( irq7_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq7_line_assert );
 
-	// watchdog read/write handlers
-	DECLARE_WRITE8_MEMBER( watchdog_reset_w );
-	DECLARE_READ8_MEMBER( watchdog_reset_r );
-	DECLARE_WRITE16_MEMBER( watchdog_reset16_w );
-	DECLARE_READ16_MEMBER( watchdog_reset16_r );
-	DECLARE_WRITE32_MEMBER( watchdog_reset32_w );
-	DECLARE_READ32_MEMBER( watchdog_reset32_r );
-
-	// generic audio
-	void soundlatch_setclearedvalue(UINT16 value) { m_latch_clear_value = value; }
-
-	// sound latch readers
-	UINT32 soundlatch_read(UINT8 index = 0);
-	DECLARE_READ8_MEMBER( soundlatch_byte_r );
-	DECLARE_READ8_MEMBER( soundlatch2_byte_r );
-	DECLARE_READ8_MEMBER( soundlatch3_byte_r );
-	DECLARE_READ8_MEMBER( soundlatch4_byte_r );
-	DECLARE_READ16_MEMBER( soundlatch_word_r );
-	DECLARE_READ16_MEMBER( soundlatch2_word_r );
-	DECLARE_READ16_MEMBER( soundlatch3_word_r );
-	DECLARE_READ16_MEMBER( soundlatch4_word_r );
-
-	// sound latch writers
-	void soundlatch_write(UINT8 index, UINT32 data);
-	void soundlatch_write(UINT32 data) { soundlatch_write(0, data); }
-	DECLARE_WRITE8_MEMBER( soundlatch_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch2_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch3_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch4_byte_w );
-	DECLARE_WRITE16_MEMBER( soundlatch_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch2_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch3_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch4_word_w );
-
-	// sound latch clearers
-	void soundlatch_clear(UINT8 index = 0);
-	DECLARE_WRITE8_MEMBER( soundlatch_clear_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch2_clear_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch3_clear_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch4_clear_byte_w );
 
 	// generic video
 	void flip_screen_set(UINT32 on);
@@ -247,17 +210,16 @@ protected:
 	virtual void video_reset();
 
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset_after_children();
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset_after_children() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 private:
 	// helpers
 	void irq_pulse_clear(void *ptr, INT32 param);
-	void soundlatch_sync_callback(void *ptr, INT32 param);
 	void updateflip();
 
 	// configuration state
@@ -266,11 +228,6 @@ private:
 	// internal state
 	const game_driver *     m_system;                   // pointer to the game driver
 	driver_callback_delegate m_callbacks[CB_COUNT];     // start/reset callbacks
-
-	// generic audio
-	UINT16                  m_latch_clear_value;
-	UINT16                  m_latched_value[4];
-	UINT8                   m_latch_read[4];
 
 	// generic video
 	UINT8                   m_flip_screen_x;
@@ -282,9 +239,9 @@ private:
 template<class _DriverClass>
 device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 {
-	assert(owner == NULL);
+	assert(owner == nullptr);
 	assert(clock == 0);
-	return global_alloc_clear(_DriverClass(mconfig, &driver_device_creator<_DriverClass>, tag));
+	return global_alloc_clear<_DriverClass>(mconfig, &driver_device_creator<_DriverClass>, tag);
 }
 
 

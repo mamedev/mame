@@ -1,13 +1,13 @@
 /*
  * Copyright 2013 Jeremie Roy. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef FONT_MANAGER_H_HEADER_GUARD
 #define FONT_MANAGER_H_HEADER_GUARD
 
 #include <bx/handlealloc.h>
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 
 class Atlas;
 

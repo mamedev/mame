@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
+#include "machine/gen_latch.h"
 #include "sound/samples.h"
 
 #define TILEMAPS 0
@@ -19,6 +21,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_bank0d(*this, "bank0d"),
 		m_bank1(*this, "bank1"),
 		m_bank1d(*this, "bank1d"),
@@ -36,6 +40,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 	optional_memory_bank m_bank0d;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank1d;
@@ -67,7 +73,7 @@ public:
 	bool m_has_text; // has text sprites (older games)
 
 	// samples
-	INT16 *m_samplebuf;
+	std::unique_ptr<INT16[]> m_samplebuf;
 	int m_sample, m_play;
 	int m_numsamples;
 
@@ -141,6 +147,7 @@ public:
 	DECLARE_DRIVER_INIT(brickznv4);
 	DECLARE_DRIVER_INIT(starfigh);
 	DECLARE_DRIVER_INIT(hardhea2);
+	DECLARE_DRIVER_INIT(hardhea2b);
 	DECLARE_DRIVER_INIT(hardhedb);
 	DECLARE_DRIVER_INIT(sparkman);
 	DECLARE_DRIVER_INIT(brickzn);
@@ -157,7 +164,6 @@ public:
 	DECLARE_MACHINE_RESET(brickzn);
 	DECLARE_MACHINE_RESET(hardhea2);
 	UINT32 screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(brickzn_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
 
 	// samples

@@ -1,0 +1,31 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  screen_opaque.json: Shader used when drawing a final
+//  post-processed screen image to the output window with
+//  no blending.
+//
+//============================================================
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "1",
+    	"dstColor": "0",
+    	"srcAlpha": "1",
+    	"dstAlpha": "0"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "vs_screen",
+    "fragment": "fs_screen",
+    "uniforms": [
+    	{ "name": "s_tex",  "type": "int",  "values": [ 1.0 ] }
+    ]
+}

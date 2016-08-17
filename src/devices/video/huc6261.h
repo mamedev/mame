@@ -44,9 +44,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	const char *m_huc6270_a_tag;
@@ -70,7 +70,7 @@ private:
 	UINT8   m_pixel_clock;
 
 	emu_timer   *m_timer;
-	bitmap_rgb32    *m_bmp;
+	std::unique_ptr<bitmap_rgb32>  m_bmp;
 	INT32   m_uv_lookup[65536][3];
 };
 

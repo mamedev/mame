@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Derrick Renaud, Couriersud
 #pragma once
 
@@ -34,11 +34,11 @@
  * This filter may be setup just with
  *
  * MCFG_FILTER_RC_ADD("tag", 0)
- * MCFG_FILTER_RC_AC(&flt_rc_ac_default)
+ * MCFG_FILTER_RC_AC()
  *
  * Default behaviour:
  *
- * Without MCFG_SOUND_CONFIG, a disabled FLT_RC_LOWPASS is created
+ * Without MCFG_FILTER_RC_AC, a disabled FLT_RC_LOWPASS is created
  *
  */
 
@@ -80,10 +80,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	void recalc();

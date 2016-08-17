@@ -504,7 +504,7 @@ inline void i8086_common_cpu_device::set_OFB_Sub(UINT32 x,UINT32 y,UINT32 z)
 }
 
 
-inline UINT16 i8086_common_cpu_device::CompressFlags()
+inline UINT16 i8086_common_cpu_device::CompressFlags() const
 {
 	return (CF ? 1 : 0)
 		| (1 << 1)

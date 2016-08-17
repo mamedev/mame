@@ -6,7 +6,7 @@
     SGI/Nintendo Reality Display Processor Blend Unit (BL)
     -------------------
 
-    by MooglyGuy
+    by Ryan Holtz
     based on initial C code by Ville Linde
     contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 
@@ -33,7 +33,7 @@ class n64_blender_t
 		void                set_machine(running_machine& machine) { m_machine = &machine; }
 		void                set_processor(n64_rdp* rdp) { m_rdp = rdp; }
 
-		running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+		running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
 	private:
 		running_machine*    m_machine;

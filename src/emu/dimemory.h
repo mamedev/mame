@@ -47,7 +47,7 @@ const int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 	device_memory_interface::static_set_addrmap(*device, _space, ADDRESS_MAP_NAME(_map));
 
 #define MCFG_DEVICE_REMOVE_ADDRESS_MAP(_space) \
-	device_memory_interface::static_set_addrmap(*device, _space, NULL);
+	device_memory_interface::static_set_addrmap(*device, _space, nullptr);
 
 #define MCFG_DEVICE_PROGRAM_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
@@ -79,19 +79,19 @@ public:
 	virtual ~device_memory_interface();
 
 	// configuration access
-	address_map_constructor address_map(address_spacenum spacenum = AS_0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : NULL; }
+	address_map_constructor address_map(address_spacenum spacenum = AS_0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : nullptr; }
 	const address_space_config *space_config(address_spacenum spacenum = AS_0) const { return memory_space_config(spacenum); }
 
 	// static inline configuration helpers
 	static void static_set_addrmap(device_t &device, address_spacenum spacenum, address_map_constructor map);
 
 	// basic information getters
-	bool has_space(int index = 0) const { return (m_addrspace[index] != NULL); }
-	bool has_space(address_spacenum index) const { return (m_addrspace[int(index)] != NULL); }
-	bool has_configured_map(int index = 0) const { return (m_address_map[index] != NULL); }
-	bool has_configured_map(address_spacenum index) const { return (m_address_map[int(index)] != NULL); }
-	address_space &space(int index = 0) const { assert(m_addrspace[index] != NULL); return *m_addrspace[index]; }
-	address_space &space(address_spacenum index) const { assert(m_addrspace[int(index)] != NULL); return *m_addrspace[int(index)]; }
+	bool has_space(int index = 0) const { return (m_addrspace[index] != nullptr); }
+	bool has_space(address_spacenum index) const { return (m_addrspace[int(index)] != nullptr); }
+	bool has_configured_map(int index = 0) const { return (m_address_map[index] != nullptr); }
+	bool has_configured_map(address_spacenum index) const { return (m_address_map[int(index)] != nullptr); }
+	address_space &space(int index = 0) const { assert(m_addrspace[index] != nullptr); return *m_addrspace[index]; }
+	address_space &space(address_spacenum index) const { assert(m_addrspace[int(index)] != nullptr); return *m_addrspace[int(index)]; }
 
 	// address space accessors
 	void set_address_space(address_spacenum spacenum, address_space &space);
@@ -119,34 +119,19 @@ protected:
 	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
 
 	// interface-level overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
+	virtual void interface_validity_check(validity_checker &valid) const override;
 
 	// configuration
 	address_map_constructor m_address_map[ADDRESS_SPACES]; // address maps for each address space
+
+private:
+	// internal state
 	address_space *     m_addrspace[ADDRESS_SPACES]; // reported address spaces
 };
 
 // iterator
 typedef device_interface_iterator<device_memory_interface> memory_interface_iterator;
 
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_get_space_config - return a pointer
-//  to sthe given address space's configuration
-//-------------------------------------------------
-
-inline const address_space_config *device_get_space_config(const device_t &device, address_spacenum spacenum = AS_0)
-{
-	const device_memory_interface *intf;
-	if (!device.interface(intf))
-		throw emu_fatalerror("Device '%s' does not have memory interface", device.tag());
-	return intf->space_config(spacenum);
-}
 
 
 #endif  /* __DIMEMORY_H__ */

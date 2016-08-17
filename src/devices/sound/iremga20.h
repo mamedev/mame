@@ -51,11 +51,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	DECLARE_WRITE8_MEMBER( irem_ga20_w );
@@ -65,8 +65,7 @@ private:
 	void iremga20_reset();
 
 private:
-	UINT8 *m_rom;
-	INT32 m_rom_size;
+	required_region_ptr<UINT8> m_rom;
 	sound_stream *m_stream;
 	UINT16 m_regs[0x40];
 	IremGA20_channel_def m_channel[4];

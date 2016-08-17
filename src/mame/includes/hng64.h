@@ -24,7 +24,7 @@ enum hng64trans_t
 
 struct blit_parameters
 {
-	bitmap_rgb32 *          bitmap;
+	bitmap_rgb32 *      bitmap;
 	rectangle           cliprect;
 	UINT32              tilemap_priority_code;
 	UINT8               mask;
@@ -55,7 +55,7 @@ struct polyVert
 struct polygon
 {
 	int n;                      // Number of sides
-	struct polyVert vert[10];   // Vertices (maximum number per polygon is 10 -> 3+6)
+	polyVert vert[10];          // Vertices (maximum number per polygon is 10 -> 3+6)
 
 	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
 	int visible;                // Polygon visibility in scene
@@ -92,6 +92,8 @@ struct polygon
 
 const int HNG64_MAX_POLYGONS = 10000;
 
+typedef frustum_clip_vertex<float, 5> hng64_clip_vertex;
+
 struct hng64_poly_data
 {
 	UINT8 texType;
@@ -109,23 +111,22 @@ class hng64_state;
 class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>
 {
 public:
-    hng64_poly_renderer(hng64_state& state);
-    
-    void drawShaded(struct polygon *p);
-    void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	hng64_poly_renderer(hng64_state& state);
 
-    hng64_state& state() { return m_state; }
-    bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
-    float* depthBuffer3d() { return m_depthBuffer3d; }
-    
+	void drawShaded(polygon *p);
+	void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+
+	hng64_state& state() { return m_state; }
+	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
+	float* depthBuffer3d() { return m_depthBuffer3d.get(); }
+
 private:
-    hng64_state& m_state;
-    
-    // (Temporarily class members - someday they will live in the memory map)
-    bitmap_rgb32 m_colorBuffer3d;
-    float* m_depthBuffer3d;
-};
+	hng64_state& m_state;
 
+	// (Temporarily class members - someday they will live in the memory map)
+	bitmap_rgb32 m_colorBuffer3d;
+	std::unique_ptr<float[]> m_depthBuffer3d;
+};
 
 
 class hng64_state : public driver_device
@@ -173,9 +174,7 @@ public:
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
 
-    /* 3D stuff */
-	UINT16* m_dl;
-
+	std::unique_ptr<UINT16[]> m_dl;
 	required_shared_ptr<UINT32> m_3dregs;
 	required_shared_ptr<UINT32> m_3d_1;
 	required_shared_ptr<UINT32> m_3d_2;
@@ -189,12 +188,12 @@ public:
 
 	int m_mcu_type;
 
-	UINT16 *m_soundram;
-	UINT16 *m_soundram2;
+	std::unique_ptr<UINT16[]> m_soundram;
+	std::unique_ptr<UINT16[]> m_soundram2;
 
 	/* Communications stuff */
-	UINT8  *m_com_op_base;
-	UINT8  *m_com_virtual_mem;
+	std::unique_ptr<UINT8[]> m_com_op_base;
+	std::unique_ptr<UINT8[]> m_com_virtual_mem;
 	UINT8 m_com_shared[8];
 
 	INT32 m_dma_start;
@@ -204,7 +203,7 @@ public:
 	UINT32 m_mcu_fake_time;
 	UINT16 m_mcu_en;
 
-	UINT32 m_activeBuffer;
+	UINT32 m_activeDisplayList;
 	UINT32 m_no_machine_error_code;
 
 	UINT32 m_unk_vreg_toggle;
@@ -237,7 +236,6 @@ public:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	DECLARE_READ32_MEMBER(hng64_random_read);
 	DECLARE_READ32_MEMBER(hng64_com_r);
 	DECLARE_WRITE32_MEMBER(hng64_com_w);
 	DECLARE_WRITE8_MEMBER(hng64_com_share_w);
@@ -275,10 +273,6 @@ public:
 
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_even_w);
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_odd_w);
-	DECLARE_WRITE32_MEMBER(trap_write);
-	DECLARE_WRITE32_MEMBER(activate_3d_buffer);
-	DECLARE_READ8_MEMBER(hng64_comm_shared_r);
-	DECLARE_WRITE8_MEMBER(hng64_comm_shared_w);
 	DECLARE_WRITE32_MEMBER(hng64_videoram_w);
 	DECLARE_READ8_MEMBER(hng64_comm_space_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_space_w);
@@ -293,10 +287,10 @@ public:
 	DECLARE_DRIVER_INIT(hng64_fght);
 	DECLARE_DRIVER_INIT(hng64_reorder_gfx);
 
-	void m_set_irq(UINT32 irq_vector);
+	void set_irq(UINT32 irq_vector);
 	UINT32 m_irq_pending;
 	UINT8 *m_comm_rom;
-	UINT8 *m_comm_ram;
+	std::unique_ptr<UINT8[]> m_comm_ram;
 	UINT8 m_mmu_regs[8];
 	UINT32 m_mmua[6];
 	UINT16 m_mmub[6];
@@ -311,38 +305,20 @@ public:
 	TILE_GET_INFO_MEMBER(get_hng64_tile2_16x16_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_16x16_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_hng64(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
 	void do_dma(address_space &space);
 
-
-	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
-
-    hng64_poly_renderer* m_poly_renderer;
-    
-    void clear3d();
-	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
-
-	void hng64_command3d(const UINT16* packet);
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
-	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
-	void setCameraTransformation(const UINT16* packet);
-	void setLighting(const UINT16* packet);
-	void set3dFlags(const UINT16* packet);
-	void setCameraProjectionMatrix(const UINT16* packet);
-	void recoverPolygonBlock(const UINT16* packet, int* numPolys);
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
+	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
+
+	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
 
 	void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
@@ -352,19 +328,39 @@ public:
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat);
 
+
+
+	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
+
+	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
+
+	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
+
+	UINT8 *m_texturerom;
+	UINT16* m_vertsrom;
+	int m_vertsrom_size;
+	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
+
+	void clear3d();
+	void hng64_command3d(const UINT16* packet);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void setCameraTransformation(const UINT16* packet);
+	void setLighting(const UINT16* packet);
+	void set3dFlags(const UINT16* packet);
+	void setCameraProjectionMatrix(const UINT16* packet);
+	void recoverPolygonBlock(const UINT16* packet, int& numPolys);
 	void printPacket(const UINT16* packet, int hex);
+	float uToF(UINT16 input);
 	void matmul4(float *product, const float *a, const float *b);
 	void vecmatmul4(float *product, const float *a, const float *b);
 	float vecDotProduct(const float *a, const float *b);
 	void setIdentity(float *matrix);
-	float uToF(UINT16 input);
 	void normalize(float* x);
-	int Inside(struct polyVert *v, int plane);
-	void Intersect(struct polyVert *input0, struct polyVert *input1, struct polyVert *output, int plane);
-	void performFrustumClip(struct polygon *p);
-	UINT8 *m_texturerom;
-	UINT16* m_vertsrom;
-	int m_vertsrom_size;
+
 	void reset_sound();
 	void reset_net();
 
@@ -385,19 +381,11 @@ public:
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_0080_w);
 
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0100_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0102_w);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0104_r);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0106_r);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0108_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_010a_w);
-
 	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
 	DECLARE_READ16_MEMBER(main_sound_comms_r);
 	DECLARE_WRITE16_MEMBER(main_sound_comms_w);
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
-	UINT16 main_latch[2],sound_latch[2];
-
-	std::vector<polygon> polys;//(1024*5);
+	UINT16 main_latch[2];
+	UINT16 sound_latch[2];
 };

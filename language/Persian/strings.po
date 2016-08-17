@@ -1,0 +1,2198 @@
+# Persian translations for PACKAGE package.
+# Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MAME\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-07 23:13+0200\n"
+"PO-Revision-Date: 2016-02-20 18:03+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: MAME Language Team\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/frontend/mame/ui/auditmenu.cpp:116
+msgid "Audit in progress..."
+msgstr ""
+
+#: src/frontend/mame/ui/barcode.cpp:73
+msgid "New Barcode:"
+msgstr ""
+
+#: src/frontend/mame/ui/barcode.cpp:77
+msgid "Enter Code"
+msgstr ""
+
+#: src/frontend/mame/ui/barcode.cpp:119
+msgid "Barcode length invalid!"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:92
+#, c-format
+msgid ""
+"Cheat Comment:\n"
+"%s"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:105
+msgid "All cheats reloaded"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:136
+msgid "Autofire Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:157
+msgid "Reset All"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:160
+msgid "Reload All"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:273
+msgid "Autofire Status"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/ui.cpp:1478
+#: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
+#: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
+#: src/frontend/mame/ui/videoopt.cpp:224
+msgid "Disabled"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/ui.cpp:1478
+#: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
+#: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
+#: src/frontend/mame/ui/videoopt.cpp:224
+msgid "Enabled"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
+#: src/frontend/mame/ui/menu.cpp:712 src/frontend/mame/ui/miscmenu.cpp:942
+#: src/frontend/mame/ui/sndmenu.cpp:133 src/frontend/mame/ui/sndmenu.cpp:135
+msgid "On"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
+#: src/frontend/mame/ui/menu.cpp:715 src/frontend/mame/ui/miscmenu.cpp:942
+#: src/frontend/mame/ui/sndmenu.cpp:133 src/frontend/mame/ui/sndmenu.cpp:135
+msgid "Off"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:316
+msgid "No buttons found on this machine!"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:327 src/frontend/mame/ui/cheatopt.cpp:331
+msgid "Autofire Delay"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:159 src/frontend/mame/ui/custmenu.cpp:446
+msgid "Main filter"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:168 src/frontend/mame/ui/custmenu.cpp:455
+msgid "Other filter"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:177 src/frontend/mame/ui/optsmenu.cpp:253
+msgid "^!Manufacturer"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:186 src/frontend/mame/ui/custmenu.cpp:473
+#: src/frontend/mame/ui/optsmenu.cpp:261
+msgid "^!Year"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:195 src/frontend/mame/ui/custmenu.cpp:509
+msgid "Remove last filter"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:198 src/frontend/mame/ui/custmenu.cpp:512
+msgid "Add filter"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:212 src/frontend/mame/ui/custmenu.cpp:232
+#: src/frontend/mame/ui/custmenu.cpp:527 src/frontend/mame/ui/custmenu.cpp:547
+msgid "Select custom filters:"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:464
+msgid "^!Publisher"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:482
+msgid "^!Software List"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:491
+msgid "^!Device type"
+msgstr ""
+
+#: src/frontend/mame/ui/custmenu.cpp:500
+msgid "^!Region"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:24
+msgid "Show All"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:25
+msgid "Hide Filters"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:26
+msgid "Hide Info/Image"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:27
+msgid "Hide Both"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:143
+msgid "Fonts"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:144
+msgid "Colors"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:149 src/frontend/mame/ui/dirmenu.cpp:38
+msgid "Language"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:153
+msgid "Show side panels"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:167 src/frontend/mame/ui/custui.cpp:187
+msgid "Custom UI Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:245
+msgid "default"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:348
+msgid "UI Font"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:353
+msgid "Bold"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:354
+msgid "Italic"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:359
+msgid "Lines"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:365
+msgid "Infos text size"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:381
+msgid "UI Fonts Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:408
+msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:506
+msgid "Normal text"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:507
+msgid "Selected color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:508
+msgid "Normal text background"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:509
+msgid "Selected background color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:510
+msgid "Subitem color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:511 src/frontend/mame/ui/custui.cpp:605
+msgid "Clone"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:512
+msgid "Border"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:513
+msgid "Background"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:514
+msgid "Dipswitch"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:515
+msgid "Unavailable color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:516
+msgid "Slider color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:517
+msgid "Gfx viewer background"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:518
+msgid "Mouse over color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:519
+msgid "Mouse over background color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:520
+msgid "Mouse down color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:521
+msgid "Mouse down background color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:524
+msgid "Restore originals colors"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:539
+msgid "UI Colors Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:567
+#, c-format
+msgid "Double click or press %1$s to change the color value"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:593
+msgid "Menu Preview"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:601
+msgid "Normal"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:602
+msgid "Subitem"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:603
+msgid "Selected"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:604
+msgid "Mouse Over"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:836 src/frontend/mame/ui/custui.cpp:839
+msgid "Alpha"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:844 src/frontend/mame/ui/custui.cpp:847
+#: src/frontend/mame/ui/custui.cpp:1009
+msgid "Red"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:852 src/frontend/mame/ui/custui.cpp:855
+#: src/frontend/mame/ui/custui.cpp:1012
+msgid "Green"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:860 src/frontend/mame/ui/custui.cpp:863
+#: src/frontend/mame/ui/custui.cpp:1013
+msgid "Blue"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:866
+msgid "Choose from palette"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:881
+msgid " - ARGB Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:905
+msgid "Color preview ="
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:1005
+msgid "White"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:1006
+msgid "Silver"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:1007
+msgid "Gray"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:1008
+msgid "Black"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:1010
+msgid "Orange"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:1011
+msgid "Yellow"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:1014
+msgid "Violet"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:65
+msgid "Software History"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:67
+msgid "Software Usage"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:195
+msgid "Revision: "
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:281 src/frontend/mame/ui/selgame.cpp:43
+#: src/frontend/mame/ui/selgame.cpp:2177 src/frontend/mame/ui/selgame.cpp:2186
+#: src/frontend/mame/ui/selsoft.cpp:1569 src/frontend/mame/ui/selsoft.cpp:1587
+#: src/frontend/mame/ui/selsoft.cpp:1596
+msgid "History"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:283 src/frontend/mame/ui/selgame.cpp:44
+msgid "Mameinfo"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:285 src/frontend/mame/ui/selgame.cpp:46
+msgid "Messinfo"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:287 src/frontend/mame/ui/selgame.cpp:45
+msgid "Sysinfo"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:289 src/frontend/mame/ui/selgame.cpp:49
+msgid "Mamescore"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:291 src/frontend/mame/ui/selgame.cpp:48
+msgid "Gameinit"
+msgstr ""
+
+#: src/frontend/mame/ui/datmenu.cpp:293 src/frontend/mame/ui/selgame.cpp:47
+msgid "Command"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:36
+msgid "ROMs"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:37
+msgid "UI"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:39
+msgid "Samples"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:40
+msgid "DATs"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:41
+msgid "INIs"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:42
+msgid "Extra INIs"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:43
+msgid "Icons"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:44 src/frontend/mame/ui/submenu.cpp:25
+msgid "Cheats"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:45 src/frontend/mame/ui/menu.cpp:41
+msgid "Snapshots"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:46 src/frontend/mame/ui/menu.cpp:42
+msgid "Cabinets"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/menu.cpp:45
+msgid "Flyers"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:48 src/frontend/mame/ui/menu.cpp:46
+msgid "Titles"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/menu.cpp:47
+msgid "Ends"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/menu.cpp:44
+msgid "PCBs"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:51 src/frontend/mame/ui/menu.cpp:56
+#: src/frontend/mame/ui/videoopt.cpp:224
+msgid "Marquees"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:52
+msgid "Controls Panels"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:53
+msgid "Crosshairs"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:54
+msgid "Artworks"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:55 src/frontend/mame/ui/menu.cpp:49
+msgid "Bosses"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:56
+msgid "Artworks Preview"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/menu.cpp:55
+msgid "Select"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:58
+msgid "GameOver"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/menu.cpp:53
+msgid "HowTo"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:60 src/frontend/mame/ui/menu.cpp:50
+msgid "Logos"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/menu.cpp:54
+msgid "Scores"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/menu.cpp:51
+msgid "Versus"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/menu.cpp:57
+msgid "Covers"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:120 src/frontend/mame/ui/dirmenu.cpp:140
+msgid "Folders Setup"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:187
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:199
+msgid "Change Folder"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:199
+msgid "Add Folder"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:202
+msgid "Remove Folder"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:537
+msgid "Press TAB to set"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:642
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
+
+#: src/frontend/mame/ui/filecreate.cpp:106
+msgid "File Already Exists - Override?"
+msgstr ""
+
+#: src/frontend/mame/ui/filecreate.cpp:108
+#: src/frontend/mame/ui/selgame.cpp:1594 src/frontend/mame/ui/selgame.cpp:1595
+#: src/frontend/mame/ui/selgame.cpp:1596 src/frontend/mame/ui/selgame.cpp:1597
+#: src/frontend/mame/ui/selgame.cpp:1598 src/frontend/mame/ui/selgame.cpp:1599
+#: src/frontend/mame/ui/selgame.cpp:1600 src/frontend/mame/ui/selgame.cpp:1609
+msgid "No"
+msgstr ""
+
+#: src/frontend/mame/ui/filecreate.cpp:109
+#: src/frontend/mame/ui/selgame.cpp:1594 src/frontend/mame/ui/selgame.cpp:1595
+#: src/frontend/mame/ui/selgame.cpp:1596 src/frontend/mame/ui/selgame.cpp:1597
+#: src/frontend/mame/ui/selgame.cpp:1598 src/frontend/mame/ui/selgame.cpp:1599
+#: src/frontend/mame/ui/selgame.cpp:1600 src/frontend/mame/ui/selgame.cpp:1609
+msgid "Yes"
+msgstr ""
+
+#: src/frontend/mame/ui/filecreate.cpp:201
+msgid "New Image Name:"
+msgstr ""
+
+#: src/frontend/mame/ui/filecreate.cpp:207
+msgid "Image Format:"
+msgstr ""
+
+#: src/frontend/mame/ui/filecreate.cpp:213
+msgid "Create"
+msgstr ""
+
+#: src/frontend/mame/ui/filecreate.cpp:244
+msgid "Please enter a file extension too"
+msgstr ""
+
+#: src/frontend/mame/ui/filecreate.cpp:296
+msgid "Select image format"
+msgstr ""
+
+#: src/frontend/mame/ui/filesel.cpp:256 src/frontend/mame/ui/swlist.cpp:67
+msgid "[empty slot]"
+msgstr ""
+
+#: src/frontend/mame/ui/filesel.cpp:260
+msgid "[create]"
+msgstr ""
+
+#: src/frontend/mame/ui/filesel.cpp:264 src/frontend/mame/ui/swlist.cpp:78
+msgid "[software list]"
+msgstr ""
+
+#: src/frontend/mame/ui/filesel.cpp:534
+msgid "Select access mode"
+msgstr ""
+
+#: src/frontend/mame/ui/filesel.cpp:535
+msgid "Read-only"
+msgstr ""
+
+#: src/frontend/mame/ui/filesel.cpp:537
+msgid "Read-write"
+msgstr ""
+
+#: src/frontend/mame/ui/filesel.cpp:538
+msgid "Read this image, write to another image"
+msgstr ""
+
+#: src/frontend/mame/ui/filesel.cpp:539
+msgid "Read this image, write to diff"
+msgstr ""
+
+#: src/frontend/mame/ui/imgcntrl.cpp:115
+msgid "Cannot save over directory"
+msgstr ""
+
+#: src/frontend/mame/ui/imgcntrl.cpp:145
+msgid ""
+"The software selected is missing one or more required ROM or CHD images. "
+"Please select a different one."
+msgstr ""
+
+#: src/frontend/mame/ui/info.cpp:99
+msgid "Not supported"
+msgstr ""
+
+#: src/frontend/mame/ui/info.cpp:102
+msgid "Partially supported"
+msgstr ""
+
+#: src/frontend/mame/ui/info.cpp:110
+msgid "[empty]"
+msgstr ""
+
+#: src/frontend/mame/ui/info_pty.cpp:28 src/frontend/mame/ui/mainmenu.cpp:93
+msgid "Pseudo terminals"
+msgstr ""
+
+#: src/frontend/mame/ui/info_pty.cpp:37
+msgid "[failed]"
+msgstr ""
+
+#: src/frontend/mame/ui/inputmap.cpp:53
+msgid "User Interface"
+msgstr ""
+
+#: src/frontend/mame/ui/inputmap.cpp:59
+msgid "Other Controls"
+msgstr ""
+
+#: src/frontend/mame/ui/inputmap.cpp:621 src/frontend/mame/ui/miscmenu.cpp:96
+#: src/frontend/mame/ui/slotopt.cpp:174
+msgid "Reset"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:54
+msgid "Input (general)"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:56
+msgid "Input (this Machine)"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:60
+msgid "Analog Controls"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:62
+msgid "Dip Switches"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:65
+msgid "Machine Configuration"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:69
+msgid "Bookkeeping Info"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:72
+msgid "Machine Information"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:79
+msgid "Image Information"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:82
+msgid "File Manager"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:90
+msgid "Tape Control"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:96
+msgid "Bios Selection"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:100
+msgid "Slot Devices"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:104
+msgid "Barcode Reader"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:108
+msgid "Network Devices"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:112
+msgid "Keyboard Mode"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:115
+msgid "Slider Controls"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:118 src/frontend/mame/ui/submenu.cpp:99
+msgid "Video Options"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:122
+msgid "Crosshair Options"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:126
+msgid "Cheat"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:129
+msgid "Plugin Options"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:133
+msgid "External DAT View"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:139 src/frontend/mame/ui/miscmenu.cpp:789
+msgid "Add To Favorites"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:141 src/frontend/mame/ui/miscmenu.cpp:791
+msgid "Remove From Favorites"
+msgstr ""
+
+#: src/frontend/mame/ui/mainmenu.cpp:148
+msgid "Select New Machine"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:43
+msgid "Control Panels"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:48
+msgid "Artwork Preview"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:52
+msgid "Game Over"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:61
+msgid "Add or remove favorites"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:62
+msgid "Export displayed list to file"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:63
+msgid "Show DATs view"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:264
+msgid "Return to Machine"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:269 src/frontend/mame/ui/menu.cpp:271
+msgid "Exit"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:276 src/frontend/mame/ui/menu.cpp:278
+msgid "Return to Previous Menu"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:718
+msgid "Auto"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:2132
+msgid "Images"
+msgstr ""
+
+#: src/frontend/mame/ui/menu.cpp:2133
+msgid "Infos"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:42
+msgid "Keyboard Mode:"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:42
+msgid "Natural"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:42
+msgid "Emulated"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:243
+#, c-format
+msgid ""
+"Uptime: %1$d:%2$02d:%3$02d\n"
+"\n"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:245
+#, c-format
+msgid ""
+"Uptime: %1$d:%2$02d\n"
+"\n"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:249
+#, c-format
+msgid ""
+"Tickets dispensed: %1$d\n"
+"\n"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:260
+msgid "Coin %1$c: NA%3$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:260
+#, c-format
+msgid "Coin %1$c: %2$d%3$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:263
+msgid " (locked)"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:517
+msgid "Visible Delay"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:616
+#, c-format
+msgid "%s.xml saved under ui folder."
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:644
+msgid "Name:             Description:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:656
+#, c-format
+msgid "%s.txt saved under ui folder."
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:674
+msgid "Export list in XML format (like -listxml)"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:675
+msgid "Export list in XML format (like -listxml, but exclude devices)"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:676
+msgid "Export list in TXT format (like -listfull)"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:726 src/frontend/mame/ui/ui.cpp:2557
+msgid ""
+"\n"
+"    Configuration saved    \n"
+"\n"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:773
+msgid "Bios"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:777
+msgid "Driver"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:780
+msgid "This machine has no bios."
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:794
+msgid "Save machine configuration"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:809
+msgid "Configure machine:"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:870 src/frontend/mame/ui/selsoft.cpp:114
+msgid " (default)"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:958 src/frontend/mame/ui/miscmenu.cpp:978
+#: src/frontend/mame/ui/selgame.cpp:602
+msgid "Plugins"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:232
+msgid "Filter"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:240
+msgid " ^!File"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:245
+msgid " ^!Category"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:268
+msgid "^!Setup custom filter"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:276
+msgid "Customize UI"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:277
+msgid "Configure Directories"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:280 src/frontend/mame/ui/sndmenu.cpp:148
+#: src/frontend/mame/ui/sndmenu.cpp:168
+msgid "Sound Options"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:283
+msgid "General Inputs"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:286
+msgid "Save Configuration"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:299 src/frontend/mame/ui/optsmenu.cpp:319
+msgid "Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/selector.cpp:167
+msgid "Selection List - Search: "
+msgstr ""
+
+#: src/frontend/mame/ui/selector.cpp:196
+#, c-format
+msgid "Double click or press %1$s to select"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:42
+msgid "General Info"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:382 src/frontend/mame/ui/selsoft.cpp:279
+#, c-format
+msgid ""
+"%s\n"
+" added to favorites list."
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:388 src/frontend/mame/ui/selgame.cpp:397
+#: src/frontend/mame/ui/selsoft.cpp:284
+#, c-format
+msgid ""
+"%s\n"
+" removed from favorites list."
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:465
+msgid ""
+"The selected machine is missing one or more required ROM or CHD images. "
+"Please select a different machine.\n"
+"\n"
+"Press any key to continue."
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:597
+#: src/frontend/mame/ui/simpleselgame.cpp:270
+msgid "Configure Options"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:598
+msgid "Configure Machine"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:762
+#, c-format
+msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:772
+#, c-format
+msgid "%1$s (%2$s - %3$s) - "
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:779 src/frontend/mame/ui/selgame.cpp:785
+#, c-format
+msgid "%1$s (%2$s) - "
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:794
+#, c-format
+msgid "%1$s Search: %2$s_"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:848
+#, c-format
+msgid "Romset: %1$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:851 src/frontend/mame/ui/selgame.cpp:900
+#: src/frontend/mame/ui/selsoft.cpp:736 src/frontend/mame/ui/selsoft.cpp:785
+#: src/frontend/mame/ui/simpleselgame.cpp:333
+#, c-format
+msgid "%1$s, %2$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:857 src/frontend/mame/ui/selsoft.cpp:742
+#, c-format
+msgid "Driver is clone of: %1$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:859 src/frontend/mame/ui/selsoft.cpp:744
+msgid "Driver is parent"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:863 src/frontend/mame/ui/selsoft.cpp:748
+#: src/frontend/mame/ui/simpleselgame.cpp:340
+msgid "Overall: NOT WORKING"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:865 src/frontend/mame/ui/selsoft.cpp:750
+#: src/frontend/mame/ui/simpleselgame.cpp:342
+msgid "Overall: Unemulated Protection"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:867 src/frontend/mame/ui/selsoft.cpp:752
+#: src/frontend/mame/ui/simpleselgame.cpp:344
+msgid "Overall: Working"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:871 src/frontend/mame/ui/selsoft.cpp:756
+msgid "Graphics: Imperfect, "
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:873 src/frontend/mame/ui/selsoft.cpp:758
+msgid "Graphics: OK, "
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:876 src/frontend/mame/ui/selsoft.cpp:761
+msgid "Sound: Unimplemented"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:878 src/frontend/mame/ui/selsoft.cpp:763
+msgid "Sound: Imperfect"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:880 src/frontend/mame/ui/selsoft.cpp:765
+msgid "Sound: OK"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:897
+#, c-format
+msgid "System: %1$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:904 src/frontend/mame/ui/selsoft.cpp:789
+#, c-format
+msgid "Software is clone of: %1$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:906 src/frontend/mame/ui/selsoft.cpp:791
+msgid "Software is parent"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:911 src/frontend/mame/ui/selsoft.cpp:796
+msgid "Supported: No"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:916 src/frontend/mame/ui/selsoft.cpp:801
+msgid "Supported: Partial"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:921 src/frontend/mame/ui/selsoft.cpp:806
+msgid "Supported: Yes"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:926 src/frontend/mame/ui/selsoft.cpp:811
+#, c-format
+msgid "romset: %1$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:934
+#, c-format
+msgid "%1$s %2$s"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1561
+#, c-format
+msgid "Romset: %1$-.100s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1562
+#, c-format
+msgid "Year: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1563
+#, c-format
+msgid "Manufacturer: %1$-.100s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1567
+#, c-format
+msgid "Driver is Clone of: %1$-.100s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1569
+msgid "Driver is Parent\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1572
+msgid "Overall: NOT WORKING\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1574
+msgid "Overall: Unemulated Protection\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1576
+msgid "Overall: Working\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1579
+msgid "Graphics: Imperfect Colors\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1583
+msgid "Graphics: Imperfect\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1585
+msgid "Graphics: OK\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1588
+msgid "Sound: Unimplemented\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1590
+msgid "Sound: Imperfect\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1592
+msgid "Sound: OK\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1594
+#, c-format
+msgid "Driver is Skeleton: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1595
+#, c-format
+msgid "Game is Mechanical: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1596
+#, c-format
+msgid "Requires Artwork: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1597
+#, c-format
+msgid "Requires Clickable Artwork: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1598
+#, c-format
+msgid "Support Cocktail: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1599
+#, c-format
+msgid "Driver is Bios: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1600
+#, c-format
+msgid "Support Save: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1601
+#, c-format
+msgid "Screen Orientation: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1601
+msgid "Vertical"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1601
+msgid "Horizontal"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1609
+#, c-format
+msgid "Requires CHD: %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1622
+msgid "Roms Audit Pass: OK\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1624
+msgid "Roms Audit Pass: BAD\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1627
+msgid "Samples Audit Pass: None Needed\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1629
+msgid "Samples Audit Pass: OK\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1631
+msgid "Samples Audit Pass: BAD\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1634
+msgid ""
+"Roms Audit Pass: Disabled\n"
+"Samples Audit Pass: Disabled\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:2074 src/frontend/mame/ui/selgame.cpp:2235
+#: src/frontend/mame/ui/selsoft.cpp:1650
+msgid "No Infos Available"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:2187 src/frontend/mame/ui/selsoft.cpp:1597
+msgid "Usage"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:375
+msgid ""
+"The selected software is missing one or more required files. Please select a "
+"different software.\n"
+"\n"
+"Press any key to continue."
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:669
+#, c-format
+msgid "%1$s %2$s ( %3$d / %4$d software packages )"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:670
+#, c-format
+msgid "Driver: \"%1$s\" software list "
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:673
+#, c-format
+msgid "Region: %1$s -"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:675
+#, c-format
+msgid "Publisher: %1$s -"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:677
+#, c-format
+msgid "Year: %1$s -"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:679
+#, c-format
+msgid "Software List: %1$s -"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:681
+#, c-format
+msgid "Device type: %1$s -"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:683
+#, c-format
+msgid "%s Search: %s_"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:733 src/frontend/mame/ui/selsoft.cpp:782
+#: src/frontend/mame/ui/simpleselgame.cpp:330
+#, c-format
+msgid "%1$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:1988 src/frontend/mame/ui/selsoft.cpp:2008
+msgid "Software part selection:"
+msgstr ""
+
+#: src/frontend/mame/ui/selsoft.cpp:2129 src/frontend/mame/ui/selsoft.cpp:2149
+msgid "Bios selection:"
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:240
+#, c-format
+msgid ""
+"No machines found. Please check the rompath specified in the %1$s.ini file.\n"
+"\n"
+"If this is your first time using %2$s, please see the config.txt file in the "
+"docs directory for information on configuring %2$s."
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:295
+#, c-format
+msgid "Type name or select: %1$s_"
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:297
+msgid "Type name or select: (random)"
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:336
+#, c-format
+msgid "Driver: %1$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:348
+#: src/frontend/mame/ui/simpleselgame.cpp:355
+msgid "Imperfect"
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:350
+#: src/frontend/mame/ui/simpleselgame.cpp:357
+msgid "OK"
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:353
+msgid "Unimplemented"
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:359
+#, c-format
+msgid "Gfx: %s, Sound: %s"
+msgstr ""
+
+#: src/frontend/mame/ui/slotopt.cpp:168
+msgid " [internal]"
+msgstr ""
+
+#: src/frontend/mame/ui/sndmenu.cpp:133
+msgid "Sound"
+msgstr ""
+
+#: src/frontend/mame/ui/sndmenu.cpp:134
+msgid "Sample Rate"
+msgstr ""
+
+#: src/frontend/mame/ui/sndmenu.cpp:135
+msgid "Use External Samples"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:21
+msgid "Miscellaneous Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:22
+msgid "Re-select last machine played"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:23
+msgid "Enlarge images in the right panel"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:24
+msgid "DATs info"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:26
+msgid "Show mouse pointer"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:27
+msgid "Confirm quit from machines"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:28
+msgid "Skip information screen at startup"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:29
+msgid "Force 4:3 aspect for snapshot display"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:30
+msgid "Use image as background"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:31
+msgid "Skip bios selection menu"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:32
+msgid "Skip software parts selection menu"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:33
+msgid "Info auto audit"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:34
+msgid "Hide romless machine from available list"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:38
+msgid "Advanced Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:39
+msgid "Performance Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:40
+msgid "Auto frame skip"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:41
+msgid "Frame skip"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:42
+msgid "Throttle"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:43
+msgid "Sleep"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:44
+msgid "Speed"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:45
+msgid "Refresh speed"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:47
+msgid "Rotation Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:48 src/frontend/mame/ui/videoopt.cpp:204
+msgid "Rotate"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:49
+msgid "Rotate right"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:50
+msgid "Rotate left"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:51
+msgid "Auto rotate right"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:52
+msgid "Auto rotate left"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:53
+msgid "Flip X"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:54
+msgid "Flip Y"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:56
+msgid "Artwork Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:57
+msgid "Artwork Crop"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:58
+msgid "Use Backdrops"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:59
+msgid "Use Overlays"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:60
+msgid "Use Bezels"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:61
+msgid "Use Control Panels"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:62
+msgid "Use Marquees"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:64
+msgid "State/Playback Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:65
+msgid "Automatic save/restore"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:66
+msgid "Bilinear snapshot"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:67
+msgid "Burn-in"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:69
+msgid "Input Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:70
+msgid "Coin lockout"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:71
+msgid "Mouse"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:72
+msgid "Joystick"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:73
+msgid "Lightgun"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:74
+msgid "Multi-keyboard"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:75
+msgid "Multi-mouse"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:76
+msgid "Steadykey"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:77
+msgid "UI active"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:78
+msgid "Offscreen reload"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:79
+msgid "Joystick deadzone"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:80
+msgid "Joystick saturation"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:81
+msgid "Natural keyboard"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:82
+msgid "Simultaneous contradictory"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:83
+msgid "Coin impulse"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:87
+msgid "Device Mapping"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:88
+msgid "Lightgun Device Assignment"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:89
+msgid "Trackball Device Assignment"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:90
+msgid "Pedal Device Assignment"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:91
+msgid "Adstick Device Assignment"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:92
+msgid "Paddle Device Assignment"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:93
+msgid "Dial Device Assignment"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:94
+msgid "Positional Device Assignment"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:95
+msgid "Mouse Device Assignment"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:100
+msgid "Video Mode"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:101
+msgid "Number Of Screens"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:103
+msgid "Triple Buffering"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:104
+msgid "HLSL"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:106
+msgid "GLSL"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:107
+msgid "Bilinear Filtering"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:108
+msgid "Bitmap Prescaling"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:109
+msgid "Window Mode"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:110
+msgid "Enforce Aspect Ratio"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:111
+msgid "Start Out Maximized"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:112
+msgid "Synchronized Refresh"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:113
+msgid "Wait Vertical Sync"
+msgstr ""
+
+#: src/frontend/mame/ui/swlist.cpp:72
+msgid "[file manager]"
+msgstr ""
+
+#: src/frontend/mame/ui/swlist.cpp:209
+msgid "Switch Item Ordering"
+msgstr ""
+
+#: src/frontend/mame/ui/swlist.cpp:240
+#, c-format
+msgid "Switched Order: entries now ordered by %s"
+msgstr ""
+
+#: src/frontend/mame/ui/swlist.cpp:240
+msgid "shortname"
+msgstr ""
+
+#: src/frontend/mame/ui/swlist.cpp:240
+msgid "description"
+msgstr ""
+
+#: src/frontend/mame/ui/swlist.cpp:385
+msgid "[compatible lists]"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:85
+msgid "stopped"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:87
+msgid "playing"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:87
+msgid "(playing)"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:88
+msgid "recording"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:88
+msgid "(recording)"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:95
+msgid "Pause/Stop"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:98
+msgid "Play"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:101
+msgid "Record"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:104
+msgid "Rewind"
+msgstr ""
+
+#: src/frontend/mame/ui/tapectrl.cpp:107
+msgid "Fast Forward"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:320
+msgid "This driver requires images to be loaded in the following device(s): "
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:776
+msgid ""
+"One or more ROMs/CHDs for this machine are incorrect. The machine may not "
+"run correctly.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:789
+msgid ""
+"There are known problems with this machine\n"
+"\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:793
+msgid ""
+"One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:797
+#, c-format
+msgid "The keyboard emulation may not be 100% accurate.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:799
+#, c-format
+msgid "The colors aren't 100% accurate.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:801
+msgid "The colors are completely wrong.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:803
+#, c-format
+msgid "The video emulation isn't 100% accurate.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:805
+#, c-format
+msgid "The sound emulation isn't 100% accurate.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:807
+msgid "The machine lacks sound.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:810
+msgid "Screen flipping in cocktail mode is not supported.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:814
+msgid "The machine requires external artwork files\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:819
+msgid ""
+"This machine was never completed. It may exhibit strange behavior or missing "
+"elements that are not bugs in the emulation.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:824
+msgid ""
+"This machine has no sound hardware, MAME will produce no sounds, this is "
+"expected behaviour.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:832
+msgid "The machine has protection which isn't fully emulated.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:835
+msgid ""
+"\n"
+"THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
+"complete. There is nothing you can do to fix this problem except wait for "
+"the developers to improve the emulation.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:839
+msgid ""
+"\n"
+"Certain elements of this machine cannot be emulated as it requires actual "
+"physical interaction or consists of mechanical devices. It is not possible "
+"to fully play this machine.\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:858
+msgid ""
+"\n"
+"\n"
+"There are working clones of this machine: "
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:872
+msgid ""
+"\n"
+"\n"
+"Press any key to continue"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:887
+#, c-format
+msgid ""
+"%1$s\n"
+"%2$s %3$s\n"
+"Driver: %4$s\n"
+"\n"
+"CPU:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:922 src/frontend/mame/ui/ui.cpp:960
+msgid "MHz"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:922 src/frontend/mame/ui/ui.cpp:960
+msgid "kHz"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:936
+msgid ""
+"\n"
+"Sound:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:964
+msgid ""
+"\n"
+"Video:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:968
+msgid "None\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:975
+msgid "Vector"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:986
+#, c-format
+msgid "%1$s: %2$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:986
+msgid "%2$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1318 src/frontend/mame/ui/ui.cpp:1328
+msgid "Keyboard Emulation Status"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1320
+msgid "Mode: PARTIAL Emulation"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1321
+msgid "UI:   Enabled"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1323 src/frontend/mame/ui/ui.cpp:1333
+msgid "**Use ScrLock to toggle**"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1330
+msgid "Mode: FULL Emulation"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1331
+msgid "UI:   Disabled"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1472
+msgid "Autofire can't be enabled"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1511
+msgid "Select position to save to"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1513
+msgid "Select position to load from"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1537
+msgid "Save cancelled"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1539
+msgid "Load cancelled"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1582
+#, c-format
+msgid "Save to position %s"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1587
+#, c-format
+msgid "Load from position %s"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1629
+#, c-format
+msgid ""
+"Are you sure you want to quit?\n"
+"\n"
+"Press ''%1$s'' to quit,\n"
+"Press ''%2$s'' to return to emulation."
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1702
+msgid "Master Volume"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1711
+#, c-format
+msgid "%1$s Volume"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1735
+#, c-format
+msgid "Overclock CPU %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1755
+#, c-format
+msgid "%1$s Refresh Rate"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1760
+#, c-format
+msgid "%1$s Brightness"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1762
+#, c-format
+msgid "%1$s Contrast"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1764
+#, c-format
+msgid "%1$s Gamma"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1768
+#, c-format
+msgid "%1$s Horiz Stretch"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1770
+#, c-format
+msgid "%1$s Horiz Position"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1772
+#, c-format
+msgid "%1$s Vert Stretch"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1774
+#, c-format
+msgid "%1$s Vert Position"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1793
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Stretch"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1795
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Position"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1797
+#, c-format
+msgid "Laserdisc '%1$s' Vert Stretch"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1799
+#, c-format
+msgid "Laserdisc '%1$s' Vert Position"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1811
+msgid "Vector Flicker"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1812
+msgid "Beam Width Minimum"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1813
+msgid "Beam Width Maximum"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1814
+msgid "Beam Intensity Weight"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1829
+#, c-format
+msgid "Crosshair Scale %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1829 src/frontend/mame/ui/ui.cpp:1831
+msgid "X"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1829 src/frontend/mame/ui/ui.cpp:1831
+msgid "Y"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1831
+#, c-format
+msgid "Crosshair Offset %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1919
+#, c-format
+msgid "%1$3ddB"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1963
+#, c-format
+msgid "%1$d%%"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1979
+#, c-format
+msgid "%1$3.0f%%"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2002
+#, c-format
+msgid "%1$.3ffps"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2025 src/frontend/mame/ui/ui.cpp:2047
+#: src/frontend/mame/ui/ui.cpp:2068 src/frontend/mame/ui/ui.cpp:2090
+#: src/frontend/mame/ui/ui.cpp:2112 src/frontend/mame/ui/ui.cpp:2134
+#: src/frontend/mame/ui/ui.cpp:2156 src/frontend/mame/ui/ui.cpp:2178
+#: src/frontend/mame/ui/ui.cpp:2200 src/frontend/mame/ui/ui.cpp:2222
+#: src/frontend/mame/ui/ui.cpp:2244
+#, c-format
+msgid "%1$.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2259 src/frontend/mame/ui/ui.cpp:2274
+#: src/frontend/mame/ui/ui.cpp:2289 src/frontend/mame/ui/ui.cpp:2304
+#, c-format
+msgid "%1$1.2f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2317
+#, c-format
+msgid "Screen '%1$s'"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2319
+msgid "Screen"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2335
+#, c-format
+msgid "Crosshair Scale X %1$1.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2335
+#, c-format
+msgid "Crosshair Scale Y %1$1.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2354
+#, c-format
+msgid "Crosshair Offset X %1$1.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2354
+#, c-format
+msgid "Crosshair Offset Y %1$1.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2506
+msgid "**Error saving ui.ini**"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2553
+#, c-format
+msgid "**Error saving %s.ini**"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:56
+#, c-format
+msgid "Screen #%d"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:208
+msgid "Backdrops"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:212
+msgid "Overlays"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:216
+msgid "Bezels"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:220
+msgid "CPanels"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:228
+msgid "View"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:228
+msgid "Cropped"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:228
+msgid "Full"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:381
+msgid " COLORS"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:381
+msgid " PENS"
+msgstr ""

@@ -13,6 +13,8 @@
 
 #include "flopimg.h"
 
+//#define USE_SCP 1
+
 class victor9k_format : public floppy_image_format_t {
 public:
 	struct format {
@@ -27,14 +29,14 @@ public:
 
 	victor9k_format();
 
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	virtual bool save(io_generic *io, floppy_image *image);
-	virtual bool supports_save() const { return true; }
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+	virtual bool save(io_generic *io, floppy_image *image) override;
+	virtual bool supports_save() const override { return true; }
 
 	static int get_rpm(int head, int track);
 

@@ -85,7 +85,6 @@
 
 class i2cmem_device :
 	public device_t,
-	public device_memory_interface,
 	public device_nvram_interface
 {
 public:
@@ -111,27 +110,23 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read( emu_file &file );
-	virtual void nvram_write( emu_file &file );
+	virtual void nvram_default() override;
+	virtual void nvram_read( emu_file &file ) override;
+	virtual void nvram_write( emu_file &file ) override;
 
 	// internal helpers
 	int address_mask();
 	int select_device();
 	int data_offset();
 
-	// device-specific configuration
-	address_space_config m_space_config;
+	optional_memory_region m_region;
 
 	// internal state
+	std::unique_ptr<UINT8[]> m_data;
 	int m_slave_address;
 	int m_page_size;
 	int m_data_size;

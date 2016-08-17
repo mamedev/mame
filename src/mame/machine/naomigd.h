@@ -6,7 +6,7 @@
 #include "machine/naomibd.h"
 
 #define MCFG_NAOMI_GDROM_BOARD_ADD(_tag, _image_tag, _pic_tag, _eeprom_tag, _irq_cb) \
-	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_GDROM_BOARD, _eeprom_tag, NULL, _irq_cb) \
+	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_GDROM_BOARD, _eeprom_tag, _irq_cb) \
 	naomi_gdrom_board::static_set_tags(*device, _image_tag, _pic_tag);
 
 class naomi_gdrom_board : public naomi_board
@@ -19,12 +19,12 @@ public:
 	UINT8 *memory(UINT32 &size) { size = dimm_data_size; return dimm_data; }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void board_setup_address(UINT32 address, bool is_dma);
-	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit);
-	virtual void board_advance(UINT32 size);
+	virtual void board_setup_address(UINT32 address, bool is_dma) override;
+	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit) override;
+	virtual void board_advance(UINT32 size) override;
 
 private:
 	enum { FILENAME_LENGTH=24 };

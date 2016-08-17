@@ -99,6 +99,7 @@ struct metal_print_context
 	, inoutStr(ralloc_strdup(buffer, ""))
 	, uniformStr(ralloc_strdup(buffer, ""))
 	, paramsStr(ralloc_strdup(buffer, ""))
+	, typedeclStr(ralloc_strdup(buffer, ""))
 	, writingParams(false)
 	, matrixCastsDone(false)
 	, matrixConstructorsDone(false)
@@ -117,6 +118,7 @@ struct metal_print_context
 	string_buffer inoutStr;
 	string_buffer uniformStr;
 	string_buffer paramsStr;
+	string_buffer typedeclStr;
 	bool writingParams;
 	bool matrixCastsDone;
 	bool matrixConstructorsDone;
@@ -209,6 +211,7 @@ _mesa_print_ir_metal(exec_list *instructions,
 
 	// includes, prefix etc.
 	ctx.prefixStr.asprintf_append ("#include <metal_stdlib>\n");
+	ctx.prefixStr.asprintf_append ("#pragma clang diagnostic ignored \"-Wparentheses-equality\"\n");
 	ctx.prefixStr.asprintf_append ("using namespace metal;\n");
 
 	ctx.inputStr.asprintf_append("struct xlatMtlShaderInput {\n");
@@ -235,8 +238,10 @@ _mesa_print_ir_metal(exec_list *instructions,
 			// skip gl_ variables if they aren't used/assigned
 			if (strstr(var->name, "gl_") == var->name)
 			{
-				if (!var->data.used && !var->data.assigned)
-					continue;
+				if (NULL == strstr(var->name, "gl_FragData_") ) {
+					if (!var->data.used && !var->data.assigned)
+						continue;
+				}
 			}
 
 			//
@@ -264,7 +269,10 @@ _mesa_print_ir_metal(exec_list *instructions,
 			if (var->data.mode == ir_var_shader_inout)
 				strOut = &ctx.inoutStr;
 		}
-
+		
+		if (ir->ir_type == ir_type_typedecl) {
+			strOut = &ctx.typedeclStr;
+		}
 
 		ir_print_metal_visitor v (ctx, *strOut, &gtracker, mode, state);
 		v.loopstate = ls;
@@ -290,6 +298,8 @@ _mesa_print_ir_metal(exec_list *instructions,
 	ctx.uniformStr.asprintf_append("};\n");
 
 	// emit global array/struct constants
+	
+	ctx.prefixStr.asprintf_append("%s", ctx.typedeclStr.c_str());
 	foreach_in_list_safe(gconst_entry_metal, node, &gtracker.global_constants)
 	{
 		ir_constant* c = node->ir;
@@ -464,6 +474,8 @@ static void print_type_precision(string_buffer& buffer, const glsl_type *t, glsl
 		typeName = "depth2d<float>"; // depth type must always be float
 	else if (!strcmp(typeName, "samplerCubeShadow"))
 		typeName = "depthcube<float>"; // depth type must always be float
+	else if (!strcmp(typeName, "sampler2DArray"))
+		typeName = halfPrec ? "texture2d_array<half>" : "texture2d_array<float>";
 
 	if (t->base_type == GLSL_TYPE_ARRAY) {
 		print_type_precision(buffer, t->fields.array, prec, true);
@@ -1015,7 +1027,17 @@ void ir_print_metal_visitor::visit(ir_expression *ir)
 			const bool halfCast = (arg_prec == glsl_precision_medium || arg_prec == glsl_precision_low);
 			buffer.asprintf_append (halfCast ? "((half)1.0/(" : "(1.0/(");
 		} else {
-			buffer.asprintf_append ("%s(", operator_glsl_strs[ir->operation]);
+			switch(ir->operation) {
+				case ir_unop_dFdy:
+				case ir_unop_dFdy_coarse:
+				case ir_unop_dFdy_fine:
+					buffer.asprintf_append ("%s(-", operator_glsl_strs[ir->operation]);
+					break;
+
+				default:
+					buffer.asprintf_append ("%s(", operator_glsl_strs[ir->operation]);
+					break;
+			}
 		}
 		if (ir->operands[0])
 			ir->operands[0]->accept(this);
@@ -1160,16 +1182,25 @@ static int tex_sampler_dim_size[] = {
 };
 
 
-static void print_texture_uv (ir_print_metal_visitor* vis, ir_texture* ir, bool is_shadow, bool is_proj, int uv_dim, int sampler_uv_dim)
+static void print_texture_uv (ir_print_metal_visitor* vis, ir_texture* ir, bool is_shadow, bool is_proj, bool is_array, int uv_dim, int sampler_uv_dim)
 {
 	if (!is_shadow)
 	{
-		if (!is_proj)
+		if (!is_proj && !is_array)
 		{
 			// regular UV
 			vis->buffer.asprintf_append (sampler_uv_dim == 3 ? "(float3)(" : "(float2)(");
 			ir->coordinate->accept(vis);
 			vis->buffer.asprintf_append (")");
+		}
+		else if (is_array)
+		{
+			// array sample
+			vis->buffer.asprintf_append ("(float2)((");
+			ir->coordinate->accept(vis);
+			vis->buffer.asprintf_append (").xy), (uint)((");
+			ir->coordinate->accept(vis);
+			vis->buffer.asprintf_append (").z)");
 		}
 		else
 		{
@@ -1212,12 +1243,13 @@ void ir_print_metal_visitor::visit(ir_texture *ir)
 {
 	glsl_sampler_dim sampler_dim = (glsl_sampler_dim)ir->sampler->type->sampler_dimensionality;
 	const bool is_shadow = ir->sampler->type->sampler_shadow;
+	const bool is_array = ir->sampler->type->sampler_array;
 	const glsl_type* uv_type = ir->coordinate->type;
 	const int uv_dim = uv_type->vector_elements;
 	int sampler_uv_dim = tex_sampler_dim_size[sampler_dim];
 	if (is_shadow)
 		sampler_uv_dim += 1;
-	const bool is_proj = (uv_dim > sampler_uv_dim);
+	const bool is_proj = (uv_dim > sampler_uv_dim) && !is_array;
 
 	// texture name & call to sample
 	ir->sampler->accept(this);
@@ -1239,7 +1271,7 @@ void ir_print_metal_visitor::visit(ir_texture *ir)
 	buffer.asprintf_append (", ");
 
 	// texture coordinate
-	print_texture_uv (this, ir, is_shadow, is_proj, uv_dim, sampler_uv_dim);
+	print_texture_uv (this, ir, is_shadow, is_proj, is_array, uv_dim, sampler_uv_dim);
 
 	// lod bias
 	if (ir->op == ir_txb)
@@ -1943,7 +1975,7 @@ ir_print_metal_visitor::visit(ir_typedecl_statement *ir)
 		buffer.asprintf_append ("  ");
 		//if (state->es_shader)
 		//	buffer.asprintf_append ("%s", get_precision_string(s->fields.structure[j].precision)); //@TODO
-		print_type(buffer, ir, s->fields.structure[j].type, false);
+		print_type_precision(buffer, s->fields.structure[j].type, s->fields.structure[j].precision, false);
 		buffer.asprintf_append (" %s", s->fields.structure[j].name);
 		print_type_post(buffer, s->fields.structure[j].type, false);
 		buffer.asprintf_append (";\n");

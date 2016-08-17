@@ -31,26 +31,26 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(input_b) { output_6(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_k) { output_7(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_4) { output_j(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_5) { output_f(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_b) override { output_6(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_k) override { output_7(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_4) override { output_j(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_5) override { output_f(state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_6) { output_b(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_7) { output_k(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_j) { output_4(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_f) { output_5(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_6) override { output_b(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_7) override { output_k(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_j) override { output_4(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_f) override { output_5(state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_c) { output_m(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_d) { output_l(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_e) { output_h(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_c) override { output_m(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_d) override { output_l(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_e) override { output_h(state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_m) { output_c(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_l) { output_d(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_h) { output_e(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_m) override { output_c(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_l) override { output_d(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_h) override { output_e(state); }
 };
 
 // device type definition

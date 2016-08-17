@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_GLCONTEXT_EGL_H_HEADER_GUARD
@@ -10,6 +10,10 @@
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
+#if defined(Success)
+// X11 defines Success
+#	undef Success
+#endif // defined(Success)
 
 namespace bgfx { namespace gl
 {

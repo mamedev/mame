@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 
 class bbusters_state : public driver_device
@@ -12,6 +14,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
+		m_soundlatch(*this, "soundlatch"),
 		m_eprom_data(*this, "eeprom"),
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
@@ -25,6 +28,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram2;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	optional_shared_ptr<UINT16> m_eprom_data;
 	required_shared_ptr<UINT16> m_ram;
@@ -60,7 +64,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(bbuster);
 	DECLARE_VIDEO_START(mechatt);
 

@@ -27,9 +27,9 @@ public:
 	UINT32 data_r() const;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 
 private:
 	struct dev_t {
@@ -57,7 +57,7 @@ public:
 	nscsi_device *get_device();
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class nscsi_device : public device_t,
@@ -95,7 +95,7 @@ protected:
 	int scsi_refid;
 	nscsi_bus_device *scsi_bus;
 
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class nscsi_full_device : public nscsi_device
@@ -103,7 +103,7 @@ class nscsi_full_device : public nscsi_device
 public:
 	nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual void scsi_ctrl_changed();
+	virtual void scsi_ctrl_changed() override;
 protected:
 	enum { SCSI_TIMER = 100 };
 
@@ -276,9 +276,9 @@ protected:
 	int scsi_cmdsize;
 	UINT8 scsi_identify;
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void scsi_message();
 	virtual void scsi_command();

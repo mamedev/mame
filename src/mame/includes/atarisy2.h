@@ -10,6 +10,10 @@
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/t11/t11.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
+#include "sound/pokey.h"
+#include "sound/tms5220.h"
 #include "slapstic.h"
 
 class atarisy2_state : public atarigen_state
@@ -23,6 +27,11 @@ public:
 			m_slapstic_base(*this, "slapstic_base"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
+			m_soundcomm(*this, "soundcomm"),
+			m_ym2151(*this, "ymsnd"),
+			m_pokey1(*this, "pokey1"),
+			m_pokey2(*this, "pokey2"),
+			m_tms5220(*this, "tms"),
 			m_rombank1(*this, "rombank1"),
 			m_rombank2(*this, "rombank2"),
 			m_slapstic(*this, "slapstic")
@@ -40,7 +49,11 @@ public:
 
 	INT8            m_pedal_count;
 
-	UINT8           m_has_tms5220;
+	required_device<atari_sound_comm_device> m_soundcomm;
+	required_device<ym2151_device> m_ym2151;
+	required_device<pokey_device> m_pokey1;
+	required_device<pokey_device> m_pokey2;
+	optional_device<tms5220_device> m_tms5220;
 
 	UINT8           m_which_adc;
 
@@ -68,10 +81,10 @@ public:
 
 	UINT16          m_vram[0x8000/2];
 
-	virtual void device_post_load();
+	virtual void device_post_load() override;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(int0_ack_w);
 	DECLARE_WRITE16_MEMBER(int1_ack_w);
 	DECLARE_WRITE16_MEMBER(int_enable_w);

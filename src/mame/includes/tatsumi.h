@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
 #include "sound/okim6295.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 
 class tatsumi_state : public driver_device
 {
@@ -15,6 +17,7 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_cyclwarr_cpua_ram(*this, "cw_cpua_ram"),
 		m_cyclwarr_cpub_ram(*this, "cw_cpub_ram"),
@@ -41,6 +44,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
@@ -79,14 +83,14 @@ public:
 	tilemap_t *m_layer2;
 	tilemap_t *m_layer3;
 	bitmap_rgb32 m_temp_bitmap;
-	UINT8 *m_apache3_road_x_ram;
+	std::unique_ptr<UINT8[]> m_apache3_road_x_ram;
 	UINT8 m_apache3_road_z;
-	UINT16* m_roundup5_vram;
+	std::unique_ptr<UINT16[]> m_roundup5_vram;
 	UINT16 m_bigfight_bank;
 	UINT16 m_bigfight_last_bank;
 	UINT8 m_roundupt_crt_selected_reg;
 	UINT8 m_roundupt_crt_reg[64];
-	UINT8* m_shadow_pen_array;
+	std::unique_ptr<UINT8[]> m_shadow_pen_array;
 	DECLARE_READ16_MEMBER(cyclwarr_sprite_r);
 	DECLARE_WRITE16_MEMBER(cyclwarr_sprite_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a20000_w);

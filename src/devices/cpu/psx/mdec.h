@@ -33,9 +33,9 @@ public:
 	void dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	void mdec_cos_precalc();

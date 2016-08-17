@@ -370,15 +370,15 @@ enum tilemap_standard_mapper
 #define MCFG_TILEMAP_BYTES_PER_ENTRY(_bpe) \
 	tilemap_device::static_set_bytes_per_entry(*device, _bpe);
 #define MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
-	tilemap_device::static_set_info_callback(*device, tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	tilemap_device::static_set_info_callback(*device, tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_TILEMAP_INFO_CB_DEVICE(_device, _class, _method) \
-	tilemap_device::static_set_info_callback(*device, tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0));
+	tilemap_device::static_set_info_callback(*device, tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)nullptr));
 #define MCFG_TILEMAP_LAYOUT_STANDARD(_standard, _columns, _rows) \
 	tilemap_device::static_set_layout(*device, TILEMAP_##_standard, _columns, _rows);
 #define MCFG_TILEMAP_LAYOUT_CB_DRIVER(_class, _method, _columns, _rows) \
-	tilemap_device::static_set_layout(*device, tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0), _columns, _rows);
+	tilemap_device::static_set_layout(*device, tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr), _columns, _rows);
 #define MCFG_TILEMAP_LAYOUT_CB_DEVICE(_device, _class, _method, _columns, _rows) \
-	tilemap_device::static_set_layout(*device, tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0), _columns, _rows);
+	tilemap_device::static_set_layout(*device, tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)nullptr), _columns, _rows);
 #define MCFG_TILEMAP_TILE_SIZE(_width, _height) \
 	tilemap_device::static_set_tile_size(*device, _width, _height);
 #define MCFG_TILEMAP_TRANSPARENT_PEN(_pen) \
@@ -484,7 +484,7 @@ class tilemap_t
 	static const logical_index INVALID_LOGICAL_INDEX = (logical_index)~0;
 
 	// maximum index in each array
-	static const int MAX_PEN_TO_FLAGS = 256;
+	static const pen_t MAX_PEN_TO_FLAGS = 256;
 
 protected:
 	// tilemap_manager controlls our allocations
@@ -497,7 +497,7 @@ public:
 	// getters
 	running_machine &machine() const;
 	tilemap_device *device() const { return m_device; }
-	palette_device *palette() const { return m_palette; }
+	palette_device &palette() const { return *m_palette; }
 	tilemap_t *next() const { return m_next; }
 	void *user_data() const { return m_user_data; }
 	memory_array &basemem() { return m_basemem; }
@@ -518,7 +518,7 @@ public:
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }
 	void set_user_data(void *user_data) { m_user_data = user_data; }
-	void set_palette(palette_device *palette) { m_palette = palette; }
+	void set_palette(palette_device &palette) { m_palette = &palette; }
 	void set_palette_offset(UINT32 offset) { m_palette_offset = offset; }
 	void set_scrolldx(int dx, int dx_flipped) { m_dx = dx; m_dx_flipped = dx_flipped; }
 	void set_scrolldy(int dy, int dy_flipped) { m_dy = dy; m_dy_flipped = dy_flipped; }
@@ -550,16 +550,16 @@ public:
 
 	// mappers
 	// scan in row-major order with optional flipping
-	static tilemap_memory_index scan_rows(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
 
 	// scan in column-major order with optional flipping
-	static tilemap_memory_index scan_cols(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
 
 	// optional memory accessors
 	UINT32 basemem_read(int index) { return m_basemem.read(index); }
@@ -692,8 +692,8 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// tilemap creation
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = nullptr);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = nullptr);
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
@@ -748,7 +748,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// devices

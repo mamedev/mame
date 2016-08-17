@@ -41,11 +41,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_post_load();
-	virtual void device_clock_changed();
+	virtual void device_start() override;
+	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	bool m_playing;
@@ -60,8 +60,7 @@ private:
 	int m_cmd_rw;
 	UINT8 m_phrase;
 
-	UINT8 *m_mem_base;
-	UINT32 m_mem_mask;
+	required_region_ptr<UINT8> m_mem;
 };
 
 

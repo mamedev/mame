@@ -31,15 +31,15 @@ public:
 	c64_4dxh_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_pet_user_port_interface overrides
-	virtual WRITE_LINE_MEMBER( input_4 ) { output_6(state); }
-	virtual WRITE_LINE_MEMBER( input_6 ) { output_4(state); }
+	virtual WRITE_LINE_MEMBER( input_4 ) override { output_6(state); }
+	virtual WRITE_LINE_MEMBER( input_6 ) override { output_4(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 

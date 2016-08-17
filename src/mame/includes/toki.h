@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
+
 #include "audio/seibu.h"
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"
 
@@ -16,7 +18,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_spriteram(*this, "spriteram") ,
+		m_soundlatch(*this, "soundlatch"),
+		m_spriteram(*this, "spriteram"),
 		m_background1_videoram(*this, "bg1_vram"),
 		m_background2_videoram(*this, "bg2_vram"),
 		m_videoram(*this, "videoram"),
@@ -29,6 +32,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // tokib
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_background1_videoram;
@@ -61,7 +65,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

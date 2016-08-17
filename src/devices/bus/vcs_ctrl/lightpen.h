@@ -30,16 +30,16 @@ public:
 	vcs_lightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vcs_control_port_interface overrides
-	virtual UINT8 vcs_joy_r();
+	virtual UINT8 vcs_joy_r() override;
 
 private:
 	required_ioport m_joy;

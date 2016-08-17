@@ -19,13 +19,10 @@
 class debugwin_info : protected debugbase_info
 {
 public:
-	template<class U> friend class simple_list;
-
 	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 	virtual ~debugwin_info();
 
-	bool is_valid() const { return m_wnd != NULL; }
-	debugwin_info *next() const { return m_next; }
+	bool is_valid() const { return m_wnd != nullptr; }
 
 	void set_ignore_char_lparam(LPARAM value) { m_ignore_char_lparam = value >> 16; }
 	bool check_ignore_char_lparam(LPARAM value)
@@ -41,9 +38,9 @@ public:
 		}
 	}
 
-	void show() { smart_show_window(m_wnd, true); }
-	void hide() { smart_show_window(m_wnd, false); }
-	void set_foreground() { SetForegroundWindow(m_wnd); }
+	void show() const { smart_show_window(m_wnd, true); }
+	void hide() const { smart_show_window(m_wnd, false); }
+	void set_foreground() const { SetForegroundWindow(m_wnd); }
 	void destroy();
 
 	virtual bool set_default_focus();
@@ -82,6 +79,9 @@ protected:
 		ID_2_BYTE_CHUNKS,
 		ID_4_BYTE_CHUNKS,
 		ID_8_BYTE_CHUNKS,
+		ID_FLOATING_POINT_32BIT,
+		ID_FLOATING_POINT_64BIT,
+		ID_FLOATING_POINT_80BIT,
 		ID_LOGICAL_ADDRESSES,
 		ID_PHYSICAL_ADDRESSES,
 		ID_REVERSE_VIEW,
@@ -115,7 +115,7 @@ protected:
 	void draw_border(HDC dc, RECT &bounds);
 	void draw_border(HDC dc, HWND child);
 
-	auto_pointer<debugview_info>    m_views[MAX_VIEWS];
+	std::unique_ptr<debugview_info>    m_views[MAX_VIEWS];
 
 private:
 	LRESULT window_proc(UINT message, WPARAM wparam, LPARAM lparam);
@@ -128,7 +128,6 @@ private:
 
 	bool const      m_is_main_console;
 
-	debugwin_info   *m_next;
 	HWND            m_wnd;
 	WNDPROC const   m_handler;
 

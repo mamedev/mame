@@ -54,11 +54,11 @@ public:
 	void rx_dma_r(UINT8 &data, bool &eof);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void recv_cb(UINT8 *buf, int len);
+	virtual void recv_cb(UINT8 *buf, int len) override;
 
 private:
 	enum { TIMER_TX, TIMER_RX };

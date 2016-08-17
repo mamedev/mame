@@ -17,15 +17,15 @@ public:
 	sega8_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void late_bank_setup();
+	virtual void late_bank_setup() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override;
 
 protected:
 	UINT8 m_rom_bank_base[3];
@@ -45,9 +45,9 @@ public:
 	sega8_othello_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 };
 
 
@@ -60,9 +60,9 @@ public:
 	sega8_castle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 };
 
 
@@ -75,13 +75,13 @@ public:
 	sega8_basic_l3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
 	// has internal RAM which overwrites the system one!
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 };
 
 
@@ -94,13 +94,13 @@ public:
 	sega8_music_editor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
 	// has internal RAM which overwrites the system one!
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 };
 
 
@@ -113,18 +113,18 @@ public:
 	sega8_terebi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override;
 
 	required_ioport m_tvdraw_x;
 	required_ioport m_tvdraw_y;
 	required_ioport m_tvdraw_pen;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
 protected:
 	UINT8 m_tvdraw_data;
@@ -140,13 +140,13 @@ public:
 	sega8_dahjee_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
 	// has internal RAM which overwrites the system one!
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 };
 
 
@@ -159,13 +159,13 @@ public:
 	sega8_dahjee_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart) {}
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override {}
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
 	// has internal RAM which overwrites the system one!
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 };
 
 
@@ -181,16 +181,16 @@ public:
 	sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_reset() override;
 
-	virtual void late_bank_setup();
+	virtual void late_bank_setup() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override;
 
 protected:
 	UINT8 m_rom_bank_base[3];
@@ -211,14 +211,14 @@ public:
 	sega8_codemasters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void late_bank_setup();
+	virtual void late_bank_setup() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 	// no mapper write for this!
 
 protected:
@@ -237,12 +237,12 @@ public:
 	sega8_4pak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 private:
 	UINT8 m_reg[3];
@@ -260,14 +260,14 @@ public:
 	sega8_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void late_bank_setup();
+	virtual void late_bank_setup() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 	// no mapper write for this!
 
 protected:
@@ -285,7 +285,7 @@ public:
 	// construction/destruction
 	sega8_nemesis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void late_bank_setup();
+	virtual void late_bank_setup() override;
 };
 
 
@@ -299,14 +299,14 @@ public:
 	sega8_janggun_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { save_item(NAME(m_rom_bank_base)); }
+	virtual void device_start() override { save_item(NAME(m_rom_bank_base)); }
 
-	virtual void late_bank_setup();
+	virtual void late_bank_setup() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override;
 
 protected:
 	UINT8 m_rom_bank_base[6];
@@ -322,14 +322,14 @@ public:
 	sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { save_item(NAME(m_rom_bank_base)); }
+	virtual void device_start() override { save_item(NAME(m_rom_bank_base)); }
 
-	virtual void late_bank_setup();
+	virtual void late_bank_setup() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart) {}
-	virtual DECLARE_WRITE8_MEMBER(write_mapper);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override {}
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override;
 
 protected:
 	UINT8 m_rom_bank_base;
@@ -344,11 +344,11 @@ public:
 	// construction/destruction
 	sega8_korean_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void late_bank_setup();
+	virtual void late_bank_setup() override;
 
 	// reading and writing
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 };
 
 
@@ -361,7 +361,7 @@ public:
 	sega8_korean_nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 };
 
 

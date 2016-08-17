@@ -16,8 +16,8 @@ public:
 	dectalk_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
@@ -33,14 +33,14 @@ public:
 	DECLARE_READ16_MEMBER(dsp_dma_r);
 	DECLARE_WRITE16_MEMBER(dsp_dma_w);
 	DECLARE_WRITE16_MEMBER(output_ctl_w);
-	DECLARE_READ16_MEMBER(bio_line_r);
+	DECLARE_READ_LINE_MEMBER(bio_line_r);
 	DECLARE_WRITE16_MEMBER(irq_line_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT16 m_cmd, m_stat, m_data, m_dsp_dma, m_ctl;

@@ -9,6 +9,7 @@
 #ifndef __ATARI_CAGE__
 #define __ATARI_CAGE__
 
+#include "machine/gen_latch.h"
 #include "sound/dmadac.h"
 
 #define CAGE_IRQ_REASON_DATA_READY      (1)
@@ -31,7 +32,7 @@ public:
 	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(object); }
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void reset_w(int state);
 
@@ -58,10 +59,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
+	required_shared_ptr<UINT32> m_cageram;
 	cpu_device *m_cpu;
+	required_device<generic_latch_16_device> m_soundlatch;
 	attotime m_cpu_h1_clock_period;
 
 	UINT8 m_cpu_to_cage_ready;
@@ -100,7 +103,7 @@ public:
 	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 

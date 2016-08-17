@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __DRCUML_H__
-#define __DRCUML_H__
+#ifndef MAME_DEVICES_CPU_DRCUML_H
+#define MAME_DEVICES_CPU_DRCUML_H
 
 #include "drccache.h"
 #include "uml.h"
@@ -28,16 +28,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// determine the type of the native DRC, falling back to C
-#ifndef NATIVE_DRC
-class drcbe_c;
-typedef drcbe_c drcbe_native;
-#else
-class NATIVE_DRC;
-typedef NATIVE_DRC drcbe_native;
-#endif
-
 
 // opaque structure describing UML generation state
 class drcuml_state;
@@ -108,7 +98,7 @@ public:
 
 	// instruction appending
 	uml::instruction &append();
-	void append_comment(const char *format, ...) ATTR_PRINTF(2,3);
+	template <typename Format, typename... Params> void append_comment(Format &&fmt, Params &&... args);
 
 	// this class is thrown if abort() is called
 	class abort_compilation : public emu_exception
@@ -189,10 +179,10 @@ public:
 
 	// symbol management
 	void symbol_add(void *base, UINT32 length, const char *name);
-	const char *symbol_find(void *base, UINT32 *offset = NULL);
+	const char *symbol_find(void *base, UINT32 *offset = nullptr);
 
 	// logging
-	bool logging() const { return (m_umllog != NULL); }
+	bool logging() const { return (m_umllog != nullptr); }
 	void log_printf(const char *format, ...) ATTR_PRINTF(2,3);
 	void log_flush() { if (logging()) fflush(m_umllog); }
 	bool logging_native() const { return m_beintf.logging(); }
@@ -206,7 +196,7 @@ private:
 
 		// construction/destruction
 		symbol(void *base, UINT32 length, const char *name)
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_base(drccodeptr(base)),
 				m_length(length),
 				m_name(name) { }
@@ -226,6 +216,7 @@ private:
 	// internal state
 	device_t &                  m_device;           // CPU device we are associated with
 	drc_cache &                 m_cache;            // pointer to the codegen cache
+	std::unique_ptr<drcbe_interface> m_drcbe_interface;
 	drcbe_interface &           m_beintf;           // backend interface pointer
 	FILE *                      m_umllog;           // handle to the UML logfile
 	simple_list<drcuml_block>   m_blocklist;        // list of active blocks
@@ -235,4 +226,31 @@ private:
 
 
 
-#endif /* __DRCUML_H__ */
+//**************************************************************************
+//  MEMBER TEMPLATES
+//**************************************************************************
+
+//-------------------------------------------------
+//  comment - attach a comment to the current
+//  output location in the specified block
+//-------------------------------------------------
+
+template <typename Format, typename... Params>
+inline void drcuml_block::append_comment(Format &&fmt, Params &&... args)
+{
+	// do the printf
+	std::string temp(util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
+
+	// allocate space in the cache to hold the comment
+	char *comment = (char *)m_drcuml.cache().alloc_temporary(temp.length() + 1);
+	if (comment != nullptr)
+	{
+		strcpy(comment, temp.c_str());
+
+		// add an instruction with a pointer
+		append().comment(comment);
+	}
+}
+
+
+#endif /* MAME_DEVICES_CPU_DRCUML_H */

@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
+#include "machine/gen_latch.h"
 #include "video/decmxc06.h"
 
 
@@ -13,12 +15,13 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_spritegen(*this, "spritegen"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
 		m_scroll(*this, "scroll"),
-		m_scroll2(*this, "scroll2"),
-		m_spritegen(*this, "spritegen")
+		m_scroll2(*this, "scroll2")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -26,13 +29,14 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<deco_mxc06_device> m_spritegen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_vram_0;
 	required_shared_ptr<UINT8> m_vram_1;
 	required_shared_ptr<UINT8> m_scroll;
 	required_shared_ptr<UINT8> m_scroll2;
-	required_device<deco_mxc06_device> m_spritegen;
 
 	int m_nmi_enable;
 	UINT8 m_protection_command;
@@ -61,9 +65,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(thedeep);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

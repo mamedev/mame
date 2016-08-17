@@ -62,21 +62,18 @@ public:
 	DECLARE_WRITE16_MEMBER(ioc_w);
 	DECLARE_READ16_MEMBER(gcpinbal_tilemaps_word_r);
 	DECLARE_WRITE16_MEMBER(gcpinbal_tilemaps_word_w);
-	DECLARE_READ16_MEMBER(gcpinbal_ctrl_word_r);
-	DECLARE_WRITE16_MEMBER(gcpinbal_ctrl_word_w);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gcpinbal_interrupt);
 	void gcpinbal_core_vh_start(  );
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	DECLARE_WRITE_LINE_MEMBER(gcp_adpcm_int);
 	required_device<excellent_spr_device> m_sprgen;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

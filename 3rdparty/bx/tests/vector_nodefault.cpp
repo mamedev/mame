@@ -33,10 +33,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if !BX_CRT_MSVC
+#	define _strdup strdup
+#endif // !BX_CRT_MSVC
+
 struct nodefault {
-	nodefault(const char* s) { data = strdup(s); }
+	nodefault(const char* s) { data = _strdup(s); }
 	~nodefault() { free(data); }
-	nodefault(const nodefault& other) { data = 0; if (other.data) data = strdup(other.data); }
+	nodefault(const nodefault& other) { data = 0; if (other.data) data = _strdup(other.data); }
 	nodefault& operator=(const nodefault& other) { nodefault(other).swap(*this); return *this; }
 	void swap(nodefault& other) { std::swap(data, other.data); }
 
@@ -148,7 +152,7 @@ TEST(vector_nodefault_popback) {
 	v.push_back("24");
 
 	CHECK(v.back() == "24");
-	
+
 	v.pop_back();
 
 	CHECK(v.back() == "12");

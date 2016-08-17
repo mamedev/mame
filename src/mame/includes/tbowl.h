@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
 
@@ -15,6 +17,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
+		m_soundlatch(*this, "soundlatch"),
 		m_txvideoram(*this, "txvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_bg2videoram(*this, "bg2videoram"),
@@ -28,6 +31,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<tecmo_spr_device> m_sprgen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_txvideoram;
 	required_shared_ptr<UINT8> m_bgvideoram;
@@ -69,9 +73,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

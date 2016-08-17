@@ -85,10 +85,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void execute_run();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void execute_run() override;
 
 	int m_icount;
 
@@ -137,7 +137,7 @@ private:
 	void update_irqs();
 	void set_scsi_state(int state);
 	void delay(const attotime &delay);
-	void scsi_ctrl_changed();
+	void scsi_ctrl_changed() override;
 	void send_byte();
 	void recv_byte();
 	void step(bool timeout);

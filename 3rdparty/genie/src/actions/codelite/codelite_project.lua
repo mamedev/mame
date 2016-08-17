@@ -75,12 +75,14 @@
 				local rundir = cfg.debugdir or cfg.buildtarget.directory
 				local runargs = table.concat(cfg.debugargs, " ")
 				local pause  = iif(cfg.kind == "WindowedApp", "no", "yes")
+				local includedirs = table.join(cfg.userincludedirs, cfg.includedirs)
 				_p('      <General OutputFile="%s" IntermediateDirectory="%s" Command="./%s" CommandArguments="%s" WorkingDirectory="%s" PauseExecWhenProcTerminates="%s"/>', fname, objdir, runcmd, runargs, rundir, pause)
 				
 				-- begin compiler block --
 				local flags = premake.esc(table.join(premake.gcc.getcflags(cfg), premake.gcc.getcxxflags(cfg), cfg.buildoptions))
 				_p('      <Compiler Required="yes" Options="%s">', table.concat(flags, ";"))
-				for _,v in ipairs(cfg.includedirs) do
+				
+				for _,v in ipairs(includedirs) do
 					_p('        <IncludePath Value="%s"/>', premake.esc(v))
 				end
 				for _,v in ipairs(cfg.defines) do

@@ -50,8 +50,8 @@ public:
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 	DECLARE_READ8_MEMBER(mainevt_sh_busy_r);
 	DECLARE_WRITE8_MEMBER(dv_sh_bankswitch_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mainevt_interrupt);

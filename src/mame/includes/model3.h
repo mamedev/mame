@@ -34,17 +34,7 @@ struct m3_vertex
 	float nz;
 };
 
-struct m3_clip_vertex
-{
-	float x;
-	float y;
-	float z;
-	float w;
-	float u;
-	float v;
-	float i;
-	float s;
-};
+typedef frustum_clip_vertex<float, 4> m3_clip_vertex;
 
 struct m3_triangle
 {
@@ -69,6 +59,7 @@ public:
 		m_scsp1(*this, "scsp1"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
+		m_adc_ports(*this, {"AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7"}),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
@@ -87,6 +78,8 @@ public:
 	required_device<scsp_device> m_scsp1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
+
+	optional_ioport_array<8> m_adc_ports;
 
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;
@@ -133,9 +126,8 @@ public:
 	int m_lightgun_reg_sel;
 	int m_adc_channel;
 	UINT64 m_real3d_status;
-	UINT64 *m_network_ram;
 	int m_prot_data_ptr;
-	UINT32 *m_vrom;
+	std::unique_ptr<UINT32[]> m_vrom;
 	int m_step;
 	int m_m3_step;
 	INT32 m_tap_state;
@@ -150,14 +142,14 @@ public:
 	UINT32 m_layer_modulate1;
 	UINT32 m_layer_modulate2;
 	UINT64 m_layer_scroll[2];
-	UINT64 *m_m3_char_ram;
-	UINT64 *m_m3_tile_ram;
-	UINT32 *m_texture_fifo;
+	std::unique_ptr<UINT64[]> m_m3_char_ram;
+	std::unique_ptr<UINT64[]> m_m3_tile_ram;
+	std::unique_ptr<UINT32[]> m_texture_fifo;
 	int m_texture_fifo_pos;
-	UINT16 *m_texture_ram[2];
-	UINT32 *m_display_list_ram;
-	UINT32 *m_culling_ram;
-	UINT32 *m_polygon_ram;
+	std::unique_ptr<UINT16[]> m_texture_ram[2];
+	std::unique_ptr<UINT32[]> m_display_list_ram;
+	std::unique_ptr<UINT32[]> m_culling_ram;
+	std::unique_ptr<UINT32[]> m_polygon_ram;
 	int m_real3d_display_list;
 	rectangle m_clip3d;
 	rectangle *m_screen_clip;
@@ -225,8 +217,6 @@ public:
 	DECLARE_READ64_MEMBER(real3d_status_r);
 	DECLARE_READ8_MEMBER(model3_sound_r);
 	DECLARE_WRITE8_MEMBER(model3_sound_w);
-	DECLARE_READ64_MEMBER(network_r);
-	DECLARE_WRITE64_MEMBER(network_w);
 
 	DECLARE_WRITE64_MEMBER(daytona2_rombank_w);
 	DECLARE_WRITE16_MEMBER(model3snd_ctrl);
@@ -285,7 +275,7 @@ public:
 	void set_irq_line(UINT8 bit, int line);
 	void model3_init(int step);
 	// video
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info_layer0_4bit);
 	TILE_GET_INFO_MEMBER(tile_info_layer1_4bit);
@@ -297,9 +287,7 @@ public:
 	TILE_GET_INFO_MEMBER(tile_info_layer3_8bit);
 	void reset_triangle_buffers();
 	m3_triangle* push_triangle(bool alpha);
-	void draw_layers(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int sx, int sy, int prio);
-	void draw_3d_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
 	cached_texture *get_texture(int page, int texx, int texy, int texwidth, int texheight, int format);
 	inline void write_texture16(int xpos, int ypos, int width, int height, int page, UINT16 *data);

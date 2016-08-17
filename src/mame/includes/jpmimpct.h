@@ -5,6 +5,7 @@
     JPM IMPACT with Video hardware
 
 ****************************************************************************/
+#include "machine/meters.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
 #include "cpu/tms34010/tms34010.h"
@@ -71,7 +72,8 @@ public:
 		m_reel2(*this, "reel2"),
 		m_reel3(*this, "reel3"),
 		m_reel4(*this, "reel4"),
-		m_reel5(*this, "reel5")
+		m_reel5(*this, "reel5"),
+		m_meters(*this, "meters")
 		{ }
 
 	UINT8 m_tms_irq;
@@ -145,4 +147,5 @@ public:
 	optional_device<stepper_device> m_reel3;
 	optional_device<stepper_device> m_reel4;
 	optional_device<stepper_device> m_reel5;
+	required_device<meters_device> m_meters;
 };

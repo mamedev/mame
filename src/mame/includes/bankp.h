@@ -32,18 +32,18 @@ public:
 	int     m_priority;
 
 	UINT8 m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(bankp_scroll_w);
-	DECLARE_WRITE8_MEMBER(bankp_videoram_w);
-	DECLARE_WRITE8_MEMBER(bankp_colorram_w);
-	DECLARE_WRITE8_MEMBER(bankp_videoram2_w);
-	DECLARE_WRITE8_MEMBER(bankp_colorram2_w);
-	DECLARE_WRITE8_MEMBER(bankp_out_w);
+	DECLARE_WRITE8_MEMBER(scroll_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_WRITE8_MEMBER(videoram2_w);
+	DECLARE_WRITE8_MEMBER(colorram2_w);
+	DECLARE_WRITE8_MEMBER(out_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(bankp);
-	UINT32 screen_update_bankp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

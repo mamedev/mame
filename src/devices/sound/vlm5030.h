@@ -6,14 +6,11 @@
 #define __VLM5030_H__
 
 	class vlm5030_device : public device_t,
-									public device_sound_interface
+									public device_sound_interface, public device_rom_interface
 	{
 	public:
 	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~vlm5030_device() {}
-
-	/* set speech rom address */
-	void set_rom(void *speech_rom);
 
 	/* get BSY pin level */
 	DECLARE_READ_LINE_MEMBER( bsy );
@@ -32,13 +29,16 @@
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	// configuration state
+	const address_space_config m_space_config;
+
 	// internal state
 	sound_stream * m_channel;
 
@@ -47,8 +47,6 @@ private:
 
 	/* need to save state */
 
-	UINT8 *m_rom;
-	int m_address_mask;
 	UINT16 m_address;
 	UINT8 m_pin_BSY;
 	UINT8 m_pin_ST;

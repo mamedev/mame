@@ -22,16 +22,15 @@ public:
 		// construction/destruction
 	cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask);
-	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask);
+	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) override;
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) override;
 
 	DECLARE_WRITE8_MEMBER( cirrus_42E8_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-private:
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 

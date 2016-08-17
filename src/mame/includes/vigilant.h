@@ -31,7 +31,7 @@ public:
 	int m_rear_color;
 	int m_rear_disable;
 	int m_rear_refresh;
-	bitmap_ind16 *m_bg_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bg_bitmap;
 
 	// common
 	DECLARE_WRITE8_MEMBER(bank_select_w);
@@ -46,9 +46,9 @@ public:
 	// kikcubic
 	DECLARE_WRITE8_MEMBER(kikcubic_coin_w);
 
-	virtual void machine_start();
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	UINT32 screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

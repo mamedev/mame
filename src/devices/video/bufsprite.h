@@ -55,7 +55,7 @@ public:
 	// construction
 	buffered_spriteram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, type, "Buffered Sprite RAM", tag, owner, clock, "buffered_spriteram", __FILE__),
-			m_spriteram(*owner, tag) { }
+			m_spriteram(*this, DEVICE_SELF) { }
 
 	// getters
 	_Type *live() const { return m_spriteram; }
@@ -65,9 +65,9 @@ public:
 	// operations
 	_Type *copy(UINT32 srcoffset = 0, UINT32 srclength = 0x7fffffff)
 	{
-		assert(m_spriteram != NULL);
-		if (m_spriteram != NULL)
-			memcpy(&m_buffered[0], m_spriteram + srcoffset, MIN(srclength, m_spriteram.bytes() / sizeof(_Type) - srcoffset) * sizeof(_Type));
+		assert(m_spriteram != nullptr);
+		if (m_spriteram != nullptr)
+			memcpy(&m_buffered[0], m_spriteram + srcoffset, (std::min<size_t>)(srclength, m_spriteram.bytes() / sizeof(_Type) - srcoffset) * sizeof(_Type));
 		return &m_buffered[0];
 	}
 
@@ -80,9 +80,9 @@ public:
 
 protected:
 	// first-time setup
-	virtual void device_start()
+	virtual void device_start() override
 	{
-		if (m_spriteram != NULL)
+		if (m_spriteram != nullptr)
 		{
 			m_buffered.resize(m_spriteram.bytes() / sizeof(_Type));
 			save_item(NAME(m_buffered));

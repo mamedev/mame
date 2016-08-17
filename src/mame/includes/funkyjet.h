@@ -38,7 +38,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	DECLARE_DRIVER_INIT(funkyjet);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_funkyjet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );

@@ -19,6 +19,9 @@
 #include "video/v9938.h"
 #include "cpu/tms9900/tms9995.h"
 #include "machine/at29x.h"
+#include "bus/ti99_peb/peribox.h"
+#include "sound/sn76496.h"
+#include "machine/ram.h"
 
 extern const device_type GENEVE_MOUSE;
 extern const device_type GENEVE_KEYBOARD;
@@ -34,9 +37,9 @@ public:
 	line_state  left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	v9938_device*   m_v9938;
@@ -66,11 +69,11 @@ public:
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(object); }
 
 protected:
-	void               device_start();
-	void               device_reset();
-	ioport_constructor device_input_ports() const;
+	void               device_start() override;
+	void               device_reset() override;
+	ioport_constructor device_input_ports() const override;
 	devcb_write_line  m_interrupt;    // Keyboard interrupt to console
-	void               device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void               device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void    post_in_key_queue(int keycode);
@@ -134,8 +137,8 @@ public:
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object) {  return downcast<geneve_mapper_device &>(device).m_ready.set_callback(object); }
 
 protected:
-	void    device_start();
-	void    device_reset();
+	void    device_start() override;
+	void    device_reset() override;
 
 private:
 	// GROM simulation
@@ -204,14 +207,14 @@ private:
 	tms9995_device*         m_cpu;
 	at29c040_device*         m_pfm512;
 	at29c040a_device*        m_pfm512a;
+	sn76496_base_device*    m_sound;
 
 	geneve_keyboard_device* m_keyboard;
-	bus8z_device*           m_video;
-	bus8z_device*           m_peribox;
-	bus8z_device*           m_sound;
+	v9938_device*           m_video;
+	peribox_device*          m_peribox;
 	UINT8*                  m_eprom;
-	UINT8*                  m_sram;
-	UINT8*                  m_dram;
+	required_device<ram_device> m_sram;
+	required_device<ram_device> m_dram;
 };
 
 #define MCFG_GENEVE_READY_HANDLER( _intcallb ) \

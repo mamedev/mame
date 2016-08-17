@@ -46,7 +46,7 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// internal helpers
 	UINT8 rearrange_key(UINT8 table, bool opcode);
@@ -55,7 +55,8 @@ protected:
 	void decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT16 *dataptr);
 
 	// internal state
-	const UINT8 *           m_key;
+	required_memory_region       m_region;
+	required_region_ptr<UINT8>   m_key;
 	std::vector<UINT16>          m_plaintext;
 	required_shared_ptr<UINT16>  m_decrypted_opcodes;
 
@@ -83,7 +84,7 @@ public:
 	fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode);
+	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) override;
 };
 
 
@@ -97,7 +98,7 @@ public:
 	fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode);
+	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) override;
 };
 
 

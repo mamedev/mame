@@ -3,8 +3,11 @@
 #ifndef __DEBUG_QT_MAIN_WINDOW_H__
 #define __DEBUG_QT_MAIN_WINDOW_H__
 
-#include <QtGui/QtGui>
 #include <vector>
+
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QComboBox>
 
 #include "debug/dvdisasm.h"
 
@@ -23,7 +26,7 @@ class MainWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	MainWindow(running_machine* machine, QWidget* parent=NULL);
+	MainWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~MainWindow();
 
 	void setProcessor(device_t* processor);
@@ -43,7 +46,7 @@ private slots:
 	void runToCursor(bool changedTo);
 	void rightBarChanged(QAction* changedTo);
 
-	void executeCommand(bool withClear=true);
+	void executeCommandSlot();
 
 	void mountImage(bool changedTo);
 	void unmountImage(bool changedTo);
@@ -72,6 +75,7 @@ private:
 	int m_historyIndex;
 	std::vector<QString> m_inputHistory;
 	void addToHistory(const QString& command);
+	void executeCommand(bool withClear);
 };
 
 
@@ -83,7 +87,7 @@ class DasmDockWidget : public QWidget
 	Q_OBJECT
 
 public:
-	DasmDockWidget(running_machine* machine, QWidget* parent=NULL) :
+	DasmDockWidget(running_machine* machine, QWidget* parent=nullptr) :
 		QWidget(parent),
 		m_machine(machine)
 	{
@@ -134,9 +138,9 @@ class ProcessorDockWidget : public QWidget
 
 public:
 	ProcessorDockWidget(running_machine* machine,
-						QWidget* parent=NULL) :
+						QWidget* parent=nullptr) :
 		QWidget(parent),
-		m_processorView(NULL),
+		m_processorView(nullptr),
 		m_machine(machine)
 	{
 		m_processorView = new DebuggerView(DVT_STATE,

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_THREAD_H_HEADER_GUARD
@@ -8,11 +8,17 @@
 
 #if BX_PLATFORM_POSIX
 #	include <pthread.h>
+#	if defined(__FreeBSD__)
+#		include <pthread_np.h>
+#	endif
+#	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
+#		include <sys/prctl.h>
+#	endif // BX_PLATFORM_
 #elif BX_PLATFORM_WINRT
 using namespace Platform;
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
-#endif
+#endif // BX_PLATFORM_
 
 #include "sem.h"
 
@@ -31,7 +37,7 @@ namespace bx
 
 	public:
 		Thread()
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 			: m_handle(INVALID_HANDLE_VALUE)
 			, m_threadId(UINT32_MAX)
 #elif BX_PLATFORM_POSIX
@@ -62,10 +68,10 @@ namespace bx
 			m_stackSize = _stackSize;
 			m_running = true;
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
-			m_handle = CreateThread(NULL
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE
+			m_handle = ::CreateThread(NULL
 				, m_stackSize
-				, threadFunc
+				, (LPTHREAD_START_ROUTINE)threadFunc
 				, this
 				, 0
 				, NULL
@@ -100,6 +106,8 @@ namespace bx
 
 			result = pthread_create(&m_handle, &attr, &threadFunc, this);
 			BX_CHECK(0 == result, "pthread_attr_setschedparam failed! %d", result);
+#else
+#	error "Not implemented!"
 #endif // BX_PLATFORM_
 
 			m_sem.wait();
@@ -149,8 +157,16 @@ namespace bx
 		{
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 			pthread_setname_np(_name);
-#elif BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
+#elif (BX_CRT_GLIBC >= 21200) && ! BX_PLATFORM_HURD
 			pthread_setname_np(m_handle, _name);
+#elif BX_PLATFORM_LINUX
+			prctl(PR_SET_NAME,_name, 0, 0, 0);
+#elif BX_PLATFORM_BSD
+#	ifdef __NetBSD__
+			pthread_setname_np(m_handle, "%s", (void*)_name);
+#	else
+			pthread_set_name_np(m_handle, _name);
+#	endif // __NetBSD__
 #elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
 #	pragma pack(push, 8)
 			struct ThreadName
@@ -215,7 +231,7 @@ namespace bx
 		}
 #endif // BX_PLATFORM_
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 		HANDLE m_handle;
 		DWORD  m_threadId;
 #elif BX_PLATFORM_POSIX
@@ -260,7 +276,7 @@ namespace bx
 		uint32_t m_id;
 	};
 
-#elif !(BX_PLATFORM_WINRT)
+#elif !(BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT)
 
 	class TlsData
 	{
@@ -291,7 +307,7 @@ namespace bx
 	private:
 		pthread_key_t m_id;
 	};
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_*
 
 } // namespace bx
 

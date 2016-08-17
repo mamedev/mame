@@ -55,15 +55,11 @@ public:
 	DECLARE_DRIVER_INIT(asterock);
 	DECLARE_DRIVER_INIT(asteroidb);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 /*----------- defined in audio/asteroid.c -----------*/
 
 DISCRETE_SOUND_EXTERN( asteroid );
 DISCRETE_SOUND_EXTERN( astdelux );
-
-/*----------- defined in audio/llander.c -----------*/
-
-DISCRETE_SOUND_EXTERN( llander );

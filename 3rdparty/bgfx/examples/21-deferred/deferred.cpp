@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -16,12 +16,6 @@
 #define RENDER_PASS_DEBUG_GBUFFER_ID  4
 
 static float s_texelHalf = 0.0f;
-static bool s_originBottomLeft = false;
-
-inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far)
-{
-	bx::mtxProj(_result, _fovy, _aspect, _near, _far, s_originBottomLeft);
-}
 
 struct PosNormalTangentTexcoordVertex
 {
@@ -218,26 +212,28 @@ void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf
 	}
 }
 
-class Deferred : public entry::AppI
+class ExampleDeferred : public entry::AppI
 {
-	void init(int /*_argc*/, char** /*_argv*/) BX_OVERRIDE
+	void init(int _argc, char** _argv) BX_OVERRIDE
 	{
-		m_width = 1280;
-		m_height = 720;
-		m_debug = BGFX_DEBUG_TEXT;
-		m_reset = BGFX_RESET_VSYNC;
+		Args args(_argc, _argv);
 
-		bgfx::init();
+		m_width  = 1280;
+		m_height = 720;
+		m_debug  = BGFX_DEBUG_TEXT;
+		m_reset  = BGFX_RESET_VSYNC;
+
+		bgfx::init(args.m_type, args.m_pciId);
 		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable m_debug text.
 		bgfx::setDebug(m_debug);
 
-		// Set clear color palette for index 0
-		bgfx::setClearColor(0, UINT32_C(0x00000000) );
+		// Set palette color for index 0
+		bgfx::setPaletteColor(0, UINT32_C(0x00000000) );
 
-		// Set clear color palette for index 1
-		bgfx::setClearColor(1, UINT32_C(0x303030ff) );
+		// Set palette color for index 1
+		bgfx::setPaletteColor(1, UINT32_C(0x303030ff) );
 
 		// Set geometry pass view clear state.
 		bgfx::setViewClear(RENDER_PASS_GEOMETRY_ID
@@ -297,10 +293,10 @@ class Deferred : public entry::AppI
 		m_lineProgram    = loadProgram("vs_deferred_debug_line", "fs_deferred_debug_line");
 
 		// Load diffuse texture.
-		m_textureColor  = loadTexture("fieldstone-rgba.dds");
+		m_textureColor  = loadTexture("textures/fieldstone-rgba.dds");
 
 		// Load normal texture.
-		m_textureNormal = loadTexture("fieldstone-n.dds");
+		m_textureNormal = loadTexture("textures/fieldstone-n.dds");
 
 		m_gbufferTex[0].idx = bgfx::invalidHandle;
 		m_gbufferTex[1].idx = bgfx::invalidHandle;
@@ -314,7 +310,6 @@ class Deferred : public entry::AppI
 		m_timeOffset = bx::getHPCounter();
 		const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
 		s_texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
-		s_originBottomLeft = bgfx::RendererType::OpenGL == renderer || bgfx::RendererType::OpenGLES == renderer;
 
 		// Get renderer capabilities info.
 		m_caps = bgfx::getCaps();
@@ -415,9 +410,9 @@ class Deferred : public entry::AppI
 			else
 			{
 				if (m_oldWidth  != m_width
-						||  m_oldHeight != m_height
-						||  m_oldReset  != m_reset
-						||  !bgfx::isValid(m_gbuffer) )
+				||  m_oldHeight != m_height
+				||  m_oldReset  != m_reset
+				||  !bgfx::isValid(m_gbuffer) )
 				{
 					// Recreate variable size render targets when resolution changes.
 					m_oldWidth  = m_width;
@@ -504,7 +499,7 @@ class Deferred : public entry::AppI
 					bgfx::setViewFrameBuffer(RENDER_PASS_LIGHT_ID, m_lightBuffer);
 
 					float proj[16];
-					mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f);
+					bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, m_caps->homogeneousDepth);
 
 					bgfx::setViewFrameBuffer(RENDER_PASS_GEOMETRY_ID, m_gbuffer);
 					bgfx::setViewTransform(RENDER_PASS_GEOMETRY_ID, view, proj);
@@ -698,7 +693,7 @@ class Deferred : public entry::AppI
 								| BGFX_STATE_ALPHA_WRITE
 								| BGFX_STATE_BLEND_ADD
 								);
-						screenSpaceQuad( (float)m_width, (float)m_height, s_texelHalf, s_originBottomLeft);
+						screenSpaceQuad( (float)m_width, (float)m_height, s_texelHalf, m_caps->originBottomLeft);
 						bgfx::submit(RENDER_PASS_LIGHT_ID, m_lightProgram);
 					}
 				}
@@ -710,7 +705,7 @@ class Deferred : public entry::AppI
 						| BGFX_STATE_RGB_WRITE
 						| BGFX_STATE_ALPHA_WRITE
 						);
-				screenSpaceQuad( (float)m_width, (float)m_height, s_texelHalf, s_originBottomLeft);
+				screenSpaceQuad( (float)m_width, (float)m_height, s_texelHalf, m_caps->originBottomLeft);
 				bgfx::submit(RENDER_PASS_COMBINE_ID, m_combineProgram);
 
 				if (m_showGBuffer)
@@ -795,4 +790,4 @@ class Deferred : public entry::AppI
 	int64_t m_timeOffset;
 };
 
-ENTRY_IMPLEMENT_MAIN(Deferred);
+ENTRY_IMPLEMENT_MAIN(ExampleDeferred);

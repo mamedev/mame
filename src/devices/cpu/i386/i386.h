@@ -8,7 +8,7 @@
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 #include "debug/debugcpu.h"
-#include "cpu/vtlb.h"
+#include "divtlb.h"
 
 
 #define INPUT_LINE_A20      1
@@ -22,8 +22,9 @@
 #define MCFG_I386_SMIACT(_devcb) \
 	i386_device::set_smiact(*device, DEVCB_##_devcb);
 
+#define X86_NUM_CPUS        4
 
-class i386_device : public cpu_device
+class i386_device : public cpu_device, public device_vtlb_interface
 {
 public:
 	// construction/destruction
@@ -40,33 +41,37 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_debug_setup();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_debug_setup() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 40; }
-	virtual UINT32 execute_input_lines() const { return 32; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 40; }
+	virtual UINT32 execute_input_lines() const override { return 32; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
-	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 15; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 15; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+
+	std::unique_ptr<UINT8[]> cycle_table_rm[X86_NUM_CPUS];
+	std::unique_ptr<UINT8[]> cycle_table_pm[X86_NUM_CPUS];
+
 
 union I386_GPR {
 	UINT32 d[8];
@@ -265,8 +270,6 @@ struct I386_CALL_GATE
 	UINT8 *m_cycle_table_pm;
 	UINT8 *m_cycle_table_rm;
 
-	vtlb_state *m_vtlb;
-
 	bool m_smm;
 	bool m_smi;
 	bool m_smi_latched;
@@ -330,6 +333,7 @@ struct I386_CALL_GATE
 	inline UINT32 DEC32(UINT32 dst);
 	inline void PUSH16(UINT16 value);
 	inline void PUSH32(UINT32 value);
+	inline void PUSH32SEG(UINT32 value);
 	inline void PUSH8(UINT8 value);
 	inline UINT8 POP8();
 	inline UINT16 POP16();
@@ -357,7 +361,7 @@ struct I386_CALL_GATE
 	void i386_load_segment_descriptor(int segment );
 	UINT32 i386_get_stack_segment(UINT8 privilege);
 	UINT32 i386_get_stack_ptr(UINT8 privilege);
-	UINT32 get_flags();
+	UINT32 get_flags() const;
 	void set_flags(UINT32 f );
 	void sib_byte(UINT8 mod, UINT32* out_ea, UINT8* out_segment);
 	void modrm_to_EA(UINT8 mod_rm, UINT32* out_ea, UINT8* out_segment);
@@ -1406,7 +1410,7 @@ struct I386_CALL_GATE
 	void build_x87_opcode_table_df();
 	void build_x87_opcode_table();
 	void i386_postload();
-	void i386_common_init(int tlbsize);
+	void i386_common_init();
 	void build_opcode_table(UINT32 features);
 	void pentium_smi();
 	void zero_state();
@@ -1430,8 +1434,8 @@ public:
 	i486_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -1443,9 +1447,9 @@ public:
 	pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
-	virtual void execute_set_input(int inputnum, int state);
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -1456,8 +1460,8 @@ public:
 	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -1468,8 +1472,8 @@ public:
 	pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -1480,8 +1484,8 @@ public:
 	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -1492,8 +1496,8 @@ public:
 	pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -1504,8 +1508,8 @@ public:
 	pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -1516,8 +1520,8 @@ public:
 	pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 

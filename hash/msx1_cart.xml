@@ -2310,7 +2310,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Casio</publisher>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="casio_basic.rom" size="32768" crc="2181a21d" sha1="c48a68db822d9bded56ee1df55d18b81fbe135b7" offset="0x400x40000" />
+				<rom name="casio_basic.rom" size="32768" crc="2181a21d" sha1="c48a68db822d9bded56ee1df55d18b81fbe135b7" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4313,7 +4313,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master (Jpn)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
@@ -13456,7 +13456,7 @@ kept for now until finding out what those bytes affect...
 	<software name="supersyn">
 		<description>Super Synth (Jpn)</description>
 		<year>1984</year>
-		<publisher>Victor </publisher>
+		<publisher>Victor</publisher>
 		<info name="serial" value="M-20001" />
 		<info name="alt_title" value="スーパーシンセ" />
 		<part name="cart" interface="msx_cart">
@@ -13469,7 +13469,7 @@ kept for now until finding out what those bytes affect...
 	<software name="supersyna" cloneof="supersyn">
 		<description>Super Synth (Jpn, Alt)</description>
 		<year>1984</year>
-		<publisher>Victor </publisher>
+		<publisher>Victor</publisher>
 		<info name="serial" value="M-20001" />
 		<info name="alt_title" value="スーパーシンセ" />
 		<part name="cart" interface="msx_cart">

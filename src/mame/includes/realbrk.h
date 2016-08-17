@@ -38,8 +38,8 @@ public:
 	optional_shared_ptr<UINT16> m_vram_0ras;
 	optional_shared_ptr<UINT16> m_vram_1ras;
 
-	bitmap_ind16 *m_tmpbitmap0;
-	bitmap_ind16 *m_tmpbitmap1;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap1;
 	int m_disable_video;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
@@ -67,7 +67,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

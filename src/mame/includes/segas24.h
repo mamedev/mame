@@ -12,14 +12,27 @@ class segas24_state : public driver_device
 {
 public:
 	segas24_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu"),
-		m_dac(*this, "dac"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_dac(*this, "dac")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_generic_paletteram_16(*this, "paletteram")
+		, m_romboard(*this, "romboard")
+		, m_gground_hack_timer(nullptr)
+		, m_p1(*this, "P1")
+		, m_p2(*this, "P2")
+		, m_p3(*this, "P3")
+		, m_service(*this, "SERVICE")
+		, m_coinage(*this, "COINAGE")
+		, m_dsw(*this, "DSW")
+		, m_paddle(*this, "PADDLE")
+		, m_dials(*this, {"DIAL1", "DIAL2", "DIAL3", "DIAL4"})
+		, m_pedals(*this, {"PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4"})
+		, m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2"})
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -27,6 +40,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_memory_region m_romboard;
 
 	static const UINT8  mahmajn_mlt[8];
 	static const UINT8 mahmajn2_mlt[8];
@@ -132,11 +146,25 @@ public:
 	DECLARE_DRIVER_INIT(dcclubfd);
 	DECLARE_DRIVER_INIT(qsww);
 	DECLARE_DRIVER_INIT(sgmast);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_frc_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_vbl);
+
+	// game specific
+	TIMER_CALLBACK_MEMBER(gground_hack_timer_callback);
+	emu_timer *m_gground_hack_timer;
+	required_ioport m_p1;
+	required_ioport m_p2;
+	optional_ioport m_p3;
+	required_ioport m_service;
+	required_ioport m_coinage;
+	required_ioport m_dsw;
+	optional_ioport m_paddle;
+	optional_ioport_array<4> m_dials;
+	optional_ioport_array<4> m_pedals;
+	optional_ioport_array<8> m_mj_inputs;
 };

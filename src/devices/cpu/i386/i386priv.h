@@ -398,7 +398,7 @@ bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_en
 	UINT32 directory = (a >> 22) & 0x3ff;
 	UINT32 table = (a >> 12) & 0x3ff;
 	vtlb_entry perm = 0;
-	bool ret = false;
+	bool ret;
 	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
 	bool write = (intention & TRANSLATE_WRITE) ? true : false;
 	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;
@@ -486,7 +486,7 @@ int i386_device::translate_address(int pl, int type, UINT32 *address, UINT32 *er
 	if(!(m_cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
 		return TRUE;
 
-	const vtlb_entry *table = vtlb_table(m_vtlb);
+	const vtlb_entry *table = vtlb_table();
 	UINT32 index = *address >> 12;
 	vtlb_entry entry = table[index];
 	if(type == TRANSLATE_FETCH)
@@ -506,7 +506,7 @@ int i386_device::translate_address(int pl, int type, UINT32 *address, UINT32 *er
 				*error |= 1;
 			return FALSE;
 		}
-		vtlb_dynload(m_vtlb, index, *address, entry);
+		vtlb_dynload(index, *address, entry);
 		return TRUE;
 	}
 	if(!(entry & (1 << type)))
@@ -516,7 +516,7 @@ int i386_device::translate_address(int pl, int type, UINT32 *address, UINT32 *er
 	}
 	*address = (entry & 0xfffff000) | (*address & 0xfff);
 #ifdef TEST_TLB
-	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, NULL);
+	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
 	if(!test_ret || (test_addr != *address))
 		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
 #endif
@@ -557,7 +557,7 @@ UINT16 i386_device::FETCH16()
 	UINT16 value;
 	UINT32 address = m_pc, error;
 
-	if( address & 0x1 ) {       /* Unaligned read */
+	if( !WORD_ALIGNED(address) ) {       /* Unaligned read */
 		value = (FETCH() << 0);
 		value |= (FETCH() << 8);
 	} else {
@@ -575,7 +575,7 @@ UINT32 i386_device::FETCH32()
 	UINT32 value;
 	UINT32 address = m_pc, error;
 
-	if( m_pc & 0x3 ) {      /* Unaligned read */
+	if( !DWORD_ALIGNED(m_pc) ) {      /* Unaligned read */
 		value = (FETCH() << 0);
 		value |= (FETCH() << 8);
 		value |= (FETCH() << 16);
@@ -607,7 +607,7 @@ UINT16 i386_device::READ16(UINT32 ea)
 	UINT16 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x1 ) {        /* Unaligned read */
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (READ8( address+0 ) << 0);
 		value |= (READ8( address+1 ) << 8);
 	} else {
@@ -624,7 +624,7 @@ UINT32 i386_device::READ32(UINT32 ea)
 	UINT32 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x3 ) {        /* Unaligned read */
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (READ8( address+0 ) << 0);
 		value |= (READ8( address+1 ) << 8);
 		value |= (READ8( address+2 ) << 16),
@@ -644,7 +644,7 @@ UINT64 i386_device::READ64(UINT32 ea)
 	UINT64 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x7 ) {        /* Unaligned read */
+	if( !QWORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (((UINT64) READ8( address+0 )) << 0);
 		value |= (((UINT64) READ8( address+1 )) << 8);
 		value |= (((UINT64) READ8( address+2 )) << 16);
@@ -678,7 +678,7 @@ UINT16 i386_device::READ16PL0(UINT32 ea)
 	UINT16 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x1 ) {        /* Unaligned read */
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (READ8PL0( address+0 ) << 0);
 		value |= (READ8PL0( address+1 ) << 8);
 	} else {
@@ -696,7 +696,7 @@ UINT32 i386_device::READ32PL0(UINT32 ea)
 	UINT32 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x3 ) {        /* Unaligned read */
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (READ8PL0( address+0 ) << 0);
 		value |= (READ8PL0( address+1 ) << 8);
 		value |= (READ8PL0( address+2 ) << 16);
@@ -732,7 +732,7 @@ void i386_device::WRITE16(UINT32 ea, UINT16 value)
 {
 	UINT32 address = ea, error;
 
-	if( ea & 0x1 ) {        /* Unaligned write */
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned write */
 		WRITE8( address+0, value & 0xff );
 		WRITE8( address+1, (value >> 8) & 0xff );
 	} else {
@@ -747,7 +747,7 @@ void i386_device::WRITE32(UINT32 ea, UINT32 value)
 {
 	UINT32 address = ea, error;
 
-	if( ea & 0x3 ) {        /* Unaligned write */
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned write */
 		WRITE8( address+0, value & 0xff );
 		WRITE8( address+1, (value >> 8) & 0xff );
 		WRITE8( address+2, (value >> 16) & 0xff );
@@ -765,7 +765,7 @@ void i386_device::WRITE64(UINT32 ea, UINT64 value)
 {
 	UINT32 address = ea, error;
 
-	if( ea & 0x7 ) {        /* Unaligned write */
+	if( !QWORD_ALIGNED(ea) ) {        /* Unaligned write */
 		WRITE8( address+0, value & 0xff );
 		WRITE8( address+1, (value >> 8) & 0xff );
 		WRITE8( address+2, (value >> 16) & 0xff );
@@ -1000,6 +1000,23 @@ void i386_device::PUSH32(UINT32 value)
 		REG16(SP) = new_esp;
 	}
 }
+
+void i386_device::PUSH32SEG(UINT32 value)
+{
+	UINT32 ea, new_esp;
+	if( STACK_32BIT ) {
+		new_esp = REG32(ESP) - 4;
+		ea = i386_translate(SS, new_esp, 1);
+		((m_cpu_version & 0xf00) == 0x300) ? WRITE16(ea, value) : WRITE32(ea, value ); // 486 also?
+		REG32(ESP) = new_esp;
+	} else {
+		new_esp = (REG16(SP) - 4) & 0xffff;
+		ea = i386_translate(SS, new_esp, 1);
+		((m_cpu_version & 0xf00) == 0x300) ? WRITE16(ea, value) : WRITE32(ea, value );
+		REG16(SP) = new_esp;
+	}
+}
+
 void i386_device::PUSH8(UINT8 value)
 {
 	if( m_operand_size ) {

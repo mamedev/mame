@@ -13,9 +13,9 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip_screen, UINT32* tilebank);
-	UINT16* m_sprram;
-	UINT16* m_sprram_old;
-	UINT16* m_sprram_old2;
+	std::unique_ptr<UINT16[]> m_sprram;
+	std::unique_ptr<UINT16[]> m_sprram_old;
+	std::unique_ptr<UINT16[]> m_sprram_old2;
 
 
 	DECLARE_WRITE16_MEMBER(fuuki_sprram_w)
@@ -31,8 +31,8 @@ public:
 	void buffer_sprites(void);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;

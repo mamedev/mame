@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #pragma once
 
@@ -43,12 +43,12 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 	UINT8   portstate;      /* port status          */
 	UINT8   control2;       /* control reg: SAMPLE, DA/AD, RAM TYPE (x8bit / x1bit), ROM/RAM */
 	UINT8   portshift;      /* address bits shift-left:
-                            ** 8 for YM2610,
-                            ** 5 for Y8950 and YM2608 */
+	                        ** 8 for YM2610,
+	                        ** 5 for Y8950 and YM2608 */
 
 	UINT8   DRAMportshift;  /* address bits shift-right:
-                            ** 0 for ROM and x8bit DRAMs,
-                            ** 3 for x1 DRAMs */
+	                        ** 0 for ROM and x8bit DRAMs,
+	                        ** 3 for x1 DRAMs */
 
 	UINT8   memread;        /* needed for reading/writing external memory */
 
@@ -71,13 +71,14 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 
 	UINT8   reg[16];        /* adpcm registers      */
 	UINT8   emulation_mode; /* which chip we're emulating */
+	device_t *device;
 };
 
 /*void YM_DELTAT_BRDY_callback(YM_DELTAT *DELTAT);*/
 
 UINT8 YM_DELTAT_ADPCM_Read(YM_DELTAT *DELTAT);
 void YM_DELTAT_ADPCM_Write(YM_DELTAT *DELTAT,int r,int v);
-void YM_DELTAT_ADPCM_Reset(YM_DELTAT *DELTAT,int pan,int emulation_mode);
+void YM_DELTAT_ADPCM_Reset(YM_DELTAT *DELTAT,int pan,int emulation_mode, device_t *device);
 void YM_DELTAT_ADPCM_CALC(YM_DELTAT *DELTAT);
 
 void YM_DELTAT_postload(YM_DELTAT *DELTAT,UINT8 *regs);

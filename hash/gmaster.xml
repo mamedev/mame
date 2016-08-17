@@ -7,7 +7,6 @@ Undumped:
 - Invader
 - Move It
 - S-Race
-- Soccer (Fuss-Ball)
 - Tank War
 -->
 <softwarelist name="gmaster" description="Hartung Game Master cartridges">
@@ -51,6 +50,17 @@ Undumped:
 		<part name="cart" interface="gmaster_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="fallblock.bin" size="8192" crc="58e409fb" sha1="f6f7e3dae361fbd56d4a8457d81bb4f3828c48aB" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fussball" supported ="partial"> <!-- some gfx corruption -->
+		<description>3-on-3 Soccer (Fuss-ball)</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="fussball.bin" size="0x8000" crc="76cf4c92" sha1="a4b6e7f98e953e47f5aa427752e8a936e7582bc9" offset="00000" />
 			</dataarea>
 		</part>
 	</software>

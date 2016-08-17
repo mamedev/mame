@@ -23,9 +23,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( read ) { output_rxd(state); }
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start() { m_owner = dynamic_cast<midi_port_device *>(owner()); }
-	virtual void device_reset() { }
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override { m_owner = dynamic_cast<midi_port_device *>(owner()); }
+	virtual void device_reset() override { }
 
 private:
 	required_device<midiin_device> m_midiin;

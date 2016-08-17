@@ -14,7 +14,7 @@ class el2_3c503_device: public device_t,
 {
 public:
 	el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void el2_3c503_irq_w(int state);
 	DECLARE_READ8_MEMBER(el2_3c503_mem_read);
@@ -23,12 +23,12 @@ public:
 	DECLARE_WRITE8_MEMBER(el2_3c503_loport_w);
 	DECLARE_READ8_MEMBER(el2_3c503_hiport_r);
 	DECLARE_WRITE8_MEMBER(el2_3c503_hiport_w);
-	void eop_w(int state);
-	UINT8 dack_r(int line);
-	void dack_w(int line, UINT8 data);
+	void eop_w(int state) override;
+	UINT8 dack_r(int line) override;
+	void dack_w(int line, UINT8 data) override;
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	required_device<dp8390d_device> m_dp8390;
 	UINT8 m_board_ram[8*1024];

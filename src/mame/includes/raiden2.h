@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 #include "audio/seibu.h"
-#include "machine/raiden2cop.h"
+#include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
 
 class raiden2_state : public driver_device
@@ -44,7 +44,10 @@ public:
 
 	}
 
-	UINT16 *back_data, *fore_data, *mid_data, *text_data; // private buffers, allocated in init
+	std::unique_ptr<UINT16[]> back_data;
+	std::unique_ptr<UINT16[]> fore_data;
+	std::unique_ptr<UINT16[]> mid_data;
+	std::unique_ptr<UINT16[]> text_data; // private buffers, allocated in init
 	required_shared_ptr<UINT16> sprites;
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
@@ -139,8 +142,6 @@ public:
 	DECLARE_MACHINE_RESET(raidendx);
 	UINT32 screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(raiden2_interrupt);
-	UINT16 rps();
-	UINT16 rpc();
 	void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask);
 	void sprcpt_init(void);
 
@@ -153,9 +154,5 @@ public:
 	optional_device<raiden2cop_device> m_raiden2cop;
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
-
-/*----------- defined in machine/r2crypt.c -----------*/
-void raiden2_decrypt_sprites(running_machine &machine);
-void zeroteam_decrypt_sprites(running_machine &machine);

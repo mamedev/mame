@@ -81,9 +81,9 @@ public:
 	TIMER_CALLBACK_MEMBER(sprite_tick);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	virtual void tile_get_info(tile_data &tileinfo, UINT16 data, int color_base);
 private:
@@ -106,8 +106,8 @@ public:
 	DECLARE_DRIVER_INIT(fround);
 
 protected:
-	virtual void video_start();
-	virtual void tile_get_info(tile_data &tileinfo, UINT16 data, int color_base);
+	virtual void video_start() override;
+	virtual void tile_get_info(tile_data &tileinfo, UINT16 data, int color_base) override;
 
 private:
 	UINT8 m_gfx_bank[4];

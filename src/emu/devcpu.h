@@ -17,43 +17,6 @@
 #ifndef __DEVCPU_H__
 #define __DEVCPU_H__
 
-#include "emuopts.h"
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// CPU information constants
-const int MAX_REGS = 256;
-enum
-{
-	// --- the following bits of info are returned as 64-bit signed integers ---
-	CPUINFO_INT_FIRST = 0x00000,
-
-	CPUINFO_INT_CPU_SPECIFIC = 0x08000,                     // R/W: CPU-specific values start here
-
-	// --- the following bits of info are returned as pointers to data or functions ---
-	CPUINFO_PTR_FIRST = 0x10000,
-
-		// CPU-specific additions
-		CPUINFO_PTR_INSTRUCTION_COUNTER = 0x14000,
-															// R/O: int *icount
-
-	CPUINFO_PTR_CPU_SPECIFIC = 0x18000, // R/W: CPU-specific values start here
-
-	// --- the following bits of info are returned as pointers to functions ---
-	CPUINFO_FCT_FIRST = 0x20000,
-
-	CPUINFO_FCT_CPU_SPECIFIC = 0x28000, // R/W: CPU-specific values start here
-
-	// --- the following bits of info are returned as NULL-terminated strings ---
-	CPUINFO_STR_FIRST = 0x30000,
-
-	CPUINFO_STR_CPU_SPECIFIC = 0x38000  // R/W: CPU-specific values start here
-};
-
-
-
 //**************************************************************************
 //  CPU DEVICE CONFIGURATION MACROS
 //**************************************************************************
@@ -63,7 +26,6 @@ enum
 #define MCFG_CPU_REPLACE MCFG_DEVICE_REPLACE
 
 #define MCFG_CPU_CLOCK MCFG_DEVICE_CLOCK
-#define MCFG_CPU_CONFIG MCFG_DEVICE_CONFIG
 
 #define MCFG_CPU_PROGRAM_MAP MCFG_DEVICE_PROGRAM_MAP
 #define MCFG_CPU_DATA_MAP MCFG_DEVICE_DATA_MAP
@@ -78,6 +40,13 @@ enum
 #define MCFG_CPU_VBLANK_INT_REMOVE MCFG_DEVICE_VBLANK_INT_REMOVE
 #define MCFG_CPU_PERIODIC_INT_REMOVE MCFG_DEVICE_PERIODIC_INT_REMOVE
 #define MCFG_CPU_IRQ_ACKNOWLEDGE_REMOVE MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE
+
+#define MCFG_CPU_DISASSEMBLE_OVERRIDE MCFG_DEVICE_DISASSEMBLE_OVERRIDE
+
+// recompilation parameters
+#define MCFG_CPU_FORCE_NO_DRC() \
+	cpu_device::static_set_force_no_drc(*device, true);
+
 
 
 //**************************************************************************
@@ -103,10 +72,19 @@ class cpu_device :  public device_t,
 {
 	friend resource_pool_object<cpu_device>::~resource_pool_object();
 
+public:
+	// configuration helpers
+	static void static_set_force_no_drc(device_t &device, bool value);
+	bool allow_drc() const;
+
 protected:
 	// construction/destruction
 	cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~cpu_device();
+
+private:
+	// configured state
+	bool                    m_force_no_drc;             // whether or not to force DRC off
 };
 
 
