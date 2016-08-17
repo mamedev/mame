@@ -7268,6 +7268,15 @@ DRIVER_INIT_MEMBER( galaxian_state, froggrs )
 
 
 
+DRIVER_INIT_MEMBER(galaxian_state,jungsub)
+{
+	/* todo, decrypt program rom */
+	// seems slightly address dependent based on text strings
+
+	/* video extensions */
+	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
+}
+
 /*************************************
  *
  *  ROM definitions
@@ -11484,6 +11493,39 @@ ROM_START( superbon )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, BAD_DUMP CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
 ROM_END
 
+ROM_START( jungsub )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "J1.2B",        0x0000, 0x1000, CRC(15735d45) SHA1(3546154dcd3cf9ce47e921b9b687c00b3b550ccb) )
+	ROM_LOAD( "J2.2D",        0x1000, 0x1000, CRC(7147a43d) SHA1(3f82da4b61626737f02e32db75c437cafcd5e5e3) )
+	ROM_LOAD( "J3.3B",        0x2000, 0x1000, CRC(f65484ee) SHA1(b971a9c857813f0c83f5d73a2a3842d91569170d) )
+	ROM_LOAD( "JC4.3D",       0x3000, 0x1000, CRC(16d23732) SHA1(ca4327709f1af5d4c97ae64e377022055595c215) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "J13.1C",       0x0000, 0x0800, CRC(414b011e) SHA1(2f714ce4266f192ff4e86c347f90811bcc896429) )
+	ROM_LOAD( "J14.1D",       0x0800, 0x0800, CRC(1f8c6a58) SHA1(e07ae7e4968ac8ec3c22a30ebd1e9f75abeec776) )
+
+	/* There is twice as much GFX data here as an original 'Jungler'
+	   
+	   This appears to be because the Rally X / Jungler hardware supports both X and Y tile flipping, a feature
+	   which Jungler needs.  Galaxian / Scramble hardware does not support tile flipping.
+	   
+	   Adding flipped copies of all the tiles would require 4x ROM capacity (normal, Flip X, Flip Y, Flip XY)
+	   but instead of doing this Subelectro worked out which tiles needed flipped copies and managed to squeeze
+	   them into twice the space instead.  Unfortunately this means constructing data to replace the bad rom
+	   is NOT a process that can be automated. */
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "J9.4B",        0x0000, 0x0800, CRC(230e6b60) SHA1(9f0dd68bf760567f0e56455ac72e819b3e677743) )
+	ROM_LOAD( "J10.4C",       0x0800, 0x0800, CRC(4b32a431) SHA1(701a4e2dfa7686de50bdec7c7f9182192ec25159) )
+	ROM_LOAD( "JC11.4D",      0x1000, 0x0800, BAD_DUMP CRC(5dee4e2d) SHA1(86b98e55602ef2a740f978bb2fcc4b3f81fcc61a) ) // rom is bad, dump entirely garbage
+	ROM_LOAD( "JC12.4F",      0x1800, 0x0800, CRC(6de4827a) SHA1(ffd04abb9f64f88adea81892caa919f84c68ced5) )
+	
+	ROM_REGION( 0x0020, "cpuprom", 0 )
+	ROM_LOAD( "KAP.CPU",      0x0000, 0x0020, CRC(27efa693) SHA1(b2ad3b52c254193a7492fe5e6785c167326ce866) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "PROM.6E",      0x0000, 0x0020, CRC(2430f47c) SHA1(f7725f4768cb57717feb18891766642f6d7cbcde) )
+ROM_END
+
 
 /*************************************
  *
@@ -11739,6 +11781,9 @@ GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, scram
 
 GAME( 1981, atlantis,    0,        theend,     atlantis,   galaxian_state, atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, atlantis2,   atlantis, theend,     atlantis,   galaxian_state, atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 2)", MACHINE_SUPPORTS_SAVE )
+
+// Konami L-1200-2 base board with custom Subelectro 113 rom board
+GAME( 1981, jungsub,    jungler,        scramble,   scramble,   galaxian_state, jungsub,   ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /* Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip */
 GAME( 1982, scorpion,    0,        scorpion,   scorpion,   galaxian_state, scorpion,   ROT90,  "Zaccaria", "Scorpion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
