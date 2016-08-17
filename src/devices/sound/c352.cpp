@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, superctr
 /*
-    c352.c - Namco C352 custom PCM chip emulation
-    v2.0
-    By R. Belmont
+	c352.c - Namco C352 custom PCM chip emulation
+	v2.0
+	By R. Belmont
 	Rewritten and improved by superctr
-    Additional code by cync and the hoot development team
+	Additional code by cync and the hoot development team
 
-    Thanks to Cap of VivaNonno for info and The_Author for preliminary reverse-engineering
+	Thanks to Cap of VivaNonno for info and The_Author for preliminary reverse-engineering
 
-    Chip specs:
-    32 voices
-    Supports 8-bit linear and 8-bit muLaw samples
-    Output: digital, 16 bit, 4 channels
-    Output sample rate is the input clock / (288 * 2).
+	Chip specs:
+	32 voices
+	Supports 8-bit linear and 8-bit muLaw samples
+	Output: digital, 16 bit, 4 channels
+	Output sample rate is the input clock / (288 * 2).
  */
 
 #include "emu.h"
@@ -55,54 +55,54 @@ void c352_device::fetch_sample(c352_voice_t* v)
 {
 	v->last_sample = v->sample;
 
-    if(v->flags & C352_FLG_NOISE)
-    {
-        m_random = (m_random>>1) ^ ((-(m_random&1)) & 0xfff6);
-        v->sample = m_random;
+	if(v->flags & C352_FLG_NOISE)
+	{
+		m_random = (m_random>>1) ^ ((-(m_random&1)) & 0xfff6);
+		v->sample = m_random;
 	}
 	else
 	{
-		char s;
+		INT8 s;
 
-		s = (char)read_byte(v->pos);
+		s = (INT8)read_byte(v->pos);
 
 		if(v->flags & C352_FLG_MULAW)
-			v->sample = m_mulaw_table[(unsigned char)s];
+			v->sample = m_mulaw_table[(UINT8)s];
 		else
 			v->sample = s<<8;
 
-		unsigned short pos = v->pos&0xffff;
+		UINT16 pos = v->pos&0xffff;
 
-        if((v->flags & C352_FLG_LOOP) && v->flags & C352_FLG_REVERSE)
-        {
+		if((v->flags & C352_FLG_LOOP) && v->flags & C352_FLG_REVERSE)
+		{
 			// backwards>forwards
-            if((v->flags & C352_FLG_LDIR) && pos == v->wave_loop)
-                v->flags &= ~C352_FLG_LDIR;
+			if((v->flags & C352_FLG_LDIR) && pos == v->wave_loop)
+				v->flags &= ~C352_FLG_LDIR;
 			// forwards>backwards
-            else if(!(v->flags & C352_FLG_LDIR) && pos == v->wave_end)
-                v->flags |= C352_FLG_LDIR;
+			else if(!(v->flags & C352_FLG_LDIR) && pos == v->wave_end)
+				v->flags |= C352_FLG_LDIR;
 
 			v->pos += (v->flags&C352_FLG_LDIR) ? -1 : 1;
-        }
-        else if(pos == v->wave_end)
-        {
-            if((v->flags & C352_FLG_LINK) && (v->flags & C352_FLG_LOOP))
-            {
-                v->pos = (v->wave_start<<16) | v->wave_loop;
-                v->flags |= C352_FLG_LOOPHIST;
-            }
-            else if(v->flags & C352_FLG_LOOP)
-            {
-                v->pos = (v->pos&0xff0000) | v->wave_loop;
-                v->flags |= C352_FLG_LOOPHIST;
-            }
-            else
-            {
-                v->flags |= C352_FLG_KEYOFF;
-                v->flags &= ~C352_FLG_BUSY;
+		}
+		else if(pos == v->wave_end)
+		{
+			if((v->flags & C352_FLG_LINK) && (v->flags & C352_FLG_LOOP))
+			{
+				v->pos = (v->wave_start<<16) | v->wave_loop;
+				v->flags |= C352_FLG_LOOPHIST;
+			}
+			else if(v->flags & C352_FLG_LOOP)
+			{
+				v->pos = (v->pos&0xff0000) | v->wave_loop;
+				v->flags |= C352_FLG_LOOPHIST;
+			}
+			else
+			{
+				v->flags |= C352_FLG_KEYOFF;
+				v->flags &= ~C352_FLG_BUSY;
 				v->sample=0;
-            }
-        }
+			}
+		}
 		else
 		{
 			v->pos += (v->flags&C352_FLG_REVERSE) ? -1 : 1;
@@ -114,7 +114,7 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 {
 	
 	int i,j;
-	short s;
+	INT16 s;
 	stream_sample_t *buffer_fl = outputs[0];
 	stream_sample_t *buffer_fr = outputs[1];
 	stream_sample_t *buffer_rl = outputs[2];
@@ -147,7 +147,7 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				
 				// Interpolate samples
 				if((v->flags & C352_FLG_FILTER) == 0)
-					 s = v->last_sample + (v->counter*(v->sample-v->last_sample)>>16);
+					s = v->last_sample + (v->counter*(v->sample-v->last_sample)>>16);
 			}
 			
 			// Left
@@ -159,35 +159,35 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			out[3] += ((v->flags & C352_FLG_PHASEFR) ? -s * (v->vol_r&0xff) : s * (v->vol_r&0xff))>>8;
 		}
 		
-		*buffer_fl++ = (short) (out[0]>>3);
-		*buffer_fr++ = (short) (out[1]>>3);
-		*buffer_rl++ = (short) (out[2]>>3);
-		*buffer_rr++ = (short) (out[3]>>3);
+		*buffer_fl++ = (INT16) (out[0]>>3);
+		*buffer_fr++ = (INT16) (out[1]>>3);
+		*buffer_rl++ = (INT16) (out[2]>>3);
+		*buffer_rr++ = (INT16) (out[3]>>3);
 	}
 	
 	
 }
 
-unsigned short c352_device::read_reg16(unsigned long address)
+UINT16 c352_device::read_reg16(unsigned long address)
 {
 	m_stream->update();
 	
 	const int reg_map[8] =
 	{
-		offsetof(c352_voice_t,vol_f) / sizeof(unsigned short),
-		offsetof(c352_voice_t,vol_r) / sizeof(unsigned short),
-		offsetof(c352_voice_t,freq) / sizeof(unsigned short),
-		offsetof(c352_voice_t,flags) / sizeof(unsigned short),
-		offsetof(c352_voice_t,wave_bank) / sizeof(unsigned short),
-		offsetof(c352_voice_t,wave_start) / sizeof(unsigned short),
-		offsetof(c352_voice_t,wave_end) / sizeof(unsigned short),
-		offsetof(c352_voice_t,wave_loop) / sizeof(unsigned short),
+		offsetof(c352_voice_t,vol_f) / sizeof(UINT16),
+		offsetof(c352_voice_t,vol_r) / sizeof(UINT16),
+		offsetof(c352_voice_t,freq) / sizeof(UINT16),
+		offsetof(c352_voice_t,flags) / sizeof(UINT16),
+		offsetof(c352_voice_t,wave_bank) / sizeof(UINT16),
+		offsetof(c352_voice_t,wave_start) / sizeof(UINT16),
+		offsetof(c352_voice_t,wave_end) / sizeof(UINT16),
+		offsetof(c352_voice_t,wave_loop) / sizeof(UINT16),
 	};
 	
-    if(address < 0x100)
-        return *((unsigned short*)&m_c352_v[address/8]+reg_map[address%8]);
-    else
-        return 0;
+	if(address < 0x100)
+		return *((UINT16*)&m_c352_v[address/8]+reg_map[address%8]);
+	else
+		return 0;
 	
 	return 0;
 }
@@ -198,48 +198,48 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 	
 	const int reg_map[8] =
 	{
-		offsetof(c352_voice_t,vol_f) / sizeof(unsigned short),
-		offsetof(c352_voice_t,vol_r) / sizeof(unsigned short),
-		offsetof(c352_voice_t,freq) / sizeof(unsigned short),
-		offsetof(c352_voice_t,flags) / sizeof(unsigned short),
-		offsetof(c352_voice_t,wave_bank) / sizeof(unsigned short),
-		offsetof(c352_voice_t,wave_start) / sizeof(unsigned short),
-		offsetof(c352_voice_t,wave_end) / sizeof(unsigned short),
-		offsetof(c352_voice_t,wave_loop) / sizeof(unsigned short),
+		offsetof(c352_voice_t,vol_f) / sizeof(UINT16),
+		offsetof(c352_voice_t,vol_r) / sizeof(UINT16),
+		offsetof(c352_voice_t,freq) / sizeof(UINT16),
+		offsetof(c352_voice_t,flags) / sizeof(UINT16),
+		offsetof(c352_voice_t,wave_bank) / sizeof(UINT16),
+		offsetof(c352_voice_t,wave_start) / sizeof(UINT16),
+		offsetof(c352_voice_t,wave_end) / sizeof(UINT16),
+		offsetof(c352_voice_t,wave_loop) / sizeof(UINT16),
 	};
 
-    int i;
+	int i;
 
-    if(address < 0x100)
+	if(address < 0x100)
 	{
 		//printf("w %04lx,%04x, %d\n", address, val, reg_map[address&7]);
-		*((unsigned short*)&m_c352_v[address/8]+reg_map[address%8]) = val;
+		*((UINT16*)&m_c352_v[address/8]+reg_map[address%8]) = val;
 	}
-    else if(address == 0x200)
-        m_control = val;
-    else if(address == 0x202) // execute keyons/keyoffs
-    {
-        for(i=0;i<32;i++)
-        {
-            if((m_c352_v[i].flags & C352_FLG_KEYON))
-            {	
-                m_c352_v[i].pos = (m_c352_v[i].wave_bank<<16) | m_c352_v[i].wave_start;
+	else if(address == 0x200)
+		m_control = val;
+	else if(address == 0x202) // execute keyons/keyoffs
+	{
+		for(i=0;i<32;i++)
+		{
+			if((m_c352_v[i].flags & C352_FLG_KEYON))
+			{	
+				m_c352_v[i].pos = (m_c352_v[i].wave_bank<<16) | m_c352_v[i].wave_start;
 
 				m_c352_v[i].sample = 0;
-                m_c352_v[i].last_sample = 0;
+				m_c352_v[i].last_sample = 0;
 				m_c352_v[i].counter = 0x10000;
 
-                m_c352_v[i].flags |= C352_FLG_BUSY;
-                m_c352_v[i].flags &= ~(C352_FLG_KEYON|C352_FLG_LOOPHIST);
+				m_c352_v[i].flags |= C352_FLG_BUSY;
+				m_c352_v[i].flags &= ~(C352_FLG_KEYON|C352_FLG_LOOPHIST);
 				
 				//printf("voice %d : pos= %08x\n",i,m_c352_v[i].pos);
-            }
-            else if(m_c352_v[i].flags & C352_FLG_KEYOFF)
-            {
-                m_c352_v[i].flags &= ~(C352_FLG_BUSY|C352_FLG_KEYOFF);
-            }
-        }
-    }
+			}
+			else if(m_c352_v[i].flags & C352_FLG_KEYOFF)
+			{
+				m_c352_v[i].flags &= ~(C352_FLG_BUSY|C352_FLG_KEYOFF);
+			}
+		}
+	}
 }
 
 void c352_device::device_start()
@@ -261,9 +261,9 @@ void c352_device::device_start()
 
 			if (i & 0x80)
 			{
-			x = -x;
+				x = -x;
 			}
-			m_mulaw_table[i] = (short)x;
+			m_mulaw_table[i] = (UINT16)x;
 	}
 
 	// register save state info
