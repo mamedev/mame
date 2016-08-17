@@ -1674,9 +1674,9 @@ void kaneko_calc3_device::mcu_run()
 			{
 				eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
-				for (i=0;i<0x80;i++)
+				for (i=0;i<0x40;i++)
 				{
-					space.write_byte(m_eeprom_addr+0x200000+i, eeprom->internal_read(i));
+					space.write_word(m_eeprom_addr+0x200000+2*i, eeprom->internal_read(i));
 				}
 
 			}
