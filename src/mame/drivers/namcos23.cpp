@@ -1267,10 +1267,17 @@ Notes:
 #include "machine/namco_settings.h"
 
 #define JVSCLOCK    (XTAL_14_7456MHz)
-#define H8CLOCK     (16737350)      /* from 2061 */
-#define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
-#define C352CLOCK   (25992000)  /* measured at 25.992MHz from 2061 pin 9  */
-#define C352DIV     (296)
+
+//#define H8CLOCK     (16737350)      /* from 2061 */
+//#define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
+//#define C352CLOCK   (25401600)  /* previously measured at 25.992MHz from 2061 pin 9  */
+//#define C352DIV     (296)
+
+#define H8CLOCK     (16934400)      /* based on research (superctr) */
+#define BUSCLOCK    (16934400*2)
+#define C352CLOCK   (25401600)
+#define C352DIV     (288)
+
 #define VSYNC1      (59.8824)
 #define VSYNC2      (59.915)
 #define HSYNC       (16666150)
