@@ -99,6 +99,21 @@
 #define IF_SET(val)             HWHI_SET(0x200, val)
 #define IF_RESET(val)           HWHI_RESET(0x200, val)
 
+#define INT_VBL                 0x0001
+#define INT_HBL                 0x0002
+#define INT_VCNT                0x0004
+#define INT_TM0_OVERFLOW        0x0008
+#define INT_TM1_OVERFLOW        0x0010
+#define INT_TM2_OVERFLOW        0x0020
+#define INT_TM3_OVERFLOW        0x0040
+#define INT_SIO                 0x0080
+#define INT_DMA0                0x0100
+#define INT_DMA1                0x0200
+#define INT_DMA2                0x0400
+#define INT_DMA3                0x0800
+#define INT_KEYPAD              0x1000
+#define INT_GAMEPAK             0x2000
+
 #define VERBOSE_LEVEL   (0)
 
 static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
@@ -132,34 +147,6 @@ void gba_state::request_irq(UINT32 int_type)
 			m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 			m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 		}
-	}
-}
-
-void gba_state::request_dma(dma_start_timing start)
-{
-	UINT16 mask = 0x0000;
-	switch (start)
-	{
-		case immediately:
-			mask = 0x0000;
-			break;
-		case vblank:
-			mask = 0x1000;
-			break;
-		case hblank:
-			mask = 0x2000;
-			break;
-		case special:
-			mask = 0x3000;
-			break;
-	}
-
-	for (int ch = 0; ch < 4; ch++)
-	{
-		int ctrl = DMACNT_H(ch);
-
-		if ((ctrl & 0x8000) && ((ctrl & 0x3000) == mask))
-			dma_exec(ch);
 	}
 }
 
@@ -1178,6 +1165,43 @@ READ32_MEMBER(gba_state::gba_10000000_r)
 	return data;
 }
 
+WRITE_LINE_MEMBER(gba_state::int_hblank_callback)
+{
+	request_irq(INT_HBL);
+}
+
+WRITE_LINE_MEMBER(gba_state::int_vblank_callback)
+{
+	request_irq(INT_VBL);
+}
+
+WRITE_LINE_MEMBER(gba_state::int_vcount_callback)
+{
+	request_irq(INT_VCNT);
+}
+
+WRITE_LINE_MEMBER(gba_state::dma_hblank_callback)
+{
+	for (int ch = 0; ch < 4; ch++)
+	{
+		int ctrl = DMACNT_H(ch);
+
+		if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x2000))
+			dma_exec(ch);
+	}
+}
+
+WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
+{
+	for (int ch = 0; ch < 4; ch++)
+	{
+		int ctrl = DMACNT_H(ch);
+
+		if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x1000))
+			dma_exec(ch);
+	}
+}
+
 static ADDRESS_MAP_START( gba_map, AS_PROGRAM, 32, gba_state )
 	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
@@ -1377,6 +1401,11 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_CPU_PROGRAM_MAP(gba_map)
 
 	MCFG_GBA_LCD_ADD("lcd")
+	MCFG_GBA_LCD_INT_HBLANK(WRITELINE(gba_state, int_hblank_callback))
+	MCFG_GBA_LCD_INT_VBLANK(WRITELINE(gba_state, int_vblank_callback))
+	MCFG_GBA_LCD_INT_VCOUNT(WRITELINE(gba_state, int_vcount_callback))
+	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(gba_state, dma_hblank_callback))
+	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(gba_state, dma_vblank_callback))
 
 	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
