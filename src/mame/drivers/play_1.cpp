@@ -5,12 +5,17 @@
 PINBALL
 Playmatic MPU 1
 
-Status:
-- Main board is emulated and appears to be working (currently in attract mode)
-- Displays to add
-- Switches, lamps, solenoids to add
-- Sound board to emulate
-- Mechanical sounds to add
+ToDo:
+- Sounds play too fast, especially in Chance.
+- Add mechanical sounds
+- Lamps, solenoids
+- Ball numbers are individual lamps
+
+Notes:
+X is the outhole.
+Chance: When starting the game, hold down X to make "Player 1" light up.
+Others: When starting the game, hold down X, then release it and hit Z to advance
+        the player to the correct number otherwise some weird bugs can happen.
 
 **********************************************************************************/
 
@@ -46,8 +51,8 @@ public:
 
 private:
 	UINT16 m_resetcnt;
+	UINT16 m_clockcnt;
 	UINT8 m_segment;
-	UINT8 m_digit;
 	UINT8 m_match;
 	virtual void machine_reset() override;
 	required_device<cosmac_device> m_maincpu;
@@ -58,15 +63,15 @@ private:
 static ADDRESS_MAP_START( play_1_map, AS_PROGRAM, 8, play_1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x081f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 3-month "battery"
+	AM_RANGE(0x0800, 0x081f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 2-month "battery"
 	AM_RANGE(0x0c00, 0x0c1f) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chance_map, AS_PROGRAM, 8, play_1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0c1f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 3-month "battery"
-	AM_RANGE(0x0e00, 0x0e1f) AM_RAM
+	AM_RANGE(0x0c00, 0x0c1f) AM_RAM
+	AM_RANGE(0x0e00, 0x0e1f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 2-month "battery"
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( play_1_io, AS_IO, 8, play_1_state )
@@ -79,7 +84,7 @@ static ADDRESS_MAP_START( play_1_io, AS_IO, 8, play_1_state )
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( play_1 )
+static INPUT_PORTS_START( chance )
 	PORT_START("X.0")
 //	PORT_DIPNAME(0x01, 0x01, DEF_STR( Coinage ) ) // this is something else, don't know what yet
 //	PORT_DIPSETTING (  0x00, DEF_STR( 1C_3C ) )
@@ -92,7 +97,7 @@ static INPUT_PORTS_START( play_1 )
 	PORT_DIPSETTING (  0x04, "Extra ball" )
 
 	PORT_START("X.1")
-	PORT_DIPNAME(0xff, 0x20, "Coinage for slot 2" )
+	PORT_DIPNAME(0xff, 0x10, "Coinage for slot 2" )
 	PORT_DIPSETTING (  0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (  0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (  0x04, DEF_STR( 2C_3C ) )
@@ -103,7 +108,7 @@ static INPUT_PORTS_START( play_1 )
 	PORT_DIPSETTING (  0x80, DEF_STR( 1C_6C ) )
 
 	PORT_START("X.2")
-	PORT_DIPNAME(0xff, 0x20, "Coinage for slot 3" )
+	PORT_DIPNAME(0xff, 0x10, "Coinage for slot 3" )
 	PORT_DIPSETTING (  0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING (  0x02, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING (  0x04, DEF_STR( 1C_5C ) )
@@ -114,43 +119,43 @@ static INPUT_PORTS_START( play_1 )
 	PORT_DIPSETTING (  0x80, "1 coin 10 credits" )
 
 	PORT_START("IN1") // 11-18
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) // outhole trough
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_T) // Tilt
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
 
 	PORT_START("IN2") // 21-28
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
 
 	PORT_START("IN3") // 31-38
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
 
 	PORT_START("IN4") // 41-48
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z) // lastlap trough
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON) // lastlap outhole
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("IN5") // 51-58
@@ -164,29 +169,77 @@ static INPUT_PORTS_START( play_1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
 
 	PORT_START("IN6") // 61-68
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD) // Show total free replays
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) // Show total games paid
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) // Show 1st chute
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) // Show 2nd shute
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) // Show 3rd chute
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("X.3") // 71-78
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9) // Test
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) // Reset Unit 1,2,3,4,5
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) // Show high score to date
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) // Set 3rd replay score
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) // Set 2nd replay score
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD) // Set 1st replay score
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( play_1 )
+	PORT_INCLUDE( chance )
+	PORT_MODIFY("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) // start
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) // outhole
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_T) // Tilt
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z) // trough
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spcgambl )
+	PORT_INCLUDE( play_1 )
+	PORT_MODIFY("IN1") // 11-18
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) // start
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_T) // Tilt
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+
+	PORT_MODIFY("IN2") // 21-28
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) // outhole
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z) // trough
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+INPUT_PORTS_END
+
 
 void play_1_state::machine_reset()
 {
 	m_resetcnt = 0;
+	m_clockcnt = 0;
 	m_segment = 0;
-	m_digit = 0;
 	m_match = 0;
 }
 
@@ -226,22 +279,39 @@ WRITE8_MEMBER( play_1_state::port03_w )
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	// D1-4, digit select
-	// according to the schematic, there's nothing to light up the tens and units for players 2,3,4
-	m_digit = data & 15;
-	switch (m_digit)
+	switch (~data & 15)
 	{
+		case 0:
+			// M1 thru M8 (unknown purpose) bit 4 lights up the bumpers
+			break;
 		case 1:
 			// a combination of bits could set higher frequencies, but that isn't documented
 			if (BIT(m_segment, 0))
 				m_monotone->set_unscaled_clock(523);
-			else if (BIT(m_segment, 1))
+			else
+			if (BIT(m_segment, 1))
 				m_monotone->set_unscaled_clock(659);
-			else if (BIT(m_segment, 2))
+			else
+			if (BIT(m_segment, 2))
 				m_monotone->set_unscaled_clock(784);
-			else if (BIT(m_segment, 3))
+			else
+			if (BIT(m_segment, 3))
 				m_monotone->set_unscaled_clock(988);
 			else
+			if ((m_segment & 0x0F)==0)
 				m_monotone->set_unscaled_clock(0);
+			// Bit 4 adjusts the volume, not emulated yet
+
+			// display player number
+			{
+				char wordnum[8];
+				UINT8 player = m_segment >> 5;
+				for (UINT8 i = 1; i < 5; i++)
+				{
+					sprintf(wordnum,"text%d", i);
+					output().set_value(wordnum, (player == i) ? 0:1);
+				}
+			}
 			break;
 		case 2:
 			output().set_digit_value(0, patterns[m_segment>>4]);
@@ -254,6 +324,12 @@ WRITE8_MEMBER( play_1_state::port03_w )
 		case 4:
 			output().set_digit_value(4, patterns[m_segment>>4]);
 			output().set_digit_value(5, patterns[m_segment&15]);
+			output().set_digit_value(14, patterns[m_segment>>4]);
+			output().set_digit_value(15, patterns[m_segment&15]);
+			output().set_digit_value(24, patterns[m_segment>>4]);
+			output().set_digit_value(25, patterns[m_segment&15]);
+			output().set_digit_value(34, patterns[m_segment>>4]);
+			output().set_digit_value(35, patterns[m_segment&15]);
 			break;
 		case 5:
 			output().set_digit_value(10, patterns[m_segment>>4]);
@@ -305,7 +381,7 @@ READ_LINE_MEMBER( play_1_state::clear_r )
 	// A hack to make the machine reset itself on boot
 	if (m_resetcnt < 0xffff)
 		m_resetcnt++;
-	return (m_resetcnt == 0xff00) ? 0 : 1;
+	return (m_resetcnt == 0x8000) ? 0 : 1;
 }
 
 READ_LINE_MEMBER( play_1_state::ef2_r )
@@ -325,20 +401,21 @@ READ_LINE_MEMBER( play_1_state::ef4_r )
 
 WRITE_LINE_MEMBER( play_1_state::clock_w )
 {
-	m_maincpu->int_w(0);
-	m_maincpu->ef1_w(!state); // inverted
 	if (state)
-		output().set_digit_value(41, m_match);
-	else
-		output().set_digit_value(44, m_match);
-	m_maincpu->int_w(1); // INT is a pulse-line - inverted
-
-	// also, state and !state go to display panel
+	{
+		m_clockcnt++;
+		m_maincpu->int_w(BIT(m_clockcnt, 0)); // inverted
+		m_maincpu->ef1_w(BIT(m_clockcnt, 1)); // inverted
+		if (BIT(m_clockcnt, 1))
+			output().set_digit_value(41, m_match);
+		else
+			output().set_digit_value(44, m_match);
+	}
 }
 
 static MACHINE_CONFIG_START( play_1, play_1_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, 400000)
+	MCFG_CPU_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
 	MCFG_CPU_PROGRAM_MAP(play_1_map)
 	MCFG_CPU_IO_MAP(play_1_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -352,7 +429,7 @@ static MACHINE_CONFIG_START( play_1, play_1_state )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_play_1)
 
-	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
+	MCFG_DEVICE_ADD("xpoint", CLOCK, 120) // crossing-point detector
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_1_state, clock_w))
 
 	/* Sound */
@@ -417,8 +494,8 @@ ROM_END
 
 
 /* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978,  bigtown,  0,       play_1, play_1, driver_device, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1978,  chance,   0,       chance, play_1, driver_device, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1978,  lastlap,  bigtown, play_1, play_1, driver_device, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1978,  spcgambl, 0,       play_1, play_1, driver_device, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1979,  party,    bigtown, play_1, play_1, driver_device, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1978,  bigtown,  0,       play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  chance,   0,       chance, chance,   driver_device, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1978,  lastlap,  bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1978,  spcgambl, 0,       play_1, spcgambl, driver_device, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1979,  party,    bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
