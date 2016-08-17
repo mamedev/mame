@@ -69,21 +69,21 @@ private:
 	
 	struct c352_voice_t {
 
-		unsigned int pos;
-		unsigned int counter;
+		UINT32 pos;
+		UINT32 counter;
 
-		short sample;
-		short last_sample;
+		INT16 sample;
+		INT16 last_sample;
 
-		unsigned short vol_f;
-		unsigned short vol_r;
-		unsigned short freq;
-		unsigned short flags;
+		UINT16 vol_f;
+		UINT16 vol_r;
+		UINT16 freq;
+		UINT16 flags;
 
-		unsigned short wave_bank;
-		unsigned short wave_start;
-		unsigned short wave_end;
-		unsigned short wave_loop;
+		UINT16  wave_bank;
+		UINT16 wave_start;
+		UINT16 wave_end;
+		UINT16 wave_loop;
 
 	};
 	
@@ -91,10 +91,10 @@ private:
 	int m_divider;
 	
 	c352_voice_t m_c352_v[32];
-	short m_mulaw_table[256];
+	INT16 m_mulaw_table[256];
 	
-    unsigned short m_random;
-    unsigned short m_control; // control flags, purpose unknown.
+    UINT16 m_random;
+    UINT16 m_control; // control flags, purpose unknown.
 	
 	void fetch_sample(c352_voice_t* v);
 
