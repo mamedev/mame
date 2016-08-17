@@ -115,10 +115,10 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	
 	int i,j;
 	short s;
-	stream_sample_t *buffer_fl = outputs[1];
-	stream_sample_t *buffer_fr = outputs[0];
-	stream_sample_t *buffer_rl = outputs[3];
-	stream_sample_t *buffer_rr = outputs[2];
+	stream_sample_t *buffer_fl = outputs[0];
+	stream_sample_t *buffer_fr = outputs[1];
+	stream_sample_t *buffer_rl = outputs[2];
+	stream_sample_t *buffer_rr = outputs[3];
 	c352_voice_t* v;
 	
 	long out[4];
