@@ -15,8 +15,6 @@
 
 #include "gba_lcd.h"
 
-#include "includes/gba.h" // this is a dependency from src/devices to src/mame which is very bad and should be fixed
-
 /* LCD I/O Registers */
 #define DISPCNT     HWLO(0x000)  /* 0x4000000  2  R/W   LCD Control */
 #define GRNSWAP     HWHI(0x000)  /* 0x4000002  2  R/W   Undocumented - Green Swap */
@@ -253,8 +251,13 @@ static inline UINT32 decrease_brightness(UINT32 color, int coeff_)
 const device_type GBA_LCD = &device_creator<gba_lcd_device>;
 
 gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, GBA_LCD, "GBA LCD", tag, owner, clock, "gba_lcd", __FILE__),
-					device_video_interface(mconfig, *this)
+	: device_t(mconfig, GBA_LCD, "GBA LCD", tag, owner, clock, "gba_lcd", __FILE__)
+	, device_video_interface(mconfig, *this)
+	, m_int_hblank_cb(*this)
+	, m_int_vblank_cb(*this)
+	, m_int_vcount_cb(*this)
+	, m_dma_hblank_cb(*this)
+	, m_dma_vblank_cb(*this)
 {
 }
 
@@ -2216,12 +2219,14 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
 	{
 		draw_scanline(scanline);
 
-		machine().driver_data<gba_state>()->request_dma(gba_state::dma_start_timing::hblank);
+		if (!m_dma_hblank_cb.isnull())
+			m_dma_hblank_cb(ASSERT_LINE);
 	}
 
 	if ((DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
 	{
-		machine().driver_data<gba_state>()->request_irq(INT_HBL);
+		if (!m_int_hblank_cb.isnull())
+			m_int_hblank_cb(ASSERT_LINE);
 	}
 
 	DISPSTAT_SET(DISPSTAT_HBL);
@@ -2246,10 +2251,12 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 		{
 			if (DISPSTAT & DISPSTAT_VBL_IRQ_EN)
 			{
-				machine().driver_data<gba_state>()->request_irq(INT_VBL);
+				if (!m_int_vblank_cb.isnull())
+					m_int_vblank_cb(ASSERT_LINE);
 			}
 
-			machine().driver_data<gba_state>()->request_dma(gba_state::dma_start_timing::vblank);
+			if (!m_dma_vblank_cb.isnull())
+				m_dma_vblank_cb(ASSERT_LINE);
 		}
 	}
 	else
@@ -2264,7 +2271,8 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 
 		if (DISPSTAT & DISPSTAT_VCNT_IRQ_EN)
 		{
-			machine().driver_data<gba_state>()->request_irq(INT_VCNT);
+			if (!m_int_vcount_cb.isnull())
+				m_int_vcount_cb(ASSERT_LINE);
 		}
 	}
 
@@ -2294,6 +2302,13 @@ UINT32 gba_lcd_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void gba_lcd_device::device_start()
 {
+	/* resolve callbacks */
+	m_int_hblank_cb.resolve();
+	m_int_vblank_cb.resolve();
+	m_int_vcount_cb.resolve();
+	m_dma_hblank_cb.resolve();
+	m_dma_vblank_cb.resolve();
+	
 	m_pram = make_unique_clear<UINT32[]>(0x400 / 4);
 	m_vram = make_unique_clear<UINT32[]>(0x18000 / 4);
 	m_oam = make_unique_clear<UINT32[]>(0x400 / 4);

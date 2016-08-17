@@ -9,22 +9,7 @@
 #include "sound/dac.h"
 #include "video/gba_lcd.h"
 
-#define INT_VBL                 0x0001
-#define INT_HBL                 0x0002
-#define INT_VCNT                0x0004
-#define INT_TM0_OVERFLOW        0x0008
-#define INT_TM1_OVERFLOW        0x0010
-#define INT_TM2_OVERFLOW        0x0020
-#define INT_TM3_OVERFLOW        0x0040
-#define INT_SIO                 0x0080
-#define INT_DMA0                0x0100
-#define INT_DMA1                0x0200
-#define INT_DMA2                0x0400
-#define INT_DMA3                0x0800
-#define INT_KEYPAD              0x1000
-#define INT_GAMEPAK             0x2000
 
-/* driver state */
 class gba_state : public driver_device, protected gba_registers<(0x400 - 0x060) / 4, 0x060>
 {
 public:
@@ -52,14 +37,6 @@ public:
 
 	void request_irq(UINT32 int_type);
 
-	enum dma_start_timing {
-		immediately = 0,
-		vblank,
-		hblank,
-		special
-	};
-
-	void request_dma(dma_start_timing start);
 	void dma_exec(int ch);
 	void audio_tick(int ref);
 
@@ -94,6 +71,11 @@ public:
 	DECLARE_READ32_MEMBER(gba_bios_r);
 	DECLARE_READ32_MEMBER(gba_10000000_r);
 	DECLARE_DRIVER_INIT(gbadv);
+	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
+	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
+	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);
+	DECLARE_WRITE_LINE_MEMBER(dma_hblank_callback);
+	DECLARE_WRITE_LINE_MEMBER(dma_vblank_callback);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(dma_complete);

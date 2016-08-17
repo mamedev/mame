@@ -34,6 +34,21 @@ extern const device_type GBA_LCD;
 #define MCFG_GBA_LCD_ADD(_tag) \
 		MCFG_DEVICE_ADD(_tag, GBA_LCD, 0)
 
+#define MCFG_GBA_LCD_INT_HBLANK(_devcb) \
+	devcb = &gba_lcd_device::set_int_hblank_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_GBA_LCD_INT_VBLANK(_devcb) \
+	devcb = &gba_lcd_device::set_int_vblank_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_GBA_LCD_INT_VCOUNT(_devcb) \
+	devcb = &gba_lcd_device::set_int_vcount_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_GBA_LCD_DMA_HBLANK(_devcb) \
+	devcb = &gba_lcd_device::set_dma_hblank_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_GBA_LCD_DMA_VBLANK(_devcb) \
+	devcb = &gba_lcd_device::set_dma_vblank_callback(*device, DEVCB_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -84,6 +99,31 @@ public:
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
+	template<class _Object> static devcb_base &set_int_hblank_callback(device_t &device, _Object object)
+	{
+		return downcast<gba_lcd_device &>(device).m_int_hblank_cb.set_callback(object);
+	}
+
+	template<class _Object> static devcb_base &set_int_vblank_callback(device_t &device, _Object object)
+	{
+		return downcast<gba_lcd_device &>(device).m_int_vblank_cb.set_callback(object);
+	}
+
+	template<class _Object> static devcb_base &set_int_vcount_callback(device_t &device, _Object object)
+	{
+		return downcast<gba_lcd_device &>(device).m_int_vcount_cb.set_callback(object);
+	}
+
+	template<class _Object> static devcb_base &set_dma_hblank_callback(device_t &device, _Object object)
+	{
+		return downcast<gba_lcd_device &>(device).m_dma_hblank_cb.set_callback(object);
+	}
+
+	template<class _Object> static devcb_base &set_dma_vblank_callback(device_t &device, _Object object)
+	{
+		return downcast<gba_lcd_device &>(device).m_dma_vblank_cb.set_callback(object);
+	}
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -100,6 +140,12 @@ private:
 	void draw_gba_oam(UINT32 *scanline, int y);
 	inline int is_in_window(int x, int window);
 	void draw_scanline(int y);
+
+	devcb_write_line m_int_hblank_cb;   /* H-Blank interrupt callback function */
+	devcb_write_line m_int_vblank_cb;   /* V-Blank interrupt callback function */
+	devcb_write_line m_int_vcount_cb;   /* V-Counter Match interrupt callback function */
+	devcb_write_line m_dma_hblank_cb;   /* H-Blank DMA request callback function */
+	devcb_write_line m_dma_vblank_cb;   /* V-Blank DMA request callback function */
 
 	std::unique_ptr<UINT32[]> m_pram;
 	std::unique_ptr<UINT32[]> m_vram;
