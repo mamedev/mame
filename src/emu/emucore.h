@@ -242,7 +242,7 @@ inline TYPE operator--(TYPE &value, int) { TYPE const old(value); --value; retur
 
 
 // useful functions to deal with bit shuffling encryptions
-#define BIT(x, n) (((x) >> (n)) & 1)
+template <typename T, typename U> constexpr T BIT(T x, U n) { return (x >> n) & T(1); }
 
 template <typename T, typename U> constexpr T bitswap(T val, U b)
 {
