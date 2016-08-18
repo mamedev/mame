@@ -9,7 +9,6 @@ Notes:
 ToDo:
 - improve interrupts
 - gunbulet force feedback
-- music tempo is too fast in Nebulas Ray, JLS V-Shoot and the Great Sluggers games
 
 Main CPU : Motorola 68020 32-bit processor @ 25MHz
 Secondary CPUs : C329 + 137 (both custom)
@@ -315,7 +314,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 		if (m_pos_irq_level != 0)
 			m_maincpu->set_input_line(m_pos_irq_level, ASSERT_LINE);
 	}
-
+/*
 	// TODO: Real sources of these
 	if (scanline == 224)
 		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
@@ -323,9 +322,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 	else if (scanline == 128)
 		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+*/
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_irq0_cb)
+{
+	m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+}
 
+TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_irq2_cb)
+{
+	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_adc_cb)
+{
+	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+}
 
 /****************************************************************************/
 
@@ -1127,6 +1140,11 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
+	
+	// has to be 60 hz or music will go crazy in nebulray, vshoot, gslugrs*
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namconb1_state, mcu_irq0_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namconb1_state, mcu_irq2_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namconb1_state, mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7)
@@ -1164,7 +1182,10 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
-
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namconb1_state, mcu_irq0_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namconb1_state, mcu_irq2_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namconb1_state, mcu_adc_cb, attotime::from_hz(60))
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7)
 	MCFG_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
