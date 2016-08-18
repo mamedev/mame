@@ -40,14 +40,6 @@
 
 ******************************************************************************/
 
-/*
-
-	TODO:
-
-	- cannot detect UHRG card (writes 0x1234 to 0x8000 in VRAM but does not read it back?)
-
-*/
-
 #include "emu.h"
 #include "softlist.h"
 #include "bus/centronics/ctronics.h"
