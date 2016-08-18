@@ -8770,6 +8770,7 @@ stk_sprs                        //
 
 @source:by35.cpp
 bbbowlin                        //
+bigbat                          //
 blakpyra                        //
 blbeauty                        //
 bmx                             //
@@ -13757,6 +13758,8 @@ barbwire                        //
 bighurt                         //
 brooks                          //
 cueball                         //
+cueball2                        //
+cueball3                        //
 freddy                          //
 freddy4                         //
 gladiatp                        //
@@ -13773,6 +13776,7 @@ smb3                            //
 smbmush                         //
 snspares                        //
 snspares1                       //
+snspares2                       //
 stargatp                        //
 stargatp1                       //
 stargatp2                       //
@@ -31660,6 +31664,7 @@ csmic_l1                        //
 dfndr_l4                        //
 fpwr2_l2                        //
 hypbl_l2                        //
+hypbl_l3                        //
 hypbl_l4                        //
 jngld_l1                        //
 jngld_l2                        //
@@ -31674,6 +31679,7 @@ thund_p2                        //
 thund_p3                        //
 tmfnt_l5                        //
 vrkon_l1                        //
+wldtexas                        //
 wrlok_l3                        //
 
 @source:s8.cpp

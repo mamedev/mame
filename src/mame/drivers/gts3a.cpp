@@ -449,6 +449,52 @@ ROM_START(cueball)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
 ROM_END
 
+ROM_START(cueball2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gprom.r2", 0x0000, 0x10000, CRC(171c0a0e) SHA1(e53d32e7cddf47feacf3f5c00651c2216da39b7a))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("dsprom.r2", 0x00000, 0x40000, CRC(70345a0b) SHA1(38ccea4f367d6ac777119201156b2f35c4d2d379))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(9fd04109) SHA1(27864fe4e9c248dce6221c9e56861967d089b216))
+
+	ROM_REGION(0x100000, "sound1", 0)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(476bb11c) SHA1(ce546df59933cc230a6671dec493bbbe71146dee))
+	ROM_RELOAD(0x00000+0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(23708ad9) SHA1(156fcb19403f9845404af1a4ac4edfd3fcde601d))
+	ROM_RELOAD(0x80000+0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
+ROM_END
+
+ROM_START(cueball3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gprom.r3", 0x0000, 0x10000, CRC(f2d6e9d8) SHA1(bac7d498876454092607116fd7d46034438c9bfa))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("dsprom.r2", 0x00000, 0x40000, CRC(70345a0b) SHA1(38ccea4f367d6ac777119201156b2f35c4d2d379))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(9fd04109) SHA1(27864fe4e9c248dce6221c9e56861967d089b216))
+
+	ROM_REGION(0x100000, "sound1", 0)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(476bb11c) SHA1(ce546df59933cc230a6671dec493bbbe71146dee))
+	ROM_RELOAD(0x00000+0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(23708ad9) SHA1(156fcb19403f9845404af1a4ac4edfd3fcde601d))
+	ROM_RELOAD(0x80000+0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Frank Thomas' Big Hurt (#745)
 /-------------------------------------------------------------------*/
@@ -850,9 +896,30 @@ ROM_START(snspares)
 	ROM_REGION(0x100000, "user3", 0)
 	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
 ROM_END
+
 ROM_START(snspares1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(590393f4) SHA1(f52400c620e510253abd1c0719050b9bb09be942))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "user2", 0)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x100000, "user3", 0)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
+ROM_END
+
+ROM_START(snspares2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(79906dfc) SHA1(1efb68dd391f79e6f8ad5a588145d6ad7b36743c))
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
@@ -1181,6 +1248,8 @@ GAME(1992,  smb2,       smb,        gts3a,   gts3a, gts3a_state,   gts3a,   ROT0
 GAME(1992,  smb3,       smb,        gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers (rev.3)",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  smbmush,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers Mushroom World",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  cueball,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Cue Ball Wizard",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  cueball2,   cueball,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Cue Ball Wizard (rev.2)",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  cueball3,   cueball,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Cue Ball Wizard (rev.3)",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  sfight2,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  sfight2a,   sfight2,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II (rev.1)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  sfight2b,   sfight2,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II (rev.2)",                MACHINE_IS_SKELETON_MECHANICAL)
@@ -1205,6 +1274,7 @@ GAME(1995,  bighurt,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0
 GAME(1995,  waterwld,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Waterworld (rev.3)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  waterwld2,  waterwld,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Waterworld (rev.2)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  snspares,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Strikes n' Spares (rev.6)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  snspares2,  snspares,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Strikes n' Spares (rev.2)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  snspares1,  snspares,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Strikes n' Spares (rev.1)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  andretti,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Mario Andretti",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  andretti4,  andretti,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Mario Andretti (rev.T4)",              MACHINE_IS_SKELETON_MECHANICAL)

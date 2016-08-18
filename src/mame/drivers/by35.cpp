@@ -2331,6 +2331,22 @@ ROM_START(monrobwl)
 ROM_END
 
 /*-----------------------------------------------------------------------------------------------
+/ Big Bat (Bat game)
+/------------------------------------------------------------------------------------------------*/
+ROM_START(bigbat)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "u2.bin", 0x1000, 0x0800, CRC(2beda24d) SHA1(80fb9ed548e4886741c709979aa4f865f47d2257))
+	ROM_CONTINUE( 0x5000, 0x0800)
+	ROM_LOAD( "u6.bin", 0x1800, 0x0800, CRC(8f13469d) SHA1(00c626f7eb166f627f6498d75906b3c56bccdd62))
+	ROM_CONTINUE( 0x5800, 0x0800)
+	ROM_RELOAD( 0x7000, 0x1000)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("u3.bin", 0xd000, 0x1000, CRC(b87a9335) SHA1(8a21bcbcbe91da1bab0af06b71604bb8f247d0d4))
+	ROM_LOAD("u4.bin", 0xe000, 0x1000, CRC(4ab75b31) SHA1(46acd1c9250a635b51bffccd77ea4e67a0c5edf5))
+	ROM_LOAD("u5.bin", 0xf000, 0x1000, CRC(0aec8204) SHA1(f44216cccc3652399549345d8c74bcae54662aa3))
+ROM_END
+
+/*-----------------------------------------------------------------------------------------------
 / Midnight Marauders (Gun game) different hardware, not a pinball, to be moved to its own driver
 /------------------------------------------------------------------------------------------------*/
 ROM_START(mdntmrdr)
@@ -2449,6 +2465,7 @@ GAME( 1988, uboat65,    0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova 
 GAME( 1986, bullseye,   0,        by35,  by35, by35_state, by35_7, ROT0, "Grand Products", "301/Bullseye", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, bbbowlin,   0,        by35,  by35, by35_state, by35_7, ROT0, "United", "Big Ball Bowling (Bowler)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, monrobwl,   0,        by35,  by35, by35_state, by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, bigbat,     0,        by35,  by35, by35_state, by35_7, ROT0, "Bally Midway", "Big Bat (Bat game)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1984, mdntmrdr,   0,        by35,  by35, by35_state, by35_6, ROT0, "Bally Midway", "Midnight Marauders (Gun game)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, blbeauty,   0,        by35,  by35, by35_state, by35_7, ROT0, "Stern", "Black Beauty (Shuffle)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1984, myststar,   0,        by35,  by35, by35_state, by35_6, ROT0, "Zaccaria", "Mystic Star", MACHINE_IS_SKELETON_MECHANICAL)
