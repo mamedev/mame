@@ -265,10 +265,6 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k053260_map, AS_0, 8, vendetta_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("k053260", 0)
-ADDRESS_MAP_END
-
 /***************************************************************************
 
     Input Ports
@@ -484,7 +480,6 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)    /* verified with PCB */
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

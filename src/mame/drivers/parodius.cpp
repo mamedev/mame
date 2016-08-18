@@ -127,10 +127,6 @@ static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( parodius_k053260_map, AS_0, 8, parodius_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("k053260", 0)
-ADDRESS_MAP_END
-
 /***************************************************************************
 
     Input Ports
@@ -284,7 +280,6 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_K053260_ADD("k053260", 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, parodius_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_CONFIG_END
