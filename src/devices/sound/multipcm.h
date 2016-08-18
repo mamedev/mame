@@ -27,19 +27,28 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	struct sample_t
+	class sample_t
 	{
-		UINT32 m_start;
-		UINT32 m_loop;
-		UINT32 m_end;
-		UINT8 m_attack_reg;
-		UINT8 m_decay1_reg;
-		UINT8 m_decay2_reg;
-		UINT8 m_decay_level;
-		UINT8 m_release_reg;
-		UINT8 m_key_rate_scale;
-		UINT8 m_lfo_vibrato_reg;
-		UINT8 m_lfo_amplitude_reg;
+	public:
+		sample_t() { }
+
+		void init(UINT32 index, multipcm_device* rom) { m_address = index * 12; m_rom = rom; }
+
+		UINT32 start() { return (m_rom->read_byte(m_address) << 16) | (m_rom->read_byte(m_address + 1) << 8) | m_rom->read_byte(m_address + 2); }
+		UINT32 loop() { return (m_rom->read_byte(m_address + 3) << 8) | m_rom->read_byte(m_address + 4); }
+		UINT32 end() { return 0xffff - ((m_rom->read_byte(m_address + 5) << 8) | m_rom->read_byte(m_address + 6)); }
+		UINT8 attack_reg() { return (m_rom->read_byte(m_address + 8) >> 4) & 0xf; }
+		UINT8 decay1_reg() { return m_rom->read_byte(m_address + 8) & 0xf; }
+		UINT8 decay2_reg() { return m_rom->read_byte(m_address + 9) & 0xf; }
+		UINT8 decay_level() { return (m_rom->read_byte(m_address + 9) >> 4) & 0xf; }
+		UINT8 release_reg() { return m_rom->read_byte(m_address + 10) & 0xf; }
+		UINT8 key_rate_scale() { return (m_rom->read_byte(m_address + 10) >> 4) & 0xf; }
+		UINT8 lfo_vibrato_reg() { return m_rom->read_byte(m_address + 7); }
+		UINT8 lfo_amplitude_reg() { return m_rom->read_byte(m_address + 11) & 0xf; }
+
+	private:
+		UINT32 m_address;
+		multipcm_device* m_rom;
 	};
 
 	enum state_t
@@ -70,7 +79,6 @@ private:
 		INT32 *m_table;
 		INT32 *m_scale;
 	};
-
 
 	struct slot_t
 	{

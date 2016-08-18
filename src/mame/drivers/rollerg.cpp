@@ -103,6 +103,9 @@ static ADDRESS_MAP_START( rollerg_sound_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( rollerg_k053260_map, AS_0, 8, rollerg_state )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 /***************************************************************************
 
@@ -284,6 +287,7 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_K053260_ADD("k053260", 3579545)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, rollerg_k053260_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

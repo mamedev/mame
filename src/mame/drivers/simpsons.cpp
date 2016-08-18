@@ -148,6 +148,10 @@ static ADDRESS_MAP_START( bank2000_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( k053260_map, AS_0, 8, simpsons_state )
+	AM_RANGE(0x00000000, 0x0013ffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
+
 WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
 {
 	membank("bank2")->set_entry(data & 7);
@@ -380,6 +384,7 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.0)
 
 	MCFG_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

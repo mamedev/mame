@@ -188,6 +188,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, asterix_state )
 	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE("ymsnd", ym2151_device, register_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( k053260_map, AS_0, 8, asterix_state )
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( asterix )
@@ -290,6 +293,7 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_K053260_ADD("k053260", XTAL_32MHz/8) // 4MHz
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

@@ -548,6 +548,9 @@ static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0xfffffc, 0xffffff) AM_READ(punkshot_kludge_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( punkshot_k053260_map, AS_0, 8, tmnt_state )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -568,6 +571,9 @@ static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( lgtnfght_k053260_map, AS_0, 8, tmnt_state )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
@@ -595,6 +601,9 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x780700, 0x78071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( blswhstl_k053260_map, AS_0, 8, tmnt_state )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 {
@@ -640,6 +649,9 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(glfgreat_rom_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( glfgreat_k053260_map, AS_0, 8, tmnt_state )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -925,6 +937,9 @@ static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( tmnt2_k053260_map, AS_0, 8, tmnt_state )
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
@@ -950,6 +965,9 @@ static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ssriders_k053260_map, AS_0, 8, tmnt_state )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
@@ -993,6 +1011,9 @@ static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x700400, 0x7007ff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0xffff)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( thndrx2_k053260_map, AS_0, 8, tmnt_state )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mia_audio_map, AS_PROGRAM, 8, tmnt_state )
@@ -2192,6 +2213,7 @@ static MACHINE_CONFIG_START( punkshot, tmnt_state )
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
 	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, punkshot_k053260_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2247,6 +2269,7 @@ static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, lgtnfght_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_CONFIG_END
@@ -2308,6 +2331,7 @@ static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 
 	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, blswhstl_k053260_map)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)   /* fixed inverted stereo channels */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -2384,6 +2408,7 @@ static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, glfgreat_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2519,6 +2544,7 @@ static MACHINE_CONFIG_START( tmnt2, tmnt_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, tmnt2_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -2578,6 +2604,7 @@ static MACHINE_CONFIG_START( ssriders, tmnt_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, ssriders_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_CONFIG_END
@@ -2680,6 +2707,7 @@ static MACHINE_CONFIG_START( thndrx2, tmnt_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, thndrx2_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

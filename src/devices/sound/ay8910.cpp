@@ -1201,6 +1201,29 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 	memset(&m_env_table,0,sizeof(m_env_table));
 	memset(&m_vol3d_table,0,sizeof(m_vol3d_table));
 	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
+
+	set_type(psg_type);
+}
+
+void ay8910_device::set_type(psg_type_t psg_type)
+{
+	m_type = psg_type;
+	if (psg_type == PSG_TYPE_AY)
+	{
+		m_env_step_mask = 0x0f;
+		m_step = 2;
+		m_zero_is_off = 1;
+		m_par = &ay8910_param;
+		m_par_env = &ay8910_param;
+	}
+	else
+	{
+		m_env_step_mask = 0x1f;
+		m_step = 1;
+		m_zero_is_off = 0;
+		m_par = &ym2149_param;
+		m_par_env = &ym2149_param_env;
+	}
 }
 
 const device_type AY8912 = &device_creator<ay8912_device>;

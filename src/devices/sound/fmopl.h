@@ -68,6 +68,7 @@ void ym3812_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, void
 ** 'rate' is sampling rate
 */
 void *ym3526_init(device_t *device, UINT32 clock, UINT32 rate);
+void ym3526_clock_changed(void *opl, UINT32 clock, UINT32 rate);
 /* shutdown the YM3526 emulators*/
 void ym3526_shutdown(void *chip);
 void ym3526_reset_chip(void *chip);
