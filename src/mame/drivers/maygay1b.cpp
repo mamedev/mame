@@ -656,7 +656,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 		// causing the relevant lamps to black out.
 		for (int i = 0; i < 8; i++)
 		{
-			output().set_lamp_value((8*m_lamp_strobe)+i+128, ((data  & (1 << (i^4))) !=0));
+			output().set_lamp_value((8*m_lamp_strobe2)+i+128, ((data  & (1 << (i^4))) !=0));
 		}
 
 		m_old_lamp_strobe2 = m_lamp_strobe2;
