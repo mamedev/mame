@@ -299,7 +299,7 @@ WRITE8_MEMBER( play_1_state::port03_w )
 				m_samples->start(0, 5);
 			if (BIT(m_segment, 7)) // knocker
 				m_samples->start(0, 6);
-				break;
+			break;
 		case 1:
 			// a combination of bits could set higher frequencies, but that isn't documented or used
 			if (BIT(m_segment, 0))
