@@ -645,8 +645,6 @@ WRITE8_MEMBER( maygay1b_state::scanlines_2_w )
 
 WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 {
-	// TODO: THIS FUNCTION IS NEVER CALLED!  So we are missing the second half of the lamp matrix
-
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
 
 	if (m_old_lamp_strobe2 != m_lamp_strobe2)
