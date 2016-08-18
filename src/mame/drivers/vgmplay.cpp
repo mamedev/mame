@@ -11,12 +11,14 @@
 #include "imagedev/bitbngr.h"
 
 #include "cpu/m6502/n2a03.h"
+#include "cpu/h6280/h6280.h"
 #include "sound/2612intf.h"
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "sound/ay8910.h"
+#include "sound/c6280.h"
 #include "sound/sn76496.h"
 #include "sound/k053260.h"
 #include "sound/segapcm.h"
@@ -39,6 +41,7 @@ public:
 		A_AY8910B    = 0x00000080,
 		A_SN76496    = 0x00000090,
 		A_K053260    = 0x000000a0,
+		A_C6280      = 0x000000d0,
 		A_SEGAPCM    = 0x00001000,
 		A_GAMEBOY	 = 0x00002000,
 		A_NESAPU     = 0x00002030,
@@ -139,6 +142,9 @@ private:
 	required_device<gameboy_sound_device> m_dmg;
 	required_device<n2a03_device> m_nescpu;
 	required_shared_ptr<UINT8> m_nesram;
+	required_device<k053260_device> m_k053260;
+	required_device<c6280_device> m_c6280;
+	required_device<h6280_device> m_h6280;
 
 	UINT32 m_multipcma_bank_l;
 	UINT32 m_multipcma_bank_r;
@@ -368,16 +374,6 @@ void vgmplay_device::execute_run()
 				m_icount -= code & 0xf;
 				break;
 
-			case 0xb3:
-				m_io->write_byte(A_GAMEBOY + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
-				m_pc += 3;
-				break;
-
-			case 0xc0:
-				m_io->write_byte(A_SEGAPCM + (m_file->read_word(m_pc+1) & 0x7ff), m_file->read_byte(m_pc+3));
-				m_pc += 4;
-				break;
-
 			case 0xa0:
 			{
 				UINT8 reg = m_file->read_byte(m_pc+1);
@@ -395,6 +391,16 @@ void vgmplay_device::execute_run()
 				break;
 			}
 
+			case 0xb3:
+				m_io->write_byte(A_GAMEBOY + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+
+			case 0xc0:
+				m_io->write_byte(A_SEGAPCM + (m_file->read_word(m_pc+1) & 0x7ff), m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
+
 			case 0xb4:
 				m_io->write_byte(A_NESAPU + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
@@ -410,6 +416,11 @@ void vgmplay_device::execute_run()
 				m_pc += 3;
 				break;
 			}
+
+			case 0xb9:
+				m_io->write_byte(A_C6280 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
 
 			case 0xba:
 				m_io->write_byte(A_K053260 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
@@ -439,7 +450,7 @@ void vgmplay_device::execute_run()
 				break;
 
 			default:
-				logerror("unhandled code %02x\n", code);
+				logerror("unhandled code %02x (%02x %02x %02x %02x)\n", code, m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2), m_file->read_byte(m_pc+3), m_file->read_byte(m_pc+4));
 				m_state = DONE;
 				m_icount = 0;
 				break;
@@ -685,7 +696,7 @@ offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb1:
-		sprintf(buffer, "rf5c68 r%02x = %02x", oprom[1], oprom[2]);
+		sprintf(buffer, "rf5c164 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb2:
@@ -713,19 +724,19 @@ offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb8:
-		sprintf(buffer, "huc6280 r%02x = %02x", oprom[1], oprom[2]);
+		sprintf(buffer, "okim6295 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb9:
-		sprintf(buffer, "k053260 r%02x = %02x", oprom[1], oprom[2]);
+		sprintf(buffer, "huc6280 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xba:
-		sprintf(buffer, "pokey r%02x = %02x", oprom[1], oprom[2]);
+		sprintf(buffer, "k053260 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xbb:
-		sprintf(buffer, "rf5c68 r%02x = %02x", oprom[1], oprom[2]);
+		sprintf(buffer, "pokey r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xc0:
@@ -812,24 +823,27 @@ READ8_MEMBER(vgmplay_device::k053260_rom_r)
 	return rom_r(0, 0x8e, offset);
 }
 
-vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_file(*this, "file"),
-	m_ym2612(*this, "ym2612"),
-	m_ym2151(*this, "ym2151"),
-	m_ym2413(*this, "ym2413"),
-	m_ym2203a(*this, "ym2203a"),
-	m_ym2203b(*this, "ym2203b"),
-	m_ym3526(*this, "ym3526"),
-	m_ay8910a(*this, "ay8910a"),
-	m_ay8910b(*this, "ay8910b"),
-	m_sn76496(*this, "sn76496"),
-	m_segapcm(*this, "segapcm"),
-	m_multipcma(*this, "multipcma"),
-	m_multipcmb(*this, "multipcmb"),
-	m_dmg(*this, "dmg"),
-	m_nescpu(*this, "nescpu"),
-	m_nesram(*this, "nesapu_ram")
+vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag)
+	, m_file(*this, "file")
+	, m_ym2612(*this, "ym2612")
+	, m_ym2151(*this, "ym2151")
+	, m_ym2413(*this, "ym2413")
+	, m_ym2203a(*this, "ym2203a")
+	, m_ym2203b(*this, "ym2203b")
+	, m_ym3526(*this, "ym3526")
+	, m_ay8910a(*this, "ay8910a")
+	, m_ay8910b(*this, "ay8910b")
+	, m_sn76496(*this, "sn76496")
+	, m_segapcm(*this, "segapcm")
+	, m_multipcma(*this, "multipcma")
+	, m_multipcmb(*this, "multipcmb")
+	, m_dmg(*this, "dmg")
+	, m_nescpu(*this, "nescpu")
+	, m_nesram(*this, "nesapu_ram")
+	, m_k053260(*this, "k053260")
+	, m_c6280(*this, "c6280")
+	, m_h6280(*this, "h6280")
 {
 }
 
@@ -993,6 +1007,12 @@ void vgmplay_state::machine_start()
 			m_multipcma->set_unscaled_clock(r32(0x88) &~ 0x40000000);
 			m_multipcmb->set_unscaled_clock(r32(0x88) &~ 0x40000000);
 		}
+		if(version >= 0x161 && r32(0xac)) {
+			m_k053260->set_unscaled_clock(r32(0xac));
+		}
+		if(version >= 0x161 && r32(0xa4)) {
+			m_c6280->set_unscaled_clock(r32(0xa4));
+		}
 	}
 }
 
@@ -1054,12 +1074,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::REG_SIZE,       vgmplay_device::REG_SIZE+3)      AM_READ(file_size_r)
-	AM_RANGE(vgmplay_device::A_YM2612,       vgmplay_device::A_YM2612+3)      AM_DEVREADWRITE("ym2612",        ym2612_device,  read, write)
-	AM_RANGE(vgmplay_device::A_YM2151,       vgmplay_device::A_YM2151+1)      AM_DEVREADWRITE("ym2151",        ym2151_device,  read, write)
-	AM_RANGE(vgmplay_device::A_YM2413,       vgmplay_device::A_YM2413+1)      AM_DEVWRITE    ("ym2413",        ym2413_device,  write)
-	AM_RANGE(vgmplay_device::A_YM2203A,      vgmplay_device::A_YM2203A+1)     AM_DEVREADWRITE("ym2203a",       ym2203_device,  read, write)
-	AM_RANGE(vgmplay_device::A_YM2203B,      vgmplay_device::A_YM2203B+1)     AM_DEVREADWRITE("ym2203b",       ym2203_device,  read, write)
-	AM_RANGE(vgmplay_device::A_YM3526,       vgmplay_device::A_YM3526+1)      AM_DEVWRITE    ("ym3526",        ym3526_device,  write)
+	AM_RANGE(vgmplay_device::A_YM2612,       vgmplay_device::A_YM2612+3)      AM_DEVWRITE    ("ym2612",        ym2612_device, write)
+	AM_RANGE(vgmplay_device::A_YM2151,       vgmplay_device::A_YM2151+1)      AM_DEVWRITE    ("ym2151",        ym2151_device, write)
+	AM_RANGE(vgmplay_device::A_YM2413,       vgmplay_device::A_YM2413+1)      AM_DEVWRITE    ("ym2413",        ym2413_device, write)
+	AM_RANGE(vgmplay_device::A_YM2203A,      vgmplay_device::A_YM2203A+1)     AM_DEVWRITE    ("ym2203a",       ym2203_device, write)
+	AM_RANGE(vgmplay_device::A_YM2203B,      vgmplay_device::A_YM2203B+1)     AM_DEVWRITE    ("ym2203b",       ym2203_device, write)
+	AM_RANGE(vgmplay_device::A_YM3526,       vgmplay_device::A_YM3526+1)      AM_DEVWRITE    ("ym3526",        ym3526_device, write)
 	AM_RANGE(vgmplay_device::A_AY8910A,      vgmplay_device::A_AY8910A)       AM_DEVWRITE    ("ay8910a",       ay8910_device, data_w)
 	AM_RANGE(vgmplay_device::A_AY8910A+1,    vgmplay_device::A_AY8910A+1)     AM_DEVWRITE    ("ay8910a",       ay8910_device, address_w)
 	AM_RANGE(vgmplay_device::A_AY8910B,      vgmplay_device::A_AY8910B)       AM_DEVWRITE    ("ay8910b",       ay8910_device, data_w)
@@ -1067,15 +1087,16 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 //	AM_RANGE(vgmplay_device::A_SN76496+0,    vgmplay_device::A_SN76496+0)     AM_DEVWRITE    ("sn76496",       sn76496_device, stereo_w)
 	AM_RANGE(vgmplay_device::A_SN76496+1,    vgmplay_device::A_SN76496+1)     AM_DEVWRITE    ("sn76496",       sn76496_device, write)
 	AM_RANGE(vgmplay_device::A_K053260,      vgmplay_device::A_K053260+0x2f)  AM_DEVWRITE    ("k053260",       k053260_device, write)
-	AM_RANGE(vgmplay_device::A_SEGAPCM,      vgmplay_device::A_SEGAPCM+0x7ff) AM_DEVREADWRITE("segapcm",       segapcm_device, sega_pcm_r, sega_pcm_w)
-	AM_RANGE(vgmplay_device::A_GAMEBOY,      vgmplay_device::A_GAMEBOY+0x16)  AM_DEVREADWRITE("dmg",           gameboy_sound_device, sound_r, sound_w)
-	AM_RANGE(vgmplay_device::A_GAMEBOY+0x20, vgmplay_device::A_GAMEBOY+0x2f)  AM_DEVREADWRITE("dmg",           gameboy_sound_device, wave_r, wave_w)
-	AM_RANGE(vgmplay_device::A_NESAPU,       vgmplay_device::A_NESAPU+0x1f)   AM_DEVREADWRITE("nescpu:nesapu", nesapu_device, read, write)
+	AM_RANGE(vgmplay_device::A_C6280,        vgmplay_device::A_C6280+0xf)     AM_DEVWRITE    ("c6280",         c6280_device, c6280_w)
+	AM_RANGE(vgmplay_device::A_SEGAPCM,      vgmplay_device::A_SEGAPCM+0x7ff) AM_DEVWRITE    ("segapcm",       segapcm_device, sega_pcm_w)
+	AM_RANGE(vgmplay_device::A_GAMEBOY,      vgmplay_device::A_GAMEBOY+0x16)  AM_DEVWRITE    ("dmg",           gameboy_sound_device, sound_w)
+	AM_RANGE(vgmplay_device::A_GAMEBOY+0x20, vgmplay_device::A_GAMEBOY+0x2f)  AM_DEVWRITE    ("dmg",           gameboy_sound_device, wave_w)
+	AM_RANGE(vgmplay_device::A_NESAPU,       vgmplay_device::A_NESAPU+0x1f)   AM_DEVWRITE    ("nescpu:nesapu", nesapu_device, write)
 	AM_RANGE(vgmplay_device::A_NESRAM,       vgmplay_device::A_NESRAM+0xffff) AM_RAM AM_SHARE("nesapu_ram")
-	AM_RANGE(vgmplay_device::A_MULTIPCMA,    vgmplay_device::A_MULTIPCMA+3)   AM_DEVREADWRITE("multipcma",     multipcm_device, read, write )
+	AM_RANGE(vgmplay_device::A_MULTIPCMA,    vgmplay_device::A_MULTIPCMA+3)   AM_DEVWRITE    ("multipcma",     multipcm_device, write )
 	AM_RANGE(vgmplay_device::A_MULTIPCMA+4,  vgmplay_device::A_MULTIPCMA+7)   AM_WRITE(multipcm_bank_hi_a_w)
 	AM_RANGE(vgmplay_device::A_MULTIPCMA+8,  vgmplay_device::A_MULTIPCMA+11)  AM_WRITE(multipcm_bank_lo_a_w)
-	AM_RANGE(vgmplay_device::A_MULTIPCMB,    vgmplay_device::A_MULTIPCMB+3)   AM_DEVREADWRITE("multipcmb",     multipcm_device, read, write )
+	AM_RANGE(vgmplay_device::A_MULTIPCMB,    vgmplay_device::A_MULTIPCMB+3)   AM_DEVWRITE    ("multipcmb",     multipcm_device, write )
 	AM_RANGE(vgmplay_device::A_MULTIPCMB+4,  vgmplay_device::A_MULTIPCMB+7)   AM_WRITE(multipcm_bank_hi_b_w)
 	AM_RANGE(vgmplay_device::A_MULTIPCMB+8,  vgmplay_device::A_MULTIPCMB+11)  AM_WRITE(multipcm_bank_lo_b_w)
 ADDRESS_MAP_END
@@ -1097,7 +1118,15 @@ static ADDRESS_MAP_START( k053260_map, AS_0, 8, vgmplay_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nescpu_map, AS_PROGRAM, 8, vgmplay_state )
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("nesapu_ram")
+	AM_RANGE(0, 0xffff) AM_RAM AM_SHARE("nesapu_ram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( h6280_map, AS_PROGRAM, 8, vgmplay_state )
+	AM_RANGE(0, 0xffff) AM_NOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( h6280_io_map, AS_IO, 8, vgmplay_state )
+	AM_RANGE(0, 3) AM_NOP
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
@@ -1171,6 +1200,15 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_CPU_ADD("nescpu", N2A03, 1000000)
 	MCFG_CPU_PROGRAM_MAP(nescpu_map)
 	MCFG_DEVICE_DISABLE()
+
+	MCFG_CPU_ADD("h6280", H6280, 1000000)
+	MCFG_CPU_PROGRAM_MAP(h6280_map)
+	MCFG_CPU_IO_MAP(h6280_io_map)
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_SOUND_ADD("c6280", C6280, 3579545)
+	MCFG_C6280_CPU("h6280")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 	MCFG_K053260_ADD("k053260", 3579545)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, k053260_map)
