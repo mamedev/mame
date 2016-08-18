@@ -27,28 +27,19 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	class sample_t
+	struct sample_t
 	{
-	public:
-		sample_t() { }
-
-		void init(UINT32 index, multipcm_device* rom) { m_address = index * 12; m_rom = rom; }
-
-		UINT32 start() { return (m_rom->read_byte(m_address) << 16) | (m_rom->read_byte(m_address + 1) << 8) | m_rom->read_byte(m_address + 2); }
-		UINT32 loop() { return (m_rom->read_byte(m_address + 3) << 8) | m_rom->read_byte(m_address + 4); }
-		UINT32 end() { return 0xffff - ((m_rom->read_byte(m_address + 5) << 8) | m_rom->read_byte(m_address + 6)); }
-		UINT8 attack_reg() { return (m_rom->read_byte(m_address + 8) >> 4) & 0xf; }
-		UINT8 decay1_reg() { return m_rom->read_byte(m_address + 8) & 0xf; }
-		UINT8 decay2_reg() { return m_rom->read_byte(m_address + 9) & 0xf; }
-		UINT8 decay_level() { return (m_rom->read_byte(m_address + 9) >> 4) & 0xf; }
-		UINT8 release_reg() { return m_rom->read_byte(m_address + 10) & 0xf; }
-		UINT8 key_rate_scale() { return (m_rom->read_byte(m_address + 10) >> 4) & 0xf; }
-		UINT8 lfo_vibrato_reg() { return m_rom->read_byte(m_address + 7); }
-		UINT8 lfo_amplitude_reg() { return m_rom->read_byte(m_address + 11) & 0xf; }
-
-	private:
-		UINT32 m_address;
-		multipcm_device* m_rom;
+		UINT32 m_start;
+		UINT32 m_loop;
+		UINT32 m_end;
+		UINT8 m_attack_reg;
+		UINT8 m_decay1_reg;
+		UINT8 m_decay2_reg;
+		UINT8 m_decay_level;
+		UINT8 m_release_reg;
+		UINT8 m_key_rate_scale;
+		UINT8 m_lfo_vibrato_reg;
+		UINT8 m_lfo_amplitude_reg;
 	};
 
 	enum state_t
@@ -85,7 +76,7 @@ private:
 		UINT8 m_slot_index;
 		UINT8 m_regs[8];
 		bool m_playing;
-		sample_t *m_sample;
+		sample_t m_sample;
 		UINT32 m_base;
 		UINT32 m_offset;
 		UINT32 m_step;
@@ -101,7 +92,6 @@ private:
 
 	// internal state
 	sound_stream *m_stream;
-	sample_t *m_samples;            // Max 512 samples
 	slot_t *m_slots;
 	UINT32 m_cur_slot;
 	UINT32 m_address;
@@ -124,6 +114,8 @@ private:
 	INT32 **m_amplitude_scale_tables;
 
 	UINT32 value_to_fixed(const UINT32 bits, const float value);
+
+	void init_sample(sample_t *sample, UINT32 index);
 
 	// Internal LFO functions
 	void lfo_init();

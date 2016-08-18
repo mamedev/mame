@@ -74,6 +74,23 @@ const INT32 multipcm_device::VALUE_TO_CHANNEL[32] =
 const UINT32 multipcm_device::TL_SHIFT = 12;
 const UINT32 multipcm_device::EG_SHIFT = 16;
 
+void multipcm_device::init_sample(sample_t *sample, UINT32 index)
+{
+	UINT32 address = index * 12;
+
+	sample->m_start = (read_byte(address) << 16) | (read_byte(address + 1) << 8) | read_byte(address + 2);
+	sample->m_loop = (read_byte(address + 3) << 8) | read_byte(address + 4);
+	sample->m_end = 0xffff - ((read_byte(address + 5) << 8) | read_byte(address + 6));
+	sample->m_attack_reg = (read_byte(address + 8) >> 4) & 0xf;
+	sample->m_decay1_reg = read_byte(address + 8) & 0xf;
+	sample->m_decay2_reg = read_byte(address + 9) & 0xf;
+	sample->m_decay_level = (read_byte(address + 9) >> 4) & 0xf;
+	sample->m_release_reg = read_byte(address + 10) & 0xf;
+	sample->m_key_rate_scale = (read_byte(address + 10) >> 4) & 0xf;
+	sample->m_lfo_vibrato_reg = read_byte(address + 7);
+	sample->m_lfo_amplitude_reg = read_byte(address + 11) & 0xf;
+}
+
 INT32 multipcm_device::envelope_generator_update(slot_t *slot)
 {
 	switch(slot->m_envelope_gen.m_state)
@@ -149,20 +166,20 @@ void multipcm_device::envelope_generator_calc(slot_t *slot)
 	}
 
 	INT32 rate;
-	if (slot->m_sample->key_rate_scale() != 0xf)
+	if (slot->m_sample.m_key_rate_scale != 0xf)
 	{
-		rate = (octave + slot->m_sample->key_rate_scale()) * 2 + ((slot->m_regs[3] >> 3) & 1);
+		rate = (octave + slot->m_sample.m_key_rate_scale) * 2 + ((slot->m_regs[3] >> 3) & 1);
 	}
 	else
 	{
 		rate = 0;
 	}
 
-	slot->m_envelope_gen.m_attack_rate = get_rate(m_attack_step, rate, slot->m_sample->attack_reg());
-	slot->m_envelope_gen.m_decay1_rate = get_rate(m_decay_release_step, rate, slot->m_sample->decay1_reg());
-	slot->m_envelope_gen.m_decay2_rate = get_rate(m_decay_release_step, rate, slot->m_sample->decay2_reg());
-	slot->m_envelope_gen.m_release_rate = get_rate(m_decay_release_step, rate, slot->m_sample->release_reg());
-	slot->m_envelope_gen.m_decay_level = 0xf - slot->m_sample->decay_level();
+	slot->m_envelope_gen.m_attack_rate = get_rate(m_attack_step, rate, slot->m_sample.m_attack_reg);
+	slot->m_envelope_gen.m_decay1_rate = get_rate(m_decay_release_step, rate, slot->m_sample.m_decay1_reg);
+	slot->m_envelope_gen.m_decay2_rate = get_rate(m_decay_release_step, rate, slot->m_sample.m_decay2_reg);
+	slot->m_envelope_gen.m_release_rate = get_rate(m_decay_release_step, rate, slot->m_sample.m_release_reg);
+	slot->m_envelope_gen.m_decay_level = 0xf - slot->m_sample.m_decay_level;
 
 }
 
@@ -316,9 +333,10 @@ void multipcm_device::write_slot(slot_t *slot, INT32 reg, UINT8 data)
 		{
 			//according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
 			//the game should never change the sample while playing.
-			sample_t &sample = m_samples[slot->m_regs[1]];
-			write_slot(slot, 6, sample.lfo_vibrato_reg());
-			write_slot(slot, 7, sample.lfo_amplitude_reg());
+			sample_t sample;
+			init_sample(&sample, slot->m_regs[1]);
+			write_slot(slot, 6, sample.m_lfo_vibrato_reg);
+			write_slot(slot, 7, sample.m_lfo_amplitude_reg);
 			break;
 		}
 		case 2: //Pitch
@@ -341,9 +359,9 @@ void multipcm_device::write_slot(slot_t *slot, INT32 reg, UINT8 data)
 		case 4:     //KeyOn/Off (and more?)
 			if (data & 0x80)       //KeyOn
 			{
-				slot->m_sample = &m_samples[slot->m_regs[1]];
+				init_sample(&slot->m_sample, slot->m_regs[1]);
 				slot->m_playing = true;
-				slot->m_base = slot->m_sample->start();
+				slot->m_base = slot->m_sample.m_start;
 				slot->m_offset = 0;
 				slot->m_prev_sample = 0;
 				slot->m_total_level = slot->m_dest_total_level << TL_SHIFT;
@@ -369,7 +387,7 @@ void multipcm_device::write_slot(slot_t *slot, INT32 reg, UINT8 data)
 			{
 				if (slot->m_playing)
 				{
-					if (slot->m_sample->release_reg() != 0xf)
+					if (slot->m_sample.m_release_reg != 0xf)
 					{
 						slot->m_envelope_gen.m_state = RELEASE;
 					}
@@ -453,7 +471,6 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24),
 		m_stream(nullptr),
-		m_samples(nullptr),
 		m_slots(nullptr),
 		m_cur_slot(0),
 		m_address(0),
@@ -584,13 +601,6 @@ void multipcm_device::device_start()
 		m_linear_to_exp_volume[i] = value_to_fixed(TL_SHIFT, exp_volume);
 	}
 
-	// Samples
-	m_samples = auto_alloc_array_clear(machine(), sample_t, 0x200);
-	for(INT32 sample = 0; sample < 512; ++sample)
-	{
-		m_samples[sample].init(sample, this);
-	}
-
 	save_item(NAME(m_cur_slot));
 	save_item(NAME(m_address));
 	save_item(NAME(m_bank_left));
@@ -685,9 +695,9 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 				}
 
 				slot->m_offset += step;
-				if (slot->m_offset >= (slot->m_sample->end() << TL_SHIFT))
+				if (slot->m_offset >= (slot->m_sample.m_end << TL_SHIFT))
 				{
-					slot->m_offset = slot->m_sample->loop() << TL_SHIFT;
+					slot->m_offset = slot->m_sample.m_loop << TL_SHIFT;
 				}
 
 				if (adr ^ (slot->m_offset >> TL_SHIFT))
