@@ -6,16 +6,16 @@ PINBALL
 Playmatic MPU 1
 
 ToDo:
-- Sounds play too fast, especially in Chance.
-- Add mechanical sounds
-- Lamps, solenoids
-- Ball numbers are individual lamps
+- Add remaining mechanical sounds
+- Lamps, solenoids (spcgambl has a "cone" lighted by the COx outputs)
 
 Notes:
+All games work.
+Max credits is 15.
 X is the outhole.
 Chance: When starting the game, hold down X to make "Player 1" light up.
-Others: When starting the game, hold down X, then release it and hit Z to advance
-        the player to the correct number otherwise some weird bugs can happen.
+Others: When starting the game, hold down X, then release and hit Z, otherwise
+        some weird bugs can happen.
 
 **********************************************************************************/
 
@@ -26,11 +26,11 @@ Others: When starting the game, hold down X, then release it and hit Z to advanc
 #include "sound/speaker.h"
 #include "play_1.lh"
 
-class play_1_state : public driver_device
+class play_1_state : public genpin_class
 {
 public:
 	play_1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dips(*this, "X")
 		, m_monotone(*this, "monotone")
@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port05_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
 	DECLARE_READ_LINE_MEMBER(clear_r);
+	DECLARE_READ_LINE_MEMBER(wait_r);
 	DECLARE_READ_LINE_MEMBER(ef2_r);
 	DECLARE_READ_LINE_MEMBER(ef3_r);
 	DECLARE_READ_LINE_MEMBER(ef4_r);
@@ -52,8 +53,10 @@ public:
 private:
 	UINT16 m_resetcnt;
 	UINT16 m_clockcnt;
+	UINT16 m_waitcnt;
 	UINT8 m_segment;
 	UINT8 m_match;
+	UINT8 m_ball;
 	virtual void machine_reset() override;
 	required_device<cosmac_device> m_maincpu;
 	required_ioport_array<4> m_dips;
@@ -62,14 +65,14 @@ private:
 
 static ADDRESS_MAP_START( play_1_map, AS_PROGRAM, 8, play_1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x0800, 0x081f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 2-month "battery"
 	AM_RANGE(0x0c00, 0x0c1f) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chance_map, AS_PROGRAM, 8, play_1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
+	AM_RANGE(0x0000, 0x0bff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x0c00, 0x0c1f) AM_RAM
 	AM_RANGE(0x0e00, 0x0e1f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 2-month "battery"
 ADDRESS_MAP_END
@@ -86,9 +89,9 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chance )
 	PORT_START("X.0")
-//	PORT_DIPNAME(0x01, 0x01, DEF_STR( Coinage ) ) // this is something else, don't know what yet
-//	PORT_DIPSETTING (  0x00, DEF_STR( 1C_3C ) )
-//	PORT_DIPSETTING (  0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME(0x01, 0x01, "Unknown" ) // Shows in schematic, not mentioned in the manuals, appears to have no effect
+	PORT_DIPSETTING (  0x00, "3 games" )
+	PORT_DIPSETTING (  0x01, "1 game" )
 	PORT_DIPNAME(0x02, 0x00, "Balls")
 	PORT_DIPSETTING (  0x00, "3" )
 	PORT_DIPSETTING (  0x02, "5" )
@@ -97,7 +100,7 @@ static INPUT_PORTS_START( chance )
 	PORT_DIPSETTING (  0x04, "Extra ball" )
 
 	PORT_START("X.1")
-	PORT_DIPNAME(0xff, 0x10, "Coinage for slot 2" )
+	PORT_DIPNAME(0xff, 0x08, "Coinage for slot 2" )
 	PORT_DIPSETTING (  0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (  0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (  0x04, DEF_STR( 2C_3C ) )
@@ -108,7 +111,7 @@ static INPUT_PORTS_START( chance )
 	PORT_DIPSETTING (  0x80, DEF_STR( 1C_6C ) )
 
 	PORT_START("X.2")
-	PORT_DIPNAME(0xff, 0x10, "Coinage for slot 3" )
+	PORT_DIPNAME(0xff, 0x01, "Coinage for slot 3" )
 	PORT_DIPSETTING (  0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING (  0x02, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING (  0x04, DEF_STR( 1C_5C ) )
@@ -150,11 +153,11 @@ static INPUT_PORTS_START( chance )
 
 	PORT_START("IN4") // 41-48
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z) // lastlap trough
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON) // lastlap outhole
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
 
@@ -185,7 +188,6 @@ static INPUT_PORTS_START( chance )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) // Set 3rd replay score
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) // Set 2nd replay score
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD) // Set 1st replay score
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( play_1 )
@@ -237,15 +239,17 @@ INPUT_PORTS_END
 
 void play_1_state::machine_reset()
 {
+	m_waitcnt = 0xffff;
 	m_resetcnt = 0;
 	m_clockcnt = 0;
 	m_segment = 0;
 	m_match = 0;
+	m_ball = 0;
 }
 
 READ8_MEMBER( play_1_state::port07_r )
 {
-	UINT8 data = m_dips[3]->read();
+	UINT8 data = m_dips[3]->read() & 0x3f;
 	data |= (m_segment & m_dips[1]->read()) ? 0x40 : 0;
 	data |= (m_segment & m_dips[2]->read()) ? 0x80 : 0;
 	return data;
@@ -262,17 +266,25 @@ WRITE8_MEMBER( play_1_state::port01_w )
 		output().set_digit_value(40, 0);
 
 	if (BIT(data, 1))
+	{
+		output().set_digit_value(44, patterns[0]);
 		output().set_digit_value(45, patterns[0]);
+	}
 	else
+	{
+		output().set_digit_value(44, 0);
 		output().set_digit_value(45, 0);
+	}
 
 	m_match = patterns[data>>4] & 0x7f;
+	m_waitcnt = 0;
 }
 
 WRITE8_MEMBER( play_1_state::port02_w )
 {
 	// N1-8, segments and other
 	m_segment = data;
+	m_waitcnt = 0;
 }
 
 WRITE8_MEMBER( play_1_state::port03_w )
@@ -282,10 +294,14 @@ WRITE8_MEMBER( play_1_state::port03_w )
 	switch (~data & 15)
 	{
 		case 0:
-			// M1 thru M8 (unknown purpose) bit 4 lights up the bumpers
-			break;
+			// M1 thru M8: bit 4 lights up the bumpers, bit 6 outhole, bit 7 knocker
+			if (BIT(m_segment, 6)) // outhole
+				m_samples->start(0, 5);
+			if (BIT(m_segment, 7)) // knocker
+				m_samples->start(0, 6);
+				break;
 		case 1:
-			// a combination of bits could set higher frequencies, but that isn't documented
+			// a combination of bits could set higher frequencies, but that isn't documented or used
 			if (BIT(m_segment, 0))
 				m_monotone->set_unscaled_clock(523);
 			else
@@ -300,7 +316,7 @@ WRITE8_MEMBER( play_1_state::port03_w )
 			else
 			if ((m_segment & 0x0F)==0)
 				m_monotone->set_unscaled_clock(0);
-			// Bit 4 adjusts the volume, not emulated yet
+			// Bit 4 when low makes the sound fade out, not emulated yet
 
 			// display player number
 			{
@@ -359,21 +375,26 @@ WRITE8_MEMBER( play_1_state::port03_w )
 		default:
 			break;
 	}
+	m_waitcnt = 0;
 }
 
 WRITE8_MEMBER( play_1_state::port04_w )
 {
 	// U1-8
+	m_ball = data;
+	m_waitcnt = 0;
 }
 
 WRITE8_MEMBER( play_1_state::port05_w )
 {
 	// V1-8
+	m_waitcnt = 0;
 }
 
 WRITE8_MEMBER( play_1_state::port06_w )
 {
 	// W1-8
+	m_waitcnt = 0;
 }
 
 READ_LINE_MEMBER( play_1_state::clear_r )
@@ -382,6 +403,18 @@ READ_LINE_MEMBER( play_1_state::clear_r )
 	if (m_resetcnt < 0xffff)
 		m_resetcnt++;
 	return (m_resetcnt == 0x8000) ? 0 : 1;
+}
+
+READ_LINE_MEMBER( play_1_state::wait_r )
+{
+	// Any OUT instruction forces a 60-100msec wait
+	if (m_waitcnt < 0x180)
+	{
+		m_waitcnt++;
+		return 0;
+	}
+	else
+		return 1;
 }
 
 READ_LINE_MEMBER( play_1_state::ef2_r )
@@ -409,7 +442,14 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 		if (BIT(m_clockcnt, 1))
 			output().set_digit_value(41, m_match);
 		else
-			output().set_digit_value(44, m_match);
+		{
+			output().set_digit_value(43, m_match);
+			output().set_value("led1", !BIT(m_ball, 1));
+			output().set_value("led2", !BIT(m_ball, 2));
+			output().set_value("led3", !BIT(m_ball, 3));
+			output().set_value("led4", !BIT(m_ball, 4));
+			output().set_value("led5", !BIT(m_ball, 5));
+		}
 	}
 }
 
@@ -418,7 +458,7 @@ static MACHINE_CONFIG_START( play_1, play_1_state )
 	MCFG_CPU_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
 	MCFG_CPU_PROGRAM_MAP(play_1_map)
 	MCFG_CPU_IO_MAP(play_1_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_WAIT_CALLBACK(READLINE(play_1_state, wait_r))
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(play_1_state, clear_r))
 	MCFG_COSMAC_EF2_CALLBACK(READLINE(play_1_state, ef2_r))
 	MCFG_COSMAC_EF3_CALLBACK(READLINE(play_1_state, ef3_r))
@@ -429,7 +469,7 @@ static MACHINE_CONFIG_START( play_1, play_1_state )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_play_1)
 
-	MCFG_DEVICE_ADD("xpoint", CLOCK, 120) // crossing-point detector
+	MCFG_DEVICE_ADD("xpoint", CLOCK, 100) // crossing-point detector
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_1_state, clock_w))
 
 	/* Sound */
@@ -450,7 +490,7 @@ MACHINE_CONFIG_END
 / Space Gambler (03/78)
 /-------------------------------------------------------------------*/
 ROM_START(spcgambl)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x800, "roms", 0)
 	ROM_LOAD("spcgamba.bin", 0x0000, 0x0400, CRC(3b6e5287) SHA1(4d2fae779bb4117a99a9311b96ab79799f40067b))
 	ROM_LOAD("spcgambb.bin", 0x0400, 0x0400, CRC(5c61f25c) SHA1(44b2d74926bf5678146b6d2347b4147e8a29a660))
 ROM_END
@@ -459,7 +499,7 @@ ROM_END
 / Big Town  (04/78)
 /-------------------------------------------------------------------*/
 ROM_START(bigtown)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x800, "roms", 0)
 	ROM_LOAD("bigtowna.bin", 0x0000, 0x0400, CRC(253f1b93) SHA1(7ff5267d0dfe6ae19ec6b0412902f4ce83f23ed1))
 	ROM_LOAD("bigtownb.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
 ROM_END
@@ -468,7 +508,7 @@ ROM_END
 / Last Lap (09/78)
 /-------------------------------------------------------------------*/
 ROM_START(lastlap)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x800, "roms", 0)
 	ROM_LOAD("lastlapa.bin", 0x0000, 0x0400, CRC(253f1b93) SHA1(7ff5267d0dfe6ae19ec6b0412902f4ce83f23ed1))
 	ROM_LOAD("lastlapb.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
 ROM_END
@@ -477,7 +517,7 @@ ROM_END
 / Chance (09/78)
 /-------------------------------------------------------------------*/
 ROM_START(chance)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0xc00, "roms", 0)
 	ROM_LOAD("chance_a.bin", 0x0000, 0x0400, CRC(3cd9d5a6) SHA1(c1d9488495a67198f7f60f70a889a9a3062c71d7))
 	ROM_LOAD("chance_b.bin", 0x0400, 0x0400, CRC(a281b0f1) SHA1(1d2d26ce5f50294d5a95f688c82c3bdcec75de95))
 	ROM_LOAD("chance_c.bin", 0x0800, 0x0200, CRC(369afee3) SHA1(7fa46c7f255a5ef21b0d1cc018056bc4889d68b8))
@@ -487,15 +527,15 @@ ROM_END
 / Party  (05/79)
 /-------------------------------------------------------------------*/
 ROM_START(party)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x800, "roms", 0)
 	ROM_LOAD("party_a.bin", 0x0000, 0x0400, CRC(253f1b93) SHA1(7ff5267d0dfe6ae19ec6b0412902f4ce83f23ed1))
 	ROM_LOAD("party_b.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
 ROM_END
 
 
 /* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978,  bigtown,  0,       play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME(1978,  chance,   0,       chance, chance,   driver_device, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1978,  lastlap,  bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1978,  spcgambl, 0,       play_1, spcgambl, driver_device, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1979,  party,    bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1978, bigtown,  0,       play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL )
+GAME(1978, lastlap,  bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL )
+GAME(1979, party,    bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL )
+GAME(1978, spcgambl, 0,       play_1, spcgambl, driver_device, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL )
+GAME(1978, chance,   0,       chance, chance,   driver_device, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL )
