@@ -60,8 +60,7 @@ alto2_log_t logprintf;
 //**************************************************************************
 
 DEVICE_ADDRESS_MAP_START( ucode_map, 32, alto2_cpu_device )
-	AM_RANGE(0,                          ALTO2_UCODE_RAM_BASE - 1)          AM_READ     ( crom_r )
-	AM_RANGE(ALTO2_UCODE_RAM_BASE,       ALTO2_UCODE_SIZE - 1)              AM_READWRITE( cram_r, cram_w )
+	AM_RANGE(0,                         4*ALTO2_UCODE_PAGE_SIZE - 1)        AM_READWRITE( crom_cram_r, crom_cram_w )
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( const_map, 16, alto2_cpu_device )
@@ -126,6 +125,12 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
 	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
+	m_cram_config(2),
+	m_ucode_rom_pages(1),
+	m_ucode_ram_pages(2),
+	m_ucode_ram_base(ALTO2_UCODE_PAGE_SIZE),
+	m_ucode_size(3*ALTO2_UCODE_PAGE_SIZE),
+	m_sreg_banks(1),
 	m_ucode_crom(nullptr),
 	m_const_data(nullptr),
 	m_icount(0),
@@ -471,10 +476,8 @@ static const prom_load_t pl_ucode[] = {
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
 		/* type */  sizeof(UINT32)
-	}
-
-#if (ALTO2_UCODE_ROM_PAGES > 1)
-	,
+	},
+	// NOTE: the Mesa 5.1 ucode PROM may be used as RAM, if m_cram_config == 3
 	{   // 02000-03777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
 		"xm51.u54",
 		nullptr,
@@ -595,7 +598,6 @@ static const prom_load_t pl_ucode[] = {
 		/* dand */  KEEP,
 		/* type */  sizeof(UINT32)
 	}
-#endif  // (UCODE_ROM_PAGES > 1)
 };
 
 /**
@@ -811,13 +813,14 @@ void alto2_cpu_device::device_start()
 	// get a pointer to the IO address space
 	m_iomem = &space(AS_2);
 
-	// decode ALTO2_UCODE_PAGES = 1 or 2 pages of micro code PROMs to CROM
-	m_ucode_crom = prom_load(machine(), pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
+	// Decode 2 pages of micro code PROMs to CROM
+	// If m_cram_config == 1 or 3, only the first page will be used
+	m_ucode_crom = prom_load(machine(), pl_ucode, memregion("ucode_proms")->base(), 2, 8);
 
-	// allocate micro code CRAM
-	m_ucode_cram = std::make_unique<UINT8[]>(sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
+	// allocate micro code CRAM for max 3 pages
+	m_ucode_cram = std::make_unique<UINT8[]>(sizeof(UINT32) * 3 * ALTO2_UCODE_PAGE_SIZE);
 	// fill with the micro code inverted bits value
-	for (offs_t offset = 0; offset < ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE; offset++)
+	for (offs_t offset = 0; offset < 3 * ALTO2_UCODE_PAGE_SIZE; offset++)
 		*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4) = ALTO2_UCODE_INVERTED;
 
 	// decode constant PROMs to m_const_data
@@ -1015,22 +1018,20 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-//! read microcode CROM
-READ32_MEMBER ( alto2_cpu_device::crom_r )
+//! read microcode CROM or CRAM
+READ32_MEMBER ( alto2_cpu_device::crom_cram_r )
 {
-	return *reinterpret_cast<UINT32 *>(m_ucode_crom + offset * 4);
+	if (offset < m_ucode_ram_base)
+		return *reinterpret_cast<UINT32 *>(m_ucode_crom + offset * 4);
+	return *reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4);
 }
 
-//! read microcode CRAM
-READ32_MEMBER ( alto2_cpu_device::cram_r )
+//! write microcode CROM or CRAM (CROM of course can't be written)
+WRITE32_MEMBER( alto2_cpu_device::crom_cram_w )
 {
-	return *reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4);
-}
-
-//! write microcode CRAM
-WRITE32_MEMBER( alto2_cpu_device::cram_w )
-{
-	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4) = data;
+	if (offset < m_ucode_ram_base)
+		return;
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4) = data;
 }
 
 //! read constants PROM
@@ -1040,9 +1041,9 @@ READ16_MEMBER ( alto2_cpu_device::const_r )
 }
 
 //! direct read access to the microcode CROM or CRAM
-#define RD_UCODE(addr) (addr < ALTO2_UCODE_RAM_BASE ? \
+#define RD_UCODE(addr) (addr < m_ucode_ram_base ? \
 	*reinterpret_cast<UINT32 *>(m_ucode_crom + addr * 4) : \
-	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (addr - ALTO2_UCODE_RAM_BASE) * 4))
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (addr - m_ucode_ram_base) * 4))
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -1055,6 +1056,7 @@ void alto2_cpu_device::device_reset()
 	ioport_port* etherid = ioport(":ETHERID");
 	if (etherid)
 		m_ether_id = etherid->read() & 0377;
+
 	// call all sub-devices' reset_...
 	reset_memory();
 	reset_disp();
@@ -2268,13 +2270,18 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 /** @brief flag that tells wheter operation was 0: arithmetic (M=0) or 1: logic (M=1) */
 #define ALUM    A10_ALUM
 
-/** @brief execute the CPU for at most nsecs nano seconds */
+/** @brief execute the CPU for the number of cycles in m_icount */
 void alto2_cpu_device::execute_run()
 {
 	m_next = m_task_mpc[m_task];        // get current task's next mpc and address modifier
 	m_next2 = m_task_next2[m_task];
 
 	do {
+                if (m_dsp.vsync) {
+			// synchronizing to the vsync signal
+			continue;
+		}
+
 		m_mpc = m_next;             // next instruction's micro program counter
 		m_mir = RD_UCODE(m_mpc);    // fetch the micro code
 
@@ -2283,15 +2290,16 @@ void alto2_cpu_device::execute_run()
 		debugger_instruction_hook(this, m_mpc);
 		m_cycle++;
 
-
 		if (f1() == f1_load_mar && check_mem_load_mar_stall(m_rsel)) {
 			LOG((this,LOG_CPU,3, "   MAR<- stall\n"));
 			continue;
 		}
+
 		if (f2() == f2_load_md && check_mem_write_stall()) {
 			LOG((this,LOG_CPU,3, "   MD<- stall\n"));
 			continue;
 		}
+
 		/*
 		 * Bus source decoding is not performed if f1 == f1_const
 		 * or f2 == f2_const. These functions use the MIR BS field to
@@ -2320,33 +2328,32 @@ void alto2_cpu_device::execute_run()
 		// The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
 		if (!do_bs || bs() >= bs_task_4) {
 			const UINT32 addr = 8 * m_rsel + bs();
-			// FIXME: is the format of m_const_data endian safe?
 			const UINT16 data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
 			LOG((this,LOG_CPU,2,"    %#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
 		}
 
 		/*
-		 * early F2 function has to be called before early BS,
+		 * Early F2 function has to be called before early BS,
 		 * because the emulator task F2 acsource or acdest may
-		 * change the m_rsel
+		 * change the value of m_rsel
 		 */
 		switch (f2()) {
-		case f2_task_12:                        // f2 12 task specific
+		case f2_task_12:                            // f2 12 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_early_load_dns();
 				break;
 			}
 			break;
-		case f2_task_13:                        // f2 13 task specific
+		case f2_task_13:                            // f2 13 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_early_acdest();
 				break;
 			}
 			break;
-		case f2_task_16:                        // f2 16 task specific
+		case f2_task_16:                            // f2 16 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_early_acsource();
@@ -2366,22 +2373,22 @@ void alto2_cpu_device::execute_run()
 				break;
 			case bs_task_3:                     // BUS source is task specific
 				switch (m_task) {
-				case task_emu:                  // emulator task
+				case task_emu:              // emulator task
 					bs_early_read_sreg();
 					break;
-				case task_ksec:                 // disk sector task
-				case task_kwd:                  // disk word task
+				case task_ksec:             // disk sector task
+				case task_kwd:              // disk word task
 					bs_early_read_kstat();
 					break;
-				case task_ether:                // ethernet task
+				case task_ether:            // ethernet task
 					bs_early_eidfct();
 					break;
-				case task_mrt:                  // memory refresh task
-				case task_dwt:                  // display word task
-				case task_curt:                 // cursor task
-				case task_dht:                  // display horizontal task
-				case task_dvt:                  // display vertical task
-				case task_part:                 // parity task
+				case task_mrt:              // memory refresh task
+				case task_dwt:              // display word task
+				case task_curt:             // cursor task
+				case task_dht:              // display horizontal task
+				case task_dvt:              // display vertical task
+				case task_part:             // parity task
 					break;
 				default:
 					bs_early_bad();
@@ -2389,20 +2396,20 @@ void alto2_cpu_device::execute_run()
 				break;
 			case bs_task_4:                     // BUS source is task specific
 				switch (m_task) {
-				case task_emu:                  // emulator task
+				case task_emu:              // emulator task
 					bs_early_load_sreg();
 					break;
-				case task_ksec:                 // disk sector task
-				case task_kwd:                  // disk word task
+				case task_ksec:             // disk sector task
+				case task_kwd:              // disk word task
 					bs_early_read_kdata();
 					break;
-				case task_ether:                // ethernet task
-				case task_mrt:                  // memory refresh task
-				case task_dwt:                  // display word task
-				case task_curt:                 // cursor task
-				case task_dht:                  // display horizontal task
-				case task_dvt:                  // display vertical task
-				case task_part:                 // parity task
+				case task_ether:            // ethernet task
+				case task_mrt:              // memory refresh task
+				case task_dwt:              // display word task
+				case task_curt:             // cursor task
+				case task_dht:              // display horizontal task
+				case task_dvt:              // display vertical task
+				case task_part:             // parity task
 					break;
 				default:
 					bs_early_bad();
@@ -2414,9 +2421,9 @@ void alto2_cpu_device::execute_run()
 			case bs_mouse:                      // BUS source is mouse data
 				bs_early_mouse();
 				break;
-			case bs_disp:						// BUS source displacement (emulator task)
+			case bs_disp:                       // BUS source displacement (emulator task)
 				switch (m_task) {
-				case task_emu:                  // emulator task
+				case task_emu:              // emulator task
 					bs_early_emu_disp();
 					break;
 				default:
@@ -2428,10 +2435,10 @@ void alto2_cpu_device::execute_run()
 
 		// early F1 function
 		switch (f1()) {
-		case f1_task:                           // f1 02 task switch
+		case f1_task:                               // f1 02 task switch
 			f1_early_task();
 			break;
-		case f1_block:                          // f1 03 task block
+		case f1_block:                              // f1 03 task block
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f1_early_emu_block();
@@ -2466,28 +2473,28 @@ void alto2_cpu_device::execute_run()
 			}
 			break;
 
-		case f1_task_13:                        // f1 13 task specific
+		case f1_task_13:                            // f1 13 task specific
 			switch (m_task) {
 			case task_ether:                    // ethernet task
 				f1_early_eilfct();
 				break;
 			}
 			break;
-		case f1_task_14:                        // f1 14 task specific
+		case f1_task_14:                            // f1 14 task specific
 			switch (m_task) {
 			case task_ether:                    // ethernet task
 				f1_early_epfct();
 				break;
 			}
 			break;
-		case f1_task_16:                        // f1 16 task specific
+		case f1_task_16:                            // f1 16 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f1_early_rsnf();
 				break;
 			}
 			break;
-		case f1_task_17:                        // f1 17 task specific
+		case f1_task_17:                            // f1 17 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f1_early_startf();
@@ -2520,27 +2527,27 @@ void alto2_cpu_device::execute_run()
 
 		// late F1 function call now
 		switch (f1()) {
-		case f1_load_mar:                       // f1 01 load memory address register
+		case f1_load_mar:                           // f1 01 load memory address register
 			f1_late_load_mar();
 			break;
-		case f1_l_lsh_1:                        // f1 04 left shift L once
+		case f1_l_lsh_1:                            // f1 04 left shift L once
 			f1_late_l_lsh_1();
 			break;
-		case f1_l_rsh_1:                        // f1 05 right shift L once
+		case f1_l_rsh_1:                            // f1 05 right shift L once
 			f1_late_l_rsh_1();
 			break;
-		case f1_l_lcy_8:                        // f1 06 cycle L 8 times
+		case f1_l_lcy_8:                            // f1 06 cycle L 8 times
 			f1_late_l_lcy_8();
 			break;
 
-		case f1_task_10:                        // f1 10 task specific
+		case f1_task_10:                            // f1 10 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f1_late_swmode();
 				break;
 			}
 			break;
-		case f1_task_11:                        // f1 11 task specific
+		case f1_task_11:                            // f1 11 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f1_late_wrtram();
@@ -2551,7 +2558,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f1_task_12:                        // f1 12 task specific
+		case f1_task_12:                            // f1 12 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f1_late_rdram();
@@ -2562,14 +2569,13 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f1_task_13:                        // f1 13 task specific
+		case f1_task_13:                            // f1 13 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
-#if (ALTO2_UCODE_RAM_PAGES == 3)
-				f1_late_load_rmr();
-#else
-				f1_late_load_srb();
-#endif
+				if (m_cram_config == 3)			// 3K CRAM available?
+					f1_late_load_rmr();
+				else
+					f1_late_load_srb();
 				break;
 			case task_ksec:                     // disk sector task
 			case task_kwd:                      // disk word task
@@ -2577,7 +2583,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f1_task_14:                        // f1 14 task specific
+		case f1_task_14:                            // f1 14 task specific
 			switch (m_task) {
 			case task_ksec:                     // disk sector task
 			case task_kwd:                      // disk word task
@@ -2585,7 +2591,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f1_task_15:                        // f1 15 task specific
+		case f1_task_15:                            // f1 15 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f1_late_emu_load_esrb();
@@ -2599,7 +2605,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f1_task_16:                        // f1 16 task specific
+		case f1_task_16:                            // f1 16 task specific
 			switch (m_task) {
 			case task_ksec:                     // disk sector task
 			case task_kwd:                      // disk word task
@@ -2607,7 +2613,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f1_task_17:                        // f1 17 task specific
+		case f1_task_17:                            // f1 17 task specific
 			switch (m_task) {
 			case task_ksec:                     // disk sector task
 			case task_kwd:                      // disk word task
@@ -2619,26 +2625,26 @@ void alto2_cpu_device::execute_run()
 
 		// late F2 function call now
 		switch (f2()) {
-		case f2_bus_eq_zero:                    // f2 01 branch on bus equals 0
+		case f2_bus_eq_zero:                        // f2 01 branch on bus equals 0
 			f2_late_bus_eq_zero();
 			break;
-		case f2_shifter_lt_zero:                // f2 02 branch on shifter less than 0
+		case f2_shifter_lt_zero:                    // f2 02 branch on shifter less than 0
 			f2_late_shifter_lt_zero();
 			break;
-		case f2_shifter_eq_zero:                // f2 03 branch on shifter equals 0
+		case f2_shifter_eq_zero:                    // f2 03 branch on shifter equals 0
 			f2_late_shifter_eq_zero();
 			break;
-		case f2_bus:                            // f2 04 branch on BUS[6-15]
+		case f2_bus:                                // f2 04 branch on BUS[6-15]
 			f2_late_bus();
 			break;
-		case f2_alucy:                          // f2 05 branch on (latched) ALU carry
+		case f2_alucy:                              // f2 05 branch on (latched) ALU carry
 			f2_late_alucy();
 			break;
-		case f2_load_md:                        // f2 06 load memory data
+		case f2_load_md:                            // f2 06 load memory data
 			f2_late_load_md();
 			break;
 
-		case f2_task_10:                        // f2 10 task specific
+		case f2_task_10:                            // f2 10 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_late_busodd();
@@ -2651,7 +2657,7 @@ void alto2_cpu_device::execute_run()
 				f2_late_eodfct();
 				break;
 			case task_dwt:                      // display word task
-				f2_late_dwt_load_ddr();
+				f2_late_load_ddr();
 				break;
 			case task_curt:                     // cursor task
 				f2_late_load_xpreg();
@@ -2664,7 +2670,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f2_task_11:                        // f2 11 task specific
+		case f2_task_11:                            // f2 11 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_late_magic();
@@ -2684,7 +2690,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f2_task_12:                        // f2 12 task specific
+		case f2_task_12:                            // f2 12 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_late_load_dns();
@@ -2698,7 +2704,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f2_task_13:                        // f2 13 task specific
+		case f2_task_13:                            // f2 13 task specific
 			switch (m_task) {
 			case task_ksec:                     // disk sector task
 			case task_kwd:                      // disk word task
@@ -2709,7 +2715,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f2_task_14:                        // f2 14 task specific
+		case f2_task_14:                            // f2 14 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_late_load_ir();
@@ -2723,7 +2729,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f2_task_15:                        // f2 15 task specific
+		case f2_task_15:                            // f2 15 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_late_idisp();
@@ -2737,7 +2743,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			}
 			break;
-		case f2_task_16:                        // f2 16 task specific
+		case f2_task_16:                            // f2 16 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
 				f2_late_acsource();
@@ -2761,7 +2767,7 @@ void alto2_cpu_device::execute_run()
 				break;
 			case bs_task_4:                     // BUS source is task specific
 				switch (m_task) {
-				case task_emu:                  // emulator task
+				case task_emu:              // emulator task
 					bs_late_load_sreg();
 					break;
 				}
@@ -2771,7 +2777,7 @@ void alto2_cpu_device::execute_run()
 
 		// update T register, if LOADT is set
 		if (loadt()) {
-			m_cram_addr = m_alu;    // latch CRAM address
+			m_cram_addr = m_alu;        // latch CRAM address
 			if (flags & TSELECT) {
 				m_t = m_alu;        // T source is ALU
 				LOG((this,LOG_CPU,2, "   T<- ALU (%#o)\n", m_alu));
@@ -2783,7 +2789,7 @@ void alto2_cpu_device::execute_run()
 
 		// update L register and LALUC0 if LOADL is set
 		if (loadl()) {
-			m_l = m_alu;            // load L from ALU
+			m_l = m_alu;                // load L from ALU
 			if (flags & ALUM) {
 				m_laluc0 = 0;       // logic operation - put 0 into latched carry
 				LOG((this,LOG_CPU,2, "   L<- ALU (%#o); LALUC0<- %o\n", m_alu, 0));
@@ -2794,7 +2800,8 @@ void alto2_cpu_device::execute_run()
 			// update M (MYL) register, if a RAM related task is active
 			if (m_ram_related[m_task]) {
 				m_myl = m_alu;      // load M from ALU, if 'GOODTASK'
-				m_s[m_s_reg_bank[m_task]][0] = m_alu;   // also writes to S[bank][0], which can't be read
+				// also writes to S[_task][0], which can't be read
+				m_s[m_s_reg_bank[m_task]][0] = m_alu;
 				LOG((this,LOG_CPU,2, "   M<- ALU (%#o)\n", m_alu));
 			}
 		}
@@ -2811,14 +2818,19 @@ void alto2_cpu_device::execute_run()
 				m_task_next2[m_task] = m_next2;
 				m_task = m_next_task;
 				LOG((this,LOG_CPU,1, "task switch to %02o:%s (cycle %lld)\n", m_task, task_name(m_task), cycle()));
-				m_next = m_task_mpc[m_task];    // get new task's mpc
-				m_next2 = m_task_next2[m_task]; // get address modifier after task switch (needed?)
+				// Get the new task's mpc
+				m_next = m_task_mpc[m_task];
+				// Get address modifier after task switch.
+				m_next2 = m_task_next2[m_task];
 
-				// let the task know it becomes active now and (most probably) reset the wakeup
+				// Let the task know it becomes active now and
+				// (most probably) reset the wakeup
 				switch (m_task) {
 				case task_emu:       // emulator task
+					// No activate_emu();
 					break;
 				case task_ksec:      // disk sector task
+					// No activate_ksec();
 					break;
 				case task_ether:     // ethernet task
 					activate_eth();
@@ -2827,6 +2839,7 @@ void alto2_cpu_device::execute_run()
 					activate_mrt();
 					break;
 				case task_dwt:       // display word task
+					// No activate_dwt();
 					break;
 				case task_curt:      // cursor task
 					activate_curt();
@@ -2841,6 +2854,7 @@ void alto2_cpu_device::execute_run()
 					activate_part();
 					break;
 				case task_kwd:       // disk word task
+					// No activate_kwd();
 					break;
 				}
 			}
@@ -2849,8 +2863,8 @@ void alto2_cpu_device::execute_run()
 		if (m_dsp_time >= 0) {
 			/**
 			 * Subtract the microcycle time from the display time accu.
-			 * If it underflows, call the display state machine and add
-			 * the time for 32(!) pixel clocks to the accu.
+			 * If it underflows, call the display state machine which
+			 * adds the time for 32 pixel clocks to the accu.
 			 * This is very close to every seventh CPU cycle
 			 */
 			m_dsp_time -= ALTO2_UCYCLE;
@@ -2863,7 +2877,7 @@ void alto2_cpu_device::execute_run()
 			 * Subtract the microcycle time from the unload time accu.
 			 * If it underflows, call the unload word function which adds
 			 * the time for 16 or 32 pixel clocks to the accu, or ends
-			 * the unloading by leaving m_unload_time at -1.
+			 * the FIFO unloading by leaving m_unload_time at -1.
 			 */
 			m_unload_time -= ALTO2_UCYCLE;
 			if (m_unload_time < 0)
@@ -2874,7 +2888,7 @@ void alto2_cpu_device::execute_run()
 			/**
 			 * Subtract the microcycle time from the bitclk time accu.
 			 * If it underflows, call the disk bitclk function which adds
-			 * the time for one bit as clocks to the accu, or ends
+			 * the time for one bit as clock cycles to the accu, or ends
 			 * the bitclk sequence by leaving m_bitclk_time at -1.
 			 */
 			m_bitclk_time -= ALTO2_UCYCLE;
@@ -2882,7 +2896,7 @@ void alto2_cpu_device::execute_run()
 		}
 	} while (m_icount-- > 0);
 
-	/* save this task's mpc and address modifier */
+	// Save this task's mpc and address modifier
 	m_task_mpc[m_task] = m_next;
 	m_task_next2[m_task] = m_next2;
 }
@@ -2900,7 +2914,7 @@ void alto2_cpu_device::hard_reset()
 		// every task starts at mpc = task number, in either ROM0 or RAM0
 		m_task_mpc[task] = (m_ctl2k_u38[task] >> 4) ^ 017;
 		if (0 == (m_reset_mode & (1 << task)))
-			m_task_mpc[task] |= ALTO2_UCODE_RAM_BASE;
+			m_task_mpc[task] |= m_ucode_ram_base;
 	}
 
 	init_memory();
@@ -2931,11 +2945,36 @@ void alto2_cpu_device::hard_reset()
 /** @brief software initiated reset (STARTF) */
 void alto2_cpu_device::soft_reset()
 {
+	// Setup the CROM and CRAM configuration
+	ioport_port* config = ioport(":CONFIG");
+	if (config)
+		m_cram_config = (config->read() >> 1) & 3;
+	switch (m_cram_config) {
+	case 0:	// invalid, default to 1
+	case 1:	// 1K CROM, 1K CRAM, 1 S register bank
+		m_ucode_rom_pages = 1;
+		m_ucode_ram_pages = 1;
+		m_sreg_banks = 1;
+		break;
+	case 2:	// 2K CROM, 1K CRAM, 1 S register bank
+		m_ucode_rom_pages = 2;
+		m_ucode_ram_pages = 1;
+		m_sreg_banks = 1;
+		break;
+	case 3:	// 1K CROM, 3K CRAM, 8 S register banks
+		m_ucode_rom_pages = 1;
+		m_ucode_ram_pages = 3;
+		m_sreg_banks = 8;
+		break;
+	}
+	m_ucode_ram_base = m_ucode_rom_pages * ALTO2_UCODE_PAGE_SIZE;
+	m_ucode_size = (m_ucode_rom_pages + m_ucode_ram_pages) * ALTO2_UCODE_PAGE_SIZE;
+
 	for (int task = 0; task < ALTO2_TASKS; task++) {
 		// every task starts at mpc = task number, in either ROM0 or RAM0
 		m_task_mpc[task] = (m_ctl2k_u38[task] >> 4) ^ 017;
 		if (0 == (m_reset_mode & (1 << task)))
-			m_task_mpc[task] |= ALTO2_UCODE_RAM_BASE;
+			m_task_mpc[task] |= m_ucode_ram_base;
 	}
 	m_next2_task = task_emu;        // switch to task 0 (emulator)
 	m_reset_mode = 0xffff;          // all tasks start in ROM0 again

@@ -230,7 +230,7 @@ WRITE16_MEMBER( alto2_cpu_device::mouse_buttons_w ) { X_WRBITS(m_hw.utilin,16,13
 /**
  * @brief read the UTILIN port
  *
- * @param addr memory mapped I/O address to be read
+ * @param offset memory mapped I/O address to be read
  * @return current value on the UTILIN port
  */
 READ16_MEMBER( alto2_cpu_device::utilin_r )
@@ -250,7 +250,7 @@ READ16_MEMBER( alto2_cpu_device::utilin_r )
 /**
  * @brief read the XBUS port
  *
- * @param addr memory mapped I/O address to be read
+ * @param offset memory mapped I/O address to be read
  * @return current value on the XBUS port latch
  */
 READ16_MEMBER( alto2_cpu_device::xbus_r )

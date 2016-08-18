@@ -448,16 +448,10 @@ void multipcm_device::set_bank(UINT32 leftoffs, UINT32 rightoffs)
 
 const device_type MULTIPCM = &device_creator<multipcm_device>;
 
-// default address map
-static ADDRESS_MAP_START( multipcm, AS_0, 8, multipcm_device )
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-ADDRESS_MAP_END
-
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
 		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("mpcm_samples", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
+		device_rom_interface(mconfig, *this, 24),
 		m_stream(nullptr),
 		m_samples(nullptr),
 		m_slots(nullptr),
@@ -469,7 +463,6 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 		m_attack_step(nullptr),
 		m_decay_release_step(nullptr),
 		m_freq_step_table(nullptr),
-		m_direct(nullptr),
 		m_left_pan_table(nullptr),
 		m_right_pan_table(nullptr),
 		m_linear_to_exp_volume(nullptr),
@@ -477,18 +470,8 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 		m_pitch_scale_tables(nullptr),
 		m_amplitude_scale_tables(nullptr)
 {
-	m_address_map[0] = *ADDRESS_MAP_NAME(multipcm);
 }
 
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *multipcm_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -506,9 +489,6 @@ void multipcm_device::device_config_complete()
 
 void multipcm_device::device_start()
 {
-	// find our direct access
-	m_direct = &space().direct();
-
 	const float clock_divider = 180.0f;
 	m_rate = (float)clock() / clock_divider;
 
@@ -612,7 +592,7 @@ void multipcm_device::device_start()
 
 		for (INT32 sample_byte = 0; sample_byte < 12; sample_byte++)
 		{
-			data[sample_byte] = (UINT8)m_direct->read_byte((sample * 12) + sample_byte);
+			data[sample_byte] = (UINT8)read_byte((sample * 12) + sample_byte);
 		}
 
 		m_samples[sample].m_start = (data[0] << 16) | (data[1] << 8) | (data[2] << 0);
@@ -711,7 +691,7 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 				UINT32 vol = (slot->m_total_level >> TL_SHIFT) | (slot->m_pan << 7);
 				UINT32 adr = slot->m_offset >> TL_SHIFT;
 				UINT32 step = slot->m_step;
-				INT32 csample = (INT16) (m_direct->read_byte(slot->m_base + adr) << 8);
+				INT32 csample = (INT16) (read_byte(slot->m_base + adr) << 8);
 				INT32 fpart = slot->m_offset & ((1 << TL_SHIFT) - 1);
 				INT32 sample = (csample * fpart + slot->m_prev_sample * ((1 << TL_SHIFT) - fpart)) >> TL_SHIFT;
 

@@ -360,9 +360,9 @@ WRITE8_MEMBER( excali64_state::port70_w )
 {
 	m_sys_status = data;
 	m_crtc->set_unscaled_clock(BIT(data, 2) ? 2e6 : 1e6);
-	if BIT(data, 1)
+	if (BIT(data, 1))
 	{
-	// select 64k ram
+		// select 64k ram
 		membank("bankr1")->set_entry(0);
 		membank("bankr2")->set_entry(0);
 		membank("bankr3")->set_entry(0);
@@ -371,10 +371,9 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankw3")->set_entry(0);
 		membank("bankw4")->set_entry(0);
 	}
-	else
-	if BIT(data, 0)
+	else if (BIT(data, 0))
 	{
-	// select videoram and hiresram
+		// select videoram and hiresram
 		membank("bankr1")->set_entry(1);
 		membank("bankr2")->set_entry(2);
 		membank("bankr3")->set_entry(2);
@@ -385,7 +384,7 @@ WRITE8_MEMBER( excali64_state::port70_w )
 	}
 	else
 	{
-	// select rom, videoram, and main ram
+		// select rom, videoram, and main ram
 		membank("bankr1")->set_entry(1);
 		membank("bankr2")->set_entry(1);
 		membank("bankr3")->set_entry(1);
@@ -515,7 +514,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 		fg = col_base + (col >> 4);
 		bg = 32 + ((col >> 1) & 7);
 
-		if BIT(col, 0)
+		if (BIT(col, 0))
 		{
 			UINT8 h = m_p_videoram[mem+0x1000] - 4;
 			if (h > 5)

@@ -238,7 +238,7 @@ WRITE8_MEMBER( gts3a_state::u4b_w )
 	bool clk_bit = BIT(data, 6);
 	if ((!m_dispclk) && clk_bit) // 0->1 is valid
 	{
-		if BIT(data, 5)
+		if (BIT(data, 5))
 			m_digit = 0;
 		else
 			m_digit++;
@@ -248,7 +248,7 @@ WRITE8_MEMBER( gts3a_state::u4b_w )
 	clk_bit = BIT(data, 1);
 	if ((!m_lampclk) && clk_bit) // 0->1 is valid
 	{
-		if BIT(data, 0)
+		if (BIT(data, 0))
 			m_row = 0;
 		else
 			m_row++;

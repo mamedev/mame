@@ -48,14 +48,14 @@ WRITE8_MEMBER(poly88_state::poly88_baud_rate_w)
 }
 
 UINT8 poly88_state::row_number(UINT8 code) {
-	if BIT(code,0) return 0;
-	if BIT(code,1) return 1;
-	if BIT(code,2) return 2;
-	if BIT(code,3) return 3;
-	if BIT(code,4) return 4;
-	if BIT(code,5) return 5;
-	if BIT(code,6) return 6;
-	if BIT(code,7) return 7;
+	if (BIT(code,0)) return 0;
+	if (BIT(code,1)) return 1;
+	if (BIT(code,2)) return 2;
+	if (BIT(code,3)) return 3;
+	if (BIT(code,4)) return 4;
+	if (BIT(code,5)) return 5;
+	if (BIT(code,6)) return 6;
+	if (BIT(code,7)) return 7;
 	return 0;
 }
 

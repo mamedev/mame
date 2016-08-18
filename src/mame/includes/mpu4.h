@@ -51,6 +51,7 @@ static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 
 static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
+//reel info
 #define STANDARD_REEL  0    // As originally designed 3/4 reels
 #define FIVE_REEL_5TO8 1    // Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel
 #define FIVE_REEL_8TO5 2    // Mounted backwards for space reasons, but different board
@@ -60,16 +61,19 @@ static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14
 #define SEVEN_REEL     6    // Mainly club machines, significant reworking of reel hardware
 #define FLUTTERBOX     7    // Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel
 
+//Lamp extension
 #define NO_EXTENDER         0 // As originally designed
 #define SMALL_CARD          1
 #define LARGE_CARD_A        2 //96 Lamps
 #define LARGE_CARD_B        3 //96 Lamps, 16 LEDs - as used by BwB
 #define LARGE_CARD_C        4 //Identical to B, no built in LED support
 
+//LED cards
 #define CARD_A          1
 #define CARD_B          2
 #define CARD_C          3
 
+//Hopper info
 #define TUBES               0
 #define HOPPER_DUART_A      1
 #define HOPPER_DUART_B      2
@@ -185,7 +189,26 @@ public:
 	DECLARE_DRIVER_INIT(m4default);
 	DECLARE_DRIVER_INIT(m4default_banks);
 	DECLARE_DRIVER_INIT(m4default_reels);
+	DECLARE_DRIVER_INIT(m4_low_volt_alt);
+	DECLARE_DRIVER_INIT(m4_five_reel_std);
+	DECLARE_DRIVER_INIT(m4_five_reel_rev);
+	DECLARE_DRIVER_INIT(m4_five_reel_alt);
+	DECLARE_DRIVER_INIT(m4_six_reel_std);
+	DECLARE_DRIVER_INIT(m4_six_reel_alt);
+	DECLARE_DRIVER_INIT(m4_seven_reel);	
 	DECLARE_DRIVER_INIT(m4_small_extender);
+	DECLARE_DRIVER_INIT(m4_large_extender_a);
+	DECLARE_DRIVER_INIT(m4_large_extender_b);
+	DECLARE_DRIVER_INIT(m4_large_extender_c);
+	DECLARE_DRIVER_INIT(m4_hopper_tubes);
+	DECLARE_DRIVER_INIT(m4_hopper_duart_a);
+	DECLARE_DRIVER_INIT(m4_hopper_duart_b);
+	DECLARE_DRIVER_INIT(m4_hopper_duart_c);
+	DECLARE_DRIVER_INIT(m4_hopper_nonduart_a);
+	DECLARE_DRIVER_INIT(m4_hopper_nonduart_b);
+	DECLARE_DRIVER_INIT(m4_led_a);
+	DECLARE_DRIVER_INIT(m4_led_b);
+	DECLARE_DRIVER_INIT(m4_led_c);
 	DECLARE_DRIVER_INIT(m4_andycp10c);
 	DECLARE_DRIVER_INIT(m_blsbys);
 	DECLARE_DRIVER_INIT(m_oldtmr);
@@ -201,7 +224,7 @@ public:
 	DECLARE_DRIVER_INIT(m4_showstring_big);
 	DECLARE_DRIVER_INIT(m_grtecpss);
 	DECLARE_DRIVER_INIT(connect4);
-	DECLARE_DRIVER_INIT(m4altreels);
+	DECLARE_DRIVER_INIT(m4altreels);//legacy, will be removed once things are sorted out
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
 	DECLARE_MACHINE_START(mpu4yam);
@@ -287,6 +310,7 @@ protected:
 	int m_ic23_active;
 	int m_led_lamp;
 	int m_link7a_connected;
+	int m_low_volt_detect_disable;
 	emu_timer *m_ic24_timer;
 	int m_expansion_latch;
 	int m_global_volume;

@@ -261,8 +261,19 @@ ROM_START(xforce)
 	ROM_LOAD16_BYTE("ic15", 0x0001, 0x8000, CRC(fb8d2853) SHA1(0b0004abfe32edfd3ac15d66f90695d264c97eba))
 	ROM_LOAD16_BYTE("ic17", 0x0000, 0x8000, CRC(122ef649) SHA1(0b425f81869bc359841377a91c39f44395502bff))
 
-	//ROM_REGION(0x20000), "cpu2", 0)
+	//ROM_REGION(0x20000, "cpu2", 0)
 	// 5 x 27256 roms are undumped
 ROM_END
 
+ROM_START(spcteam)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE("cpu_top.bin", 0x000001, 0x8000, CRC(b11dcf1f) SHA1(084eb98ee4c9f32d5518897a891ad1a601850d80))
+	ROM_LOAD16_BYTE("cpu_bot.bin", 0x000000, 0x8000, CRC(892a5592) SHA1(c30dce37a5aae2834459179787f6c99353aadabb))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sound.bin", 0x8000, 0x8000, CRC(6a87370f) SHA1(51e055dcf23a30e337ff439bba3c40e5c51c490a))
+	ROM_RELOAD(0, 0x8000)
+ROM_END
+
 GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  spcteam, 0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL) // needs correct layout

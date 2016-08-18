@@ -71,12 +71,6 @@ const UINT8 okim6295_device::s_volume_table[16] =
 	0x00,
 };
 
-// default address map
-static ADDRESS_MAP_START( okim6295, AS_0, 8, okim6295_device )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-ADDRESS_MAP_END
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -89,15 +83,13 @@ ADDRESS_MAP_END
 okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OKIM6295, "OKI6295", tag, owner, clock, "okim6295", __FILE__),
 		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_LITTLE, 8, 18, 0, nullptr, *ADDRESS_MAP_NAME(okim6295)),
+		device_rom_interface(mconfig, *this, 18),
 		m_region(*this, DEVICE_SELF),
 		m_command(-1),
 		m_bank_installed(false),
 		m_bank_offs(0),
 		m_stream(nullptr),
-		m_pin7_state(0),
-		m_direct(nullptr)
+		m_pin7_state(0)
 {
 }
 
@@ -120,9 +112,6 @@ void okim6295_device::static_set_pin7(device_t &device, int pin7)
 
 void okim6295_device::device_start()
 {
-	// find our direct access
-	m_direct = &space().direct();
-
 	// create the stream
 	int divisor = m_pin7_state ? 132 : 165;
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
@@ -180,17 +169,6 @@ void okim6295_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *okim6295_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
-
-
-//-------------------------------------------------
 //  stream_generate - handle update requests for
 //  our sound stream
 //-------------------------------------------------
@@ -202,7 +180,7 @@ void okim6295_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
-		elem.generate_adpcm(*m_direct, outputs[0], samples);
+		elem.generate_adpcm(*this, outputs[0], samples);
 }
 
 
@@ -304,14 +282,14 @@ void okim6295_device::write_command(UINT8 command)
 					// determine the start/stop positions
 					offs_t base = m_command * 8;
 
-					offs_t start = m_direct->read_byte(base + 0) << 16;
-					start |= m_direct->read_byte(base + 1) << 8;
-					start |= m_direct->read_byte(base + 2) << 0;
+					offs_t start = read_byte(base + 0) << 16;
+					start |= read_byte(base + 1) << 8;
+					start |= read_byte(base + 2) << 0;
 					start &= 0x3ffff;
 
-					offs_t stop = m_direct->read_byte(base + 3) << 16;
-					stop |= m_direct->read_byte(base + 4) << 8;
-					stop |= m_direct->read_byte(base + 5) << 0;
+					offs_t stop = read_byte(base + 3) << 16;
+					stop |= read_byte(base + 4) << 8;
+					stop |= read_byte(base + 5) << 0;
 					stop &= 0x3ffff;
 
 					if (start < stop)
@@ -396,7 +374,7 @@ okim6295_device::okim_voice::okim_voice()
 //  add them to an output stream
 //-------------------------------------------------
 
-void okim6295_device::okim_voice::generate_adpcm(direct_read_data &direct, stream_sample_t *buffer, int samples)
+void okim6295_device::okim_voice::generate_adpcm(device_rom_interface &rom, stream_sample_t *buffer, int samples)
 {
 	// skip if not active
 	if (!m_playing)
@@ -406,7 +384,7 @@ void okim6295_device::okim_voice::generate_adpcm(direct_read_data &direct, strea
 	while (samples-- != 0)
 	{
 		// fetch the next sample byte
-		int nibble = direct.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
+		int nibble = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 
 		// output to the buffer, scaling by the volume
 		// signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767

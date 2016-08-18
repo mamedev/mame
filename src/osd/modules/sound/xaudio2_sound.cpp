@@ -596,6 +596,10 @@ void sound_xaudio2::submit_needed()
 	XAUDIO2_VOICE_STATE state;
 	m_sourceVoice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
 
+	// If we have a too many buffers on the queue, flush to resync
+	if (state.BuffersQueued > 2)
+		m_sourceVoice->FlushSourceBuffers();
+
 	std::lock_guard<std::mutex> lock(m_buffer_lock);
 
 	// Roll the buffer

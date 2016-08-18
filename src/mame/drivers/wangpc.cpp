@@ -449,7 +449,7 @@ READ8_MEMBER( wangpc_state::busy_clr_r )
 {
 	if (LOG) logerror("%s: BUSY clear\n", machine().describe_context());
 
-	m_centronics_busy = 1;
+	m_centronics_busy = 0;
 	check_level1_interrupts();
 
 	return 0xff;
@@ -713,7 +713,7 @@ WRITE_LINE_MEMBER( wangpc_state::dack3_w )
 
 void wangpc_state::check_level1_interrupts()
 {
-	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_centronics_ack || !m_dav || !m_centronics_busy;
+	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_centronics_ack || !m_dav || m_centronics_busy;
 
 	m_pic->ir1_w(state);
 }
@@ -1191,4 +1191,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, driver_device, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, driver_device, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_SUPPORTS_SAVE )

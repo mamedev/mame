@@ -216,6 +216,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
 	DECLARE_MACHINE_START(cave);
 	DECLARE_MACHINE_RESET(cave);
+	DECLARE_MACHINE_RESET(sailormn);
 	DECLARE_VIDEO_START(cave_2_layers);
 	DECLARE_PALETTE_INIT(dfeveron);
 	DECLARE_VIDEO_START(cave_3_layers);
@@ -241,6 +242,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start_left);
 	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start_right);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_lev2_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(sailormn_startup);
 	void cave_get_sprite_info(int chip);
 	void cave_get_sprite_info_all();
 	void sailormn_tilebank_w(int bank);

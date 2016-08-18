@@ -593,11 +593,11 @@ static MACHINE_CONFIG_START( coh110, namcos11_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", 20013200, 228)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
+	MCFG_C352_ADD("c352", 25401600, 288)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
+	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
 	MCFG_AT28C16_ADD( "at28c16", nullptr )
 MACHINE_CONFIG_END

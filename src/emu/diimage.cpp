@@ -1255,53 +1255,6 @@ void device_image_interface::update_names(const device_type device_type, const c
 }
 
 //-------------------------------------------------
-//  software_name_split - helper that splits a
-//  software_list:software:part string into
-//  separate software_list, software, and part
-//  strings.
-//
-//  str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3
-//  str1:str2       => swlist_name - nullptr, swname - str1, swpart - str2
-//  str1            => swlist_name - nullptr, swname - str1, swpart - nullptr
-//
-//  Notice however that we could also have been
-//  passed a string swlist_name:swname, and thus
-//  some special check has to be performed in this
-//  case.
-//-------------------------------------------------
-
-void device_image_interface::software_name_split(const std::string &swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart)
-{
-	// reset all output parameters
-	swlist_name.clear();
-	swname.clear();
-	swpart.clear();
-
-	// if no colon, this is the swname by itself
-	auto split1 = swlist_swname.find_first_of(':');
-	if (split1 == std::string::npos)
-	{
-		swname = swlist_swname;
-		return;
-	}
-
-	// if one colon, it is the swname and swpart alone
-	auto split2 = swlist_swname.find_first_of(':', split1 + 1);
-	if (split2 == std::string::npos)
-	{
-		swname = swlist_swname.substr(0, split1);
-		swpart = swlist_swname.substr(split1 + 1);
-		return;
-	}
-
-	// if two colons present, split into 3 parts
-	swlist_name = swlist_swname.substr(0, split1);
-	swname = swlist_swname.substr(split1 + 1, split2 - (split1 + 1));
-	swpart = swlist_swname.substr(split2 + 1);
-}
-
-
-//-------------------------------------------------
 //	find_software_item
 //-------------------------------------------------
 
@@ -1309,7 +1262,8 @@ const software_part *device_image_interface::find_software_item(const std::strin
 {
 	// split full software name into software list name and short software name
 	std::string swlist_name, swinfo_name, swpart_name;
-	software_name_split(path, swlist_name, swinfo_name, swpart_name);
+	if (!software_name_parse(path, &swlist_name, &swinfo_name, &swpart_name))
+		return nullptr;
 
 	// determine interface
 	const char *interface = nullptr;

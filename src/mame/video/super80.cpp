@@ -75,7 +75,7 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 
 	if (screen_on)
 	{
-		if BIT(options, 5)
+		if (BIT(options, 5))
 			fg = 15;    /* b&w */
 		else
 			fg = 5;     /* green */
@@ -129,7 +129,7 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 
 	if (screen_on)
 	{
-		if BIT(options, 5)
+		if (BIT(options, 5))
 			fg = 15;    /* b&w */
 		else
 			fg = 5;     /* green */
@@ -177,7 +177,7 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 
 	if (screen_on)
 	{
-		if BIT(options, 5)
+		if (BIT(options, 5))
 			fg = 15;    /* b&w */
 		else
 			fg = 5;     /* green */
@@ -228,7 +228,7 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 
 	if (screen_on)
 	{
-		if BIT(options, 5)
+		if (BIT(options, 5))
 			fg = 15;    /* b&w */
 		else
 			fg = 5;     /* green */
@@ -299,7 +299,7 @@ static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x
 
 READ8_MEMBER( super80_state::super80v_low_r )
 {
-	if BIT(m_portf0, 2)
+	if (BIT(m_portf0, 2))
 		return m_p_videoram[offset];
 	else
 		return m_p_colorram[offset];
@@ -307,7 +307,7 @@ READ8_MEMBER( super80_state::super80v_low_r )
 
 WRITE8_MEMBER( super80_state::super80v_low_w )
 {
-	if BIT(m_portf0, 2)
+	if (BIT(m_portf0, 2))
 		m_p_videoram[offset] = data;
 	else
 		m_p_colorram[offset] = data;
@@ -318,7 +318,7 @@ READ8_MEMBER( super80_state::super80v_high_r )
 	if (!BIT(m_portf0, 2))
 		return m_p_colorram[0x800 | offset];
 	else
-	if BIT(m_portf0, 4)
+	if (BIT(m_portf0, 4))
 		return m_p_pcgram[0x800 | offset];
 	else
 		return m_p_pcgram[offset];
@@ -332,7 +332,7 @@ WRITE8_MEMBER( super80_state::super80v_high_w )
 	{
 		m_p_videoram[0x800 | offset] = data;
 
-		if BIT(m_portf0, 4)
+		if (BIT(m_portf0, 4))
 			m_p_pcgram[0x800 | offset] = data;
 	}
 }

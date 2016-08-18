@@ -419,7 +419,7 @@ void gb_lcd_device::common_reset()
 	// specific reg initialization
 	m_vid_regs[0x06] = 0xff;
 
-	for (int i = 0x0c; i < _NR_GB_VID_REGS; i++)
+	for (int i = 0x0c; i < NR_GB_VID_REGS; i++)
 		m_vid_regs[i] = 0xff;
 
 	LCDSTAT = 0x80;

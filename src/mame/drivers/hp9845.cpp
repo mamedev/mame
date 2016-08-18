@@ -21,11 +21,11 @@
 // - T15 tape drive
 // - Software list to load optional ROMs
 // - Beeper
+// - Correct character generator ROMs (a huge "thank you" to Ansgar Kueckes for the dumps!)
 // What's not yet in:
 // - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
 // What's wrong:
-// - I'm using character generator from HP64K (another driver of mine): no known dump of the original one
 // - Speed, as usual
 
 #include "emu.h"
@@ -170,6 +170,9 @@ private:
 
 	// Character generator
 	const UINT8 *m_chargen;
+
+	// Optional character generator
+	const UINT8 *m_optional_chargen;
 
 		// Text mode video I/F
 		typedef struct {
@@ -394,6 +397,8 @@ void hp9845b_state::machine_start()
 
 		m_chargen = memregion("chargen")->base();
 
+	m_optional_chargen = memregion("optional_chargen")->base();
+
 				m_graphic_mem.resize(GVIDEO_MEM_SIZE);
 }
 
@@ -517,10 +522,8 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 				for (unsigned i = 0; i < 80; i++) {
 						UINT8 charcode = m_video_buff[ buff_idx ].chars[ i ];
 						UINT8 attrs = m_video_buff[ buff_idx ].attrs[ i ];
-						UINT8 chargen_byte = m_chargen[ line_in_row  | ((unsigned)charcode << 4) ];
+						UINT16 chrgen_addr = ((UINT16)(charcode ^ 0x7f) << 4) | line_in_row;
 						UINT16 pixels;
-
-						// TODO: Check if order of bits in "pixels" is ok
 
 						if ((ul_line && BIT(attrs , 3)) ||
 							(cursor_line && cursor_blink && BIT(attrs , 0))) {
@@ -528,10 +531,9 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 						} else if (char_blink && BIT(attrs , 2)) {
 								pixels = 0;
 						} else if (BIT(attrs , 4)) {
-								// Optional character generator ROM not installed, it reads as 1 everywhere
-								pixels = 0x7f << 1;
+							pixels = (UINT16)(m_optional_chargen[ chrgen_addr ] & 0x7f) << 1;
 						} else {
-								pixels = (UINT16)(chargen_byte & 0x7f) << 1;
+							pixels = (UINT16)(m_chargen[ chrgen_addr ] & 0x7f) << 1;
 						}
 
 						if (BIT(attrs , 1)) {
@@ -539,7 +541,7 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 						}
 
 						for (unsigned j = 0; j < 9; j++) {
-								bool pixel = (pixels & (1U << (8 - j))) != 0;
+								bool pixel = (pixels & (1U << j)) != 0;
 
 								m_bitmap.pix32(video_scanline , i * 9 + j) = pen[ pixel ? 1 : 0 ];
 						}
@@ -1220,8 +1222,10 @@ ROM_END
 
 ROM_START( hp9845b )
 	ROM_REGION(0x800 , "chargen" , 0)
-		// Don't have the real character generator from HP9845, use the one from HP64000 for now
-	ROM_LOAD("1818_2668.bin" , 0 , 0x800 , BAD_DUMP CRC(32a52664) SHA1(8b2a49a32510103ff424e8481d5ed9887f609f2f))
+	ROM_LOAD("chrgen.bin" , 0 , 0x800 , CRC(fe9e844f) SHA1(0c45ae00766ceba94a19bd5e154bd6d23e208cca))
+
+	ROM_REGION(0x800 , "optional_chargen" , 0)
+	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
 		ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
 		ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))

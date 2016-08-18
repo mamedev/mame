@@ -344,7 +344,7 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		break;
 	case 7: // put the constant from PROM (RSELECT,BS) on the bus
 		pa = (rsel << 3) | bs;
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o", const_prom[pa]);
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o ", const_prom[pa]);
 		break;
 	default:
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "F1_%02o ", f1);
@@ -386,6 +386,8 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-F2_%02o ", f2);
 		break;
 	}
+	if (dst > buffer && dst[-1] == ' ')
+		*--dst = '\0';
 
 	return result;
 }

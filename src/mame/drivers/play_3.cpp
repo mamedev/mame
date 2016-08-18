@@ -13,7 +13,7 @@ Status:
 - Mechanical sounds to add
 
 ***********************************************************************************/
-
+#if 0
 
 #include "machine/genpin.h"
 #include "cpu/cosmac/cosmac.h"
@@ -217,3 +217,4 @@ ROM_END
 
 GAME(1983,  megaaton,  0,         play_3,  play_3, play_3_state,  play_3,  ROT0,  "Playmatic",    "Meg-Aaton",     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  megaatona, megaaton,  play_3,  play_3, play_3_state,  play_3,  ROT0,  "Playmatic",    "Meg-Aaton (alternate set)",     MACHINE_IS_SKELETON_MECHANICAL)
+#endif

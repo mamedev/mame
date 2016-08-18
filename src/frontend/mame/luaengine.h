@@ -62,7 +62,7 @@ public:
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
 	void on_frame_done();
-	void call_plugin(const char *data, const char *name);
+	const char *call_plugin(const char *data, const char *name);
 
 private:
 	struct hook {

@@ -43,7 +43,6 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 #define MPLLCON  1
 #define UPLLCON  2
 
-#define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&((1<<((m)-(n)+1))-1))
 
 

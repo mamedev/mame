@@ -12,9 +12,6 @@
 #include "emu.h"
 
 
-#define _NR_GB_VID_REGS     0x40
-
-
 struct layer_struct {
 	UINT8  enabled;
 	UINT8  *bg_tiles;
@@ -82,7 +79,9 @@ protected:
 
 	int m_window_lines_drawn;
 
-	UINT8   m_vid_regs[_NR_GB_VID_REGS];
+	static constexpr unsigned NR_GB_VID_REGS = 0x40;
+
+	UINT8   m_vid_regs[NR_GB_VID_REGS];
 	UINT8   m_bg_zbuf[160];
 
 	UINT16  m_cgb_bpal[32];   /* CGB current background palette table */

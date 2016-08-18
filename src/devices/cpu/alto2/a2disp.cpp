@@ -245,11 +245,12 @@ static const UINT16 double_bits[256] = {
 //! update the internal frame buffer and draw the scanline segment if changed
 void alto2_cpu_device::update_framebuf_word(UINT16* framebuf, int x, int y, UINT16 word)
 {
+	int xpword = (m_dsp.xpreg ^ 01777) / 16;
 	// mixing with the cursor
-	if (x == m_dsp.curxpos + 0)
-		word ^= m_dsp.cursor0;
-	if (x == m_dsp.curxpos + 1)
-		word ^= m_dsp.cursor1;
+	if (x == xpword++)
+		word ^= (m_dsp.csr << (m_dsp.xpreg % 16)) >> 16;
+	if (x == xpword) 
+		word ^= (m_dsp.csr << (m_dsp.xpreg % 16)) & 0xffff;
 	// no change?
 	if (word == framebuf[x])
 		return;
@@ -263,14 +264,14 @@ void alto2_cpu_device::update_framebuf_word(UINT16* framebuf, int x, int y, UINT
 void alto2_cpu_device::unload_word()
 {
 	int x = m_unload_word;
-	int y = ((m_dsp.hlc - m_dsp.vblank) & ~02001) ^ HLC1024;
+	int y = m_dsp.scanline;
 
-	if (y < 0 || y >= ALTO2_DISPLAY_HEIGHT || x >= ALTO2_DISPLAY_VISIBLE_WORDS)
+	if (y < 0 || y >= ALTO2_DISPLAY_TOTAL_HEIGHT || x >= ALTO2_DISPLAY_VISIBLE_WORDS)
 	{
 		m_unload_time = -1;
 		return;
 	}
-	UINT16* framebuf = m_dsp.framebuf.get()  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
+	UINT16* framebuf = m_dsp.framebuf.get() + y * ALTO2_DISPLAY_SCANLINE_WORDS;
 	UINT16 word = m_dsp.inverse;
 	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (FIFO_MBEMPTY(a38))
@@ -329,8 +330,14 @@ void alto2_cpu_device::display_state_machine()
 	{
 		// count horizontal line counters and wrap
 		m_dsp.hlc += 1;
-		if (m_dsp.hlc > ALTO2_DISPLAY_HLC_END)
+		if (m_dsp.hlc > ALTO2_DISPLAY_HLC_END) {
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
+			m_dsp.scanline = 30;
+			m_dsp.vsync = true;
+		} else if (m_dsp.hlc == 1024) {
+			m_dsp.vsync = true;
+			m_dsp.scanline = 31;
+		}
 		// wake up the memory refresh task _twice_ on each scanline
 		m_task_wakeup |= 1 << task_mrt;
 	}
@@ -342,9 +349,6 @@ void alto2_cpu_device::display_state_machine()
 
 	if (A66_VBLANK(a66))
 	{
-		// Rising edge of VBLANK: remember HLC[1-10] where the VBLANK starts
-		m_dsp.vblank = m_dsp.hlc & ~(1 << 10);
-
 		LOG((this,LOG_DISPL,1, " VBLANK"));
 
 		// VSYNC is always within VBLANK, thus we handle it only here
@@ -357,6 +361,7 @@ void alto2_cpu_device::display_state_machine()
 			 */
 			m_task_wakeup |= 1 << task_dvt;
 		}
+		m_dsp.inverse = 0xffff;
 	}
 	else
 	{
@@ -385,9 +390,10 @@ void alto2_cpu_device::display_state_machine()
 		}
 		if (!A63_HBLANK(a63) && A63_HBLANK(m_dsp.a63))
 		{
+			m_dsp.scanline += 2;
 			// Falling edge of a63 HBLANK starts unloading of FIFO words
 			LOG((this,LOG_DISPL,1, " HBLANK\\ UNLOAD"));
-			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
+			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 40+32 : 40+16);
 			m_unload_word = 0;
 		}
 	}
@@ -470,7 +476,7 @@ void alto2_cpu_device::display_state_machine()
  */
 void alto2_cpu_device::f2_late_evenfield()
 {
-	UINT16 r = HLC1024 ^ 1;
+	UINT16 r = m_dsp.odd ? 0 : 1;
 	LOG((this,LOG_DISPL,2,"  EVENFIELD branch (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 }
@@ -499,12 +505,8 @@ void alto2_cpu_device::init_disp()
 	save_item(NAME(m_dsp.dwt_blocks));
 	save_item(NAME(m_dsp.curt_blocks));
 	save_item(NAME(m_dsp.curt_wakeup));
-	save_item(NAME(m_dsp.vblank));
 	save_item(NAME(m_dsp.xpreg));
 	save_item(NAME(m_dsp.csr));
-	save_item(NAME(m_dsp.curxpos));
-	save_item(NAME(m_dsp.cursor0));
-	save_item(NAME(m_dsp.cursor1));
 
 	m_disp_a38 = prom_load(machine(), &pl_displ_a38, memregion("displ_a38")->base());
 	m_disp_a63 = prom_load(machine(), &pl_displ_a63, memregion("displ_a63")->base());
@@ -512,7 +514,7 @@ void alto2_cpu_device::init_disp()
 
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 
-	m_dsp.framebuf = std::make_unique<UINT16[]>(ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	m_dsp.framebuf = std::make_unique<UINT16[]>(ALTO2_DISPLAY_TOTAL_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 	m_dsp.patterns = auto_alloc_array(machine(), UINT8, 65536 * 16);
 	for (int y = 0; y < 65536; y++) {
 		UINT8* dst = m_dsp.patterns + y * 16;
@@ -520,7 +522,8 @@ void alto2_cpu_device::init_disp()
 			*dst++ = (~y >> (15 - x)) & 1;
 	}
 
-	m_dsp.bitmap = std::make_unique<bitmap_ind16>(ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT);
+	// Allocate a bitmap including the V/H blank areas
+	m_dsp.bitmap = std::make_unique<bitmap_ind16>(ALTO2_DISPLAY_TOTAL_WIDTH, ALTO2_DISPLAY_TOTAL_HEIGHT);
 	m_dsp.state = 0;
 }
 
@@ -537,6 +540,7 @@ void alto2_cpu_device::reset_disp()
 	m_dsp.a66 = 0;
 	m_dsp.setmode = 0;
 	m_dsp.inverse = 0;
+	m_dsp.scanline = 30;
 	m_dsp.halfclock = false;
 	m_dsp.wa = 0;
 	m_dsp.ra = 0;
@@ -544,12 +548,10 @@ void alto2_cpu_device::reset_disp()
 	m_dsp.dwt_blocks = false;
 	m_dsp.curt_blocks = false;
 	m_dsp.curt_wakeup = false;
-	m_dsp.vblank = 0;
+	m_dsp.vsync = false;
+	m_dsp.odd = false;
 	m_dsp.xpreg = 0;
 	m_dsp.csr = 0;
-	m_dsp.curxpos = 0;
-	m_dsp.cursor0 = 0;
-	m_dsp.cursor1 = 0;
 	memset(m_dsp.framebuf.get(), 1, sizeof(UINT16) * ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 }
 
@@ -557,10 +559,7 @@ void alto2_cpu_device::reset_disp()
 UINT32 alto2_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, *m_dsp.bitmap, 0, 0, 0, 0, cliprect);
+	m_dsp.vsync = false;
+		m_dsp.odd = !m_dsp.odd;
 	return 0;
-}
-
-void alto2_cpu_device::screen_eof(screen_device &screen, bool state)
-{
-	// FIXME: do we need this in some way?
 }

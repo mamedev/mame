@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DEVFIND_H__
-#define __DEVFIND_H__
+#ifndef MAME_EMU_DEVFIND_H
+#define MAME_EMU_DEVFIND_H
 
 #define FINDER_DUMMY_TAG "finder_dummy_tag"
 
@@ -350,7 +350,7 @@ public:
 
 	// operators to make use transparent
 	operator _PointerType *() const { return this->m_target; }
-	_PointerType operator[](int index) const { assert(index < m_length); return this->m_target[index]; }
+	const _PointerType &operator[](int index) const { assert(index < m_length); return this->m_target[index]; }
 	_PointerType &operator[](int index) { assert(index < m_length); return this->m_target[index]; }
 
 	// setter for setting the object and its length
@@ -409,7 +409,7 @@ public:
 
 	// operators to make use transparent
 	operator _PointerType *() const { return this->m_target; }
-	_PointerType operator[](int index) const { return this->m_target[index]; }
+	const _PointerType &operator[](int index) const { return this->m_target[index]; }
 	_PointerType &operator[](int index) { return this->m_target[index]; }
 
 	// getter for explicit fetching
@@ -507,4 +507,4 @@ public:
 };
 
 
-#endif  /* __DEVFIND_H__ */
+#endif  /* MAME_EMU_DEVFIND_H */

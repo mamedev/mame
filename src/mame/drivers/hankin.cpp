@@ -255,22 +255,17 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 
 	if (!m_ic11_ca2)
 	{
-		if BIT(data, 2)
+		if (BIT(data, 2))
 			m_digit = 5;
-		else
-		if BIT(data, 3)
+		else if (BIT(data, 3))
 			m_digit = 4;
-		else
-		if BIT(data, 4)
+		else if (BIT(data, 4))
 			m_digit = 3;
-		else
-		if BIT(data, 5)
+		else if (BIT(data, 5))
 			m_digit = 2;
-		else
-		if BIT(data, 6)
+		else if (BIT(data, 6))
 			m_digit = 1;
-		else
-		if BIT(data, 7)
+		else if (BIT(data, 7))
 			m_digit = 0;
 
 		// This machine has a 10-segment display, however the only

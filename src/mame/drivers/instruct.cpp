@@ -107,7 +107,7 @@ WRITE8_MEMBER( instruct_state::port_w )
 // cassette port
 WRITE8_MEMBER( instruct_state::portf8_w )
 {
-	if BIT(data, 4)
+	if (BIT(data, 4))
 		m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
 	else
 		m_cass->output(0.0);
@@ -179,14 +179,14 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 	UINT8 hwkeys = ioport("HW")->read();
 
 	// check RST key
-	if BIT(hwkeys, 3)
+	if (BIT(hwkeys, 3))
 	{
 		m_maincpu->set_state_int(S2650_PC, 0);
 		return;
 	}
 	else
 	// check MON key
-	if BIT(hwkeys, 2)
+	if (BIT(hwkeys, 2))
 	{
 		m_maincpu->set_state_int(S2650_PC, 0x1800);
 		return;
@@ -199,7 +199,7 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 		UINT8 vector = BIT(switches, 0) ? 0x87 : 0x07;
 
 		// Check INT sw & key
-		if BIT(switches, 1)
+		if (BIT(switches, 1))
 			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector);
 		else
 		// process ac input

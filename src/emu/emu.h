@@ -67,6 +67,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "devfind.h"
 #include "distate.h"
 #include "dimemory.h"
+#include "dirom.h"
 #include "diexec.h"
 #include "opresolv.h"
 #include "digfx.h"

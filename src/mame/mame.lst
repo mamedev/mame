@@ -1044,10 +1044,13 @@ dinoeggs                        //
 mystcast                        //
 mystcasta                       //
 pstlpkr                         //
+pstlpkr1                        //
 punchy                          //
+punchy3                         //
 usafootb                        //
 wrldtour                        //
 wrldtour2                       //
+wrldtour3                       //
 
 @source:amaticmg.cpp
 am_mg24                         // (c) 2000 Amatic
@@ -9028,6 +9031,7 @@ bsb105                          //
 bsv100r                         //
 bsv102r                         //
 bsv103                          //
+bsv102                          //
 ffv101                          //
 ffv104                          //
 ghv101                          //
@@ -9076,6 +9080,12 @@ agalletj                        // (c) 1996 Banpresto / Gazelle (country is in E
 agalletk                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
 agallett                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
 agalletu                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalleta                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletah                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletaj                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletak                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletat                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletau                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
 crusherm                        // (c) 1999 Takumi
 ddonpach                        // (c) 1997 Atlus/Cave
 ddonpacha                       // hack
@@ -9362,10 +9372,12 @@ mj3evo                          // 2007.06 Sega Network Taisen Mahjong MJ 3 Evol
 ollie                           // 2004.03 Ollie King
 outr2                           // 2003.12 Outrun 2 (Rev A)
 outr2st                         // 2004.12 Outrun 2 Special Tours (Rev A)
+outr2stj                        // 2004.12 Outrun 2 Special Tours (Japan) (Rev A)
 scg06nt                         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 vcop3a                          // 2003.02.26 Virtua Cop 3 (Rev A)
 vcop3                           // 2003.05.21 Virtua Cop 3 (Rev B)
 wangmid                         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
+wangmidj                        // 2004.06 Wangan Midnight Maximum Tune (Japan) (Rev B)
 wangmid2                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
 wangmid2j                       // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
 questofd                        // 2004.09 Quest of D (CDV-10005C)
@@ -9495,6 +9507,9 @@ firebatl                        // (c) 1984 Taito
 
 @source:cm1800.cpp
 cm1800                          //
+
+@source:cmi.cpp
+cmi2x                           // Fairlight CMI IIx
 
 @source:cmmb.cpp
 cmmb162                         //
@@ -10137,9 +10152,10 @@ ssf2tu                          // 23/03/1994 (c) 1994 (USA)
 ssf2tur1                        // 23/02/1994 (c) 1994 (USA)
 ssf2u                           // 11/09/1993 (c) 1993 (USA)
 ssf2ud                          //
-ssf2xj                          // 23/02/1994 (c) 1994 (Japan)
-ssf2xjd                         //
-ssf2xjr                         // 23/02/1994 (c) 1994 (Japan)
+ssf2xj                          // 11/03/1994 (c) 1994 (Japan)
+ssf2xjr1                        // 23/02/1994 (c) 1994 (Japan)
+ssf2xjr1d                       //
+ssf2xjr1r                       // 23/02/1994 (c) 1994 (Japan)
 uecology                        // 03/12/1993 (c) 1994 (Japan)
 vampj                           // 05/07/1994 (c) 1994 (Japan)
 vampja                          // 05/07/1994 (c) 1994 (Japan)
@@ -11843,6 +11859,7 @@ poizone                         // (c) 1990 Sisteme
 deluxe5                         // (c) 2000 ESD
 deluxe5a                        // (c) 2000 ESD
 deluxe5b                        // (c) 2000 ESD
+deluxe4u						// (c) 2000 ESD
 hedpanic                        // (c) 2000 ESD
 hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
 hedpanico                       // (c) 1999 ESD
@@ -14039,6 +14056,9 @@ mwcbaseb                        // Mattel
 packmon                         // Bandai
 pairmtch                        // Bandai
 pbqbert                         // Parker Brothers
+sag_si2                         // Entex
+sag_bb4                         // Entex
+sag_pb                          // Entex
 tmtron                          // Tomy
 vinvader                        // VTech
 zackman                         // Bandai
@@ -14902,6 +14922,8 @@ halleya                         //
 lortium                         //
 olympus                         //
 petaco                          //
+petacon                         //
+petacona                        //
 petaco2                         //
 pimbal                          //
 
@@ -16486,6 +16508,7 @@ kinstp                          // (c) 1994 Rare
 
 @source:kissproto.cpp
 kissp                           //
+kissp2                          //
 
 @source:klax.cpp
 klax                            // 136075           (c) 1989
@@ -19711,7 +19734,8 @@ mephistp1                       //
 
 @source:merit.cpp
 bigappg                         // (c) 1986 Merit / Big Apple Games
-casino5                         // (c) 1984 Merit
+casino5                         // (c) 1989 Merit
+casino5a                        // (c) 1984 Merit
 chkndraw                        // (c) 1984 Merit
 couple                          // (c) 1988 Merit
 couplei                         // (c) 1988 Merit
@@ -19722,7 +19746,8 @@ dodgectyc                       // (c) 1986 Merit
 dtrvwz5                         // (c) 1987 Merit
 iowapp                          // (c) 1990 Merit
 misdraw                         // (c) 1986 Merit / Big Apple Games
-mpchoice                        // (c) 1986 Merit
+mdchoice                        // (c) 1983 Merit
+mpchoice                        // (c) 1983 Merit
 mroundup                        // (c) 1984 Merit
 phrcraze                        // (c) 1986 Merit
 phrcrazea                       // (c) 1986 Merit
@@ -20052,6 +20077,7 @@ term2                           // (c) 1992 Midway
 term2la1                        // (c) 1992 Midway
 term2la2                        // (c) 1992 Midway
 term2la3                        // (c) 1992 Midway
+term2lg1                        // (c) 1992 Midway
 totcarn                         // (c) 1992 Midway
 totcarnp                        // (c) 1992 Midway
 trog                            // (c) 1990 Midway
@@ -30047,6 +30073,7 @@ superpet                        //
 
 @source:peyper.cpp
 gamatros                        //
+hangonp                         //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
@@ -30348,8 +30375,12 @@ megaatona                       //
 
 @source:play_5.cpp
 fldragon                        //
+fldragona                       //
+ironball                        //
 kz26                            //
+msdisco                         //
 nautilus                        //
+phntmshp                        //
 rock2500                        //
 sklflite                        //
 spain82                         //
@@ -32170,6 +32201,7 @@ hangon1                         // (c) 1985
 hangon2                         // (c) 1985
 shangonrb                       // (c) 1992 (but bootleg, hangon hw?)
 shangonro                       // (c) 1987 (FD1094)
+shangonho						// (c) 1987 (FD1094)
 sharrier                        // (c) 1985
 sharrier1                       // (c) 1985
 
@@ -33277,7 +33309,10 @@ slapshot                        // D71 (c) 1994 Taito Corporation (Japan)
 slc1                            //
 
 @source:sleic.cpp
+bikerace                        //
+bikerace2                       //
 sleicpin                        //
+iomoon                          //
 
 @source:slicer.cpp
 slicer                          // 1983 Slicer Computers
@@ -34918,6 +34953,7 @@ tecjmon                         // Talking Electronics Computer
 
 @source:techno.cpp
 xforce                          //
+spcteam                         //
 
 @source:tecmo.cpp
 backfirt                        // bootleg [(c) 1988 Tecmo]
@@ -36206,6 +36242,9 @@ wcombatj                        // 2002
 wcombatk                        // 2002
 wcombatu                        // 2002
 xtrial                          // 2002
+
+@source:vis.cpp
+vis
 
 @source:vixen.cpp
 vixen                           //
@@ -37548,3 +37587,7 @@ ts1500                          // Timex Sinclair 1500
 zx80                            // 1980 Sinclair ZX-80
 zx81                            // 1981 Sinclair ZX-81
 zx97                            //
+
+@source:vgmplay.cpp
+vgmplay
+

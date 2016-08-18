@@ -130,7 +130,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual void interrupt(int int_num, int trap = 1);
-	bool common_op(UINT8 op);
+	virtual bool common_op(UINT8 op);
 
 	// Accessing memory and io
 	inline UINT8 read_byte(UINT32 addr);

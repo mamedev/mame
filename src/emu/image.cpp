@@ -10,19 +10,13 @@
 ***************************************************************************/
 
 #include <ctype.h>
-#include <regex>
 
 #include "emu.h"
 #include "emuopts.h"
 #include "image.h"
 #include "config.h"
 #include "xmlfile.h"
-
-//**************************************************************************
-//  STATIC VARIABLES
-//**************************************************************************
-
-static std::regex s_potenial_softlist_regex("\\w+(\\:\\w+\\:\\w+)?");
+#include "softlist.h"
 
 
 //**************************************************************************
@@ -54,7 +48,7 @@ image_manager::image_manager(running_machine &machine)
 			image.set_init_phase();
 
 			// try as a softlist
-			if (std::regex_match(image_name, s_potenial_softlist_regex))
+			if (software_name_parse(image_name))
 				result = image.load_software(image_name);
 
 			// failing that, try as an image

@@ -145,7 +145,7 @@ private:
 
 READ8_MEMBER( apf_state::videoram_r )
 {
-	if BIT(m_pad_data, 7) // AG line
+	if (BIT(m_pad_data, 7)) // AG line
 	{
 		// Need the cpu and crtc to be locked together for proper graphics
 		// This is a hack to fix Rocket Patrol and Blackjack

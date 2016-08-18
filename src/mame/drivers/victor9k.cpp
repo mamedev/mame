@@ -10,16 +10,15 @@
 
     TODO:
 
+    - contrast
+    - MC6852
+    - codec sound
     - expansion bus
         - Z80 card
         - Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
         - RAM cards
         - clock cards
     - floppy 8048
-    - hires graphics
-    - brightness/contrast
-    - MC6852
-    - codec sound
 
 */
 
@@ -86,46 +85,80 @@ INPUT_PORTS_END
 //  MC6845
 //-------------------------------------------------
 
-#define CODE_NON_DISPLAY    0x1000
-#define CODE_UNDERLINE      0x2000
-#define CODE_LOW_INTENSITY  0x4000
-#define CODE_REVERSE_VIDEO  0x8000
+#define DC_SECRET   0x1000
+#define DC_UNDLN    0x2000
+#define DC_LOWINT  	0x4000
+#define DC_RVS  	0x8000
 
 MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 {
+	int hires = BIT(ma, 13);
+	int dot_addr = BIT(ma, 12);
+	int width = hires ? 16 : 10;
+
+	if (m_hires != hires)
+	{
+		m_hires = hires;
+		m_crtc->set_clock(XTAL_30MHz / width);
+		m_crtc->set_hpixels_per_column(width);
+	}
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	
+	int x = hbp;
 
-	if (BIT(ma, 13))
-	{
-		fatalerror("Graphics mode not supported!\n");
-	}
-	else
-	{
-		UINT16 video_ram_addr = (ma & 0xfff) << 1;
+	offs_t aa = (ma & 0x7ff) << 1;
 
-		for (int sx = 0; sx < x_count; sx++)
+	for (int sx = 0; sx < x_count; sx++)
+	{
+		UINT16 dc = (m_video_ram[aa + 1] << 8) | m_video_ram[aa];
+		offs_t ab = (dot_addr << 15) | ((dc & 0x7ff) << 4) | (ra & 0x0f);
+		UINT16 dd = program.read_word(ab << 1);
+
+		int cursor = (sx == cursor_x) ? 1 : 0;
+		int undln = !((dc & DC_UNDLN) && BIT(dd, 15)) ? 2 : 0;
+		int rvs = (dc & DC_RVS) ? 4 : 0;
+		int secret = (dc & DC_SECRET) ? 1 : 0;
+		int lowint = (dc & DC_LOWINT) ? 1 : 0;
+
+		for (int bit = 0; bit < width; bit++)
 		{
-			UINT16 code = (m_video_ram[video_ram_addr + 1] << 8) | m_video_ram[video_ram_addr];
-			UINT32 char_ram_addr = (BIT(ma, 12) << 16) | ((code & 0xff) << 5) | (ra << 1);
-			UINT16 data = program.read_word(char_ram_addr);
+			int pixel = 0;
 
-			if (code & CODE_REVERSE_VIDEO) data ^= 0xffff;
-			if (code & CODE_NON_DISPLAY) data = 0;
-			if (sx == cursor_x) data = 0xffff;
-
-			for (int x = 0; x <= 10; x++)
+			switch (rvs | undln | cursor)
 			{
-				int pixel = BIT(data, x);
-				int color = palette[pixel && de];
-				if (!(code & CODE_LOW_INTENSITY) && color) color = 2;
+			case 0:	case 5:
+				pixel = 1;
+				break;
 
-				bitmap.pix32(vbp + y, hbp + x + sx*10) = color;
+			case 1: case 4:
+				pixel = 0;
+				break;
+
+			case 2: case 7:
+				pixel = !(!(BIT(dd, bit) && !secret));
+				break;
+
+			case 3: case 6:
+				pixel = !(BIT(dd, bit) && !secret);
+				break;
 			}
 
-			video_ram_addr += 2;
-			video_ram_addr &= 0xfff;
+			int color = 0;
+
+			if (pixel && de)
+			{
+				int pen = 1 + m_brt;
+				if (!lowint) pen = 9;
+				color = palette[pen];
+			}
+
+			bitmap.pix32(vbp + y, x++) = color;
 		}
+
+		aa += 2;
+		aa &= 0xfff;
 	}
 }
 
@@ -173,6 +206,14 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 	m_ssda_irq = state;
 
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
+}
+
+
+WRITE_LINE_MEMBER( victor9k_state::ssda_sm_dtr_w )
+{
+	m_ssda->cts_w(state);
+	m_ssda->dcd_w(!state);
+	//m_cvsd->enc_dec_w(!state);
 }
 
 
@@ -312,6 +353,8 @@ WRITE8_MEMBER( victor9k_state::via2_pb_w )
 
 	// contrast
 	m_cont = data >> 5;
+
+	if (LOG) logerror("BRT %u CONT %u\n", m_brt, m_cont);
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
@@ -365,8 +408,9 @@ WRITE_LINE_MEMBER( victor9k_state::write_rib )
 WRITE8_MEMBER( victor9k_state::via3_pb_w )
 {
 	// codec clock output
-	m_ssda->rx_clk_w(BIT(data, 7));
-	m_ssda->tx_clk_w(BIT(data, 7));
+	m_ssda->rx_clk_w(!BIT(data, 7));
+	m_ssda->tx_clk_w(!BIT(data, 7));
+	m_cvsd->clock_w(!BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
@@ -412,6 +456,30 @@ WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
+PALETTE_INIT_MEMBER(victor9k_state, victor9k)
+{
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+
+	// BRT0 82K
+	// BRT1 39K
+	// BRT2 20K
+	// 12V 220K pullup
+	palette.set_pen_color(1, rgb_t(0x00, 0x10, 0x00));
+	palette.set_pen_color(2, rgb_t(0x00, 0x20, 0x00));
+	palette.set_pen_color(3, rgb_t(0x00, 0x40, 0x00));
+	palette.set_pen_color(4, rgb_t(0x00, 0x60, 0x00));
+	palette.set_pen_color(5, rgb_t(0x00, 0x80, 0x00));
+	palette.set_pen_color(6, rgb_t(0x00, 0xa0, 0x00));
+	palette.set_pen_color(7, rgb_t(0x00, 0xc0, 0x00));
+	palette.set_pen_color(8, rgb_t(0x00, 0xff, 0x00));
+
+	// CONT0 620R
+	// CONT1 332R
+	// CONT2 162R
+	// 12V 110R pullup
+	palette.set_pen_color(9, rgb_t(0xff, 0x00, 0x00));
+}
+
 void victor9k_state::machine_start()
 {
 	// state saving
@@ -425,6 +493,7 @@ void victor9k_state::machine_start()
 	save_item(NAME(m_kbrdy));
 	save_item(NAME(m_kbackctl));
 
+#ifndef USE_SCP
 	// patch out SCP self test
 	m_rom->base()[0x11ab] = 0xc3;
 
@@ -433,6 +502,7 @@ void victor9k_state::machine_start()
 	m_rom->base()[0x1d52] = 0x90;
 	m_rom->base()[0x1d53] = 0x90;
 	m_rom->base()[0x1d54] = 0x90;
+#endif
 }
 
 void victor9k_state::machine_reset()
@@ -470,10 +540,10 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505S_TAG, hd6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(victor9k_state, victor9k)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
-
-	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, XTAL_30MHz/11) // HD6845 == HD46505S
+	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, XTAL_30MHz/10) // HD6845 == HD46505S
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(10)
 	MCFG_MC6845_UPDATE_ROW_CB(victor9k_state, crtc_update_row)
@@ -481,7 +551,8 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(HC55516_TAG, HC55516, 100000)
+	MCFG_SOUND_ADD(HC55516_TAG, HC55516, 0)
+	//MCFG_HC55516_DIG_OUT_CB(DEVWRITELINE(MC6852_TAG, mc6852_device, rx_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -516,6 +587,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	MCFG_DEVICE_ADD(MC6852_TAG, MC6852, XTAL_30MHz/30)
 	MCFG_MC6852_TX_DATA_CALLBACK(DEVWRITELINE(HC55516_TAG, hc55516_device, digit_w))
+	MCFG_MC6852_SM_DTR_CALLBACK(WRITELINE(victor9k_state, ssda_sm_dtr_w))
 	MCFG_MC6852_IRQ_CALLBACK(WRITELINE(victor9k_state, ssda_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL_30MHz/30)
@@ -598,4 +670,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, driver_device, 0,    "Victor Business Products", "Victor 9000",   MACHINE_NOT_WORKING )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, driver_device, 0,    "Victor Business Products", "Victor 9000",   MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

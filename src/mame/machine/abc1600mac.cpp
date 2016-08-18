@@ -137,7 +137,7 @@ void abc1600_mac_device::device_start()
 
 	// HACK fill segment RAM or abcenix won't boot
 	memset(m_segment_ram, 0xcd, 0x400);
-	memset(m_page_ram, 0xcd, 0x400);
+	//memset(m_page_ram, 0xcd, 0x400);
 
 	// state saving
 	save_item(NAME(m_ifc2));
@@ -234,7 +234,7 @@ offs_t abc1600_mac_device::translate_address(offs_t offset, int *nonx, int *wp)
 	*nonx = PAGE_NONX;
 	*wp = PAGE_WP;
 
-	if (LOG_MAC) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u)\n", machine().describe_context(), offset, virtual_offset, sega, segd, pga, m_page_ram[pga], *nonx, *wp);
+	if (LOG_MAC && offset != virtual_offset) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u)\n", machine().describe_context(), offset, virtual_offset, sega, segd, pga, m_page_ram[pga], *nonx, *wp);
 
 	return virtual_offset;
 }

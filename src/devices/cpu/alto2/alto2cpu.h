@@ -46,11 +46,6 @@ enum {
 #define ALTO2_DEBUG             1
 #endif
 
-#ifndef ALTO2_CRAM_CONFIG
-//! Use default CROM/CRAM configuration 2.
-#define ALTO2_CRAM_CONFIG       2
-#endif
-
 //!< Define to 1 to use the F9318 priority encoder code (broken).
 #define USE_PRIO_F9318          0
 
@@ -200,9 +195,6 @@ public:
 	//! update the screen bitmap
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	//! screen VBLANK handler
-	void screen_eof(screen_device &screen, bool state);
-
 	DECLARE_ADDRESS_MAP( ucode_map, 32 );
 	DECLARE_ADDRESS_MAP( const_map, 16 );
 	DECLARE_ADDRESS_MAP( iomem_map, 16 );
@@ -255,18 +247,22 @@ private:
 
 	address_space* m_iomem;
 
+	UINT32 m_cram_config;                   //!< CROM/CRAM configuration (1 .. 3)
+	UINT32 m_ucode_rom_pages;               //!< Number of CROM pages; derived from m_cram_config
+	UINT32 m_ucode_ram_pages;               //!< Number of CRAM pages; derived from m_cram_config
+	UINT32 m_ucode_ram_base;                //!< Base offset of the CRAM addresses
+	UINT32 m_ucode_size;                    //!< Size of both, CROM and CRAM together
+	UINT32 m_sreg_banks;                    //!< Number of S register banks; derived from m_cram_config
+
 	UINT8* m_ucode_crom;
 	std::unique_ptr<UINT8[]> m_ucode_cram;
 	UINT8* m_const_data;
 
-	//! read microcode CROM
-	DECLARE_READ32_MEMBER ( crom_r );
+	//! read microcode CROM or CRAM, depending on m_ucode_ram_base
+	DECLARE_READ32_MEMBER ( crom_cram_r );
 
-	//! read microcode CRAM
-	DECLARE_READ32_MEMBER ( cram_r );
-
-	//! write microcode CRAM
-	DECLARE_WRITE32_MEMBER( cram_w );
+	//! write microcode CRAM, depending on m_ucode_ram_base (ignore writes to CROM)
+	DECLARE_WRITE32_MEMBER( crom_cram_w );
 
 	//! read constants PROM
 	DECLARE_READ16_MEMBER ( const_r );
@@ -568,7 +564,7 @@ private:
 	UINT16 m_next;                                  //!< current micro instruction's next
 	UINT16 m_next2;                                 //!< next micro instruction's next
 	UINT16 m_r[ALTO2_REGS];                         //!< R register file
-	UINT16 m_s[ALTO2_SREG_BANKS][ALTO2_REGS];       //!< S register file(s)
+	UINT16 m_s[8][ALTO2_REGS];                      //!< S register file(s) (1 or 8 are used)
 	UINT16 m_bus;                                   //!< wired-AND bus
 	UINT16 m_t;                                     //!< T register
 	UINT16 m_alu;                                   //!< the current ALU

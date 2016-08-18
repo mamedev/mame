@@ -52,13 +52,6 @@ static MACHINE_CONFIG_FRAGMENT( bsmt2000 )
 MACHINE_CONFIG_END
 
 
-// default address map for the external memory interface
-// the BSMT can address a full 32 bits but typically only 24 are used
-static ADDRESS_MAP_START( bsmt2000, AS_0, 8, bsmt2000_device)
-	AM_RANGE(0x00000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
-
-
 // ROM definition for the BSMT2000 program ROM
 ROM_START( bsmt2000 )
 	ROM_REGION( 0x2000, "bsmt2000", 0 )
@@ -79,11 +72,9 @@ ROM_END
 bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BSMT2000, "BSMT2000", tag, owner, clock, "bsmt2000", __FILE__),
 		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_LITTLE, 8, 32, 0, nullptr),
+		device_rom_interface(mconfig, *this, 32),
 		m_ready_callback(nullptr),
 		m_stream(nullptr),
-		m_direct(nullptr),
 		m_cpu(nullptr),
 		m_register_select(0),
 		m_write_data(0),
@@ -93,7 +84,6 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 		m_right_data(0),
 		m_write_pending(false)
 {
-	m_address_map[0] = *ADDRESS_MAP_NAME(bsmt2000);
 }
 
 
@@ -140,9 +130,6 @@ void bsmt2000_device::device_start()
 	// find our CPU
 	m_cpu = subdevice<tms32015_device>("bsmt2000");
 
-	// find our direct access
-	m_direct = &space().direct();
-
 	// create the stream; BSMT typically runs at 24MHz and writes to a DAC, so
 	// in theory we should generate a 24MHz stream, but that's certainly overkill
 	// internally at 24MHz the max output sample rate is 32kHz
@@ -169,16 +156,6 @@ void bsmt2000_device::device_reset()
 	synchronize(TIMER_ID_RESET);
 }
 
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *bsmt2000_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
 
 
 //-------------------------------------------------
@@ -296,7 +273,7 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 READ16_MEMBER( bsmt2000_device::tms_rom_r )
 {
 	// underlying logic assumes this is a sign-extended value
-	return (INT8)m_direct->read_byte((m_rom_bank << 16) + m_rom_address);
+	return (INT8)read_byte((m_rom_bank << 16) + m_rom_address);
 }
 
 
