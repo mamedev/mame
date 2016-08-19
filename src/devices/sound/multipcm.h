@@ -71,13 +71,12 @@ private:
 		INT32 *m_scale;
 	};
 
-
 	struct slot_t
 	{
 		UINT8 m_slot_index;
 		UINT8 m_regs[8];
 		bool m_playing;
-		sample_t *m_sample;
+		sample_t m_sample;
 		UINT32 m_base;
 		UINT32 m_offset;
 		UINT32 m_step;
@@ -93,7 +92,6 @@ private:
 
 	// internal state
 	sound_stream *m_stream;
-	sample_t *m_samples;            // Max 512 samples
 	slot_t *m_slots;
 	UINT32 m_cur_slot;
 	UINT32 m_address;
@@ -116,6 +114,8 @@ private:
 	INT32 **m_amplitude_scale_tables;
 
 	UINT32 value_to_fixed(const UINT32 bits, const float value);
+
+	void init_sample(sample_t *sample, UINT32 index);
 
 	// Internal LFO functions
 	void lfo_init();

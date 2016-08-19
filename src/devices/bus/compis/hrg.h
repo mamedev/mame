@@ -45,7 +45,6 @@ protected:
 	virtual UINT8 pcs6_6_r(address_space &space, offs_t offset) override;
 	virtual void pcs6_6_w(address_space &space, offs_t offset, UINT8 data) override;
 
-private:
 	required_device<upd7220_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_video_ram;
@@ -64,6 +63,8 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
 };
 
 

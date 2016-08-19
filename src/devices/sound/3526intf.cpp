@@ -107,7 +107,6 @@ void ym3526_device::device_start()
 	m_chip = ym3526_init(this,clock(),rate);
 	assert_always(m_chip != nullptr, "Error creating YM3526 chip");
 
-	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 	/* YM3526 setup */
 	ym3526_set_timer_handler (m_chip, timer_handler, this);
 	ym3526_set_irq_handler   (m_chip, IRQHandler, this);
@@ -115,6 +114,22 @@ void ym3526_device::device_start()
 
 	m_timer[0] = timer_alloc(0);
 	m_timer[1] = timer_alloc(1);
+}
+
+void ym3526_device::device_clock_changed()
+{
+	calculate_rates();
+	ym3526_clock_changed(m_chip, clock(), clock() / 72);
+}
+
+void ym3526_device::calculate_rates()
+{
+	int rate = clock()/72; /* ??? */
+
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 }
 
 //-------------------------------------------------

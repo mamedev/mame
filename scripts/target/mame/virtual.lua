@@ -13,12 +13,18 @@
 -- specify available CPU cores
 --------------------------------------------------
 
+CPUS["M6502"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
 -- only for MAME and so aren't included
 --------------------------------------------------
 
+SOUNDS["GB_SOUND"] = true
+SOUNDS["AY8910"] = true
+SOUNDS["YM2203"] = true
+SOUNDS["YM3526"] = true
+SOUNDS["NES_APU"] = true
 
 --------------------------------------------------
 -- specify available video cores

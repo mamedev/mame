@@ -32,13 +32,12 @@
 // ======================> k053260_device
 
 class k053260_device : public device_t,
-						public device_sound_interface
+						public device_sound_interface,
+						public device_rom_interface
 {
 public:
 	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k053260_device() { }
-
-	static void set_region_tag(device_t &device, const char *tag) { downcast<k053260_device &>(device).m_rom.set_tag(tag); }
 
 	DECLARE_READ8_MEMBER( main_read );
 	DECLARE_WRITE8_MEMBER( main_write );
@@ -56,7 +55,6 @@ protected:
 private:
 	// configuration
 	sound_stream *  m_stream;
-	required_region_ptr<UINT8> m_rom;
 
 	// live state
 	UINT8           m_portdata[4];

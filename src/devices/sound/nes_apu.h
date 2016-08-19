@@ -53,6 +53,8 @@ public:
 	static void set_cpu_tag(device_t &device, const char *tag) { downcast<nesapu_device &>(device).m_cpu_tag = tag; }
 	void set_tag_memory(const char *tag);
 
+	virtual void device_clock_changed() override;
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -78,6 +80,7 @@ private:
 
 	const char *m_cpu_tag;
 
+	void calculate_rates();
 	void create_syncs(unsigned long sps);
 	int8 apu_square(square_t *chan);
 	int8 apu_triangle(triangle_t *chan);

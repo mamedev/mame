@@ -7,19 +7,21 @@ Playmatic MPU 3,4,5
 
 Status:
 - Lamps, Solenoids to add
-- AY chips output port adds various components across the analog outputs (including muting)
+- AY chips output port adds various components across the analog outputs
+- Lots of loud siren-like noises when there should be silence
 - Mechanical sounds to add
 - Most games work
 -- Spain82: not working
 -- Nautilus: sound is broken (runs into the weeds)
 -- Skill Flight: not working
--- Meg Aaton: not working (No Ball)
+-- Miss Disco: not working
+-- Phantom Ship: different unknown sound card (no manual available)
 
 Note: The input lines INT, EF1-4 are inverted (not true voltage).
 
 First time:
 - The default settings are fine, so start with a clean slate
-- Wait for it to say No Ball, then hold down X.
+- Wait for it to say No Ball, then hold down X (Meg Aaton = 8-pad)
 - Keep holding X, insert credits, and press start. When it says ball 1, let go immediately.
 - If you hold down X longer than you should, it says Coil Error, and the game is ended. You
   should let go the instant the ball number increments.
@@ -57,6 +59,8 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_4013a(*this, "4013a")
 		, m_4013b(*this, "4013b")
+		, m_aysnd1(*this, "aysnd1")
+		, m_aysnd2(*this, "aysnd2")
 		, m_keyboard(*this, "X")
 	{ }
 
@@ -92,6 +96,8 @@ private:
 	required_device<cosmac_device> m_audiocpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
+	required_device<ay8910_device> m_aysnd1;
+	required_device<ay8910_device> m_aysnd2;
 	required_ioport_array<10> m_keyboard;
 };
 
@@ -401,9 +407,9 @@ static MACHINE_CONFIG_START( play_5, play_5_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL_3_579545MHz / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ADD("aysnd2", AY8910, XTAL_3_579545MHz / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -411,10 +417,10 @@ MACHINE_CONFIG_END
 / KZ-26 (1984)
 /-------------------------------------------------------------------*/
 ROM_START(kz26)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("kz26.cpu", 0x0000, 0x2000, CRC(8030a699) SHA1(4f86b325801d8ce16011f7b6ba2f3633e2f2af35))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("sound1.su3", 0x0000, 0x2000, CRC(8ad1a804) SHA1(6177619f09af4302ffddd8c0c1b374dab7f47e91))
 	ROM_LOAD("sound2.su4", 0x2000, 0x0800, CRC(355dc9ad) SHA1(eac8bc27157afd908f9bc5b5a7c40be5b9427269))
 ROM_END
@@ -423,11 +429,11 @@ ROM_END
 / Spain 82 (10/82)
 /-------------------------------------------------------------------*/
 ROM_START(spain82)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("spaic12.bin", 0x0000, 0x1000, CRC(cd37ecdc) SHA1(ff2d406b6ac150daef868121e5857a956aabf005))
 	ROM_LOAD("spaic11.bin", 0x1000, 0x0800, CRC(c86c0801) SHA1(1b52539538dae883f9c8fe5bc6454f9224780d11))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("spasnd.bin", 0x0000, 0x2000, CRC(62412e2e) SHA1(9e48dc3295e78e1024f726906be6e8c3fe3e61b1))
 ROM_END
 
@@ -435,10 +441,10 @@ ROM_END
 / ??/84 Nautilus
 /-------------------------------------------------------------------*/
 ROM_START(nautilus)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("nautilus.rom", 0x0000, 0x2000, CRC(197e5492) SHA1(0f83fc2e742fd0cca0bd162add4bef68c6620067))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("nautilus.snd", 0x0000, 0x2000, CRC(413d110f) SHA1(8360f652296c46339a70861efb34c41e92b25d0e))
 ROM_END
 
@@ -446,10 +452,10 @@ ROM_END
 / ??/84 The Raid
 /-------------------------------------------------------------------*/
 ROM_START(theraid)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("theraid.rom", 0x0000, 0x2000, CRC(97aa1489) SHA1(6b691b287138cc78cfc1010f380ff8c66342c39b))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("theraid.snd", 0x0000, 0x2000, CRC(e33f8363) SHA1(e7f251c334b15e12b1eb7e079c2e9a5f64338052))
 ROM_END
 
@@ -457,10 +463,10 @@ ROM_END
 / 11/84 UFO-X
 /-------------------------------------------------------------------*/
 ROM_START(ufo_x)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("ufoxcpu.rom", 0x0000, 0x2000, CRC(cf0f7c52) SHA1(ce52da05b310ac84bdd57609e21b0401ee3a2564))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("ufoxu3.rom", 0x0000, 0x2000, CRC(6ebd8ee1) SHA1(83522b76a755556fd38d7b292273b4c68bfc0ddf))
 	ROM_LOAD("ufoxu4.rom", 0x2000, 0x0800, CRC(aa54ede6) SHA1(7dd7e2852d42aa0f971936dbb84c7708727ce0e7))
 ROM_END
@@ -469,10 +475,10 @@ ROM_END
 / ??/85 Rock 2500
 /-------------------------------------------------------------------*/
 ROM_START(rock2500)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("r2500cpu.rom", 0x0000, 0x2000, CRC(9c07e373) SHA1(5bd4e69d11e69fdb911a6e65b3d0a7192075abc8))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("r2500snd.rom", 0x0000, 0x2000, CRC(24fbaeae) SHA1(20ff35ed689291f321e483287a977c02e84d4524))
 ROM_END
 
@@ -480,19 +486,19 @@ ROM_END
 / ??/85 Star Fire
 /-------------------------------------------------------------------*/
 ROM_START(starfirp)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("starfcpu.rom", 0x0000, 0x2000, CRC(450ddf20) SHA1(c63c4e3833ffc1f69fcec39bafecae9c80befb2a))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("starfu3.rom", 0x0000, 0x2000, CRC(5d602d80) SHA1(19d21adbcbd0067c051f3033468eda8c5af57be1))
 	ROM_LOAD("starfu4.rom", 0x2000, 0x0800, CRC(9af8be9a) SHA1(da6db3716db73baf8e1493aba91d4d85c5d613b4))
 ROM_END
 
 ROM_START(starfirpa)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("starcpua.rom", 0x0000, 0x2000, CRC(29bac350) SHA1(ab3e3ea4881be954f7fa7278800ffd791c4581da))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("starfu3.rom", 0x0000, 0x2000, CRC(5d602d80) SHA1(19d21adbcbd0067c051f3033468eda8c5af57be1))
 	ROM_LOAD("starfu4.rom", 0x2000, 0x0800, CRC(9af8be9a) SHA1(da6db3716db73baf8e1493aba91d4d85c5d613b4))
 ROM_END
@@ -501,21 +507,21 @@ ROM_END
 / ??/86 Flash Dragon
 /-------------------------------------------------------------------*/
 ROM_START(fldragon)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("fldrcpu1.rom", 0x0000, 0x2000, CRC(e513ded0) SHA1(64ed3dcff53311fb93bd50d105a4c1186043fdd7))
 	ROM_LOAD("fldraudiocpu.rom", 0x2000, 0x2000, CRC(6ff2b276) SHA1(040b614f0b0587521ef5550b5587b94a7f3f178b))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("fdsndu3.rom", 0x0000, 0x2000, CRC(aa9c52a8) SHA1(97d5d63b14d10c70a5eb80c08ccf5a1f3df7596d))
 	ROM_LOAD("fdsndu4.rom", 0x2000, 0x0800, CRC(0a7dc1d2) SHA1(32c7be5e9fbe4fa9ca661af7b7b5ea13ef250ce6))
 ROM_END
 
 ROM_START(fldragona)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("fldr_1a.cpu", 0x0000, 0x2000, CRC(21fda8e8) SHA1(feea608c2605cea1cdf9f7ed884297a95993f754))
 	ROM_LOAD("fldr_2a.cpu", 0x2000, 0x2000, CRC(3592a0b7) SHA1(4c4ed7930dcbbf81ce2e5296c0b36bb615bd2270))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("fdsndu3.rom", 0x0000, 0x2000, CRC(aa9c52a8) SHA1(97d5d63b14d10c70a5eb80c08ccf5a1f3df7596d))
 	ROM_LOAD("fdsndu4.rom", 0x2000, 0x0800, CRC(0a7dc1d2) SHA1(32c7be5e9fbe4fa9ca661af7b7b5ea13ef250ce6))
 ROM_END
@@ -528,7 +534,7 @@ ROM_END
 / ??/87 Skill Flight
 /-------------------------------------------------------------------*/
 ROM_START(sklflite)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("skflcpu1.rom", 0x0000, 0x2000, CRC(8f833b55) SHA1(1729203582c22b51d1cc401aa8f270aa5cdadabe))
 	ROM_LOAD("skflaudiocpu.rom", 0x2000, 0x2000, CRC(ffc497aa) SHA1(3e88539ae1688322b9268f502d8ca41cffb28df3))
 
@@ -540,7 +546,7 @@ ROM_END
 / ??/87 Phantom Ship
 /-------------------------------------------------------------------*/
 ROM_START(phntmshp)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("video1.bin", 0x0000, 0x2000, CRC(2b61a8d2) SHA1(1b5cabbab252b2ffb6ed12fb7e4181de7695ed9a))
 	ROM_LOAD("video2.bin", 0x2000, 0x2000, CRC(50126db1) SHA1(58d89e44131554cb087c4cad62869f90366704ad))
 
@@ -555,10 +561,10 @@ ROM_END
 / Trailer (1985)
 /-------------------------------------------------------------------*/
 ROM_START(trailer)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("trcpu.rom", 0x0000, 0x2000, CRC(cc81f84d) SHA1(7a3282a47de271fde84cfddbaceb118add0df116))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("trsndu3.rom", 0x0000, 0x2000, CRC(05975c29) SHA1(e54d3a5613c3e39fc0338a53dbadc2e91c09ffe3))
 	ROM_LOAD("trsndu4.rom", 0x2000, 0x0800, CRC(bda2a735) SHA1(134b5abb813ed8bf2eeac0861b4c88c7176582d8))
 ROM_END
@@ -567,20 +573,20 @@ ROM_END
 / Meg Aaton
 /-------------------------------------------------------------------*/
 ROM_START(megaaton)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("cpumegat.bin", 0x0000, 0x2000, CRC(7e7a4ede) SHA1(3194b367cbbf6e0cb2629cd5d82ddee6fe36985a))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("smogot.bin", 0x0000, 0x2000, CRC(fefc3ab2) SHA1(e748d9b443a69fcdd587f22c87d41818b6c0e436))
 	ROM_LOAD("smegat.bin", 0x2000, 0x1000, CRC(910ab7fe) SHA1(0ddfd15c9c25f43b8fcfc4e11bc8ea180f6bd761))
 ROM_END
 
 ROM_START(megaatona)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("mega_u12.bin", 0x0000, 0x1000, CRC(65761b02) SHA1(dd9586eaf70698ef7a80ce1be293322f64829aea))
 	ROM_LOAD("mega_u11.bin", 0x1000, 0x1000, CRC(513f3683) SHA1(0f080a33426df1ffdb14e9b2e6382304e201e335))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("smogot.bin", 0x0000, 0x2000, CRC(fefc3ab2) SHA1(e748d9b443a69fcdd587f22c87d41818b6c0e436))
 	ROM_LOAD("smegat.bin", 0x2000, 0x1000, CRC(910ab7fe) SHA1(0ddfd15c9c25f43b8fcfc4e11bc8ea180f6bd761))
 ROM_END
@@ -589,10 +595,10 @@ ROM_END
 / ??/87 Iron Balls (Stargame)
 /-------------------------------------------------------------------*/
 ROM_START(ironball)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("video.bin", 0x0000, 0x2000, CRC(1867ebff) SHA1(485e46c742d914febcbdd58cb5a886f1d773282a))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("sound.bin", 0x0000, 0x2000, CRC(83165483) SHA1(5076e5e836105d69c4ba606d8b995ecb16f88504))
 ROM_END
 
@@ -600,16 +606,16 @@ ROM_END
 / ??/83 Miss Disco (Bingo machine)
 /-------------------------------------------------------------------*/
 ROM_START(msdisco)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x1000, CRC(06fb7da9) SHA1(36c6fda166b2a07a5ed9ad5d2b6fdfe8fd707b0f))
 
-	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x4000, "audiocpu", ROMREGION_ERASEFF)
 ROM_END
 
 GAME(1982,  spain82,   0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Spain '82",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1983,  megaaton,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1983,  megaatona, megaaton, play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton (alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1984,  nautilus,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Nautilus",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(1983,  megaaton,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton",                 MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1983,  megaatona, megaaton, play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton (alternate set)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1984,  nautilus,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Nautilus",                  MACHINE_MECHANICAL | MACHINE_NO_SOUND)
 GAME(1984,  theraid,   0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "The Raid",                  MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
 GAME(1984,  ufo_x,     0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "UFO-X",                     MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
 GAME(1984,  kz26,      0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "KZ-26",                     MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
@@ -617,11 +623,11 @@ GAME(1985,  rock2500,  0,        play_5, play_5, driver_device, 0, ROT0, "Playma
 GAME(1985,  starfirp,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Star Fire",                 MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
 GAME(1985,  starfirpa, starfirp, play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Star Fire (alternate set)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
 GAME(1985,  trailer,   0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Trailer",                   MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1986,  fldragon,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Flash Dragon",              MACHINE_MECHANICAL | MACHINE_NO_SOUND)
-GAME(1986,  fldragona, fldragon, play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Flash Dragon (alternate set)", MACHINE_MECHANICAL | MACHINE_NO_SOUND)
+GAME(1986,  fldragon,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Flash Dragon",              MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1986,  fldragona, fldragon, play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Flash Dragon (alternate set)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
 GAME(1987,  phntmshp,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Phantom Ship",              MACHINE_MECHANICAL | MACHINE_NO_SOUND)
 GAME(1987,  sklflite,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Skill Flight (Playmatic)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // not by Playmatic, but same hardware
-GAME(1987,  ironball,  0,        play_5, play_5, driver_device, 0, ROT0, "Stargame",  "Iron Balls",                MACHINE_MECHANICAL | MACHINE_NO_SOUND)
+GAME(1987,  ironball,  0,        play_5, play_5, driver_device, 0, ROT0, "Stargame",  "Iron Balls",                MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
 // bingo hardware, to be split (?)
 GAME(1983,  msdisco,   0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Miss Disco (Bingo)",        MACHINE_IS_SKELETON_MECHANICAL)

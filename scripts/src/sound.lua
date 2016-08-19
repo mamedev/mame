@@ -1367,7 +1367,7 @@ end
 
 ---------------------------------------------------
 -- PCD3311
---@src/devices/sound/gb.h,SOUNDS["PCD3311"] = true
+--@src/devices/sound/pcd3311.h,SOUNDS["PCD3311"] = true
 ---------------------------------------------------
 
 if (SOUNDS["PCD3311"]~=null) then

@@ -25,6 +25,7 @@ public:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
+	virtual void device_clock_changed() override;
 
 	READ8_MEMBER(psg1_4014_r);
 	READ8_MEMBER(psg1_4015_r);

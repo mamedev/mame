@@ -685,6 +685,16 @@ ROM_START(hypbl_l4)
 	ROM_LOAD("sound12.532",  0x4000, 0x1000, CRC(06051e5e) SHA1(f0ab4be812ceaf771829dd549f2a612156102a93))
 ROM_END
 
+ROM_START(hypbl_l3)
+	ROM_REGION(0x3000, "roms", 0)
+	ROM_LOAD("ic20-l3.532",  0x0000, 0x1000, CRC(4a37d6e8) SHA1(8c26dd5652ace431a6ff0faf0bb9db37489c4fec))
+	ROM_LOAD("ic14-l3.532",  0x1000, 0x1000, CRC(e233bbed) SHA1(bb29acc3e48d6b40b3df2e7702f8a8ff4357c15c))
+	ROM_LOAD("ic17.532",     0x2000, 0x1000, CRC(6f4c0c4c) SHA1(1036067e2c85da867983e6e51ee2a7b5135000df))
+
+	ROM_REGION(0x5000, "audioroms", 0)
+	ROM_LOAD("sound12.532",  0x4000, 0x1000, CRC(06051e5e) SHA1(f0ab4be812ceaf771829dd549f2a612156102a93))
+ROM_END
+
 ROM_START(hypbl_l2)
 	ROM_REGION(0x3000, "roms", 0)
 	ROM_LOAD("ic20-l2.532",  0x0000, 0x1000, CRC(f5f66cf1) SHA1(885b4961b6ec712b7445001d448d881245be1234))
@@ -819,6 +829,22 @@ ROM_START(fpwr2_l2)
 	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
+/*--------------------------------
+/ Wild Texas 
+/-------------------------------*/
+// Conversion of Firepower II
+// http://www.ipdb.org/machine.cgi?id=5500
+
+ROM_START(wldtexas)
+	ROM_REGION(0x10000, "roms", 0)
+	ROM_LOAD("wldtexas.prg", 0x4000, 0x4000, CRC(243e7116) SHA1(c13c261632b3e8693a500d922f151296102e0169))
+	ROM_RELOAD(0x8000, 0x4000)
+	ROM_RELOAD(0xc000, 0x4000)
+
+	ROM_REGION(0x5000, "audioroms", 0)
+	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+ROM_END
+
 /*-----------------------------
 / Star Light - Sys.7 (Game #530)
 /-----------------------------*/
@@ -846,6 +872,7 @@ GAME( 1982, thund_p1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Thunder
 GAME( 1982, thund_p2, thund_p1, s7, s7, s7_state, s7, ROT0, "Williams", "Thunderball (P-2)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
 GAME( 1982, thund_p3, thund_p1, s7, s7, s7_state, s7, ROT0, "Williams", "Thunderball (P-3)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
 GAME( 1981, hypbl_l4, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "HyperBall (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1981, hypbl_l3, hypbl_l4, s7, s7, s7_state, s7, ROT0, "Williams", "HyperBall (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1981, hypbl_l2, hypbl_l4, s7, s7, s7_state, s7, ROT0, "Williams", "HyperBall (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1981, barra_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Barracora (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 1982, vrkon_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Varkon (L-1)", MACHINE_MECHANICAL )
@@ -857,3 +884,5 @@ GAME( 1983, jst_l1,   jst_l2,   s7, s7, s7_state, s7, ROT0, "Williams", "Joust (
 GAME( 1983, lsrcu_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Laser Cue (L-2)", MACHINE_MECHANICAL )
 GAME( 1983, fpwr2_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Firepower II (L-2)", MACHINE_MECHANICAL )
 GAME( 1984, strlt_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Star Light (L-1)", MACHINE_MECHANICAL )
+// same hardware, unknown manufacturer
+GAME( 1983, wldtexas, 0,        s7, s7, s7_state, s7, ROT0, "<unknown>", "Wild Texas", MACHINE_MECHANICAL )

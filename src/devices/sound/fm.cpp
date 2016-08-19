@@ -2288,6 +2288,14 @@ void * ym2203_init(void *param, device_t *device, int clock, int rate,
 	return F2203;
 }
 
+void ym2203_clock_changed(void *chip, int clock, int rate)
+{
+	YM2203 *FM2203 = (YM2203 *)chip;
+
+	FM2203->OPN.ST.clock = clock;
+	FM2203->OPN.ST.rate = rate;
+}
+
 /* shut down emulator */
 void ym2203_shutdown(void *chip)
 {

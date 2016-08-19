@@ -1961,6 +1961,15 @@ static void OPL_save_state(FM_OPL *OPL, device_t *device)
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(OPL_postload), OPL));
 }
 
+static void OPL_clock_changed(FM_OPL *OPL, UINT32 clock, UINT32 rate)
+{
+	OPL->clock = clock;
+	OPL->rate  = rate;
+
+	/* init global tables */
+	OPL_initalize(OPL);
+}
+
 
 /* Create one of virtual YM3812/YM3526/Y8950 */
 /* 'clock' is chip clock in Hz  */
@@ -1997,11 +2006,7 @@ static FM_OPL *OPLCreate(device_t *device, UINT32 clock, UINT32 rate, int type)
 
 	OPL->device = device;
 	OPL->type  = type;
-	OPL->clock = clock;
-	OPL->rate  = rate;
-
-	/* init global tables */
-	OPL_initalize(OPL);
+	OPL_clock_changed(OPL, clock, rate);
 
 	return OPL;
 }
@@ -2280,6 +2285,11 @@ void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length)
 
 
 #if (BUILD_YM3526)
+
+void ym3526_clock_changed(void *opl, UINT32 clock, UINT32 rate)
+{
+	OPL_clock_changed((FM_OPL *)opl, clock, rate);
+}
 
 void *ym3526_init(device_t *device, UINT32 clock, UINT32 rate)
 {
