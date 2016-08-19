@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 #ifndef MAME_FRONTEND_UI_TOOLBAR_IPP
 #define MAME_FRONTEND_UI_TOOLBAR_IPP
 #pragma once

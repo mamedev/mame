@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
     ui/datmenu.cpp

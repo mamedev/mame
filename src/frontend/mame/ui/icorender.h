@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota, Victor Laskin
+// copyright-holders:Victor Laskin
 /***************************************************************************
 
     ui/icorender.h

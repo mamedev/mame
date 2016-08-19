@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 #ifndef MAME_FRONTEND_UI_DEFIMG_IPP
 #define MAME_FRONTEND_UI_DEFIMG_IPP
 #pragma once
