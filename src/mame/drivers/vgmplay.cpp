@@ -17,6 +17,7 @@
 #include "sound/ym2413.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/c6280.h"
 #include "sound/sn76496.h"
@@ -37,11 +38,12 @@ public:
 		A_YM2203A    = 0x00000040,
 		A_YM2203B    = 0x00000050,
 		A_YM3526     = 0x00000060,
-		A_AY8910A    = 0x00000070,
-		A_AY8910B    = 0x00000080,
-		A_SN76496    = 0x00000090,
-		A_K053260    = 0x000000a0,
-		A_C6280      = 0x000000d0,
+		A_YM3812     = 0x00000070,
+		A_AY8910A    = 0x00000080,
+		A_AY8910B    = 0x00000090,
+		A_SN76496    = 0x000000a0,
+		A_K053260    = 0x000000b0,
+		A_C6280      = 0x000000e0,
 		A_SEGAPCM    = 0x00001000,
 		A_GAMEBOY	 = 0x00002000,
 		A_NESAPU     = 0x00002030,
@@ -133,6 +135,7 @@ private:
 	required_device<ym2203_device>  m_ym2203a;
 	required_device<ym2203_device>  m_ym2203b;
 	required_device<ym3526_device>  m_ym3526;
+	required_device<ym3812_device>  m_ym3812;
 	required_device<ay8910_device>  m_ay8910a;
 	required_device<ay8910_device>  m_ay8910b;
 	required_device<sn76496_device> m_sn76496;
@@ -312,6 +315,12 @@ void vgmplay_device::execute_run()
 			case 0xA5:
 				m_io->write_byte(A_YM2203B+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2203B+1, m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+
+			case 0x5a:
+				m_io->write_byte(A_YM3812+0, m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_YM3812+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
@@ -832,6 +841,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_ym2203a(*this, "ym2203a")
 	, m_ym2203b(*this, "ym2203b")
 	, m_ym3526(*this, "ym3526")
+	, m_ym3812(*this, "ym3812")
 	, m_ay8910a(*this, "ay8910a")
 	, m_ay8910b(*this, "ay8910b")
 	, m_sn76496(*this, "sn76496")
@@ -941,8 +951,9 @@ void vgmplay_state::machine_start()
 			logerror("Warning: file requests an unsupported YM2608\n");
 		if(version >= 0x151 && r32(0x4c))
 			logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
-		if(version >= 0x151 && r32(0x50))
-			logerror("Warning: file requests an unsupported YM3812\n");
+		if(version >= 0x151 && r32(0x50)) {
+			m_ym3812->set_unscaled_clock(r32(0x50));
+		}
 		if(version >= 0x151 && r32(0x54)) {
 			m_ym3526->set_unscaled_clock(r32(0x54));
 		}
@@ -1080,6 +1091,7 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_YM2203A,      vgmplay_device::A_YM2203A+1)     AM_DEVWRITE    ("ym2203a",       ym2203_device, write)
 	AM_RANGE(vgmplay_device::A_YM2203B,      vgmplay_device::A_YM2203B+1)     AM_DEVWRITE    ("ym2203b",       ym2203_device, write)
 	AM_RANGE(vgmplay_device::A_YM3526,       vgmplay_device::A_YM3526+1)      AM_DEVWRITE    ("ym3526",        ym3526_device, write)
+	AM_RANGE(vgmplay_device::A_YM3812,       vgmplay_device::A_YM3812+1)      AM_DEVWRITE    ("ym3812",        ym3812_device, write)
 	AM_RANGE(vgmplay_device::A_AY8910A,      vgmplay_device::A_AY8910A)       AM_DEVWRITE    ("ay8910a",       ay8910_device, data_w)
 	AM_RANGE(vgmplay_device::A_AY8910A+1,    vgmplay_device::A_AY8910A+1)     AM_DEVWRITE    ("ay8910a",       ay8910_device, address_w)
 	AM_RANGE(vgmplay_device::A_AY8910B,      vgmplay_device::A_AY8910B)       AM_DEVWRITE    ("ay8910b",       ay8910_device, data_w)
@@ -1194,8 +1206,11 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym3526", YM3526, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+
+	MCFG_SOUND_ADD("ym3812", YM3812, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_CPU_ADD("nescpu", N2A03, 1000000)
 	MCFG_CPU_PROGRAM_MAP(nescpu_map)

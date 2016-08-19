@@ -98,14 +98,16 @@ void ym3526_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void ym3526_device::device_start()
 {
-	int rate = clock()/72;
+	int rate = clock() / 72;
 
 	// resolve callbacks
 	m_irq_handler.resolve();
 
 	/* stream system initialize */
-	m_chip = ym3526_init(this,clock(),rate);
+	m_chip = ym3526_init(this, clock(), rate);
 	assert_always(m_chip != nullptr, "Error creating YM3526 chip");
+
+	calculate_rates();
 
 	/* YM3526 setup */
 	ym3526_set_timer_handler (m_chip, timer_handler, this);

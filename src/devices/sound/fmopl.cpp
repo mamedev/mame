@@ -2158,6 +2158,11 @@ static int OPLTimerOver(FM_OPL *OPL,int c)
 
 #if (BUILD_YM3812)
 
+void ym3812_clock_changed(void *chip, UINT32 clock, UINT32 rate)
+{
+	OPL_clock_changed((FM_OPL *)chip, clock, rate);
+}
+
 void * ym3812_init(device_t *device, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
@@ -2286,9 +2291,9 @@ void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length)
 
 #if (BUILD_YM3526)
 
-void ym3526_clock_changed(void *opl, UINT32 clock, UINT32 rate)
+void ym3526_clock_changed(void *chip, UINT32 clock, UINT32 rate)
 {
-	OPL_clock_changed((FM_OPL *)opl, clock, rate);
+	OPL_clock_changed((FM_OPL *)chip, clock, rate);
 }
 
 void *ym3526_init(device_t *device, UINT32 clock, UINT32 rate)

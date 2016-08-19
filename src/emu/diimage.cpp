@@ -740,20 +740,21 @@ int device_image_interface::reopen_for_write(const std::string &path)
 //  flags to use, and in what order
 //-------------------------------------------------
 
-void device_image_interface::determine_open_plan(int is_create, UINT32 *open_plan)
+std::vector<UINT32> device_image_interface::determine_open_plan(bool is_create)
 {
-	int i = 0;
+	std::vector<UINT32> open_plan;
 
-	// emit flags
+	// emit flags into a vector
 	if (!is_create && is_readable() && is_writeable())
-		open_plan[i++] = OPEN_FLAG_READ | OPEN_FLAG_WRITE;
+		open_plan.push_back(OPEN_FLAG_READ | OPEN_FLAG_WRITE);
 	if (!is_create && !is_readable() && is_writeable())
-		open_plan[i++] = OPEN_FLAG_WRITE;
+		open_plan.push_back(OPEN_FLAG_WRITE);
 	if (!is_create && is_readable())
-		open_plan[i++] = OPEN_FLAG_READ;
-	if (is_writeable() && is_creatable())
-		open_plan[i++] = OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE;
-	open_plan[i] = 0;
+		open_plan.push_back(OPEN_FLAG_READ);
+	if (is_create && is_writeable() && is_creatable())
+		open_plan.push_back(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+
+	return open_plan;
 }
 
 
@@ -922,9 +923,6 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 
 image_init_result device_image_interface::load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
 {
-	UINT32 open_plan[4];
-	int i;
-
 	// first unload the image
 	unload();
 
@@ -940,13 +938,13 @@ image_init_result device_image_interface::load_internal(const std::string &path,
 	if (core_opens_image_file())
 	{
 		// determine open plan
-		determine_open_plan(is_create, open_plan);
+		std::vector<UINT32> open_plan = determine_open_plan(is_create);
 
 		// attempt to open the file in various ways
-		for (i = 0; !m_file && open_plan[i]; i++)
+		for (auto iter = open_plan.cbegin(); !m_file && iter != open_plan.cend(); iter++)
 		{
 			// open the file
-			m_err = load_image_by_path(open_plan[i], path);
+			m_err = load_image_by_path(*iter, path);
 			if (m_err && (m_err != IMAGE_ERROR_FILENOTFOUND))
 				goto done;
 		}
