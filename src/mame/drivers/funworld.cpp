@@ -4882,12 +4882,12 @@ ROM_END
     Magic Card II (Impera)
     ----------------------
 
-    - 1x Special CPU with CM602 (??) on it  <--- dumper notes.
+    - 1x Special CPU with CM602 (??) on it  <--- from dumper notes.
     - 1x MC6845P
     - 1x YM2149F
     - 2x MC6821P
     - 1x Crystal 16.000 MHz
-    - 2x HY18CV85 (electrically-erasable PLD)
+    - 2x HY18CV8S (electrically-erasable PLD)
 
     Some versions have Mexican Rockwell R65C02.
     The game doesn't work with a regular 65C02 CPU.
