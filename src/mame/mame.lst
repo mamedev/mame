@@ -12647,6 +12647,7 @@ gteikokb                        // bootleg
 gteikoku                        // (c) Irem
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
+jungsub							// bootleg
 kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
 kingball                        // (c) 1980 Namco
 kingballj                       // (c) 1980 Namco
@@ -31140,6 +31141,7 @@ r2dtank                         // (c) 1980 Sigma Ent. Inc.
 
 @source:r2dx_v33.cpp
 nzeroteam                       // (c) 1997 Seibu Kaihatsu
+nzeroteama						//
 r2dx_v33                        // (c) 1996 Seibu Kaihatsu
 r2dx_v33_r2                     // (c) 1996 Seibu Kaihatsu
 zerotm2k                        // (c) 2000 Seibu Kaihatsu
