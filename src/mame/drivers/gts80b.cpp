@@ -445,8 +445,38 @@ MACHINE_CONFIG_END
 /-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------
-/ Amazon Hunt II 05/85
+/ Amazon Hunt II (#684C)
 /-------------------------------------------------------------------*/
+
+ROM_START(amazonh2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("684c-cpu.rom", 0x2000, 0x2000, CRC(0b5040c3) SHA1(104e5a63b4097ea72a5b31df1a7d5198342be5c4))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("684c-snd.rom",0xe000,0x2000, CRC(182d64e1) SHA1(c0aaa646a3d53cf00aa23e0b8d46bbb70ce46e5c))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Amazon Hunt III (#684D)
+/-------------------------------------------------------------------*/
+
+ROM_START(amazonh3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("684d-cpu.rom", 0x2000, 0x2000, CRC(2ec8bd4c) SHA1(46a08ddccba952fa69b79739802b676567f6386f))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("684d-snd.rom",0x8000,0x8000, CRC(a660f233) SHA1(3b80629696a2fd5aa4a86ed472e60c95d3cfa906))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+ROM_END
 
 /*-------------------------------------------------------------------
 / Arena (#709)
@@ -458,6 +488,25 @@ ROM_START(arena)
 	ROM_RELOAD(0x9000, 0x0800)
 	ROM_RELOAD(0xd000, 0x0800)
 	ROM_LOAD("prom1.cpu", 0x2000, 0x2000, CRC(8c9f8ee9) SHA1(840505d08e387c3f7de105305e183f8ed3a6d5c6))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("drom1.snd",0xe000,0x2000, CRC(78e6cbf1) SHA1(7b66a0cb211a93cf475172aa0465a952009e1a59))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("yrom1.snd",0xe000,0x2000, CRC(f7a951c2) SHA1(12d7a6119d9033ae02c6312c9af888bfc7c63ad1))
+	ROM_LOAD("yrom2.snd",0xc000,0x2000, CRC(cc2aef4e) SHA1(a6e243de99f6a76eb527e879f4441c036dd379b6))
+ROM_END
+
+ROM_START(arenaa)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("prom2a.cpu", 0x1000, 0x0800, CRC(13c8813b) SHA1(756e3583fd55b72e0bfb15e9b4a60740b389ca2e))
+	ROM_RELOAD(0x5000, 0x0800)
+	ROM_RELOAD(0x9000, 0x0800)
+	ROM_RELOAD(0xd000, 0x0800)
+	ROM_LOAD("prom1a.cpu", 0x2000, 0x2000, CRC(253eceb1) SHA1(b46ccec4b3e8fc57fb3295b675b4f27dafc0322e))
 	ROM_RELOAD(0x6000, 0x2000)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
@@ -577,6 +626,17 @@ ROM_END
 ROM_START(triplay)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("prom1.cpu", 0x2000, 0x2000, CRC(42b29b01) SHA1(58145ce10939d00faff49972ada669005a223792))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_LOAD("696-s.snd", 0x0800, 0x0800, CRC(deedea61) SHA1(6aec221397f250d5dd99faefa313e8028c8818f7))
+ROM_END
+
+ROM_START(triplaya)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("prom1a.cpu", 0x2000, 0x2000, CRC(fc2145cb) SHA1(f7b9648c533997e9f777a8b40dad9852f26abd9a))
 	ROM_RELOAD(0x6000, 0x2000)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
@@ -736,6 +796,25 @@ ROM_START(mntecrlo)
 	ROM_LOAD("yrom2.snd",0xc000,0x2000, CRC(a95d1a6b) SHA1(91946ef7af0e4dd96db6d2d6f4f2e9a3a7279b81))
 ROM_END
 
+ROM_START(mntecrloa)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("prom2a.cpu", 0x1000, 0x0800, CRC(5dd75c06) SHA1(911f7e56b7602c9bc9b51dde7719d3e0562f0702))
+	ROM_RELOAD(0x5000, 0x0800)
+	ROM_RELOAD(0x9000, 0x0800)
+	ROM_RELOAD(0xd000, 0x0800)
+	ROM_LOAD("prom1a.cpu", 0x2000, 0x2000, CRC(de980755) SHA1(0df99526a432e26fb73288b529dc0f4f49623e81))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("drom1.snd",0xe000,0x2000, CRC(1a53ac15) SHA1(f2751664a09431e908873580ddf4f44df9b4eda7))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("yrom1.snd",0xe000,0x2000, CRC(6e234c49) SHA1(fdb4126ecdaac378d144e9dd3c29b4e79290da2a))
+	ROM_LOAD("yrom2.snd",0xc000,0x2000, CRC(a95d1a6b) SHA1(91946ef7af0e4dd96db6d2d6f4f2e9a3a7279b81))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Night Moves C-103
 /-------------------------------------------------------------------*/
@@ -763,6 +842,24 @@ ROM_END
 ROM_START(raven)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("prom2.cpu", 0x1000, 0x0800, CRC(481f3fb8) SHA1(22ffa55ed362219ebedbc40edcf866ff152a01b9))
+	ROM_RELOAD(0x5000, 0x0800)
+	ROM_RELOAD(0x9000, 0x0800)
+	ROM_RELOAD(0xd000, 0x0800)
+	ROM_LOAD("prom1.cpu", 0x2000, 0x2000, CRC(edc88561) SHA1(101878527307c6f04d141dd74e04102c4ea53105))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("drom1.snd",0xe000,0x2000, CRC(a04bf7d0) SHA1(5be5d445b199e7dc9d42e7ee5e9b31c18dec3881))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("yrom1.snd",0xe000,0x2000, CRC(ee5f868b) SHA1(23ef4112b94109ad4d4a6b9bb5215acec20e5e55))
+ROM_END
+
+ROM_START(ravena)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("prom2a.cpu", 0x1000, 0x0800, CRC(a693785e) SHA1(7c8878f1c3c5205b3ae46a78c881bbd2b722838d))
 	ROM_RELOAD(0x5000, 0x0800)
 	ROM_RELOAD(0x9000, 0x0800)
 	ROM_RELOAD(0xd000, 0x0800)
@@ -844,6 +941,25 @@ ROM_START(sprbreak)
 	ROM_RELOAD(0x9000, 0x0800)
 	ROM_RELOAD(0xd000, 0x0800)
 	ROM_LOAD("prom1.cpu", 0x2000, 0x2000, CRC(53ed608b) SHA1(555a6c02d637ea03e8265bb2b0fba95f2e2584b3))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("drom1.snd",0xe000,0x2000, CRC(97d3f9ba) SHA1(1b34c7e51373c26d29d757c57a2b0333fe38d19e))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("yrom1.snd",0xe000,0x2000, CRC(5ea89df9) SHA1(98ce7661a4d862fd02c77e69b0f6e9372c3ade2b))
+	ROM_LOAD("yrom2.snd",0xc000,0x2000, CRC(0fb0128e) SHA1(3bdc5ed11b8e062f71f2a78b955830bd985e80a3))
+ROM_END
+
+ROM_START(sprbreaka)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("prom2a.cpu", 0x1000, 0x0800, CRC(d9d841b4) SHA1(8b9773e5ae9917d27089deca3b8311cb74e7f88e))
+	ROM_RELOAD(0x5000, 0x0800)
+	ROM_RELOAD(0x9000, 0x0800)
+	ROM_RELOAD(0xd000, 0x0800)
+	ROM_LOAD("prom1a.cpu", 0x2000, 0x2000, CRC(93db71e9) SHA1(59f75c4ef2c36b4f1f94dd365f2df82e7bcf53f8))
 	ROM_RELOAD(0x6000, 0x2000)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
@@ -950,21 +1066,46 @@ ROM_START(victoryp)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(921a100e) SHA1(0c3c7eae4ceeb5a1a8150bac52203d3f1e8f917e))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ System 80B Test Fixture
+/-------------------------------------------------------------------*/
+ROM_START(s80btest)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("test2.cpu", 0x1000, 0x0800, CRC(6199c002) SHA1(d997e7a2f10b1780532aea689ee00e0c60e1cc64))
+	ROM_RELOAD(0x5000, 0x0800)
+	ROM_RELOAD(0x9000, 0x0800)
+	ROM_RELOAD(0xd000, 0x0800)
+	ROM_LOAD("test1.cpu", 0x2000, 0x2000, CRC(032ccbff) SHA1(e6703bd061d7c8c7e8917371d253647cf1320356))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("testd.snd", 0x8000, 0x8000, CRC(5d04a6d9) SHA1(f83bd8692146af7d234c1a32d0b688e76d1b2b85))
+ROM_END
 
 GAME(1985, bountyh,   0,        gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bounty Hunter",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985, triplay,   0,        gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Triple Play",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985, triplay,   0,        gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Chicago Cubs' Triple Play", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985, triplaya,  triplay,  gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Chicago Cubs' Triple Play (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985, rock,      0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Rock",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985, tagteamp,  0,        gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Tag-Team Wrestling",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985, tagteamp2, tagteamp, gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Tag-Team Wrestling (rev.2)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1986, raven,     0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Raven",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, ravena,    raven,    gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Raven (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1986, hlywoodh,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Hollywood Heat",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1986, rock_enc,  rock,     gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Rock Encore",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1986, genesisp,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Genesis",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, amazonh2,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Amazon Hunt II (French)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, sprbreak,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Spring Break",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(19??, sprbreaks, sprbreak, gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Spring Break (single ball game)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, sprbreaka, sprbreak, gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Spring Break (alternate set)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, sprbreaks, sprbreak, gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Spring Break (single ball game)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1986, goldwing,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Gold Wings",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, mntecrlo,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Monte Carlo (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, mntecrloa, mntecrlo, gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Monte Carlo (Pinball, alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, arena,     0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Arena",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, arenaa,    arena,    gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Arena (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, victoryp,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Victory (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, diamondp,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Diamond Lady",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, txsector,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "TX-Sector",            MACHINE_IS_SKELETON_MECHANICAL)
@@ -976,3 +1117,5 @@ GAME(1989, hotshots,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "
 GAME(1989, bonebstr,  0,        bonebstr,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bone Busters Inc.",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989, bonebstrf, bonebstr, bonebstr,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bone Busters Inc. (French)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989, nmoves,    0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "International Concepts", "Night Moves",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, amazonh3,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Amazon Hunt III (French)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?, s80btest,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "System 80B Test",       MACHINE_IS_SKELETON_MECHANICAL)

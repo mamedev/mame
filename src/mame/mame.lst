@@ -8463,6 +8463,7 @@ brooklyn                        //
 brooklyna                       //
 cntine31                        //
 cntinntl                        //
+cntinntl2                       //
 domino2                         //
 ggate                           //
 ggatea                          //
@@ -13808,6 +13809,7 @@ hh_1                            //
 jamesb                          //
 jamesb2                         //
 marsp                           //
+marspf                          //
 panthera                        //
 pnkpnthr                        //
 s80tst                          //
@@ -13816,11 +13818,13 @@ starrace                        //
 timeline                        //
 vlcno_1a                        //
 vlcno_1b                        //
+vlcno_1c                        //
 vlcno_ax                        //
 
 @source:gts80a.cpp
 alienstr                        //
 amazonh                         //
+amazonha                        //
 caveman                         //
 cavemana                        //
 dvlsdre                         //
@@ -13843,7 +13847,10 @@ thegames                        //
 touchdn                         //
 
 @source:gts80b.cpp
+amazonh2                        //
+amazonh3                        //
 arena                           //
+arenaa                          //
 badgirls                        //
 bighouse                        //
 bonebstr                        //
@@ -13856,16 +13863,21 @@ goldwing                        //
 hlywoodh                        //
 hotshots                        //
 mntecrlo                        //
+mntecrloa                       //
 nmoves                          //
 raven                           //
+ravena                          //
 robowars                        //
 rock                            //
 rock_enc                        //
+s80btest                        //
 sprbreak                        //
+sprbreaka                       //
 sprbreaks                       //
 tagteamp                        //
 tagteamp2                       //
 triplay                         //
+triplaya                        //
 txsector                        //
 victoryp                        //
 

@@ -566,6 +566,17 @@ ROM_START(marsp)
 	ROM_LOAD("666-s2.snd", 0x7800, 0x0800, CRC(e5616f3e) SHA1(a6b5ebd0b456a555db0889cd63ce79aafc64dbe5))
 ROM_END
 
+ROM_START(marspf)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
+	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	ROM_LOAD("666-1.cpu", 0x1000, 0x0800, CRC(bb7d476a) SHA1(22d5d7f0e52c5180f73a1ca0b3c6bd4b7d0843d6))
+
+	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
+	ROM_LOAD("f666-s1.snd", 0x7000, 0x0800, CRC(f9f782c5) SHA1(83438fcf3475bc2cb24c828036d94063c263a031))
+	ROM_LOAD("f666-s2.snd", 0x7800, 0x0800, CRC(7bd64d94) SHA1(a52492820e69f2072fd1dffb5cbb48fb960e19ce))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Panthera #652
 /-------------------------------------------------------------------*/
@@ -710,6 +721,18 @@ ROM_START(vlcno_ax)
 	ROM_LOAD("667-s2.snd", 0x7800, 0x0800, CRC(b54bd123) SHA1(3522ccdcb28bfacff2287f5537d52f22879249ab))
 ROM_END
 
+ROM_START(vlcno_1c)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
+	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	ROM_LOAD("667-1c.cpu", 0x1000, 0x0800, CRC(e364202d) SHA1(128eaa5b390e309f4cf89f3631da0341f1419ffe))
+
+	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_LOAD("667-a-s.snd", 0x0400, 0x0400, CRC(894b4e2e) SHA1(d888f8e00b2b50cef5cc916d46e4c5e6699914a1))
+	ROM_RELOAD( 0x0800, 0x0400)
+	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+ROM_END
+
 ROM_START(vlcno_1b)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
@@ -761,9 +784,11 @@ ROM_END
 /* disp1 */GAME(1981, forceii,    0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Force II",             MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME(1981, pnkpnthr,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Pink Panther",         MACHINE_IS_SKELETON_MECHANICAL)
 /* disp1 */GAME(1981, marsp,      0,        gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Mars - God of War",    MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, marspf,     marsp,    gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL)
 /* disp1 */GAME(1981, vlcno_ax,   0,        gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano",              MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, vlcno_1b,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano (Sound Only set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, vlcno_1a,   vlcno_1b, gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano (Sound Only set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, vlcno_1c,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano (Sound Only set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, vlcno_1b,   vlcno_1c, gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano (Sound Only set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, vlcno_1a,   vlcno_1c, gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano (Sound Only set 3)", MACHINE_IS_SKELETON_MECHANICAL)
 /* disp2 */GAME(1981, blckhole,   0,        gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Black Hole (Rev. 4)",      MACHINE_IS_SKELETON_MECHANICAL)
 /* disp2 */GAME(1981, blckhole2,  blckhole, gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Black Hole (Rev. 2)",      MACHINE_IS_SKELETON_MECHANICAL)
 /* disp2 */GAME(1981, blckhols,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Black Hole (Sound Only)",  MACHINE_IS_SKELETON_MECHANICAL)
