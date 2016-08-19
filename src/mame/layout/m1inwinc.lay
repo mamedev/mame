@@ -38,6 +38,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="Winnings">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_205_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -49,6 +75,32 @@
 		</rect>
 	</element>
 	<element name="lamp_205_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="Bonus">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -90,6 +142,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="Repeat">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_136_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.50">
@@ -101,6 +179,32 @@
 		</rect>
 	</element>
 	<element name="lamp_136_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Mystic Mog">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00">
 			</color>
@@ -148,6 +252,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="Trail ">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="Held">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_138_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.25" green="0.50" blue="0.50">
@@ -174,6 +310,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.25" green="0.50" blue="0.50">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.06" green="0.12" blue="0.12">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="1.00" blue="1.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.13" green="0.25" blue="0.25">
+			</color>
+		</disk>
+		<text string="&#xA3;1">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_137_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -185,6 +347,38 @@
 		</rect>
 	</element>
 	<element name="lamp_137_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="9">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -238,6 +432,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="11">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_140_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -249,6 +475,38 @@
 		</rect>
 	</element>
 	<element name="lamp_140_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="12">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -296,6 +554,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<text string="Boost">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_143_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -307,6 +591,38 @@
 		</rect>
 	</element>
 	<element name="lamp_143_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="15">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -354,6 +670,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.25" green="0.50" blue="0.50">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.06" green="0.12" blue="0.12">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="1.00" blue="1.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.13" green="0.25" blue="0.25">
+			</color>
+		</disk>
+		<text string="60p">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_135_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -365,6 +707,38 @@
 		</rect>
 	</element>
 	<element name="lamp_135_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="7">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -418,6 +792,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="5">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_132_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.00" green="0.25" blue="0.50">
@@ -429,6 +835,32 @@
 		</rect>
 	</element>
 	<element name="lamp_132_1" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Nudge Now">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.00" green="0.50" blue="1.00">
 			</color>
@@ -476,6 +908,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="3">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_129_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.00" green="0.00" blue="0.00">
@@ -502,6 +966,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<text string="Boost">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_128_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -513,6 +1003,38 @@
 		</rect>
 	</element>
 	<element name="lamp_128_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="Start">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -566,6 +1088,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="57">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_38_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -577,6 +1131,32 @@
 		</rect>
 	</element>
 	<element name="lamp_38_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#xA3;1">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -618,6 +1198,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#xA3;1.60">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_42_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -629,6 +1235,32 @@
 		</rect>
 	</element>
 	<element name="lamp_42_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#xA3;2">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -670,6 +1302,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#xA3;2.40">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_46_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -681,6 +1339,32 @@
 		</rect>
 	</element>
 	<element name="lamp_46_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#xA3;3">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -722,6 +1406,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#xA3;6">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_248_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -733,6 +1443,32 @@
 		</rect>
 	</element>
 	<element name="lamp_248_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="Instant">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -774,6 +1510,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="Win">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_217_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.50">
@@ -785,6 +1547,32 @@
 		</rect>
 	</element>
 	<element name="lamp_217_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Boost">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00">
 			</color>
@@ -826,6 +1614,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Respin">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_213_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.50">
@@ -837,6 +1651,32 @@
 		</rect>
 	</element>
 	<element name="lamp_213_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Random Stop">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00">
 			</color>
@@ -878,6 +1718,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Skill Stop">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_209_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.50">
@@ -889,6 +1755,32 @@
 		</rect>
 	</element>
 	<element name="lamp_209_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Lo">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00">
 			</color>
@@ -930,6 +1822,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Hi">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_36_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.25" green="0.25" blue="0.38">
@@ -941,6 +1859,32 @@
 		</disk>
 	</element>
 	<element name="lamp_36_1" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.50" blue="0.75">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.13" green="0.13" blue="0.19">
+			</color>
+		</disk>
+		<text string="Nudge Now">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.25" green="0.25" blue="0.38">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.06" green="0.06" blue="0.09">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
 		<disk state="1">
 			<color red="0.50" green="0.50" blue="0.75">
 			</color>
@@ -982,6 +1926,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.15" blue="0.15">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.04" blue="0.04">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.29" blue="0.29">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.07" blue="0.07">
+			</color>
+		</disk>
+		<text string="D">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_81_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.50" green="0.15" blue="0.15">
@@ -993,6 +1963,32 @@
 		</disk>
 	</element>
 	<element name="lamp_81_1" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.29" blue="0.29">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.07" blue="0.07">
+			</color>
+		</disk>
+		<text string="U">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.15" blue="0.15">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.04" blue="0.04">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
 		<disk state="1">
 			<color red="1.00" green="0.29" blue="0.29">
 			</color>
@@ -1034,6 +2030,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="1">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_34_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.38">
@@ -1045,6 +2067,32 @@
 		</rect>
 	</element>
 	<element name="lamp_34_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="2">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.75">
 			</color>
@@ -1086,6 +2134,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="3">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_32_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.38">
@@ -1097,6 +2171,32 @@
 		</rect>
 	</element>
 	<element name="lamp_32_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="4">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.75">
 			</color>
@@ -1138,6 +2238,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="lamp_189_1_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_189_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;1">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_192_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.25" blue="0.38">
@@ -1149,6 +2275,32 @@
 		</rect>
 	</element>
 	<element name="lamp_192_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;3">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="lamp_189_2_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_189_2" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="0.50" blue="0.75">
 			</color>
@@ -1190,6 +2342,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="lamp_189_3_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_189_3" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;2">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_201_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.25" blue="0.38">
@@ -1201,6 +2379,32 @@
 		</rect>
 	</element>
 	<element name="lamp_201_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;3">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="lamp_189_4_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_189_4" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="0.50" blue="0.75">
 			</color>
@@ -1242,6 +2446,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="lamp_188_1_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_188_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;5">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_196_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.25" blue="0.38">
@@ -1253,6 +2483,32 @@
 		</rect>
 	</element>
 	<element name="lamp_196_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;2">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="lamp_188_2_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_188_2" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="0.50" blue="0.75">
 			</color>
@@ -1294,6 +2550,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="lamp_188_3_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_188_3" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;1">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_202_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.25" blue="0.38">
@@ -1305,6 +2587,32 @@
 		</rect>
 	</element>
 	<element name="lamp_202_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="JP">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="lamp_188_4_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_188_4" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="0.50" blue="0.75">
 			</color>
@@ -1346,6 +2654,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="lamp_188_5_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_188_5" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;3">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_194_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.25" blue="0.38">
@@ -1357,6 +2691,32 @@
 		</rect>
 	</element>
 	<element name="lamp_194_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;3">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="lamp_188_6_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_188_6" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="0.50" blue="0.75">
 			</color>
@@ -1398,6 +2758,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="lamp_189_5_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_189_5" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="&#xA3;5">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_193_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.25" blue="0.38">
@@ -1409,6 +2795,32 @@
 		</rect>
 	</element>
 	<element name="lamp_193_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.50" blue="0.75">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.13" blue="0.19">
+			</color>
+		</rect>
+		<text string="JP">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="lamp_189_6_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.25" blue="0.38">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.09">
+			</color>
+		</rect>
+	</element>
+	<element name="lamp_189_6" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="0.50" blue="0.75">
 			</color>
@@ -1456,6 +2868,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.50" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.12" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="1.00" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.25" blue="0.25">
+			</color>
+		</rect>
+		<text string="Jackpot">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="58">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_187_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.00" blue="0.00">
@@ -1467,6 +2911,38 @@
 		</rect>
 	</element>
 	<element name="lamp_187_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<text string="Scratch Card">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="59">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.00" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00">
 			</color>
@@ -1526,6 +3002,44 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.00" blue="0.00">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<text string="Step to">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.27">
+			</bounds>
+		</text>
+		<text string="Nearest">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.37" width="0.80" height="0.27">
+			</bounds>
+		</text>
+		<text string="Win">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.63" width="0.80" height="0.27">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_142_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.50" green="0.00" blue="0.00">
@@ -1537,6 +3051,38 @@
 		</disk>
 	</element>
 	<element name="lamp_142_1" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<text string="Skill">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.40">
+			</bounds>
+		</text>
+		<text string="Cash">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.50" width="0.80" height="0.40">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.00" blue="0.00">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
 		<disk state="1">
 			<color red="1.00" green="0.00" blue="0.00">
 			</color>
@@ -1590,6 +3136,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="23">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_150_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.25" green="0.50" blue="0.50">
@@ -1601,6 +3179,32 @@
 		</disk>
 	</element>
 	<element name="lamp_150_1" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="1.00" blue="1.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.13" green="0.25" blue="0.25">
+			</color>
+		</disk>
+		<text string="&#xA3;1.60">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.25" green="0.50" blue="0.50">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.06" green="0.12" blue="0.12">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
 		<disk state="1">
 			<color red="0.50" green="1.00" blue="1.00">
 			</color>
@@ -1642,6 +3246,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="Trail Held">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_148_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -1653,6 +3283,38 @@
 		</rect>
 	</element>
 	<element name="lamp_148_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="20">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -1706,6 +3368,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="19">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_146_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.50" green="0.00" blue="0.00">
@@ -1717,6 +3411,38 @@
 		</disk>
 	</element>
 	<element name="lamp_146_1" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<text string="Lucky">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.40">
+			</bounds>
+		</text>
+		<text string="Dip">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.50" width="0.80" height="0.40">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.00" blue="0.00">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
 		<disk state="1">
 			<color red="1.00" green="0.00" blue="0.00">
 			</color>
@@ -1770,6 +3496,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="17">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_153_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -1781,6 +3539,38 @@
 		</rect>
 	</element>
 	<element name="lamp_153_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="25">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -1828,6 +3618,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.25" green="0.50" blue="0.50">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.06" green="0.12" blue="0.12">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="1.00" blue="1.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.13" green="0.25" blue="0.25">
+			</color>
+		</disk>
+		<text string="&#xA3;2">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_155_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -1839,6 +3655,38 @@
 		</rect>
 	</element>
 	<element name="lamp_155_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="27">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -1886,6 +3734,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Nudge Now">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_157_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -1897,6 +3771,38 @@
 		</rect>
 	</element>
 	<element name="lamp_157_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="29">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -1944,6 +3850,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.00" blue="0.00">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<text string="Instant Win">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_159_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -1955,6 +3887,38 @@
 		</rect>
 	</element>
 	<element name="lamp_159_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="31">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -2008,6 +3972,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="39">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_166_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.25" green="0.50" blue="0.50">
@@ -2034,6 +4030,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.25" green="0.50" blue="0.50">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.06" green="0.12" blue="0.12">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="1.00" blue="1.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.13" green="0.25" blue="0.25">
+			</color>
+		</disk>
+		<text string="&#xA3;2.40">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_165_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -2045,6 +4067,38 @@
 		</rect>
 	</element>
 	<element name="lamp_165_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="37">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -2098,6 +4152,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="36">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_163_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.00" green="0.25" blue="0.50">
@@ -2109,6 +4195,32 @@
 		</rect>
 	</element>
 	<element name="lamp_163_1" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Nudge Now">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.00" green="0.50" blue="1.00">
 			</color>
@@ -2150,6 +4262,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.00" blue="0.00">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<text string="Number Run">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_161_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -2161,6 +4299,38 @@
 		</rect>
 	</element>
 	<element name="lamp_161_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="33">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -2214,6 +4384,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="41">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_170_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.25" green="0.50" blue="0.50">
@@ -2225,6 +4427,32 @@
 		</disk>
 	</element>
 	<element name="lamp_170_1" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="1.00" blue="1.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.13" green="0.25" blue="0.25">
+			</color>
+		</disk>
+		<text string="&#xA3;3">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.25" green="0.50" blue="0.50">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.06" green="0.12" blue="0.12">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
 		<disk state="1">
 			<color red="0.50" green="1.00" blue="1.00">
 			</color>
@@ -2272,6 +4500,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="44">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_171_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -2298,6 +4558,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="Trail Held">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_173_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -2309,6 +4595,38 @@
 		</rect>
 	</element>
 	<element name="lamp_173_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="45">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -2362,6 +4680,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.00" blue="0.00">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<text string="Can U ">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.40">
+			</bounds>
+		</text>
+		<text string="MT me">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.50" width="0.80" height="0.40">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_175_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.00">
@@ -2373,6 +4723,38 @@
 		</rect>
 	</element>
 	<element name="lamp_175_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="&#x3C;-">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="47">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00">
 			</color>
@@ -2426,6 +4808,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="55">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_182_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.25" green="0.50" blue="0.50">
@@ -2437,6 +4851,32 @@
 		</disk>
 	</element>
 	<element name="lamp_182_1" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="1.00" blue="1.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.13" green="0.25" blue="0.25">
+			</color>
+		</disk>
+		<text string="&#xA3;5">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.25" green="0.50" blue="0.50">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.06" green="0.12" blue="0.12">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
 		<disk state="1">
 			<color red="0.50" green="1.00" blue="1.00">
 			</color>
@@ -2484,6 +4924,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="53">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_180_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.00" green="0.00" blue="0.00">
@@ -2495,6 +4967,32 @@
 		</rect>
 	</element>
 	<element name="lamp_180_1" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<text string="Boost">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.00" green="0.00" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.00" green="0.00" blue="0.00">
 			</color>
@@ -2542,6 +5040,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="51">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_178_1_border" defstate="0">
 		<disk state="1">
 			<color red="0.50" green="0.00" blue="0.00">
@@ -2553,6 +5083,32 @@
 		</disk>
 	</element>
 	<element name="lamp_178_1" defstate="0">
+		<disk state="1">
+			<color red="1.00" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<text string="Cash Cracker">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<disk state="1">
+			<color red="0.50" green="0.00" blue="0.00">
+			</color>
+		</disk>
+		<disk state="0">
+			<color red="0.12" green="0.00" blue="0.00">
+			</color>
+		</disk>
+	</element>
+	<element name="" defstate="0">
 		<disk state="1">
 			<color red="1.00" green="0.00" blue="0.00">
 			</color>
@@ -2600,6 +5156,38 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
+		<text string="-&#x3E;">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45">
+			</bounds>
+		</text>
+		<text string="49">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_144_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.50">
@@ -2611,6 +5199,32 @@
 		</rect>
 	</element>
 	<element name="lamp_144_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Mystic Mog">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00">
 			</color>
@@ -2652,6 +5266,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Mystic Mog">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_176_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.50">
@@ -2663,6 +5303,32 @@
 		</rect>
 	</element>
 	<element name="lamp_176_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Mystic Mog">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00">
 			</color>
@@ -2704,6 +5370,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Mystic Mog">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_168_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.50">
@@ -2715,6 +5407,32 @@
 		</rect>
 	</element>
 	<element name="lamp_168_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Mystic Mog">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00">
 			</color>
@@ -2756,6 +5474,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Mystic Mog">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_252_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.50">
@@ -2767,6 +5511,32 @@
 		</rect>
 	</element>
 	<element name="lamp_252_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.25">
+			</color>
+		</rect>
+		<text string="">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="1.00">
 			</color>
@@ -2808,6 +5578,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.25">
+			</color>
+		</rect>
+		<text string="">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_254_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="0.50">
@@ -2819,6 +5615,32 @@
 		</rect>
 	</element>
 	<element name="lamp_254_1" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.25">
+			</color>
+		</rect>
+		<text string="">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="1.00">
 			</color>
@@ -2860,6 +5682,32 @@
 			</bounds>
 		</text>
 	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.25">
+			</color>
+		</rect>
+		<text string="">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
 	<element name="lamp_210_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.25" green="0.25" blue="0.50">
@@ -2871,6 +5719,32 @@
 		</rect>
 	</element>
 	<element name="lamp_210_1" defstate="0">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="1.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.13" green="0.13" blue="0.25">
+			</color>
+		</rect>
+		<text string="Mystic Mog">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="_border" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="0.50">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.06" green="0.06" blue="0.12">
+			</color>
+		</rect>
+	</element>
+	<element name="" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00">
 			</color>
