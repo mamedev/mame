@@ -258,24 +258,21 @@ Notes:
          CN12 - 5 volt output connector
 
 
----------------------------------------------------------
-Bios Version Information                                |
----------------------------------------------------------
-    Bios                     |   Support | Support      |
-    Label                    |   GD-ROM  | Cabinet Link |
----------------------------------------------------------
-Naomi / GD-ROM               |           |              |
-    EPR-21576D (and earlier) |   No      |    No        |
-    EPR-21576E               |   Yes     |    No        |
-    EPR-21576F               |   Yes     |    Yes       |
-    EPR-21576G (and newer)   |   Yes     |    Yes       |
----------------------------------------------------------
-Naomi 2 / GD-ROM             |           |              |
-    EPR-23605                |   Yes     |    No        |
-    EPR-23605A               |   Yes     |    Yes       |
-    EPR-23605B (and newer)   |   Yes     |    Yes       |
----------------------------------------------------------
-
+------------------------------------------------------------------------------------------------------------
+Bios Version Information                                                                                   |          
+------------------------------------------------------------------------------------------------------------
+    Bios Label               |  Support    | mobo s/n    | 171-7978B   | Support | Support   | 171-8346C   |
+---------------------------- | Multi-Board | EEPROM type | M1-type     | DIMM    | Net-DIMM  | M4-type     |
+    NAOMI     |  Naomi 2     |             |             | ROM board   |         |           | ROM board   |
+------------------------------------------------------------------------------------------------------------
+  EPR-21576B  (and earlier)  |   No        |  X76F100    |   No        |   No    |    No     |   No        |
+  EPR-21576C  |              |   Yes       |  X76F100    |   No        |   No    |    No     |   No        |
+  EPR-21576D  |              |   Yes       |   Any       |   Yes       |   No    |    No     |   No        |
+  EPR-21576E  |  EPR-23605   |   Yes       |   Any       |   Yes       |   Yes   |    No     |   No        |
+              |  EPR-23605A  |   Yes       |   Any       |   Yes       |   Yes   |    Yes    |   No        |
+  EPR-21576G  |  EPR-23605B  |   Yes       |   Any       |   Yes       |   Yes   |    Yes    |   No        |
+  EPR-21576H  |  EPR-23605C  |   Yes       |   Any       |   Yes       |   Yes   |    Yes    |   Yes       |
+------------------------------------------------------------------------------------------------------------
 
 NAOMI ROM cart usage
 -------------------------
@@ -1593,6 +1590,7 @@ WRITE64_MEMBER(naomi_state::naomi_unknown1_w )
 READ64_MEMBER(naomi_state::eeprom_93c46a_r )
 {
 	int res;
+	// bit 0 - EEPROM type: 0 - 93C46, 1 - X76F100 TODO
 
 	/* bit 3 is EEPROM data */
 	res = m_eeprom->do_read() << 4;
@@ -2787,10 +2785,12 @@ MACHINE_CONFIG_END
 
 /* BIOS info:
 
-Revisions A through D can handle game carts only
+Revisions through C supports only motherboards with X76F100 seral number eeprom
+Revisions through D can handle game carts only
 Revisions C and later can also handle Multi-board
-Revisions E and later can also handle GD-Rom board
-Revisions F and later can also handle GD-Rom board and or the network GD-Rom board
+Revisions E and later can also handle DIMM board
+Revisions G and later can also handle DIMM board and or the network DIMM board
+Revision  H can also handle M4-type ROM-boards
 
 F355 has it's own BIOS (3 screen version)
 
@@ -6898,7 +6898,7 @@ PIC stuff
 
 command             response                   comment
 
-kayjyo!?          ->:\x70\x1f\x71\x1f\0\0\0    (unlock gdrom)
+kayjyo!?          ->:\x70\x1f\x71\x1f\0\0\0    (SYS_CHK_SECU and SYS_REQ_SECU gdrom commands, last byte is 1 in network boot games)
 C1strdf0          ->5BDA.BIN                   (lower part of boot filename string, BDA.BIN in this example)
 D1strdf1          ->6\0\0\0\0\0\0\0            (upper part of filename string)
 bsec_ver          ->8VER0001                   (always the same? )
