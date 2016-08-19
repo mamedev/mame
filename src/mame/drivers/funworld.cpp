@@ -3610,22 +3610,6 @@ ROM_START( jolycdab )
 ROM_END
 
 
-ROM_START( intrgmes )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bonus-off_5b87d19c.bin", 0x8000, 0x8000, CRC(03a4d1ef) SHA1(375ae1de5e6e4a7a6d6cedfd08902826fa62f93b) )
-
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "ig2ch2.bin", 0x0000, 0x8000, CRC(52f0bc70) SHA1(cd9ba34efb438c9610551900c3de2a09aea76cb9) )
-	ROM_LOAD( "ig2ch1.bin", 0x8000, 0x8000, CRC(8fc7d74e) SHA1(bf7ee7ef5c95877fe82fb6e04a5d8ab211fc730c) )
-
-	ROM_REGION( 0x0800, "nvram", 0 )    /* Default NVRAM. */
-	ROM_LOAD( "ds1220y.bin", 0x0000, 0x0800, CRC(7bc4554e) SHA1(c9ad1651e673f8edd0fd354b1098db8f27697d18) )
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
-ROM_END
-
-
 /******************************** Bonus Card based sets ************************************/
 
 /*
@@ -5802,6 +5786,36 @@ ROM_START( chinatow )
 ROM_END
 
 
+/*
+  Unknown poker game from Inter Games.
+  
+  1x G65C02P-2
+  2x MC68B21P
+  1x MC68B45P
+  1x AY38910A/P
+  3x NMC27C256Q
+  1x Dallas DS1220Y
+  1x AM27S29APC
+  1x LM380N
+  1x Crystal 16.0000 MHz.
+  
+*/
+ROM_START( intrgmes )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bonus-off_5b87d19c.bin", 0x8000, 0x8000, CRC(03a4d1ef) SHA1(375ae1de5e6e4a7a6d6cedfd08902826fa62f93b) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "ig2ch2.bin", 0x0000, 0x8000, CRC(52f0bc70) SHA1(cd9ba34efb438c9610551900c3de2a09aea76cb9) )
+	ROM_LOAD( "ig2ch1.bin", 0x8000, 0x8000, CRC(8fc7d74e) SHA1(bf7ee7ef5c95877fe82fb6e04a5d8ab211fc730c) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* Default NVRAM. */
+	ROM_LOAD( "ds1220y.bin", 0x0000, 0x0800, CRC(7bc4554e) SHA1(c9ad1651e673f8edd0fd354b1098db8f27697d18) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
+ROM_END
+
+
 // http://www.citylan.it/wiki/images/6/69/1189_PCB_component_side.jpg
 ROM_START( royalcrd_nes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5840,6 +5854,8 @@ ROM_START( royalcrd_msx )
 	ROM_LOAD( "me0.bin",    0x0000, 0x10000, CRC(bd5be18b) SHA1(b43a176db0522bcda0a17dd0c210c987dc380c97) ) // weird pattern? might be bad if not a lookup table?  BADADDR        -------xxxxxxxxx
 	ROM_LOAD( "me1.bin",    0x0000, 0x40000, CRC(2152c6b7) SHA1(e512e29f4a899cc3f91a446141fd4432a487228f) )
 ROM_END
+
+
 
 /**************************
 *  Driver Initialization  *
