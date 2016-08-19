@@ -49,8 +49,8 @@ public:
 	virtual void mcs0_w(address_space &space, offs_t offset, UINT8 data) { }
 	virtual UINT8 mcs1_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void mcs1_w(address_space &space, offs_t offset, UINT8 data) { }
-	virtual UINT8 pcs3_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void pcs3_w(address_space &space, offs_t offset, UINT8 data) { }
+	virtual UINT16 pcs3_r(address_space &space, offs_t offset) { return 0xff; }
+	virtual void pcs3_w(address_space &space, offs_t offset, UINT16 data) { }
 	virtual UINT8 pcs6_6_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void pcs6_6_w(address_space &space, offs_t offset, UINT8 data) { }
 	virtual UINT8 dma_ack_r(address_space &space, offs_t offset) { return 0xff; }
@@ -77,8 +77,8 @@ public:
 	DECLARE_WRITE8_MEMBER( mcs0_w ) { if (m_card) m_card->mcs0_w(space, offset, data); }
 	DECLARE_READ8_MEMBER( mcs1_r ) { return m_card ? m_card->mcs1_r(space, offset) : 0xff; }
 	DECLARE_WRITE8_MEMBER( mcs1_w ) { if (m_card) m_card->mcs1_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( pcs3_r ) { return m_card ? m_card->pcs3_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( pcs3_w ) { if (m_card) m_card->pcs3_w(space, offset, data); }
+	DECLARE_READ16_MEMBER( pcs3_r ) { return m_card ? m_card->pcs3_r(space, offset) : 0xff; }
+	DECLARE_WRITE16_MEMBER( pcs3_w ) { if (m_card) m_card->pcs3_w(space, offset, data); }
 	DECLARE_READ8_MEMBER( pcs6_6_r ) { return m_card ? m_card->pcs6_6_r(space, offset) : 0xff; }
 	DECLARE_WRITE8_MEMBER( pcs6_6_w ) { if (m_card) m_card->pcs6_6_w(space, offset, data); }
 	DECLARE_READ8_MEMBER( dma_ack_r ) { return m_card ? m_card->dma_ack_r(space, offset) : 0xff; }

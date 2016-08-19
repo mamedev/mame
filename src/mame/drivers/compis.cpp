@@ -29,16 +29,21 @@
     80000-EFFFF NOP
     F0000-FFFFF ROM UMCS (Upper Memory Chip Select)
 
-18/08/2011 -[Robbbert]
-- Modernised
-- Removed F4 display, as the gfx is in different places per bios.
-- Changed to monochrome, it usually had a greenscreen monitor, although some
-  were amber.
-- Still doesn't work.
-- Added a nasty hack to get a display on compis2 (wait 20 seconds)
-
-
 ******************************************************************************/
+
+/*
+
+	TODO:
+
+	- disk formats
+	- uhrg graphics are drawn wrong (upd7220 bugs?)
+	- compis2
+		- color graphics
+		- 8087
+		- programmable keyboard
+	- hard disk
+
+*/
 
 #include "emu.h"
 #include "softlist.h"
@@ -396,7 +401,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis2_mem, AS_PROGRAM, 16, compis_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xbffff) AM_RAM
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 
@@ -410,12 +415,9 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE(0x0000, 0x0007) /* PCS0 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8255_TAG, i8255_device, read, write, 0xff00)
 	AM_RANGE(0x0080, 0x0087) /* PCS1 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x0100, 0x011f) /* PCS2 */ AM_MIRROR(0x60) AM_DEVREADWRITE8(MM58174A_TAG, mm58274c_device, read, write, 0x00ff)
-	//AM_RANGE(0x0180, 0x0181) /* PCS3 */ AM_MIRROR(0x7e)
+	AM_RANGE(0x0180, 0x01ff) /* PCS3 */ AM_DEVREADWRITE(GRAPHICS_TAG, compis_graphics_slot_t, pcs3_r, pcs3_w)
 	//AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
 	AM_RANGE(0x0280, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVICE(I80130_TAG, i80130_device, io_map)
-//	AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
-//	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0xff00)
-//	AM_RANGE(0x0312, 0x0313) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, status_r, control_w, 0xff00)
 	AM_RANGE(0x0300, 0x030f) AM_READWRITE(pcs6_0_1_r, pcs6_0_1_w)
 	AM_RANGE(0x0310, 0x031f) AM_READWRITE(pcs6_2_3_r, pcs6_2_3_w)
 	AM_RANGE(0x0320, 0x032f) AM_READWRITE(pcs6_4_5_r, pcs6_4_5_w)
@@ -681,6 +683,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( compis_state::tape_tick )
 	m_maincpu->tmrin0_w(m_cassette->input() > 0.0);
 }
 
+
+
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -691,10 +695,26 @@ TIMER_DEVICE_CALLBACK_MEMBER( compis_state::tape_tick )
 
 void compis_state::machine_start()
 {
-	if (m_ram->size() == 256*1024)
+	// RAM size
+	switch (m_ram->size())
 	{
+	case 256*1024:
 		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x3ffff, nullptr);
+		break;
+
+	case 512*1024:
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x7ffff, nullptr);
+		break;
+
+	case 768*1024:
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0xbffff, nullptr);
+		break;
 	}
+
+	// state saving
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_tmr0));
 }
 
 
@@ -827,7 +847,8 @@ static MACHINE_CONFIG_DERIVED( compis2, compis )
 
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K")
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("512K,768K")
 MACHINE_CONFIG_END
 
 
@@ -868,5 +889,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
-COMP(1985,  compis,     0,      0,     compis,  compis, driver_device, 0, "Telenova", "Compis" , MACHINE_NOT_WORKING )
-COMP(1986,  compis2,    compis, 0,     compis2, compis, driver_device, 0, "Telenova", "Compis II" , MACHINE_NOT_WORKING )
+COMP(1985,  compis,     0,      0,     compis,  compis, driver_device, 0, "Telenova", "Compis" , MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP(1986,  compis2,    compis, 0,     compis2, compis, driver_device, 0, "Telenova", "Compis II" , MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
