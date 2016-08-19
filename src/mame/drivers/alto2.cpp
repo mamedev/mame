@@ -44,6 +44,9 @@ protected:
 	required_ioport m_io_row6;
 	required_ioport m_io_row7;
 	optional_ioport m_io_config;
+	static const device_timer_id TIMER_VBLANK = 0;
+	emu_timer* m_vblank_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /* Input Ports */
@@ -269,7 +272,7 @@ ADDRESS_MAP_START( alto2_iomem_map, AS_2, 16, alto2_state )
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( alto2, alto2_state )
-	/* basic machine hardware */
+	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
 	MCFG_CPU_ADD("maincpu", ALTO2, XTAL_29_4912MHz/5)
@@ -277,16 +280,13 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_CPU_DATA_MAP(alto2_const_map)
 	MCFG_CPU_IO_MAP(alto2_iomem_map)
 
-	/* video hardware */
+	// Video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
-             ALTO2_DISPLAY_TOTAL_WIDTH,
-                 0,
-                 ALTO2_DISPLAY_WIDTH,
-             ALTO2_DISPLAY_TOTAL_HEIGHT,
-                 16,                          // some scalines of vblank period before
-                 16+ALTO2_DISPLAY_HEIGHT+8)   // and after the usual range
-	MCFG_SCREEN_REFRESH_RATE(30)          // two interlaced fields at 60Hz
+             A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
+             A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)
+	// Two interlaced fields at 60Hz => 30Hz frame rate
+	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	/* sound hardware */
+	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -306,11 +306,24 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER( alto2_state, alto2 )
 {
-	// make the diablo drives known to the CPU core
+	// Make the diablo drives known to the CPU core
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
 	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
 	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
 	cpu->set_speaker(m_speaker);
+	// Create a timer which fires twice per frame, once for each field
+	m_vblank_timer = timer_alloc(TIMER_VBLANK);
+	m_vblank_timer->adjust(attotime::from_hz(30),0,attotime::from_hz(30*2));
+}
+
+void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
+	switch (id) {
+	case TIMER_VBLANK:
+		cpu->screen_vblank();
+		break;
+	}
 }
 
 /* Game Drivers */

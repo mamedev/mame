@@ -195,6 +195,9 @@ public:
 	//! update the screen bitmap
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	//! set the vblank bit for the display to synch upon
+	void screen_vblank();
+
 	DECLARE_ADDRESS_MAP( ucode_map, 32 );
 	DECLARE_ADDRESS_MAP( const_map, 16 );
 	DECLARE_ADDRESS_MAP( iomem_map, 16 );
@@ -584,10 +587,10 @@ private:
 	UINT8 m_bank_reg[ALTO2_TASKS];                  //!< normal and extended RAM banks per task
 	bool m_ether_enable;                            //!< set to true, if the ethernet should be simulated
 	bool m_ewfct;                                   //!< set by Ether task when it want's a wakeup at switch to task_mrt
-	int m_dsp_time;                                 //!< display_state_machine() time accu
-	int m_unload_time;                              //!< unload word time accu
+	attoseconds_t m_display_time;                   //!< display time accu (display state machine)
+	attoseconds_t m_unload_time;                    //!< unload word time accu (display FIFO)
 	int m_unload_word;                              //!< unload word number
-	int m_bitclk_time;                              //!< bitclk call time accu
+	attoseconds_t m_bitclk_time;                    //!< bitclk call time accu (disk shift register)
 	int m_bitclk_index;                             //!< bitclk index (bit number in sector)
 
 	static const char *task_name(int task);         //!< human readable task names

@@ -157,7 +157,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_wrtram_flag(false),
 	m_ether_enable(false),
 	m_ewfct(false),
-	m_dsp_time(0),
+	m_display_time(0),
 	m_unload_time(0),
 	m_unload_word(0),
 	m_bitclk_time(0),
@@ -872,7 +872,7 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_bank_reg));
 	save_item(NAME(m_ether_enable));
 	save_item(NAME(m_ewfct));
-	save_item(NAME(m_dsp_time));
+	save_item(NAME(m_display_time));
 	save_item(NAME(m_unload_time));
 	save_item(NAME(m_unload_word));
 	save_item(NAME(m_bitclk_time));
@@ -2275,11 +2275,42 @@ void alto2_cpu_device::execute_run()
 {
 	m_next = m_task_mpc[m_task];        // get current task's next mpc and address modifier
 	m_next2 = m_task_next2[m_task];
+	attoseconds_t ucycle = DOUBLE_TO_ATTOSECONDS(1.0/m_clock);
 
 	do {
-                if (m_dsp.vsync) {
-			// synchronizing to the vsync signal
-			continue;
+		if (m_display_time >= 0) {
+			/**
+			 * Subtract the microcycle time from the display time accu.
+			 * If it underflows, call the display state machine which
+			 * adds the time for 32 pixel clocks to the accu.
+			 * This is very close to every seventh CPU cycle
+			 */
+			m_display_time -= ucycle;
+			if (m_display_time < 0)
+				display_state_machine();
+		}
+
+		if (m_unload_time >= 0) {
+			/**
+			 * Subtract the microcycle time from the unload time accu.
+			 * If it underflows, call the unload word function which adds
+			 * the time for 16 or 32 pixel clocks to the accu, or ends
+			 * the FIFO unloading by leaving m_unload_time at -1.
+			 */
+			m_unload_time -= ucycle;
+			if (m_unload_time < 0)
+				unload_word();
+		}
+
+		if (m_bitclk_time >= 0) {
+			/**
+			 * Subtract the microcycle time from the bitclk time accu.
+			 * If it underflows, call the disk bitclk function which adds
+			 * the time for one bit as clock cycles to the accu, or ends
+			 * the bitclk sequence by leaving m_bitclk_time at -1.
+			 */
+			m_bitclk_time -= ucycle;
+			disk_bitclk(nullptr, m_bitclk_index);
 		}
 
 		m_mpc = m_next;             // next instruction's micro program counter
@@ -2859,41 +2890,6 @@ void alto2_cpu_device::execute_run()
 				}
 			}
 		}
-
-		if (m_dsp_time >= 0) {
-			/**
-			 * Subtract the microcycle time from the display time accu.
-			 * If it underflows, call the display state machine which
-			 * adds the time for 32 pixel clocks to the accu.
-			 * This is very close to every seventh CPU cycle
-			 */
-			m_dsp_time -= ALTO2_UCYCLE;
-			if (m_dsp_time < 0)
-				display_state_machine();
-		}
-
-		if (m_unload_time >= 0) {
-			/**
-			 * Subtract the microcycle time from the unload time accu.
-			 * If it underflows, call the unload word function which adds
-			 * the time for 16 or 32 pixel clocks to the accu, or ends
-			 * the FIFO unloading by leaving m_unload_time at -1.
-			 */
-			m_unload_time -= ALTO2_UCYCLE;
-			if (m_unload_time < 0)
-				unload_word();
-		}
-
-		if (m_bitclk_time >= 0) {
-			/**
-			 * Subtract the microcycle time from the bitclk time accu.
-			 * If it underflows, call the disk bitclk function which adds
-			 * the time for one bit as clock cycles to the accu, or ends
-			 * the bitclk sequence by leaving m_bitclk_time at -1.
-			 */
-			m_bitclk_time -= ALTO2_UCYCLE;
-			disk_bitclk(nullptr, m_bitclk_index);
-		}
 	} while (m_icount-- > 0);
 
 	// Save this task's mpc and address modifier
@@ -2935,7 +2931,7 @@ void alto2_cpu_device::hard_reset()
 	init_part();
 	init_kwd();
 
-	m_dsp_time = 0;                 // reset the display state timing
+	m_display_time = 0;                 // reset the display state timing
 	m_unload_time = 0;              // reset the word unload timing accu
 	m_bitclk_time = 0;              // reset the bitclk timing accu
 	m_task = task_emu;              // start with task 0 (emulator)
@@ -2981,7 +2977,7 @@ void alto2_cpu_device::soft_reset()
 	m_task = task_emu;              // set current task to emulator
 	m_task_wakeup = 1 << task_emu;  // set only the emulator task wakeup flag
 
-	m_dsp_time = 0;                 // reset the display state machine timing accu
+	m_display_time = 0;                 // reset the display state machine timing accu
 	m_unload_time = 0;              // reset the word unload timing accu
 	m_bitclk_time = 0;              // reset the bitclk timing accu
 }

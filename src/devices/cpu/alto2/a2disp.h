@@ -18,7 +18,7 @@
  *
  * The value is 2+4+16+128 = 150
  */
-#define ALTO2_DISPLAY_HLC_START (2+4+16+128)
+#define A2_DISP_HLC_START (2+4+16+128)
 
 /**
  * @brief End value for the horizontal line counter.
@@ -30,7 +30,7 @@
  * Note: The horizontal line counts 150 ... 1023 for the even field,
  * and 1024 ... 1899 for the odd field.
  */
-#define ALTO2_DISPLAY_HLC_END (1+2+8+32+64+256+512+1024)
+#define A2_DISP_HLC_END (1+2+8+32+64+256+512+1024)
 
 /**
  * @brief display total height, including overscan (vertical blanking and synch)
@@ -39,7 +39,7 @@
  * scanlines to the monitor. The frame rate is 60Hz, which is actually the rate
  * of the half-frames. The rate for full frames is thus 30Hz.
  */
-#define ALTO2_DISPLAY_TOTAL_HEIGHT ((ALTO2_DISPLAY_HLC_END + 1 - ALTO2_DISPLAY_HLC_START) / 2)
+#define A2_DISP_TOTAL_HEIGHT (static_cast<double>(A2_DISP_HLC_END - A2_DISP_HLC_START) / 2)
 
 /**
  * @brief display total width, including horizontal blanking
@@ -68,40 +68,39 @@
  * as its own next address A0-A3!
  *
  */
-#define ALTO2_DISPLAY_TOTAL_WIDTH 768
+#define A2_DISP_TOTAL_WIDTH 768
 
 //! The display fifo has 16 words.
-#define ALTO2_DISPLAY_FIFO 16
+#define A2_DISP_FIFO 16
 
 //! Words per scanline.
-#define ALTO2_DISPLAY_SCANLINE_WORDS (ALTO2_DISPLAY_TOTAL_WIDTH/16)
+#define A2_DISP_SCANLINE_WORDS (A2_DISP_TOTAL_WIDTH/16)
 
-//! Number of visible scanlines per frame; 808 really, but there are some empty lines?
-#define ALTO2_DISPLAY_HEIGHT 808
+//! Number of visible scanlines per frame
+#define A2_DISP_HEIGHT 808
 
 //! Visible width of the display; 38 x 16 bit words - 2 pixels.
-//#define ALTO2_DISPLAY_WIDTH 606
-#define ALTO2_DISPLAY_WIDTH 608
+#define A2_DISP_WIDTH 606
 
 //! Visible words per scanline.
-#define ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)
+#define A2_DISP_VISIBLE_WORDS ((A2_DISP_WIDTH+15)/16)
 
 //! Display bit clock in Hertz (20.16MHz).
-#define ALTO2_DISPLAY_BITCLOCK 20160000ll
+#define A2_DISP_BITCLOCK 20160000ll
 
 //! Display bit time in pico seconds (~= 49.6031ns).
-#define ALTO2_DISPLAY_BITTIME(n) (U64(1000000000000)*(n)/ALTO2_DISPLAY_BITCLOCK)
+#define A2_DISP_BITTIME(n) DOUBLE_TO_ATTOSECONDS(static_cast<double>(n)/A2_DISP_BITCLOCK)
 
 //! Time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns).
-#define ALTO2_DISPLAY_SCANLINE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)
+#define A2_DISP_SCANLINE_TIME A2_DISP_BITTIME(A2_DISP_TOTAL_WIDTH)
 
 //!< Time of the visible part of a scanline in pico seconds (606 * 49.6031ns ~= 30059.4786ns).
-#define ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)
+#define A2_DISP_VISIBLE_TIME A2_DISP_BITTIME(A2_DISP_WIDTH)
 
 //!< Time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns).
-#define ALTO2_DISPLAY_WORD_TIME ALTO2_DISPLAY_BITTIME(16)
+#define A2_DISP_WORD_TIME A2_DISP_BITTIME(16)
 
-#define ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
+#define A2_DISP_VBLANK_TIME (static_cast<double>(-A2_DISP_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
 
 #else   // ALTO2_DEFINE_CONSTANTS
 /**
@@ -200,9 +199,8 @@ struct {
 	UINT32 inverse;                         //!< set to 0xffff if line is inverse, 0x0000 otherwise
 	UINT32 scanline;                        //!< current scanline
 	bool halfclock;                         //!< false for normal pixel clock, true for half pixel clock
-	bool vsync;                             //!< true after vsync, false when end_of_frame was called
-	bool odd;                               //!< true if odd field
-	UINT16 fifo[ALTO2_DISPLAY_FIFO];        //!< display word fifo
+	bool vblank;                            //!< true during vblank, false otherwise
+	UINT16 fifo[A2_DISP_FIFO];              //!< display word fifo
 	UINT32 wa;                              //!< fifo input pointer (write address; 4-bit)
 	UINT32 ra;                              //!< fifo output pointer (read address; 4-bit)
 	UINT32 a63;                             //!< most recent value read from the PROM a63
