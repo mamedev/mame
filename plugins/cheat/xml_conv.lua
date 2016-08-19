@@ -14,7 +14,7 @@ local function xml_parse(data)
 		local arr = {}
 		while str ~= "" do
 			local tag, attr, stop
-			tag, attr, stop, str = str:match("<([%w!-]+) ?(.-)(/?)[ -]->(.*)")
+			tag, attr, stop, str = str:match("<([%w!%-]+) ?(.-)(/?)[ %-]->(.*)")
 
 			if not tag then
 				return arr
@@ -26,7 +26,7 @@ local function xml_parse(data)
 					nest, str = str:match("(.-)</ *" .. tag .. " *>(.*)")
 					local children = get_tags(nest)
 					if not next(children) then
-						nest = nest:gsub("<!--.--->", "")
+						nest = nest:gsub("<!--.-%-%->", "")
 						nest = nest:gsub("^%s*(.-)%s*$", "%1")
 						block["text"] = nest
 					else
