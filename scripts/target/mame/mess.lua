@@ -2221,6 +2221,7 @@ files {
 createMESSProjects(_target, _subtarget, "mos")
 files {
 	MAME_DIR .. "src/mame/drivers/kim1.cpp",
+	MAME_DIR .. "src/mame/includes/kim1.h",
 }
 
 createMESSProjects(_target, _subtarget, "motorola")
