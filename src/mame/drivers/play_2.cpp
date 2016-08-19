@@ -14,7 +14,7 @@ Playmatic MPU 2
 
 ToDo:
 - Lamps, Solenoids to add
-- Mechanical sounds to add
+- Add remaining mechanical sounds
 - Some sound boards to add
 
 Notes:
@@ -77,6 +77,7 @@ private:
 	bool m_disp_sw;
 	UINT8 m_soundlatch;
 	UINT8 m_psg_latch;
+	UINT8 m_port06;
 	virtual void machine_reset() override;
 	required_device<cosmac_device> m_maincpu;
 	required_device<ttl7474_device> m_4013a;
@@ -98,7 +99,7 @@ static ADDRESS_MAP_START( play_2_io, AS_IO, 8, play_2_state )
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("1863", cdp1863_device, str_w)
 	AM_RANGE(0x04, 0x04) AM_READ(port04_r)
 	AM_RANGE(0x05, 0x05) AM_READ(port05_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // segments
+	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w)
 ADDRESS_MAP_END
 
@@ -189,6 +190,7 @@ void play_2_state::machine_reset()
 	m_4013b->d_w(1);
 	m_kbdrow = 0;
 	m_disp_sw = 0;
+	m_port06 = 0;
 	for (UINT8 i = 0; i < 5; i++)
 		m_segment[i] = 0;
 }
@@ -207,8 +209,14 @@ WRITE8_MEMBER( play_2_state::port01_w )
 	m_1863->oe_w(BIT(data, 7)); // this actually mutes the audio amp, but doing it this way is far easier
 }
 
-WRITE8_MEMBER( play_2_state::port06_w )
+WRITE8_MEMBER( play_2_state::port02_w )
 {
+	m_segment[4] = m_segment[3];
+	m_segment[3] = m_segment[2];
+	m_segment[2] = m_segment[1];
+	m_segment[1] = m_segment[0];
+	m_segment[0] = data;
+	m_disp_sw = 1;
 }
 
 WRITE8_MEMBER( play_2_state::port03_w )
@@ -230,14 +238,9 @@ READ8_MEMBER( play_2_state::port05_r )
 	return m_keyboard[6]->read();
 }
 
-WRITE8_MEMBER( play_2_state::port02_w )
+WRITE8_MEMBER( play_2_state::port06_w )
 {
-	m_segment[4] = m_segment[3];
-	m_segment[3] = m_segment[2];
-	m_segment[2] = m_segment[1];
-	m_segment[1] = m_segment[0];
-	m_segment[0] = data;
-	m_disp_sw = 1;
+	m_port06 = data & 15;
 }
 
 WRITE8_MEMBER( play_2_state::port07_w )
@@ -245,6 +248,13 @@ WRITE8_MEMBER( play_2_state::port07_w )
 	m_soundlatch = (data & 0x70) >> 4; // Zira (manual doesn't say where data comes from)
 	m_4013b->clear_w(0);
 	m_4013b->clear_w(1);
+	if (!BIT(data, 7))
+	{
+		if (m_port06 == 11)
+			m_samples->start(0, 5); // outhole
+		if (m_port06 == 13)
+			m_samples->start(0, 6); // knocker
+	}
 }
 
 READ_LINE_MEMBER( play_2_state::clear_r )

@@ -276,7 +276,7 @@ WRITE8_MEMBER( play_1_state::port01_w )
 		output().set_digit_value(45, 0);
 	}
 
-	m_match = patterns[data>>4] & 0x7f;
+	m_match = patterns[data>>4];
 	m_waitcnt = 0;
 }
 
