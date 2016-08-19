@@ -1236,7 +1236,7 @@ static ADDRESS_MAP_START( intergames_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia0", pia6821_device, read, write)  // whatever enter the book mode request a byte from $3400 to advance...
+	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia0", pia6821_device, read, write)  // the bookkeeping mode requests a byte from $3400 to advance pages...
 	AM_RANGE(0x3800, 0x3803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)  // WRONG. just a placeholder...
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -5804,11 +5804,14 @@ ROM_END
   Video RAM splitted in two well separated offsets:
   Video RAM at $2000 and Color Ram at $7000.
 
-  Code expect some input at $3400 to pass through the bookkeeping pages,
+  Code expects some input at $3400 to pass through the bookkeeping pages,
   so at least one PIA should be mapped there.
 
   There are multiple buffers and compare from some registers,
   reminding the way some hardwares handle inputs without PIAs.
+
+  Bipolar PROM has the first half empty, so will black the screen
+  after any attempt of ROM swap.
 
   A lot to investigate/reverse...
 */
