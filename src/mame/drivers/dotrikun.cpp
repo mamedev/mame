@@ -47,8 +47,7 @@ public:
 	required_shared_ptr<UINT8> m_vram;
 
 	UINT8 m_vram_latch;
-	UINT8 m_fg_color;
-	UINT8 m_bg_color;
+	UINT8 m_color;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(color_w);
@@ -78,8 +77,7 @@ WRITE8_MEMBER(dotrikun_state::color_w)
 	// d3-d5: bg palette
 	// d6,d7: N/C
 	m_screen->update_now();
-	m_fg_color = data & 7;
-	m_bg_color = data >> 3 & 7;
+	m_color = data & 0x3f;
 }
 
 
@@ -92,11 +90,11 @@ UINT32 dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			if ((x & 7) == 0)
 			{
 				// on vram fetch(every 8 pixels during active display), z80 is stalled for 2 clocks
-				m_maincpu->eat_cycles(2);
+				m_maincpu->adjust_icount(-2);
 				m_vram_latch = m_vram[x >> 3 | y >> 1 << 4];
 			}
 			
-			bitmap.pix16(y, x) = (m_vram_latch >> (~x & 7) & 1) ? m_fg_color : m_bg_color;
+			bitmap.pix16(y, x) = (m_vram_latch >> (~x & 7) & 1) ? m_color & 7 : m_color >> 3;
 		}
 	}
 
@@ -155,14 +153,13 @@ INTERRUPT_GEN_MEMBER(dotrikun_state::interrupt)
 void dotrikun_state::machine_start()
 {
 	save_item(NAME(m_vram_latch));
-	save_item(NAME(m_fg_color));
-	save_item(NAME(m_bg_color));
+	save_item(NAME(m_color));
 }
 
 void dotrikun_state::machine_reset()
 {
 	m_vram_latch = 0;
-	m_fg_color = m_bg_color = 0;
+	m_color = 0;
 }
 
 static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
