@@ -96,15 +96,15 @@ void ym3812_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void ym3812_device::device_start()
 {
-	int rate = clock()/72;
+	int rate = clock() / 72;
 
 	m_irq_handler.resolve();
 
 	/* stream system initialize */
-	m_chip = ym3812_init(this,clock(),rate);
+	m_chip = ym3812_init(this, clock(), rate);
 	assert_always(m_chip != nullptr, "Error creating YM3812 chip");
 
-	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
+	calculate_rates();
 
 	/* YM3812 setup */
 	ym3812_set_timer_handler (m_chip, timer_handler, this);
@@ -113,6 +113,22 @@ void ym3812_device::device_start()
 
 	m_timer[0] = timer_alloc(0);
 	m_timer[1] = timer_alloc(1);
+}
+
+void ym3812_device::device_clock_changed()
+{
+	calculate_rates();
+	ym3812_clock_changed(m_chip, clock(), clock() / 72);
+}
+
+void ym3812_device::calculate_rates()
+{
+	int rate = clock() / 72;
+
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
 }
 
 //-------------------------------------------------
