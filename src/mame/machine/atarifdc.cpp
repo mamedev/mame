@@ -143,8 +143,11 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 	/* re allocate the buffer; we don't want to be too lazy ;) */
 	//m_drv[id].image = (UINT8*)image.image_realloc(m_drv[id].image, size);
 
+	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype returns "" :/
+	bool is_softlist_entry = image.software_entry() != nullptr;
+
 	/* no extension: assume XFD format (no header) */
-	if (image.is_filetype(""))
+	if (image.is_filetype("") && !is_softlist_entry)
 	{
 		m_drv[id].type = FORMAT_XFD;
 		m_drv[id].header_skip = 0;
@@ -158,7 +161,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 	}
 	else
 	/* ATR extension */
-	if( image.is_filetype("atr") )
+	if( image.is_filetype("atr") || is_softlist_entry)
 	{
 		m_drv[id].type = FORMAT_ATR;
 		m_drv[id].header_skip = 16;
