@@ -16,7 +16,8 @@
 
   Games running on this hardware:
 
-  * Jolly Card (Austrian),                            TAB Austria,        1985.
+  * Jolly Card (Austrian, set 1),                     TAB Austria,        1985.
+  * Jolly Card (Austrian, set 2),                     TAB Austria,        1985.
   * Jolly Card (3x3 deal),                            TAB Austria,        1985.
   * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
   * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
@@ -3571,6 +3572,22 @@ ROM_START( jolycdab )
 ROM_END
 
 
+ROM_START( jollycrda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pok14.bin", 0x8000, 0x8000, CRC(30936afb) SHA1(5b96cd7e425ad79163e1d55e530cbabcb116f8d2) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "tab3.bin", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
+	ROM_LOAD( "tab2.bin", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* Default NVRAM. The game doesn't work without it */
+	ROM_LOAD( "jollycrda_nvram.bin", 0x0000, 0x0800, CRC(5cbb4d8f) SHA1(da5edbef20bb4f0c634939389b3a9744c5743641) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "jop.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+ROM_END
+
+
 /******************************** Bonus Card based sets ************************************/
 
 /*
@@ -6515,7 +6532,8 @@ DRIVER_INIT_MEMBER(funworld_state, rcdinch)
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT      ROT    COMPANY            FULLNAME                                          FLAGS                  LAYOUT */
 
 // Jolly Card based...
-GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian)",                           0,                       layout_jollycrd )
+GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian, set 1)",                    0,                       layout_jollycrd )
+GAMEL( 1985, jollycrda, jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian, set 2)",                    0,                       layout_jollycrd )
 GAMEL( 1985, jolyc3x3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (3x3 deal)",                           0,                       layout_jollycrd )
 GAMEL( 1993, jolycmzs,  jollycrd, cuoreuno, jolyc980,  driver_device,  0,        ROT0, "MZS Tech",        "Jolly Card Professional 2.0 (MZS Tech)",          0,                       layout_jollycrd )
 GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  driver_device,  0,        ROT0, "Spale Soft",      "Jolly Card Professional 2.0 (Spale Soft)",        0,                       layout_jollycrd )
