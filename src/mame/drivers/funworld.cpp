@@ -5798,7 +5798,19 @@ ROM_END
   1x AM27S29APC
   1x LM380N
   1x Crystal 16.0000 MHz.
-  
+
+  The game has way different architecture.
+
+  Video RAM splitted in two well separated offsets:
+  Video RAM at $2000 and Color Ram at $7000.
+
+  Code expect some input at $3400 to pass through the bookkeeping pages,
+  so at least one PIA should be mapped there.
+
+  There are multiple buffers and compare from some registers,
+  reminding the way some hardwares handle inputs without PIAs.
+
+  A lot to investigate/reverse...
 */
 ROM_START( intrgmes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
