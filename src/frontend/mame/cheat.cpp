@@ -1381,13 +1381,13 @@ void cheat_manager::load_cheats(const char *filename)
 {
 	xml_data_node *rootnode = nullptr;
 	std::string searchstr(machine().options().cheat_path());
-	path_iterator path(searchstr.c_str());
+	path_iterator path(searchstr);
 	std::string curpath;
 	while (path.next(curpath))
 	{
 		searchstr.append(";").append(curpath).append(PATH_SEPARATOR).append("cheat");
 	}
-	emu_file cheatfile(searchstr.c_str(), OPEN_FLAG_READ);
+	emu_file cheatfile(std::move(searchstr), OPEN_FLAG_READ);
 	try
 	{
 		// open the file with the proper name
