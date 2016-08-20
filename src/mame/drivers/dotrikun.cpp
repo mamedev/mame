@@ -40,12 +40,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_vram(*this, "vram"),
+		m_interrupt_timer(*this, "interrupt"),
 		m_scanline_off_timer(*this, "scanline_off")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT8> m_vram;
+	required_device<timer_device> m_interrupt_timer;
 	required_device<timer_device> m_scanline_off_timer;
 
 	UINT8 m_vram_latch;
@@ -54,12 +56,18 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(color_w);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_on);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_on);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
+
+TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
+{
+	generic_pulse_irq_line(m_maincpu, 0, 1);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_off)
 {
@@ -69,15 +77,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_off)
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_on)
 {
 	// on vram fetch(every 8 pixels during active display), z80 is stalled for 2 clocks
-	if (param >= 0 && param < 192)
+	if (param < 192)
 	{
 		m_maincpu->set_unscaled_clock(XTAL_4MHz * 0.75);
-		m_scanline_off_timer->adjust(m_screen->time_until_pos(param, 128), param);
+		m_scanline_off_timer->adjust(m_screen->time_until_pos(param, 128));
 	}
 	
 	// vblank interrupt
-	else if (param == 192)
-		generic_pulse_irq_line(m_maincpu, 0, 1);
+	if (param == 191)
+		m_interrupt_timer->adjust(m_screen->time_until_pos(param, 128+64));
 }
 
 
@@ -184,7 +192,8 @@ static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scanline_on", dotrikun_state, scanline_on, "screen", 0, 1)
 	MCFG_TIMER_DRIVER_ADD("scanline_off", dotrikun_state, scanline_off)
-	
+	MCFG_TIMER_DRIVER_ADD("interrupt", dotrikun_state, interrupt)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_4MHz, 128+128, 0, 128, 192+64, 0, 192)
@@ -214,5 +223,5 @@ ROM_START( dotrikun2 )
 ROM_END
 
 
-GAMEL(1990, dotrikun,  0,        dotrikun, dotrikun, driver_device, 0, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS, layout_dotrikun )
-GAMEL(1990, dotrikun2, dotrikun, dotrikun, dotrikun, driver_device, 0, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS, layout_dotrikun )
+GAMEL(1990, dotrikun,  0,        dotrikun, dotrikun, driver_device, 0, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAMEL(1990, dotrikun2, dotrikun, dotrikun, dotrikun, driver_device, 0, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
