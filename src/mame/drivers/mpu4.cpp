@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:James Wallace
 /* MPU4 hardware emulation
-  for sets see mpu4.c
+  for sets see the various includes prefixed 'mpu4'
 */
 
 /* Note 19/07/11 DH
@@ -252,6 +252,8 @@ TODO: - Distinguish door switches using manual
       start modelling the individual hysteresis curves of filament lamps.
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
       - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
+	  
+	  - Per game inputs not currently supported, may need to do something about DIPs, inverted lines etc.
 ***********************************************************************************************************/
 #include "emu.h"
 
@@ -843,15 +845,23 @@ READ8_MEMBER(mpu4_state::pia_ic5_porta_r)
 	}
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
 
-	return m_aux1_port->read()|m_aux1_input;
+	UINT8 tempinput = m_aux1_port->read()|m_aux1_input;
+	if (m_aux1_invert)
+	{
+		return ~tempinput;
+	}
+	else
+	{
+		return tempinput;
+	}
 }
 
 WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 {
 	int i;
-	pia6821_device *pia_ic4 = m_pia4;
 	if (m_hopper == HOPPER_NONDUART_A)
 	{
+		//opto line
 		//hopper1_drive_sensor(data&0x10);
 	}
 	switch (m_lamp_extender)
@@ -859,7 +869,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 	case NO_EXTENDER:
 		if (m_led_extender == CARD_B)
 		{
-			led_write_latch(data & 0x1f, pia_ic4->a_output(),m_input_strobe);
+			led_write_latch(data & 0x1f, m_pia4->a_output(),m_input_strobe);
 		}
 		else if ((m_led_extender != CARD_A)&&(m_led_extender != NO_EXTENDER))
 		{
@@ -1009,12 +1019,12 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_portb_w)
 {
 	if (m_hopper == HOPPER_NONDUART_B)
 	{
-		//hopper1_drive_motor(data &0x01)
-		//hopper1_drive_sensor(data &0x08)
+		//hopper1_drive_motor(data &0x01) motor
+		//hopper1_drive_sensor(data &0x08) opto
 	}
 	if (m_led_extender == CARD_A)
 	{
-		// led_write_latch(data & 0x07, pia_get_output_a(pia_ic4),m_input_strobe)
+		led_write_latch(data & 0x07, m_pia4->a_output(),m_input_strobe);
 	}
 
 }
@@ -1037,7 +1047,16 @@ READ8_MEMBER(mpu4_state::pia_ic5_portb_r)
 	machine().bookkeeping().coin_lockout_w(1, (m_pia5->b_output() & 0x02) );
 	machine().bookkeeping().coin_lockout_w(2, (m_pia5->b_output() & 0x04) );
 	machine().bookkeeping().coin_lockout_w(3, (m_pia5->b_output() & 0x08) );
-	return m_aux2_port->read() | m_aux2_input;
+
+	UINT8 tempinput = m_aux2_port->read()|m_aux2_input;
+	if (m_aux2_invert)
+	{
+		return ~tempinput;
+	}
+	else
+	{
+		return tempinput;
+	}
 }
 
 
@@ -1260,7 +1279,14 @@ READ8_MEMBER(mpu4_state::pia_ic8_porta_r)
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
 	m_pia5->cb1_w(m_aux2_port->read() & 0x80);
-	return (m_port_mux[m_input_strobe])->read();
+	if ( (m_input_strobe == 2) && (m_door_invert ==1) )
+	{
+		return ((m_port_mux[m_input_strobe])->read() ^ 0x01);
+	}
+	else
+	{
+		return (m_port_mux[m_input_strobe])->read();
+	}
 }
 
 
@@ -2270,6 +2296,21 @@ DRIVER_INIT_MEMBER(mpu4_state,m4_low_volt_alt)
 	m_low_volt_detect_disable =1;
 }
 
+DRIVER_INIT_MEMBER(mpu4_state,m4_aux1_invert)
+{
+	m_aux1_invert =1;
+}
+
+DRIVER_INIT_MEMBER(mpu4_state,m4_aux2_invert)
+{
+	m_aux2_invert =1;
+}
+
+DRIVER_INIT_MEMBER(mpu4_state,m4_door_invert)
+{
+	m_aux2_invert =1;
+}
+
 DRIVER_INIT_MEMBER(mpu4_state,m4_small_extender)
 {
 	m_lamp_extender=SMALL_CARD;
@@ -2414,10 +2455,6 @@ DRIVER_INIT_MEMBER(mpu4_state,m4gambal)
 
 DRIVER_INIT_MEMBER(mpu4_state,m_grtecp)
 {
-	DRIVER_INIT_CALL(m4_five_reel_std);
-	DRIVER_INIT_CALL(m4_small_extender);
-	DRIVER_INIT_CALL(m4default_banks);
-
 	m_current_chr_table = grtecp_data;
 }
 
@@ -2452,6 +2489,9 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default)
 {
 	DRIVER_INIT_CALL(m4default_reels);
 	m_bwb_bank=0;
+	m_aux1_invert=0;
+	m_aux2_invert=0;
+	m_door_invert=0;
 	DRIVER_INIT_CALL(m4default_banks);
 }
 
@@ -2459,6 +2499,9 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default)
 DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_aux1_invert=0;
+	m_aux2_invert=0;
+	m_door_invert=0;
 
 	int size = memregion( "maincpu" )->bytes();
 	if (size<=0x10000)

@@ -24,6 +24,14 @@ INPUT_PORTS_EXTERN( grtecp );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 
+#include "m4actbnk.lh"
+#include "m4andybt.lh"
+#include "m4andycp.lh"
+#include "m4andyfh.lh"
+#include "m4andyge.lh"
+#include "m4addr.lh"
+#include "m4tenten.lh"
+
 DRIVER_INIT_MEMBER(mpu4_state,m4debug)
 {
 	// many original barcrest / bwb sets have identification info around here
@@ -91,12 +99,81 @@ DRIVER_INIT_MEMBER(mpu4_state,m4_showstring_big)
 	DRIVER_INIT_CALL(m4default_big);
 	DRIVER_INIT_CALL(m4debug);
 }
+/* Explanation of automatically generated descriptions
 
-DRIVER_INIT_MEMBER(mpu4_state,m_grtecpss)
+DRIVER_INIT_MEMBER(mpu4_state,PARENT NAME)
 {
-	DRIVER_INIT_CALL(m_grtecp);
-	DRIVER_INIT_CALL(m4debug);
+	//Derived from Andy_Capp_(Barcrest)_[C05_v1-0_1024_6jp].gam - MFME layout name used
+	
+	//any needed data for hoppers, extenders, reels are here, alongside wiring changes such as low voltage detection, or the AUX settings
+
+	//PCKEY =9 default setting in hex
+	//STKEY =0 default setting in hex
+	//JPKEY =0 default setting in hex
+	//JPSET =0 default setting in hex
+
+	Default DIP settings used in the layouts
+	//DIP1_0=false
+	//DIP1_1=false
+	//DIP1_2=false
+	//DIP1_3=false
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=true
+	//DIP2_6=false
+	//DIP2_7=false
+
+	//Sound empire - if set, this is the sound board type (although this is often ignored
+	//Standard - or Datapak
+	//Volume 0 Stereo= 1  - other sound settings
+	//Sample rate 16000
+	
+	//Front door code 39 Cash door code 38 - Button numbers for doors, just in case
 }
+*/
+
+DRIVER_INIT_MEMBER(mpu4_state,m4andycp)
+{
+	//Derived from Andy_Capp_(Barcrest)_[C05_v1-0_1024_6jp].gam
+	DRIVER_INIT_CALL(m4default);
+	DRIVER_INIT_CALL(m4_hopper_tubes);
+	DRIVER_INIT_CALL(m4_small_extender);
+	DRIVER_INIT_CALL(m4default_reels);
+	//PCKEY =9
+	//STKEY =0
+	//JPKEY =0
+	//JPSET =0
+	//DIP1_0=false
+	//DIP1_1=false
+	//DIP1_2=false
+	//DIP1_3=false
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=true
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound empire
+	//Standard
+	//Volume 0 Stereo= 1
+	//Sample rate 16000
+	//Front door code 39 Cash door code 38
+}
+
+
 #define M4ANDYCP_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "ac.chr", 0x0000, 0x000048, CRC(87808826) SHA1(df0915a6f89295efcd10e6a06bfa3d3fe8fef160) ) \
@@ -111,7 +188,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m_grtecpss)
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYCP_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS )
+	GAMEL(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4andycp,ROT0,company,title,GAME_FLAGS, layout_m4andycp )
 
 // "(C)1994  B.W.B."  and  "AC101.0"
 GAME_CUSTOM( 1994, m4andycp,           0,          "ac10.hex",         0x0000, 0x010000, CRC(0e250923) SHA1(9557315cca7a47c307e811d437ff424fe77a2843), "Bwb",      "Andy Capp (Bwb / Barcrest) (MPU4) (AC10)" )
@@ -436,6 +513,42 @@ GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog,     "rhog20_11",                0x0
 GAME_CUSTOM( 1995, m4rhog_roc,       m4rhog,     "roadhog5p4std.bin",        0x0000, 0x010000, BAD_DUMP CRC(0ff60341) SHA1(c12d5b160d9e47a6f1aa6f378c2a70186be6bdff), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (ROC 2.0, bad)" )
 
 
+DRIVER_INIT_MEMBER(mpu4_state,m4andyge)
+{
+	//Derived from Andy's_Great_Escape_(Barcrest)_[C02_1024_10jp].gam
+	DRIVER_INIT_CALL(m4default);
+	DRIVER_INIT_CALL(m4_hopper_tubes);
+	DRIVER_INIT_CALL(m4_small_extender);
+	DRIVER_INIT_CALL(m4_five_reel_std);
+	DRIVER_INIT_CALL(m_grtecp);
+
+	//PCKEY =1
+	//STKEY =3
+	//JPKEY =7
+	//JPSET =3
+	//DIP1_0=false
+	//DIP1_1=false
+	//DIP1_2=false
+	//DIP1_3=false
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=false
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound other
+	//Standard
+	//Volume 1 Stereo= 1
+	//Sample rate 16000
+	//Front door code 0 Cash door code 0
+}
+
 #define M4ANDYGE_EXTRA_ROMS \
 	ROM_REGION( 0x1200, "plds", 0 ) /* PAL16V8 PLD, like others - CHR? Guess it should be here... */  \
 	ROM_LOAD( "age.bin", 0x0000, 0x000117, CRC(901359e5) SHA1(7dbcd6023e7ce68f4aa7f191f572d74f21f978aa) ) \
@@ -452,7 +565,7 @@ GAME_CUSTOM( 1995, m4rhog_roc,       m4rhog,     "roadhog5p4std.bin",        0x0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYGE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki_5r ,grtecp , mpu4_state,m_grtecpss ,ROT0,company,title,GAME_FLAGS )
+	GAMEL(year, setname, parent ,mod4oki_5r ,grtecp , mpu4_state,m4andyge ,ROT0,company,title,GAME_FLAGS, layout_m4andyge )
 // "(C)1991 BARCREST"  and "AN2 0.3"
 GAME_CUSTOM( 1991, m4andyge,           0,          "an2s.p1",                  0x0000, 0x010000, CRC(65399fa0) SHA1(ecefdf63e7aa477001fa530ed340e90e85252c3c), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 1)" ) // one of these is probably hacked
 GAME_CUSTOM( 1991, m4andygen2_a,       m4andyge,   "agesc20p",                 0x0000, 0x010000, CRC(94fec0f3) SHA1(7678e01a4e0fcc4136f6d4a668c4d1dd9a8f1246), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 2)" ) // or has the wrong id strings
@@ -522,13 +635,47 @@ GAME_CUSTOM( 199?, m4andyge_h3,        m4andyge,   "age_20_.8",                0
 GAME_CUSTOM( 199?, m4andyge_h4,        m4andyge,   "age20_101",                0x0000, 0x010000, CRC(7e3674f0) SHA1(351e353da24b63d2ef7cb09690b770b26505569a), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (8V1 0.3, hack?, set 2)" )
 
 
+DRIVER_INIT_MEMBER(mpu4_state,m4addr)
+{
+	//Derived from Adders_&_Ladders_(Barcrest)_[C03_800_6jp].gam
+	DRIVER_INIT_CALL(m4default);
+	DRIVER_INIT_CALL(m4_hopper_tubes);
+	DRIVER_INIT_CALL(m4default_reels);
+	//PCKEY =0
+	//STKEY =0
+	//JPKEY =0
+	//JPSET =0
+	//DIP1_0=false
+	//DIP1_1=false
+	//DIP1_2=false
+	//DIP1_3=false
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=false
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound barcrest1
+	//Standard
+	//Volume 0 Stereo= 1
+	//Sample rate 16000
+	//Front door code 0 Cash door code 0
+}
+
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
+	GAMEL(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4addr ,ROT0,company,title,GAME_FLAGS, layout_m4addr )
 // all the adders and ladders sets kill the cpu, end up jumping to the ram area after an RTI/RTS combo? are we saturating the CPU with too many interrupts or is there a bug?
 // also the BWB versioning is.. illogical
 // I think this is a mod2, but because it doesn't boot I haven't moved it to mpu4mod2sw.c yet
@@ -3443,6 +3590,39 @@ GAME_CUSTOM( 199?, m4luckst__au,   m4luckst,   "lstrikegame10-8t.bin", 0x0000, 0
 GAME_CUSTOM( 199?, m4luckst__b,    m4luckst,   "ls15t",                0x0000, 0x020000, CRC(20447a20) SHA1(ca2ba566317ca87afcc2501e551c1326b9712526), "hack","Lucky Strike (Barcrest) (MPU4) (LSS 0.6, hack, set 2)" )
 
 
+DRIVER_INIT_MEMBER(mpu4_state,m4tenten)
+{
+	DRIVER_INIT_CALL(m4default);
+	//Derived from 10_x_10_(Barcrest)_[C01_v1-0_1024_10jp].gam
+	DRIVER_INIT_CALL(m4_hopper_duart_a);
+	DRIVER_INIT_CALL(m4default_reels);
+	//PCKEY =9
+	//STKEY =3
+	//JPKEY =7
+	//JPSET =3
+	//DIP1_0=false
+	//DIP1_1=false
+	//DIP1_2=false
+	//DIP1_3=false
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=true
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound barcrest1
+	//Standard
+	//Volume 0 Stereo= 1
+	//Sample rate 16000 LVD= 0
+	//Front door code 39 Cash door code 38
+}
+
 #define M4TENTEN_EXTRA_ROMS \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
 	ROM_LOAD( "tttsnd01.p1", 0x0000, 0x080000, CRC(5518474c) SHA1(0b7e98e33f62d80882f2b0b4af0c9056f1ffb78d) )
@@ -3453,7 +3633,7 @@ GAME_CUSTOM( 199?, m4luckst__b,    m4luckst,   "ls15t",                0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TENTEN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
+	GAMEL(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4tenten ,ROT0,company,title,GAME_FLAGS, layout_m4tenten )
 
 // "(C)1991 BARCREST" and "T20 0.2"
 GAME_CUSTOM( 199?, m4tenten,       0,          "t2002s.p1",    0x0000, 0x010000, CRC(6cd9fa10) SHA1(8efe36e3fc5b709fa4363194634686d62b5d6609), "Barcrest","10 X 10 (Barcrest) (MPU4) (T20 0.2)" )
@@ -3529,6 +3709,39 @@ GAME_CUSTOM( 199?, m4tenten__a0,   m4tenten,   "tst01r.p1",    0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4tenten__a2,   m4tenten,   "tst01y.p1",    0x0000, 0x010000, CRC(e3ba4b94) SHA1(a7b13c172e5177711ddb81ef1ea77e27e14bf470), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 66)" )
 
 
+DRIVER_INIT_MEMBER(mpu4_state,m4andyfh)
+{
+	//Derived from Andy's_Full_House_(Barcrest)_[C01_800_10jp].gam
+	DRIVER_INIT_CALL(m4default);
+	DRIVER_INIT_CALL(m4_hopper_tubes);
+	DRIVER_INIT_CALL(m4default_reels);
+	//PCKEY =b
+	//STKEY =2
+	//JPKEY =7
+	//JPSET =3
+	//DIP1_0=false
+	//DIP1_1=false
+	//DIP1_2=false
+	//DIP1_3=false
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=true
+	//DIP2_1=true
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=true
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound barcrest1
+	//Standard
+	//Volume 0 Stereo= 1
+	//Sample rate 16000
+	//Front door code 0 Cash door code 0
+}
+
 #define M4ANDYFH_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "afhsnd1.bin", 0x000000, 0x080000, CRC(ce0b1890) SHA1(224d05f936a1b6f84ad682c282c557e87ad8931f) ) \
@@ -3540,7 +3753,7 @@ GAME_CUSTOM( 199?, m4tenten__a2,   m4tenten,   "tst01y.p1",    0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYFH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
+	GAMEL(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4andyfh ,ROT0,company,title,GAME_FLAGS, layout_m4andyfh )
 
 
 // "(C)1991 BARCREST" and "AFH 0.1"
@@ -4450,6 +4663,38 @@ GAME_CUSTOM( 199?, m4shocm__h,  m4shocm,    "scmj.p1",  0x0000, 0x020000, CRC(ed
 GAME_CUSTOM( 199?, m4shocm__i,  m4shocm,    "scmy.p1",  0x0000, 0x020000, CRC(044a0065) SHA1(e5deb75e7d05787f1e820352aec99abebd3530b6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    "scmk.p1",  0x0000, 0x020000, CRC(83a9209b) SHA1(011ecd85c435c02b4868ed74012e16c73beb6e99), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 11)" )
 
+DRIVER_INIT_MEMBER(mpu4_state,m4actbnk)
+{
+	//Derived from Action_Bank_(Barcrest)_[C04_1024_8jp].gam
+	DRIVER_INIT_CALL(m4default);
+	DRIVER_INIT_CALL(m4_hopper_tubes);
+	DRIVER_INIT_CALL(m4default_reels);
+	//PCKEY =a
+	//STKEY =2
+	//JPKEY =6
+	//JPSET =1
+	//DIP1_0=false
+	//DIP1_1=false
+	//DIP1_2=false
+	//DIP1_3=false
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=false
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound barcrest1
+	//Standard
+	//Volume 0 Stereo= 1
+	//Sample rate 16000
+	//Front door code 39 Cash door code 38
+}
 
 #define M4ACTBNK_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -4462,7 +4707,7 @@ GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    "scmk.p1",  0x0000, 0x020000, CRC(83
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ACTBNK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
+	GAMEL(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4actbnk ,ROT0,company,title,GAME_FLAGS, layout_m4actbnk )
 
 // these require a jackpot key to be inserted
 // "(C)1993 BARCREST" and "ACT 0.7"
@@ -5082,6 +5327,40 @@ GAME_CUSTOM( 199?, m4typcl__b,  m4typcl,    "ctp13f.p1",    0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CRC(6063e27d) SHA1(c99599fbc7146d8fcf62432994098dd51250b17b), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (NTP 0.2)" )
 
 
+DRIVER_INIT_MEMBER(mpu4_state,m4andybt)
+{
+	DRIVER_INIT_CALL(m4default_big);
+	//Derived from Andy's_Big_Time_(Barcrest)_[C03_800_250jp]_[c].gam
+	DRIVER_INIT_CALL(m4_hopper_tubes);
+	DRIVER_INIT_CALL(m4_large_extender_b);
+	DRIVER_INIT_CALL(m4_five_reel_rev);
+	//PCKEY =0
+	//STKEY =0
+	//JPKEY =0
+	//JPSET =0
+	//DIP1_0=true
+	//DIP1_1=true
+	//DIP1_2=true
+	//DIP1_3=true
+	//DIP1_4=true
+	//DIP1_5=true
+	//DIP1_6=true
+	//DIP1_7=true
+	//DIP2_0=false
+	//DIP2_1=true
+	//DIP2_2=true
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=false
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound barcrest1
+	//Standard
+	//Volume 0 Stereo= 1
+	//Sample rate 16000
+	//Front door code 0 Cash door code 0
+}
+
 #define M4ANDYBT_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "abt18s.chr", 0x0000, 0x000048, CRC(68007536) SHA1(72f7a76a1ba1c8ac94de425892780ffe78269513) ) \
@@ -5095,7 +5374,7 @@ GAME_CUSTOM( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYBT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
+	GAMEL(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4andybt ,ROT0,company,title,GAME_FLAGS, layout_m4andybt )
 
 // "(C)1991 BARCREST" and "ABT 1.8"
 GAME_CUSTOM( 199?, m4andybt,       0,          "abt18s.p1",    0x0000, 0x020000, CRC(625263e4) SHA1(23fa0547164cc1f9b7c6cd26e06b0d779bf0329d), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (ABT 1.8)" )
