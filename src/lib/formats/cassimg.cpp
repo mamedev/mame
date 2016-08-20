@@ -109,18 +109,18 @@ static void cassette_finishinit(casserr_t err, cassette_image *cassette, cassett
 
 
 
-static int good_format(const struct CassetteFormat *format, const char *extension, int flags)
+static bool good_format(const struct CassetteFormat *format, const std::string &extension, int flags)
 {
-	if (extension && !image_find_extension(format->extensions, extension))
-		return FALSE;
+	if (!extension.empty() && !image_find_extension(format->extensions, extension.c_str()))
+		return false;
 	if (((flags & CASSETTE_FLAG_READONLY) == 0) && !format->save)
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 
 
-casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const char *extension,
+casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const std::string &extension,
 	const struct CassetteFormat *const *formats, int flags, cassette_image **outcassette)
 {
 	casserr_t err;

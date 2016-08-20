@@ -160,7 +160,7 @@ CASSETTE_FORMATLIST_EXTERN(cassette_default_formats);
 
 casserr_t cassette_open(void *file, const struct io_procs *procs,
 	const struct CassetteFormat *format, int flags, cassette_image **outcassette);
-casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const char *extension,
+casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const std::string &extension,
 	const struct CassetteFormat *const *formats, int flags, cassette_image **outcassette);
 casserr_t cassette_create(void *file, const struct io_procs *procs, const struct CassetteFormat *format,
 	const struct CassetteOptions *opts, int flags, cassette_image **outcassette);

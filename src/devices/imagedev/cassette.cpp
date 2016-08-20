@@ -265,26 +265,25 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 {
 	casserr_t err;
 	int cassette_flags;
-	int is_writable;
+	bool is_writable;
 	device_image_interface *image = nullptr;
 	interface(image);
 
-	if (is_create || (length() == 0))
+	if (is_create)
 	{
-		/* creating an image */
+		// creating an image
 		err = cassette_create((void *)image, &image_ioprocs, &wavfile_format, m_create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &m_cassette);
 		if (err)
 			goto error;
 	}
 	else
 	{
-		/* opening an image */
+		// opening an image
 		do
 		{
 			is_writable = !is_readonly();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
-			std::string fname;
-			err = cassette_open_choices((void *)image, &image_ioprocs, filetype().c_str(), m_formats, cassette_flags, &m_cassette);
+			err = cassette_open_choices((void *)image, &image_ioprocs, filetype(), m_formats, cassette_flags, &m_cassette);
 		}
 		while(err && is_writable);
 
