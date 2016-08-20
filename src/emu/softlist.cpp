@@ -131,20 +131,21 @@ software_info::software_info(std::string &&name, std::string &&parent, const std
 
 const software_part *software_info::find_part(const std::string &part_name, const char *interface) const
 {
-	// if neither partname nor interface supplied, then we just return the first entry
-	if (part_name.empty() && interface == nullptr)
-		return &m_partdata.front();
-
 	// look for the part by name and match against the interface if provided
-	for (const software_part &part : m_partdata)
-		if (!part_name.empty() && (part_name == part.name()))
+	auto iter = std::find_if(
+		m_partdata.begin(),
+		m_partdata.end(),
+		[&](const software_part &part)
 		{
-			if (interface == nullptr || part.matches_interface(interface))
-				return &part;
-		}
-		else if (part_name.empty() && part.matches_interface(interface))
-				return &part;
-	return nullptr;
+			// try to match the part_name (or all parts if part_name is empty), and then try
+			// to match the interface (or all interfaces if interface is nullptr)
+			return (part_name.empty() || part_name == part.name())
+				&& (interface == nullptr || part.matches_interface(interface));
+		});
+
+	return iter != m_partdata.end()
+		? &*iter
+		: nullptr;
 }
 
 
