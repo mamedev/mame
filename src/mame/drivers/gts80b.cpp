@@ -1083,7 +1083,7 @@ ROM_START(s80btest)
 	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("testd.snd", 0x8000, 0x8000, CRC(5d04a6d9) SHA1(f83bd8692146af7d234c1a32d0b688e76d1b2b85))
+	ROM_LOAD("testd.snd", 0x8000, 0x2000, CRC(5d04a6d9) SHA1(f83bd8692146af7d234c1a32d0b688e76d1b2b85))
 ROM_END
 
 GAME(1985, bountyh,   0,        gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bounty Hunter",        MACHINE_IS_SKELETON_MECHANICAL)
