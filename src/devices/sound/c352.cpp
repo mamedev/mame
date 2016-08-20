@@ -112,7 +112,7 @@ void c352_device::fetch_sample(c352_voice_t* v)
 
 void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	
+
 	int i,j;
 	INT16 s;
 	stream_sample_t *buffer_fl = outputs[0];
@@ -120,19 +120,19 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	stream_sample_t *buffer_rl = outputs[2];
 	stream_sample_t *buffer_rr = outputs[3];
 	c352_voice_t* v;
-	
+
 	long out[4];
-	
+
 	for(i=0;i<samples;i++)
 	{
 		out[0]=out[1]=out[2]=out[3]=0;
-		
+
 		for(j=0;j<32;j++)
 		{
-			
+
 			v = &m_c352_v[j];
 			s = 0;
-			
+
 			if(v->flags & C352_FLG_BUSY)
 			{
 				v->counter += v->freq;
@@ -144,12 +144,12 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				}
 
 				s = v->sample;
-				
+
 				// Interpolate samples
 				if((v->flags & C352_FLG_FILTER) == 0)
 					s = v->last_sample + (v->counter*(v->sample-v->last_sample)>>16);
 			}
-			
+
 			// Left
 			out[0] += ((v->flags & C352_FLG_PHASEFL) ? -s * (v->vol_f>>8) : s * (v->vol_f>>8))>>8;
 			out[2] += ((v->flags & C352_FLG_PHASERL) ? -s * (v->vol_r>>8) : s * (v->vol_r>>8))>>8;
@@ -158,20 +158,20 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			out[1] += ((v->flags & C352_FLG_PHASEFR) ? -s * (v->vol_f&0xff) : s * (v->vol_f&0xff))>>8;
 			out[3] += ((v->flags & C352_FLG_PHASEFR) ? -s * (v->vol_r&0xff) : s * (v->vol_r&0xff))>>8;
 		}
-		
+
 		*buffer_fl++ = (INT16) (out[0]>>3);
 		*buffer_fr++ = (INT16) (out[1]>>3);
 		*buffer_rl++ = (INT16) (out[2]>>3);
 		*buffer_rr++ = (INT16) (out[3]>>3);
 	}
-	
-	
+
+
 }
 
 UINT16 c352_device::read_reg16(unsigned long address)
 {
 	m_stream->update();
-	
+
 	const int reg_map[8] =
 	{
 		offsetof(c352_voice_t,vol_f) / sizeof(UINT16),
@@ -183,19 +183,19 @@ UINT16 c352_device::read_reg16(unsigned long address)
 		offsetof(c352_voice_t,wave_end) / sizeof(UINT16),
 		offsetof(c352_voice_t,wave_loop) / sizeof(UINT16),
 	};
-	
+
 	if(address < 0x100)
 		return *((UINT16*)&m_c352_v[address/8]+reg_map[address%8]);
 	else
 		return 0;
-	
+
 	return 0;
 }
 
 void c352_device::write_reg16(unsigned long address, unsigned short val)
-{	
+{
 	m_stream->update();
-	
+
 	const int reg_map[8] =
 	{
 		offsetof(c352_voice_t,vol_f) / sizeof(UINT16),
@@ -222,7 +222,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 		for(i=0;i<32;i++)
 		{
 			if((m_c352_v[i].flags & C352_FLG_KEYON))
-			{	
+			{
 				m_c352_v[i].pos = (m_c352_v[i].wave_bank<<16) | m_c352_v[i].wave_start;
 
 				m_c352_v[i].sample = 0;
@@ -231,7 +231,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 
 				m_c352_v[i].flags |= C352_FLG_BUSY;
 				m_c352_v[i].flags &= ~(C352_FLG_KEYON|C352_FLG_LOOPHIST);
-				
+
 				//printf("voice %d : pos= %08x\n",i,m_c352_v[i].pos);
 			}
 			else if(m_c352_v[i].flags & C352_FLG_KEYOFF)
@@ -240,6 +240,15 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 			}
 		}
 	}
+}
+
+void c352_device::device_clock_changed()
+{
+	m_sample_rate_base = clock() / m_divider;
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(m_sample_rate_base);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
 }
 
 void c352_device::device_start()
@@ -306,6 +315,7 @@ WRITE16_MEMBER( c352_device::write )
 {
 	if (mem_mask == 0xffff)
 	{
+		//printf("%04x: %04x\n", offset, data);
 		write_reg16(offset, data);
 	}
 	else

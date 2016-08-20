@@ -42,6 +42,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -66,7 +67,7 @@ private:
 		C352_FLG_LOOP       = 0x0002,   // loop forward
 		C352_FLG_REVERSE    = 0x0001    // play sample backwards
 	};
-	
+
 	struct c352_voice_t {
 
 		UINT32 pos;
@@ -86,16 +87,16 @@ private:
 		UINT16 wave_loop;
 
 	};
-	
+
 	int m_sample_rate_base;
 	int m_divider;
-	
+
 	c352_voice_t m_c352_v[32];
 	INT16 m_mulaw_table[256];
-	
+
     UINT16 m_random;
     UINT16 m_control; // control flags, purpose unknown.
-	
+
 	void fetch_sample(c352_voice_t* v);
 
 	unsigned short read_reg16(unsigned long address);
