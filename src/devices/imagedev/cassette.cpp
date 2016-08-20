@@ -263,7 +263,7 @@ image_init_result cassette_image_device::call_load()
 
 image_init_result cassette_image_device::internal_load(bool is_create)
 {
-	casserr_t err;
+	cassette_image::error err;
 	int cassette_flags;
 	bool is_writable;
 	device_image_interface *image = nullptr;
@@ -273,7 +273,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 	{
 		// creating an image
 		err = cassette_create((void *)image, &image_ioprocs, &wavfile_format, m_create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &m_cassette);
-		if (err)
+		if (err != cassette_image::error::SUCCESS)
 			goto error;
 	}
 	else
@@ -285,9 +285,9 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			err = cassette_open_choices((void *)image, &image_ioprocs, filetype(), m_formats, cassette_flags, &m_cassette);
 		}
-		while(err && is_writable);
+		while(err != cassette_image::error::SUCCESS && is_writable);
 
-		if (err)
+		if (err != cassette_image::error::SUCCESS)
 			goto error;
 	}
 
@@ -309,16 +309,16 @@ error:
 	image_error_t imgerr = IMAGE_ERROR_UNSPECIFIED;
 	switch(err)
 	{
-		case CASSETTE_ERROR_INTERNAL:
+		case cassette_image::error::INTERNAL:
 			imgerr = IMAGE_ERROR_INTERNAL;
 			break;
-		case CASSETTE_ERROR_UNSUPPORTED:
+		case cassette_image::error::UNSUPPORTED:
 			imgerr = IMAGE_ERROR_UNSUPPORTED;
 			break;
-		case CASSETTE_ERROR_OUTOFMEMORY:
+		case cassette_image::error::OUT_OF_MEMORY:
 			imgerr = IMAGE_ERROR_OUTOFMEMORY;
 			break;
-		case CASSETTE_ERROR_INVALIDIMAGE:
+		case cassette_image::error::INVALID_IMAGE:
 			imgerr = IMAGE_ERROR_INVALIDIMAGE;
 			break;
 		default:

@@ -175,22 +175,22 @@ static const struct CassetteLegacyWaveFiller lynx128k_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t lynx48k_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error lynx48k_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &lynx48k_legacy_fill_wave);
 }
 
-static casserr_t lynx128k_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error lynx128k_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &lynx128k_legacy_fill_wave);
 }
 
-static casserr_t lynx48k_cassette_load(cassette_image *cassette)
+static cassette_image::error lynx48k_cassette_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &lynx48k_legacy_fill_wave);
 }
 
-static casserr_t lynx128k_cassette_load(cassette_image *cassette)
+static cassette_image::error lynx128k_cassette_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &lynx128k_legacy_fill_wave);
 }

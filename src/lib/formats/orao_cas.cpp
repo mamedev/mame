@@ -97,13 +97,13 @@ static const struct CassetteLegacyWaveFiller orao_legacy_fill_wave = {
 
 
 
-static casserr_t orao_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error orao_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	return cassette_legacy_identify( cassette, opts, &orao_legacy_fill_wave );
 }
 
 
 
-static casserr_t orao_cassette_load( cassette_image *cassette ) {
+static cassette_image::error orao_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &orao_legacy_fill_wave );
 }
 

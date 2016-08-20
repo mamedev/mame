@@ -117,14 +117,14 @@ static const struct CassetteLegacyWaveFiller fmsx_legacy_fill_wave =
 
 
 
-static casserr_t fmsx_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error fmsx_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &fmsx_legacy_fill_wave);
 }
 
 
 
-static casserr_t fmsx_cas_load(cassette_image *cassette)
+static cassette_image::error fmsx_cas_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &fmsx_legacy_fill_wave);
 }

@@ -314,14 +314,14 @@ static const struct CassetteLegacyWaveFiller mz700_legacy_fill_wave =
 
 
 
-static casserr_t mz700_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error mz700_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &mz700_legacy_fill_wave);
 }
 
 
 
-static casserr_t mz700_cas_load(cassette_image *cassette)
+static cassette_image::error mz700_cas_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &mz700_legacy_fill_wave);
 }

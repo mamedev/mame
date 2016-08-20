@@ -226,12 +226,12 @@ static const struct CassetteLegacyWaveFiller primo_legacy_fill_wave =
 	0                                           /* trailer_samples */
 };
 
-static casserr_t primo_ptp_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error primo_ptp_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &primo_legacy_fill_wave);
 }
 
-static casserr_t primo_ptp_load(cassette_image *cassette)
+static cassette_image::error primo_ptp_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &primo_legacy_fill_wave);
 }
