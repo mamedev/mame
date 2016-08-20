@@ -1264,14 +1264,14 @@ const software_part *device_image_interface::find_software_item(const std::strin
 		return nullptr;
 
 	// determine interface
-	const char *interface = nullptr;
-	if (restrict_to_interface)
-		interface = image_interface();
+	const char *interface = restrict_to_interface
+		? image_interface()
+		: nullptr;
 
 	// find the software list if explicitly specified
 	for (software_list_device &swlistdev : software_list_device_iterator(device().mconfig().root_device()))
 	{
-		if (list_name.compare(swlistdev.list_name())==0 || !(list_name.length() > 0))
+		if (list_name.empty() || (list_name == swlistdev.list_name()))
 		{
 			const software_info *info = swlistdev.find(software_name);
 			if (info != nullptr)
