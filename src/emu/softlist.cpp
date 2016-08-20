@@ -129,20 +129,20 @@ software_info::software_info(std::string &&name, std::string &&parent, const std
 //  optional interface match
 //-------------------------------------------------
 
-const software_part *software_info::find_part(const std::string &partname, const char *interface) const
+const software_part *software_info::find_part(const std::string &part_name, const char *interface) const
 {
 	// if neither partname nor interface supplied, then we just return the first entry
-	if (partname.empty() && interface == nullptr)
+	if (part_name.empty() && interface == nullptr)
 		return &m_partdata.front();
 
 	// look for the part by name and match against the interface if provided
 	for (const software_part &part : m_partdata)
-		if (!partname.empty() && (partname == part.name()))
+		if (!part_name.empty() && (part_name == part.name()))
 		{
 			if (interface == nullptr || part.matches_interface(interface))
 				return &part;
 		}
-		else if (partname.empty() && part.matches_interface(interface))
+		else if (part_name.empty() && part.matches_interface(interface))
 				return &part;
 	return nullptr;
 }
@@ -821,8 +821,8 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 //-------------------------------------------------
 //  software_name_parse - helper that splits a
-//  software_list:software:part string into
-//  separate software_list, software, and part
+//	software identifier (software_list:software:part)
+//	string into separate software_list, software, and part
 //  strings.
 //
 //  str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3
@@ -835,47 +835,47 @@ void softlist_parser::parse_soft_end(const char *tagname)
 //  case.
 //-------------------------------------------------
 
-bool software_name_parse(const std::string &text, std::string *swlist_name, std::string *swname, std::string *swpart)
+bool software_name_parse(const std::string &identifier, std::string *list_name, std::string *software_name, std::string *part_name)
 {
 	// first, sanity check the arguments
-	if (!std::regex_match(text, s_potenial_softlist_regex))
+	if (!std::regex_match(identifier, s_potenial_softlist_regex))
 		return false;
 
 	// reset all output parameters (if specified of course)
-	if (swlist_name != nullptr)
-		swlist_name->clear();
-	if (swname != nullptr)
-		swname->clear();
-	if (swpart != nullptr)
-		swpart->clear();
+	if (list_name != nullptr)
+		list_name->clear();
+	if (software_name != nullptr)
+		software_name->clear();
+	if (part_name != nullptr)
+		part_name->clear();
 
 	// if no colon, this is the swname by itself
-	auto split1 = text.find_first_of(':');
+	auto split1 = identifier.find_first_of(':');
 	if (split1 == std::string::npos)
 	{
-		if (swname != nullptr)
-			*swname = text;
+		if (software_name != nullptr)
+			*software_name = identifier;
 		return true;
 	}
 
 	// if one colon, it is the swname and swpart alone
-	auto split2 = text.find_first_of(':', split1 + 1);
+	auto split2 = identifier.find_first_of(':', split1 + 1);
 	if (split2 == std::string::npos)
 	{
-		if (swname != nullptr)
-			*swname = text.substr(0, split1);
-		if (swpart != nullptr)
-			*swpart = text.substr(split1 + 1);
+		if (software_name != nullptr)
+			*software_name = identifier.substr(0, split1);
+		if (part_name != nullptr)
+			*part_name = identifier.substr(split1 + 1);
 		return true;
 	}
 
 	// if two colons present, split into 3 parts
-	if (swlist_name != nullptr)
-		*swlist_name = text.substr(0, split1);
-	if (swname != nullptr)
-		*swname = text.substr(split1 + 1, split2 - (split1 + 1));
-	if (swpart != nullptr)
-		*swpart = text.substr(split2 + 1);
+	if (list_name != nullptr)
+		*list_name = identifier.substr(0, split1);
+	if (software_name != nullptr)
+		*software_name = identifier.substr(split1 + 1, split2 - (split1 + 1));
+	if (part_name != nullptr)
+		*part_name = identifier.substr(split2 + 1);
 	return true;
 }
 
