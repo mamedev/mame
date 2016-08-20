@@ -110,7 +110,7 @@ READ32_MEMBER(hng64_state::hng64_soundram_r)
 
 WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
 {
-	if (mem_mask&0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		int cmd = data >> 16;
 		// I guess it's only one of the bits, the commands are inverse of each other
@@ -132,9 +132,9 @@ WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
 		}
 	}
 
-	if (mem_mask&0x0000ffff)
+	if (ACCESSING_BITS_0_15)
 	{
-			logerror("unknown hng64_soundcpu_enable_w %08x %08x\n", data, mem_mask);
+		logerror("unknown hng64_soundcpu_enable_w %08x %08x\n", data, mem_mask);
 	}
 }
 

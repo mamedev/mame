@@ -24,7 +24,7 @@ ROM_START( rs232 )
 	ROM_LOAD("rs232_v15.ic2", 0x000, 0x800, CRC(6545260d) SHA1(4042f6f1e09e383f3c92f628c6187dc5f072fdb2))
 ROM_END
 
-const rom_entry *rs232_interface_device::device_rom_region() const
+const tiny_rom_entry *rs232_interface_device::device_rom_region() const
 {
 	return ROM_NAME( rs232 );
 }

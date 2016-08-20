@@ -24,7 +24,7 @@
 #include "mame.h"
 #include "rendfont.h"
 #include "rendutil.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "uiinput.h"
 
 
@@ -96,18 +96,20 @@ bool has_multiple_bios(const game_driver *driver, s_bios &biosname)
 	if (driver->rom == nullptr)
 		return false;
 
-	std::string default_name;
-	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			default_name = ROM_GETNAME(rom);
+	auto entries = rom_build_entries(driver->rom);
 
-	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+	std::string default_name;
+	for (const rom_entry &rom : entries)
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			default_name = ROM_GETNAME(&rom);
+
+	for (const rom_entry &rom : entries)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
-			std::string name(ROM_GETHASHDATA(rom));
-			std::string bname(ROM_GETNAME(rom));
-			int bios_flags = ROM_GETBIOSFLAGS(rom);
+			std::string name(ROM_GETHASHDATA(&rom));
+			std::string bname(ROM_GETNAME(&rom));
+			int bios_flags = ROM_GETBIOSFLAGS(&rom);
 
 			if (bname == default_name)
 			{
@@ -528,7 +530,7 @@ void menu_select_software::build_software_list()
 		for (const software_info &swinfo : swlist.get_info())
 		{
 			const software_part &part = swinfo.parts().front();
-			if (part.is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
+			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;
@@ -560,7 +562,7 @@ void menu_select_software::build_software_list()
 				tmpmatches.supported = swinfo.supported();
 				tmpmatches.part = part.name();
 				tmpmatches.driver = m_driver;
-				tmpmatches.listname = strensure(swlist.list_name());
+				tmpmatches.listname = swlist.list_name();
 				tmpmatches.interface = part.interface();
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();

@@ -73,7 +73,7 @@ void microdisc_device::device_reset()
 	ram[0xe000] = 0x42;
 }
 
-const rom_entry *microdisc_device::device_rom_region() const
+const tiny_rom_entry *microdisc_device::device_rom_region() const
 {
 	return ROM_NAME( microdisc );
 }

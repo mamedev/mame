@@ -31,7 +31,7 @@
 #define __COLECOVISION_CARTRIDGE_SLOT__
 
 #include "emu.h"
-
+#include "softlist_dev.h"
 
 
 //**************************************************************************

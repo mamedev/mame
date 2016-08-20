@@ -10,7 +10,7 @@ ROM_START( m24_keyboard )
 ROM_END
 
 
-const rom_entry *m24_keyboard_device::device_rom_region() const
+const tiny_rom_entry *m24_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( m24_keyboard );
 }

@@ -87,7 +87,7 @@ void iq151_video32_device::device_reset()
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *iq151_video32_device::device_rom_region() const
+const tiny_rom_entry *iq151_video32_device::device_rom_region() const
 {
 	return ROM_NAME( iq151_video32 );
 }

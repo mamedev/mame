@@ -37,7 +37,7 @@ ROM_START( m20_8086 )
 ROM_END
 
 
-const rom_entry *m20_8086_device::device_rom_region() const
+const tiny_rom_entry *m20_8086_device::device_rom_region() const
 {
 	return ROM_NAME( m20_8086 );
 }

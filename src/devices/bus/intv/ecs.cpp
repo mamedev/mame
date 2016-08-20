@@ -120,7 +120,7 @@ ROM_START( ecs )
 	ROM_LOAD16_WORD_SWAP( "ecs_rom.e0", 0x1c000, 0x2000, CRC(c2ebcd90) SHA1(b3c14955f56c57e6f0d8fbb695771946cfcf6582))
 ROM_END
 
-const rom_entry *intv_ecs_device::device_rom_region() const
+const tiny_rom_entry *intv_ecs_device::device_rom_region() const
 {
 	return ROM_NAME( ecs );
 }

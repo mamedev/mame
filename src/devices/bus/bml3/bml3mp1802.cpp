@@ -70,7 +70,7 @@ machine_config_constructor bml3bus_mp1802_device::device_mconfig_additions() con
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *bml3bus_mp1802_device::device_rom_region() const
+const tiny_rom_entry *bml3bus_mp1802_device::device_rom_region() const
 {
 	return ROM_NAME( mp1802 );
 }

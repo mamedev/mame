@@ -98,7 +98,7 @@ machine_config_constructor egret_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( egret );
 }
 
-const rom_entry *egret_device::device_rom_region() const
+const tiny_rom_entry *egret_device::device_rom_region() const
 {
 	return ROM_NAME( egret );
 }

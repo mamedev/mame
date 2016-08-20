@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drivenum.c
+    drivenum.cpp
 
     Driver enumeration helpers.
 
@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "drivenum.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include <ctype.h>
 
 

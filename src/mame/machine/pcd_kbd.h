@@ -17,7 +17,7 @@ public:
 
 	template<class _Object> static devcb_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<pcd_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 

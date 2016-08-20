@@ -139,6 +139,14 @@ ROM_START(cntinntl)
 	ROM_LOAD("bingo.u48", 0x0000, 0x0800, CRC(81bbcb19) SHA1(17c3d900d1cbe3cb5332d830288ef2c578afe8f8))
 ROM_END
 
+ROM_START(cntinntl2)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("u36.bin", 0x1800, 0x0800, CRC(205cca08) SHA1(ae21794a63f1c50e3c7239275f7a58caf701a7bc))
+	ROM_LOAD("bingo.u40", 0x1000, 0x0800, CRC(67160fc8) SHA1(6b93c1a7edcd7079a1e7d8a926e72febe2b39e9e))
+	ROM_LOAD("bingo.u44", 0x0800, 0x0800, CRC(068acc49) SHA1(34fa2977513276bd5adc0b06cf258bb5a3702ed2))
+	ROM_LOAD("u48.bin", 0x0000, 0x0800, CRC(8fda0bf9) SHA1(ea2926bb2c1cc394a060d88cc6ef53b7cf39790b))
+ROM_END
+
 ROM_START(goldgame)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD16_BYTE("h9925_1.e", 0x80000, 0x10000, CRC(c5ec9181) SHA1(fac7fc0fbfddca44c728c78973ee5273a3d0bc43))
@@ -300,6 +308,7 @@ ROM_END
 
 
 GAME(1980,  cntinntl,       0,          bingo,  bingo, bingo_state, bingo,  ROT0,   "Bally",        "Continental (Bingo)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cntinntl2,      cntinntl,   bingo,  bingo, bingo_state, bingo,  ROT0,   "Bally",        "Continental (Bingo, alternate version)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??,  goldgame,       0,          splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Golden Game (Bingo)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??,  goldgkitb,      goldgame,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Golden Game Kit Bingo Stake 6/10 (Bingo)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??,  goldgstake,     goldgame,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Golden Game Bingo Stake 6/10 (Bingo)", MACHINE_IS_SKELETON_MECHANICAL)

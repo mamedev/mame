@@ -427,7 +427,7 @@ machine_config_constructor ti_fdc_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ti_fdc );
 }
 
-const rom_entry *ti_fdc_device::device_rom_region() const
+const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( ti_fdc );
 }

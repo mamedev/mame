@@ -38,22 +38,22 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const 
 
 UINT8 ie15_keyboard_device::row_number(UINT32 code)
 {
-	if BIT(code,0) return 0;
-	if BIT(code,1) return 1;
-	if BIT(code,2) return 2;
-	if BIT(code,3) return 3;
-	if BIT(code,4) return 4;
-	if BIT(code,5) return 5;
-	if BIT(code,6) return 6;
-	if BIT(code,7) return 7;
-	if BIT(code,8) return 8;
-	if BIT(code,9) return 9;
-	if BIT(code,10) return 10;
-	if BIT(code,11) return 11;
-	if BIT(code,12) return 12;
-	if BIT(code,13) return 13;
-	if BIT(code,14) return 14;
-	if BIT(code,15) return 15;
+	if (BIT(code,0)) return 0;
+	if (BIT(code,1)) return 1;
+	if (BIT(code,2)) return 2;
+	if (BIT(code,3)) return 3;
+	if (BIT(code,4)) return 4;
+	if (BIT(code,5)) return 5;
+	if (BIT(code,6)) return 6;
+	if (BIT(code,7)) return 7;
+	if (BIT(code,8)) return 8;
+	if (BIT(code,9)) return 9;
+	if (BIT(code,10)) return 10;
+	if (BIT(code,11)) return 11;
+	if (BIT(code,12)) return 12;
+	if (BIT(code,13)) return 13;
+	if (BIT(code,14)) return 14;
+	if (BIT(code,15)) return 15;
 	return 0;
 }
 
@@ -141,7 +141,7 @@ ROM_START( ie15_keyboard )
 	ROM_LOAD( "15bbb.rt5", 0x000, 0x200, CRC(e6a4226e) SHA1(0ee46f5be1b01fa917a6d483bb51463106ae441f) )
 ROM_END
 
-const rom_entry *ie15_keyboard_device::device_rom_region() const
+const tiny_rom_entry *ie15_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( ie15_keyboard );
 }

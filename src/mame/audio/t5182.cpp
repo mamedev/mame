@@ -296,7 +296,7 @@ ROM_END
 //  rom_region - return a pointer to the device's
 //  internal ROM region
 //-------------------------------------------------
-const rom_entry *t5182_device::device_rom_region() const
+const tiny_rom_entry *t5182_device::device_rom_region() const
 {
 	return ROM_NAME( t5182 );
 }

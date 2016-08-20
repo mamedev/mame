@@ -141,31 +141,52 @@ void nesapu_device::set_tag_memory(const char *tag)
 		(m_APU.dpcm).memory = &machine().device(tag)->memory().space(AS_PROGRAM);
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+void nesapu_device::device_clock_changed()
+{
+	calculate_rates();
+}
 
-void nesapu_device::device_start()
+void nesapu_device::calculate_rates()
 {
 	int rate = clock() / 4;
 
-	/* Initialize global variables */
-	m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
+	screen_device *screen = machine().first_screen();
+	if (screen != nullptr)
+	{
+		m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
+		m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
+	}
+	else
+	{
+		m_samps_per_sync = rate / screen_device::DEFAULT_FRAME_RATE;
+		m_real_rate = m_samps_per_sync * screen_device::DEFAULT_FRAME_RATE;
+	}
 	m_buffer_size = m_samps_per_sync;
-	m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
 	m_apu_incsize = (float) (clock() / (float) m_real_rate);
 
-	/* Use initializer calls */
-	create_noise(m_noise_lut, 13, NOISE_LONG);
 	create_vbltimes(m_vbl_times,vbl_length,m_samps_per_sync);
 	create_syncs(m_samps_per_sync);
 
 	/* Adjust buffer size if 16 bits */
 	m_buffer_size+=m_samps_per_sync;
 
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void nesapu_device::device_start()
+{
+	create_noise(m_noise_lut, 13, NOISE_LONG);
+
 	set_tag_memory(m_cpu_tag);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
+	calculate_rates();
 
 	/* register for save */
 	for (int i = 0; i < 2; i++)

@@ -555,6 +555,7 @@ inline void construct_core_types_other(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   SERVICE,             "Service",                input_seq(KEYCODE_F2) )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   TILT,                "Tilt",                   input_seq(KEYCODE_T) )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   INTERLOCK,           "Door Interlock",         input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   MEMORY_RESET,        "Memory Reset",           input_seq(KEYCODE_F1) )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   VOLUME_DOWN,         "Volume Down",            input_seq(KEYCODE_MINUS) )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   VOLUME_UP,           "Volume Up",              input_seq(KEYCODE_EQUALS) )
 }

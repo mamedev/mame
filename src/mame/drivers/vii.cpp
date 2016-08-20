@@ -66,6 +66,9 @@ Detailed list of bugs:
 -- Smart Dart, black screen
 -- Happy Tennis, controls are haywire
 -- Bowling, freezes at the high score screen
+-- The "EEPROM TEST" option in the diagnostic menu (accessible by holding 1+2 or A+B during startup) freezes when selected
+-- The "MOTOR" option in the diagnostic menu does nothing when selected
+-- The input for the gyroscopic sensor tests in the "KEYBOARD + G-SENSOR" sub-menu goes haywire
 
 
 *******************************************************************************/

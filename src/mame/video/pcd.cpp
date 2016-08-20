@@ -42,7 +42,7 @@ ROM_START( pcd_video )
 	ROM_LOAD("s36361-d321-v1.bin", 0x000, 0x400, CRC(69baeb2a) SHA1(98b9cd0f38c51b4988a3aed0efcf004bedd115ff))
 ROM_END
 
-const rom_entry *pcd_video_device::device_rom_region() const
+const tiny_rom_entry *pcd_video_device::device_rom_region() const
 {
 	return ROM_NAME( pcd_video );
 }
@@ -56,7 +56,7 @@ ROM_START( pcx_video )
 	ROM_LOAD("d39-graka.bin", 0x4000, 0x2000, CRC(02920e25) SHA1(145a6648d75c1dc4788f9bc7790281ef7e8f8426))
 ROM_END
 
-const rom_entry *pcx_video_device::device_rom_region() const
+const tiny_rom_entry *pcx_video_device::device_rom_region() const
 {
 	return ROM_NAME( pcx_video );
 }

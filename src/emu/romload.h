@@ -90,7 +90,7 @@ class software_list_device;
 
 /* ----- start/stop macros ----- */
 #define ROM_NAME(name)                              rom_##name
-#define ROM_START(name)                             static const rom_entry ROM_NAME(name)[] = {
+#define ROM_START(name)                             static const tiny_rom_entry ROM_NAME(name)[] = {
 #define ROM_END                                     { nullptr, nullptr, 0, 0, ROMENTRYTYPE_END } };
 
 
@@ -130,11 +130,11 @@ class software_list_device;
 #define ROM_RELOAD_PLAIN(offset,length)                 { nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD },
 
 /* ----- additional ROM-related macros ----- */
-#define ROM_CONTINUE(offset,length)                 { nullptr, nullptr, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
-#define ROM_IGNORE(length)                          { nullptr, nullptr, 0,      length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
-#define ROM_FILL(offset,length,value)               { nullptr, #value, offset, length, ROMENTRYTYPE_FILL },
-#define ROMX_FILL(offset,length,value,flags)        { nullptr, #value, offset, length, ROMENTRYTYPE_FILL | flags },
-#define ROM_COPY(srctag,srcoffs,offset,length)      { srctag, #srcoffs, offset, length, ROMENTRYTYPE_COPY },
+#define ROM_CONTINUE(offset,length)                 { nullptr, nullptr, (offset), (length), ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
+#define ROM_IGNORE(length)                          { nullptr, nullptr, 0,      (length), ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
+#define ROM_FILL(offset,length,value)               { nullptr, (const char *)(value), (offset), (length), ROMENTRYTYPE_FILL },
+#define ROMX_FILL(offset,length,value,flags)        { nullptr, (const char *)(value), (offset), (length), ROMENTRYTYPE_FILL | flags },
+#define ROM_COPY(srctag,srcoffs,offset,length)      { (srctag), (const char *)(srcoffs), (offset), (length), ROMENTRYTYPE_COPY },
 
 
 /* ----- system BIOS macros ----- */
@@ -279,6 +279,9 @@ std::string rom_parameter_name(const device_t &device, const rom_entry *romp);
 
 /* return the value for a per-game parameter */
 std::string rom_parameter_value(const rom_entry *romp);
+
+// builds a rom_entry vector from a tiny_rom_entry array
+std::vector<rom_entry> rom_build_entries(const tiny_rom_entry *tinyentries);
 
 
 /* open a disk image, searching up the parent and loading by checksum */

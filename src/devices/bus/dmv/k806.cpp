@@ -131,7 +131,7 @@ ioport_constructor dmv_k806_device::device_input_ports() const
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *dmv_k806_device::device_rom_region() const
+const tiny_rom_entry *dmv_k806_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k806 );
 }

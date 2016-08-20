@@ -60,7 +60,7 @@ void iq151_rom_device::device_start()
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *iq151_rom_device::device_rom_region() const
+const tiny_rom_entry *iq151_rom_device::device_rom_region() const
 {
 	return ROM_NAME( iq151_rom );
 }

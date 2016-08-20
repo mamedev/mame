@@ -226,7 +226,7 @@ ROM_START( ym2608 )
 ROM_END
 
 
-const rom_entry *ym2608_device::device_rom_region() const
+const tiny_rom_entry *ym2608_device::device_rom_region() const
 {
 	return ROM_NAME( ym2608 );
 }

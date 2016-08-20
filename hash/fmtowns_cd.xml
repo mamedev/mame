@@ -550,7 +550,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Missing a floppy disk -->
-	<software name="win31">
+	<software name="win31l11">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="[OS] Windows 3.1 L11 (Track 1).bin" size="210974400" crc="f1c0baee" sha1="b6b3a75c06dda9f2c7df10703b2640871db84d34"/>
@@ -569,6 +569,36 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="[os] windows 3.1 l11" sha1="94c9b88833a6ea2f39167981cdc45ed0ce407ecd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win31l12">
+		<!--
+		 Origin: redump.org
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM).cue" size="1318" crc="2f97abdf" md5="92ba0009e7e40106bb2b3216718de756" sha1="1fc667a993343fc2560a83d3031398924f4d73ac"/>
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM) (Track 1).bin" size="369734400" crc="b910308c" md5="2f64df6e2cc329a827340d6fc4df5244" sha1="aa3e7bf45123fa4d145051a5d6393b773b36f6cc"/>
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM) (Track 2).bin" size="24296160" crc="84ca1c64" md5="a9697de9d633de946ba286c35ab53963" sha1="a5a76ce4664e31a431f0ede7fb595f68f91ea70e"/>
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM) (Track 3).bin" size="33280800" crc="c715fa2a" md5="02bce69fd1beab8b5e3cb11c583f6b3d" sha1="d1f949e98d6721569224f487662b4be4379930d1"/>
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM) (Track 4).bin" size="31203984" crc="ddc80416" md5="f99637fa3490d1047fddc975629e8353" sha1="e416686251a310ca37ab28d71422aa0a4b8aad5c"/>
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM) (Track 5).bin" size="33687696" crc="6dc2adb0" md5="44bfd720f1899716eaa86cb04f3a5ea9" sha1="f15fbaa51ef779119ea20c2559b2942e0d660bea"/>
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM) (Track 6).bin" size="24484320" crc="6003c48f" md5="64a2f33664aceec7f8188c907cc98360" sha1="06cf72ab1a8a97967cf505ebf63ababeb253f64d"/>
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM) (Track 7).bin" size="66366384" crc="14c119e5" md5="ab983a7c47d13f222cb320799dda1799" sha1="f5fc90b31f35f2fff7fe2a71f66359baecb047dc"/>
+		<rom name="Microsoft Windows Version 3.1 L12 Operating System (Japan) (Setup CD-ROM) (Track 8).bin" size="41049456" crc="7ac70a73" md5="0689216716f45af6f0f113f1d08abd19" sha1="a51becc2bb7686925441a2538f238aa151807006"/>
+		 -->
+		<description>Windows 3.1 L12</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows version 3.1 l12 operating system (japan) (setup disk).hdm" size="1261568" crc="6703b021" sha1="55161fea07a7d4da4a744707a11c8a5942bc53c5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<feature name="part_id" value="Setup CD-ROM" />
+			<diskarea name="cdrom">
+				<disk name="microsoft windows version 3.1 l12 operating system (japan) (setup cd-rom)" sha1="6fc77133989a78df696cded58f0a96b5990a85c4" />
 			</diskarea>
 		</part>
 	</software>
@@ -1029,6 +1059,30 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="air combat ii special" sha1="8a8b49b7ca086084fe3c1ff23e6ee95e69559cf3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="airmanag">
+		<!--
+		Origin: redump.org
+		<rom name="Air Management - Oozora ni Kakeru (Japan).cue" size="410" crc="6a571778" md5="d755ba0a62bec95b05c75a60970142b9" sha1="0f1b1f1cead906b9aa3fc73923a7d416160c65a7"/>
+		<rom name="Air Management - Oozora ni Kakeru (Japan) (Track 1).bin" size="10231200" crc="0706eb4e" md5="0e8058f6fd6d59092d929cc02f48d230" sha1="e806c1b786667135be2fecb0f40a1c3f5043fc9f"/>
+		<rom name="Air Management - Oozora ni Kakeru (Japan) (Track 2).bin" size="27085632" crc="fbe8232b" md5="e12ffdb4a9b363f645d00437335e63c7" sha1="ca040d3605b3f9bcba020abd09ff6a9a78fb0776"/>
+		<rom name="Air Management - Oozora ni Kakeru (Japan) (Track 3).bin" size="50473920" crc="29f8860c" md5="aa94c731bf450359cb94c9c90345c022" sha1="fb642ea6192c6f9b45cf2d959944e2dfc33ec82a"/>
+		-->
+		<description>Air Management - Oozora ni Kakeru</description>
+		<year>1992</year>
+		<publisher>光栄 (Koei)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="air management - oozora ni kakeru (japan) (user disk).hdm" size="1261568" crc="1095e60c" sha1="a4f27fedb0d4c5b1aeaf39bbf2fbbd104c40760b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="air management - oozora ni kakeru (japan)" sha1="9a0649bb7eaf24a579bf8eff5e56faacfbc5bb53" />
 			</diskarea>
 		</part>
 	</software>
@@ -3864,6 +3918,36 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom2" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="highlight cd 20 (disc 2)" sha1="b7251d8531bf3a18e32beec3e9d836de203052ac" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hiouden2">
+		<!--
+		Origin: redump.org
+		<rom name="Hiouden II (Japan).cue" size="84" crc="497b5f5f" md5="50c108bde5663b3b92ea60b398846d03" sha1="d5d1de91ae78512f7774b317cb42c8c0e6fb4c77"/>
+		<rom name="Hiouden II (Japan).bin" size="31396848" crc="62ee325e" md5="4b3e585d9e28cf65f0b61d15ed3f3490" sha1="eb1980658c818c2964c4974e444cacb7739758af"/>
+		-->
+		<description>Hiouden II</description>
+		<year>1994</year>
+		<publisher>ウルフチーム (WolfTeam)</publisher>
+		<!-- 
+		Note from the dumper:
+		
+		When I dumped the system disk it was considerably damaged, with a lot of bad sectors
+		on side 1. Thankfully this doesn't affect the executable files and doesn't prevent the
+		game from running, but there are saved games by the original owner that probably won't work.
+		In any case, the disk needs a redump from a cleaner copy.
+		-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="hiouden ii (japan) (system disk).hdm" size="1261568" crc="a3430507" sha1="6dadde7fb90329717adce6e98b4b3698cb67a199" offset="000000" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hiouden ii (japan)" sha1="559dc86590f0a486293e2e695875eff12e13d31f" />
 			</diskarea>
 		</part>
 	</software>

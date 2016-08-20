@@ -53,7 +53,7 @@ ROM_START( buddha )
 	ROMX_LOAD("buddha_103-17.rom", 0x0000, 0x8000, CRC(2b7b24e0) SHA1(ec17a58962c373a2892090ec9b1722d2c326d631), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
 
-const rom_entry *buddha_device::device_rom_region() const
+const tiny_rom_entry *buddha_device::device_rom_region() const
 {
 	return ROM_NAME( buddha );
 }

@@ -5,6 +5,7 @@
 
 #include "slot.h"
 #include "bus/msx_cart/cartridge.h"
+#include "softlist_dev.h"
 
 
 extern const device_type MSX_SLOT_CARTRIDGE;

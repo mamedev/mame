@@ -56,11 +56,11 @@ void menu_main::populate()
 	item_append(_("Input (this Machine)"), "", 0, (void *)INPUT_SPECIFIC);
 
 	/* add optional input-related menus */
-	if (machine().ioport().has_analog())
+	if (ui().machine_info().has_analog())
 		item_append(_("Analog Controls"), "", 0, (void *)ANALOG);
-	if (machine().ioport().has_dips())
+	if (ui().machine_info().has_dips())
 		item_append(_("Dip Switches"), "", 0, (void *)SETTINGS_DIP_SWITCHES);
-	if (machine().ioport().has_configs())
+	if (ui().machine_info().has_configs())
 	{
 		item_append(_("Machine Configuration"), "", 0, (void *)SETTINGS_DRIVER_CONFIG);
 	}
@@ -92,7 +92,7 @@ void menu_main::populate()
 	if (pty_interface_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Pseudo terminals"), "", 0, (void *)PTY_INFO);
 
-	if (machine().ioport().has_bioses())
+	if (ui().machine_info().has_bioses())
 		item_append(_("Bios Selection"), "", 0, (void *)BIOS_SELECTION);
 
 	/* add slot info menu */

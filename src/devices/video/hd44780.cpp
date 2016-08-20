@@ -69,7 +69,7 @@ ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *hd44780_device::device_rom_region() const
+const tiny_rom_entry *hd44780_device::device_rom_region() const
 {
 	switch (m_charset_type)
 	{

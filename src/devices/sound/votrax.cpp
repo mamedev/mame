@@ -1124,7 +1124,7 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *votrax_sc01_device::device_rom_region() const
+const tiny_rom_entry *votrax_sc01_device::device_rom_region() const
 {
 	return ROM_NAME( votrax_sc01 );
 }

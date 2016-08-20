@@ -18,18 +18,59 @@ Based on G65C816 CPU Emulator by Karl Stenerud
 
 #define ADDRESS_24BIT(A) ((A)&0xffffff)
 
-struct m7700_opcode_struct
+namespace {
+
+class m7700_opcode_struct
 {
-	unsigned char name;
+public:
+	bool is_call() const { return m_name == op::JSR; }
+	bool is_return() const { return (m_name == op::RTS) || (m_name == op::RTI); }
+	const char *name() const { return s_opnames[unsigned(m_name)]; }
+
+	static const m7700_opcode_struct &get(unsigned char ins) { return s_opcodes[ins]; }
+	static const m7700_opcode_struct &get_prefix42(unsigned char ins) { return s_opcodes_prefix42[ins]; }
+	static const m7700_opcode_struct &get_prefix89(unsigned char ins) { return s_opcodes_prefix89[ins]; }
+
 	unsigned char flag;
 	unsigned char ea;
+
+protected:
+	enum class op : unsigned
+	{
+		ADC ,  AND ,  ASL ,  BCC ,  BCS ,  BEQ ,  BIT ,  BMI ,  BNE ,  BPL ,  BRA ,
+		BRK ,  BRL ,  BVC ,  BVS ,  CLC ,  CLD ,  CLI ,  CLV ,  CMP ,  COP ,  CPX ,
+		CPY ,  DEA ,  DEC ,  DEX ,  DEY ,  EOR ,  INA ,  INC ,  INX ,  INY ,  JML ,
+		JMP ,  JSL ,  JSR ,  LDA ,  LDX ,  LDY ,  LSR ,  MVN ,  MVP ,  NOP ,  ORA ,
+		PEA ,  PEI ,  PER ,  PHA ,  PHT ,  PHD ,  PHK ,  PHP ,  PHX ,  PHY ,  PLA ,
+		PLB ,  PLD ,  PLP ,  PLX ,  PLY ,  CLP ,  ROL ,  ROR ,  RTI ,  RTL ,  RTS ,
+		SBC ,  SEC ,  SED ,  SEI ,  SEP ,  STA ,  STP ,  STX ,  STY ,  STZ ,  TAX ,
+		TAY ,  TCS ,  TCD ,  TDC ,  TRB ,  TSB ,  TSC ,  TSX ,  TXA ,  TXS ,  TXY ,
+		TYA ,  TYX ,  WAI ,  WDM ,  XBA ,  XCE ,  MPY ,  DIV ,  MPYS,  DIVS,  RLA ,
+		EXTS, EXTZ ,  LDT ,  LDM ,  UNK ,  SEB ,  SEM ,  CLM ,  STB ,  LDB ,  ADCB ,
+		SBCB, EORB ,  TBX ,  CMPB,  INB ,  DEB ,  TXB ,  TYB ,  LSRB,  ORB ,  CLB ,
+		BBC,   BBS,   TBY,   ANDB,  PUL ,  PSH ,  PLAB,  XAB ,  PHB
+	};
+
+	m7700_opcode_struct(op n, unsigned char f, unsigned char e)
+		: flag(f)
+		, ea(e)
+		, m_name(n)
+	{
+	}
+
+	op m_name;
+
+	static const char *const s_opnames[];
+	static const m7700_opcode_struct s_opcodes[256];
+	static const m7700_opcode_struct s_opcodes_prefix42[256];
+	static const m7700_opcode_struct s_opcodes_prefix89[256];
 };
 
 enum
 {
 	IMP , ACC , RELB, RELW, IMM , A   , AI  , AL  , ALX , AX  , AXI ,
 	AY  , D   , DI  , DIY , DLI , DLIY, DX  , DXI , DY  , S   , SIY ,
-	SIG /*, MVN , MVP , PEA , PEI , PER */, LDM4, LDM5, LDM4X, LDM5X,
+	SIG , MVN , MVP , PEA , PEI , PER , LDM4, LDM5, LDM4X, LDM5X,
 	BBCD, BBCA, ACCB
 };
 
@@ -40,23 +81,7 @@ enum
 	X  /* check x bit */
 };
 
-enum
-{
-	ADC ,  AND ,  ASL ,  BCC ,  BCS ,  BEQ ,  BIT ,  BMI ,  BNE ,  BPL ,  BRA ,
-	BRK ,  BRL ,  BVC ,  BVS ,  CLC ,  CLD ,  CLI ,  CLV ,  CMP ,  COP ,  CPX ,
-	CPY ,  DEA ,  DEC ,  DEX ,  DEY ,  EOR ,  INA ,  INC ,  INX ,  INY ,  JML ,
-	JMP ,  JSL ,  JSR ,  LDA ,  LDX ,  LDY ,  LSR ,  MVN ,  MVP ,  NOP ,  ORA ,
-	PEA ,  PEI ,  PER ,  PHA ,  PHT ,  PHD ,  PHK ,  PHP ,  PHX ,  PHY ,  PLA ,
-	PLB ,  PLD ,  PLP ,  PLX ,  PLY ,  CLP ,  ROL ,  ROR ,  RTI ,  RTL ,  RTS ,
-	SBC ,  SEC ,  SED ,  SEI ,  SEP ,  STA ,  STP ,  STX ,  STY ,  STZ ,  TAX ,
-	TAY ,  TCS ,  TCD ,  TDC ,  TRB ,  TSB ,  TSC ,  TSX ,  TXA ,  TXS ,  TXY ,
-	TYA ,  TYX ,  WAI ,  WDM ,  XBA ,  XCE ,  MPY ,  DIV ,  MPYS,  DIVS,  RLA ,
-	EXTS, EXTZ ,  LDT ,  LDM ,  UNK ,  SEB ,  SEM ,  CLM ,  STB ,  LDB ,  ADCB ,
-	SBCB, EORB ,  TBX ,  CMPB,  INB ,  DEB ,  TXB ,  TYB ,  LSRB,  ORB ,  CLB ,
-	BBC,   BBS,   TBY,   ANDB,  PUL ,  PSH ,  PLAB,  XAB ,  PHB
-};
-
-static const char *const g_opnames[] =
+const char *const m7700_opcode_struct::s_opnames[] =
 {
 	"ADC", "AND", "ASL", "BCC", "BCS", "BEQ", "BIT", "BMI", "BNE", "BPL", "BRA",
 	"BRK", "BRL", "BVC", "BVS", "CLC", "CLD", "CLI", "CLV", "CMP", "COP", "CPX",
@@ -66,260 +91,262 @@ static const char *const g_opnames[] =
 	"PLT", "PLD", "PLP", "PLX", "PLY", "CLP", "ROL", "ROR", "RTI", "RTL", "RTS",
 	"SBC", "SEC", "SED", "SEI", "SEP", "STA", "STP", "STX", "STY", "STZ", "TAX",
 	"TAY", "TCS", "TCD", "TDC", "TRB", "TSB", "TSC", "TSX", "TXA", "TXS", "TXY",
-	"TYA", "TYX", "WAI", "WDM", "XBA", "XCE", "MPY", "DIV", "MPYS", "DIVS", "RLA",
+	"TYA", "TYX", "WAI", "WDM", "XBA", "XCE", "MPY", "DIV", "MPYS","DIVS","RLA",
 	"EXTS","EXTZ","LDT", "LDM", "UNK", "SEB", "SEM", "CLM", "STB", "LDB", "ADCB",
-	"SBCB","EORB","TBX", "CMPB","INB", "DEB", "TXB", "TYB", "LSRB", "ORB", "CLB",
+	"SBCB","EORB","TBX", "CMPB","INB", "DEB", "TXB", "TYB", "LSRB","ORB", "CLB",
 	"BBC", "BBS", "TBY", "ANDB","PUL", "PSH", "PLB", "XAB", "PHB",
 };
 
-static const m7700_opcode_struct g_opcodes[256] =
+const m7700_opcode_struct m7700_opcode_struct::s_opcodes[256] =
 {
-	{BRK, I, SIG }, {ORA, M, DXI }, {UNK, I, SIG }, {ORA, M, S   },
-	{SEB, M, LDM4 }, {ORA, M, D   }, {ASL, M, D   }, {ORA, M, DLI },
-	{PHP, I, IMP }, {ORA, M, IMM }, {ASL, M, ACC }, {PHD, I, IMP },
-	{SEB, M, LDM5 }, {ORA, M, A   }, {ASL, M, A   }, {ORA, M, AL  },
+	{op::BRK, I, SIG  }, {op::ORA, M, DXI }, {op::UNK, I, SIG }, {op::ORA, M, S    },
+	{op::SEB, M, LDM4 }, {op::ORA, M, D   }, {op::ASL, M, D   }, {op::ORA, M, DLI  },
+	{op::PHP, I, IMP  }, {op::ORA, M, IMM }, {op::ASL, M, ACC }, {op::PHD, I, IMP  },
+	{op::SEB, M, LDM5 }, {op::ORA, M, A   }, {op::ASL, M, A   }, {op::ORA, M, AL   },
 // 0x10
-	{BPL, I, RELB}, {ORA, M, DIY }, {ORA, M, DI  }, {ORA, M, SIY },
-	{CLB, M, LDM4}, {ORA, M, DX  }, {ASL, M, DX  }, {ORA, M, DLIY},
-	{CLC, I, IMP }, {ORA, M, AY  }, {DEA, I, IMP }, {TCS, I, IMP },
-	{CLB, M, LDM5}, {ORA, M, AX  }, {ASL, M, AX  }, {ORA, M, ALX },
+	{op::BPL, I, RELB }, {op::ORA, M, DIY }, {op::ORA, M, DI  }, {op::ORA, M, SIY  },
+	{op::CLB, M, LDM4 }, {op::ORA, M, DX  }, {op::ASL, M, DX  }, {op::ORA, M, DLIY },
+	{op::CLC, I, IMP  }, {op::ORA, M, AY  }, {op::DEA, I, IMP }, {op::TCS, I, IMP  },
+	{op::CLB, M, LDM5 }, {op::ORA, M, AX  }, {op::ASL, M, AX  }, {op::ORA, M, ALX  },
 // 0x20
-	{JSR, I, A   }, {AND, M, DXI }, {JSL, I, AL  }, {AND, M, S   },
-	{BBS, M, BBCD}, {AND, M, D   }, {ROL, M, D   }, {AND, M, DLI },
-	{PLP, I, IMP }, {AND, M, IMM }, {ROL, M, ACC }, {PLD, I, IMP },
-	{BBS, M, BBCA}, {AND, M, A   }, {ROL, M, A   }, {AND, M, AL  },
+	{op::JSR, I, A    }, {op::AND, M, DXI }, {op::JSL, I, AL  }, {op::AND, M, S    },
+	{op::BBS, M, BBCD }, {op::AND, M, D   }, {op::ROL, M, D   }, {op::AND, M, DLI  },
+	{op::PLP, I, IMP  }, {op::AND, M, IMM }, {op::ROL, M, ACC }, {op::PLD, I, IMP  },
+	{op::BBS, M, BBCA }, {op::AND, M, A   }, {op::ROL, M, A   }, {op::AND, M, AL   },
 // 0x30
-	{BMI, I, RELB}, {AND, M, DIY }, {AND, M, DI  }, {AND, M, SIY },
-	{BBC, M, BBCD}, {AND, M, DX  }, {ROL, M, DX  }, {AND, M, DLIY},
-	{SEC, I, IMP }, {AND, M, AY  }, {INA, I, IMP }, {TSC, I, IMP },
-	{BBC, M, BBCA}, {AND, M, AX  }, {ROL, M, AX  }, {AND, M, ALX },
+	{op::BMI, I, RELB }, {op::AND, M, DIY }, {op::AND, M, DI  }, {op::AND, M, SIY  },
+	{op::BBC, M, BBCD }, {op::AND, M, DX  }, {op::ROL, M, DX  }, {op::AND, M, DLIY },
+	{op::SEC, I, IMP  }, {op::AND, M, AY  }, {op::INA, I, IMP }, {op::TSC, I, IMP  },
+	{op::BBC, M, BBCA }, {op::AND, M, AX  }, {op::ROL, M, AX  }, {op::AND, M, ALX  },
 // 0x40
-	{RTI, I, IMP }, {EOR, M, DXI }, {WDM, I, IMP }, {EOR, M, S   },
-	{MVP, I, MVP }, {EOR, M, D   }, {LSR, M, D   }, {EOR, M, DLI },
-	{PHA, I, IMP }, {EOR, M, IMM }, {LSR, M, ACC }, {PHK, I, IMP },
-	{JMP, I, A   }, {EOR, M, A   }, {LSR, M, A   }, {EOR, M, AL  },
+	{op::RTI, I, IMP  }, {op::EOR, M, DXI }, {op::WDM, I, IMP }, {op::EOR, M, S    },
+	{op::MVP, I, MVP  }, {op::EOR, M, D   }, {op::LSR, M, D   }, {op::EOR, M, DLI  },
+	{op::PHA, I, IMP  }, {op::EOR, M, IMM }, {op::LSR, M, ACC }, {op::PHK, I, IMP  },
+	{op::JMP, I, A    }, {op::EOR, M, A   }, {op::LSR, M, A   }, {op::EOR, M, AL   },
 // 0x50
-	{BVC, I, RELB}, {EOR, M, DIY }, {EOR, M, DI  }, {EOR, M, SIY },
-	{MVN, I, MVN }, {EOR, M, DX  }, {LSR, M, DX  }, {EOR, M, DLIY},
-	{CLI, I, IMP }, {EOR, M, AY  }, {PHY, I, IMP }, {TCD, I, IMP },
-	{JMP, I, AL  }, {EOR, M, AX  }, {LSR, M, AX  }, {EOR, M, ALX },
+	{op::BVC, I, RELB }, {op::EOR, M, DIY }, {op::EOR, M, DI  }, {op::EOR, M, SIY  },
+	{op::MVN, I, MVN  }, {op::EOR, M, DX  }, {op::LSR, M, DX  }, {op::EOR, M, DLIY },
+	{op::CLI, I, IMP  }, {op::EOR, M, AY  }, {op::PHY, I, IMP }, {op::TCD, I, IMP  },
+	{op::JMP, I, AL   }, {op::EOR, M, AX  }, {op::LSR, M, AX  }, {op::EOR, M, ALX  },
 // 0x60
-	{RTS, I, IMP }, {ADC, M, DXI }, {PER, I, PER }, {ADC, M, S   },
-	{LDM, M, LDM4 }, {ADC, M, D   }, {ROR, M, D   }, {ADC, M, DLI },
-	{PLA, I, IMP }, {ADC, M, IMM }, {ROR, M, ACC }, {RTL, I, IMP },
-	{JMP, I, AI  }, {ADC, M, A   }, {ROR, M, A   }, {ADC, M, AL  },
+	{op::RTS, I, IMP  }, {op::ADC, M, DXI }, {op::PER, I, PER }, {op::ADC, M, S    },
+	{op::LDM, M, LDM4 }, {op::ADC, M, D   }, {op::ROR, M, D   }, {op::ADC, M, DLI  },
+	{op::PLA, I, IMP  }, {op::ADC, M, IMM }, {op::ROR, M, ACC }, {op::RTL, I, IMP  },
+	{op::JMP, I, AI   }, {op::ADC, M, A   }, {op::ROR, M, A   }, {op::ADC, M, AL   },
 // 0x70
-	{BVS, I, RELB}, {ADC, M, DIY }, {ADC, M, DI  }, {ADC, M, SIY },
-	{LDM, M, LDM4X }, {ADC, M, DX  }, {ROR, M, DX  }, {ADC, M, DLIY},
-	{SEI, I, IMP }, {ADC, M, AY  }, {PLY, I, IMP }, {TDC, I, IMP },
-	{JMP, I, AXI }, {ADC, M, AX  }, {ROR, M, AX  }, {ADC, M, ALX },
+	{op::BVS, I, RELB }, {op::ADC, M, DIY }, {op::ADC, M, DI  }, {op::ADC, M, SIY  },
+	{op::LDM, M, LDM4X}, {op::ADC, M, DX  }, {op::ROR, M, DX  }, {op::ADC, M, DLIY },
+	{op::SEI, I, IMP  }, {op::ADC, M, AY  }, {op::PLY, I, IMP }, {op::TDC, I, IMP  },
+	{op::JMP, I, AXI  }, {op::ADC, M, AX  }, {op::ROR, M, AX  }, {op::ADC, M, ALX  },
 // 0x80
-	{BRA, I, RELB}, {STA, M, DXI }, {BRL, I, RELW}, {STA, M, S   },
-	{STY, X, D   }, {STA, M, D   }, {STX, X, D   }, {STA, M, DLI },
-	{DEY, I, IMP }, {BIT, M, IMM }, {TXA, I, IMP }, {PHT, I, IMP },
-	{STY, X, A   }, {STA, M, A   }, {STX, X, A   }, {STA, M, AL  },
+	{op::BRA, I, RELB }, {op::STA, M, DXI }, {op::BRL, I, RELW}, {op::STA, M, S    },
+	{op::STY, X, D    }, {op::STA, M, D   }, {op::STX, X, D   }, {op::STA, M, DLI  },
+	{op::DEY, I, IMP  }, {op::BIT, M, IMM }, {op::TXA, I, IMP }, {op::PHT, I, IMP  },
+	{op::STY, X, A    }, {op::STA, M, A   }, {op::STX, X, A   }, {op::STA, M, AL   },
 // 0x90
-	{BCC, I, RELB}, {STA, M, DIY }, {STA, M, DI  }, {STA, M, SIY },
-	{STY, X, DX  }, {STA, M, DX  }, {STX, X, DY  }, {STA, M, DLIY},
-	{TYA, I, IMP }, {STA, M, AY  }, {TXS, I, IMP }, {TXY, I, IMP },
-	{LDM, M, LDM5 }, {STA, M, AX  }, {LDM, M, LDM5X }, {STA, M, ALX },
+	{op::BCC, I, RELB }, {op::STA, M, DIY }, {op::STA, M, DI  }, {op::STA, M, SIY  },
+	{op::STY, X, DX   }, {op::STA, M, DX  }, {op::STX, X, DY  }, {op::STA, M, DLIY },
+	{op::TYA, I, IMP  }, {op::STA, M, AY  }, {op::TXS, I, IMP }, {op::TXY, I, IMP  },
+	{op::LDM, M, LDM5 }, {op::STA, M, AX  }, {op::LDM, M, LDM5X},{op::STA, M, ALX  },
 // 0xA0
-	{LDY, X, IMM }, {LDA, M, DXI }, {LDX, X, IMM }, {LDA, M, S   },
-	{LDY, X, D   }, {LDA, M, D   }, {LDX, X, D   }, {LDA, M, DLI },
-	{TAY, I, IMP }, {LDA, M, IMM }, {TAX, I, IMP }, {PLB, I, IMP },
-	{LDY, X, A   }, {LDA, M, A   }, {LDX, X, A   }, {LDA, M, AL  },
+	{op::LDY, X, IMM  }, {op::LDA, M, DXI }, {op::LDX, X, IMM }, {op::LDA, M, S    },
+	{op::LDY, X, D    }, {op::LDA, M, D   }, {op::LDX, X, D   }, {op::LDA, M, DLI  },
+	{op::TAY, I, IMP  }, {op::LDA, M, IMM }, {op::TAX, I, IMP }, {op::PLB, I, IMP  },
+	{op::LDY, X, A    }, {op::LDA, M, A   }, {op::LDX, X, A   }, {op::LDA, M, AL   },
 // 0xB0
-	{BCS, I, RELB}, {LDA, M, DIY }, {LDA, M, DI  }, {LDA, M, SIY },
-	{LDY, X, DX  }, {LDA, M, DX  }, {LDX, X, DY  }, {LDA, M, DLIY},
-	{CLV, I, IMP }, {LDA, M, AY  }, {TSX, I, IMP }, {TYX, I, IMP },
-	{LDY, X, AX  }, {LDA, M, AX  }, {LDX, X, AY  }, {LDA, M, ALX },
+	{op::BCS, I, RELB }, {op::LDA, M, DIY }, {op::LDA, M, DI  }, {op::LDA, M, SIY  },
+	{op::LDY, X, DX   }, {op::LDA, M, DX  }, {op::LDX, X, DY  }, {op::LDA, M, DLIY },
+	{op::CLV, I, IMP  }, {op::LDA, M, AY  }, {op::TSX, I, IMP }, {op::TYX, I, IMP  },
+	{op::LDY, X, AX   }, {op::LDA, M, AX  }, {op::LDX, X, AY  }, {op::LDA, M, ALX  },
 // 0xC0
-	{CPY, X, IMM }, {CMP, M, DXI }, {CLP, I, IMM }, {CMP, M, S   },
-	{CPY, X, D   }, {CMP, M, D   }, {DEC, M, D   }, {CMP, M, DLI },
-	{INY, I, IMP }, {CMP, M, IMM }, {DEX, I, IMP }, {WAI, I, IMP },
-	{CPY, X, A   }, {CMP, M, A   }, {DEC, M, A   }, {CMP, M, AL  },
+	{op::CPY, X, IMM  }, {op::CMP, M, DXI }, {op::CLP, I, IMM }, {op::CMP, M, S    },
+	{op::CPY, X, D    }, {op::CMP, M, D   }, {op::DEC, M, D   }, {op::CMP, M, DLI  },
+	{op::INY, I, IMP  }, {op::CMP, M, IMM }, {op::DEX, I, IMP }, {op::WAI, I, IMP  },
+	{op::CPY, X, A    }, {op::CMP, M, A   }, {op::DEC, M, A   }, {op::CMP, M, AL   },
 // 0xD0
-	{BNE, I, RELB}, {CMP, M, DIY }, {CMP, M, DI  }, {CMP, M, SIY },
-	{PEI, I, PEI }, {CMP, M, DX  }, {DEC, M, DX  }, {CMP, M, DLIY},
-	{CLM, I, IMP }, {CMP, M, AY  }, {PHX, I, IMP }, {STP, I, IMP },
-	{JML, I, AI  }, {CMP, M, AX  }, {DEC, M, AX  }, {CMP, M, ALX },
+	{op::BNE, I, RELB }, {op::CMP, M, DIY }, {op::CMP, M, DI  }, {op::CMP, M, SIY  },
+	{op::PEI, I, PEI  }, {op::CMP, M, DX  }, {op::DEC, M, DX  }, {op::CMP, M, DLIY },
+	{op::CLM, I, IMP  }, {op::CMP, M, AY  }, {op::PHX, I, IMP }, {op::STP, I, IMP  },
+	{op::JML, I, AI   }, {op::CMP, M, AX  }, {op::DEC, M, AX  }, {op::CMP, M, ALX  },
 // 0xE0
-	{CPX, X, IMM }, {SBC, M, DXI }, {SEP, I, IMM }, {SBC, M, S   },
-	{CPX, X, D   }, {SBC, M, D   }, {INC, M, D   }, {SBC, M, DLI },
-	{INX, M, IMP }, {SBC, M, IMM }, {NOP, I, IMP }, {PSH, I, IMM },
-	{CPX, X, A   }, {SBC, M, A   }, {INC, M, A   }, {SBC, M, AL  },
+	{op::CPX, X, IMM  }, {op::SBC, M, DXI }, {op::SEP, I, IMM }, {op::SBC, M, S    },
+	{op::CPX, X, D    }, {op::SBC, M, D   }, {op::INC, M, D   }, {op::SBC, M, DLI  },
+	{op::INX, M, IMP  }, {op::SBC, M, IMM }, {op::NOP, I, IMP }, {op::PSH, I, IMM  },
+	{op::CPX, X, A    }, {op::SBC, M, A   }, {op::INC, M, A   }, {op::SBC, M, AL   },
 // 0xF0
-	{BEQ, I, RELB}, {SBC, M, DIY }, {SBC, M, DI  }, {SBC, M, SIY },
-	{PEA, I, PEA }, {SBC, M, DX  }, {INC, M, DX  }, {SBC, M, DLIY},
-	{SEM, I, IMP }, {SBC, M, AY  }, {PLX, I, IMP }, {PUL, I, IMM },
-	{JSR, I, AXI }, {SBC, M, AX  }, {INC, M, AX  }, {SBC, M, ALX }
+	{op::BEQ, I, RELB }, {op::SBC, M, DIY }, {op::SBC, M, DI  }, {op::SBC, M, SIY  },
+	{op::PEA, I, PEA  }, {op::SBC, M, DX  }, {op::INC, M, DX  }, {op::SBC, M, DLIY },
+	{op::SEM, I, IMP  }, {op::SBC, M, AY  }, {op::PLX, I, IMP }, {op::PUL, I, IMM  },
+	{op::JSR, I, AXI  }, {op::SBC, M, AX  }, {op::INC, M, AX  }, {op::SBC, M, ALX  }
 };
 
-static const m7700_opcode_struct g_opcodes_prefix42[256] =
+const m7700_opcode_struct m7700_opcode_struct::s_opcodes_prefix42[256] =
 {
-	{BRK, I, SIG }, {ORB, M, DXI }, {COP, I, SIG }, {ORB, M, S   },
-	{TSB, M, D   }, {ORB, M, D   }, {ASL, M, D   }, {ORB, M, DLI },
-	{PHP, I, IMP }, {ORB, M, IMM }, {ASL, M, ACCB }, {PHD, I, IMP },
-	{TSB, M, A   }, {ORB, M, A   }, {ASL, M, A   }, {ORB, M, AL  },
+	{op::BRK, I, SIG  }, {op::ORB, M, DXI }, {op::COP, I, SIG }, {op::ORB,  M, S   },
+	{op::TSB, M, D    }, {op::ORB, M, D   }, {op::ASL, M, D   }, {op::ORB,  M, DLI },
+	{op::PHP, I, IMP  }, {op::ORB, M, IMM }, {op::ASL, M, ACCB}, {op::PHD,  I, IMP },
+	{op::TSB, M, A    }, {op::ORB, M, A   }, {op::ASL, M, A   }, {op::ORB,  M, AL  },
 // 0x10
-	{BPL, I, RELB}, {ORB, M, DIY }, {ORB, M, DI  }, {ORB, M, SIY },
-	{TRB, M, D   }, {ORB, M, DX  }, {ASL, M, DX  }, {ORB, M, DLIY},
-	{CLC, I, IMP }, {ORB, M, AY  }, {DEB, I, IMP }, {TCS, I, IMP },
-	{TRB, M, A   }, {ORB, M, AX  }, {ASL, M, AX  }, {ORB, M, ALX },
+	{op::BPL, I, RELB }, {op::ORB, M, DIY }, {op::ORB, M, DI  }, {op::ORB,  M, SIY },
+	{op::TRB, M, D    }, {op::ORB, M, DX  }, {op::ASL, M, DX  }, {op::ORB,  M, DLIY},
+	{op::CLC, I, IMP  }, {op::ORB, M, AY  }, {op::DEB, I, IMP }, {op::TCS,  I, IMP },
+	{op::TRB, M, A    }, {op::ORB, M, AX  }, {op::ASL, M, AX  }, {op::ORB,  M, ALX },
 // 0x20
-	{JSR, I, A   }, {ANDB, M, DXI }, {JSL, I, AL  }, {ANDB, M, S   },
-	{BIT, M, D   }, {ANDB, M, D   }, {ROL, M, D   }, {ANDB, M, DLI },
-	{PLP, I, IMP }, {ANDB, M, IMM }, {ROL, M, ACCB }, {PLD, I, IMP },
-	{BIT, M, A   }, {ANDB, M, A   }, {ROL, M, A   }, {ANDB, M, AL  },
+	{op::JSR, I, A    }, {op::ANDB,M, DXI }, {op::JSL, I, AL  }, {op::ANDB, M, S   },
+	{op::BIT, M, D    }, {op::ANDB,M, D   }, {op::ROL, M, D   }, {op::ANDB, M, DLI },
+	{op::PLP, I, IMP  }, {op::ANDB,M, IMM }, {op::ROL, M, ACCB}, {op::PLD,  I, IMP },
+	{op::BIT, M, A    }, {op::ANDB,M, A   }, {op::ROL, M, A   }, {op::ANDB, M, AL  },
 // 0x30
-	{BMI, I, RELB}, {AND, M, DIY }, {AND, M, DI  }, {AND, M, SIY },
-	{BIT, M, DX  }, {AND, M, DX  }, {ROL, M, DX  }, {AND, M, DLIY},
-	{SEC, I, IMP }, {AND, M, AY  }, {INB, I, IMP }, {TSC, I, IMP },
-	{BIT, M, AX  }, {AND, M, AX  }, {ROL, M, AX  }, {AND, M, ALX },
+	{op::BMI, I, RELB }, {op::AND, M, DIY }, {op::AND, M, DI  }, {op::AND,  M, SIY },
+	{op::BIT, M, DX   }, {op::AND, M, DX  }, {op::ROL, M, DX  }, {op::AND,  M, DLIY},
+	{op::SEC, I, IMP  }, {op::AND, M, AY  }, {op::INB, I, IMP }, {op::TSC,  I, IMP },
+	{op::BIT, M, AX   }, {op::AND, M, AX  }, {op::ROL, M, AX  }, {op::AND,  M, ALX },
 // 0x40
-	{RTI, I, IMP }, {EORB, M, DXI }, {WDM, I, IMP }, {EORB, M, S   },
-	{MVP, I, MVP }, {EORB, M, D   }, {LSRB, M, D   }, {EORB, M, DLI },
-	{PHB, I, IMP }, {EORB, M, IMM }, {LSRB, M, ACC }, {PHK, I, IMP },
-	{JMP, I, A   }, {EORB, M, A   }, {LSRB, M, A   }, {EORB, M, AL  },
+	{op::RTI, I, IMP  }, {op::EORB,M, DXI }, {op::WDM, I, IMP }, {op::EORB, M, S   },
+	{op::MVP, I, MVP  }, {op::EORB,M, D   }, {op::LSRB,M, D   }, {op::EORB, M, DLI },
+	{op::PHB, I, IMP  }, {op::EORB,M, IMM }, {op::LSRB,M, ACC }, {op::PHK,  I, IMP },
+	{op::JMP, I, A    }, {op::EORB,M, A   }, {op::LSRB,M, A   }, {op::EORB, M, AL  },
 // 0x50
-	{BVC, I, RELB}, {EORB, M, DIY }, {EORB, M, DI  }, {EORB, M, SIY },
-	{MVN, I, MVN }, {EORB, M, DX  }, {LSRB, M, DX  }, {EORB, M, DLIY},
-	{CLI, I, IMP }, {EORB, M, AY  }, {PHY, I, IMP }, {TCD, I, IMP },
-	{JMP, I, AL  }, {EORB, M, AX  }, {LSRB, M, AX  }, {EORB, M, ALX },
+	{op::BVC, I, RELB }, {op::EORB,M, DIY }, {op::EORB,M, DI  }, {op::EORB, M, SIY },
+	{op::MVN, I, MVN  }, {op::EORB,M, DX  }, {op::LSRB,M, DX  }, {op::EORB, M, DLIY},
+	{op::CLI, I, IMP  }, {op::EORB,M, AY  }, {op::PHY, I, IMP }, {op::TCD,  I, IMP },
+	{op::JMP, I, AL   }, {op::EORB,M, AX  }, {op::LSRB,M, AX  }, {op::EORB, M, ALX },
 // 0x60
-	{RTS, I, IMP }, {ADCB, M, DXI }, {PER, I, PER }, {ADCB, M, S   },
-	{STZ, M, D   }, {ADCB, M, D   }, {ROR, M, D   }, {ADCB, M, DLI },
-	{PLAB,I, IMP }, {ADCB, M, IMM }, {ROR, M, ACC }, {RTL, I, IMP },
-	{JMP, I, AI  }, {ADCB, M, A   }, {ROR, M, A   }, {ADCB, M, AL  },
+	{op::RTS, I, IMP  }, {op::ADCB,M, DXI }, {op::PER, I, PER }, {op::ADCB, M, S   },
+	{op::STZ, M, D    }, {op::ADCB,M, D   }, {op::ROR, M, D   }, {op::ADCB, M, DLI },
+	{op::PLAB,I, IMP  }, {op::ADCB,M, IMM }, {op::ROR, M, ACC }, {op::RTL,  I, IMP },
+	{op::JMP, I, AI   }, {op::ADCB,M, A   }, {op::ROR, M, A   }, {op::ADCB, M, AL  },
 // 0x70
-	{BVS, I, RELB}, {ADCB, M, DIY }, {ADCB, M, DI  }, {ADCB, M, SIY },
-	{STZ, M, DX  }, {ADCB, M, DX  }, {ROR, M, DX  }, {ADCB, M, DLIY},
-	{SEI, I, IMP }, {ADCB, M, AY  }, {PLY, I, IMP }, {TDC, I, IMP },
-	{JMP, I, AXI }, {ADCB, M, AX  }, {ROR, M, AX  }, {ADCB, M, ALX },
+	{op::BVS, I, RELB }, {op::ADCB,M, DIY }, {op::ADCB,M, DI  }, {op::ADCB, M, SIY },
+	{op::STZ, M, DX   }, {op::ADCB,M, DX  }, {op::ROR, M, DX  }, {op::ADCB, M, DLIY},
+	{op::SEI, I, IMP  }, {op::ADCB,M, AY  }, {op::PLY, I, IMP }, {op::TDC,  I, IMP },
+	{op::JMP, I, AXI  }, {op::ADCB,M, AX  }, {op::ROR, M, AX  }, {op::ADCB, M, ALX },
 // 0x80
-	{BRA, I, RELB}, {STB, M, DXI }, {BRL, I, RELW}, {STB, M, S   },
-	{STY, X, D   }, {STB, M, D   }, {STX, X, D   }, {STB, M, DLI },
-	{DEY, I, IMP }, {BIT, M, IMM }, {TXB, I, IMP }, {PHB, I, IMP },
-	{STY, X, A   }, {STB, M, A   }, {STX, X, A   }, {STB, M, AL  },
+	{op::BRA, I, RELB }, {op::STB, M, DXI }, {op::BRL, I, RELW}, {op::STB,  M, S   },
+	{op::STY, X, D    }, {op::STB, M, D   }, {op::STX, X, D   }, {op::STB,  M, DLI },
+	{op::DEY, I, IMP  }, {op::BIT, M, IMM }, {op::TXB, I, IMP }, {op::PHB,  I, IMP },
+	{op::STY, X, A    }, {op::STB, M, A   }, {op::STX, X, A   }, {op::STB,  M, AL  },
 // 0x90
-	{BCC, I, RELB}, {STB, M, DIY }, {STB, M, DI  }, {STB, M, SIY },
-	{STY, X, DX  }, {STB, M, DX  }, {STX, X, DY  }, {STB, M, DLIY},
-	{TYB, I, IMP }, {STB, M, AY  }, {TXS, I, IMP }, {TXY, I, IMP },
-	{STZ, M, A   }, {STB, M, AX  }, {STZ, M, AX  }, {STB, M, ALX },
+	{op::BCC, I, RELB }, {op::STB, M, DIY }, {op::STB, M, DI  }, {op::STB,  M, SIY },
+	{op::STY, X, DX   }, {op::STB, M, DX  }, {op::STX, X, DY  }, {op::STB,  M, DLIY},
+	{op::TYB, I, IMP  }, {op::STB, M, AY  }, {op::TXS, I, IMP }, {op::TXY,  I, IMP },
+	{op::STZ, M, A    }, {op::STB, M, AX  }, {op::STZ, M, AX  }, {op::STB,  M, ALX },
 // 0xA0
-	{LDY, X, IMM }, {LDB, M, DXI }, {LDX, X, IMM }, {LDB, M, S   },
-	{LDY, X, D   }, {LDB, M, D   }, {LDX, X, D   }, {LDB, M, DLI },
-	{TBY, I, IMP }, {LDB, M, IMM }, {TBX, I, IMP }, {PLB, I, IMP },
-	{LDY, X, A   }, {LDB, M, A   }, {LDX, X, A   }, {LDB, M, AL  },
+	{op::LDY, X, IMM  }, {op::LDB, M, DXI }, {op::LDX, X, IMM }, {op::LDB,  M, S   },
+	{op::LDY, X, D    }, {op::LDB, M, D   }, {op::LDX, X, D   }, {op::LDB,  M, DLI },
+	{op::TBY, I, IMP  }, {op::LDB, M, IMM }, {op::TBX, I, IMP }, {op::PLB,  I, IMP },
+	{op::LDY, X, A    }, {op::LDB, M, A   }, {op::LDX, X, A   }, {op::LDB,  M, AL  },
 // 0xB0
-	{BCS, I, RELB}, {LDB, M, DIY }, {LDB, M, DI  }, {LDB, M, SIY },
-	{LDY, X, DX  }, {LDB, M, DX  }, {LDX, X, DY  }, {LDB, M, DLIY},
-	{CLV, I, IMP }, {LDB, M, AY  }, {TSX, I, IMP }, {TYX, I, IMP },
-	{LDY, X, AX  }, {LDB, M, AX  }, {LDX, X, AY  }, {LDB, M, ALX },
+	{op::BCS, I, RELB }, {op::LDB, M, DIY }, {op::LDB, M, DI  }, {op::LDB,  M, SIY },
+	{op::LDY, X, DX   }, {op::LDB, M, DX  }, {op::LDX, X, DY  }, {op::LDB,  M, DLIY},
+	{op::CLV, I, IMP  }, {op::LDB, M, AY  }, {op::TSX, I, IMP }, {op::TYX,  I, IMP },
+	{op::LDY, X, AX   }, {op::LDB, M, AX  }, {op::LDX, X, AY  }, {op::LDB,  M, ALX },
 // 0xC0
-	{CPY, X, IMM }, {CMPB, M, DXI }, {CLP, I, IMM }, {CMPB, M, S   },
-	{CPY, X, D   }, {CMPB, M, D   }, {DEC, M, D   }, {CMPB, M, DLI },
-	{INY, I, IMP }, {CMPB, M, IMM }, {DEX, I, IMP }, {WAI, I, IMP },
-	{CPY, X, A   }, {CMPB, M, A   }, {DEC, M, A   }, {CMPB, M, AL  },
+	{op::CPY, X, IMM  }, {op::CMPB,M, DXI }, {op::CLP, I, IMM }, {op::CMPB, M, S   },
+	{op::CPY, X, D    }, {op::CMPB,M, D   }, {op::DEC, M, D   }, {op::CMPB, M, DLI },
+	{op::INY, I, IMP  }, {op::CMPB,M, IMM }, {op::DEX, I, IMP }, {op::WAI,  I, IMP },
+	{op::CPY, X, A    }, {op::CMPB,M, A   }, {op::DEC, M, A   }, {op::CMPB, M, AL  },
 // 0xD0
-	{BNE, I, RELB}, {CMPB, M, DIY }, {CMPB, M, DI  }, {CMPB, M, SIY },
-	{PEI, I, PEI }, {CMPB, M, DX  }, {DEC, M, DX  }, {CMPB, M, DLIY},
-	{CLD, I, IMP }, {CMPB, M, AY  }, {PHX, I, IMP }, {STP, I, IMP },
-	{JML, I, AI  }, {CMPB, M, AX  }, {DEC, M, AX  }, {CMPB, M, ALX },
+	{op::BNE, I, RELB }, {op::CMPB,M, DIY }, {op::CMPB,M, DI  }, {op::CMPB, M, SIY },
+	{op::PEI, I, PEI  }, {op::CMPB,M, DX  }, {op::DEC, M, DX  }, {op::CMPB, M, DLIY},
+	{op::CLD, I, IMP  }, {op::CMPB,M, AY  }, {op::PHX, I, IMP }, {op::STP,  I, IMP },
+	{op::JML, I, AI   }, {op::CMPB,M, AX  }, {op::DEC, M, AX  }, {op::CMPB, M, ALX },
 // 0xE0
-	{CPX, X, IMM }, {SBCB, M, DXI }, {SEP, I, IMM }, {SBCB, M, S   },
-	{CPX, X, D   }, {SBCB, M, D   }, {INC, M, D   }, {SBCB, M, DLI },
-	{INX, M, IMP }, {SBCB, M, IMM }, {NOP, I, IMP }, {XBA, I, IMP },
-	{CPX, X, A   }, {SBCB, M, A   }, {INC, M, A   }, {SBCB, M, AL  },
+	{op::CPX, X, IMM  }, {op::SBCB,M, DXI }, {op::SEP, I, IMM }, {op::SBCB, M, S   },
+	{op::CPX, X, D    }, {op::SBCB,M, D   }, {op::INC, M, D   }, {op::SBCB, M, DLI },
+	{op::INX, M, IMP  }, {op::SBCB,M, IMM }, {op::NOP, I, IMP }, {op::XBA,  I, IMP },
+	{op::CPX, X, A    }, {op::SBCB,M, A   }, {op::INC, M, A   }, {op::SBCB, M, AL  },
 // 0xF0
-	{BEQ, I, RELB}, {SBCB, M, DIY }, {SBCB, M, DI  }, {SBCB, M, SIY },
-	{PEA, I, PEA }, {SBCB, M, DX  }, {INC, M, DX  }, {SBCB, M, DLIY},
-	{SED, I, IMP }, {SBCB, M, AY  }, {PLX, I, IMP }, {XCE, I, IMP },
-	{JSR, I, AXI }, {SBCB, M, AX  }, {INC, M, AX  }, {SBCB, M, ALX }
+	{op::BEQ, I, RELB }, {op::SBCB,M, DIY }, {op::SBCB,M, DI  }, {op::SBCB, M, SIY },
+	{op::PEA, I, PEA  }, {op::SBCB,M, DX  }, {op::INC, M, DX  }, {op::SBCB, M, DLIY},
+	{op::SED, I, IMP  }, {op::SBCB,M, AY  }, {op::PLX, I, IMP }, {op::XCE,  I, IMP },
+	{op::JSR, I, AXI  }, {op::SBCB,M, AX  }, {op::INC, M, AX  }, {op::SBCB, M, ALX }
 };
 
-static const m7700_opcode_struct g_opcodes_prefix89[256] =
+const m7700_opcode_struct m7700_opcode_struct::s_opcodes_prefix89[256] =
 {
-	{BRK, I, SIG }, {MPY, M, DXI }, {COP, I, SIG }, {MPY, M, S   },
-	{TSB, M, D   }, {MPY, M, D   }, {ASL, M, D   }, {MPY, M, DLI },
-	{PHP, I, IMP }, {MPY, M, IMM }, {ASL, M, ACC }, {PHD, I, IMP },
-	{TSB, M, A   }, {MPY, M, A   }, {ASL, M, A   }, {MPY, M, AL  },
+	{op::BRK, I, SIG  }, {op::MPY, M, DXI }, {op::COP, I, SIG }, {op::MPY, M, S    },
+	{op::TSB, M, D    }, {op::MPY, M, D   }, {op::ASL, M, D   }, {op::MPY, M, DLI  },
+	{op::PHP, I, IMP  }, {op::MPY, M, IMM }, {op::ASL, M, ACC }, {op::PHD, I, IMP  },
+	{op::TSB, M, A    }, {op::MPY, M, A   }, {op::ASL, M, A   }, {op::MPY, M, AL   },
 // 0x10
-	{BPL, I, RELB}, {ORA, M, DIY }, {ORA, M, DI  }, {ORA, M, SIY },
-	{TRB, M, D   }, {MPY, M, DX  }, {ASL, M, DX  }, {ORA, M, DLIY},
-	{CLC, I, IMP }, {MPY, M, AY  }, {INA, I, IMP }, {TCS, I, IMP },
-	{TRB, M, A   }, {ORA, M, AX  }, {ASL, M, AX  }, {ORA, M, ALX },
+	{op::BPL, I, RELB }, {op::ORA, M, DIY }, {op::ORA, M, DI  }, {op::ORA, M, SIY  },
+	{op::TRB, M, D    }, {op::MPY, M, DX  }, {op::ASL, M, DX  }, {op::ORA, M, DLIY },
+	{op::CLC, I, IMP  }, {op::MPY, M, AY  }, {op::INA, I, IMP }, {op::TCS, I, IMP  },
+	{op::TRB, M, A    }, {op::ORA, M, AX  }, {op::ASL, M, AX  }, {op::ORA, M, ALX  },
 // 0x20
-	{JSR, I, A   }, {AND, M, DXI }, {JSL, I, AL  }, {AND, M, S   },
-	{BIT, M, D   }, {AND, M, D   }, {ROL, M, D   }, {AND, M, DLI },
-	{XAB, I, IMP }, {AND, M, IMM }, {ROL, M, ACC }, {PLD, I, IMP },
-	{BIT, M, A   }, {AND, M, A   }, {ROL, M, A   }, {AND, M, AL  },
+	{op::JSR, I, A    }, {op::AND, M, DXI }, {op::JSL, I, AL  }, {op::AND, M, S    },
+	{op::BIT, M, D    }, {op::AND, M, D   }, {op::ROL, M, D   }, {op::AND, M, DLI  },
+	{op::XAB, I, IMP  }, {op::AND, M, IMM }, {op::ROL, M, ACC }, {op::PLD, I, IMP  },
+	{op::BIT, M, A    }, {op::AND, M, A   }, {op::ROL, M, A   }, {op::AND, M, AL   },
 // 0x30
-	{BMI, I, RELB}, {AND, M, DIY }, {AND, M, DI  }, {AND, M, SIY },
-	{BIT, M, DX  }, {AND, M, DX  }, {ROL, M, DX  }, {AND, M, DLIY},
-	{SEC, I, IMP }, {AND, M, AY  }, {DEA, I, IMP }, {TSC, I, IMP },
-	{BIT, M, AX  }, {AND, M, AX  }, {ROL, M, AX  }, {AND, M, ALX },
+	{op::BMI, I, RELB }, {op::AND, M, DIY }, {op::AND, M, DI  }, {op::AND, M, SIY  },
+	{op::BIT, M, DX   }, {op::AND, M, DX  }, {op::ROL, M, DX  }, {op::AND, M, DLIY },
+	{op::SEC, I, IMP  }, {op::AND, M, AY  }, {op::DEA, I, IMP }, {op::TSC, I, IMP  },
+	{op::BIT, M, AX   }, {op::AND, M, AX  }, {op::ROL, M, AX  }, {op::AND, M, ALX  },
 // 0x40
-	{RTI, I, IMP }, {EOR, M, DXI }, {WDM, I, IMP }, {EOR, M, S   },
-	{MVP, I, MVP }, {EOR, M, D   }, {LSR, M, D   }, {EOR, M, DLI },
-	{PHA, I, IMP }, {RLA, M, IMM }, {LSR, M, ACC }, {PHK, I, IMP },
-	{JMP, I, A   }, {EOR, M, A   }, {LSR, M, A   }, {EOR, M, AL  },
+	{op::RTI, I, IMP  }, {op::EOR, M, DXI }, {op::WDM, I, IMP }, {op::EOR, M, S    },
+	{op::MVP, I, MVP  }, {op::EOR, M, D   }, {op::LSR, M, D   }, {op::EOR, M, DLI  },
+	{op::PHA, I, IMP  }, {op::RLA, M, IMM }, {op::LSR, M, ACC }, {op::PHK, I, IMP  },
+	{op::JMP, I, A    }, {op::EOR, M, A   }, {op::LSR, M, A   }, {op::EOR, M, AL   },
 // 0x50
-	{BVC, I, RELB}, {EOR, M, DIY }, {EOR, M, DI  }, {EOR, M, SIY },
-	{MVN, I, MVN }, {EOR, M, DX  }, {LSR, M, DX  }, {EOR, M, DLIY},
-	{CLI, I, IMP }, {EOR, M, AY  }, {PHY, I, IMP }, {TCD, I, IMP },
-	{JMP, I, AL  }, {EOR, M, AX  }, {LSR, M, AX  }, {EOR, M, ALX },
+	{op::BVC, I, RELB }, {op::EOR, M, DIY }, {op::EOR, M, DI  }, {op::EOR, M, SIY  },
+	{op::MVN, I, MVN  }, {op::EOR, M, DX  }, {op::LSR, M, DX  }, {op::EOR, M, DLIY },
+	{op::CLI, I, IMP  }, {op::EOR, M, AY  }, {op::PHY, I, IMP }, {op::TCD, I, IMP  },
+	{op::JMP, I, AL   }, {op::EOR, M, AX  }, {op::LSR, M, AX  }, {op::EOR, M, ALX  },
 // 0x60
-	{RTS, I, IMP }, {ADC, M, DXI }, {PER, I, PER }, {ADC, M, S   },
-	{STZ, M, D   }, {ADC, M, D   }, {ROR, M, D   }, {ADC, M, DLI },
-	{PLA, I, IMP }, {ADC, M, IMM }, {ROR, M, ACC }, {RTL, I, IMP },
-	{JMP, I, AI  }, {ADC, M, A   }, {ROR, M, A   }, {ADC, M, AL  },
+	{op::RTS, I, IMP  }, {op::ADC, M, DXI }, {op::PER, I, PER }, {op::ADC, M, S    },
+	{op::STZ, M, D    }, {op::ADC, M, D   }, {op::ROR, M, D   }, {op::ADC, M, DLI  },
+	{op::PLA, I, IMP  }, {op::ADC, M, IMM }, {op::ROR, M, ACC }, {op::RTL, I, IMP  },
+	{op::JMP, I, AI   }, {op::ADC, M, A   }, {op::ROR, M, A   }, {op::ADC, M, AL   },
 // 0x70
-	{BVS, I, RELB}, {ADC, M, DIY }, {ADC, M, DI  }, {ADC, M, SIY },
-	{STZ, M, DX  }, {ADC, M, DX  }, {ROR, M, DX  }, {ADC, M, DLIY},
-	{SEI, I, IMP }, {ADC, M, AY  }, {PLY, I, IMP }, {TDC, I, IMP },
-	{JMP, I, AXI }, {ADC, M, AX  }, {ROR, M, AX  }, {ADC, M, ALX },
+	{op::BVS, I, RELB }, {op::ADC, M, DIY }, {op::ADC, M, DI  }, {op::ADC, M, SIY  },
+	{op::STZ, M, DX   }, {op::ADC, M, DX  }, {op::ROR, M, DX  }, {op::ADC, M, DLIY },
+	{op::SEI, I, IMP  }, {op::ADC, M, AY  }, {op::PLY, I, IMP }, {op::TDC, I, IMP  },
+	{op::JMP, I, AXI  }, {op::ADC, M, AX  }, {op::ROR, M, AX  }, {op::ADC, M, ALX  },
 // 0x80
-	{BRA, I, RELB}, {STA, M, DXI }, {BRL, I, RELW}, {STA, M, S   },
-	{STY, X, D   }, {STA, M, D   }, {STX, X, D   }, {STA, M, DLI },
-	{DEY, I, IMP }, {BIT, M, IMM }, {TXA, I, IMP }, {PHB, I, IMP },
-	{STY, X, A   }, {STA, M, A   }, {STX, X, A   }, {STA, M, AL  },
+	{op::BRA, I, RELB }, {op::STA, M, DXI }, {op::BRL, I, RELW}, {op::STA, M, S    },
+	{op::STY, X, D    }, {op::STA, M, D   }, {op::STX, X, D   }, {op::STA, M, DLI  },
+	{op::DEY, I, IMP  }, {op::BIT, M, IMM }, {op::TXA, I, IMP }, {op::PHB, I, IMP  },
+	{op::STY, X, A    }, {op::STA, M, A   }, {op::STX, X, A   }, {op::STA, M, AL   },
 // 0x90
-	{BCC, I, RELB}, {STA, M, DIY }, {STA, M, DI  }, {STA, M, SIY },
-	{STY, X, DX  }, {STA, M, DX  }, {STX, X, DY  }, {STA, M, DLIY},
-	{TYA, I, IMP }, {STA, M, AY  }, {TXS, I, IMP }, {TXY, I, IMP },
-	{STZ, M, A   }, {STA, M, AX  }, {STZ, M, AX  }, {STA, M, ALX },
+	{op::BCC, I, RELB }, {op::STA, M, DIY }, {op::STA, M, DI  }, {op::STA, M, SIY  },
+	{op::STY, X, DX   }, {op::STA, M, DX  }, {op::STX, X, DY  }, {op::STA, M, DLIY },
+	{op::TYA, I, IMP  }, {op::STA, M, AY  }, {op::TXS, I, IMP }, {op::TXY, I, IMP  },
+	{op::STZ, M, A    }, {op::STA, M, AX  }, {op::STZ, M, AX  }, {op::STA, M, ALX  },
 // 0xA0
-	{LDY, X, IMM }, {LDA, M, DXI }, {LDX, X, IMM }, {LDA, M, S   },
-	{LDY, X, D   }, {LDA, M, D   }, {LDX, X, D   }, {LDA, M, DLI },
-	{TAY, I, IMP }, {LDA, M, IMM }, {TAX, I, IMP }, {PLB, I, IMP },
-	{LDY, X, A   }, {LDA, M, A   }, {LDX, X, A   }, {LDA, M, AL  },
+	{op::LDY, X, IMM  }, {op::LDA, M, DXI }, {op::LDX, X, IMM }, {op::LDA, M, S    },
+	{op::LDY, X, D    }, {op::LDA, M, D   }, {op::LDX, X, D   }, {op::LDA, M, DLI  },
+	{op::TAY, I, IMP  }, {op::LDA, M, IMM }, {op::TAX, I, IMP }, {op::PLB, I, IMP  },
+	{op::LDY, X, A    }, {op::LDA, M, A   }, {op::LDX, X, A   }, {op::LDA, M, AL   },
 // 0xB0
-	{BCS, I, RELB}, {LDA, M, DIY }, {LDA, M, DI  }, {LDA, M, SIY },
-	{LDY, X, DX  }, {LDA, M, DX  }, {LDX, X, DY  }, {LDA, M, DLIY},
-	{CLV, I, IMP }, {LDA, M, AY  }, {TSX, I, IMP }, {TYX, I, IMP },
-	{LDY, X, AX  }, {LDA, M, AX  }, {LDX, X, AY  }, {LDA, M, ALX },
+	{op::BCS, I, RELB }, {op::LDA, M, DIY }, {op::LDA, M, DI  }, {op::LDA, M, SIY  },
+	{op::LDY, X, DX   }, {op::LDA, M, DX  }, {op::LDX, X, DY  }, {op::LDA, M, DLIY },
+	{op::CLV, I, IMP  }, {op::LDA, M, AY  }, {op::TSX, I, IMP }, {op::TYX, I, IMP  },
+	{op::LDY, X, AX   }, {op::LDA, M, AX  }, {op::LDX, X, AY  }, {op::LDA, M, ALX  },
 // 0xC0
-	{CPY, X, IMM }, {CMP, M, DXI }, {LDT, I, IMM }, {CMP, M, S   },
-	{CPY, X, D   }, {CMP, M, D   }, {DEC, M, D   }, {CMP, M, DLI },
-	{INY, I, IMP }, {CMP, M, IMM }, {DEX, I, IMP }, {WAI, I, IMP },
-	{CPY, X, A   }, {CMP, M, A   }, {DEC, M, A   }, {CMP, M, AL  },
+	{op::CPY, X, IMM  }, {op::CMP, M, DXI }, {op::LDT, I, IMM }, {op::CMP, M, S    },
+	{op::CPY, X, D    }, {op::CMP, M, D   }, {op::DEC, M, D   }, {op::CMP, M, DLI  },
+	{op::INY, I, IMP  }, {op::CMP, M, IMM }, {op::DEX, I, IMP }, {op::WAI, I, IMP  },
+	{op::CPY, X, A    }, {op::CMP, M, A   }, {op::DEC, M, A   }, {op::CMP, M, AL   },
 // 0xD0
-	{BNE, I, RELB}, {CMP, M, DIY }, {CMP, M, DI  }, {CMP, M, SIY },
-	{PEI, I, PEI }, {CMP, M, DX  }, {DEC, M, DX  }, {CMP, M, DLIY},
-	{CLD, I, IMP }, {CMP, M, AY  }, {PHX, I, IMP }, {STP, I, IMP },
-	{JML, I, AI  }, {CMP, M, AX  }, {DEC, M, AX  }, {CMP, M, ALX },
+	{op::BNE, I, RELB }, {op::CMP, M, DIY }, {op::CMP, M, DI  }, {op::CMP, M, SIY  },
+	{op::PEI, I, PEI  }, {op::CMP, M, DX  }, {op::DEC, M, DX  }, {op::CMP, M, DLIY },
+	{op::CLD, I, IMP  }, {op::CMP, M, AY  }, {op::PHX, I, IMP }, {op::STP, I, IMP  },
+	{op::JML, I, AI   }, {op::CMP, M, AX  }, {op::DEC, M, AX  }, {op::CMP, M, ALX  },
 // 0xE0
-	{CPX, X, IMM }, {SBC, M, DXI }, {SEP, I, IMM }, {SBC, M, S   },
-	{CPX, X, D   }, {SBC, M, D   }, {INC, M, D   }, {SBC, M, DLI },
-	{INX, M, IMP }, {SBC, M, IMM }, {NOP, I, IMP }, {XBA, I, IMP },
-	{CPX, X, A   }, {SBC, M, A   }, {INC, M, A   }, {SBC, M, AL  },
+	{op::CPX, X, IMM  }, {op::SBC, M, DXI }, {op::SEP, I, IMM }, {op::SBC, M, S    },
+	{op::CPX, X, D    }, {op::SBC, M, D   }, {op::INC, M, D   }, {op::SBC, M, DLI  },
+	{op::INX, M, IMP  }, {op::SBC, M, IMM }, {op::NOP, I, IMP }, {op::XBA, I, IMP  },
+	{op::CPX, X, A    }, {op::SBC, M, A   }, {op::INC, M, A   }, {op::SBC, M, AL   },
 // 0xF0
-	{BEQ, I, RELB}, {SBC, M, DIY }, {SBC, M, DI  }, {SBC, M, SIY },
-	{PEA, I, PEA }, {SBC, M, DX  }, {INC, M, DX  }, {SBC, M, DLIY},
-	{SEM, I, IMP }, {SBC, M, AY  }, {PLX, I, IMP }, {XCE, I, IMP },
-	{JSR, I, AXI }, {SBC, M, AX  }, {INC, M, AX  }, {SBC, M, ALX }
+	{op::BEQ, I, RELB }, {op::SBC, M, DIY }, {op::SBC, M, DI  }, {op::SBC, M, SIY  },
+	{op::PEA, I, PEA  }, {op::SBC, M, DX  }, {op::INC, M, DX  }, {op::SBC, M, DLIY },
+	{op::SEM, I, IMP  }, {op::SBC, M, AY  }, {op::PLX, I, IMP }, {op::XCE, I, IMP  },
+	{op::JSR, I, AXI  }, {op::SBC, M, AX  }, {op::INC, M, AX  }, {op::SBC, M, ALX  }
 };
+
+} // anonymous namespace
 
 static inline unsigned int read_8(const UINT8 *oprom, unsigned int offset)
 {
@@ -389,33 +416,33 @@ int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 
 	// check for prefixes
 	switch (instruction)
 	{
-		case 0x42:
-			address++;
-			length++;
-			oprom++;
-			instruction = read_8(oprom,0);
-			opcode = g_opcodes_prefix42 + instruction;
-			break;
+	case 0x42:
+		address++;
+		length++;
+		oprom++;
+		instruction = read_8(oprom,0);
+		opcode = &m7700_opcode_struct::get_prefix42(instruction);
+		break;
 
-		case 0x89:
-			address++;
-			length++;
-			oprom++;
-			instruction = read_8(oprom,0);
-			opcode = g_opcodes_prefix89 + instruction;
-			break;
+	case 0x89:
+		address++;
+		length++;
+		oprom++;
+		instruction = read_8(oprom,0);
+		opcode = &m7700_opcode_struct::get_prefix89(instruction);
+		break;
 
-		default:
-			opcode = g_opcodes + instruction;
-			break;
+	default:
+		opcode = &m7700_opcode_struct::get(instruction);
+		break;
 	}
 
-	if (opcode->name == JSR)
+	if (opcode->is_call())
 		flags = DASMFLAG_STEP_OVER;
-	else if (opcode->name == RTS || opcode->name == RTI)
+	else if (opcode->is_return())
 		flags = DASMFLAG_STEP_OUT;
 
-	sprintf(buff, "%s", g_opnames[opcode->name]);
+	sprintf(buff, "%s", opcode->name());
 	ptr = buff + strlen(buff);
 
 	switch(opcode->ea)

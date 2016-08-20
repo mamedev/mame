@@ -191,7 +191,7 @@ machine_config_constructor mackbd_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( mackbd );
 }
 
-const rom_entry *mackbd_device::device_rom_region() const
+const tiny_rom_entry *mackbd_device::device_rom_region() const
 {
 	return ROM_NAME( mackbd );
 }

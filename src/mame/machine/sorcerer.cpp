@@ -18,7 +18,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
 	Transmit and receive clocks are connected to the same clock. */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-	if BIT(m_fe, 7)
+	if (BIT(m_fe, 7))
 	{
 		/* connect to rs232 */
 		m_rs232->write_txd(m_uart->get_output_pin(AY31015_SO));

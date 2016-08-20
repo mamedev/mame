@@ -137,7 +137,7 @@ machine_config_constructor isa8_mda_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_mda_device::device_rom_region() const
+const tiny_rom_entry *isa8_mda_device::device_rom_region() const
 {
 	return ROM_NAME( mda );
 }
@@ -574,7 +574,7 @@ machine_config_constructor isa8_hercules_device::device_mconfig_additions() cons
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_hercules_device::device_rom_region() const
+const tiny_rom_entry *isa8_hercules_device::device_rom_region() const
 {
 	return ROM_NAME( hercules );
 }

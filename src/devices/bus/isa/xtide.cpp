@@ -286,7 +286,7 @@ ioport_constructor xtide_device::device_input_ports() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *xtide_device::device_rom_region() const
+const tiny_rom_entry *xtide_device::device_rom_region() const
 {
 	return ROM_NAME( xtide );
 }

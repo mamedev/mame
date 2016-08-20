@@ -46,7 +46,7 @@ machine_config_constructor isa16_svga_cirrus_device::device_mconfig_additions() 
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_cirrus_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_cirrus_device::device_rom_region() const
 {
 	return ROM_NAME( dm_clgd5430 );
 }
@@ -132,7 +132,7 @@ machine_config_constructor isa16_svga_cirrus_gd542x_device::device_mconfig_addit
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
 {
 	return ROM_NAME( clgd542x );
 }

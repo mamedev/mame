@@ -82,7 +82,6 @@ void stfight_state::machine_start()
 	save_item(NAME(m_adpcm_nibble));
 	save_item(NAME(m_adpcm_reset));
 	save_item(NAME(m_coin_state));
-	save_item(NAME(m_sprite_base));
 	save_item(NAME(m_portA_out));
 	save_item(NAME(m_portA_in));
 	save_item(NAME(m_portB_out));
@@ -93,6 +92,7 @@ void stfight_state::machine_start()
 	save_item(NAME(m_ddrB));
 	save_item(NAME(m_ddrC));
 }
+
 
 void stfight_state::machine_reset()
 {

@@ -439,7 +439,7 @@ image_init_result legacy_floppy_image_device::internal_floppy_device_load(bool i
 	{
 		/* opening an image */
 		floppy_flags = !is_readonly() ? FLOPPY_FLAGS_READWRITE : FLOPPY_FLAGS_READONLY;
-		err = floppy_open_choices((void *) image, &image_ioprocs, filetype().c_str(), floppy_options, floppy_flags, &m_floppy);
+		err = floppy_open_choices((void *) image, &image_ioprocs, filetype(), floppy_options, floppy_flags, &m_floppy);
 		if (err)
 			goto error;
 	}

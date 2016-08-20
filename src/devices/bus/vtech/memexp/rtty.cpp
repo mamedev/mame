@@ -24,7 +24,7 @@ ROM_START( rtty )
 	ROM_LOAD("vzrtty.ic3", 0x0000, 0x1000, CRC(ccf4289b) SHA1(de737ef0e0b582b3102da473836af1fa159a2e78))
 ROM_END
 
-const rom_entry *rtty_interface_device::device_rom_region() const
+const tiny_rom_entry *rtty_interface_device::device_rom_region() const
 {
 	return ROM_NAME( rtty );
 }

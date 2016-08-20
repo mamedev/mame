@@ -84,7 +84,7 @@ ROM_START( o2voice )
 	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
 ROM_END
 
-const rom_entry *o2_voice_device::device_rom_region() const
+const tiny_rom_entry *o2_voice_device::device_rom_region() const
 {
 	return ROM_NAME( o2voice );
 }

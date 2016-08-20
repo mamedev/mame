@@ -36,7 +36,7 @@ ROM_START( cpc_smartwatch )
 	ROM_LOAD( "timerom+.rom",   0x0000, 0x4000, CRC(ed42a147) SHA1(61750d0535a1fbf2a4addad9def332cbcf8917c3) )
 ROM_END
 
-const rom_entry *cpc_smartwatch_device::device_rom_region() const
+const tiny_rom_entry *cpc_smartwatch_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_smartwatch );
 }

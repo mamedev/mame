@@ -138,32 +138,32 @@ machine_config_constructor a2bus_videx80_device::device_mconfig_additions() cons
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *a2bus_videoterm_device::device_rom_region() const
+const tiny_rom_entry *a2bus_videoterm_device::device_rom_region() const
 {
 	return ROM_NAME( a2videoterm );
 }
 
-const rom_entry *a2bus_ap16_device::device_rom_region() const
+const tiny_rom_entry *a2bus_ap16_device::device_rom_region() const
 {
 	return ROM_NAME( a2ap16 );
 }
 
-const rom_entry *a2bus_ap16alt_device::device_rom_region() const
+const tiny_rom_entry *a2bus_ap16alt_device::device_rom_region() const
 {
 	return ROM_NAME( a2ap16alt );
 }
 
-const rom_entry *a2bus_vtc1_device::device_rom_region() const
+const tiny_rom_entry *a2bus_vtc1_device::device_rom_region() const
 {
 	return ROM_NAME( vtc1 );
 }
 
-const rom_entry *a2bus_vtc2_device::device_rom_region() const
+const tiny_rom_entry *a2bus_vtc2_device::device_rom_region() const
 {
 	return ROM_NAME( vtc2 );
 }
 
-const rom_entry *a2bus_aevm80_device::device_rom_region() const
+const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 {
 	return ROM_NAME( a2aevm80 );
 }

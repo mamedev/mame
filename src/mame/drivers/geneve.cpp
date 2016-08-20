@@ -218,8 +218,8 @@
 #define TRACE_LINES 0
 #define TRACE_CRU 0
 
-#define SRAM_SIZE 384*1024   // maximum SRAM expansion on-board
-#define DRAM_SIZE 512*1024
+#define SRAM_GEN_TAG  "sram"
+#define DRAM_GEN_TAG  "dram"
 
 class geneve_state : public driver_device
 {
@@ -355,7 +355,7 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 	if ((addroff & 0xffc0) == CRU_SSTEP_BASE)
 	{
 		int bit = (addroff & 0x003e)>>1;
-		logerror("geneve: Single step not implemented; bit %d set to %d\n", bit, data);
+		logerror("Single step not implemented; bit %d set to %d\n", bit, data);
 		return;
 	}
 
@@ -366,47 +366,47 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 		{
 		case 5:
 			// No one really cares...
-			if (TRACE_CRU) logerror("geneve: Set PAL flag = %02x\n", data);
+			if (TRACE_CRU) logerror("Set PAL flag = %02x\n", data);
 			// m_palvideo = (data!=0);
 			break;
 		case 7:
 			// m_capslock = (data!=0);
-			if (TRACE_CRU) logerror("geneve: Set capslock flag = %02x\n", data);
+			if (TRACE_CRU) logerror("Set capslock flag = %02x\n", data);
 			break;
 		case 8:
-			if (TRACE_CRU) logerror("geneve: Set keyboard clock flag = %02x\n", data);
+			if (TRACE_CRU) logerror("Set keyboard clock flag = %02x\n", data);
 			m_keyboard->clock_control((data!=0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 9:
-			if (TRACE_CRU) logerror("geneve: Set keyboard scan flag = %02x\n", data);
+			if (TRACE_CRU) logerror("Set keyboard scan flag = %02x\n", data);
 			m_keyboard->send_scancodes((data!=0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 10:
-			if (TRACE_CRU) logerror("geneve: Geneve mode = %02x\n", data);
+			if (TRACE_CRU) logerror("Geneve mode = %02x\n", data);
 			m_mapper->set_geneve_mode(data!=0);
 			break;
 		case 11:
-			if (TRACE_CRU) logerror("geneve: Direct mode = %02x\n", data);
+			if (TRACE_CRU) logerror("Direct mode = %02x\n", data);
 			m_mapper->set_direct_mode(data!=0);
 			break;
 		case 12:
-			if (TRACE_CRU) logerror("geneve: Cartridge size 8K = %02x\n", data);
+			if (TRACE_CRU) logerror("Cartridge size 8K = %02x\n", data);
 			m_mapper->set_cartridge_size((data!=0)? 0x2000 : 0x4000);
 			break;
 		case 13:
-			if (TRACE_CRU) logerror("geneve: Cartridge writable 6000 = %02x\n", data);
+			if (TRACE_CRU) logerror("Cartridge writable 6000 = %02x\n", data);
 			m_mapper->set_cartridge_writable(0x6000, (data!=0));
 			break;
 		case 14:
-			if (TRACE_CRU) logerror("geneve: Cartridge writable 7000 = %02x\n", data);
+			if (TRACE_CRU) logerror("Cartridge writable 7000 = %02x\n", data);
 			m_mapper->set_cartridge_writable(0x7000, (data!=0));
 			break;
 		case 15:
-			if (TRACE_CRU) logerror("geneve: Extra wait states = %02x\n", data==0);
+			if (TRACE_CRU) logerror("Extra wait states = %02x\n", data==0);
 			m_mapper->set_extra_waitstates(data==0);  // let's use the inverse semantics
 			break;
 		default:
-			logerror("geneve: set CRU address %04x=%02x ignored\n", addroff, data);
+			logerror("set CRU address %04x=%02x ignored\n", addroff, data);
 			break;
 		}
 	}
@@ -426,7 +426,7 @@ READ8_MEMBER( geneve_state::cruread )
 	if ((addroff & 0xffc0) == CRU_SSTEP_BASE)
 	{
 		int bit = (addroff & 0x003e)>>1;
-		logerror("geneve: Single step not implemented; attempting to read bit %d\n", bit);
+		logerror("Single step not implemented; attempting to read bit %d\n", bit);
 		return value;
 	}
 
@@ -478,7 +478,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		if (m_intb==CLEAR_LINE) answer |= 0x10;
 		if (m_video_wait==ASSERT_LINE) answer |= 0x20;
 		// TODO: PAL pin 5
-		if (TRACE_LINES) logerror("geneve: INT15-8 = %02x\n", answer);
+		if (TRACE_LINES) logerror("INT15-8 = %02x\n", answer);
 		break;
 
 	case TMS9901_P0_P7:
@@ -506,7 +506,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 */
 WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 {
-	logerror("geneve: Peripheral bus reset request; not implemented yet.\n");
+	logerror("Peripheral bus reset request; not implemented yet.\n");
 }
 
 /*
@@ -514,7 +514,7 @@ WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 */
 WRITE_LINE_MEMBER( geneve_state::VDP_reset )
 {
-	logerror("geneve: Video reset request; not implemented yet.\n");
+	logerror("Video reset request; not implemented yet.\n");
 }
 
 /*
@@ -530,7 +530,7 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
 */
 WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
 {
-	logerror("geneve: External bus wait states set to %d, not implemented yet.\n", state);
+	logerror("External bus wait states set to %d, not implemented yet.\n", state);
 }
 
 /*
@@ -539,7 +539,7 @@ WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
 */
 WRITE_LINE_MEMBER( geneve_state::video_wait_states )
 {
-	if (TRACE_LINES) logerror("geneve: Video wait states set to %d\n", state);
+	if (TRACE_LINES) logerror("Video wait states set to %d\n", state);
 	m_mapper->set_video_waitstates(state==ASSERT_LINE);
 	m_video_wait = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -581,14 +581,14 @@ WRITE_LINE_MEMBER( geneve_state::intb )
 
 WRITE_LINE_MEMBER( geneve_state::ext_ready )
 {
-	if (TRACE_READY) logerror("geneve: READY level (ext) = %02x\n", state);
+	if (TRACE_READY) logerror("READY level (ext) = %02x\n", state);
 	m_ready_line = state;
 	m_cpu->ready_line((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( geneve_state::mapper_ready )
 {
-	if (TRACE_READY) logerror("geneve: READY level (mapper) = %02x\n", state);
+	if (TRACE_READY) logerror("READY level (mapper) = %02x\n", state);
 	m_ready_line1 = state;
 	m_cpu->ready_line((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
@@ -633,7 +633,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(geneve_state::geneve_hblank_interrupt)
 WRITE8_MEMBER( geneve_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
-	if (offset != IDLE_OP) logerror("geneve: External operation %s not implemented on Geneve board\n", extop[offset]);
+	if (offset != IDLE_OP) logerror("External operation %s not implemented on Geneve board\n", extop[offset]);
 }
 
 /*
@@ -740,6 +740,16 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_AT29C040_ADD( PFM512_TAG )
 	MCFG_AT29C040A_ADD( PFM512A_TAG )
 
+	// DRAM 512K
+	MCFG_RAM_ADD(DRAM_GEN_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// SRAM 384K (max; stock Geneve: 32K)
+	MCFG_RAM_ADD(SRAM_GEN_TAG)
+	MCFG_RAM_DEFAULT_SIZE("384K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
 MACHINE_CONFIG_END
 
 /*
@@ -752,12 +762,6 @@ ROM_START(geneve)
 	ROM_LOAD("genbt100.bin", 0x0000, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs v1.0 */
 	ROM_LOAD_OPTIONAL("genbt098.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs v0.98 */
 	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs GenMod */
-
-	ROM_REGION(SRAM_SIZE, SRAM_TAG, 0)
-	ROM_FILL(0x0000, SRAM_SIZE, 0x00)
-
-	ROM_REGION(DRAM_SIZE, DRAM_TAG, 0)
-	ROM_FILL(0x0000, DRAM_SIZE, 0x00)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */

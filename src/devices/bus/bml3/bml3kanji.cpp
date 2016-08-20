@@ -51,7 +51,7 @@ machine_config_constructor bml3bus_kanji_device::device_mconfig_additions() cons
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *bml3bus_kanji_device::device_rom_region() const
+const tiny_rom_entry *bml3bus_kanji_device::device_rom_region() const
 {
 	return ROM_NAME( kanji );
 }

@@ -265,7 +265,6 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
 ADDRESS_MAP_END
 
-
 /***************************************************************************
 
     Input Ports
@@ -613,7 +612,6 @@ ROM_START( vendetta2p )
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
-
 
 ROM_START( vendetta2peba )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */

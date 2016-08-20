@@ -77,7 +77,7 @@ ROM_START( pc9801_86 )
 	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
 ROM_END
 
-const rom_entry *pc9801_86_device::device_rom_region() const
+const tiny_rom_entry *pc9801_86_device::device_rom_region() const
 {
 	return ROM_NAME( pc9801_86 );
 }

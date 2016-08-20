@@ -315,7 +315,7 @@ WRITE16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_regs_w )
 /* some weird logic needed for Gals Panic on the EXPRO02 board */
 WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w)
 {
-	if (mem_mask & 0x00ff)
+	if (ACCESSING_BITS_0_7)
 	{
 		int val = (data & 0x00ff)<<8;
 
@@ -329,7 +329,7 @@ WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w)
 
 WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w)
 {
-	if (mem_mask & 0x00ff)
+	if (ACCESSING_BITS_0_7)
 	{
 		int val = (data & 0x00ff)<<8;
 

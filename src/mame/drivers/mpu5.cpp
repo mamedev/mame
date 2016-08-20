@@ -121,10 +121,10 @@ READ8_MEMBER(mpu5_state::asic_r8)
 READ32_MEMBER(mpu5_state::asic_r32)
 {
 	UINT32 retdata = 0;
-	if (mem_mask&0xff000000) retdata |= asic_r8(space,(offset*4)+0) <<24;
-	if (mem_mask&0x00ff0000) retdata |= asic_r8(space,(offset*4)+1) <<16;
-	if (mem_mask&0x0000ff00) retdata |= asic_r8(space,(offset*4)+2) <<8;
-	if (mem_mask&0x000000ff) retdata |= asic_r8(space,(offset*4)+3) <<0;
+	if (ACCESSING_BITS_24_31) retdata |= asic_r8(space,(offset*4)+0) <<24;
+	if (ACCESSING_BITS_16_23) retdata |= asic_r8(space,(offset*4)+1) <<16;
+	if (ACCESSING_BITS_8_15) retdata |= asic_r8(space,(offset*4)+2) <<8;
+	if (ACCESSING_BITS_0_7) retdata |= asic_r8(space,(offset*4)+3) <<0;
 	return retdata;
 }
 
@@ -255,10 +255,10 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 
 WRITE32_MEMBER(mpu5_state::asic_w32)
 {
-	if (mem_mask&0xff000000) asic_w8(space,(offset*4)+0, (data>>24)&0xff);
-	if (mem_mask&0x00ff0000) asic_w8(space,(offset*4)+1, (data>>16)&0xff);
-	if (mem_mask&0x0000ff00) asic_w8(space,(offset*4)+2, (data>>8) &0xff);
-	if (mem_mask&0x000000ff) asic_w8(space,(offset*4)+3, (data>>0) &0xff);
+	if (ACCESSING_BITS_24_31) asic_w8(space,(offset*4)+0, (data>>24)&0xff);
+	if (ACCESSING_BITS_16_23) asic_w8(space,(offset*4)+1, (data>>16)&0xff);
+	if (ACCESSING_BITS_8_15) asic_w8(space,(offset*4)+2, (data>>8) &0xff);
+	if (ACCESSING_BITS_0_7) asic_w8(space,(offset*4)+3, (data>>0) &0xff);
 }
 
 

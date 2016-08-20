@@ -2682,19 +2682,19 @@ READ32_MEMBER( n64_periphs::pif_ram_r )
 
 WRITE32_MEMBER( n64_periphs::pif_ram_w )
 {
-	if( mem_mask & 0xff000000 )
+	if( ACCESSING_BITS_24_31 )
 	{
 		pif_ram[offset*4+0] = ( data >> 24 ) & 0x000000ff;
 	}
-	if( mem_mask & 0x00ff0000 )
+	if( ACCESSING_BITS_16_23 )
 	{
 		pif_ram[offset*4+1] = ( data >> 16 ) & 0x000000ff;
 	}
-	if( mem_mask & 0x0000ff00 )
+	if( ACCESSING_BITS_8_15 )
 	{
 		pif_ram[offset*4+2] = ( data >>  8 ) & 0x000000ff;
 	}
-	if( mem_mask & 0x000000ff )
+	if( ACCESSING_BITS_0_7 )
 	{
 		pif_ram[offset*4+3] = ( data >>  0 ) & 0x000000ff;
 	}

@@ -135,7 +135,7 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  1M 8 inch double density
 		floppy_image::FF_8, floppy_image::DSDD, floppy_image::MFM,
-		2000, 26, 77, 2, 256, {}, 1, {}, 55, 22, 54
+		1200, 26, 77, 2, 256, {}, 1, {}, 55, 22, 54
 	},
 
 	{}

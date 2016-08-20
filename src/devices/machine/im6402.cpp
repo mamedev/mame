@@ -340,6 +340,9 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 		else parity = PARITY_ODD;
 
 		set_data_frame(1, data_bit_count, parity, stop_bits);
+	
+		receive_register_reset();
+		transmit_register_reset();
 	}
 }
 

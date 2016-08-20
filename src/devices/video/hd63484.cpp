@@ -351,7 +351,7 @@ const address_space_config *hd63484_device::memory_space_config(address_spacenum
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *hd63484_device::device_rom_region() const
+const tiny_rom_entry *hd63484_device::device_rom_region() const
 {
 	return ROM_NAME( hd63484 );
 }

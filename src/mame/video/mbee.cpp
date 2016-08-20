@@ -116,7 +116,7 @@ READ8_MEMBER( mbee_state::video_low_r )
 
 WRITE8_MEMBER( mbee_state::video_low_w )
 {
-	if BIT(m_1c, 4)
+	if (BIT(m_1c, 4))
 	{
 		// non-premium attribute writes are discarded
 		if (m_is_premium && BIT(m_1c, 7))
@@ -128,7 +128,7 @@ WRITE8_MEMBER( mbee_state::video_low_w )
 
 READ8_MEMBER( mbee_state::video_high_r )
 {
-	if BIT(m_08, 6)
+	if (BIT(m_08, 6))
 		return m_p_colorram[offset];
 	else
 		return m_p_gfxram[(((m_1c & 15) + 1) << 11) | offset];
@@ -203,31 +203,27 @@ void mbee_state::oldkb_matrix_r(UINT16 offs)
 		{
 			if ((port == 0) || (port == 2) || (port == 3))
 				extra = m_io_x7->read();
-			else
-			if (port == 7)
+			else if (port == 7)
 				extra = data;
 
 			if (extra)
 			{
-				if BIT(extra, 0) // cursor up
+				if (BIT(extra, 0)) // cursor up
 				{
 					if( port == 7 && bit == 1 ) keydown = 1;
 					if( port == 0 && bit == 5 ) keydown = 1; // control E
 				}
-				else
-				if BIT(extra, 2) // cursor down
+				else if (BIT(extra, 2)) // cursor down
 				{
 					if( port == 7 && bit == 1 ) keydown = 1;
 					if( port == 3 && bit == 0 ) keydown = 1; // control X
 				}
-				else
-				if BIT(extra, 3) // cursor left
+				else if (BIT(extra, 3)) // cursor left
 				{
 					if( port == 7 && bit == 1 ) keydown = 1;
 					if( port == 2 && bit == 3 ) keydown = 1; // control S
 				}
-				else
-				if BIT(extra, 6) // cursor right
+				else if (BIT(extra, 6)) // cursor right
 				{
 					if( port == 7 && bit == 1 ) keydown = 1;
 					if( port == 0 && bit == 4 ) keydown = 1; // control D
@@ -353,14 +349,14 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 		mem = (ma + x) & 0x7ff;
 		chr = m_p_videoram[mem];
 
-		if BIT(m_1c, 7) // premium graphics enabled?
+		if (BIT(m_1c, 7)) // premium graphics enabled?
 		{
 			attr = m_p_attribram[mem];
 
-			if BIT(chr, 7)
+			if (BIT(chr, 7))
 				chr += ((attr & 15) << 7);          // bump chr to its particular pcg definition
 
-			if BIT(attr, 6)
+			if (BIT(attr, 6))
 				inv ^= 0xff;                    // inverse attribute
 
 			if (BIT(attr, 7) & BIT(m_framecnt, 4))            // flashing attribute

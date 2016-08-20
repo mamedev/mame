@@ -75,7 +75,7 @@ ROM_START( mos6570_036 )
 	ROM_LOAD("328191-02.ic1", 0x000, 0x800, CRC(4a3fc332) SHA1(83b21d0c8b93fc9b9b3b287fde4ec8f3badac5a2))
 ROM_END
 
-const rom_entry *amigakbd_device::device_rom_region() const
+const tiny_rom_entry *amigakbd_device::device_rom_region() const
 {
 	return ROM_NAME( mos6570_036 );
 }

@@ -25,7 +25,7 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 		UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -60,7 +60,7 @@ class nubus_824gc_device : public jmfb_device
 {
 public:
 	nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition

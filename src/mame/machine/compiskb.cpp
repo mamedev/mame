@@ -40,7 +40,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *compis_keyboard_device::device_rom_region() const
+const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( compis_keyboard );
 }
@@ -64,7 +64,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( compis_keyboard )
-	MCFG_CPU_ADD(I8748_TAG, I8748, XTAL_2MHz)
+	MCFG_CPU_ADD(I8748_TAG, I8748, 2016000) // XTAL_4_032MHz/2 ???
 	MCFG_CPU_IO_MAP(compis_keyboard_io)
 
 	// sound hardware

@@ -23,7 +23,7 @@ public:
 	cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void set_mapping(UINT8 type) override;
 	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }

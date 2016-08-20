@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "plib/pstring.h"
-#include "plib/palloc.h"
 #include "plib/pfmtlog.h"
 #include "plib/pstream.h"
 #include "plib/putil.h"
@@ -270,6 +269,8 @@ namespace netlist
 
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::device_object_t::type_t atype, bool required = true);
+
+		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
 
 		void connect_terminals(detail::core_terminal_t &in, detail::core_terminal_t &out);
 		void connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out);

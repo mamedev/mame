@@ -255,6 +255,14 @@ void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> 
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 			break;
 
+#if defined(__APPLE__) && defined(__MACH__)
+		// 78-key Apple MacBook & Bluetooth keyboards have no right control key
+		case IPT_MAHJONG_SCORE:
+			if (entry.player() == 0)
+				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_SLASH);
+			break;
+#endif
+
 			// leave everything else alone
 		default:
 			break;

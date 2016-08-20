@@ -82,7 +82,7 @@ ROM_START( msx_sfg01 )
 ROM_END
 
 
-const rom_entry *msx_cart_sfg01::device_rom_region() const
+const tiny_rom_entry *msx_cart_sfg01::device_rom_region() const
 {
 	return ROM_NAME( msx_sfg01 );
 }
@@ -94,7 +94,7 @@ ROM_START( msx_sfg05 )
 ROM_END
 
 
-const rom_entry *msx_cart_sfg05::device_rom_region() const
+const tiny_rom_entry *msx_cart_sfg05::device_rom_region() const
 {
 	return ROM_NAME( msx_sfg05 );
 }

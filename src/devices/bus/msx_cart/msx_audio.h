@@ -42,7 +42,7 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void initialize_cartridge() override;
 
@@ -69,7 +69,7 @@ public:
 	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void initialize_cartridge() override;
 

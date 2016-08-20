@@ -88,7 +88,7 @@ ROM_START( k573msu )
 	ROM_LOAD( "m48t58y.6t",   0x000000, 0x002000, CRC(609ef020) SHA1(71b87c8b25b9613b4d4511c53d0a3a3aacf1499d) )
 ROM_END
 
-const rom_entry *k573msu_device::device_rom_region() const
+const tiny_rom_entry *k573msu_device::device_rom_region() const
 {
 	return ROM_NAME( k573msu );
 }

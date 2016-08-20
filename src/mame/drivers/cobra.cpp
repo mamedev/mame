@@ -1730,7 +1730,7 @@ READ32_MEMBER(cobra_state::sub_unk1_r)
 WRITE32_MEMBER(cobra_state::sub_unk1_w)
 {
 	/*
-	if (!(mem_mask & 0xff000000))
+	if (!ACCESSING_BITS_24_31)
 	{
 	    printf("%02X", data >> 24);
 	    ucount++;

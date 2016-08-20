@@ -12,6 +12,7 @@
 #define CASSETTE_H
 
 #include "formats/cassimg.h"
+#include "softlist_dev.h"
 
 
 enum cassette_state

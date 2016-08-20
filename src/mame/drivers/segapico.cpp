@@ -330,8 +330,8 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 			m_sega_315_5641_pcm->reset_w(1);
 			m_sega_315_5641_pcm->start_w(1);
 
-			if (mem_mask&0x00ff) m_sega_315_5641_pcm->port_w(space,0,data&0xff);
-			if (mem_mask&0xff00) m_sega_315_5641_pcm->port_w(space,0,(data>>8)&0xff);*/
+			if (ACCESSING_BITS_0_7) m_sega_315_5641_pcm->port_w(space,0,data&0xff);
+			if (ACCESSING_BITS_8_15) m_sega_315_5641_pcm->port_w(space,0,(data>>8)&0xff);*/
 
 			break;
 	}

@@ -75,15 +75,6 @@ enum
 
 
 //**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define ISWAP(var1, var2) do { int temp = var1; var1 = var2; var2 = temp; } while (0)
-#define FSWAP(var1, var2) do { float temp = var1; var1 = var2; var2 = temp; } while (0)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -136,8 +127,8 @@ inline void apply_orientation(render_bounds &bounds, int orientation)
 	// swap first
 	if (orientation & ORIENTATION_SWAP_XY)
 	{
-		FSWAP(bounds.x0, bounds.y0);
-		FSWAP(bounds.x1, bounds.y1);
+		std::swap(bounds.x0, bounds.y0);
+		std::swap(bounds.x1, bounds.y1);
 	}
 
 	// apply X flip
@@ -164,9 +155,9 @@ inline void apply_orientation(render_bounds &bounds, int orientation)
 inline void normalize_bounds(render_bounds &bounds)
 {
 	if (bounds.x0 > bounds.x1)
-		FSWAP(bounds.x0, bounds.x1);
+		std::swap(bounds.x0, bounds.x1);
 	if (bounds.y0 > bounds.y1)
-		FSWAP(bounds.y0, bounds.y1);
+		std::swap(bounds.y0, bounds.y1);
 }
 
 
@@ -947,7 +938,7 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 	if (manager.machine().options().uneven_stretch() && !manager.machine().options().uneven_stretch_x())
 		m_scale_mode = SCALE_FRACTIONAL;
 	else
-		m_scale_mode = manager.machine().options().uneven_stretch_x()? SCALE_FRACTIONAL_X : SCALE_INTEGER;
+		m_scale_mode = manager.machine().options().uneven_stretch_x() ? SCALE_FRACTIONAL_X : SCALE_INTEGER;
 
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
@@ -1177,7 +1168,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 
 				// first apply target orientation
 				if (target_orientation & ORIENTATION_SWAP_XY)
-					FSWAP(width, height);
+					std::swap(width, height);
 
 				// apply the target pixel aspect ratio
 				height *= target_pixel_aspect;
@@ -1235,8 +1226,8 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			if (y_is_integer) yscale = std::min(maxyscale, std::max(1.0f, render_round_nearest(yscale)));
 
 			// check if we have user defined scale factors, if so use them instead
-			xscale = m_int_scale_x? m_int_scale_x : xscale;
-			yscale = m_int_scale_y? m_int_scale_y : yscale;
+			xscale = m_int_scale_x > 0 ? m_int_scale_x : xscale;
+			yscale = m_int_scale_y > 0 ? m_int_scale_y : yscale;
 
 			// set the final width/height
 			visible_width = render_round_nearest(src_width * xscale);
@@ -2051,7 +2042,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		INT32 height = render_round_nearest(xform.yscale);
 		set_render_bounds_wh(&prim->bounds, render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), (float) width, (float) height);
 		if (xform.orientation & ORIENTATION_SWAP_XY)
-			ISWAP(width, height);
+			std::swap(width, height);
 		width = std::min(width, m_maxtexwidth);
 		height = std::min(height, m_maxtexheight);
 

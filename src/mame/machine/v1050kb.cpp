@@ -41,7 +41,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *v1050_keyboard_device::device_rom_region() const
+const tiny_rom_entry *v1050_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( v1050_keyboard );
 }

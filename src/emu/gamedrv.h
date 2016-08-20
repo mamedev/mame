@@ -71,7 +71,7 @@ struct game_driver
 	machine_config_constructor machine_config;      // machine driver tokens
 	ioport_constructor  ipt;                        // pointer to constructor for input ports
 	void                (*driver_init)(running_machine &machine); // DRIVER_INIT callback
-	const rom_entry *   rom;                        // pointer to list of ROMs for the game
+	const tiny_rom_entry *   rom;                        // pointer to list of ROMs for the game
 	const char *        compatible_with;
 	UINT32              flags;                      // orientation and other flags; see defines below
 	const internal_layout *        default_layout;             // default internally defined layout

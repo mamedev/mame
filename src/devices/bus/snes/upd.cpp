@@ -525,42 +525,42 @@ ROM_START( snes_st011 )
 	ROM_LOAD( "st011.bin",      0,  0x11000, CRC(34d2952c) SHA1(1375b8c1efc8cae4962b57dfe22f6b78e1ddacc8) )
 ROM_END
 
-const rom_entry *sns_rom20_necdsp1_legacy_device::device_rom_region() const
+const tiny_rom_entry *sns_rom20_necdsp1_legacy_device::device_rom_region() const
 {
 	return ROM_NAME( snes_dsp1 );
 }
 
-const rom_entry *sns_rom20_necdsp1b_legacy_device::device_rom_region() const
+const tiny_rom_entry *sns_rom20_necdsp1b_legacy_device::device_rom_region() const
 {
 	return ROM_NAME( snes_dsp1b );
 }
 
-const rom_entry *sns_rom20_necdsp2_legacy_device::device_rom_region() const
+const tiny_rom_entry *sns_rom20_necdsp2_legacy_device::device_rom_region() const
 {
 	return ROM_NAME( snes_dsp2 );
 }
 
-const rom_entry *sns_rom20_necdsp3_legacy_device::device_rom_region() const
+const tiny_rom_entry *sns_rom20_necdsp3_legacy_device::device_rom_region() const
 {
 	return ROM_NAME( snes_dsp3 );
 }
 
-const rom_entry *sns_rom20_necdsp4_legacy_device::device_rom_region() const
+const tiny_rom_entry *sns_rom20_necdsp4_legacy_device::device_rom_region() const
 {
 	return ROM_NAME( snes_dsp4 );
 }
 
-const rom_entry *sns_rom21_necdsp1_legacy_device::device_rom_region() const
+const tiny_rom_entry *sns_rom21_necdsp1_legacy_device::device_rom_region() const
 {
 	return ROM_NAME( snes_dsp1 );
 }
 
-const rom_entry *sns_rom_seta10dsp_legacy_device::device_rom_region() const
+const tiny_rom_entry *sns_rom_seta10dsp_legacy_device::device_rom_region() const
 {
 	return ROM_NAME( snes_st010 );
 }
 
-const rom_entry *sns_rom_seta11dsp_legacy_device::device_rom_region() const
+const tiny_rom_entry *sns_rom_seta11dsp_legacy_device::device_rom_region() const
 {
 	return ROM_NAME( snes_st011 );
 }

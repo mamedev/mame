@@ -56,7 +56,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *ql_trump_card_t::device_rom_region() const
+const tiny_rom_entry *ql_trump_card_t::device_rom_region() const
 {
 	return ROM_NAME( ql_trump_card );
 }

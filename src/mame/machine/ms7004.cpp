@@ -79,7 +79,7 @@ machine_config_constructor ms7004_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ms7004 );
 }
 
-const rom_entry *ms7004_device::device_rom_region() const
+const tiny_rom_entry *ms7004_device::device_rom_region() const
 {
 	return ROM_NAME( ms7004 );
 }
@@ -316,8 +316,8 @@ INPUT_PORTS_START( ms7004 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 
 	PORT_START("KBD0")  // vertical row 15
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F17") //PORT_CODE(KEYCODE_F17) PORT_CHAR(UCHAR_MAMEKEY(F17))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F18") //PORT_CODE(KEYCODE_F18) PORT_CHAR(UCHAR_MAMEKEY(F18))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F17") PORT_CODE(KEYCODE_F17) PORT_CHAR(UCHAR_MAMEKEY(F17))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F18") PORT_CODE(KEYCODE_F18) PORT_CHAR(UCHAR_MAMEKEY(F18))
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF2") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF3") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 8") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -326,8 +326,8 @@ INPUT_PORTS_START( ms7004 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 3") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
 
 	PORT_START("KBD4")  // vertical row 16
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F19") //PORT_CODE(KEYCODE_F19) PORT_CHAR(UCHAR_MAMEKEY(F19))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F20") //PORT_CODE(KEYCODE_F20) PORT_CHAR(UCHAR_MAMEKEY(F20))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F19") PORT_CODE(KEYCODE_F19) PORT_CHAR(UCHAR_MAMEKEY(F19))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F20") PORT_CODE(KEYCODE_F20) PORT_CHAR(UCHAR_MAMEKEY(F20))
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF4") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 9") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num ,") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
@@ -375,7 +375,8 @@ ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, dev
 	m_kbd13(*this, "KBD13"),
 	m_kbd14(*this, "KBD14"),
 	m_kbd15(*this, "KBD15"),
-	m_tx_handler(*this)
+	m_tx_handler(*this),
+	m_rts_handler(*this)
 {
 }
 
@@ -386,6 +387,7 @@ ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, dev
 void ms7004_device::device_start()
 {
 	m_tx_handler.resolve_safe();
+	m_rts_handler.resolve_safe();
 }
 
 
@@ -395,8 +397,14 @@ void ms7004_device::device_start()
 
 void ms7004_device::device_reset()
 {
+	m_rts_handler(0);
 }
 
+
+WRITE_LINE_MEMBER( ms7004_device::write_rxd )
+{
+	DBG_LOG(1,0,("write_rxd %d\n", state));
+}
 
 //-------------------------------------------------
 //  p1_w -
@@ -441,7 +449,7 @@ WRITE8_MEMBER( ms7004_device::p2_w )
 	    6       LED "Caps"
 	    7       LED "Hold"
 	*/
-	DBG_LOG(2,0,( "%s: p2_w %02x = col %d\n", tag(), data, data&15));
+	DBG_LOG(2,0,( "p2_w %02x = col %d\n", data, data&15));
 
 	m_p2 = data;
 	m_i8243->i8243_p2_w(space, offset, data);
@@ -456,8 +464,8 @@ WRITE8_MEMBER( ms7004_device::i8243_port_w )
 {
 	int sense = 0;
 
-	DBG_LOG(2,0,( "%s: 8243 port %d data %02xH\n",
-		tag(), offset + 4, data));
+	DBG_LOG(2,0,( "8243 port %d data %02xH\n",
+		offset + 4, data));
 
 	if (data) {
 		switch(offset << 4 | data) {
@@ -480,8 +488,8 @@ WRITE8_MEMBER( ms7004_device::i8243_port_w )
 		}
 		m_keylatch = BIT(sense, (m_p1 & 7));
 		if (m_keylatch)
-		DBG_LOG(1,0,( "%s: row %d col %02x t1 %d\n",
-			tag(), (m_p1 & 7), (offset << 4 | data), m_keylatch));
+		DBG_LOG(1,0,( "row %d col %02x t1 %d\n",
+			(m_p1 & 7), (offset << 4 | data), m_keylatch));
 	}
 }
 

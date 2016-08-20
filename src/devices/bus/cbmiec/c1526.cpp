@@ -48,7 +48,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1526_t::device_rom_region() const
+const tiny_rom_entry *c1526_t::device_rom_region() const
 {
 	return ROM_NAME( c1526 );
 }
@@ -68,7 +68,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c4023_t::device_rom_region() const
+const tiny_rom_entry *c4023_t::device_rom_region() const
 {
 	return ROM_NAME( c4023 );
 }

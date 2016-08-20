@@ -16,7 +16,8 @@
 
   Games running on this hardware:
 
-  * Jolly Card (Austrian),                            TAB Austria,        1985.
+  * Jolly Card (Austrian, set 1),                     TAB Austria,        1985.
+  * Jolly Card (Austrian, set 2),                     TAB Austria,        1985.
   * Jolly Card (3x3 deal),                            TAB Austria,        1985.
   * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
   * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
@@ -92,6 +93,7 @@
   * Novo Play Multi Card / Club Card,                 Admiral/Novomatic,  1986.
   * unknown encrypted Royal Card (Dino4 HW),          unknown,            1998.
   * China Town (Ver 1B, Dino4 HW),                    unknown,            1998.
+  * Unknown Inter Games poker,                        Inter Games,        1991.
 
 ***********************************************************************************
 
@@ -1224,6 +1226,19 @@ static ADDRESS_MAP_START( witchryl_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( intergames_map, AS_PROGRAM, 8, funworld_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)           // WRONG. just a placeholder...
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)  // WRONG. just a placeholder...
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia0", pia6821_device, read, write)  // the bookkeeping mode requests a byte from $3400 to advance pages...
+	AM_RANGE(0x3800, 0x3803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)  // WRONG. just a placeholder...
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -3080,6 +3095,14 @@ static MACHINE_CONFIG_DERIVED( rcdino4, fw1stpal )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( intrgmes, fw1stpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(intergames_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+MACHINE_CONFIG_END
+
+
 
 /*************************
 *        Rom Load        *
@@ -3166,6 +3189,22 @@ ROM_START( jollycrd )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+ROM_END
+
+
+ROM_START( jollycrda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pok14.bin", 0x8000, 0x8000, CRC(30936afb) SHA1(5b96cd7e425ad79163e1d55e530cbabcb116f8d2) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "tab3.bin", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
+	ROM_LOAD( "tab2.bin", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* Default NVRAM. The game doesn't work without it */
+	ROM_LOAD( "jollycrda_nvram.bin", 0x0000, 0x0800, CRC(5cbb4d8f) SHA1(da5edbef20bb4f0c634939389b3a9744c5743641) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "jop.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
@@ -4827,12 +4866,12 @@ ROM_END
     Magic Card II (Impera)
     ----------------------
 
-    - 1x Special CPU with CM602 (??) on it  <--- dumper notes.
+    - 1x Special CPU with CM602 (??) on it  <--- from dumper notes.
     - 1x MC6845P
     - 1x YM2149F
     - 2x MC6821P
     - 1x Crystal 16.000 MHz
-    - 2x HY18CV85 (electrically-erasable PLD)
+    - 2x HY18CV8S (electrically-erasable PLD)
 
     Some versions have Mexican Rockwell R65C02.
     The game doesn't work with a regular 65C02 CPU.
@@ -5747,6 +5786,51 @@ ROM_START( chinatow )
 ROM_END
 
 
+/*
+  Unknown poker game from Inter Games.
+  
+  1x G65C02P-2
+  2x MC68B21P
+  1x MC68B45P
+  1x AY38910A/P
+  3x NMC27C256Q
+  1x Dallas DS1220Y
+  1x AM27S29APC
+  1x LM380N
+  1x Crystal 16.0000 MHz.
+
+  The game has way different architecture.
+
+  Video RAM splitted in two well separated offsets:
+  Video RAM at $2000 and Color Ram at $7000.
+
+  Code expects some input at $3400 to pass through the bookkeeping pages,
+  so at least one PIA should be mapped there.
+
+  There are multiple buffers and compare from some registers,
+  reminding the way some hardwares handle inputs without PIAs.
+
+  Bipolar PROM has the first half empty, so will black the screen
+  after any attempt of ROM swap.
+
+  A lot to investigate/reverse...
+*/
+ROM_START( intrgmes )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bonus-off_5b87d19c.bin", 0x8000, 0x8000, CRC(03a4d1ef) SHA1(375ae1de5e6e4a7a6d6cedfd08902826fa62f93b) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "ig2ch2.bin", 0x0000, 0x8000, CRC(52f0bc70) SHA1(cd9ba34efb438c9610551900c3de2a09aea76cb9) )
+	ROM_LOAD( "ig2ch1.bin", 0x8000, 0x8000, CRC(8fc7d74e) SHA1(bf7ee7ef5c95877fe82fb6e04a5d8ab211fc730c) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* Default NVRAM. */
+	ROM_LOAD( "ds1220y.bin", 0x0000, 0x0800, CRC(7bc4554e) SHA1(c9ad1651e673f8edd0fd354b1098db8f27697d18) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
+ROM_END
+
+
 // http://www.citylan.it/wiki/images/6/69/1189_PCB_component_side.jpg
 ROM_START( royalcrd_nes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5785,6 +5869,8 @@ ROM_START( royalcrd_msx )
 	ROM_LOAD( "me0.bin",    0x0000, 0x10000, CRC(bd5be18b) SHA1(b43a176db0522bcda0a17dd0c210c987dc380c97) ) // weird pattern? might be bad if not a lookup table?  BADADDR        -------xxxxxxxxx
 	ROM_LOAD( "me1.bin",    0x0000, 0x40000, CRC(2152c6b7) SHA1(e512e29f4a899cc3f91a446141fd4432a487228f) )
 ROM_END
+
+
 
 /**************************
 *  Driver Initialization  *
@@ -6515,7 +6601,8 @@ DRIVER_INIT_MEMBER(funworld_state, rcdinch)
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT      ROT    COMPANY            FULLNAME                                          FLAGS                  LAYOUT */
 
 // Jolly Card based...
-GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian)",                           0,                       layout_jollycrd )
+GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian, set 1)",                    0,                       layout_jollycrd )
+GAMEL( 1985, jollycrda, jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian, set 2)",                    0,                       layout_jollycrd )
 GAMEL( 1985, jolyc3x3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (3x3 deal)",                           0,                       layout_jollycrd )
 GAMEL( 1993, jolycmzs,  jollycrd, cuoreuno, jolyc980,  driver_device,  0,        ROT0, "MZS Tech",        "Jolly Card Professional 2.0 (MZS Tech)",          0,                       layout_jollycrd )
 GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  driver_device,  0,        ROT0, "Spale Soft",      "Jolly Card Professional 2.0 (Spale Soft)",        0,                       layout_jollycrd )
@@ -6614,8 +6701,11 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw,
 
 // Other games...
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   driver_device,  0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
-GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  driver_device,  0,        ROT0, "Admiral/Novomatic", "Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
+GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  driver_device,  0,        ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",          0,                       layout_novoplay )
+GAME(  1991, intrgmes, 0,         intrgmes, funworld,  driver_device,  0,        ROT0, "Inter Games",           "Unknown Inter Games poker",                 MACHINE_NOT_WORKING )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
-GAMEL( 1991, royalcrd_nes,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with NES multigame)",                    MACHINE_NOT_WORKING,                       layout_jollycrd )
-GAMEL( 1991, royalcrd_msx,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with MSX multigame)",                    MACHINE_NOT_WORKING,                       layout_jollycrd )
+GAMEL( 1991, royalcrd_nes,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with NES multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, royalcrd_msx,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with MSX multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
+
+

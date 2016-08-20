@@ -48,7 +48,7 @@ machine_config_constructor nubus_cb264se30_device::device_mconfig_additions() co
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nubus_cb264se30_device::device_rom_region() const
+const tiny_rom_entry *nubus_cb264se30_device::device_rom_region() const
 {
 	return ROM_NAME( cb264se30 );
 }

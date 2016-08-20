@@ -26,7 +26,7 @@
 
 namespace ui {
 class menu_item;
-
+class machine_info;
 } // namespace ui
 
 /***************************************************************************
@@ -152,6 +152,7 @@ public:
 
 	// construction/destruction
 	mame_ui_manager(running_machine &machine);
+	~mame_ui_manager();
 
 	void init();
 
@@ -159,6 +160,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	bool single_step() const { return m_single_step; }
 	ui_options &options() { return m_ui_options; }
+	ui::machine_info &machine_info() const { assert(m_machine_info != nullptr); return *m_machine_info; }
 
 	// setters
 	void set_single_step(bool single_step) { m_single_step = single_step; }
@@ -213,9 +215,6 @@ public:
 	void start_save_state();
 	void start_load_state();
 
-	// print the game info string into a buffer
-	std::string &game_info_astring(std::string &str);
-
 	// slider controls
 	std::vector<ui::menu_item>&  get_slider_list(void);
 
@@ -249,6 +248,8 @@ private:
 	bool                    m_load_save_hold;
 	ui_options              m_ui_options;
 
+	std::unique_ptr<ui::machine_info> m_machine_info;
+
 	// static variables
 	static std::string      messagebox_text;
 	static std::string      messagebox_poptext;
@@ -256,9 +257,6 @@ private:
 
 	static std::vector<ui::menu_item> slider_list;
 	static slider_state     *slider_current;
-
-	// text generators
-	std::string &warnings_string(std::string &buffer);
 
 	// UI handlers
 	UINT32 handler_messagebox(render_container &container);

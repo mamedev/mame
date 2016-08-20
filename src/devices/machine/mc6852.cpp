@@ -39,51 +39,6 @@ const device_type MC6852 = &device_creator<mc6852_device>;
 #define LOG 0
 
 
-#define S_RDA           0x01
-#define S_TDRA          0x02
-#define S_DCD           0x04
-#define S_CTS           0x08
-#define S_TUF           0x10
-#define S_RX_OVRN       0x20
-#define S_PE            0x40
-#define S_IRQ           0x80
-
-
-#define C1_RX_RS        0x01
-#define C1_TX_RS        0x02
-#define C1_STRIP_SYNC   0x04
-#define C1_CLEAR_SYNC   0x08
-#define C1_TIE          0x10
-#define C1_RIE          0x20
-#define C1_AC_MASK      0xc0
-#define C1_AC_C2        0x00
-#define C1_AC_C3        0x40
-#define C1_AC_SYNC      0x80
-#define C1_AC_TX_FIFO   0xc0
-
-
-#define C2_PC1          0x01
-#define C2_PC2          0x02
-#define C2_1_2_BYTE     0x04
-#define C2_WS_MASK      0x38
-#define C2_WS_6_E       0x00
-#define C2_WS_6_O       0x08
-#define C2_WS_7         0x10
-#define C2_WS_8         0x18
-#define C2_WS_7_E       0x20
-#define C2_WS_7_O       0x28
-#define C2_WS_8_E       0x30
-#define C2_WS_8_O       0x38
-#define C2_TX_SYNC      0x40
-#define C2_EIE          0x80
-
-
-#define C3_E_I_SYNC     0x01
-#define C3_1_2_SYNC     0x02
-#define C3_CLEAR_CTS    0x04
-#define C3_CTUF         0x08
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -122,6 +77,9 @@ void mc6852_device::device_start()
 	m_write_sm_dtr.resolve_safe();
 	m_write_tuf.resolve_safe();
 
+	set_rcv_rate(m_rx_clock);
+	set_tra_rate(m_tx_clock);
+
 	// register for state saving
 	save_item(NAME(m_status));
 	save_item(NAME(m_cr));
@@ -146,17 +104,16 @@ void mc6852_device::device_reset()
 	m_rx_fifo = std::queue<UINT8>();
 	m_tx_fifo = std::queue<UINT8>();
 
-	transmit_register_reset();
 	receive_register_reset();
-
-	set_rcv_rate(m_rx_clock);
-	set_tra_rate(m_tx_clock);
-
-	/* set receiver shift register to all 1's */
-	m_rsr = 0xff;
+	transmit_register_reset();
 
 	/* reset and inhibit receiver/transmitter sections */
 	m_cr[0] |= (C1_TX_RS | C1_RX_RS);
+	m_cr[1] &= ~(C2_EIE | C2_PC2 | C2_PC1);
+	m_status &= ~S_TDRA;
+
+	/* set receiver shift register to all 1's */
+	m_rsr = 0xff;
 }
 
 
@@ -235,18 +192,40 @@ WRITE8_MEMBER( mc6852_device::write )
 	{
 		switch (m_cr[0] & C1_AC_MASK)
 		{
-		case C1_AC_C2:
+		case C1_AC_C2: {
 			/* control 2 */
+			if (LOG) logerror("MC6852 '%s' Control 2 %02x\n", tag(), data);
 			m_cr[1] = data;
+			
+			int data_bit_count = 0;
+			parity_t parity = PARITY_NONE;
+			stop_bits_t stop_bits = STOP_BITS_1;
+
+			switch (data & C2_WS_MASK)
+			{
+			case 0: data_bit_count = 6; parity = PARITY_EVEN; break;
+			case 1: data_bit_count = 6; parity = PARITY_ODD; break;
+			case 2: data_bit_count = 7; parity = PARITY_NONE; break;
+			case 3: data_bit_count = 8; parity = PARITY_NONE; break;
+			case 4: data_bit_count = 7; parity = PARITY_EVEN; break;
+			case 5: data_bit_count = 7; parity = PARITY_ODD; break;
+			case 6: data_bit_count = 8; parity = PARITY_EVEN; break;
+			case 7: data_bit_count = 8; parity = PARITY_ODD; break;
+			}
+
+			set_data_frame(1, data_bit_count, parity, stop_bits);
+			}
 			break;
 
 		case C1_AC_C3:
 			/* control 3 */
+			if (LOG) logerror("MC6852 '%s' Control 3 %02x\n", tag(), data);
 			m_cr[2] = data;
 			break;
 
 		case C1_AC_SYNC:
 			/* sync code */
+			if (LOG) logerror("MC6852 '%s' Sync Code %02x\n", tag(), data);
 			m_scr = data;
 			break;
 
@@ -254,6 +233,7 @@ WRITE8_MEMBER( mc6852_device::write )
 			/* transmit data FIFO */
 			if (m_tx_fifo.size() < 3)
 			{
+				if (LOG) logerror("MC6852 '%s' Transmit FIFO %02x\n", tag(), data);
 				m_tx_fifo.push(data);
 			}
 			break;
@@ -261,6 +241,8 @@ WRITE8_MEMBER( mc6852_device::write )
 	}
 	else
 	{
+		if (LOG) logerror("MC6852 '%s' Control 1 %02x\n", tag(), data);
+		
 		/* receiver reset */
 		if (data & C1_RX_RS)
 		{
@@ -274,6 +256,8 @@ WRITE8_MEMBER( mc6852_device::write )
 
 			m_status &= ~(S_RX_OVRN | S_PE | S_DCD | S_RDA);
 			m_rsr = 0xff;
+
+			receive_register_reset();
 		}
 
 		/* transmitter reset */
@@ -289,6 +273,8 @@ WRITE8_MEMBER( mc6852_device::write )
 			if (LOG) logerror("MC6852 '%s' Transmitter Reset\n", tag());
 
 			m_status &= ~(S_TUF | S_CTS | S_TDRA);
+	
+			transmit_register_reset();
 		}
 
 		if (LOG)

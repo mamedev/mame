@@ -25,7 +25,7 @@ ROM_START( sv603 )
 	ROM_LOAD("sv603.ic10", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78))
 ROM_END
 
-const rom_entry *sv603_device::device_rom_region() const
+const tiny_rom_entry *sv603_device::device_rom_region() const
 {
 	return ROM_NAME( sv603 );
 }

@@ -431,6 +431,7 @@ end
 --------------------------------------------------
 -- LUA library objects
 --------------------------------------------------
+if (STANDALONE~=true) then
 
 if not _OPTIONS["with-system-lua"] then
 project "lua"
@@ -565,6 +566,7 @@ project "lualibs"
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
 	}
 
+end
 --------------------------------------------------
 -- portmidi library objects
 --------------------------------------------------

@@ -109,7 +109,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c8050_t::device_rom_region() const
+const tiny_rom_entry *c8050_t::device_rom_region() const
 {
 	return ROM_NAME( c8050 );
 }
@@ -143,7 +143,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c8250lp_t::device_rom_region() const
+const tiny_rom_entry *c8250lp_t::device_rom_region() const
 {
 	return ROM_NAME( c8250lp );
 }
@@ -173,7 +173,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *sfd1001_t::device_rom_region() const
+const tiny_rom_entry *sfd1001_t::device_rom_region() const
 {
 	return ROM_NAME( sfd1001 );
 }

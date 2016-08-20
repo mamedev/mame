@@ -34,7 +34,7 @@ public:
 	static void static_set_jvs_name(device_t &device, const char *name);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER(control_r);

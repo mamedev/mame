@@ -451,6 +451,31 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 	return proxy;
 }
 
+void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
+{
+	netlist().log().debug("merging nets ...\n");
+	if (&othernet == &thisnet)
+	{
+		netlist().log().warning("Connecting {1} to itself. This may be right, though\n", thisnet.name());
+		return; // Nothing to do
+	}
+
+	if (thisnet.isRailNet() && othernet.isRailNet())
+		netlist().log().fatal("Trying to merge two rail nets: {1} and {2}\n", thisnet.name(), othernet.name());
+
+	if (othernet.isRailNet())
+	{
+		netlist().log().debug("othernet is railnet\n");
+		merge_nets(othernet, thisnet);
+	}
+	else
+	{
+		othernet.move_connections(thisnet);
+	}
+}
+
+
+
 void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out)
 {
 	if (out.is_analog() && in.is_logic())
@@ -477,7 +502,7 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 	else
 	{
 		if (in.has_net())
-			out.net().merge_net(&in.net());
+			merge_nets(out.net(), in.net());
 		else
 			out.net().register_con(in);
 	}
@@ -503,7 +528,7 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 
 		if (inp.has_net())
 			//fatalerror("logic inputs can only belong to one net!\n");
-			proxy->m_Q.net().merge_net(&inp.net());
+			merge_nets(proxy->m_Q.net(), inp.net());
 		else
 			proxy->m_Q.net().register_con(inp);
 
@@ -522,7 +547,7 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 		log().debug("connect_terminal_output: {1} {2}\n", in.name(), out.name());
 		/* no proxy needed, just merge existing terminal net */
 		if (in.has_net())
-			out.net().merge_net(&in.net());
+			merge_nets(out.net(), in.net());
 		else
 			out.net().register_con(in);
 	}
@@ -544,7 +569,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 	if (t1.has_net() && t2.has_net())
 	{
 		log().debug("T2 and T1 have net\n");
-		t1.net().merge_net(&t2.net());
+		merge_nets(t1.net(), t2.net());
 	}
 	else if (t2.has_net())
 	{
@@ -678,8 +703,8 @@ void setup_t::resolve_inputs()
 	int tries = 100;
 	while (m_links.size() > 0 && tries >  0) // FIXME: convert into constant
 	{
-		auto li = m_links.begin();
-		while (li != m_links.end())
+
+		for (auto li = m_links.begin(); li != m_links.end(); )
 		{
 			const pstring t1s = li->first;
 			const pstring t2s = li->second;
@@ -703,18 +728,20 @@ void setup_t::resolve_inputs()
 
 	log().verbose("deleting empty nets ...");
 
-	// delete empty nets ... and save m_list ...
+	// delete empty nets
 
-	for (auto net = netlist().m_nets.begin(); net != netlist().m_nets.end();)
-	{
-		if (net->get()->num_cons() == 0)
-		{
-			log().verbose("Deleting net {1} ...", net->get()->name());
-			net = netlist().m_nets.erase(net);
-		}
-		else
-			++net;
-	}
+	netlist().m_nets.erase(
+			std::remove_if(netlist().m_nets.begin(), netlist().m_nets.end(),
+					[](plib::owned_ptr<detail::net_t> &x)
+					{
+						if (x->num_cons() == 0)
+						{
+							x->netlist().log().verbose("Deleting net {1} ...", x->name());
+							return true;
+						}
+						else
+							return false;
+					}), netlist().m_nets.end());
 
 	pstring errstr("");
 

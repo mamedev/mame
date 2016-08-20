@@ -1638,8 +1638,8 @@ void alto2_cpu_device::next_sector(int unit)
 {
 	diablo_hd_device* dhd = m_drive[unit];
 	LOG((this,LOG_DISK,0,"%s dhd=%p\n", __FUNCTION__, dhd));
-	// get bit time in pico seconds
-	m_dsk.bitclk_time[unit] = static_cast<int>(dhd->bit_time().as_attoseconds() / 1000000);
+	// get bit time in attoseconds
+	m_dsk.bitclk_time[unit] = dhd->bit_time().as_attoseconds();
 	if (m_bitclk_time >= 0) {
 		LOG((this,LOG_DISK,0,"   unit #%d stop bitclk\n", unit));
 		m_bitclk_time = -1;
@@ -1796,8 +1796,8 @@ void alto2_cpu_device::reset_disk()
 	m_dsk.strobe = 0;
 	m_dsk.strobon_timer->reset();
 	m_dsk.bitclk = 0;
-	m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
-	m_dsk.bitclk_time[1] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
+	m_dsk.bitclk_time[0] = attotime::from_nsec(300).as_attoseconds();
+	m_dsk.bitclk_time[1] = attotime::from_nsec(300).as_attoseconds();
 	m_dsk.datin = 0;
 	m_dsk.bitcount = 0;
 	m_dsk.seclate = 0;

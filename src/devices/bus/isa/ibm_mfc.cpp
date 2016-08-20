@@ -433,7 +433,7 @@ ioport_constructor isa8_ibm_mfc_device::device_input_ports() const
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_ibm_mfc_device::device_rom_region() const
+const tiny_rom_entry *isa8_ibm_mfc_device::device_rom_region() const
 {
 	return ROM_NAME( ibm_mfc );
 }

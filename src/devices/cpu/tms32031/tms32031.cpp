@@ -323,7 +323,7 @@ tms3203x_device::~tms3203x_device()
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *tms3203x_device::device_rom_region() const
+const tiny_rom_entry *tms3203x_device::device_rom_region() const
 {
 	switch (m_chip_type)
 	{

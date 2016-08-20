@@ -124,12 +124,17 @@
   3) Pyon Pyon Jump (a contents where the same characters try to cross the river jumping on pads).
   4) Sui Sui Pyon Pyon (a swimming competition where the same characters swim with different styles, even walking).
 
-  Coin 1 (key 5) could be set either as Coin 1 or as Payout button, through
-  a DIP switch.
+  The 100 Yen coin input (key 7) can be set as "Exchange" through a DIP switch, in
+  which case its value is not accepted as credits but immediately paid out in
+  "medals."
 
   If you get a 'medal jam' error, and the game is not responding anymore, press
-  RESET (key 9), and the game will reset to default values (even all counters
-  will be cleared).
+  RESET (key F1), and the game will reset to default values (even all counters
+  will be cleared; the program does this by zeroing the magic byte preceding the
+  game ID string copied with it into NVRAM and then jumping to the boot routine).
+
+  The tables for the I/O routines have room for 7 coin inputs (address + mask) and
+  3 output latches, but only 3 coin inputs and 1 output latch are defined and used.
 
 
 ************************************************************************************
@@ -145,9 +150,9 @@
   How to play...
 
   Insert tokens (medals).
-  You can bet to any (or all) of the following 5 characters: Bote, Oume, Pyoko,
-  Kunio, and Pyon Pyon. Press start, and the reels start to roll. You'll win if
-  you can get 3 of the chosen character(s) in a row, column or diagonal.
+  You can bet to any (or all) of the following 5 characters: Botechin, Oume,
+  Pyokorin, Kunio, and Pyon-Pyon. Press start, and the reels start to roll. You'll
+  win if you can get 3 of the chosen character(s) in a row, column or diagonal.
 
   The black tadpoles behave just like jokers... If you have 2 chosen characters
   in a row and the remaining one is a black tadpole, it will transform into another
@@ -253,6 +258,9 @@
 #include "machine/ticket.h"
 #include "machine/nvram.h"
 #include "machine/gen_latch.h"
+
+#define UNICODE_10YEN   "\xC2\xA5" "10"
+#define UNICODE_100YEN  "\xC2\xA5" "100"
 
 class kurukuru_state : public driver_device
 {
@@ -361,7 +369,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);      /* Coin Counter 1 */
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);      /* Coin Counter 2 */
 	machine().bookkeeping().coin_lockout_global_w(data & 0x40);  /* Coin Lock */
-	m_hopper->write(space, 0, (data & 0x40));    /* Hopper Motor */
+	m_hopper->write(space, 0, (data & 0x40) ? 0x80 : 0);         /* Hopper Motor */
 
 	if (data & 0x9e)
 		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
@@ -540,13 +548,13 @@ static INPUT_PORTS_START( kurukuru )
 /*  bits d0-d3 are JAMMA top side pins 20,21,22,23, bits d4-d7 are JAMMA bottom side pins 20,21,22,23
     so that's player 1 left/right/button1/button2 then player 2 left/right/button1/button2
 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("1st (Bote/Botechin)")                  // edge connector pin 20 top
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("1st (Botechin)")                       // edge connector pin 20 top
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("2nd (Oume)")                           // edge connector pin 21 top
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyoko/Pyokorin)")                 // edge connector pin 22 top
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyokorin)")                       // edge connector pin 22 top
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("4th (Kunio)")                          // edge connector pin 23 top
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("5th (Pyon-Pyon)")                      // edge connector pin 20 bottom
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Unknown A0h - bit5")  // edge connector pin 21 bottom
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_M) PORT_NAME("Unknown A0h - bit6")  // edge connector pin 22 bottom
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 21 bottom
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 22 bottom
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                                                        // edge connector pin 23 bottom
 
 	PORT_START("IN1")
@@ -554,16 +562,16 @@ static INPUT_PORTS_START( kurukuru )
     so that's test, tilt/slam, coin 1, coin 2, p1 start, p2 start, p1 button 3, p2 button 3
 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                   // edge connector pin 15 top
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")                                 // edge connector pin 15 bottom
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Reset Button")        // edge connector pin 16 top
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )                                                         // edge connector pin 16 bottom
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown B0h - bit4")  // edge connector pin 17 top (active)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)                                      // edge connector pin 17 bottom
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Medal In")                                 // edge connector pin 15 bottom
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                  // edge connector pin 16 top
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME(UNICODE_10YEN " In")                        // edge connector pin 16 bottom
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 17 top (active)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME(UNICODE_100YEN " In") PORT_IMPULSE(2)       // edge connector pin 17 bottom
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback, edge connector pin 24 top
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                                 // edge connector pin 24 bottom
 
 	PORT_START("DSW1")  // found in the PCB: 11111111
-	PORT_DIPNAME( 0x07, 0x00, "Coinage A (100 Y)" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x00, "Coinage A (" UNICODE_100YEN ")" ) PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x02, "1 Coin / 3 Medal" )
 	PORT_DIPSETTING(    0x06, "1 Coin / 4 Medal" )
 	PORT_DIPSETTING(    0x01, "1 Coin / 5 Medal" )
@@ -572,17 +580,17 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_DIPSETTING(    0x07, "1 Coin / 11 Medal" )
 	PORT_DIPSETTING(    0x04, "1 Coin / 20 Medal" )
 	PORT_DIPSETTING(    0x00, "1 Coin / 50 Medal" )
-	PORT_DIPNAME( 0x18, 0x00, "Coinage B (10 Y)" )  PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPNAME( 0x18, 0x00, "Coinage B (" UNICODE_10YEN ")" )  PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING(    0x00, "3 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x10, "2 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x18, "1 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x08, "1 Coin / 2 Medal" )
 	PORT_DIPNAME( 0x20, 0x00, "Coinage Config" )    PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x00, "Coin 1 = Normal; Medal In = 2 Credits by Medal" )
-	PORT_DIPSETTING(    0x20, "Coin 1 = Payout; Medal In = 1 Credit by Medal" )
+	PORT_DIPSETTING(    0x00, UNICODE_100YEN " = Credits; Medal In = 2 Credits by Medal" )
+	PORT_DIPSETTING(    0x20, UNICODE_100YEN " = Exchange; Medal In = 1 Credit by Medal" )
 	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x40, "Manual" )
-	PORT_DIPSETTING(    0x00, "Automatic" )
+	PORT_DIPSETTING(    0x40, "Automatic" )
+	PORT_DIPSETTING(    0x00, "Manual" )
 	PORT_DIPNAME( 0x80, 0x00, "Repeat Last Bet")    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -625,8 +633,8 @@ static INPUT_PORTS_START( ppj )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyon-Pyon)")                      // edge connector pin 22 top
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("4th (Pyokorin)")                       // edge connector pin 23 top
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("5th (Botechin)")                       // edge connector pin 20 bottom
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("Unknown 70h - bit5")  // edge connector pin 21 bottom (active)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_D) PORT_NAME("Unknown 70h - bit6")  // edge connector pin 22 bottom (active)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 21 bottom (active)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 22 bottom (active)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                                                        // edge connector pin 23 bottom
 
 	PORT_START("IN1")
@@ -634,16 +642,16 @@ static INPUT_PORTS_START( ppj )
     so that's test, tilt/slam, coin 1, coin 2, p1 start, p2 start, p1 button 3, p2 button 3
 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                   // edge connector pin 15 top
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")                                 // edge connector pin 15 bottom
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Reset Button")        // edge connector pin 16 top
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )                                                         // edge connector pin 16 bottom
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 60h - bit4")  // edge connector pin 17 top (active)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)                                      // edge connector pin 17 bottom
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Medal In")                                 // edge connector pin 15 bottom
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                  // edge connector pin 16 top
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME(UNICODE_10YEN " In")                        // edge connector pin 16 bottom
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 17 top (active)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME(UNICODE_100YEN " In") PORT_IMPULSE(2)       // edge connector pin 17 bottom
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)  // hopper feedback, edge connector pin 24 top
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                                 // edge connector pin 24 bottom
 
 	PORT_START("DSW1")  // found in the PCB: 00000000 (arranged for sale since they are uncommon settings)
-	PORT_DIPNAME( 0x07, 0x03, "Coinage A (100 Y)" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x03, "Coinage A (" UNICODE_100YEN ")" ) PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "1 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x04, "1 Coin / 2 Medal" )
 	PORT_DIPSETTING(    0x02, "1 Coin / 3 Medal" )
@@ -652,21 +660,22 @@ static INPUT_PORTS_START( ppj )
 	PORT_DIPSETTING(    0x05, "1 Coin / 6 Medal" )
 	PORT_DIPSETTING(    0x03, "1 Coin / 10 Medal" )
 	PORT_DIPSETTING(    0x07, "1 Coin / 11 Medal" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	// Coinage B is always 1 Coin / 1 Medal
+	PORT_DIPNAME( 0x08, 0x00, "Coinage Config" )    PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x00, UNICODE_100YEN " = Credits" )
+	PORT_DIPSETTING(    0x08, UNICODE_100YEN " = Exchange" )
+	PORT_DIPNAME( 0x10, 0x00, "Payout Mode" )       PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, "Automatic" )
+	PORT_DIPSETTING(    0x00, "Manual" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Unknown (related to coin1/payout)")  PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Coinage Config" )    PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x00, "Coin 1 = Normal" )
-	PORT_DIPSETTING(    0x20, "Coin 1 = Payout" )
-	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x40, "Manual" )
-	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x80, 0x00, "Repeat Last Bet")    PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  // found in the PCB: 00000000 (arranged for sale since they are uncommon settings)
 	PORT_DIPNAME( 0x07, 0x01, "Percentage" )    PORT_DIPLOCATION("DSW2:1,2,3")
@@ -732,7 +741,7 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -770,7 +779,7 @@ static MACHINE_CONFIG_START( ppj, kurukuru_state )
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -800,6 +809,7 @@ MACHINE_CONFIG_END
 ROM_START( kurukuru )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "kp_17l.ic17",  0x00000, 0x08000, CRC(9b552ebc) SHA1(07d0e62b7fdad381963a345376b72ad31eb7b96d) ) // program code
+	// Game ID string: "carp carp carp hiroshima ---"
 
 	ROM_REGION( 0x40000, "user1", 0 ) // maincpu banked roms
 	ROM_FILL(                 0x00000, 0x10000, 0xff )                                                         // ic23: unpopulated
@@ -824,6 +834,7 @@ ROM_END
 ROM_START( ppj )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "ppj17.ic17",  0x00000, 0x08000, CRC(5d9c9ceb) SHA1(0f52c8a0aaaf978afeb07e56493399133b4ce781) ) // program code
+	// Game ID string: "PYON PYON JUMP V1.40"
 
 	ROM_REGION( 0x40000, "user1", 0 ) // maincpu banked roms
 	ROM_FILL(                 0x00000, 0x10000, 0xff )                                                         // ic23: unpopulated

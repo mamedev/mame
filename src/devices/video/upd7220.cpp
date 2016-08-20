@@ -175,7 +175,7 @@ const address_space_config *upd7220_device::memory_space_config(address_spacenum
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *upd7220_device::device_rom_region() const
+const tiny_rom_entry *upd7220_device::device_rom_region() const
 {
 	return ROM_NAME( upd7220 );
 }
@@ -388,7 +388,7 @@ inline void upd7220_device::recompute_parameters()
 	else if((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON)
 	{
 		// in interlaced mode every line contains both fields
-		horiz_mult = 8;
+		horiz_mult = 8; // TODO this breaks compis uhrg video, characters are 16 pixels wide in interlaced mode too
 		vert_mult = 2;
 	}
 

@@ -72,7 +72,7 @@ ROM_START( side116 )
 	ROM_LOAD("bios12.u2", 0x0000, 0x2000, CRC(c202a0e6) SHA1(a5b130a6d17c972d6c378cb2cd8113a4039631fe))
 ROM_END
 
-const rom_entry *side116_device::device_rom_region() const
+const tiny_rom_entry *side116_device::device_rom_region() const
 {
 	return ROM_NAME( side116 );
 }

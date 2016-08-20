@@ -843,7 +843,7 @@ static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0xffff) AM_ROM
+	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
@@ -856,7 +856,7 @@ static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2800, 0xffff) AM_ROM
+	AM_RANGE(0x2800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8, calomega_state )

@@ -96,8 +96,11 @@ void portfolio_expansion_slot_t::device_reset()
 // slot devices
 #include "hpc101.h"
 #include "hpc102.h"
+#include "hpc104.h"
 
 SLOT_INTERFACE_START( portfolio_expansion_cards )
 	SLOT_INTERFACE("lpt", HPC101)
 	SLOT_INTERFACE("uart", HPC102)
+	SLOT_INTERFACE("ram", HPC104)
+	SLOT_INTERFACE("ram2", HPC104_2)
 SLOT_INTERFACE_END

@@ -16,7 +16,7 @@
 #include "xmlfile.h"
 #include "config.h"
 #include "drivenum.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include <ctype.h>
 
@@ -515,21 +515,23 @@ void info_xml_creator::output_bios()
 	if (m_drivlist.driver().rom == nullptr)
 		return;
 
+	auto rom_entries = rom_build_entries(m_drivlist.driver().rom);
+
 	// first determine the default BIOS name
 	std::string defaultname;
-	for (const rom_entry *rom = m_drivlist.driver().rom; !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			defaultname = ROM_GETNAME(rom);
+	for (const rom_entry &rom : rom_entries)
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			defaultname = ROM_GETNAME(&rom);
 
 	// iterate over ROM entries and look for BIOSes
-	for (const rom_entry *rom = m_drivlist.driver().rom; !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+	for (const rom_entry &rom : rom_entries)
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
 			// output extracted name and descriptions
 			fprintf(m_output, "\t\t<biosset");
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)));
-			fprintf(m_output, " description=\"%s\"", xml_normalize_string(ROM_GETHASHDATA(rom)));
-			if (defaultname == ROM_GETNAME(rom))
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(ROM_GETNAME(&rom)));
+			fprintf(m_output, " description=\"%s\"", xml_normalize_string(ROM_GETHASHDATA(&rom)));
+			if (defaultname == ROM_GETNAME(&rom))
 				fprintf(m_output, " default=\"yes\"");
 			fprintf(m_output, "/>\n");
 		}
@@ -577,7 +579,7 @@ void info_xml_creator::output_rom(device_t &device)
 				if (!is_disk && is_bios)
 				{
 					// scan backwards through the ROM entries
-					for (const rom_entry *brom = rom - 1; brom != m_drivlist.driver().rom; brom--)
+					for (const rom_entry *brom = rom - 1; brom != device.rom_region(); brom--)
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
 							strcpy(bios_name, ROM_GETNAME(brom));
@@ -1561,7 +1563,7 @@ void info_xml_creator::output_software_list()
 {
 	for (const software_list_device &swlist : software_list_device_iterator(m_drivlist.config().root_device()))
 	{
-		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name());
+		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name().c_str());
 		fprintf(m_output, "status=\"%s\" ", (swlist.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
 		if (swlist.filter())
 			fprintf(m_output, "filter=\"%s\" ", swlist.filter());

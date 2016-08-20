@@ -64,7 +64,7 @@ public:
 			logerror("dreambal_eeprom_w unhandled data %04x %04x\n",data&0x0fff8, mem_mask);
 		}
 
-		if (mem_mask&0x00ff)
+		if (ACCESSING_BITS_0_7)
 		{
 			m_eeprom->clk_write(data &0x2 ? ASSERT_LINE : CLEAR_LINE);
 			m_eeprom->di_write(data &0x1);

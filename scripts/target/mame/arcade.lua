@@ -669,6 +669,16 @@ BUSES["VECTREX"] = true
 --BUSES["Z88"] = true
 --BUSES["ZORRO"] = true
 
+
+--------------------------------------------------
+-- specify used file formats
+--------------------------------------------------
+
+FORMATS["GUAB_DSK"] = true
+FORMATS["AMI_DSK"] = true
+FORMATS["SC3000_BIT"] = true
+FORMATS["WD177X_DSK"] = true
+
 --------------------------------------------------
 -- this is the list of driver libraries that
 -- comprise MAME plus mamedriv.o which contains
@@ -3285,9 +3295,12 @@ files {
 	MAME_DIR .. "src/mame/video/seibuspi.cpp",
 	MAME_DIR .. "src/mame/drivers/sengokmj.cpp",
 	MAME_DIR .. "src/mame/drivers/stfight.cpp",
+	MAME_DIR .. "src/mame/video/stfight_dev.cpp",
+	MAME_DIR .. "src/mame/video/stfight_dev.h",
+	MAME_DIR .. "src/mame/video/airraid_dev.cpp",
+	MAME_DIR .. "src/mame/video/airraid_dev.h",
 	MAME_DIR .. "src/mame/includes/stfight.h",
 	MAME_DIR .. "src/mame/machine/stfight.cpp",
-	MAME_DIR .. "src/mame/video/stfight.cpp",
 	MAME_DIR .. "src/mame/drivers/toki.cpp",
 	MAME_DIR .. "src/mame/includes/toki.h",
 	MAME_DIR .. "src/mame/video/toki.cpp",
@@ -4169,7 +4182,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/play_1.cpp",
 	MAME_DIR .. "src/mame/drivers/play_2.cpp",
 	MAME_DIR .. "src/mame/drivers/play_3.cpp",
-	MAME_DIR .. "src/mame/drivers/play_5.cpp",
 	MAME_DIR .. "src/mame/drivers/rowamet.cpp",
 	MAME_DIR .. "src/mame/drivers/s11.cpp",
 	MAME_DIR .. "src/mame/includes/s11.h",

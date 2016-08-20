@@ -40,7 +40,7 @@
 #define __PLUS4_EXPANSION_SLOT__
 
 #include "emu.h"
-
+#include "softlist_dev.h"
 
 
 //**************************************************************************

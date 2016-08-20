@@ -152,7 +152,7 @@ sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, d
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *sed1330_device::device_rom_region() const
+const tiny_rom_entry *sed1330_device::device_rom_region() const
 {
 	return ROM_NAME( sed1330 );
 }

@@ -12,6 +12,7 @@
 #include "machine/at_keybc.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "sound/dac.h"
+#include "softlist_dev.h"
 
 #define LOG_PORT80  0
 

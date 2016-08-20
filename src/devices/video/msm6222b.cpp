@@ -40,7 +40,7 @@ msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char
 	m_cgrom.set_tag("cgrom");
 }
 
-const rom_entry *msm6222b_01_device::device_rom_region() const
+const tiny_rom_entry *msm6222b_01_device::device_rom_region() const
 {
 	return ROM_NAME(msm6222b_01);
 }

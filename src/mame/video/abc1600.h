@@ -42,12 +42,14 @@ public:
 	abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(crtc_map, 8);
-	virtual DECLARE_ADDRESS_MAP(io_map, 8);
+	virtual DECLARE_ADDRESS_MAP(iowr0_map, 8);
+	virtual DECLARE_ADDRESS_MAP(iowr1_map, 8);
+	virtual DECLARE_ADDRESS_MAP(iowr2_map, 8);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

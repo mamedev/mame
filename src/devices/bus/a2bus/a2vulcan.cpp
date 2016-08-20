@@ -100,12 +100,12 @@ machine_config_constructor a2bus_vulcanbase_device::device_mconfig_additions() c
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *a2bus_vulcan_device::device_rom_region() const
+const tiny_rom_entry *a2bus_vulcan_device::device_rom_region() const
 {
 	return ROM_NAME( vulcan );
 }
 
-const rom_entry *a2bus_vulcangold_device::device_rom_region() const
+const tiny_rom_entry *a2bus_vulcangold_device::device_rom_region() const
 {
 	return ROM_NAME( vulcangold );
 }

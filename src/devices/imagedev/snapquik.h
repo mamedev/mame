@@ -11,6 +11,8 @@
 #ifndef __SNAPQUIK_H__
 #define __SNAPQUIK_H__
 
+#include "softlist_dev.h"
+
 typedef delegate<image_init_result (device_image_interface &,const char *, int)> snapquick_load_delegate;
 
 // ======================> snapshot_image_device

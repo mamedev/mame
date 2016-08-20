@@ -164,7 +164,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const override;

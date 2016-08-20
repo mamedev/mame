@@ -14,6 +14,8 @@
 #define _HP_OPTROM_H_
 
 #include "emu.h"
+#include "softlist_dev.h"
+
 
 class hp_optrom_cart_device : public device_t,
 								public device_slot_card_interface

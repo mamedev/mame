@@ -1267,10 +1267,17 @@ Notes:
 #include "machine/namco_settings.h"
 
 #define JVSCLOCK    (XTAL_14_7456MHz)
-#define H8CLOCK     (16737350)      /* from 2061 */
-#define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
-#define C352CLOCK   (25992000)  /* measured at 25.992MHz from 2061 pin 9  */
-#define C352DIV     (296)
+
+//#define H8CLOCK     (16737350)      /* from 2061 */
+//#define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
+//#define C352CLOCK   (25401600)  /* previously measured at 25.992MHz from 2061 pin 9  */
+//#define C352DIV     (296)
+
+#define H8CLOCK     (16934400)      /* based on research (superctr) */
+#define BUSCLOCK    (16934400*2)
+#define C352CLOCK   (25401600)
+#define C352DIV     (288)
+
 #define VSYNC1      (59.8824)
 #define VSYNC2      (59.915)
 #define HSYNC       (16666150)
@@ -3587,10 +3594,10 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -5119,7 +5126,7 @@ ROM_END
 
 
 /* Games */
-#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 //    YEAR, NAME,        PARENT,   MACHINE,     INPUT,     INIT,                MNTR,  COMPANY, FULLNAME,                      FLAGS
 GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
 GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe

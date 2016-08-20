@@ -13,82 +13,100 @@
 
 #include "lh5801.h"
 
-enum Adr
-{
-	Imp,
-	Reg,
-	Vec, // imm byte (vector at 0xffxx)
-	Vej,
-	Imm,
-	RegImm,
-	Imm16,
-	RegImm16,
-	ME0,
-	ME0Imm,
-	Abs,
-	AbsImm,
-	ME1,
-	ME1Imm,
-	ME1Abs,
-	ME1AbsImm,
-	RelP,
-	RelM
-};
-
-enum Regs
-{
-	RegNone,
-	A,
-	XL, XH, X,
-	YL, YH, Y,
-	UL, UH, U,
-	P, S
-};
-
-static const char *const RegNames[]= {
-	nullptr, "A", "XL", "XH", "X", "YL", "YH", "Y", "UL", "UH", "U", "P", "S"
-};
-
 #if defined(SEC)
 #undef SEC
 #endif
 
-enum Ins
+namespace {
+
+class Entry
 {
-	ILL, ILL2, PREFD, NOP,
+public:
+	enum Ins
+	{
+		ILL, ILL2, PREFD, NOP,
 
-	LDA, STA, LDI, LDX, STX,
-	LDE, SDE, LIN, SIN,
-	TIN, // (x++)->(y++)
-	ADC, ADI, ADR, SBC, SBI,
-	DCA, DCS, // bcd add and sub
-	CPA, CPI, CIN, // A compared with (x++)
-	AND, ANI, ORA, ORI, EOR, EAI, BIT, BII,
-	INC, DEC,
-	DRL, DRR, // digit rotates
-	ROL, ROR,
-	SHL, SHR,
-	AEX, // A nibble swap
+		LDA, STA, LDI, LDX, STX,
+		LDE, SDE, LIN, SIN,
+		TIN, // (x++)->(y++)
+		ADC, ADI, ADR, SBC, SBI,
+		DCA, DCS, // bcd add and sub
+		CPA, CPI, CIN, // A compared with (x++)
+		AND, ANI, ORA, ORI, EOR, EAI, BIT, BII,
+		INC, DEC,
+		DRL, DRR, // digit rotates
+		ROL, ROR,
+		SHL, SHR,
+		AEX, // A nibble swap
 
-	BCR, BCS, BHR, BHS, BZR, BZS, BVR, BVS,
-	BCH, LOP, // loop with ul
-	JMP, SJP, RTN, RTI, HLT,
-	VCR, VCS, VHR, VHS, VVS, VZR, VZS,
-	VMJ, VEJ,
-	PSH, POP, ATT, TTA,
-	REC, SEC, RIE, SIE,
+		BCR, BCS, BHR, BHS, BZR, BZS, BVR, BVS,
+		BCH, LOP, // loop with ul
+		JMP, SJP, RTN, RTI, HLT,
+		VCR, VCS, VHR, VHS, VVS, VZR, VZS,
+		VMJ, VEJ,
+		PSH, POP, ATT, TTA,
+		REC, SEC, RIE, SIE,
 
-	AM0, AM1, // load timer reg
-	ITA, // reads input port
-	ATP, // akku send to data bus
-	CDV, // clears internal divider
-	OFF, // clears bf flip flop
-	RDP, SDP,// reset display flip flop
-	RPU, SPU,// flip flop pu off
-	RPV, SPV // flip flop pv off
+		AM0, AM1, // load timer reg
+		ITA, // reads input port
+		ATP, // akku send to data bus
+		CDV, // clears internal divider
+		OFF, // clears bf flip flop
+		RDP, SDP,// reset display flip flop
+		RPU, SPU,// flip flop pu off
+		RPV, SPV // flip flop pv off
+	};
+
+	enum Adr
+	{
+		Imp,
+		Reg,
+		Vec, // imm byte (vector at 0xffxx)
+		Vej,
+		Imm,
+		RegImm,
+		Imm16,
+		RegImm16,
+		ME0,
+		ME0Imm,
+		Abs,
+		AbsImm,
+		ME1,
+		ME1Imm,
+		ME1Abs,
+		ME1AbsImm,
+		RelP,
+		RelM
+	};
+
+	enum Regs
+	{
+		RegNone,
+		A,
+		XL, XH, X,
+		YL, YH, Y,
+		UL, UH, U,
+		P, S
+	};
+
+	const char *ins_name() const { return ins_names[ins]; }
+	const char *reg_name() const { return reg_names[reg]; }
+
+	Ins ins;
+	Adr adr;
+	Regs reg;
+
+	static const Entry table[0x100];
+	static const Entry table_fd[0x100];
+
+protected:
+	Entry(Ins i, Adr a = Imp, Regs r = RegNone) : ins(i), adr(a), reg(r) { }
+
+	static const char *const ins_names[];
+	static const char *const reg_names[];
 };
 
-static const char *const InsNames[]={
+const char *const Entry::ins_names[]={
 	"ILL", "ILL", nullptr, "NOP",
 	"LDA", "STA", "LDI", "LDX", "STX",
 	"LDE", "SDE", "LIN", "SIN",
@@ -120,9 +138,11 @@ static const char *const InsNames[]={
 	"RPV", "SPV",
 };
 
-struct Entry { Ins ins; Adr adr; Regs reg; };
+const char *const Entry::reg_names[]= {
+	nullptr, "A", "XL", "XH", "X", "YL", "YH", "Y", "UL", "UH", "U", "P", "S"
+};
 
-static const Entry table[0x100]={
+const Entry Entry::table[0x100]={
 	{ SBC, Reg, XL }, // 0
 	{ SBC, ME0, X },
 	{ ADC, Reg, XL },
@@ -380,7 +400,8 @@ static const Entry table[0x100]={
 	{ ILL },
 	{ ILL }
 };
-static const Entry table_fd[0x100]={
+
+const Entry Entry::table_fd[0x100]={
 	{ ILL2 }, // 0x00
 	{ SBC, ME1, X },
 	{ ILL2 },
@@ -639,6 +660,9 @@ static const Entry table_fd[0x100]={
 	{ ILL2 }
 };
 
+} // anonymous namespace
+
+
 CPU_DISASSEMBLE( lh5801 )
 {
 	int pos = 0;
@@ -648,75 +672,75 @@ CPU_DISASSEMBLE( lh5801 )
 	int temp;
 
 	oper=oprom[pos++];
-	entry=table+oper;
+	entry=Entry::table+oper;
 
-	if (table[oper].ins==PREFD) {
+	if (Entry::table[oper].ins==Entry::PREFD) {
 		oper=oprom[pos++];
-		entry=table_fd+oper;
+		entry=Entry::table_fd+oper;
 	}
 	switch (entry->ins) {
-	case ILL:
-		sprintf(buffer,"%s %.2x", InsNames[entry->ins], oper);break;
-	case ILL2:
-		sprintf(buffer,"%s fd%.2x", InsNames[entry->ins], oper);break;
+	case Entry::ILL:
+		sprintf(buffer,"%s %.2x", entry->ins_name(), oper);break;
+	case Entry::ILL2:
+		sprintf(buffer,"%s fd%.2x", entry->ins_name(), oper);break;
 	default:
 		switch(entry->adr) {
-		case Imp:
-			sprintf(buffer,"%s", InsNames[entry->ins]);break;
-		case Reg:
-			sprintf(buffer,"%s %s", InsNames[entry->ins],RegNames[entry->reg]);break;
-		case RegImm:
-			sprintf(buffer,"%s %s,%.2x", InsNames[entry->ins],
-					RegNames[entry->reg], oprom[pos++]);
+		case Entry::Imp:
+			sprintf(buffer,"%s", entry->ins_name());break;
+		case Entry::Reg:
+			sprintf(buffer,"%s %s", entry->ins_name(),entry->reg_name());break;
+		case Entry::RegImm:
+			sprintf(buffer,"%s %s,%.2x", entry->ins_name(),
+					entry->reg_name(), oprom[pos++]);
 			break;
-		case RegImm16:
+		case Entry::RegImm16:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s %s,%.4x", InsNames[entry->ins],RegNames[entry->reg],absolut );
+			sprintf(buffer,"%s %s,%.4x", entry->ins_name(),entry->reg_name(),absolut );
 			break;
-		case Vec:
-			sprintf(buffer,"%s (ff%.2x)", InsNames[entry->ins],oprom[pos++]);break;
-		case Vej:
-			sprintf(buffer,"%s (ff%.2x)", InsNames[entry->ins], oper);break;
-		case Imm:
-			sprintf(buffer,"%s %.2x", InsNames[entry->ins],oprom[pos++]);break;
-		case Imm16:
+		case Entry::Vec:
+			sprintf(buffer,"%s (ff%.2x)", entry->ins_name(),oprom[pos++]);break;
+		case Entry::Vej:
+			sprintf(buffer,"%s (ff%.2x)", entry->ins_name(), oper);break;
+		case Entry::Imm:
+			sprintf(buffer,"%s %.2x", entry->ins_name(),oprom[pos++]);break;
+		case Entry::Imm16:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s %.4x", InsNames[entry->ins],absolut );break;
-		case RelP:
+			sprintf(buffer,"%s %.4x", entry->ins_name(),absolut );break;
+		case Entry::RelP:
 			temp=oprom[pos++];
-			sprintf(buffer,"%s %.4x", InsNames[entry->ins],pc+pos+temp );break;
-		case RelM:
+			sprintf(buffer,"%s %.4x", entry->ins_name(),pc+pos+temp );break;
+		case Entry::RelM:
 			temp=oprom[pos++];
-			sprintf(buffer,"%s %.4x", InsNames[entry->ins],pc+pos-temp );break;
-		case Abs:
+			sprintf(buffer,"%s %.4x", entry->ins_name(),pc+pos-temp );break;
+		case Entry::Abs:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s (%.4x)", InsNames[entry->ins],absolut );break;
-		case ME1Abs:
+			sprintf(buffer,"%s (%.4x)", entry->ins_name(),absolut );break;
+		case Entry::ME1Abs:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s #(%.4x)", InsNames[entry->ins],absolut );break;
-		case AbsImm:
+			sprintf(buffer,"%s #(%.4x)", entry->ins_name(),absolut );break;
+		case Entry::AbsImm:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s (%.4x),%.2x", InsNames[entry->ins],absolut,
+			sprintf(buffer,"%s (%.4x),%.2x", entry->ins_name(),absolut,
 					oprom[pos++]);break;
-		case ME1AbsImm:
+		case Entry::ME1AbsImm:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s #(%.4x),%.2x", InsNames[entry->ins],absolut,
+			sprintf(buffer,"%s #(%.4x),%.2x", entry->ins_name(),absolut,
 					oprom[pos++]);break;
-		case ME0:
-			sprintf(buffer,"%s (%s)", InsNames[entry->ins],RegNames[entry->reg] );break;
-		case ME0Imm:
-			sprintf(buffer,"%s (%s),%.2x", InsNames[entry->ins],RegNames[entry->reg],oprom[pos++] );
+		case Entry::ME0:
+			sprintf(buffer,"%s (%s)", entry->ins_name(),entry->reg_name() );break;
+		case Entry::ME0Imm:
+			sprintf(buffer,"%s (%s),%.2x", entry->ins_name(),entry->reg_name(),oprom[pos++] );
 			break;
-		case ME1:
-			sprintf(buffer,"%s #(%s)", InsNames[entry->ins],RegNames[entry->reg] );break;
-		case ME1Imm:
-			sprintf(buffer,"%s #(%s),%.2x", InsNames[entry->ins],RegNames[entry->reg],oprom[pos++] );
+		case Entry::ME1:
+			sprintf(buffer,"%s #(%s)", entry->ins_name(),entry->reg_name() );break;
+		case Entry::ME1Imm:
+			sprintf(buffer,"%s #(%s),%.2x", entry->ins_name(),entry->reg_name(),oprom[pos++] );
 			break;
 		}
 	}

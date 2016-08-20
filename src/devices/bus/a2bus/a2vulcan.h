@@ -56,7 +56,7 @@ class a2bus_vulcan_device : public a2bus_vulcanbase_device
 {
 public:
 	a2bus_vulcan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	virtual void device_start() override;
@@ -68,7 +68,7 @@ class a2bus_vulcangold_device : public a2bus_vulcanbase_device
 {
 public:
 	a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition

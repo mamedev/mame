@@ -39,17 +39,17 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsung8_state::yunsung8_videobank_w)
+WRITE8_MEMBER(yunsung8_state::videobank_w)
 {
 	m_videobank = data;
 }
 
 
-READ8_MEMBER(yunsung8_state::yunsung8_videoram_r)
+READ8_MEMBER(yunsung8_state::videoram_r)
 {
 	int bank;
 
-	/*  Bit 1 of the bankswitching register contols the c000-c7ff
+	/*  Bit 1 of the bankswitching register controls the c000-c7ff
 	    area (Palette). Bit 0 controls the c800-dfff area (Tiles) */
 
 	if (offset < 0x0800)
@@ -64,7 +64,7 @@ READ8_MEMBER(yunsung8_state::yunsung8_videoram_r)
 }
 
 
-WRITE8_MEMBER(yunsung8_state::yunsung8_videoram_w)
+WRITE8_MEMBER(yunsung8_state::videoram_w)
 {
 	if (offset < 0x0800)        // c000-c7ff    Banked Palette RAM
 	{
@@ -107,7 +107,7 @@ WRITE8_MEMBER(yunsung8_state::yunsung8_videoram_w)
 }
 
 
-WRITE8_MEMBER(yunsung8_state::yunsung8_flipscreen_w)
+WRITE8_MEMBER(yunsung8_state::flipscreen_w)
 {
 	machine().tilemap().set_flip_all((data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_1)
 /***************************************************************************
 
 
-                            Vide Hardware Init
+                            Video Hardware Init
 
 
 ***************************************************************************/
@@ -186,7 +186,7 @@ void yunsung8_state::video_start()
 
 ***************************************************************************/
 
-UINT32 yunsung8_state::screen_update_yunsung8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 yunsung8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = (~m_layers_ctrl) >> 4;
 

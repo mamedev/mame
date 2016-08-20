@@ -123,17 +123,17 @@ machine_config_constructor isa16_vga_mach64_device::device_mconfig_additions() c
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_vga_gfxultra_device::device_rom_region() const
+const tiny_rom_entry *isa16_vga_gfxultra_device::device_rom_region() const
 {
 	return ROM_NAME( gfxultra );
 }
 
-const rom_entry *isa16_vga_gfxultrapro_device::device_rom_region() const
+const tiny_rom_entry *isa16_vga_gfxultrapro_device::device_rom_region() const
 {
 	return ROM_NAME( gfxultrp );
 }
 
-const rom_entry *isa16_vga_mach64_device::device_rom_region() const
+const tiny_rom_entry *isa16_vga_mach64_device::device_rom_region() const
 {
 	return ROM_NAME( mach64 );
 }

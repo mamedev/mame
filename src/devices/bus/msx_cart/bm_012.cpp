@@ -90,7 +90,7 @@ ROM_START( msx_cart_bm_012 )
 ROM_END
 
 
-const rom_entry *msx_cart_bm_012::device_rom_region() const
+const tiny_rom_entry *msx_cart_bm_012::device_rom_region() const
 {
 	return ROM_NAME( msx_cart_bm_012 );
 }

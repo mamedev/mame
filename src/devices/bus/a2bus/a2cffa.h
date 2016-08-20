@@ -30,7 +30,7 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	virtual void device_start() override;
@@ -70,7 +70,7 @@ class a2bus_cffa2_6502_device : public a2bus_cffa2000_device, public device_nvra
 {
 public:
 	a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	// device_config_nvram_interface overrides

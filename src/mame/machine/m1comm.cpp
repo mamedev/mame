@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( m1comm_io, AS_IO, 8, m1comm_device )
 	AM_RANGE(0x20, 0x2F) AM_READWRITE(dma_reg_r, dma_reg_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(syn_r, syn_w)
 	AM_RANGE(0x60, 0x60) AM_READWRITE(zfg_r, zfg_w)
-	AM_RANGE(0xFFFF, 0xFFFF) AM_RAM
+	AM_RANGE(0xFF, 0xFF) AM_RAM
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( m1comm )
@@ -111,7 +111,7 @@ machine_config_constructor m1comm_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *m1comm_device::device_rom_region() const
+const tiny_rom_entry *m1comm_device::device_rom_region() const
 {
 	return ROM_NAME( m1comm );
 }

@@ -10,19 +10,13 @@
 ***************************************************************************/
 
 #include <ctype.h>
-#include <regex>
 
 #include "emu.h"
 #include "emuopts.h"
 #include "image.h"
 #include "config.h"
 #include "xmlfile.h"
-
-//**************************************************************************
-//  STATIC VARIABLES
-//**************************************************************************
-
-static std::regex s_potenial_softlist_regex("\\w+(\\:\\w+\\:\\w+)?");
+#include "softlist.h"
 
 
 //**************************************************************************
@@ -54,7 +48,7 @@ image_manager::image_manager(running_machine &machine)
 			image.set_init_phase();
 
 			// try as a softlist
-			if (std::regex_match(image_name, s_potenial_softlist_regex))
+			if (software_name_parse(image_name))
 				result = image.load_software(image_name);
 
 			// failing that, try as an image
@@ -145,7 +139,7 @@ void image_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
 			if (node != nullptr)
 			{
 				xml_set_attribute(node, "instance", dev_instance);
-				xml_set_attribute(node, "directory", image.working_directory());
+				xml_set_attribute(node, "directory", image.working_directory().c_str());
 			}
 		}
 	}
@@ -207,23 +201,6 @@ void image_manager::options_extract()
 		write_config(machine().options(), nullptr, &machine().system());
 }
 
-
-/*-------------------------------------------------
- image_mandatory_scan - search for devices which
- need an image to be loaded
- -------------------------------------------------*/
-
-std::string &image_manager::mandatory_scan(std::string &mandatory)
-{
-	mandatory.clear();
-	// make sure that any required image has a mounted file
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
-	{
-		if (image.filename() == nullptr && image.must_be_loaded())
-			mandatory.append("\"").append(image.instance_name()).append("\", ");
-	}
-	return mandatory;
-}
 
 /*-------------------------------------------------
     postdevice_init - initialize devices for a specific

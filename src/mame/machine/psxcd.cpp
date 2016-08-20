@@ -1322,7 +1322,7 @@ ROM_START( psxcd )
 	ROMX_LOAD( "sc430920.s19", 0x0000, 0xb195, CRC(8380a5a2) SHA1(6fe45fd6fb96b12a25a45f39b5efd0be5e3f3e86), ROM_BIOS(16) )
 ROM_END
 
-const rom_entry *psxcd_device::device_rom_region() const
+const tiny_rom_entry *psxcd_device::device_rom_region() const
 {
 	return ROM_NAME( psxcd );
 }

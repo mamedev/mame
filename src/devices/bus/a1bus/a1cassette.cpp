@@ -47,7 +47,7 @@ machine_config_constructor a1bus_cassette_device::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME( cassette );
 }
 
-const rom_entry *a1bus_cassette_device::device_rom_region() const
+const tiny_rom_entry *a1bus_cassette_device::device_rom_region() const
 {
 	return ROM_NAME( cassette );
 }

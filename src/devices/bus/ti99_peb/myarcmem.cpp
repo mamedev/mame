@@ -200,7 +200,7 @@ machine_config_constructor myarc_memory_expansion_device::device_mconfig_additio
 	return MACHINE_CONFIG_NAME( myarc_exp );
 }
 
-const rom_entry *myarc_memory_expansion_device::device_rom_region() const
+const tiny_rom_entry *myarc_memory_expansion_device::device_rom_region() const
 {
 	return ROM_NAME( myarc_exp );
 }

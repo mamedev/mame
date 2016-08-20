@@ -276,7 +276,7 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 		}
 	}
 
-	cpu_control_register = (cpu_control_register & ~mem_mask) | (data & mem_mask);
+	COMBINE_DATA(&cpu_control_register);
 
 	output().set_value("internal_led_1", (cpu_control_register >> 15) & 1);
 	output().set_value("internal_led_2", (cpu_control_register >> 14) & 1);

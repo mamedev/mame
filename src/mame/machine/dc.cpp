@@ -271,7 +271,7 @@ int dc_state::decode_reg3216_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 		//machine().debug_break();
 	}
 
-	if (mem_mask & U64(0x0000ffff00000000))
+	if (ACCESSING_BITS_32_47)
 	{
 		reg++;
 		*shift = 32;

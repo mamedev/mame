@@ -290,7 +290,7 @@ machine_config_constructor beta_disk_device::device_mconfig_additions() const
 //  the device's ROM definitions
 //-------------------------------------------------
 
-const rom_entry *beta_disk_device::device_rom_region() const
+const tiny_rom_entry *beta_disk_device::device_rom_region() const
 {
 	return ROM_NAME(beta_disk );
 }

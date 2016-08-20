@@ -488,6 +488,17 @@ ROM_START(amazonh)
 	ROM_LOAD("684-s2.snd", 0x7800, 0x0800, CRC(4d8ea26c) SHA1(d76d535bf29297247f1e5abd080a52b7dfc3811b))
 ROM_END
 
+ROM_START(amazonha)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u2_80a.bin", 0x2000, 0x1000, CRC(241de1d4) SHA1(9d5942704cbdec6565d6335e33e9f7e4c60a41ac))
+	ROM_LOAD("u3_80a.bin", 0x3000, 0x1000, CRC(2d77ccdc) SHA1(47241ccd365e8d74d5aa5b775acf6445cc95b8a8))
+	ROM_LOAD("684-1.cpu", 0x1000, 0x0800, CRC(7fac5132) SHA1(2fbcda45935c1817b2230598921b86c6f52564c8))
+
+	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
+	ROM_LOAD("684-s1.snd", 0x7000, 0x0800, CRC(86d239df) SHA1(f18efdc6b84d18b1cf01e79224284c5180c57d22))
+	ROM_LOAD("684-s2.snd", 0x7800, 0x0800, CRC(4d8ea26c) SHA1(d76d535bf29297247f1e5abd080a52b7dfc3811b))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Caveman (#PV-810) Pinball/Video Combo
 /-------------------------------------------------------------------*/
@@ -790,6 +801,7 @@ ROM_END
 /* disp3 */GAME(1983,   rflshdlx,   0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Royal Flush Deluxe",       MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME(1983,   goinnuts,   0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Goin' Nuts",           MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,   amazonh,    0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt",          MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   amazonha,   amazonh,gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,   rackempp,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rack 'em Up! (Pinball)",           MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,   raimfire,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Ready...Aim...Fire!",      MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1984,   jack2opn,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Jacks to Open",            MACHINE_IS_SKELETON_MECHANICAL)

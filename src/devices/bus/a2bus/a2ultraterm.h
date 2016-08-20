@@ -61,7 +61,7 @@ class a2bus_ultraterm_device : public a2bus_videx160_device
 public:
 	a2bus_ultraterm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class a2bus_ultratermenh_device : public a2bus_videx160_device
@@ -69,7 +69,7 @@ class a2bus_ultratermenh_device : public a2bus_videx160_device
 public:
 	a2bus_ultratermenh_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition

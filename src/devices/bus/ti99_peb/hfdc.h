@@ -21,6 +21,7 @@
 
 #include "machine/mm58274c.h"
 #include "machine/hdc92x4.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_HFDC;
 
@@ -55,7 +56,7 @@ private:
 	void device_start() override;
 	void device_reset() override;
 
-	const rom_entry *device_rom_region() const override;
+	const tiny_rom_entry *device_rom_region() const override;
 	machine_config_constructor device_mconfig_additions() const override;
 	ioport_constructor device_input_ports() const override;
 
@@ -149,7 +150,7 @@ private:
 	int     m_rom_page;
 
 	// HFDC on-board SRAM (8K or 32K)
-	UINT8*  m_buffer_ram;
+	required_device<ram_device> m_buffer_ram;
 
 	// RAM page registers
 	int     m_ram_page[4];

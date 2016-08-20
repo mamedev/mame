@@ -369,7 +369,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *victor_9000_keyboard_t::device_rom_region() const
+const tiny_rom_entry *victor_9000_keyboard_t::device_rom_region() const
 {
 	return ROM_NAME( victor9k_keyboard );
 }
@@ -687,10 +687,8 @@ WRITE8_MEMBER( victor_9000_keyboard_t::kb_p2_w )
 	if (!BIT(data, 0))
 	{
 		m_y = m_p1 & 0x0f;
+		m_y12 = BIT(data, 2);
 	}
-
-	// keyboard row 12
-	m_y12 = BIT(data, 2);
 
 	// keyboard ready
 	m_kbrdy_cb(BIT(data, 1));

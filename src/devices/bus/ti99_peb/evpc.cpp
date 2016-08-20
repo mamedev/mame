@@ -453,7 +453,7 @@ INPUT_PORTS_START( ti99_evpc )
 		PORT_DIPSETTING(    0x01, "NOVRAM" )
 INPUT_PORTS_END
 
-const rom_entry *snug_enhanced_video_device::device_rom_region() const
+const tiny_rom_entry *snug_enhanced_video_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_evpc );
 }

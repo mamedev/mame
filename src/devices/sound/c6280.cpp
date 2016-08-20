@@ -239,25 +239,13 @@ c6280_device::c6280_device(const machine_config &mconfig, const char *tag, devic
 }
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  calculate_clocks - (re)calculate clock-derived
+//  members
 //-------------------------------------------------
 
-void c6280_device::device_start()
+void c6280_device::calculate_clocks()
 {
 	int rate = clock() / 16;
-
-	/* Create stereo stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
-
-	/* Loudest volume level for table */
-	double level = 65535.0 / 6.0 / 32.0;
-
-	/* Clear context */
-	m_select = 0;
-	m_balance = 0;
-	m_lfo_frequency = 0;
-	m_lfo_control = 0;
-	memset(m_channel, 0, sizeof(channel) * 8);
 
 	/* Make waveform frequency table */
 	for (int i = 0; i < 4096; i += 1)
@@ -272,6 +260,35 @@ void c6280_device::device_start()
 		double step = ((clock() / rate) * 32) / (i+1);
 		m_noise_freq_tab[i] = (UINT32)step;
 	}
+
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
+}
+
+void c6280_device::device_clock_changed()
+{
+	calculate_clocks();
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void c6280_device::device_start()
+{
+	/* Loudest volume level for table */
+	double level = 65535.0 / 6.0 / 32.0;
+
+	/* Clear context */
+	m_select = 0;
+	m_balance = 0;
+	m_lfo_frequency = 0;
+	m_lfo_control = 0;
+	memset(m_channel, 0, sizeof(channel) * 8);
+
+	calculate_clocks();
 
 	/* Make volume table */
 	/* PSG has 48dB volume range spread over 32 steps */

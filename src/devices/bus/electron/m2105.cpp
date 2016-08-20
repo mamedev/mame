@@ -113,7 +113,7 @@ machine_config_constructor electron_m2105_device::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME( m2105 );
 }
 
-const rom_entry *electron_m2105_device::device_rom_region() const
+const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 {
 	return ROM_NAME( m2105 );
 }

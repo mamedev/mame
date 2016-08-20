@@ -1308,7 +1308,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 	switch (offset)
 	{
 		case 0x11:
-			logerror("%05X:ERROR - read from 80186 EOI\n", pc());
+			if (LOG_PORTS) logerror("%05X:ERROR - read from 80186 EOI\n", pc());
 			break;
 
 		case 0x12:
@@ -1397,7 +1397,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 
 		case 0x2a:
 		case 0x2e:
-			logerror("%05X:read 80186 Timer %d max B\n", pc(), (offset - 0x2a) / 4);
+			if (LOG_PORTS) logerror("%05X:read 80186 Timer %d max B\n", pc(), (offset - 0x2a) / 4);
 			which = (offset - 0x2a) / 4;
 			return m_timer[which].maxB;
 
@@ -1468,7 +1468,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 			return m_reloc;
 
 		default:
-			logerror("%05X:read 80186 port %02X\n", pc(), offset);
+			if (LOG_PORTS) logerror("%05X:read 80186 port %02X\n", pc(), offset);
 			break;
 	}
 
@@ -1494,11 +1494,11 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 			break;
 
 		case 0x12:
-			logerror("%05X:ERROR - write to 80186 interrupt poll = %04X\n", pc(), data);
+			if (LOG_PORTS) logerror("%05X:ERROR - write to 80186 interrupt poll = %04X\n", pc(), data);
 			break;
 
 		case 0x13:
-			logerror("%05X:ERROR - write to 80186 interrupt poll status = %04X\n", pc(), data);
+			if (LOG_PORTS) logerror("%05X:ERROR - write to 80186 interrupt poll status = %04X\n", pc(), data);
 			break;
 
 		case 0x14:
@@ -1704,7 +1704,7 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 			break;
 
 		default:
-			logerror("%05X:80186 port %02X = %04X\n", pc(), offset, data);
+			if (LOG_PORTS) logerror("%05X:80186 port %02X = %04X\n", pc(), offset, data);
 			break;
 	}
 }

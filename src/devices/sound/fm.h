@@ -113,6 +113,11 @@ void * ym2203_init(void *param, device_t *device, int baseclock, int rate,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 
 /*
+** YM2203 clock changed notifier
+*/
+void ym2203_clock_changed(void *chip, int clock, int rate);
+
+/*
 ** shutdown the YM2203 emulators
 */
 void ym2203_shutdown(void *chip);

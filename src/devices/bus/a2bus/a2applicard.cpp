@@ -66,7 +66,7 @@ machine_config_constructor a2bus_applicard_device::device_mconfig_additions() co
 //  device_rom_region - device-specific ROMs
 //-------------------------------------------------
 
-const rom_entry *a2bus_applicard_device::device_rom_region() const
+const tiny_rom_entry *a2bus_applicard_device::device_rom_region() const
 {
 	return ROM_NAME( a2applicard );
 }

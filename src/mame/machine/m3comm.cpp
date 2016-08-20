@@ -318,10 +318,10 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
 		send_size = (send_size >> 8) | (data << 8);
 		break;
 	case 0x88 / 2:
-		m_status0 = (m_status0 & ~mem_mask) | (data & mem_mask);
+		COMBINE_DATA(&m_status0);
 		break;
 	case 0x8A / 2:
-		m_status1 = (m_status1 & ~mem_mask) | (data & mem_mask);
+		COMBINE_DATA(&m_status1);
 		break;
 	case 0xC0 / 2:
 		m_commcpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);

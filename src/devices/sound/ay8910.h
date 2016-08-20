@@ -106,6 +106,7 @@ public:
 
 	// static configuration helpers
 	static void set_flags(device_t &device, int flags) { downcast<ay8910_device &>(device).m_flags = flags; }
+	static void set_psg_type(device_t &device, psg_type_t psg_type) { downcast<ay8910_device &>(device).set_type(psg_type); }
 	static void set_resistors_load(device_t &device, int res_load0, int res_load1, int res_load2) { downcast<ay8910_device &>(device).m_res_load[0] = res_load0; downcast<ay8910_device &>(device).m_res_load[1] = res_load1; downcast<ay8910_device &>(device).m_res_load[2] = res_load2; }
 	template<class _Object> static devcb_base &set_port_a_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_read_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_port_b_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_b_read_cb.set_callback(object); }
@@ -158,6 +159,7 @@ protected:
 
 private:
 	// internal helpers
+	void set_type(psg_type_t psg_type);
 	inline UINT16 mix_3D();
 	void ay8910_write_reg(int r, int v);
 	void build_mixer_table();

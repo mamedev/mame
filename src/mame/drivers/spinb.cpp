@@ -379,7 +379,7 @@ WRITE8_MEMBER( spinb_state::ppi60a_w )
 {
 	if (data)
 		for (UINT8 i = 0; i < 8; i++)
-			if BIT(data, i)
+			if (BIT(data, i))
 				m_row = i;
 }
 
@@ -388,7 +388,7 @@ WRITE8_MEMBER( spinb_state::ppi60b_w )
 {
 	if (data & 7)
 		for (UINT8 i = 0; i < 3; i++)
-			if BIT(data, i)
+			if (BIT(data, i))
 				m_row = i+8;
 }
 
@@ -403,11 +403,9 @@ WRITE8_MEMBER( spinb_state::sndbank_a_w )
 
 	if (!BIT(data, 6))
 		m_sound_addr_a |= (1<<19);
-	else
-	if (!BIT(data, 5))
+	else if (!BIT(data, 5))
 		m_sound_addr_a |= (2<<19);
-	else
-	if BIT(data, 7)
+	else if (BIT(data, 7))
 		m_sndbank_a = 0xff;
 }
 
@@ -418,11 +416,9 @@ WRITE8_MEMBER( spinb_state::sndbank_m_w )
 
 	if (!BIT(data, 6))
 		m_sound_addr_m |= (1<<19);
-	else
-	if (!BIT(data, 5))
+	else if (!BIT(data, 5))
 		m_sound_addr_m |= (2<<19);
-	else
-	if BIT(data, 7)
+	else if (BIT(data, 7))
 		m_sndbank_m = 0xff;
 }
 

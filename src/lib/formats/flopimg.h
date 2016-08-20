@@ -164,8 +164,8 @@ LEGACY_FLOPPY_OPTIONS_EXTERN(default);
 OPTION_GUIDE_EXTERN(floppy_option_guide);
 
 /* opening, closing and creating of floppy images */
-floperr_t floppy_open(void *fp, const struct io_procs *procs, const char *extension, const struct FloppyFormat *format, int flags, floppy_image_legacy **outfloppy);
-floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const char *extension, const struct FloppyFormat *formats, int flags, floppy_image_legacy **outfloppy);
+floperr_t floppy_open(void *fp, const struct io_procs *procs, const std::string &extension, const struct FloppyFormat *format, int flags, floppy_image_legacy **outfloppy);
+floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const std::string &extension, const struct FloppyFormat *formats, int flags, floppy_image_legacy **outfloppy);
 floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct FloppyFormat *format, util::option_resolution *parameters, floppy_image_legacy **outfloppy);
 void floppy_close(floppy_image_legacy *floppy);
 

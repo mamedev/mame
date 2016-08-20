@@ -15,7 +15,6 @@
 #include <type_traits>
 #include <cmath>
 
-#include "palloc.h"
 #include "pstring.h"
 
 namespace plib {
@@ -44,12 +43,12 @@ public:
 
 	size_t size() { return N; }
 
-	C& operator[](const std::size_t &index)
+	C& operator[](const std::size_t &index) noexcept
 	{
 		return *reinterpret_cast<C *>(&m_buf[index]);
 	}
 
-	const C& operator[](const std::size_t &index) const
+	const C& operator[](const std::size_t &index) const noexcept
 	{
 		return *reinterpret_cast<C *>(&m_buf[index]);
 	}
@@ -86,7 +85,7 @@ public:
 
 		element_t() : m_next(nullptr) {}
 
-		LC *next() const { return m_next; }
+		LC *next() const noexcept { return m_next; }
 	private:
 		LC * m_next;
 	};
@@ -108,8 +107,8 @@ public:
 
 	linkedlist_t() : m_head(nullptr) {}
 
-	iter_t begin() const { return iter_t(m_head); }
-	constexpr iter_t end() const { return iter_t(nullptr); }
+	iter_t begin() const noexcept { return iter_t(m_head); }
+	constexpr iter_t end() const noexcept { return iter_t(nullptr); }
 
 	void push_front(LC *elem)
 	{

@@ -146,7 +146,7 @@ ROM_START( aga )
 	ROM_LOAD("50146 char d1.0 euro.u16", 0x00000, 0x02000, CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //D1.0
 ROM_END
 
-const rom_entry *isa8_aga_device::device_rom_region() const
+const tiny_rom_entry *isa8_aga_device::device_rom_region() const
 {
 	return ROM_NAME( aga );
 }
@@ -177,7 +177,7 @@ ROM_START( aga_pc200 )
 	ROM_LOAD("40109.ic159",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
-const rom_entry *isa8_aga_pc200_device::device_rom_region() const
+const tiny_rom_entry *isa8_aga_pc200_device::device_rom_region() const
 {
 	return ROM_NAME( aga_pc200 );
 }

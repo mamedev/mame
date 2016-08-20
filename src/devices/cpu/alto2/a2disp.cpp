@@ -245,11 +245,14 @@ static const UINT16 double_bits[256] = {
 //! update the internal frame buffer and draw the scanline segment if changed
 void alto2_cpu_device::update_framebuf_word(UINT16* framebuf, int x, int y, UINT16 word)
 {
+	if (y >= A2_DISP_TOTAL_HEIGHT)
+		return;
+	int xpword = (m_dsp.xpreg ^ 01777) / 16;
 	// mixing with the cursor
-	if (x == m_dsp.curxpos + 0)
-		word ^= m_dsp.cursor0;
-	if (x == m_dsp.curxpos + 1)
-		word ^= m_dsp.cursor1;
+	if (x == xpword++)
+		word ^= (m_dsp.csr << (m_dsp.xpreg % 16)) >> 16;
+	if (x == xpword)
+		word ^= (m_dsp.csr << (m_dsp.xpreg % 16)) & 0xffff;
 	// no change?
 	if (word == framebuf[x])
 		return;
@@ -263,14 +266,13 @@ void alto2_cpu_device::update_framebuf_word(UINT16* framebuf, int x, int y, UINT
 void alto2_cpu_device::unload_word()
 {
 	int x = m_unload_word;
-	int y = ((m_dsp.hlc - m_dsp.vblank) & ~02001) ^ HLC1024;
+	int y = m_dsp.scanline;
 
-	if (y < 0 || y >= ALTO2_DISPLAY_HEIGHT || x >= ALTO2_DISPLAY_VISIBLE_WORDS)
-	{
+	if (x >= A2_DISP_VISIBLE_WORDS) {
 		m_unload_time = -1;
 		return;
 	}
-	UINT16* framebuf = m_dsp.framebuf.get()  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
+	UINT16* framebuf = m_dsp.framebuf.get() + y * A2_DISP_SCANLINE_WORDS;
 	UINT16 word = m_dsp.inverse;
 	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (FIFO_MBEMPTY(a38))
@@ -280,9 +282,9 @@ void alto2_cpu_device::unload_word()
 	else
 	{
 		word ^= m_dsp.fifo[m_dsp.ra];
-		m_dsp.ra = (m_dsp.ra + 1) % ALTO2_DISPLAY_FIFO;
+		m_dsp.ra = (m_dsp.ra + 1) % A2_DISP_FIFO;
 		LOG((this,LOG_DISPL,3, " DSP pull %04x from FIFO[%02o] y:%d x:%d\n",
-				word, (m_dsp.ra - 1) & (ALTO2_DISPLAY_FIFO - 1), y, x));
+				word, (m_dsp.ra - 1) & (A2_DISP_FIFO - 1), y, x));
 	}
 
 	if (m_dsp.halfclock)
@@ -290,21 +292,21 @@ void alto2_cpu_device::unload_word()
 		const UINT16 word1 = double_bits[word / 256];
 		update_framebuf_word(framebuf, x, y, word1);
 		x++;
-		if (x < ALTO2_DISPLAY_VISIBLE_WORDS)
+		if (x < A2_DISP_VISIBLE_WORDS)
 		{
 			const UINT16 word2 = double_bits[word % 256];
 			update_framebuf_word(framebuf, x, y, word2);
 			x++;
 		}
-		m_unload_time += ALTO2_DISPLAY_BITTIME(32);
+		m_unload_time += A2_DISP_BITTIME(32);
 	}
 	else
 	{
 		update_framebuf_word(framebuf, x, y, word);
 		x++;
-		m_unload_time += ALTO2_DISPLAY_BITTIME(16);
+		m_unload_time += A2_DISP_BITTIME(16);
 	}
-	if (x < ALTO2_DISPLAY_VISIBLE_WORDS)
+	if (x < A2_DISP_VISIBLE_WORDS)
 		m_unload_word = x;
 	else
 		m_unload_time = -1;
@@ -329,8 +331,12 @@ void alto2_cpu_device::display_state_machine()
 	{
 		// count horizontal line counters and wrap
 		m_dsp.hlc += 1;
-		if (m_dsp.hlc > ALTO2_DISPLAY_HLC_END)
-			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
+		if (m_dsp.hlc > A2_DISP_HLC_END) {
+			m_dsp.hlc = A2_DISP_HLC_START;
+			m_dsp.scanline = 0;
+		} else if (m_dsp.hlc == 1024) {
+			m_dsp.scanline = 1;
+		}
 		// wake up the memory refresh task _twice_ on each scanline
 		m_task_wakeup |= 1 << task_mrt;
 	}
@@ -342,10 +348,16 @@ void alto2_cpu_device::display_state_machine()
 
 	if (A66_VBLANK(a66))
 	{
-		// Rising edge of VBLANK: remember HLC[1-10] where the VBLANK starts
-		m_dsp.vblank = m_dsp.hlc & ~(1 << 10);
-
 		LOG((this,LOG_DISPL,1, " VBLANK"));
+		// Rising edge of VBLANK?
+		if (!A66_VBLANK(m_dsp.a66)) {
+			// synchronize on MAME video timing
+			if (!m_dsp.vblank) {
+				m_display_time += A2_DISP_BITTIME(1);
+				return;
+			}
+			m_dsp.vblank = false;
+		}
 
 		// VSYNC is always within VBLANK, thus we handle it only here
 		if (A66_VSYNC(a66) && !A66_VSYNC(m_dsp.a66))
@@ -357,6 +369,7 @@ void alto2_cpu_device::display_state_machine()
 			 */
 			m_task_wakeup |= 1 << task_dvt;
 		}
+		m_dsp.inverse = 0xffff;
 	}
 	else
 	{
@@ -385,9 +398,10 @@ void alto2_cpu_device::display_state_machine()
 		}
 		if (!A63_HBLANK(a63) && A63_HBLANK(m_dsp.a63))
 		{
+			m_dsp.scanline += 2;
 			// Falling edge of a63 HBLANK starts unloading of FIFO words
 			LOG((this,LOG_DISPL,1, " HBLANK\\ UNLOAD"));
-			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
+			m_unload_time = A2_DISP_BITTIME(m_dsp.halfclock ? 40+32 : 40+16);
 			m_unload_word = 0;
 		}
 	}
@@ -460,7 +474,7 @@ void alto2_cpu_device::display_state_machine()
 	m_dsp.a63 = a63;
 	m_dsp.a66 = a66;
 	m_dsp.state = next;
-	m_dsp_time += ALTO2_DISPLAY_BITTIME(32);
+	m_display_time += A2_DISP_BITTIME(32);
 }
 
 /**
@@ -499,20 +513,16 @@ void alto2_cpu_device::init_disp()
 	save_item(NAME(m_dsp.dwt_blocks));
 	save_item(NAME(m_dsp.curt_blocks));
 	save_item(NAME(m_dsp.curt_wakeup));
-	save_item(NAME(m_dsp.vblank));
 	save_item(NAME(m_dsp.xpreg));
 	save_item(NAME(m_dsp.csr));
-	save_item(NAME(m_dsp.curxpos));
-	save_item(NAME(m_dsp.cursor0));
-	save_item(NAME(m_dsp.cursor1));
 
 	m_disp_a38 = prom_load(machine(), &pl_displ_a38, memregion("displ_a38")->base());
 	m_disp_a63 = prom_load(machine(), &pl_displ_a63, memregion("displ_a63")->base());
 	m_disp_a66 = prom_load(machine(), &pl_displ_a66, memregion("displ_a66")->base());
 
-	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
+	m_dsp.hlc = A2_DISP_HLC_START;
 
-	m_dsp.framebuf = std::make_unique<UINT16[]>(ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	m_dsp.framebuf = std::make_unique<UINT16[]>(A2_DISP_TOTAL_HEIGHT * A2_DISP_SCANLINE_WORDS);
 	m_dsp.patterns = auto_alloc_array(machine(), UINT8, 65536 * 16);
 	for (int y = 0; y < 65536; y++) {
 		UINT8* dst = m_dsp.patterns + y * 16;
@@ -520,7 +530,8 @@ void alto2_cpu_device::init_disp()
 			*dst++ = (~y >> (15 - x)) & 1;
 	}
 
-	m_dsp.bitmap = std::make_unique<bitmap_ind16>(ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT);
+	// Allocate a bitmap including the V/H blank areas
+	m_dsp.bitmap = std::make_unique<bitmap_ind16>(A2_DISP_TOTAL_WIDTH, A2_DISP_TOTAL_HEIGHT);
 	m_dsp.state = 0;
 }
 
@@ -532,11 +543,12 @@ void alto2_cpu_device::exit_disp()
 void alto2_cpu_device::reset_disp()
 {
 	m_dsp.state = 0;
-	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
+	m_dsp.hlc = A2_DISP_HLC_START;
 	m_dsp.a63 = 0;
 	m_dsp.a66 = 0;
 	m_dsp.setmode = 0;
 	m_dsp.inverse = 0;
+	m_dsp.scanline = 0;
 	m_dsp.halfclock = false;
 	m_dsp.wa = 0;
 	m_dsp.ra = 0;
@@ -544,13 +556,10 @@ void alto2_cpu_device::reset_disp()
 	m_dsp.dwt_blocks = false;
 	m_dsp.curt_blocks = false;
 	m_dsp.curt_wakeup = false;
-	m_dsp.vblank = 0;
+	m_dsp.vblank = false;
 	m_dsp.xpreg = 0;
 	m_dsp.csr = 0;
-	m_dsp.curxpos = 0;
-	m_dsp.cursor0 = 0;
-	m_dsp.cursor1 = 0;
-	memset(m_dsp.framebuf.get(), 1, sizeof(UINT16) * ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	memset(m_dsp.framebuf.get(), 1, sizeof(UINT16) * A2_DISP_HEIGHT * A2_DISP_SCANLINE_WORDS);
 }
 
 /* Video update */
@@ -560,7 +569,7 @@ UINT32 alto2_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void alto2_cpu_device::screen_eof(screen_device &screen, bool state)
+void alto2_cpu_device::screen_vblank()
 {
-	// FIXME: do we need this in some way?
+	m_dsp.vblank = true;
 }

@@ -100,7 +100,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c64_currah_speech_cartridge_device::device_rom_region() const
+const tiny_rom_entry *c64_currah_speech_cartridge_device::device_rom_region() const
 {
 	return ROM_NAME( c64_currah_speech );
 }

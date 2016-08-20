@@ -79,14 +79,14 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 
 READ64_MEMBER(segasp_state::sp_bank_r)
 {
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_bank;
 }
 
 WRITE64_MEMBER(segasp_state::sp_bank_w)
 {
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 		return;
 	UINT16 bank = data & 0xffff;
 	if (bank != m_sp_bank)
@@ -116,14 +116,14 @@ WRITE64_MEMBER(segasp_state::sn_93c46a_w)
 
 READ64_MEMBER(segasp_state::sp_eeprom_r)
 {
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_eeprom->do_read() << 4;
 }
 
 WRITE64_MEMBER(segasp_state::sp_eeprom_w)
 {
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 		return;
 	m_sp_eeprom->di_write(data & 1);
 	m_sp_eeprom->cs_write((data & 2) ? ASSERT_LINE : CLEAR_LINE);
@@ -144,7 +144,7 @@ READ64_MEMBER(segasp_state::sp_io_r)
 	int reg = offset * 2;
 	int shift = 0;
 
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 	{
 		reg++;
 		shift = 32;

@@ -22,7 +22,7 @@ ROM_START( cpc_transtape )
 	ROM_LOAD( "tta.rom",   0x0000, 0x4000, CRC(c568da76) SHA1(cc509d21216bf11d40f9a3e0791ef7f4ada03790) )
 ROM_END
 
-const rom_entry *cpc_transtape_device::device_rom_region() const
+const tiny_rom_entry *cpc_transtape_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_transtape );
 }

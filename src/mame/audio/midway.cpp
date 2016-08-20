@@ -413,7 +413,7 @@ ROM_END
 //  the device's ROM definitions
 //-------------------------------------------------
 
-const rom_entry *midway_ssio_device::device_rom_region() const
+const tiny_rom_entry *midway_ssio_device::device_rom_region() const
 {
 	return ROM_NAME(midway_ssio);
 }

@@ -192,10 +192,6 @@ public:
 	int m_videoROM_address;
 	DECLARE_READ8_MEMBER(lisa_fdc_io_r);
 	DECLARE_WRITE8_MEMBER(lisa_fdc_io_w);
-	DECLARE_READ8_MEMBER(lisa_fdc_r);
-	DECLARE_READ8_MEMBER(lisa210_fdc_r);
-	DECLARE_WRITE8_MEMBER(lisa_fdc_w);
-	DECLARE_WRITE8_MEMBER(lisa210_fdc_w);
 	DECLARE_READ16_MEMBER(lisa_r);
 	DECLARE_WRITE16_MEMBER(lisa_w);
 	DECLARE_READ16_MEMBER(lisa_IO_r);

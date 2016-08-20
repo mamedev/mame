@@ -48,7 +48,7 @@ machine_config_constructor isa16_svga_tgui9680_device::device_mconfig_additions(
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_tgui9680_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_tgui9680_device::device_rom_region() const
 {
 	return ROM_NAME( tgui9680 );
 }

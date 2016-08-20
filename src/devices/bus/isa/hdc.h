@@ -38,6 +38,7 @@ public:
 	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_drq_handler.set_callback(object); }
 
 	int dack_r();
+	int dack_rs();
 	void dack_w(int data);
 	void dack_ws(int data);
 
@@ -50,6 +51,7 @@ public:
 	UINT8 status_r();
 	void set_ready();
 	UINT8 get_command() { return buffer[0]; }
+	bool install_rom() { return (m_type != EC1841); }
 
 protected:
 	// device-level overrides
@@ -61,6 +63,7 @@ protected:
 	int no_dma(void);
 	int get_lbasector();
 	void execute_read();
+	void execute_readsbuff();
 	void execute_write();
 	void execute_writesbuff();
 	void get_drive();
@@ -153,7 +156,7 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual ioport_constructor device_input_ports() const override;
 protected:
 		// device-level overrides

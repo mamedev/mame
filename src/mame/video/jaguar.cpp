@@ -543,7 +543,7 @@ READ32_MEMBER( jaguar_state::blitter_r )
 WRITE32_MEMBER( jaguar_state::blitter_w )
 {
 	COMBINE_DATA(&m_blitter_regs[offset]);
-	if ((offset == B_CMD) && (mem_mask & 0x0000ffff))
+	if ((offset == B_CMD) && ACCESSING_BITS_0_15)
 	{
 		m_blitter_status = 0;
 		int inner_count = m_blitter_regs[B_COUNT] & 0xffff;

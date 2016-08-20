@@ -377,7 +377,7 @@ ROM_START( isbc_215g )
 	ROM_LOAD16_BYTE( "174581.002.bin", 0x0001, 0x2000, CRC(6190fa67) SHA1(295dd4e75f699aaf93227cc4876cee8accae383a))
 ROM_END
 
-const rom_entry *isbc_215g_device::device_rom_region() const
+const tiny_rom_entry *isbc_215g_device::device_rom_region() const
 {
 	return ROM_NAME( isbc_215g );
 }
