@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    cassimg.c
+    cassimg.cpp
 
     Cassette tape image abstraction code
 
@@ -109,13 +109,24 @@ static void cassette_finishinit(cassette_image::error err, cassette_image *casse
 
 
 
-static bool good_format(const struct CassetteFormat *format, const std::string &extension, int flags)
+static cassette_image::error try_identify_format(const struct CassetteFormat &format, cassette_image *image, const std::string &extension, int flags, struct CassetteOptions &opts)
 {
-	if (!extension.empty() && !image_find_extension(format->extensions, extension.c_str()))
-		return false;
-	if (((flags & CASSETTE_FLAG_READONLY) == 0) && !format->save)
-		return false;
-	return true;
+	// is this the right extension?
+	if (!extension.empty() && !image_find_extension(format.extensions, extension.c_str()))
+		return cassette_image::error::INVALID_IMAGE;
+
+	// invoke format->identify
+	memset(&opts, 0, sizeof(opts));
+	cassette_image::error err = format.identify(image, &opts);
+	if (err != cassette_image::error::SUCCESS)
+		return err;
+
+	// is this a read only format, but the cassette was not opened read only?
+	if (((flags & CASSETTE_FLAG_READONLY) == 0) && (format.save == nullptr))
+		return cassette_image::error::READ_WRITE_UNSUPPORTED;
+
+	// success!
+	return cassette_image::error::SUCCESS;
 }
 
 
@@ -145,16 +156,14 @@ cassette_image::error cassette_open_choices(void *file, const struct io_procs *p
 	format = nullptr;
 	for (i = 0; !format && formats[i]; i++)
 	{
-		if (good_format(formats[i], extension, flags))
-		{
+		// try this format
+		err = try_identify_format(*formats[i], cassette, extension, flags, opts);
+		if (err != cassette_image::error::SUCCESS && err != cassette_image::error::INVALID_IMAGE)
+			goto done;
+
+		// did we succeed?
+		if (err == cassette_image::error::SUCCESS)
 			format = formats[i];
-			memset(&opts, 0, sizeof(opts));
-			err = format->identify(cassette, &opts);
-			if (err == cassette_image::error::INVALID_IMAGE)
-				format = nullptr;
-			else if (err != cassette_image::error::SUCCESS)
-				goto done;
-		}
 	}
 
 	/* have we found a proper format */
@@ -208,7 +217,7 @@ cassette_image::error cassette_create(void *file, const struct io_procs *procs, 
 		return cassette_image::error::INVALID_IMAGE;
 
 	/* is this a good format? */
-	if (!good_format(format, nullptr, flags))
+	if (format->save == nullptr)
 		return cassette_image::error::INVALID_IMAGE;
 
 	/* normalize arguments */
