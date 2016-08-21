@@ -231,20 +231,6 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="26-3089" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="canyon climber (1982)(26-3089)(datasoft)[!].rom" size="8192" crc="aa214e43" sha1="ac5d771b3fd692de72d69945ae1fa4788db54538" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cclimbra" cloneof="cclimber">
-		<description>Canyon Climber (Alt)</description>
-		<year>1982</year>
-		<publisher>Tandy</publisher>
-		<info name="developer" value="Datasoft" />
-		<info name="author" value="James Garon" />
-		<info name="serial" value="26-3089" />
-		<part name="cart" interface="coco_cart">
-			<dataarea name="rom" size="8192">
 				<rom name="canyon climber (1982) (26-3089) (datasoft) [a1].rom" size="8192" crc="23e3869f" sha1="b064b863b0e621bdfece76a0ac7b11301b5d8528" offset="0" />
 			</dataarea>
 		</part>
