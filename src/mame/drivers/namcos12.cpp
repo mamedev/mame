@@ -22,8 +22,8 @@
       which is called by the routine at 3FEA.  It is not clear how execution is intended to get to 3FEA - there are no direct
       branches to that location, and the bytes 3F EA don't appear at all in the program.
 	  
-	- technodr: printer not emulated. To play the game, press F2 to enter the test menu, navigate to GAME OPTIONS and disable
-	  the printer by setting "PRINTER" to OFF.
+    - technodr: printer not emulated. To play the game, press F2 to enter the test menu, navigate to GAME OPTIONS and disable
+      the printer by setting "PRINTER" to OFF.
 
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
