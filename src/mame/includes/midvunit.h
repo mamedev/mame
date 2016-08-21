@@ -96,7 +96,11 @@ public:
 	UINT8 m_video_changed;
 	emu_timer *m_scanline_timer;
 	std::unique_ptr<midvunit_renderer> m_poly;
+<<<<<<< master
 	UINT32 lamps;
+=======
+	UINT8 m_output_mode;
+>>>>>>> local
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
@@ -132,8 +136,12 @@ public:
 	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
 	DECLARE_WRITE8_MEMBER(midvplus_xf1_w);
 	DECLARE_READ32_MEMBER(generic_speedup_r);
+<<<<<<< master
 	DECLARE_READ32_MEMBER(lamps_r);
 	DECLARE_WRITE32_MEMBER(lamps_w);
+=======
+	DECLARE_WRITE32_MEMBER(midvunit_output_w);
+>>>>>>> local
 	DECLARE_DRIVER_INIT(crusnu40);
 	DECLARE_DRIVER_INIT(crusnu21);
 	DECLARE_DRIVER_INIT(crusnwld);

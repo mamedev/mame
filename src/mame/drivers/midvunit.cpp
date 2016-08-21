@@ -55,7 +55,11 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_last_port0));
 	save_item(NAME(m_shifter_state));
 	save_item(NAME(m_timer_rate));
+<<<<<<< master
 	save_item(NAME(lamps));
+=======
+	save_item(NAME(m_output_mode));
+>>>>>>> local
 }
 
 
@@ -372,6 +376,25 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 	m_midway_serial_pic2->write(space, 0, data >> 16);
 }
 
+WRITE32_MEMBER(midvunit_state::midvunit_output_w)
+{
+	int bit;
+	UINT8 op = (data >> 8) & 0x0F;
+	UINT8 arg = data & 0xFF;
+	switch (op) {
+		case 0x7: m_output_mode = arg; break;
+		case 0xB:
+		switch (m_output_mode) {
+			//case 0x4: wheel angle
+			case 0x5:
+			for (bit = 0; bit < 8; bit++) {
+				output().set_lamp_value(bit, (arg >> bit) & 0x1);
+			}
+			break;
+		}
+		break;
+	}
+}
 
 
 /*************************************
@@ -478,7 +501,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
 	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995000, 0x995000) AM_WRITENOP    // force feedback?
+	AM_RANGE(0x995000, 0x995000) AM_WRITE(midvunit_output_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP // communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
@@ -1847,6 +1870,7 @@ GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, crusnu21,
 
 GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+<<<<<<< master
 GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, crusnw23, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, crusnw20, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, crusnw19, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
@@ -1858,6 +1882,19 @@ GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, offroadc, 
 GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, offroadc,  ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, offroadc,  ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, offroadc1, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+=======
+GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+
+GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+>>>>>>> local
 
 GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )
