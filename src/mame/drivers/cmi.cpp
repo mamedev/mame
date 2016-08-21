@@ -426,11 +426,6 @@ public:
 
 	DECLARE_DRIVER_INIT( cmi2x );
 
-	DECLARE_WRITE8_MEMBER( acia_control_w );
-	DECLARE_WRITE8_MEMBER( acia_data_w );
-	DECLARE_READ8_MEMBER( acia_status_r );
-	DECLARE_READ8_MEMBER( acia_data_r );
-
 	// CPU card
 	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq0 );
 	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq1 );
@@ -1023,34 +1018,6 @@ static ADDRESS_MAP_START( maincpu2_map, AS_PROGRAM, 8, cmi_state )
 	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r)
 ADDRESS_MAP_END
 
-
-READ8_MEMBER( cmi_state::acia_status_r )
-{
-	UINT8 ret = m_acia_mkbd_cmi->status_r(space, offset);
-	//printf("cmi acia_status_r: %02x\n", ret);
-	return ret;
-}
-
-READ8_MEMBER( cmi_state::acia_data_r )
-{
-	UINT8 ret = m_acia_mkbd_cmi->data_r(space, offset);
-	//printf("cmi acia_data_r: %02x\n", ret);
-	machine().debug_break();
-	return ret;
-}
-
-WRITE8_MEMBER( cmi_state::acia_data_w )
-{
-	m_acia_mkbd_cmi->data_w(space, offset, data, mem_mask);
-	//printf("cmi acia_data_w: %02x\n", data);
-}
-
-WRITE8_MEMBER( cmi_state::acia_control_w )
-{
-	m_acia_mkbd_cmi->control_w(space, offset, data, mem_mask);
-	//printf("cmi acia_control_w: %02x\n", data);
-}
-
 static ADDRESS_MAP_START( muskeys_map, AS_PROGRAM, 8, cmi_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM
@@ -1058,10 +1025,8 @@ static ADDRESS_MAP_START( muskeys_map, AS_PROGRAM, 8, cmi_state)
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("cmi10_pia_u20", pia6821_device, read, write)
 	AM_RANGE(0x00a0, 0x00a0) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, status_r, control_w)
 	AM_RANGE(0x00a1, 0x00a1) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, data_r, data_w)
-	//AM_RANGE(0x00b0, 0x00b0) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, status_r, control_w)
-	//AM_RANGE(0x00b1, 0x00b1) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, data_r, data_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_READWRITE(acia_status_r, acia_control_w)
-	AM_RANGE(0x00b1, 0x00b1) AM_READWRITE(acia_data_r, acia_data_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, status_r, control_w)
+	AM_RANGE(0x00b1, 0x00b1) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, data_r, data_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0xb000, 0xb400) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
