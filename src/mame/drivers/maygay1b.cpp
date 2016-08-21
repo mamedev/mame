@@ -635,7 +635,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 
 READ8_MEMBER( maygay1b_state::kbd_r )
 {
-	return (m_kbd_ports[m_lamp_strobe&0x07])->read();
+	return (m_kbd_ports[(m_lamp_strobe&0x07)^4])->read();
 }
 
 WRITE8_MEMBER( maygay1b_state::scanlines_2_w )
