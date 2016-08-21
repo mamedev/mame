@@ -94,8 +94,9 @@
   * unknown encrypted Royal Card (Dino4 HW),          unknown,            1998.
   * China Town (Ver 1B, Dino4 HW),                    unknown,            1998.
   * Unknown Inter Games poker,                        Inter Games,        1991.
-  * Unknown Funworld A7-11 game 1,                    Fun World,          1985.
-  * Unknown Funworld A7-11 game 2,                    Fun World,          1985.
+  * Unknown Fun World A7-11 game 1,                   Fun World,          1985.
+  * Unknown Fun World A7-11 game 2,                   Fun World,          1985.
+  * Unknown Fun World A0-1 game,                      Fun World,          1985.
 
 ***********************************************************************************
 
@@ -5975,6 +5976,21 @@ ROM_START( fw_a7_11a )
 	ROM_LOAD( "pal16l8acn_block.bin", 0x0000, 0x0117, CRC(fcda7872) SHA1(60acdb968e6229a8f71c2e29d22e132906a65bd5) )
 ROM_END
 
+/*
+  Unknown Funworld A0-1 game
+  CPU epoxy brick marked "Funworld A0-1".
+*/
+ROM_START( fw_a0_1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d27128.bin", 0xc000, 0x4000, CRC(67ac1337) SHA1(896bd30d4b061f08b8eeeb36aaceb7859f342eaf) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "10.bin", 0x0000, 0x8000, CRC(d34f0e63) SHA1(5984248331ec632b665f60ad553b74916630d4d3) )
+	ROM_LOAD( "9.bin",  0x8000, 0x8000, CRC(16aebfb3) SHA1(3a2c587b2c31341a83ec9e0f9dd188d4bb63e764) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147n.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
+ROM_END
 
 
 /**************************
@@ -6808,8 +6824,9 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw,
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   driver_device,  0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  driver_device,  0,        ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",          0,                       layout_novoplay )
 GAME(  1991, intrgmes,  0,        intrgmes, funworld,  driver_device,  0,        ROT0, "Inter Games",           "Unknown Inter Games poker",                 MACHINE_NOT_WORKING )
-GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Funworld A7-11 game 1",             MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Funworld A7-11 game 2",             MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 1",             MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 2",             MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a0_1,   0,        fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Fun World A0-1 game",                MACHINE_NOT_WORKING,     layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with NES multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
