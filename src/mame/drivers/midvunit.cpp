@@ -1744,38 +1744,21 @@ READ32_MEMBER(midvunit_state::generic_speedup_r)
 	return m_generic_speedup[offset];
 }
 
-READ32_MEMBER(midvunit_state::lamps_r)
-{
-	return lamps;
-}
 
-WRITE32_MEMBER(midvunit_state::lamps_w)
-{
-	COMBINE_DATA(&lamps);
-
-	int bit;
-	for (bit = 0; bit < 8; bit++) {
-		output().set_lamp_value(bit, (lamps >> bit) & 0x1);
-	}
-}
-
-
-void midvunit_state::init_crusnusa_common(offs_t speedup, offs_t lamp)
+void midvunit_state::init_crusnusa_common(offs_t speedup)
 {
 	m_adc_shift = 24;
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(lamp, lamp, read32_delegate(FUNC(midvunit_state::lamps_r),this), write32_delegate(FUNC(midvunit_state::lamps_w),this));
 
 	/* speedups */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
 	m_generic_speedup = m_ram_base + speedup;
 }
-DRIVER_INIT_MEMBER(midvunit_state,crusnusa)  { init_crusnusa_common(0xc93e, 0xc8cd); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnu40)  { init_crusnusa_common(0xc957, 0xc8e5); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnu21)  { init_crusnusa_common(0xc051, 0xbf2c); }
+DRIVER_INIT_MEMBER(midvunit_state,crusnusa)  { init_crusnusa_common(0xc93e); }
+DRIVER_INIT_MEMBER(midvunit_state,crusnu40)  { init_crusnusa_common(0xc957); }
+DRIVER_INIT_MEMBER(midvunit_state,crusnu21)  { init_crusnusa_common(0xc051); }
 
 
-void midvunit_state::init_crusnwld_common(offs_t speedup, offs_t lamp)
+void midvunit_state::init_crusnwld_common(offs_t speedup)
 {
 	m_adc_shift = 16;
 
@@ -1790,26 +1773,19 @@ void midvunit_state::init_crusnwld_common(offs_t speedup, offs_t lamp)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9d0000, 0x9d1fff, read32_delegate(FUNC(midvunit_state::bit_data_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9d0000, 0x9d0000, write32_delegate(FUNC(midvunit_state::bit_reset_w),this));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(lamp, lamp, read32_delegate(FUNC(midvunit_state::lamps_r),this), write32_delegate(FUNC(midvunit_state::lamps_w),this));
-
 	/* speedups */
 	if (speedup) {
 		m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
 		m_generic_speedup = m_ram_base + speedup;
 	}
 }
-DRIVER_INIT_MEMBER(midvunit_state,crusnwld)  { init_crusnwld_common(0xd4c0, 0xcc43); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnw23)  { init_crusnwld_common(0xd4c0, 0xcc47); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnw20)  { init_crusnwld_common(0xd4c0, 0xcc23); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnw19)  { init_crusnwld_common(0xd4c0, 0xcc20); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnw17)  { init_crusnwld_common(0xd4c0, 0xcc04); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnw13)  { init_crusnwld_common(0xd4c0, 0xccc1); }
+DRIVER_INIT_MEMBER(midvunit_state,crusnwld)  { init_crusnwld_common(0xd4c0); }
 #if 0
 DRIVER_INIT_MEMBER(midvunit_state,crusnw20)  { init_crusnwld_common(0xd49c); }
 DRIVER_INIT_MEMBER(midvunit_state,crusnw13)  { init_crusnwld_common(0); }
 #endif
 
-void midvunit_state::init_offroadc_common(offs_t speedup, offs_t lamp)
+DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 {
 	m_adc_shift = 16;
 
@@ -1819,14 +1795,10 @@ void midvunit_state::init_offroadc_common(offs_t speedup, offs_t lamp)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32_delegate(FUNC(midvunit_state::offroadc_serial_status_r),this));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::offroadc_serial_data_r),this), write32_delegate(FUNC(midvunit_state::offroadc_serial_data_w),this));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(lamp, lamp, read32_delegate(FUNC(midvunit_state::lamps_r),this), write32_delegate(FUNC(midvunit_state::lamps_w),this));
-
 	/* speedups */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
-	m_generic_speedup = m_ram_base + speedup;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x195aa, 0x195aa, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_generic_speedup = m_ram_base + 0x195aa;
 }
-DRIVER_INIT_MEMBER(midvunit_state,offroadc)   { init_offroadc_common(0x195aa, 0x19e16); }
-DRIVER_INIT_MEMBER(midvunit_state,offroadc1)  { init_offroadc_common(0x195aa, 0x19e17); }
 
 
 DRIVER_INIT_MEMBER(midvunit_state,wargods)
