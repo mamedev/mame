@@ -94,6 +94,8 @@
   * unknown encrypted Royal Card (Dino4 HW),          unknown,            1998.
   * China Town (Ver 1B, Dino4 HW),                    unknown,            1998.
   * Unknown Inter Games poker,                        Inter Games,        1991.
+  * Unknown Funworld A7-11 game 1,                    Fun World,          1985.
+  * Unknown Funworld A7-11 game 2,                    Fun World,          1985.
 
 ***********************************************************************************
 
@@ -1240,6 +1242,21 @@ static ADDRESS_MAP_START( intergames_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x3800, 0x3803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)  // WRONG. just a placeholder...
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fw_a7_11_map, AS_PROGRAM, 8, funworld_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x4000, 0x4000) AM_READNOP
+	AM_RANGE(0x8000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -3100,6 +3117,14 @@ static MACHINE_CONFIG_DERIVED( intrgmes, fw1stpal )
 	MCFG_CPU_PROGRAM_MAP(intergames_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( fw_a7_11, fw1stpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(fw_a7_11_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
+//	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
 MACHINE_CONFIG_END
 
 
@@ -5894,6 +5919,63 @@ ROM_START( royalcrd_msx )
 ROM_END
 
 
+/*
+  Unknown Funworld A7-11 game
+
+  CPU epoxy brick marked "Funworld A7-11", with:
+  1x RP65C02A
+  2x Toshiba TC5565PL1-12
+  1x Toshiba TMM24128AP
+  1x PAL16L8B-2CN
+  3x TTL's...
+
+  PCB components:
+  
+  2x Hitachi HD68B21P
+  1x Hitachi HD46505SP-2
+  1x GI AY-3-8910A
+
+  1x Toshiba TC5565APL-10
+  1x Hitachi HD6116LP-3
+  2x Toshiba TMM27256AD-20
+  1x Harris M3-7649A-5 Bipolar PROM.
+
+  1x Xtal 16.000 MHz.
+  1x 3.6V lithium battery.
+  1x 8 DIP switches bank.
+
+*/
+ROM_START( fw_a7_11 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tmm24128ap.bin", 0xc000, 0x4000, CRC(67ac1337) SHA1(896bd30d4b061f08b8eeeb36aaceb7859f342eaf) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "e-3.bin", 0x0000, 0x8000, CRC(d34f0e63) SHA1(5984248331ec632b665f60ad553b74916630d4d3) )
+	ROM_LOAD( "e-2.bin", 0x8000, 0x8000, CRC(16aebfb3) SHA1(3a2c587b2c31341a83ec9e0f9dd188d4bb63e764) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "m3-7649a-5.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pal16l8b-2cn_block.bin", 0x0000, 0x0117, NO_DUMP )
+ROM_END
+
+ROM_START( fw_a7_11a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tmm24128ap.bin", 0xc000, 0x4000, CRC(28126b0f) SHA1(e2baa643c1858cd3ea53abf801fc9ab1a1e3ff9b) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(d34f0e63) SHA1(5984248331ec632b665f60ad553b74916630d4d3) )
+	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(16aebfb3) SHA1(3a2c587b2c31341a83ec9e0f9dd188d4bb63e764) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "m3-7649a-5.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
+
+	ROM_REGION( 0x0200, "plds", 0 )    /* Cracked PLD */
+	ROM_LOAD( "pal16l8acn_block.bin", 0x0000, 0x0117, CRC(fcda7872) SHA1(60acdb968e6229a8f71c2e29d22e132906a65bd5) )
+ROM_END
+
+
 
 /**************************
 *  Driver Initialization  *
@@ -6725,10 +6807,11 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw,
 // Other games...
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   driver_device,  0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  driver_device,  0,        ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",          0,                       layout_novoplay )
-GAME(  1991, intrgmes, 0,         intrgmes, funworld,  driver_device,  0,        ROT0, "Inter Games",           "Unknown Inter Games poker",                 MACHINE_NOT_WORKING )
+GAME(  1991, intrgmes,  0,        intrgmes, funworld,  driver_device,  0,        ROT0, "Inter Games",           "Unknown Inter Games poker",                 MACHINE_NOT_WORKING )
+GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Funworld A7-11 game 1",             MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a, 0,        fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Funworld A7-11 game 2",             MACHINE_NOT_WORKING,     layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with NES multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, royalcrd_msx,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with MSX multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
-
 
