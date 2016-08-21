@@ -105,6 +105,18 @@ Optional (on expansion card) (Viper)
 #include "sc1_vfd.lh"
 #include "sc1_vid.lh"
 
+#include "sc1barcd.lh"
+#include "sc1bartk.lh"
+#include "sc1cl65.lh"
+#include "sc1clbtma.lh"
+#include "sc1cwcl.lh"
+#include "sc1dblch.lh"
+#include "sc1pwrl.lh"
+#include "sc1sirb.lh"
+#include "sc1spct.lh"
+#include "sc1str4.lh"
+
+
 class bfm_sc1_state : public driver_device
 {
 public:
@@ -2597,7 +2609,7 @@ ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL
+#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_CLICKABLE_ARTWORK
 
 //Adder 2
 GAME( 1996, m_tppokr        , 0         ,  scorpion1_adder2 , toppoker  , bfm_sc1_state, toppoker       , 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
@@ -2706,9 +2718,9 @@ ROM_START( sc1barcd ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95740352 b.
 ROM_START( sc1barcda )ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "barcode 5_10p b.bin", 0x0000, 0x8000, CRC(69d4d0b2) SHA1(bb73b917cf414623dcd239c5daeeccb4e0ccc2ed) ) ROM_LOAD( "barcode 5_10p a.bin", 0x8000, 0x8000, CRC(e864aba1) SHA1(b3f707b6d5f3d7236e4a5e9ed78c61a78c3e8196) ) sc1barcd_sound ROM_END
 
 // PROJECT NUMBER 5907  BARCODE 20P PAYOUT - 8-JAN-1992 15:34:28
-GAME( 198?, sc1barcd        , 0         , scorpion1_viper   , clatt     , bfm_sc1_state, lotse          , 0,       "BFM",      "Barcode (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-502
+GAMEL( 198?, sc1barcd        , 0         , scorpion1_viper   , clatt     , bfm_sc1_state, lotse          , 0,       "BFM",      "Barcode (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS, layout_sc1barcd ) // GAME No 39-370-502
 // PROJECT NUMBER 6380  BARCODE 5P 10P PLAY- 17-FEB-1994 09:23:56
-GAME( 198?, sc1barcda       , sc1barcd  , scorpion1_viper   , clatt     , bfm_sc1_state, lotse          , 0,       "BFM",      "Barcode (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) //  GAME No 39-370-959
+GAMEL( 198?, sc1barcda       , sc1barcd  , scorpion1_viper   , clatt     , bfm_sc1_state, lotse          , 0,       "BFM",      "Barcode (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS, layout_sc1barcd ) //  GAME No 39-370-959
 
 /********************************************************************************************************************************************************************************************************************
  Double Chance
@@ -2735,10 +2747,10 @@ ROM_START( sc1dblchb )
 ROM_END
 
 // PROJECT NUMBER 5599  DOUBLE CHANCE 20P - 6-APR-1990 11:02:09
-GAME( 198?, sc1dblch        , 0         , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Double Chance (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-203
+GAMEL( 198?, sc1dblch        , 0         , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Double Chance (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS, layout_sc1dblch ) // GAME No 39-370-203
 // too bad to get PROJECT identification
-GAME( 198?, sc1dblcha       , sc1dblch  , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Double Chance (Bellfruit) (set 2, bad) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1dblchb       , sc1dblch  , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Double Chance (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
+GAMEL( 198?, sc1dblcha       , sc1dblch  , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Double Chance (Bellfruit) (set 2, bad) (Scorpion 1)", GAME_FLAGS, layout_sc1dblch )
+GAMEL( 198?, sc1dblchb       , sc1dblch  , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Double Chance (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS, layout_sc1dblch )
 
 
 /********************************************************************************************************************************************************************************************************************
@@ -2767,19 +2779,19 @@ ROM_START( sc1cl65a )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370858.p
 ROM_START( sc1cl65ap ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370858.p2", 0x0000, 0x8000, CRC(ff0e35c0) SHA1(0d3d46b541e188200cb4b9cc65eb60eac913dc2b) ) ROM_LOAD( "club-six-five-special_dat_ac_rot_20po_ass.bin",        0x8000, 0x8000, CRC(028ff7b2) SHA1(500b6f8d85678e99ae804600099fe78b542ad6a3) ) sc1_cl65_sound_alt ROM_END
 
 // PROJECT NUMBER 5732  SIX FIVE SPECIAL -  6-SEP-1990 14:55:09
-GAME( 198?, sc1cl65         , 0         , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-240
+GAMEL( 198?, sc1cl65         , 0         , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-370-240
 // PROJECT NUMBER 5732  SIX FIVE SPECIAL -  5-OCT-1992 16:23:33
-GAME( 198?, sc1cl65d        , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-694
-GAME( 198?, sc1cl65dp       , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 2, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-694
+GAMEL( 198?, sc1cl65d        , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-370-694
+GAMEL( 198?, sc1cl65dp       , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 2, Protocol) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-371-694
 // PROJECT NUMBER 5732  SIX FIVE SPECIAL 20P PAYOUT - 13-OCT-1992 12:18:09
-GAME( 198?, sc1cl65c        , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-714
-GAME( 198?, sc1cl65cp       , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-714
+GAMEL( 198?, sc1cl65c        , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-370-714
+GAMEL( 198?, sc1cl65cp       , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-371-714
 // PROJECT NUMBER 6124  SIX FIVE SPECIAL 200 POUND JP - 21-APR-1993 14:43:38
-GAME( 198?, sc1cl65b        , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-859
-GAME( 198?, sc1cl65bp       , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 4, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-859
+GAMEL( 198?, sc1cl65b        , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-370-859
+GAMEL( 198?, sc1cl65bp       , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 4, Protocol) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-371-859
 // PROJECT NUMBER 6124 20P PAYOUT  SIX FIVE SPECIAL #200/20P PAYOUT - 21-APR-1993 14:46:20
-GAME( 198?, sc1cl65a        , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-858
-GAME( 198?, sc1cl65ap       , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-858
+GAMEL( 198?, sc1cl65a        , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-370-858
+GAMEL( 198?, sc1cl65ap       , sc1cl65   , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5, Protocol) (Scorpion 1)", GAME_FLAGS, layout_sc1cl65 ) // GAME No 39-371-858
 
 /********************************************************************************************************************************************************************************************************************
  China Town
@@ -2824,9 +2836,9 @@ ROM_START( sc1clbtm )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "temp12b.bi
 ROM_START( sc1clbtma ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "temptp2",     0x0000, 0x8000, CRC(d165fa87) SHA1(aef8a4af8b6e83ef09dffc8aca305eaf7dd3936b) ) ROM_LOAD( "temptp1",       0x8000, 0x8000, CRC(6f03648d) SHA1(a6402c94ebf4d570d1d3fb462eb621566c27f307) ) sc1_clbtm_sound ROM_END
 
 // PROJECT NUMBER 5491  TEMPTATION - 1-MAY-1991 13:36:44
-GAME( 198?, sc1clbtm        , 0         , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club Temptation (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-342
+GAMEL( 198?, sc1clbtm        , 0         , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club Temptation (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS, layout_sc1clbtma ) // GAME No 39-370-342
 // PROJECT NUMBER 5491  TEMPTATION HI-FREQ CASHPOT - 31-OCT-1991 12:50:19
-GAME( 198?, sc1clbtma       , sc1clbtm  , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club Temptation (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-449
+GAMEL( 198?, sc1clbtma       , sc1clbtm  , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Club Temptation (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS, layout_sc1clbtma ) // GAME No 39-370-449
 
 /********************************************************************************************************************************************************************************************************************
  Count Cash Club
@@ -2869,12 +2881,12 @@ ROM_START( sc1sirc )
 ROM_END
 
 // PROJECT NUMBER 5773  STRIKE IT RICH - 2P - 7-MAR-1990 15:24:32
-GAME( 198?, sc1sir          , 0         , scorpion1         , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Strike It Rich (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-180
+GAMEL( 198?, sc1sir          , 0         , scorpion1         , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Strike It Rich (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS, layout_sc1sirb ) // GAME No 39-370-180
 // PROJECT NUMBER 5773  STRIKE IT RICH - 5P - 9-MAR-1990 10:48:23
-GAME( 198?, sc1sirb         , sc1sir    , scorpion1         , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Strike It Rich (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) //  GAME No 39-370-184
+GAMEL( 198?, sc1sirb         , sc1sir    , scorpion1         , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Strike It Rich (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS, layout_sc1sirb ) //  GAME No 39-370-184
 // 2nd half with the ident strings is missing
-GAME( 198?, sc1sira         , sc1sir    , scorpion1         , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Strike It Rich (Bellfruit) (set 3, bad) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1sirc         , sc1sir    , scorpion1         , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Strike It Rich (Bellfruit) (set 4, bad) (Scorpion 1)", GAME_FLAGS )
+GAMEL( 198?, sc1sira         , sc1sir    , scorpion1         , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Strike It Rich (Bellfruit) (set 3, bad) (Scorpion 1)", GAME_FLAGS, layout_sc1sirb )
+GAMEL( 198?, sc1sirc         , sc1sir    , scorpion1         , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Strike It Rich (Bellfruit) (set 4, bad) (Scorpion 1)", GAME_FLAGS, layout_sc1sirb )
 
 /********************************************************************************************************************************************************************************************************************
  Fun House Club
@@ -2934,7 +2946,7 @@ GAME( 198?, sc1clbxpa       , sc1clbxp  , scorpion1_viper   , clatt , bfm_sc1_st
 ROM_START( sc1cwcl ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95717154b.bin", 0x0000, 0x8000, CRC(e6422f75) SHA1(4ab33a5503209377f4739dbe11e4afa8d7e43699) )  ROM_LOAD( "95717153a.bin", 0x8000, 0x8000, CRC(233174a1) SHA1(94cf071a955e3716f463c4370daabfe94db2fd0e) ) sc1_cwcl_sound ROM_END
 
 // PROJECT NUMBER 5216  VE 5/10/20p PLAY - 17-FEB-1989 12:23:30
-GAME( 198?, sc1cwcl         , 0         , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Clockwise (Bellfruit) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-076
+GAMEL( 198?, sc1cwcl         , 0         , scorpion1_viper           , clatt , bfm_sc1_state, lotse          , 0,       "BFM",      "Clockwise (Bellfruit) (Scorpion 1)", GAME_FLAGS, layout_sc1cwcl ) // GAME No 39-370-076
 
 /********************************************************************************************************************************************************************************************************************
  Bar Trek
@@ -2947,7 +2959,7 @@ GAME( 198?, sc1cwcl         , 0         , scorpion1_viper           , clatt , bf
 ROM_START( sc1bartk ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "bartrekgameb.bin", 0x0000, 0x8000, CRC(24c7c803) SHA1(ab5051c8727cab44ad59913edab3d5d145728cb5) ) ROM_LOAD( "bartrekgamea.bin", 0x8000, 0x8000, CRC(a7a84c16) SHA1(8c5ab34268e932be12e85eed5a56386681f13da4) ) sc1_bartk_sound ROM_END
 
 // PROJECT NUMBER 6006  BAR TREK #3/#6 - 1-DEC-1992 08:20:06
-GAME( 198?, sc1bartk        , 0         , scorpion1_viper   , clatt     , bfm_sc1_state, lotse          , 0,       "BFM",      "Bar Trek (Bellfruit) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-746
+GAMEL( 198?, sc1bartk        , 0         , scorpion1_viper   , clatt     , bfm_sc1_state, lotse          , 0,       "BFM",      "Bar Trek (Bellfruit) (Scorpion 1)", GAME_FLAGS, layout_sc1bartk ) // GAME No 39-370-746
 
 
 
@@ -2983,12 +2995,12 @@ GAME( 198?, sc1linxa        , sc1linx   , scorpion1         , scorpion1 , bfm_sc
 GAME( 198?, sc1linxp        , sc1linx   , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM",      "Linx (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 5493  20P POWERLINES  VARIABLE %  GAME No 39-370-130 - 13-DEC-1989 16:21:27
-GAME( 198?, sc1pwrl         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM",      "Power Lines (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+GAMEL( 198?, sc1pwrl         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM",      "Power Lines (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS, layout_sc1pwrl )
 
 // PROJECT NUMBER 6104  SPECTRE #6/#3  GAME No 39-370-765 - 11-JAN-1993 13:52:50
-GAME( 198?, sc1spct         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM",      "Spectre (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+GAMEL( 198?, sc1spct         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM",      "Spectre (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS, layout_sc1spct )
 // PROJECT NUMBER 6104  SPECTRE #6/#3 5P/10P PLAY 10P/20P P/O  GAME No 39-370-966 - 10-MAR-1994 07:57:48
-GAME( 198?, sc1spcta        , sc1spct   , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM",      "Spectre (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // bad rom
+GAMEL( 198?, sc1spcta        , sc1spct   , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM",      "Spectre (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS, layout_sc1spct ) // bad rom
 
 // different inputs, hold ALT to run
 // PROJECT NUMBER 6171  TYPHOON PHOENIX1 #200  GAME No 39-370-944 -  5-NOV-1993 12:02:03
@@ -3211,9 +3223,9 @@ GAME( 198?, sc1shan         , 0         , scorpion1         , scorpion1 , bfm_sc
 GAME( 198?, sc1ster         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Sterling (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 5367  DUTCH STRIKE 4  GAME No 01-ST8-0A1 - 30-AUG-1991 13:13:27
-GAME( 198?, sc1str4         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS )
+GAMEL( 198?, sc1str4         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS, layout_sc1str4 )
 // PROJECT NUMBER 5367  DUTCH STRIKE 4  GAME No 39-360-009 - 14-MRT-1988 16:40:00
-GAME( 198?, sc1str4a        , sc1str4   , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS )
+GAMEL( 198?, sc1str4a        , sc1str4   , scorpion1         , scorpion1 , bfm_sc1_state, nocrypt        , 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS, layout_sc1str4 )
 
 // PROJECT NUMBER 6244  TORNADO  GAME No 39-370-930 - 19-OCT-1993 12:16:25
 GAME( 198?, sc1torn         , 0         , scorpion1         , scorpion1 , bfm_sc1_state, lotse          , 0,       "BFM/ELAM", "Tornado (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
