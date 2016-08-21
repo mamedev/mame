@@ -3192,6 +3192,26 @@ ROM_START( jollycrd )
 ROM_END
 
 
+/*
+  Jolly Card (Austrian)
+
+  1x R65C02P2
+  2x ST EF68B21P
+  1x UM6845B
+  1x Microchip AY-3-8910A
+  1x Unknown DIL40 IC.
+
+  1x HY6264LP-15
+  1x MK6116LN-15
+  3x ST M27C256B
+  1x 82S147 Bipolar PROM.
+  1x GAL16V8S
+
+  1x Xtal 16.000 MHz.
+  1x 3.6V lithium battery.
+  1x 8 DIP switches bank.
+
+*/
 ROM_START( jollycrda )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pok14.bin", 0x8000, 0x8000, CRC(30936afb) SHA1(5b96cd7e425ad79163e1d55e530cbabcb116f8d2) )
@@ -3206,7 +3226,7 @@ ROM_START( jollycrda )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "jop.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 
-	ROM_REGION( 0x0200, "plds", 0 )  // cracked pld...
+	ROM_REGION( 0x0200, "plds", 0 )    /* Cracked PLD */
 	ROM_LOAD( "tab1.0_gal16v8s.bin", 0x0000, 0x0117, CRC(574f9a48) SHA1(bb5e2e86da85130d92f61cc57038a844950f443e) )
 ROM_END
 
