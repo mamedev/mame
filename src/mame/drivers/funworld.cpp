@@ -3199,7 +3199,7 @@ ROM_END
   2x ST EF68B21P
   1x UM6845B
   1x Microchip AY-3-8910A
-  1x Unknown DIL40 IC.
+  1x Intel P5C090-50 (24 Macrocell CMOS PLD, DIP40)
 
   1x HY6264LP-15
   1x MK6116LN-15
