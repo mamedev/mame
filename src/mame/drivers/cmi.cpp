@@ -381,8 +381,9 @@ public:
 		, m_acia_mkbd_cmi(*this, "acia_mkbd_cmi")
 		, m_cmi07_ptm(*this, "cmi07_ptm")
 		, m_qfc9_region(*this, "qfc9")
-		, m_floppy_0(*this, "wd1791:0:8dsdd")
-		, m_floppy_1(*this, "wd1791:1:8dsdd")
+		, m_floppy_0(*this, "wd1791:0")
+		, m_floppy_1(*this, "wd1791:1")
+		, m_floppy(nullptr)
 		, m_wd1791(*this, "wd1791")
 		, m_cmi01a_0(*this, "cmi01a_0")
 		, m_cmi01a_1(*this, "cmi01a_1")
@@ -551,8 +552,9 @@ protected:
 	required_device<ptm6840_device> m_cmi07_ptm;
 
 	required_memory_region m_qfc9_region;
-	required_device<floppy_image_device> m_floppy_0;
-	required_device<floppy_image_device> m_floppy_1;
+	required_device<floppy_connector> m_floppy_0;
+	required_device<floppy_connector> m_floppy_1;
+	floppy_image_device *m_floppy;
 	required_device<fd1791_t> m_wd1791;
 
 	required_device<cmi01a_device> m_cmi01a_0;
@@ -1482,16 +1484,20 @@ void cmi_state::write_fdc_ctrl(UINT8 data)
 	int drive = data & 1;
 	int side = BIT(data, 5) ? 1 : 0;
 
+	m_floppy = nullptr;
+
 	if (drive)
 	{
-		m_floppy_1->ss_w(side);
-		m_wd1791->set_floppy(m_floppy_1);
+		m_floppy = m_floppy_1->get_device();
 	}
 	else
 	{
-		m_floppy_0->ss_w(side);
-		m_wd1791->set_floppy(m_floppy_0);
+		m_floppy = m_floppy_0->get_device();
 	}
+
+	if (m_floppy)
+		m_floppy->ss_w(side);
+	m_wd1791->set_floppy(m_floppy);
 	m_wd1791->dden_w(BIT(data, 7) ? true : false);
 
 	m_fdc_ctrl = data;
@@ -1543,113 +1549,54 @@ void cmi_state::fdc_dma_transfer()
 	UINT8 map_info = m_map_sel[MAPSEL_P2_A_DMA1];
 	int map = map_info & 0x1f;
 
+	int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
+	int phys_page = 0;
+
+	int i;
+	for (i = 0; i < NUM_Q256_CARDS; ++i)
+	{
+		phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
+
+		if (phys_page & 0x80)
+			break;
+	}
+
+	//phys_page &= 0x7f;
+
 	/* Transfer from disk to RAM */
 	if (!BIT(m_fdc_ctrl, 4))
 	{
-		/* Determine the initial page */
-		int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
-		int phys_page = 0;
+		/* Read a byte at a time */
+		UINT8 data = m_wd1791->data_r() ^ 0xff;
 
-//		printf("FDC DMA: Disk to [%x] (%x bytes)\n", m_fdc_dma_addr.w.l, m_fdc_dma_cnt.w.l ^ 0xffff);
-
-		int i;
-		for (i = 0; i < NUM_Q256_CARDS; ++i)
+		if (m_cmi07_ctrl & 0x30)
+		if (BIT(m_cmi07_ctrl, 6) && !BIT(m_cmi07_ctrl, 7))
 		{
-			phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
-
-			if (phys_page & 0x80)
-				break;
+			if ((m_fdc_dma_addr.w.l & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
+				m_cmi07_ram[m_fdc_dma_addr.w.l & 0x3fff] = data;
 		}
 
-		//phys_page &= 0x7f;
+		if (phys_page & 0x80)
+			m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)] = data;
 
-		for (; m_fdc_dma_cnt.w.l < 0xffff && m_fdc_drq; m_fdc_dma_cnt.w.l++)
-		{
-			/* Read a byte at a time */
-			UINT8 data = m_wd1791->data_r() ^ 0xff;
-
-			if (m_cmi07_ctrl & 0x30)
-			if (BIT(m_cmi07_ctrl, 6) && !BIT(m_cmi07_ctrl, 7))
-			{
-				if ((m_fdc_dma_addr.w.l & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
-					m_cmi07_ram[m_fdc_dma_addr.w.l & 0x3fff] = data;
-			}
-
-			if (phys_page & 0x80)
-				m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)] = data;
-
-			/* TODO: Is updating these correct? */
-			if (!BIT(m_fdc_ctrl, 3))
-				m_fdc_dma_addr.w.l++;
-
-			if ((m_fdc_dma_addr.w.l % PAGE_SIZE) == 0)
-			{
-				++cpu_page;
-
-				for (int i = 0; i < NUM_Q256_CARDS; ++i)
-				{
-					phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
-
-					if (phys_page & 0x80)
-						break;
-				}
-			}
-		}
+		if (!BIT(m_fdc_ctrl, 3))
+			m_fdc_dma_addr.w.l++;
 	}
 
 	// Transfer from RAM to disk
 	else
 	{
-		/* TODO: Check me and combine common code with the above */
-		/* Determine the initial page */
-		int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
-		int phys_page = 0;
+		/* Write a byte at a time */
+		UINT8 data = 0;
 
-		int i;
-		for (i = 0; i < NUM_Q256_CARDS; ++i)
-		{
-			phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
+		/* TODO: This should be stuck in a deferred write */
+		if (phys_page & 0x80)
+			data = m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)];
 
-			if (phys_page & 0x80)
-				break;
-		}
+		m_wd1791->data_w(data ^ 0xff);
 
-		phys_page &= 0x7f;
-
-		for (; m_fdc_dma_cnt.w.l < 0xffff && m_fdc_drq; m_fdc_dma_cnt.w.l++)
-		{
-			/* Write a byte at a time */
-			UINT8 data = 0;
-
-			/* TODO: This should be stuck in a deferred write */
-			if (phys_page & 0x80)
-				data = m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)];
-
-			m_wd1791->data_w(data ^ 0xff);
-
-			/* TODO: Is updating these correct? */
-			if (!BIT(m_fdc_ctrl, 3))
-				m_fdc_dma_addr.w.l++;
-
-			if ((m_fdc_dma_addr.w.l % PAGE_SIZE) == 0)
-			{
-				++cpu_page;
-
-				for (int i = 0; i < NUM_Q256_CARDS; ++i)
-				{
-					phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
-
-					if (phys_page & 0x80)
-						break;
-				}
-
-				if ((phys_page & 0x80) == 0)
-				{
-					printf("Trying to DMA floppy data from a non-enabled page!\n");
-					return;
-				}
-			}
-		}
+		if (!BIT(m_fdc_ctrl, 3))
+			m_fdc_dma_addr.w.l++;
 	}
 }
 
@@ -2793,7 +2740,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cmi_state, wd1791_irq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(cmi_state, wd1791_drq))
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
 	// Channel cards
 	MCFG_CMI01A_ADD("cmi01a_0", 0)
