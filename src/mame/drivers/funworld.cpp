@@ -3205,6 +3205,9 @@ ROM_START( jollycrda )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "jop.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+
+	ROM_REGION( 0x0200, "plds", 0 )  // cracked pld...
+	ROM_LOAD( "tab1.0_gal16v8s.bin", 0x0000, 0x0117, CRC(574f9a48) SHA1(bb5e2e86da85130d92f61cc57038a844950f443e) )
 ROM_END
 
 
