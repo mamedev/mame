@@ -49,15 +49,23 @@ GAME( 199?, m1blkhol    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,
 #define m1_bargn_sound \
 	ROM_REGION( 0x100000, "upd", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "bgsnd", 0x0000, 0x020000, CRC(abe7c01d) SHA1(21caadcd149772dfd79a9d30ebc1d8da91ff36f4) )
-ROM_START( m1bargn )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-077.bin", 0x0000, 0x010000, CRC(7ae8ea12) SHA1(537f828bdaba3c63abb83b5417a4ec115834a48a) )   m1_bargn_sound ROM_END_M1A_MCU
-ROM_START( m1bargnp )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-078.bin", 0x0000, 0x010000, CRC(dcc0b83e) SHA1(a85e3f60decb7dbc2de77b93dd8a79ff137d85b7) )   m1_bargn_sound ROM_END_M1A_MCU
 ROM_START( m1bargnc )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa2-141", 0x0000, 0x010000, CRC(9dcaaaa9) SHA1(6cd015990036c2e20e4f4a2e19a363e6c565b473) )   m1_bargn_sound ROM_END_M1A_MCU
 ROM_START( m1bargncp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa2-142", 0x0000, 0x010000, CRC(2972747a) SHA1(6854a3cd9c6a834a24a0d8c763fa2a18c1d26a10) )   m1_bargn_sound ROM_END_M1A_MCU
 
-GAMEL( 1990, m1bargn     ,0          ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Bar-gain (Maygay) v7.1 (M1A/B)",GAME_FLAGS, layout_m1bargnc)
-GAMEL( 1990, m1bargnp    ,m1bargn    ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Bar-gain (Maygay) v7.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1bargnc)
-GAMEL( 1990, m1bargnc    ,m1bargn    ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (M1A/B)",GAME_FLAGS, layout_m1bargnc)
-GAMEL( 1990, m1bargncp   ,m1bargn    ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (Protocol)(M1A/B)",GAME_FLAGS, layout_m1bargnc)
+GAMEL( 1990, m1bargnc    ,0           ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (M1A/B)",GAME_FLAGS, layout_m1bargnc)
+GAMEL( 1990, m1bargncp   ,m1bargnc    ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (Protocol)(M1A/B)",GAME_FLAGS, layout_m1bargnc)
+
+/*******************************************************************************************************************************************************************************************************
+  Bar-gain (this requires a different layout to Casino Bar Gain)
+   (sound rom is wrong?)
+******************************************************************************************************************************************************************************************************/
+
+ROM_START( m1bargn )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-077.bin", 0x0000, 0x010000, CRC(7ae8ea12) SHA1(537f828bdaba3c63abb83b5417a4ec115834a48a) )   m1_bargn_sound ROM_END_M1A_MCU
+ROM_START( m1bargnp )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-078.bin", 0x0000, 0x010000, CRC(dcc0b83e) SHA1(a85e3f60decb7dbc2de77b93dd8a79ff137d85b7) )   m1_bargn_sound ROM_END_M1A_MCU
+
+GAME( 1990, m1bargn     ,0          ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Bar-gain (Maygay) v7.1 (M1A/B)",GAME_FLAGS)
+GAME( 1990, m1bargnp    ,m1bargn    ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Bar-gain (Maygay) v7.1 (Protocol) (M1A/B)",GAME_FLAGS)
+
 
 /*******************************************************************************************************************************************************************************************************
   Bounty Hunter Club
