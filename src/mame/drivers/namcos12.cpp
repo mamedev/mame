@@ -9,6 +9,9 @@
   H8/3002 and Golgo13 support by R. Belmont based on work by The_Author and DynaChicken
   JVS Support by R. Belmont
 
+  Notes:
+    - technodr: Calibrate controls by turning on the service mode switch (F2) while holdign service coin (9).
+  
   Issues:
     not all games work due to either banking, dma or protection issues.
     graphics are glitchy in some games.
@@ -18,7 +21,9 @@
     - truckk doesn't boot: the H8/3002 never enters InitJVSBoards @ 1DE2.  1DE2 is referenced in a table of commands at 4032,
       which is called by the routine at 3FEA.  It is not clear how execution is intended to get to 3FEA - there are no direct
       branches to that location, and the bytes 3F EA don't appear at all in the program.
-
+	  
+    - technodr: printer not emulated. To play the game, press F2 to enter the test menu, navigate to GAME OPTIONS and disable
+      the printer by setting "PRINTER" to OFF.
 
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
