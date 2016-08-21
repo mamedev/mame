@@ -2242,10 +2242,15 @@ READ8_MEMBER( cmi_state::q133_1_porta_r )
 WRITE8_MEMBER( cmi_state::q133_1_porta_w )
 {
 	m_msm5832_addr = data & 0xf;
+	m_msm5832->address_w(data & 0x0f);
 }
 
 WRITE8_MEMBER( cmi_state::q133_1_portb_w )
 {
+	m_msm5832->hold_w(BIT(data, 0));
+	m_msm5832->read_w(BIT(data, 1));
+	m_msm5832->write_w(BIT(data, 2));
+	m_msm5832->cs_w(1);
 }
 
 WRITE8_MEMBER( cmi_state::master_tune_w )
