@@ -28,7 +28,7 @@ static void tvc64_emit_level(cassette_image *cass, double &time, int freq, int l
 	time += period;
 }
 
-static casserr_t tvc64_output_byte(cassette_image *cass, double &time, UINT8 byte)
+static cassette_image::error tvc64_output_byte(cassette_image *cass, double &time, UINT8 byte)
 {
 	for (int i=0; i<8; i++)
 	{
@@ -44,7 +44,7 @@ static casserr_t tvc64_output_byte(cassette_image *cass, double &time, UINT8 byt
 		}
 	}
 
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 static int tvc64_output_predata(cassette_image *cass, double &time, int number)
@@ -55,7 +55,7 @@ static int tvc64_output_predata(cassette_image *cass, double &time, int number)
 		tvc64_emit_level(cass, time, TVC64_PRE_FREQ*2, -1);
 	}
 
-	return CASSETTE_ERROR_SUCCESS;
+	return (int)cassette_image::error::SUCCESS;
 }
 
 static UINT16 tvc64_calc_crc(const UINT8 *bytes, int size)
@@ -82,7 +82,7 @@ static UINT16 tvc64_calc_crc(const UINT8 *bytes, int size)
 	return crc;
 }
 
-static casserr_t tvc64_cassette_load(cassette_image *cassette)
+static cassette_image::error tvc64_cassette_load(cassette_image *cassette)
 {
 	UINT8 tmp_buff[512];
 	int buff_idx = 0;
@@ -197,10 +197,10 @@ static casserr_t tvc64_cassette_load(cassette_image *cassette)
 	// 1 sec silence
 	tvc64_emit_level(cassette, time, 1, 0);
 
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
-static casserr_t tvc64_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error tvc64_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	UINT8 byte;
 	cassette_image_read(cassette, &byte, 0, 1);
@@ -210,10 +210,10 @@ static casserr_t tvc64_cassette_identify(cassette_image *cassette, struct Casset
 		opts->bits_per_sample = 16;
 		opts->channels = 1;
 		opts->sample_frequency = 44100;
-		return CASSETTE_ERROR_SUCCESS;
+		return cassette_image::error::SUCCESS;
 	}
 
-	return CASSETTE_ERROR_INVALIDIMAGE;
+	return cassette_image::error::INVALID_IMAGE;
 }
 
 static const struct CassetteFormat tvc64_cassette_image_format =

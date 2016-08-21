@@ -142,17 +142,17 @@ static const struct CassetteLegacyWaveFiller a26_legacy_fill_wave = {
 	0
 };
 
-static casserr_t a26_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error a26_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	UINT64 size;
 
 	size = cassette_image_size( cassette );
 	if ( size == A26_CAS_SIZE ) {
 		return cassette_legacy_identify( cassette, opts, &a26_legacy_fill_wave );
 	}
-	return CASSETTE_ERROR_INVALIDIMAGE;
+	return cassette_image::error::INVALID_IMAGE;
 }
 
-static casserr_t a26_cassette_load( cassette_image *cassette ) {
+static cassette_image::error a26_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &a26_legacy_fill_wave );
 }
 

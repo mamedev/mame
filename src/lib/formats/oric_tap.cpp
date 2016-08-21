@@ -494,14 +494,14 @@ static const struct CassetteLegacyWaveFiller oric_legacy_fill_wave =
 
 
 
-static casserr_t oric_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error oric_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &oric_legacy_fill_wave);
 }
 
 
 
-static casserr_t oric_tap_load(cassette_image *cassette)
+static cassette_image::error oric_tap_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &oric_legacy_fill_wave);
 }

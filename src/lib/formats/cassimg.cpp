@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    cassimg.c
+    cassimg.cpp
 
     Cassette tape image abstraction code
 
@@ -96,9 +96,9 @@ static cassette_image *cassette_init(const struct CassetteFormat *format, void *
 
 
 
-static void cassette_finishinit(casserr_t err, cassette_image *cassette, cassette_image **outcassette)
+static void cassette_finishinit(cassette_image::error err, cassette_image *cassette, cassette_image **outcassette)
 {
-	if (cassette && (err || !outcassette))
+	if (cassette && ((err != cassette_image::error::SUCCESS) || !outcassette))
 	{
 		cassette_close(cassette);
 		cassette = nullptr;
@@ -109,21 +109,32 @@ static void cassette_finishinit(casserr_t err, cassette_image *cassette, cassett
 
 
 
-static int good_format(const struct CassetteFormat *format, const char *extension, int flags)
+static cassette_image::error try_identify_format(const struct CassetteFormat &format, cassette_image *image, const std::string &extension, int flags, struct CassetteOptions &opts)
 {
-	if (extension && !image_find_extension(format->extensions, extension))
-		return FALSE;
-	if (((flags & CASSETTE_FLAG_READONLY) == 0) && !format->save)
-		return FALSE;
-	return TRUE;
+	// is this the right extension?
+	if (!extension.empty() && !image_find_extension(format.extensions, extension.c_str()))
+		return cassette_image::error::INVALID_IMAGE;
+
+	// invoke format->identify
+	memset(&opts, 0, sizeof(opts));
+	cassette_image::error err = format.identify(image, &opts);
+	if (err != cassette_image::error::SUCCESS)
+		return err;
+
+	// is this a read only format, but the cassette was not opened read only?
+	if (((flags & CASSETTE_FLAG_READONLY) == 0) && (format.save == nullptr))
+		return cassette_image::error::READ_WRITE_UNSUPPORTED;
+
+	// success!
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const char *extension,
+cassette_image::error cassette_open_choices(void *file, const struct io_procs *procs, const std::string &extension,
 	const struct CassetteFormat *const *formats, int flags, cassette_image **outcassette)
 {
-	casserr_t err;
+	cassette_image::error err;
 	cassette_image *cassette;
 	const struct CassetteFormat *format;
 	struct CassetteOptions opts = {0, };
@@ -137,7 +148,7 @@ casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const 
 	cassette = cassette_init(nullptr, file, procs, flags);
 	if (!cassette)
 	{
-		err = CASSETTE_ERROR_OUTOFMEMORY;
+		err = cassette_image::error::OUT_OF_MEMORY;
 		goto done;
 	}
 
@@ -145,22 +156,20 @@ casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const 
 	format = nullptr;
 	for (i = 0; !format && formats[i]; i++)
 	{
-		if (good_format(formats[i], extension, flags))
-		{
+		// try this format
+		err = try_identify_format(*formats[i], cassette, extension, flags, opts);
+		if (err != cassette_image::error::SUCCESS && err != cassette_image::error::INVALID_IMAGE)
+			goto done;
+
+		// did we succeed?
+		if (err == cassette_image::error::SUCCESS)
 			format = formats[i];
-			memset(&opts, 0, sizeof(opts));
-			err = format->identify(cassette, &opts);
-			if (err == CASSETTE_ERROR_INVALIDIMAGE)
-				format = nullptr;
-			else if (err)
-				goto done;
-		}
 	}
 
 	/* have we found a proper format */
 	if (!format)
 	{
-		err = CASSETTE_ERROR_INVALIDIMAGE;
+		err = cassette_image::error::INVALID_IMAGE;
 		goto done;
 	}
 	cassette->format = format;
@@ -171,12 +180,12 @@ casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const 
 
 	/* load the image */
 	err = format->load(cassette);
-	if (err)
+	if (err != cassette_image::error::SUCCESS)
 		goto done;
 
 	/* success */
 	cassette->flags &= ~CASSETTE_FLAG_DIRTY;
-	err = CASSETTE_ERROR_SUCCESS;
+	err = cassette_image::error::SUCCESS;
 
 done:
 	cassette_finishinit(err, cassette, outcassette);
@@ -185,7 +194,7 @@ done:
 
 
 
-casserr_t cassette_open(void *file, const struct io_procs *procs,
+cassette_image::error cassette_open(void *file, const struct io_procs *procs,
 	const struct CassetteFormat *format, int flags, cassette_image **outcassette)
 {
 	const struct CassetteFormat *formats[2];
@@ -196,20 +205,20 @@ casserr_t cassette_open(void *file, const struct io_procs *procs,
 
 
 
-casserr_t cassette_create(void *file, const struct io_procs *procs, const struct CassetteFormat *format,
+cassette_image::error cassette_create(void *file, const struct io_procs *procs, const struct CassetteFormat *format,
 	const struct CassetteOptions *opts, int flags, cassette_image **outcassette)
 {
-	casserr_t err;
+	cassette_image::error err;
 	cassette_image *cassette;
 	static const struct CassetteOptions default_options = { 1, 16, 44100 };
 
 	/* cannot create to a read only image */
 	if (flags & CASSETTE_FLAG_READONLY)
-		return CASSETTE_ERROR_INVALIDIMAGE;
+		return cassette_image::error::INVALID_IMAGE;
 
 	/* is this a good format? */
-	if (!good_format(format, nullptr, flags))
-		return CASSETTE_ERROR_INVALIDIMAGE;
+	if (format->save == nullptr)
+		return cassette_image::error::INVALID_IMAGE;
 
 	/* normalize arguments */
 	if (!opts)
@@ -219,7 +228,7 @@ casserr_t cassette_create(void *file, const struct io_procs *procs, const struct
 	cassette = cassette_init(format, file, procs, flags);
 	if (!cassette)
 	{
-		err = CASSETTE_ERROR_OUTOFMEMORY;
+		err = cassette_image::error::OUT_OF_MEMORY;
 		goto done;
 	}
 
@@ -227,7 +236,7 @@ casserr_t cassette_create(void *file, const struct io_procs *procs, const struct
 	cassette->channels = opts->channels;
 	cassette->sample_frequency = opts->sample_frequency;
 
-	err = CASSETTE_ERROR_SUCCESS;
+	err = cassette_image::error::SUCCESS;
 
 done:
 	cassette_finishinit(err, cassette, outcassette);
@@ -236,7 +245,7 @@ done:
 
 
 
-static casserr_t cassette_perform_save(cassette_image *cassette)
+static cassette_image::error cassette_perform_save(cassette_image *cassette)
 {
 	struct CassetteInfo info;
 	cassette_get_info(cassette, &info);
@@ -245,19 +254,19 @@ static casserr_t cassette_perform_save(cassette_image *cassette)
 
 
 
-casserr_t cassette_save(cassette_image *cassette)
+cassette_image::error cassette_save(cassette_image *cassette)
 {
-	casserr_t err;
+	cassette_image::error err;
 
 	if (!cassette->format || !cassette->format->save)
-		return CASSETTE_ERROR_UNSUPPORTED;
+		return cassette_image::error::UNSUPPORTED;
 
 	err = cassette_perform_save(cassette);
-	if (err)
+	if (err != cassette_image::error::SUCCESS)
 		return err;
 
 	cassette->flags &= ~CASSETTE_FLAG_DIRTY;
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
@@ -350,7 +359,7 @@ static size_t my_round(double d)
 
 
 
-static casserr_t compute_manipulation_ranges(cassette_image *cassette, int channel,
+static cassette_image::error compute_manipulation_ranges(cassette_image *cassette, int channel,
 	double time_index, double sample_period, struct manipulation_ranges *ranges)
 {
 	if (channel < 0)
@@ -370,12 +379,12 @@ static casserr_t compute_manipulation_ranges(cassette_image *cassette, int chann
 	if (ranges->sample_last > ranges->sample_first)
 		ranges->sample_last--;
 
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sample, INT32 **ptr)
+static cassette_image::error lookup_sample(cassette_image *cassette, int channel, size_t sample, INT32 **ptr)
 {
 	*ptr = nullptr;
 	size_t sample_blocknum = (sample / SAMPLES_PER_BLOCK) * cassette->channels + channel;
@@ -401,7 +410,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 	}
 
 	*ptr = &block[sample_index];
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
@@ -410,11 +419,11 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
     waveform accesses
 *********************************************************************/
 
-casserr_t cassette_get_samples(cassette_image *cassette, int channel,
+cassette_image::error cassette_get_samples(cassette_image *cassette, int channel,
 	double time_index, double sample_period, size_t sample_count, size_t sample_bytes,
 	void *samples, int waveform_flags)
 {
-	casserr_t err;
+	cassette_image::error err;
 	struct manipulation_ranges ranges;
 	size_t sample_index;
 	size_t cassette_sample_index;
@@ -428,7 +437,7 @@ casserr_t cassette_get_samples(cassette_image *cassette, int channel,
 	assert(cassette);
 
 	err = compute_manipulation_ranges(cassette, channel, time_index, sample_period, &ranges);
-	if (err)
+	if (err != cassette_image::error::SUCCESS)
 		return err;
 
 	for (sample_index = 0; sample_index < sample_count; sample_index++)
@@ -441,7 +450,7 @@ casserr_t cassette_get_samples(cassette_image *cassette, int channel,
 			d = map_double(ranges.sample_last + 1 - ranges.sample_first, 0, sample_count, sample_index) + ranges.sample_first;
 			cassette_sample_index = (size_t) d;
 			err = lookup_sample(cassette, channel, cassette_sample_index, (INT32 **) &source_ptr);
-			if (err)
+			if (err != cassette_image::error::SUCCESS)
 				return err;
 
 			sum += *source_ptr;
@@ -472,16 +481,16 @@ casserr_t cassette_get_samples(cassette_image *cassette, int channel,
 				break;
 		}
 	}
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-casserr_t cassette_put_samples(cassette_image *cassette, int channel,
+cassette_image::error cassette_put_samples(cassette_image *cassette, int channel,
 	double time_index, double sample_period, size_t sample_count, size_t sample_bytes,
 	const void *samples, int waveform_flags)
 {
-	casserr_t err;
+	cassette_image::error err;
 	struct manipulation_ranges ranges;
 	size_t sample_index;
 	INT32 *dest_ptr;
@@ -492,13 +501,13 @@ casserr_t cassette_put_samples(cassette_image *cassette, int channel,
 	double d;
 
 	if (!cassette)
-		return CASSETTE_ERROR_SUCCESS;
+		return cassette_image::error::SUCCESS;
 
 	if (sample_period == 0)
-		return CASSETTE_ERROR_SUCCESS;
+		return cassette_image::error::SUCCESS;
 
 	err = compute_manipulation_ranges(cassette, channel, time_index, sample_period, &ranges);
-	if (err)
+	if (err != cassette_image::error::SUCCESS)
 		return err;
 
 	if (cassette->sample_count < ranges.sample_last+1)
@@ -540,24 +549,24 @@ casserr_t cassette_put_samples(cassette_image *cassette, int channel,
 			dest_value = dword;
 			break;
 		default:
-			return CASSETTE_ERROR_INTERNAL;
+			return cassette_image::error::INTERNAL;
 		}
 
 		for (channel = ranges.channel_first; channel <= ranges.channel_last; channel++)
 		{
 			/* find the sample that we are putting */
 			err = lookup_sample(cassette, channel, sample_index, &dest_ptr);
-			if (err)
+			if (err != cassette_image::error::SUCCESS)
 				return err;
 			*dest_ptr = dest_value;
 		}
 	}
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-casserr_t cassette_get_sample(cassette_image *cassette, int channel,
+cassette_image::error cassette_get_sample(cassette_image *cassette, int channel,
 	double time_index, double sample_period, INT32 *sample)
 {
 	return cassette_get_samples(cassette, channel, time_index,
@@ -566,7 +575,7 @@ casserr_t cassette_get_sample(cassette_image *cassette, int channel,
 
 
 
-casserr_t cassette_put_sample(cassette_image *cassette, int channel,
+cassette_image::error cassette_put_sample(cassette_image *cassette, int channel,
 	double time_index, double sample_period, INT32 sample)
 {
 	return cassette_put_samples(cassette, channel, time_index,
@@ -579,10 +588,10 @@ casserr_t cassette_put_sample(cassette_image *cassette, int channel,
     waveform accesses to/from the raw image
 *********************************************************************/
 
-casserr_t cassette_read_samples(cassette_image *cassette, int channels, double time_index,
+cassette_image::error cassette_read_samples(cassette_image *cassette, int channels, double time_index,
 	double sample_period, size_t sample_count, UINT64 offset, int waveform_flags)
 {
-	casserr_t err;
+	cassette_image::error err;
 	size_t chunk_sample_count;
 	size_t bytes_per_sample;
 	size_t sample_bytes;
@@ -607,22 +616,22 @@ casserr_t cassette_read_samples(cassette_image *cassette, int channels, double t
 		{
 			err = cassette_put_samples(cassette, channel, chunk_time_index, chunk_sample_period,
 				chunk_sample_count, sample_bytes, &buffer[channel * bytes_per_sample], waveform_flags);
-			if (err)
+			if (err != cassette_image::error::SUCCESS)
 				return err;
 		}
 
 		offset += chunk_sample_count * sample_bytes;
 		samples_loaded += chunk_sample_count;
 	}
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-casserr_t cassette_write_samples(cassette_image *cassette, int channels, double time_index,
+cassette_image::error cassette_write_samples(cassette_image *cassette, int channels, double time_index,
 	double sample_period, size_t sample_count, UINT64 offset, int waveform_flags)
 {
-	casserr_t err;
+	cassette_image::error err;
 	size_t chunk_sample_count;
 	size_t bytes_per_sample;
 	size_t sample_bytes;
@@ -645,7 +654,7 @@ casserr_t cassette_write_samples(cassette_image *cassette, int channels, double 
 		{
 			err = cassette_get_samples(cassette, channel, chunk_time_index, chunk_sample_period,
 				chunk_sample_count, sample_bytes, &buffer[channel * bytes_per_sample], waveform_flags);
-			if (err)
+			if (err != cassette_image::error::SUCCESS)
 				return err;
 		}
 
@@ -654,7 +663,7 @@ casserr_t cassette_write_samples(cassette_image *cassette, int channels, double 
 		offset += chunk_sample_count * sample_bytes;
 		samples_saved += chunk_sample_count;
 	}
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
@@ -682,7 +691,7 @@ static const INT8 *choose_wave(const struct CassetteModulation *modulation, size
 
 
 
-casserr_t cassette_modulation_identify(cassette_image *cassette, const struct CassetteModulation *modulation,
+cassette_image::error cassette_modulation_identify(cassette_image *cassette, const struct CassetteModulation *modulation,
 	struct CassetteOptions *opts)
 {
 	size_t wave_bytes_length;
@@ -690,16 +699,16 @@ casserr_t cassette_modulation_identify(cassette_image *cassette, const struct Ca
 	opts->bits_per_sample = 8;
 	opts->channels = 1;
 	opts->sample_frequency = (UINT32) (std::max(modulation->zero_frequency_high, modulation->one_frequency_high) * wave_bytes_length * 2);
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-casserr_t cassette_put_modulated_data(cassette_image *cassette, int channel, double time_index,
+cassette_image::error cassette_put_modulated_data(cassette_image *cassette, int channel, double time_index,
 	const void *data, size_t data_length, const struct CassetteModulation *modulation,
 	double *time_displacement)
 {
-	casserr_t err;
+	cassette_image::error err;
 	const UINT8 *data_bytes = (const UINT8 *)data;
 	const INT8 *wave_bytes;
 	size_t wave_bytes_length;
@@ -719,13 +728,13 @@ casserr_t cassette_put_modulated_data(cassette_image *cassette, int channel, dou
 			pulse_frequency = (b & (1 << i)) ? modulation->one_frequency_cannonical : modulation->zero_frequency_cannonical;
 			pulse_period = 1 / pulse_frequency;
 			err = cassette_put_samples(cassette, 0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, CASSETTE_WAVEFORM_8BIT);
-			if (err)
+			if (err != cassette_image::error::SUCCESS)
 				goto done;
 			time_index += pulse_period;
 			total_displacement += pulse_period;
 		}
 	}
-	err = CASSETTE_ERROR_SUCCESS;
+	err = cassette_image::error::SUCCESS;
 
 done:
 	if (time_displacement)
@@ -735,18 +744,18 @@ done:
 
 
 
-casserr_t cassette_put_modulated_filler(cassette_image *cassette, int channel, double time_index,
+cassette_image::error cassette_put_modulated_filler(cassette_image *cassette, int channel, double time_index,
 	UINT8 filler, size_t filler_length, const struct CassetteModulation *modulation,
 	double *time_displacement)
 {
-	casserr_t err;
+	cassette_image::error err;
 	double delta;
 	double total_displacement = 0.0;
 
 	while(filler_length--)
 	{
 		err = cassette_put_modulated_data(cassette, channel, time_index, &filler, 1, modulation, &delta);
-		if (err)
+		if (err != cassette_image::error::SUCCESS)
 			return err;
 		total_displacement += delta;
 		time_index += delta;
@@ -754,16 +763,16 @@ casserr_t cassette_put_modulated_filler(cassette_image *cassette, int channel, d
 
 	if (time_displacement)
 		*time_displacement = total_displacement;
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, double time_index,
+cassette_image::error cassette_read_modulated_data(cassette_image *cassette, int channel, double time_index,
 	UINT64 offset, UINT64 length, const struct CassetteModulation *modulation,
 	double *time_displacement)
 {
-	casserr_t err;
+	cassette_image::error err;
 	UINT8 buffer_stack[1024];
 	UINT8 *buffer;
 	UINT8 *alloc_buffer = nullptr;
@@ -783,7 +792,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 		alloc_buffer = (UINT8*)malloc(buffer_length);
 		if (!alloc_buffer)
 		{
-			err = CASSETTE_ERROR_OUTOFMEMORY;
+			err = cassette_image::error::OUT_OF_MEMORY;
 			goto done;
 		}
 		buffer = alloc_buffer;
@@ -795,7 +804,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 		cassette_image_read(cassette, buffer, offset, this_length);
 
 		err = cassette_put_modulated_data(cassette, channel, time_index, buffer, this_length, modulation, &delta);
-		if (err)
+		if (err != cassette_image::error::SUCCESS)
 			goto done;
 		total_displacement += delta;
 		time_index += delta;
@@ -804,7 +813,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 
 	if (time_displacement)
 		*time_displacement = total_displacement;
-	err = CASSETTE_ERROR_SUCCESS;
+	err = cassette_image::error::SUCCESS;
 
 done:
 	if (alloc_buffer)
@@ -814,11 +823,11 @@ done:
 
 
 
-casserr_t cassette_put_modulated_data_bit(cassette_image *cassette, int channel, double time_index,
+cassette_image::error cassette_put_modulated_data_bit(cassette_image *cassette, int channel, double time_index,
 	UINT8 data, const struct CassetteModulation *modulation,
 	double *time_displacement)
 {
-	casserr_t err;
+	cassette_image::error err;
 	const INT8 *wave_bytes;
 	size_t wave_bytes_length;
 	double total_displacement = 0.0;
@@ -830,12 +839,12 @@ casserr_t cassette_put_modulated_data_bit(cassette_image *cassette, int channel,
 	pulse_frequency = (data) ? modulation->one_frequency_cannonical : modulation->zero_frequency_cannonical;
 	pulse_period = 1 / pulse_frequency;
 	err = cassette_put_samples(cassette, 0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, CASSETTE_WAVEFORM_8BIT);
-	if (err)
+	if (err != cassette_image::error::SUCCESS)
 		goto done;
 	time_index += pulse_period;
 	total_displacement += pulse_period;
 
-	err = CASSETTE_ERROR_SUCCESS;
+	err = cassette_image::error::SUCCESS;
 
 done:
 	if (time_displacement)
@@ -849,21 +858,21 @@ done:
     waveform accesses to/from the raw image
 *********************************************************************/
 
-casserr_t cassette_legacy_identify(cassette_image *cassette, struct CassetteOptions *opts,
+cassette_image::error cassette_legacy_identify(cassette_image *cassette, struct CassetteOptions *opts,
 	const struct CassetteLegacyWaveFiller *legacy_args)
 {
 	opts->channels = 1;
 	opts->bits_per_sample = 16;
 	opts->sample_frequency = legacy_args->sample_frequency;
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-casserr_t cassette_legacy_construct(cassette_image *cassette,
+cassette_image::error cassette_legacy_construct(cassette_image *cassette,
 	const struct CassetteLegacyWaveFiller *legacy_args)
 {
-	casserr_t err;
+	cassette_image::error err;
 	int length;
 	int sample_count;
 	dynamic_buffer bytes;
@@ -898,7 +907,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	{
 		if (size > 0x7FFFFFFF)
 		{
-			err = CASSETTE_ERROR_OUTOFMEMORY;
+			err = cassette_image::error::OUT_OF_MEMORY;
 			goto done;
 		}
 
@@ -925,7 +934,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_HEADER);
 		if (length < 0)
 		{
-			err = CASSETTE_ERROR_INVALIDIMAGE;
+			err = cassette_image::error::INVALID_IMAGE;
 			goto done;
 		}
 		pos += length;
@@ -940,7 +949,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 		length = args.fill_wave(&samples[pos], sample_count - pos, &chunk[0]);
 		if (length < 0)
 		{
-			err = CASSETTE_ERROR_INVALIDIMAGE;
+			err = cassette_image::error::INVALID_IMAGE;
 			goto done;
 		}
 		pos += length;
@@ -954,7 +963,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_TRAILER);
 		if (length < 0)
 		{
-			err = CASSETTE_ERROR_INVALIDIMAGE;
+			err = cassette_image::error::INVALID_IMAGE;
 			goto done;
 		}
 		pos += length;
@@ -963,11 +972,11 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	/* specify the wave */
 	err = cassette_put_samples(cassette, 0, 0.0, ((double) pos) / args.sample_frequency,
 		pos, 2, &samples[0], CASSETTE_WAVEFORM_16BIT);
-	if (err)
+	if (err != cassette_image::error::SUCCESS)
 		goto done;
 
 	/* success! */
-	err = CASSETTE_ERROR_SUCCESS;
+	err = cassette_image::error::SUCCESS;
 
 #if DUMP_CASSETTES
 	cassette_dump(cassette, "C:\\TEMP\\CASDUMP.WAV");
