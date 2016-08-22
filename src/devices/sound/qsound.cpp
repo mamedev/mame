@@ -157,32 +157,39 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			// Go through the buffer and add voice contributions
 			for (int i = 0; i < samples; i++)
 			{
-				elem.address += (elem.step_ptr >> 12);
-				elem.step_ptr &= 0xfff;
-				elem.step_ptr += elem.freq;
-
-				if (elem.address >= elem.end)
+				elem.prev_sample = elem.sample;
+				
+				if(elem.step_ptr>>12)
 				{
-					if (elem.loop)
+					elem.address += (elem.step_ptr >> 12);
+					if (elem.address >= elem.end)
 					{
-						// Reached the end, restart the loop
-						elem.address -= elem.loop;
+						if (elem.loop)
+						{
+							// Reached the end, restart the loop
+							elem.address -= elem.loop;
 
-						// Make sure we don't overflow (what does the real chip do in this case?)
-						if (elem.address >= elem.end)
-							elem.address = elem.end - elem.loop;
+							// Make sure we don't overflow (what does the real chip do in this case?)
+							if (elem.address >= elem.end)
+								elem.address = elem.end - elem.loop;
 
-						elem.address &= 0xffff;
+							elem.address &= 0xffff;
+						}
+						else
+						{
+							// Reached the end of a non-looped sample
+							elem.enabled = false;
+							break;
+						}
 					}
-					else
-					{
-						// Reached the end of a non-looped sample
-						elem.enabled = false;
-						break;
-					}
+					
+					elem.sample = read_sample(elem.bank | elem.address);
 				}
-
-				INT8 sample = read_sample(elem.bank | elem.address);
+				
+				elem.step_ptr &= 0xfff;
+				INT8 sample = elem.prev_sample + (elem.step_ptr*(elem.sample-elem.prev_sample)>>12);
+				elem.step_ptr += elem.freq;
+				
 				*lmix++ += ((sample * elem.lvol * elem.vol) >> 14);
 				*rmix++ += ((sample * elem.rvol * elem.vol) >> 14);
 			}
