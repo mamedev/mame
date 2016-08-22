@@ -305,6 +305,23 @@ ROM_START(dvlriderg)
 	ROM_LOAD("g_snd_3.bin", 0xa000, 0x2000, CRC(2e64a401) SHA1(694808963d6e6a02ddeb9228073825ff16f91d49))
 ROM_END
 
+ROM_START(dvlriderf)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "cpu.ic1", 0x0000, 0x0800, CRC(5874ab12) SHA1(e616193943797d91e5cf2abfcc052821d24336b4))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "cpu.ic2", 0x0800, 0x0800, CRC(09829446) SHA1(dc82135eae544f8eb1a3227bc6de0bd9a464e778))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("fr01snd1.1d", 0xe000, 0x2000, CRC(ba435706) SHA1(a05fb75aa135d02e9f97024524fe780d48d92be0))
+	ROM_LOAD("fr01snd2.1e", 0xc000, 0x2000, NO_DUMP)
+	ROM_LOAD("fr01snd3.1g", 0xa000, 0x2000, CRC(f707ad05) SHA1(0e3254ccf901181854f2e31c7339bd9e21d7d0bd))
+ROM_END
+
 /*--------------------------------
 / Farfalla (09/83)
 /-------------------------------*/
@@ -721,6 +738,22 @@ ROM_START(socrking)
 	ROM_LOAD("sound4.g", 0xc000, 0x1000, CRC(720593fb) SHA1(93aa9ae1be299548e17b4fe97a7fb4ddab76de40))
 ROM_END
 
+ROM_START(socrkinga)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "soccer.ic1", 0x0000, 0x0800, CRC(3fbd7c32) SHA1(2f56f67d1ad987638284000cca1e20ff17fcd4f9))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_LOAD ( "soccer.ic2", 0x0800, 0x0800, CRC(0cc0df1f) SHA1(2fd05af0ec63835a8f69fdc50e2faceb829b4df2))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_LOAD ( "soccer.ic3", 0x1000, 0x0800, CRC(5da6ea20) SHA1(c0e740e20a968ee58e0cd12a0089bb047f5e2cbb))
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sound1.c", 0xf000, 0x1000, CRC(3aa95018) SHA1(5347c3aefb642fc5cabd9d5e61fe6515a2dcb2aa))
+	ROM_LOAD("sound2.e", 0xe000, 0x1000, CRC(f9b57fd6) SHA1(50e42ed349680211eedf55ae639dbae899f3c6da))
+	ROM_LOAD("sound3.f", 0xd000, 0x1000, CRC(551566e6) SHA1(350432dbc0d6f55404cae970524a0dfda15d8aa0))
+	ROM_LOAD("sound4.g", 0xc000, 0x1000, CRC(720593fb) SHA1(93aa9ae1be299548e17b4fe97a7fb4ddab76de40))
+ROM_END
+
 ROM_START(socrkingi)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD ( "soccer.ic1", 0x0000, 0x0800, CRC(3fbd7c32) SHA1(2f56f67d1ad987638284000cca1e20ff17fcd4f9))
@@ -824,6 +857,33 @@ ROM_START(strsphnx)
 ROM_END
 
 /*--------------------------------
+/ Thunder Man (1987)
+/-------------------------------*/
+ROM_START(thndrman)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mpu_ic1.764",0x0000, 0x0800, CRC(d4861835) SHA1(b3518eb3126fc3f5b6f3e9a4c53df8eec21768c5))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x0800, 0x0800)
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_RELOAD  (0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_CONTINUE(0x4800, 0x0800)
+	ROM_CONTINUE(0x6800, 0x0800)
+	ROM_LOAD("mpu_ic3.764",0x1000, 0x0800, CRC(db85aec2) SHA1(ac5b321cc9d6f86a7f554af010858d2144cbdf2a))
+	ROM_CONTINUE(0x3000, 0x0800)
+	ROM_CONTINUE(0x1800, 0x0800)
+	ROM_CONTINUE(0x3800, 0x0800)
+	ROM_RELOAD  (0x5000, 0x0800)
+	ROM_CONTINUE(0x7000, 0x0800)
+	ROM_CONTINUE(0x5800, 0x0800)
+	ROM_CONTINUE(0x7800, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("snd_1f.764", 0xc000, 0x2000, CRC(400e8e2a) SHA1(24af3a8e11aec89ae27a5cfcce9d4624bede18f7))
+	ROM_LOAD("snd_1c.764", 0xe000, 0x2000, CRC(4f18409f) SHA1(21002a147e2542caacba0392cec62511343b90c2))
+ROM_END	
+
+/*--------------------------------
 / Time Machine (04/83)
 /-------------------------------*/
 ROM_START(tmachzac)
@@ -910,6 +970,7 @@ GAME(1985,  clown,      0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Za
 GAME(1984,  dvlrider,   0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Devil Riders",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1984,  dvlrideri,  dvlrider, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Devil Riders (Italian speech)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1984,  dvlriderg,  dvlrider, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Devil Riders (German speech)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  dvlriderf,  dvlrider, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Devil Riders (French speech)",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  farfalla,   0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Farfalla",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  farfallai,  farfalla, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Farfalla (Italian speech)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  farfallag,  farfalla, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Farfalla (German speech)",             MACHINE_IS_SKELETON_MECHANICAL)
@@ -934,11 +995,13 @@ GAME(1985,  robotg,     robot,    zac_2,  zac_2, driver_device, 0,  ROT0,    "Za
 GAME(1985,  robotf,     robot,    zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Robot (Zaccaria, French speech)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  scram_tp,   0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Tecnoplay",   "Scramble (Pinball)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1982,  socrking,   0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Soccer Kings",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  socrkinga,  socrking, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Soccer Kings (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1982,  socrkingi,  socrking, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Soccer Kings (Italian speech)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1982,  socrkingg,  socrking, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Soccer Kings (German speech)",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  spookyp,    0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Spooky",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  spookyi,    spookyp,  zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Spooky (Italian speech)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  strsphnx,   0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Star's Phoenix (Italian speech)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  thndrman,   0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Apple Time",  "Thunder Man",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  tmachzac,   0,        zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Time Machine (Zaccaria)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  tmachzacg,  tmachzac, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Time Machine (Zaccaria, German speech)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  tmachzacf,  tmachzac, zac_2,  zac_2, driver_device, 0,  ROT0,    "Zaccaria",    "Time Machine (Zaccaria, French speech)",                MACHINE_IS_SKELETON_MECHANICAL)
