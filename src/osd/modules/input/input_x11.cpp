@@ -11,7 +11,7 @@
 #include "input_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_SDL2) && /*!defined(SDLMAME_WIN32) &&*/ defined(USE_XINPUT) && USE_XINPUT
+#if defined(SDLMAME_SDL2) && !defined(SDLMAME_WIN32) && defined(USE_XINPUT) && USE_XINPUT
 
 // for X11 xinput
 #include <X11/Xlib.h>
