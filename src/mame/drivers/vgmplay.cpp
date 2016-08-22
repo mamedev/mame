@@ -978,6 +978,23 @@ void vgmplay_state::machine_start()
 
 		UINT32 version = r32(8);
 		logerror("File version %x.%02x\n", version >> 8, version & 0xff);
+
+		UINT32 header_size = 0;
+		if(version < 0x151)
+			header_size = 0x40;
+		else if(version < 0x161)
+			header_size = 0x80;
+		else if(version < 0x171)
+			header_size = 0xc0;
+		else
+			header_size = 0x100;
+		logerror("Header size according to version is %x, header size according to header is %x\n", header_size, r32(0x34) + 0x34);
+
+		UINT32 data_start = header_size;
+		if (version >= 0x150 && r32(0x34))
+			data_start = r32(0x34) + 0x34;
+
+		// Parse clocks
 		if(r32(0x0c))
 			m_sn76496->set_unscaled_clock(r32(0x0c));
 		if(r32(0x10))
@@ -990,103 +1007,116 @@ void vgmplay_state::machine_start()
 			m_ym2612->set_unscaled_clock(r32(0x2c));
 		if(version >= 0x110 && r32(0x30))
 			m_ym2151->set_unscaled_clock(r32(0x30));
+
 		if(version >= 0x151 && r32(0x38))
 			m_segapcm->set_unscaled_clock(r32(0x38));
-		if(version >= 0x151 && r32(0x40))
-			logerror("Warning: file requests an unsupported RF5C68\n");
-		if(version >= 0x151 && r32(0x44)) {
-			UINT32 clock = r32(0x44);
-			if (clock & 0x40000000)
-				clock &= ~0x40000000;
-			m_ym2203a->set_unscaled_clock(clock);
-			m_ym2203b->set_unscaled_clock(clock);
-		}
-		if(version >= 0x151 && r32(0x48))
-			logerror("Warning: file requests an unsupported YM2608\n");
-		if(version >= 0x151 && r32(0x4c))
-			logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
-		if(version >= 0x151 && r32(0x50)) {
-			m_ym3812->set_unscaled_clock(r32(0x50));
-		}
-		if(version >= 0x151 && r32(0x54)) {
-			m_ym3526->set_unscaled_clock(r32(0x54));
-		}
-		if(version >= 0x151 && r32(0x58))
-			logerror("Warning: file requests an unsupported Y8950\n");
-		if(version >= 0x151 && r32(0x5c))
-			logerror("Warning: file requests an unsupported YMF262\n");
-		if(version >= 0x151 && r32(0x60))
-			logerror("Warning: file requests an unsupported YMF278B\n");
-		if(version >= 0x151 && r32(0x64))
-			logerror("Warning: file requests an unsupported YMF271\n");
-		if(version >= 0x151 && r32(0x68))
-			logerror("Warning: file requests an unsupported YMZ280B\n");
-		if(version >= 0x151 && r32(0x6c))
-			logerror("Warning: file requests an unsupported RF5C164\n");
-		if(version >= 0x151 && r32(0x70))
-			logerror("Warning: file requests an unsupported PWM\n");
-		if(version >= 0x151 && r32(0x74)) {
-			m_ay8910a->set_unscaled_clock(r32(0x74) & ~0x40000000);
-			m_ay8910b->set_unscaled_clock(r32(0x74) & ~0x40000000);
-		}
-		if(version >= 0x151 && r8(0x78)) {
-			UINT8 type = r8(0x78);
-			if (type & 0x10)
-			{
-				ay8910_device::set_psg_type(*m_ay8910a, ay8910_device::PSG_TYPE_YM);
-				ay8910_device::set_psg_type(*m_ay8910b, ay8910_device::PSG_TYPE_YM);
+
+		if (data_start > 0x40)
+		{
+			if(version >= 0x151 && r32(0x40))
+				logerror("Warning: file requests an unsupported RF5C68\n");
+			if(version >= 0x151 && r32(0x44)) {
+				UINT32 clock = r32(0x44);
+				if (clock & 0x40000000)
+					clock &= ~0x40000000;
+				m_ym2203a->set_unscaled_clock(clock);
+				m_ym2203b->set_unscaled_clock(clock);
+			}
+			if(version >= 0x151 && r32(0x48))
+				logerror("Warning: file requests an unsupported YM2608\n");
+			if(version >= 0x151 && r32(0x4c))
+				logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
+			if(version >= 0x151 && r32(0x50)) {
+				m_ym3812->set_unscaled_clock(r32(0x50));
+			}
+			if(version >= 0x151 && r32(0x54)) {
+				m_ym3526->set_unscaled_clock(r32(0x54));
+			}
+			if(version >= 0x151 && r32(0x58))
+				logerror("Warning: file requests an unsupported Y8950\n");
+			if(version >= 0x151 && r32(0x5c))
+				logerror("Warning: file requests an unsupported YMF262\n");
+			if(version >= 0x151 && r32(0x60))
+				logerror("Warning: file requests an unsupported YMF278B\n");
+			if(version >= 0x151 && r32(0x64))
+				logerror("Warning: file requests an unsupported YMF271\n");
+			if(version >= 0x151 && r32(0x68))
+				logerror("Warning: file requests an unsupported YMZ280B\n");
+			if(version >= 0x151 && r32(0x6c))
+				logerror("Warning: file requests an unsupported RF5C164\n");
+			if(version >= 0x151 && r32(0x70))
+				logerror("Warning: file requests an unsupported PWM\n");
+			if(version >= 0x151 && r32(0x74)) {
+				m_ay8910a->set_unscaled_clock(r32(0x74) & ~0x40000000);
+				m_ay8910b->set_unscaled_clock(r32(0x74) & ~0x40000000);
+			}
+			if(version >= 0x151 && r8(0x78)) {
+				UINT8 type = r8(0x78);
+				if (type & 0x10)
+				{
+					ay8910_device::set_psg_type(*m_ay8910a, ay8910_device::PSG_TYPE_YM);
+					ay8910_device::set_psg_type(*m_ay8910b, ay8910_device::PSG_TYPE_YM);
+				}
+			}
+			if(version >= 0x151 && r8(0x79)) {
+				UINT8 flags = r8(0x79);
+				UINT8 to_set = 0;
+				if (flags & 1)
+					to_set |= AY8910_LEGACY_OUTPUT;
+				if (flags & 2)
+					to_set |= AY8910_SINGLE_OUTPUT;
+				if (flags & 4)
+					to_set |= AY8910_DISCRETE_OUTPUT;
+				ay8910_device::set_flags(*m_ay8910a, to_set);
+				ay8910_device::set_flags(*m_ay8910b, to_set);
+			}
+			if(version >= 0x151 && r8(0x7a)) {
+				UINT8 flags = r8(0x7a);
+				UINT8 to_set = 0;
+				if (flags & 1)
+					to_set |= AY8910_LEGACY_OUTPUT;
+				if (flags & 2)
+					to_set |= AY8910_SINGLE_OUTPUT;
+				if (flags & 4)
+					to_set |= AY8910_DISCRETE_OUTPUT;
+				ay8910_device::set_flags(*m_ym2203a, to_set);
+				ay8910_device::set_flags(*m_ym2203b, to_set);
 			}
 		}
-		if(version >= 0x151 && r8(0x79)) {
-			UINT8 flags = r8(0x79);
-			UINT8 to_set = 0;
-			if (flags & 1)
-				to_set |= AY8910_LEGACY_OUTPUT;
-			if (flags & 2)
-				to_set |= AY8910_SINGLE_OUTPUT;
-			if (flags & 4)
-				to_set |= AY8910_DISCRETE_OUTPUT;
-			ay8910_device::set_flags(*m_ay8910a, to_set);
-			ay8910_device::set_flags(*m_ay8910b, to_set);
+
+		if (data_start > 0x80)
+		{
+			if(version >= 0x161 && r32(0x80)) {
+				m_dmg->set_unscaled_clock(r32(0x80));
+			}
+			if(version >= 0x161 && r32(0x84)) {
+				m_nescpu->set_unscaled_clock(r32(0x84));
+				m_nescpu->m_apu->set_unscaled_clock(r32(0x84));
+			}
+			if(version >= 0x161 && r32(0x88)) {
+				m_multipcma->set_unscaled_clock(r32(0x88) & ~0x40000000);
+				m_multipcmb->set_unscaled_clock(r32(0x88) & ~0x40000000);
+			}
+			if(version >= 0x161 && r32(0xac)) {
+				m_k053260->set_unscaled_clock(r32(0xac));
+			}
+			if(version >= 0x161 && r32(0xa4)) {
+				m_c6280->set_unscaled_clock(r32(0xa4));
+			}
+			if(version >= 0x161 && r32(0xb0)) {
+				m_pokeya->set_unscaled_clock(r32(0xb0) & ~0x40000000);
+				m_pokeyb->set_unscaled_clock(r32(0xb0) & ~0x40000000);
+			}
 		}
-		if(version >= 0x151 && r8(0x7a)) {
-			UINT8 flags = r8(0x7a);
-			UINT8 to_set = 0;
-			if (flags & 1)
-				to_set |= AY8910_LEGACY_OUTPUT;
-			if (flags & 2)
-				to_set |= AY8910_SINGLE_OUTPUT;
-			if (flags & 4)
-				to_set |= AY8910_DISCRETE_OUTPUT;
-			ay8910_device::set_flags(*m_ym2203a, to_set);
-			ay8910_device::set_flags(*m_ym2203b, to_set);
-		}
-		if(version >= 0x161 && r32(0x80)) {
-			m_dmg->set_unscaled_clock(r32(0x80));
-		}
-		if(version >= 0x161 && r32(0x84)) {
-			m_nescpu->set_unscaled_clock(r32(0x84));
-			m_nescpu->m_apu->set_unscaled_clock(r32(0x84));
-		}
-		if(version >= 0x161 && r32(0x88)) {
-			m_multipcma->set_unscaled_clock(r32(0x88) & ~0x40000000);
-			m_multipcmb->set_unscaled_clock(r32(0x88) & ~0x40000000);
-		}
-		if(version >= 0x161 && r32(0xac)) {
-			m_k053260->set_unscaled_clock(r32(0xac));
-		}
-		if(version >= 0x161 && r32(0xa4)) {
-			m_c6280->set_unscaled_clock(r32(0xa4));
-		}
-		if(version >= 0x161 && r32(0xb0)) {
-			m_pokeya->set_unscaled_clock(r32(0xb0) & ~0x40000000);
-			m_pokeyb->set_unscaled_clock(r32(0xb0) & ~0x40000000);
-		}
-		if(version >= 0x171 && r8(0xd6)) {
-			c352_device::static_set_divider(*m_c352, r8(0xd6) * 4);
-		}
-		if(version >= 0x171 && r32(0xdc)) {
-			m_c352->set_unscaled_clock(r32(0xdc));
+
+		if (data_start > 0xc0)
+		{
+			if(version >= 0x171 && r8(0xd6)) {
+				c352_device::static_set_divider(*m_c352, r8(0xd6) * 4);
+			}
+			if(version >= 0x171 && r32(0xdc)) {
+				m_c352->set_unscaled_clock(r32(0xdc));
+			}
 		}
 	}
 }
