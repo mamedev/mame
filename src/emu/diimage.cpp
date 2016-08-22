@@ -1052,7 +1052,9 @@ image_init_result device_image_interface::load_software(const std::string &softl
 	m_image_name = m_full_software_name;
 	m_basename = m_full_software_name;
 	m_basename_noext = m_full_software_name;
-	m_filetype = "";
+	m_filetype = m_mame_file != nullptr
+		? core_filename_extract_extension(m_mame_file->filename(), true)
+		: "";
 
 	// check if image should be read-only
 	const char *read_only = get_feature("read_only");
