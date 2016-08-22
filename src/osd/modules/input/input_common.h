@@ -17,10 +17,10 @@
 #include <memory>
 #include <mutex>
 #include <queue>
-#include <string>
+#include <algorithm>
+#include <functional>
 #undef min
 #undef max
-#include <utility>
 
 
 //============================================================
@@ -287,55 +287,37 @@ public:
 
 class input_device_list
 {
-protected:
+private:
 	std::vector<std::unique_ptr<device_info>> m_list;
 
 public:
-	input_device_list()
-	{
-	}
+	size_t size() const { return m_list.size(); }
+	auto begin() { return m_list.begin(); }
+	auto end() { return m_list.end(); }
 
 	void poll_devices()
 	{
-		for (auto iter = m_list.begin(); iter != m_list.end(); ++iter)
-			iter->get()->poll();
+		for (auto &device: m_list)
+			device->poll();
 	}
 
 	void reset_devices()
 	{
-		for (auto iter = m_list.begin(); iter != m_list.end(); ++iter)
-			iter->get()->reset();
+		for (auto &device: m_list)
+			device->reset();
 	}
 
-	void free_device(device_info * devinfo)
+	void free_device(device_info* devinfo)
 	{
-		// remove us from the list
-		for (auto iter = m_list.begin(); iter != m_list.end(); ++iter)
-		{
-			if (iter->get() == devinfo)
-			{
-				m_list.erase(iter);
-				break;
-			}
-		}
+		// find the device to remove
+		auto device_matches = [devinfo](std::unique_ptr<device_info> &device) { return devinfo == device.get(); };
+		m_list.erase(std::remove_if(std::begin(m_list), std::end(m_list), device_matches), m_list.end());
 	}
 
-	int find_index(device_info* devinfo)
+	void for_each_device(std::function<void (device_info*)> action)
 	{
-		// remove us from the list
-		int i = 0;
-		for (auto iter = m_list.begin(); iter != m_list.end(); ++iter)
-		{
-			if (iter->get() == devinfo)
-			{
-				break;
-			}
-
-			i++;
-		}
-
-		// return the index or -1 if we couldn't find it
-		return i == m_list.size() ? -1 : i;
+		for (auto &device: m_list)
+			action(device.get());
 	}
 
 	void free_all_devices()
@@ -344,49 +326,17 @@ public:
 			m_list.pop_back();
 	}
 
-	int size() const
-	{
-		return m_list.size();
-	}
-
-	device_info* at(int index)
-	{
-		return m_list.at(index).get();
-	}
-
-	template <typename TActual>
-	TActual* create_device(running_machine &machine, const char *name, input_module &module)
+	template <typename TActual, typename... TArgs>
+	TActual* create_device(running_machine &machine, const char *name, input_module &module, TArgs&&... args)
 	{
 		// allocate the device object
-		auto devinfo = std::make_unique<TActual>(machine, name, module);
+		auto devinfo = std::make_unique<TActual>(machine, name, module, std::forward<TArgs>(args)...);
 
-		return add_device_internal(machine, name, module, std::move(devinfo));
-	}
-
-	template <typename TActual, typename TArg>
-	TActual* create_device1(running_machine &machine, const char *name, input_module &module, TArg arg1)
-	{
-		// allocate the device object
-		auto devinfo = std::make_unique<TActual>(machine, name, module, arg1);
-
-		return add_device_internal(machine, name, module, std::move(devinfo));
-	}
-
-	template <class TActual>
-	TActual* at(int index)
-	{
-		return static_cast<TActual*>(m_list.at(index).get());
-	}
-
-private:
-	template <typename TActual>
-	TActual* add_device_internal(running_machine &machine, const char *name, input_module &module, std::unique_ptr<TActual> allocated)
-	{
 		// Add the device to the machine
-		allocated->m_device = machine.input().device_class(allocated->deviceclass()).add_device(allocated->name(), allocated.get());
+		devinfo->m_device = machine.input().device_class(devinfo->deviceclass()).add_device(devinfo->name(), devinfo.get());
 
 		// append us to the list
-		m_list.push_back(std::move(allocated));
+		m_list.push_back(std::move(devinfo));
 
 		return static_cast<TActual*>(m_list.back().get());
 	}

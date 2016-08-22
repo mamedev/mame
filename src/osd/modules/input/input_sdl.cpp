@@ -19,15 +19,15 @@
 // standard sdl header
 #include <SDL2/SDL.h>
 #include <ctype.h>
+// ReSharper disable once CppUnusedIncludeDirective
 #include <stddef.h>
 #include <mutex>
 #include <memory>
 #include <queue>
+#include <algorithm>
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
-#include "ui/uimain.h"
 #include "uiinput.h"
 #include "strconv.h"
 
@@ -487,11 +487,12 @@ public:
 		return sdl_event_manager::instance().has_focus() && input_enabled();
 	}
 
-	virtual void handle_event(SDL_Event &sdlevent) override
+	void handle_event(SDL_Event &sdlevent) override
 	{
 		// By default dispatch event to every device
-		for (int i = 0; i < devicelist()->size(); i++)
-			downcast<sdl_device*>(devicelist()->at(i))->queue_events(&sdlevent, 1);
+		devicelist()->for_each_device([&sdlevent](auto device) {
+			downcast<sdl_device*>(device)->queue_events(&sdlevent, 1);
+		});
 	}
 };
 
@@ -554,7 +555,7 @@ private:
 		char *keymap_filename;
 		FILE *keymap_file;
 		int line = 1;
-		int index, i, sk, vk, ak;
+		int index, len, sk, vk, ak;
 		char buf[256];
 		char mks[41];
 		char sks[41];
@@ -592,9 +593,9 @@ private:
 			if (ret && buf[0] != '\n' && buf[0] != '#')
 			{
 				buf[255] = 0;
-				i = strlen(buf);
-				if (i && buf[i - 1] == '\n')
-					buf[i - 1] = 0;
+				len = strlen(buf);
+				if (len && buf[len - 1] == '\n')
+					buf[len - 1] = 0;
 				if (strncmp(buf, "[SDL2]", 6) == 0)
 				{
 					sdl2section = 1;
@@ -861,43 +862,41 @@ public:
 	virtual void handle_event(SDL_Event &sdlevent) override
 	{
 		// Figure out which joystick this event id destined for
-		for (int i = 0; i < devicelist()->size(); i++)
+		auto target_device = std::find_if(devicelist()->begin(), devicelist()->end(), [&sdlevent](auto &device)
 		{
-			auto joy = downcast<sdl_joystick_device*>(devicelist()->at(i));
-
-			// If we find a matching joystick, dispatch the event to the joystick
-			if (joy->sdl_state.joystick_id == sdlevent.jdevice.which)
-				joy->queue_events(&sdlevent, 1);
+			std::unique_ptr<device_info> &ptr = device;
+			return downcast<sdl_joystick_device*>(ptr.get())->sdl_state.joystick_id == sdlevent.jdevice.which;
+		});
+		
+		// If we find a matching joystick, dispatch the event to the joystick
+		if (target_device != devicelist()->end())
+		{
+			downcast<sdl_joystick_device*>((*target_device).get())->queue_events(&sdlevent, 1);
 		}
 	}
 
 private:
 	sdl_joystick_device* create_joystick_device(running_machine &machine, device_map_t *devmap, int index, input_device_class devclass)
 	{
-		sdl_joystick_device *devinfo = nullptr;
 		char tempname[20];
 
-		if (devmap->map[index].name.length() == 0)
+		if (devmap->map[index].name.empty())
 		{
-			/* only map place holders if there were mappings specified is enabled */
+			// only map place holders if there were mappings specified
 			if (devmap->initialized)
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
-				devinfo = m_sixaxis_mode
+				m_sixaxis_mode
 					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, *this)
 					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, *this);
 			}
 
 			return nullptr;
 		}
-		else
-		{
-			devinfo = m_sixaxis_mode
-				? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), *this)
-				: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), *this);
-		}
 
-		return devinfo;
+		return m_sixaxis_mode
+			? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), *this)
+			: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), *this);
 	}
 };
 

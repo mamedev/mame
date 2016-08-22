@@ -97,15 +97,22 @@ typedef DWORD (WINAPI *xinput_get_caps_fn)(DWORD, DWORD, XINPUT_CAPABILITIES *);
 class xinput_api_helper : public std::enable_shared_from_this<xinput_api_helper>
 {
 public:
+	xinput_api_helper()
+		: m_xinput_dll(nullptr),
+		  XInputGetState(nullptr),
+		  XInputGetCapabilities(nullptr)
+	{
+	}
+
 	int initialize();
 	xinput_joystick_device * create_xinput_device(running_machine &machine, UINT index, wininput_module &module);
 
-	inline DWORD xinput_get_state(DWORD dwUserindex, XINPUT_STATE *pState)
+	DWORD xinput_get_state(DWORD dwUserindex, XINPUT_STATE *pState) const
 	{
 		return (*XInputGetState)(dwUserindex, pState);
 	}
 
-	inline DWORD xinput_get_capabilities(DWORD dwUserindex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities)
+	DWORD xinput_get_capabilities(DWORD dwUserindex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities) const
 	{
 		return (*XInputGetCapabilities)(dwUserindex, dwFlags, pCapabilities);
 	}
