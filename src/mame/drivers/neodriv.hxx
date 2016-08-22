@@ -8669,7 +8669,7 @@ GAME( 1997, kof97,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1997, kof97h,     kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (NGH-2320)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97k,     kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (Korean release)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97pls,   kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, kof97oro,   kof97,    kof97oro,  neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Oroshi Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, kof97oro,   kof97,    kof97oro,  neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Chongchu Jianghu Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kog,        kof97,    kog,       neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protected bootleg
 GAME( 1997, lastblad,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", MACHINE_SUPPORTS_SAVE )

@@ -9267,9 +9267,10 @@
 	<!-- The King of Fighters '97 bootlegs -->
 
 	<software name="kof97oro" cloneof="kof97">
-		<description>The King of Fighters '97 Oroshi Plus 2003 (bootleg)</description>
+		<description>The King of Fighters '97 Chongchu Jianghu Plus 2003 (bootleg)</description>
 		<year>1997</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="The King of Fighters '97 重出江湖 Plus 2003 (bootleg)"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
