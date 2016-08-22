@@ -377,10 +377,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
 
 READ16_MEMBER(cps_state::qsound_rom_r)
 {
-	UINT8 *rom = memregion("user1")->base();
-
-	if (rom)
+	if (memregion("user1") != nullptr)
+	{
+		UINT8 *rom = memregion("user1")->base();
 		return rom[offset] | 0xff00;
+	}
 	else
 	{
 		popmessage("%06x: read sound ROM byte %04x", space.device().safe_pc(), offset);
