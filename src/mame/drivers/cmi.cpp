@@ -663,9 +663,6 @@ private:
 	UINT8 	m_msm5832_addr;
 	int		m_mkbd_kbd_acia_irq;
 	int		m_mkbd_cmi_acia_irq;
-	int		m_mkbd_tx_start;
-	int		m_mkbd_tx_bits;
-	int		m_mkbd_tx_reg;
 
 	// Alphanumeric keyboard
 	int		m_ank_irqa;
