@@ -283,6 +283,7 @@ void qsound_device::write_data(UINT8 address, UINT16 data)
 		case 3:
 			// key on (does the value matter? it always writes 0x8000)
 			m_channel[ch].enabled = true;
+			m_channel[ch].prev_sample = 0;
 			m_channel[ch].step_ptr = 0;
 			break;
 
