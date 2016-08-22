@@ -70,6 +70,12 @@
 			<bounds x="0.0" y="0.0" width="5.0" height="1.0" />
 		</text>
 	</element>
+	
+	<element name="counter" defstate="0">
+		<simplecounter digits="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</simplecounter>
+	</element>
 
 	<view name="Simple LEDs">
 		<bounds left="0" top="0" right="4" bottom="3.472" />
@@ -102,6 +108,10 @@
 		</bezel>
 		<bezel name="lamp7" element="lamp">
 			<bounds x="2.115" y="3.2" width="0.1" height="0.1" />
+		</bezel>
+		
+		<bezel name="wheel" element="counter">
+			<bounds x="1.9" y="3.0" width="0.2" height="0.1" />
 		</bezel>
 	</view>
 </mamelayout>

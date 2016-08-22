@@ -372,23 +372,32 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 	m_midway_serial_pic2->write(space, 0, data >> 16);
 }
 
+READ32_MEMBER(midvunit_state::midvunit_output_r)
+{
+	return 1; //will let motion testing start. unable to succeed.
+}
+
 WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 {
 	int bit;
-	UINT8 op = (data >> 8) & 0x0F;
+	UINT8 op = (data >> 8) & 0xFF;
 	UINT8 arg = data & 0xFF;
 	switch (op) {
-		case 0x7: m_output_mode = arg; break;
-		case 0xB:
+		case 0xF7: m_output_mode = arg; break;
+		case 0xFB:
 		switch (m_output_mode) {
-			//case 0x4: wheel angle
-			case 0x5:
-			for (bit = 0; bit < 8; bit++) {
-				output().set_lamp_value(bit, (arg >> bit) & 0x1);
-			}
-			break;
+			case 0x00: break; //device init?
+			case 0x04: output().set_value("wheel", (arg&0x80)?(0x7F-(arg&0x7F)):(arg|0x80)); break; //wheel motor delta. left < 128 < right. 128 is no change.
+			case 0x05: for (bit = 0; bit < 8; bit++) output().set_lamp_value(bit, (arg >> bit) & 0x1); break;
+			case 0x08: break; //unknown. rarely changed.
+			case 0x09: break; //motion init program? large payload.
+			case 0x0A: break; //motion init? always being set to 0 during attempts to test.
+			case 0x0B: break; //motor1? init to 0 at boot.
+			case 0x0C: break; //motor2? init to 0 at boot.
 		}
 		break;
+		//receives same data as midvunit_sound_w. unsure what its purpose is, but it is redundant.
+		//case 0xFD: m_dcs->data_w(arg); break;
 	}
 }
 
@@ -497,7 +506,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
 	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995000, 0x995000) AM_WRITE(midvunit_output_w)
+	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_output_r, midvunit_output_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP // communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)

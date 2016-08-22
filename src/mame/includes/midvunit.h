@@ -132,6 +132,7 @@ public:
 	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
 	DECLARE_WRITE8_MEMBER(midvplus_xf1_w);
 	DECLARE_READ32_MEMBER(generic_speedup_r);
+	DECLARE_READ32_MEMBER(midvunit_output_r);
 	DECLARE_WRITE32_MEMBER(midvunit_output_w);
 	DECLARE_DRIVER_INIT(crusnu40);
 	DECLARE_DRIVER_INIT(crusnu21);
