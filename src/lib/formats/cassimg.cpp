@@ -903,7 +903,7 @@ cassette_image::error cassette_legacy_construct(cassette_image *cassette,
 	chunk.resize(args.chunk_size);
 
 	/* determine number of samples */
-	if (args.chunk_sample_calc)
+	if (args.chunk_sample_calc != nullptr)
 	{
 		if (size > 0x7FFFFFFF)
 		{
@@ -914,6 +914,13 @@ cassette_image::error cassette_legacy_construct(cassette_image *cassette,
 		bytes.resize(size);
 		cassette_image_read(cassette, &bytes[0], 0, size);
 		sample_count = args.chunk_sample_calc(&bytes[0], (int)size);
+		
+		// chunk_sample_calc functions report errors by returning negative numbers
+		if (sample_count < 0)
+		{
+			err = cassette_image::error::INVALID_IMAGE;
+			goto done;
+		}
 
 		if (args.header_samples < 0)
 			args.header_samples = sample_count;
