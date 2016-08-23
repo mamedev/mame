@@ -2458,7 +2458,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_LOAD( "95004121.hi", 0x080000, 0x080000, CRC(239f389c) SHA1(75d6f9f500aab5f114f8b86c4ca1f8dce6ea2ca4) )
 
 #define sc_crcc_matrix \
-	ROM_REGION( 0x400000, "matrix", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x400000, "dm01:matrix", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95000611.p1", 0x0000, 0x010000, CRC(3f40a2c9) SHA1(f73731171c56add1329f3a9d2f84303311d87884) )
 
 
@@ -2547,7 +2547,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_LOAD( "95004103.lo", 0x000000, 0x080000, CRC(9926f103) SHA1(f29a0d25eebd0a0990cd165116b425b795ed62e0) ) \
 	ROM_LOAD( "95004104.hi", 0x080000, 0x080000, CRC(bec75a23) SHA1(cdf895081ebf3afb52d5bfaab29f713800c85fc9) )
 #define sc_fcc_matrix \
-	ROM_REGION( 0x200000, "matrix", ROMREGION_ERASEFF )\
+	ROM_REGION( 0x200000, "dm01:matrix", ROMREGION_ERASEFF )\
 	ROM_LOAD( "club-firecracker_mtx_ass.bin", 0x0000, 0x010000, CRC(c23ffee9) SHA1(b4f2542e8ed0b282a439e523baa6cd43c5b2cb50) )
 #define sc_frsu_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2741,7 +2741,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_LOAD( "pub-en.s1", 0x000000, 0x080000, CRC(7e3f4295) SHA1(b7a2c538d79663a3d21f89311195619158fa7197) ) /* need testing */ \
 	ROM_LOAD( "pub-en.s2", 0x080000, 0x080000, CRC(637d3c0f) SHA1(193964efc28e56b05f39099a696dd3e9119b80dd) ) \
 	\
-	ROM_REGION( 0x400000, "matrix", 0 ) \
+	ROM_REGION( 0x400000, "dm01:matrix", 0 ) \
 	/* I don't think the SC4 version uses a DMD */ \
 	ROM_LOAD( "pbemydot", 0x0000, 0x010000, CRC(b056d3d4) SHA1(6c1dbc6fcb4761c25f9cc8123e9f0fe791488c19) ) /* DMD rom? Possibly SC2 DM01 */
 #define sc_oyf_others \
@@ -2902,7 +2902,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_LOAD( "95004082.p1", 0x000000, 0x080000, CRC(b7caba0f) SHA1(777afdb6a2f78edad5f4df506eb4cd571f9f357b) ) \
 	ROM_LOAD( "95004083.p2", 0x080000, 0x080000, CRC(c0cc21b7) SHA1(d0b22db4c1faeef34b794ac4c31bc9fd386493ea) )
 #define sc_ticlb_matrix \
-	ROM_REGION( 0x400000, "matrix", 0 ) \
+	ROM_REGION( 0x400000, "dm01:matrix", 0 ) \
 	ROM_LOAD( "club-treasure-island_mtx_ass.bin", 0x0000, 0x010000, CRC(74f97b29) SHA1(9334bf1e4b4e2bcbbfaa5ae32201ceaab0641d83) ) /* DMD */
 #define sc_tri7_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* PR1328 TRIPLE 7S SOUNDS11 */ \
@@ -2987,7 +2987,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 
 
 #define sc_clbtm_matrix \
-	ROM_REGION( 0x400000, "matrix", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x400000, "dm01:matrix", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "clubtempdot.bin", 0x0000, 0x010000, CRC(283d2d9c) SHA1(5b76a13ad674f8a40c270e5dbc61dac04d411d02) ) /* DM01 */ \
 	ROM_REGION( 0x400000, "matrixhex", ROMREGION_ERASE00 ) /* can probably be removed, need to verify it matches first tho */ \
 	ROM_LOAD( "club-temptation_mtx_(ihex)ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) )
