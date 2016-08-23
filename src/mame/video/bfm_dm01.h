@@ -32,13 +32,18 @@ public:
 
 	void writedata(UINT8 data);
 	int busy(void);
+	
+	INTERRUPT_GEN_MEMBER(nmi_line_assert);
 
 protected:
 	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	required_device<cpu_device> m_matrixcpu;
+
 	// internal state
 	int m_data_avail;
 	int m_control;
@@ -52,10 +57,10 @@ private:
 	devcb_write_line m_busy_cb;
 
 	int read_data(void);
+
 };
 
 extern const device_type BF_DM01;
 
-ADDRESS_MAP_EXTERN( bfm_dm01_memmap,8 );
 
 #endif
