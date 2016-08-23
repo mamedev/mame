@@ -929,6 +929,16 @@ ROM_START( am_mg24 )
 	ROM_LOAD( "n82s147a_2.bin", 0x0200, 0x0200, NO_DUMP )
 ROM_END
 
+/*
+  1x 40-pin custom CPU labeled:
+
+     Amatic Trading GMBH
+     Lfnd. Nr. 0940
+     Type:     801 L
+     Datum:    11.12.95
+
+  The program needs proper decryption.
+*/
 ROM_START( am_mg24a )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
