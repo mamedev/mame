@@ -73,11 +73,11 @@
   1x Dallas DS1236-10 (micro manager).
   1x Push button.
 
-  1x Unknown 24-pin IC labeled K-666 9330.
-  1x Unknown 8-pin IC labeled K-664 9432 (looks like a DAC).
-  1x LM358P (8-pin).
-  1x MC14538BCL (Dual precision monostable multivibrator).
-  1x TDA2003 Audio Amp.
+  1x Custom DIP24 IC labeled K-666 9330 (equivalent to YM3812).
+  1x Custom DIP8 IC labeled K-664 (equivalent to YM3014).
+  1x LM358P (DIP8, dual operational amplifier).
+  1x MC14538BCL (dual precision monostable multivibrator).
+  1x TDA2003 (10W. audio amplifier).
   1x Pot.
 
   1x KM6264BL-7 (RAM).
@@ -202,9 +202,9 @@
 
   1x Yamaha YM3812.
   1x Yamaha Y3014B (DAC).
-  1x LM358M (8-pin).
-  1x MC14538 (Dual precision monostable multivibrator).
-  1x TDA2003 (Audio Amp, Heatsinked).
+  1x LM358M (DIP8, dual operational amplifier).
+  1x MC14538 (dual precision monostable multivibrator).
+  1x TDA2003 (10W. audio amplifier) heatsinked.
   1x Pot.
 
   1x HY6264A (RAM).
