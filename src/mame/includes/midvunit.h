@@ -97,6 +97,7 @@ public:
 	emu_timer *m_scanline_timer;
 	std::unique_ptr<midvunit_renderer> m_poly;
 	UINT8 m_output_mode;
+	std::string m_galil_cmd;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);

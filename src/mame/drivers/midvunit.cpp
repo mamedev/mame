@@ -374,7 +374,10 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 
 READ32_MEMBER(midvunit_state::midvunit_output_r)
 {
-	return 1; //will let motion testing start. unable to succeed.
+	//need 0x8000 to allow reading of the following:
+	//0x4700, 0x5100, 0x5300, 0x5600, 0x5700, 0x5800, 0x5900, 0x5A00 (ascii maybe?)
+	//will softlock the game if it remains 0x8000 as that is not one of the expected branches
+	return 0;
 }
 
 WRITE32_MEMBER(midvunit_state::midvunit_output_w)
@@ -386,14 +389,21 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 		case 0xF7: m_output_mode = arg; break;
 		case 0xFB:
 		switch (m_output_mode) {
-			case 0x00: break; //device init?
+			case 0x00: break; //device init? 3C 1C are the only 2 writes at boot.
 			case 0x04: output().set_value("wheel", (arg&0x80)?(0x7F-(arg&0x7F)):(arg|0x80)); break; //wheel motor delta. left < 128 < right. 128 is no change.
 			case 0x05: for (bit = 0; bit < 8; bit++) output().set_lamp_value(bit, (arg >> bit) & 0x1); break;
-			case 0x08: break; //unknown. rarely changed.
-			case 0x09: break; //motion init program? large payload.
-			case 0x0A: break; //motion init? always being set to 0 during attempts to test.
-			case 0x0B: break; //motor1? init to 0 at boot.
-			case 0x0C: break; //motor2? init to 0 at boot.
+			case 0x08: break; //called when motion controller reads a 0x8000 from midvunit_output_r and wants a response.
+			case 0x09:
+				if (arg != 0xD)
+					m_galil_cmd += (char)arg;
+				else {
+					osd_printf_error("Galil: %s\n", m_galil_cmd.c_str());
+					m_galil_cmd.clear();
+				}
+			break; //Galil command input. ascii inputs terminated with carriage return.
+			case 0x0A: break; //write 0 to request response. wants to read 0x8000 after?
+			case 0x0B: break; //0 written at boot.
+			case 0x0C: break; //0 written at boot.
 		}
 		break;
 		//receives same data as midvunit_sound_w. unsure what its purpose is, but it is redundant.
