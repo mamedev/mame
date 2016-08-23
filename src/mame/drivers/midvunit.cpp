@@ -56,6 +56,7 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_shifter_state));
 	save_item(NAME(m_timer_rate));
 	save_item(NAME(m_output_mode));
+	save_item(NAME(m_output));
 }
 
 
@@ -375,9 +376,21 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 READ32_MEMBER(midvunit_state::midvunit_output_r)
 {
 	//need 0x8000 to allow reading of the following:
-	//0x4700, 0x5100, 0x5300, 0x5600, 0x5700, 0x5800, 0x5900, 0x5A00 (ascii maybe?)
+	//0x4700, 0x5100, 0x5300, 0x5600, 0x5700, 0x5800, 0x5900, 0x5A00
+	
+	//G
+	//V$## -> Expects value of 6, if not checks FCAC for 2 and sets it?
+	//X$## -> Stored at FD12
+	//Y$## -> Stored at FD13
+	//Z$## -> Stored at FD14
+	
+	//Floating point operation. No further inputs given. Goes to same place as G when done.
+	//W -> BE36
+	//S -> BE37
+	//Q -> BE38
+	
 	//will softlock the game if it remains 0x8000 as that is not one of the expected branches
-	return 0;
+	return m_output;
 }
 
 WRITE32_MEMBER(midvunit_state::midvunit_output_w)
@@ -389,19 +402,27 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 		case 0xF7: m_output_mode = arg; break;
 		case 0xFB:
 		switch (m_output_mode) {
-			case 0x00: break; //device init? 3C 1C are the only 2 writes at boot.
+			case 0x00:
+				m_galil_input[0] = 'G';
+				m_galil_input_index = 0;
+				m_galil_input_length = 1;
+				m_galil_output_index = 0;
+				memset(m_galil_output, 0, 256);
+			break; //device init? 3C 1C are the only 2 writes at boot.
 			case 0x04: output().set_value("wheel", (arg&0x80)?(0x7F-(arg&0x7F)):(arg|0x80)); break; //wheel motor delta. left < 128 < right. 128 is no change.
 			case 0x05: for (bit = 0; bit < 8; bit++) output().set_lamp_value(bit, (arg >> bit) & 0x1); break;
-			case 0x08: break; //called when motion controller reads a 0x8000 from midvunit_output_r and wants a response.
+			case 0x08: m_output = m_galil_input[m_galil_input_index++] << 8; break; //get next character from input string.
 			case 0x09:
 				if (arg != 0xD)
-					m_galil_cmd += (char)arg;
+					m_galil_output[(m_galil_output_index < 255) ? m_galil_output_index++ : m_galil_output_index] = (char)arg;
 				else {
-					osd_printf_error("Galil: %s\n", m_galil_cmd.c_str());
-					m_galil_cmd.clear();
+					osd_printf_error("Galil: %s\n", m_galil_output);
+					m_galil_input_index = 0;
+					m_galil_output_index = 0;
+					memset(m_galil_output, 0, 256);
 				}
 			break; //Galil command input. ascii inputs terminated with carriage return.
-			case 0x0A: break; //write 0 to request response. wants to read 0x8000 after?
+			case 0x0A: m_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0; break; //set output to 0x8000 if there is data available, otherwise 0.
 			case 0x0B: break; //0 written at boot.
 			case 0x0C: break; //0 written at boot.
 		}

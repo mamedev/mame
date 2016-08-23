@@ -96,8 +96,13 @@ public:
 	UINT8 m_video_changed;
 	emu_timer *m_scanline_timer;
 	std::unique_ptr<midvunit_renderer> m_poly;
+	UINT8 m_galil_input_index;
+	UINT8 m_galil_input_length;
+	char m_galil_input[256];
+	UINT8 m_galil_output_index;
+	char m_galil_output[256];
+	UINT32 m_output;
 	UINT8 m_output_mode;
-	std::string m_galil_cmd;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
