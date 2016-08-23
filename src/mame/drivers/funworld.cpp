@@ -83,6 +83,7 @@
   * Jolly Joker (98bet, set 1).                       Impera,             198?.
   * Jolly Joker (98bet, set 2).                       Impera,             198?.
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
+  * Jolly Joker (Apple Time),                         Apple Time,         198?.
   * Multi Win (Ver.0167, encrypted),                  Fun World,          1992.
   * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
   * Mongolfier New (Italian),                         unknown,            199?.
@@ -5239,7 +5240,9 @@ ROM_END
 
 /*
   Jolly Joker (Apple Time)
+  With Motorola SC67334CP 44N46 instead of regular M6845.
 
+  Program ROM is faulty...
 */
 ROM_START( jolyjokrc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
