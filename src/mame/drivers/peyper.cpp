@@ -831,6 +831,20 @@ ROM_START(wolfman)
 	ROM_LOAD("memoriac.bin", 0x4000, 0x2000, CRC(468f16f0) SHA1(66ce0464d82331cfc0ac1f6fbd871066e4e57262))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Sir Lancelot (1994)
+/-------------------------------------------------------------------*/
+ROM_START(lancelot)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("lancelot.bin", 0x0000, 0x8000, CRC(26c10926) SHA1(ad032b43c15b1d7a7f32a12ca09ea3344d75105b))
+	ROM_REGION(0x4000, "audiocpu", 0)
+	ROM_LOAD("tmp91640.rom", 0x0000, 0x4000, NO_DUMP)
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("snd_u3.bin", 0x00000, 0x20000, CRC(db88c28d) SHA1(35a80509c4a1f931d07af2fc74adbafc11af5639))
+	ROM_LOAD("snd_u4.bin", 0x20000, 0x20000, CRC(5cebed6e) SHA1(d11cc57fadee95f056fc65927fa1f6ff0f337446))
+	ROM_REGION(0x20000, "sound2", 0)
+	ROM_LOAD("snd_u5.bin", 0x00000, 0x20000, CRC(bf141441) SHA1(630b852bb3bba0fcdae13ae548b1e9810bc64d7d))
+ROM_END
 
 GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, odin,     ROT0, "Peyper", "Odin", MACHINE_MECHANICAL)
 GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, odin,     ROT0, "Sonic",  "Odin De Luxe", MACHINE_MECHANICAL)
@@ -842,4 +856,5 @@ GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0
 GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Wolf Man", MACHINE_MECHANICAL)
 GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Nemesis", MACHINE_MECHANICAL)
 GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, wolfman,  ROT0, "Peyper", "Odisea Paris-Dakar", MACHINE_MECHANICAL)
-GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, peyper,  ROT0, "Sonic",  "Hang-On (Sonic)", MACHINE_MECHANICAL) // inputs to be checked
+GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, peyper,  ROT0,  "Sonic",  "Hang-On (Sonic)", MACHINE_MECHANICAL) // inputs to be checked
+GAME( 1994, lancelot, 0,        peyper,   sonstwar, driver_device,0,       ROT0,  "Peyper", "Sir Lancelot", MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)
