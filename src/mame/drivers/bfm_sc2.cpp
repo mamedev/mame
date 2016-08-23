@@ -219,7 +219,11 @@ public:
 			m_vfd0(*this, "vfd0"),
 			m_vfd1(*this, "vfd1"),
 			m_dm01(*this, "dm01"),
-			m_meters(*this, "meters") { }
+			m_meters(*this, "meters")
+	{
+		for (auto & elem : m_lampcache)
+		elem = 0;
+	}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<stepper_device> m_reel0;
@@ -286,6 +290,7 @@ public:
 	int m_e2dummywrite;
 	int m_e2data_to_read;
 	UINT8 m_codec_data[256];
+	UINT8 m_lampcache[0x20];
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -579,6 +584,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel12_vid_w)// in a video cabinet this is used to 
 /* Reels 1 and 2 */
 WRITE8_MEMBER(bfm_sc2_state::reel12_w)
 {
+	g_profiler.start(PROFILER_USER3);
+
 	m_reel12_latch = data;
 
 	m_reel0->update( data    &0x0f);
@@ -586,10 +593,14 @@ WRITE8_MEMBER(bfm_sc2_state::reel12_w)
 
 	awp_draw_reel(machine(),"reel1", m_reel0);
 	awp_draw_reel(machine(),"reel2", m_reel1);
+
+	g_profiler.stop();
 }
 
 WRITE8_MEMBER(bfm_sc2_state::reel34_w)
 {
+	g_profiler.start(PROFILER_USER4);
+
 	m_reel34_latch = data;
 
 	m_reel2->update( data    &0x0f);
@@ -597,12 +608,16 @@ WRITE8_MEMBER(bfm_sc2_state::reel34_w)
 
 	awp_draw_reel(machine(),"reel3", m_reel2);
 	awp_draw_reel(machine(),"reel4", m_reel3);
+
+	g_profiler.stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 WRITE8_MEMBER(bfm_sc2_state::reel56_w)
 {
+	g_profiler.start(PROFILER_USER5);
+
 	m_reel56_latch = data;
 
 	m_reel4->update( data    &0x0f);
@@ -610,6 +625,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel56_w)
 
 	awp_draw_reel(machine(),"reel5", m_reel4);
 	awp_draw_reel(machine(),"reel6", m_reel5);
+
+	g_profiler.stop();
 }
 
 
@@ -643,12 +660,23 @@ WRITE8_MEMBER(bfm_sc2_state::mmtr_w)
 
 WRITE8_MEMBER(bfm_sc2_state::mux_output_w)
 {
+	g_profiler.start(PROFILER_USER6);
+
 	int i;
 	int off = offset<<3;
 
-	for (i=0; i<8; i++)
-		output().set_lamp_value(off+i, ((data & (1 << i)) != 0));
+	for (i = 0; i < 8; i++)
+	{
+		int cachebit = m_lampcache[offset] & (1 << i);
+		int newbit = data & (1 << i);
 
+		if (cachebit != newbit)
+			output().set_lamp_value(off + i, newbit != 0);
+	}
+
+	m_lampcache[offset] = data;
+
+	g_profiler.stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -707,6 +735,8 @@ WRITE8_MEMBER(bfm_sc2_state::unknown_w)
 
 WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 {
+	g_profiler.start(PROFILER_USER7);
+
 	int old = m_volume_override;
 
 	m_volume_override = data?1:0;
@@ -720,6 +750,8 @@ WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 		ym->set_output_gain(1, percent);
 		m_upd7759->set_output_gain(0, percent);
 	}
+
+	g_profiler.stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -782,6 +814,9 @@ READ8_MEMBER(bfm_sc2_state::vfd_status_hop_r)// on video games, hopper inputs ar
 
 WRITE8_MEMBER(bfm_sc2_state::expansion_latch_w)
 {
+
+	g_profiler.start(PROFILER_USER8);
+
 	int changed = m_expansion_latch^data;
 
 	m_expansion_latch = data;
@@ -818,6 +853,8 @@ WRITE8_MEMBER(bfm_sc2_state::expansion_latch_w)
 			}
 		}
 	}
+
+	g_profiler.stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////
