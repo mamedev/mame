@@ -154,19 +154,19 @@ void sam6883_device::configure_bank(int bank, UINT8 *memory, UINT32 memory_size,
 	switch(bank)
 	{
 		case 4:
-			m_space_FF00.point(&m_banks[4], 0x0000, 0);
+			m_space_FF00.point(&m_banks[4], 0x0000);
 			break;
 		case 5:
-			m_space_FF20.point(&m_banks[5], 0x0000, 0);
+			m_space_FF20.point(&m_banks[5], 0x0000);
 			break;
 		case 6:
-			m_space_FF40.point(&m_banks[6], 0x0000, 0);
+			m_space_FF40.point(&m_banks[6], 0x0000);
 			break;
 		case 7:
-			m_space_FF60.point(&m_banks[7], 0x0000, 0);
+			m_space_FF60.point(&m_banks[7], 0x0000);
 			break;
 		case 2:
-			m_space_FFE0.point(&m_banks[2], 0x1FE0, 0);
+			m_space_FFE0.point(&m_banks[2], 0x1FE0);
 			break;
 	}
 }
@@ -241,24 +241,20 @@ void sam6883_device::update_memory(void)
 	// TODO:  This should affect _all_ memory accesses, not just video ram
 	// TODO:  Verify that the CoCo 3 ignored this
 
-	// for now, lets assume that the caller is nice and made m_memory_size
-	// a power of two
-	UINT16 ram_mask = (UINT16) m_banks[0].m_memory_size - 1;
-
 	// switch depending on the M1/M0 variables
 	bool setup_rom = true;
 	switch(m_sam_state & (SAM_STATE_M1|SAM_STATE_M0))
 	{
 		case 0:
 			// 4K mode
-			m_space_0000.point(&m_banks[0], 0x0000, ram_mask);
+			m_space_0000.point(&m_banks[0], 0x0000, m_banks[0].m_memory_size);
 			m_counter_mask = 0x0FFF;
 			m_counter_or = 0x0000;
 			break;
 
 		case SAM_STATE_M0:
 			// 16K mode
-			m_space_0000.point(&m_banks[0], 0x0000, ram_mask);
+			m_space_0000.point(&m_banks[0], 0x0000, m_banks[0].m_memory_size);
 			m_counter_mask = 0x3FFF;
 			m_counter_or = 0x0000;
 			break;
@@ -269,10 +265,10 @@ void sam6883_device::update_memory(void)
 			if (m_sam_state & SAM_STATE_TY)
 			{
 				// full 64k RAM
-				m_space_0000.point(&m_banks[0], 0x0000, ram_mask);
-				m_space_8000.point(&m_banks[0], 0x8000, 0);
-				m_space_A000.point(&m_banks[0], 0xA000, 0);
-				m_space_C000.point(&m_banks[0], 0xC000, 0);
+				m_space_0000.point(&m_banks[0], 0x0000, m_banks[0].m_memory_size);
+				m_space_8000.point(&m_banks[0], 0x8000);
+				m_space_A000.point(&m_banks[0], 0xA000);
+				m_space_C000.point(&m_banks[0], 0xC000);
 				m_counter_mask = 0xFFFF;
 				m_counter_or = 0x0000;
 				setup_rom = false;
@@ -281,7 +277,7 @@ void sam6883_device::update_memory(void)
 			{
 				// ROM/RAM
 				UINT16 ram_base = (m_sam_state & SAM_STATE_P1) ? 0x8000 : 0x0000;
-				m_space_0000.point(&m_banks[0], ram_base, ram_mask);
+				m_space_0000.point(&m_banks[0], ram_base, m_banks[0].m_memory_size);
 				m_counter_mask = 0x7FFF;
 				m_counter_or = ram_base;
 			}
@@ -290,13 +286,13 @@ void sam6883_device::update_memory(void)
 
 	if (setup_rom)
 	{
-		m_space_8000.point(&m_banks[1], m_banks[1].m_memory_offset, 0);
-		m_space_A000.point(&m_banks[2], m_banks[2].m_memory_offset, 0);
-		m_space_C000.point(&m_banks[3], m_banks[3].m_memory_offset, 0);
+		m_space_8000.point(&m_banks[1], m_banks[1].m_memory_offset);
+		m_space_A000.point(&m_banks[2], m_banks[2].m_memory_offset);
+		m_space_C000.point(&m_banks[3], m_banks[3].m_memory_offset);
 	}
 
 	// update $FFE0-$FFFF
-	m_space_FFE0.point(&m_banks[2], m_banks[2].m_memory_offset + 0x1FE0, 0);
+	m_space_FFE0.point(&m_banks[2], m_banks[2].m_memory_offset + 0x1FE0);
 }
 
 
@@ -455,7 +451,7 @@ sam6883_device::sam_space<_addrstart, _addrend>::sam_space(sam6883_device &owner
 {
 	m_read_bank = nullptr;
 	m_write_bank = nullptr;
-	m_mask = 0;
+	m_length = 0;
 }
 
 
@@ -478,21 +474,21 @@ address_space &sam6883_device::sam_space<_addrstart, _addrend>::cpu_space() cons
 //-------------------------------------------------
 
 template<UINT16 _addrstart, UINT16 _addrend>
-void sam6883_device::sam_space<_addrstart, _addrend>::point(const sam_bank *bank, UINT16 offset, UINT16 mask)
+void sam6883_device::sam_space<_addrstart, _addrend>::point(const sam_bank *bank, UINT16 offset, UINT32 length)
 {
 	if (LOG_SAM)
 	{
-		m_owner.logerror("sam6883_device::sam_space::point():  addrstart=0x%04X addrend=0x%04X offset=0x%04X mask=0x%04X bank->m_memory=0x%p bank->m_memory_read_only=%s\n",
+		m_owner.logerror("sam6883_device::sam_space::point():  addrstart=0x%04X addrend=0x%04X offset=0x%04X length=0x%04X bank->m_memory=0x%p bank->m_memory_read_only=%s\n",
 			(unsigned) _addrstart,
 			(unsigned) _addrend,
 			(unsigned) offset,
-			(unsigned) mask,
+			(unsigned)length,
 			bank->m_memory,
 			bank->m_memory_read_only ? "true" : "false");
 	}
 
-	point_specific_bank(bank, offset, mask, m_read_bank, _addrstart, _addrend, false);
-	point_specific_bank(bank, offset, mask, m_write_bank, _addrstart, _addrend, true);
+	point_specific_bank(bank, offset, length, m_read_bank, _addrstart, _addrend, false);
+	point_specific_bank(bank, offset, length, m_write_bank, _addrstart, _addrend, true);
 }
 
 
@@ -501,35 +497,46 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point(const sam_bank *bank
 //  sam_space::point_specific_bank
 //-------------------------------------------------
 template<UINT16 _addrstart, UINT16 _addrend>
-void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const sam_bank *bank, UINT16 offset, UINT16 mask, memory_bank *&memory_bank, INT32 addrstart, INT32 addrend, bool is_write)
+void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const sam_bank *bank, UINT32 offset, UINT32 length, memory_bank *&memory_bank, UINT32 addrstart, UINT32 addrend, bool is_write)
 {
-	char buffer[16];
-
 	if (bank->m_memory != nullptr)
 	{
-		// normalize offset
-		if (mask != 0)
-			offset &= mask;
-		else
-			mask = 0xffff;
+		// this bank is a memory bank - first lets adjust the length as per the offset; as
+		// passed to this method, the length is from offset zero
+		if (length != ~0)
+			length -= std::min(offset, length);
 
-		UINT32 mirror = (addrend - addrstart) & ~mask;
-
-		// this bank is a memory bank - first ensure that we have a bank
-		if (!memory_bank || !memory_bank->matches_exactly(addrstart, addrend) || (mask != m_mask))
+		// do we even have a bank?  and if so, have legit changes occured?
+		if (!memory_bank || !memory_bank->matches_exactly(addrstart, addrend) || (length != m_length))
 		{
 			// name the bank
-			snprintf(buffer, ARRAY_LENGTH(buffer), "bank%04X_%c", addrstart, is_write ? 'w' : 'r');
+			auto tag = string_format("bank%04X_%c", addrstart, is_write ? 'w' : 'r');
 
-			// install it
+			// determine "nop_addrstart" - where the bank ends, and above which is AM_NOP
+			UINT32 nop_addrstart = (length != ~0)
+				? std::min(addrend + 1, addrstart + length)
+				: addrend + 1;
+
+			// install the bank
 			if (is_write)
-				cpu_space().install_write_bank(addrstart, addrend, mirror, buffer);
+			{
+				if (addrstart < nop_addrstart)
+					cpu_space().install_write_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
+				if (nop_addrstart <= addrend)
+					cpu_space().nop_write(nop_addrstart, addrend);
+			}
 			else
-				cpu_space().install_read_bank(addrstart, addrend, mirror, buffer);
-			m_mask = mask;
+			{
+				if (addrstart < nop_addrstart)
+					cpu_space().install_read_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
+				if (nop_addrstart <= addrend)
+					cpu_space().nop_read(nop_addrstart, addrend);
+			}
+
+			m_length = length;
 
 			// and get it
-			memory_bank = cpu_space().device().owner()->membank(buffer);
+			memory_bank = cpu_space().device().owner()->membank(tag.c_str());
 		}
 
 		// point the bank
@@ -543,8 +550,9 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 	}
 	else
 	{
-		// this bank uses handlers
-		assert((offset == 0) && (mask == 0));   // changes to the offset are not supported
+		// this bank uses handlers - first thing's first, assert that we are not doing
+		// any weird stuff with offfsets and lengths - that isn't supported in this path
+		assert((offset == 0) && (length == (UINT32)~0));
 
 		if (is_write)
 		{
