@@ -30118,6 +30118,7 @@ superpet                        //
 @source:peyper.cpp
 gamatros                        //
 hangonp                         //
+lancelot                        //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
@@ -31547,6 +31548,7 @@ rx78                            //
 
 @source:s11.cpp
 gmine_l2                        //
+grand_l3                        //
 grand_l4                        //
 hs_l3                           //
 hs_l4                           //
@@ -31564,8 +31566,10 @@ f14_l1                          //
 f14_p3                          //
 f14_p4                          //
 f14_p5                          //
+fire_l2                         //
 fire_l3                         //
 milln_l3                        //
+pb_l1                           //
 pb_l2                           //
 pb_l3                           //
 pb_l5                           //
@@ -31579,13 +31583,17 @@ bguns_l8                        //
 bguns_la                        //
 bguns_p1                        //
 bk2k_l4                         //
+bk2k_la2                        //
 bk2k_lg1                        //
 bk2k_lg3                        //
+bk2k_pa5                        //
+bk2k_pa7                        //
 bk2k_pu1                        //
 bnzai_g3                        //
 bnzai_l1                        //
 bnzai_l3                        //
 bnzai_pa                        //
+cycln_l1                        //
 cycln_l4                        //
 cycln_l5                        //
 eatpm_4g                        //
@@ -31611,10 +31619,13 @@ polic_l2                        //
 polic_l3                        //
 polic_l4                        //
 spstn_l5                        //
+swrds_l1                        //
 swrds_l2                        //
 taxi_l3                         //
 taxi_l4                         //
 taxi_lg1                        //
+taxi_lu1                        //
+taxi_p5                         //
 tsptr_l3                        //
 whirl_l2                        //
 whirl_l3                        //
@@ -31626,6 +31637,7 @@ bbnny_lu                        //
 dd_l2                           //
 dd_p6                           //
 diner_l1                        //
+diner_l2                        //
 diner_l3                        //
 diner_l4                        //
 gs_l3                           //
@@ -31645,6 +31657,7 @@ rollr_l2                        //
 rollr_l3                        //
 rollr_p2                        //
 rvrbt_l3                        //
+rvrbt_p7                       //
 strax_p7                        //
 
 @source:s3.cpp
@@ -31735,6 +31748,7 @@ comet_l5                        //
 ratrc_l1                        //
 sorcr_l1                        //
 sorcr_l2                        //
+sshtl_l3                        //
 sshtl_l7                        //
 szone_l2                        //
 szone_l5                        //
