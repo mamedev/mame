@@ -935,10 +935,14 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 	m_int_overscan = manager.machine().options().int_overscan();
 	m_int_scale_x = manager.machine().options().int_scale_x();
 	m_int_scale_y = manager.machine().options().int_scale_y();
-	if (manager.machine().options().uneven_stretch() && !manager.machine().options().uneven_stretch_x())
+	if (manager.machine().options().uneven_stretch_x())
+		m_scale_mode = SCALE_FRACTIONAL_X;
+	else if (manager.machine().options().uneven_stretch_y())
+		m_scale_mode = SCALE_FRACTIONAL_Y;
+	else if (manager.machine().options().uneven_stretch())
 		m_scale_mode = SCALE_FRACTIONAL;
 	else
-		m_scale_mode = manager.machine().options().uneven_stretch_x() ? SCALE_FRACTIONAL_X : SCALE_INTEGER;
+		m_scale_mode = SCALE_INTEGER;
 
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
@@ -1195,6 +1199,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 		}
 
 		case SCALE_FRACTIONAL_X:
+		case SCALE_FRACTIONAL_Y:
 		case SCALE_INTEGER:
 		{
 			// get source size and aspect
@@ -1210,8 +1215,8 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			float target_aspect = (float)target_width / (float)target_height * target_pixel_aspect;
 
 			// determine the scale mode for each axis
-			bool x_is_integer = !(target_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
-			bool y_is_integer = !(target_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
+			bool x_is_integer = !((target_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X) || (target_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_Y));
+			bool y_is_integer = !((target_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X) || (target_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_Y));
 
 			// first compute scale factors to fit the screen
 			float xscale = (float)target_width / src_width;
