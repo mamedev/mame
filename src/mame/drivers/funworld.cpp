@@ -5237,6 +5237,26 @@ ROM_START( jolyjokrb )
 ROM_END
 
 
+/*
+  Jolly Joker (Apple Time)
+
+*/
+ROM_START( jolyjokrc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b&g_jj1.bin", 0x8000, 0x8000, BAD_DUMP CRC(2fd585a7) SHA1(d517141ef17da9b61ddf3e6e8c41f5173de980c3) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "jje.bin", 0x0000, 0x8000, CRC(d9da6e74) SHA1(2a966e2d7849aed9d952a9d94c99955ba651d14d) )
+	ROM_LOAD( "jjd.bin", 0x8000, 0x8000, CRC(9d596852) SHA1(a29e210cbdc75717465068e85b693edcc1c642da) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tbp28s42.bin", 0x0000, 0x0200, CRC(0b671bba) SHA1(92d512e02b50f98b7bc5a60deee4fee722656c4f) )
+
+	ROM_REGION( 0x0200, "plds", 0 )    /* Cracked PLD */
+	ROM_LOAD( "jjpal.bin", 0x0000, 0x0117, CRC(3b084c34) SHA1(5d186b70317ef871c9a426eb420b66efcbd918de) )
+ROM_END
+
+
 /******************************** Other sets ************************************/
 
 /*
@@ -6800,6 +6820,7 @@ GAMEL( 1993, vegasmil,  vegasslw, fw2ndpal, vegasmil,  driver_device,  0,       
 GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  driver_device,  0,        ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, driver_device,  0,        ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                       layout_jollycrd )
 GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  driver_device,  0,        ROT0, "Impera",          "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
+GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  driver_device,  0,        ROT0, "Apple Time",      "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd ) // bad program ROM...
 
 // Encrypted games...
 GAME(  1992, multiwin,  0,        fw1stpal, funworld,  funworld_state, multiwin, ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 MACHINE_NOT_WORKING )
