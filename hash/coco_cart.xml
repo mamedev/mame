@@ -1216,7 +1216,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="26-3054" />
 		<info name="usage" value="CoCo 3 Only" />
 		<part name="cart" interface="coco_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="32768">
 				<rom name="silpheed (1988)(26-3054)(sierra)(coco 3 version).rom" size="32768" crc="ccfd0a0c" sha1="bd0e2bd1fd57b9512bb01414c15ce07afbe298f2" offset="0" />
 			</dataarea>
 		</part>
