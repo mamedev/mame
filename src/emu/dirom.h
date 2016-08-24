@@ -29,10 +29,14 @@ public:
 	inline UINT64 read_qword(offs_t byteaddress) { return m_rom_direct->read_qword(byteaddress); }
 
 	void set_rom(const void *base, UINT32 size);
+	void set_rom_bank(int bank);
 
 private:
 	const address_space_config m_rom_config;
 	direct_read_data *m_rom_direct;
+
+	memory_bank *m_bank;
+	int m_cur_bank;
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 	virtual void interface_pre_start() override;
@@ -41,6 +45,8 @@ private:
 	DECLARE_READ16_MEMBER(z16_r);
 	DECLARE_READ32_MEMBER(z32_r);
 	DECLARE_READ64_MEMBER(z64_r);
+
+	void reset_bank();
 };
 
 #endif
