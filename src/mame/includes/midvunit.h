@@ -100,7 +100,7 @@ public:
 	UINT8 m_galil_input_length;
 	const char *m_galil_input;
 	UINT8 m_galil_output_index;
-	char m_galil_output[256];
+	char m_galil_output[450];
 	UINT32 m_output;
 	UINT8 m_output_mode;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
@@ -146,6 +146,7 @@ public:
 	DECLARE_DRIVER_INIT(wargods);
 	DECLARE_DRIVER_INIT(offroadc);
 	DECLARE_DRIVER_INIT(crusnusa);
+	void set_input(const char *s);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
 	virtual void machine_start() override;
