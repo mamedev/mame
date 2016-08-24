@@ -264,7 +264,7 @@ public:
 		m_analog1(*this, "AN1"),
 		m_analog2(*this, "AN2"),
 		m_analog3(*this, "AN3"),
-		m_ports(*this, { { "IN0", "IN1", "IN2", "IN3" } })
+		m_ports(*this, "IN%u", 0)
 	{
 	}
 
