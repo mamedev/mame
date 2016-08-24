@@ -548,7 +548,7 @@ void floppy_image_device::mon_w(int state)
 		}
 	}
 
-	// Create a motor sound (loaded or empty) 
+	// Create a motor sound (loaded or empty)
 	if (m_make_sound) m_sound_out->motor(state==0, exists());
 }
 
@@ -954,7 +954,7 @@ UINT32 floppy_image_device::get_variant() const
 //   MZ, Aug 2015
 //===================================================================
 
-enum 
+enum
 {
 	QUIET=-1,
 	SPIN_START_EMPTY=0,
@@ -974,9 +974,9 @@ enum
 };
 
 /*
-	Unless labeled "constructed", all samples were recorded from real floppy drives.
-	The 3.5" floppy drive is a Sony MPF420-1.
-	The 5.25" floppy drive is a Chinon FZ502.
+    Unless labeled "constructed", all samples were recorded from real floppy drives.
+    The 3.5" floppy drive is a Sony MPF420-1.
+    The 5.25" floppy drive is a Chinon FZ502.
 */
 static const char *const floppy35_sample_names[] =
 {
@@ -990,10 +990,10 @@ static const char *const floppy35_sample_names[] =
 	"35_spin_end",
 // Stepping sounds
 	"35_step_1_1",
-// Seeking sounds	
-	"35_seek_2ms",		// constructed
+// Seeking sounds
+	"35_seek_2ms",      // constructed
 	"35_seek_6ms",
-	"35_seek_12ms",		
+	"35_seek_12ms",
 	"35_seek_20ms",
 	nullptr
 };
@@ -1010,7 +1010,7 @@ static const char *const floppy525_sample_names[] =
 	"525_spin_end",
 // Stepping sounds
 	"525_step_1_1",
-// Seeking sounds	
+// Seeking sounds
 	"525_seek_2ms",    // unrealistically fast, but needed for 3.5 (constructed)
 	"525_seek_6ms",
 	"525_seek_12ms",
@@ -1046,8 +1046,8 @@ void floppy_sound_device::register_for_save_states()
 	save_item(NAME(m_step_samples));
 	save_item(NAME(m_spin_samplepos));
 	save_item(NAME(m_step_samplepos));
-	save_item(NAME(m_seek_samplepos));	
-	save_item(NAME(m_seek_sound_timeout));	
+	save_item(NAME(m_seek_samplepos));
+	save_item(NAME(m_seek_sound_timeout));
 	save_item(NAME(m_zones));
 	save_item(NAME(m_spin_playback_sample));
 	save_item(NAME(m_step_playback_sample));
@@ -1065,19 +1065,19 @@ void floppy_sound_device::device_start()
 	static_set_samples_names(*this, is525? floppy525_sample_names : floppy35_sample_names);
 
 	m_motor_on = false;
-	
+
 	// Offsets in the sample collection
 	m_spin_samples = 5;
 	m_step_base = 5;
 	m_step_samples = 1;
 	m_zones = 1;             // > 1 needs more than one step sample
-	
+
 	m_spin_samplepos = m_step_samplepos = m_seek_samplepos = 0;
-	m_spin_playback_sample = m_step_playback_sample = QUIET; 
+	m_spin_playback_sample = m_step_playback_sample = QUIET;
 
 	// Read audio samples. The samples are stored in the list m_samples.
 	m_loaded = load_samples();
-	
+
 	// If we don't have all samples, don't allocate a stream or access sample data.
 	if (m_loaded)
 	{
@@ -1087,36 +1087,36 @@ void floppy_sound_device::device_start()
 }
 
 /*
-	Motor sound. Select appropriate sound sample, depending on whether the
-	motor is started or keeps running. Motor samples are always fully 
-	played.
+    Motor sound. Select appropriate sound sample, depending on whether the
+    motor is started or keeps running. Motor samples are always fully
+    played.
 */
 void floppy_sound_device::motor(bool running, bool withdisk)
 {
 	if (samples_loaded())
 	{
 		m_sound->update(); // required
-		
+
 		if ((m_spin_playback_sample==QUIET || m_spin_playback_sample==SPIN_END) && running) // motor was either off or already spinning down
 		{
 			m_spin_samplepos = 0;
 			m_spin_playback_sample = withdisk? SPIN_START_LOADED : SPIN_START_EMPTY; // (re)start the motor sound
 		}
-		else 
+		else
 		{
 			// Motor has been running and is turned off now
-			if ((m_spin_playback_sample == SPIN_EMPTY || m_spin_playback_sample == SPIN_LOADED) && !running) 
+			if ((m_spin_playback_sample == SPIN_EMPTY || m_spin_playback_sample == SPIN_LOADED) && !running)
 				m_spin_playback_sample = SPIN_END; // go to spin down sound when loop is finished
 		}
-	}		
+	}
 	m_motor_on = running;
 	m_with_disk = withdisk;
 }
 
 /*
-	Activate the step sound.
-	The zone parameter should be used to select specific samples for the 
-	current head position (if available). Its value should range from 0 to 4.
+    Activate the step sound.
+    The zone parameter should be used to select specific samples for the
+    current head position (if available). Its value should range from 0 to 4.
 */
 void floppy_sound_device::step(int zone)
 {
@@ -1127,76 +1127,76 @@ void floppy_sound_device::step(int zone)
 		// Pick one of the step samples
 		// TODO: This is only preliminary, need to complete that.
 		if (zone >= m_zones) zone = m_zones-1;
-		m_step_playback_sample = (zone * m_step_samples) + (machine().rand() % m_step_samples); 
-		
-	    if (m_step_samplepos > 0)
-	    {
-	    	if (m_seek_playback_sample == QUIET)
-	    	{
-	    		// The last step sample was not completed;
-	    		// we need to find out the step rate
-	    		// With a sample rate of 44100 Hz we can calculate the 
-	    		// rate from the sample position 
-	    		// 2ms = 88
-	    		// 6ms = 265
-	    		// 12ms = 529
-	    		// 20ms = 882
-	    		
-	    		if (m_step_samplepos < 100) 
-	    		{
-	    			// Should only used for 3.5 drives
-	    			m_seek_playback_sample = STEP_SEEK2;
-	    			m_seek_pitch = 1.0;  // don't use a pitch
-	    		}
-	    		else
-	    		{
-	    			if (m_step_samplepos < 400)  	  // Use this for 8 ms also 
-	    			{
-	    				m_seek_playback_sample = STEP_SEEK6;
-	    				m_seek_pitch = 265.0 / m_step_samplepos;
-	    			}
-	    			else
-	    			{
-	    				if (m_step_samplepos < 600)
-	    				{
-	    					m_seek_playback_sample = STEP_SEEK12;
-	    					m_seek_pitch = 529.0 / m_step_samplepos;
-	    				}
-	    				else
-	    				{
-	    					if (m_step_samplepos < 1200) 
-	    					{
-	    						m_seek_playback_sample = STEP_SEEK20;
-	    						m_seek_pitch = 882.0 / m_step_samplepos;
-	    					}
-	    					else
-	    						// For 30ms and longer we replay the step sound
-	    						m_seek_playback_sample = QUIET;
-		    			}
-		    		}
-		    	}
-		    }
-	    	
-	    	// Changing the pitch does not always sound convincing
-	    	if (!PITCH_SEEK_SAMPLES) m_seek_pitch = 1;
-	    	
-	    	if (TRACE_AUDIO) logerror("Seek sample = %d, pitch = %f\n", m_seek_playback_sample, m_seek_pitch);
+		m_step_playback_sample = (zone * m_step_samples) + (machine().rand() % m_step_samples);
 
-	    	// Set the timeout for the seek sound. When it expires,
-	    	// we assume that the seek process is over, and we'll play the
-	    	// rest of the step sound.
-	    	// This will be retriggered with each step pulse.
-	    	m_seek_sound_timeout = m_step_samplepos * 2;
-	    }
-	    else
-	    {
-	    	// Last step sample was completed, this is not a seek process
-	    	m_seek_playback_sample = QUIET;
-	    }
-	    
-	    // If we switch to the seek sample, let's keep the position of the
-	    // step sample; else reset the step sample position.
-		if (m_seek_playback_sample == QUIET) 
+		if (m_step_samplepos > 0)
+		{
+			if (m_seek_playback_sample == QUIET)
+			{
+				// The last step sample was not completed;
+				// we need to find out the step rate
+				// With a sample rate of 44100 Hz we can calculate the
+				// rate from the sample position
+				// 2ms = 88
+				// 6ms = 265
+				// 12ms = 529
+				// 20ms = 882
+
+				if (m_step_samplepos < 100)
+				{
+					// Should only used for 3.5 drives
+					m_seek_playback_sample = STEP_SEEK2;
+					m_seek_pitch = 1.0;  // don't use a pitch
+				}
+				else
+				{
+					if (m_step_samplepos < 400)       // Use this for 8 ms also
+					{
+						m_seek_playback_sample = STEP_SEEK6;
+						m_seek_pitch = 265.0 / m_step_samplepos;
+					}
+					else
+					{
+						if (m_step_samplepos < 600)
+						{
+							m_seek_playback_sample = STEP_SEEK12;
+							m_seek_pitch = 529.0 / m_step_samplepos;
+						}
+						else
+						{
+							if (m_step_samplepos < 1200)
+							{
+								m_seek_playback_sample = STEP_SEEK20;
+								m_seek_pitch = 882.0 / m_step_samplepos;
+							}
+							else
+								// For 30ms and longer we replay the step sound
+								m_seek_playback_sample = QUIET;
+						}
+					}
+				}
+			}
+
+			// Changing the pitch does not always sound convincing
+			if (!PITCH_SEEK_SAMPLES) m_seek_pitch = 1;
+
+			if (TRACE_AUDIO) logerror("Seek sample = %d, pitch = %f\n", m_seek_playback_sample, m_seek_pitch);
+
+			// Set the timeout for the seek sound. When it expires,
+			// we assume that the seek process is over, and we'll play the
+			// rest of the step sound.
+			// This will be retriggered with each step pulse.
+			m_seek_sound_timeout = m_step_samplepos * 2;
+		}
+		else
+		{
+			// Last step sample was completed, this is not a seek process
+			m_seek_playback_sample = QUIET;
+		}
+
+		// If we switch to the seek sample, let's keep the position of the
+		// step sample; else reset the step sample position.
+		if (m_seek_playback_sample == QUIET)
 			m_step_samplepos = 0;
 	}
 }
@@ -1215,7 +1215,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	stream_sample_t *samplebuffer = outputs[0];
 	int idx = 0;
 	int sampleend = 0;
-	
+
 	while (samples-- > 0)
 	{
 		out = 0;
@@ -1226,7 +1226,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			idx = m_spin_playback_sample;
 			sampleend = m_sample[idx].data.size();
 			out = m_sample[idx].data[m_spin_samplepos++];
-			
+
 			if (m_spin_samplepos >= sampleend)
 			{
 				// Motor sample has completed
@@ -1253,7 +1253,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 					// motor has been restarted
 					if (m_motor_on)
 						m_spin_playback_sample = m_with_disk? SPIN_START_LOADED : SPIN_START_EMPTY;
-					else 
+					else
 						m_spin_playback_sample = QUIET;
 					break;
 				}
@@ -1277,27 +1277,27 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 		if (m_seek_playback_sample != QUIET)
 		{
 			m_seek_sound_timeout--;
-			
+
 			idx = m_step_base + m_seek_playback_sample;
 			sampleend = m_sample[idx].data.size();
 			// Mix it into the stream value
 			out += m_sample[idx].data[(int)m_seek_samplepos];
 			// By adding different values than 1, we can change the playback speed
 			// This will be used to adjust the seek sound
-			m_seek_samplepos += m_seek_pitch; 
-			
+			m_seek_samplepos += m_seek_pitch;
+
 			// The seek sample will be replayed without interrupt
 			if (m_seek_samplepos >= sampleend)
 				m_seek_samplepos = 0;
 		}
 		else
-		{	
+		{
 			// Stepper sound
 			if (m_step_playback_sample != QUIET)
 			{
 				idx = m_step_base + m_step_playback_sample;
 				sampleend = m_sample[idx].data.size();
-				
+
 				// Mix it into the stream value
 				out += m_sample[idx].data[m_step_samplepos++];
 				if (m_step_samplepos >= sampleend)
