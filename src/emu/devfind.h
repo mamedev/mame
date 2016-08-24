@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_DEVFIND_H
 #define MAME_EMU_DEVFIND_H
 
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+
 #define FINDER_DUMMY_TAG "finder_dummy_tag"
 
 //**************************************************************************
