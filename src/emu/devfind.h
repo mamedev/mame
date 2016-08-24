@@ -503,46 +503,52 @@ public:
 // ======================> shared_ptr_array_finder
 
 // shared pointer array finder template
-template<typename _PointerType, int _Count, bool _Required>
-class shared_ptr_array_finder
+template <typename PointerType, unsigned Count, bool Required>
+class shared_ptr_array_finder : public array_finder_base<shared_ptr_finder<PointerType, Required>, Count>
 {
-	typedef shared_ptr_finder<_PointerType, _Required> shared_ptr_type;
-
 public:
-	// construction/destruction
-	shared_ptr_array_finder(device_t &base, const char *basetag, UINT8 width = sizeof(_PointerType) * 8)
+	template <typename F>
+	shared_ptr_array_finder(device_t &base, F const &fmt, unsigned start)
+		: array_finder_base<shared_ptr_finder<PointerType, Required>, Count>(base, fmt, start)
 	{
-		for (int index = 0; index < _Count; index++)
-		{
-			m_tag[index] = string_format("%s.%d", basetag, index);
-			m_array[index] = std::make_unique<shared_ptr_type>(base, m_tag[index].c_str(), width);
-		}
 	}
 
-	// array accessors
-	const shared_ptr_type &operator[](int index) const { assert(index < _Count); return *m_array[index]; }
-	shared_ptr_type &operator[](int index) { assert(index < _Count); return *m_array[index]; }
+	shared_ptr_array_finder(device_t &base, const char *basetag)
+		: array_finder_base<shared_ptr_finder<PointerType, Required>, Count>(base, basetag)
+	{
+	}
 
-protected:
-	// internal state
-	std::unique_ptr<shared_ptr_type> m_array[_Count];
-	std::string m_tag[_Count];
+	shared_ptr_array_finder(device_t &base, char const *const tags[])
+		: array_finder_base<shared_ptr_finder<PointerType, Required>, Count>(base, tags)
+	{
+	}
+
+	shared_ptr_array_finder(device_t &base, std::array<char const *, Count> const &tags)
+		: array_finder_base<shared_ptr_finder<PointerType, Required>, Count>(base, tags)
+	{
+	}
 };
 
 // optional shared pointer array finder
-template<class _PointerType, int _Count>
-class optional_shared_ptr_array : public shared_ptr_array_finder<_PointerType, _Count, false>
+template <typename PointerType, unsigned Count>
+class optional_shared_ptr_array : public shared_ptr_array_finder<PointerType, Count, false>
 {
 public:
-	optional_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, false>(base, tag, width) { }
+	template <typename F> optional_shared_ptr_array(device_t &base, F const &fmt, unsigned start) : shared_ptr_array_finder<PointerType, Count, false>(base, fmt, start) { }
+	optional_shared_ptr_array(device_t &base, char const *basetag) : shared_ptr_array_finder<PointerType, Count, false>(base, basetag) { }
+	optional_shared_ptr_array(device_t &base, char const *const tags[]) : shared_ptr_array_finder<PointerType, Count, false>(base, tags) { }
+	optional_shared_ptr_array(device_t &base, std::array<char const *, Count> const &tags) : shared_ptr_array_finder<PointerType, Count, false>(base, tags) { }
 };
 
 // required shared pointer array finder
-template<class _PointerType, int _Count>
-class required_shared_ptr_array : public shared_ptr_array_finder<_PointerType, _Count, true>
+template <typename PointerType, unsigned Count>
+class required_shared_ptr_array : public shared_ptr_array_finder<PointerType, Count, true>
 {
 public:
-	required_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, true>(base, tag, width) { }
+	template <typename F> required_shared_ptr_array(device_t &base, F const &fmt, unsigned start) : shared_ptr_array_finder<PointerType, Count, true>(base, fmt, start) { }
+	required_shared_ptr_array(device_t &base, char const *basetag) : shared_ptr_array_finder<PointerType, Count, true>(base, basetag) { }
+	required_shared_ptr_array(device_t &base, char const *const tags[]) : shared_ptr_array_finder<PointerType, Count, true>(base, tags) { }
+	required_shared_ptr_array(device_t &base, std::array<char const *, Count> const &tags) : shared_ptr_array_finder<PointerType, Count, true>(base, tags) { }
 };
 
 
