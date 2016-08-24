@@ -112,7 +112,7 @@ bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *
 
 	int file_size = io_generic_size(io);
 	int track_size = get_track_size(cell_size, sector_count);
-	int track_count = tracks; 
+	int track_count = tracks;
 	if (tracks==0) track_count = file_size / (track_size*heads);
 
 	if (TRACE) osd_printf_info("ti99_dsk: track count = %d\n", track_count);
