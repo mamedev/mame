@@ -98,7 +98,7 @@ public:
 	std::unique_ptr<midvunit_renderer> m_poly;
 	UINT8 m_galil_input_index;
 	UINT8 m_galil_input_length;
-	char m_galil_input[256];
+	const char *m_galil_input;
 	UINT8 m_galil_output_index;
 	char m_galil_output[256];
 	UINT32 m_output;

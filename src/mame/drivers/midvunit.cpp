@@ -375,21 +375,17 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 
 READ32_MEMBER(midvunit_state::midvunit_output_r)
 {
-	//need 0x8000 to allow reading of the following:
-	//0x4700, 0x5100, 0x5300, 0x5600, 0x5700, 0x5800, 0x5900, 0x5A00
-	
-	//G
-	//V$## -> Expects value of 6, if not checks FCAC for 2 and sets it?
-	//X$## -> Stored at FD12
-	//Y$## -> Stored at FD13
-	//Z$## -> Stored at FD14
+	//G -> MG "G"
+	//V$## -> #IBO;IBO=_SCX|_SCY|_SCZ;MG "V" IBO {$2.0}
+	//X$## -> MG "X", _TSX {$2.0}
+	//Y$## -> MG "Y", _TSY {$2.0}
+	//Z$## -> MG "Z", _TSZ {$2.0}
 	
 	//Floating point operation. No further inputs given. Goes to same place as G when done.
-	//W -> BE36
-	//S -> BE37
-	//Q -> BE38
+	//W -> MG "W"
+	//S -> MG "S"
+	//Q -> MG "Q"
 	
-	//will softlock the game if it remains 0x8000 as that is not one of the expected branches
 	return m_output;
 }
 
@@ -403,7 +399,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 		case 0xFB:
 		switch (m_output_mode) {
 			case 0x00:
-				m_galil_input[0] = 'G';
+				m_galil_input = ":";
 				m_galil_input_index = 0;
 				m_galil_input_length = 1;
 				m_galil_output_index = 0;
@@ -416,9 +412,16 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 				if (arg != 0xD)
 					m_galil_output[(m_galil_output_index < 255) ? m_galil_output_index++ : m_galil_output_index] = (char)arg;
 				else {
-					osd_printf_error("Galil: %s\n", m_galil_output);
 					m_galil_input_index = 0;
 					m_galil_output_index = 0;
+					if (strstr(m_galil_output,"MG \"V\" IBO {$2.0}")) {
+						m_galil_input = "V$00";
+						m_galil_input_length = 4;
+					} else {
+						m_galil_input = ":";
+						m_galil_input_length = 1;
+					}
+					osd_printf_error("Galil << %s\nGalil >> %s\n", m_galil_output, m_galil_input);
 					memset(m_galil_output, 0, 256);
 				}
 			break; //Galil command input. ascii inputs terminated with carriage return.
