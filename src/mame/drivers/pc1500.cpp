@@ -27,7 +27,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rtc(*this, "upd1990a")
 		, m_lcd_data(*this, "lcd_data")
-		, m_keyboard(*this, "KEY,%u", 0)
+		, m_keyboard(*this, "KEY.%u", 0)
 		, m_io_on(*this, "ON")
 	{
 	}
