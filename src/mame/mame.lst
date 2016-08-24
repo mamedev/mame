@@ -2504,6 +2504,9 @@ metrocrsa                       // (c) 1985
 @source:barata.cpp
 barata                          //
 
+@source:barni.cpp
+redbarnp                        //
+
 @source:bartop52.cpp
 barbball                        // (proto)          (c) 1983
 
@@ -14453,6 +14456,10 @@ zekepeak                        //
 @source:ichiban.cpp
 ichiban                         // (c) 199? Excel
 
+@source:idsa.cpp
+bsktbllp                        //
+v1                              //
+
 @source:ie15.cpp
 ie15                            //
 
@@ -14583,6 +14590,10 @@ metalman                        //
 mundial                         //
 pinclown                        //
 pinmoonl                        //
+
+@source:inderp.cpp
+centauri
+centauri2
 
 @source:indiana.cpp
 indiana                         //
@@ -14943,6 +14954,10 @@ jedi                            // 136030           (c) 1984
 @source:jeutel.cpp
 leking                          //
 olympic                         //
+
+@source:jeutel.cpp
+punkywil                        //
+walkyria                        //
 
 @source:jokrwild.cpp
 jokrwild                        // (c) 1988 Sigma
@@ -17396,6 +17411,17 @@ macsefd                         // 1988 Apple Macintosh SE (FDHD)
 pmac6100                        // 1993 Apple Power Macintosh 6100
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
+
+@source:macp.cpp
+//glxplay                       //
+glxplay2                        //
+kidnap                          //
+mac_1808                        //
+macgalxy                        //
+macjungn                        //
+nbamac                          //
+spcpnthr                        //
+spctrain                        //
 
 @source:macpci.cpp
 pippin                          //

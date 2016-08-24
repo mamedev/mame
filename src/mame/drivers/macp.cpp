@@ -1,0 +1,145 @@
+// license:BSD-3-Clause
+// copyright-holders:Ivan Vangelista
+
+// Skeleton driver for MAC S.A. and CICPlay pinballs. ROM definitions taken from PinMAME.
+
+#include "cpu/z80/z80.h"
+#include "machine/genpin.h"
+#include "machine/i8279.h"
+#include "sound/ay8910.h"
+#include "sound/msm5205.h"
+
+class macp_state : public genpin_class
+{
+public:
+	macp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu") { }
+
+private:
+	required_device<cpu_device> m_maincpu;
+};
+
+static ADDRESS_MAP_START( macp_map, AS_PROGRAM, 8, macp_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( macp0_map, AS_PROGRAM, 8, macp_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( macp_io, AS_IO, 8, macp_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+   	
+static INPUT_PORTS_START( macp )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cicplay )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( macp, macp_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, 2500000)
+	MCFG_CPU_PROGRAM_MAP(macp_map)
+	MCFG_CPU_IO_MAP(macp_io)
+
+	/* video hardware */
+	//MCFG_DEFAULT_LAYOUT()
+
+	//I8279
+
+	/* sound hardware */
+	//2x AY8910
+	MCFG_FRAGMENT_ADD( genpin_audio )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( macp0, macp)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(macp0_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( macpmsm, macp)
+	// MSM5205
+MACHINE_CONFIG_END
+
+ROM_START(macgalxy)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("galaxy1.bin", 0x0000, 0x2000, CRC(00c71e67) SHA1(c1ad1dacae2b90f516c732bfdf8244908f67e15a))
+	ROM_LOAD("galaxy2.bin", 0x2000, 0x2000, CRC(f0efb723) SHA1(697b3c9f3ebedca1087354eda5dfe9719d497045))
+ROM_END
+
+ROM_START(spctrain)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("mbm27128.25", 0x0000, 0x4000, CRC(d65c5c36) SHA1(6f350b48daaecd36b3086e682ec6ee174f297a34))
+ROM_END
+
+ROM_START(spcpnthr)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("sp_game.bin", 0x0000, 0x8000, CRC(0428563c) SHA1(45b9daf12f8384101450f1e529491812f73d88bd))
+
+	ROM_REGION(0x8000, "msm5205", 0)
+	ROM_LOAD("mac_snd.bin", 0x0000, 0x8000, CRC(d7aedbac) SHA1(4b59028e08b2d7ff8f19596022ba6e830cf736e2))
+ROM_END
+
+ROM_START(mac_1808)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("mac_1808.cpu", 0x0000, 0x8000, CRC(29126585) SHA1(b24c4f0f17f3ef7de5348cb06ec3b305c6ca7373))
+
+	ROM_REGION(0x8000, "msm5205", 0)
+	ROM_LOAD("mac_snd.bin", 0x0000, 0x8000, CRC(d7aedbac) SHA1(4b59028e08b2d7ff8f19596022ba6e830cf736e2))
+ROM_END
+
+ROM_START(macjungn)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("juego1.bin", 0x0000, 0x8000, CRC(0b2d9b64) SHA1(22602b79c8b178793b447783bca59dcb49e4525f))
+
+	ROM_REGION(0x8000, "msm5205", 0)
+	ROM_LOAD("mac_snd.bin", 0x0000, 0x8000, CRC(d7aedbac) SHA1(4b59028e08b2d7ff8f19596022ba6e830cf736e2))
+ROM_END
+
+ROM_START(nbamac)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("nba_mac.cpu", 0x0000, 0x8000, CRC(0c430988) SHA1(71126d9caf10ac27056b8bf28d300775062dc693))
+
+	ROM_REGION(0x8000, "msm5205", 0)
+	ROM_LOAD("mac_snd.bin", 0x0000, 0x8000, CRC(d7aedbac) SHA1(4b59028e08b2d7ff8f19596022ba6e830cf736e2))
+ROM_END
+
+ROM_START(kidnap)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("kidnap_1.bin", 0x0000, 0x2000, CRC(4b8f9bb1) SHA1(16672c1a5e55ba5963fbd8834443dbead9bdff10) BAD_DUMP)
+	ROM_LOAD("kidnap_2.bin", 0x2000, 0x2000, CRC(4333d9ba) SHA1(362bcc9caaf37ad7efc116c3bee9b99cbbfa0563))
+ROM_END
+
+/*  not dumped yet
+ROM_START(glxplay)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("1083-1.cpu", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("1083-2.cpu", 0x2000, 0x2000, NO_DUMP)
+ROM_END
+*/
+
+ROM_START(glxplay2)
+	ROM_REGION(0x4000, "maincpu", 0)
+    ROM_LOAD("1382-1.cpu", 0x0000, 0x2000, CRC(da43b0b9) SHA1(b13b260c61b3bd0b7632aabcdbcf4cdd5cbe4b22))
+    ROM_LOAD("1382-2.cpu", 0x2000, 0x2000, CRC(945c90fd) SHA1(8367992f8db8b402d82e4a3f02a35b796756ce0f))
+ROM_END
+
+// MAC S.A. pinballs
+GAME( 1986, macgalxy, 0, macp0,   macp, driver_device, 0, ROT0, "MAC S.A.", "MAC's Galaxy", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, spctrain, 0, macp,    macp, driver_device, 0, ROT0, "MAC S.A.", "Space Train (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, spcpnthr, 0, macpmsm, macp, driver_device, 0, ROT0, "MAC S.A.", "Space Panther", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, mac_1808, 0, macpmsm, macp, driver_device, 0, ROT0, "MAC S.A.", "Unknown Game (MAC #1808)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, macjungn, 0, macpmsm, macp, driver_device, 0, ROT0, "MAC S.A.", "MAC Jungle (New version)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1996, nbamac,   0, macpmsm, macp, driver_device, 0, ROT0, "MAC S.A.", "NBA MAC", MACHINE_IS_SKELETON_MECHANICAL )
+
+// CICPlay pinballs
+GAME( 1986, kidnap,   0, macp0,  cicplay, driver_device, 0, ROT0, "CICPlay", "Kidnap", MACHINE_IS_SKELETON_MECHANICAL )
+// GAME( 1986, glxplay,  0, macp0,  cicplay, driver_device, 0, ROT0, "CICPlay", "Galaxy Play", MACHINE_IS_SKELETON_MECHANICAL ) // not dumped yet
+GAME( 1987, glxplay2, 0, macp0,  cicplay, driver_device, 0, ROT0, "CICPlay", "Galaxy Play 2", MACHINE_IS_SKELETON_MECHANICAL )
