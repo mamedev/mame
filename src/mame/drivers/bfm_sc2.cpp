@@ -202,18 +202,7 @@ public:
 			m_reel3(*this, "reel3"),
 			m_reel4(*this, "reel4"),
 			m_reel5(*this, "reel5"),
-			m_strobein0(*this, "STROBE0"),
-			m_strobein1(*this, "STROBE1"),
-			m_strobein2(*this, "STROBE2"),
-			m_strobein3(*this, "STROBE3"),
-			m_strobein4(*this, "STROBE4"),
-			m_strobein5(*this, "STROBE5"),
-			m_strobein6(*this, "STROBE6"),
-			m_strobein7(*this, "STROBE7"),
-			m_strobein8(*this, "STROBE8"),
-			m_strobein9(*this, "STROBE9"),
-			m_strobein10(*this, "STROBE10"),
-			m_strobein11(*this, "STROBE11"),
+			m_strobein(*this, { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", "STROBE8", "STROBE9", "STROBE10", "STROBE11" }),
 			m_rombank1(*this, "bank1"),
 			m_upd7759(*this, "upd"),
 			m_vfd0(*this, "vfd0"),
@@ -232,7 +221,7 @@ public:
 	optional_device<stepper_device> m_reel3;
 	optional_device<stepper_device> m_reel4;
 	optional_device<stepper_device> m_reel5;
-	required_ioport m_strobein0, m_strobein1, m_strobein2, m_strobein3, m_strobein4, m_strobein5, m_strobein6, m_strobein7, m_strobein8, m_strobein9, m_strobein10, m_strobein11;
+	required_ioport_array<12> m_strobein;
 	optional_memory_bank m_rombank1;
 
 	required_device<upd7759_device> m_upd7759;
@@ -684,8 +673,6 @@ WRITE8_MEMBER(bfm_sc2_state::mux_output_w)
 READ8_MEMBER(bfm_sc2_state::mux_input_r)
 {
 	int result = 0xFF,t1,t2;
-
-	required_ioport m_strobein[12] = { m_strobein0, m_strobein1, m_strobein2, m_strobein3, m_strobein4, m_strobein5, m_strobein6, m_strobein7, m_strobein8, m_strobein9, m_strobein10, m_strobein11 };
 
 	if (offset < 8)
 	{
