@@ -14,9 +14,9 @@ public:
 	cischeat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vregs(*this, "vregs"),
-		m_scrollram(*this, "scrollram"),
+		m_scrollram(*this, "scrollram.%u", 0),
 		m_ram(*this, "ram"),
-		m_roadram(*this, "roadram"),
+		m_roadram(*this, "roadram.%u", 0),
 		m_f1gpstr2_ioready(*this, "ioready"),
 		m_maincpu(*this, "maincpu"),
 		m_cpu1(*this, "cpu1"),

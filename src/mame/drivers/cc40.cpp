@@ -92,7 +92,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
-		m_key_matrix(*this, "IN"),
+		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY")
 	{
 		m_sysram[0] = nullptr;

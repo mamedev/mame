@@ -101,8 +101,8 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
-		, m_joy(*this, "joy")
-		, m_key(*this, "key")
+		, m_joy(*this, "joy.%u", 0)
+		, m_key(*this, "key.%u", 0)
 		, m_p_videoram(*this, "videoram")
 	{ }
 

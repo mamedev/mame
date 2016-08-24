@@ -106,7 +106,7 @@ public:
 		m_viewregs7(*this, "viewregs7"),
 		m_viewregs9(*this, "viewregs9"),
 		m_viewregs10(*this, "viewregs10"),
-		m_tilemap_regs(*this, "tilemap_regs"),
+		m_tilemap_regs(*this, "tilemap_regs.%u", 0),
 		m_spriteregs(*this, "spriteregs"),
 		m_blitterregs(*this, "blitterregs"),
 		m_spriteram(*this, "spriteram") { }

@@ -36,7 +36,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_c140(*this, "c140"),
-		m_muxed_inputs(*this, muxed_inputs),
+		m_muxed_inputs(*this, { { "P4", "DSW", "P1", "P2" } }),
 		m_io_p3(*this, "P3"),
 		m_workram(*this,"workram"),
 		m_vreg(*this,"vreg"),
@@ -54,7 +54,6 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<c140_device> m_c140;
 
-	DECLARE_IOPORT_ARRAY(muxed_inputs);
 	required_ioport_array<4> m_muxed_inputs;
 	required_ioport          m_io_p3;
 

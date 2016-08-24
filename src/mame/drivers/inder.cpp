@@ -49,7 +49,7 @@ public:
 		, m_7a(*this, "7a")
 		, m_9a(*this, "9a")
 		, m_9b(*this, "9b")
-		, m_switches(*this, "SW")
+		, m_switches(*this, "SW.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(ppic_r);

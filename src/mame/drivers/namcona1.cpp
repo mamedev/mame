@@ -662,8 +662,6 @@ WRITE8_MEMBER(namcona1_state::port6_w)
 	m_mcu_port6 = data;
 }
 
-IOPORT_ARRAY_MEMBER(namcona1_state::muxed_inputs) { "P4", "DSW", "P1", "P2" };
-
 READ8_MEMBER(namcona1_state::port7_r)
 {
 	if ((m_mcu_port6 & 0x80) == 0)

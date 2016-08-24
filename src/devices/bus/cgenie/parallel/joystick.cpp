@@ -95,8 +95,8 @@ ioport_constructor cgenie_joystick_device::device_input_ports() const
 cgenie_joystick_device::cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CGENIE_JOYSTICK, "Joystick Interface EG2013", tag, owner, clock, "cgenie_joystick", __FILE__),
 	device_parallel_interface(mconfig, *this),
-	m_joy(*this, "JOY"),
-	m_keypad(*this, "KEYPAD"),
+	m_joy(*this, "JOY.%u", 0),
+	m_keypad(*this, "KEYPAD.%u", 0),
 	m_select(0)
 {
 }

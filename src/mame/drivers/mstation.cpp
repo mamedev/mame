@@ -38,14 +38,15 @@ class mstation_state : public driver_device
 {
 public:
 	mstation_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_bankdev1(*this, "bank0"),
-			m_bankdev2(*this, "bank1"),
-			m_keyboard(*this, "LINE"),
-			m_nvram(*this, "nvram")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_bankdev1(*this, "bank0")
+		, m_bankdev2(*this, "bank1")
+		, m_keyboard(*this, "LINE.%u", 0)
+		, m_nvram(*this, "nvram")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

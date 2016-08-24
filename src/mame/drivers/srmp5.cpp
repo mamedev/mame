@@ -67,15 +67,16 @@ class srmp5_state : public driver_device
 {
 public:
 	srmp5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_maincpu(*this,"maincpu"),
-			m_subcpu(*this, "sub"),
-			m_chrrom(*this, "chr"),
-			m_keys(*this, "KEY"),
-			m_chrbank(0)
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_maincpu(*this,"maincpu")
+		, m_subcpu(*this, "sub")
+		, m_chrrom(*this, "chr")
+		, m_keys(*this, "KEY.%u", 0)
+		, m_chrbank(0)
+	{
+	}
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;

@@ -21,7 +21,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
-		m_line(*this, "LINE"),
+		m_line(*this, "LINE.%u", 0),
 		m_beep(0)
 	{ }
 

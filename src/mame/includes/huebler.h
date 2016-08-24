@@ -23,18 +23,18 @@ class amu880_state : public driver_device
 {
 public:
 	amu880_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_cassette(*this, "cassette"),
-			m_z80sio(*this, Z80SIO_TAG),
-			m_palette(*this, "palette"),
-			m_kb_rom(*this, "keyboard"),
-			m_char_rom(*this, "chargen"),
-			m_video_ram(*this, "video_ram"),
-			m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15"}),
-			m_special(*this, "SPECIAL"),
-			m_key_d6(0),
-			m_key_d7(0),
-			m_key_a8(1)
+		: driver_device(mconfig, type, tag)
+		, m_cassette(*this, "cassette")
+		, m_z80sio(*this, Z80SIO_TAG)
+		, m_palette(*this, "palette")
+		, m_kb_rom(*this, "keyboard")
+		, m_char_rom(*this, "chargen")
+		, m_video_ram(*this, "video_ram")
+		, m_key_row(*this, "Y%u", 0)
+		, m_special(*this, "SPECIAL")
+		, m_key_d6(0)
+		, m_key_d7(0)
+		, m_key_a8(1)
 	{ }
 
 	required_device<cassette_image_device> m_cassette;

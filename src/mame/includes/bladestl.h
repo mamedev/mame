@@ -29,7 +29,7 @@ public:
 		m_filter3(*this, "filter3"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch"),
-		m_trackball(*this, "TRACKBALL"),
+		m_trackball(*this, "TRACKBALL.%u", 0),
 		m_rombank(*this, "rombank") { }
 
 	required_device<cpu_device> m_maincpu;

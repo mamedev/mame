@@ -32,7 +32,7 @@ public:
 		m_in2(*this, "IN2"),
 		m_coinage(*this, "COINAGE"),
 		m_color_bw(*this, "COLOR_BW"),
-		m_fake_lives(*this, "FAKE_LIVES")
+		m_fake_lives(*this, "FAKE_LIVES.%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

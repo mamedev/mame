@@ -31,7 +31,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_testport(*this, "TEST")
 		, m_coinport(*this, "COIN")
-		, m_switch(*this, "SWITCH")
+		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port00_w);

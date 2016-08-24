@@ -39,7 +39,7 @@ public:
 		, m_pio2(*this, "pio2")
 		, m_pio3(*this, "pio3")
 		, m_ctc(*this, "ctc")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_beep(*this, "beeper")
 	{ }
 

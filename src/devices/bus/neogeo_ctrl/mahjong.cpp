@@ -93,17 +93,15 @@ ioport_constructor neogeo_mjctrl_device::device_input_ports() const
 //  neogeo_joystick_device - constructor
 //-------------------------------------------------
 
-neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source):
-						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_neogeo_control_port_interface(mconfig, *this),
-						m_mjpanel(*this, "MJ")
+neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_neogeo_control_port_interface(mconfig, *this)
+	, m_mjpanel(*this, "MJ.%u", 0)
 {
 }
 
-neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, NEOGEO_MJCTRL_AC, "SNK Neo Geo Arcade Mahjong panel", tag, owner, clock, "neogeo_mjac", __FILE__),
-						device_neogeo_control_port_interface(mconfig, *this),
-						m_mjpanel(*this, "MJ")
+neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: neogeo_mjctrl_ac_device(mconfig, NEOGEO_MJCTRL_AC, "SNK Neo Geo Arcade Mahjong panel", tag, owner, clock, "neogeo_mjac", __FILE__)
 {
 }
 

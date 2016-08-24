@@ -25,7 +25,7 @@ public:
 		m_palette(*this, "palette"),
 		m_fuukivid(*this, "fuukivid"),
 		m_soundlatch(*this, "soundlatch"),
-		m_vram(*this, "vram"),
+		m_vram(*this, "vram.%u", 0),
 		m_vregs(*this, "vregs"),
 		m_unknown(*this, "unknown"),
 		m_priority(*this, "priority")

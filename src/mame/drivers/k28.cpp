@@ -37,7 +37,7 @@ public:
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
 		m_onbutton_timer(*this, "on_button"),
-		m_inp_matrix(*this, "IN"),
+		m_inp_matrix(*this, "IN.%u", 0),
 		m_display_wait(33),
 		m_display_maxy(1),
 		m_display_maxx(0)

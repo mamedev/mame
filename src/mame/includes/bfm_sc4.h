@@ -123,17 +123,17 @@ class sc4_state : public bfm_sc45_state
 {
 public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: bfm_sc45_state(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cpuregion(*this, "maincpu"),
-			m_nvram(*this, "nvram"),
-			m_reel1(*this, "reel1"),
-			m_reel2(*this, "reel2"),
-			m_reel3(*this, "reel3"),
-			m_reel4(*this, "reel4"),
-			m_reel5(*this, "reel5"),
-			m_reel6(*this, "reel6"),
-			m_io_ports(*this, {"IN-0", "IN-1", "IN-2", "IN-3", "IN-4", "IN-5", "IN-6", "IN-7", "IN-8", "IN-9", "IN-10", "IN-11"})
+		: bfm_sc45_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cpuregion(*this, "maincpu")
+		, m_nvram(*this, "nvram")
+		, m_reel1(*this, "reel1")
+		, m_reel2(*this, "reel2")
+		, m_reel3(*this, "reel3")
+		, m_reel4(*this, "reel4")
+		, m_reel5(*this, "reel5")
+		, m_reel6(*this, "reel6")
+		, m_io_ports(*this, "IN-%u", 0)
 	{
 		m_chk41addr = -1;
 		m_dochk41 = false;

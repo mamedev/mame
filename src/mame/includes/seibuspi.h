@@ -29,7 +29,7 @@ public:
 		m_oki2(*this, "oki2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_key(*this, "KEY"),
+		m_key(*this, "KEY.%u", 0),
 		m_special(*this, "SPECIAL")
 	{ }
 

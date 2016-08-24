@@ -25,7 +25,7 @@ public:
 		m_tlc34076(*this, "tlc34076"),
 		m_screen(*this, "screen"),
 		m_ticket(*this, "ticket"),
-		m_an(*this, analog_inputs),
+		m_an(*this, { { "AN_C", "AN_D", "AN_E", "AN_F" } }),
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY"),
 		m_visarea(0, 0, 0, 0) { }
@@ -46,7 +46,6 @@ public:
 	required_device<tlc34076_device> m_tlc34076;
 	required_device<screen_device> m_screen;
 	required_device<ticket_dispenser_device> m_ticket;
-	DECLARE_IOPORT_ARRAY(analog_inputs);
 	optional_ioport_array<4> m_an;
 	optional_ioport m_fakex;
 	optional_ioport m_fakey;

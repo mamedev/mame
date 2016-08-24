@@ -32,7 +32,7 @@ public:
 	play_1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_dips(*this, "X")
+		, m_dips(*this, "X.%u", 0)
 		, m_monotone(*this, "monotone")
 	{ }
 

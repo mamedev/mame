@@ -54,7 +54,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
-		, m_keyboard(*this, "LINE")
+		, m_keyboard(*this, "LINE.%u", 0)
 		{ }
 
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_w);

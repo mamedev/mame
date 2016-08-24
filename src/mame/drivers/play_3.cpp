@@ -65,7 +65,7 @@ public:
 		, m_4013b(*this, "4013b")
 		, m_aysnd1(*this, "aysnd1")
 		, m_aysnd2(*this, "aysnd2")
-		, m_keyboard(*this, "X")
+		, m_keyboard(*this, "X.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port01_w);

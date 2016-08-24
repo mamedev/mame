@@ -42,7 +42,7 @@ public:
 		m_bank3(*this, "bank3"),
 		m_bank4(*this, "bank4"),
 		m_region_maincpu(*this, "maincpu"),
-		m_line(*this, "LINE"),
+		m_line(*this, "LINE.%u", 0),
 		m_reset(*this, "RESET")
 	{ }
 

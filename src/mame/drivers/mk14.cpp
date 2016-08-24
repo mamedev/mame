@@ -47,7 +47,7 @@ public:
 	mk14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_keyboard(*this, "X")
+		, m_keyboard(*this, "X.%u", 0)
 		, m_cass(*this, "cassette")
 		, m_dac(*this, "dac")
 	{ }

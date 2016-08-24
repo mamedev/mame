@@ -108,14 +108,14 @@ public:
 			m_ms32_bg1_ram(*this, "bg1_ram"),
 			m_ms32_roz0_ram(*this, "roz0_ram"),
 			m_ms32_roz1_ram(*this, "roz1_ram"),
-			m_ms32_roz_ctrl(*this, "roz_ctrl"),
+			m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0),
 			m_ms32_spram(*this, "spram"),
 			m_ms32_tx0_scroll(*this, "tx0_scroll"),
 			m_ms32_bg0_scroll(*this, "bg0_scroll"),
 			m_ms32_tx1_scroll(*this, "tx1_scroll"),
 			m_ms32_bg1_scroll(*this, "bg1_scroll"),
-			m_p1_keys(*this, "P1KEY"),
-			m_p2_keys(*this, "P2KEY") { }
+			m_p1_keys(*this, "P1KEY.%u", 0),
+			m_p2_keys(*this, "P2KEY.%u", 0) { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];

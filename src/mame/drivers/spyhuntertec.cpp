@@ -31,7 +31,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_analog_timer(*this, "analog_timer"),
-		m_analog_input(*this, "AN"),
+		m_analog_input(*this, "AN.%u", 0),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),

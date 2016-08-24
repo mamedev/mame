@@ -30,7 +30,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pcd8544(*this, "pcd8544"),
-		m_keypad(*this, "COL"),
+		m_keypad(*this, "COL.%u", 0),
 		m_pwr(*this, "PWR")
 	{ }
 

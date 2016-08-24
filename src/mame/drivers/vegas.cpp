@@ -465,7 +465,7 @@ public:
 		m_rombase(*this, "rombase"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN")
+		m_io_analog(*this, "AN.%u", 0)
 	{ }
 
 	required_device<mips3_device> m_maincpu;

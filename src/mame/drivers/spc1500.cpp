@@ -245,7 +245,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_p_videoram(*this, "videoram")
 		, m_pcgram(*this, "pcgram")
-		, m_io_kb(*this, "LINE")
+		, m_io_kb(*this, "LINE.%u", 0)
 		, m_io_joy(*this, "JOY")
 		, m_dipsw(*this, "DIP_SWITCH")
 		, m_centronics(*this, "centronics")

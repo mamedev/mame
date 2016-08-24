@@ -44,7 +44,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pio(*this, "z80pio"),
 		m_cart(*this, "cartslot"),
-		m_buttons(*this, "BUTTONS")
+		m_buttons(*this, "BUTTONS.%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

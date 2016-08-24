@@ -30,7 +30,7 @@ public:
 		m_palette2(*this, "rpalette"),
 		m_lscreen(*this, "lscreen"),
 		m_rscreen(*this, "rscreen"),
-		m_keys(*this, "KEY")
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	/* memory pointers */
