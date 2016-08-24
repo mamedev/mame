@@ -1269,13 +1269,13 @@ ROM_START( deluxe5b ) /* Deluxe 5 */
 ROM_END
 
 
-ROM_START( deluxe4u ) /* Deluxe 4 U */
+ROM_START( deluxe4u ) /* Deluxe 4 U - Removes Blackjack game, but otherwise same as Deluxe 5 */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.cu02", 0x000000, 0x040000,  CRC(db213e1f) SHA1(bf9c49635f79b92a761715138528200106aa86ae) )
 	ROM_LOAD16_BYTE( "1.cu03", 0x000001, 0x040000,  CRC(fbf14d74) SHA1(5ff5bf4ff55609452d5b8a49d8658f878541ce60) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 Code */
-	ROM_LOAD( "3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) )
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) /* AM27C020 mask rom */
 
 	ROM_REGION( 0x180000, "spr", 0 )    /* Sprites, 16x16x5 */
 	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) /* AM27C020 mask roms with no label */
@@ -1285,11 +1285,11 @@ ROM_START( deluxe4u ) /* Deluxe 4 U */
 	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    /* Layers, 16x16x8 */
-	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(6df14570) SHA1(fa4fc64c984d6a94fe61ec809ec515e840388704) )
-	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, CRC(93175d6d) SHA1(691832134f43e17bb767dff080b2736288961414) )
+	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(6df14570) SHA1(fa4fc64c984d6a94fe61ec809ec515e840388704) ) /* Specific to Deluxe 4 U - No labels on the flash roms  */
+	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, CRC(93175d6d) SHA1(691832134f43e17bb767dff080b2736288961414) ) /* Specific to Deluxe 4 U - No labels on the flash roms  */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) )
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
 ROM_END
 
 
