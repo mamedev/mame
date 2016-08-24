@@ -208,7 +208,7 @@ public:
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
-		m_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6"}),
+		m_keys(*this, "KEY%u", 0),
 		m_montype(*this, "MONTYPE"),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16"),

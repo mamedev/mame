@@ -9267,9 +9267,10 @@
 	<!-- The King of Fighters '97 bootlegs -->
 
 	<software name="kof97oro" cloneof="kof97">
-		<description>The King of Fighters '97 Oroshi Plus 2003 (bootleg)</description>
+		<description>The King of Fighters '97 Chongchu Jianghu Plus 2003 (bootleg)</description>
 		<year>1997</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="The King of Fighters '97 重出江湖 Plus 2003 (bootleg)"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -10566,7 +10567,7 @@
 			<dataarea name="ymsnd" size="0x200000">
 				<rom name="dig-v1.bin" offset="0x000000" size="0x080000" crc="ee15bda4" sha1="fe2206728e6efd02d6302869a98b196eb19a17df" />
 			</dataarea>
-			<dataarea name="sprites" size="0x400000">
+			<dataarea name="sprites" size="0x100000">
 				<rom loadflag="load16_byte" name="dig-c1.bin" offset="0x000000" size="0x080000" crc="3db0a4ed" sha1="6214faa883d97ea05809b6af7e0c85a236a18a28" />
 				<rom loadflag="load16_byte" name="dig-c2.bin" offset="0x000001" size="0x080000" crc="3e632161" sha1="83711c4286fb1d9f3f91414ac6e5fed36618033e" />
 			</dataarea>

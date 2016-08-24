@@ -53,8 +53,10 @@ Standard dm01 memorymap
 
 const device_type BF_DM01 = &device_creator<bfmdm01_device>;
 
+
 bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BF_DM01, "BFM Dotmatrix 01", tag, owner, clock, "bfm_dm01", __FILE__),
+	m_matrixcpu(*this, "matrix"),
 	m_data_avail(0),
 	m_control(0),
 	m_xcounter(0),
@@ -188,10 +190,14 @@ WRITE8_MEMBER( bfmdm01_device::mux_w )
 				p++;
 			}
 
+			g_profiler.start(PROFILER_USER1);
+
 			for (int pos=0;pos<65;pos++)
 			{
 				machine().output().set_indexed_value("dotmatrix", pos +(65*row), m_segbuffer[(pos)]);
 			}
+
+			g_profiler.stop();
 		}
 	}
 }
@@ -233,19 +239,38 @@ READ8_MEMBER( bfmdm01_device::unknown_r )
 
 WRITE8_MEMBER( bfmdm01_device::unknown_w )
 {
-	space.machine().device("matrix")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE ); //?
+	m_matrixcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE ); //?
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 ADDRESS_MAP_START( bfm_dm01_memmap, AS_PROGRAM, 8, bfmdm01_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM                             // 8k RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("dm01", bfmdm01_device, control_r, control_w)  // control reg
-	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("dm01", bfmdm01_device, mux_r, mux_w)           // mux
-	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("dm01", bfmdm01_device, comm_r, comm_w)     //
-	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("dm01", bfmdm01_device, unknown_r, unknown_w)   // ???
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE(control_r, control_w)  // control reg
+	AM_RANGE(0x2800, 0x2800) AM_READWRITE(mux_r, mux_w)           // mux
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(comm_r, comm_w)     //
+	AM_RANGE(0x3800, 0x3800) AM_READWRITE(unknown_r, unknown_w)   // ???
 	AM_RANGE(0x4000, 0xFfff) AM_ROM                             // 48k  ROM
 ADDRESS_MAP_END
+
+INTERRUPT_GEN_MEMBER( bfmdm01_device::nmi_line_assert )
+{
+	m_matrixcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+static MACHINE_CONFIG_FRAGMENT( bdmdm01 )
+	MCFG_CPU_ADD("matrix", M6809, 2000000 )        /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
+	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bfmdm01_device, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
+
+
+MACHINE_CONFIG_END
+
+machine_config_constructor bfmdm01_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( bdmdm01 );
+}
+
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -255,7 +280,7 @@ void bfmdm01_device::writedata(UINT8 data)
 	m_data_avail = 1;
 
 	//pulse IRQ line
-	machine().device("matrix")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE ); // trigger IRQ
+	m_matrixcpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE ); // trigger IRQ
 }
 
 ///////////////////////////////////////////////////////////////////////////

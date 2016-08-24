@@ -136,12 +136,12 @@ static const struct CassetteLegacyWaveFiller spc1000_tap_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t spc1000_tap_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error spc1000_tap_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &spc1000_tap_legacy_fill_wave);
 }
 
-static casserr_t spc1000_tap_cassette_load(cassette_image *cassette)
+static cassette_image::error spc1000_tap_cassette_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &spc1000_tap_legacy_fill_wave);
 }
@@ -167,12 +167,12 @@ static const struct CassetteLegacyWaveFiller spc1000_cas_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t spc1000_cas_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error spc1000_cas_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &spc1000_cas_legacy_fill_wave);
 }
 
-static casserr_t spc1000_cas_cassette_load(cassette_image *cassette)
+static cassette_image::error spc1000_cas_cassette_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &spc1000_cas_legacy_fill_wave);
 }

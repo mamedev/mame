@@ -50,7 +50,7 @@ public:
 		, m_msm_m(*this, "msm_m")
 		, m_ic5a(*this, "ic5a")
 		, m_ic5m(*this, "ic5m")
-		, m_switches(*this, "SW")
+		, m_switches(*this, "SW.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(p1_w);

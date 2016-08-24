@@ -206,7 +206,7 @@ static int kc_handle_tap(INT16 *buffer, const UINT8 *casdata)
 	}
 	else
 	{
-		return CASSETTE_ERROR_INVALIDIMAGE;
+		return (int)cassette_image::error::INVALID_IMAGE;
 	}
 }
 
@@ -260,13 +260,13 @@ static const struct CassetteLegacyWaveFiller kc_kcc_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t kc_kcc_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error kc_kcc_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &kc_kcc_legacy_fill_wave);
 }
 
 
-static casserr_t kc_kcc_load(cassette_image *cassette)
+static cassette_image::error kc_kcc_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &kc_kcc_legacy_fill_wave);
 }
@@ -312,13 +312,13 @@ static const struct CassetteLegacyWaveFiller kc_tap_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t kc_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error kc_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &kc_tap_legacy_fill_wave);
 }
 
 
-static casserr_t kc_tap_load(cassette_image *cassette)
+static cassette_image::error kc_tap_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &kc_tap_legacy_fill_wave);
 }
@@ -364,13 +364,13 @@ static const struct CassetteLegacyWaveFiller kc_sss_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t kc_sss_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error kc_sss_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &kc_sss_legacy_fill_wave);
 }
 
 
-static casserr_t kc_sss_load(cassette_image *cassette)
+static cassette_image::error kc_sss_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &kc_sss_legacy_fill_wave);
 }

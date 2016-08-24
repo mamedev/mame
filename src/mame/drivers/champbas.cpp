@@ -225,6 +225,12 @@ static ADDRESS_MAP_START( champbasja_map, AS_PROGRAM, 8, champbas_state )
 	AM_IMPORT_FROM( champbas_map )
 ADDRESS_MAP_END
 
+// champbasjb appears to have no protection
+static ADDRESS_MAP_START( champbasjb_map, AS_PROGRAM, 8, champbas_state )
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
+	AM_IMPORT_FROM( champbas_map )
+ADDRESS_MAP_END
+
 // champbb2
 static ADDRESS_MAP_START( champbb2_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x7800, 0x7fff) AM_ROM
@@ -613,6 +619,13 @@ static MACHINE_CONFIG_DERIVED( champbasja, champbas )
 	MCFG_CPU_PROGRAM_MAP(champbasja_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( champbasjb, champbas )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(champbasjb_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( champbb2, champbasj )
 
 	/* basic machine hardware */
@@ -822,6 +835,28 @@ ROM_START( champbasja )
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "clr",    0x0000, 0x0020, CRC(8f989357) SHA1(d0916fb5ef4b43bdf84663cd403418ffc5e98c17) ) /* palette */
 	ROM_LOAD( "5k.bpr", 0x0020, 0x0100, CRC(2e481ffa) SHA1(bc8979efd43bee8be0ce96ebdacc873a5821e06e) ) /* look-up table */
+ROM_END
+
+ROM_START( champbasjb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.2e",  0x0000, 0x2000, CRC(4dcf2e03) SHA1(2cdae2cc560d316bb651f8a92e4d6af6eaac8785) )
+	ROM_LOAD( "2.2g",  0x2000, 0x2000, CRC(ccbd0eff) SHA1(5437e571b417fb162b36376fd26cab753ca178ff) )
+	ROM_LOAD( "3.2h",  0x4000, 0x2000, CRC(4c7f1de4) SHA1(c5b4ad5f3e3f606e372fb5316ee875f8a299129c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6.2k",  0x0000, 0x2000, CRC(24c482ee) SHA1(c25bdf77014e095fc11a9a6b17f16858f19db451) )
+	ROM_LOAD( "7.2l",  0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
+	ROM_LOAD( "8.2n",  0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_LOAD( "4.5e",  0x0000, 0x2000, CRC(1930fb52) SHA1(cae0b2701c2b53b79e9df3a7496442ba3472e996) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_LOAD( "5.5g",  0x0000, 0x2000, CRC(a67c0c40) SHA1(3845839eff8c1624d26937f28ffde67a5fcb4805) )
+
+	ROM_REGION( 0x0120, "proms", 0 ) // palette + table missing in set, taken from champbasj
+	ROM_LOAD( "1e.bpr", 0x0000, 0x0020, BAD_DUMP CRC(f5ce825e) SHA1(956f580840f1a7d24bfbd72b2929d14e9ee1b660) ) /* palette */
+	ROM_LOAD( "5k.bpr", 0x0020, 0x0100, BAD_DUMP CRC(2e481ffa) SHA1(bc8979efd43bee8be0ce96ebdacc873a5821e06e) ) /* look-up table */
 ROM_END
 
 ROM_START( champbb2 )
@@ -1218,6 +1253,7 @@ GAME( 1982, talbot,     0,        talbot,     talbot,   driver_device,  0,      
 GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE ) // no protection
 GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE ) // simplified protection, no mcu
+GAME( 1983, champbasjb, champbas, champbasjb, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 3)", MACHINE_SUPPORTS_SAVE ) // no protection
 GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, champbb2a,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
 GAME( 1983, champbb2j,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )

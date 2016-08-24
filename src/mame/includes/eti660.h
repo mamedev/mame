@@ -35,7 +35,7 @@ public:
 		, m_cti(*this, CDP1864_TAG)
 		, m_pia(*this, MC6821_TAG)
 		, m_cassette(*this, "cassette")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_special(*this, "SPECIAL")
 	{ }
 

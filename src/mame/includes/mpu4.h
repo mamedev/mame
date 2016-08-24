@@ -190,6 +190,9 @@ public:
 	DECLARE_DRIVER_INIT(m4default_banks);
 	DECLARE_DRIVER_INIT(m4default_reels);
 	DECLARE_DRIVER_INIT(m4_low_volt_alt);
+	DECLARE_DRIVER_INIT(m4_aux1_invert);
+	DECLARE_DRIVER_INIT(m4_aux2_invert);
+	DECLARE_DRIVER_INIT(m4_door_invert);
 	DECLARE_DRIVER_INIT(m4_five_reel_std);
 	DECLARE_DRIVER_INIT(m4_five_reel_rev);
 	DECLARE_DRIVER_INIT(m4_five_reel_alt);
@@ -215,16 +218,28 @@ public:
 	DECLARE_DRIVER_INIT(m4tst);
 	DECLARE_DRIVER_INIT(m_ccelbr);
 	DECLARE_DRIVER_INIT(m4gambal);
-	DECLARE_DRIVER_INIT(m_grtecp);
 	DECLARE_DRIVER_INIT(m4debug);
 	DECLARE_DRIVER_INIT(m4_showstring);
 	DECLARE_DRIVER_INIT(m4_showstring_mod4yam);
 	DECLARE_DRIVER_INIT(m4_debug_mod4yam);
 	DECLARE_DRIVER_INIT(m4_showstring_mod2);
 	DECLARE_DRIVER_INIT(m4_showstring_big);
-	DECLARE_DRIVER_INIT(m_grtecpss);
 	DECLARE_DRIVER_INIT(connect4);
 	DECLARE_DRIVER_INIT(m4altreels);//legacy, will be removed once things are sorted out
+	DECLARE_DRIVER_INIT(m_grtecp);//legacy, will be removed once things are sorted out RE: CHR
+	DECLARE_DRIVER_INIT(m4tenten);
+	DECLARE_DRIVER_INIT(m4actbnk);
+	DECLARE_DRIVER_INIT(m4actclb);
+	DECLARE_DRIVER_INIT(m4actpak);
+	DECLARE_DRIVER_INIT(m4addr);
+	DECLARE_DRIVER_INIT(m4aao);
+	DECLARE_DRIVER_INIT(m4alladv);
+	DECLARE_DRIVER_INIT(m4alpha);
+	DECLARE_DRIVER_INIT(m4andycp);
+	DECLARE_DRIVER_INIT(m4andybt);
+	DECLARE_DRIVER_INIT(m4andyfh);
+	DECLARE_DRIVER_INIT(m4andyge);
+	DECLARE_DRIVER_INIT(m4apachg);
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
 	DECLARE_MACHINE_START(mpu4yam);
@@ -311,6 +326,9 @@ protected:
 	int m_led_lamp;
 	int m_link7a_connected;
 	int m_low_volt_detect_disable;
+	int	m_aux1_invert;
+	int m_aux2_invert;
+	int m_door_invert;
 	emu_timer *m_ic24_timer;
 	int m_expansion_latch;
 	int m_global_volume;

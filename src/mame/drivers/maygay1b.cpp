@@ -91,6 +91,7 @@
 #include "m1cluedo4.lh"
 #include "m1cluessf.lh"
 #include "m1coro21n.lh"
+#include "m1cororrk.lh"
 #include "m1dkong91n.lh"
 #include "m1dxmono51o.lh"
 #include "m1eastndl.lh"
@@ -100,6 +101,7 @@
 #include "m1frexplc.lh"
 #include "m1gladg.lh"
 #include "m1grescb.lh"
+#include "m1guvnor.lh"
 #include "m1hotpoth.lh"
 #include "m1htclb.lh"
 #include "m1imclb.lh"
@@ -119,11 +121,13 @@
 #include "m1nudbnke.lh"
 #include "m1omega.lh"
 #include "m1onbusa.lh"
+#include "m1pinkpc.lh"
 #include "m1przeeb.lh"
 #include "m1retpp.lh"
 #include "m1search.lh"
 #include "m1sptlgtc.lh"
 #include "m1startr.lh"
+#include "m1sudnima.lh"
 #include "m1taknot.lh"
 #include "m1thatlfc.lh"
 #include "m1topstr.lh"
@@ -635,7 +639,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 
 READ8_MEMBER( maygay1b_state::kbd_r )
 {
-	return (m_kbd_ports[m_lamp_strobe&0x07])->read();
+	return (m_kbd_ports[(m_lamp_strobe&0x07)^4])->read();
 }
 
 WRITE8_MEMBER( maygay1b_state::scanlines_2_w )

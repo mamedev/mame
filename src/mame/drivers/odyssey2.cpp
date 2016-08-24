@@ -28,8 +28,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_i8244(*this, "i8244"),
 		m_cart(*this, "cartslot"),
-		m_keyboard(*this, "KEY"),
-		m_joysticks(*this, "JOY") { }
+		m_keyboard(*this, "KEY.%u", 0),
+		m_joysticks(*this, "JOY.%u", 0) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8244_device> m_i8244;

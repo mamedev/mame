@@ -20,7 +20,6 @@
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -104,8 +103,12 @@ public:
 			case INPUT_EVENT_KEYDOWN:
 			case INPUT_EVENT_KEYUP:
 				args = static_cast<KeyPressEventArgs*>(eventdata);
-				for (int i = 0; i < devicelist()->size(); i++)
-					downcast<win32_keyboard_device*>(devicelist()->at(i))->queue_events(args, 1);
+				devicelist()->for_each_device([args](auto device)
+				{
+					auto keyboard = dynamic_cast<win32_keyboard_device*>(device);
+					if (keyboard != nullptr)
+						keyboard->queue_events(args, 1);
+				});
 
 				return true;
 
@@ -234,8 +237,12 @@ public:
 			return false;
 
 		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
-		for (int i = 0; i < devicelist()->size(); i++)
-			downcast<win32_mouse_device*>(devicelist()->at(i))->queue_events(args, 1);
+		devicelist()->for_each_device([args](auto device)
+		{
+			auto mouse = dynamic_cast<win32_mouse_device*>(device);
+			if (mouse != nullptr)
+				mouse->queue_events(args, 1);
+		});
 
 		return true;
 	}
@@ -417,8 +424,13 @@ public:
 		if (!input_enabled() || !lightgun_enabled() || eventid != INPUT_EVENT_MOUSE_BUTTON)
 			return false;
 
-		for (int i = 0; i < devicelist()->size(); i++)
-			downcast<win32_lightgun_device*>(devicelist()->at(i))->queue_events(static_cast<MouseButtonEventArgs*>(eventdata), 1);
+		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
+		devicelist()->for_each_device([args](auto device)
+		{
+			auto lightgun = dynamic_cast<win32_lightgun_device*>(device);
+			if (lightgun != nullptr)
+				lightgun->queue_events(args, 1);
+		});
 
 		return true;
 	}

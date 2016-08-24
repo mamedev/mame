@@ -1427,7 +1427,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC")
+		m_adc_ports(*this, "ADC.%u", 0)
 	{ }
 
 	required_device<mips3_device> m_maincpu;

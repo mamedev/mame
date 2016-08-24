@@ -22,25 +22,25 @@ class segaybd_state : public sega_16bit_common_base
 public:
 	// construction/destruction
 	segaybd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_subx(*this, "subx"),
-			m_suby(*this, "suby"),
-			m_soundcpu(*this, "soundcpu"),
-			m_linkcpu(*this, "linkcpu"),
-			m_watchdog(*this, "watchdog"),
-			m_bsprites(*this, "bsprites"),
-			m_ysprites(*this, "ysprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_soundlatch(*this, "soundlatch"),
-			m_digital_ports(*this, digital_ports),
-			m_adc_ports(*this, "ADC"),
-			m_pdrift_bank(0),
-			m_scanline_timer(nullptr),
-			m_irq2_scanline(0),
-			m_timer_irq_state(0),
-			m_vblank_irq_state(0),
-			m_tmp_bitmap(512, 512)
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subx(*this, "subx")
+		, m_suby(*this, "suby")
+		, m_soundcpu(*this, "soundcpu")
+		, m_linkcpu(*this, "linkcpu")
+		, m_watchdog(*this, "watchdog")
+		, m_bsprites(*this, "bsprites")
+		, m_ysprites(*this, "ysprites")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_soundlatch(*this, "soundlatch")
+		, m_digital_ports(*this, { { "P1", "GENERAL", "LIMITSW", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" } })
+		, m_adc_ports(*this, "ADC.%u", 0)
+		, m_pdrift_bank(0)
+		, m_scanline_timer(nullptr)
+		, m_irq2_scanline(0)
+		, m_timer_irq_state(0)
+		, m_vblank_irq_state(0)
+		, m_tmp_bitmap(512, 512)
 	{
 		memset(m_analog_data, 0, sizeof(m_analog_data));
 		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
@@ -117,7 +117,6 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// input ports
-	DECLARE_IOPORT_ARRAY(digital_ports);
 	required_ioport_array<8> m_digital_ports;
 	optional_ioport_array<6> m_adc_ports;
 

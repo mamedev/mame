@@ -103,12 +103,15 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/m68000/m68000.h"
 
-#include "machine/msm5832.h"
+#include "machine/clock.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/mos6551.h"
 #include "machine/i8214.h"
 #include "machine/wd_fdc.h"
+#include "machine/msm5832.h"
+#include "machine/input_merger.h"
 #include "video/dl1416.h"
 
 #define Q209_CPU_CLOCK		4000000 // ?
@@ -363,6 +366,10 @@ public:
 		, m_q133_pia_0(*this, "q133_pia_1")
 		, m_q133_pia_1(*this, "q133_pia_2")
 		, m_q133_ptm(*this, "q133_ptm")
+		, m_q133_acia_0(*this, "q133_acia_0")
+		, m_q133_acia_1(*this, "q133_acia_1")
+		, m_q133_acia_2(*this, "q133_acia_2")
+		, m_q133_acia_3(*this, "q133_acia_3")
 		, m_q133_region(*this, "q133")
 		, m_q219_pia(*this, "q219_pia")
 		, m_q219_ptm(*this, "q219_ptm")
@@ -374,17 +381,11 @@ public:
 		, m_acia_mkbd_cmi(*this, "acia_mkbd_cmi")
 		, m_cmi07_ptm(*this, "cmi07_ptm")
 		, m_qfc9_region(*this, "qfc9")
-		, m_floppy_0(*this, "wd1791:0:8dsdd")
-		, m_floppy_1(*this, "wd1791:1:8dsdd")
+		, m_floppy_0(*this, "wd1791:0")
+		, m_floppy_1(*this, "wd1791:1")
+		, m_floppy(nullptr)
 		, m_wd1791(*this, "wd1791")
-		, m_cmi01a_0(*this, "cmi01a_0")
-		, m_cmi01a_1(*this, "cmi01a_1")
-		, m_cmi01a_2(*this, "cmi01a_2")
-		, m_cmi01a_3(*this, "cmi01a_3")
-		, m_cmi01a_4(*this, "cmi01a_4")
-		, m_cmi01a_5(*this, "cmi01a_5")
-		, m_cmi01a_6(*this, "cmi01a_6")
-		, m_cmi01a_7(*this, "cmi01a_7")
+		, m_channels(*this, "cmi01a_%u", 0)
 		, m_cmi10_pia_u20(*this, "cmi10_pia_u20")
 		, m_cmi10_pia_u21(*this, "cmi10_pia_u21")
 		, m_dp1(*this, "dp1")
@@ -392,16 +393,13 @@ public:
 		, m_dp3(*this, "dp3")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_ankrow_ports(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7"})
+		, m_ankrow_ports(*this, "ROW%u", 0)
 		, m_lp_x_port(*this, "LP_X")
 		, m_lp_y_port(*this, "LP_Y")
 		, m_lp_touch_port(*this, "LP_TOUCH")
 		, m_keypad_a_port(*this, "KEYPAD_A")
 		, m_keypad_b_port(*this, "KEYPAD_B")
-		, m_key_mux0_port(*this, {"KEY_0_0", "KEY_1_0", "KEY_2_0"})
-		, m_key_mux1_port(*this, {"KEY_0_1", "KEY_1_1", "KEY_2_1"})
-		, m_key_mux2_port(*this, {"KEY_0_2", "KEY_1_2", "KEY_2_2"})
-		, m_key_mux3_port(*this, {"KEY_0_3", "KEY_1_3", "KEY_2_3"})
+		, m_key_mux_ports{ { *this, "KEY_%u_0", 0 }, { *this, "KEY_%u_1", 0 }, { *this, "KEY_%u_2", 0 }, { *this, "KEY_%u_3", 0 } }
 		, m_cmi07_ram(*this, "cmi07_ram")
 	{
 	}
@@ -420,8 +418,10 @@ public:
 	DECLARE_DRIVER_INIT( cmi2x );
 
 	// CPU card
-	DECLARE_READ8_MEMBER( q133_acia_r );
-	DECLARE_WRITE8_MEMBER( q133_acia_w );
+	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq0 );
+	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq1 );
+	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq2 );
+	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq3 );
 	DECLARE_WRITE8_MEMBER( i8214_cpu1_w );
 	DECLARE_WRITE8_MEMBER( i8214_cpu2_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_1_int_w );
@@ -480,10 +480,10 @@ public:
 	DECLARE_WRITE8_MEMBER( master_tune_w );
 
 	// Alphanumeric keyboard
-	DECLARE_WRITE_LINE_MEMBER( ank_data_w );
 	DECLARE_READ8_MEMBER( ank_col_r );
-	DECLARE_WRITE_LINE_MEMBER( ank_cts_w );
 	DECLARE_READ_LINE_MEMBER( ank_rts_r );
+	DECLARE_WRITE_LINE_MEMBER( ank_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( ank_irqb_w );
 
 	// ???
 	DECLARE_READ8_MEMBER( cmi07_r );
@@ -500,22 +500,11 @@ public:
 	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp2 );
 	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp3 );
 
-	DECLARE_READ_LINE_MEMBER( mkbd_kbd_rx );
-	DECLARE_WRITE_LINE_MEMBER( mkbd_kbd_tx );
-#if 0
-	DECLARE_READ_LINE_MEMBER( q133_rx );
-	DECLARE_WRITE_LINE_MEMBER( q133_tx );
-	DECLARE_WRITE_LINE_MEMBER( mkbd_cmi_w );
-#endif
-	DECLARE_READ_LINE_MEMBER( mkbd_cmi_rx );
-	DECLARE_WRITE_LINE_MEMBER( mkbd_cmi_tx );
 	DECLARE_WRITE_LINE_MEMBER( msm5832_irq );
-	DECLARE_WRITE_LINE_MEMBER( mkbd_acia1_int );
-	DECLARE_WRITE_LINE_MEMBER( mkbd_acia2_int );
-#if 0
-	DECLARE_WRITE_LINE_MEMBER( q133_acia_int );
-#endif
+	DECLARE_WRITE_LINE_MEMBER( mkbd_kbd_acia_int );
+	DECLARE_WRITE_LINE_MEMBER( mkbd_cmi_acia_int );
 	DECLARE_WRITE_LINE_MEMBER( cmi07_irq );
+	DECLARE_WRITE_LINE_MEMBER( mkbd_acia_clock );
 
 protected:
 
@@ -533,6 +522,10 @@ protected:
 	required_device<pia6821_device> m_q133_pia_0;
 	required_device<pia6821_device> m_q133_pia_1;
 	required_device<ptm6840_device> m_q133_ptm;
+	required_device<mos6551_device> m_q133_acia_0;
+	required_device<mos6551_device> m_q133_acia_1;
+	required_device<mos6551_device> m_q133_acia_2;
+	required_device<mos6551_device> m_q133_acia_3;
 	required_memory_region m_q133_region;
 
 	required_device<pia6821_device> m_q219_pia;
@@ -549,19 +542,12 @@ protected:
 	required_device<ptm6840_device> m_cmi07_ptm;
 
 	required_memory_region m_qfc9_region;
-	required_device<floppy_image_device> m_floppy_0;
-	required_device<floppy_image_device> m_floppy_1;
+	required_device<floppy_connector> m_floppy_0;
+	required_device<floppy_connector> m_floppy_1;
+	floppy_image_device *m_floppy;
 	required_device<fd1791_t> m_wd1791;
 
-	required_device<cmi01a_device> m_cmi01a_0;
-	required_device<cmi01a_device> m_cmi01a_1;
-	required_device<cmi01a_device> m_cmi01a_2;
-	required_device<cmi01a_device> m_cmi01a_3;
-	required_device<cmi01a_device> m_cmi01a_4;
-	required_device<cmi01a_device> m_cmi01a_5;
-	required_device<cmi01a_device> m_cmi01a_6;
-	required_device<cmi01a_device> m_cmi01a_7;
-	cmi01a_device* m_channels[8];
+	required_device_array<cmi01a_device, 8> m_channels;
 
 	required_device<pia6821_device> m_cmi10_pia_u20;
 	required_device<pia6821_device> m_cmi10_pia_u21;
@@ -581,10 +567,7 @@ protected:
 	required_ioport m_keypad_a_port;
 	required_ioport m_keypad_b_port;
 
-	required_ioport_array<3> m_key_mux0_port;
-	required_ioport_array<3> m_key_mux1_port;
-	required_ioport_array<3> m_key_mux2_port;
-	required_ioport_array<3> m_key_mux3_port;
+	required_ioport_array<3> m_key_mux_ports[4];
 
 	required_shared_ptr<UINT8> m_cmi07_ram;
 
@@ -592,11 +575,7 @@ protected:
 	address_space *m_cpu2space;
 
 	UINT8 *m_q133_rom;
-	UINT8 m_q133_acia_rx_data;
-//	UINT8 m_q133_acia_tx_data;
-	UINT8 m_q133_acia_status;
-	UINT8 m_q133_acia_cmd;
-	UINT8 m_q133_acia_ctrl;
+	UINT8 m_q133_acia_irq;
 
 private:
 
@@ -661,11 +640,12 @@ private:
 
 	/* Musical keyboard */
 	UINT8 	m_msm5832_addr;
-	int		m_mkbd_acia1_irq;
-	int		m_mkbd_acia2_irq;
-	int		m_mkbd_tx_start;
-	int		m_mkbd_tx_bits;
-	int		m_mkbd_tx_reg;
+	int		m_mkbd_kbd_acia_irq;
+	int		m_mkbd_cmi_acia_irq;
+
+	// Alphanumeric keyboard
+	int		m_ank_irqa;
+	int		m_ank_irqb;
 };
 
 /**************************************
@@ -856,7 +836,6 @@ READ8_MEMBER( cmi_state::rom_r )
 
 WRITE8_MEMBER( cmi_state::map_ram_w )
 {
-	//printf("map_ram_w: %04x = %02x\n", offset, data);
 	if ((offset & 1) == 0)
 	{
 		m_map_ram_latch = data;
@@ -890,14 +869,12 @@ READ8_MEMBER( cmi_state::map_r )
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
 	UINT8 data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
-	//printf("map_r %04x = %02x (%d)\n", offset, data, cpunum);
 	return data;
 }
 
 WRITE8_MEMBER( cmi_state::map_w )
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
-	//printf("map_w %04x = %02x (%d)\n", offset, data, cpunum);
 
 	m_map_switch_timer->adjust(attotime::from_ticks(data & 0xf, M6809_CLOCK), cpunum);
 }
@@ -949,13 +926,13 @@ WRITE8_MEMBER( cmi_state::cpufunc_w )
 	int cpunum = data & 1;
 	int idx = data & 6;
 	int bit = (data & 8) >> 3;
-	//printf("cpufunc_w %04x = %02x cpunum:%d idx:%d bit:%d\n", offset, data, cpunum, idx, bit);
 
 	switch (idx)
 	{
 		case 0: set_interrupt(cpunum, IRQ_IPI2_LEVEL, bit ? ASSERT_LINE : CLEAR_LINE);
 				break;
 		case 2: // TODO: Hardware trace
+				printf("TODO: Hardware trace %02x\n", data);
 				break;
 		case 4: m_cpu_map_switch[cpunum] = bit;
 				break;
@@ -976,7 +953,6 @@ READ8_MEMBER( cmi_state::parity_r )
 
 WRITE8_MEMBER( cmi_state::mapsel_w )
 {
-	//printf("mapsel_w %04x = %02x\n", offset, data);
 	data ^= 0x1f;
 	m_map_sel[offset] = data;
 
@@ -1393,52 +1369,28 @@ READ8_MEMBER( cmi_state::cmi07_r )
 	return 0xff;
 }
 
-READ8_MEMBER( cmi_state::q133_acia_r )
+WRITE_LINE_MEMBER( cmi_state::q133_acia_irq0 )
 {
-	int acia = (offset >> 2) & 3;
-
-	if (acia != 0)
-		return 0;
-
-	switch (offset & 3)
-	{
-		case 0:
-			/* Clear RDRF */
-			m_q133_acia_status &= ~0x08;
-			set_interrupt(CPU_1, IRQ_ACINT_LEVEL, CLEAR_LINE);
-			return m_q133_acia_rx_data;
-		case 1:
-			m_q133_acia_status &= ~0x80;
-			return m_q133_acia_status | 0x10;
-		case 2: return m_q133_acia_cmd;
-		case 3: return m_q133_acia_ctrl;
-	}
-
-	return 0;
-
-//	return m_133_acia->read(0);
+	m_q133_acia_irq = (m_q133_acia_irq & ~1) | state;
+	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( cmi_state::q133_acia_w )
+WRITE_LINE_MEMBER( cmi_state::q133_acia_irq1 )
 {
-	int acia = (offset >> 2) & 3;
-
-	if (acia != 0)
-		return;
-
-	switch (offset & 3)
-	{
-		case 0: break;//printf("%c\n", data); break; // TODO
-		case 1: break; // Reset
-		case 2: m_q133_acia_cmd = data; break;
-		case 3: m_q133_acia_ctrl = data; break;
-	}
-
-//	m_q133_acia->write(offset & 3, data);
+	m_q133_acia_irq = (m_q133_acia_irq & ~2) | (state << 1);
+	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( cmi_state::ank_data_w )
+WRITE_LINE_MEMBER( cmi_state::q133_acia_irq2 )
 {
+	m_q133_acia_irq = (m_q133_acia_irq & ~4) | (state << 2);
+	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( cmi_state::q133_acia_irq3 )
+{
+	m_q133_acia_irq = (m_q133_acia_irq & ~8) | (state << 3);
+	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( cmi_state::ank_col_r )
@@ -1495,7 +1447,6 @@ void cmi_state::dma_fdc_rom()
 
 	/* TODO: This should be stuck in a deferred write */
 	int cnt = std::min(m_fdc_dma_cnt.w.l ^ 0xffff, 2048);
-	//printf("cnt is %d\n", cnt);
 	memcpy(&m_q256_ram[i][(p_info & 0x7f) * PAGE_SIZE], m_qfc9_region_ptr, cnt);
 	m_fdc_status |= FDC_STATUS_DRIVER_LOAD;
 
@@ -1509,17 +1460,20 @@ void cmi_state::write_fdc_ctrl(UINT8 data)
 	int drive = data & 1;
 	int side = BIT(data, 5) ? 1 : 0;
 
-	//printf("write_fdc_ctrl: drive:%d side:%d dd:%d data:%02x\n", drive, side, BIT(data, 7) ? 1 : 0, data);
+	m_floppy = nullptr;
+
 	if (drive)
 	{
-		m_floppy_1->ss_w(side);
-		m_wd1791->set_floppy(m_floppy_1);
+		m_floppy = m_floppy_1->get_device();
 	}
 	else
 	{
-		m_floppy_0->ss_w(side);
-		m_wd1791->set_floppy(m_floppy_0);
+		m_floppy = m_floppy_0->get_device();
 	}
+
+	if (m_floppy)
+		m_floppy->ss_w(side);
+	m_wd1791->set_floppy(m_floppy);
 	m_wd1791->dden_w(BIT(data, 7) ? true : false);
 
 	m_fdc_ctrl = data;
@@ -1527,21 +1481,20 @@ void cmi_state::write_fdc_ctrl(UINT8 data)
 
 WRITE8_MEMBER( cmi_state::fdc_w )
 {
-	//printf("fdc_w: %04x = %02x\n", offset, data); fflush(stdout);
 	if (offset == 0)
 	{
 		switch (m_fdc_addr)
 		{
-			case 0x0: /*printf("write_fdc_ctrl: %02x\n", data);*/ write_fdc_ctrl(data);         break;
-			case 0x2: /*printf("fdc_dma_addr : %02x\n", data);*/ m_fdc_dma_addr.b.l = data;    break;
-			case 0x4: /*printf("fdc_dma_addr hi: %02x\n", data);*/ m_fdc_dma_addr.b.h  = data;   break;
-			case 0x6: /*printf("fdc_dma_cnt lo: %02x\n", data);*/ m_fdc_dma_cnt.b.l = data;     break;
-			case 0x8: /*printf("fdc_dma_cnt hi: %02x\n", data);*/ m_fdc_dma_cnt.b.h = data;     break;
-			case 0xa: /*printf("dma_fdc_rom\n");*/ dma_fdc_rom();                break;
-			case 0xc: /*printf("cmd_w: %02x\n", data);*/ m_wd1791->cmd_w(data ^ 0xff);        break;
-			case 0xd: /*printf("track_w: %02x\n", data);*/ m_wd1791->track_w(data ^ 0xff);      break;
-			case 0xe: /*printf("sector_w: %02x\n", data);*/ m_wd1791->sector_w(data ^ 0xff);     break;
-			case 0xf: /*printf("data_w: %02x\n", data);*/ m_wd1791->data_w(data ^ 0xff);       break;
+			case 0x0: write_fdc_ctrl(data);         break;
+			case 0x2: m_fdc_dma_addr.b.l = data;    break;
+			case 0x4: m_fdc_dma_addr.b.h  = data;   break;
+			case 0x6: m_fdc_dma_cnt.b.l = data;     break;
+			case 0x8: m_fdc_dma_cnt.b.h = data;     break;
+			case 0xa: dma_fdc_rom();                break;
+			case 0xc: m_wd1791->cmd_w(data ^ 0xff);        break;
+			case 0xd: m_wd1791->track_w(data ^ 0xff);      break;
+			case 0xe: m_wd1791->sector_w(data ^ 0xff);     break;
+			case 0xf: m_wd1791->data_w(data ^ 0xff);       break;
 			default: printf("fdc_w: Invalid access (%x with %x)", m_fdc_addr, data);
 		}
 	}
@@ -1555,10 +1508,10 @@ READ8_MEMBER( cmi_state::fdc_r )
 	{
 		switch (m_fdc_addr)
 		{
-			case 0xc: { UINT8 ret = m_wd1791->status_r(); /*printf("status_r: %02x\n", ret);*/ return ret ^ 0xff; }
-			case 0xd: { UINT8 ret = m_wd1791->track_r(); /*printf("track_r: %02x\n", ret);*/ return ret ^ 0xff; }
-			case 0xe: { UINT8 ret = m_wd1791->sector_r(); /*printf("sector_r: %02x\n", ret);*/ return ret ^ 0xff; }
-			case 0xf: { UINT8 ret = m_wd1791->data_r(); /*printf("data_r: %02x\n", ret);*/ return ret ^ 0xff; }
+			case 0xc: { return m_wd1791->status_r() ^ 0xff; }
+			case 0xd: { return m_wd1791->track_r() ^ 0xff; }
+			case 0xe: { return m_wd1791->sector_r() ^ 0xff; }
+			case 0xf: { return m_wd1791->data_r() ^ 0xff; }
 			default:  return 0;
 		}
 	}
@@ -1572,131 +1525,54 @@ void cmi_state::fdc_dma_transfer()
 	UINT8 map_info = m_map_sel[MAPSEL_P2_A_DMA1];
 	int map = map_info & 0x1f;
 
+	int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
+	int phys_page = 0;
+
+	int i;
+	for (i = 0; i < NUM_Q256_CARDS; ++i)
+	{
+		phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
+
+		if (phys_page & 0x80)
+			break;
+	}
+
+	//phys_page &= 0x7f;
+
 	/* Transfer from disk to RAM */
 	if (!BIT(m_fdc_ctrl, 4))
 	{
-		//printf("fdc_dma_transfer: Transfer from disk to RAM\n");
-		/* Determine the initial page */
-		int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
-		int phys_page = 0;
+		/* Read a byte at a time */
+		UINT8 data = m_wd1791->data_r() ^ 0xff;
 
-		//printf("fdc_dma_transfer: m_fdc_dma_addr (RAM addr): %04x\n", m_fdc_dma_addr.w.l);
-
-//		printf("FDC DMA: Disk to [%x] (%x bytes)\n", m_fdc_dma_addr.w.l, m_fdc_dma_cnt.w.l ^ 0xffff);
-
-		int i;
-		for (i = 0; i < NUM_Q256_CARDS; ++i)
+		if (m_cmi07_ctrl & 0x30)
+		if (BIT(m_cmi07_ctrl, 6) && !BIT(m_cmi07_ctrl, 7))
 		{
-			phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
-
-			if (phys_page & 0x80)
-				break;
+			if ((m_fdc_dma_addr.w.l & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
+				m_cmi07_ram[m_fdc_dma_addr.w.l & 0x3fff] = data;
 		}
 
-		//phys_page &= 0x7f;
+		if (phys_page & 0x80)
+			m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)] = data;
 
-		//printf("fdc_dma_transfer: fdc_dma_cnt is %04x, drq is %d\n", m_fdc_dma_cnt.w.l, m_fdc_drq);
-
-		for (; m_fdc_dma_cnt.w.l < 0xffff && m_fdc_drq; m_fdc_dma_cnt.w.l++)
-		{
-			/* Read a byte at a time */
-			UINT8 data = m_wd1791->data_r() ^ 0xff;
-
-			//printf("fdc_dma_transfer, data %02x\n", data);
-			if (m_cmi07_ctrl & 0x30)
-			if (BIT(m_cmi07_ctrl, 6) && !BIT(m_cmi07_ctrl, 7))
-			{
-				if ((m_fdc_dma_addr.w.l & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
-					m_cmi07_ram[m_fdc_dma_addr.w.l & 0x3fff] = data;
-			}
-
-			if (phys_page & 0x80)
-				m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)] = data;
-
-			/* TODO: Is updating these correct? */
-			if (!BIT(m_fdc_ctrl, 3))
-				m_fdc_dma_addr.w.l++;
-
-			if ((m_fdc_dma_addr.w.l % PAGE_SIZE) == 0)
-			{
-				++cpu_page;
-
-				for (int i = 0; i < NUM_Q256_CARDS; ++i)
-				{
-					phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
-
-					if (phys_page & 0x80)
-						break;
-				}
-			}
-		}
-
-		/* HACK */
-		while (m_fdc_drq)
-		{
-			//printf("fdc_dma_transfer: fdc_drq is still set; emptying wd1791 until it is lowered\n");
-			m_wd1791->data_r();
-		}
+		if (!BIT(m_fdc_ctrl, 3))
+			m_fdc_dma_addr.w.l++;
 	}
 
 	// Transfer from RAM to disk
 	else
 	{
-		//printf("fdc_dma_transfer: Transfer from RAM to disk\n");
-		/* TODO: Check me and combine common code with the above */
-		/* Determine the initial page */
-		int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
-		int phys_page = 0;
+		/* Write a byte at a time */
+		UINT8 data = 0;
 
-		//printf("fdc_dma_transfer: m_fdc_dma_addr (RAM addr): %04x\n", m_fdc_dma_addr.w.l);
-		int i;
-		for (i = 0; i < NUM_Q256_CARDS; ++i)
-		{
-			phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
+		/* TODO: This should be stuck in a deferred write */
+		if (phys_page & 0x80)
+			data = m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)];
 
-			if (phys_page & 0x80)
-				break;
-		}
+		m_wd1791->data_w(data ^ 0xff);
 
-		phys_page &= 0x7f;
-
-		//printf("fdc_dma_transfer: fdc_dma_cnt is %04x, drq is %d\n", m_fdc_dma_cnt.w.l, m_fdc_drq);
-
-		for (; m_fdc_dma_cnt.w.l < 0xffff && m_fdc_drq; m_fdc_dma_cnt.w.l++)
-		{
-			/* Write a byte at a time */
-			UINT8 data = 0;
-
-			/* TODO: This should be stuck in a deferred write */
-			if (phys_page & 0x80)
-				data = m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)];
-
-			//printf("fdc_dma_transfer: writing data %02x to controller\n", data);
-			m_wd1791->data_w(data ^ 0xff);
-
-			/* TODO: Is updating these correct? */
-			if (!BIT(m_fdc_ctrl, 3))
-				m_fdc_dma_addr.w.l++;
-
-			if ((m_fdc_dma_addr.w.l % PAGE_SIZE) == 0)
-			{
-				++cpu_page;
-
-				for (int i = 0; i < NUM_Q256_CARDS; ++i)
-				{
-					phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
-
-					if (phys_page & 0x80)
-						break;
-				}
-
-				if ((phys_page & 0x80) == 0)
-				{
-					printf("Trying to DMA floppy data from a non-enabled page!\n");
-					return;
-				}
-			}
-		}
+		if (!BIT(m_fdc_ctrl, 3))
+			m_fdc_dma_addr.w.l++;
 	}
 }
 
@@ -1720,7 +1596,6 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_irq )
 WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
 {
 	m_fdc_drq = state;
-	//printf("m_fdc_drq: %d\n", state);
 	if (state)
 		fdc_dma_transfer();
 }
@@ -2124,10 +1999,24 @@ WRITE8_MEMBER( cmi_state::shared_ram_w )
 	m_shared_ram[offset] = data;
 }
 
-
-WRITE_LINE_MEMBER( cmi_state::ank_cts_w )
+WRITE_LINE_MEMBER( cmi_state::ank_irqa_w )
 {
-//	printf("ANK CTS: %x\n", state);
+	m_ank_irqa = state;
+
+	if (m_ank_irqa)
+		m_alphakeyscpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
+	else if(!m_ank_irqb)
+		m_alphakeyscpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( cmi_state::ank_irqb_w )
+{
+	m_ank_irqb = state;
+
+	if (m_ank_irqb)
+		m_alphakeyscpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
+	else if(!m_ank_irqa)
+		m_alphakeyscpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 }
 
 READ_LINE_MEMBER( cmi_state::ank_rts_r )
@@ -2148,7 +2037,6 @@ READ_LINE_MEMBER( cmi01a_device::zx_r )
 
 void cmi_state::install_peripherals(int cpunum)
 {
-	//printf("Installing peripherals for CPU %d\n", cpunum + 1);
 	address_space *space = (cpunum == CPU_1 ? m_cpu1space : m_cpu2space);
 
 	space->install_readwrite_handler(0xe000, 0xe03f, read8_delegate(FUNC(cmi_state::cmi02_r),this), write8_delegate(FUNC(cmi_state::cmi02_w),this));
@@ -2158,10 +2046,14 @@ void cmi_state::install_peripherals(int cpunum)
 	space->install_rom(0xf800, 0xfbff, m_q133_rom + (cpunum == CPU_2 ? 0x1800 : 0x2800));
 
 	space->install_readwrite_handler(0xfc40, 0xfc4f, read8_delegate(FUNC(cmi_state::parity_r),this), write8_delegate(FUNC(cmi_state::mapsel_w),this));
-	//space->install_readwrite_handler(0xfc5a, 0xfc5b, SMH_NOP, SMH_NOP); // Q077 HDD controller - not installed
+	space->nop_readwrite(0xfc5a, 0xfc5b); // Q077 HDD controller - not installed
 	space->install_readwrite_handler(0xfc5e, 0xfc5e, read8_delegate(FUNC(cmi_state::atomic_r),this), write8_delegate(FUNC(cmi_state::cpufunc_w),this));
 	space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(FUNC(cmi_state::map_r),this), write8_delegate(FUNC(cmi_state::map_w),this));
-	space->install_readwrite_handler(0xfc80, 0xfc8f, read8_delegate(FUNC(cmi_state::q133_acia_r),this), write8_delegate(FUNC(cmi_state::q133_acia_w),this));
+
+	space->install_readwrite_handler(0xfc80, 0xfc83, read8_delegate(FUNC(mos6551_device::read),m_q133_acia_0.target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia_0.target()));
+	space->install_readwrite_handler(0xfc84, 0xfc87, read8_delegate(FUNC(mos6551_device::read),m_q133_acia_1.target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia_1.target()));
+	space->install_readwrite_handler(0xfc88, 0xfc8b, read8_delegate(FUNC(mos6551_device::read),m_q133_acia_2.target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia_2.target()));
+	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8_delegate(FUNC(mos6551_device::read),m_q133_acia_3.target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia_3.target()));
 	space->install_readwrite_handler(0xfc90, 0xfc97, read8_delegate(FUNC(ptm6840_device::read),m_q133_ptm.target()), write8_delegate(FUNC(ptm6840_device::write),m_q133_ptm.target()));
 
 	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8_delegate(FUNC(cmi_state::cmi07_r),this), write8_delegate(FUNC(cmi_state::cmi07_w),this));
@@ -2171,6 +2063,7 @@ void cmi_state::install_peripherals(int cpunum)
 	space->install_readwrite_handler(0xfcc8, 0xfccf, read8_delegate(FUNC(ptm6840_device::read),m_q219_ptm.target()), write8_delegate(FUNC(ptm6840_device::write),m_q219_ptm.target()));
 	space->install_readwrite_handler(0xfcd0, 0xfcdc, read8_delegate(FUNC(cmi_state::video_r),this), write8_delegate(FUNC(cmi_state::video_w),this));
 	space->install_readwrite_handler(0xfce0, 0xfce1, read8_delegate(FUNC(cmi_state::fdc_r),this), write8_delegate(FUNC(cmi_state::fdc_w),this));
+	space->nop_readwrite(0xfce2, 0xfcef); // Monitor ROM will attempt to detect floppy disk controller cards in this entire range
 	space->install_readwrite_handler(0xfcf0, 0xfcf7, read8_delegate(FUNC(pia6821_device::read),m_q133_pia_0.target()), write8_delegate(FUNC(pia6821_device::write),m_q133_pia_0.target()));
 	space->install_readwrite_handler(0xfcf8, 0xfcff, read8_delegate(FUNC(pia6821_device::read),m_q133_pia_1.target()), write8_delegate(FUNC(pia6821_device::write),m_q133_pia_1.target()));
 
@@ -2326,10 +2219,15 @@ READ8_MEMBER( cmi_state::q133_1_porta_r )
 WRITE8_MEMBER( cmi_state::q133_1_porta_w )
 {
 	m_msm5832_addr = data & 0xf;
+	m_msm5832->address_w(data & 0x0f);
 }
 
 WRITE8_MEMBER( cmi_state::q133_1_portb_w )
 {
+	m_msm5832->hold_w(BIT(data, 0));
+	m_msm5832->read_w(BIT(data, 1));
+	m_msm5832->write_w(BIT(data, 2));
+	m_msm5832->cs_w(1);
 }
 
 WRITE8_MEMBER( cmi_state::master_tune_w )
@@ -2496,23 +2394,7 @@ READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 
 	for (int module = 0; module < 3; ++module)
 	{
-		UINT8 keyval = 0;
-		switch (mux)
-		{
-			case 0:
-				keyval = m_key_mux0_port[module]->read();
-				break;
-			case 1:
-				keyval = m_key_mux1_port[module]->read();
-				break;
-			case 2:
-				keyval = m_key_mux2_port[module]->read();
-				break;
-			case 3:
-				keyval = m_key_mux3_port[module]->read();
-				break;
-		}
-
+		UINT8 keyval = m_key_mux_ports[mux][module]->read();
 		data |= BIT(keyval, key) << module;
 	}
 
@@ -2529,63 +2411,16 @@ READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 //static int kbd_to_cmi;
 //static int cmi_to_kbd;
 
-READ_LINE_MEMBER( cmi_state::mkbd_kbd_rx )
+WRITE_LINE_MEMBER( cmi_state::mkbd_acia_clock )
 {
-	return m_ank_pia->cb2_output();
-}
-
-WRITE_LINE_MEMBER( cmi_state::mkbd_kbd_tx )
-{
-}
-
-#if 0
-READ_LINE_MEMBER( cmi_state::q133_rx )
-{
-	return m_kbd_to_cmi;
-}
-
-WRITE_LINE_MEMBER( cmi_state::q133_tx )
-{
-	m_cmi_to_kbd = state;
-}
-
-WRITE_LINE_MEMBER( cmi_state::mkbd_cmi_w )
-{
-
-}
-#endif
-
-READ_LINE_MEMBER( cmi_state::mkbd_cmi_rx )
-{
-	return 1;//cmi_to_kbd;
-}
-
-WRITE_LINE_MEMBER( cmi_state::mkbd_cmi_tx )
-{
-//	kbd_to_cmi = state;
-
-	if (m_mkbd_tx_start == 0)
-	{
-		if (!state)
-		{
-			m_mkbd_tx_start = 1;
-			m_mkbd_tx_bits = 10;
-			m_mkbd_tx_reg = 0;
-		}
-	}
-	else if (m_mkbd_tx_start)
-	{
-		m_mkbd_tx_reg = m_mkbd_tx_reg | state << (10 - m_mkbd_tx_bits);
-
-		if (--m_mkbd_tx_bits == 0)
-		{
-			m_q133_acia_rx_data = m_mkbd_tx_reg & 0xff;
-			m_q133_acia_status |= 0x88;
-			set_interrupt(CPU_1, IRQ_ACINT_LEVEL, ASSERT_LINE);
-//			printf("%x\n",q133_acia_rx_data);
-			m_mkbd_tx_start = 0;
-		}
-	}
+	m_acia_mkbd_kbd->write_rxc(state);
+	m_acia_mkbd_kbd->write_txc(state);
+	m_acia_mkbd_cmi->write_rxc(state);
+	m_acia_mkbd_cmi->write_txc(state);
+	m_q133_acia_0->write_rxc(state);
+	m_q133_acia_1->write_rxc(state);
+	m_q133_acia_2->write_rxc(state);
+	m_q133_acia_3->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( cmi_state::msm5832_irq )
@@ -2595,32 +2430,29 @@ WRITE_LINE_MEMBER( cmi_state::msm5832_irq )
 #endif
 }
 
-WRITE_LINE_MEMBER( cmi_state::mkbd_acia1_int )
+WRITE_LINE_MEMBER( cmi_state::mkbd_kbd_acia_int )
 {
-	m_mkbd_acia1_irq = state;
+	m_mkbd_kbd_acia_irq = state;
 
-	if (m_mkbd_acia1_irq)
+	if (m_mkbd_kbd_acia_irq)
+	{
 		m_muskeyscpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	else if (!m_mkbd_acia2_irq)
+	}
+	else if (!m_mkbd_cmi_acia_irq)
+	{
+		m_muskeyscpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER( cmi_state::mkbd_cmi_acia_int )
+{
+	m_mkbd_cmi_acia_irq = state;
+
+	if (m_mkbd_cmi_acia_irq)
+		m_muskeyscpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	else if (!m_mkbd_kbd_acia_irq)
 		m_muskeyscpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
-
-WRITE_LINE_MEMBER( cmi_state::mkbd_acia2_int )
-{
-	m_mkbd_acia2_irq = state;
-
-	if (m_mkbd_acia2_irq)
-		m_muskeyscpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	else if (!m_mkbd_acia1_irq)
-		m_muskeyscpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-}
-
-#if 0
-WRITE_LINE_MEMBER( cmi_state::q133_acia_int )
-{
-	m_maincpu1->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-#endif
 
 WRITE_LINE_MEMBER( cmi_state::cmi07_irq )
 {
@@ -2670,6 +2502,10 @@ void cmi_state::machine_reset()
 
 	m_cmi10_scnd_timer->adjust(attotime::from_hz(4000000 / 4 / 2048 / 2), 0, attotime::from_hz(4000000 / 4 / 2048 / 2));
 	m_scnd = 0;
+
+	m_ank_irqa = 0;
+	m_ank_irqb = 0;
+	m_q133_acia_irq = 0;
 }
 
 void cmi_state::machine_start()
@@ -2708,15 +2544,6 @@ void cmi_state::machine_start()
 	/* Allocate 256B scratch RAM per CPU */
 	m_scratch_ram[0] = std::make_unique<UINT8[]>(0x100);
 	m_scratch_ram[1] = std::make_unique<UINT8[]>(0x100);
-
-	m_channels[0] = m_cmi01a_0;
-	m_channels[1] = m_cmi01a_1;
-	m_channels[2] = m_cmi01a_2;
-	m_channels[3] = m_cmi01a_3;
-	m_channels[4] = m_cmi01a_4;
-	m_channels[5] = m_cmi01a_5;
-	m_channels[6] = m_cmi01a_6;
-	m_channels[7] = m_cmi01a_7;
 }
 
 INTERRUPT_GEN_MEMBER( cmi_state::cmi_iix_vblank )
@@ -2747,9 +2574,9 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_CPU_ADD("muskeys", M6802, 3840000)
 	MCFG_CPU_PROGRAM_MAP(muskeys_map)
 
-	MCFG_CPU_ADD("alphakeys", M6802, 4000000)
+	MCFG_CPU_ADD("alphakeys", M6802, 3840000)
 	MCFG_CPU_PROGRAM_MAP(alphakeys_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, 9600) // TODO: ACIA controls this
+	MCFG_CPU_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, 9600) // TODO: PIA controls this
 
 	MCFG_CPU_ADD("smptemidi", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(midicpu_map)
@@ -2811,24 +2638,56 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 0) // ptm_cmi02_config
 	MCFG_PTM6840_INTERNAL_CLOCK(2000000) // TODO
 
+	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, 9600*16)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cmi_state, mkbd_acia_clock))
+
+	MCFG_DEVICE_ADD("q133_acia_0", MOS6551, XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq0))
+
+	MCFG_DEVICE_ADD("q133_acia_1", MOS6551, XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq1))
+
+	MCFG_DEVICE_ADD("q133_acia_2", MOS6551, XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq2))
+
+	MCFG_DEVICE_ADD("q133_acia_3", MOS6551, XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq3))
+
+	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, XTAL_1_8432MHz / 12) // acia_mkbd_kbd
+	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, XTAL_1_8432MHz / 12) // acia_mkbd_cmi
 	MCFG_DEVICE_ADD("ank_pia", PIA6821, 0) // pia_ank_config
-	MCFG_PIA_READPA_HANDLER(READ8(cmi_state, ank_col_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(cmi_state, ank_rts_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi_state, ank_cts_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi_state, ank_data_w))
 
-	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, 1843200 / 12) // acia_mkbd_cmi
-	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, 1843200 / 12) // acia_mkbd_kbd
-
-	MCFG_DEVICE_MODIFY("acia_mkbd_kbd")
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia_mkbd_cmi", acia6850_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia_mkbd_cmi", acia6850_device, write_cts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(cmi_state, mkbd_acia1_int))
+	MCFG_DEVICE_MODIFY("q133_acia_0")
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("acia_mkbd_cmi", acia6850_device, write_rxd))
+	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("acia_mkbd_cmi", acia6850_device, write_cts))
 
 	MCFG_DEVICE_MODIFY("acia_mkbd_cmi")
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia_mkbd_kbd", acia6850_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia_mkbd_kbd", acia6850_device, write_cts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(cmi_state, mkbd_acia2_int))
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("q133_acia_0", mos6551_device, write_rxd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("q133_acia_0", mos6551_device, write_cts))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(cmi_state, mkbd_cmi_acia_int))
+
+	MCFG_DEVICE_MODIFY("acia_mkbd_kbd")
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, cb2_w))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca2_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(cmi_state, mkbd_kbd_acia_int))
+
+	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("alphakeys", M6802_IRQ_LINE))
+
+	MCFG_DEVICE_MODIFY("ank_pia")
+	MCFG_PIA_READPA_HANDLER(READ8(cmi_state, ank_col_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(cmi_state, ank_rts_r))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("acia_mkbd_kbd", acia6850_device, write_cts))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("acia_mkbd_kbd", acia6850_device, write_rxd))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi_state, ank_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi_state, ank_irqb_w))
+
+	MCFG_DEVICE_ADD("ank_pia_clock", CLOCK, 9600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca1_w))
 
 	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 0) // ptm_cmi07_config
 	MCFG_PTM6840_INTERNAL_CLOCK(2000000) // TODO
@@ -2838,7 +2697,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cmi_state, wd1791_irq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(cmi_state, wd1791_drq))
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
 	// Channel cards
 	MCFG_CMI01A_ADD("cmi01a_0", 0)

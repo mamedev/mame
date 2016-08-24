@@ -247,7 +247,7 @@ public:
 		m_tstadd(*this, "TSTADD"),
 		m_twdmsb(*this, "TWDMSB"),
 		m_twdlsb(*this, "TWDLSB"),
-		m_twr(*this, "TWR"),
+		m_twr(*this, "TWR.%u", 0),
 		m_cfg(*this, "CFG"),
 		m_io_lightpen(*this, "LIGHTPEN"),
 		m_lightx(*this, "LIGHTX"),

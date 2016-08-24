@@ -431,6 +431,17 @@ ROM_START(sshtl_l7)
 	ROM_LOAD("cpu_u49.128", 0x4000, 0x4000, CRC(8050ae27) SHA1(e3f5e9398f61b075620ecd075617a8dac3c07d0e))
 ROM_END
 
+ROM_START(sshtl_l3)
+	ROM_REGION(0x4000, "roms", 0)
+	ROM_LOAD("cpu_u20.l3", 0x0000, 0x4000, CRC(dc5f08e0) SHA1(67869c1db4e1f49f38588978d4ed32fe7d62e2d6))
+
+	ROM_REGION(0x8000, "audioroms", 0)
+	ROM_LOAD("spch_u5.732", 0x1000, 0x1000, CRC(13edd4e5) SHA1(46c4052c31ddc20bb87445636f8fe3b6f7bff856))
+	ROM_LOAD("spch_u6.732", 0x2000, 0x1000, CRC(cf48b2e7) SHA1(fe55419a5d40b3a4e8c02a92746b25a075b8efd3))
+	ROM_LOAD("spch_u4.732", 0x3000, 0x1000, CRC(b0d03c5e) SHA1(46b952f71a7ecc03e22e427875f6e16a9d124067))
+	ROM_LOAD("cpu_u49.128", 0x4000, 0x4000, CRC(8050ae27) SHA1(e3f5e9398f61b075620ecd075617a8dac3c07d0e))
+ROM_END
+
 /*-------------------------
 / Comet (S9) 06/85 (#540)
 /--------------------------*/
@@ -499,6 +510,7 @@ GAME( 1983, ratrc_l1, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Rat Rac
 GAME( 1985, sorcr_l1, sorcr_l2, s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-1)", MACHINE_MECHANICAL )
 GAME( 1985, sorcr_l2, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-2)", MACHINE_MECHANICAL )
 GAME( 1984, sshtl_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-7)", MACHINE_MECHANICAL )
+GAME( 1984, sshtl_l3, sshtl_l7, s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-3)", MACHINE_MECHANICAL )
 GAME( 1985, comet_l4, comet_l5, s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-4)", MACHINE_MECHANICAL)
 GAME( 1985, comet_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-5)", MACHINE_MECHANICAL)
 GAME( 1984, szone_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

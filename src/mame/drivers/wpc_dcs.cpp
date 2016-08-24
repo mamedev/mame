@@ -17,15 +17,15 @@ class wpc_dcs_state : public driver_device
 {
 public:
 	wpc_dcs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			maincpu(*this, "maincpu"),
-			dcs(*this, "dcs"),
-			rombank(*this, "rombank"),
-			mainram(*this, "mainram"),
-			nvram(*this, "nvram"),
-			lamp(*this, "lamp"),
-			out(*this, "out"),
-			swarray(*this, "SW")
+		: driver_device(mconfig, type, tag)
+		, maincpu(*this, "maincpu")
+		, dcs(*this, "dcs")
+		, rombank(*this, "rombank")
+		, mainram(*this, "mainram")
+		, nvram(*this, "nvram")
+		, lamp(*this, "lamp")
+		, out(*this, "out")
+		, swarray(*this, "SW.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bank_w);

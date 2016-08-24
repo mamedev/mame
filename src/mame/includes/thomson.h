@@ -126,7 +126,7 @@ public:
 		m_io_vconfig(*this, "vconfig"),
 		m_io_mconfig(*this, "mconfig"),
 		m_io_fconfig(*this, "fconfig"),
-		m_io_keyboard(*this, "keyboard"),
+		m_io_keyboard(*this, "keyboard.%u", 0),
 		m_vrambank(*this, THOM_VRAM_BANK),
 		m_cartbank(*this, THOM_CART_BANK),
 		m_rambank(*this, THOM_RAM_BANK),

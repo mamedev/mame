@@ -34,8 +34,8 @@ public:
 		, m_paletteram16(*this, "palette")
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
-		, m_analog_ports(*this, "AN")
-		, m_digital_ports(*this, "IN")
+		, m_analog_ports(*this, "AN.%u", 0)
+		, m_digital_ports(*this, "IN.%u", 0)
 	{
 	}
 

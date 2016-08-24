@@ -62,7 +62,7 @@ public:
 		, m_exp_0c(*this, "exp0c")
 		, m_exp_0d(*this, "exp0d")
 		, m_p_videoram(*this, "videoram")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(pegasus_keyboard_r);

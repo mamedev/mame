@@ -111,13 +111,13 @@ static const struct CassetteLegacyWaveFiller trs80l2_cas_legacy_fill_wave =
 };
 
 
-static casserr_t trs80l2_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error trs80l2_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &trs80l2_cas_legacy_fill_wave);
 }
 
 
-static casserr_t trs80l2_cas_load(cassette_image *cassette)
+static cassette_image::error trs80l2_cas_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &trs80l2_cas_legacy_fill_wave);
 }

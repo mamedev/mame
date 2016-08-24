@@ -98,6 +98,7 @@ balsente.cpp
 bankp.cpp
 baraduke.cpp
 barata.cpp
+barni.cpp
 bartop52.cpp
 batman.cpp
 battlane.cpp
@@ -505,6 +506,7 @@ ice_bozopail.cpp
 ice_tbd.cpp
 icecold.cpp
 ichiban.cpp
+idsa.cpp
 igs_fear.cpp
 igs_m027.cpp
 igs_m036.cpp
@@ -516,6 +518,7 @@ igspoker.cpp
 ikki.cpp
 imolagp.cpp
 inder.cpp
+inderp.cpp
 instantm.cpp
 intrscti.cpp
 inufuku.cpp
@@ -544,6 +547,7 @@ jchan.cpp
 jclub2.cpp
 jedi.cpp
 jeutel.cpp
+joctronic.cpp
 jokrwild.cpp
 jollyjgr.cpp
 jongkyo.cpp
@@ -638,6 +642,7 @@ m72.cpp
 m79amb.cpp
 m90.cpp
 m92.cpp
+macp.cpp
 macrossp.cpp
 macs.cpp
 madalien.cpp

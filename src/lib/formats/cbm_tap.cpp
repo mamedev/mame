@@ -348,13 +348,13 @@ static const struct CassetteLegacyWaveFiller cbm_legacy_fill_wave = {
 };
 
 
-static casserr_t cbm_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error cbm_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
 {
 	return cassette_legacy_identify( cassette, opts, &cbm_legacy_fill_wave );
 }
 
 
-static casserr_t cbm_cassette_load( cassette_image *cassette )
+static cassette_image::error cbm_cassette_load( cassette_image *cassette )
 {
 	return cassette_legacy_construct( cassette, &cbm_legacy_fill_wave );
 }

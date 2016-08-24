@@ -52,8 +52,8 @@ public:
 		, m_telcom(*this, "telcom")
 		, m_basic(*this, "basic")
 		, m_io_x7(*this, "X.7")
-		, m_io_oldkb(*this, "X")
-		, m_io_newkb(*this, "Y")
+		, m_io_oldkb(*this, "X.%u", 0)
+		, m_io_newkb(*this, "Y.%u", 0)
 		, m_io_config(*this, "CONFIG")
 		, m_screen(*this, "screen")
 	{ }

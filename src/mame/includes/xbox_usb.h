@@ -74,15 +74,55 @@ enum OHCIRegisters {
 
 enum HcControlBits
 {
-	CBSR = 1 << 0, // ControlBulkServiceRatio
+	CBSR = 3 << 0, // ControlBulkServiceRatio
 	PLE = 1 << 2, // PeriodicListEnable
 	IE = 1 << 3, // IsochronousEnable
 	CLE = 1 << 4, // ControlListEnable
 	BLE = 1 << 5, // BulkListEnable
-	HCFS = 1 << 6, // HostControllerFunctionalState
+	HCFS = 3 << 6, // HostControllerFunctionalState
 	IR = 1 << 8, // InterruptRouting
 	RWC = 1 << 9, // RemoteWakeupConnected
 	RWE = 1 << 10 // RemoteWakeupEnable
+};
+
+enum HcCommandStatusBits
+{
+	HCR = 1 << 0, // HostControllerReset
+	CLF = 1 << 1, // ControlListFilled
+	BLF = 1 << 2, // BulkListFilled
+	OCR = 1 << 3, // OwnershipChangeRequest
+	SOC = 3 << 16 // SchedulingOverrunCount
+};
+
+enum HcInterruptEnableBits
+{
+	SO = 1 << 0, // SchedulingOverrun
+	WDH = 1 << 1, // WritebackDoneHead
+	SF = 1 << 2, // StartofFrame
+	RD = 1 << 3, // ResumeDetected
+	UE = 1 << 4, // UnrecoverableError
+	FNO = 1 << 5, // FrameNumberOverflow
+	RHSC = 1 << 6, // RootHubStatusChange
+	OC = 1 << 30, // OwnershipChange
+	MIE = 1 << 31, // MasterInterruptEnable
+};
+
+
+enum HcRhDescriptorABits
+{
+	NDP = 0xff << 0, // NumberDownstreamPorts
+	PSM = 1 << 8, // PowerSwitchingMode
+	NPS = 1 << 9, // NoPowerSwitching
+	DT = 1 << 10, // DeviceType
+	OCPM = 1 << 11, // OverCurrentProtectionMode
+	NOCPM = 1 << 12, // NoOverCurrentProtection
+	POTPGT = 0xff << 24 // PowerOnToPowerGoodTime
+};
+
+enum HcRhDescriptorBBits
+{
+	DR = 0xffff << 0, // DeviceRemovable
+	PPCM = 0xffff << 16 // PortPowerControlMask
 };
 
 enum HcRhStatusBits

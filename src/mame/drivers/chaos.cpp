@@ -21,11 +21,12 @@
     end, exec, execute, fill, find, goto, if, input, let, list, load, lowercase,
     memdis, memset, open, port, read, reboot, runhex, run, save, type, typesl,
     verify.
-    An example is: memdis 0 f
+    An example is: memdis 0 8 (memory dump starting at 0, show 8 lines)
     Don't try 'fill' - it fills all memory with zeroes, crashing the system.
 
     ToDo:
-    - Connect up floppy disk (no info available on this)
+    - Connect up floppy disk (WD1771 fdc, 5.25", single density, 
+      no other info available)
 
 ****************************************************************************/
 
@@ -33,16 +34,15 @@
 #include "cpu/s2650/s2650.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class chaos_state : public driver_device
 {
 public:
 	chaos_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_terminal(*this, TERMINAL_TAG),
-		m_p_ram(*this, "p_ram") ,
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_terminal(*this, "terminal")
+		, m_p_ram(*this, "ram")
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -51,6 +51,7 @@ public:
 	DECLARE_READ8_MEMBER(port90_r);
 	DECLARE_READ8_MEMBER(port91_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+private:
 	UINT8 m_term_data;
 	virtual void machine_reset() override;
 	required_device<generic_terminal_device> m_terminal;
@@ -61,7 +62,7 @@ public:
 
 static ADDRESS_MAP_START( chaos_mem, AS_PROGRAM, 8, chaos_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chaos_io, AS_IO, 8, chaos_state )
@@ -70,7 +71,7 @@ static ADDRESS_MAP_START( chaos_io, AS_IO, 8, chaos_state )
 	AM_RANGE(0x1f, 0x1f) AM_READWRITE(port90_r, port1f_w)
 	AM_RANGE(0x90, 0x90) AM_READ(port90_r)
 	AM_RANGE(0x91, 0x91) AM_READ(port91_r)
-	AM_RANGE(0x92, 0x92) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x92, 0x92) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x101, 0x103) AM_NOP // stops error log filling up while using debug
 ADDRESS_MAP_END
 
@@ -132,32 +133,32 @@ WRITE8_MEMBER( chaos_state::kbd_put )
 void chaos_state::machine_reset()
 {
 	// copy the roms into ram
-	UINT8* ROM = memregion("maincpu")->base();
+	UINT8* ROM = memregion("roms")->base();
 	memcpy(m_p_ram, ROM, 0x3000);
-	memcpy(m_p_ram+0x7000, ROM+0x7000, 0x1000);
+	memcpy(m_p_ram+0x7000, ROM+0x3000, 0x1000);
 }
 
 static MACHINE_CONFIG_START( chaos, chaos_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(chaos_mem)
 	MCFG_CPU_IO_MAP(chaos_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(chaos_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( chaos )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "roms", ROMREGION_ERASEFF )
 	ROM_LOAD( "chaos.001", 0x0000, 0x1000, CRC(3b433e72) SHA1(5b487337d71253d0e64e123f405da9eaf20e87ac))
 	ROM_LOAD( "chaos.002", 0x1000, 0x1000, CRC(8b0b487f) SHA1(0d167cf3004a81c87446f2f1464e3debfa7284fe))
 	ROM_LOAD( "chaos.003", 0x2000, 0x1000, CRC(5880db81) SHA1(29b8f1b03c83953f66464ad1fbbfe2e019637ce1))
-	ROM_LOAD( "chaos.004", 0x7000, 0x1000, CRC(5d6839d6) SHA1(237f52f0780ac2e29d57bf06d0f7a982eb523084))
+	ROM_LOAD( "chaos.004", 0x3000, 0x1000, CRC(5d6839d6) SHA1(237f52f0780ac2e29d57bf06d0f7a982eb523084))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1983, chaos,  0,      0,       chaos,     chaos, driver_device,   0,     "<unknown>",  "Chaos 2", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY        FULLNAME       FLAGS */
+COMP( 1983, chaos,  0,      0,       chaos,     chaos, driver_device,   0,   "David Greaves",  "Chaos 2", MACHINE_NO_SOUND_HW )

@@ -113,8 +113,6 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
  *
  *************************************/
 
-IOPORT_ARRAY_MEMBER(midwunit_state::wunit_ports) { "IN0", "IN1", "DSW", "IN2" };
-
 READ16_MEMBER(midwunit_state::midwunit_io_r)
 {
 	/* apply I/O shuffling */

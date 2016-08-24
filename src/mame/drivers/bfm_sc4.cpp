@@ -558,7 +558,7 @@ void bfm_sc45_state::bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data)
 					if ( vfd_ser_count == 8 )
 					{
 						vfd_ser_count = 0;
-						if (machine().device("matrix"))
+						if (m_dm01)
 						{
 							m_dm01->writedata(vfd_ser_value);
 						}
@@ -1115,13 +1115,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START( sc4dmd, sc4_state )
 	MCFG_FRAGMENT_ADD(sc4_common)
 	/* video hardware */
-
+	
 	//MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
 	MCFG_DEVICE_ADD("dm01", BF_DM01, 0)
 	MCFG_BF_DM01_BUSY_CB(WRITELINE(sc4_state, bfmdm01_busy))
-	MCFG_CPU_ADD("matrix", M6809, 2000000 )             /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
-	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sc4_state, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
 
 	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 

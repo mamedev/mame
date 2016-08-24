@@ -114,9 +114,6 @@ WRITE16_MEMBER( segaybd_state::analog_w )
 //  io_chip_r - handle reads from the I/O chip
 //-------------------------------------------------
 
-IOPORT_ARRAY_MEMBER( segaybd_state::digital_ports )
-{ "P1", "GENERAL", "LIMITSW", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
-
 READ16_MEMBER( segaybd_state::io_chip_r )
 {
 	offset &= 0x1f/2;

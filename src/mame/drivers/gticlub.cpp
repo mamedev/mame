@@ -264,7 +264,10 @@ public:
 		m_analog1(*this, "AN1"),
 		m_analog2(*this, "AN2"),
 		m_analog3(*this, "AN3"),
-		m_ports(*this, ports) { }
+		m_ports(*this, "IN%u", 0)
+	{
+	}
+
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
@@ -290,8 +293,6 @@ public:
 	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
 
 	required_ioport_array<4> m_ports;
-
-	DECLARE_IOPORT_ARRAY(ports);
 
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);
@@ -393,8 +394,6 @@ WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 
 
 /******************************************************************/
-
-IOPORT_ARRAY_MEMBER(gticlub_state::ports) { "IN0", "IN1", "IN2", "IN3" };
 
 READ8_MEMBER(gticlub_state::sysreg_r)
 {

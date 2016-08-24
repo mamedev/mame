@@ -203,6 +203,7 @@
 
 #include "attackfc.lh"
 #include "cosmicm.lh"
+#include "escmars.lh"
 #include "galactic.lh"
 #include "gunchamp.lh"
 #include "shuttlei.lh"
@@ -1035,6 +1036,12 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
+static ADDRESS_MAP_START( escmars_map, AS_PROGRAM, 8, _8080bw_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x4000, 0x4fff) AM_ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( lrescue_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -1072,6 +1079,39 @@ static MACHINE_CONFIG_DERIVED_CLASS( lrescue, mw8080bw_root, _8080bw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
 
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(lrescue_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	/* extra audio channel */
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( escmars, _8080bw_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8080, XTAL_18MHz / 10) // divider guessed
+	MCFG_CPU_PROGRAM_MAP(escmars_map)
+	MCFG_CPU_IO_MAP(lrescue_io_map)
+
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
+
+	/* add shifter */
+	MCFG_MB14241_ADD("mb14241")
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_mw8080bw)
+
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4107,6 +4147,18 @@ ROM_START( desterth )
 	ROM_RELOAD(               0x0400, 0x0400 )
 ROM_END
 
+ROM_START( escmars )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2516_em.m5",        0x0000, 0x0800, CRC(6580f1c3) SHA1(fd44d4bab799e02b2d7c20fe6bf14ade9c8d4f1d) )
+	ROM_LOAD( "2716_em.n5",        0x0800, 0x0800, CRC(49e79706) SHA1(bed675bb97d59ae0132c007ccead0d096ed2ddf1) )
+	ROM_LOAD( "2516_em.p5",        0x1000, 0x0800, CRC(1ac969be) SHA1(67ac47f45b9fa5c530bf6047bb7d5776b52847be) )
+	ROM_LOAD( "2516_em.r5",        0x1800, 0x0800, CRC(c1bd5949) SHA1(df390dd159766ed6489abfae8bb258115dc643e6) )
+	ROM_LOAD( "2716_em.s5",        0x4000, 0x0800, CRC(1ec21a31) SHA1(5db61f00d8987662ccae1132fb25da318ac177dd) )
+	ROM_LOAD( "2716_em.t5",        0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) )
+
+	/* No proms, only colour overlay */
+ROM_END
+
 ROM_START( lrescuem )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "48.ic36",    0x0000, 0x0400, CRC(bad5ba48) SHA1(6d8a2df172e058d16f196ad7f29430e9fd1fdaa8) )
@@ -4900,6 +4952,7 @@ GAME( 1980, mlander,    lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270
 GAME( 1979, lrescuem,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,  lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg", "Destination Earth (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAMEL( 1980,escmars,    lrescue,  escmars,   lrescue,   driver_device, 0, ROT270, "bootleg", "Escape from Mars (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 
 GAME( 1979, schaser,    0,        schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, schasera,   schaser,  schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 2)", MACHINE_SUPPORTS_SAVE )

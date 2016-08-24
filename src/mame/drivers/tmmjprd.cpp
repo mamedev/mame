@@ -45,7 +45,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_tilemap_regs(*this, "tilemap_regs"),
+		m_tilemap_regs(*this, "tilemap_regs.%u", 0),
 		m_spriteregs(*this, "spriteregs"),
 		m_spriteram(*this, "spriteram") { }
 

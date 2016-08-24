@@ -90,17 +90,17 @@ class prestige_state : public driver_device
 {
 public:
 	prestige_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_cart(*this, "cartslot"),
-			m_keyboard(*this, "KEY"),
-			m_cart_type(*this, "CART_TYPE"),
-			m_bank1(*this, "bank1"),
-			m_bank2(*this, "bank2"),
-			m_bank3(*this, "bank3"),
-			m_bank4(*this, "bank4"),
-			m_bank5(*this, "bank5")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_cart(*this, "cartslot")
+		, m_keyboard(*this, "KEY.%u", 0)
+		, m_cart_type(*this, "CART_TYPE")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
 		{ }
 
 	required_device<cpu_device> m_maincpu;

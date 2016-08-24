@@ -11,10 +11,8 @@
 #ifndef INPUT_SDLCOMMON_H_
 #define INPUT_SDLCOMMON_H_
 
-#include <vector>
 #include <unordered_map>
 #include <algorithm>
-#include <queue>
 
 #define MAX_DEVMAP_ENTRIES  16
 #define SDL_MODULE_EVENT_BUFFER_SIZE 5
@@ -96,17 +94,18 @@ public:
 	{
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 
-		// Loop over the entries and find ones that match our subscriber
-		std::vector<typename std::unordered_multimap<int, TSubscriber*>::iterator> remove;
-		for (auto iter = m_subscription_index.begin(); iter != m_subscription_index.end(); ++iter)
+		// Remove the events that match the subscriber
+		for (auto it = begin(m_subscription_index); it != end(m_subscription_index);)
 		{
-			if (iter->second == subscriber)
-				remove.push_back(iter);
+			if (it->second == subscriber)
+			{
+				it = m_subscription_index.erase(it);
+			}
+			else
+			{
+				++it;
+			}
 		}
-
-		// remove those that matched
-		for (int i = 0; i < remove.size(); i++)
-			m_subscription_index.erase(remove[i]);
 	}
 
 	virtual void process_events(running_machine &machine) = 0;
@@ -117,14 +116,14 @@ class sdl_window_info;
 class sdl_event_manager : public event_manager_t<sdl_event_subscriber>
 {
 private:
-	bool                  m_mouse_over_window;
-	bool                  m_has_focus;
+	bool                                 m_mouse_over_window;
+	bool                                 m_has_focus;
 	std::shared_ptr<sdl_window_info>     m_focus_window;
 
 	sdl_event_manager()
 		: m_mouse_over_window(true),
-			m_has_focus(true),
-			m_focus_window(nullptr)
+		  m_has_focus(true),
+		  m_focus_window(nullptr)
 	{
 	}
 
@@ -151,12 +150,12 @@ private:
 
 static inline int devmap_leastfree(device_map_t *devmap)
 {
-	int i;
-	for (i = 0; i < MAX_DEVMAP_ENTRIES; i++)
+	for (int i = 0; i < MAX_DEVMAP_ENTRIES; i++)
 	{
 		if (devmap->map[i].name.length() == 0)
 			return i;
 	}
+
 	return -1;
 }
 

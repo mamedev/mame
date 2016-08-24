@@ -33,7 +33,7 @@ public:
 		, m_dmdcpu(*this, "dmdcpu")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
-		, m_switches(*this, "X")
+		, m_switches(*this, "X.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts3a);

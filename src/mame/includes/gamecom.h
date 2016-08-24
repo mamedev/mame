@@ -231,8 +231,9 @@ public:
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
 		, m_io_in2(*this, "IN2")
-		, m_io_grid(*this, "GRID")
-		{ }
+		, m_io_grid(*this, "GRID.%u", 0)
+	{
+	}
 
 	DECLARE_READ8_MEMBER( gamecom_internal_r );
 	DECLARE_READ8_MEMBER( gamecom_pio_r );

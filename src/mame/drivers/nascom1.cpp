@@ -50,7 +50,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_keyboard(*this, "KEY")
+		m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

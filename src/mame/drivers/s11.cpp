@@ -499,9 +499,27 @@ MACHINE_CONFIG_END
 /-----------------------------*/
 ROM_START(grand_l4)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("lzrd_u26.l4", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
+	ROM_LOAD("lzrd_u26.l3", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("lzrd_u27.l4", 0x8000, 0x8000, CRC(6462ca55) SHA1(0ebfa998d3cefc213ada9ed815d44977120e5d6d))
+	ROM_FILL(0x6035, 1, 0x00) // default to English
+
+	// according to the manual these should be 32K roms just like the other games here
+	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u21.l1", 0x1c000, 0x4000, CRC(98859d37) SHA1(08429b9e6a3b3007815373dc280b985e3441aa9f))
+	ROM_RELOAD( 0x18000, 0x4000)
+	ROM_LOAD("lzrd_u22.l1", 0x14000, 0x4000, CRC(4e782eba) SHA1(b44ab499128300175bdb57f07ffe2992c82e47e4))
+	ROM_RELOAD( 0x10000, 0x4000)
+
+	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u4.l1", 0x8000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
+ROM_END
+
+ROM_START(grand_l3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("lzrd_u26.l3", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
+	ROM_RELOAD( 0x6000, 0x2000)
+	ROM_LOAD("lzrd_u27.l3", 0x8000, 0x8000, CRC(9061dfdc) SHA1(06e0add721afa0a89ad4961cddbc5409f95362df))
 	ROM_FILL(0x6035, 1, 0x00) // default to English
 
 	// according to the manual these should be 32K roms just like the other games here
@@ -677,6 +695,7 @@ ROM_START(shfin_l1)
 ROM_END
 
 GAME( 1986, grand_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, grand_l3, grand_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1986, hs_l4,    0,        s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

@@ -21221,7 +21221,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
-			<dataarea name="rom" size="8388608">
+			<dataarea name="rom" size="16777216">
 				<rom name="abmxped.bin" size="16777216" crc="b6438226" sha1="3c0b7ccd303c30ac5c4ffc9fb0aa7137a533ad69" offset="000000" />
 			</dataarea>
 		</part>
@@ -21267,7 +21267,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
-			<dataarea name="rom" size="8388608">
+			<dataarea name="rom" size="16777216">
 				<rom name="abmxe00.bin" size="16777216" crc="922c4a10" sha1="58986c4d6f2e5ccdc04936cc8b7c9d378570710c" offset="000000" />
 			</dataarea>
 		</part>
@@ -21298,7 +21298,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
-			<dataarea name="rom" size="8388608">
+			<dataarea name="rom" size="16777216">
 				<rom name="metj01d.bin" size="16777216" crc="3acbd239" sha1="a45b539becbf10f3913255d6d624ee954dcc5593" offset="000000" />
 			</dataarea>
 		</part>

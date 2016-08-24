@@ -32,14 +32,14 @@ static UINT8 cassette_image_read_uint8( cassette_image *cassette, UINT64 offset)
 	return data;
 }
 
-static casserr_t sordm5_tap_identify( cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error sordm5_tap_identify( cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_modulation_identify( cassette, &sordm5_cas_modulation, opts);
 }
 
-static casserr_t sordm5_tap_load( cassette_image *cassette)
+static cassette_image::error sordm5_tap_load( cassette_image *cassette)
 {
-	casserr_t err;
+	cassette_image::error err;
 	UINT64 image_size;
 	double time_index = 0.0;
 	double time_displacement;
@@ -52,20 +52,20 @@ static casserr_t sordm5_tap_load( cassette_image *cassette)
 	image_size = cassette_image_size(cassette);
 	image_pos = 0;
 	// read/check header
-	if (image_size < 16) return CASSETTE_ERROR_INVALIDIMAGE;
+	if (image_size < 16) return cassette_image::error::INVALID_IMAGE;
 	cassette_image_read( cassette, &header, image_pos, 16);
 	image_pos += 16;
-	if (memcmp( header, SORDM5_CAS_HEADER, sizeof(SORDM5_CAS_HEADER)) != 0) return CASSETTE_ERROR_INVALIDIMAGE;
+	if (memcmp( header, SORDM5_CAS_HEADER, sizeof(SORDM5_CAS_HEADER)) != 0) return cassette_image::error::INVALID_IMAGE;
 	// add silence (header)
 	err = cassette_put_sample( cassette, 0, time_index, SORDM5_WAVESAMPLES_HEADER, 0);
-	if (err) return err;
+	if (err != cassette_image::error::SUCCESS) return err;
 	time_index += SORDM5_WAVESAMPLES_HEADER;
 	// process blocks
 	while (image_pos < image_size)
 	{
 		// read block type
 		block_type = cassette_image_read_uint8( cassette, image_pos + 0);
-		if ((block_type != 'H') && (block_type != 'D')) return CASSETTE_ERROR_INVALIDIMAGE;
+		if ((block_type != 'H') && (block_type != 'D')) return cassette_image::error::INVALID_IMAGE;
 		// read block size
 		block_size = cassette_image_read_uint8( cassette, image_pos + 1);
 		if (block_size == 0) block_size = 0x100;
@@ -74,13 +74,13 @@ static casserr_t sordm5_tap_load( cassette_image *cassette)
 		if (block_type == 'H')
 		{
 			err = cassette_put_sample( cassette, 0, time_index, SORDM5_WAVESAMPLES_BLOCK, 0);
-			if (err) return err;
+			if (err != cassette_image::error::SUCCESS) return err;
 			time_index += SORDM5_WAVESAMPLES_BLOCK;
 		}
 		// add sync
 		if (block_type == 'H') filler_length = 2.4 * (3150 / 8); else filler_length = 0.15 * (3150 / 8);
 		err = cassette_put_modulated_filler(cassette, 0, time_index, 0xFF, filler_length, &sordm5_cas_modulation, &time_displacement);
-		if (err) return err;
+		if (err != cassette_image::error::SUCCESS) return err;
 		time_index += time_displacement;
 		// process block
 		for (i=0;i<block_size;i++)
@@ -91,7 +91,7 @@ static casserr_t sordm5_tap_load( cassette_image *cassette)
 			#if 0
 			if (i == block_size)
 			{
-				if (byte != (crc & 0xFF)) return CASSETTE_ERROR_INVALIDIMAGE;
+				if (byte != (crc & 0xFF)) return cassette_image::error::INVALID_IMAGE;
 			}
 			if (i > 2) crc += byte;
 			#endif
@@ -109,23 +109,23 @@ static casserr_t sordm5_tap_load( cassette_image *cassette)
 				}
 				// add bit
 				err = cassette_put_modulated_data_bit( cassette, 0, time_index, bit, &sordm5_cas_modulation, &time_displacement);
-				if (err) return err;
+				if (err != cassette_image::error::SUCCESS) return err;
 				time_index += time_displacement;
 			}
 		}
 		// mark end of block
 		err = cassette_put_modulated_data_bit( cassette, 0, time_index, 1, &sordm5_cas_modulation, &time_displacement);
-		if (err) return err;
+		if (err != cassette_image::error::SUCCESS) return err;
 		time_index += time_displacement;
 		// next block
 		image_pos += block_size;
 	}
 	// add silence (trailer)
 	err = cassette_put_sample( cassette, 0, time_index, SORDM5_WAVESAMPLES_TRAILER, 0);
-	if (err) return err;
+	if (err != cassette_image::error::SUCCESS) return err;
 	time_index += SORDM5_WAVESAMPLES_TRAILER;
 	//
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 static const struct CassetteFormat sordm5_cas_format =

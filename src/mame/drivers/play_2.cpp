@@ -45,7 +45,7 @@ public:
 		, m_4013b(*this, "4013b")
 		, m_1863(*this, "1863")
 		, m_aysnd1(*this, "aysnd1")
-		, m_keyboard(*this, "X")
+		, m_keyboard(*this, "X.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port01_w);
@@ -193,6 +193,7 @@ void play_2_state::machine_reset()
 	m_port06 = 0;
 	for (UINT8 i = 0; i < 5; i++)
 		m_segment[i] = 0;
+	m_1863->oe_w(1);
 }
 
 WRITE8_MEMBER( play_2_state::port01_w )
@@ -206,7 +207,7 @@ WRITE8_MEMBER( play_2_state::port01_w )
 				for (UINT8 i = 0; i < 5; i++)
 					output().set_digit_value(j*10 + i, m_segment[i] & 0x7f);
 	}
-	m_1863->oe_w(BIT(data, 7)); // this actually mutes the audio amp, but doing it this way is far easier
+	m_1863->set_output_gain(0, BIT(data, 7) ? 1.00 : 0.00);
 }
 
 WRITE8_MEMBER( play_2_state::port02_w )

@@ -140,6 +140,9 @@ ROM_START( nfsug )
 
 	DISK_REGION( "drive_1" )
 	DISK_IMAGE_READONLY( "nfsug1_1-disc2", 0, SHA1(5b0be45eb3fcd27ba513baca1da633f9e9a4c5ef) )
+
+	DISK_REGION( "recovery" )
+	DISK_IMAGE_READONLY( "nfsug-recovery", 0, SHA1(e306bacb3498582a025706ff81a665776b8a18da) )
 ROM_END
 
 

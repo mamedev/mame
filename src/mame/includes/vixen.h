@@ -43,7 +43,7 @@ public:
 			m_sync_rom(*this, "video"),
 			m_char_rom(*this, "chargen"),
 			m_video_ram(*this, "video_ram"),
-			m_key(*this, "KEY"),
+			m_key(*this, "KEY.%u", 0),
 			m_cmd_d1(0),
 			m_fdint(0),
 			m_vsync(0),

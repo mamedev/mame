@@ -47,7 +47,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_snsnd(*this, "snsnd")
-		, m_switch(*this, "SWITCH")
+		, m_switch(*this, "SWITCH.%u", 0)
 		, m_p_ram(*this, "nvram")
 	{ }
 

@@ -27,7 +27,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_analog_ports(*this, "AN"),
+		m_analog_ports(*this, "AN.%u", 0),
 		m_tc0780fpa(*this, "tc0780fpa")
 	{
 		m_mcu_output = 0;

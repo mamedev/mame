@@ -216,10 +216,10 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_beep(*this, "beeper")
-		, m_keyrows(*this, "ROW")
-		, m_vram(*this, "vram"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		, m_keyrows(*this, "ROW.%u", 0)
+		, m_vram(*this, "vram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{ }
 
 	// devices

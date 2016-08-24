@@ -99,7 +99,8 @@ bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *
 	int cell_size = 0;
 	int sector_count = 0;
 	int heads = 0;
-	determine_sizes(io, cell_size, sector_count, heads);
+	int tracks = 0;
+	determine_sizes(io, cell_size, sector_count, heads, tracks);
 
 	if (cell_size == 0) return false;
 
@@ -111,7 +112,8 @@ bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *
 
 	int file_size = io_generic_size(io);
 	int track_size = get_track_size(cell_size, sector_count);
-	int track_count = file_size / (track_size*heads);
+	int track_count = tracks;
+	if (tracks==0) track_count = file_size / (track_size*heads);
 
 	if (TRACE) osd_printf_info("ti99_dsk: track count = %d\n", track_count);
 
@@ -785,7 +787,7 @@ int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
 	return vote;
 }
 
-void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads)
+void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
 	UINT64 file_size = io_generic_size(io);
 	ti99vib vib;
@@ -819,10 +821,11 @@ void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 		}
 		if (TRACE) osd_printf_info("ti99_dsk: VIB says that this disk is %s density with %d sectors per track, %d tracks, and %d heads\n", (cell_size==4000)? "single": ((cell_size==2000)? "double" : "high"), sector_count, vib.tracksperside, heads);
 		have_vib = true;
+		tracks = vib.tracksperside;
 	}
 
 	// Do we have a broken VIB? The Pascal disks are known to have such incomplete VIBs
-	if (heads == 0 || sector_count == 0) have_vib = false;
+	if (tracks == 0 || heads == 0 || sector_count == 0) have_vib = false;
 
 	// We're also checking the size of the image
 	int cell_size1 = 0;
@@ -1095,7 +1098,7 @@ int ti99_tdf_format::identify(io_generic *io, UINT32 form_factor)
     Find the proper format for a given image file. We determine the cell size,
     but we do not care about the sector size (only needed by the SDF converter).
 */
-void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads)
+void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
 	UINT64 file_size = io_generic_size(io);
 	heads = 2;  // TDF only supports two-sided recordings

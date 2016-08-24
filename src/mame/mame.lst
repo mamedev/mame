@@ -119,6 +119,7 @@ cosmicmo                        // Universal
 cosmo                           // TDS & Mints
 darthvdr                        // bootleg
 desterth                        // bootleg
+escmars                         // bootleg
 galactic                        // (c) 19?? Taito
 galmonst                        // (c) Laguna S.A.
 galxwars                        // (c) 1979 Universal
@@ -1054,6 +1055,7 @@ wrldtour3                       //
 
 @source:amaticmg.cpp
 am_mg24                         // (c) 2000 Amatic
+am_mg24a                        // (c) 2000 Amatic
 am_mg3                          // (c) 2000 Amatic
 am_mg31i                        // (c) Amatic
 am_mg33i                        // (c) Amatic
@@ -2501,6 +2503,9 @@ metrocrsa                       // (c) 1985
 
 @source:barata.cpp
 barata                          //
+
+@source:barni.cpp
+redbarnp                        //
 
 @source:bartop52.cpp
 barbball                        // (proto)          (c) 1983
@@ -9302,6 +9307,7 @@ cham24                          // 2002
 champbas                        // (c) 1983 Sega
 champbasj                       // (c) 1983 Alpha Denshi Co.
 champbasja                      // (c) 1983 Alpha Denshi Co.
+champbasjb                      // (c) 1983 Alpha Denshi Co.
 champbb2                        // (c) 1983 Sega
 champbb2a                       // (c) 1983 ?
 champbb2j                       // (c) 1983 ?
@@ -10636,18 +10642,25 @@ bttf_a20                        //
 bttf_a21                        //
 bttf_a27                        //
 bttf_g27                        //
+kiko_a10                        //
+lwar_a81                        //
 lwar_a83                        //
 lwar_e90                        //
 mnfb_c27                        //
 play_a24                        //
+poto_a29                        //
 poto_a32                        //
+robo_a30                        //
 robo_a34                        //
 simp_a20                        //
 simp_a27                        //
 ssvc_a26                        //
 ssvc_b26                        //
+ssvc_a42                        //
 tmac_a18                        //
 tmac_a24                        //
+tmac_g18                        //
+torp_a16                        //
 torp_e21                        //
 
 @source:de_3.cpp
@@ -10658,7 +10671,10 @@ btmn_106                        //
 btmn_g13                        //
 ckpt_a17                        //
 gnr_300                         //
+gnr_300d                        //
+gnr_300f                        //
 hook_401                        //
+hook_401p                       //
 hook_404                        //
 hook_408                        //
 jupk_501                        //
@@ -10669,6 +10685,7 @@ lah_112                         //
 lah_l104                        //
 lah_l108                        //
 lw3_200                         //
+lw3_203                         //
 lw3_205                         //
 lw3_207                         //
 lw3_207c                        //
@@ -10679,6 +10696,7 @@ rab_320                         //
 stwr_102                        //
 stwr_103                        //
 stwr_104                        //
+stwr_106                        //
 stwr_a14                        //
 stwr_e12                        //
 stwr_g11                        //
@@ -10689,10 +10707,12 @@ tftc_302                        //
 tftc_303                        //
 tmnt_103                        //
 tmnt_104                        //
+tomy_102                        //
 tomy_400                        //
 tomy_h30                        //
 trek_110                        //
 trek_11a                        //
+trek_117                        //
 trek_120                        //
 trek_200                        //
 trek_201                        //
@@ -10701,7 +10721,11 @@ wwfr_106                        //
 
 @source:de_3b.cpp
 batmanf                         //
+batmanf1                        //
+batmanf2                        //
 batmanf3                        //
+bay_d300                        //
+bay_d400                        //
 bay_e400                        //
 baywatch                        //
 bmf_at                          //
@@ -11119,6 +11143,7 @@ gulfstrm                        // (c) 1991 Dooyong
 gulfstrma                       // (c) 1991 Dooyong
 gulfstrmb                       // (c) 1991 Dooyong
 gulfstrmm                       // (c) 1991 Dooyong + distributed by Media Shoji
+gulfstrmk
 gundl94                         // (c) 1994 Dooyong
 lastday                         // (c) 1990 Dooyong
 lastdaya                        // (c) 1990 Dooyong
@@ -12412,6 +12437,7 @@ jolycmzs                        // (c) 1993 MZS Tech
 jolyjokr                        // (c) 198? Impera
 jolyjokra                       // (c) 198? Impera
 jolyjokrb                       // (c) 198? Impera
+jolyjokrc                       // (c) 198? Apple Time
 lluck3x3                        // (c) 1991 TAB-Austria
 lluck4x1                        // (c) 1991 TAB-Austria
 lunapark                        // 1998 unknown.
@@ -12461,6 +12487,9 @@ vegasmil                        // (c) 1993 Mile
 vegasslw                        // (c) 1993 Fun World
 witchryl                        // (c) 199? Video Klein
 intrgmes                        // (c) 1991 Inter Games
+fw_a7_11                        // (c) 1985 Fun World
+fw_a7_11a                       // (c) 1985 Fun World
+fw_a0_1                         // (c) 1991 Fun World
 
 @source:funybubl.cpp
 funybubl                        // (c) 1999 In Chang Electronic Co
@@ -14427,6 +14456,10 @@ zekepeak                        //
 @source:ichiban.cpp
 ichiban                         // (c) 199? Excel
 
+@source:idsa.cpp
+bsktbllp                        //
+v1                              //
+
 @source:ie15.cpp
 ie15                            //
 
@@ -14557,6 +14590,10 @@ metalman                        //
 mundial                         //
 pinclown                        //
 pinmoonl                        //
+
+@source:inderp.cpp
+centauri
+centauri2
 
 @source:indiana.cpp
 indiana                         //
@@ -14698,6 +14735,7 @@ gt97v121                        // (c) 1997 Incredible Technologies
 gt97v122                        // (c) 1997 Incredible Technologies
 gt98                            // (c) 1998 Incredible Technologies
 gt98s100                        // (c) 1998 Incredible Technologies
+gt98t302                        // (c) 1998 Incredible Technologies
 gt98t303                        // (c) 1998 Incredible Technologies
 gt98v100                        // (c) 1998 Incredible Technologies
 gt99                            // (c) 1999 Incredible Technologies
@@ -14916,6 +14954,10 @@ jedi                            // 136030           (c) 1984
 @source:jeutel.cpp
 leking                          //
 olympic                         //
+
+@source:jeutel.cpp
+punkywil                        //
+walkyria                        //
 
 @source:jokrwild.cpp
 jokrwild                        // (c) 1988 Sigma
@@ -17369,6 +17411,17 @@ macsefd                         // 1988 Apple Macintosh SE (FDHD)
 pmac6100                        // 1993 Apple Power Macintosh 6100
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
+
+@source:macp.cpp
+//glxplay                       //
+glxplay2                        //
+kidnap                          //
+mac_1808                        //
+macgalxy                        //
+macjungn                        //
+nbamac                          //
+spcpnthr                        //
+spctrain                        //
 
 @source:macpci.cpp
 pippin                          //
@@ -30094,6 +30147,7 @@ superpet                        //
 @source:peyper.cpp
 gamatros                        //
 hangonp                         //
+lancelot                        //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
@@ -31523,6 +31577,7 @@ rx78                            //
 
 @source:s11.cpp
 gmine_l2                        //
+grand_l3                        //
 grand_l4                        //
 hs_l3                           //
 hs_l4                           //
@@ -31540,8 +31595,10 @@ f14_l1                          //
 f14_p3                          //
 f14_p4                          //
 f14_p5                          //
+fire_l2                         //
 fire_l3                         //
 milln_l3                        //
+pb_l1                           //
 pb_l2                           //
 pb_l3                           //
 pb_l5                           //
@@ -31555,13 +31612,17 @@ bguns_l8                        //
 bguns_la                        //
 bguns_p1                        //
 bk2k_l4                         //
+bk2k_la2                        //
 bk2k_lg1                        //
 bk2k_lg3                        //
+bk2k_pa5                        //
+bk2k_pa7                        //
 bk2k_pu1                        //
 bnzai_g3                        //
 bnzai_l1                        //
 bnzai_l3                        //
 bnzai_pa                        //
+cycln_l1                        //
 cycln_l4                        //
 cycln_l5                        //
 eatpm_4g                        //
@@ -31587,10 +31648,13 @@ polic_l2                        //
 polic_l3                        //
 polic_l4                        //
 spstn_l5                        //
+swrds_l1                        //
 swrds_l2                        //
 taxi_l3                         //
 taxi_l4                         //
 taxi_lg1                        //
+taxi_lu1                        //
+taxi_p5                         //
 tsptr_l3                        //
 whirl_l2                        //
 whirl_l3                        //
@@ -31602,6 +31666,7 @@ bbnny_lu                        //
 dd_l2                           //
 dd_p6                           //
 diner_l1                        //
+diner_l2                        //
 diner_l3                        //
 diner_l4                        //
 gs_l3                           //
@@ -31621,6 +31686,7 @@ rollr_l2                        //
 rollr_l3                        //
 rollr_p2                        //
 rvrbt_l3                        //
+rvrbt_p7                       //
 strax_p7                        //
 
 @source:s3.cpp
@@ -31711,6 +31777,7 @@ comet_l5                        //
 ratrc_l1                        //
 sorcr_l1                        //
 sorcr_l2                        //
+sshtl_l3                        //
 sshtl_l7                        //
 szone_l2                        //
 szone_l5                        //
@@ -34237,6 +34304,7 @@ cyvernj                         // 1998.02 (c) 1998 Kaneko (Japan)
 galpani4                        // 1996.09 (c) 1996 Kaneko (Japan)
 galpani4k                       // 1996.09 (c) 1996 Kaneko (Korea)
 galpanis                        // 1997.04 (c) 1997 Kaneko (Europe)
+galpanise                       // 1997.04 (c) 1997 Kaneko (Europe)
 galpanisj                       // 1997.04 (c) 1997 Kaneko (Japan)
 galpanisk                       // 1997.04 (c) 1997 Kaneko (Korea)
 galpans2                        // 1999.02 (c) 1999 Kaneko (Japan)
@@ -36482,6 +36550,7 @@ wgpjoya                         // C32 (c) 1989 Taito Corporation (Japan)
 wheelfir                        // (c) 199? TCH
 
 @source:white_mod.cpp
+dalejr                          //
 elvisf                          //
 elvisf302                       //
 elvisf303                       //
@@ -36638,6 +36707,8 @@ sopranos_400                    //
 @source:whitestar.cpp
 apollo13                        //
 apollo13_10                     //
+apollo13_20                     //
+apollo13_d4                     //
 aust201                         //
 aust300                         //
 aust301                         //
@@ -36649,6 +36720,8 @@ austnew                         //
 ctchzdlx                        //
 gldneye                         //
 godzillp                        //
+godzillp_090                    //
+godzillp_100                    //
 goldcue                         //
 harl_a10                        //
 harl_a13                        //
@@ -36682,9 +36755,13 @@ hirolcat                        //
 hironew                         //
 id4                             //
 id4_201                         //
+id4f                            //
+id4f_201                        //
 jplstw20                        //
 jplstw22                        //
 lostspc                         //
+lostspcg                        //
+lostspc_d1                      //
 mononew                         //
 monop233                        //
 monop251                        //
@@ -36777,6 +36854,7 @@ simpprty_204                    //
 simpprty_300                    //
 simpprty_400                    //
 spacejam                        //
+spacejam_200                    //
 spacejmf                        //
 spacejmg                        //
 spacejmi                        //
@@ -36784,6 +36862,7 @@ sprk_090                        //
 sprk_096                        //
 sprk_103                        //
 startrp                         //
+startrp2                        //
 strikext                        //
 strknew                         //
 strxt_fr                        //
@@ -36813,8 +36892,10 @@ twst_300                        //
 twst_404                        //
 twst_405                        //
 viprsega                        //
+viprsega_102                    //
 wackadoo                        //
 xfiles2                         //
+xfiles20                        //
 xfilesp                         //
 
 @source:wicat.cpp
@@ -37383,6 +37464,7 @@ wsports                         //
 bbeltzac                        //
 clown                           //
 dvlrider                        //
+dvlriderf                       //
 dvlriderg                       //
 dvlrideri                       //
 farfalla                        //
@@ -37409,11 +37491,13 @@ robotg                          //
 roboti                          //
 scram_tp                        //
 socrking                        //
+socrkinga                       //
 socrkingg                       //
 socrkingi                       //
 spookyi                         //
 spookyp                         //
 strsphnx                        //
+thndrman                        //
 tmachzac                        //
 tmachzacf                       //
 tmachzacg                       //

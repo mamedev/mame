@@ -20,18 +20,46 @@
 #define FINDER_DUMMY_TAG "finder_dummy_tag"
 
 //**************************************************************************
-//  IOPORT ARRAY MACROS
-//**************************************************************************
-
-// these macros can be used to initialize an ioport_array with
-// individual port names, instead of a base name + numeric suffix
-
-#define IOPORT_ARRAY_MEMBER(name) const char * const name[] =
-#define DECLARE_IOPORT_ARRAY(name) static const char * const name[]
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// ======================> array_finder_base
+
+template <typename T, unsigned Count>
+class array_finder_base
+{
+private:
+	template <unsigned... V> struct indices { };
+	template <unsigned C, unsigned... V> struct range : public range<C - 1, C - 1, V...> { };
+	template <unsigned... V> struct range<0U, V...> { typedef indices<V...> type; };
+	template <unsigned C> using index_range = typename range<C>::type;
+
+	template <typename F, unsigned... V>
+	array_finder_base(device_t &base, F const &fmt, unsigned start, indices<V...>)
+		: m_tag{ util::string_format(fmt, start + V)... }
+		, m_array{ { base, m_tag[V].c_str() }... }
+	{
+	}
+
+	template <unsigned... V>
+	array_finder_base(device_t &base, std::array<char const *, Count> const &tags, indices<V...>)
+		: m_array{ { base, tags[V] }... }
+	{
+	}
+
+protected:
+	template <typename F> array_finder_base(device_t &base, F const &fmt, unsigned start) : array_finder_base(base, fmt, start, index_range<Count>()) { }
+	array_finder_base(device_t &base, std::array<char const *, Count> const &tags) : array_finder_base(base, tags, index_range<Count>()) { }
+
+	std::string m_tag[Count];
+	T m_array[Count];
+
+public:
+	const T &operator[](unsigned index) const { assert(index < Count); return m_array[index]; }
+	T &operator[](unsigned index) { assert(index < Count); return m_array[index]; }
+
+};
+
 
 // ======================> finder_base
 
@@ -141,6 +169,44 @@ public:
 };
 
 
+// ======================> device_array_finder
+
+// device array finder template
+template <class DeviceClass, unsigned Count, bool Required>
+class device_array_finder : public array_finder_base<device_finder<DeviceClass, Required>, Count>
+{
+public:
+	template <typename F>
+	device_array_finder(device_t &base, F const &fmt, unsigned start)
+		: array_finder_base<device_finder<DeviceClass, Required>, Count>(base, fmt, start)
+	{
+	}
+
+	device_array_finder(device_t &base, std::array<char const *, Count> const &tags)
+		: array_finder_base<device_finder<DeviceClass, Required>, Count>(base, tags)
+	{
+	}
+};
+
+// optional device array finder
+template <class DeviceClass, unsigned Count>
+class optional_device_array : public device_array_finder<DeviceClass, Count, false>
+{
+public:
+	template <typename F> optional_device_array(device_t &base, F const &fmt, unsigned start) : device_array_finder<DeviceClass, Count, false>(base, fmt, start) { }
+	optional_device_array(device_t &base, std::array<char const *, Count> const &tags) : device_array_finder<DeviceClass, Count, false>(base, tags) { }
+};
+
+// required device array finder
+template <class DeviceClass, unsigned Count>
+class required_device_array : public device_array_finder<DeviceClass, Count, true>
+{
+public:
+	template <typename F> required_device_array(device_t &base, F const &fmt, unsigned start) : device_array_finder<DeviceClass, Count, true>(base, fmt, start) { }
+	required_device_array(device_t &base, std::array<char const *, Count> const &tags) : device_array_finder<DeviceClass, Count, true>(base, tags) { }
+};
+
+
 // ======================> memory_region_finder
 
 // device finder template
@@ -227,7 +293,7 @@ public:
 
 // ======================> ioport_finder
 
-// device finder template
+// ioport finder template
 template<bool _Required>
 class ioport_finder : public object_finder_base<ioport_port>
 {
@@ -252,84 +318,55 @@ public:
 	}
 };
 
-// optional device finder
+// optional ioport finder
 class optional_ioport : public ioport_finder<false>
 {
 public:
 	optional_ioport(device_t &base, const char *tag = FINDER_DUMMY_TAG) : ioport_finder<false>(base, tag) { }
 };
 
-// required devices are similar but throw an error if they are not found
+// required ioports are similar but throw an error if they are not found
 class required_ioport : public ioport_finder<true>
 {
 public:
 	required_ioport(device_t &base, const char *tag = FINDER_DUMMY_TAG) : ioport_finder<true>(base, tag) { }
 };
 
-
 // ======================> ioport_array_finder
 
 // ioport array finder template
-template<int _Count, bool _Required>
-class ioport_array_finder
+template <unsigned Count, bool Required>
+class ioport_array_finder : public array_finder_base<ioport_finder<Required>, Count>
 {
-	typedef ioport_finder<_Required> ioport_finder_type;
-
 public:
-	// construction/destruction
-	ioport_array_finder(device_t &base, const char *basetag)
+	template <typename F>
+	ioport_array_finder(device_t &base, F const &fmt, unsigned start)
+		: array_finder_base<ioport_finder<Required>, Count>(base, fmt, start)
 	{
-		for (int index = 0; index < _Count; index++)
-		{
-			m_tag[index] = string_format("%s.%d", basetag, index);
-			m_array[index] = std::make_unique<ioport_finder_type>(base, m_tag[index].c_str());
-		}
 	}
 
-	ioport_array_finder(device_t &base, const char * const *tags)
+	ioport_array_finder(device_t &base, std::array<char const *, Count> const &tags)
+		: array_finder_base<ioport_finder<Required>, Count>(base, tags)
 	{
-		for (int index = 0; index < _Count; index++)
-			m_array[index] = std::make_unique<ioport_finder_type>(base, tags[index]);
 	}
-
-	ioport_array_finder(device_t &base, std::initializer_list<const char *> taglist)
-	{
-		assert(taglist.size() <= _Count);
-		int index = 0;
-		for (const char *tag : taglist)
-			m_array[index++] = std::make_unique<ioport_finder_type>(base, tag);
-		while (index < _Count)
-			m_array[index++] = std::make_unique<ioport_finder_type>(base, FINDER_DUMMY_TAG);
-	}
-
-	// array accessors
-	const ioport_finder_type &operator[](int index) const { assert(index < _Count); return *m_array[index]; }
-	ioport_finder_type &operator[](int index) { assert(index < _Count); return *m_array[index]; }
-
-protected:
-	// internal state
-	std::unique_ptr<ioport_finder_type> m_array[_Count];
-	std::string m_tag[_Count];
 };
 
 // optional ioport array finder
-template<int _Count>
-class optional_ioport_array: public ioport_array_finder<_Count, false>
+template <unsigned Count>
+class optional_ioport_array: public ioport_array_finder<Count, false>
 {
 public:
-	optional_ioport_array(device_t &base, const char *basetag) : ioport_array_finder<_Count, false>(base, basetag) { }
-	optional_ioport_array(device_t &base, const char * const *tags) : ioport_array_finder<_Count, false>(base, tags) { }
-	optional_ioport_array(device_t &base, std::initializer_list<const char *> taglist) : ioport_array_finder<_Count, false>(base, taglist) { }
+	template <typename F> optional_ioport_array(device_t &base, F const &fmt, unsigned start) : ioport_array_finder<Count, false>(base, fmt, start) { }
+	optional_ioport_array(device_t &base, std::array<char const *, Count> const &tags) : ioport_array_finder<Count, false>(base, tags) { }
 };
 
 // required ioport array finder
-template<int _Count>
-class required_ioport_array: public ioport_array_finder<_Count, true>
+template <unsigned Count>
+class required_ioport_array: public ioport_array_finder<Count, true>
 {
 public:
-	required_ioport_array(device_t &base, const char *basetag) : ioport_array_finder<_Count, true>(base, basetag) { }
-	required_ioport_array(device_t &base, const char * const *tags) : ioport_array_finder<_Count, true>(base, tags) { }
-	required_ioport_array(device_t &base, std::initializer_list<const char *> taglist) : ioport_array_finder<_Count, true>(base, taglist) { }
+	template <typename F> required_ioport_array(device_t &base, F const &fmt, unsigned start) : ioport_array_finder<Count, true>(base, fmt, start) { }
+	required_ioport_array(device_t &base, std::array<char const *, Count> const &tags) : ioport_array_finder<Count, true>(base, tags) { }
 };
 
 
@@ -464,46 +501,38 @@ public:
 // ======================> shared_ptr_array_finder
 
 // shared pointer array finder template
-template<typename _PointerType, int _Count, bool _Required>
-class shared_ptr_array_finder
+template <typename PointerType, unsigned Count, bool Required>
+class shared_ptr_array_finder : public array_finder_base<shared_ptr_finder<PointerType, Required>, Count>
 {
-	typedef shared_ptr_finder<_PointerType, _Required> shared_ptr_type;
-
 public:
-	// construction/destruction
-	shared_ptr_array_finder(device_t &base, const char *basetag, UINT8 width = sizeof(_PointerType) * 8)
+	template <typename F>
+	shared_ptr_array_finder(device_t &base, F const &fmt, unsigned start)
+		: array_finder_base<shared_ptr_finder<PointerType, Required>, Count>(base, fmt, start)
 	{
-		for (int index = 0; index < _Count; index++)
-		{
-			m_tag[index] = string_format("%s.%d", basetag, index);
-			m_array[index] = std::make_unique<shared_ptr_type>(base, m_tag[index].c_str(), width);
-		}
 	}
 
-	// array accessors
-	const shared_ptr_type &operator[](int index) const { assert(index < _Count); return *m_array[index]; }
-	shared_ptr_type &operator[](int index) { assert(index < _Count); return *m_array[index]; }
-
-protected:
-	// internal state
-	std::unique_ptr<shared_ptr_type> m_array[_Count];
-	std::string m_tag[_Count];
+	shared_ptr_array_finder(device_t &base, std::array<char const *, Count> const &tags)
+		: array_finder_base<shared_ptr_finder<PointerType, Required>, Count>(base, tags)
+	{
+	}
 };
 
 // optional shared pointer array finder
-template<class _PointerType, int _Count>
-class optional_shared_ptr_array : public shared_ptr_array_finder<_PointerType, _Count, false>
+template <typename PointerType, unsigned Count>
+class optional_shared_ptr_array : public shared_ptr_array_finder<PointerType, Count, false>
 {
 public:
-	optional_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, false>(base, tag, width) { }
+	template <typename F> optional_shared_ptr_array(device_t &base, F const &fmt, unsigned start) : shared_ptr_array_finder<PointerType, Count, false>(base, fmt, start) { }
+	optional_shared_ptr_array(device_t &base, std::array<char const *, Count> const &tags) : shared_ptr_array_finder<PointerType, Count, false>(base, tags) { }
 };
 
 // required shared pointer array finder
-template<class _PointerType, int _Count>
-class required_shared_ptr_array : public shared_ptr_array_finder<_PointerType, _Count, true>
+template <typename PointerType, unsigned Count>
+class required_shared_ptr_array : public shared_ptr_array_finder<PointerType, Count, true>
 {
 public:
-	required_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, true>(base, tag, width) { }
+	template <typename F> required_shared_ptr_array(device_t &base, F const &fmt, unsigned start) : shared_ptr_array_finder<PointerType, Count, true>(base, fmt, start) { }
+	required_shared_ptr_array(device_t &base, std::array<char const *, Count> const &tags) : shared_ptr_array_finder<PointerType, Count, true>(base, tags) { }
 };
 
 
