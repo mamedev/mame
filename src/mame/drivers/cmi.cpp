@@ -401,24 +401,16 @@ public:
 		, m_dp3(*this, "dp3")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_ankrow_ports{
-				{ *this, "ROW0" },
-				{ *this, "ROW1" },
-				{ *this, "ROW2" },
-				{ *this, "ROW3" },
-				{ *this, "ROW4" },
-				{ *this, "ROW5" },
-				{ *this, "ROW6" },
-				{ *this, "ROW7" } }
+		, m_ankrow_ports(*this, "ROW%u", 0)
 		, m_lp_x_port(*this, "LP_X")
 		, m_lp_y_port(*this, "LP_Y")
 		, m_lp_touch_port(*this, "LP_TOUCH")
 		, m_keypad_a_port(*this, "KEYPAD_A")
 		, m_keypad_b_port(*this, "KEYPAD_B")
-		, m_key_mux0_port{ { *this, "KEY_0_0" }, { *this, "KEY_1_0" }, { *this, "KEY_2_0" } }
-		, m_key_mux1_port{ { *this, "KEY_0_1" }, { *this, "KEY_1_1" }, { *this, "KEY_2_1" } }
-		, m_key_mux2_port{ { *this, "KEY_0_2" }, { *this, "KEY_1_2" }, { *this, "KEY_2_2" } }
-		, m_key_mux3_port{ { *this, "KEY_0_3" }, { *this, "KEY_1_3" }, { *this, "KEY_2_3" } }
+		, m_key_mux0_port(*this, "KEY_%u_0", 0)
+		, m_key_mux1_port(*this, "KEY_%u_1", 0)
+		, m_key_mux2_port(*this, "KEY_%u_2", 0)
+		, m_key_mux3_port(*this, "KEY_%u_3", 0)
 		, m_cmi07_ram(*this, "cmi07_ram")
 	{
 	}
