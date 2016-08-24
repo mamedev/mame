@@ -47,7 +47,7 @@
 #define SECTOR_SIZE 256
 
 // Debugging
-#define TRACE 1
+#define TRACE 0
 
 // ====================================================
 //  Common methods for both formats.
