@@ -323,7 +323,7 @@ public:
 // ======================> ioport_array_finder
 
 // ioport array finder template
-template<int Count, bool Required>
+template <unsigned Count, bool Required>
 class ioport_array_finder : public array_finder_base<ioport_finder<Required>, Count>
 {
 public:
