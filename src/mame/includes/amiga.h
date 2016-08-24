@@ -347,7 +347,7 @@ public:
 	m_potgo_port(*this, "potgo"),
 	m_pot0dat_port(*this, "POT0DAT"),
 	m_pot1dat_port(*this, "POT1DAT"),
-	m_joy_ports(*this, {"p1_joy", "p2_joy"}),
+	m_joy_ports(*this, "p%u_joy", 1),
 	m_p1_mouse_x(*this, "p1_mouse_x"),
 	m_p1_mouse_y(*this, "p1_mouse_y"),
 	m_p2_mouse_x(*this, "p2_mouse_x"),
