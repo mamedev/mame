@@ -3732,10 +3732,12 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_FRAGMENT_ADD(_8meters)
 MACHINE_CONFIG_END
 
+#if 0
 static MACHINE_CONFIG_DERIVED( scorpion2_3m, scorpion2 )
 	MCFG_DEVICE_REMOVE("meters")
 	MCFG_FRAGMENT_ADD(_3meters)
 MACHINE_CONFIG_END
+#endif
 
 /* machine driver for scorpion3 board */
 static MACHINE_CONFIG_DERIVED( scorpion3, scorpion2 )
@@ -5338,7 +5340,7 @@ ROM_START( sc2cpe3 )
 	ROM_LOAD( "club-public-enemy-no1_std_ac_200pnd_ass.bin", 0x0000, 0x010000, CRC(5704e52d) SHA1(dfae48734794cea2e9a952d808dedb96fd5204b3) )
 
 	ROM_REGION( 0x20000, "dm01:matrix", 0 )
-	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // seems to be from a cops+robbers instead, will say 'wrong display prom' during attract cycle
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // WRONG this is from cops and robbers
 
 	sc2_cpe_sound_alt2
 ROM_END
@@ -5348,7 +5350,7 @@ ROM_START( sc2cpe3p )
 	ROM_LOAD( "club-public-enemy-no1_dat_ac_200pnd_ass.bin", 0x0000, 0x010000, CRC(fec925a3) SHA1(5ce3b6f1236f511ae8975c7ecd1549e8d427a245) )
 
 	ROM_REGION( 0x20000, "dm01:matrix", 0 )
-	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
 
 	sc2_cpe_sound_alt2
 ROM_END
@@ -5358,7 +5360,7 @@ ROM_START( sc2cpe4 )
 	ROM_LOAD( "95750273.p1", 0x0000, 0x010000, CRC(950da13c) SHA1(2c544e06112969f7914a5b4fd15e6b0dfedf6b0b) )
 
 	ROM_REGION( 0x20000, "dm01:matrix", 0 )
-	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
 
 	sc2_cpe_sound_alt2
 ROM_END
@@ -5368,7 +5370,7 @@ ROM_START( sc2cpe4p )
 	ROM_LOAD( "club-public-enemy-no1_dat_fe_ac_200pnd_p65_rot_ass.bin", 0x0000, 0x010000, CRC(8d5ff953) SHA1(bdf6b5e014c46f6abac792a5913e98cb897b2a73) )
 
 	ROM_REGION( 0x20000, "dm01:matrix", 0 )
-	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
 
 	sc2_cpe_sound_alt2
 ROM_END
@@ -5518,120 +5520,180 @@ ROM_START( sc2copcl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_250pnd-25p_phx_ass.bin", 0x0000, 0x010000, CRC(668def2e) SHA1(802ca565a20d0fce2f5e4340c646429af6aadff6) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copclp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_dat_ac_250pnd-25p_phx_ass.bin", 0x0000, 0x010000, CRC(f6e9a013) SHA1(02b6c203c3facdd7015ba1119bcb70bf34b4ec00) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_250pnd-20p_rot_ass.bin", 0x0000, 0x010000, CRC(078651b5) SHA1(2acc45e5d66625753e5869f6f3ac1379d0c9dfcd) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl1p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_dat_ac_250pnd-20p_rot_ass.bin", 0x0000, 0x010000, CRC(05635f8b) SHA1(d3cf98e3858189db725621d4ba07728a585d7a3b) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(229c65c1) SHA1(8052c4b8702275235545807e7b075571fc97d4f3) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_fe_ac_p67_ass.bin", 0x0000, 0x010000, CRC(4906d170) SHA1(c304a2986560d675b2e776965fdf444e4d56f104) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl3p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_dat_fe_ac_p67_ass.bin", 0x0000, 0x010000, CRC(327db998) SHA1(aa8583cedd52a3cd06be6423a32e48273ec6218a) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )	
 ROM_END
 
 ROM_START( sc2copcl4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_var_p65_ass.bin", 0x0000, 0x010000, CRC(23d80392) SHA1(d7f5bab4fc8f42c1a38e26b54bc519e0f03d20bc) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_fe_ac_p63_ass.bin", 0x0000, 0x010000, CRC(fc7f9b85) SHA1(d9f940bca29919d097fa7d128869725e01d6dbc3) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )	
 ROM_END
 
 ROM_START( sc2copcl6 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_200pnd-20p_ass.bin", 0x0000, 0x010000, CRC(214cda40) SHA1(fc585f211256495bfaaa6cb6c4d9c8a110ab5051) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl6p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_dat_ac_200pnd-20p_ass.bin", 0x0000, 0x010000, CRC(b4071611) SHA1(2596ccee2b94bb56aa629ee892bd357b706005b0) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_var_200pnd_ijf_ass.bin", 0x0000, 0x010000, CRC(db5a287e) SHA1(5615480767348061b7f08a709a16aa0b9cf0658e) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl8 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_ffp_ass.bin", 0x0000, 0x010000, CRC(347255bf) SHA1(7f96277579e68bdf1e21788cc5e35941d98df87f) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl8p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_dat_ac_ffp_ass.bin", 0x0000, 0x010000, CRC(ec92b62d) SHA1(f10bc8fa55cd59127f179a35a61c1a57597856b6) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl9 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_fe_ac_ass.bin", 0x0000, 0x010000, CRC(c7461e95) SHA1(f4088056e848742d3795f5b067476b56071f99bd) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl9p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_dat_fe_ac_ass.bin", 0x0000, 0x010000, CRC(ead8cbe5) SHA1(5594eb9a736e0f15a6f0f097a8cbbd8352e46fc4) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_npr_ass.bin", 0x0000, 0x010000, CRC(b9c0bcb4) SHA1(c1a398bd58097411b80d36030760e7820dc346f4) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl11 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cops200", 0x0000, 0x010000, CRC(05d29adc) SHA1(06a986356c1b48ad5ee92c9a7f6fb2531e1806af) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl11p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_dat_fr_ac_p63_ass.bin", 0x0000, 0x010000, CRC(93965bfc) SHA1(52af75234f56a77f082132d9532d3ffcaef5d271) )
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl12 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "premier-club-manager_dat_ac_250pnd-25p_ass.bin", 0x0000, 0x010000, CRC(6446176c) SHA1(17cccc00d443ffde11943ebda112ef1e79134455) ) // filename is wrong, this is a club cops n robbers
 	sc2_copcl_sound
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copdc )
@@ -7786,37 +7848,37 @@ GAME( 199?, sc2gsclb6p  , sc2gsclb  ,  scorpion2        , drwho     , bfm_sc2_st
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT PR6231  CLUB COPS AND ROBBERS - 20-JUL-1993 15:15:32
-GAMEL( 199?, sc2copcl11  , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-750-118
+GAMEL( 199?, sc2copcl11  , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-750-118
 // PROJECT PR6231  CLUB COPS AND ROBBERS 150 POUND JACKPOT - 16-NOV-1993 12:34:10
-GAMEL( 199?, sc2copcl1   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-154
-GAMEL( 199?, sc2copcl1p  , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 2, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-154
+GAMEL( 199?, sc2copcl1   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-154
+GAMEL( 199?, sc2copcl1p  , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 2, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-154
 // PROJECT NUMBER PR6231  CLUB COPS AND ROBBERS FIXED 65% - 16-NOV-1993 12:35:38
-GAMEL( 199?, sc2copcl4   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-750-156
+GAMEL( 199?, sc2copcl4   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-750-156
 // PROJECT PR6231  CLUB COPS AND ROBBERS - 16-NOV-1993 12:39:31
-GAMEL( 199?, sc2copcl6   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-153
-GAMEL( 199?, sc2copcl6p  , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-153
+GAMEL( 199?, sc2copcl6   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-153
+GAMEL( 199?, sc2copcl6p  , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-153
 // PROJECT PR6231  CLUB COPS AND ROBBERS GENEROUS 5P - 20-JAN-1994 11:13:45
-GAMEL( 199?, sc2copcl7   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-750-190
+GAMEL( 199?, sc2copcl7   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-750-190
 // PROJECT PR6231  CLUB COPS AND ROBBERS - 4-AUG-1994 16:23:21
-GAMEL( 199?, sc2copcl10  , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 6, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) //  GAME No 95-750-268
+GAMEL( 199?, sc2copcl10  , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 6, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) //  GAME No 95-750-268
 // PROJECT PR6231  CLUB COPS AND ROBBERS SEALINK VERSION - 22-MAY-1995 11:47:58
-GAMEL( 199?, sc2copcl9   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 7, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-409
-GAMEL( 199?, sc2copcl9p  , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 7, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-409
+GAMEL( 199?, sc2copcl9   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 7, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-409
+GAMEL( 199?, sc2copcl9p  , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 7, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-409
 // PROJECT NUMBER 6231  CLUB COPS AND ROBBERS GENEROUS 5P NPO - 2-FEB-1996 12:39:22
-GAMEL( 199?, sc2copcl8   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 8, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-628
-GAMEL( 199?, sc2copcl8p  , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 8, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-628
+GAMEL( 199?, sc2copcl8   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 8, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-628
+GAMEL( 199?, sc2copcl8p  , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 8, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-628
 // PROJECT NUMBER PR6231  CLUB COPS AND ROBBERS 25P/#250 - 2-SEP-1996 17:17:50
-GAMEL( 199?, sc2copcl    , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-859
-GAMEL( 199?, sc2copclp   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-859
+GAMEL( 199?, sc2copcl    , 0         ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)            // GAME No 95-750-859
+GAMEL( 199?, sc2copclp   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)  // GAME No 95-751-859
 // PROJECT NUMBER PR6231  CLUB COPS AND ROBBERS 20P/#250 - 2-SEP-1996 17:26:44
-GAMEL( 199?, sc2copcl2   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)           // GAME No 95-750-858
-GAMEL( 199?, sc2copcl12  , sc2copcl  ,  scorpion2_3m     , drwho     , bfm_sc2_state, prom       , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-751-858
+GAMEL( 199?, sc2copcl2   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)           // GAME No 95-750-858
+GAMEL( 199?, sc2copcl12  , sc2copcl  ,  scorpion2_dm01_3m     , drwho     , bfm_sc2_state, prom       , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-751-858
 // PROJECT PR6231  CLUB COPS AND ROBBERS NPO 63% SEALINK VERSION - 5-JAN-1998 11:53:49
-GAMEL( 199?, sc2copcl5   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)           // GAME No 95-752-015
-GAMEL( 199?, sc2copcl11p , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-753-015
+GAMEL( 199?, sc2copcl5   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)           // GAME No 95-752-015
+GAMEL( 199?, sc2copcl11p , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-753-015
 // PROJECT PR6231  CLUB COPS AND ROBBERS NPO 67% SEALINK VERSION - 5-JAN-1998 11:56:01
-GAMEL( 199?, sc2copcl3   , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 12, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)           // GAME No 95-752-014
-GAMEL( 199?, sc2copcl3p  , sc2copcl  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 12, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-753-014
+GAMEL( 199?, sc2copcl3   , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 12, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7)           // GAME No 95-752-014
+GAMEL( 199?, sc2copcl3p  , sc2copcl  ,  scorpion2_dm01        , drwho     , bfm_sc2_state, drwho      , 0,         "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 12, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2copcl7) // GAME No 95-753-014
 
 
 /********************************************************************************************************************************************************************************************************************

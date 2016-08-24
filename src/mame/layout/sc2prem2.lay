@@ -9178,11 +9178,10 @@
 			<bounds x="328" y="288" width="4" height="3">
 			</bounds>
 		</backdrop>
-		
+		<!-- The DMD -->
     <screen index="0">
 			<bounds left="261" top="6" right="523" bottom="92" />
-		</screen>
-    
+		</screen>  
 		<backdrop name="label15" element="label_15">
 			<bounds x="619" y="85" width="38" height="67">
 			</bounds>
