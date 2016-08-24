@@ -456,7 +456,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
 
-	if (size > 0x20000)
+	if (size > 0x80000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 MACHINE_CONFIG_END
 
 ROM_START(svision)
-	ROM_REGION(0x20000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASE00)
 ROM_END
 
 
