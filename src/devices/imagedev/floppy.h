@@ -267,22 +267,22 @@ private:
 	// device_sound_interface overrides
 	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 	sound_stream*   m_sound;
-	
-	int			m_step_base;
-	int			m_spin_samples;
-	int			m_step_samples;
-	int			m_spin_samplepos;
-	int			m_step_samplepos;
-	int			m_seek_sound_timeout;
-	int			m_zones;
-	int 		m_spin_playback_sample;
-	int 		m_step_playback_sample;	
-	int			m_seek_playback_sample;
-	bool		m_motor_on;
-	bool		m_with_disk;
+
+	int         m_step_base;
+	int         m_spin_samples;
+	int         m_step_samples;
+	int         m_spin_samplepos;
+	int         m_step_samplepos;
+	int         m_seek_sound_timeout;
+	int         m_zones;
+	int         m_spin_playback_sample;
+	int         m_step_playback_sample;
+	int         m_seek_playback_sample;
+	bool        m_motor_on;
+	bool        m_with_disk;
 	bool        m_loaded;
-	double		m_seek_pitch;
-	double		m_seek_samplepos;
+	double      m_seek_pitch;
+	double      m_seek_samplepos;
 };
 
 
