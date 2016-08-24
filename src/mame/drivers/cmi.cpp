@@ -407,10 +407,7 @@ public:
 		, m_lp_touch_port(*this, "LP_TOUCH")
 		, m_keypad_a_port(*this, "KEYPAD_A")
 		, m_keypad_b_port(*this, "KEYPAD_B")
-		, m_key_mux0_port(*this, "KEY_%u_0", 0)
-		, m_key_mux1_port(*this, "KEY_%u_1", 0)
-		, m_key_mux2_port(*this, "KEY_%u_2", 0)
-		, m_key_mux3_port(*this, "KEY_%u_3", 0)
+		, m_key_mux_ports{ { *this, "KEY_%u_0", 0 }, { *this, "KEY_%u_1", 0 }, { *this, "KEY_%u_2", 0 }, { *this, "KEY_%u_3", 0 } }
 		, m_cmi07_ram(*this, "cmi07_ram")
 	{
 	}
@@ -578,10 +575,7 @@ protected:
 	required_ioport m_keypad_a_port;
 	required_ioport m_keypad_b_port;
 
-	required_ioport_array<3> m_key_mux0_port;
-	required_ioport_array<3> m_key_mux1_port;
-	required_ioport_array<3> m_key_mux2_port;
-	required_ioport_array<3> m_key_mux3_port;
+	required_ioport_array<3> m_key_mux_ports[4];
 
 	required_shared_ptr<UINT8> m_cmi07_ram;
 
@@ -2408,23 +2402,7 @@ READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 
 	for (int module = 0; module < 3; ++module)
 	{
-		UINT8 keyval = 0;
-		switch (mux)
-		{
-			case 0:
-				keyval = m_key_mux0_port[module]->read();
-				break;
-			case 1:
-				keyval = m_key_mux1_port[module]->read();
-				break;
-			case 2:
-				keyval = m_key_mux2_port[module]->read();
-				break;
-			case 3:
-				keyval = m_key_mux3_port[module]->read();
-				break;
-		}
-
+		UINT8 keyval = m_key_mux_ports[mux][module]->read();
 		data |= BIT(keyval, key) << module;
 	}
 
