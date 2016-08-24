@@ -29,7 +29,7 @@ protected:
 
 	virtual int min_heads() =0;
 
-	virtual void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads) =0;
+	virtual void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks) =0;
 	virtual int get_track_size(int cell_size, int sector_count) =0;
 	virtual void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize) =0;
 	virtual void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes) =0;
@@ -57,7 +57,7 @@ public:
 	const char *extensions() const override;
 
 private:
-	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads) override;
+	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks) override;
 	int get_track_size(int cell_size, int sector_count) override;
 	void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes) override;
 	void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize) override;
@@ -96,7 +96,7 @@ public:
 	const char *extensions() const override;
 
 private:
-	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads) override;
+	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks) override;
 	void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize) override;
 	void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes) override;
 	int get_track_size(int cell_size, int sector_count) override;
