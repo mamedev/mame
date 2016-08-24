@@ -35,7 +35,7 @@
 
 	TODO:
 
-	- disk formats
+	- booting system2 with disk in drive b: fails
 	- uhrg graphics are drawn wrong (upd7220 bugs?)
 	- compis2
 		- color graphics
@@ -841,9 +841,6 @@ static MACHINE_CONFIG_DERIVED( compis2, compis )
 	MCFG_CPU_MODIFY(I80186_TAG)
 	MCFG_CPU_PROGRAM_MAP(compis2_mem)
 	// TODO 8087
-
-	// devices
-	// TODO 525hd drives
 
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)
