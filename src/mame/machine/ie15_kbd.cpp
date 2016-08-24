@@ -16,10 +16,7 @@
 
 ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_io_kbd0(*this, "TERM_LINE0")
-	, m_io_kbd1(*this, "TERM_LINE1")
-	, m_io_kbd2(*this, "TERM_LINE2")
-	, m_io_kbd3(*this, "TERM_LINE3")
+	, m_io_kbd(*this, "KEY")
 	, m_io_kbdc(*this, "TERM_LINEC")
 	, m_keyboard_cb(*this)
 {
@@ -27,10 +24,7 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device
 
 ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IE15_KEYBOARD, "15WWW-97-006 Keyboard", tag, owner, clock, "ie15_keyboard", __FILE__)
-	, m_io_kbd0(*this, "TERM_LINE0")
-	, m_io_kbd1(*this, "TERM_LINE1")
-	, m_io_kbd2(*this, "TERM_LINE2")
-	, m_io_kbd3(*this, "TERM_LINE3")
+	, m_io_kbd(*this, "KEY")
 	, m_io_kbdc(*this, "TERM_LINEC")
 	, m_keyboard_cb(*this)
 {
@@ -38,23 +32,11 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const 
 
 UINT8 ie15_keyboard_device::row_number(UINT32 code)
 {
-	if (BIT(code,0)) return 0;
-	if (BIT(code,1)) return 1;
-	if (BIT(code,2)) return 2;
-	if (BIT(code,3)) return 3;
-	if (BIT(code,4)) return 4;
-	if (BIT(code,5)) return 5;
-	if (BIT(code,6)) return 6;
-	if (BIT(code,7)) return 7;
-	if (BIT(code,8)) return 8;
-	if (BIT(code,9)) return 9;
-	if (BIT(code,10)) return 10;
-	if (BIT(code,11)) return 11;
-	if (BIT(code,12)) return 12;
-	if (BIT(code,13)) return 13;
-	if (BIT(code,14)) return 14;
-	if (BIT(code,15)) return 15;
-	return 0;
+	int row = 0;
+
+	while (code >>= 1) { ++row; }
+
+	return row;
 }
 
 UINT16 ie15_keyboard_device::keyboard_handler(UINT16 last_code, UINT8 *scan_line)
@@ -68,13 +50,8 @@ UINT16 ie15_keyboard_device::keyboard_handler(UINT16 last_code, UINT8 *scan_line
 
 	i = *scan_line;
 	{
-		if (i == 0) code = m_io_kbd0->read();
-		else
-		if (i == 1) code = m_io_kbd1->read();
-		else
-		if (i == 2) code = m_io_kbd2->read();
-		else
-		if (i == 3) code = m_io_kbd3->read();
+		if (i<4)
+			code = m_io_kbd[i]->read();
 
 		if (code != 0)
 		{
@@ -206,7 +183,7 @@ rom:
 */
 
 static INPUT_PORTS_START( ie15_keyboard )
-	PORT_START("TERM_LINE0")
+	PORT_START("KEY.0")
 	PORT_BIT(0x000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
@@ -232,7 +209,7 @@ static INPUT_PORTS_START( ie15_keyboard )
 	PORT_BIT(0x400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) // 'f2'
 	PORT_BIT(0x800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))   // 'f3'
 
-	PORT_START("TERM_LINE1")
+	PORT_START("KEY.1")
 	PORT_BIT(0x000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT(0x000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
@@ -258,7 +235,7 @@ static INPUT_PORTS_START( ie15_keyboard )
 	PORT_BIT(0x400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Begin") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END))
 	PORT_BIT(0x800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
-	PORT_START("TERM_LINE2")
+	PORT_START("KEY.2")
 	PORT_BIT(0x000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT(0x000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
@@ -284,7 +261,7 @@ static INPUT_PORTS_START( ie15_keyboard )
 	PORT_BIT(0x400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ins") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
-	PORT_START("TERM_LINE3")
+	PORT_START("KEY.3")
 	PORT_BIT(0x000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~')
 	PORT_BIT(0x000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
