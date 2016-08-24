@@ -569,7 +569,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_ioport m_ankrow_ports[8];
+	required_ioport_array<8> m_ankrow_ports;
 
 	required_ioport m_lp_x_port;
 	required_ioport m_lp_y_port;
@@ -578,10 +578,10 @@ protected:
 	required_ioport m_keypad_a_port;
 	required_ioport m_keypad_b_port;
 
-	required_ioport m_key_mux0_port[3];
-	required_ioport m_key_mux1_port[3];
-	required_ioport m_key_mux2_port[3];
-	required_ioport m_key_mux3_port[3];
+	required_ioport_array<3> m_key_mux0_port;
+	required_ioport_array<3> m_key_mux1_port;
+	required_ioport_array<3> m_key_mux2_port;
+	required_ioport_array<3> m_key_mux3_port;
 
 	required_shared_ptr<UINT8> m_cmi07_ram;
 
