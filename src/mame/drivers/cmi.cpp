@@ -385,15 +385,7 @@ public:
 		, m_floppy_1(*this, "wd1791:1")
 		, m_floppy(nullptr)
 		, m_wd1791(*this, "wd1791")
-		, m_channels{
-				{ *this, "cmi01a_0" },
-				{ *this, "cmi01a_1" },
-				{ *this, "cmi01a_2" },
-				{ *this, "cmi01a_3" },
-				{ *this, "cmi01a_4" },
-				{ *this, "cmi01a_5" },
-				{ *this, "cmi01a_6" },
-				{ *this, "cmi01a_7" } }
+		, m_channels(*this, "cmi01a_%u", 0)
 		, m_cmi10_pia_u20(*this, "cmi10_pia_u20")
 		, m_cmi10_pia_u21(*this, "cmi10_pia_u21")
 		, m_dp1(*this, "dp1")
@@ -555,7 +547,7 @@ protected:
 	floppy_image_device *m_floppy;
 	required_device<fd1791_t> m_wd1791;
 
-	required_device<cmi01a_device> m_channels[8];
+	required_device_array<cmi01a_device, 8> m_channels;
 
 	required_device<pia6821_device> m_cmi10_pia_u20;
 	required_device<pia6821_device> m_cmi10_pia_u21;

@@ -23,6 +23,44 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> array_finder_base
+
+template <typename T, unsigned Count>
+class array_finder_base
+{
+private:
+	template <unsigned... V> struct indices { };
+	template <unsigned C, unsigned... V> struct range : public range<C - 1, C - 1, V...> { };
+	template <unsigned... V> struct range<0U, V...> { typedef indices<V...> type; };
+	template <unsigned C> using index_range = typename range<C>::type;
+
+	template <typename F, unsigned... V>
+	array_finder_base(device_t &base, F const &fmt, unsigned start, indices<V...>)
+		: m_tag{ util::string_format(fmt, start + V)... }
+		, m_array{ { base, m_tag[V].c_str() }... }
+	{
+	}
+
+	template <unsigned... V>
+	array_finder_base(device_t &base, std::array<char const *, Count> const &tags, indices<V...>)
+		: m_array{ { base, tags[V] }... }
+	{
+	}
+
+protected:
+	template <typename F> array_finder_base(device_t &base, F const &fmt, unsigned start) : array_finder_base(base, fmt, start, index_range<Count>()) { }
+	array_finder_base(device_t &base, std::array<char const *, Count> const &tags) : array_finder_base(base, tags, index_range<Count>()) { }
+
+	std::string m_tag[Count];
+	T m_array[Count];
+
+public:
+	const T &operator[](unsigned index) const { assert(index < Count); return m_array[index]; }
+	T &operator[](unsigned index) { assert(index < Count); return m_array[index]; }
+
+};
+
+
 // ======================> finder_base
 
 // helper class to request auto-object discovery in the constructor of a derived class
@@ -131,6 +169,44 @@ public:
 };
 
 
+// ======================> device_array_finder
+
+// device array finder template
+template <class DeviceClass, unsigned Count, bool Required>
+class device_array_finder : public array_finder_base<device_finder<DeviceClass, Required>, Count>
+{
+public:
+	template <typename F>
+	device_array_finder(device_t &base, F const &fmt, unsigned start)
+		: array_finder_base<device_finder<DeviceClass, Required>, Count>(base, fmt, start)
+	{
+	}
+
+	device_array_finder(device_t &base, std::array<char const *, Count> const &tags)
+		: array_finder_base<device_finder<DeviceClass, Required>, Count>(base, tags)
+	{
+	}
+};
+
+// optional device array finder
+template <class DeviceClass, unsigned Count>
+class optional_device_array : public device_array_finder<DeviceClass, Count, false>
+{
+public:
+	template <typename F> optional_device_array(device_t &base, F const &fmt, unsigned start) : device_array_finder<DeviceClass, Count, false>(base, fmt, start) { }
+	optional_device_array(device_t &base, std::array<char const *, Count> const &tags) : device_array_finder<DeviceClass, Count, false>(base, tags) { }
+};
+
+// required device array finder
+template <class DeviceClass, unsigned Count>
+class required_device_array : public device_array_finder<DeviceClass, Count, true>
+{
+public:
+	template <typename F> required_device_array(device_t &base, F const &fmt, unsigned start) : device_array_finder<DeviceClass, Count, true>(base, fmt, start) { }
+	required_device_array(device_t &base, std::array<char const *, Count> const &tags) : device_array_finder<DeviceClass, Count, true>(base, tags) { }
+};
+
+
 // ======================> memory_region_finder
 
 // device finder template
@@ -217,7 +293,7 @@ public:
 
 // ======================> ioport_finder
 
-// device finder template
+// ioport finder template
 template<bool _Required>
 class ioport_finder : public object_finder_base<ioport_port>
 {
@@ -242,58 +318,19 @@ public:
 	}
 };
 
-// optional device finder
+// optional ioport finder
 class optional_ioport : public ioport_finder<false>
 {
 public:
 	optional_ioport(device_t &base, const char *tag = FINDER_DUMMY_TAG) : ioport_finder<false>(base, tag) { }
 };
 
-// required devices are similar but throw an error if they are not found
+// required ioports are similar but throw an error if they are not found
 class required_ioport : public ioport_finder<true>
 {
 public:
 	required_ioport(device_t &base, const char *tag = FINDER_DUMMY_TAG) : ioport_finder<true>(base, tag) { }
 };
-
-
-// ======================> array_finder_base
-
-template <typename T, unsigned Count>
-class array_finder_base
-{
-private:
-	template <unsigned... V> struct indices { };
-	template <unsigned C, unsigned... V> struct range : public range<C - 1, C - 1, V...> { };
-	template <unsigned... V> struct range<0U, V...> { typedef indices<V...> type; };
-	template <unsigned C> using index_range = typename range<C>::type;
-
-	template <typename F, unsigned... V>
-	array_finder_base(device_t &base, F const &fmt, unsigned start, indices<V...>)
-		: m_tag{ util::string_format(fmt, start + V)... }
-		, m_array{ { base, m_tag[V].c_str() }... }
-	{
-	}
-
-	template <unsigned... V>
-	array_finder_base(device_t &base, std::array<char const *, Count> const &tags, indices<V...>)
-		: m_array{ { base, tags[V] }... }
-	{
-	}
-
-protected:
-	template <typename F> array_finder_base(device_t &base, F const &fmt, unsigned start) : array_finder_base(base, fmt, start, index_range<Count>()) { }
-	array_finder_base(device_t &base, std::array<char const *, Count> const &tags) : array_finder_base(base, tags, index_range<Count>()) { }
-
-	std::string m_tag[Count];
-	T m_array[Count];
-
-public:
-	const T &operator[](unsigned index) const { assert(index < Count); return m_array[index]; }
-	T &operator[](unsigned index) { assert(index < Count); return m_array[index]; }
-
-};
-
 
 // ======================> ioport_array_finder
 
