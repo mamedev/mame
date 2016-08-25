@@ -96,6 +96,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
+	virtual const bool use_software_list_file_extension_for_filetype() const override { return true; }
 
 private:
 	cassette_image  *m_cassette;
