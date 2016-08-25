@@ -12,17 +12,41 @@
 
 
 //**************************************************************************
+//  TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+template class object_finder_base<memory_region, false>;
+template class object_finder_base<memory_region, true>;
+template class memory_region_finder<false>;
+template class memory_region_finder<true>;
+
+template class object_finder_base<memory_bank, false>;
+template class object_finder_base<memory_bank, true>;
+template class memory_bank_finder<false>;
+template class memory_bank_finder<true>;
+
+template class object_finder_base<ioport_port, false>;
+template class object_finder_base<ioport_port, true>;
+template class ioport_finder<false>;
+template class ioport_finder<true>;
+
+
+
+//**************************************************************************
 //  BASE FINDER CLASS
 //**************************************************************************
+
+constexpr char finder_base::DUMMY_TAG[];
+
 
 //-------------------------------------------------
 //  finder_base - constructor
 //-------------------------------------------------
 
 finder_base::finder_base(device_t &base, const char *tag)
-	: m_next(base.register_auto_finder(*this)),
-		m_base(base),
-		m_tag(tag)
+	: m_next(base.register_auto_finder(*this))
+	, m_base(base)
+	, m_tag(tag)
 {
 }
 
@@ -43,7 +67,7 @@ finder_base::~finder_base()
 void *finder_base::find_memregion(UINT8 width, size_t &length, bool required) const
 {
 	// look up the region and return nullptr if not found
-	memory_region *region = m_base.memregion(m_tag);
+	memory_region *const region = m_base.memregion(m_tag);
 	if (region == nullptr)
 	{
 		length = 0;
@@ -60,11 +84,11 @@ void *finder_base::find_memregion(UINT8 width, size_t &length, bool required) co
 	}
 
 	// check the length and warn if other than specified
-	size_t length_found = region->bytes() / width;
+	size_t const length_found = region->bytes() / width;
 	if (length != 0 && length != length_found)
 	{
 		if (required)
-			osd_printf_warning("Region '%s' found but has %d bytes, not %d as requested\n", m_tag, region->bytes(), (int)length*width);
+			osd_printf_warning("Region '%s' found but has %d bytes, not %ld as requested\n", m_tag, region->bytes(), long(length*width));
 		length = 0;
 		return nullptr;
 	}
@@ -100,15 +124,13 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 			break;
 	}
 
-	if (bytes_found != 0)
+	// check the length and warn if other than specified
+	if ((bytes_found != 0) && (bytes != 0) && (bytes != bytes_found))
 	{
-		// check the length and warn if other than specified
-		if (bytes != 0 && bytes != bytes_found)
-		{
-			osd_printf_warning("Region '%s' found but has %d bytes, not %d as requested\n", m_tag, (int)bytes_found, (int)bytes);
-			bytes_found = 0;
-		}
+		osd_printf_warning("Region '%s' found but has %ld bytes, not %ld as requested\n", m_tag, long(bytes_found), long(bytes));
+		bytes_found = 0;
 	}
+
 	return report_missing(bytes_found != 0, "memory region", required);
 }
 
@@ -145,9 +167,9 @@ void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required) cons
 
 bool finder_base::report_missing(bool found, const char *objname, bool required) const
 {
-	if (required && strcmp(m_tag, FINDER_DUMMY_TAG)==0)
+	if (required && (strcmp(m_tag, DUMMY_TAG) == 0))
 	{
-		osd_printf_error("Tag not defined for required device\n");
+		osd_printf_error("Tag not defined for required %s\n", objname);
 		return false;
 	}
 
@@ -156,7 +178,7 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 		return true;
 
 	// otherwise, report
-	std::string region_fulltag = m_base.subtag(m_tag);
+	std::string const region_fulltag = m_base.subtag(m_tag);
 	if (required)
 		osd_printf_error("Required %s '%s' not found\n", objname, region_fulltag.c_str());
 	else
