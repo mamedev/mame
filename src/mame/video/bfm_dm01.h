@@ -8,6 +8,9 @@
 #ifndef BFM_DM01
 #define BFM_DM01
 
+// this is slow
+//#define USE_ARTWORK_ELEMENTS_FOR_DMD
+
 #define DM_BYTESPERROW 9
 
 #define MCFG_BF_DM01_BUSY_CB(_devcb) \
@@ -35,6 +38,8 @@ public:
 	
 	INTERRUPT_GEN_MEMBER(nmi_line_assert);
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -43,7 +48,10 @@ protected:
 
 private:
 	required_device<cpu_device> m_matrixcpu;
-
+#ifndef USE_ARTWORK_ELEMENTS_FOR_DMD
+	optional_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+#endif
 	// internal state
 	int m_data_avail;
 	int m_control;
@@ -57,6 +65,8 @@ private:
 	devcb_write_line m_busy_cb;
 
 	int read_data(void);
+	
+	bitmap_ind16 m_tmpbitmap;
 
 };
 
