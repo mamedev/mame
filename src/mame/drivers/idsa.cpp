@@ -6,14 +6,14 @@
 // Hardware listing and ROM definitions from PinMAME.
 
 /*
-	Hardware:
-	---------
-		CPU:     Z80 @ 4 MHz
-			INT: IRQ @ 977 Hz (4MHz/2048/2) or 488 Hz (4MHz/2048/4)
-		IO:      DMA, AY8910 ports
-		DISPLAY: bsktball: 7-digit 7-segment panels with PROM-based 5-bit BCD data (allowing a simple alphabet)
-		         v1: 6-digit 7-segment panels with BCD decoding
-		SOUND:	 2 x AY8910 @ 2 MHz plus SP0256 @ 3.12 MHz on board
+Hardware:
+---------
+CPU:     Z80 @ 4 MHz
+    INT: IRQ @ 977 Hz (4MHz/2048/2) or 488 Hz (4MHz/2048/4)
+IO:      DMA, AY8910 ports
+DISPLAY: bsktball: 7-digit 7-segment panels with PROM-based 5-bit BCD data (allowing a simple alphabet)
+         v1: 6-digit 7-segment panels with BCD decoding
+SOUND:   2 x AY8910 @ 2 MHz plus SP0256 @ 3.12 MHz on board
 */
 
 #include "cpu/z80/z80.h"
