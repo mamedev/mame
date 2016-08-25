@@ -273,22 +273,7 @@ km035_device::km035_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, KM035, "KM035 keyboard", tag, owner, clock, "km035", __FILE__),
 	m_maincpu(*this, KM035_CPU_TAG),
 	m_speaker(*this, KM035_SPK_TAG),
-	m_kbd0(*this, "KBD0"),
-	m_kbd1(*this, "KBD1"),
-	m_kbd2(*this, "KBD2"),
-	m_kbd3(*this, "KBD3"),
-	m_kbd4(*this, "KBD4"),
-	m_kbd5(*this, "KBD5"),
-	m_kbd6(*this, "KBD6"),
-	m_kbd7(*this, "KBD7"),
-	m_kbd8(*this, "KBD8"),
-	m_kbd9(*this, "KBD9"),
-	m_kbd10(*this, "KBD10"),
-	m_kbd11(*this, "KBD11"),
-	m_kbd12(*this, "KBD12"),
-	m_kbd13(*this, "KBD13"),
-	m_kbd14(*this, "KBD14"),
-	m_kbd15(*this, "KBD15"),
+	m_kbd(*this, "KBD%u", 0),
 	m_tx_handler(*this),
 	m_rts_handler(*this)
 {
@@ -345,24 +330,7 @@ WRITE8_MEMBER( km035_device::p1_w )
 	DBG_LOG(2,0,( "p1_w %02x = row %d col %d tx %d\n", data, (data>>4)&15, data&7, !BIT(data, 3)));
 	m_p1 = data;
 
-	switch((data>>4)&15) {
-		case 0x0: sense = m_kbd0->read(); break;
-		case 0x1: sense = m_kbd1->read(); break;
-		case 0x2: sense = m_kbd2->read(); break;
-		case 0x3: sense = m_kbd3->read(); break;
-		case 0x4: sense = m_kbd4->read(); break;
-		case 0x5: sense = m_kbd5->read(); break;
-		case 0x6: sense = m_kbd6->read(); break;
-		case 0x7: sense = m_kbd7->read(); break;
-		case 0x8: sense = m_kbd8->read(); break;
-		case 0x9: sense = m_kbd9->read(); break;
-		case 0xa: sense = m_kbd10->read(); break;
-		case 0xb: sense = m_kbd11->read(); break;
-		case 0xc: sense = m_kbd12->read(); break;
-		case 0xd: sense = m_kbd13->read(); break;
-		case 0xe: sense = m_kbd14->read(); break;
-		case 0xf: sense = m_kbd15->read(); break;
-	}
+	sense = m_kbd[(data>>4) & 15]->read();
 	m_keylatch = BIT(sense, (data & 7));
 	if (m_keylatch)
 		DBG_LOG(1,0,( "keypress at row %d col %d\n", (data>>4)&15, data&7));
