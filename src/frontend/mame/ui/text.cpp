@@ -466,7 +466,7 @@ int text_layout::get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend)
 //  emit
 //-------------------------------------------------
 
-void text_layout::emit(render_container &container, float x, float y)
+void text_layout::emit(render_container &container, float x, float y, float scale)
 {
 	for (const auto &line : m_lines)
 	{
@@ -479,10 +479,10 @@ void text_layout::emit(render_container &container, float x, float y)
 
 			// position this specific character correctly (TODO - this doesn't
 			// handle differently sized text (yet)
-			float char_x = x + line_xoffset + ch.xoffset;
-			float char_y = y + line->yoffset();
-			float char_width = ch.xwidth;
-			float char_height = line->height();
+			float char_x = x + (line_xoffset + ch.xoffset) * scale;
+			float char_y = y + line->yoffset() * scale;
+			float char_width = ch.xwidth * scale;
+			float char_height = line->height() * scale;
 
 			// render the background of the character (if present)
 			if (ch.style.bgcolor.a() != 0)

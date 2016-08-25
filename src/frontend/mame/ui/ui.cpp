@@ -602,8 +602,8 @@ void mame_ui_manager::draw_text_full(render_container &container, const char *or
 
 void mame_ui_manager::draw_text_box(render_container &container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
-	// cap the maximum width
-	float maximum_width = 1.0f - UI_BOX_LR_BORDER * 2;
+	// cap the maximum width and height
+	const float maximum_width = 1.0f - UI_BOX_LR_BORDER * 2;
 
 	// create a layout
 	ui::text_layout layout = create_layout(container, maximum_width, justify);
@@ -623,10 +623,19 @@ void mame_ui_manager::draw_text_box(render_container &container, const char *tex
 
 void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
 {
-	// xpos and ypos are where we want to "pin" the layout, but we need to adjust for the actual size of the payload
 	auto actual_left = layout.actual_left();
 	auto actual_width = layout.actual_width();
 	auto actual_height = layout.actual_height();
+
+	// figure out the scale
+	const float maximum_width = 1.0f - UI_BOX_LR_BORDER * 2;
+	const float maximum_height = 1.0f - UI_BOX_TB_BORDER * 2;
+	float scale = std::min(1.0f, std::min(maximum_width / actual_width, maximum_height / actual_height));
+	actual_width *= scale;
+	actual_height *= scale;
+
+	// xpos and ypos are where we want to "pin" the layout, but we need to adjust for the actual size of the payload
+	// measure out actual dimensions
 	auto x = std::min(std::max(xpos - actual_width / 2, UI_BOX_LR_BORDER), 1.0f - actual_width - UI_BOX_LR_BORDER);
 	auto y = std::min(std::max(ypos - actual_height / 2, UI_BOX_TB_BORDER), 1.0f - actual_height - UI_BOX_TB_BORDER);
 
@@ -638,7 +647,7 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 			y + actual_height + UI_BOX_TB_BORDER, backcolor);
 
 	// emit the text
-	layout.emit(container, x - actual_left, y);
+	layout.emit(container, x - actual_left, y, scale);
 }
 
 
