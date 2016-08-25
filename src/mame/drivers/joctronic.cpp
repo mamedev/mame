@@ -5,7 +5,7 @@
 // Known pinballs to be dumped: Rider's Surf (1986), Pin Ball (1987)
 // ROM definitions from PinMAME.
 
-
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/genpin.h"
 #include "machine/z80ctc.h"

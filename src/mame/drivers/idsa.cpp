@@ -16,6 +16,7 @@ DISPLAY: bsktball: 7-digit 7-segment panels with PROM-based 5-bit BCD data (allo
 SOUND:   2 x AY8910 @ 2 MHz plus SP0256 @ 3.12 MHz on board
 */
 
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/genpin.h"
 #include "sound/ay8910.h"

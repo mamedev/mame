@@ -4,7 +4,7 @@
 // A "virtual" driver to play vgm files
 // Use with mame vgmplay -bitb file.vgm
 
-#include <zlib.h>
+#include "zlib/zlib.h"
 
 #include "emu.h"
 #include "debugger.h"
