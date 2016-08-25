@@ -77,5 +77,5 @@ ROM_START(centauri2)
 ROM_END
 
 
-GAME( 1979, centauri,  0,        inderp, inderp, driver_device, 0, ROT0, "Inder", "Centaur", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri,  0,        inderp, inderp, driver_device, 0, ROT0, "Inder", "Centaur (Inder)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, centauri2, centauri, inderp, inderp, driver_device, 0, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
