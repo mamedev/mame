@@ -21,6 +21,7 @@
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 #include "zippath.h"
+#include "imagedev/floppy.h"
 
 class debug_area
 {
@@ -107,7 +108,10 @@ public:
 		m_initialised(false),
 		m_filelist_refresh(false),
 		m_mount_open(false),
-		m_selected_file(nullptr)
+		m_create_open(false),
+		m_create_confirm_wait(false),
+		m_selected_file(nullptr),
+		m_format_sel(0)
 	{
 	}
 
@@ -135,6 +139,13 @@ private:
 		std::string fullpath;
 	};
 
+	struct image_type_entry
+	{
+		floppy_image_format_t* format;
+		std::string shortname;
+		std::string longname;
+	};
+	
 	void handle_mouse();
 	void handle_mouse_views();
 	void handle_keys();
@@ -154,7 +165,11 @@ private:
 	void draw_log(debug_area* view_ptr, bool* opened);
 	void draw_view(debug_area* view_ptr, bool exp_change);
 	void draw_mount_dialog(const char* label);
+	void draw_create_dialog(const char* label);
 	void mount_image();
+	void create_image();
+	void refresh_filelist();
+	void refresh_typelist();
 	void update_cpu_view(device_t* device);
 	static bool get_view_source(void* data, int idx, const char** out_text);
 	static int history_set(ImGuiTextEditCallbackData* data);
@@ -177,8 +192,12 @@ private:
 	device_image_interface* m_dialog_image;
 	bool             m_filelist_refresh;  // set to true to refresh mount/create dialog file lists
 	bool             m_mount_open;  // true when opening a mount dialog
+	bool             m_create_open;  // true when opening a create dialog
+	bool             m_create_confirm_wait;  // true if waiting for confirmation of the above
 	std::vector<file_entry> m_filelist;
+	std::vector<image_type_entry> m_typelist;
 	file_entry*      m_selected_file;
+	int              m_format_sel;
 	char             m_path[1024];  // path text field buffer
 };
 
@@ -955,13 +974,106 @@ void debug_imgui::mount_image()
 	}
 }
 
+void debug_imgui::create_image()
+{
+	image_init_result res;
+
+	if(m_dialog_image->image_type() == IO_FLOPPY)
+	{
+		floppy_image_device *fd = static_cast<floppy_image_device *>(m_dialog_image);
+		res = fd->create(m_path,nullptr,nullptr);
+		if(res == image_init_result::PASS)
+			fd->setup_write(m_typelist.at(m_format_sel).format);
+	}
+	else
+		res = m_dialog_image->create(m_path,nullptr,nullptr);
+	if(res == image_init_result::PASS)
+		ImGui::CloseCurrentPopup();
+	// TODO: add a messagebox to display on an error
+}
+
+void debug_imgui::refresh_filelist()
+{
+	int x;
+	osd_file::error err;
+	util::zippath_directory* dir = nullptr;
+	const char *volume_name;
+	const osd::directory::entry *dirent;
+	
+	// todo
+	m_filelist.clear();
+	m_filelist_refresh = false;
+
+	err = util::zippath_opendir(m_path,&dir);
+	if(err == osd_file::error::NONE)
+	{
+		x = 0;
+		// add drives
+		while((volume_name = osd_get_volume_name(x))!=nullptr)
+		{
+			file_entry temp;
+			temp.type = file_entry_type::DRIVE;
+			temp.basename = std::string(volume_name);
+			temp.fullpath = std::string(volume_name);
+			m_filelist.emplace_back(std::move(temp));
+			x++;
+		}
+		while((dirent = util::zippath_readdir(dir)) != nullptr)
+		{
+			file_entry temp;
+			switch(dirent->type)
+			{
+				case osd::directory::entry::entry_type::FILE:
+					temp.type = file_entry_type::FILE;
+					break;
+				case osd::directory::entry::entry_type::DIR:
+					temp.type = file_entry_type::DIRECTORY;
+					break;
+				default:
+					break;
+			}
+			temp.basename = std::string(dirent->name);
+			temp.fullpath = util::zippath_combine(m_path,dirent->name);
+			m_filelist.emplace_back(std::move(temp));
+		}
+	}
+	if (dir != nullptr)
+		util::zippath_closedir(dir);
+}
+
+void debug_imgui::refresh_typelist()
+{
+	floppy_image_device *fd = static_cast<floppy_image_device *>(m_dialog_image);
+	
+	m_typelist.clear();
+	if(m_dialog_image->formatlist().empty())
+		return;
+	if(fd == nullptr)
+		return;
+	
+	floppy_image_format_t* format_list = fd->get_formats();
+	for(floppy_image_format_t* flist = format_list; flist; flist = flist->next)
+	{
+		if(flist->supports_save())
+		{
+			image_type_entry temp;
+			temp.format = flist;
+			temp.shortname = flist->name();
+			temp.longname = flist->description();
+			m_typelist.emplace_back(std::move(temp));
+		}
+	}
+}
+
 void debug_imgui::draw_images_menu()
 {
 	if(ImGui::BeginMenu("Images"))
 	{
+		int x = 0;
 		for (device_image_interface &img : image_interface_iterator(m_machine->root_device()))
 		{
-			std::string str = string_format("%s : %s",img.device().name(),img.exists() ? img.filename() : "[Empty slot]");
+			x++;
+			std::string str = string_format(" %s : %s##%i",img.device().name(),img.exists() ? img.filename() : "[Empty slot]",x);
 			if(ImGui::BeginMenu(str.c_str())) 
 			{
 				if(ImGui::MenuItem("Mount...")) 
@@ -979,7 +1091,16 @@ void debug_imgui::draw_images_menu()
 					img.unload();
 				ImGui::Separator();
 				if(img.is_creatable())
-					if(ImGui::MenuItem("Create...",NULL,false,false)) {}
+				{
+					if(ImGui::MenuItem("Create..."))
+					{
+						m_dialog_image = &img;
+						m_create_open = true;
+						m_create_confirm_wait = false;
+						refresh_typelist();
+						strcpy(m_path,img.working_directory().c_str());
+					}
+				}	
 				// TODO: Cassette controls
 				ImGui::EndMenu();
 			}
@@ -990,63 +1111,14 @@ void debug_imgui::draw_images_menu()
 
 void debug_imgui::draw_mount_dialog(const char* label)
 {
-	int x;
-	
 	// render dialog
-	ImGui::SetNextWindowContentWidth(200.0f);
+	//ImGui::SetNextWindowContentWidth(200.0f);
 	if(ImGui::BeginPopupModal(label,NULL,ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		if(m_filelist_refresh)
-		{
-			osd_file::error err;
-			util::zippath_directory* dir = nullptr;
-			const char *volume_name;
-			const osd::directory::entry *dirent;
-			
-			// todo
-			m_filelist.clear();
-			m_filelist_refresh = false;
-
-			err = util::zippath_opendir(m_path,&dir);
-			if(err == osd_file::error::NONE)
-			{
-				x = 0;
-				// add drives
-				while((volume_name = osd_get_volume_name(x))!=nullptr)
-				{
-					file_entry temp;
-					temp.type = file_entry_type::DRIVE;
-					temp.basename = std::string(volume_name);
-					temp.fullpath = std::string(volume_name);
-					m_filelist.emplace_back(std::move(temp));
-					x++;
-				}
-				while((dirent = util::zippath_readdir(dir)) != nullptr)
-				{
-					file_entry temp;
-					switch(dirent->type)
-					{
-						case osd::directory::entry::entry_type::FILE:
-							temp.type = file_entry_type::FILE;
-							break;
-						case osd::directory::entry::entry_type::DIR:
-							temp.type = file_entry_type::DIRECTORY;
-							break;
-						default:
-							break;
-					}
-					temp.basename = std::string(dirent->name);
-					temp.fullpath = util::zippath_combine(m_path,dirent->name);
-					m_filelist.emplace_back(std::move(temp));
-				}
-			}
-			if (dir != nullptr)
-				util::zippath_closedir(dir);
-		}
+			refresh_filelist();
 		if(ImGui::InputText("##mountpath",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
-		{
 			m_filelist_refresh = true;
-		}
 		ImGui::Separator();
 		{
 			ImGui::ListBoxHeader("##filelist",m_filelist.size(),15);
@@ -1084,6 +1156,75 @@ void debug_imgui::draw_mount_dialog(const char* label)
 		ImGui::SameLine();
 		if(ImGui::Button("OK##mount"))
 			mount_image();
+		ImGui::EndPopup();
+	}
+}
+
+void debug_imgui::draw_create_dialog(const char* label)
+{
+	// render dialog
+	//ImGui::SetNextWindowContentWidth(200.0f);
+	if(ImGui::BeginPopupModal(label,NULL,ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::LabelText("##static1","Filename:");
+		ImGui::SameLine();
+		if(ImGui::InputText("##createfilename",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			auto entry = osd_stat(m_path);
+			auto file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
+			if(file_type == osd::directory::entry::entry_type::NONE)
+				create_image();
+			if(file_type == osd::directory::entry::entry_type::FILE)
+				m_create_confirm_wait = true;
+			// cannot overwrite a directory, so nothing will be none in that case.
+		}
+
+		// format combo box for floppy devices
+		if(m_dialog_image->image_type() == IO_FLOPPY)
+		{
+			std::string combo_str;
+			combo_str.clear();
+			for(std::vector<image_type_entry>::iterator f = m_typelist.begin();f != m_typelist.end();++f)
+			{
+				// TODO: perhaps do this at the time the format list is generated, rather than every frame
+				combo_str.append((*f).longname);
+				combo_str.append(1,'\0');
+			}
+			combo_str.append(1,'\0');
+			ImGui::Separator();
+			ImGui::LabelText("##static2","Format:");
+			ImGui::SameLine();
+			ImGui::Combo("##formatcombo",&m_format_sel,combo_str.c_str(),m_typelist.size());
+		}
+		
+		if(m_create_confirm_wait)
+		{
+			ImGui::Separator();
+			ImGui::Text("File already exists.  Are you sure you wish to overwrite it?");
+			ImGui::Separator();
+			if(ImGui::Button("Cancel##mount"))
+				ImGui::CloseCurrentPopup();
+			ImGui::SameLine();
+			if(ImGui::Button("OK##mount"))
+				create_image();
+		}
+		else
+		{
+			ImGui::Separator();
+			if(ImGui::Button("Cancel##mount"))
+				ImGui::CloseCurrentPopup();
+			ImGui::SameLine();
+			if(ImGui::Button("OK##mount"))
+			{
+				auto entry = osd_stat(m_path);
+				auto file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
+				if(file_type == osd::directory::entry::entry_type::NONE)
+					create_image();
+				if(file_type == osd::directory::entry::entry_type::FILE)
+					m_create_confirm_wait = true;
+				// cannot overwrite a directory, so nothing will be none in that case.
+			}
+		}
 		ImGui::EndPopup();
 	}
 }
@@ -1204,7 +1345,13 @@ void debug_imgui::draw_console()
 			ImGui::OpenPopup("Mount Image");
 			m_mount_open = false;
 		}
+		if(m_create_open)
+		{
+			ImGui::OpenPopup("Create Image");
+			m_create_open = false;
+		}
 		draw_mount_dialog("Mount Image");  // draw mount image dialog if open
+		draw_create_dialog("Create Image");  // draw create image dialog if open
 		ImGui::PopItemWidth();
 		ImGui::EndChild();
 		ImGui::End();
