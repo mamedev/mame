@@ -36,7 +36,7 @@ template class ioport_finder<true>;
 //  BASE FINDER CLASS
 //**************************************************************************
 
-constexpr char finder_base::DUMMY_TAG[];
+const char finder_base::DUMMY_TAG[] = "finder_dummy_tag";
 
 
 //-------------------------------------------------
