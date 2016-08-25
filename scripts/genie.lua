@@ -958,23 +958,15 @@ end
 			buildoptions {
 				"-Wno-cast-align",
 				"-Wno-tautological-compare",
-				"-Wno-dynamic-class-memaccess",
 				"-Wno-unused-value",
-				"-Wno-inline-new-delete",
 				"-Wno-constant-logical-operand",
-				"-Wno-deprecated-register",
+				"-Wno-missing-braces", -- clang is not as permissive as GCC about std::array initialization
 				"-fdiagnostics-show-note-include-stack",
 			}
 			if (version >= 30500) then
 				buildoptions {
-					"-Wno-absolute-value",
 					"-Wno-unknown-warning-option",
 					"-Wno-extern-c-compat",
-				}
-			end
-			if (version >= 70000) then
-				buildoptions {
-					"-Wno-tautological-undefined-compare",
 				}
 			end
 		else

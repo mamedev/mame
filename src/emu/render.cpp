@@ -1756,8 +1756,8 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	cliprect.y1 = xform.yoffs + xform.yscale;
 	sect_render_bounds(&cliprect, &m_bounds);
 
-	float root_xoffs = root_xform.xoffs + abs(root_xform.xscale - xform.xscale) * 0.5f;
-	float root_yoffs = root_xform.yoffs + abs(root_xform.yscale - xform.yscale) * 0.5f;
+	float root_xoffs = root_xform.xoffs + fabsf(root_xform.xscale - xform.xscale) * 0.5f;
+	float root_yoffs = root_xform.yoffs + fabsf(root_xform.yscale - xform.yscale) * 0.5f;
 
 	render_bounds root_cliprect;
 	root_cliprect.x0 = root_xoffs;
