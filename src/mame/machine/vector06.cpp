@@ -195,6 +195,21 @@ WRITE8_MEMBER(vector06_state::vector06_status_callback)
 		update_mem();
 }
 
+WRITE_LINE_MEMBER(vector06_state::speaker_w)
+{
+	m_speaker->level_w(state);
+}
+
+WRITE8_MEMBER(vector06_state::pit8253_w)
+{
+	m_pit8253->write(space, offset ^ 3, data);
+}
+
+READ8_MEMBER(vector06_state::pit8253_r)
+{
+	return m_pit8253->read(space,  offset ^ 3);
+}
+
 void vector06_state::machine_start()
 {
 	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(vector06_state::reset_check_callback),this));
