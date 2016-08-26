@@ -103,7 +103,7 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 	m_bg_yoffs(0),
 	m_bg_flip_yoffs(0),
 	m_has_fg0(1),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -141,8 +141,8 @@ void tc0080vco_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -156,7 +156,7 @@ void tc0080vco_device::device_start()
 	m_tilemap[0]->set_scroll_rows(512);
 
 	/* Perform extra initialisations for text layer */
-	m_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tilemap[2]->set_scrolldx(0, 0);
 	m_tilemap[2]->set_scrolldy(48, -448);

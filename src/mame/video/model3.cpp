@@ -210,7 +210,7 @@ void model3_state::video_start()
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char4_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	// 8-bit tiles
-	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, char8_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(*m_palette, char8_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	init_matrix_stack();
 }

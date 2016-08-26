@@ -124,7 +124,7 @@ const device_type ATARI_MOTION_OBJECTS = &device_creator<atari_motion_objects_de
 //-------------------------------------------------
 
 atari_motion_objects_device::atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, "Atari Motion Objects", tag, owner, "atarimo", __FILE__),
+	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, "Atari Motion Objects", tag, owner, "atarimo", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_tilewidth(0)
 	, m_tileheight(0)

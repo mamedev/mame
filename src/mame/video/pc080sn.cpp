@@ -58,7 +58,7 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 	m_y_offset(0),
 	m_y_invert(0),
 	m_dblwidth(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	for (auto & elem : m_ctrl)
 		elem = 0;
@@ -94,13 +94,13 @@ void pc080sn_device::device_start()
 	/* use the given gfx set for bg tiles */
 	if (!m_dblwidth) /* standard tilemaps */
 	{
-		m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pc080sn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-		m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pc080sn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pc080sn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pc080sn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	}
 	else    /* double width tilemaps */
 	{
-		m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pc080sn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-		m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pc080sn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pc080sn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pc080sn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	}
 
 	m_tilemap[0]->set_transparent_pen(0);

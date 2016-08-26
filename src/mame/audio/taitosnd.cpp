@@ -41,13 +41,13 @@ const device_type TC0140SYT = &device_creator<tc0140syt_device>;
 //-------------------------------------------------
 
 tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0140SYT, "Taito TC0140SYT", tag, owner, clock, "tc0140syt", __FILE__),
-		m_mainmode(0),
-		m_submode(0),
-		m_status(0),
-		m_nmi_enabled(0),
-		m_mastercpu(*this),
-		m_slavecpu(*this)
+	: device_t(mconfig, TC0140SYT, "Taito TC0140SYT", tag, owner, clock, "tc0140syt", __FILE__)
+	, m_mainmode(0)
+	, m_submode(0)
+	, m_status(0)
+	, m_nmi_enabled(0)
+	, m_mastercpu(*this, finder_base::DUMMY_TAG)
+	, m_slavecpu(*this, finder_base::DUMMY_TAG)
 {
 	memset(m_slavedata, 0, sizeof(UINT8)*4);
 	memset(m_masterdata, 0, sizeof(UINT8)*4);

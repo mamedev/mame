@@ -462,7 +462,7 @@ void limenko_state::draw_sprites(UINT32 *sprites, const rectangle &cliprect, int
 			continue;
 
 		/* prepare GfxElement on the fly */
-		gfx_element gfx(m_palette, gfxdata, width, height, width, m_palette->entries(), 0, 256);
+		gfx_element gfx(*m_palette, gfxdata, width, height, width, m_palette->entries(), 0, 256);
 
 		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
 
