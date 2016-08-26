@@ -675,7 +675,7 @@ void fd1094_device::device_reset()
 	// flush the cache and switch to the reset state
 	m_cache.reset();
 	change_state(STATE_RESET);
-	fprintf(stderr, "reset done\n");
+
 	// reset the parent
 	m68000_device::device_reset();
 }
