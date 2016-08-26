@@ -44,7 +44,7 @@ ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, RAMDAC, "RAMDAC", tag, owner, clock, "ramdac", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(ramdac_palram)),
-		m_palette(*this),
+		m_palette(*this, finder_base::DUMMY_TAG),
 		m_split_read_reg(0)
 {
 }

@@ -1524,14 +1524,7 @@ WRITE_LINE_MEMBER( tmsprom_device::enable_w )
 const device_type TMS5110 = &device_creator<tms5110_device>;
 
 tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__)
-	, device_sound_interface(mconfig, *this)
-	, m_table(*this, DEVICE_SELF)
-	, m_m0_cb(*this)
-	, m_m1_cb(*this)
-	, m_addr_cb(*this)
-	, m_data_cb(*this)
-	, m_romclk_cb(*this)
+	: tms5110_device(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__)
 {
 }
 
@@ -1610,7 +1603,7 @@ const device_type TMSPROM = &device_creator<tmsprom_device>;
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock, "tmsprom", __FILE__),
 		m_rom(*this, DEVICE_SELF),
-		m_prom(*this, 0x20),
+		m_prom(*this, finder_base::DUMMY_TAG, 0x20),
 		m_rom_size(0),
 		m_pdc_bit(0),
 		m_ctl1_bit(0),
