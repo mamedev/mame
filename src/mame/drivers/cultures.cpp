@@ -100,9 +100,9 @@ TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 
 void cultures_state::video_start()
 {
-	m_bg0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
-	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
-	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
 
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg0_tilemap->set_transparent_pen(0);

@@ -36,15 +36,15 @@ private:
 	template <unsigned... V> struct range<0U, V...> { typedef indices<V...> type; };
 	template <unsigned C> using index_range = typename range<C>::type;
 
-	template <typename F, unsigned... V>
-	object_array_finder(device_t &base, F const &fmt, unsigned start, indices<V...>)
+	template <typename F, typename... Param, unsigned... V>
+	object_array_finder(device_t &base, F const &fmt, unsigned start, indices<V...>, Param const &... arg)
 		: m_tag{ util::string_format(fmt, start + V)... }
-		, m_array{ { base, m_tag[V].c_str() }... }
+		, m_array{ { base, m_tag[V].c_str(), arg... }... }
 	{
 	}
 
-	template <unsigned... V>
-	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, indices<V...>)
+	template <typename... Param, unsigned... V>
+	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, indices<V...>, Param const &... arg)
 		: m_array{ { base, tags[V] }... }
 	{
 	}
@@ -75,10 +75,16 @@ public:
 	/// \param [in] base Base device to search from.
 	/// \param [in] fmt Search tag format, should expect single unsigned
 	///   int argument.
-	/// \param [in] start Number to add to element index when calculating
-	///   values for string format arguments.
+	/// \param [in] start Number to add to element index when
+	///   calculating values for string format argument.
+	/// \arg [in] Optional additional constructor argument(s) passed to
+	///   all elements.
 	/// \sa util::string_format
-	template <typename F> object_array_finder(device_t &base, F const &fmt, unsigned start) : object_array_finder(base, fmt, start, index_range<Count>()) { }
+	template <typename F, typename... Param>
+	object_array_finder(device_t &base, F const &fmt, unsigned start, Param const &... arg)
+		: object_array_finder(base, fmt, start, index_range<Count>(), arg...)
+	{
+	}
 
 	/// \brief Construct with free-form list of tags
 	///
@@ -86,14 +92,22 @@ public:
 	/// particular pattern to the object tags.
 	/// \param [in] base Base device to search from.
 	/// \param [in] tags Tags to search for, e.g. { "player", "dips" }.
-	object_array_finder(device_t &base, std::array<char const *, Count> const &tags) : object_array_finder(base, tags, index_range<Count>()) { }
+	///   The tags are not copied, it is the caller's responsibility to
+	///   ensure the pointers remain valid until resolution time.
+	/// \arg [in] Optional additional constructor argument(s) passed to
+	///   all elements.
+	template <typename... Param>
+	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, Param const &... arg)
+		: object_array_finder(base, tags, index_range<Count>(), arg...)
+	{
+	}
 
 	/// \brief Element accessor (const)
 	///
 	/// Returns a const reference to the element at the supplied index.
 	/// \param [in] index Index of desired element (zero-based).
 	/// \return Reference to element at specified index.
-	const T &operator[](unsigned index) const { assert(index < Count); return m_array[index]; }
+	T const &operator[](unsigned index) const { assert(index < Count); return m_array[index]; }
 
 	/// \brief Element accessor (non-const)
 	///
@@ -151,7 +165,7 @@ public:
 	/// \param [in] tag Updated search tag.  This is not copied, it is
 	///   the caller's responsibility to ensure this pointer remains
 	///   valid until resolution time.
-	void set_tag(const char *tag) { m_tag = tag; }
+	void set_tag(char const *tag) { m_tag = tag; }
 
 	/// \brief Dummy tag always treated as not found
 	constexpr static char DUMMY_TAG[17] = "finder_dummy_tag";
@@ -165,7 +179,7 @@ protected:
 	/// \param [in] tag Object tag to search for.  This is not copied,
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
-	finder_base(device_t &base, const char *tag);
+	finder_base(device_t &base, char const *tag);
 
 	/// \brief Find a memory region
 	///
@@ -234,7 +248,7 @@ protected:
 	/// \param [in] required True if the object is required (validation
 	///   error if not found), or false if optional.
 	/// \return True if found or not required, false otherwise.
-	bool report_missing(bool found, const char *objname, bool required) const;
+	bool report_missing(bool found, char const *objname, bool required) const;
 
 	/// \brief Print a message at warning level
 	///
@@ -242,7 +256,7 @@ protected:
 	/// detailed.  Uses printf semantics of the C runtime library.
 	/// \param [in] format Format string as used by printf function in
 	///   runtime library
-	void printf_warning(const char *format, ...) ATTR_PRINTF(2,3);
+	void printf_warning(char const *format, ...) ATTR_PRINTF(2,3);
 
 
 	/// \brief Pointer to next registered discovery helper
@@ -251,8 +265,12 @@ protected:
 	/// container that requires elements of the same type.  Hence it
 	/// implements basic single-linked list behaviour.
 	finder_base *const m_next;
+
+	/// \brief Base device to search from
 	device_t &m_base;
-	const char *m_tag;
+
+	/// \brief Object tag to search for
+	char const *m_tag;
 };
 
 
@@ -432,11 +450,6 @@ template <unsigned Count, bool Required> using memory_region_array_finder = obje
 template <unsigned Count> using optional_memory_region_array = memory_region_array_finder<Count, false>;
 template <unsigned Count> using required_memory_region_array = memory_region_array_finder<Count, true>;
 
-extern template class object_finder_base<memory_region, false>;
-extern template class object_finder_base<memory_region, true>;
-extern template class memory_region_finder<false>;
-extern template class memory_region_finder<true>;
-
 
 /// \brief Memory bank finder template
 ///
@@ -516,16 +529,26 @@ public:
 	}
 };
 
+/// \brief Optional I/O port finder
+///
+/// Finds I/O port with maching tag.  No error is generated if a
+/// matching I/O port is not found (the target object pointer will be
+/// null).  If you have a number of similar optional I/O ports, consider
+/// using optional_ioport_array.
+/// \sa required_ioport optional_ioport_array ioport_finder
 using optional_ioport = ioport_finder<false>;
+
+/// \brief Required I/O port finder
+///
+/// Finds I/O port with maching tag.  A validation error is generated if
+/// a matching I/O port is not found.  If you have a number of similar
+/// required I/O ports, consider using required_ioport_array.
+/// \sa optional_ioport required_ioport_array ioport_finder
 using required_ioport = ioport_finder<true>;
+
 template <unsigned Count, bool Required> using ioport_array_finder = object_array_finder<ioport_finder<Required>, Count>;
 template <unsigned Count> using optional_ioport_array = ioport_array_finder<Count, false>;
 template <unsigned Count> using required_ioport_array = ioport_array_finder<Count, true>;
-
-extern template class object_finder_base<ioport_port, false>;
-extern template class object_finder_base<ioport_port, true>;
-extern template class ioport_finder<false>;
-extern template class ioport_finder<true>;
 
 
 // ======================> region_ptr_finder
@@ -632,6 +655,82 @@ template <typename PointerType> using required_shared_ptr = shared_ptr_finder<Po
 template <typename PointerType, unsigned Count, bool Required> using shared_ptr_array_finder = object_array_finder<shared_ptr_finder<PointerType, Required>, Count>;
 template <typename PointerType, unsigned Count> using optional_shared_ptr_array = shared_ptr_array_finder<PointerType, Count, false>;
 template <typename PointerType, unsigned Count> using required_shared_ptr_array = shared_ptr_array_finder<PointerType, Count, true>;
+
+
+
+//**************************************************************************
+//  EXTERNAL TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+extern template class object_finder_base<memory_region, false>;
+extern template class object_finder_base<memory_region, true>;
+extern template class object_finder_base<memory_bank, false>;
+extern template class object_finder_base<memory_bank, true>;
+extern template class object_finder_base<ioport_port, false>;
+extern template class object_finder_base<ioport_port, true>;
+
+extern template class object_finder_base<UINT8, false>;
+extern template class object_finder_base<UINT8, true>;
+extern template class object_finder_base<UINT16, false>;
+extern template class object_finder_base<UINT16, true>;
+extern template class object_finder_base<UINT32, false>;
+extern template class object_finder_base<UINT32, true>;
+extern template class object_finder_base<UINT64, false>;
+extern template class object_finder_base<UINT64, true>;
+
+extern template class object_finder_base<INT8, false>;
+extern template class object_finder_base<INT8, true>;
+extern template class object_finder_base<INT16, false>;
+extern template class object_finder_base<INT16, true>;
+extern template class object_finder_base<INT32, false>;
+extern template class object_finder_base<INT32, true>;
+extern template class object_finder_base<INT64, false>;
+extern template class object_finder_base<INT64, true>;
+
+extern template class memory_region_finder<false>;
+extern template class memory_region_finder<true>;
+
+extern template class memory_bank_finder<false>;
+extern template class memory_bank_finder<true>;
+
+extern template class ioport_finder<false>;
+extern template class ioport_finder<true>;
+
+extern template class region_ptr_finder<UINT8, false>;
+extern template class region_ptr_finder<UINT8, true>;
+extern template class region_ptr_finder<UINT16, false>;
+extern template class region_ptr_finder<UINT16, true>;
+extern template class region_ptr_finder<UINT32, false>;
+extern template class region_ptr_finder<UINT32, true>;
+extern template class region_ptr_finder<UINT64, false>;
+extern template class region_ptr_finder<UINT64, true>;
+
+extern template class region_ptr_finder<INT8, false>;
+extern template class region_ptr_finder<INT8, true>;
+extern template class region_ptr_finder<INT16, false>;
+extern template class region_ptr_finder<INT16, true>;
+extern template class region_ptr_finder<INT32, false>;
+extern template class region_ptr_finder<INT32, true>;
+extern template class region_ptr_finder<INT64, false>;
+extern template class region_ptr_finder<INT64, true>;
+
+extern template class shared_ptr_finder<UINT8, false>;
+extern template class shared_ptr_finder<UINT8, true>;
+extern template class shared_ptr_finder<UINT16, false>;
+extern template class shared_ptr_finder<UINT16, true>;
+extern template class shared_ptr_finder<UINT32, false>;
+extern template class shared_ptr_finder<UINT32, true>;
+extern template class shared_ptr_finder<UINT64, false>;
+extern template class shared_ptr_finder<UINT64, true>;
+
+extern template class shared_ptr_finder<INT8, false>;
+extern template class shared_ptr_finder<INT8, true>;
+extern template class shared_ptr_finder<INT16, false>;
+extern template class shared_ptr_finder<INT16, true>;
+extern template class shared_ptr_finder<INT32, false>;
+extern template class shared_ptr_finder<INT32, true>;
+extern template class shared_ptr_finder<INT64, false>;
+extern template class shared_ptr_finder<INT64, true>;
 
 #endif // MAME_EMU_DEVFIND_H
 /** \} */

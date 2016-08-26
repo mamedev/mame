@@ -132,7 +132,7 @@ UINT32 psikyo4_state::screen_update_psikyo4_left(screen_device &screen, bitmap_i
 UINT32 psikyo4_state::screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x800, cliprect);
-	m_gfxdecode->gfx(0)->set_palette(m_palette2);
+	m_gfxdecode->gfx(0)->set_palette(*m_palette2);
 	draw_sprites(bitmap, cliprect, 0x2000);
 	return 0;
 }
