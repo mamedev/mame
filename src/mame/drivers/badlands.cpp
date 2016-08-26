@@ -196,7 +196,7 @@ void badlands_state::scanline_update(screen_device &screen, int scanline)
 		if (scanline & 32)
 			m_soundcomm->sound_irq_ack_r(space, 0);
 		else if (!(ioport("FE4000")->read() & 0x40))
-			m_soundcomm->sound_irq_gen(m_audiocpu);
+			m_soundcomm->sound_irq_gen(*m_audiocpu);
 	}
 	else
 		return;

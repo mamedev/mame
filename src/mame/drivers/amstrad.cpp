@@ -266,11 +266,11 @@ INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
 {
 	if ( (m_io_green_display->read()) & 0x01 )
 	{
-		PALETTE_INIT_NAME( amstrad_cpc_green )(m_palette);
+		PALETTE_INIT_NAME( amstrad_cpc_green )(*m_palette);
 	}
 	else
 	{
-		PALETTE_INIT_NAME( amstrad_cpc )(m_palette);
+		PALETTE_INIT_NAME( amstrad_cpc )(*m_palette);
 	}
 }
 

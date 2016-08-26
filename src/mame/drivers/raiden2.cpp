@@ -525,10 +525,10 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 	save_pointer(NAME(mid_data.get()), 0x800/2);
 	save_pointer(NAME(text_data.get()), 0x1000/2);
 
-	text_layer       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
-	background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	midground_layer  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
+	background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	midground_layer  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 }
 
 /* screen_update_raiden2 (move to video file) */

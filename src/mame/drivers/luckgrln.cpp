@@ -277,10 +277,10 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel4_tile_info)
 
 void luckgrln_state::video_start()
 {
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel4_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel4_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel4_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);

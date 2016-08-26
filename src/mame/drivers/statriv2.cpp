@@ -173,12 +173,12 @@ PALETTE_INIT_MEMBER(statriv2_state, statriv2)
 
 void statriv2_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info),this) ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info),this) ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
 }
 
 VIDEO_START_MEMBER(statriv2_state,vertical)
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 }
 
 

@@ -267,9 +267,9 @@ void tc0091lvc_device::device_start()
 	m_tvram = m_pcg_ram + 0xa000;
 	m_sprram = m_pcg_ram + 0xb000;
 
-	tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	tx_tilemap->set_transparent_pen(0);
 	bg0_tilemap->set_transparent_pen(0);

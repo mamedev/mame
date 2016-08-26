@@ -43,8 +43,8 @@ TILE_GET_INFO_MEMBER(gotcha_state::bg_get_tile_info)
 
 void gotcha_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gotcha_state::fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gotcha_state::bg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gotcha_state::fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gotcha_state::bg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 

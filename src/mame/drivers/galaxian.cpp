@@ -6633,7 +6633,7 @@ void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 	dstregion = memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	PALETTE_INIT_NAME(galaxian)(m_palette);
+	PALETTE_INIT_NAME(galaxian)(*m_palette);
 }
 
 DRIVER_INIT_MEMBER(galaxian_state,tenspot)

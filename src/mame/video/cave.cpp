@@ -385,7 +385,7 @@ void cave_state::cave_vh_start( int num )
 	switch (num)
 	{
 		case 4:
-			m_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
+			m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			m_tilemap[3]->set_transparent_pen(0);
 			m_tilemap[3]->set_scroll_rows(1);
 			m_tilemap[3]->set_scroll_cols(1);
@@ -393,7 +393,7 @@ void cave_state::cave_vh_start( int num )
 			save_item(NAME(m_old_tiledim[3]));
 
 		case 3:
-			m_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
+			m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			m_tilemap[2]->set_transparent_pen(0);
 			m_tilemap[2]->set_scroll_rows(1);
 			m_tilemap[2]->set_scroll_cols(1);
@@ -401,7 +401,7 @@ void cave_state::cave_vh_start( int num )
 			save_item(NAME(m_old_tiledim[2]));
 
 		case 2:
-			m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
+			m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			m_tilemap[1]->set_transparent_pen(0);
 			m_tilemap[1]->set_scroll_rows(1);
 			m_tilemap[1]->set_scroll_cols(1);
@@ -409,7 +409,7 @@ void cave_state::cave_vh_start( int num )
 			save_item(NAME(m_old_tiledim[1]));
 
 		case 1:
-			m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
+			m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			m_tilemap[0]->set_transparent_pen(0);
 			m_tilemap[0]->set_scroll_rows(1);
 			m_tilemap[0]->set_scroll_cols(1);
@@ -458,7 +458,7 @@ VIDEO_START_MEMBER(cave_state,sailormn_3_layers)
 	cave_vh_start(2);
 
 	/* Layer 2 (8x8) needs to be handled differently */
-	m_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::sailormn_get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8 );
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::sailormn_get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8 );
 
 	m_tilemap[2]->set_transparent_pen(0);
 	m_tilemap[2]->set_scroll_rows(1);

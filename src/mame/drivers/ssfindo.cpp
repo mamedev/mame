@@ -334,7 +334,7 @@ TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer0_callback)
 	m_PS7500_IO[IRQSTA]|=0x20;
 	if(m_PS7500_IO[IRQMSKA]&0x20)
 	{
-		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE, 1);
+		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE, 1);
 	}
 }
 
@@ -353,7 +353,7 @@ TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer1_callback)
 	m_PS7500_IO[IRQSTA]|=0x40;
 	if(m_PS7500_IO[IRQMSKA]&0x40)
 	{
-		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE, 1);
+		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE, 1);
 	}
 }
 

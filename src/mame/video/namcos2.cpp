@@ -403,7 +403,7 @@ void namcos2_state::draw_sprite_init()
 void namcos2_state::video_start()
 {
 	namco_tilemap_init(2, memregion("gfx4")->base(), TilemapCB);
-	m_tilemap_roz = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
+	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 	draw_sprite_init();
 }

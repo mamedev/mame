@@ -62,14 +62,14 @@ void namcos2_shared_state::namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	mTilemapInfo.videoram = std::make_unique<UINT16[]>( 0x10000 );
 
 		/* four scrolling tilemaps */
-		mTilemapInfo.tmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		mTilemapInfo.tmap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		mTilemapInfo.tmap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		mTilemapInfo.tmap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		mTilemapInfo.tmap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		mTilemapInfo.tmap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		mTilemapInfo.tmap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		mTilemapInfo.tmap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 		/* two non-scrolling tilemaps */
-		mTilemapInfo.tmap[4] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
-		mTilemapInfo.tmap[5] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+		mTilemapInfo.tmap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+		mTilemapInfo.tmap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 
 		/* define offsets for scrolling */
 		for( i=0; i<4; i++ )

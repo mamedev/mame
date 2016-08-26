@@ -501,9 +501,9 @@ void limenko_state::copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bit
 
 void limenko_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
-	m_md_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_md_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_md_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 
 	m_md_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);

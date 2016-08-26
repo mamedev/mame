@@ -42,8 +42,10 @@ TILE_GET_INFO_MEMBER(microtan_state::get_bg_tile_info)
 
 void microtan_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(microtan_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		8, 16, 32, 16);
+	m_bg_tilemap = &machine().tilemap().create(*
+			m_gfxdecode,
+			tilemap_get_info_delegate(FUNC(microtan_state::get_bg_tile_info),this),
+			TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
 
 	m_chunky_buffer = std::make_unique<UINT8[]>(0x200);
 	memset(m_chunky_buffer.get(), 0, 0x200);

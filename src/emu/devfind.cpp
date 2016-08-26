@@ -12,23 +12,78 @@
 
 
 //**************************************************************************
-//  TEMPLATE INSTANTIATIONS
+//  EXPLICIT TEMPLATE INSTANTIATIONS
 //**************************************************************************
 
 template class object_finder_base<memory_region, false>;
 template class object_finder_base<memory_region, true>;
+template class object_finder_base<memory_bank, false>;
+template class object_finder_base<memory_bank, true>;
+template class object_finder_base<ioport_port, false>;
+template class object_finder_base<ioport_port, true>;
+
+template class object_finder_base<UINT8, false>;
+template class object_finder_base<UINT8, true>;
+template class object_finder_base<UINT16, false>;
+template class object_finder_base<UINT16, true>;
+template class object_finder_base<UINT32, false>;
+template class object_finder_base<UINT32, true>;
+template class object_finder_base<UINT64, false>;
+template class object_finder_base<UINT64, true>;
+
+template class object_finder_base<INT8, false>;
+template class object_finder_base<INT8, true>;
+template class object_finder_base<INT16, false>;
+template class object_finder_base<INT16, true>;
+template class object_finder_base<INT32, false>;
+template class object_finder_base<INT32, true>;
+template class object_finder_base<INT64, false>;
+template class object_finder_base<INT64, true>;
+
 template class memory_region_finder<false>;
 template class memory_region_finder<true>;
 
-template class object_finder_base<memory_bank, false>;
-template class object_finder_base<memory_bank, true>;
 template class memory_bank_finder<false>;
 template class memory_bank_finder<true>;
 
-template class object_finder_base<ioport_port, false>;
-template class object_finder_base<ioport_port, true>;
 template class ioport_finder<false>;
 template class ioport_finder<true>;
+
+template class region_ptr_finder<UINT8, false>;
+template class region_ptr_finder<UINT8, true>;
+template class region_ptr_finder<UINT16, false>;
+template class region_ptr_finder<UINT16, true>;
+template class region_ptr_finder<UINT32, false>;
+template class region_ptr_finder<UINT32, true>;
+template class region_ptr_finder<UINT64, false>;
+template class region_ptr_finder<UINT64, true>;
+
+template class region_ptr_finder<INT8, false>;
+template class region_ptr_finder<INT8, true>;
+template class region_ptr_finder<INT16, false>;
+template class region_ptr_finder<INT16, true>;
+template class region_ptr_finder<INT32, false>;
+template class region_ptr_finder<INT32, true>;
+template class region_ptr_finder<INT64, false>;
+template class region_ptr_finder<INT64, true>;
+
+template class shared_ptr_finder<UINT8, false>;
+template class shared_ptr_finder<UINT8, true>;
+template class shared_ptr_finder<UINT16, false>;
+template class shared_ptr_finder<UINT16, true>;
+template class shared_ptr_finder<UINT32, false>;
+template class shared_ptr_finder<UINT32, true>;
+template class shared_ptr_finder<UINT64, false>;
+template class shared_ptr_finder<UINT64, true>;
+
+template class shared_ptr_finder<INT8, false>;
+template class shared_ptr_finder<INT8, true>;
+template class shared_ptr_finder<INT16, false>;
+template class shared_ptr_finder<INT16, true>;
+template class shared_ptr_finder<INT32, false>;
+template class shared_ptr_finder<INT32, true>;
+template class shared_ptr_finder<INT64, false>;
+template class shared_ptr_finder<INT64, true>;
 
 
 
