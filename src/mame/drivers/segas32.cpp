@@ -544,7 +544,7 @@ segas32_state::segas32_state(const machine_config &mconfig, const char *tag, dev
 		m_system32_workram(*this,"workram"),
 		m_system32_videoram(*this,"videoram", 0),
 		m_system32_spriteram(*this,"spriteram", 0),
-		m_system32_paletteram(*this,"paletteram", 0) ,
+		m_system32_paletteram(*this,"paletteram.%u", 0) ,
 		m_ports_a(*this, {"P1_A", "P2_A", "PORTC_A", "PORTD_A", "SERVICE12_A", "SERVICE34_A", "PORTG_A", "PORTH_A"}),
 		m_ports_b(*this, {"P1_B", "P2_B", "PORTC_B", "PORTD_B", "SERVICE12_B", "SERVICE34_B", "PORTG_B", "PORTH_B"}),
 		m_analog_ports(*this, {"ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8"}),
