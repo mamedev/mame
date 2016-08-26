@@ -8,6 +8,8 @@
 
     Known bugs:
         * lghost sprites seem to be slightly out of sync
+        * lghost gun offset correction is not perfect yet - we should be able
+          to get an exact conversion from the disasm
         * vdp gfx on 2nd attract level of lghost are corrupt at top of stairs
           after attract mode loops
         * pauses in lghost where all sprites vanish
@@ -403,9 +405,13 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 
 			pos_value_x = ioport("GUNX1")->read();
 			pos_value_y = 255 - ioport("GUNY1")->read();
+			
+			// Offset adjustment is disabled?
+			if (!ioport("FAKE")->read())
+				m_lghost_value = pos_value_y;
 
 			// Depending of the position on the X axis, we need to calculate the Y offset accordingly
-			if (pos_value_x >= 50 && pos_value_x <= 99)
+			else if (pos_value_x >= 50 && pos_value_x <= 99)
 			{
 				// Linear function (decreasing)
 				if (pos_value_y >= 130 && pos_value_y <= 225)
@@ -449,11 +455,15 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 
 			pos_value_x = ioport("GUNX1")->read();
 
+			// Offset adjustment is disabled?
+			if (!ioport("FAKE")->read())
+				m_lghost_value = pos_value_x;
+
 			// Here, linear functions (increasing) are used
 			// The line is divided in two parts to get more precise results
 
 			// Linear function (increasing) #1
-			if (pos_value_x >= 26 && pos_value_x <= 85)
+			else if (pos_value_x >= 26 && pos_value_x <= 85)
 				m_lghost_value = round(pos_value_x * 1.13 + 0.95);
 
 			// Linear function (increasing) #2
@@ -485,8 +495,12 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 				pos_value_x = ioport("GUNX3")->read();
 				pos_value_y = 255 - ioport("GUNY3")->read();
 
+				// Offset adjustment is disabled?
+				if (!ioport("FAKE")->read())
+					m_lghost_value = pos_value_y;
+
 				// Depending of the position on the X axis, we need to calculate the Y offset accordingly
-				if (pos_value_x >= 128 && pos_value_x <= 255)
+				else if (pos_value_x >= 128 && pos_value_x <= 255)
 				{
 					// Linear function (increasing)
 					if (pos_value_y >= 30 && pos_value_y <= 125)
@@ -527,8 +541,12 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 			{
 				pos_value_x = ioport("GUNX3")->read();
 
+				// Offset adjustment is disabled?
+				if (!ioport("FAKE")->read())
+					m_lghost_value = pos_value_x;
+
 				// Right edge of screen, constant value
-				if (pos_value_x >= 17 && pos_value_x <= 34)
+				else if (pos_value_x >= 17 && pos_value_x <= 34)
 					m_lghost_value = pos_value_x - 17;
 
 				// Linear function (increasing)
@@ -1141,6 +1159,11 @@ static INPUT_PORTS_START( lghost )
 
 	PORT_START("GUNY3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(3)
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x01, "Correct P1/P3 Gun Offsets")
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
