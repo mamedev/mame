@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, MetalliC
 /***************************************************************************
 
         Vector06c driver by Miodrag Milanovic
@@ -72,7 +72,12 @@ READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
-		return 0xff;
+		return m_ay->ay8910_read_ym();
+}
+
+WRITE8_MEMBER(vector06_state::vector06_romdisk_portb_w)
+{
+	m_aylatch = data;
 }
 
 WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
@@ -82,6 +87,8 @@ WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
 
 WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
 {
+	if (data & 4)
+		m_ay->ay8910_write_ym((data >> 1) & 1, m_aylatch);
 	m_romdisk_msb = data;
 }
 
@@ -107,10 +114,7 @@ WRITE8_MEMBER( vector06_state::vector06_8255_2_w )
 
 INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
 {
-	m_vblank_state++;
-	if (m_vblank_state>1) m_vblank_state=0;
-	device.execute().set_input_line(0,m_vblank_state ? HOLD_LINE : CLEAR_LINE);
-
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)

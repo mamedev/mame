@@ -14,6 +14,7 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
+#include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -39,6 +40,7 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_ppi2(*this, "ppi8255_2"),
 		m_pit8253(*this, "pit8253"),
+		m_ay(*this, "aysnd"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette"),
 		m_bank1(*this, "bank1"),
@@ -57,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vector06_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(vector06_color_set);
 	DECLARE_READ8_MEMBER(vector06_romdisk_portb_r);
+	DECLARE_WRITE8_MEMBER(vector06_romdisk_portb_w);
 	DECLARE_WRITE8_MEMBER(vector06_romdisk_porta_w);
 	DECLARE_WRITE8_MEMBER(vector06_romdisk_portc_w);
 	DECLARE_READ8_MEMBER(vector06_8255_1_r);
@@ -90,6 +93,7 @@ private:
 	required_device<i8255_device> m_ppi;
 	required_device<i8255_device> m_ppi2;
 	required_device<pit8253_device> m_pit8253;
+	required_device<ay8910_device> m_ay;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 	required_memory_bank m_bank1;
@@ -106,6 +110,7 @@ private:
 	UINT8 m_romdisk_lsb;
 	UINT8 m_vblank_state;
 	UINT8 m_rambank;
+	UINT8 m_aylatch;
 	bool m_stack_state;
 	bool m_romen;
 

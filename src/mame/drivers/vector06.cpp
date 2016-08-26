@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, MetalliC
 /***************************************************************************
 
         Vector06c driver by Miodrag Milanovic
 
         10/07/2008 Preliminary driver.
+
+note: press F12 after initial boot was load (indicated in screen lower part)
 
 ****************************************************************************/
 
@@ -27,6 +29,7 @@ static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
 	AM_RANGE( 0x08, 0x0B) AM_READWRITE(pit8253_r, pit8253_w)
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE(vector06_color_set)
 	AM_RANGE( 0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
+	AM_RANGE( 0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)
 	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", fd1793_t, data_r, data_w)
 	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", fd1793_t, sector_r, sector_w)
 	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", fd1793_t, track_r, track_w)
@@ -170,6 +173,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_romdisk_porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_romdisk_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(vector06_state, vector06_romdisk_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(vector06_state, vector06_romdisk_portc_w))
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -201,6 +205,10 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(vector06_state, speaker_w))
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(vector06_state, speaker_w))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(vector06_state, speaker_w))
+
+	// optional
+	MCFG_SOUND_ADD("aysnd", AY8910, 1773400)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -242,7 +250,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME      FLAGS */
-COMP( 1987, vector06,    0,        0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 06c",  MACHINE_NOT_WORKING)
+COMP( 1987, vector06,    0,        0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 06c",  0)
 COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
 COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
 COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)
