@@ -981,17 +981,17 @@ void namcos2_shared_state::c169_roz_init(int gfxbank, const char *maskregion)
 	m_c169_roz_gfxbank = gfxbank;
 	m_c169_roz_mask = memregion(maskregion)->base();
 
-	m_c169_roz_tilemap[0] = &machine().tilemap().create(m_gfxdecode,
-		tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info0), this),
-		tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
-		16,16,
-		256,256);
+	m_c169_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
+			tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info0), this),
+			tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
+			16,16,
+			256,256);
 
-	m_c169_roz_tilemap[1] = &machine().tilemap().create(m_gfxdecode,
-		tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info1), this),
-		tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
-		16,16,
-		256,256);
+	m_c169_roz_tilemap[1] = &machine().tilemap().create(*m_gfxdecode,
+			tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info1), this),
+			tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
+			16,16,
+			256,256);
 
 	save_item(NAME(m_c169_roz_bank));
 	save_item(NAME(m_c169_roz_control));

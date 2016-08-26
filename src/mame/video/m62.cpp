@@ -401,7 +401,7 @@ void m62_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 
 void m62_state::m62_start( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tile_get_info, TILEMAP_SCAN_ROWS,  x1, y1, x2, y2);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tile_get_info, TILEMAP_SCAN_ROWS,  x1, y1, x2, y2);
 
 	register_savestate();
 
@@ -414,7 +414,7 @@ void m62_state::m62_start( tilemap_get_info_delegate tile_get_info, int rows, in
 
 void m62_state::m62_textlayer( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tile_get_info, TILEMAP_SCAN_ROWS,  x1, y1, x2, y2);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tile_get_info, TILEMAP_SCAN_ROWS,  x1, y1, x2, y2);
 
 	if (rows != 0)
 		m_fg_tilemap->set_scroll_rows(rows);
@@ -728,7 +728,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_fg_tile_info)
 
 VIDEO_START_MEMBER(m62_state,kidniki)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */
 

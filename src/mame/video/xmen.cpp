@@ -211,9 +211,9 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 		m_screen->priority().fill(0, cliprect);
 		/* note the '+1' in the background color!!! */
 		renderbitmap->fill(16 * bg_colorbase + 1, cliprect);
-		m_k052109->tilemap_draw(m_screen, *renderbitmap, cliprect, layer[0], 0, 1);
-		m_k052109->tilemap_draw(m_screen, *renderbitmap, cliprect, layer[1], 0, 2);
-		m_k052109->tilemap_draw(m_screen, *renderbitmap, cliprect, layer[2], 0, 4);
+		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[0], 0, 1);
+		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[1], 0, 2);
+		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[2], 0, 4);
 
 	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
 	    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */

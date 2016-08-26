@@ -419,7 +419,7 @@ WRITE_LINE_MEMBER(missb2_state::irqhandler)
 
 MACHINE_START_MEMBER(missb2_state,missb2)
 {
-	m_gfxdecode->gfx(1)->set_palette(m_bgpalette);
+	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
 
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));

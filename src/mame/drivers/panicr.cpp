@@ -353,7 +353,7 @@ READ8_MEMBER(panicr_state::collision_r)
 	// there is a 3rd additional bit that is used as priority, we're not concerned about that here
 
 	m_infotilemap_2->set_scrollx(0, m_scrollx & 0xffff);
-	m_infotilemap_2->draw(m_screen, *m_tempbitmap_1, m_tempbitmap_clip, 0,0);
+	m_infotilemap_2->draw(*m_screen, *m_tempbitmap_1, m_tempbitmap_clip, 0,0);
 
 
 	int actual_column = offset&0x3f;

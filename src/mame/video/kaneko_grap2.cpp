@@ -17,8 +17,8 @@
 const device_type KANEKO_GRAP2 = &device_creator<kaneko_grap2_device>;
 
 kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_GRAP2, "Kaneko GRAP2", tag, owner, clock, "kaneko_grap2", __FILE__),
-	m_palette(*this)
+	: device_t(mconfig, KANEKO_GRAP2, "Kaneko GRAP2", tag, owner, clock, "kaneko_grap2", __FILE__)
+	, m_palette(*this, finder_base::DUMMY_TAG)
 {
 	m_chipnum = 0;
 }

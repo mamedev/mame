@@ -625,13 +625,13 @@ void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT
 	if(m_reel1)
 	{
 		m_reel1->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel1", m_reel1);
+		awp_draw_reel(machine(),"reel1", *m_reel1);
 	}
 
 	if (m_reel2)
 	{
 		m_reel2->update((data>>4)&0x0f);
-		awp_draw_reel(machine(),"reel2", m_reel2);
+		awp_draw_reel(machine(),"reel2", *m_reel2);
 	}
 }
 
@@ -642,7 +642,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 	if(m_reel3)
 	{
 		m_reel3->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel3", m_reel3);
+		awp_draw_reel(machine(),"reel3", *m_reel3);
 	}
 }
 
@@ -653,7 +653,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
 	if(m_reel4)
 	{
 		m_reel4->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel4", m_reel4);
+		awp_draw_reel(machine(),"reel4", *m_reel4);
 	}
 }
 
@@ -707,10 +707,10 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 
 
 	m_maincpu->set_port_callbacks(
-		m68307_porta_read_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_r),this),
-		m68307_porta_write_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_w),this),
-		m68307_portb_read_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_r),this),
-		m68307_portb_write_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_w),this) );
+			m68307_porta_read_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_r),this),
+			m68307_porta_write_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_w),this),
+			m68307_portb_read_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_r),this),
+			m68307_portb_write_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_w),this) );
 
 }
 
@@ -747,20 +747,20 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 	if(m_reel5)
 	{
 		m_reel5->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel5", m_reel5);
+		awp_draw_reel(machine(),"reel5", *m_reel5);
 	}
 
 	if (m_reel6)
 	{
 		m_reel6->update((data>>4)&0x0f);
-		awp_draw_reel(machine(),"reel6", m_reel6);
+		awp_draw_reel(machine(),"reel6", *m_reel6);
 	}
 }
 
 
 WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
 {
-	logerror("m68307_duart_tx %02x\n",state);
+	logerror("m68307_duart_tx %02x\n", state);
 }
 
 READ8_MEMBER(sc4_state::m68307_duart_input_r)

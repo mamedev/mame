@@ -205,13 +205,13 @@ const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
 const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
 
 sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_master_cpu(*this, "32x_master_sh2"),
-		m_slave_cpu(*this, "32x_slave_sh2"),
-		m_lch_pwm(*this, "lch_pwm"),
-		m_rch_pwm(*this, "rch_pwm"),
-		m_sh2_shared(*this, "sh2_shared"),
-		m_palette(*this)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_master_cpu(*this, "32x_master_sh2")
+	, m_slave_cpu(*this, "32x_slave_sh2")
+	, m_lch_pwm(*this, "lch_pwm")
+	, m_rch_pwm(*this, "rch_pwm")
+	, m_sh2_shared(*this, "sh2_shared")
+	, m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 

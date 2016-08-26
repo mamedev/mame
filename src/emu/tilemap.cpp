@@ -1584,7 +1584,7 @@ const device_type TILEMAP = &device_creator<tilemap_device>;
 
 tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TILEMAP, "Tilemap", tag, owner, clock, "tilemap", __FILE__),
-		m_gfxdecode(*this),
+		m_gfxdecode(*this, finder_base::DUMMY_TAG),
 		m_standard_mapper(TILEMAP_STANDARD_COUNT),
 		m_bytes_per_entry(0),
 		m_tile_width(8),
@@ -1773,9 +1773,9 @@ void tilemap_device::device_start()
 
 	// allocate the tilemap
 	if (m_standard_mapper == TILEMAP_STANDARD_COUNT)
-		machine().tilemap().create(m_gfxdecode, m_get_info, m_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
+		machine().tilemap().create(*m_gfxdecode, m_get_info, m_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
 	else
-		machine().tilemap().create(m_gfxdecode, m_get_info, m_standard_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
+		machine().tilemap().create(*m_gfxdecode, m_get_info, m_standard_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());

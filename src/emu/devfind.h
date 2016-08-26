@@ -45,7 +45,7 @@ private:
 
 	template <typename... Param, unsigned... V>
 	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, indices<V...>, Param const &... arg)
-		: m_array{ { base, tags[V] }... }
+		: m_array{ { base, tags[V], arg... }... }
 	{
 	}
 

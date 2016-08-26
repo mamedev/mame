@@ -319,7 +319,7 @@ VIDEO_START_MEMBER(metro_state,blzntrnd)
 
 	m_has_zoom = 1;
 
-	m_k053936_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
+	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
 
 	m_tilemap_scrolldx[0] = 8;
 	m_tilemap_scrolldx[1] = 8;
@@ -332,7 +332,7 @@ VIDEO_START_MEMBER(metro_state,gstrik2)
 
 	m_has_zoom = 1;
 
-	m_k053936_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
+	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
 
 	m_tilemap_scrolldx[0] = 8;
 	m_tilemap_scrolldx[1] = 0;
@@ -495,7 +495,7 @@ void metro_state::metro_draw_sprites( screen_device &screen, bitmap_ind16 &bitma
 				if ((gfxstart + width * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element gfx(m_palette, base_gfx8 + gfxstart, width, height, width, m_palette->entries(), 0, 256);
+				gfx_element gfx(*m_palette, base_gfx8 + gfxstart, width, height, width, m_palette->entries(), 0, 256);
 
 				gfx.prio_zoom_transpen(bitmap,cliprect,
 								0,
@@ -511,7 +511,7 @@ void metro_state::metro_draw_sprites( screen_device &screen, bitmap_ind16 &bitma
 				if ((gfxstart + width / 2 * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element gfx(m_palette, base_gfx4 + 2 * gfxstart, width, height, width, m_palette->entries(),0, 16);
+				gfx_element gfx(*m_palette, base_gfx4 + 2 * gfxstart, width, height, width, m_palette->entries(),0, 16);
 
 				gfx.prio_zoom_transpen(bitmap,cliprect,
 								0,

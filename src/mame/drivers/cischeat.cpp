@@ -573,7 +573,7 @@ void cischeat_state::captflag_motor_move(int side, UINT16 data)
 {
 	UINT16 & pos  = m_captflag_motor_pos[side];
 
-	timer_device & dev = ((side == RIGHT) ? m_captflag_motor_right : m_captflag_motor_left);
+	timer_device &dev((side == RIGHT) ? *m_captflag_motor_right : *m_captflag_motor_left);
 
 //  bool busy = !(dev.time_left() == attotime::never);
 	bool busy = false;

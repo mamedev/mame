@@ -582,8 +582,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel12_w)
 	m_reel0->update( data    &0x0f);
 	m_reel1->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel1", m_reel0);
-	awp_draw_reel(machine(),"reel2", m_reel1);
+	awp_draw_reel(machine(),"reel1", *m_reel0);
+	awp_draw_reel(machine(),"reel2", *m_reel1);
 }
 
 WRITE8_MEMBER(bfm_sc2_state::reel34_w)
@@ -593,8 +593,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel34_w)
 	m_reel2->update( data    &0x0f);
 	m_reel3->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel3", m_reel2);
-	awp_draw_reel(machine(),"reel4", m_reel3);
+	awp_draw_reel(machine(),"reel3", *m_reel2);
+	awp_draw_reel(machine(),"reel4", *m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -606,8 +606,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel56_w)
 	m_reel4->update( data    &0x0f);
 	m_reel5->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel5", m_reel4);
-	awp_draw_reel(machine(),"reel6", m_reel5);
+	awp_draw_reel(machine(),"reel5", *m_reel4);
+	awp_draw_reel(machine(),"reel6", *m_reel5);
 }
 
 
