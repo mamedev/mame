@@ -60,10 +60,15 @@ class gba_registers
 protected:
 	static constexpr unsigned REG_BASE = BASE;
 
-	UINT32 &WORD(unsigned x) { return m_regs[(x - REG_BASE) / 4]; }             // 32-bit Register
-	const UINT32 &WORD(unsigned x) const { return m_regs[(x - REG_BASE) / 4]; } // 32-bit Register
-	UINT16 HWHI(unsigned x) const { return UINT16(WORD(x) >> 16); }             // 16-bit Register, Upper Half-Word
-	UINT16 HWLO(unsigned x) const { return UINT16(WORD(x)); }                   // 16-bit Register, Lower Half-Word
+	// 32-bit Register
+	UINT32 &WORD(unsigned x) { return m_regs[(x - REG_BASE) / 4]; }
+	const UINT32 &WORD(unsigned x) const { return m_regs[(x - REG_BASE) / 4]; }
+
+	// 16-bit Register, Upper Half-Word
+	UINT16 HWHI(unsigned x) const { return UINT16(WORD(x) >> 16); }
+
+	// 16-bit Register, Lower Half-Word
+	UINT16 HWLO(unsigned x) const { return UINT16(WORD(x)); }
 
 	UINT32 &WORD_SET(unsigned x, UINT32 y) { return WORD(x) |= y; }
 	UINT32 &HWHI_SET(unsigned x, UINT16 y) { return WORD(x) |= UINT32(y) << 16; }
@@ -131,6 +136,10 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
+	UINT32 bg_screen_base(UINT32 bgxcnt);
+	UINT32 bg_char_base(UINT32 bgxcnt);
+	void   bg_screen_size(UINT16 bgxcnt, bool text, int &width, int &height);
+
 	inline void update_mask(UINT8* mask, int mode, int submode, UINT32* obj_win, UINT8 inwin0, UINT8 inwin1, UINT8 in0_mask, UINT8 in1_mask, UINT8 out_mask);
 	void draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp);
 	void draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
