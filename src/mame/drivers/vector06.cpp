@@ -14,8 +14,9 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8, vector06_state)
-	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
+	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank2")
+	AM_RANGE( 0xa000, 0xdfff ) AM_READWRITE_BANK("bank3")
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE_BANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
@@ -24,6 +25,7 @@ static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
 	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector06_8255_1_r, vector06_8255_1_w )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector06_8255_2_r, vector06_8255_2_w )
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE(vector06_color_set)
+	AM_RANGE( 0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
 	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", fd1793_t, data_r, data_w)
 	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", fd1793_t, sector_r, sector_w)
 	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", fd1793_t, track_r, track_w)
@@ -137,6 +139,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 //  MCFG_CPU_ADD("maincpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)
 	MCFG_CPU_IO_MAP(vector06_io)
+	MCFG_I8085A_STATUS(WRITE8(vector06_state, vector06_status_callback))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vector06_state,vector06_irq_callback)
 
@@ -184,7 +187,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_SIZE("320K")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 

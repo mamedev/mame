@@ -40,7 +40,6 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
-		m_bank4(*this, "bank4"),
 		m_region_maincpu(*this, "maincpu"),
 		m_line(*this, "LINE.%u", 0),
 		m_reset(*this, "RESET")
@@ -61,6 +60,8 @@ public:
 	DECLARE_READ8_MEMBER(vector06_8255_2_r);
 	DECLARE_WRITE8_MEMBER(vector06_8255_2_w);
 	DECLARE_WRITE8_MEMBER(vector06_disc_w);
+	DECLARE_WRITE8_MEMBER(vector06_status_callback);
+	DECLARE_WRITE8_MEMBER(vector06_ramdisk_w);
 	void vector06_set_video_mode(int width);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -85,7 +86,6 @@ private:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
 	required_memory_region m_region_maincpu;
 	required_ioport_array<9> m_line;
 	required_ioport m_reset;
@@ -96,7 +96,11 @@ private:
 	UINT8 m_romdisk_msb;
 	UINT8 m_romdisk_lsb;
 	UINT8 m_vblank_state;
+	UINT8 m_rambank;
+	bool m_stack_state;
+	bool m_romen;
 
+	void update_mem();
 };
 
 #endif /* VECTOR06_H_ */

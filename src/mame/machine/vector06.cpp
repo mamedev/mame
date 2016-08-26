@@ -125,13 +125,15 @@ TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 
 	if (BIT(val, 0))
 	{
-		m_bank1->set_base(m_region_maincpu->base() + 0x10000);
+		m_romen = true;
+		update_mem();
 		m_maincpu->reset();
 	}
 
 	if (BIT(val, 1))
 	{
-		m_bank1->set_base(m_ram->pointer() + 0x0000);
+		m_romen = false;
+		update_mem();
 		m_maincpu->reset();
 	}
 }
@@ -156,6 +158,43 @@ WRITE8_MEMBER( vector06_state::vector06_disc_w )
 	}
 }
 
+void vector06_state::update_mem()
+{
+	if ((m_rambank & 0x10) && m_stack_state) {
+		int sentry = ((m_rambank >> 2) & 3) + 1;
+		m_bank1->set_entry(sentry);
+		m_bank3->set_entry(sentry);
+		m_bank2->set_base(m_ram->pointer() + sentry * 0x10000);
+	}
+	else {
+		m_bank1->set_entry(0);
+		int ventry = 0;
+		if (m_rambank & 0x20)
+			ventry = (m_rambank & 3) + 1;
+		m_bank3->set_entry(ventry);
+		if (m_romen)
+			m_bank2->set_base(m_region_maincpu->base() + 0x10000);
+		else
+			m_bank2->set_base(m_ram->pointer());
+	}
+}
+
+WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
+{
+	UINT8 oldbank = m_rambank;
+	m_rambank = data;
+	if (oldbank != m_rambank)
+		update_mem();
+}
+
+WRITE8_MEMBER(vector06_state::vector06_status_callback)
+{
+	bool oldstate = m_stack_state;
+	m_stack_state = (data & I8085_STATUS_STACK) ? true : false;
+	if (oldstate != m_stack_state && (m_rambank & 0x10))
+		update_mem();
+}
+
 void vector06_state::machine_start()
 {
 	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(vector06_state::reset_check_callback),this));
@@ -163,17 +202,15 @@ void vector06_state::machine_start()
 
 void vector06_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_stack_state = false;
+	m_rambank = 0;
+	m_romen = true;
 
-	space.install_read_bank (0x0000, 0x7fff, m_bank1);
-	space.install_write_bank(0x0000, 0x7fff, m_bank2);
-	space.install_read_bank (0x8000, 0xffff, m_bank3);
-	space.install_write_bank(0x8000, 0xffff, m_bank4);
+	m_bank1->configure_entries(0, 5, m_ram->pointer(), 0x10000);
+	for (int i = 0; i < 5; i++)
+		m_bank3->configure_entry(i, m_ram->pointer() + 0x10000 * i + 0xa000);
 
-	m_bank1->set_base(m_region_maincpu->base() + 0x10000);
-	m_bank2->set_base(m_ram->pointer() + 0x0000);
-	m_bank3->set_base(m_ram->pointer() + 0x8000);
-	m_bank4->set_base(m_ram->pointer() + 0x8000);
+	update_mem();
 
 	m_keyboard_mask = 0;
 	m_color_index = 0;
