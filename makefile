@@ -999,31 +999,6 @@ windows_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
-# Visual Studio 2013
-#-------------------------------------------------
-
-.PHONY: vs2013
-vs2013: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2013
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2013_intel
-vs2013_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2013
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2013_xp
-vs2013_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2013-xp vs2013
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-#-------------------------------------------------
 # Visual Studio 2015
 #-------------------------------------------------
 

@@ -11,21 +11,7 @@
 #ifndef __EIVC__
 #define __EIVC__
 
-#if (_MSC_VER >= 1400)
-
-// need to ignore 'nonstandard extension used' warning in setjmp.h
-#pragma warning(push)
-#pragma warning(disable: 4987)
-#include <intrin.h>
-#pragma warning(pop)
-
-#else
-extern "C" unsigned char _BitScanReverse(unsigned long *Index, unsigned long Mask);
-#endif
-
-#if (_MSC_VER >= 1310)
 #pragma intrinsic(_BitScanReverse)
-#endif
 
 
 /***************************************************************************

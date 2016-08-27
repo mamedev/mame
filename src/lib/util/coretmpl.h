@@ -18,11 +18,6 @@
 
 #include <vector>
 
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-#include <yvals.h>
-#define noexcept _NOEXCEPT
-#endif
-
 // TEMPORARY helper to catch is_pod assertions in the debugger
 #if 0
 #undef assert
