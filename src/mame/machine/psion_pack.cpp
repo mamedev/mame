@@ -105,7 +105,7 @@ void datapack_device::device_config_complete()
 //  option_guide for create new image
 //-------------------------------------------------
 
-const option_guide *datapack_device::create_option_guide() const
+const util::option_guide &datapack_device::create_option_guide() const
 {
 	return datapack_option_guide;
 }

@@ -922,7 +922,7 @@ void bml3_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinf
 		case IMGTOOLINFO_PTR_WRITE_FILE:                    info->write_file = bml3_diskimage_writefile; break;
 		case IMGTOOLINFO_PTR_DELETE_FILE:                   info->delete_file = bml3_diskimage_deletefile; break;
 		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = bml3_diskimage_suggesttransfer; break;
-		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:            info->writefile_optguide = bml3_writefile_optionguide; break;
+		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:            info->writefile_optguide = &bml3_writefile_optionguide; break;
 		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_default; break;
 	}
 }

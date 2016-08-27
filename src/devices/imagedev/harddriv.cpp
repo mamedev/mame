@@ -85,7 +85,7 @@ void harddisk_image_device::device_config_complete()
 	update_names();
 }
 
-const option_guide *harddisk_image_device::create_option_guide() const
+const util::option_guide &harddisk_image_device::create_option_guide() const
 {
 	return hd_option_guide;
 }

@@ -442,7 +442,7 @@ void ti990_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolin
 		case IMGTOOLINFO_PTR_DELETE_FILE:                   /* info->delete_file = ti990_image_deletefile; */ break;
 		case IMGTOOLINFO_PTR_CREATE:                        info->create = ti990_image_create; break;
 
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = ti990_create_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = &ti990_create_optionguide; break;
 		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:           strcpy(info->s = imgtool_temp_str(), ti990_create_optionspecs); break;
 	}
 }

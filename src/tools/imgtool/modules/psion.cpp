@@ -669,8 +669,8 @@ void psion_get_info( const imgtool_class *imgclass, UINT32 state, union imgtooli
 		case IMGTOOLINFO_PTR_READ_FILE   : info->read_file   = datapack_read_file; break;
 		case IMGTOOLINFO_PTR_WRITE_FILE  : info->write_file  = datapack_write_file; break;
 		case IMGTOOLINFO_PTR_DELETE_FILE : info->delete_file = datapack_delete_file; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE : info->createimage_optguide = psion_create_optguide; break;
-		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE : info->createimage_optguide = psion_write_optguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE : info->createimage_optguide = &psion_create_optguide; break;
+		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE : info->createimage_optguide = &psion_write_optguide; break;
 
 		// --- the following bits of info are returned as NULL-terminated strings ---
 		case IMGTOOLINFO_STR_NAME            : strcpy( info->s = imgtool_temp_str(), "psionpack"); break;

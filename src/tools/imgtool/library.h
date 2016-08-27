@@ -291,8 +291,8 @@ union imgtoolinfo
 	int             (*approve_filename_char)(unicode_char ch);
 	int             (*make_class)(int index, imgtool_class *imgclass);
 
-	const option_guide *createimage_optguide;
-	const option_guide *writefile_optguide;
+	const util::option_guide *createimage_optguide;
+	const util::option_guide *writefile_optguide;
 };
 
 
@@ -369,7 +369,7 @@ struct imgtool_module
 
 	UINT32 block_size;
 
-	const option_guide *createimage_optguide;
+	const util::option_guide *createimage_optguide;
 	const char *createimage_optspec;
 
 	const void *extra;
