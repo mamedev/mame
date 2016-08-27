@@ -1298,6 +1298,12 @@ configuration { "winphone8* or winstore8*" }
 	}
 
 
+-- adding this till we sort out asserts in debug mode
+configuration { "Debug", "gmake" }
+	buildoptions_cpp {
+		"-Wno-terminate",
+	}
+
 configuration { }
 
 if (_OPTIONS["SOURCES"] ~= nil) then
