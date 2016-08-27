@@ -36,7 +36,7 @@ template void format_flags::apply(vectorstream &) const;
 template void format_flags::apply(wvectorstream &) const;
 
 template class format_argument<std::ostream>;
-template class format_argument<std::wostream.;
+template class format_argument<std::wostream>;
 template class format_argument<std::iostream>;
 template class format_argument<std::wiostream>;
 template class format_argument<std::ostringstream>;
