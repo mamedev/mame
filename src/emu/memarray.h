@@ -69,14 +69,14 @@ public:
 	int bytes_per_entry() const { return m_bytes_per_entry; }
 
 	// entry-level readers and writers
-	UINT32 read(int index) { return (this->*m_read_entry)(index); }
+	UINT32 read(int index) const { return (this->*m_read_entry)(index); }
 	void write(int index, UINT32 data) { (this->*m_write_entry)(index, data); }
 
 	// byte/word/dword-level readers and writers
-	UINT8 read8(offs_t offset) { return reinterpret_cast<UINT8 *>(m_base)[offset]; }
-	UINT16 read16(offs_t offset) { return reinterpret_cast<UINT16 *>(m_base)[offset]; }
-	UINT32 read32(offs_t offset) { return reinterpret_cast<UINT32 *>(m_base)[offset]; }
-	UINT64 read64(offs_t offset) { return reinterpret_cast<UINT64 *>(m_base)[offset]; }
+	UINT8 read8(offs_t offset) const { return reinterpret_cast<UINT8 *>(m_base)[offset]; }
+	UINT16 read16(offs_t offset) const { return reinterpret_cast<UINT16 *>(m_base)[offset]; }
+	UINT32 read32(offs_t offset) const { return reinterpret_cast<UINT32 *>(m_base)[offset]; }
+	UINT64 read64(offs_t offset) const { return reinterpret_cast<UINT64 *>(m_base)[offset]; }
 	void write8(offs_t offset, UINT8 data) { reinterpret_cast<UINT8 *>(m_base)[offset] = data; }
 	void write16(offs_t offset, UINT16 data, UINT16 mem_mask = 0xffff) { COMBINE_DATA(&reinterpret_cast<UINT16 *>(m_base)[offset]); }
 	void write32(offs_t offset, UINT32 data, UINT32 mem_mask = 0xffffffff) { COMBINE_DATA(&reinterpret_cast<UINT32 *>(m_base)[offset]); }
@@ -84,31 +84,31 @@ public:
 
 private:
 	// internal read/write helpers for 1 byte entries
-	UINT32 read8_from_8(int index);     void write8_to_8(int index, UINT32 data);
-	UINT32 read8_from_16le(int index);  void write8_to_16le(int index, UINT32 data);
-	UINT32 read8_from_16be(int index);  void write8_to_16be(int index, UINT32 data);
-	UINT32 read8_from_32le(int index);  void write8_to_32le(int index, UINT32 data);
-	UINT32 read8_from_32be(int index);  void write8_to_32be(int index, UINT32 data);
-	UINT32 read8_from_64le(int index);  void write8_to_64le(int index, UINT32 data);
-	UINT32 read8_from_64be(int index);  void write8_to_64be(int index, UINT32 data);
+	UINT32 read8_from_8(int index) const;     void write8_to_8(int index, UINT32 data);
+	UINT32 read8_from_16le(int index) const;  void write8_to_16le(int index, UINT32 data);
+	UINT32 read8_from_16be(int index) const;  void write8_to_16be(int index, UINT32 data);
+	UINT32 read8_from_32le(int index) const;  void write8_to_32le(int index, UINT32 data);
+	UINT32 read8_from_32be(int index) const;  void write8_to_32be(int index, UINT32 data);
+	UINT32 read8_from_64le(int index) const;  void write8_to_64le(int index, UINT32 data);
+	UINT32 read8_from_64be(int index) const;  void write8_to_64be(int index, UINT32 data);
 
 	// internal read/write helpers for 2 byte entries
-	UINT32 read16_from_8le(int index);  void write16_to_8le(int index, UINT32 data);
-	UINT32 read16_from_8be(int index);  void write16_to_8be(int index, UINT32 data);
-	UINT32 read16_from_16(int index);   void write16_to_16(int index, UINT32 data);
-	UINT32 read16_from_32le(int index); void write16_to_32le(int index, UINT32 data);
-	UINT32 read16_from_32be(int index); void write16_to_32be(int index, UINT32 data);
-	UINT32 read16_from_64le(int index); void write16_to_64le(int index, UINT32 data);
-	UINT32 read16_from_64be(int index); void write16_to_64be(int index, UINT32 data);
+	UINT32 read16_from_8le(int index) const;  void write16_to_8le(int index, UINT32 data);
+	UINT32 read16_from_8be(int index) const;  void write16_to_8be(int index, UINT32 data);
+	UINT32 read16_from_16(int index) const;   void write16_to_16(int index, UINT32 data);
+	UINT32 read16_from_32le(int index) const; void write16_to_32le(int index, UINT32 data);
+	UINT32 read16_from_32be(int index) const; void write16_to_32be(int index, UINT32 data);
+	UINT32 read16_from_64le(int index) const; void write16_to_64le(int index, UINT32 data);
+	UINT32 read16_from_64be(int index) const; void write16_to_64be(int index, UINT32 data);
 
 	// internal read/write helpers for 4 byte entries
-	UINT32 read32_from_8le(int index);  void write32_to_8le(int index, UINT32 data);
-	UINT32 read32_from_8be(int index);  void write32_to_8be(int index, UINT32 data);
-	UINT32 read32_from_16le(int index); void write32_to_16le(int index, UINT32 data);
-	UINT32 read32_from_16be(int index); void write32_to_16be(int index, UINT32 data);
-	UINT32 read32_from_32(int index);   void write32_to_32(int index, UINT32 data);
-	UINT32 read32_from_64le(int index); void write32_to_64le(int index, UINT32 data);
-	UINT32 read32_from_64be(int index); void write32_to_64be(int index, UINT32 data);
+	UINT32 read32_from_8le(int index) const;  void write32_to_8le(int index, UINT32 data);
+	UINT32 read32_from_8be(int index) const;  void write32_to_8be(int index, UINT32 data);
+	UINT32 read32_from_16le(int index) const; void write32_to_16le(int index, UINT32 data);
+	UINT32 read32_from_16be(int index) const; void write32_to_16be(int index, UINT32 data);
+	UINT32 read32_from_32(int index) const;   void write32_to_32(int index, UINT32 data);
+	UINT32 read32_from_64le(int index) const; void write32_to_64le(int index, UINT32 data);
+	UINT32 read32_from_64be(int index) const; void write32_to_64be(int index, UINT32 data);
 
 	// internal state
 	void *              m_base;
@@ -116,7 +116,7 @@ private:
 	int                 m_membits;
 	endianness_t        m_endianness;
 	int                 m_bytes_per_entry;
-	UINT32 (memory_array::*m_read_entry)(int);
+	UINT32 (memory_array::*m_read_entry)(int) const;
 	void (memory_array::*m_write_entry)(int, UINT32);
 };
 

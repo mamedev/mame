@@ -301,14 +301,10 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 	offs_t base = byte_offset / bpe;
 	for (int index = 0; index < count; index++)
 	{
-		UINT32 data = m_paletteram.read(base + index);
-		if (m_paletteram_ext.base() != nullptr)
-			data |= m_paletteram_ext.read(base + index) << (8 * bpe);
-
 		if (indirect)
-			set_indirect_color(base + index, m_raw_to_rgb(data));
+			set_indirect_color(base + index, m_raw_to_rgb(read_entry(base + index)));
 		else
-			m_palette->entry_set_color(base + index, m_raw_to_rgb(data));
+			m_palette->entry_set_color(base + index, m_raw_to_rgb(read_entry(base + index)));
 	}
 }
 
