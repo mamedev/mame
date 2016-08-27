@@ -112,8 +112,8 @@ MACHINE_RESET_MEMBER(dooyong_z80_ym2203_state, sound_ym2203)
 static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc007) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xc008, 0xc00f) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
+	AM_RANGE(0xc008, 0xc00f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
 	AM_RANGE(0xc010, 0xc010) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc010, 0xc010) AM_WRITE(lastday_ctrl_w)   /* coin counter, flip screen */
 	AM_RANGE(0xc011, 0xc011) AM_READ_PORT("P1")
@@ -141,8 +141,8 @@ static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)    /* coin counter, flip screen */
 	AM_RANGE(0xf010, 0xf010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf018, 0xf01f) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf020, 0xf027) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xf018, 0xf01f) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
+	AM_RANGE(0xf020, 0xf027) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(paletteram_flytiger_r, paletteram_flytiger_w)
 ADDRESS_MAP_END
 
@@ -160,8 +160,8 @@ static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state 
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)    /* coin counter, flip screen */
 	AM_RANGE(0xf010, 0xf010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf018, 0xf01f) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf020, 0xf027) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xf018, 0xf01f) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
+	AM_RANGE(0xf020, 0xf027) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
@@ -176,9 +176,9 @@ static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc008, 0xc008) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xc010, 0xc010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc018, 0xc01f) AM_WRITE(fg2scroll_w)
-	AM_RANGE(0xc040, 0xc047) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xc048, 0xc04f) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xc018, 0xc01f) AM_DEVWRITE("fg2", dooyong_rom_tilemap_device, ctrl_w)
+	AM_RANGE(0xc040, 0xc047) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
+	AM_RANGE(0xc048, 0xc04f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("spriteram")
@@ -198,8 +198,8 @@ static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe010, 0xe010) AM_WRITE(flytiger_ctrl_w)  /* coin counter, flip screen */
 	AM_RANGE(0xe020, 0xe020) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe030, 0xe037) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xe040, 0xe047) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xe030, 0xe037) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
+	AM_RANGE(0xe040, 0xe047) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
 	AM_RANGE(0xe800, 0xefff) AM_READWRITE(paletteram_flytiger_r, paletteram_flytiger_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 ADDRESS_MAP_END
@@ -218,8 +218,8 @@ static ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("P1")
 	AM_RANGE(0xf830, 0xf830) AM_READ_PORT("P2")
 	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc00, 0xfc07) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xfc08, 0xfc0f) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
+	AM_RANGE(0xfc08, 0xfc0f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16, dooyong_68k_state )
@@ -270,11 +270,11 @@ static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c0012, 0x0c0013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)
 	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITENOP // ?
-	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE8(bgscroll_w, 0x00ff)
-	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE8(bg2scroll_w, 0x00ff)
+	AM_RANGE(0x0c4000, 0x0c400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
+	AM_RANGE(0x0c4010, 0x0c401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE8(fgscroll_w, 0x00ff) // not used atm
-	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE8(fg2scroll_w, 0x00ff) // not used atm
+	//AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE8(fgscroll_w, 0x00ff) // not used atm
+	//AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE8(fg2scroll_w, 0x00ff) // not used atm
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
 ADDRESS_MAP_END
 
@@ -840,6 +840,9 @@ static MACHINE_CONFIG_START( lastday, dooyong_z80_ym2203_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
 
@@ -888,6 +891,9 @@ static MACHINE_CONFIG_START( gulfstrm, dooyong_z80_ym2203_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
 
@@ -923,6 +929,9 @@ static MACHINE_CONFIG_START( pollux, dooyong_z80_ym2203_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
 
@@ -957,6 +966,11 @@ static MACHINE_CONFIG_START( bluehawk, dooyong_z80_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bluehawk)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx3", 0x78000)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx4", 0x78000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg2", "gfxdecode", 4, "gfx5", 0x38000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, bluehawk)
 
@@ -991,6 +1005,10 @@ static MACHINE_CONFIG_START( flytiger, dooyong_z80_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flytiger)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx3", 0x78000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx4", 0x78000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
 
@@ -1022,6 +1040,11 @@ static MACHINE_CONFIG_START( primella, dooyong_z80_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", primella)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 1, "gfx2", -0x8000)
+	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 2, "gfx3", -0x8000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
+	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, primella)
 
@@ -1131,6 +1154,10 @@ static MACHINE_CONFIG_START( popbingo, dooyong_68k_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popbingo)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 1, "gfx2", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
+	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg2", "gfxdecode", 2, "gfx3", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_68k_state, popbingo)
 
