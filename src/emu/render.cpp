@@ -1240,8 +1240,10 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			if (y_is_integer) yscale = std::min(maxyscale, std::max(1.0f, render_round_nearest(yscale)));
 
 			// check if we have user defined scale factors, if so use them instead
-			xscale = m_int_scale_x > 0 ? m_int_scale_x : xscale;
-			yscale = m_int_scale_y > 0 ? m_int_scale_y : yscale;
+			int user_scale_x = target_is_portrait? m_int_scale_y : m_int_scale_x;
+			int user_scale_y = target_is_portrait? m_int_scale_x : m_int_scale_y;
+			xscale = user_scale_x > 0 ? user_scale_x : xscale;
+			yscale = user_scale_y > 0 ? user_scale_y : yscale;
 
 			// set the final width/height
 			visible_width = render_round_nearest(src_width * xscale);
