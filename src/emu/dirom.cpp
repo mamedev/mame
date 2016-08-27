@@ -35,7 +35,7 @@ void device_rom_interface::set_rom(const void *base, UINT32 size)
 {
 	UINT32 mend = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
 	UINT32 rend = size-1;
-	UINT32 banks = (rend+1) / (mend+1);
+	UINT32 banks = mend == 0xffffffff ? 1 : (rend+1) / (mend+1);
 	if(banks < 1)
 		banks = 1;
 
@@ -43,6 +43,7 @@ void device_rom_interface::set_rom(const void *base, UINT32 size)
 		space().install_read_bank(0, mend, device().tag());
 		m_bank = device().machine().memory().banks().find(device().tag())->second.get();
 		m_bank->configure_entries(0, banks, const_cast<void *>(base), mend+1);
+		m_cur_bank = 0;
 
 	} else {
 		// Round up to the nearest power-of-two-minus-one
