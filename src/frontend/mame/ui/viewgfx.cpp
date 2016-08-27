@@ -347,14 +347,12 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 	int total = state.palette.which ? palette->indirect_entries() : palette->entries();
 	const rgb_t *raw_color = palette->palette()->entry_list_raw();
 	render_font *ui_font = mui.get_font();
-	float cellwidth, cellheight;
 	float chwidth, chheight;
 	float titlewidth;
 	float x0, y0;
 	render_bounds cellboxbounds;
 	render_bounds boxbounds;
 	int x, y, skip;
-	char title[100];
 
 	// add a half character padding for the box
 	chheight = mui.get_line_height();
@@ -377,10 +375,42 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 	// add space on the top for a title, a half line of padding, a header, and another half line
 	cellboxbounds.y0 += 3.0f * chheight;
 
-	// figure out the title and expand the outer box to fit
-	const char *suffix = palette->indirect_entries() == 0 ? "" : state.palette.which ? _(" COLORS") : _(" PENS");
-	sprintf(title, "'%s'%s", palette->tag(), suffix);
-	titlewidth = ui_font->string_width(chheight, mui.machine().render().ui_aspect(), title);
+	// compute the cell size
+	float cellwidth = (cellboxbounds.x1 - cellboxbounds.x0) / (float)state.palette.columns;
+	float cellheight = (cellboxbounds.y1 - cellboxbounds.y0) / (float)state.palette.columns;
+
+	// figure out the title
+	std::ostringstream title_buf;
+	util::stream_format(title_buf, "'%s'", palette->tag());
+	if (palette->indirect_entries() > 0)
+		title_buf << (state.palette.which ? _(" COLORS") : _(" PENS"));
+
+	// if the mouse pointer is over one of our cells, add some info about the corresponding palette entry
+	INT32 mouse_target_x, mouse_target_y;
+	bool mouse_button;
+	float mouse_x, mouse_y;
+	render_target *mouse_target = mui.machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
+	if (mouse_target != nullptr && mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y)
+		&& cellboxbounds.x0 <= mouse_x && cellboxbounds.x1 > mouse_x
+		&& cellboxbounds.y0 <= mouse_y && cellboxbounds.y1 > mouse_y)
+	{
+		int index = state.palette.offset + int((mouse_x - cellboxbounds.x0) / cellwidth) + int((mouse_y - cellboxbounds.y0) / cellheight) * state.palette.columns;
+		if (index < total)
+		{
+			util::stream_format(title_buf, " #%X", index);
+			if (palette->indirect_entries() > 0 && !state.palette.which)
+				util::stream_format(title_buf, " => %X", palette->pen_indirect(index));
+			else if (palette->basemem().base() != nullptr)
+				util::stream_format(title_buf, " = %X", palette->read_entry(index));
+
+			rgb_t col = state.palette.which ? palette->indirect_color(index) : raw_color[index];
+			util::stream_format(title_buf, " (R:%X G:%X B:%X)", col.r(), col.g(), col.b());
+		}
+	}
+
+	// expand the outer box to fit the title
+	const std::string title = title_buf.str();
+	titlewidth = ui_font->string_width(chheight, mui.machine().render().ui_aspect(), title.c_str());
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
@@ -391,15 +421,11 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 	// draw the title
 	x0 = 0.5f - 0.5f * titlewidth;
 	y0 = boxbounds.y0 + 0.5f * chheight;
-	for (x = 0; title[x] != 0; x++)
+	for (auto ch : title)
 	{
-		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, title[x]);
-		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), title[x]);
+		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, ch);
+		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), ch);
 	}
-
-	// compute the cell size
-	cellwidth = (cellboxbounds.x1 - cellboxbounds.x0) / (float)state.palette.columns;
-	cellheight = (cellboxbounds.y1 - cellboxbounds.y0) / (float)state.palette.columns;
 
 	// draw the top column headers
 	skip = (int)(chwidth / cellwidth);
@@ -559,7 +585,6 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	float cellwidth, cellheight;
 	float chwidth, chheight;
 	float titlewidth;
-	//float cellaspect;
 	float x0, y0;
 	render_bounds cellboxbounds;
 	render_bounds boxbounds;
@@ -570,7 +595,6 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	int xcells, ycells;
 	int pixelscale = 0;
 	int x, y, skip;
-	char title[100];
 
 	// add a half character padding for the box
 	chheight = mui.get_line_height();
@@ -638,12 +662,12 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	boxbounds.y1 = boxbounds.y0 + fullheight;
 
 	// figure out the title and expand the outer box to fit
-	sprintf(title, "'%s' %d/%d %dx%d COLOR %X",
+	const std::string title = string_format("'%s' %d/%d %dx%d COLOR %X",
 					interface.device().tag(),
 					set, info.setcount - 1,
 					gfx.width(), gfx.height(),
 					info.color[set]);
-	titlewidth = ui_font->string_width(chheight, mui.machine().render().ui_aspect(), title);
+	titlewidth = ui_font->string_width(chheight, mui.machine().render().ui_aspect(), title.c_str());
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
@@ -654,10 +678,10 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	// draw the title
 	x0 = 0.5f - 0.5f * titlewidth;
 	y0 = boxbounds.y0 + 0.5f * chheight;
-	for (x = 0; title[x] != 0; x++)
+	for (auto ch : title)
 	{
-		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, title[x]);
-		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), title[x]);
+		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, ch);
+		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), ch);
 	}
 
 	// draw the top column headers
@@ -960,8 +984,6 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	int mapboxwidth, mapboxheight;
 	int maxxscale, maxyscale;
 	UINT32 mapwidth, mapheight;
-	int x, pixelscale;
-	char title[100];
 
 	// get the size of the tilemap itself
 	tilemap_t *tilemap = mui.machine().tilemap().find(state.tilemap.which);
@@ -993,7 +1015,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	mapboxheight = (mapboxbounds.y1 - mapboxbounds.y0) * (float)targheight;
 
 	// determine the maximum integral scaling factor
-	pixelscale = state.tilemap.zoom;
+	int pixelscale = state.tilemap.zoom;
 	if (pixelscale == 0)
 	{
 		for (maxxscale = 1; mapwidth * (maxxscale + 1) < mapboxwidth; maxxscale++) { }
@@ -1018,8 +1040,8 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	boxbounds.y1 = mapboxbounds.y1 + 0.5f * chheight;
 
 	// figure out the title and expand the outer box to fit
-	sprintf(title, "TILEMAP %d/%d %dx%d OFFS %d,%d", state.tilemap.which, mui.machine().tilemap().count() - 1, mapwidth, mapheight, state.tilemap.xoffs, state.tilemap.yoffs);
-	titlewidth = ui_font->string_width(chheight, mui.machine().render().ui_aspect(), title);
+	const std::string title = string_format("TILEMAP %d/%d %dx%d OFFS %d,%d", state.tilemap.which, mui.machine().tilemap().count() - 1, mapwidth, mapheight, state.tilemap.xoffs, state.tilemap.yoffs);
+	titlewidth = ui_font->string_width(chheight, mui.machine().render().ui_aspect(), title.c_str());
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 	{
 		boxbounds.x0 = 0.5f - 0.5f * (titlewidth + chwidth);
@@ -1032,10 +1054,10 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	// draw the title
 	x0 = 0.5f - 0.5f * titlewidth;
 	y0 = boxbounds.y0 + 0.5f * chheight;
-	for (x = 0; title[x] != 0; x++)
+	for (auto ch : title)
 	{
-		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, title[x]);
-		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), title[x]);
+		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, ch);
+		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), ch);
 	}
 
 	// update the bitmap
