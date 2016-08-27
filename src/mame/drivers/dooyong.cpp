@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)
 	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITENOP // ?
 	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE8(bgscroll_w, 0x00ff)
-	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE8(bg2scroll_w, 0x00ff) // not used atm
+	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE8(bg2scroll_w, 0x00ff)
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE8(fgscroll_w, 0x00ff) // not used atm
 	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE8(fg2scroll_w, 0x00ff) // not used atm
