@@ -381,9 +381,8 @@ public:
 		, m_acia_mkbd_cmi(*this, "acia_mkbd_cmi")
 		, m_cmi07_ptm(*this, "cmi07_ptm")
 		, m_qfc9_region(*this, "qfc9")
-		, m_floppy_0(*this, "wd1791:0")
-		, m_floppy_1(*this, "wd1791:1")
-		, m_floppy(nullptr)
+		, m_floppy0(*this, "wd1791:0")
+		, m_floppy1(*this, "wd1791:1")
 		, m_wd1791(*this, "wd1791")
 		, m_channels(*this, "cmi01a_%u", 0)
 		, m_cmi10_pia_u20(*this, "cmi10_pia_u20")
@@ -542,9 +541,8 @@ protected:
 	required_device<ptm6840_device> m_cmi07_ptm;
 
 	required_memory_region m_qfc9_region;
-	required_device<floppy_connector> m_floppy_0;
-	required_device<floppy_connector> m_floppy_1;
-	floppy_image_device *m_floppy;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<fd1791_t> m_wd1791;
 
 	required_device_array<cmi01a_device, 8> m_channels;
@@ -1462,20 +1460,15 @@ void cmi_state::write_fdc_ctrl(UINT8 data)
 	int drive = data & 1;
 	int side = BIT(data, 5) ? 1 : 0;
 
-	m_floppy = nullptr;
-
-	if (drive)
+	switch (drive)
 	{
-		m_floppy = m_floppy_1->get_device();
-	}
-	else
-	{
-		m_floppy = m_floppy_0->get_device();
+	case 0: m_wd1791->set_floppy(m_floppy0->get_device()); break;
+	case 1: m_wd1791->set_floppy(m_floppy1->get_device()); break;
 	}
 
-	if (m_floppy)
-		m_floppy->ss_w(side);
-	m_wd1791->set_floppy(m_floppy);
+	if (m_floppy0->get_device()) m_floppy0->get_device()->ss_w(side);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->ss_w(side);
+
 	m_wd1791->dden_w(BIT(data, 7) ? true : false);
 
 	m_fdc_ctrl = data;
@@ -2695,7 +2688,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cmi_state, wd1791_irq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(cmi_state, wd1791_drq))
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
 	// Channel cards
 	MCFG_CMI01A_ADD("cmi01a_0", 0)
