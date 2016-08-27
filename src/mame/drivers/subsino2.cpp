@@ -612,7 +612,7 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 	{
 		layer_t *l = &m_layers[i];
 
-		l->tmap = &machine().tilemap().create(m_gfxdecode, i ?
+		l->tmap = &machine().tilemap().create(*m_gfxdecode, i ?
 												tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_1),this) :
 												tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_0),this),
 												TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);

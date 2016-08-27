@@ -32,13 +32,22 @@ public:
 
 	void writedata(UINT8 data);
 	int busy(void);
+	
+	INTERRUPT_GEN_MEMBER(nmi_line_assert);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	required_device<cpu_device> m_matrixcpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 	// internal state
 	int m_data_avail;
 	int m_control;
@@ -52,10 +61,12 @@ private:
 	devcb_write_line m_busy_cb;
 
 	int read_data(void);
+	
+	bitmap_ind16 m_tmpbitmap;
+
 };
 
 extern const device_type BF_DM01;
 
-ADDRESS_MAP_EXTERN( bfm_dm01_memmap,8 );
 
 #endif

@@ -423,7 +423,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
-		m_k054338->update_all_shadows(rushingheroes_hack, m_palette);
+		m_k054338->update_all_shadows(rushingheroes_hack, *m_palette);
 	}
 
 	// pre-sort layers
@@ -731,7 +731,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 			if (width>512) // vsnetscr case
 				pixeldouble_output = 1;
 
-			K053936GP_0_zoom_draw(machine(), bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl, m_palette);
+			K053936GP_0_zoom_draw(machine(), bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl, *m_palette);
 		}
 		else
 		{
@@ -1165,8 +1165,8 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type3)
 
 	common_init();
 
-	m_gx_psac_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
-	m_gx_psac_tilemap_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_alt_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
+	m_gx_psac_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_alt_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
 
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 2;
@@ -1201,7 +1201,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4)
 
 	common_init();
 
-	m_gx_psac_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 3;
 
@@ -1229,7 +1229,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_vsn)
 
 	common_init();
 
-	m_gx_psac_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 3;
 
@@ -1256,7 +1256,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_sd2)
 
 	common_init();
 
-	m_gx_psac_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 3;
 
@@ -1285,8 +1285,8 @@ VIDEO_START_MEMBER(konamigx_state, opengolf)
 	m_k056832->set_layer_offs(2,  2+1, 0);
 	m_k056832->set_layer_offs(3,  3+1, 0);
 
-	m_gx_psac_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
-	m_gx_psac_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
 	//m_gx_psac_tilemap->set_transparent_pen(0);
@@ -1320,8 +1320,8 @@ VIDEO_START_MEMBER(konamigx_state, racinfrc)
 	m_k056832->set_layer_offs(2,  2+1, -16);
 	m_k056832->set_layer_offs(3,  3+1, -16);
 
-	m_gx_psac_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
-	m_gx_psac_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
 	//m_gx_psac_tilemap->set_transparent_pen(0);
@@ -1486,8 +1486,8 @@ UINT32 konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap
 			{
 				UINT32 coldat = m_generic_paletteram_32[offset];
 
-				set_color_555(m_palette, offset*2, 0, 5, 10,coldat >> 16);
-				set_color_555(m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
+				set_color_555(*m_palette, offset*2, 0, 5, 10,coldat >> 16);
+				set_color_555(*m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
 			}
 		}
 		else
@@ -1531,8 +1531,8 @@ UINT32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitma
 			{
 				UINT32 coldat = m_subpaletteram32[offset];
 
-				set_color_555(m_palette, offset*2, 0, 5, 10,coldat >> 16);
-				set_color_555(m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
+				set_color_555(*m_palette, offset*2, 0, 5, 10,coldat >> 16);
+				set_color_555(*m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
 			}
 		}
 		else
@@ -1570,8 +1570,8 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
 
 	coldat = m_generic_paletteram_32[offset];
 
-	set_color_555(m_palette, offset*2, 0, 5, 10,coldat >> 16);
-	set_color_555(m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
+	set_color_555(*m_palette, offset*2, 0, 5, 10,coldat >> 16);
+	set_color_555(*m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
 
 // sub monitor for type 3
@@ -1583,8 +1583,8 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
 
 	offset += (0x4000/4);
 
-	set_color_555(m_palette, offset*2, 0, 5, 10,coldat >> 16);
-	set_color_555(m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
+	set_color_555(*m_palette, offset*2, 0, 5, 10,coldat >> 16);
+	set_color_555(*m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
 #endif
 

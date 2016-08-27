@@ -1043,11 +1043,6 @@ project "uv"
 			"WIN32_LEAN_AND_MEAN",
 			"_WIN32_WINNT=0x0502",
 		}
-		if _ACTION == "vs2013" then
-			files {
-				MAME_DIR .. "3rdparty/libuv/src/win/snprintf.c",
-			}
-		end
 		configuration { }
 		files {
 			MAME_DIR .. "3rdparty/libuv/src/win/async.c",

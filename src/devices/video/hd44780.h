@@ -105,7 +105,8 @@ private:
 	bool        m_busy_flag;      // busy flag
 	UINT8       m_ddram[0x80];    // internal display data RAM
 	UINT8       m_cgram[0x40];    // internal chargen RAM
-	optional_region_ptr<UINT8> m_cgrom; // internal chargen ROM
+	UINT8 const *m_cgrom;
+	optional_region_ptr<UINT8> m_cgrom_region; // internal chargen ROM
 	int         m_ac;             // address counter
 	UINT8       m_dr;             // data register
 	UINT8       m_ir;             // instruction register

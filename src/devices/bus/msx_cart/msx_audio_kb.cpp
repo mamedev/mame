@@ -52,8 +52,9 @@ public:
 		: device_t(mconfig, MSX_AUDIO_KB_HXMU901, "Toshiba HXMU901", tag, owner, clock, "hxmu901", __FILE__)
 		, msx_audio_kb_port_interface(mconfig, *this)
 		, m_row(0)
-		, m_keyboard(*this, "KEY")
-	{ };
+		, m_keyboard(*this, "KEY.%u", 0)
+	{
+	}
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -182,8 +183,8 @@ public:
 		: device_t(mconfig, MSX_AUDIO_KB_NMS1160, "Philips NMS-1160", tag, owner, clock, "nms1160", __FILE__)
 		, msx_audio_kb_port_interface(mconfig, *this)
 		, m_row(0)
-		, m_keyboard(*this, "KEY")
-	{ };
+		, m_keyboard(*this, "KEY.%u", 0)
+	{ }
 
 	virtual ioport_constructor device_input_ports() const override;
 

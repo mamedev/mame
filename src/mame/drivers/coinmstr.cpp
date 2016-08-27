@@ -228,7 +228,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 		UINT32  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
-		coinmstr_set_pal(m_palette, paldata, offset - 0x240);
+		coinmstr_set_pal(*m_palette, paldata, offset - 0x240);
 
 	}
 }
@@ -243,7 +243,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 		UINT32  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
-		coinmstr_set_pal(m_palette, paldata, offset - 0x240);
+		coinmstr_set_pal(*m_palette, paldata, offset - 0x240);
 
 	}
 }
@@ -1221,7 +1221,7 @@ TILE_GET_INFO_MEMBER(coinmstr_state::get_bg_tile_info)
 
 void coinmstr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
 }
 
 UINT32 coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

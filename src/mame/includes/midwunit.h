@@ -16,15 +16,13 @@ public:
 			m_midway_serial_pic(*this, "serial_pic"),
 			m_nvram(*this, "nvram"),
 			m_mainram(*this, "mainram"),
-			m_ports(*this, wunit_ports)
+			m_ports(*this, { { "IN0", "IN1", "DSW", "IN2" } })
 			{ }
 
 	required_device<midway_serial_pic_device> m_midway_serial_pic;
 	required_shared_ptr<UINT16> m_nvram;
 	required_shared_ptr<UINT16> m_mainram;
 	required_ioport_array<4> m_ports;
-
-	DECLARE_IOPORT_ARRAY(wunit_ports);
 
 	UINT8 m_cmos_write_enable;
 	UINT16 m_iodata[8];

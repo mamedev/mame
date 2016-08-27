@@ -470,7 +470,7 @@ static void chcolor(palette_device &palette, pen_t color, UINT16 data)
 WRITE16_MEMBER(model2_state::model2_palette_w)
 {
 	COMBINE_DATA(&m_palram[offset]);
-	chcolor(m_palette, offset, m_palram[offset]);
+	chcolor(*m_palette, offset, m_palram[offset]);
 }
 
 READ16_MEMBER(model2_state::model2_palette_r)

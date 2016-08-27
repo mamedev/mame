@@ -633,24 +633,24 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 avr8_device::avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_shifted_pc(0),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
-		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
-		m_io_config("io", ENDIANNESS_LITTLE, 8, 4),
-		m_eeprom(*this),
-		m_cpu_type(cpu_type),
-		m_lfuses(0x62),
-		m_hfuses(0x99),
-		m_efuses(0xFF),
-		m_lock_bits(0xFF),
-		m_pc(0),
-		m_spi_active(false),
-		m_spi_prescale(0),
-		m_spi_prescale_count(0),
-		m_addr_mask(addr_mask),
-		m_interrupt_pending(false),
-		m_elapsed_cycles(0)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_shifted_pc(0)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 22)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 4)
+	, m_eeprom(*this, finder_base::DUMMY_TAG)
+	, m_cpu_type(cpu_type)
+	, m_lfuses(0x62)
+	, m_hfuses(0x99)
+	, m_efuses(0xFF)
+	, m_lock_bits(0xFF)
+	, m_pc(0)
+	, m_spi_active(false)
+	, m_spi_prescale(0)
+	, m_spi_prescale_count(0)
+	, m_addr_mask(addr_mask)
+	, m_interrupt_pending(false)
+	, m_elapsed_cycles(0)
 {
 	// Allocate & setup
 

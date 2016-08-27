@@ -65,7 +65,7 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -105,7 +105,7 @@ READ8_MEMBER( bcs3_state::keyboard_r )
 	offset ^= 0x3ff;
 
 	for (i = 0; i < 10; i++)
-		if BIT(offset, i)
+		if (BIT(offset, i))
 			data |= m_io_keyboard[i]->read();
 
 	return data;

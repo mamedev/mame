@@ -5,6 +5,41 @@
 MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
 
+#include "m4apachg.lh"
+
+DRIVER_INIT_MEMBER(mpu4_state,m4apachg)
+{
+	DRIVER_INIT_CALL(m4default);
+	//Derived from Apache_Gold_(Empire)_[C02_800_25jp].gam
+	DRIVER_INIT_CALL(m4_hopper_duart_a);
+	DRIVER_INIT_CALL(m4_large_extender_b);
+	DRIVER_INIT_CALL(m4default_reels);
+	//PCKEY =b
+	//STKEY =4
+	//JPKEY =a
+	//JPSET =5
+	//DIP1_0=false
+	//DIP1_1=true
+	//DIP1_2=false
+	//DIP1_3=true
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=true
+	//DIP2_4=true
+	//DIP2_5=false
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound empire
+	//Standard
+	//Volume 0 Stereo= 1
+	//Sample rate 16000
+	//Front door code 0 Cash door code 0
+}
 
 ROM_START( m4apachg )
 	ROM_REGION( 0x020000, "maincpu", 0 )
@@ -823,13 +858,14 @@ ROM_END
    most of these boot (after a single reset to initialize)
    but have broken text, need to check VFD emulation */
 
-GAME(199?, m4apachg,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4apachga, m4apachg, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4apachgb, m4apachg, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4apachgc, m4apachg, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4apachgd, m4apachg, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4apachge, m4apachg, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 6)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4apachgf, m4apachg, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 7)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAMEL(199?, m4apachg,  0,        mod4oki, mpu4, mpu4_state, m4apachg, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachga, m4apachg, mod4oki, mpu4, mpu4_state, m4apachg, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachgb, m4apachg, mod4oki, mpu4, mpu4_state, m4apachg, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachgc, m4apachg, mod4oki, mpu4, mpu4_state, m4apachg, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachgd, m4apachg, mod4oki, mpu4, mpu4_state, m4apachg, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachge, m4apachg, mod4oki, mpu4, mpu4_state, m4apachg, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 6)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachgf, m4apachg, mod4oki, mpu4, mpu4_state, m4apachg, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 7)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+
 GAME(199?, m4bangrs,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Bangers 'n' Cash (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4bangrsa, m4bangrs, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Bangers 'n' Cash (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4bangrsb, m4bangrs, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Bangers 'n' Cash (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )

@@ -166,7 +166,7 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 	m_flip_xoffs(0),
 	m_flip_yoffs(0),
 	m_col_base(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	memset(m_ctrl, 0, sizeof(m_ctrl));
 
@@ -215,18 +215,18 @@ void tc0480scp_device::device_start()
 
 
 	/* Single width versions */
-	m_tilemap[0][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[1][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[2][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[3][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[4][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[2][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[3][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[4][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	m_tilemap[0][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[1][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[2][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[3][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[4][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[2][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[3][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[4][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0480scp_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	for (int i = 0; i < 2; i++)
 	{

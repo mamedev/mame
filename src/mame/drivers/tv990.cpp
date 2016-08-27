@@ -343,7 +343,7 @@ INPUT_CHANGED_MEMBER(tv990_state::color)
 			color = rgb_t::white;
 			break;
 	}
-	m_screen->static_set_color(m_screen, color);
+	m_screen->static_set_color(*m_screen, color);
 }
 
 void tv990_state::machine_reset()

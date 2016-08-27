@@ -26,6 +26,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <algorithm>
 
 // MAME headers
 #include "emu.h"
@@ -135,7 +136,7 @@ find_device_info(Display    *display,
 	int     num_devices;
 	int     len = strlen(name);
 	bool    is_id = true;
-	XID     id = (XID)-1;
+	XID     id = static_cast<XID>(-1);
 
 	for(loop = 0; loop < len; loop++)
 	{
@@ -258,6 +259,8 @@ register_events(
 class x11_event_handler
 {
 public:
+	virtual ~x11_event_handler() {}
+
 	virtual void handle_event(XEvent &xevent) = 0;
 };
 
@@ -272,7 +275,7 @@ private:
 	{
 	}
 public:
-	Display *       display() { return m_display; }
+	Display * display() const { return m_display; }
 
 	static x11_event_manager& instance()
 	{
@@ -295,7 +298,7 @@ public:
 		}
 
 		XExtensionVersion *version = XGetExtensionVersion(m_display, INAME);
-		if (!version || (version == (XExtensionVersion*)NoSuchExtension))
+		if (!version || (version == reinterpret_cast<XExtensionVersion*>(NoSuchExtension)))
 		{
 			osd_printf_verbose("xinput extension not available!\n");
 			return -1;
@@ -318,8 +321,10 @@ public:
 			auto subscribers = m_subscription_index.equal_range(xevent.type);
 
 			// Dispatch the events
-			for (auto iter = subscribers.first; iter != subscribers.second; iter++)
-				iter->second->handle_event(xevent);
+			std::for_each(subscribers.first, subscribers.second, [&xevent](auto &pair)
+			{
+				pair.second->handle_event(xevent);
+			});
 		}
 	}
 };
@@ -359,7 +364,7 @@ public:
 	{
 		if (xevent.type == motion_type)
 		{
-			XDeviceMotionEvent *motion = (XDeviceMotionEvent *)&xevent;
+			XDeviceMotionEvent *motion = reinterpret_cast<XDeviceMotionEvent *>(&xevent);
 			print_motion_event(motion);
 
 			/*
@@ -395,7 +400,7 @@ public:
 		}
 		else if (xevent.type == button_press_type || xevent.type == button_release_type)
 		{
-			XDeviceButtonEvent *button = (XDeviceButtonEvent *)&xevent;
+			XDeviceButtonEvent *button = reinterpret_cast<XDeviceButtonEvent *>(&xevent);
 			lightgun.buttons[button->button] = (xevent.type == button_press_type) ? 0x80 : 0;
 		}
 	}
@@ -417,7 +422,8 @@ private:
 	Display *      m_display;
 public:
 	x11_lightgun_module()
-		: input_module_base(OSD_LIGHTGUNINPUT_PROVIDER, "x11")
+		: input_module_base(OSD_LIGHTGUNINPUT_PROVIDER, "x11"),
+		  m_display(nullptr)
 	{
 	}
 
@@ -463,10 +469,10 @@ public:
 			if (info->num_classes > 0)
 			{
 				// Add the lightgun buttons based on what we read
-				add_lightgun_buttons((XAnyClassPtr)info->inputclassinfo, info->num_classes, devinfo);
+				add_lightgun_buttons(static_cast<XAnyClassPtr>(info->inputclassinfo), info->num_classes, devinfo);
 
 				// Also, set the axix min/max ranges if we got them
-				set_lightgun_axis_props((XAnyClassPtr)info->inputclassinfo, info->num_classes, devinfo);
+				set_lightgun_axis_props(static_cast<XAnyClassPtr>(info->inputclassinfo), info->num_classes, devinfo);
 			}
 
 			// Add X and Y axis
@@ -481,7 +487,7 @@ public:
 
 			// Register this device to receive event notifications
 			int events_registered = register_events(m_display, info, m_lightgun_map.map[index].name.c_str(), 0);
-			osd_printf_verbose("Device %i: Registered %i events.\n", (int)info->id, events_registered);
+			osd_printf_verbose("Device %i: Registered %i events.\n", static_cast<int>(info->id), events_registered);
 
 			// register ourself to handle events from event manager
 			int event_types[] = { motion_type, button_press_type, button_release_type };
@@ -511,16 +517,15 @@ public:
 
 	void handle_event(XEvent &xevent) override
 	{
-		for (int i = 0; i < devicelist()->size(); i++)
+		devicelist()->for_each_device([&xevent](auto device)
 		{
-			downcast<x11_input_device*>(devicelist()->at(i))->queue_events(&xevent, 1);
-		}
+			downcast<x11_input_device*>(device)->queue_events(&xevent, 1);
+		});
 	}
 
 private:
 	x11_lightgun_device* create_lightgun_device(running_machine &machine, int index)
 	{
-		x11_lightgun_device *devinfo = nullptr;
 		char tempname[20];
 
 		if (m_lightgun_map.map[index].name.length() == 0)
@@ -528,20 +533,16 @@ private:
 			if (m_lightgun_map.initialized)
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
-				devinfo = devicelist()->create_device<x11_lightgun_device>(machine, tempname, *this);
+				devicelist()->create_device<x11_lightgun_device>(machine, tempname, *this);
 			}
 
 			return nullptr;
 		}
-		else
-		{
-			devinfo = devicelist()->create_device<x11_lightgun_device>(machine, m_lightgun_map.map[index].name.c_str(), *this);
-		}
 
-		return devinfo;
+		return devicelist()->create_device<x11_lightgun_device>(machine, m_lightgun_map.map[index].name.c_str(), *this);
 	}
 
-	void add_lightgun_buttons(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device *devinfo)
+	void add_lightgun_buttons(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device *devinfo) const
 	{
 		XAnyClassPtr any = first_info_class;
 
@@ -550,20 +551,20 @@ private:
 			switch (any->c_class)
 			{
 			case ButtonClass:
-				XButtonInfoPtr b = (XButtonInfoPtr)any;
+				XButtonInfoPtr b = reinterpret_cast<XButtonInfoPtr>(any);
 				for (int button = 0; button < b->num_buttons; button++)
 				{
-					input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
+					input_item_id itemid = static_cast<input_item_id>(ITEM_ID_BUTTON1 + button);
 					devinfo->device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo->lightgun.buttons[button]);
 				}
 				break;
 			}
 
-			any = (XAnyClassPtr)((char *)any + any->length);
+			any = reinterpret_cast<XAnyClassPtr>(reinterpret_cast<char *>(any) + any->length);
 		}
 	}
 
-	void set_lightgun_axis_props(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device *devinfo)
+	void set_lightgun_axis_props(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device *devinfo) const
 	{
 		XAnyClassPtr any = first_info_class;
 
@@ -572,8 +573,8 @@ private:
 			switch (any->c_class)
 			{
 			case ValuatorClass:
-				XValuatorInfoPtr valuator_info = (XValuatorInfoPtr)any;
-				XAxisInfoPtr axis_info = (XAxisInfoPtr)((char *)valuator_info + sizeof(XValuatorInfo));
+				XValuatorInfoPtr valuator_info = reinterpret_cast<XValuatorInfoPtr>(any);
+				XAxisInfoPtr axis_info = reinterpret_cast<XAxisInfoPtr>(reinterpret_cast<char *>(valuator_info) + sizeof(XValuatorInfo));
 				for (int j = 0; j < valuator_info->num_axes; j++, axis_info++)
 				{
 					if (j == 0)
@@ -593,7 +594,7 @@ private:
 				break;
 			}
 
-			any = (XAnyClassPtr)((char *)any + any->length);
+			any = reinterpret_cast<XAnyClassPtr>(reinterpret_cast<char *>(any) + any->length);
 		}
 	}
 };

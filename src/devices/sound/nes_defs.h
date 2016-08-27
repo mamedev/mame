@@ -28,8 +28,6 @@
 #ifndef __NES_DEFS_H__
 #define __NES_DEFS_H__
 
-#include "nes_defs.h"
-
 /* BOOLEAN CONSTANTS */
 #ifndef TRUE
 #define TRUE   1

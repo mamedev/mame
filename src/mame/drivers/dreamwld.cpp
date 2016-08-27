@@ -261,8 +261,8 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
 
 void dreamwld_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
-	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
 	m_bg2_tilemap->set_transparent_pen(0);
 
 	m_bg_tilemap->set_scroll_rows(64*16); // line scrolling

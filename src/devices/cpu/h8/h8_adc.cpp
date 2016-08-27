@@ -33,7 +33,7 @@ void h8_adc_device::set_info(const char *_intc_tag, int _intc_vector)
 READ8_MEMBER(h8_adc_device::addr8_r)
 {
 	if(V>=1) logerror("addr8_r %d %03x\n", offset, addr[offset >> 1]);
-	return offset & 1 ? addr[offset >> 1] >> 2 : addr[offset >> 1] << 6;
+	return offset & 1 ? addr[offset >> 1] << 6 : addr[offset >> 1] >> 2;
 }
 
 READ16_MEMBER(h8_adc_device::addr16_r)

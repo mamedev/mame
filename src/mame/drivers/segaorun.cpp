@@ -678,8 +678,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(segaorun_state::bankmotor_update)
 //  for Out Run
 //-------------------------------------------------
 
-IOPORT_ARRAY_MEMBER( segaorun_state::digital_ports ) { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-
 READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 {
 	offset &= 0x7f/2;

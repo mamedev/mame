@@ -351,8 +351,14 @@ void aica_device::InitADPCM(int *PrevSignal, int *PrevQuant)
 
 signed short aica_device::DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
 {
+	int x = (*PrevQuant * quant_mul[Delta & 7]) / 8;
+	if (x > 0x7FFF) x = 0x7FFF;
+	if (Delta & 8)	x = -x;
+	x += *PrevSignal;
+#if 0 // older implementation
 	int x = *PrevQuant * quant_mul [Delta & 15];
 		x = *PrevSignal + ((int)(x + ((UINT32)x >> 29)) >> 3);
+#endif
 	*PrevSignal=ICLIP16(x);
 	*PrevQuant=(*PrevQuant*TableQuant[Delta&7])>>ADPCMSHIFT;
 	*PrevQuant=(*PrevQuant<0x7f)?0x7f:((*PrevQuant>0x6000)?0x6000:*PrevQuant);

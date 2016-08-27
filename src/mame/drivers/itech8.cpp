@@ -518,8 +518,6 @@
 
 
 
-IOPORT_ARRAY_MEMBER(itech8_state::analog_inputs) { "AN_C", "AN_D", "AN_E", "AN_F" };
-
 /*************************************
  *
  *  Interrupt handling

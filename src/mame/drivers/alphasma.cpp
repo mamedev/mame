@@ -23,16 +23,17 @@ class alphasmart_state : public driver_device
 {
 public:
 	alphasmart_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_lcdc0(*this, "ks0066_0"),
-			m_lcdc1(*this, "ks0066_1"),
-			m_nvram(*this, "nvram"),
-			m_ram(*this, RAM_TAG),
-			m_rambank(*this, "rambank"),
-			m_keyboard(*this, "COL"),
-			m_battery_status(*this, "BATTERY")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lcdc0(*this, "ks0066_0")
+		, m_lcdc1(*this, "ks0066_1")
+		, m_nvram(*this, "nvram")
+		, m_ram(*this, RAM_TAG)
+		, m_rambank(*this, "rambank")
+		, m_keyboard(*this, "COL.%u", 0)
+		, m_battery_status(*this, "BATTERY")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc0;
@@ -69,9 +70,10 @@ class asma2k_state : public alphasmart_state
 {
 public:
 	asma2k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: alphasmart_state(mconfig, type, tag),
-			m_intram(*this, "internal_ram")
-		{ }
+		: alphasmart_state(mconfig, type, tag)
+		, m_intram(*this, "internal_ram")
+	{
+	}
 
 	required_shared_ptr<UINT8> m_intram;
 

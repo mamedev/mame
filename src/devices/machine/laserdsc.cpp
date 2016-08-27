@@ -92,7 +92,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_overenable(false),
 		m_overindex(0),
 		m_overtex(nullptr),
-		m_overlay_palette(*this)
+		m_overlay_palette(*this, finder_base::DUMMY_TAG)
 {
 	// initialize overlay_config
 	m_orig_config.m_overposx = m_orig_config.m_overposy = 0.0f;

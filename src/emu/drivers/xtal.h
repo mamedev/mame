@@ -146,6 +146,7 @@ enum
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_16_384MHz      = 16384000,
 	XTAL_16_5888MHz     = 16588800,     /* SM 7238 */
+	XTAL_16_777216MHz   = 16777216,     /* Nintendo Game Boy Advance */
 	XTAL_16_9344MHz     = 16934400,     /* Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
 	XTAL_17_36MHz       = 17360000,     /* OMTI Series 10 SCSI controller */
 	XTAL_17_73447MHz    = 17734470,     /* (~4x PAL subcarrier) */

@@ -31,7 +31,7 @@ public:
 		, m_pio(*this, "z80pio")
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
-		, m_keyboard(*this, "KEY")
+		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(pasopia_ctrl_w);
@@ -219,13 +219,13 @@ READ8_MEMBER( pasopia_state::rombank_r )
 READ8_MEMBER( pasopia_state::keyb_r )
 {
 	UINT8 i,j,res = 0;
-	for(j=0;j<3;j++)
+	for (j=0; j<3; j++)
 	{
-		if BIT(m_mux_data, 4+j)
+		if (BIT(m_mux_data, 4+j))
 		{
-			for(i=0;i<4;i++)
+			for (i=0; i<4; i++)
 			{
-				if BIT(m_mux_data, i)
+				if (BIT(m_mux_data, i))
 					res |= m_keyboard[j*4+i]->read();
 			}
 		}

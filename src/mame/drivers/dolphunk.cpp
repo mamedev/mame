@@ -143,13 +143,13 @@ READ8_MEMBER( dauphin_state::port07_r )
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				data = i | 0xc0;
 
 	keyin = ioport("X1")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				data = i | 0xc8;
 
 	if (data == m_last_key)

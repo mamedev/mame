@@ -49,7 +49,7 @@ public:
 		, m_7a(*this, "7a")
 		, m_9a(*this, "9a")
 		, m_9b(*this, "9b")
-		, m_switches(*this, "SW")
+		, m_switches(*this, "SW.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(ppic_r);
@@ -1137,22 +1137,22 @@ WRITE8_MEMBER( inder_state::sol_brvteam_w )
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
-		if BIT(data, 1)
+		if (BIT(data, 1))
 			m_samples->start(0, 7); // left sling near bumpers "canon izq"
 
-		if BIT(data, 2)
+		if (BIT(data, 2))
 			m_samples->start(1, 7); // right sling near bumpers "canon der"
 
-		if BIT(data, 3)
+		if (BIT(data, 3))
 			m_samples->start(0, 5); // outhole
 
-		if BIT(data, 5)
+		if (BIT(data, 5))
 			m_samples->start(2, 0); // left bumper
 
-		if BIT(data, 6)
+		if (BIT(data, 6))
 			m_samples->start(3, 0); // right bumper
 
-		if BIT(data, 7)
+		if (BIT(data, 7))
 			m_samples->start(4, 0); // middle bumper
 	}
 }
@@ -1162,16 +1162,16 @@ WRITE8_MEMBER( inder_state::sol_canasta_w )
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
-		if BIT(data, 3)
+		if (BIT(data, 3))
 			m_samples->start(0, 5); // outhole
 
-		if BIT(data, 5)
+		if (BIT(data, 5))
 			m_samples->start(2, 0); // left bumper
 
-		if BIT(data, 6)
+		if (BIT(data, 6))
 			m_samples->start(3, 0); // right bumper
 
-		if BIT(data, 7)
+		if (BIT(data, 7))
 			m_samples->start(4, 0); // middle bumper
 	}
 }
@@ -1195,7 +1195,7 @@ WRITE8_MEMBER( inder_state::ppi60a_w )
 {
 	if (data)
 		for (UINT8 i = 0; i < 8; i++)
-			if BIT(data, i)
+			if (BIT(data, i))
 				m_row = i;
 }
 
@@ -1204,7 +1204,7 @@ WRITE8_MEMBER( inder_state::ppi60b_w )
 {
 	if (data & 7)
 		for (UINT8 i = 0; i < 3; i++)
-			if BIT(data, i)
+			if (BIT(data, i))
 				m_row = i+8;
 }
 
@@ -1212,7 +1212,7 @@ WRITE8_MEMBER( inder_state::ppi64c_w )
 {
 	UINT8 i;
 	data &= 15;
-	if BIT(data, 3) // 8 to 15
+	if (BIT(data, 3)) // 8 to 15)
 	{
 		data ^= 15; // now 7 to 0
 		for (i = 0; i < 5; i++)
@@ -1289,7 +1289,7 @@ WRITE8_MEMBER( inder_state::ppic_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc, 5))
-		m_msm->set_prescaler_selector(m_msm, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm->set_prescaler_selector(*m_msm, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
 	m_7a->clock_w(BIT(data, 6));
 	m_7a->preset_w(!BIT(data, 7));
 	m_9a->preset_w(!BIT(data, 7));

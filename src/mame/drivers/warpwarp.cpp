@@ -150,8 +150,6 @@ INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-IOPORT_ARRAY_MEMBER(warpwarp_state::portnames) { "SW0", "SW1", "DSW2", "PLACEHOLDER" }; // "IN1" & "IN2" are read separately when offset==3
-
 /* B&W Games I/O */
 READ8_MEMBER(warpwarp_state::geebee_in_r)
 {

@@ -136,8 +136,8 @@ TILE_GET_INFO_MEMBER(bmcpokr_state::get_t2_tile_info)
 
 void bmcpokr_state::video_start()
 {
-	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bmcpokr_state::get_t1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,128);
-	m_tilemap_2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bmcpokr_state::get_t2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,128);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bmcpokr_state::get_t1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,128);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bmcpokr_state::get_t2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,128);
 
 	m_tilemap_1->set_transparent_pen(0);
 	m_tilemap_2->set_transparent_pen(0);

@@ -2,10 +2,10 @@
 // copyright-holders:smf
 #include "legscsi.h"
 
-legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_selected(0),
-	m_scsi_port(*this)
+legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_selected(0)
+	, m_scsi_port(*this, finder_base::DUMMY_TAG)
 {
 }
 

@@ -17,7 +17,7 @@ decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag,
 	device_video_interface(mconfig, *this),
 	m_dirty_palette(nullptr),
 	m_priority(0),
-	m_palette(*this),
+	m_palette(*this, finder_base::DUMMY_TAG),
 	m_generic_paletteram_16(*this, "^paletteram")
 {
 }

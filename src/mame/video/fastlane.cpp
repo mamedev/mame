@@ -91,8 +91,8 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 void fastlane_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_layer0->set_scroll_rows(32);
 
@@ -147,7 +147,7 @@ UINT32 fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind1
 	m_layer0->set_scrolly(0, m_k007121->ctrlram_r(space, 2));
 
 	m_layer0->draw(screen, bitmap, finalclip0, 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_palette, m_spriteram, 0, 40, 0, screen.priority(), (UINT32)-1);
+	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), *m_palette, m_spriteram, 0, 40, 0, screen.priority(), (UINT32)-1);
 	m_layer1->draw(screen, bitmap, finalclip1, 0, 0);
 	return 0;
 }

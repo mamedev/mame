@@ -26,7 +26,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vregs(*this, "vregs"),
 		m_objectram(*this, "objectram"),
-		m_scrollram(*this, "scrollram"),
+		m_scrollram(*this, "scrollram.%u", 0),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),

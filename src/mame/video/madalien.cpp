@@ -133,14 +133,14 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 		16, 16, 32, 32
 	};
 
-	m_tilemap_fg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_tilemap_fg->set_transparent_pen(0);
 
 	for (i = 0; i < 4; i++)
 	{
-		m_tilemap_edge1[i] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 
-		m_tilemap_edge2[i] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge2[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 	}
 
 	m_headlight_bitmap = std::make_unique<bitmap_ind16>(128, 128);

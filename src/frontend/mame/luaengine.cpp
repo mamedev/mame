@@ -1252,7 +1252,7 @@ int lua_engine::lua_memory_region::l_region_write(lua_State *L)
 		if(region.endianness() == ENDIANNESS_BIG)
 			region.base()[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		else
-			region.base()[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
+			region.base()[(BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		val >>= 8;
 	}
 
@@ -1317,7 +1317,7 @@ int lua_engine::lua_memory_share::l_share_write(lua_State *L)
 		if(share.endianness() == ENDIANNESS_BIG)
 			ptr[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		else
-			ptr[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
+			ptr[(BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		val >>= 8;
 	}
 
@@ -1724,12 +1724,12 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 
 int lua_engine::lua_emu_file::l_emu_file_read(lua_State *L)
 {
-	lua_emu_file *file = luabridge::Stack<lua_emu_file *>::get(L, 1);
+	emu_file *file = luabridge::Stack<emu_file *>::get(L, 1);
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "length (integer) expected");
 	int ret, len = lua_tonumber(L, 2);
 	luaL_Buffer buff;
 	char *ptr = luaL_buffinitsize(L, &buff, len);
-	ret = file->file.read(ptr, len);
+	ret = file->read(ptr, len);
 	luaL_pushresultsize(&buff, ret);
 	return 1;
 }
@@ -1942,9 +1942,10 @@ lua_engine::~lua_engine()
 	close();
 }
 
-void lua_engine::call_plugin(const char *data, const char *name)
+const char *lua_engine::call_plugin(const char *data, const char *name)
 {
 	std::string field("cb_");
+	const char *ret = nullptr;
 	field += name;
 	lua_settop(m_lua_state, 0);
 	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
@@ -1952,17 +1953,21 @@ void lua_engine::call_plugin(const char *data, const char *name)
 	if(!lua_isfunction(m_lua_state, -1))
 	{
 		lua_pop(m_lua_state, 1);
-		return;
+		return nullptr;
 	}
 	lua_pushstring(m_lua_state, data);
 	int error;
-	if((error = lua_pcall(m_lua_state, 1, 0, 0)) != LUA_OK)
+	if((error = lua_pcall(m_lua_state, 1, 1, 0)) != LUA_OK)
 	{
 		if(error == LUA_ERRRUN)
 			printf("%s\n", lua_tostring(m_lua_state, -1));
 		lua_pop(m_lua_state, 1);
-		return;
+		return nullptr;
 	}
+	if(lua_isstring(m_lua_state, -1))
+		ret = lua_tostring(m_lua_state, -1);
+	lua_pop(m_lua_state, 1);
+	return ret;
 }
 
 int lua_engine::l_emu_register_callback(lua_State *L)
@@ -2670,15 +2675,17 @@ void lua_engine::initialize()
 				.addProperty <bool> ("is_creatable", &device_image_interface::is_creatable)
 				.addProperty <bool> ("is_reset_on_load", &device_image_interface::is_reset_on_load)
 			.endClass()
-			.beginClass <lua_emu_file> ("file")
-				.addConstructor <void (*)(const char *, UINT32)> ()
+			.beginClass <lua_emu_file> ("lua_file")
 				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
-				.addFunction ("open", &lua_emu_file::open)
-				.addFunction ("open_next", &lua_emu_file::open_next)
-				.addFunction ("seek", &lua_emu_file::seek)
-				.addFunction ("size", &lua_emu_file::size)
-				.addFunction ("filename", &lua_emu_file::filename)
-				.addFunction ("fullpath", &lua_emu_file::fullpath)
+			.endClass()
+			.deriveClass <emu_file, lua_emu_file> ("file")
+				.addConstructor <void (*)(const char *, UINT32)> ()
+				.addFunction ("open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open))
+				.addFunction ("open_next", &emu_file::open_next)
+				.addFunction ("seek", &emu_file::seek)
+				.addFunction ("size", &emu_file::size)
+				.addFunction ("filename", &emu_file::filename)
+				.addFunction ("fullpath", &emu_file::fullpath)
 			.endClass()
 			.beginClass <lua_item> ("item")
 				.addConstructor <void (*)(int)> ()

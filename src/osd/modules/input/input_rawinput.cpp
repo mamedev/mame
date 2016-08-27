@@ -21,10 +21,10 @@
 
 #include <mutex>
 #include <functional>
+#include <algorithm>
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 #include "strconv.h"
 
 // MAMEOS headers
@@ -467,7 +467,11 @@ private:
 
 public:
 	rawinput_module(const char *type, const char* name)
-		: wininput_module(type, name)
+		: wininput_module(type, name),
+		get_rawinput_device_list(nullptr),
+		get_rawinput_data(nullptr),
+		get_rawinput_device_info(nullptr),
+		register_rawinput_devices(nullptr)
 	{
 	}
 
@@ -615,24 +619,23 @@ protected:
 		{
 			std::lock_guard<std::mutex> scope_lock(m_module_lock);
 
-			rawinput_device *devinfo;
+			RAWINPUT *input = reinterpret_cast<RAWINPUT*>(data);
+
 			// find the device in the list and update
-			for (int i = 0; i < devicelist()->size(); i++)
+			auto target_device = std::find_if(devicelist()->begin(), devicelist()->end(), [input](auto &device)
 			{
-				devinfo = dynamic_cast<rawinput_device*>(devicelist()->at(i));
-				if (devinfo)
-				{
-					RAWINPUT *input = reinterpret_cast<RAWINPUT*>(data);
-					if (input->header.hDevice == devinfo->device_handle())
-					{
-						devinfo->queue_events(input, 1);
-						result = true;
-					}
-				}
+				auto devinfo = dynamic_cast<rawinput_device*>(device.get());
+				return devinfo != nullptr && input->header.hDevice == devinfo->device_handle();
+			});
+
+			if (target_device != devicelist()->end())
+			{
+				static_cast<rawinput_device*>((*target_device).get())->queue_events(input, 1);
+				return true;
 			}
 		}
 
-		return result;
+		return false;
 	}
 };
 

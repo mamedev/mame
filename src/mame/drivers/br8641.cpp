@@ -39,7 +39,7 @@ public:
 		, m_pio2(*this, "pio2")
 		, m_pio3(*this, "pio3")
 		, m_ctc(*this, "ctc")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_beep(*this, "beeper")
 	{ }
 
@@ -124,7 +124,7 @@ READ8_MEMBER( brandt8641_state::port08_r )
 	UINT8 i, data = 7;
 
 	for (i = 0; i < 8; i++)
-		if BIT(m_port09, i)
+		if (BIT(m_port09, i))
 			data &= m_io_keyboard[i]->read();
 
 	return data | m_port08;

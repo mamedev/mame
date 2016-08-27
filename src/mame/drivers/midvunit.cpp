@@ -34,6 +34,8 @@ Known to exist but not dumped:
 #include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
+#include "crusnusa.lh"
+#include <iostream>
 
 
 #define CPU_CLOCK       50000000
@@ -54,6 +56,8 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_last_port0));
 	save_item(NAME(m_shifter_state));
 	save_item(NAME(m_timer_rate));
+	save_item(NAME(m_output_mode));
+	save_item(NAME(m_output));
 }
 
 
@@ -370,6 +374,81 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 	m_midway_serial_pic2->write(space, 0, data >> 16);
 }
 
+READ32_MEMBER(midvunit_state::midvunit_output_r)
+{
+	return m_output;
+}
+
+void midvunit_state::set_input(const char *s) {
+	m_galil_input = s;
+	m_galil_input_index = 0;
+	m_galil_input_length = strlen(s);
+}
+
+WRITE32_MEMBER(midvunit_state::midvunit_output_w)
+{
+	int bit;
+	UINT8 op = (data >> 8) & 0xFF;
+	UINT8 arg = data & 0xFF;
+	switch (op) {
+		case 0xF7: m_output_mode = arg; break;
+		case 0xFB:
+		switch (m_output_mode) {
+			case 0x00:
+				set_input(":");
+				m_galil_output_index = 0;
+				memset(m_galil_output, 0, 450);
+			break; //device init? 3C 1C are the only 2 writes at boot.
+			case 0x04: output().set_value("wheel", (arg&0x80)?(0x7F-(arg&0x7F)):(arg|0x80)); break; //wheel motor delta. left < 128 < right. 128 is no change.
+			case 0x05: for (bit = 0; bit < 8; bit++) output().set_lamp_value(bit, (arg >> bit) & 0x1); break;
+			case 0x08: m_output = m_galil_input[m_galil_input_index++] << 8; break; //get next character from input string.
+			case 0x09:
+				if (arg != 0xD) {
+					m_galil_output[m_galil_output_index] = (char)arg;
+					if (m_galil_output_index < 450)
+						m_galil_output_index++;
+				}
+				else {
+					// G, W, S, and Q are commented out because they are error commands.
+					// When the motion tests succeeds it will send the program over to
+					// the motion controller and as this is not a real system it will
+					// assume it wants to execute them which turns off the motion system.
+					// If anyone wishes to implement a real Galil motion controller feel
+					// free to do so. This will only dump everything to stdout.
+					if (strstr(m_galil_output,"MG \"V\" IBO {$2.0}"))
+						set_input("V$00");
+					else if (strstr(m_galil_output,"MG \"X\", _TSX {$2.0}"))
+						set_input("X$00");
+					else if (strstr(m_galil_output,"MG \"Y\", _TSY {$2.0}"))
+						set_input("Y$00");
+					else if (strstr(m_galil_output,"MG \"Z\", _TSZ {$2.0}"))
+						set_input("Z$00");
+					/*else if (strstr(m_galil_output,"MG \"G\""))
+						set_input("G");
+					else if (strstr(m_galil_output,"MG \"W\""))
+						set_input("W");
+					else if (strstr(m_galil_output,"MG \"S\""))
+						set_input("S");
+					else if (strstr(m_galil_output,"MG \"Q\""))
+						set_input("Q");*/
+					else
+						set_input(":");
+					std::cout << m_galil_output << std::endl;
+					//osd_printf_error("Galil << %s\n", m_galil_output);
+					memset(m_galil_output, 0, m_galil_output_index);
+					m_galil_output_index = 0;
+				}
+			break; //Galil command input. ascii inputs terminated with carriage return.
+			case 0x0A: m_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0; break; //set output to 0x8000 if there is data available, otherwise 0.
+			case 0x0B: break; //0 written at boot.
+			case 0x0C: break; //0 written at boot.
+			case 0x0E: break; //0 written after test.
+		}
+		break;
+		//receives same data as midvunit_sound_w. unsure what its purpose is, but it is redundant.
+		//case 0xFD: m_dcs->data_w(arg); break;
+	}
+}
 
 
 /*************************************
@@ -476,7 +555,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
 	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995000, 0x995000) AM_WRITENOP    // force feedback?
+	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_output_r, midvunit_output_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP // communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
@@ -553,8 +632,15 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 1")  /* view 1 */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 2")  /* view 2 */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 3") /* view 3 */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("View 4") /* view 4 */
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Stop")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Right Mat")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Rear Mat")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Left Mat")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Front Mat")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Mat Plugin")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Mat Step")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Opto Detector")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Failsafe Switch")
 
 	PORT_START("DSW")
 	/* DSW2 at U97 */
@@ -1811,23 +1897,23 @@ DRIVER_INIT_MEMBER(midvunit_state,wargods)
  *
  *************************************/
 
-GAME( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAME( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAME( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
 GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )

@@ -611,10 +611,10 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_C352_ADD("c352", 48384000/2, 288)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
+	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 ROM_START( speedrcr )
@@ -808,7 +808,7 @@ DRIVER_INIT_MEMBER(namcofl_state,finalapr)
 	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_IMPERFECT_SOUND, layout_namcofl )
-GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_IMPERFECT_SOUND, layout_namcofl )
-GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_SOUND, layout_namcofl )
+GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", 0, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", 0, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", 0, layout_namcofl )

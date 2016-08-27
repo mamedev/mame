@@ -16,7 +16,7 @@ public:
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_dials(*this, "DIAL"),
+		m_dials(*this, "DIAL.%u", 0),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),

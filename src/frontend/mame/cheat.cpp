@@ -1379,22 +1379,17 @@ void cheat_manager::frame_update()
 
 void cheat_manager::load_cheats(const char *filename)
 {
-	xml_data_node *rootnode = nullptr;
 	std::string searchstr(machine().options().cheat_path());
-	path_iterator path(searchstr.c_str());
 	std::string curpath;
-	while (path.next(curpath))
+	for (path_iterator path(searchstr); path.next(curpath); )
 	{
 		searchstr.append(";").append(curpath).append(PATH_SEPARATOR).append("cheat");
 	}
-	emu_file cheatfile(searchstr.c_str(), OPEN_FLAG_READ);
+	emu_file cheatfile(std::move(searchstr), OPEN_FLAG_READ);
 	try
 	{
-		// open the file with the proper name
-		osd_file::error filerr = cheatfile.open(filename, ".xml");
-
 		// loop over all instrances of the files found in our search paths
-		while (filerr == osd_file::error::NONE)
+		for (osd_file::error filerr = cheatfile.open(filename, ".xml"); filerr == osd_file::error::NONE; filerr = cheatfile.open_next())
 		{
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
 
@@ -1402,7 +1397,7 @@ void cheat_manager::load_cheats(const char *filename)
 			xml_parse_options options = { nullptr };
 			xml_parse_error error;
 			options.error = &error;
-			rootnode = xml_file_read(cheatfile, &options);
+			std::unique_ptr<xml_data_node, void (*)(xml_data_node *)> rootnode(xml_file_read(cheatfile, &options), &xml_file_free);
 
 			// if unable to parse the file, just bail
 			if (rootnode == nullptr)
@@ -1432,12 +1427,6 @@ void cheat_manager::load_cheats(const char *filename)
 				else // add to the end of the list
 					m_cheatlist.push_back(std::move(curcheat));
 			}
-
-			// free the file and loop for the next one
-			xml_file_free(rootnode);
-
-			// open the next file in sequence
-			filerr = cheatfile.open_next();
 		}
 	}
 
@@ -1446,7 +1435,5 @@ void cheat_manager::load_cheats(const char *filename)
 	{
 		osd_printf_error("%s\n", err.string());
 		m_cheatlist.clear();
-		if (rootnode != nullptr)
-			xml_file_free(rootnode);
 	}
 }

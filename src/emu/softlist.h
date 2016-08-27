@@ -124,7 +124,7 @@ public:
 	const std::list<software_part> &parts() const { return m_partdata; }
 
 	// additional operations
-	const software_part *find_part(const std::string &partname, const char *interface = nullptr) const;
+	const software_part *find_part(const std::string &part_name, const char *interface = nullptr) const;
 	bool has_multiple_parts(const char *interface) const;
 
 private:
@@ -207,8 +207,8 @@ private:
 
 // ----- Helpers -----
 
-// parses a software name (e.g. - 'apple2e:agentusa:flop1') into its consituent parts (returns false if cannot parse)
-bool software_name_parse(const std::string &text, std::string *swlist_name = nullptr, std::string *swname = nullptr, std::string *swpart = nullptr);
+// parses a software identifier (e.g. - 'apple2e:agentusa:flop1') into its consituent parts (returns false if cannot parse)
+bool software_name_parse(const std::string &identifier, std::string *list_name = nullptr, std::string *software_name = nullptr, std::string *part_name = nullptr);
 
 #endif // __SOFTLIST_H_
 

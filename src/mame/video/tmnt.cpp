@@ -252,7 +252,7 @@ VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 
 VIDEO_START_MEMBER(tmnt_state,glfgreat)
 {
-	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	m_glfgreat_roz_rom_bank = 0;
@@ -265,7 +265,7 @@ VIDEO_START_MEMBER(tmnt_state,glfgreat)
 
 VIDEO_START_MEMBER(tmnt_state,prmrsocr)
 {
-	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	m_prmrsocr_sprite_bank = 0;

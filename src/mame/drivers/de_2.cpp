@@ -674,12 +674,36 @@ ROM_START(bttf_g27)
 	ROM_LOAD("bttfsf5.rom", 0x10000, 0x10000, CRC(37a6f6b8) SHA1(ebd603d36527a2af25dcda1fde5cdf9a34d1f9cd))
 ROM_END
 
+/*-------------------------------------------------------------------------------
+/ King Kong - CPU Rev 3 /Alpha Type 3 16/32K Roms - 32/64K Sound Roms
+/-------------------------------------------------------------------------------*/
+ROM_START(kiko_a10)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("kkcpu_b5.bin", 0x4000, 0x4000, CRC(97b80fd2) SHA1(a704bda771bd44676a0de2f698a713d10feb01f3))
+	ROM_LOAD("kkcpu_c5.bin", 0x8000, 0x8000, CRC(d42cab64) SHA1(ca4ceac34384804395b3e3035a430560f194846b))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("kksnd_f7.bin", 0x8000, 0x8000, CRC(fb1b3e11) SHA1(3c9a6958749d7e4dc5a1a57d6683e3cb3dc34890))
+	ROM_REGION(0x1000000, "sound1", 0)
+	ROM_LOAD("kkvoi_f5.bin", 0x00000, 0x10000, CRC(415f814c) SHA1(27e5b6b7f7ce2e5548ee9bf30966fa4f276bdc4d))
+	ROM_LOAD("kkvoi_f4.bin", 0x10000, 0x10000, CRC(bbdc836c) SHA1(825a02b4f058d9dbc387035eb6533547d1766396))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Laser War - CPU Rev 1 /Alpha Type 1 - 32K ROM - 32/64K Sound Roms
 /-------------------------------------------------------------------*/
 ROM_START(lwar_a83)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("lwar8-3.c5", 0x8000, 0x8000, CRC(eee158ee) SHA1(54db2342bdd15b16fee906dc65f183a957fd0012))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("lwar_e9.snd", 0x8000, 0x8000, CRC(9a6c834d) SHA1(c6e2c4658db4bd8dfcbb0351793837cdff30ba28))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("lwar_e6.snd", 0x00000, 0x10000, CRC(7307d795) SHA1(5d88b8d883a2f17ca9fa30c7e7ac29c9f236ac4d))
+	ROM_LOAD("lwar_e7.snd", 0x10000, 0x10000, CRC(0285cff9) SHA1(2c5e3de649e419ec7944059f2a226aaf58fe2af5))
+ROM_END
+
+ROM_START(lwar_a81)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("c100_g8.256", 0x8000, 0x8000, CRC(fe63ef04) SHA1(edab4b7fab4a016e653a546110a4bc8c563e7cb7))
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("lwar_e9.snd", 0x8000, 0x8000, CRC(9a6c834d) SHA1(c6e2c4658db4bd8dfcbb0351793837cdff30ba28))
 	ROM_REGION(0x40000, "sound1", 0)
@@ -727,6 +751,17 @@ ROM_START(poto_a32)
 	ROM_LOAD("potof5.rom", 0x10000, 0x10000, CRC(5a0537a8) SHA1(26724441d7e2edd7725337b262d95448499151ad))
 ROM_END
 
+ROM_START(poto_a29)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("potob5.2-9", 0x4000, 0x4000, CRC(f01b5510) SHA1(90c632ee74a2dbf877cfe013a69067b1771f1d67))
+	ROM_LOAD("potoc5.2-9", 0x8000, 0x8000, CRC(c34975b3) SHA1(c9c57126a5da6d78b4066b1d316ffc840660689d))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("potof7.rom", 0x8000, 0x8000, CRC(2e60b2e3) SHA1(0be89fc9b2c6548392febb35c1ace0eb912fc73f))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("potof6.rom", 0x00000, 0x10000, CRC(62b8f74b) SHA1(f82c706b88f49341bab9014bd83371259eb53b47))
+	ROM_LOAD("potof5.rom", 0x10000, 0x10000, CRC(5a0537a8) SHA1(26724441d7e2edd7725337b262d95448499151ad))
+ROM_END
+
 /*-----------------------------------------------------------------------------------
 / Playboy 35th Anniversary - CPU Rev 2 /Alpha Type 2 - 32K Roms - 32/64K Sound Roms
 /-----------------------------------------------------------------------------------*/
@@ -755,6 +790,17 @@ ROM_START(robo_a34)
 	ROM_LOAD("robof4.rom", 0x10000, 0x10000, CRC(27d31df3) SHA1(1611a508ce74eb62a07296d69782ea4fa14503fc))
 ROM_END
 
+ROM_START(robo_a30)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("b5.256", 0x0000, 0x8000, CRC(6870f3ae) SHA1(f02cace5f1d1922aed52c84efe60a46e5297865c))
+	ROM_LOAD("c5.256", 0x8000, 0x8000, CRC(f2de58cf) SHA1(0b5dd14761b4c64c1b01faad923ab671573499c5))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("robof7.rom", 0x8000, 0x8000, CRC(fa0891bd) SHA1(332d03c7802989abf717564230993b54819ebc0d))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("robof6.rom", 0x00000, 0x10000, CRC(9246e107) SHA1(e8e72c0d099b17ea9e59ea7794011bad4c072c5e))
+	ROM_LOAD("robof4.rom", 0x10000, 0x10000, CRC(27d31df3) SHA1(1611a508ce74eb62a07296d69782ea4fa14503fc))
+ROM_END
+
 /*-------------------------------------------------------------------------
 / Secret Service - CPU Rev 2 /Alpha Type 2 - 32K Roms - 32K/64K Sound Roms
 /-------------------------------------------------------------------------*/
@@ -773,6 +819,17 @@ ROM_START(ssvc_b26)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ssvc2-6.b5", 0x0000, 0x8000, CRC(e5eab8cd) SHA1(63cb678084d4fb2131ba64ed9de1294830057960))
 	ROM_LOAD("ssvc2-6.c5", 0x8000, 0x8000, CRC(171b97ae) SHA1(9d678b7b91a5d50ea3cf4f2352094c2355f917b2))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sssndf7b.rom", 0x8000, 0x8000, CRC(4bd6b16a) SHA1(b9438a16cd35820628fe6eb82287b2c39fe4b1c6))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("ssv1f6.rom", 0x00000, 0x10000, CRC(ccbc72f8) SHA1(c5c13fb8d05d7fb4005636655073d88b4d12d65e))
+	ROM_LOAD("ssv2f4.rom", 0x10000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
+ROM_END
+
+ROM_START(ssvc_a42)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ss-b5.256", 0x0000, 0x8000, CRC(e7d27ea1) SHA1(997412f62c95cffc0cf9eba065fbc020574c7ad5))
+	ROM_LOAD("ss-c5.256", 0x8000, 0x8000, CRC(eceab834) SHA1(d946adac7ec8688709fd75108674a82f2f5c7b53))
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sssndf7b.rom", 0x8000, 0x8000, CRC(4bd6b16a) SHA1(b9438a16cd35820628fe6eb82287b2c39fe4b1c6))
 	ROM_REGION(0x40000, "sound1", 0)
@@ -830,6 +887,17 @@ ROM_START(tmac_a18)
 	ROM_LOAD("tmachf4.rom", 0x10000, 0x10000, CRC(51e3aade) SHA1(38fc0f3a9c727bfd07fbcb16c3ca6d0560dc65c3))
 ROM_END
 
+ROM_START(tmac_g18)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("tmachg18.b5", 0x4000, 0x4000, CRC(513d70ad) SHA1(dacdfc77956b1b5fb9bebca59fdb705aefa1b5b2))
+	ROM_LOAD("tmachg18.c5", 0x8000, 0x8000, CRC(5a348def) SHA1(bf2b9a69d516d38e6f87c5886e0ba768c2dc28ab))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("tmachf7.rom", 0x8000, 0x8000, CRC(0f518bd4) SHA1(05e24ca0e76d576c65d9d2a01417f1ad2aa984bb))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("tmachf6.rom", 0x00000, 0x10000, CRC(47e61641) SHA1(93cd946ebc9f69d82512429a9ae5f2754499b00a))
+	ROM_LOAD("tmachf4.rom", 0x10000, 0x10000, CRC(51e3aade) SHA1(38fc0f3a9c727bfd07fbcb16c3ca6d0560dc65c3))
+ROM_END
+
 /*-----------------------------------------------------------------------
 / Torpedo Alley - CPU Rev 2 /Alpha Type 2 - 32K Roms - 32/64K Sound Roms
 /------------------------------------------------------------------------*/
@@ -844,21 +912,39 @@ ROM_START(torp_e21)
 	ROM_LOAD("torpef4.rom", 0x10000, 0x10000, CRC(83a4e7f3) SHA1(96deac9251fe68cc0319ac009becd424c4e444c5))
 ROM_END
 
+ROM_START(torp_a16)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("b5.256", 0x0000, 0x8000, CRC(89711a7c) SHA1(b976b32b287d6cbaf4c448697f8aa12452db1f0b))
+	ROM_LOAD("c5.256", 0x8000, 0x8000, CRC(3b3d754f) SHA1(c5d4a09f4daf92af78d778148377fa0d2a550761))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("torpef7.rom", 0x8000, 0x8000, CRC(26f4c33e) SHA1(114f85e93e7b699c4cd6ce1298f95228d439deba))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("torpef6.rom", 0x00000, 0x10000, CRC(b214a7ea) SHA1(d972148395581844e3eaed08f755f3e2217dbbc0))
+	ROM_LOAD("torpef4.rom", 0x10000, 0x10000, CRC(83a4e7f3) SHA1(96deac9251fe68cc0319ac009becd424c4e444c5))
+ROM_END
+
 
 GAME(1990,  bttf_a27,       0,          de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7)",                                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  bttf_a20,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.0)",                                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  bttf_a21,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To The Future (2.1)",                                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(199?,  bttf_g27,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7 Germany)",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  kiko_a10,       0,          de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "King Kong (1.0)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_a83,       0,          de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.3)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  lwar_a81,       lwar_a83,   de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.1)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_e90,       lwar_a83,   de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (9.0 Europe)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  mnfb_c27,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  poto_a32,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (3.2)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  poto_a29,       poto_a32,   de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (2.9)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  play_a24,       0,          de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Playboy 35th Anniversary (2.4)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  robo_a34,       0,          de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Robocop (3.4)",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  robo_a30,       robo_a34,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Robocop (3.0)",                            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  ssvc_a26,       0,          de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Secret Service (2.6)",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  ssvc_b26,       ssvc_a26,   de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Secret Service (2.6 alternate sound)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  ssvc_a42,       ssvc_a26,   de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Secret Service (4.2 alternate sound)",     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  simp_a27,       0,          de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "The Simpsons (2.7)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  simp_a20,       simp_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "The Simpsons (2.0)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  tmac_a24,       0,          de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Time Machine (2.4)",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  tmac_a18,       tmac_a24,   de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Time Machine (1.8)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  tmac_g18,       tmac_a24,   de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Time Machine (1.8, Germany)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  torp_e21,       0,          de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Torpedo Alley (2.1, Europe)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  torp_a16,       torp_e21,   de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Torpedo Alley (1.6)",              MACHINE_IS_SKELETON_MECHANICAL)

@@ -10,20 +10,165 @@
 
     TODO:
 
+    - contrast
+    - MC6852
+    - codec sound
     - expansion bus
         - Z80 card
         - Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
         - RAM cards
         - clock cards
     - floppy 8048
-    - brightness/contrast
-    - MC6852
-    - codec sound
 
 */
 
-#include "includes/victor9k.h"
+#include "emu.h"
 #include "softlist.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/ieee488/ieee488.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/i86/i86.h"
+#include "formats/victor9k_dsk.h"
+#include "imagedev/floppy.h"
+#include "machine/6522via.h"
+#include "machine/mc6852.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "machine/victor9kb.h"
+#include "machine/victor9k_fdc.h"
+#include "machine/z80dart.h"
+#include "sound/hc55516.h"
+#include "video/mc6845.h"
+
+#define I8088_TAG       "8l"
+#define I8253_TAG       "13h"
+#define I8259A_TAG      "7l"
+#define UPD7201_TAG     "16e"
+#define HD46505S_TAG    "11a"
+#define MC6852_TAG      "11b"
+#define HC55516_TAG     "15c"
+#define M6522_1_TAG     "m6522_1"
+#define M6522_2_TAG     "m6522_2"
+#define M6522_3_TAG     "14l"
+#define DAC0808_0_TAG   "5b"
+#define DAC0808_1_TAG   "5c"
+#define CENTRONICS_TAG  "centronics"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+#define SCREEN_TAG      "screen"
+#define KB_TAG          "kb"
+#define FDC_TAG         "fdc"
+
+class victor9k_state : public driver_device
+{
+public:
+	victor9k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8088_TAG),
+		m_ieee488(*this, IEEE488_TAG),
+		m_pic(*this, I8259A_TAG),
+		m_upd7201(*this, UPD7201_TAG),
+		m_ssda(*this, MC6852_TAG),
+		m_via1(*this, M6522_1_TAG),
+		m_via2(*this, M6522_2_TAG),
+		m_via3(*this, M6522_3_TAG),
+		m_cvsd(*this, HC55516_TAG),
+		m_crtc(*this, HD46505S_TAG),
+		m_ram(*this, RAM_TAG),
+		m_kb(*this, KB_TAG),
+		m_fdc(*this, FDC_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_rs232a(*this, RS232_A_TAG),
+		m_rs232b(*this, RS232_B_TAG),
+		m_palette(*this, "palette"),
+		m_rom(*this, I8088_TAG),
+		m_video_ram(*this, "video_ram"),
+		m_brt(0),
+		m_cont(0),
+		m_via1_irq(CLEAR_LINE),
+		m_via2_irq(CLEAR_LINE),
+		m_via3_irq(CLEAR_LINE),
+		m_fdc_irq(CLEAR_LINE),
+		m_ssda_irq(CLEAR_LINE),
+		m_kbrdy(1),
+		m_kbackctl(0)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ieee488_device> m_ieee488;
+	required_device<pic8259_device> m_pic;
+	required_device<upd7201_device> m_upd7201;
+	required_device<mc6852_device> m_ssda;
+	required_device<via6522_device> m_via1;
+	required_device<via6522_device> m_via2;
+	required_device<via6522_device> m_via3;
+	required_device<hc55516_device> m_cvsd;
+	required_device<mc6845_device> m_crtc;
+	required_device<ram_device> m_ram;
+	required_device<victor_9000_keyboard_t> m_kb;
+	required_device<victor_9000_fdc_t> m_fdc;
+	required_device<centronics_device> m_centronics;
+	required_device<rs232_port_device> m_rs232a;
+	required_device<rs232_port_device> m_rs232b;
+	required_device<palette_device> m_palette;
+	required_memory_region m_rom;
+	required_shared_ptr<UINT8> m_video_ram;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_WRITE8_MEMBER( via1_pa_w );
+	DECLARE_WRITE_LINE_MEMBER( write_nfrd );
+	DECLARE_WRITE_LINE_MEMBER( write_ndac );
+	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( codec_vol_w );
+
+	DECLARE_WRITE8_MEMBER( via2_pa_w );
+	DECLARE_WRITE8_MEMBER( via2_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( write_ria );
+	DECLARE_WRITE_LINE_MEMBER( write_rib );
+	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
+
+	DECLARE_WRITE8_MEMBER( via3_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
+
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+
+	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( ssda_sm_dtr_w );
+
+	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
+	DECLARE_WRITE_LINE_MEMBER( vert_w );
+
+	MC6845_UPDATE_ROW( crtc_update_row );
+
+	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
+	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
+
+	DECLARE_PALETTE_INIT( victor9k );
+
+	// video state
+	int m_brt;
+	int m_cont;
+	int m_hires;
+
+	// interrupts
+	int m_via1_irq;
+	int m_via2_irq;
+	int m_via3_irq;
+	int m_fdc_irq;
+	int m_ssda_irq;
+
+	// keyboard
+	int m_kbrdy;
+	int m_kbackctl;
+
+	void update_kback();
+};
+
 
 
 //**************************************************************************
@@ -95,7 +240,6 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	int hires = BIT(ma, 13);
 	int dot_addr = BIT(ma, 12);
 	int width = hires ? 16 : 10;
-	if (hires) x_count = 0x32;
 
 	if (m_hires != hires)
 	{
@@ -125,7 +269,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 
 		for (int bit = 0; bit < width; bit++)
 		{
-			int pixel;
+			int pixel = 0;
 
 			switch (rvs | undln | cursor)
 			{
@@ -146,8 +290,14 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 				break;
 			}
 
-			int color = palette[pixel && de];
-			if (!lowint && color) color = 2;
+			int color = 0;
+
+			if (pixel && de)
+			{
+				int pen = 1 + m_brt;
+				if (!lowint) pen = 9;
+				color = palette[pen];
+			}
 
 			bitmap.pix32(vbp + y, x++) = color;
 		}
@@ -201,6 +351,14 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 	m_ssda_irq = state;
 
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
+}
+
+
+WRITE_LINE_MEMBER( victor9k_state::ssda_sm_dtr_w )
+{
+	m_ssda->cts_w(state);
+	m_ssda->dcd_w(!state);
+	//m_cvsd->enc_dec_w(!state);
 }
 
 
@@ -340,6 +498,8 @@ WRITE8_MEMBER( victor9k_state::via2_pb_w )
 
 	// contrast
 	m_cont = data >> 5;
+
+	if (LOG) logerror("BRT %u CONT %u\n", m_brt, m_cont);
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
@@ -393,8 +553,9 @@ WRITE_LINE_MEMBER( victor9k_state::write_rib )
 WRITE8_MEMBER( victor9k_state::via3_pb_w )
 {
 	// codec clock output
-	m_ssda->rx_clk_w(BIT(data, 7));
-	m_ssda->tx_clk_w(BIT(data, 7));
+	m_ssda->rx_clk_w(!BIT(data, 7));
+	m_ssda->tx_clk_w(!BIT(data, 7));
+	m_cvsd->clock_w(!BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
@@ -440,6 +601,30 @@ WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
+PALETTE_INIT_MEMBER(victor9k_state, victor9k)
+{
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+
+	// BRT0 82K
+	// BRT1 39K
+	// BRT2 20K
+	// 12V 220K pullup
+	palette.set_pen_color(1, rgb_t(0x00, 0x10, 0x00));
+	palette.set_pen_color(2, rgb_t(0x00, 0x20, 0x00));
+	palette.set_pen_color(3, rgb_t(0x00, 0x40, 0x00));
+	palette.set_pen_color(4, rgb_t(0x00, 0x60, 0x00));
+	palette.set_pen_color(5, rgb_t(0x00, 0x80, 0x00));
+	palette.set_pen_color(6, rgb_t(0x00, 0xa0, 0x00));
+	palette.set_pen_color(7, rgb_t(0x00, 0xc0, 0x00));
+	palette.set_pen_color(8, rgb_t(0x00, 0xff, 0x00));
+
+	// CONT0 620R
+	// CONT1 332R
+	// CONT2 162R
+	// 12V 110R pullup
+	palette.set_pen_color(9, rgb_t(0xff, 0x00, 0x00));
+}
+
 void victor9k_state::machine_start()
 {
 	// state saving
@@ -453,6 +638,7 @@ void victor9k_state::machine_start()
 	save_item(NAME(m_kbrdy));
 	save_item(NAME(m_kbackctl));
 
+#ifndef USE_SCP
 	// patch out SCP self test
 	m_rom->base()[0x11ab] = 0xc3;
 
@@ -461,6 +647,7 @@ void victor9k_state::machine_start()
 	m_rom->base()[0x1d52] = 0x90;
 	m_rom->base()[0x1d53] = 0x90;
 	m_rom->base()[0x1d54] = 0x90;
+#endif
 }
 
 void victor9k_state::machine_reset()
@@ -498,8 +685,8 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505S_TAG, hd6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(victor9k_state, victor9k)
 
 	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, XTAL_30MHz/10) // HD6845 == HD46505S
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
@@ -509,7 +696,8 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(HC55516_TAG, HC55516, 100000)
+	MCFG_SOUND_ADD(HC55516_TAG, HC55516, 0)
+	//MCFG_HC55516_DIG_OUT_CB(DEVWRITELINE(MC6852_TAG, mc6852_device, rx_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -544,6 +732,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	MCFG_DEVICE_ADD(MC6852_TAG, MC6852, XTAL_30MHz/30)
 	MCFG_MC6852_TX_DATA_CALLBACK(DEVWRITELINE(HC55516_TAG, hc55516_device, digit_w))
+	MCFG_MC6852_SM_DTR_CALLBACK(WRITELINE(victor9k_state, ssda_sm_dtr_w))
 	MCFG_MC6852_IRQ_CALLBACK(WRITELINE(victor9k_state, ssda_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL_30MHz/30)
@@ -626,4 +815,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, driver_device, 0,    "Victor Business Products", "Victor 9000",   MACHINE_NOT_WORKING )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, driver_device, 0,    "Victor Business Products", "Victor 9000",   MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

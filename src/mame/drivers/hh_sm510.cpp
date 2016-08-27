@@ -23,7 +23,7 @@ public:
 	hh_sm510_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN"),
+		m_inp_matrix(*this, "IN.%u", 0),
 		m_speaker(*this, "speaker"),
 		m_inp_lines(0)
 	{ }

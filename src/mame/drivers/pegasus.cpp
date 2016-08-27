@@ -62,7 +62,7 @@ public:
 		, m_exp_0c(*this, "exp0c")
 		, m_exp_0d(*this, "exp0d")
 		, m_p_videoram(*this, "videoram")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(pegasus_keyboard_r);
@@ -124,7 +124,7 @@ READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
 		if (!BIT(m_kbd_row, i)) data &= m_io_keyboard[i]->read();
 
 	m_kbd_irq = (data == 0xff) ? 1 : 0;
-	if BIT(m_control_bits, 3)
+	if (BIT(m_control_bits, 3))
 		data<<=4;
 	return data;
 }
@@ -169,7 +169,7 @@ READ8_MEMBER( pegasus_state::pegasus_pcg_r )
 
 WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
 {
-//  if BIT(m_control_bits, 1)
+//  if (BIT(m_control_bits, 1))
 	{
 		UINT8 code = m_p_videoram[offset] & 0x7f;
 		m_p_pcgram[(code << 4) | (~m_kbd_row & 15)] = data;

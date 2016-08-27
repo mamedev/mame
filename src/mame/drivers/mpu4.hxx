@@ -22,6 +22,8 @@ INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( grtecp );
 
+#include "m4aao.lh"
+
 ROM_START( m4tst2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "ut2.p1",  0xE000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
@@ -1515,6 +1517,38 @@ ROM_END
 
 
 
+DRIVER_INIT_MEMBER(mpu4_state,m4aao)
+{
+	//Derived from Against_All_Odds_(Eurotek)_[C01_800_15jp].gam
+	DRIVER_INIT_CALL(m4default);
+	DRIVER_INIT_CALL(m4_hopper_duart_a);
+	DRIVER_INIT_CALL(m4default_reels);
+	//PCKEY =9
+	//STKEY =0
+	//JPKEY =0
+	//JPSET =0
+	//DIP1_0=true
+	//DIP1_1=true
+	//DIP1_2=true
+	//DIP1_3=true
+	//DIP1_4=true
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=false
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound barcrest1
+	//Standard
+	//Volume 0 Stereo= 0
+	//Sample rate 16000
+	//Front door code 255 Cash door code 255
+}
 
 ROM_START( m4aao )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -2603,7 +2637,7 @@ GAME(199?, m4sctagt ,0          ,mod4oki    ,mpu4               , mpu4_state,m4d
 /* Others */
 
 
-GAME(199?, m4aao,     0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS )
+GAMEL(199?, m4aao,     0,        mod4oki, mpu4, mpu4_state, m4aao	, ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
 GAME(199?, m4bandgd,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
 
 GAME(199?, m4bigben,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",GAME_FLAGS )

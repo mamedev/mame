@@ -36,18 +36,18 @@ class pc8401a_state : public driver_device
 {
 public:
 	pc8401a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_rtc(*this, UPD1990A_TAG),
-			m_lcdc(*this, SED1330_TAG),
-			m_crtc(*this, MC6845_TAG),
-			m_screen_lcd(*this, SCREEN_TAG),
-			m_cart(*this, "cartslot"),
-			m_io_cart(*this, "io_cart"),
-			m_ram(*this, RAM_TAG),
-			m_rom(*this, Z80_TAG),
-			m_crt_ram(*this, "crt_ram"),
-			m_io_y(*this, "Y")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_rtc(*this, UPD1990A_TAG)
+		, m_lcdc(*this, SED1330_TAG)
+		, m_crtc(*this, MC6845_TAG)
+		, m_screen_lcd(*this, SCREEN_TAG)
+		, m_cart(*this, "cartslot")
+		, m_io_cart(*this, "io_cart")
+		, m_ram(*this, RAM_TAG)
+		, m_rom(*this, Z80_TAG)
+		, m_crt_ram(*this, "crt_ram")
+		, m_io_y(*this, "Y.%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

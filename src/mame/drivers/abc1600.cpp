@@ -34,11 +34,14 @@
 
     TODO:
 
+	- starting from MAME 0.151, the Z80 DMA reads 0x08 as the 257th byte to transfer from disk t0s14 thus failing a comparison @ 37cfa, leading to a watchdog reset
+	  changing z80dma.cpp:477 to "done = (m_count == 0);" fixes this but isn't the real reason
 	- abcenix boot stuck in a loop @ 37cfa
-    - segment/page RAM addresses are not correctly decoded, "sas/format/format" can't find the SASI interface because of this
-        forcetask0 1 t0 0 t1 0 t2 0 t3 0
-        sega19 0 task 0
-        sega 000 segd 00 pga 008 pgd 4058 virtual 02c730 (should be 004730)
+    - segment/page RAM addresses are not correctly decoded, "sas/format/format" after abcenix is booted can't find the SASI interface because of this
+		[:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0)
+			should be
+		[:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1)
+		
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!

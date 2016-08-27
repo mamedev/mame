@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(k3_state::get_k3_bg_tile_info)
 
 void k3_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

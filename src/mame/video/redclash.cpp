@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(redclash_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(redclash_state,redclash)
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(redclash_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(redclash_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -482,11 +482,11 @@ WRITE8_MEMBER(redclash_state::sraider_io_w)
 
 VIDEO_START_MEMBER(redclash_state,sraider)
 {
-	m_grid_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(redclash_state::get_grid_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_grid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(redclash_state::get_grid_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_grid_tilemap->set_scroll_rows(32);
 	m_grid_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(redclash_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(redclash_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
 }

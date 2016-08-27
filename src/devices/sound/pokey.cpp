@@ -351,7 +351,6 @@ void pokey_device::device_start()
 
 }
 
-
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -378,6 +377,12 @@ void pokey_device::device_post_load()
 
 void pokey_device::device_clock_changed()
 {
+	m_clock_period = attotime::from_hz(clock());
+
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(clock());
+	else
+		m_stream = stream_alloc(0, 1, clock());
 }
 
 //-------------------------------------------------

@@ -97,7 +97,7 @@ static floppy_image_legacy *floppy_init(void *fp, const struct io_procs *procs, 
 
 /* main code for identifying and maybe opening a disk image; not exposed
  * directly because this function is big and hideous */
-static floperr_t floppy_open_internal(void *fp, const struct io_procs *procs, const char *extension,
+static floperr_t floppy_open_internal(void *fp, const struct io_procs *procs, const std::string &extension,
 	const struct FloppyFormat *floppy_options, int max_options, int flags, floppy_image_legacy **outfloppy,
 	int *outoption)
 {
@@ -118,7 +118,7 @@ static floperr_t floppy_open_internal(void *fp, const struct io_procs *procs, co
 	/* vote on the best format */
 	for (i = 0; (i < max_options) && floppy_options[i].construct; i++)
 	{
-		if (!extension || !floppy_options[i].extensions || image_find_extension(floppy_options[i].extensions, extension))
+		if (extension.empty() || !floppy_options[i].extensions || image_find_extension(floppy_options[i].extensions, extension.c_str()))
 		{
 			if (floppy_options[i].identify)
 			{
@@ -188,7 +188,7 @@ floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *ex
 
 
 
-floperr_t floppy_open(void *fp, const struct io_procs *procs, const char *extension,
+floperr_t floppy_open(void *fp, const struct io_procs *procs, const std::string &extension,
 	const struct FloppyFormat *format, int flags, floppy_image_legacy **outfloppy)
 {
 	return floppy_open_internal(fp, procs, extension, format, 1, flags, outfloppy, nullptr);
@@ -196,7 +196,7 @@ floperr_t floppy_open(void *fp, const struct io_procs *procs, const char *extens
 
 
 
-floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const char *extension,
+floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const std::string &extension,
 	const struct FloppyFormat *formats, int flags, floppy_image_legacy **outfloppy)
 {
 	return floppy_open_internal(fp, procs, extension, formats, INT_MAX, flags, outfloppy, nullptr);

@@ -176,13 +176,13 @@ static const struct CassetteLegacyWaveFiller gtp_legacy_fill_wave = {
 
 
 
-static casserr_t gtp_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error gtp_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	return cassette_legacy_identify( cassette, opts, &gtp_legacy_fill_wave );
 }
 
 
 
-static casserr_t gtp_cassette_load( cassette_image *cassette ) {
+static cassette_image::error gtp_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &gtp_legacy_fill_wave );
 }
 

@@ -23,7 +23,7 @@ public:
 		m_dsw1(*this, "DSW1"),
 		m_volin1(*this, "VOLIN1"),
 		m_volin2(*this, "VOLIN2"),
-		m_ports(*this, portnames)
+		m_ports(*this, { { "SW0", "SW1", "DSW2", "PLACEHOLDER" } }) // "IN1" & "IN2" are read separately when offset==3
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -39,7 +39,6 @@ public:
 	optional_ioport m_dsw1;
 	optional_ioport m_volin1;
 	optional_ioport m_volin2;
-	DECLARE_IOPORT_ARRAY(portnames);
 	optional_ioport_array<4> m_ports;
 
 	int m_geebee_bgw;

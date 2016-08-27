@@ -57,7 +57,7 @@ mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, d
 				m_out_spim_cb(*this),
 				m_in_spim_cb(*this),
 				m_spim_xch_trigger_cb(*this),
-				m_cpu(*this)
+				m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 

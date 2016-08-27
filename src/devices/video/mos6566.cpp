@@ -573,19 +573,7 @@ inline void mos6566_device::draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, 
 //-------------------------------------------------
 
 mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6566, "MOS6566", tag, owner, clock, "mos6566", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_variant(TYPE_6566),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
-		m_write_irq(*this),
-		m_write_ba(*this),
-		m_write_aec(*this),
-		m_write_k(*this),
-		m_cpu(*this)
+	: mos6566_device(mconfig, MOS6566, "MOS6566", tag, owner, clock, TYPE_6566, "mos6566", __FILE__)
 {
 }
 
@@ -602,7 +590,7 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 		m_write_ba(*this),
 		m_write_aec(*this),
 		m_write_k(*this),
-		m_cpu(*this),
+		m_cpu(*this, finder_base::DUMMY_TAG),
 		m_phi0(1),
 		m_ba(ASSERT_LINE),
 		m_aec(ASSERT_LINE)

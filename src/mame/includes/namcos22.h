@@ -199,7 +199,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_adc_ports(*this, "ADC"),
+		m_adc_ports(*this, "ADC.%u", 0),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
 		m_mcup5a(*this, "MCUP5A"),

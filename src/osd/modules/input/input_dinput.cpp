@@ -25,13 +25,10 @@
 #undef min
 #undef max
 
-#include <utility>
 #include <mutex>
-#include <thread>
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 #include "strconv.h"
 
 // MAMEOS headers
@@ -139,7 +136,8 @@ void dinput_keyboard_device::reset()
 
 dinput_api_helper::dinput_api_helper(int version)
 	: m_dinput(nullptr),
-		m_dinput_version(version)
+	  m_dinput_version(version),
+	  m_dinput_create_prt(nullptr)
 {
 }
 
@@ -385,7 +383,7 @@ public:
 		result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_REL);
 		if (result != DI_OK && result != DI_PROPNOEFFECT)
 		{
-			osd_printf_error("DirectInput: Unable to set relative mode for mouse %d (%s)\n", devicelist()->size(), devinfo->name());
+			osd_printf_error("DirectInput: Unable to set relative mode for mouse %u (%s)\n", static_cast<unsigned int>(devicelist()->size()), devinfo->name());
 			goto error;
 		}
 

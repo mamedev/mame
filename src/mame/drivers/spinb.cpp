@@ -50,7 +50,7 @@ public:
 		, m_msm_m(*this, "msm_m")
 		, m_ic5a(*this, "ic5a")
 		, m_ic5m(*this, "ic5m")
-		, m_switches(*this, "SW")
+		, m_switches(*this, "SW.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(p1_w);
@@ -379,7 +379,7 @@ WRITE8_MEMBER( spinb_state::ppi60a_w )
 {
 	if (data)
 		for (UINT8 i = 0; i < 8; i++)
-			if BIT(data, i)
+			if (BIT(data, i))
 				m_row = i;
 }
 
@@ -388,7 +388,7 @@ WRITE8_MEMBER( spinb_state::ppi60b_w )
 {
 	if (data & 7)
 		for (UINT8 i = 0; i < 3; i++)
-			if BIT(data, i)
+			if (BIT(data, i))
 				m_row = i+8;
 }
 
@@ -403,11 +403,9 @@ WRITE8_MEMBER( spinb_state::sndbank_a_w )
 
 	if (!BIT(data, 6))
 		m_sound_addr_a |= (1<<19);
-	else
-	if (!BIT(data, 5))
+	else if (!BIT(data, 5))
 		m_sound_addr_a |= (2<<19);
-	else
-	if BIT(data, 7)
+	else if (BIT(data, 7))
 		m_sndbank_a = 0xff;
 }
 
@@ -418,11 +416,9 @@ WRITE8_MEMBER( spinb_state::sndbank_m_w )
 
 	if (!BIT(data, 6))
 		m_sound_addr_m |= (1<<19);
-	else
-	if (!BIT(data, 5))
+	else if (!BIT(data, 5))
 		m_sound_addr_m |= (2<<19);
-	else
-	if BIT(data, 7)
+	else if (BIT(data, 7))
 		m_sndbank_m = 0xff;
 }
 
@@ -504,7 +500,7 @@ WRITE8_MEMBER( spinb_state::ppia_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_a, 5))
-		m_msm_a->set_prescaler_selector(m_msm_a, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm_a->set_prescaler_selector(*m_msm_a, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
 	m_msm_a->reset_w(BIT(data, 6));
 	m_ic5a->clear_w(!BIT(data, 6));
 	m_portc_a = data & 0xfe;
@@ -514,7 +510,7 @@ WRITE8_MEMBER( spinb_state::ppim_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_m, 5))
-		m_msm_m->set_prescaler_selector(m_msm_m, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm_m->set_prescaler_selector(*m_msm_m, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
 	m_msm_m->reset_w(BIT(data, 6));
 	m_ic5m->clear_w(!BIT(data, 6));
 	m_portc_m = data & 0xfe;

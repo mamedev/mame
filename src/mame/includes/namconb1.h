@@ -113,7 +113,10 @@ public:
 	UINT32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
-
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
+	
 	int NB1objcode2tile(int code);
 	int NB2objcode2tile(int code);
 };

@@ -359,22 +359,7 @@ ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, dev
 	m_maincpu(*this, MS7004_CPU_TAG),
 	m_speaker(*this, MS7004_SPK_TAG),
 	m_i8243(*this, "i8243"),
-	m_kbd0(*this, "KBD0"),
-	m_kbd1(*this, "KBD1"),
-	m_kbd2(*this, "KBD2"),
-	m_kbd3(*this, "KBD3"),
-	m_kbd4(*this, "KBD4"),
-	m_kbd5(*this, "KBD5"),
-	m_kbd6(*this, "KBD6"),
-	m_kbd7(*this, "KBD7"),
-	m_kbd8(*this, "KBD8"),
-	m_kbd9(*this, "KBD9"),
-	m_kbd10(*this, "KBD10"),
-	m_kbd11(*this, "KBD11"),
-	m_kbd12(*this, "KBD12"),
-	m_kbd13(*this, "KBD13"),
-	m_kbd14(*this, "KBD14"),
-	m_kbd15(*this, "KBD15"),
+	m_kbd(*this, "KBD%u", 0),
 	m_tx_handler(*this),
 	m_rts_handler(*this)
 {
@@ -464,27 +449,14 @@ WRITE8_MEMBER( ms7004_device::i8243_port_w )
 {
 	int sense = 0;
 
-	DBG_LOG(2,0,( "8243 port %d data %02xH\n",
-		offset + 4, data));
+	DBG_LOG(2,0,( "8243 port %d data %02xH\n", offset + 4, data));
 
 	if (data) {
-		switch(offset << 4 | data) {
-			case 0x01: sense = m_kbd0->read(); break;
-			case 0x02: sense = m_kbd1->read(); break;
-			case 0x04: sense = m_kbd2->read(); break;
-			case 0x08: sense = m_kbd3->read(); break;
-			case 0x11: sense = m_kbd4->read(); break;
-			case 0x12: sense = m_kbd5->read(); break;
-			case 0x14: sense = m_kbd6->read(); break;
-			case 0x18: sense = m_kbd7->read(); break;
-			case 0x21: sense = m_kbd8->read(); break;
-			case 0x22: sense = m_kbd9->read(); break;
-			case 0x24: sense = m_kbd10->read(); break;
-			case 0x28: sense = m_kbd11->read(); break;
-			case 0x31: sense = m_kbd12->read(); break;
-			case 0x32: sense = m_kbd13->read(); break;
-			case 0x34: sense = m_kbd14->read(); break;
-			case 0x38: sense = m_kbd15->read(); break;
+		switch(data) {
+			case 0x01: sense = m_kbd[(offset << 2) + 0]->read(); break;
+			case 0x02: sense = m_kbd[(offset << 2) + 1]->read(); break;
+			case 0x04: sense = m_kbd[(offset << 2) + 2]->read(); break;
+			case 0x08: sense = m_kbd[(offset << 2) + 3]->read(); break;
 		}
 		m_keylatch = BIT(sense, (m_p1 & 7));
 		if (m_keylatch)

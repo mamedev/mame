@@ -165,10 +165,10 @@ static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
 ADDRESS_MAP_END
 
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0091LVC, "Taito TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8)),
-		m_gfxdecode(*this)
+	: device_t(mconfig, TC0091LVC, "Taito TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8))
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -267,9 +267,9 @@ void tc0091lvc_device::device_start()
 	m_tvram = m_pcg_ram + 0xa000;
 	m_sprram = m_pcg_ram + 0xb000;
 
-	tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	tx_tilemap->set_transparent_pen(0);
 	bg0_tilemap->set_transparent_pen(0);

@@ -49,7 +49,7 @@ public:
 		, m_sn1(*this, "sn1")
 		, m_sn2(*this, "sn2")
 		, m_palette(*this, "palette")
-		, m_keyboard(*this, "KEY")
+		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(vram_r);
@@ -736,13 +736,13 @@ GFXDECODE_END
 READ8_MEMBER( pasopia7_state::keyb_r )
 {
 	UINT8 i,j,res = 0;
-	for(j=0;j<3;j++)
+	for (j=0; j<3; j++)
 	{
-		if BIT(m_mux_data, 4+j)
+		if (BIT(m_mux_data, 4+j))
 		{
-			for(i=0;i<4;i++)
+			for (i=0; i<4; i++)
 			{
-				if BIT(m_mux_data, i)
+				if (BIT(m_mux_data, i))
 					res |= m_keyboard[j*4+i]->read();
 			}
 		}

@@ -80975,7 +80975,7 @@ that the real dumps might surface -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
 			<feature name="pcb" value="UNL-OneBus" />
-			<dataarea name="flop" size="4194304">
+			<dataarea name="prg" size="4194304">
 				<rom name="29w320dt.bin" size="4194304" crc="a4bed7eb" sha1="f1aa89916264ba781d3f1390a2336ef42129b607" offset="00000" />
 			</dataarea>
 			<!-- 8k? VRAM on cartridge -->
@@ -80991,7 +80991,7 @@ that the real dumps might surface -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
 			<feature name="pcb" value="UNL-OneBus" />
-			<dataarea name="flop" size="4194304">
+			<dataarea name="prg" size="4194304">
 				<rom name="138-in-1 coolbaby (coolboy rs-5, pcb060-10009011v1.3)(unl)[u][!].bin" size="4194304" crc="6b5b1a1a" sha1="2df0cd717bd0de0b0c973ac356426ddbb0d736fa" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k? VRAM on cartridge -->
@@ -81007,7 +81007,7 @@ that the real dumps might surface -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
 			<feature name="pcb" value="UNL-OneBus" />
-			<dataarea name="flop" size="1048576">
+			<dataarea name="prg" size="1048576">
 				<rom name="777777-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin" size="1048576" crc="7790c21a" sha1="f320f3dd18b88ae5f65bb51f58d4cb869997bab3" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k? VRAM on cartridge -->

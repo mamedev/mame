@@ -40,8 +40,6 @@ Primella:
 - does the game really support cocktail mode as service mode suggests?
 - are buttons 2 and 3 used as service mode suggests?
 Pop Bingo
-- appears to combine 2 4bpp layers to make 1 8bpp layer, for now we just
-  treat it as 1 8bpp layer and ignore the 2nd set of registers.
 - some unknown reads / writes
 
 18.02.2011. Tomasz Slanina
@@ -273,7 +271,7 @@ static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)
 	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITENOP // ?
 	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE8(bgscroll_w, 0x00ff)
-	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE8(bg2scroll_w, 0x00ff) // not used atm
+	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE8(bg2scroll_w, 0x00ff)
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE8(fgscroll_w, 0x00ff) // not used atm
 	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE8(fg2scroll_w, 0x00ff) // not used atm
@@ -470,18 +468,6 @@ static INPUT_PORTS_START( dooyongm68_generic )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-/*
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-*/
-
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -546,7 +532,7 @@ static INPUT_PORTS_START( pollux )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // palette cycle effects need this to work (read near code that also writes to the output ports) - currently can't see them due to wrong palette selection tho
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // palette cycle effects need this to work
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -711,24 +697,6 @@ static const gfx_layout rshark_spritelayout =
 	128*8
 };
 
-static const gfx_layout popbingo_tilelayout =
-{
-	32,32,
-	RGN_FRAC(1,2),
-	8,
-	{ 0*4, 1*4,  2*4, 3*4, RGN_FRAC(1,2)+0*4,RGN_FRAC(1,2)+1*4,RGN_FRAC(1,2)+2*4,RGN_FRAC(1,2)+3*4 },
-
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			32*32+0, 32*32+1, 32*32+2, 32*32+3, 32*32+16+0, 32*32+16+1, 32*32+16+2, 32*32+16+3,
-			2*32*32+0, 2*32*32+1, 2*32*32+2, 2*32*32+3, 2*32*32+16+0, 2*32*32+16+1, 2*32*32+16+2, 2*32*32+16+3,
-			3*32*32+0, 3*32*32+1, 3*32*32+2, 3*32*32+3, 3*32*32+16+0, 3*32*32+16+1, 3*32*32+16+2, 3*32*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32,
-			24*32, 25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32 },
-	512*8
-};
-
 static GFXDECODE_START( lastday )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
@@ -769,8 +737,10 @@ GFXDECODE_END
 
 static GFXDECODE_START( popbingo )
 	/* no chars */
-	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, popbingo_tilelayout, 256,  1 )
+	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0,  1 )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,           0,  1 )
+
 GFXDECODE_END
 
 READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
@@ -1425,6 +1395,42 @@ ROM_START( gulfstrmm )
 	ROM_LOAD16_BYTE( "11.bin",       0x00001, 0x10000, CRC(2ed7545b) SHA1(6a70743bbb03ef694310f2b5531f384209db62a1) )
 ROM_END
 
+ROM_START( gulfstrmk )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_LOAD( "18.4L",        0x00000, 0x20000, CRC(02bcf56d) SHA1(7f13710e9291ca6afd1a534489883607eee4e35a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
+	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "2.bin",        0x0000, 0x8000, CRC(cb555d96) SHA1(ebc1dee91a09a829db2ae6fc1616c7c989f7f1c2) )    /* empty */
+	ROM_CONTINUE(             0x0000, 0x8000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
+	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
+	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
+	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
+	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
+	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
+	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_LOAD16_BYTE( "12.bin",       0x00000, 0x20000, CRC(3e3d3b57) SHA1(398a6cac7144ba7bacaa36c593bcb4b3c051eb0f) )
+	ROM_LOAD16_BYTE( "13.bin",       0x00001, 0x20000, CRC(66fcce80) SHA1(6ab2b7cd49447d374cde40b98db0a6209dcad461) )
+
+	ROM_REGION( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_LOAD16_BYTE( "8.e8",         0x00000, 0x10000, CRC(8d7f4693) SHA1(a7c8573d9e54c8230decc3e88f76ae729d77b096) )
+	ROM_LOAD16_BYTE( "9.e9",         0x00001, 0x10000, CRC(34d440c4) SHA1(74b0e15e75f62106177234b6ea54a5d312628802) )
+
+	ROM_REGION( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_LOAD16_BYTE( "10.bin",       0x00000, 0x10000, CRC(08149140) SHA1(ff0094883ca0fc81bae991d6ea62d0064d6f7c47) )
+	ROM_LOAD16_BYTE( "11.bin",       0x00001, 0x10000, CRC(2ed7545b) SHA1(6a70743bbb03ef694310f2b5531f384209db62a1) )
+ROM_END
+
 ROM_START( pollux )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "pollux2.bin",  0x00000, 0x10000, CRC(45e10d4e) SHA1(ece25fcc0acda9a8cfc00f3132a87469037b5a4e) )
@@ -2041,13 +2047,13 @@ ROM_START( popbingo )
 	ROM_LOAD16_BYTE( "rom5.9m",   0x00000, 0x80000, CRC(e8d73e07) SHA1(4ed647eaa6b32b9f159fc49d30962ad20f97b245) )
 	ROM_LOAD16_BYTE( "rom6.9l",   0x00001, 0x80000, CRC(c3db3975) SHA1(bb085c9339d640585b18992dc8b861870920559a) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* tiles + tilemaps (together!) */
-	/* its probably actually 4 bpp layers that combine to form 1 8bpp layer */
-	ROM_LOAD16_BYTE( "rom10.9a",    0x000000, 0x80000, CRC(135ab90a) SHA1(5911923ccf579edd0bf3449945a434fbf37b51aa) )
-	ROM_LOAD16_BYTE( "rom9.9c",     0x000001, 0x80000, CRC(c9d90007) SHA1(ad457ef297797dcb9bb8dc1725fa207cd57eedfe) )
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rom10.9a",  0x00000, 0x80000, CRC(135ab90a) SHA1(5911923ccf579edd0bf3449945a434fbf37b51aa) )
+	ROM_LOAD16_BYTE( "rom9.9c",   0x00001, 0x80000, CRC(c9d90007) SHA1(ad457ef297797dcb9bb8dc1725fa207cd57eedfe) )
 
-	ROM_LOAD16_BYTE( "rom7.9h",     0x100000, 0x80000, CRC(b2b4c13b) SHA1(37ddc9751860a85b809782c5cec4418bca71412c) )
-	ROM_LOAD16_BYTE( "rom8.9e",     0x100001, 0x80000, CRC(66c4b00f) SHA1(ed416ec594fe065c0f169008fb8ce553813f6260) )
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rom7.9h",   0x00000, 0x80000, CRC(b2b4c13b) SHA1(37ddc9751860a85b809782c5cec4418bca71412c) )
+	ROM_LOAD16_BYTE( "rom8.9e",   0x00001, 0x80000, CRC(66c4b00f) SHA1(ed416ec594fe065c0f169008fb8ce553813f6260) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* OKI6295 samples */
 	ROM_LOAD( "rom4.4r",     0x00000, 0x20000, CRC(0fdee034) SHA1(739d39b04c2e860c3c193ab32b30ccc39ff1a8c2) )
@@ -2069,6 +2075,7 @@ GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, driver_device, 0, ROT270, "D
 GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gulfstrmb,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmk,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )

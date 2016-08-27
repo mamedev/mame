@@ -38,7 +38,7 @@ public:
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_io_dsw(*this, "DSW")
 		, m_io_config(*this, "CONFIG")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_crtc(*this, "crtc")
 		, m_dma(*this, "dma")
 		, m_fdc (*this, "fdc")

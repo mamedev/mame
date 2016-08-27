@@ -330,7 +330,7 @@ void device_t::set_machine(running_machine &machine)
 bool device_t::findit(bool isvalidation) const
 {
 	bool allfound = true;
-	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->m_next)
+	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
 	{
 		if (isvalidation)
 		{

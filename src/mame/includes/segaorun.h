@@ -38,8 +38,8 @@ public:
 		m_segaic16road(*this, "segaic16road"),
 		m_soundlatch(*this, "soundlatch"),
 		m_bankmotor_timer(*this, "bankmotor"),
-		m_digital_ports(*this, digital_ports),
-		m_adc_ports(*this, "ADC"),
+		m_digital_ports(*this, { { "SERVICE", "UNKNOWN", "COINAGE", "DSW" } }),
+		m_adc_ports(*this, "ADC.%u", 0),
 		m_workram(*this, "workram"),
 		m_custom_map(nullptr),
 		m_shangon_video(false),
@@ -131,7 +131,6 @@ protected:
 	optional_device<timer_device> m_bankmotor_timer;
 
 	// input ports
-	DECLARE_IOPORT_ARRAY(digital_ports);
 	required_ioport_array<4> m_digital_ports;
 	optional_ioport_array<8> m_adc_ports;
 

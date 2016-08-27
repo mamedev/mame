@@ -381,6 +381,9 @@ protected:
 	// Read/write logical or physical?
 	bool m_logical;
 
+	// Shall bad sectors be bypassed or shall the command be terminated in error?
+	bool m_bypass;
+
 	// Signals to abort writing
 	bool m_stopwrite;
 
@@ -445,13 +448,16 @@ protected:
 	int sector_size();
 
 	// Returns the sector header length
-	int header_length();
+	virtual int header_length() =0;
 
 	// Returns the index of the register for the header field
 	int register_number(int slot);
 
 	// Is the currently selected drive a floppy drive?
 	bool using_floppy();
+
+	// Was the Bad Sector flag set for the recently read sector header?
+	bool bad_sector();
 
 	// Common subprograms READ ID, VERIFY, and DATA TRANSFER
 	void read_id(int& cont, bool implied_seek, bool wait_seek_complete);
@@ -488,6 +494,7 @@ public:
 
 protected:
 	int step_time() override;
+	int header_length() override;
 };
 
 class hdc9234_device : public hdc92x4_device
@@ -497,6 +504,7 @@ public:
 
 protected:
 	int step_time() override;
+	int header_length() override;
 };
 
 #endif

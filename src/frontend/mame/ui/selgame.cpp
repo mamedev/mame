@@ -1027,7 +1027,6 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 
 	for (auto & s_driver : s_drivers)
 	{
-		auto entries = rom_build_entries(s_driver->rom);
 		if (!bioscheck && filter != FILTER_BIOS && (s_driver->flags & MACHINE_IS_BIOS_ROOT) != 0)
 			continue;
 
@@ -1113,15 +1112,19 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 			}
 			break;
 		case FILTER_CHD:
-			for (const rom_entry &rom : entries)
-				if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
-				{
-					m_displaylist.push_back(s_driver);
-					break;
+			{
+				auto entries = rom_build_entries(s_driver->rom);
+				for (const rom_entry &rom : entries)
+					if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
+					{
+						m_displaylist.push_back(s_driver);
+						break;
+					}
 				}
 			break;
 		case FILTER_NOCHD:
 			{
+				auto entries = rom_build_entries(s_driver->rom);
 				bool found = false;
 				for (const rom_entry &rom : entries)
 					if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))

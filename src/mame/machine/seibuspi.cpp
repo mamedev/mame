@@ -121,7 +121,7 @@ static const UINT16 key_table[256]=
 #endif
 
 
-static const UINT8 bitswap[16][16] =
+static const UINT8 spi_bitswap[16][16] =
 {
 	{ 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, },
 	{  7, 6, 5,14, 0,15, 4, 3, 2, 8, 9,10,11,12,13, 1, },
@@ -170,7 +170,7 @@ void seibuspi_sprite_decrypt(UINT8 *src, int rom_size)
 
 
 		/* first of all, permutate 16 of the 48 bits */
-		bs = bitswap[key_table[addr & 0xff]&0xf];
+		bs = spi_bitswap[key_table[addr & 0xff]&0xf];
 		y3 = BITSWAP16(y3, bs[0],bs[1],bs[2],bs[3],bs[4],bs[5],bs[6],bs[7],
 							bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 

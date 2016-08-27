@@ -87,14 +87,14 @@ static const struct CassetteLegacyWaveFiller fm7_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t fm7_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error fm7_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &fm7_legacy_fill_wave);
 }
 
 
 
-static casserr_t fm7_cas_load(cassette_image *cassette)
+static cassette_image::error fm7_cas_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &fm7_legacy_fill_wave);
 }

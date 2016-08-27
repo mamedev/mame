@@ -9,6 +9,9 @@
   H8/3002 and Golgo13 support by R. Belmont based on work by The_Author and DynaChicken
   JVS Support by R. Belmont
 
+  Notes:
+    - technodr: Calibrate controls by turning on the service mode switch (F2) while holdign service coin (9).
+  
   Issues:
     not all games work due to either banking, dma or protection issues.
     graphics are glitchy in some games.
@@ -18,7 +21,9 @@
     - truckk doesn't boot: the H8/3002 never enters InitJVSBoards @ 1DE2.  1DE2 is referenced in a table of commands at 4032,
       which is called by the routine at 3FEA.  It is not clear how execution is intended to get to 3FEA - there are no direct
       branches to that location, and the bytes 3F EA don't appear at all in the program.
-
+	  
+    - technodr: printer not emulated. To play the game, press F2 to enter the test menu, navigate to GAME OPTIONS and disable
+      the printer by setting "PRINTER" to OFF.
 
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
@@ -1153,6 +1158,7 @@ public:
 
 	DECLARE_DRIVER_INIT(namcos12);
 	DECLARE_DRIVER_INIT(ptblank2);
+	DECLARE_DRIVER_INIT(technodr);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
@@ -1654,6 +1660,14 @@ DRIVER_INIT_MEMBER(namcos12_state,ptblank2)
 	*( (UINT32 *)( memregion( "maincpu:rom" )->base() + 0x331c4 ) ) = 0;
 }
 
+DRIVER_INIT_MEMBER(namcos12_state,technodr)
+{
+	DRIVER_INIT_CALL(namcos12);
+
+	// HACK: patch H8 to fix COIN ERROR
+	*( (UINT32 *)( memregion( "sub" )->base() + 0x14b6 ) ) = 0;
+}
+
 static MACHINE_CONFIG_START( coh700, namcos12_state )
 
 	/* basic machine hardware */
@@ -1665,7 +1679,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_state::namcos12_rom_read ), (namcos12_state *) owner ) )
 
-	MCFG_CPU_ADD("sub", H83002, 16737350)
+	MCFG_CPU_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
 	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
 	MCFG_CPU_IO_MAP(s12h8iomap)
 
@@ -1691,11 +1705,11 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", 29168000, 332)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
+	MCFG_C352_ADD("c352", 25401600, 288)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
+	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ptblank2, coh700 )
@@ -1996,13 +2010,13 @@ static INPUT_PORTS_START( technodr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )  // service coin
 
 	PORT_START("GAS")
-	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal") PORT_REVERSE
 
 	PORT_START("BRAKE")
-	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal") PORT_REVERSE
 
 	PORT_START("STEER")
-	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel") PORT_REVERSE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aplarail )
@@ -3109,8 +3123,8 @@ ROM_START( technodr )
 	ROM_LOAD16_BYTE( "th1rom0u.9",   0x0000001, 0x400000, CRC(260ae0c5) SHA1(2ecb82e069fa64b9d3f63d6193befae02f3140e4) )
 	ROM_LOAD16_BYTE( "th1rom1l.7",   0x0800000, 0x400000, CRC(56d9b477) SHA1(101b5acfbe5d292418f7fd8db642187f2b571d0b) )
 	ROM_LOAD16_BYTE( "th1rom1u.10",  0x0800001, 0x400000, CRC(a45d337e) SHA1(10e230b61ab4c6aa386c68463badef0c4ba58f0e) )
-	ROM_LOAD16_BYTE( "th1fl3l.12",   0x1000000, 0x200000, CRC(cd4422c0) SHA1(97a9788cf0c589477f77c5403cc715ce4980a7bd) )
-	ROM_LOAD16_BYTE( "th1fl3u.13",   0x1000001, 0x200000, CRC(c330116f) SHA1(b12de5a82d6ebb5f893882b578e02af732231512) )
+	ROM_LOAD16_BYTE( "th1fl3l.12",   0x1800000, 0x200000, CRC(c330116f) SHA1(b12de5a82d6ebb5f893882b578e02af732231512) )
+	ROM_LOAD16_BYTE( "th1fl3u.13",   0x1800001, 0x200000, CRC(cd4422c0) SHA1(97a9788cf0c589477f77c5403cc715ce4980a7bd) )
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
 	ROM_LOAD16_WORD_SWAP( "th1verb.11s",  0x000000, 0x080000, CRC(85806e2e) SHA1(9e0a7e6924b72e7b5b1d0e72eeec10045984dd4b) )
@@ -3150,55 +3164,55 @@ ROM_START( aplarail )
 	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(db1b63c5) SHA1(01fc3386a2d1cb1bed1b7fd9bd2fd59e503832d3) )
 ROM_END
 
-GAME( 1996, tekken3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC006 */
-GAME( 1996, tekken3ae, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Asia, TET2/VER.E1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC006 */
-GAME( 1996, tekken3ud, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC006 */
-GAME( 1996, tekken3ab, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Asia, TET2/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC006 */
-GAME( 1996, tekken3ua, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC006 */
-GAME( 1996, tekken3aa, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Asia, TET2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC006 */
-GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC014 */
-GAME( 1997, lbgrande,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (Asia, LG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC014 */
-GAME( 1997, lbgrandeja,lbgrande, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (Japan, LG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC014 */
-GAME( 1997, toukon3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC019 */
-GAME( 1998, soulclbr,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, soulclbruc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, soulclbrjc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC020 */
-GAME( 1998, soulclbrwb,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, soulclbrub,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC020 */
-GAME( 1998, soulclbrjb,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC020 */
-GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC020 */
-GAME( 1998, ehrgeiz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (US, EG3/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC021 */
-GAME( 1998, ehrgeizaa, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Asia, EG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC021 */
-GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC021 */
-GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC035 */
-GAME( 1998, aplarail,  0,        aplarail, aplarail, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Attack Pla Rail (Japan, AP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC032 */
-GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC0?? */
-GAME( 1998, technodr,  0,        technodr, technodr, namcos12_state, namcos12, ROT0, "Namco",           "Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
-GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Asia, TKM2/VER.A1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC036 */
-GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC036 */
-GAME( 1998, fgtlayer,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC037 */
-GAME( 1999, pacapp,    0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC038 */
-GAME( 1999, ptblank2,  0,        ptblank2, ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC042 */
-GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC042 */
-GAME( 1999, sws99,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC043 */
-GAME( 1999, tektagt,   0,        tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", MACHINE_IMPERFECT_SOUND ) /* KC044 */
-GAME( 1999, tektagtac, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 1)", MACHINE_IMPERFECT_SOUND ) /* KC044 */
-GAME( 1999, tektagtac1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 2)", MACHINE_IMPERFECT_SOUND ) /* KC044 */
-GAME( 1999, tektagtub, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", MACHINE_IMPERFECT_SOUND ) /* KC044 */
-GAME( 1999, tektagtjc1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.C1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC044 */
-GAME( 1999, tektagtjb, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC044 */
-GAME( 1999, tektagtja, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC044 */
-GAME( 1999, ghlpanic,  0,        ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (Asia, OB2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC045 */
-GAME( 1999, ohbakyuun, ghlpanic, ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Oh! Bakyuuun (Japan, OB1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC045 */
-GAME( 1999, pacapp2,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC046 */
-GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_state,namcos12, ROT0, "Namco",           "Mr. Driller (US, DRI3/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC048 */
-GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_state,namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC048 */
-GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC050 */
-GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC052 */
-GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC053 */
-GAME( 1999, golgo13,   0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC054 */
-GAME( 1999, g13knd,    0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* KC059 */
-GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC055 */
+GAME( 1996, tekken3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3ae, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Asia, TET2/VER.E1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3ud, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3ab, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Asia, TET2/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3ua, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3aa, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Asia, TET2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC014 */
+GAME( 1997, lbgrande,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (Asia, LG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC014 */
+GAME( 1997, lbgrandeja,lbgrande, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (Japan, LG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC014 */
+GAME( 1997, toukon3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC019 */
+GAME( 1998, soulclbr,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, soulclbruc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, soulclbrjc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, soulclbrwb,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.B)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, soulclbrub,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, soulclbrjb,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, ehrgeiz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (US, EG3/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
+GAME( 1998, ehrgeizaa, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Asia, EG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
+GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
+GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC035 */
+GAME( 1998, aplarail,  0,        aplarail, aplarail, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Attack Pla Rail (Japan, AP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC032 */
+GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC0?? */
+GAME( 1998, technodr,  0,        technodr, technodr, namcos12_state, technodr, ROT0, "Namco",           "Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC056 */
+GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Asia, TKM2/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
+GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
+GAME( 1998, fgtlayer,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC037 */
+GAME( 1999, pacapp,    0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC038 */
+GAME( 1999, ptblank2,  0,        ptblank2, ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC042 */
+GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC042 */
+GAME( 1999, sws99,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", MACHINE_IMPERFECT_GRAPHICS ) /* KC043 */
+GAME( 1999, tektagt,   0,        tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", 0 ) /* KC044 */
+GAME( 1999, tektagtac, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 1)", 0 ) /* KC044 */
+GAME( 1999, tektagtac1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 2)", 0 ) /* KC044 */
+GAME( 1999, tektagtub, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", 0 ) /* KC044 */
+GAME( 1999, tektagtjc1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.C1)", MACHINE_NOT_WORKING ) /* KC044 */
+GAME( 1999, tektagtjb, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", MACHINE_NOT_WORKING ) /* KC044 */
+GAME( 1999, tektagtja, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", MACHINE_NOT_WORKING ) /* KC044 */
+GAME( 1999, ghlpanic,  0,        ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (Asia, OB2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC045 */
+GAME( 1999, ohbakyuun, ghlpanic, ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Oh! Bakyuuun (Japan, OB1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC045 */
+GAME( 1999, pacapp2,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC046 */
+GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_state,namcos12, ROT0, "Namco",           "Mr. Driller (US, DRI3/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC048 */
+GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_state,namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC048 */
+GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC050 */
+GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC052 */
+GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC053 */
+GAME( 1999, golgo13,   0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC054 */
+GAME( 1999, g13knd,    0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC059 */
+GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC055 */
 GAME( 2000, truckk,    0,        truckk,   namcos12, namcos12_state, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
-GAME( 2000, kartduel,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC057 */
-GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC061 */
+GAME( 2000, kartduel,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC057 */
+GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC061 */

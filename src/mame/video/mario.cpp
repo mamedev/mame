@@ -134,7 +134,8 @@ TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
 
 void mario_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mario_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(mario_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
 	m_gfxdecode->gfx(0)->set_granularity(8);
@@ -259,7 +260,7 @@ UINT32 mario_state::screen_update_common(screen_device &screen, bitmap_ind16 &bi
 	if (t != m_monitor)
 	{
 		m_monitor = t;
-		PALETTE_INIT_NAME(mario)(m_palette);
+		PALETTE_INIT_NAME(mario)(*m_palette);
 	}
 
 	m_bg_tilemap->set_scrolly(0, m_gfx_scroll);

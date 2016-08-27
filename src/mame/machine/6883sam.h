@@ -157,16 +157,16 @@ private:
 	{
 	public:
 		sam_space(sam6883_device &owner);
-		void point(const sam_bank *bank, UINT16 offset, UINT16 mask);
+		void point(const sam_bank *bank, UINT16 offset, UINT32 length = ~0);
 
 	private:
 		sam6883_device &    m_owner;
 		memory_bank *       m_read_bank;
 		memory_bank *       m_write_bank;
-		UINT16              m_mask;
+		UINT32              m_length;
 
 		address_space &cpu_space() const;
-		void point_specific_bank(const sam_bank *bank, UINT16 offset, UINT16 mask, memory_bank *&memory_bank, INT32 addrstart, INT32 addrend, bool is_write);
+		void point_specific_bank(const sam_bank *bank, UINT32 offset, UINT32 mask, memory_bank *&memory_bank, UINT32 addrstart, UINT32 addrend, bool is_write);
 	};
 
 	const char *        m_cpu_tag;

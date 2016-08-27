@@ -52,8 +52,8 @@ public:
 	g627_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_switch(*this, "SWITCH")
-		, m_testipt(*this, "TEST")
+		, m_switch(*this, "SWITCH.%u", 0)
+		, m_testipt(*this, "TEST.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(v115);

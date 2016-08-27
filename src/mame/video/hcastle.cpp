@@ -109,8 +109,8 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_bg_tile_info)
 
 void hcastle_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hcastle_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hcastle_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hcastle_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hcastle_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -186,7 +186,7 @@ void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
-	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), m_palette, sbank, base_color, 0, bank_base, priority_bitmap, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), *m_palette, sbank, base_color, 0, bank_base, priority_bitmap, (UINT32)-1);
 }
 
 /*****************************************************************************/

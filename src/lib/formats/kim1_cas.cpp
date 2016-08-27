@@ -171,13 +171,13 @@ static const struct CassetteLegacyWaveFiller kim1_kim_legacy_fill_wave =
 };
 
 
-static casserr_t kim1_kim_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error kim1_kim_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &kim1_kim_legacy_fill_wave);
 }
 
 
-static casserr_t kim1_kim_load(cassette_image *cassette)
+static cassette_image::error kim1_kim_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &kim1_kim_legacy_fill_wave);
 }

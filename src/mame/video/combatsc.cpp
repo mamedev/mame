@@ -254,9 +254,9 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 
 VIDEO_START_MEMBER(combatsc_state,combatsc)
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_textlayer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_spriteram[0] = make_unique_clear<UINT8[]>(0x800);
 	m_spriteram[1] = make_unique_clear<UINT8[]>(0x800);
@@ -273,9 +273,9 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 
 VIDEO_START_MEMBER(combatsc_state,combatscb)
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_textlayer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_spriteram[0] = make_unique_clear<UINT8[]>(0x800);
 	m_spriteram[1] = make_unique_clear<UINT8[]>(0x800);
@@ -360,7 +360,7 @@ void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	address_space &space = machine().driver_data()->generic_space();
 	int base_color = (circuit * 4) * 16 + (k007121->ctrlram_r(space, 6) & 0x10) * 2;
 
-	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(circuit), m_palette, source, base_color, 0, 0, priority_bitmap, pri_mask);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(circuit), *m_palette, source, base_color, 0, 0, priority_bitmap, pri_mask);
 }
 
 

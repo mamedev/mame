@@ -548,7 +548,6 @@ static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0xfffffc, 0xffffff) AM_READ(punkshot_kludge_r)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -567,7 +566,6 @@ static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0e0000, 0x0e001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 ADDRESS_MAP_END
-
 
 WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
@@ -594,7 +592,6 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x780700, 0x78071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 ADDRESS_MAP_END
-
 
 WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 {
@@ -639,7 +636,6 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(glfgreat_rom_r)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -925,7 +921,6 @@ static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM /* main RAM */
@@ -949,7 +944,6 @@ static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
@@ -992,7 +986,6 @@ static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0xffff)
 	AM_RANGE(0x700400, 0x7007ff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0xffff)
 ADDRESS_MAP_END
-
 
 
 static ADDRESS_MAP_START( mia_audio_map, AS_PROGRAM, 8, tmnt_state )
@@ -2862,6 +2855,40 @@ ROM_START( tmntua )
 	ROM_LOAD( "963a25.d5",      0x00000, 0x80000, CRC(fca078c7) SHA1(3e1124d72c9db4cb11d8de6c44b7aeca967f44e1) )
 ROM_END
 
+ROM_START( tmntub )
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 2*128k and 2*64k for 68000 code */
+	ROM_LOAD16_BYTE( "963-h23.j17",      0x00000, 0x20000, CRC(718086e1) SHA1(6fd07a36195521be101782a05a9ecbcc5aaebbbd) )
+	ROM_LOAD16_BYTE( "963-h24.k17",      0x00001, 0x20000, CRC(2f7d66e1) SHA1(53bd51458609662066b696f3edd19075e883bcde) )
+	ROM_LOAD16_BYTE( "963-h21.j15",      0x40000, 0x10000, CRC(1944641e) SHA1(6664dbd9856d3d579a63c6537feef9a6e9bd09c5) )
+	ROM_LOAD16_BYTE( "963-h22.k15",      0x40001, 0x10000, CRC(50ce5512) SHA1(641bf4d60a64f23cd3b52af983565dc6b38037c1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "963e20.g13",      0x00000, 0x08000, CRC(1692a6d6) SHA1(68c3419012b2863e91a7d7e479fce5ceabb10b88) )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
+	ROM_LOAD32_WORD( "963a29.k27",      0x000002, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
+
+	ROM_REGION( 0x200000, "k051960", 0 )    /* sprites */
+	ROM_LOAD32_WORD( "963a17.h4",      0x000000, 0x80000, CRC(b5239a44) SHA1(84e94807e7c51aa652b4e4b827b36be59a53d0d6) )
+	ROM_LOAD32_WORD( "963a15.k4",      0x000002, 0x80000, CRC(1f324eed) SHA1(971a675578518fffa341a943d0cc4fdea005fde0) )
+	ROM_LOAD32_WORD( "963a18.h6",      0x100000, 0x80000, CRC(dd51adef) SHA1(5010c0911b0b9e4f23a785e8a751a0bde5be5be0) )
+	ROM_LOAD32_WORD( "963a16.k6",      0x100002, 0x80000, CRC(d4bd9984) SHA1(d780ae7f72e16767c3a492544f02f0f1a332ab22) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )  /* sprite address decoder */
+	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) ) /* priority encoder (not used) */
+
+	ROM_REGION( 0x20000, "k007232", 0 ) /* 128k for the samples */
+	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* 128k for the samples */
+	ROM_LOAD( "963a27.d18",      0x00000, 0x20000, CRC(2dfd674b) SHA1(bbec5896c70056964fbc972a84bd5b0dfc6af257) ) /* samples for UPD7759C */
+
+	ROM_REGION( 0x80000, "title", 0 )   /* 512k for the title music sample */
+	ROM_LOAD( "963a25.d5",      0x00000, 0x80000, CRC(fca078c7) SHA1(3e1124d72c9db4cb11d8de6c44b7aeca967f44e1) )
+ROM_END
+
 ROM_START( tmht )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 2*128k and 2*64k for 68000 code */
 	ROM_LOAD16_BYTE( "963-f23.j17",   0x00000, 0x20000, CRC(9cb5e461) SHA1(b693e61070d6ce7ac59ff3f0a824cfefb37b33eb) )
@@ -4204,17 +4231,18 @@ GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state,    cuebrick,
 GAME( 1989, mia,         0,        mia,      mia,       tmnt_state,    mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state,    mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (World 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (World 4 Players, version X)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, version R)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, version J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, version H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, version F)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, version S)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, version ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, version U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, punkshot,    0,        punkshot, punkshot,  driver_device, 0,        ROT0,   "Konami", "Punk Shot (US 4 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  driver_device, 0,        ROT0,   "Konami", "Punk Shot (US 2 Players)", MACHINE_SUPPORTS_SAVE )

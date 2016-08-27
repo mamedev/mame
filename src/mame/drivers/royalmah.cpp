@@ -1397,7 +1397,7 @@ static INPUT_PORTS_START( mjctrl1 )
 
 	PORT_START("SYSTEM")    /* IN10 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) /* "Note" ("Paper Money") = 10 Credits */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 )  /* Memory Reset */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MEMORY_RESET )  /* Memory Reset */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )  /* Analizer (Statistics) */
 	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )

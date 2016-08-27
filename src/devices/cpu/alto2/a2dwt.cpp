@@ -11,15 +11,15 @@
  * Copied from ALTOCODE24.MU
  *
  *	;Display Word Task
- *	
+ *
  *	DWT:	T← DWA;
  *		T←-3+T+1;
  *		L← AECL+T,BUS=0,TASK;	AECL CONTAINS NWRDS AT THIS TIME
  *		AECL←L, :DWTZ;
- *	
+ *
  *	DWTY:	BLOCK;
  *		TASK, :DWTF;
- *	
+ *
  *	DWTZ:	L←HTAB-1, BUS=0,TASK;
  *		HTAB←L, :DOTAB;
  *
@@ -66,12 +66,12 @@ void alto2_cpu_device::f2_late_load_ddr()
 {
 	LOG((this,LOG_DWT,2,"    DDR<- BUS (%#o)\n", m_bus));
 	m_dsp.fifo[m_dsp.wa] = m_bus;
-	m_dsp.wa = (m_dsp.wa + 1) % ALTO2_DISPLAY_FIFO;
+	m_dsp.wa = (m_dsp.wa + 1) % A2_DISP_FIFO;
 	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (FIFO_STOPWAKE(a38))
 		m_task_wakeup &= ~(1 << task_dwt);
 	LOG((this,LOG_DWT,2, "   DWT push %04x into FIFO[%02o]%s\n",
-		m_bus, (m_dsp.wa - 1) & (ALTO2_DISPLAY_FIFO - 1),
+		m_bus, (m_dsp.wa - 1) & (A2_DISP_FIFO - 1),
 		FIFO_STOPWAKE(a38) ? " STOPWAKE" : ""));
 }
 

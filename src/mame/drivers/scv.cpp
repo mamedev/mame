@@ -23,7 +23,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_upd1771c(*this, "upd1771c"),
 		m_cart(*this, "cartslot"),
-		m_pa(*this, "PA"),
+		m_pa(*this, "PA.%u", 0),
 		m_pc0(*this, "PC0"),
 		m_charrom(*this, "charrom") { }
 

@@ -901,32 +901,32 @@ static const struct CassetteLegacyWaveFiller cdt_legacy_fill_wave =
 	0                   /* trailer_samples */
 };
 
-static casserr_t tzx_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error tzx_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
 {
 	return cassette_legacy_identify(cassette, opts, &tzx_legacy_fill_wave);
 }
 
-static casserr_t tap_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error tap_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
 {
 	return cassette_legacy_identify(cassette, opts, &tap_legacy_fill_wave);
 }
 
-static casserr_t cdt_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error cdt_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
 {
 	return cassette_legacy_identify(cassette, opts, &cdt_legacy_fill_wave);
 }
 
-static casserr_t tzx_cassette_load( cassette_image *cassette )
+static cassette_image::error tzx_cassette_load( cassette_image *cassette )
 {
 	return cassette_legacy_construct(cassette, &tzx_legacy_fill_wave);
 }
 
-static casserr_t tap_cassette_load( cassette_image *cassette )
+static cassette_image::error tap_cassette_load( cassette_image *cassette )
 {
 	return cassette_legacy_construct(cassette, &tap_legacy_fill_wave);
 }
 
-static casserr_t cdt_cassette_load( cassette_image *cassette )
+static cassette_image::error cdt_cassette_load( cassette_image *cassette )
 {
 	return cassette_legacy_construct(cassette, &cdt_legacy_fill_wave);
 }

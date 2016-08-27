@@ -118,9 +118,9 @@ WRITE32_MEMBER(silkroad_state::silkroad_fgram3_w)
 
 void silkroad_state::video_start()
 {
-	m_fg_tilemap  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg2_tilemap->set_transparent_pen(0);

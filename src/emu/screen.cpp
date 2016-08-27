@@ -556,7 +556,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_yoffset(0.0f),
 		m_xscale(1.0f),
 		m_yscale(1.0f),
-		m_palette(*this),
+		m_palette(*this, finder_base::DUMMY_TAG),
 		m_video_attributes(0),
 		m_svg_region(nullptr),
 		m_container(nullptr),

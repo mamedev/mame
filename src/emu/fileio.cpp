@@ -22,47 +22,99 @@ const UINT32 OPEN_FLAG_HAS_CRC  = 0x10000;
 //**************************************************************************
 
 //-------------------------------------------------
-//  path_iterator - constructor
+//  path_iterator - constructors
 //-------------------------------------------------
 
-path_iterator::path_iterator(const char *rawsearchpath)
-	: m_base(rawsearchpath),
-		m_current(m_base),
-		m_index(0)
+path_iterator::path_iterator(std::string &&searchpath)
+	: m_searchpath(std::move(searchpath))
+	, m_current(m_searchpath.cbegin())
+	, m_is_first(true)
+{
+}
+
+path_iterator::path_iterator(std::string const &searchpath)
+	: m_searchpath(searchpath)
+	, m_current(m_searchpath.cbegin())
+	, m_is_first(true)
+{
+}
+
+path_iterator::path_iterator(path_iterator &&that)
+{
+	operator=(std::move(that));
+}
+
+path_iterator::path_iterator(path_iterator const &that)
+	: m_searchpath(that.m_searchpath)
+	, m_current(std::next(m_searchpath.cbegin(), std::distance(that.m_searchpath.cbegin(), that.m_current)))
+	, m_is_first(that.m_is_first)
 {
 }
 
 
 //-------------------------------------------------
-//  path_iterator_get_next - get the next entry
-//  in a multipath sequence
+//  path_iterator - assignement operators
+//-------------------------------------------------
+
+path_iterator &path_iterator::operator=(path_iterator &&that)
+{
+	auto const current(std::distance(that.m_searchpath.cbegin(), that.m_current));
+	m_searchpath = std::move(that.m_searchpath);
+	m_current = std::next(m_searchpath.cbegin(), current);
+	m_is_first = that.m_is_first;
+	return *this;
+}
+
+path_iterator &path_iterator::operator=(path_iterator const &that)
+{
+	m_searchpath = that.m_searchpath;
+	m_current = std::next(m_searchpath.cbegin(), std::distance(that.m_searchpath.cbegin(), that.m_current));
+	m_is_first = that.m_is_first;
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  path_iterator::next - get the next entry in a
+//  multipath sequence
 //-------------------------------------------------
 
 bool path_iterator::next(std::string &buffer, const char *name)
 {
 	// if none left, return FALSE to indicate we are done
-	if (m_index != 0 && *m_current == 0)
+	if (!m_is_first && (m_searchpath.cend() == m_current))
 		return false;
 
-	// copy up to the next semicolon
-	const char *semi = strchr(m_current, ';');
-	if (semi == nullptr)
-		semi = m_current + strlen(m_current);
-	buffer.assign(m_current, semi - m_current);
-	m_current = (*semi == 0) ? semi : semi + 1;
+	// copy up to the next separator
+	auto const sep(std::find(m_current, m_searchpath.cend(), ';')); // FIXME this should be a macro - UNIX prefers :
+	buffer.assign(m_current, sep);
+	m_current = sep;
+	if (m_searchpath.cend() != m_current)
+		++m_current;
 
 	// append the name if we have one
-	if (name != nullptr)
+	if (name)
 	{
 		// compute the full pathname
-		if (buffer.length() > 0)
+		if (!buffer.empty() && (*buffer.rbegin() != *PATH_SEPARATOR))
 			buffer.append(PATH_SEPARATOR);
 		buffer.append(name);
 	}
 
 	// bump the index and return TRUE
-	m_index++;
+	m_is_first = false;
 	return true;
+}
+
+
+//-------------------------------------------------
+//  path_iteratr::reset - let's go again
+//-------------------------------------------------
+
+void path_iterator::reset()
+{
+	m_current = m_searchpath.cbegin();
+	m_is_first = true;
 }
 
 
@@ -72,27 +124,6 @@ bool path_iterator::next(std::string &buffer, const char *name)
 //**************************************************************************
 
 //-------------------------------------------------
-//  file_enumerator - constructor
-//-------------------------------------------------
-
-file_enumerator::file_enumerator(const char *searchpath)
-	: m_iterator(searchpath),
-		m_curdir(nullptr)/*,
-		m_buflen(0)*/
-{
-}
-
-
-//-------------------------------------------------
-//  ~file_enumerator - destructor
-//-------------------------------------------------
-
-file_enumerator::~file_enumerator()
-{
-}
-
-
-//-------------------------------------------------
 //  next - return information about the next file
 //  in the search path
 //-------------------------------------------------
@@ -100,7 +131,7 @@ file_enumerator::~file_enumerator()
 const osd::directory::entry *file_enumerator::next()
 {
 	// loop over potentially empty directories
-	while (1)
+	while (true)
 	{
 		// if no open directory, get the next path
 		while (!m_curdir)
@@ -114,8 +145,8 @@ const osd::directory::entry *file_enumerator::next()
 		}
 
 		// get the next entry from the current directory
-		const osd::directory::entry *result = m_curdir->read();
-		if (result != nullptr)
+		const osd::directory::entry *const result = m_curdir->read();
+		if (result)
 			return result;
 
 		// we're done; close this directory
@@ -134,31 +165,31 @@ const osd::directory::entry *file_enumerator::next()
 //-------------------------------------------------
 
 emu_file::emu_file(UINT32 openflags)
-	: m_file(nullptr),
-		m_iterator(""),
-		m_mediapaths(""),
-		m_crc(0),
-		m_openflags(openflags),
-		m_zipfile(nullptr),
-		m_ziplength(0),
-		m_remove_on_close(false),
-		m_restrict_to_mediapath(false)
+	: m_file()
+	, m_iterator(std::string())
+	, m_mediapaths(std::string())
+	, m_crc(0)
+	, m_openflags(openflags)
+	, m_zipfile(nullptr)
+	, m_ziplength(0)
+	, m_remove_on_close(false)
+	, m_restrict_to_mediapath(false)
 {
 	// sanity check the open flags
 	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))
 		throw emu_fatalerror("Attempted to open a file for write with OPEN_FLAG_HAS_CRC");
 }
 
-emu_file::emu_file(const char *searchpath, UINT32 openflags)
-	: m_file(nullptr),
-		m_iterator(searchpath),
-		m_mediapaths(searchpath),
-		m_crc(0),
-		m_openflags(openflags),
-		m_zipfile(nullptr),
-		m_ziplength(0),
-		m_remove_on_close(false),
-		m_restrict_to_mediapath(false)
+emu_file::emu_file(std::string &&searchpath, UINT32 openflags)
+	: m_file()
+	, m_iterator(searchpath)
+	, m_mediapaths(std::move(searchpath))
+	, m_crc(0)
+	, m_openflags(openflags)
+	, m_zipfile(nullptr)
+	, m_ziplength(0)
+	, m_remove_on_close(false)
+	, m_restrict_to_mediapath(false)
 {
 	// sanity check the open flags
 	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))

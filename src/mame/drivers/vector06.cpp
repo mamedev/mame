@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, MetalliC
 /***************************************************************************
 
         Vector06c driver by Miodrag Milanovic
 
         10/07/2008 Preliminary driver.
+
+note: press F12 after initial boot was load (indicated in screen lower part)
 
 ****************************************************************************/
 
@@ -14,8 +16,9 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8, vector06_state)
-	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
+	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank2")
+	AM_RANGE( 0xa000, 0xdfff ) AM_READWRITE_BANK("bank3")
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE_BANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
@@ -23,7 +26,10 @@ static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector06_8255_1_r, vector06_8255_1_w )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector06_8255_2_r, vector06_8255_2_w )
+	AM_RANGE( 0x08, 0x0B) AM_READWRITE(pit8253_r, pit8253_w)
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE(vector06_color_set)
+	AM_RANGE( 0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
+	AM_RANGE( 0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)
 	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", fd1793_t, data_r, data_w)
 	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", fd1793_t, sector_r, sector_w)
 	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", fd1793_t, track_r, track_w)
@@ -137,6 +143,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 //  MCFG_CPU_ADD("maincpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)
 	MCFG_CPU_IO_MAP(vector06_io)
+	MCFG_I8085A_STATUS(WRITE8(vector06_state, vector06_status_callback))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vector06_state,vector06_irq_callback)
 
@@ -166,6 +173,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_romdisk_porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_romdisk_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(vector06_state, vector06_romdisk_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(vector06_state, vector06_romdisk_portc_w))
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -184,8 +192,23 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_SIZE("320K")
 	MCFG_RAM_DEFAULT_VALUE(0)
+
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(1500000)
+	MCFG_PIT8253_CLK1(1500000)
+	MCFG_PIT8253_CLK2(1500000)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(vector06_state, speaker_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(vector06_state, speaker_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(vector06_state, speaker_w))
+
+	// optional
+	MCFG_SOUND_ADD("aysnd", AY8910, 1773400)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -227,7 +250,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME      FLAGS */
-COMP( 1987, vector06,    0,        0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 06c",  MACHINE_NOT_WORKING)
+COMP( 1987, vector06,    0,        0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 06c",  0)
 COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
 COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
 COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)

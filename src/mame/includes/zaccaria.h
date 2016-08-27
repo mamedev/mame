@@ -16,7 +16,7 @@ public:
 		, m_attributesram(*this, "attributesram")
 		, m_spriteram(*this, "spriteram")
 		, m_spriteram2(*this, "spriteram2")
-		, m_dsw_port(*this, "DSW")
+		, m_dsw_port(*this, "DSW.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(dsw_r);

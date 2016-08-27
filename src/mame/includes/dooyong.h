@@ -6,12 +6,11 @@ class dooyong_state : public driver_device
 {
 public:
 	dooyong_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_palette_bank(0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bgscroll_w);
@@ -25,39 +24,48 @@ public:
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 const *tilerom, UINT8 const *scroll, int graphics);
 	inline void scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map);
 
+	void clear_video_regs()
+	{
+		std::fill(std::begin(m_bgscroll8), std::end(m_bgscroll8), 0);
+		std::fill(std::begin(m_bg2scroll8), std::end(m_bg2scroll8), 0);
+		std::fill(std::begin(m_fgscroll8), std::end(m_fgscroll8), 0);
+		std::fill(std::begin(m_fg2scroll8), std::end(m_fg2scroll8), 0);
+		m_palette_bank = 0;
+	}
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg2_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_fg2_tilemap;
-	tilemap_t *m_tx_tilemap;
-	UINT8 m_bgscroll8[0x10];
-	UINT8 m_bg2scroll8[0x10];
-	UINT8 m_fgscroll8[0x10];
-	UINT8 m_fg2scroll8[0x10];
-	UINT8 *m_bg_tilerom;
-	UINT8 *m_bg2_tilerom;
-	UINT8 *m_fg_tilerom;
-	UINT8 *m_fg2_tilerom;
-	int m_bg_gfx;
-	int m_bg2_gfx;
-	int m_fg_gfx;
-	int m_fg2_gfx;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg2_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_fg2_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	UINT8 m_bgscroll8[0x10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	UINT8 m_bg2scroll8[0x10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	UINT8 m_fgscroll8[0x10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	UINT8 m_fg2scroll8[0x10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	UINT8 *m_bg_tilerom = nullptr;
+	UINT8 *m_bg2_tilerom = nullptr;
+	UINT8 *m_fg_tilerom = nullptr;
+	UINT8 *m_fg2_tilerom = nullptr;
+	int m_bg_gfx = 0;
+	int m_bg2_gfx = 0;
+	int m_fg_gfx = 0;
+	int m_fg2_gfx = 0;
+	UINT8 m_palette_bank = 0;
+	int m_bg_fg_tilemap_mode = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	UINT8 m_palette_bank;
 };
 
 class dooyong_z80_state : public dooyong_state
 {
 public:
 	dooyong_z80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dooyong_state(mconfig, type, tag),
-		m_txvideoram(*this, "txvideoram"),
-		m_spriteram(*this, "spriteram")
+		: dooyong_state(mconfig, type, tag)
+		, m_txvideoram(*this, "txvideoram")
+		, m_spriteram(*this, "spriteram")
 	{ }
 
 	enum
@@ -87,10 +95,10 @@ public:
 
 	required_shared_ptr<UINT8> m_txvideoram;
 	std::unique_ptr<UINT8[]> m_paletteram_flytiger;
-	UINT8 m_sprites_disabled;
-	UINT8 m_flytiger_pri;
-	UINT8 m_tx_pri;
-	int m_tx_tilemap_mode;
+	UINT8 m_sprites_disabled = 0;
+	UINT8 m_flytiger_pri = 0;
+	UINT8 m_tx_pri = 0;
+	int m_tx_tilemap_mode = 0;
 
 	optional_device<buffered_spriteram8_device> m_spriteram;
 };
@@ -115,16 +123,19 @@ public:
 	DECLARE_VIDEO_START(gulfstrm);
 	DECLARE_VIDEO_START(pollux);
 
-	int m_interrupt_line_1;
-	int m_interrupt_line_2;
+	int m_interrupt_line_1 = 0;
+	int m_interrupt_line_2 = 0;
 };
 
 class dooyong_68k_state : public dooyong_state
 {
 public:
 	dooyong_68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dooyong_state(mconfig, type, tag),
-		m_spriteram(*this, "spriteram")
+		: dooyong_state(mconfig, type, tag)
+		, m_bg_bitmap()
+		, m_bg2_bitmap()
+		, m_screen(*this, "screen")
+		, m_spriteram(*this, "spriteram")
 	{ }
 
 	DECLARE_WRITE16_MEMBER(ctrl_w);
@@ -140,11 +151,15 @@ public:
 	DECLARE_VIDEO_START(rshark);
 	DECLARE_VIDEO_START(popbingo);
 
-	UINT8 *m_bg_tilerom2;
-	UINT8 *m_bg2_tilerom2;
-	UINT8 *m_fg_tilerom2;
-	UINT8 *m_fg2_tilerom2;
-	UINT16 m_bg2_priority;
+	UINT8 *m_bg_tilerom2 = nullptr;
+	UINT8 *m_bg2_tilerom2 = nullptr;
+	UINT8 *m_fg_tilerom2 = nullptr;
+	UINT8 *m_fg2_tilerom2 = nullptr;
+	UINT16 m_bg2_priority = 0;
 
+	bitmap_ind16 m_bg_bitmap;
+	bitmap_ind16 m_bg2_bitmap;
+
+	required_device<screen_device> m_screen;
 	required_device<buffered_spriteram16_device> m_spriteram;
 };

@@ -184,14 +184,14 @@ static const struct CassetteLegacyWaveFiller svi_legacy_fill_wave =
 
 
 
-static casserr_t svi_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error svi_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &svi_legacy_fill_wave);
 }
 
 
 
-static casserr_t svi_cas_load(cassette_image *cassette)
+static cassette_image::error svi_cas_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &svi_legacy_fill_wave);
 }

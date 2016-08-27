@@ -56,7 +56,7 @@ protected:
 	UINT32                  m_baseaddress;
 	UINT32                  m_size;
 	UINT32                  m_rgnoffset;
-	std::vector<UINT16>          m_decrypted_opcodes[256];
+	std::vector<UINT16>     m_decrypted_opcodes[256];
 };
 
 
@@ -110,7 +110,8 @@ protected:
 	bool                    m_irqmode;
 	state_change_delegate   m_state_change;
 	fd1094_decryption_cache m_cache;
-	optional_region_ptr<UINT16> m_srcbase;
+	UINT16 const            *m_srcbase;
+	optional_region_ptr<UINT16> m_rom;
 	required_region_ptr<UINT8> m_key;
 	UINT8                   m_masked_opcodes_lookup[2][65536/8/2];
 

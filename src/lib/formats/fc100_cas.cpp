@@ -133,12 +133,12 @@ static const struct CassetteLegacyWaveFiller fc100_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t fc100_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error fc100_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &fc100_legacy_fill_wave);
 }
 
-static casserr_t fc100_cassette_load(cassette_image *cassette)
+static cassette_image::error fc100_cassette_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &fc100_legacy_fill_wave);
 }

@@ -30,8 +30,8 @@
 const device_type VSYSTEM_SPR2 = &device_creator<vsystem_spr2_device>;
 
 vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VSYSTEM_SPR2, "Video System Sprites Type 2", tag, owner, clock, "vsystem_spr2", __FILE__),
-		m_gfxdecode(*this)
+	: device_t(mconfig, VSYSTEM_SPR2, "Video System Sprites Type 2", tag, owner, clock, "vsystem_spr2", __FILE__)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	m_newtilecb =  vsystem_tile2_indirection_delegate(FUNC(vsystem_spr2_device::tile_callback_noindirect), this);
 	m_pritype = 0; // hack until we have better handling

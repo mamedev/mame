@@ -390,10 +390,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
 			m_timer_s[1] = m_sound1; // set to preset value
 			m_timer_s[2]++;
 			offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
-			if BIT(m_sound0, 6)
+			if (BIT(m_sound0, 6))
 				m_dac->write_unsigned8(m_p_prom[offs]<< 4);
 			// noise
-			if BIT(m_sound0, 7)
+			if (BIT(m_sound0, 7))
 			{
 				bool ab0 = BIT(m_timer_s[3], 0) ^ BIT(m_timer_s[4], 6);
 				bool ab1 = !BIT(m_timer_s[3], 1);
@@ -418,7 +418,7 @@ WRITE8_MEMBER( atari_s2_state::sound0_w )
 {
 	m_sound0 = data;
 	offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
-	if BIT(m_sound0, 6)
+	if (BIT(m_sound0, 6))
 		m_dac->write_unsigned8(m_p_prom[offs]<< 4);
 }
 

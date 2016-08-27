@@ -69,6 +69,7 @@ Games on this system include....
 |*| 2004 | Virtua Striker 4 (Japan) (Rev E)                                | Sega                                | GDROM | GDT-0013E      | 317-0391-JPN |               |
 | | 2004 | Virtua Striker 4 (Export)                                       | Sega                                | GDROM | GDT-0014       |              |               |
 |*| 2004 | Virtua Striker 4 (Export)                                       | Sega                                | GDROM | GDT-0015       | 317-0393-EXP |               |
+| | 2004 | Virtua Striker 4 (Export)                                       | Sega                                | CF    | MDA-G0016      | 317-0393-EXP |               |
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (server)                | Sega / Hitmaker                     | GDROM | GDT-0016       |              |               |
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (client)                | Sega / Hitmaker                     | GDROM | GDT-0017       |              |               |
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev A)        | Sega / Hitmaker                     | GDROM | GDT-0017A      |              |               |
@@ -88,6 +89,7 @@ Games on this system include....
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev C)                       | Sega                                | GDROM | GDT-0020C      |              |               |
 |*| 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev D)                       | Sega                                | GDROM | GDT-0020D      | 317-0432-JPN | 253-5508-0432J|
 |*| 2006 | Virtua Striker 4 Ver.2006 (Export)                              | Sega                                | GDROM | GDT-0021       | 317-0433-EXP | 253-5508-0433E|
+| | 2006 | Virtua Striker 4 Ver.2006 (Export)                              | Sega                                | CF    | MDA-G00??      | 317-0433-EXP | 253-5508-0433E|
 | | 2006 | Triforce Firmware Update for Compact Flash Box                  | Sega                                | GDROM | GDT-0022       | 317-0567-COM |               |
 |*| 2006 | Triforce Firmware Update for Compact Flash Box (Rev A)          | Sega                                | GDROM | GDT-0022A      | 317-0567-COM |               |
 | | 2006 | Donkey Kong : Banana Kingdom                                    | Namco / Nintendo                    | Cart? |                |              |               |

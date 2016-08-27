@@ -32,7 +32,7 @@ tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *ta
 	m_ram(nullptr),
 	//m_ctrl[8](0),
 	m_base_color(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -56,7 +56,7 @@ void tc0280grd_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap->set_transparent_pen(0);
 
 	m_ram = make_unique_clear<UINT16[]>(TC0280GRD_RAM_SIZE / 2);

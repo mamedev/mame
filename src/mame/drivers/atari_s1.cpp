@@ -65,7 +65,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
 		, m_dac(*this, "dac")
-		, m_switch(*this, "SWITCH")
+		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(m1080_r);

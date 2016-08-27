@@ -485,6 +485,7 @@ osd_file::error win_error_to_file_error(DWORD error)
 	case ERROR_FILE_NOT_FOUND:
 	case ERROR_FILENAME_EXCED_RANGE:
 	case ERROR_PATH_NOT_FOUND:
+	case ERROR_INVALID_NAME:
 		filerr = osd_file::error::NOT_FOUND;
 		break;
 

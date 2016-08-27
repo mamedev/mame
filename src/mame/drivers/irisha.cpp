@@ -280,7 +280,7 @@ WRITE8_MEMBER(irisha_state::irisha_8255_portc_w)
 {
 	//logerror("irisha_8255_portc_w %02x\n",data);
 
-	if BIT(data, 6)
+	if (BIT(data, 6))
 		m_pit->write_gate2((BIT(m_ppi_porta, 5) && !BIT(data, 5)) ? 1 : 0);
 
 	m_ppi_portc = data;

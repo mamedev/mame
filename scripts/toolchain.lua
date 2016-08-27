@@ -49,9 +49,7 @@ newoption {
 	allowed = {
 		{ "intel-14",      "Intel C++ Compiler XE 14.0" },
 		{ "intel-15",      "Intel C++ Compiler XE 15.0" },
-		{ "vs2013-clang",  "Clang 3.6"         },
 		{ "vs2015-clang",  "Clang 3.6"         },
-		{ "vs2013-xp",     "Visual Studio 2013 targeting XP" },
 		{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
 		{ "winphone8",     "Windows Phone 8.0" },
 		{ "winphone81",    "Windows Phone 8.1" },
@@ -333,7 +331,7 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ci20")
 		end
 
-	elseif _ACTION == "vs2013" or _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
+	elseif _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
@@ -382,11 +380,6 @@ function toolchain(_buildDir, _subDir)
 		if "intel-15" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "Intel C++ Compiler XE 15.0"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
-		end
-
-		if ("vs2013-xp") == _OPTIONS["vs"] then
-			premake.vstudio.toolset = ("v120_xp")
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
 		end
 
 		if ("vs2015-xp") == _OPTIONS["vs"] then

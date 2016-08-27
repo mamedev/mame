@@ -54,12 +54,6 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-// default address map
-static ADDRESS_MAP_START( ymf278b, AS_0, 8, ymf278b_device )
-		AM_RANGE(0x000000, 0x3fffff) AM_ROM
-ADDRESS_MAP_END
-
-
 /**************************************************************************/
 
 int ymf278b_device::compute_rate(YMF278BSlot *slot, int val)
@@ -255,23 +249,23 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				{
 					// 8 bit
 					case 0:
-						sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>16))<<8;
+						sample = read_byte(slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
 					// 12 bit
 					case 1:
 						if (slot->stepptr & 0x10000)
-							sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
-								(m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
+							sample = read_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
+								(read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
-							sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
-								(m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
+							sample = read_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
+								(read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
 					// 16 bit
 					case 2:
-						sample = m_direct->read_byte(slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
-							m_direct->read_byte(slot->startaddr + ((slot->stepptr>>16)*2)+1);
+						sample = read_byte(slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
+							read_byte(slot->startaddr + ((slot->stepptr>>16)*2)+1);
 						break;
 
 					// ?? bit, effect is unknown, datasheet says it's prohibited
@@ -485,7 +479,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 				else
 					offset = m_wavetblhdr*0x80000 + (slot->wave - 384) * 12;
 				for (i = 0; i < 12; i++)
-					p[i] = m_direct->read_byte(offset+i);
+					p[i] = read_byte(offset+i);
 
 				slot->bits = (p[0]&0xc0)>>6;
 				slot->startaddr = (p[2] | (p[1]<<8) | ((p[0]&0x3f)<<16));
@@ -762,7 +756,7 @@ READ8_MEMBER( ymf278b_device::read )
 					ret = (m_pcmregs[m_port_C] & 0x1f) | 0x20; // device ID in upper bits
 					break;
 				case 6:
-					ret = m_direct->read_byte(m_memadr);
+					ret = read_byte(m_memadr);
 					m_memadr = (m_memadr + 1) & 0x3fffff;
 					break;
 
@@ -969,7 +963,6 @@ void ymf278b_device::device_start()
 {
 	int i;
 
-	m_direct = &space().direct();
 	m_clock = clock();
 	m_irq_handler.resolve();
 
@@ -1032,12 +1025,10 @@ const device_type YMF278B = &device_creator<ymf278b_device>;
 ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMF278B, "YMF278B", tag, owner, clock, "ymf278b", __FILE__),
 		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_BIG, 8, 22, 0, nullptr),
+		device_rom_interface(mconfig, *this, 22),
 		m_irq_handler(*this),
 		m_last_fm_data(0)
 {
-	m_address_map[0] = *ADDRESS_MAP_NAME(ymf278b);
 }
 
 //-------------------------------------------------
