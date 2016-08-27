@@ -609,8 +609,8 @@ private:
 
 	/* Memory management */
 	UINT8	m_map_sel[16];
-	std::unique_ptr<UINT8[]>	m_map_ram[4];
-	std::unique_ptr<UINT8[]>	m_q256_ram[4];
+	std::unique_ptr<UINT8[]>	m_map_ram[2];
+	std::unique_ptr<UINT8[]>	m_q256_ram[2];
 	UINT8	m_map_ram_latch;
 	int		m_cpu_active_space[2]; // TODO: Make one register
 	int		m_cpu_map_switch[2];
@@ -1294,6 +1294,8 @@ void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
 
 	address_space *space = (cpunum == 0 ? m_cpu1space : m_cpu2space);
 
+	space->unmap_readwrite(0x0000, 0xffff);
+
 	/* Step through the map RAM assignments */
 	for (int page = 0; page < PAGE_COUNT; ++page)
 	{
@@ -1317,7 +1319,7 @@ void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
 				if (m_cmi07_ctrl & 0x30)
 				if ((address & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
 				{
-					space->install_ram(address, address + PAGE_SIZE, &m_cmi07_ram[(page * PAGE_SIZE) & 0x3fff]);
+					space->install_ram(address, address + PAGE_SIZE - 1, &m_cmi07_ram[(page * PAGE_SIZE) & 0x3fff]);
 					continue;
 				}
 			}
@@ -1336,7 +1338,7 @@ void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
 			continue;
 
 		/* Now map the RAM page */
-		space->install_ram(address, address + PAGE_SIZE, &m_q256_ram[i][(page_info & 0x7f) * PAGE_SIZE]);
+		space->install_ram(address, address + PAGE_SIZE - 1, &m_q256_ram[i][(page_info & 0x7f) * PAGE_SIZE]);
 	}
 
 	if (vram_en)
@@ -2526,14 +2528,10 @@ void cmi_state::machine_start()
 	/* Allocate 1kB memory mapping RAM */
 	m_map_ram[0] = std::make_unique<UINT8[]>(0x400);
 	m_map_ram[1] = std::make_unique<UINT8[]>(0x400);
-	m_map_ram[2] = std::make_unique<UINT8[]>(0x400);
-	m_map_ram[3] = std::make_unique<UINT8[]>(0x400);
 
 	/* Allocate 256kB for each Q256 RAM card */
 	m_q256_ram[0] = std::make_unique<UINT8[]>(0x40000);
 	m_q256_ram[1] = std::make_unique<UINT8[]>(0x40000);
-	m_q256_ram[2] = std::make_unique<UINT8[]>(0x40000);
-	m_q256_ram[3] = std::make_unique<UINT8[]>(0x40000);
 
 	/* Allocate 16kB video RAM */
 	m_video_ram = std::make_unique<UINT8[]>(0x4000);
