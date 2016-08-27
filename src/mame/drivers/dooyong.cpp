@@ -40,8 +40,6 @@ Primella:
 - does the game really support cocktail mode as service mode suggests?
 - are buttons 2 and 3 used as service mode suggests?
 Pop Bingo
-- appears to combine 2 4bpp layers to make 1 8bpp layer, for now we just
-  treat it as 1 8bpp layer and ignore the 2nd set of registers.
 - some unknown reads / writes
 
 18.02.2011. Tomasz Slanina
@@ -470,18 +468,6 @@ static INPUT_PORTS_START( dooyongm68_generic )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-/*
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-*/
-
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -546,7 +532,7 @@ static INPUT_PORTS_START( pollux )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // palette cycle effects need this to work (read near code that also writes to the output ports) - currently can't see them due to wrong palette selection tho
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // palette cycle effects need this to work
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -711,24 +697,6 @@ static const gfx_layout rshark_spritelayout =
 	128*8
 };
 
-static const gfx_layout popbingo_tilelayout =
-{
-	32,32,
-	RGN_FRAC(1,2),
-	8,
-	{ 0*4, 1*4,  2*4, 3*4, RGN_FRAC(1,2)+0*4,RGN_FRAC(1,2)+1*4,RGN_FRAC(1,2)+2*4,RGN_FRAC(1,2)+3*4 },
-
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			32*32+0, 32*32+1, 32*32+2, 32*32+3, 32*32+16+0, 32*32+16+1, 32*32+16+2, 32*32+16+3,
-			2*32*32+0, 2*32*32+1, 2*32*32+2, 2*32*32+3, 2*32*32+16+0, 2*32*32+16+1, 2*32*32+16+2, 2*32*32+16+3,
-			3*32*32+0, 3*32*32+1, 3*32*32+2, 3*32*32+3, 3*32*32+16+0, 3*32*32+16+1, 3*32*32+16+2, 3*32*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32,
-			24*32, 25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32 },
-	512*8
-};
-
 static GFXDECODE_START( lastday )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
@@ -769,8 +737,10 @@ GFXDECODE_END
 
 static GFXDECODE_START( popbingo )
 	/* no chars */
-	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, popbingo_tilelayout, 256,  1 )
+	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0,  1 )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,           0,  1 )
+
 GFXDECODE_END
 
 READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
@@ -2077,13 +2047,13 @@ ROM_START( popbingo )
 	ROM_LOAD16_BYTE( "rom5.9m",   0x00000, 0x80000, CRC(e8d73e07) SHA1(4ed647eaa6b32b9f159fc49d30962ad20f97b245) )
 	ROM_LOAD16_BYTE( "rom6.9l",   0x00001, 0x80000, CRC(c3db3975) SHA1(bb085c9339d640585b18992dc8b861870920559a) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* tiles + tilemaps (together!) */
-	/* its probably actually 4 bpp layers that combine to form 1 8bpp layer */
-	ROM_LOAD16_BYTE( "rom10.9a",    0x000000, 0x80000, CRC(135ab90a) SHA1(5911923ccf579edd0bf3449945a434fbf37b51aa) )
-	ROM_LOAD16_BYTE( "rom9.9c",     0x000001, 0x80000, CRC(c9d90007) SHA1(ad457ef297797dcb9bb8dc1725fa207cd57eedfe) )
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rom10.9a",  0x00000, 0x80000, CRC(135ab90a) SHA1(5911923ccf579edd0bf3449945a434fbf37b51aa) )
+	ROM_LOAD16_BYTE( "rom9.9c",   0x00001, 0x80000, CRC(c9d90007) SHA1(ad457ef297797dcb9bb8dc1725fa207cd57eedfe) )
 
-	ROM_LOAD16_BYTE( "rom7.9h",     0x100000, 0x80000, CRC(b2b4c13b) SHA1(37ddc9751860a85b809782c5cec4418bca71412c) )
-	ROM_LOAD16_BYTE( "rom8.9e",     0x100001, 0x80000, CRC(66c4b00f) SHA1(ed416ec594fe065c0f169008fb8ce553813f6260) )
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rom7.9h",   0x00000, 0x80000, CRC(b2b4c13b) SHA1(37ddc9751860a85b809782c5cec4418bca71412c) )
+	ROM_LOAD16_BYTE( "rom8.9e",   0x00001, 0x80000, CRC(66c4b00f) SHA1(ed416ec594fe065c0f169008fb8ce553813f6260) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* OKI6295 samples */
 	ROM_LOAD( "rom4.4r",     0x00000, 0x20000, CRC(0fdee034) SHA1(739d39b04c2e860c3c193ab32b30ccc39ff1a8c2) )
