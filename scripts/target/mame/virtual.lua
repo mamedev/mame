@@ -69,11 +69,15 @@ function createVirtualProjects(_target, _subtarget, _name)
 		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "3rdparty",
 	}
+
+	includedirs {
+		ext_includedir("zlib"),
+	}
 end
 
 function createProjects_mame_virtual(_target, _subtarget)
-createVirtualProjects(_target, _subtarget, "virtual")
-files {
-	MAME_DIR .. "src/mame/drivers/vgmplay.cpp",
-}
+	createVirtualProjects(_target, _subtarget, "virtual")
+	files {
+		MAME_DIR .. "src/mame/drivers/vgmplay.cpp",
+	}
 end
