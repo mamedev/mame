@@ -635,7 +635,7 @@ public:
 	/// Behaviour is undefined for negative element indices.
 	/// \param [in] index Non-negative element index.
 	/// \return Non-const reference to element at requested index.
-	PointerType &operator[](size_t index) const { assert(index < m_length); return this->m_target[index]; }
+	PointerType &operator[](int index) const { assert(index < m_length); return this->m_target[index]; }
 
 	/// \brief Get length in units of elements
 	/// \return Length in units of elements or zero if no matching
@@ -729,7 +729,7 @@ public:
 	}
 
 	// operators to make use transparent
-	PointerType &operator[](size_t index) const { return this->m_target[index]; }
+	PointerType &operator[](int index) const { return this->m_target[index]; }
 
 	// getter for explicit fetching
 	UINT32 bytes() const { return m_bytes; }
