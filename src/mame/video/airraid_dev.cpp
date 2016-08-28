@@ -80,6 +80,9 @@ machine_config_constructor airraid_video_device::device_mconfig_additions() cons
 
 void airraid_video_device::device_start()
 {
+	if (!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	save_item(NAME(m_hw));
 
 	// there might actually be 4 banks of 2048 x 16 tilemaps in here as the upper scroll bits are with the rom banking.
