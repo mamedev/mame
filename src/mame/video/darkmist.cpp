@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 
 	code=memregion("bg_map")->base()[tile_index*2]; /* TTTTTTTT */
 	attr=memregion("bg_map")->base()[(tile_index*2)+1]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
-	
+
 	code+=(attr&3)<<8;
 	pal=(attr>>4);
 
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 {
 	int code,attr,pal;
 
-	code = memregion("fg_map")->base()[tile_index*2]; /* TTTTTTTT */ 
+	code = memregion("fg_map")->base()[tile_index*2]; /* TTTTTTTT */
 	attr = memregion("fg_map")->base()[(tile_index*2)+1]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 
 	code+=(attr&3)<<8;

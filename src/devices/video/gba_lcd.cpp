@@ -51,11 +51,11 @@
 #define WININ       HWLO(0x048)  /* 0x4000048  2  R/W   Inside of Window 0 and 1 */
 #define WINOUT      HWHI(0x048)  /* 0x400004A  2  R/W   Inside of OBJ Window & Outside of Windows */
 #define MOSAIC      HWLO(0x04C)  /* 0x400004C  2  W     Mosaic Size */
-                                 /* 0x400004E  2  -     Unused */
+								 /* 0x400004E  2  -     Unused */
 #define BLDCNT      HWLO(0x050)  /* 0x4000050  2  R/W   Color Special Effects Selection */
 #define BLDALPHA    HWHI(0x050)  /* 0x4000052  2  W     Alpha Blending Coefficients */
 #define BLDY        HWLO(0x054)  /* 0x4000054  2  W     Brightness (Fade-In/Out) Coefficient */
-                                 /* 0x4000056  2  -     Unused */
+								 /* 0x4000056  2  -     Unused */
 
 #define DISPSTAT_SET(val)       HWLO_SET(0x004, val)
 #define DISPSTAT_RESET(val)     HWLO_RESET(0x004, val)
@@ -132,7 +132,7 @@ public:
 	{
 		attr0 = oam[(4 * index) + 0];
 		attr1 = oam[(4 * index) + 1];
-		attr2 = oam[(4 * index) + 2];		
+		attr2 = oam[(4 * index) + 2];
 	}
 
 	int    pos_y()       { return  attr0 & 0x00FF; }
@@ -168,7 +168,7 @@ public:
 			{ { 8,  16 }, { 8,  32 }, { 16, 32 }, { 32, 64 } }, // vertical rect
 			{ { 0,   0 }, { 0,   0 }, { 0,   0 }, { 0,   0 } }  // invalid
 		};
-		
+
 		int shape = (attr0 & 0xC000) >> 14;
 		int size  = (attr1 & 0xC000) >> 14;
 
@@ -184,7 +184,7 @@ private:
 
 	UINT16 attr0;
 	UINT16 attr1;
-	UINT16 attr2;		
+	UINT16 attr2;
 };
 
 inline UINT32 gba_lcd_device::bg_screen_base(UINT32 bgxcnt)
@@ -204,7 +204,7 @@ inline void gba_lcd_device::bg_screen_size(UINT16 bgxcnt, bool text, int &width,
 		{ { 256, 256 }, { 512, 256 }, { 256, 512 }, { 512,   512 } }, // text mode
 		{ { 128, 128 }, { 256, 256 }, { 512, 512 }, { 1024, 1024 } }  // rotation/scaling (roz) mode
 	};
-	
+
 	int mode = text ? 0 : 1;
 	int size = (bgxcnt & 0xC000) >> 14;
 

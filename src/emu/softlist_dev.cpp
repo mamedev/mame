@@ -2,9 +2,9 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-	softlist_dev.cpp
+    softlist_dev.cpp
 
-	Software list construction helpers.
+    Software list construction helpers.
 
 ***************************************************************************/
 

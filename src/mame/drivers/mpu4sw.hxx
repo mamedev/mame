@@ -106,39 +106,39 @@ DRIVER_INIT_MEMBER(mpu4_state,m4_showstring_big)
 
 DRIVER_INIT_MEMBER(mpu4_state,PARENT NAME)
 {
-	//Derived from Andy_Capp_(Barcrest)_[C05_v1-0_1024_6jp].gam - MFME layout name used
-	
-	//any needed data for hoppers, extenders, reels are here, alongside wiring changes such as low voltage detection, or the AUX settings
+    //Derived from Andy_Capp_(Barcrest)_[C05_v1-0_1024_6jp].gam - MFME layout name used
 
-	//PCKEY =9 default setting in hex
-	//STKEY =0 default setting in hex
-	//JPKEY =0 default setting in hex
-	//JPSET =0 default setting in hex
+    //any needed data for hoppers, extenders, reels are here, alongside wiring changes such as low voltage detection, or the AUX settings
 
-	Default DIP settings used in the layouts
-	//DIP1_0=false
-	//DIP1_1=false
-	//DIP1_2=false
-	//DIP1_3=false
-	//DIP1_4=false
-	//DIP1_5=false
-	//DIP1_6=false
-	//DIP1_7=false
-	//DIP2_0=false
-	//DIP2_1=false
-	//DIP2_2=false
-	//DIP2_3=false
-	//DIP2_4=false
-	//DIP2_5=true
-	//DIP2_6=false
-	//DIP2_7=false
+    //PCKEY =9 default setting in hex
+    //STKEY =0 default setting in hex
+    //JPKEY =0 default setting in hex
+    //JPSET =0 default setting in hex
 
-	//Sound empire - if set, this is the sound board type (although this is often ignored
-	//Standard - or Datapak
-	//Volume 0 Stereo= 1  - other sound settings
-	//Sample rate 16000
-	
-	//Front door code 39 Cash door code 38 - Button numbers for doors, just in case
+    Default DIP settings used in the layouts
+    //DIP1_0=false
+    //DIP1_1=false
+    //DIP1_2=false
+    //DIP1_3=false
+    //DIP1_4=false
+    //DIP1_5=false
+    //DIP1_6=false
+    //DIP1_7=false
+    //DIP2_0=false
+    //DIP2_1=false
+    //DIP2_2=false
+    //DIP2_3=false
+    //DIP2_4=false
+    //DIP2_5=true
+    //DIP2_6=false
+    //DIP2_7=false
+
+    //Sound empire - if set, this is the sound board type (although this is often ignored
+    //Standard - or Datapak
+    //Volume 0 Stereo= 1  - other sound settings
+    //Sample rate 16000
+
+    //Front door code 39 Cash door code 38 - Button numbers for doors, just in case
 }
 */
 
@@ -3005,7 +3005,7 @@ GAME_CUSTOM( 199?, m4richfm__e,    m4richfm,   "rchfam8",      0x0000, 0x004000,
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
-/// "(C)1991 BARCREST" and "NN4 0.2" (CN3 0.2 on startup) 
+/// "(C)1991 BARCREST" and "NN4 0.2" (CN3 0.2 on startup)
 GAME_CUSTOM( 199?, m4nnwwc,     0,          "cn302s.p1",        0x0000, 0x010000, CRC(87703a1a) SHA1(6582ffa42a61b60e92e456a794c4c219a9901a1c), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.2 / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__7,  m4nnwwc,    "cn302c.p1",        0x0000, 0x010000, CRC(fd9de050) SHA1(14c80deba1396aa5be0a1d02964ecd4b946f2ee8), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.2 C / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__y,  m4nnwwc,    "cn302ad.p1",       0x0000, 0x010000, CRC(7a6acd9b) SHA1(9a1f0ed19d66428c6b541ce1c8e169d9b4be3ef1), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.2 AD / NN4 0.2)" )
@@ -3018,7 +3018,7 @@ GAME_CUSTOM( 199?, m4nnwwc__4,  m4nnwwc,    "cn302dy.p1",       0x0000, 0x010000
 GAME_CUSTOM( 199?, m4nnwwc__5,  m4nnwwc,    "cn302k.p1",        0x0000, 0x010000, CRC(7a3202f1) SHA1(2dd5e8195120b1efc3eb51214cf054432fc50aed), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.2 K / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__6,  m4nnwwc,    "cn302r.p1",        0x0000, 0x010000, CRC(e7cf9e1e) SHA1(66a1e54fc928c09d16f7ac1c002685eee841315f), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.2 R / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__8,  m4nnwwc,    "cn302y.p1",        0x0000, 0x010000, CRC(7aa4b6f0) SHA1(2c185a9a7c8a4957fb5901305883661c41cb0cb4), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.2 Y / NN4 0.2)" )
-/// "(C)1991 BARCREST" and "NN4 0.2" (CF3 0.2 on startup) 
+/// "(C)1991 BARCREST" and "NN4 0.2" (CF3 0.2 on startup)
 GAME_CUSTOM( 199?, m4nnwwc__k,  m4nnwwc,    "cf302s.p1",        0x0000, 0x010000, CRC(7a3e8ead) SHA1(590dc78b98f9928d6fa87ef661234f88dccfdff8), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.2 / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__a,  m4nnwwc,    "cf302ad.p1",       0x0000, 0x010000, CRC(6c6aa0cd) SHA1(5a58a19c35b0b195f3b4e7a21f57ca61d45ec1fb), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.2 AD / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__b,  m4nnwwc,    "cf302b.p1",        0x0000, 0x010000, CRC(9ca07939) SHA1(6eb0a5675bb803a11c4c874dc0516d94c48194b7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.2 B / NN4 0.2)" )
@@ -3031,7 +3031,7 @@ GAME_CUSTOM( 199?, m4nnwwc__h,  m4nnwwc,    "cf302dy.p1",       0x0000, 0x010000
 GAME_CUSTOM( 199?, m4nnwwc__i,  m4nnwwc,    "cf302k.p1",        0x0000, 0x010000, CRC(07ca4c45) SHA1(8f6ee3c17527b05a6652845019919d490cc00c64), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.2 K / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__j,  m4nnwwc,    "cf302r.p1",        0x0000, 0x010000, CRC(e09f43bd) SHA1(65dcdf8d223936c4415ddc3f734b83367d6b8db7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.2 R / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__l,  m4nnwwc,    "cf302y.p1",        0x0000, 0x010000, CRC(c1063a32) SHA1(e1c8fc463b1a1db87110f272a8727435f9d9b97a), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.2 Y / NN4 0.2)" )
-/// "(C)1991 BARCREST" and "NN4 0.2" (CH3 0.2 on startup) 
+/// "(C)1991 BARCREST" and "NN4 0.2" (CH3 0.2 on startup)
 GAME_CUSTOM( 199?, m4nnwwc__w,  m4nnwwc,    "ch302s.p1",        0x0000, 0x010000, CRC(e7d0ceb2) SHA1(b75d58136b9e1e4bfde86730ef4e95bc98494813), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CH3 0.2 / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__m,  m4nnwwc,    "ch302ad.p1",       0x0000, 0x010000, CRC(20405f4e) SHA1(7f87c881f428f704c98b0f4be459980062ccd29a), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CH3 0.2 AD / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__n,  m4nnwwc,    "ch302b.p1",        0x0000, 0x010000, CRC(cf7543ac) SHA1(2fe810741bfc18f800ad8028724218557d93a830), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CH3 0.2 B / NN4 0.2)" )
@@ -3044,7 +3044,7 @@ GAME_CUSTOM( 199?, m4nnwwc__t,  m4nnwwc,    "ch302dy.p1",       0x0000, 0x010000
 GAME_CUSTOM( 199?, m4nnwwc__u,  m4nnwwc,    "ch302k.p1",        0x0000, 0x010000, CRC(908d8b10) SHA1(a80a5ce1a83d05f1e68e66d14bacc424bc833aa7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CH3 0.2 K / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__v,  m4nnwwc,    "ch302r.p1",        0x0000, 0x010000, CRC(c31c4c28) SHA1(e94c7588211044dae7c5ac587e6232b0ace2fc7b), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CH3 0.2 R / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnwwc__x,  m4nnwwc,    "ch302y.p1",        0x0000, 0x010000, CRC(5e7764c6) SHA1(05a61a57ac906cbea1d72fffd1c8ea707852b895), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CH3 0.2  / NN4 0.2)" )
-/// "(C)1991 BARCREST" and "NN4 0.1" (CN3 0.1 on startup) 
+/// "(C)1991 BARCREST" and "NN4 0.1" (CN3 0.1 on startup)
 GAME_CUSTOM( 199?, m4nnwwc__9,  m4nnwwc,    "cnc03s.p1",        0x0000, 0x010000, CRC(57a03b29) SHA1(52cc8eb3f02c4a812de06ceec0588ca930e07876), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.1 / NN4 0.1)" )
 // "(C)2000    BWB" and "CNN 2.0"
 GAME_CUSTOM( 199?, m4nnwwc__aa, m4nnwwc,    "cl__x__x.2_0",     0x0000, 0x010000, CRC(c3de4791) SHA1(220d32b961b6710d508c0c7e6b2d8e4d292746f4), "Bwb","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CNN 2.0)" )
@@ -3145,7 +3145,7 @@ GAME_CUSTOM( 199?, m4takepk__u,    m4takepk,   "typ15r",       0x0000, 0x020000,
 // no copyright string and "TPH 0.7"
 GAME_CUSTOM( 199?, m4takepk__t,    m4takepk,   "typ15f",       0x0000, 0x020000, CRC(65c44b06) SHA1(629e7ac4149c66fc1dc33a103e1a4ff5aaecdcfd), "hack","Take Your Pick (Barcrest) (MPU4) (TPH 0.7, hack)" )
 // below sets are all smaller (Bwb sets / hacks of them?)
-// "(C)1997  B.W.B." and "TAC 2.3" 
+// "(C)1997  B.W.B." and "TAC 2.3"
 GAME_CUSTOM( 199?, m4takepk__1,    m4takepk,   "typ5p10p.bin", 0x0000, 0x010000, CRC(45ddeaf4) SHA1(6db822aac402cb6772718015420c14875e74b13d), "Bwb","Take Your Pick (Barcrest) (MPU4) (TAC 2.3 K)" ) // hack?
 // no copyright string and "TAC 2.3"
 GAME_CUSTOM( 199?, m4takepk__v,    m4takepk,   "typ510",       0x0000, 0x010000, CRC(ebf0c71c) SHA1(6c759144aecce83f82ded8aae7c61ecec2d92fb3), "hack","Take Your Pick (Barcrest) (MPU4) (TAC 2.3, hack, set 1)" )
@@ -4322,7 +4322,7 @@ GAME_CUSTOM( 199?, m4hypvip__o,    m4hypvip,   "hyp55",                0x0000, 0
 GAME_CUSTOM( 199?, m4hypvip__p,    m4hypvip,   "hypr58c",              0x0000, 0x010000, CRC(d6028f8f) SHA1(54a3188ddb5196808a1161a0e1e6a8c1fe8bfde3), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 4)" )
 GAME_CUSTOM( 199?, m4hypvip__t,    m4hypvip,   "hypv_05_.4",           0x0000, 0x010000, CRC(246f171c) SHA1(7bbefb0cae57cf8097aa6d033df1a428e8bfe744), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 5)" )
 GAME_CUSTOM( 199?, m4hypvip__q,    m4hypvip,   "hvip_05_.8",           0x0000, 0x010000, CRC(625f1b9d) SHA1(f8dc0cde774f3fc4fb3d66d014ad47e9576c0f44), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 1)" )
-// "DICK WAS ERE" and "HVP 3.0"
+// "DICKÂ WASÂ ERE" and "HVP 3.0"
 GAME_CUSTOM( 199?, m4hypvip__i,    m4hypvip,   "hv108c",               0x0000, 0x010000, CRC(4d40ebfe) SHA1(0e355fe5b185ba595c5040335956037b8ed21599), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 6)" )
 GAME_CUSTOM( 199?, m4hypvip__j,    m4hypvip,   "hv10_101",             0x0000, 0x010000, CRC(57714454) SHA1(de99f5a66081191a7280c54e875fd17cc94e111b), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 7)" )
 GAME_CUSTOM( 199?, m4hypvip__u,    m4hypvip,   "hypv_10_.4",           0x0000, 0x010000, CRC(f85d21a1) SHA1(55ed92147335a1471b7b443f68dd700f579d21f3), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 8)" )

@@ -3,7 +3,7 @@
 
 /* There are 2 versions of the Air Raid / Cross Shooter hardware, one has everything integrated on a single PCB
    the other is a Air Raid specific video PCB used with the Street Fight motherboard, there could be differences.
-  
+
    This is very similar to Dark Mist */
 
 #include "emu.h"
@@ -91,8 +91,8 @@ void airraid_video_device::device_start()
 
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_cstx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 
-//	m_fg_tilemap->set_transparent_pen(0);
-//	m_tx_tilemap->set_transparent_pen(0);
+//  m_fg_tilemap->set_transparent_pen(0);
+//  m_tx_tilemap->set_transparent_pen(0);
 
 	// we do manual mixing using a temp bitmap
 	m_screen->register_screen_bitmap(m_temp_bitmap);
@@ -208,7 +208,7 @@ UINT32 airraid_video_device::screen_update_airraid(screen_device &screen, bitmap
 	// draw screen
 	bitmap.fill(0x80, cliprect); // temp
 
-//	m_temp_bitmap.fill(0x00, cliprect);
+//  m_temp_bitmap.fill(0x00, cliprect);
 
 	if ((m_hw & DISPLAY_BG) == 0x00)
 	{

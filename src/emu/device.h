@@ -362,7 +362,7 @@ private:
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find
-	mutable std::vector<rom_entry>	m_rom_entries;
+	mutable std::vector<rom_entry>  m_rom_entries;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;

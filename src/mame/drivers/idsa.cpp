@@ -42,7 +42,7 @@ static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, idsa_state )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-   	
+
 static INPUT_PORTS_START( idsa )
 INPUT_PORTS_END
 

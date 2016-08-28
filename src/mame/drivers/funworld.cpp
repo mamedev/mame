@@ -3126,7 +3126,7 @@ static MACHINE_CONFIG_DERIVED( fw_a7_11, fw1stpal )
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(fw_a7_11_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
-//	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
 MACHINE_CONFIG_END
 
 
@@ -5860,7 +5860,7 @@ ROM_END
 
 /*
   Unknown poker game from Inter Games.
-  
+
   1x G65C02P-2
   2x MC68B21P
   1x MC68B45P
@@ -5954,7 +5954,7 @@ ROM_END
   3x TTL's...
 
   PCB components:
-  
+
   2x Hitachi HD68B21P
   1x Hitachi HD46505SP-2
   1x GI AY-3-8910A

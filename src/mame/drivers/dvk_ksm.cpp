@@ -13,11 +13,11 @@
     - 7.102.076 -- has DIP switches, SRAM at 0x2000, model name "KSM"
     - 7.102.228 -- no DIP switches, ?? SRAM at 0x2100, model name "KSM-01"
 
-	Two sets of dumps exist:
-	- one puts SRAM at 0x2000, which is where technical manual puts it, 
-	  but chargen has 1 missing pixel in 'G' character.
-	- another puts SRAM at 0x2100, but has no missing pixel.
-	Merge them for now into one (SRAM at 0x2000 and no missing pixel).
+    Two sets of dumps exist:
+    - one puts SRAM at 0x2000, which is where technical manual puts it,
+      but chargen has 1 missing pixel in 'G' character.
+    - another puts SRAM at 0x2100, but has no missing pixel.
+    Merge them for now into one (SRAM at 0x2000 and no missing pixel).
 
     Emulates a VT52 without copier (ESC Z response is ESC / M), with
     Hold Screen mode and Graphics character set (but it is unique and

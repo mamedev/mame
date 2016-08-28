@@ -198,7 +198,7 @@ public:
 	DECLARE_DRIVER_INIT(m4_five_reel_alt);
 	DECLARE_DRIVER_INIT(m4_six_reel_std);
 	DECLARE_DRIVER_INIT(m4_six_reel_alt);
-	DECLARE_DRIVER_INIT(m4_seven_reel);	
+	DECLARE_DRIVER_INIT(m4_seven_reel);
 	DECLARE_DRIVER_INIT(m4_small_extender);
 	DECLARE_DRIVER_INIT(m4_large_extender_a);
 	DECLARE_DRIVER_INIT(m4_large_extender_b);
@@ -326,7 +326,7 @@ protected:
 	int m_led_lamp;
 	int m_link7a_connected;
 	int m_low_volt_detect_disable;
-	int	m_aux1_invert;
+	int m_aux1_invert;
 	int m_aux2_invert;
 	int m_door_invert;
 	emu_timer *m_ic24_timer;

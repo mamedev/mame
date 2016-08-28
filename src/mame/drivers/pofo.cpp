@@ -9,7 +9,7 @@
     http://www.best-electronics-ca.com/portfoli.htm
     http://www.atari-portfolio.co.uk/pfnews/pf9.txt
 
-	Command line for dual RAM expansion with A: File Manager ROM card and B: RAM card
+    Command line for dual RAM expansion with A: File Manager ROM card and B: RAM card
     ./mess64 pofo -exp ram -exp:ram:exp ram2 -cart1 fileman -exp:ram:ccmb ram
 
 */
@@ -18,17 +18,17 @@
 
     TODO:
 
-	- cursor is missing
-	- where do CDET and NMD1 connect to ??
+    - cursor is missing
+    - where do CDET and NMD1 connect to ??
     - i/o port 8051
     - screen contrast
     - system tick frequency selection (1 or 128 Hz)
     - soft power off
     - LCD board
-    	- HD61830A00
-    	- 5816 2Kx8 RAM
-    	- 27C256 32Kx8 EPROM
-    	- PCD3311T DTMF generator @ 3.578640MHz
+        - HD61830A00
+        - 5816 2Kx8 RAM
+        - 27C256 32Kx8 EPROM
+        - PCD3311T DTMF generator @ 3.578640MHz
 
 */
 
@@ -53,7 +53,7 @@
 
 #define M80C88A_TAG     "u1"
 #define HD61830_TAG     "hd61830"
-#define PCD3311T_TAG	"pcd3311t"
+#define PCD3311T_TAG    "pcd3311t"
 #define TIMER_TICK_TAG  "tick"
 #define SCREEN_TAG      "screen"
 
@@ -370,13 +370,13 @@ WRITE8_MEMBER( portfolio_state::dtmf_w )
 
 	    bit     description
 
-	    0		PCD3311T D0
-	    1		PCD3311T D1
-	    2		PCD3311T D2
-	    3		PCD3311T D3
-	    4		PCD3311T D4
-	    5		PCD3311T D5
-	    6		PCD3311T STROBE
+	    0       PCD3311T D0
+	    1       PCD3311T D1
+	    2       PCD3311T D2
+	    3       PCD3311T D3
+	    4       PCD3311T D4
+	    5       PCD3311T D5
+	    6       PCD3311T STROBE
 	    7       PCD3311T VDD,MODE,A0
 
 	*/
@@ -435,11 +435,11 @@ READ8_MEMBER( portfolio_state::battery_r )
 
 	    bit     signal      description
 
-	    0		?			1=boots from B:
-	    1		?			1=boots from external ROM
-	    2		?			1=boots from B:
-	    3		?			1=boots from ???
-	    4		?
+	    0       ?           1=boots from B:
+	    1       ?           1=boots from external ROM
+	    2       ?           1=boots from B:
+	    3       ?           1=boots from ???
+	    4       ?
 	    5       PDET        1=peripheral connected
 	    6       BATD?       0=battery low
 	    7       ?           1=cold boot
@@ -468,12 +468,12 @@ WRITE8_MEMBER( portfolio_state::select_w )
 
 	    bit     description
 
-	    0		?
-	    1		?
-	    2		?
-	    3		?
+	    0       ?
+	    1       ?
+	    2       ?
+	    3       ?
 	    4
-	    5       
+	    5
 	    6       ?
 	    7       ?
 
@@ -574,7 +574,7 @@ READ8_MEMBER( portfolio_state::mem_r )
 	int iom = 0;
 	int bcom = 1;
 	int ncc1 = 1;
-	
+
 	if (offset < 0x1f000)
 	{
 		data = m_ram->read(offset);
@@ -626,7 +626,7 @@ WRITE8_MEMBER( portfolio_state::mem_w )
 	int iom = 0;
 	int bcom = 1;
 	int ncc1 = 1;
-	
+
 	if (offset < 0x1f000)
 	{
 		m_ram->write(offset, data);
@@ -674,7 +674,7 @@ READ8_MEMBER( portfolio_state::io_r )
 		case 0:
 			data = keyboard_r(space, 0);
 			break;
-		
+
 		case 1:
 			if (offset & 0x01)
 			{
@@ -689,7 +689,7 @@ READ8_MEMBER( portfolio_state::io_r )
 		case 4:
 			data = counter_r(space, offset & 0x01);
 			break;
-		
+
 		case 5:
 			if (offset & 0x01)
 			{
@@ -700,7 +700,7 @@ READ8_MEMBER( portfolio_state::io_r )
 				data = irq_status_r(space, 0);
 			}
 			break;
-		
+
 		case 7:
 			bcom = 0;
 			break;
@@ -737,19 +737,19 @@ WRITE8_MEMBER( portfolio_state::io_w )
 				m_lcdc->data_w(space, 0, data);
 			}
 			break;
-		
+
 		case 2:
 			dtmf_w(space, 0, data);
 			break;
-		
+
 		case 3:
 			power_w(space, 0, data);
 			break;
-		
+
 		case 4:
 			counter_w(space, offset & 0x01, data);
 			break;
-		
+
 		case 5:
 			if (offset & 0x01)
 			{
@@ -760,11 +760,11 @@ WRITE8_MEMBER( portfolio_state::io_w )
 				irq_mask_w(space, 0, data);
 			}
 			break;
-		
+
 		case 6:
 			contrast_w(space, 0, data);
 			break;
-		
+
 		case 7:
 			bcom = 0;
 			break;

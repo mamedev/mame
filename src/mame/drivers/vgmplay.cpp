@@ -28,8 +28,8 @@
 #include "sound/pokey.h"
 #include "sound/c352.h"
 
-#define AS_IO16				AS_1
-#define MCFG_CPU_IO16_MAP	MCFG_CPU_DATA_MAP
+#define AS_IO16             AS_1
+#define MCFG_CPU_IO16_MAP   MCFG_CPU_DATA_MAP
 
 class vgmplay_device : public cpu_device
 {
@@ -50,7 +50,7 @@ public:
 		A_K053260    = 0x000000b0,
 		A_C6280      = 0x000000e0,
 		A_SEGAPCM    = 0x00001000,
-		A_GAMEBOY	 = 0x00002000,
+		A_GAMEBOY    = 0x00002000,
 		A_NESAPU     = 0x00002030,
 		A_NESRAM     = 0x00003000,
 		A_MULTIPCMA  = 0x00013000,
@@ -1194,7 +1194,7 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_AY8910A+1,    vgmplay_device::A_AY8910A+1)     AM_DEVWRITE    ("ay8910a",       ay8910_device, address_w)
 	AM_RANGE(vgmplay_device::A_AY8910B,      vgmplay_device::A_AY8910B)       AM_DEVWRITE    ("ay8910b",       ay8910_device, data_w)
 	AM_RANGE(vgmplay_device::A_AY8910B+1,    vgmplay_device::A_AY8910B+1)     AM_DEVWRITE    ("ay8910b",       ay8910_device, address_w)
-//	AM_RANGE(vgmplay_device::A_SN76496+0,    vgmplay_device::A_SN76496+0)     AM_DEVWRITE    ("sn76496",       sn76496_device, stereo_w)
+//  AM_RANGE(vgmplay_device::A_SN76496+0,    vgmplay_device::A_SN76496+0)     AM_DEVWRITE    ("sn76496",       sn76496_device, stereo_w)
 	AM_RANGE(vgmplay_device::A_SN76496+1,    vgmplay_device::A_SN76496+1)     AM_DEVWRITE    ("sn76496",       sn76496_device, write)
 	AM_RANGE(vgmplay_device::A_K053260,      vgmplay_device::A_K053260+0x2f)  AM_DEVWRITE    ("k053260",       k053260_device, write)
 	AM_RANGE(vgmplay_device::A_C6280,        vgmplay_device::A_C6280+0xf)     AM_DEVWRITE    ("c6280",         c6280_device, c6280_w)

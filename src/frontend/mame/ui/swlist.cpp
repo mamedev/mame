@@ -32,8 +32,8 @@ namespace ui {
 
 //-------------------------------------------------
 //  is_valid_softlist_part_char - returns whether
-//	this character is a valid char for a softlist
-//	part
+//  this character is a valid char for a softlist
+//  part
 //-------------------------------------------------
 
 static bool is_valid_softlist_part_char(unicode_char ch)

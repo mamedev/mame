@@ -282,7 +282,7 @@
 #define H5(hpb) X_BIT(hpb,8,5)      //!< get Hamming code bit 5 from hpb data (really bit 37)
 #define RH(hpb) X_RDBITS(hpb,8,0,5) //!< get Hamming code from hpb data (bits 32 to 37)
 #define RP(hpb) X_BIT(hpb,8,6)      //!< get parity bit from hpb data (really bit 38)
-#define	RU(hpb) X_BIT(hpb,8,7)		//!< get unused bit from hpb data (really bit 39) [unused]
+#define RU(hpb) X_BIT(hpb,8,7)      //!< get unused bit from hpb data (really bit 39) [unused]
 
 /**
  * @brief Return even parity of a (masked) 32 bit value.
@@ -321,7 +321,7 @@ static const int hamming_lut[64] = {
  * @brief Caluclate a Hamming code after reading or before writing a memory double-word.
  *
  * Hamming code generation is according to the schematics described above.
- * 
+ *
  * It's certainly overkill to do this on a modern PC, but I think we'll
  * need it for perfect emulation anyways, e.g. Hamming code hardware checking.
  *
@@ -374,7 +374,7 @@ UINT32 alto2_cpu_device::hamming_code(bool write, UINT32 dw_addr, UINT32 dw_data
 
 
 	/* a54: HC(3)A HC(4)A HCPA   HCPB   H(0/2) XX01   WD02   WD03   P    PERR    ---
-	 * 
+	 *
 	 * Note: Here I XOR all the non dw_data inputs into bit 0,
 	 * which has the same effect as spreading them over some bits
 	 * and then counting them... I hope ;-)
@@ -636,7 +636,7 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 		m_mem.access = ALTO2_MEM_RAM;
 		// fetch the memory double-word to the read/write latches
 		m_mem.rmdd = m_mem.wmdd = m_mem.ram[m_mem.mar/2];
-		m_mem.cycle = cycle();	// keep track of the current CPU cycle
+		m_mem.cycle = cycle();  // keep track of the current CPU cycle
 	} else {
 		m_mem.access = ALTO2_MEM_INVALID;
 		m_mem.rmdd = m_mem.wmdd = ~0;

@@ -1573,7 +1573,7 @@ ROM_START( trog4 )
 	ROM_RELOAD(                        0x40000, 0x10000 )
 	ROM_LOAD( "trog_ii_u-20_sl_1.u20", 0x50000, 0x10000, CRC(67f1658a) SHA1(c85dc920ff4b292afa9f6681f31918a200799cc9) )
 	ROM_RELOAD(                        0x60000, 0x10000 )
-	
+
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "trog_ii_u-105_la-4.u105", 0xc0000, 0x20000, CRC(e6095189) SHA1(a2caaf64e371050b37c63d9608ba5d289cf3cd91) )
 	ROM_LOAD16_BYTE( "trog_ii_u-89_la-4.u89",   0xc0001, 0x20000, CRC(fdd7cc65) SHA1(bfc4339953c122bca968f9cfa3a82df3584a3727) )

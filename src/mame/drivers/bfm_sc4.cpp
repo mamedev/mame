@@ -1191,7 +1191,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START( sc4dmd, sc4_state )
 	MCFG_FRAGMENT_ADD(sc4_common)
 	/* video hardware */
-	
+
 	//MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
 	MCFG_DEVICE_ADD("dm01", BF_DM01, 0)
 	MCFG_BF_DM01_BUSY_CB(WRITELINE(sc4_state, bfmdm01_busy))
@@ -1717,7 +1717,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4)
 
 
 	// debug helpers to find strings used for inputs and where the buttons map
-//	bfm_sc45_layout_helper(machine());
+//  bfm_sc45_layout_helper(machine());
 
 }
 

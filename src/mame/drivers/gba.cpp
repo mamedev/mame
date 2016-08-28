@@ -23,9 +23,9 @@
 #define SOUNDCNT_L  HWLO(0x080)  /* 0x4000080  2  R/W   Control Stereo/Volume/Enable */
 #define SOUNDCNT_H  HWHI(0x080)  /* 0x4000082  2  R/W   Control Mixing/DMA Control */
 #define SOUNDCNT_X  HWLO(0x084)  /* 0x4000084  2  R/W   Control Sound on/off */
-                                 /* 0x4000086  2  -     Unused */
+								 /* 0x4000086  2  -     Unused */
 #define SOUNDBIAS   HWLO(0x088)  /* 0x4000088  2  BIOS  Sound PWM Control */
-                                 /* 0x400008A  2  -     Unused */
+								 /* 0x400008A  2  -     Unused */
 
 /* DMA Registers (4 Transfer Channels) */
 #define DMASAD(c)   WORD(0x0B0 + c * 0xC) /* 0x40000B0  4  W     DMA 0 Source Address */
@@ -42,7 +42,7 @@
 #define SIOCNT      HWLO(0x128)  /* 0x4000128  2  R/W   SIO Control Register */
 #define SIOMLT_SEND HWHI(0x128)  /* 0x400012A  2  R/W   SIO Data (Local of MultiPlayer; shared below) */
 #define SIODATA8    HWHI(0x128)  /* 0x400012A  2  R/W   SIO Data (Normal-8bit and UART Mode) */
-                                 /* 0x400012C  2  -     Unused */
+								 /* 0x400012C  2  -     Unused */
 
 /* Keypad Input Registers */
 #define KEYINPUT    HWLO(0x130)  /* 0x4000130  2  R     Key Status */
@@ -51,29 +51,29 @@
 /* Serial Communication (2) Registers */
 #define RCNT        HWLO(0x134)  /* 0x4000134  2  R/W   SIO Mode Select/General Purpose Data */
 #define IR          HWHI(0x134)  /* 0x4000136  2  R/W   Ancient - Infrared Register (Prototypes only) */
-                                 /* 0x4000138  8  -     Unused */
+								 /* 0x4000138  8  -     Unused */
 #define JOYCNT      HWLO(0x140)  /* 0x4000140  2  R/W   SIO JOY Bus Control */
-                                 /* 0x4000142  2  -     Unused */
+								 /* 0x4000142  2  -     Unused */
 #define JOY_RECV    WORD(0x150)  /* 0x4000150  4  R/W   SIO JOY Bus Receive Data */
 #define JOY_TRANS   WORD(0x154)  /* 0x4000154  4  R/W   SIO JOY Bus Transmit Data */
 #define JOYSTAT     HWLO(0x158)  /* 0x4000158  2  R/?   SIO JOY Bus Receive Status */
-                                 /* 0x400015A  2  -     Unused */
+								 /* 0x400015A  2  -     Unused */
 
 /* Interrupt, Waitstate, and Power-Down Control Registers */
 #define IE          HWLO(0x200)  /* 0x4000200  2  R/W   Interrupt Enable Register */
 #define IF          HWHI(0x200)  /* 0x4000202  2  R/W   Interrupt Request Flags / IRQ Acknowledge */
 #define WAITCNT     HWLO(0x204)  /* 0x4000204  2  R/W   Game Pak Waitstate Control */
-                                 /* 0x4000206     -     Unused */
+								 /* 0x4000206     -     Unused */
 #define IME         HWLO(0x208)  /* 0x4000208  2  R/W   Interrupt Master Enable Register */
-                                 /* 0x400020A     -     Unused */
-                                 /* 0x4000300  1  R/W   Undocumented - Post Boot Flag */
-                                 /* 0x4000301  1  W     Undocumented - Power Down Control */
-                                 /* 0x4000302     -     Unused */
-                                 /* 0x4000410  ?  ?     Undocumented - Purpose Unknown / Bug ??? 0FFh */
-                                 /* 0x4000411     -     Unused */
-                                 /* 0x4000800  4  R/W   Undocumented - Internal Memory Control (R/W) */
-                                 /* 0x4000804     -     Unused */
-                                 /* 0x4xx0800  4  R/W   Mirrors of 4000800h (repeated each 64K) */
+								 /* 0x400020A     -     Unused */
+								 /* 0x4000300  1  R/W   Undocumented - Post Boot Flag */
+								 /* 0x4000301  1  W     Undocumented - Power Down Control */
+								 /* 0x4000302     -     Unused */
+								 /* 0x4000410  ?  ?     Undocumented - Purpose Unknown / Bug ??? 0FFh */
+								 /* 0x4000411     -     Unused */
+								 /* 0x4000800  4  R/W   Undocumented - Internal Memory Control (R/W) */
+								 /* 0x4000804     -     Unused */
+								 /* 0x4xx0800  4  R/W   Mirrors of 4000800h (repeated each 64K) */
 
 #define SOUNDBIAS_SET(val)      HWLO_SET(0x088, val)
 
@@ -172,7 +172,7 @@ TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
 	// always clear active for immediate DMAs though
 	if (!((ctrl>>9) & 1) || ((ctrl & 0x3000) == 0))
 	{
-		DMACNT_H_RESET(ch, 0x8000);	// clear "active" bit
+		DMACNT_H_RESET(ch, 0x8000); // clear "active" bit
 	}
 	else
 	{
@@ -606,7 +606,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 		case 0x00b8/4:
 			if (ACCESSING_BITS_0_15)
 			{
-				// read only				
+				// read only
 			}
 			if (ACCESSING_BITS_16_31)
 			{
@@ -620,7 +620,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 		case 0x00c4/4:
 			if (ACCESSING_BITS_0_15)
 			{
-				// read only				
+				// read only
 			}
 			if (ACCESSING_BITS_16_31)
 			{
@@ -634,7 +634,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 		case 0x00d0/4:
 			if (ACCESSING_BITS_0_15)
 			{
-				// read only				
+				// read only
 			}
 			if (ACCESSING_BITS_16_31)
 			{
@@ -650,7 +650,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 				// note: this suspicious piece of code crashes "Buffy The Vampire Slayer" (08008DB4) and "The Ant Bully", so disable it for now
 			if (ACCESSING_BITS_0_15)
 			{
-				// read only				
+				// read only
 			}
 			if (ACCESSING_BITS_16_31)
 			{
@@ -725,7 +725,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 			break;
 	}
 
-//	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
+//  assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
 
 	if (ACCESSING_BITS_0_15)
 	{
@@ -747,7 +747,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 	COMBINE_DATA(&m_regs[offset]);
 
-//	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
+//  assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
 
 	if (ACCESSING_BITS_0_15)
 	{

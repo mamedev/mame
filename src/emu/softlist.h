@@ -4,7 +4,7 @@
 
     softlist.h
 
-	Software list file format.
+    Software list file format.
 
 *********************************************************************/
 
@@ -190,13 +190,13 @@ private:
 	void parse_soft_end(const char *name);
 
 	// internal parsing state
-	util::core_file &					m_file;
-	std::string 						m_filename;
-	std::list<software_info> &	m_infolist;
-	std::ostringstream &		m_errors;
-	struct XML_ParserStruct *	m_parser;
-	bool						m_done;
-	std::string &				m_description;
+	util::core_file &                   m_file;
+	std::string                         m_filename;
+	std::list<software_info> &  m_infolist;
+	std::ostringstream &        m_errors;
+	struct XML_ParserStruct *   m_parser;
+	bool                        m_done;
+	std::string &               m_description;
 	bool                    m_data_accum_expected;
 	std::string             m_data_accum;
 	software_info *         m_current_info;

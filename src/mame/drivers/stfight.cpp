@@ -6,8 +6,8 @@
 
 
  Notes:  Lower Board - CPU board        S-0086-002-B0  (both games)
-		 Top Board   - GFX board        S-0086-002A-A0 (Street Fight)
-		 Top Board   - GFX board        S-0087-807     (Cross Shooter)
+         Top Board   - GFX board        S-0086-002A-A0 (Street Fight)
+         Top Board   - GFX board        S-0087-807     (Cross Shooter)
 
  for the single PCB version of Air Raid / Cross Shooter on the S-0087-011A-0 PCB,
  see airraid.cpp

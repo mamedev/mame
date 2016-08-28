@@ -12,7 +12,7 @@ Keys:
 UP: MEM increments the currently displayed address, (and goes into data entry mode in V1 bios).
 = : TERM changes to "data entry" mode. In this mode, entering hex digits will change the byte at the currently displayed address
 - : ABORT changes to "address entry" mode. In this mode, entering hex digits will change the address.
-X : GO runs the program from the currently displayed address. On exit, the instruction after the program is displayed 
+X : GO runs the program from the currently displayed address. On exit, the instruction after the program is displayed
 
 Pasting:
         0-F : as is

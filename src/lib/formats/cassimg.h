@@ -87,12 +87,12 @@ struct cassette_image
 {
 	enum class error
 	{
-		SUCCESS,				// no error
-		INTERNAL,				// fatal internal error
-		UNSUPPORTED,			// this operation is unsupported
-		OUT_OF_MEMORY,			// ran out of memory
-		INVALID_IMAGE,			// invalid image
-		READ_WRITE_UNSUPPORTED	// read/write is not supported by this image format
+		SUCCESS,                // no error
+		INTERNAL,               // fatal internal error
+		UNSUPPORTED,            // this operation is unsupported
+		OUT_OF_MEMORY,          // ran out of memory
+		INVALID_IMAGE,          // invalid image
+		READ_WRITE_UNSUPPORTED  // read/write is not supported by this image format
 	};
 
 	const struct CassetteFormat *format;

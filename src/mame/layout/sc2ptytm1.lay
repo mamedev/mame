@@ -4873,11 +4873,11 @@
 			<bounds x="696" y="11" width="46" height="12">
 			</bounds>
 		</backdrop>
-    
-    <!-- The DMD -->
-    <screen index="0">
-      <bounds left="134" top="325" right="396" bottom="421" />
-    </screen>
+
+	<!-- The DMD -->
+	<screen index="0">
+	  <bounds left="134" top="325" right="396" bottom="421" />
+	</screen>
 
 		<backdrop name="label10" element="label_10">
 			<bounds x="12" y="162" width="32" height="19">

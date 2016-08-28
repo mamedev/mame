@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, superctr
 /*
-	c352.c - Namco C352 custom PCM chip emulation
-	v2.0
-	By R. Belmont
-	Rewritten and improved by superctr
-	Additional code by cync and the hoot development team
+    c352.c - Namco C352 custom PCM chip emulation
+    v2.0
+    By R. Belmont
+    Rewritten and improved by superctr
+    Additional code by cync and the hoot development team
 
-	Thanks to Cap of VivaNonno for info and The_Author for preliminary reverse-engineering
+    Thanks to Cap of VivaNonno for info and The_Author for preliminary reverse-engineering
 
-	Chip specs:
-	32 voices
-	Supports 8-bit linear and 8-bit muLaw samples
-	Output: digital, 16 bit, 4 channels
-	Output sample rate is the input clock / (288 * 2).
+    Chip specs:
+    32 voices
+    Supports 8-bit linear and 8-bit muLaw samples
+    Output: digital, 16 bit, 4 channels
+    Output sample rate is the input clock / (288 * 2).
  */
 
 #include "emu.h"

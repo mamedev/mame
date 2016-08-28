@@ -20,7 +20,7 @@ class airraid_video_device :  public device_t
 public:
 	// construction/destruction
 	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_WRITE8_MEMBER(txram_w);
 	DECLARE_WRITE8_MEMBER(vregs_w);
 	void layer_enable_w(UINT8 enable);
@@ -37,7 +37,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	
+
 	// region pointers
 	required_region_ptr<UINT8> m_tx_clut;
 	required_region_ptr<UINT8> m_fg_clut;

@@ -867,7 +867,7 @@ public:
 			std::unique_ptr<device_info> &ptr = device;
 			return downcast<sdl_joystick_device*>(ptr.get())->sdl_state.joystick_id == sdlevent.jdevice.which;
 		});
-		
+
 		// If we find a matching joystick, dispatch the event to the joystick
 		if (target_device != devicelist()->end())
 		{
