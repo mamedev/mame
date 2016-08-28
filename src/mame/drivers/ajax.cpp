@@ -182,7 +182,7 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 108, 412, 256, 16, 240)
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
 //  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ajax_state, screen_update)
