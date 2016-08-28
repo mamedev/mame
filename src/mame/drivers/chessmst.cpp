@@ -5,6 +5,8 @@
         Chess-Master
 
         TODO:
+        - the HALT button does not work as it should: it stops the computers calculation
+          (the board LEDs go OFF and the CM's LED goes ON), but the machine doesn't return any move (as it should)
         - a better artwork
 
 ****************************************************************************/
