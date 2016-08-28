@@ -193,7 +193,7 @@ TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 
 
 rshark_rom_tilemap_device::rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
-	: dooyong_rom_tilemap_device(mconfig, RSHARK_ROM_TILEMAP, "Dooyong ROM Tilemap", tag, owner, clock, "dooyong_rom_tilemap", __FILE__)
+	: dooyong_rom_tilemap_device(mconfig, RSHARK_ROM_TILEMAP, "R-Shark ROM Tilemap", tag, owner, clock, "rshark_rom_tilemap", __FILE__)
 	, m_colorrom(*this, finder_base::DUMMY_TAG)
 	, m_colorrom_offset(0)
 {
