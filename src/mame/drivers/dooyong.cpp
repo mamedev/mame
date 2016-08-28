@@ -231,13 +231,13 @@ static ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE8(bgscroll_w, 0x00ff)
-	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE8(bg2scroll_w, 0x00ff)
+	AM_RANGE(0x0c4000, 0x0c400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
+	AM_RANGE(0x0c4010, 0x0c401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0c0012, 0x0c0013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)    /* flip screen + unknown stuff */
-	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE8(fgscroll_w, 0x00ff)
-	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE8(fg2scroll_w, 0x00ff)
+	AM_RANGE(0x0cc000, 0x0cc00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
+	AM_RANGE(0x0cc010, 0x0cc01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16, dooyong_68k_state )
@@ -249,13 +249,13 @@ static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x084000, 0x08400f) AM_WRITE8(bgscroll_w, 0x00ff)
-	AM_RANGE(0x084010, 0x08401f) AM_WRITE8(bg2scroll_w, 0x00ff)
+	AM_RANGE(0x084000, 0x08400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
+	AM_RANGE(0x084010, 0x08401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 	AM_RANGE(0x088000, 0x088fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x080012, 0x080013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(ctrl_w)    /* flip screen + unknown stuff */
-	AM_RANGE(0x08c000, 0x08c00f) AM_WRITE8(fgscroll_w, 0x00ff)
-	AM_RANGE(0x08c010, 0x08c01f) AM_WRITE8(fg2scroll_w, 0x00ff)
+	AM_RANGE(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
+	AM_RANGE(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
@@ -273,8 +273,8 @@ static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c4000, 0x0c400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 	AM_RANGE(0x0c4010, 0x0c401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	//AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE8(fgscroll_w, 0x00ff) // not used atm
-	//AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE8(fg2scroll_w, 0x00ff) // not used atm
+	//AM_RANGE(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
+	//AM_RANGE(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
 ADDRESS_MAP_END
 
@@ -1090,6 +1090,13 @@ static MACHINE_CONFIG_START( rshark, dooyong_68k_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rshark)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_RSHARK_ROM_TILEMAP_ADD("bg", "gfxdecode", 4, "gfx5", 0x00000, "gfx6", 0x60000)
+	MCFG_RSHARK_ROM_TILEMAP_ADD("bg2", "gfxdecode", 3, "gfx4", 0x00000, "gfx6", 0x40000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
+	MCFG_RSHARK_ROM_TILEMAP_ADD("fg", "gfxdecode", 2, "gfx3", 0x00000, "gfx6", 0x20000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
+	MCFG_RSHARK_ROM_TILEMAP_ADD("fg2", "gfxdecode", 1, "gfx2", 0x00000, "gfx6", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_68k_state, rshark)
 
@@ -1122,6 +1129,13 @@ static MACHINE_CONFIG_START( superx, dooyong_68k_state ) // dif mem map
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rshark)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_RSHARK_ROM_TILEMAP_ADD("bg", "gfxdecode", 4, "gfx5", 0x00000, "gfx6", 0x60000)
+	MCFG_RSHARK_ROM_TILEMAP_ADD("bg2", "gfxdecode", 3, "gfx4", 0x00000, "gfx6", 0x40000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
+	MCFG_RSHARK_ROM_TILEMAP_ADD("fg", "gfxdecode", 2, "gfx3", 0x00000, "gfx6", 0x20000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
+	MCFG_RSHARK_ROM_TILEMAP_ADD("fg2", "gfxdecode", 1, "gfx2", 0x00000, "gfx6", 0x00000)
+	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_68k_state, rshark)
 

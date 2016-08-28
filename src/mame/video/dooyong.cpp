@@ -15,10 +15,25 @@
    at once uses hundreds of megabytes of RAM). */
 
 device_type const DOOYONG_ROM_TILEMAP = &device_creator<dooyong_rom_tilemap_device>;
+device_type const RSHARK_ROM_TILEMAP = &device_creator<rshark_rom_tilemap_device>;
 
 
 dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DOOYONG_ROM_TILEMAP, "Dooyong ROM Tilemap", tag, owner, clock, "dooyong_rom_tilemap", __FILE__)
+	: dooyong_rom_tilemap_device(mconfig, DOOYONG_ROM_TILEMAP, "Dooyong ROM Tilemap", tag, owner, clock, "dooyong_rom_tilemap", __FILE__)
+{
+}
+
+dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(
+			machine_config const &mconfig,
+			device_type type,
+			char const *name,
+			char const *tag,
+			device_t *owner,
+			UINT32 clock,
+			char const *shortname,
+			char const *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_rows(8)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_tilerom(*this, finder_base::DUMMY_TAG)
 	, m_gfxnum(0)
@@ -114,16 +129,21 @@ void dooyong_rom_tilemap_device::set_palette_bank(UINT16 bank)
 
 void dooyong_rom_tilemap_device::device_start()
 {
+	if (!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
 			tilemap_get_info_delegate(FUNC(dooyong_rom_tilemap_device::tile_info), this),
 			TILEMAP_SCAN_COLS,
-			32, 32,
-			32, 8);
+			gfx().width(),
+			gfx().height(),
+			1024 / gfx().width(),
+			m_rows);
 	if (~m_transparent_pen)
 		m_tilemap->set_transparent_pen(m_transparent_pen);
 
-	if (m_tilerom_offset < 0)
+	if (0 > m_tilerom_offset)
 		m_tilerom_offset = m_tilerom.length() + m_tilerom_offset;
 
 	std::fill(std::begin(m_registers), std::end(m_registers), 0);
@@ -135,7 +155,7 @@ void dooyong_rom_tilemap_device::device_start()
 
 TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 {
-	tilemap_memory_index const offs = (tile_index + (unsigned(m_registers[1]) << 6)) << 1;
+	tilemap_memory_index const offs = adjust_tile_index(tile_index) << 1;
 	unsigned const attr = m_tilerom[m_tilerom_offset + offs];
 	unsigned code, color, flags;
 	if (BIT(m_registers[6], 5))
@@ -172,68 +192,38 @@ TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 }
 
 
-inline void dooyong_68k_state::scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map)
+rshark_rom_tilemap_device::rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+	: dooyong_rom_tilemap_device(mconfig, RSHARK_ROM_TILEMAP, "Dooyong ROM Tilemap", tag, owner, clock, "dooyong_rom_tilemap", __FILE__)
+	, m_colorrom(*this, finder_base::DUMMY_TAG)
+	, m_colorrom_offset(0)
 {
-	UINT8 const old = scroll[offset];
-	if (old != data)
-	{
-		scroll[offset] = data;
-		if (map != nullptr) switch (offset)
-		{
-		case 0: /* Low byte of x scroll - scroll tilemap */
-			map->set_scrollx(0, data);
-			break;
-		case 1: /* High byte of x scroll - mark tilemap dirty so new tile gfx will be loaded */
-			map->mark_all_dirty();
-			break;
-		case 3: /* Low byte of y scroll */
-		case 4: /* High byte of y scroll */
-			map->set_scrolly(0, (unsigned)scroll[3] | ((unsigned)scroll[4] << 8));
-			break;
-		case 6: /* Tilemap enable and mode control */
-			map->enable(!(data & 0x10));
-			if ((data & 0x20) != (old & 0x20))  // This sets the tilemap data format
-				map->mark_all_dirty();
-			break;
-		default:    /* Other addresses are used but function is unknown */
-			/* 0x05 and 0x07 are initialised on startup */
-			/* 0x02 is initialised on startup by some games and written to continuously by others */
-			/*{
-			    const char *name;
-			    if (scroll == m_bgscroll8)        name = "bg";
-			    else if (scroll == m_bg2scroll8)  name = "bg2";
-			    else if (scroll == m_fgscroll8)   name = "fg";
-			    else if (scroll == m_fg2scroll8)  name = "fg2";
-			    else                            name = "unknown";
-			    printf("Unknown %s tilemap control: 0x%02x = 0x%02x\n", name, (unsigned)offset, (unsigned)data);
-			}*/
-			break;
-		}
-	}
+	m_rows = 32;
 }
 
-
-/* These handle writes to the tilemap scroll registers.
-   There is one per tilemap, wrapping the above function that does the work. */
-
-WRITE8_MEMBER(dooyong_68k_state::bgscroll_w)
+void rshark_rom_tilemap_device::static_set_colorrom_tag(device_t &device, char const *tag)
 {
-	scroll8_w(offset, data, m_bgscroll8, m_bg_tilemap);
+	downcast<rshark_rom_tilemap_device &>(device).m_colorrom.set_tag(tag);
 }
 
-WRITE8_MEMBER(dooyong_68k_state::bg2scroll_w)
+void rshark_rom_tilemap_device::static_set_colorrom_offset(device_t &device, int offset)
 {
-	scroll8_w(offset, data, m_bg2scroll8, m_bg2_tilemap);
+	downcast<rshark_rom_tilemap_device &>(device).m_colorrom_offset = offset;
 }
 
-WRITE8_MEMBER(dooyong_68k_state::fgscroll_w)
+void rshark_rom_tilemap_device::device_start()
 {
-	scroll8_w(offset, data, m_fgscroll8, m_fg_tilemap);
+	dooyong_rom_tilemap_device::device_start();
+
+	if (0 > m_colorrom_offset)
+		m_colorrom_offset = m_colorrom.length() + m_colorrom_offset;
 }
 
-WRITE8_MEMBER(dooyong_68k_state::fg2scroll_w)
+TILE_GET_INFO_MEMBER(rshark_rom_tilemap_device::tile_info)
 {
-	scroll8_w(offset, data, m_fg2scroll8, m_fg2_tilemap);
+	dooyong_rom_tilemap_device::tile_info(tilemap, tileinfo, tile_index);
+
+	UINT8 const color = m_colorrom[m_colorrom_offset + adjust_tile_index(tile_index)] & 0x0fU;
+	tileinfo.palette_base = gfx().colorbase() + (gfx().granularity() * (color % gfx().colors()));
 }
 
 
@@ -704,47 +694,6 @@ WRITE16_MEMBER(dooyong_68k_state::ctrl_w)
 }
 
 
-inline void dooyong_68k_state::rshark_get_tile_info(tile_data &tileinfo, int tile_index,
-		UINT8 const *tilerom1, UINT8 const *tilerom2, UINT8 const *scroll, int graphics)
-{
-		/* Tiles take two bytes in tile ROM 1:
-		                 MSB   LSB
-		   [offs + 0x00] YX?c cccc    (Y flip, X flip, bits 12-8 of gfx code)
-		   [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
-		   ? = unused/unknown
-		   c = gfx code
-		   X = x flip
-		   Y = y flip */
-	int const offs = tile_index + ((int)scroll[1] << 9);
-	int const attr = tilerom1[offs * 2];
-	int const code = tilerom1[(offs * 2) + 1] | ((attr & 0x1f) << 8);
-	int const color = tilerom2[offs] & 0x0f;
-	int const flags = TILE_FLIPYX((attr & 0xC0) >> 6);
-
-	tileinfo.set(graphics, code, color, flags);
-}
-
-TILE_GET_INFO_MEMBER(dooyong_68k_state::rshark_get_bg_tile_info)
-{
-	rshark_get_tile_info(tileinfo, tile_index, m_bg_tilerom, m_bg_tilerom2, m_bgscroll8, m_bg_gfx);
-}
-
-TILE_GET_INFO_MEMBER(dooyong_68k_state::rshark_get_bg2_tile_info)
-{
-	rshark_get_tile_info(tileinfo, tile_index, m_bg2_tilerom, m_bg2_tilerom2, m_bg2scroll8, m_bg2_gfx);
-}
-
-TILE_GET_INFO_MEMBER(dooyong_68k_state::rshark_get_fg_tile_info)
-{
-	rshark_get_tile_info(tileinfo, tile_index, m_fg_tilerom, m_fg_tilerom2, m_fgscroll8, m_fg_gfx);
-}
-
-TILE_GET_INFO_MEMBER(dooyong_68k_state::rshark_get_fg2_tile_info)
-{
-	rshark_get_tile_info(tileinfo, tile_index, m_fg2_tilerom, m_fg2_tilerom2, m_fg2scroll8, m_fg2_gfx);
-}
-
-
 void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Sprites take 8 16-bit words each in memory:
@@ -814,10 +763,10 @@ UINT32 dooyong_68k_state::screen_update_rshark(screen_device &screen, bitmap_ind
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, (m_bg2_priority ? 2 : 1));
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
-	m_fg2_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg2->draw(screen, bitmap, cliprect, 0, (m_bg2_priority ? 2 : 1));
+	m_fg->draw(screen, bitmap, cliprect, 0, 2);
+	m_fg2->draw(screen, bitmap, cliprect, 0, 2);
 
 	draw_sprites(screen, bitmap, cliprect);
 
@@ -853,46 +802,7 @@ UINT32 dooyong_68k_state::screen_update_popbingo(screen_device &screen, bitmap_i
 
 VIDEO_START_MEMBER(dooyong_68k_state, rshark)
 {
-	/* Configure tilemap callbacks */
-	m_bg_tilerom = memregion("gfx5")->base();
-	m_bg2_tilerom = memregion("gfx4")->base();
-	m_fg_tilerom = memregion("gfx3")->base();
-	m_fg2_tilerom = memregion("gfx2")->base();
-	m_bg_tilerom2 = memregion("gfx6")->base() + 0x60000;
-	m_bg2_tilerom2 = memregion("gfx6")->base() + 0x40000;
-	m_fg_tilerom2 = memregion("gfx6")->base() + 0x20000;
-	m_fg2_tilerom2 = memregion("gfx6")->base() + 0x00000;
-	m_bg_gfx = 4;
-	m_bg2_gfx = 3;
-	m_fg_gfx = 2;
-	m_fg2_gfx = 1;
-
-	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::rshark_get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-			16, 16, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::rshark_get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
-			16, 16, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::rshark_get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-			16, 16, 64, 32);
-	m_fg2_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::rshark_get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
-			16, 16, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_bg2_tilemap->set_transparent_pen(15);
-	m_fg_tilemap->set_transparent_pen(15);
-	m_fg2_tilemap->set_transparent_pen(15);
-
-	clear_video_regs();
-
 	/* Register for save/restore */
-	save_item(NAME(m_bgscroll8));
-	save_item(NAME(m_bg2scroll8));
-	save_item(NAME(m_fgscroll8));
-	save_item(NAME(m_fg2scroll8));
 	save_item(NAME(m_bg2_priority));
 }
 
@@ -901,10 +811,6 @@ VIDEO_START_MEMBER(dooyong_68k_state, popbingo)
 	m_screen->register_screen_bitmap(m_bg_bitmap);
 	m_screen->register_screen_bitmap(m_bg2_bitmap);
 
-	clear_video_regs();
-
 	/* Register for save/restore */
-	save_item(NAME(m_fgscroll8)); // Not used atm
-	save_item(NAME(m_fg2scroll8)); // Not used atm
 	save_item(NAME(m_bg2_priority)); // Not used atm
 }
