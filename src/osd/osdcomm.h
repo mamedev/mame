@@ -167,8 +167,6 @@ constexpr UINT64 little_endianize_int64(UINT64 x) { return flipendian_int64(x); 
 #ifdef _MSC_VER
 #include <malloc.h>
 using ssize_t = std::make_signed_t<size_t>;
-#define __LINE__Var 0
-#define _CRT_STDIO_LEGACY_WIDE_SPECIFIERS
 #endif
 
 #ifdef __GNUC__
