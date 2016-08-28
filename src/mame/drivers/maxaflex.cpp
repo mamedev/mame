@@ -228,7 +228,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(maxaflex_state::mcu_timer_proc)
 		if ( (m_tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(m_mcu, M68705_INT_TIMER, 1);
+			generic_pulse_irq_line(*m_mcu, M68705_INT_TIMER, 1);
 		}
 	}
 }

@@ -5,7 +5,6 @@
         Chess-Master
 
         TODO:
-        - add Reset and Halt buttons
         - a better artwork
 
 ****************************************************************************/
@@ -17,6 +16,7 @@
 #include "sound/speaker.h"
 #include "chessmst.lh"
 
+#define MASTER_CLOCK (9830400/4) /* 9830.4kHz source */
 
 class chessmst_state : public driver_device
 {
@@ -25,7 +25,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker")
-				{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -41,6 +41,7 @@ public:
 	DECLARE_READ8_MEMBER( pio2_port_a_r );
 	DECLARE_WRITE8_MEMBER( pio2_port_b_w );
 	DECLARE_INPUT_CHANGED_MEMBER(chessmst_sensor);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
 
 
@@ -58,6 +59,11 @@ static ADDRESS_MAP_START( chessmst_io , AS_IO, 8, chessmst_state)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xf0) AM_DEVREADWRITE("z80pio1", z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf0) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
 ADDRESS_MAP_END
+
+INPUT_CHANGED_MEMBER(chessmst_state::reset_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 INPUT_CHANGED_MEMBER(chessmst_state::chessmst_sensor)
 {
@@ -153,6 +159,10 @@ static INPUT_PORTS_START( chessmst )
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Color    [2]")    PORT_CODE(KEYCODE_2)    PORT_CODE(KEYCODE_C)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Level    [1]")    PORT_CODE(KEYCODE_1)    PORT_CODE(KEYCODE_L)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game [0]")    PORT_CODE(KEYCODE_0)    PORT_CODE(KEYCODE_ENTER)
+	
+	PORT_START("EXTRA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Halt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER("z80pio1", z80pio_device, strobe_a) // -> PIO(1) ASTB pin
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, reset_button, 0) // -> Z80 RESET pin
 INPUT_PORTS_END
 
 void chessmst_state::machine_reset()
@@ -241,8 +251,9 @@ WRITE8_MEMBER( chessmst_state::pio2_port_b_w )
 }
 
 static MACHINE_CONFIG_START( chessmst, chessmst_state )
+
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK) // U880
 	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
 	MCFG_CPU_IO_MAP(chessmst_io)
 
@@ -255,12 +266,12 @@ static MACHINE_CONFIG_START( chessmst, chessmst_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, MASTER_CLOCK)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, MASTER_CLOCK)
 	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
 MACHINE_CONFIG_END

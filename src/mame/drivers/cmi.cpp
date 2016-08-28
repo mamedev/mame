@@ -381,9 +381,8 @@ public:
 		, m_acia_mkbd_cmi(*this, "acia_mkbd_cmi")
 		, m_cmi07_ptm(*this, "cmi07_ptm")
 		, m_qfc9_region(*this, "qfc9")
-		, m_floppy_0(*this, "wd1791:0")
-		, m_floppy_1(*this, "wd1791:1")
-		, m_floppy(nullptr)
+		, m_floppy0(*this, "wd1791:0")
+		, m_floppy1(*this, "wd1791:1")
 		, m_wd1791(*this, "wd1791")
 		, m_channels(*this, "cmi01a_%u", 0)
 		, m_cmi10_pia_u20(*this, "cmi10_pia_u20")
@@ -542,9 +541,8 @@ protected:
 	required_device<ptm6840_device> m_cmi07_ptm;
 
 	required_memory_region m_qfc9_region;
-	required_device<floppy_connector> m_floppy_0;
-	required_device<floppy_connector> m_floppy_1;
-	floppy_image_device *m_floppy;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<fd1791_t> m_wd1791;
 
 	required_device_array<cmi01a_device, 8> m_channels;
@@ -609,8 +607,8 @@ private:
 
 	/* Memory management */
 	UINT8	m_map_sel[16];
-	std::unique_ptr<UINT8[]>	m_map_ram[4];
-	std::unique_ptr<UINT8[]>	m_q256_ram[4];
+	std::unique_ptr<UINT8[]>	m_map_ram[2];
+	std::unique_ptr<UINT8[]>	m_q256_ram[2];
 	UINT8	m_map_ram_latch;
 	int		m_cpu_active_space[2]; // TODO: Make one register
 	int		m_cpu_map_switch[2];
@@ -1294,6 +1292,8 @@ void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
 
 	address_space *space = (cpunum == 0 ? m_cpu1space : m_cpu2space);
 
+	space->unmap_readwrite(0x0000, 0xffff);
+
 	/* Step through the map RAM assignments */
 	for (int page = 0; page < PAGE_COUNT; ++page)
 	{
@@ -1317,7 +1317,7 @@ void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
 				if (m_cmi07_ctrl & 0x30)
 				if ((address & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
 				{
-					space->install_ram(address, address + PAGE_SIZE, &m_cmi07_ram[(page * PAGE_SIZE) & 0x3fff]);
+					space->install_ram(address, address + PAGE_SIZE - 1, &m_cmi07_ram[(page * PAGE_SIZE) & 0x3fff]);
 					continue;
 				}
 			}
@@ -1336,7 +1336,7 @@ void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
 			continue;
 
 		/* Now map the RAM page */
-		space->install_ram(address, address + PAGE_SIZE, &m_q256_ram[i][(page_info & 0x7f) * PAGE_SIZE]);
+		space->install_ram(address, address + PAGE_SIZE - 1, &m_q256_ram[i][(page_info & 0x7f) * PAGE_SIZE]);
 	}
 
 	if (vram_en)
@@ -1460,20 +1460,15 @@ void cmi_state::write_fdc_ctrl(UINT8 data)
 	int drive = data & 1;
 	int side = BIT(data, 5) ? 1 : 0;
 
-	m_floppy = nullptr;
-
-	if (drive)
+	switch (drive)
 	{
-		m_floppy = m_floppy_1->get_device();
-	}
-	else
-	{
-		m_floppy = m_floppy_0->get_device();
+	case 0: m_wd1791->set_floppy(m_floppy0->get_device()); break;
+	case 1: m_wd1791->set_floppy(m_floppy1->get_device()); break;
 	}
 
-	if (m_floppy)
-		m_floppy->ss_w(side);
-	m_wd1791->set_floppy(m_floppy);
+	if (m_floppy0->get_device()) m_floppy0->get_device()->ss_w(side);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->ss_w(side);
+
 	m_wd1791->dden_w(BIT(data, 7) ? true : false);
 
 	m_fdc_ctrl = data;
@@ -2526,14 +2521,10 @@ void cmi_state::machine_start()
 	/* Allocate 1kB memory mapping RAM */
 	m_map_ram[0] = std::make_unique<UINT8[]>(0x400);
 	m_map_ram[1] = std::make_unique<UINT8[]>(0x400);
-	m_map_ram[2] = std::make_unique<UINT8[]>(0x400);
-	m_map_ram[3] = std::make_unique<UINT8[]>(0x400);
 
 	/* Allocate 256kB for each Q256 RAM card */
 	m_q256_ram[0] = std::make_unique<UINT8[]>(0x40000);
 	m_q256_ram[1] = std::make_unique<UINT8[]>(0x40000);
-	m_q256_ram[2] = std::make_unique<UINT8[]>(0x40000);
-	m_q256_ram[3] = std::make_unique<UINT8[]>(0x40000);
 
 	/* Allocate 16kB video RAM */
 	m_video_ram = std::make_unique<UINT8[]>(0x4000);
@@ -2697,7 +2688,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cmi_state, wd1791_irq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(cmi_state, wd1791_drq))
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
 	// Channel cards
 	MCFG_CMI01A_ADD("cmi01a_0", 0)

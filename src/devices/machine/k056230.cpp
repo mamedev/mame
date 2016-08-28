@@ -22,9 +22,9 @@ const device_type K056230 = &device_creator<k056230_device>;
 //-------------------------------------------------
 
 k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K056230, "K056230 LANC", tag, owner, clock, "k056230", __FILE__),
-		m_is_thunderh(0),
-		m_cpu(*this)
+	: device_t(mconfig, K056230, "K056230 LANC", tag, owner, clock, "k056230", __FILE__)
+	, m_is_thunderh(0)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 

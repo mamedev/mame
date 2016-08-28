@@ -103,19 +103,19 @@ VIDEO_START_MEMBER(mcr_state,mcr)
 	switch (mcr_cpu_board)
 	{
 		case 90009:
-			bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90009_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+			bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90009_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 			break;
 
 		case 90010:
-			bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90010_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+			bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90010_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 			break;
 
 		case 91475:
-			bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90010_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+			bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90010_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 			break;
 
 		case 91490:
-			bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_91490_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+			bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_91490_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 			break;
 
 		default:

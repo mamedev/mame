@@ -196,21 +196,7 @@ void okim6295_device::set_bank_base(offs_t base, bool bDontUpdateStream)
 	{
 		m_stream->update();
 	}
-
-	// if we are setting a non-zero base, and we have no bank, allocate one
-	if (!m_bank_installed && base != 0)
-	{
-		// override our memory map with a bank
-		space().install_read_bank(0x00000, 0x3ffff, tag());
-		m_bank_installed = true;
-	}
-
-	// if we have a bank number, set the base pointer
-	if (m_bank_installed)
-	{
-		m_bank_offs = base;
-		membank(tag())->set_base(m_region->base() + base);
-	}
+	set_rom_bank(base / 0x40000);
 }
 
 

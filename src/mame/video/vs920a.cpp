@@ -37,7 +37,7 @@ vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mco
 	m_vram(nullptr),
 	m_pal_base(0),
 	m_gfx_region(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 
 {
 }
@@ -53,7 +53,7 @@ void vs920a_text_tilemap_device::device_start()
 	save_item(NAME(m_pal_base));
 
 
-	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(vs920a_text_tilemap_device::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(vs920a_text_tilemap_device::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	m_tmap->set_transparent_pen(0);
 }
 

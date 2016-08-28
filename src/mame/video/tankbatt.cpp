@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(tankbatt_state::get_bg_tile_info)
 
 void tankbatt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tankbatt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tankbatt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 void tankbatt_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -126,19 +126,19 @@ GFXDECODE_END
 
 
 k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051960, "K051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__),
-	device_gfx_interface(mconfig, *this, gfxinfo),
-	m_ram(nullptr),
-	m_sprite_rom(*this, DEVICE_SELF),
-	m_screen(*this),
-	m_scanline_timer(nullptr),
-	m_irq_handler(*this),
-	m_firq_handler(*this),
-	m_nmi_handler(*this),
-	m_romoffset(0),
-	m_spriteflip(0),
-	m_readroms(0),
-	m_nmi_enabled(0)
+	: device_t(mconfig, K051960, "K051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__)
+	, device_gfx_interface(mconfig, *this, gfxinfo)
+	, m_ram(nullptr)
+	, m_sprite_rom(*this, DEVICE_SELF)
+	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_scanline_timer(nullptr)
+	, m_irq_handler(*this)
+	, m_firq_handler(*this)
+	, m_nmi_handler(*this)
+	, m_romoffset(0)
+	, m_spriteflip(0)
+	, m_readroms(0)
+	, m_nmi_enabled(0)
 {
 }
 

@@ -45,16 +45,16 @@ ROM_END
 //  hd44780_device - constructor
 //-------------------------------------------------
 
-hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, HD44780, "HD44780 A00", tag, owner, clock, "hd44780_a00", __FILE__),
-	m_cgrom(*this, DEVICE_SELF)
+hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: hd44780_device(mconfig, HD44780, "HD44780 A00", tag, owner, clock, "hd44780_a00", __FILE__)
 {
 	set_charset_type(CHARSET_HD44780_A00);
 }
 
-hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_cgrom(*this, DEVICE_SELF)
+hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_cgrom(nullptr)
+	, m_cgrom_region(*this, DEVICE_SELF)
 {
 }
 
@@ -86,8 +86,7 @@ const tiny_rom_entry *hd44780_device::device_rom_region() const
 
 void hd44780_device::device_start()
 {
-	if (!m_cgrom.found())
-		m_cgrom.set_target(memregion("cgrom")->base(), 0x1000);
+	m_cgrom = m_cgrom_region.found() ? m_cgrom_region : memregion("cgrom")->base();
 
 	m_pixel_update_cb.bind_relative_to(*owner());
 

@@ -516,10 +516,10 @@ WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 	m_reel1->update((data>>2) & 0x03);
 	m_reel2->update((data>>4) & 0x03);
 	m_reel3->update((data>>6) & 0x03);
-	awp_draw_reel(machine(),"reel1", m_reel0);
-	awp_draw_reel(machine(),"reel2", m_reel1);
-	awp_draw_reel(machine(),"reel3", m_reel2);
-	awp_draw_reel(machine(),"reel4", m_reel3);
+	awp_draw_reel(machine(),"reel1", *m_reel0);
+	awp_draw_reel(machine(),"reel2", *m_reel1);
+	awp_draw_reel(machine(),"reel3", *m_reel2);
+	awp_draw_reel(machine(),"reel4", *m_reel3);
 }
 
 READ8_MEMBER(mpu3_state::pia_ic5_portb_r)

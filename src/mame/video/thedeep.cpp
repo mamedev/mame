@@ -100,8 +100,8 @@ PALETTE_INIT_MEMBER(thedeep_state, thedeep)
 
 void thedeep_state::video_start()
 {
-	m_tilemap_0  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(thedeep_state::tilemap_scan_rows_back),this),16,16,0x20,0x20);
-	m_tilemap_1  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,0x20,0x20);
+	m_tilemap_0  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(thedeep_state::tilemap_scan_rows_back),this),16,16,0x20,0x20);
+	m_tilemap_1  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,0x20,0x20);
 
 	m_tilemap_0->set_transparent_pen(0 );
 	m_tilemap_1->set_transparent_pen(0 );

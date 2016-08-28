@@ -251,14 +251,12 @@ extern const device_type FLOPPYSOUND;
     Floppy drive sound
 */
 
-#define MAX_STEP_SAMPLES 5
-
 class floppy_sound_device : public samples_device
 {
 public:
 	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void motor(bool on);
-	void step();
+	void motor(bool on, bool withdisk);
+	void step(int track);
 	bool samples_loaded() { return m_loaded; }
 	void register_for_save_states();
 
@@ -268,26 +266,23 @@ protected:
 private:
 	// device_sound_interface overrides
 	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
 	sound_stream*   m_sound;
-	bool            m_loaded;
-	bool            m_is525; // true if this is a 5.25" floppy drive
 
-	int             m_sampleindex_motor_start;
-	int             m_sampleindex_motor_loop;
-	int             m_sampleindex_motor_end;
-	int             m_samplesize_motor_start;
-	int             m_samplesize_motor_loop;
-	int             m_samplesize_motor_end;
-	int             m_samplepos_motor;
-	int             m_motor_playback_state;
-	bool            m_motor_on;
-
-	int             m_step_samples;
-	int             m_sampleindex_step1;
-	int             m_samplesize_step[MAX_STEP_SAMPLES];
-	int             m_samplepos_step;
-	int             m_step_playback_state;
+	int         m_step_base;
+	int         m_spin_samples;
+	int         m_step_samples;
+	int         m_spin_samplepos;
+	int         m_step_samplepos;
+	int         m_seek_sound_timeout;
+	int         m_zones;
+	int         m_spin_playback_sample;
+	int         m_step_playback_sample;
+	int         m_seek_playback_sample;
+	bool        m_motor_on;
+	bool        m_with_disk;
+	bool        m_loaded;
+	double      m_seek_pitch;
+	double      m_seek_samplepos;
 };
 
 

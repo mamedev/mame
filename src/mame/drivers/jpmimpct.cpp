@@ -1088,18 +1088,18 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 			m_reel1->update((data >> 1)& 0x0F);
 			m_reel2->update((data >> 2)& 0x0F);
 			m_reel3->update((data >> 3)& 0x0F);
-			awp_draw_reel(machine(),"reel1", m_reel0);
-			awp_draw_reel(machine(),"reel2", m_reel1);
-			awp_draw_reel(machine(),"reel3", m_reel2);
-			awp_draw_reel(machine(),"reel4", m_reel3);
+			awp_draw_reel(machine(),"reel1", *m_reel0);
+			awp_draw_reel(machine(),"reel2", *m_reel1);
+			awp_draw_reel(machine(),"reel3", *m_reel2);
+			awp_draw_reel(machine(),"reel4", *m_reel3);
 			break;
 		}
 		case 0x04:
 		{
 			m_reel4->update((data >> 4)& 0x0F);
 			m_reel5->update((data >> 5)& 0x0F);
-			awp_draw_reel(machine(),"reel5", m_reel4);
-			awp_draw_reel(machine(),"reel6", m_reel5);
+			awp_draw_reel(machine(),"reel5", *m_reel4);
+			awp_draw_reel(machine(),"reel6", *m_reel5);
 			break;
 		}
 		case 0x06:

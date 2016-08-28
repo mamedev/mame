@@ -475,6 +475,33 @@ private:
 };
 
 
+// ======================> address_space_debug_wrapper
+
+// wrapper for temporarily setting the debug flag on a memory space (especially one being accessed through another space)
+class address_space_debug_wrapper
+{
+public:
+	// construction
+	address_space_debug_wrapper(address_space &space, bool debugger_access)
+		: m_target(space)
+		, m_prev_debugger_access(space.debugger_access())
+	{
+		space.set_debugger_access(debugger_access);
+	}
+
+	// destruction
+	~address_space_debug_wrapper() { m_target.set_debugger_access(m_prev_debugger_access); }
+
+	// getter
+	address_space &space() const { return m_target; }
+
+private:
+	// internal state
+	address_space &m_target;
+	const bool m_prev_debugger_access;
+};
+
+
 // ======================> memory_block
 
 // a memory block is a chunk of RAM associated with a range of memory in a device's address space

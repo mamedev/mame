@@ -213,7 +213,7 @@ UINT8 compis_hrg_t::pcs6_6_r(address_space &space, offs_t offset)
 	else
 		data = 0;
 
-	logerror("%s PCS 6:6 read %04x : %02x\n", machine().describe_context(), offset, data);
+	//logerror("%s PCS 6:6 read %04x : %02x\n", machine().describe_context(), offset, data);
 
 	return data;
 }
@@ -225,7 +225,7 @@ UINT8 compis_hrg_t::pcs6_6_r(address_space &space, offs_t offset)
 
 void compis_hrg_t::pcs6_6_w(address_space &space, offs_t offset, UINT8 data)
 {
-	logerror("%s PCS 6:6 write %04x : %02x\n", machine().describe_context(), offset, data);
+	//logerror("%s PCS 6:6 write %04x : %02x\n", machine().describe_context(), offset, data);
 
 	// 0x336 is likely the color plane register
 	if (offset < 2) m_crtc->write(space, offset & 0x01, data);

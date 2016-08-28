@@ -1027,7 +1027,7 @@ image_init_result device_image_interface::load(const std::string &path)
 //  load_software - loads a softlist item by name
 //-------------------------------------------------
 
-image_init_result device_image_interface::load_software(const std::string &softlist_name)
+image_init_result device_image_interface::load_software(const std::string &software_identifier)
 {
 	// Prepare to load
 	unload();
@@ -1036,7 +1036,7 @@ image_init_result device_image_interface::load_software(const std::string &softl
 
 	// Check if there's a software list defined for this device and use that if we're not creating an image
 	std::string list_name;
-	bool softload = load_software_part(softlist_name, m_software_part_ptr, &list_name);
+	bool softload = load_software_part(software_identifier, m_software_part_ptr, &list_name);
 	if (!softload)
 	{
 		m_is_loading = false;
@@ -1088,9 +1088,9 @@ image_init_result device_image_interface::load_software(const std::string &softl
 		if (!m_init_phase)
 		{
 			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-				device().popmessage("Image '%s' was successfully loaded.", softlist_name);
+				device().popmessage("Image '%s' was successfully loaded.", software_identifier);
 			else
-				osd_printf_info("Image '%s' was successfully loaded.\n", softlist_name.c_str());
+				osd_printf_info("Image '%s' was successfully loaded.\n", software_identifier.c_str());
 		}
 	}
 
@@ -1256,27 +1256,27 @@ void device_image_interface::update_names(const device_type device_type, const c
 //	find_software_item
 //-------------------------------------------------
 
-const software_part *device_image_interface::find_software_item(const std::string &path, bool restrict_to_interface, software_list_device **dev) const
+const software_part *device_image_interface::find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **dev) const
 {
 	// split full software name into software list name and short software name
-	std::string swlist_name, swinfo_name, swpart_name;
-	if (!software_name_parse(path, &swlist_name, &swinfo_name, &swpart_name))
+	std::string list_name, software_name, part_name;
+	if (!software_name_parse(identifier, &list_name, &software_name, &part_name))
 		return nullptr;
 
 	// determine interface
-	const char *interface = nullptr;
-	if (restrict_to_interface)
-		interface = image_interface();
+	const char *interface = restrict_to_interface
+		? image_interface()
+		: nullptr;
 
 	// find the software list if explicitly specified
 	for (software_list_device &swlistdev : software_list_device_iterator(device().mconfig().root_device()))
 	{
-		if (swlist_name.compare(swlistdev.list_name())==0 || !(swlist_name.length() > 0))
+		if (list_name.empty() || (list_name == swlistdev.list_name()))
 		{
-			const software_info *info = swlistdev.find(swinfo_name);
+			const software_info *info = swlistdev.find(software_name);
 			if (info != nullptr)
 			{
-				const software_part *part = info->find_part(swpart_name, interface);
+				const software_part *part = info->find_part(part_name, interface);
 				if (part != nullptr)
 				{
 					if (dev != nullptr)
@@ -1286,13 +1286,13 @@ const software_part *device_image_interface::find_software_item(const std::strin
 			}
 		}
 
-		if (swinfo_name == swlistdev.list_name())
+		if (software_name == swlistdev.list_name())
 		{
 			// ad hoc handling for the case path = swlist_name:swinfo_name (e.g.
 			// gameboy:sml) which is not handled properly by software_name_split
 			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
-			const software_info *info = swlistdev.find(swpart_name);
+			const software_info *info = swlistdev.find(part_name);
 			if (info != nullptr)
 			{
 				const software_part *part = info->find_part("", interface);
@@ -1336,14 +1336,14 @@ const software_list_loader &device_image_interface::get_software_list_loader() c
 //  sw_info and sw_part are also set.
 //-------------------------------------------------
 
-bool device_image_interface::load_software_part(const std::string &path, const software_part *&swpart, std::string *list_name)
+bool device_image_interface::load_software_part(const std::string &identifier, const software_part *&swpart, std::string *list_name)
 {
 	// if no match has been found, we suggest similar shortnames
 	software_list_device *swlist;
-	swpart = find_software_item(path, true, &swlist);
+	swpart = find_software_item(identifier, true, &swlist);
 	if (swpart == nullptr)
 	{
-		software_list_device::display_matches(device().machine().config(), image_interface(), path);
+		software_list_device::display_matches(device().machine().config(), image_interface(), identifier);
 		return false;
 	}
 

@@ -392,6 +392,15 @@ public:
 	bool shadows_enabled() { return m_enable_shadows; }
 	bool hilights_enabled() { return m_enable_hilights; }
 
+	// raw entry reading
+	UINT32 read_entry(pen_t pen) const
+	{
+		UINT32 data = m_paletteram.read(pen);
+		if (m_paletteram_ext.base() != nullptr)
+			data |= m_paletteram_ext.read(pen) << (8 * m_paletteram.bytes_per_entry());
+		return data;
+	}
+
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
 	void set_pen_red_level(pen_t pen, UINT8 level) { m_palette->entry_set_red_level(pen, level); }

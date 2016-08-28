@@ -121,28 +121,28 @@ void ppu2c0x_device::device_config_complete()
 }
 
 ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-					device_memory_interface(mconfig, *this),
-					device_video_interface(mconfig, *this),
-					m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(ppu2c0x)),
-					m_cpu(*this),
-					m_scanline(0),  // reset the scanline count
-					m_refresh_data(0),
-					m_refresh_latch(0),
-					m_x_fine(0),
-					m_toggle(0),
-					m_add(1),
-					m_videomem_addr(0),
-					m_data_latch(0),
-					m_buffered_data(0),
-					m_tile_page(0),
-					m_sprite_page(0),
-					m_back_color(0),
-					m_color_base(0),
-					m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
-					m_tilecount(0),
-					m_draw_phase(0),
-					m_use_sprite_write_limitation(true)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(ppu2c0x))
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_scanline(0)  // reset the scanline count
+	, m_refresh_data(0)
+	, m_refresh_latch(0)
+	, m_x_fine(0)
+	, m_toggle(0)
+	, m_add(1)
+	, m_videomem_addr(0)
+	, m_data_latch(0)
+	, m_buffered_data(0)
+	, m_tile_page(0)
+	, m_sprite_page(0)
+	, m_back_color(0)
+	, m_color_base(0)
+	, m_scan_scale(1) // set the scan scale (this is for dual monitor vertical setups)
+	, m_tilecount(0)
+	, m_draw_phase(0)
+	, m_use_sprite_write_limitation(true)
 {
 	for (auto & elem : m_regs)
 		elem = 0;

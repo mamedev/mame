@@ -229,7 +229,7 @@ public:
 	image_init_result load(const std::string &path);
 
 	// loads a softlist item by name
-	image_init_result load_software(const std::string &softlist_name);
+	image_init_result load_software(const std::string &software_identifier);
 
 	bool open_image_file(emu_options &options);
 	image_init_result finish_load();
@@ -271,8 +271,8 @@ protected:
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	const software_part *find_software_item(const std::string &path, bool restrict_to_interface, software_list_device **device = nullptr) const;
-	bool load_software_part(const std::string &path, const software_part *&swpart, std::string *list_name = nullptr);
+	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
+	bool load_software_part(const std::string &identifier, const software_part *&swpart, std::string *list_name = nullptr);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);

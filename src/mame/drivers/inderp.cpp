@@ -11,13 +11,14 @@
 
    Hardware:
    ---------
-		CPU:     M6502, R/C combo with 100kOhms and 10pF for clock, manual says 4 microseconds min. instruction execution
-			INT:   ? (somewhere in between 200 .. 250 Hz seems likely)
-		IO:      DMA only
-		DISPLAY: 6-digit, both 9-segment & 7-segment panels with direct segment access
-		SOUND:	 simple tones, needs comparison with real machine
+CPU:     M6502, R/C combo with 100kOhms and 10pF for clock, manual says 4 microseconds min. instruction execution
+    INT: ? (somewhere in between 200 .. 250 Hz seems likely)
+IO:      DMA only
+DISPLAY: 6-digit, both 9-segment & 7-segment panels with direct segment access
+SOUND:   simple tones, needs comparison with real machine
  */
 
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/genpin.h"
 
@@ -77,5 +78,5 @@ ROM_START(centauri2)
 ROM_END
 
 
-GAME( 1979, centauri,  0, inderp, inderp, driver_device, 0, ROT0, "Inder", "Centaru", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri,  0,        inderp, inderp, driver_device, 0, ROT0, "Inder", "Centaur (Inder)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, centauri2, centauri, inderp, inderp, driver_device, 0, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )

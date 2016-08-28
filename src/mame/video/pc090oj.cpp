@@ -84,8 +84,8 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 	m_x_offset(0),
 	m_y_offset(0),
 	m_use_buffer(0),
-	m_gfxdecode(*this),
-	m_palette(*this)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 

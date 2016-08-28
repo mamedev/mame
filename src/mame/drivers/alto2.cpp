@@ -313,7 +313,7 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 	cpu->set_speaker(m_speaker);
 	// Create a timer which fires twice per frame, once for each field
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
-	m_vblank_timer->adjust(attotime::from_hz(30),0,attotime::from_hz(30*2));
+	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
 }
 
 void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

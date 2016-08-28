@@ -3714,6 +3714,8 @@ WRITE16_MEMBER(ddenlovr_state::akamaru_protection1_w)
 	COMBINE_DATA(&m_prot_16);
 	// BCD number?
 	bank = (((m_prot_16 >> 4) & 0x0f) % 10) * 10 + ((m_prot_16 & 0x0f) % 10);
+	if (bank >= 12)
+		bank = 0;
 	m_oki->set_bank_base(bank * 0x40000);
 
 //  popmessage("bank $%0x (%d)", m_prot_16, bank);

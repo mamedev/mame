@@ -70,7 +70,7 @@ static const char g_version[] = "4.90";
 #define ATTR_NORETURN           __attribute__((noreturn))
 #else
 #define ATTR_PRINTF(x,y)
-#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+#if defined(_MSC_VER)
 #define ATTR_NORETURN           __declspec(noreturn)
 #else
 #define ATTR_NORETURN

@@ -86,9 +86,9 @@ void voodoo_pci_device::set_cpu_tag(const char *_cpu_tag)
 
 void voodoo_pci_device::device_start()
 {
-	voodoo_device::static_set_cpu_tag(m_voodoo, m_cpu_tag);
-	voodoo_device::static_set_fbmem(m_voodoo, m_fbmem);
-	voodoo_device::static_set_tmumem(m_voodoo, m_tmumem0, m_tmumem1);
+	voodoo_device::static_set_cpu_tag(*m_voodoo, m_cpu_tag);
+	voodoo_device::static_set_fbmem(*m_voodoo, m_fbmem);
+	voodoo_device::static_set_tmumem(*m_voodoo, m_tmumem0, m_tmumem1);
 	switch (m_type) {
 		//void set_ids(UINT32 main_id, UINT8 revision, UINT32 pclass, UINT32 subsystem_id);
 		case TYPE_VOODOO_1:

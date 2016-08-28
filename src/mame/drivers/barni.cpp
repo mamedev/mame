@@ -7,15 +7,16 @@
 
 /*
    Hardware:
-		CPU: 2 x M6809, optional M6802 (what for?)
-			 INT: IRQ on CPU 0, FIRQ on CPU 1
-		IO: DMA (Direct Memory Access/Address)
-		    2x PIA 6821
-		    1x VIS 6522
-		DISPLAY: 5x6 digit 7 or 16 segment display
-		SOUND:	 basically the same as Bally's Squalk & Talk -61 board but missing AY8912 synth chip
+CPU:     2 x M6809, optional M6802 (what for?)
+    INT: IRQ on CPU 0, FIRQ on CPU 1
+IO:      DMA (Direct Memory Access/Address)
+         2x PIA 6821
+         1x VIS 6522
+DISPLAY: 5x6 digit 7 or 16 segment display
+SOUND:   basically the same as Bally's Squalk & Talk -61 board but missing AY8912 synth chip
 */
 
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/genpin.h"

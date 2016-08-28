@@ -505,7 +505,7 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 #define MCFG_SCREEN_PALETTE(_palette_tag) \
 	screen_device::static_set_palette(*device, "^" _palette_tag);
 #define MCFG_SCREEN_NO_PALETTE \
-	screen_device::static_set_palette(*device, FINDER_DUMMY_TAG);
+	screen_device::static_set_palette(*device, finder_base::DUMMY_TAG);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	screen_device::static_set_video_attributes(*device, _flags);
 #define MCFG_SCREEN_COLOR(_color) \

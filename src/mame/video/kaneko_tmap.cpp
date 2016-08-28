@@ -97,8 +97,8 @@ There are more!
 const device_type KANEKO_TMAP = &device_creator<kaneko_view2_tilemap_device>;
 
 kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_TMAP, "Kaneko VIEW2 Tilemaps", tag, owner, clock, "kaneko_view2_tilemap", __FILE__),
-	m_gfxdecode(*this)
+	: device_t(mconfig, KANEKO_TMAP, "Kaneko VIEW2 Tilemaps", tag, owner, clock, "kaneko_view2_tilemap", __FILE__)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	m_invert_flip = 0;
 }
@@ -157,10 +157,16 @@ void kaneko_view2_tilemap_device::device_start()
 	m_vscroll[1] = make_unique_clear<UINT16[]>(0x1000/2);
 	m_regs = make_unique_clear<UINT16[]>(0x20/2);
 
-	m_tmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
-											16,16, 0x20,0x20    );
-	m_tmap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
-											16,16, 0x20,0x20    );
+	m_tmap[0] = &machine().tilemap().create(
+			*m_gfxdecode,
+			tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_0),this),
+			TILEMAP_SCAN_ROWS,
+			16,16, 0x20,0x20);
+	m_tmap[1] = &machine().tilemap().create(
+			*m_gfxdecode,
+			tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_1),this),
+			TILEMAP_SCAN_ROWS,
+			16,16, 0x20,0x20);
 
 	m_tmap[0]->set_transparent_pen(0);
 	m_tmap[1]->set_transparent_pen(0);
