@@ -62,7 +62,6 @@ Incomplete:
       the software list and loading code.
 
 Missing:
-    - Support for floppy disks
     - Other peripherals
 ******************************************************************************/
 
@@ -105,6 +104,10 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (newval)
+	{
+		m_exp->reset();
+	}
 }
 
 static INPUT_PORTS_START( electron )
@@ -228,7 +231,7 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_GENERIC_LOAD(electron_state, electron_cart)
 
 	/* expansion port */
-	MCFG_ELECTRON_EXPANSION_SLOT_ADD("exp", electron_expansion_devices, nullptr)
+	MCFG_ELECTRON_EXPANSION_SLOT_ADD("exp", electron_expansion_devices, "plus3", false)
 	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
 

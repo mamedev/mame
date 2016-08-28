@@ -2,59 +2,56 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    BT Merlin M2105
+    ALA13 - Acorn Plus 3
 
 **********************************************************************/
 
 
-#ifndef __ELECTRON_M2105__
-#define __ELECTRON_M2105__
+#ifndef __ELECTRON_PLUS3__
+#define __ELECTRON_PLUS3__
 
 #include "emu.h"
 #include "exp.h"
-#include "machine/6522via.h"
-#include "machine/mc68681.h"
-#include "machine/input_merger.h"
-#include "sound/tms5220.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/rs232/rs232.h"
+#include "machine/wd_fdc.h"
+#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class electron_m2105_device:
+class electron_plus3_device:
 	public device_t,
 	public device_electron_expansion_interface
-
 {
 public:
 	// construction/destruction
-	electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	DECLARE_WRITE8_MEMBER(wd1770_status_w);
+
 protected:
+	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	required_memory_region m_exp_rom;
-	required_device<via6522_device> m_via6522_0;
-	required_device<via6522_device> m_via6522_1;
-	required_device<mc68681_device> m_duart;
-	required_device<tms5220_device> m_tms;
-	required_device<centronics_device> m_centronics;
-	required_device<input_merger_active_high_device> m_irqs;
+	required_device<wd1770_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+
+	int m_drive_control;
 };
 
 
 // device type definition
-extern const device_type ELECTRON_M2105;
+extern const device_type ELECTRON_PLUS3;
 
 
-#endif /* __ELECTRON_M2105__ */
+#endif /* __ELECTRON_PLUS3__ */
