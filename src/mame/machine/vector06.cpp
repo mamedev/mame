@@ -68,8 +68,8 @@ WRITE8_MEMBER( vector06_state::vector06_color_set )
 
 READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 {
-	UINT16 addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
-	if (m_cart->exists() && addr < m_cart->get_rom_size())
+	UINT16 addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
+	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
 		return m_ay->ay8910_read_ym();

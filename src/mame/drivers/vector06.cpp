@@ -6,7 +6,12 @@
 
         10/07/2008 Preliminary driver.
 
-note: press F12 after initial boot was load (indicated in screen lower part)
+boot from ROM cart:
+ hold F2 then system reset (press F11), then press F12
+
+boot from FDD:
+ press F12 after initial boot was load (indicated in screen lower part)
+ hold Ctrl ("YC" key) during MicroDOS start to format RAM disk (required by some games)
 
 ****************************************************************************/
 
@@ -30,10 +35,10 @@ static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE(vector06_color_set)
 	AM_RANGE( 0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
 	AM_RANGE( 0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)
-	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", fd1793_t, data_r, data_w)
-	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", fd1793_t, sector_r, sector_w)
-	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", fd1793_t, track_r, track_w)
-	AM_RANGE( 0x1b, 0x1b) AM_DEVREADWRITE("wd1793", fd1793_t, status_r, cmd_w)
+	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", kr1818vg93_t, data_r, data_w)
+	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", kr1818vg93_t, sector_r, sector_w)
+	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", kr1818vg93_t, track_r, track_w)
+	AM_RANGE( 0x1b, 0x1b) AM_DEVREADWRITE("wd1793", kr1818vg93_t, status_r, cmd_w)
 	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector06_disc_w)
 ADDRESS_MAP_END
 
@@ -179,7 +184,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_FD1793_ADD("wd1793", XTAL_1MHz)
+	MCFG_KR1818VG93_ADD("wd1793", XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)
