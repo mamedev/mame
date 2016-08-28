@@ -70,7 +70,7 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_region_ptr<UINT8> m_tilerom;
+	required_region_ptr<UINT16> m_tilerom;
 	int m_gfxnum;
 	int m_tilerom_offset;
 	unsigned m_transparent_pen;

@@ -155,37 +155,36 @@ void dooyong_rom_tilemap_device::device_start()
 
 TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 {
-	tilemap_memory_index const offs = adjust_tile_index(tile_index) << 1;
-	unsigned const attr = m_tilerom[m_tilerom_offset + offs];
+	unsigned const attr = m_tilerom[m_tilerom_offset + adjust_tile_index(tile_index)];
 	unsigned code, color, flags;
 	if (BIT(m_registers[6], 5))
 	{   // lastday/gulfstrm/pollux/flytiger
-		/* Tiles take two bytes in ROM:
-		                 MSB   LSB
-		   [offs + 0x00] cCCC CYXc    (bit 9 of gfx code, bits 3-0 of color, Y flip, X flip, bit 8 of gfx code)
-		   [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
-		   c = gfx code
-		   C = color code
-		   X = x flip
-		   Y = y flip */
-		code = m_tilerom[m_tilerom_offset + offs + 1] | (BIT(attr, 0) << 8) | (BIT(attr, 7) << 9);
-		color = m_palette_bank | ((attr >> 3) & 0x0fU);
-		flags = TILE_FLIPYX((attr >> 1) & 0x03U);
+		// Tiles take one word in ROM:
+		// MSB             LSB
+		// cCCC CYXc cccc cccc  (bit 9 of gfx code, bits 3-0 of color, Y flip, X flip, bits 8-0 of gfx code)
+		// c = gfx code
+		// C = color code
+		// X = x flip
+		// Y = y flip
+		code = (BIT(attr, 15) << 9) | (attr & 0x01ff);
+		color = m_palette_bank | ((attr >> 11) & 0x0fU);
+		flags = TILE_FLIPYX((attr >> 9) & 0x03U);
 	}
 	else
 	{   // primella/popbingo
-		/* Tiles take two bytes in ROM:
-		                 MSB   LSB
-		   [offs + 0x00] YXCC CCcc    (Y flip, X flip, bits 3-0 of color code, bits 9-8 of gfx code)
-		   [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
-		   c = gfx code
-		   C = color code
-		   X = x flip
-		   Y = y flip */
-		code = (attr << 8) | m_tilerom[m_tilerom_offset + offs + 1];
-		color = (code & m_primella_color_mask) >> m_primella_color_shift;
-		flags = TILE_FLIPYX((attr >> 6) & 0x03U);
-		code &= m_primella_code_mask;
+		// Tiles take one word in ROM:
+		//          MSB             LSB
+		// primella YXCC CCcc cccc cccc (Y flip, X flip, bits 3-0 of color code, bits 9-0 of gfx code)
+		// popbingo YX?? ?ccc cccc cccc (Y flip, X flip, bits 3-0 of color code, bits 10-0 of gfx code)
+		// rshark   YX?c cccc cccc cccc (Y flip, X flip, bits 3-0 of color code, bits 12-0 of gfx code)
+		// c = gfx code
+		// C = color code
+		// X = x flip
+		// Y = y flip
+		// ? = unused?
+		color = (attr & m_primella_color_mask) >> m_primella_color_shift;
+		flags = TILE_FLIPYX((attr >> 14) & 0x03U);
+		code = attr & m_primella_code_mask;
 	}
 
 	tileinfo.set(m_gfxnum, code, color, flags);
