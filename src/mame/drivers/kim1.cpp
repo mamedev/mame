@@ -248,7 +248,6 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 	MCFG_CASSETTE_INTERFACE ("kim1_cass")
 
-
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", kim1_state, kim1_update_leds, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", kim1_state, kim1_cassette_input, attotime::from_hz(44100))
 
@@ -271,5 +270,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS              INIT  COMPANY             FULLNAME  FLAGS */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS              INIT  COMPANY             FULLNAME  FLAGS
 COMP( 1975, kim1,     0,        0,      kim1,     kim1, driver_device,     0,    "MOS Technologies", "KIM-1" , MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
