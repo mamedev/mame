@@ -903,6 +903,7 @@
 		<description>Birds of Prey</description>
 		<year>1983</year>
 		<publisher>Romik</publisher>
+		<info name="author" value="Clive Webster" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="4781">
 				<rom name="birdsofprey_e.uef" size="4781" crc="bb351757" sha1="0a7e05484605bb7a614614ba3da5a2362c4e170e" offset="0"/>
@@ -948,6 +949,7 @@
 		<description>Blitzkrieg</description>
 		<year>1984</year>
 		<publisher>Software Invasion</publisher>
+		<info name="author" value="Simon Vout" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="11295">
 				<rom name="blitzkrieg_e.uef" size="11295" crc="c0ad9e3a" sha1="ad1a648291ed70842c1866b6c2132ba5870c620b" offset="0"/>
@@ -1037,6 +1039,7 @@
 		<description>Bone Cruncher</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="author" value="Martyn Howard" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="23578">
 				<rom name="bonecruncher_e.uef" size="23578" crc="5db04665" sha1="43e10472909f0aaccb6603ea9939532cb0cf2e66" offset="0"/>
@@ -1639,7 +1642,7 @@
 	</software>
 
 	<software name="comblynxa" cloneof="comblynx">
-		<description>Combat Lynx Alternative)</description>
+		<description>Combat Lynx (Alternative)</description>
 		<year>198?</year>
 		<publisher>Alternative</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2467,7 +2470,7 @@
 	</software>
 
 	<software name="euser101">
-		<description>Electron User Vol.1-1</description>
+		<description>Electron User Vol.1 No.1</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2478,7 +2481,7 @@
 	</software>
 
 	<software name="euser105">
-		<description>Electron User Vol.1-5</description>
+		<description>Electron User Vol.1 No.5</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2489,7 +2492,7 @@
 	</software>
 
 	<software name="euser106">
-		<description>Electron User Vol.1-6</description>
+		<description>Electron User Vol.1 No.6</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2500,7 +2503,7 @@
 	</software>
 
 	<software name="euser107">
-		<description>Electron User Vol.1-7</description>
+		<description>Electron User Vol.1 No.7</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2511,7 +2514,7 @@
 	</software>
 
 	<software name="euser108">
-		<description>Electron User Vol.1-8</description>
+		<description>Electron User Vol.1 No.8</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2522,7 +2525,7 @@
 	</software>
 
 	<software name="euser109">
-		<description>Electron User Vol.1-9</description>
+		<description>Electron User Vol.1 No.9</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2533,7 +2536,7 @@
 	</software>
 
 	<software name="euser110">
-		<description>Electron User Vol.1-10</description>
+		<description>Electron User Vol.1 No.10</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2544,7 +2547,7 @@
 	</software>
 
 	<software name="euser111">
-		<description>Electron User Vol.1-11</description>
+		<description>Electron User Vol.1 No.11</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2555,7 +2558,7 @@
 	</software>
 
 	<software name="euser112">
-		<description>Electron User Vol.1-12</description>
+		<description>Electron User Vol.1 No.12</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2566,7 +2569,7 @@
 	</software>
 
 	<software name="euser201">
-		<description>Electron User Vol.2-1</description>
+		<description>Electron User Vol.2 No.1</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2577,7 +2580,7 @@
 	</software>
 
 	<software name="euser202">
-		<description>Electron User Vol.2-2</description>
+		<description>Electron User Vol.2 No.2</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2588,7 +2591,7 @@
 	</software>
 
 	<software name="euser203">
-		<description>Electron User Vol.2-3</description>
+		<description>Electron User Vol.2 No.3</description>
 		<year>1984</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2599,7 +2602,7 @@
 	</software>
 
 	<software name="euser204">
-		<description>Electron User Vol.2-4</description>
+		<description>Electron User Vol.2 No.4</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2610,7 +2613,7 @@
 	</software>
 
 	<software name="euser205">
-		<description>Electron User Vol.2-5</description>
+		<description>Electron User Vol.2 No.5</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2621,7 +2624,7 @@
 	</software>
 
 	<software name="euser206">
-		<description>Electron User Vol.2-6</description>
+		<description>Electron User Vol.2 No.6</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2632,7 +2635,7 @@
 	</software>
 
 	<software name="euser207">
-		<description>Electron User Vol.2-7</description>
+		<description>Electron User Vol.2 No.7</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2643,7 +2646,7 @@
 	</software>
 
 	<software name="euser208">
-		<description>Electron User Vol.2-8</description>
+		<description>Electron User Vol.2 No.8</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2654,7 +2657,7 @@
 	</software>
 
 	<software name="euser209">
-		<description>Electron User Vol.2-9</description>
+		<description>Electron User Vol.2 No.9</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2665,7 +2668,7 @@
 	</software>
 
 	<software name="euser210">
-		<description>Electron User Vol.2-10</description>
+		<description>Electron User Vol.2 No.10</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2676,7 +2679,7 @@
 	</software>
 
 	<software name="euser211">
-		<description>Electron User Vol.2-11</description>
+		<description>Electron User Vol.2 No.11</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2687,7 +2690,7 @@
 	</software>
 
 	<software name="euser212">
-		<description>Electron User Vol.2-12</description>
+		<description>Electron User Vol.2 No.12</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2698,7 +2701,7 @@
 	</software>
 
 	<software name="euser301">
-		<description>Electron User Vol.3-1</description>
+		<description>Electron User Vol.3 No.1</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2709,7 +2712,7 @@
 	</software>
 
 	<software name="euser302">
-		<description>Electron User Vol.3-2</description>
+		<description>Electron User Vol.3 No.2</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2720,7 +2723,7 @@
 	</software>
 
 	<software name="euser303">
-		<description>Electron User Vol.3-3</description>
+		<description>Electron User Vol.3 No.3</description>
 		<year>1985</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2731,7 +2734,7 @@
 	</software>
 
 	<software name="euser304">
-		<description>Electron User Vol.3-4</description>
+		<description>Electron User Vol.3 No.4</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2742,7 +2745,7 @@
 	</software>
 
 	<software name="euser305">
-		<description>Electron User Vol.3-5</description>
+		<description>Electron User Vol.3 No.5</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2753,7 +2756,7 @@
 	</software>
 
 	<software name="euser306">
-		<description>Electron User Vol.3-6</description>
+		<description>Electron User Vol.3 No.6</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2764,7 +2767,7 @@
 	</software>
 
 	<software name="euser307">
-		<description>Electron User Vol.3-7</description>
+		<description>Electron User Vol.3 No.7</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2775,7 +2778,7 @@
 	</software>
 
 	<software name="euser308">
-		<description>Electron User Vol.3-8</description>
+		<description>Electron User Vol.3 No.8</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2786,7 +2789,7 @@
 	</software>
 
 	<software name="euser309">
-		<description>Electron User Vol.3-9</description>
+		<description>Electron User Vol.3 No.9</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2797,7 +2800,7 @@
 	</software>
 
 	<software name="euser310">
-		<description>Electron User Vol.3-10</description>
+		<description>Electron User Vol.3 No.10</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2808,7 +2811,7 @@
 	</software>
 
 	<software name="euser311">
-		<description>Electron User Vol.3-11</description>
+		<description>Electron User Vol.3 No.11</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2819,7 +2822,7 @@
 	</software>
 
 	<software name="euser312">
-		<description>Electron User Vol.3-12</description>
+		<description>Electron User Vol.3 No.12</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2830,7 +2833,7 @@
 	</software>
 
 	<software name="euser401">
-		<description>Electron User Vol.4-1</description>
+		<description>Electron User Vol.4 No.1</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2841,7 +2844,7 @@
 	</software>
 
 	<software name="euser402">
-		<description>Electron User Vol.4-2</description>
+		<description>Electron User Vol.4 No.2</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2852,7 +2855,7 @@
 	</software>
 
 	<software name="euser403">
-		<description>Electron User Vol.4-3</description>
+		<description>Electron User Vol.4 No.3</description>
 		<year>1986</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2863,7 +2866,7 @@
 	</software>
 
 	<software name="euser404">
-		<description>Electron User Vol.4-4</description>
+		<description>Electron User Vol.4 No.4</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2874,7 +2877,7 @@
 	</software>
 
 	<software name="euser405">
-		<description>Electron User Vol.4-5</description>
+		<description>Electron User Vol.4 No.5</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2885,7 +2888,7 @@
 	</software>
 
 	<software name="euser406">
-		<description>Electron User Vol.4-6</description>
+		<description>Electron User Vol.4 No.6</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2896,7 +2899,7 @@
 	</software>
 
 	<software name="euser407">
-		<description>Electron User Vol.4-7</description>
+		<description>Electron User Vol.4 No.7</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2907,7 +2910,7 @@
 	</software>
 
 	<software name="euser408">
-		<description>Electron User Vol.4-8</description>
+		<description>Electron User Vol.4 No.8</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2918,7 +2921,7 @@
 	</software>
 
 	<software name="euser409">
-		<description>Electron User Vol.4-9</description>
+		<description>Electron User Vol.4 No.9</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2929,7 +2932,7 @@
 	</software>
 
 	<software name="euser410">
-		<description>Electron User Vol.4-10</description>
+		<description>Electron User Vol.4 No.10</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2940,7 +2943,7 @@
 	</software>
 
 	<software name="euser411">
-		<description>Electron User Vol.4-11</description>
+		<description>Electron User Vol.4 No.11</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2951,7 +2954,7 @@
 	</software>
 
 	<software name="euser412">
-		<description>Electron User Vol.4-12</description>
+		<description>Electron User Vol.4 No.12</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2962,7 +2965,7 @@
 	</software>
 
 	<software name="euser501">
-		<description>Electron User Vol.5-1</description>
+		<description>Electron User Vol.5 No.1</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2973,7 +2976,7 @@
 	</software>
 
 	<software name="euser502">
-		<description>Electron User Vol.5-2</description>
+		<description>Electron User Vol.5 No.2</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2984,7 +2987,7 @@
 	</software>
 
 	<software name="euser503">
-		<description>Electron User Vol.5-3</description>
+		<description>Electron User Vol.5 No.3</description>
 		<year>1987</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2995,7 +2998,7 @@
 	</software>
 
 	<software name="euser504">
-		<description>Electron User Vol.5-4</description>
+		<description>Electron User Vol.5 No.4</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3006,7 +3009,7 @@
 	</software>
 
 	<software name="euser505">
-		<description>Electron User Vol.5-5</description>
+		<description>Electron User Vol.5 No.5</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3017,7 +3020,7 @@
 	</software>
 
 	<software name="euser506">
-		<description>Electron User Vol.5-6</description>
+		<description>Electron User Vol.5 No.6</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3028,7 +3031,7 @@
 	</software>
 
 	<software name="euser507">
-		<description>Electron User Vol.5-7</description>
+		<description>Electron User Vol.5 No.7</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3039,7 +3042,7 @@
 	</software>
 
 	<software name="euser508">
-		<description>Electron User Vol.5-8</description>
+		<description>Electron User Vol.5 No.8</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3050,7 +3053,7 @@
 	</software>
 
 	<software name="euser509">
-		<description>Electron User Vol.5-9</description>
+		<description>Electron User Vol.5 No.9</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3061,7 +3064,7 @@
 	</software>
 
 	<software name="euser510">
-		<description>Electron User Vol.5-10</description>
+		<description>Electron User Vol.5 No.10</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3072,7 +3075,7 @@
 	</software>
 
 	<software name="euser511">
-		<description>Electron User Vol.5-11</description>
+		<description>Electron User Vol.5 No.11</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3083,7 +3086,7 @@
 	</software>
 
 	<software name="euser512">
-		<description>Electron User Vol.5-12</description>
+		<description>Electron User Vol.5 No.12</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3094,7 +3097,7 @@
 	</software>
 
 	<software name="euser601">
-		<description>Electron User Vol.6-1</description>
+		<description>Electron User Vol.6 No.1</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3105,7 +3108,7 @@
 	</software>
 
 	<software name="euser602">
-		<description>Electron User Vol.6-2</description>
+		<description>Electron User Vol.6 No.2</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3116,7 +3119,7 @@
 	</software>
 
 	<software name="euser603">
-		<description>Electron User Vol.6-3</description>
+		<description>Electron User Vol.6 No.3</description>
 		<year>1988</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3127,7 +3130,7 @@
 	</software>
 
 	<software name="euser604">
-		<description>Electron User Vol.6-4</description>
+		<description>Electron User Vol.6 No.4</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3138,7 +3141,7 @@
 	</software>
 
 	<software name="euser605">
-		<description>Electron User Vol.6-5</description>
+		<description>Electron User Vol.6 No.5</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3149,7 +3152,7 @@
 	</software>
 
 	<software name="euser606">
-		<description>Electron User Vol.6-6</description>
+		<description>Electron User Vol.6 No.6</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3160,7 +3163,7 @@
 	</software>
 
 	<software name="euser607">
-		<description>Electron User Vol.6-7</description>
+		<description>Electron User Vol.6 No.7</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3171,7 +3174,7 @@
 	</software>
 
 	<software name="euser608">
-		<description>Electron User Vol.6-8</description>
+		<description>Electron User Vol.6 No.8</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3182,7 +3185,7 @@
 	</software>
 
 	<software name="euser609">
-		<description>Electron User Vol.6-9</description>
+		<description>Electron User Vol.6 No.9</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3193,7 +3196,7 @@
 	</software>
 
 	<software name="euser610">
-		<description>Electron User Vol.6-10</description>
+		<description>Electron User Vol.6 No.10</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3204,7 +3207,7 @@
 	</software>
 
 	<software name="euser611">
-		<description>Electron User Vol.6-11</description>
+		<description>Electron User Vol.6 No.11</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3215,7 +3218,7 @@
 	</software>
 
 	<software name="euser612">
-		<description>Electron User Vol.6-12</description>
+		<description>Electron User Vol.6 No.12</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3226,7 +3229,7 @@
 	</software>
 
 	<software name="euser701">
-		<description>Electron User Vol.7-1</description>
+		<description>Electron User Vol.7 No.1</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3237,7 +3240,7 @@
 	</software>
 
 	<software name="euser702">
-		<description>Electron User Vol.7-2</description>
+		<description>Electron User Vol.7 No.2</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3248,7 +3251,7 @@
 	</software>
 
 	<software name="euser703">
-		<description>Electron User Vol.7-3</description>
+		<description>Electron User Vol.7 No.3</description>
 		<year>1989</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3259,7 +3262,7 @@
 	</software>
 
 	<software name="euser704">
-		<description>Electron User Vol.7-4</description>
+		<description>Electron User Vol.7 No.4</description>
 		<year>1990</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3270,7 +3273,7 @@
 	</software>
 
 	<software name="euser705">
-		<description>Electron User Vol.7-5</description>
+		<description>Electron User Vol.7 No.5</description>
 		<year>1990</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3281,7 +3284,7 @@
 	</software>
 
 	<software name="euser706">
-		<description>Electron User Vol.7-6</description>
+		<description>Electron User Vol.7 No.6</description>
 		<year>1990</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3292,7 +3295,7 @@
 	</software>
 
 	<software name="euser707">
-		<description>Electron User Vol.7-7</description>
+		<description>Electron User Vol.7 No.7</description>
 		<year>1990</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3303,7 +3306,7 @@
 	</software>
 
 	<software name="euser708">
-		<description>Electron User Vol.7-8</description>
+		<description>Electron User Vol.7 No.8</description>
 		<year>1990</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3314,7 +3317,7 @@
 	</software>
 
 	<software name="euser709">
-		<description>Electron User Vol.7-9</description>
+		<description>Electron User Vol.7 No.9</description>
 		<year>1990</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3325,7 +3328,7 @@
 	</software>
 
 	<software name="euser710">
-		<description>Electron User Vol.7-10</description>
+		<description>Electron User Vol.7 No.10</description>
 		<year>1990</year>
 		<publisher>Electron User</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3339,6 +3342,7 @@
 		<description>Elite</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Ian Bell and David Braben" />
 		<info name="release" value="SLG38" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="24486">
@@ -3351,6 +3355,7 @@
 		<description>Elite (Superior Software)</description>
 		<year>1986</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="author" value="Ian Bell and David Braben" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="24515">
 				<rom name="elite-srr_e.uef" size="24515" crc="daa78649" sha1="ae2e718087151fbd56275c8bf1611adaf03d8a6c" offset="0"/>
@@ -3863,7 +3868,7 @@
 		</part>
 	</software>
 
-	<software name="fstein2k">
+	<software name="frnk2000au" cloneof="frnk2000">
 		<description>Frankenstein 2000 (Audiogenic)</description>
 		<year>198?</year>
 		<publisher>Audiogenic</publisher>
@@ -4414,7 +4419,7 @@
 
 	<software name="harerais">
 		<description>Hareraiser (Prelude)</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Haresoft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="6455">
@@ -4596,6 +4601,7 @@
 		<description>Hopper</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Neil Raine" />
 		<info name="release" value="SLG23" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="8360">
@@ -4608,6 +4614,7 @@
 		<description>Hopper (Play It Again Sam 6)</description>
 		<year>1989</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="author" value="Neil Raine" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="11804">
 				<rom name="hopper-piasrr_e.uef" size="11804" crc="a3e8dc48" sha1="652a55eec44233ef3025ac5af748aee196880498" offset="0"/>
@@ -5934,7 +5941,7 @@
 		</part>
 	</software>
 
-	<software name="mraidpia">
+	<software name="moonraidpias" cloneof="moonraid">
 		<description>Moon Raider (Play It Again Sam 5)</description>
 		<year>1989</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -7872,6 +7879,7 @@
 		<description>Sphinx Adventure</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Paul Fellows" />
 		<info name="release" value="SLG07" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="11661">
@@ -9502,19 +9510,19 @@
 	</software>
 
 	<software name="triple1">
-		<description>Triple Decker 1</description>
+		<description>Triple Decker 1: Grand Prix, Day at the Races &amp; Manic Mole</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Day at the Races"/>
-			<dataarea name="cass" size="3758">
-				<rom name="td1-dayattheraces_be.uef" size="3758" crc="98ad60b1" sha1="33b518d6ff7bf6aaadcd8fcbc93dcbbe8bb8288a" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Grand Prix"/>
 			<dataarea name="cass" size="3106">
 				<rom name="td1-grandprix_be.uef" size="3106" crc="d1d4d48d" sha1="19afd5ee6c65f59502b34cf1a486b801cb9e619c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="electron_cass">
+			<feature name="part_id" value="Day at the Races"/>
+			<dataarea name="cass" size="3758">
+				<rom name="td1-dayattheraces_be.uef" size="3758" crc="98ad60b1" sha1="33b518d6ff7bf6aaadcd8fcbc93dcbbe8bb8288a" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="electron_cass">
@@ -9526,19 +9534,19 @@
 	</software>
 
 	<software name="triple2">
-		<description>Triple Decker 2</description>
+		<description>Triple Decker 2: Invasion Force, Haunted &amp; Parachute</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Haunted House"/>
-			<dataarea name="cass" size="6341">
-				<rom name="td2-hauntedhouse_be.uef" size="6341" crc="f220a044" sha1="974000aaf52ca543d8abee93a5dde9a7cad7c9d9" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Invasion Force"/>
 			<dataarea name="cass" size="3817">
 				<rom name="td2-invasionforce_be.uef" size="3817" crc="1bc8de92" sha1="390a98f4ed21f804e42fdded33cc47f89dae5845" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="electron_cass">
+			<feature name="part_id" value="Haunted House"/>
+			<dataarea name="cass" size="6341">
+				<rom name="td2-hauntedhouse_be.uef" size="6341" crc="f220a044" sha1="974000aaf52ca543d8abee93a5dde9a7cad7c9d9" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="electron_cass">
@@ -9550,61 +9558,61 @@
 	</software>
 
 	<software name="triple3">
-		<description>Triple Decker 3</description>
+		<description>Triple Decker 3: Lunar Invasion, Jam Butty &amp; Lander</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Jam Butty"/>
-			<dataarea name="cass" size="4959">
-				<rom name="td3-jambutty_be.uef" size="4959" crc="e104ea68" sha1="1ece0e663d567593feec80c1e111fd308b5040d0" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="electron_cass">
-			<feature name="part_id" value="Lander"/>
-			<dataarea name="cass" size="2425">
-				<rom name="td3-lander_be.uef" size="2425" crc="556dfa34" sha1="02c14af7ac4582841c4a23dca80e028d5c2c8c87" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="cass3" interface="electron_cass">
 			<feature name="part_id" value="Lunar Invasion"/>
 			<dataarea name="cass" size="5597">
 				<rom name="td3-lunarinvasion_be.uef" size="5597" crc="86ff28d6" sha1="086319c9695ee8d5ed1ffa8962bf5a7f5d76c2be" offset="0"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="triple4">
-		<description>Triple Decker 4</description>
-		<year>1988</year>
-		<publisher>Alternative</publisher>
-		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Fishing"/>
-			<dataarea name="cass" size="4316">
-				<rom name="td4-fishing_be.uef" size="4316" crc="30128ecd" sha1="4c1ae505585158c2e408d645ca7bcae78d00a3d7" offset="0"/>
-			</dataarea>
-		</part>
 		<part name="cass2" interface="electron_cass">
-			<feature name="part_id" value="Golf"/>
-			<dataarea name="cass" size="2959">
-				<rom name="td4-golf_be.uef" size="2959" crc="adaf81b4" sha1="9b3f2ec7cce0d758ee0c5f3a68ab936ee38e2f86" offset="0"/>
+			<feature name="part_id" value="Jam Butty"/>
+			<dataarea name="cass" size="4959">
+				<rom name="td3-jambutty_be.uef" size="4959" crc="e104ea68" sha1="1ece0e663d567593feec80c1e111fd308b5040d0" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="electron_cass">
+			<feature name="part_id" value="Lander"/>
+			<dataarea name="cass" size="2425">
+				<rom name="td3-lander_be.uef" size="2425" crc="556dfa34" sha1="02c14af7ac4582841c4a23dca80e028d5c2c8c87" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triple4">
+		<description>Triple Decker 4: Howzat!, Fishing &amp; Golf</description>
+		<year>1988</year>
+		<publisher>Alternative</publisher>
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Howzat"/>
 			<dataarea name="cass" size="5319">
 				<rom name="td4-howzat_be.uef" size="5319" crc="27b76b55" sha1="af52dd65256abcdf88891fee936ee673c4e300c5" offset="0"/>
 			</dataarea>
 		</part>
+		<part name="cass2" interface="electron_cass">
+			<feature name="part_id" value="Fishing"/>
+			<dataarea name="cass" size="4316">
+				<rom name="td4-fishing_be.uef" size="4316" crc="30128ecd" sha1="4c1ae505585158c2e408d645ca7bcae78d00a3d7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="electron_cass">
+			<feature name="part_id" value="Golf"/>
+			<dataarea name="cass" size="2959">
+				<rom name="td4-golf_be.uef" size="2959" crc="adaf81b4" sha1="9b3f2ec7cce0d758ee0c5f3a68ab936ee38e2f86" offset="0"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="triple5">
-		<description>Triple Decker 5</description>
+		<description>Triple Decker 5: Star Fight, Skramble &amp; Karate Warrior</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Karate Warrior"/>
-			<dataarea name="cass" size="5631">
-				<rom name="td5-karatewarrior_be.uef" size="5631" crc="121a519d" sha1="6e321d160e5ceb3757d76cdf59b7169770b074b5" offset="0"/>
+			<feature name="part_id" value="Star Fight"/>
+			<dataarea name="cass" size="4024">
+				<rom name="td5-starfight_be.uef" size="4024" crc="b9f6cd6e" sha1="9986a532523f0faef807ba21bf32a4e12273f99f" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="electron_cass">
@@ -9614,39 +9622,39 @@
 			</dataarea>
 		</part>
 		<part name="cass3" interface="electron_cass">
-			<feature name="part_id" value="Starfight"/>
-			<dataarea name="cass" size="4024">
-				<rom name="td5-starfight_be.uef" size="4024" crc="b9f6cd6e" sha1="9986a532523f0faef807ba21bf32a4e12273f99f" offset="0"/>
+			<feature name="part_id" value="Karate Warrior"/>
+			<dataarea name="cass" size="5631">
+				<rom name="td5-karatewarrior_be.uef" size="5631" crc="121a519d" sha1="6e321d160e5ceb3757d76cdf59b7169770b074b5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="triple6">
-		<description>Triple Decker 6</description>
+		<description>Triple Decker 6: Cavern Capers, Snap Dragon &amp; Castle of Sand</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Castles of Sand"/>
-			<dataarea name="cass" size="5703">
-				<rom name="td6-castleofsands_be.uef" size="5703" crc="20827c9f" sha1="ea22fe3dd338cc52e58bdcd2b23b6edd6f704cdb" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Cavern Capers"/>
 			<dataarea name="cass" size="6890">
 				<rom name="td6-caverncapers_be.uef" size="6890" crc="fa93f549" sha1="b5da4f0c96019a705449e878114bac314ee330e3" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass3" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Snap Dragon"/>
 			<dataarea name="cass" size="4171">
 				<rom name="td6-snapdragon_be.uef" size="4171" crc="6d9369b9" sha1="428ef9cd739290973b4954653855528f0252a3f2" offset="0"/>
 			</dataarea>
 		</part>
+		<part name="cass3" interface="electron_cass">
+			<feature name="part_id" value="Castles of Sand"/>
+			<dataarea name="cass" size="5703">
+				<rom name="td6-castleofsands_be.uef" size="5703" crc="20827c9f" sha1="ea22fe3dd338cc52e58bdcd2b23b6edd6f704cdb" offset="0"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="triple7">
-		<description>Triple Decker 7</description>
+		<description>Triple Decker 7: Atom Smash, Knockout &amp; Reaction Tester</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
@@ -9670,31 +9678,31 @@
 	</software>
 
 	<software name="triple8">
-		<description>Triple Decker 8</description>
+		<description>Triple Decker 8: Grebit, Mr Freeze &amp; Fruit Worm</description>
 		<year>198?</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Fruit Worm"/>
-			<dataarea name="cass1" size="5785">
-				<rom name="td8-fruitworm_e.uef" size="5785" crc="1a78cd86" sha1="6dda88bc98a7a8a1a5b9cec194b0b2815e644c65" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Grebit"/>
-			<dataarea name="cass2" size="6664">
+			<dataarea name="cass" size="6664">
 				<rom name="td8-grebit_e.uef" size="6664" crc="d584cdf0" sha1="a5e2177d1380079b9b31b69da3daff9475be68f5" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass3" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Mr Freeze"/>
-			<dataarea name="cass3" size="5484">
+			<dataarea name="cass" size="5484">
 				<rom name="td8-mrfreeze_e.uef" size="5484" crc="4b4994e8" sha1="8bf14738dbeef8ac91191706649d80e54d2b4f12" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="electron_cass">
+			<feature name="part_id" value="Fruit Worm"/>
+			<dataarea name="cass" size="5785">
+				<rom name="td8-fruitworm_e.uef" size="5785" crc="1a78cd86" sha1="6dda88bc98a7a8a1a5b9cec194b0b2815e644c65" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="triple9">
-		<description>Triple Decker 09</description>
+		<description>Triple Decker 9: Break Free, Missile Jammer &amp; Code Breaker</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
@@ -9704,27 +9712,27 @@
 			</dataarea>
 		</part>
 		<part name="cass2" interface="electron_cass">
-			<feature name="part_id" value="Code Breaker"/>
-			<dataarea name="cass" size="2108">
-				<rom name="td9-codebreaker_be.uef" size="2108" crc="b260db2f" sha1="b1593a47c0c991b92099a4083175e375b2e49222" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="cass3" interface="electron_cass">
 			<feature name="part_id" value="Missile Jammer"/>
 			<dataarea name="cass" size="3223">
 				<rom name="td9-missilejammer_be.uef" size="3223" crc="8b5553da" sha1="f60628e9bf0e3d39af0767cee37750c10db37e4a" offset="0"/>
 			</dataarea>
 		</part>
+		<part name="cass3" interface="electron_cass">
+			<feature name="part_id" value="Code Breaker"/>
+			<dataarea name="cass" size="2108">
+				<rom name="td9-codebreaker_be.uef" size="2108" crc="b260db2f" sha1="b1593a47c0c991b92099a4083175e375b2e49222" offset="0"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="triple10">
-		<description>Triple Decker 10</description>
+		<description>Triple Decker 10: Rockfall, Money Maze &amp; Bunny Blitz</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Bunny Blitz"/>
-			<dataarea name="cass" size="1660">
-				<rom name="td10-bunnyblitz_be.uef" size="1660" crc="99f1a92b" sha1="abecf28d379e97dd2b436996713a16e995e75d6d" offset="0"/>
+			<feature name="part_id" value="Rock Fall"/>
+			<dataarea name="cass" size="5148">
+				<rom name="td10-rockfall_be.uef" size="5148" crc="50d5a42c" sha1="e56ccb7cead9a85a9b789df1f63b7e698dfce298" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="electron_cass">
@@ -9734,9 +9742,9 @@
 			</dataarea>
 		</part>
 		<part name="cass3" interface="electron_cass">
-			<feature name="part_id" value="Rock Fall"/>
-			<dataarea name="cass" size="5148">
-				<rom name="td10-rockfall_be.uef" size="5148" crc="50d5a42c" sha1="e56ccb7cead9a85a9b789df1f63b7e698dfce298" offset="0"/>
+			<feature name="part_id" value="Bunny Blitz"/>
+			<dataarea name="cass" size="1660">
+				<rom name="td10-bunnyblitz_be.uef" size="1660" crc="99f1a92b" sha1="abecf28d379e97dd2b436996713a16e995e75d6d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
