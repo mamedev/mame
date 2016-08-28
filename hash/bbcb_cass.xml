@@ -951,17 +951,6 @@
 		</part>
 	</software>
 
-	<software name="atomsmas">
-		<description>Atom Smasher</description>
-		<year>1983</year>
-		<publisher>Romik</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="4572">
-				<rom name="atomsmasher(1983)(romik).uef" size="4572" crc="80f9484c" sha1="6be2cffc1aa05f9396618efcb8525725f3f1f1be" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alphacen">
 		<description>Attack on Alpha Centauri</description>
 		<year>1983</year>
@@ -1411,6 +1400,7 @@
 		<description>Birds of Prey</description>
 		<year>1983</year>
 		<publisher>Romik</publisher>
+		<info name="author" value="Clive Webster" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4192">
 				<rom name="birdsofprey(1983)(romik).uef" size="4192" crc="8c9e7abd" sha1="884f8830c9ec21070ab75edbd9d7d4de252c0269" offset="0" />
@@ -1456,6 +1446,7 @@
 		<description>Blitzkrieg</description>
 		<year>1984</year>
 		<publisher>Software Invasion</publisher>
+		<info name="author" value="Simon Vout" />
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Original"/>
 			<dataarea name="cass" size="17412">
@@ -1632,6 +1623,7 @@
 		<description>Bone Cruncher (Play It Again Sam 7)</description>
 		<year>1989</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="author" value="Martyn Howard" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="39351">
 				<rom name="bonecruncher-piasrr(1989)(superior).uef" size="39351" crc="0583cf9f" sha1="d7c787af3751a73e733fb492b0df29ef4f47fbab" offset="0" />
@@ -1643,6 +1635,7 @@
 		<description>Bone Cruncher</description>
 		<year>1987</year>
 		<publisher>Superior Software</publisher>
+		<info name="author" value="Martyn Howard" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="39942">
 				<rom name="bonecruncher(1987)(superior).hq.uef" size="39942" crc="8a58ee25" sha1="636b48be4778819889edf6ad5e6270f69c68cf22" offset="0" />
@@ -1996,6 +1989,7 @@
 		<description>Carousel</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="David Shepherd" />
 		<info name="release" value="SBG24" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10211">
@@ -2237,7 +2231,7 @@
 	</software>
 
 	<software name="champion">
-		<description>Champions</description>
+		<description>Champions!</description>
 		<year>198?</year>
 		<publisher>Peaksoft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -2642,7 +2636,7 @@
 	</software>
 
 	<software name="colos4br">
-		<description>Colossus Bridge 4</description>
+		<description>Colossus Bridge 4.0</description>
 		<year>1988</year>
 		<publisher>CDS</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -2653,7 +2647,7 @@
 	</software>
 
 	<software name="colos4ch">
-		<description>Colossus Chess 4</description>
+		<description>Colossus Chess 4.0</description>
 		<year>1986</year>
 		<publisher>CDS</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -2953,7 +2947,7 @@
 	</software>
 
 	<software name="copsnrob">
-		<description>Cops n Robbers</description>
+		<description>Cops n' Robbers</description>
 		<year>1987</year>
 		<publisher>Atlantis</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -4184,6 +4178,7 @@
 		<description>Elite (Superior Software)</description>
 		<year>1986</year>
 		<publisher>Superior Software</publisher>
+		<info name="author" value="Ian Bell and David Braben" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26126">
 				<rom name="elite-srr(1986)(superior)(g38).uef" size="26126" crc="15c3c66c" sha1="907877ec62ca0217ba95292a8e6227721401cc1f" offset="0" />
@@ -4195,6 +4190,7 @@
 		<description>Elite</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Ian Bell and David Braben" />
 		<info name="release" value="SBG38" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="27174">
@@ -5979,7 +5975,7 @@
 	</software>
 
 	<software name="highrise">
-		<description>High Rise Horror</description>
+		<description>High-Rise Horror</description>
 		<year>1984</year>
 		<publisher>Virgin Games</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -5990,7 +5986,7 @@
 	</software>
 
 	<software name="hiqquiz">
-		<description>Hi-Q Quiz</description>
+		<description>Hi-Q-Quiz</description>
 		<year>1989</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -6115,6 +6111,7 @@
 		<description>Hopper v2.1</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Neil Raine" />
 		<info name="release" value="SBG23" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8395">
@@ -6127,6 +6124,7 @@
 		<description>Hopper v2.2</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Neil Raine" />
 		<info name="release" value="SBG23" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8397">
@@ -7771,7 +7769,7 @@
 
 	<software name="mayday">
 		<description>Mayday</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>Bevan Technology</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6836">
@@ -11030,7 +11028,7 @@
 	</software>
 
 	<software name="slickerp">
-		<description>Slicker Puzzle</description>
+		<description>The Slicker Puzzle</description>
 		<year>198?</year>
 		<publisher>DK'Tronics</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -11564,7 +11562,7 @@
 	</software>
 
 	<software name="spectape">
-		<description>Spectapede</description>
+		<description>Spectipede</description>
 		<year>198?</year>
 		<publisher>Mastertronic</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -11641,6 +11639,7 @@
 		<description>Sphinx Adventure</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Paul Fellows" />
 		<info name="release" value="SBG07" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14688">
@@ -12370,6 +12369,7 @@
 		<description>Super-7</description>
 		<year>1983</year>
 		<publisher>DACC</publisher>
+		<info name="usage" value="PAGE=&amp;1200 CH.&quot;&quot;" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17337">
 				<rom name="super7(dacc).uef" size="17337" crc="318f078c" sha1="b2a2a7d46555ef2528eb2bad77281f8c320eac4c" offset="0" />
@@ -12425,6 +12425,7 @@
 		<description>Super Invaders</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Geoffrey J Crammond" />
 		<info name="release" value="SBG16" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6377">
@@ -13443,13 +13444,13 @@
 	</software>
 
 	<software name="triple10">
-		<description>Triple Decker 10</description>
+		<description>Triple Decker 10: Rockfall, Money Maze &amp; Bunny Blitz</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Bunny Blitz"/>
-			<dataarea name="cass" size="1660">
-				<rom name="td10-bunnyblitz_be(1988)(alternative).uef" size="1660" crc="99f1a92b" sha1="abecf28d379e97dd2b436996713a16e995e75d6d" offset="0" />
+			<feature name="part_id" value="Rock Fall"/>
+			<dataarea name="cass" size="5148">
+				<rom name="td10-rockfall_be(1988)(alternative).uef" size="5148" crc="50d5a42c" sha1="e56ccb7cead9a85a9b789df1f63b7e698dfce298" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
@@ -13459,27 +13460,27 @@
 			</dataarea>
 		</part>
 		<part name="cass3" interface="bbc_cass">
-			<feature name="part_id" value="Rock Fall"/>
-			<dataarea name="cass" size="5148">
-				<rom name="td10-rockfall_be(1988)(alternative).uef" size="5148" crc="50d5a42c" sha1="e56ccb7cead9a85a9b789df1f63b7e698dfce298" offset="0" />
+			<feature name="part_id" value="Bunny Blitz"/>
+			<dataarea name="cass" size="1660">
+				<rom name="td10-bunnyblitz_be(1988)(alternative).uef" size="1660" crc="99f1a92b" sha1="abecf28d379e97dd2b436996713a16e995e75d6d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="triple1">
-		<description>Triple Decker 1</description>
+		<description>Triple Decker 1: Grand Prix, Day at the Races &amp; Manic Mole</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Day at the Races"/>
-			<dataarea name="cass" size="3758">
-				<rom name="td1-dayattheraces_be(1988)(alternative).uef" size="3758" crc="98ad60b1" sha1="33b518d6ff7bf6aaadcd8fcbc93dcbbe8bb8288a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Grand Prix"/>
 			<dataarea name="cass" size="3106">
 				<rom name="td1-grandprix_be(1988)(alternative).uef" size="3106" crc="d1d4d48d" sha1="19afd5ee6c65f59502b34cf1a486b801cb9e619c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Day at the Races"/>
+			<dataarea name="cass" size="3758">
+				<rom name="td1-dayattheraces_be(1988)(alternative).uef" size="3758" crc="98ad60b1" sha1="33b518d6ff7bf6aaadcd8fcbc93dcbbe8bb8288a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="bbc_cass">
@@ -13491,19 +13492,19 @@
 	</software>
 
 	<software name="triple2">
-		<description>Triple Decker 2</description>
+		<description>Triple Decker 2: Invasion Force, Haunted &amp; Parachute</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Haunted House"/>
-			<dataarea name="cass" size="6341">
-				<rom name="td2-hauntedhouse_be(1988)(alternative).uef" size="6341" crc="f220a044" sha1="974000aaf52ca543d8abee93a5dde9a7cad7c9d9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Invasion Force"/>
 			<dataarea name="cass" size="3817">
 				<rom name="td2-invasionforce_be(1988)(alternative).uef" size="3817" crc="1bc8de92" sha1="390a98f4ed21f804e42fdded33cc47f89dae5845" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Haunted House"/>
+			<dataarea name="cass" size="6341">
+				<rom name="td2-hauntedhouse_be(1988)(alternative).uef" size="6341" crc="f220a044" sha1="974000aaf52ca543d8abee93a5dde9a7cad7c9d9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="bbc_cass">
@@ -13515,61 +13516,61 @@
 	</software>
 
 	<software name="triple3">
-		<description>Triple Decker 3</description>
+		<description>Triple Decker 3: Lunar Invasion, Jam Butty &amp; Lander</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Jam Butty"/>
-			<dataarea name="cass" size="4959">
-				<rom name="td3-jambutty_be(1988)(alternative).uef" size="4959" crc="e104ea68" sha1="1ece0e663d567593feec80c1e111fd308b5040d0" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="bbc_cass">
-			<feature name="part_id" value="Lander"/>
-			<dataarea name="cass" size="2425">
-				<rom name="td3-lander_be(1988)(alternative).uef" size="2425" crc="556dfa34" sha1="02c14af7ac4582841c4a23dca80e028d5c2c8c87" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="bbc_cass">
 			<feature name="part_id" value="Lunar Invasion"/>
 			<dataarea name="cass" size="5597">
 				<rom name="td3-lunarinvasion_be(1988)(alternative).uef" size="5597" crc="86ff28d6" sha1="086319c9695ee8d5ed1ffa8962bf5a7f5d76c2be" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="triple4">
-		<description>Triple Decker 4</description>
-		<year>1988</year>
-		<publisher>Alternative</publisher>
-		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Fishing"/>
-			<dataarea name="cass" size="4316">
-				<rom name="td4-fishing_be(1988)(alternative).uef" size="4316" crc="30128ecd" sha1="4c1ae505585158c2e408d645ca7bcae78d00a3d7" offset="0" />
-			</dataarea>
-		</part>
 		<part name="cass2" interface="bbc_cass">
-			<feature name="part_id" value="Golf"/>
-			<dataarea name="cass" size="2959">
-				<rom name="td4-golf_be(1988)(alternative).uef" size="2959" crc="adaf81b4" sha1="9b3f2ec7cce0d758ee0c5f3a68ab936ee38e2f86" offset="0" />
+			<feature name="part_id" value="Jam Butty"/>
+			<dataarea name="cass" size="4959">
+				<rom name="td3-jambutty_be(1988)(alternative).uef" size="4959" crc="e104ea68" sha1="1ece0e663d567593feec80c1e111fd308b5040d0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Lander"/>
+			<dataarea name="cass" size="2425">
+				<rom name="td3-lander_be(1988)(alternative).uef" size="2425" crc="556dfa34" sha1="02c14af7ac4582841c4a23dca80e028d5c2c8c87" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triple4">
+		<description>Triple Decker 4: Howzat!, Fishing &amp; Golf</description>
+		<year>1988</year>
+		<publisher>Alternative</publisher>
+		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Howzat"/>
 			<dataarea name="cass" size="5319">
 				<rom name="td4-howzat_be(1988)(alternative).uef" size="5319" crc="27b76b55" sha1="af52dd65256abcdf88891fee936ee673c4e300c5" offset="0" />
 			</dataarea>
 		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Fishing"/>
+			<dataarea name="cass" size="4316">
+				<rom name="td4-fishing_be(1988)(alternative).uef" size="4316" crc="30128ecd" sha1="4c1ae505585158c2e408d645ca7bcae78d00a3d7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Golf"/>
+			<dataarea name="cass" size="2959">
+				<rom name="td4-golf_be(1988)(alternative).uef" size="2959" crc="adaf81b4" sha1="9b3f2ec7cce0d758ee0c5f3a68ab936ee38e2f86" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="triple5">
-		<description>Triple Decker 5</description>
+		<description>Triple Decker 5: Star Fight, Skramble &amp; Karate Warrior</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Karate Warrior"/>
-			<dataarea name="cass" size="5631">
-				<rom name="td5-karatewarrior_be(1988)(alternative).uef" size="5631" crc="121a519d" sha1="6e321d160e5ceb3757d76cdf59b7169770b074b5" offset="0" />
+			<feature name="part_id" value="Star Fight"/>
+			<dataarea name="cass" size="4024">
+				<rom name="td5-starfight_be(1988)(alternative).uef" size="4024" crc="b9f6cd6e" sha1="9986a532523f0faef807ba21bf32a4e12273f99f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
@@ -13579,39 +13580,39 @@
 			</dataarea>
 		</part>
 		<part name="cass3" interface="bbc_cass">
-			<feature name="part_id" value="Starfight"/>
-			<dataarea name="cass" size="4024">
-				<rom name="td5-starfight_be(1988)(alternative).uef" size="4024" crc="b9f6cd6e" sha1="9986a532523f0faef807ba21bf32a4e12273f99f" offset="0" />
+			<feature name="part_id" value="Karate Warrior"/>
+			<dataarea name="cass" size="5631">
+				<rom name="td5-karatewarrior_be(1988)(alternative).uef" size="5631" crc="121a519d" sha1="6e321d160e5ceb3757d76cdf59b7169770b074b5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="triple6">
-		<description>Triple Decker 6</description>
+		<description>Triple Decker 6: Cavern Capers, Snap Dragon &amp; Castle of Sand</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Castles of Sand"/>
-			<dataarea name="cass" size="5703">
-				<rom name="td6-castlesofsand_be(1988)(alternative).uef" size="5703" crc="20827c9f" sha1="ea22fe3dd338cc52e58bdcd2b23b6edd6f704cdb" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Cavern Capers"/>
 			<dataarea name="cass" size="6890">
 				<rom name="td6-caverncapers_be(1988)(alternative).uef" size="6890" crc="fa93f549" sha1="b5da4f0c96019a705449e878114bac314ee330e3" offset="0" />
 			</dataarea>
 		</part>
-		<part name="cass3" interface="bbc_cass">
+		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Snap Dragon"/>
 			<dataarea name="cass" size="4171">
 				<rom name="td6-snapdragon_be(1988)(alternative).uef" size="4171" crc="6d9369b9" sha1="428ef9cd739290973b4954653855528f0252a3f2" offset="0" />
 			</dataarea>
 		</part>
+		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Castles of Sand"/>
+			<dataarea name="cass" size="5703">
+				<rom name="td6-castlesofsand_be(1988)(alternative).uef" size="5703" crc="20827c9f" sha1="ea22fe3dd338cc52e58bdcd2b23b6edd6f704cdb" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="triple7">
-		<description>Triple Decker 7</description>
+		<description>Triple Decker 7: Atom Smash, Knockout &amp; Reaction Tester</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="bbc_cass">
@@ -13635,7 +13636,7 @@
 	</software>
 
 	<software name="triple9">
-		<description>Triple Decker 9</description>
+		<description>Triple Decker 9: Break Free, Missile Jammer &amp; Code Breaker</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="bbc_cass">
@@ -13645,15 +13646,15 @@
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
-			<feature name="part_id" value="Code Breaker"/>
-			<dataarea name="cass" size="2108">
-				<rom name="td9-codebreaker_be(1988)(alternative).uef" size="2108" crc="b260db2f" sha1="b1593a47c0c991b92099a4083175e375b2e49222" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="bbc_cass">
 			<feature name="part_id" value="Missile Jammer"/>
 			<dataarea name="cass" size="3223">
 				<rom name="td9-missilejammer_be(1988)(alternative).uef" size="3223" crc="8b5553da" sha1="f60628e9bf0e3d39af0767cee37750c10db37e4a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Code Breaker"/>
+			<dataarea name="cass" size="2108">
+				<rom name="td9-codebreaker_be(1988)(alternative).uef" size="2108" crc="b260db2f" sha1="b1593a47c0c991b92099a4083175e375b2e49222" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13670,7 +13671,7 @@
 	</software>
 
 	<software name="turfform">
-		<description>Turf Form</description>
+		<description>Turf-Form</description>
 		<year>1988</year>
 		<publisher>Blue Ribbon</publisher>
 		<info name="usage" value="Load with *RUN" />
@@ -15567,6 +15568,7 @@
 		<description>Sentence Sequencing</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Ann and Russel Wills" />
 		<info name="release" value="SBE07" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8628">
@@ -16038,7 +16040,7 @@
 
 	<software name="beebtalk">
 		<description>Beeb Talk</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Cheetah</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3559">
@@ -16048,7 +16050,7 @@
 	</software>
 
 	<software name="graphpac">
-		<description>Graphics Package</description>
+		<description>Graphics Pack</description>
 		<year>198?</year>
 		<publisher>Bug Byte</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16341,9 +16343,9 @@
 	</software>
 
 	<software name="beeb110">
-		<description>Beebug Vol.1-10</description>
+		<description>Beebug Vol.1 No.10 March 1983</description>
 		<year>1983</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11793">
 				<rom name="beebug1-10.uef" size="11793" crc="5be96473" sha1="16aa695809a54a41cb5e37491a26442141c141be" offset="0" />
@@ -16352,9 +16354,9 @@
 	</software>
 
 	<software name="beeb210">
-		<description>Beebug Vol.2-10</description>
+		<description>Beebug Vol.2 No.10 April 1984</description>
 		<year>1984</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="28680">
 				<rom name="beebug2-10.uef" size="28680" crc="6e9565cc" sha1="e2262c9bdf03240237f2514cc211dca9000c8167" offset="0" />
@@ -16363,9 +16365,9 @@
 	</software>
 
 	<software name="beeb21">
-		<description>Beebug Vol.2-1</description>
+		<description>Beebug Vol.2 No.1 April/May 1983</description>
 		<year>1983</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="16785">
 				<rom name="beebug2-1.uef" size="16785" crc="4442eaa4" sha1="501ecf104964c5442b6da1808d2026101fa67830" offset="0" />
@@ -16374,9 +16376,9 @@
 	</software>
 
 	<software name="beeb22">
-		<description>Beebug Vol.2-2</description>
+		<description>Beebug Vol.2 No.2 June 1983</description>
 		<year>1983</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12928">
 				<rom name="beebug2-2.uef" size="12928" crc="1ab2060b" sha1="1bd10c365f5ad5d03d6957b4640a1cc0104f511a" offset="0" />
@@ -16385,9 +16387,9 @@
 	</software>
 
 	<software name="beeb23">
-		<description>Beebug Vol.2-3</description>
+		<description>Beebug Vol.2 No.3 July 1983</description>
 		<year>1983</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20464">
 				<rom name="beebug2-3.uef" size="20464" crc="85554204" sha1="03dcf75265f489d54ef063661cdcd7601c056e15" offset="0" />
@@ -16396,9 +16398,9 @@
 	</software>
 
 	<software name="beeb24">
-		<description>Beebug Vol.2-4</description>
+		<description>Beebug Vol.2 No.4 Aug/Sept 1983</description>
 		<year>1983</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21223">
 				<rom name="beebug2-4.uef" size="21223" crc="2817e74b" sha1="55db18b06acd8cb600a88befc8feb2151b606a28" offset="0" />
@@ -16407,9 +16409,9 @@
 	</software>
 
 	<software name="beeb25">
-		<description>Beebug Vol.2-5</description>
+		<description>Beebug Vol.2 No.5 October 1983</description>
 		<year>1983</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19299">
 				<rom name="beebug2-5.uef" size="19299" crc="863e1030" sha1="9a8c70ab93c055605575e795868e2c29f3a777c7" offset="0" />
@@ -16418,9 +16420,9 @@
 	</software>
 
 	<software name="beeb26">
-		<description>Beebug Vol.2-6</description>
+		<description>Beebug Vol.2 No.6 November 1983</description>
 		<year>1983</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="28808">
 				<rom name="beebug2-6.uef" size="28808" crc="be2d3f84" sha1="e4291053d271b765972ee0f9ea5175f30cc0fd05" offset="0" />
@@ -16429,9 +16431,9 @@
 	</software>
 
 	<software name="beeb27">
-		<description>Beebug Vol.2-7</description>
+		<description>Beebug Vol.2 No.7 December 1983</description>
 		<year>1983</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="24989">
 				<rom name="beebug2-7.uef" size="24989" crc="07790ba0" sha1="ed35a872272c267bde77338a0f3229f5f5b401c2" offset="0" />
@@ -16440,9 +16442,9 @@
 	</software>
 
 	<software name="beeb28">
-		<description>Beebug Vol.2-8</description>
+		<description>Beebug Vol.2 No.8 Jan/Feb 1984</description>
 		<year>1984</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15354">
 				<rom name="beebug2-8.uef" size="15354" crc="03a46237" sha1="461731d75a43e9fd1bb5e9feccd5db5a760ffe26" offset="0" />
@@ -16451,9 +16453,9 @@
 	</software>
 
 	<software name="beeb29">
-		<description>Beebug Vol.2-9</description>
+		<description>Beebug Vol.2 No.9 March 1984</description>
 		<year>1984</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18719">
 				<rom name="beebug2-9.uef" size="18719" crc="13d62de6" sha1="2db8d2bc09ddc03000734f85fc7e4ba4492ec705" offset="0" />
@@ -16462,9 +16464,9 @@
 	</software>
 
 	<software name="beeb310">
-		<description>Beebug Vol.3-10</description>
+		<description>Beebug Vol.3 No.10 April 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26889">
 				<rom name="beebug3-10.uef" size="26889" crc="9b8a07f9" sha1="be99daf556ec19cd08329dd51a839d6953db8753" offset="0" />
@@ -16473,9 +16475,9 @@
 	</software>
 
 	<software name="beeb31">
-		<description>Beebug Vol.3-1</description>
+		<description>Beebug Vol.3 No.1 May 1984</description>
 		<year>1984</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26205">
 				<rom name="beebug3-1.uef" size="26205" crc="1a0c76f4" sha1="bb14210406991518b51231cde905526e358a9418" offset="0" />
@@ -16484,9 +16486,9 @@
 	</software>
 
 	<software name="beeb32">
-		<description>Beebug Vol.3-2</description>
+		<description>Beebug Vol.3 No.2 June 1984</description>
 		<year>1984</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22112">
 				<rom name="beebug3-2.uef" size="22112" crc="ce98c964" sha1="7626cfdc341158e2d9ca521b51d0294d1badc22d" offset="0" />
@@ -16495,9 +16497,9 @@
 	</software>
 
 	<software name="beeb36">
-		<description>Beebug Vol.3-6</description>
+		<description>Beebug Vol.3 No.6 November 1984</description>
 		<year>1984</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="25403">
 				<rom name="beebug3-6.uef" size="25403" crc="a493bafb" sha1="2518d6fc18ced2f5fd25bf26bce09023488dfae7" offset="0" />
@@ -16506,9 +16508,9 @@
 	</software>
 
 	<software name="beeb37">
-		<description>Beebug Vol.3-7</description>
+		<description>Beebug Vol.3 No.7 December 1984</description>
 		<year>1984</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="32842">
 				<rom name="beebug3-7.uef" size="32842" crc="d6750704" sha1="69aac49d807a9f0602f764eb217e3dd3b01e12bd" offset="0" />
@@ -16517,9 +16519,9 @@
 	</software>
 
 	<software name="beeb38">
-		<description>Beebug Vol.3-8</description>
+		<description>Beebug Vol.3 No.8 Jan/Feb 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="27945">
 				<rom name="beebug3-8.uef" size="27945" crc="1dcda3b1" sha1="f48ead14ebdb3fb423137fa418f9c6ab1155b758" offset="0" />
@@ -16528,9 +16530,9 @@
 	</software>
 
 	<software name="beeb39">
-		<description>Beebug Vol.3-9</description>
+		<description>Beebug Vol.3 No.9 March 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19761">
 				<rom name="beebug3-9.uef" size="19761" crc="21bcdf9c" sha1="178dd9eb6fa31bee2b77ed11933e324a08b05079" offset="0" />
@@ -16539,9 +16541,9 @@
 	</software>
 
 	<software name="beeb410">
-		<description>Beebug Vol.4-10</description>
+		<description>Beebug Vol.4 No.10 April 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="25305">
 				<rom name="beebug4-10.uef" size="25305" crc="1d6476cb" sha1="3f37ab44ede1adc200e7ce1ddf48ef19591ad8be" offset="0" />
@@ -16550,9 +16552,9 @@
 	</software>
 
 	<software name="beeb41">
-		<description>Beebug Vol.4-1</description>
+		<description>Beebug Vol.4 No.1 May 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="29409">
 				<rom name="beebug4-1.uef" size="29409" crc="e2af5fbf" sha1="d62354006a1cb22e4a1c5e6412c40876d4a3e3d5" offset="0" />
@@ -16561,9 +16563,9 @@
 	</software>
 
 	<software name="beeb42">
-		<description>Beebug Vol.4-2</description>
+		<description>Beebug Vol.4 No.2 June 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="23353">
 				<rom name="beebug4-2.uef" size="23353" crc="32623a94" sha1="706a64cd0f4ac9db0017005e451a56957b79477c" offset="0" />
@@ -16572,9 +16574,9 @@
 	</software>
 
 	<software name="beeb43">
-		<description>Beebug Vol.4-3</description>
+		<description>Beebug Vol.4 No.3 July 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21535">
 				<rom name="beebug4-3.uef" size="21535" crc="67558739" sha1="58b7eee0d936a5bca7146ac8fa4f7819f0b609ce" offset="0" />
@@ -16583,9 +16585,9 @@
 	</software>
 
 	<software name="beeb44">
-		<description>Beebug Vol.4-4</description>
+		<description>Beebug Vol.4 No.4 Aug/Sept 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="28498">
 				<rom name="beebug4-4.uef" size="28498" crc="8e740efa" sha1="ea958186b5674dfcf45e54ba6f06c4533c1bf4bd" offset="0" />
@@ -16594,9 +16596,9 @@
 	</software>
 
 	<software name="beeb45">
-		<description>Beebug Vol.4-5</description>
+		<description>Beebug Vol.4 No.5 October 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="30789">
 				<rom name="beebug4-5.uef" size="30789" crc="35a5f43f" sha1="b992819a88f0f040ad0d01b922713c803d81cbfa" offset="0" />
@@ -16605,9 +16607,9 @@
 	</software>
 
 	<software name="beeb46">
-		<description>Beebug Vol.4-6</description>
+		<description>Beebug Vol.4 No.6 November 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="31991">
 				<rom name="beebug4-6.uef" size="31991" crc="a61d9e93" sha1="7b9a952205324e902b60d3dc4df2987e69fd96e1" offset="0" />
@@ -16616,9 +16618,9 @@
 	</software>
 
 	<software name="beeb47">
-		<description>Beebug Vol.4-7</description>
+		<description>Beebug Vol.4 No.7 December 1985</description>
 		<year>1985</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="35063">
 				<rom name="beebug4-7.uef" size="35063" crc="e2537eaf" sha1="50ec992b73d496940b36eff61b9994cce5c5ed12" offset="0" />
@@ -16627,9 +16629,9 @@
 	</software>
 
 	<software name="beeb48">
-		<description>Beebug Vol.4-8</description>
+		<description>Beebug Vol.4 No.8 Jan/Feb 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="32109">
 				<rom name="beebug4-8.uef" size="32109" crc="c11039db" sha1="0ce2aebdbb658fca71e3abc38b980f3f47cbeafb" offset="0" />
@@ -16638,9 +16640,9 @@
 	</software>
 
 	<software name="beeb49">
-		<description>Beebug Vol.4-9</description>
+		<description>Beebug Vol.4 No.9 March 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="37618">
 				<rom name="beebug4-9.uef" size="37618" crc="c2160c49" sha1="932acc5c8a7ae4ec7fc9bca59bd47c716939cbfe" offset="0" />
@@ -16649,9 +16651,9 @@
 	</software>
 
 	<software name="beeb510">
-		<description>Beebug Vol.5-10</description>
-		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<description>Beebug Vol.5 No.10 April 1987</description>
+		<year>1987</year>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="24520">
 				<rom name="beebug5-10.uef" size="24520" crc="326cac62" sha1="5715811264f4bc7fda06c2ceaefdbf2d536fa85b" offset="0" />
@@ -16660,9 +16662,9 @@
 	</software>
 
 	<software name="beeb51">
-		<description>Beebug Vol.5-1</description>
+		<description>Beebug Vol.5 No.1 May 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="36023">
 				<rom name="beebug5-1.uef" size="36023" crc="26e59567" sha1="10fe9351f5cb5be02bc29e4c799e58918efdcb42" offset="0" />
@@ -16671,9 +16673,9 @@
 	</software>
 
 	<software name="beeb52">
-		<description>Beebug Vol.5-2</description>
+		<description>Beebug Vol.5 No.2 June 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="30768">
 				<rom name="beebug5-2.uef" size="30768" crc="81c4cbee" sha1="d053667133a6c48fc1d7ee307ae54ece419c9eab" offset="0" />
@@ -16682,9 +16684,9 @@
 	</software>
 
 	<software name="beeb53">
-		<description>Beebug Vol.5-3</description>
+		<description>Beebug Vol.5 No.3 July 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="29264">
 				<rom name="beebug5-3.uef" size="29264" crc="60543d78" sha1="2bb2c68db0d39e02cc09a05d432a8bee173f82f4" offset="0" />
@@ -16693,9 +16695,9 @@
 	</software>
 
 	<software name="beeb54">
-		<description>Beebug Vol.5-4</description>
+		<description>Beebug Vol.5 No.4 Aug/Sept 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="37078">
 				<rom name="beebug5-4.uef" size="37078" crc="78afe76b" sha1="4d43e0d9b50a705d0cd5dba4859ec91c8d3c6b82" offset="0" />
@@ -16704,9 +16706,9 @@
 	</software>
 
 	<software name="beeb55">
-		<description>Beebug Vol.5-5</description>
+		<description>Beebug Vol.5 No.5 October 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="34700">
 				<rom name="beebug5-5.uef" size="34700" crc="45f9f697" sha1="003f2071ecbbb5c8aba7b85bcbf924ed72ee3de6" offset="0" />
@@ -16715,9 +16717,9 @@
 	</software>
 
 	<software name="beeb56">
-		<description>Beebug Vol.5-6</description>
+		<description>Beebug Vol.5 No.6 November 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="35082">
 				<rom name="beebug5-6.uef" size="35082" crc="87b5b9d3" sha1="e0aac5d3420f6a3d3193a532182d9f715979bb2f" offset="0" />
@@ -16726,9 +16728,9 @@
 	</software>
 
 	<software name="beeb57">
-		<description>Beebug Vol.5-7</description>
+		<description>Beebug Vol.5 No.7 December 1986</description>
 		<year>1986</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="32487">
 				<rom name="beebug5-7.uef" size="32487" crc="66304dfc" sha1="00a54a34efb9b72936379c346021e8b31b6b3f8f" offset="0" />
@@ -16737,9 +16739,9 @@
 	</software>
 
 	<software name="beeb58">
-		<description>Beebug Vol.5-8</description>
+		<description>Beebug Vol.5 No.8 Jan/Feb 1987</description>
 		<year>1987</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="34543">
 				<rom name="beebug5-8.uef" size="34543" crc="ca98ecd1" sha1="e673ae5e4ec70dc1d417109e04f890687e71c1b7" offset="0" />
@@ -16748,9 +16750,9 @@
 	</software>
 
 	<software name="beeb59">
-		<description>Beebug Vol.5-9</description>
+		<description>Beebug Vol.5 No.9 March 1987</description>
 		<year>1987</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="30413">
 				<rom name="beebug5-9.uef" size="30413" crc="ec148d0f" sha1="74b5f944630642890f06d3e341b9f57b52e53a16" offset="0" />
@@ -16759,9 +16761,9 @@
 	</software>
 
 	<software name="beeb61">
-		<description>Beebug Vol.6-1</description>
+		<description>Beebug Vol.6 No.1 May 1987</description>
 		<year>1987</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="33428">
 				<rom name="beebug6-1.uef" size="33428" crc="9fd92f27" sha1="b41f0da1b8f3fa5e9efdc67d2346033100bd86dc" offset="0" />
@@ -16770,9 +16772,9 @@
 	</software>
 
 	<software name="beeb62">
-		<description>Beebug Vol.6-2</description>
+		<description>Beebug Vol.6 No.2 June 1987</description>
 		<year>1987</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="27214">
 				<rom name="beebug6-2.uef" size="27214" crc="e0f15dcf" sha1="412fee6a1987b4d23260032dbec8a989d75325a7" offset="0" />
@@ -16781,9 +16783,9 @@
 	</software>
 
 	<software name="beeb63">
-		<description>Beebug Vol.6-3</description>
+		<description>Beebug Vol.6 No.3 July 1987</description>
 		<year>1987</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26251">
 				<rom name="beebug6-3.uef" size="26251" crc="d79c81e7" sha1="2d20188270808bee924bc7f1d67c71b9bf81c3c4" offset="0" />
@@ -16792,9 +16794,9 @@
 	</software>
 
 	<software name="beeb64">
-		<description>Beebug Vol.6-4</description>
+		<description>Beebug Vol.6 No.4 Aug/Sept 1987</description>
 		<year>1987</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26125">
 				<rom name="beebug6-4.uef" size="26125" crc="b5aff1f0" sha1="9703a9997a239a3fcbdc202ff74c665499faa052" offset="0" />
@@ -16803,9 +16805,9 @@
 	</software>
 
 	<software name="beeb68">
-		<description>Beebug Vol.6-8</description>
+		<description>Beebug Vol.6 No.8 Jan/Feb 1988</description>
 		<year>1988</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="31264">
 				<rom name="beebug6-8.uef" size="31264" crc="492276ad" sha1="48735cdbf2c7983e1693461d09f9acb1d828fb4b" offset="0" />
@@ -16814,9 +16816,9 @@
 	</software>
 
 	<software name="beeb69">
-		<description>Beebug Vol.6-9</description>
+		<description>Beebug Vol.6 No.9 March 1988</description>
 		<year>1988</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="43406">
 				<rom name="beebug6-9.uef" size="43406" crc="0e15792f" sha1="b03f90c78e950f4b119fa0d3bbdbf5d71c23141e" offset="0" />
@@ -16825,9 +16827,9 @@
 	</software>
 
 	<software name="beeb82">
-		<description>Beebug Vol.8-2</description>
+		<description>Beebug Vol.8 No.2 June 1989</description>
 		<year>1989</year>
-		<publisher>Beebug</publisher>
+		<publisher>Beebugsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="42575">
 				<rom name="beebug8-2.uef" size="42575" crc="fde69a32" sha1="d344c8d8af2ee444ac77b439e9df549dfa26e703" offset="0" />
@@ -16858,7 +16860,7 @@
 	</software>
 
 	<software name="modelb10">
-		<description>Model B Computing Issue 10</description>
+		<description>Model B Computing No.10</description>
 		<year>1985</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16869,7 +16871,7 @@
 	</software>
 
 	<software name="modelb1">
-		<description>Model B Computing Issue 1</description>
+		<description>Model B Computing No.1</description>
 		<year>1984</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16880,7 +16882,7 @@
 	</software>
 
 	<software name="modelb2">
-		<description>Model B Computing Issue 2</description>
+		<description>Model B Computing No.2</description>
 		<year>1984</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16891,7 +16893,7 @@
 	</software>
 
 	<software name="modelb3">
-		<description>Model B Computing Issue 3</description>
+		<description>Model B Computing No.3</description>
 		<year>1984</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16902,7 +16904,7 @@
 	</software>
 
 	<software name="modelb4">
-		<description>Model B Computing Issue 4</description>
+		<description>Model B Computing No.4</description>
 		<year>1984</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16913,7 +16915,7 @@
 	</software>
 
 	<software name="modelb5">
-		<description>Model B Computing Issue 5</description>
+		<description>Model B Computing No.5</description>
 		<year>1984</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16924,7 +16926,7 @@
 	</software>
 
 	<software name="modelb6">
-		<description>Model B Computing Issue 6</description>
+		<description>Model B Computing No.6</description>
 		<year>1984</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16935,7 +16937,7 @@
 	</software>
 
 	<software name="modelb7">
-		<description>Model B Computing Issue 7</description>
+		<description>Model B Computing No.7</description>
 		<year>1984</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16946,7 +16948,7 @@
 	</software>
 
 	<software name="modelb9">
-		<description>Model B Computing Issue 9</description>
+		<description>Model B Computing No.9</description>
 		<year>1984</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16957,7 +16959,7 @@
 	</software>
 
 	<software name="mu110">
-		<description>Micro User Vol.1-10</description>
+		<description>Micro User Vol.1, No.10: Tower Bridge</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16968,7 +16970,7 @@
 	</software>
 
 	<software name="mu111">
-		<description>Micro User Vol.1-11</description>
+		<description>Micro User Vol.1, No.11: Barrel Battle</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16979,7 +16981,7 @@
 	</software>
 
 	<software name="mu112">
-		<description>Micro User Vol.1-12</description>
+		<description>Micro User Vol.1, No.12: Alien Invasion</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -16990,7 +16992,7 @@
 	</software>
 
 	<software name="mu11">
-		<description>Micro User Vol.1-1</description>
+		<description>Micro User Vol.1, No.1: Deathwatch</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17001,7 +17003,7 @@
 	</software>
 
 	<software name="mu12">
-		<description>Micro User Vol.1-2</description>
+		<description>Micro User Vol.1, No.2: King Kong</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17012,7 +17014,7 @@
 	</software>
 
 	<software name="mu13">
-		<description>Micro User Vol.1-3</description>
+		<description>Micro User Vol.1, No.3: Air Strike</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17023,7 +17025,7 @@
 	</software>
 
 	<software name="mu14">
-		<description>Micro User Vol.1-4</description>
+		<description>Micro User Vol.1, No.4: Space Pilot</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17034,7 +17036,7 @@
 	</software>
 
 	<software name="mu15">
-		<description>Micro User Vol.1-5</description>
+		<description>Micro User Vol.1, No.5: Tenpins</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17045,7 +17047,7 @@
 	</software>
 
 	<software name="mu16">
-		<description>Micro User Vol.1-6</description>
+		<description>Micro User Vol.1, No.6: Fruities</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17056,7 +17058,7 @@
 	</software>
 
 	<software name="mu17">
-		<description>Micro User Vol.1-7</description>
+		<description>Micro User Vol.1, No.7: Robin and Marian</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17067,7 +17069,7 @@
 	</software>
 
 	<software name="mu18">
-		<description>Micro User Vol.1-8</description>
+		<description>Micro User Vol.1, No.8: Gone Fishin'</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17078,7 +17080,7 @@
 	</software>
 
 	<software name="mu19">
-		<description>Micro User Vol.1-9</description>
+		<description>Micro User Vol.1, No.9: Goblins and Blackjack</description>
 		<year>1983</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17089,7 +17091,7 @@
 	</software>
 
 	<software name="mu102">
-		<description>Micro User Vol.10-2</description>
+		<description>Micro User Vol.10, No.2</description>
 		<year>1992</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17100,7 +17102,7 @@
 	</software>
 
 	<software name="mu105">
-		<description>Micro User Vol.10-5</description>
+		<description>Micro User Vol.10, No.5</description>
 		<year>1992</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17111,7 +17113,7 @@
 	</software>
 
 	<software name="mu106">
-		<description>Micro User Vol.10-6</description>
+		<description>Micro User Vol.10, No.6</description>
 		<year>1992</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17122,7 +17124,7 @@
 	</software>
 
 	<software name="mu107">
-		<description>Micro User Vol.10-7</description>
+		<description>Micro User Vol.10, No.7</description>
 		<year>1992</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17133,7 +17135,7 @@
 	</software>
 
 	<software name="mu210">
-		<description>Micro User Vol.2-10-omegaprobemissing</description>
+		<description>Micro User Vol.2, No.10: Painter &amp; Miner</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17144,7 +17146,7 @@
 	</software>
 
 	<software name="mu211">
-		<description>Micro User Vol.2-11</description>
+		<description>Micro User Vol.2, No.11: Rover</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17155,7 +17157,7 @@
 	</software>
 
 	<software name="mu212">
-		<description>Micro User Vol.2-12</description>
+		<description>Micro User Vol.2, No.12: 'Copter Dogfight</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17166,7 +17168,7 @@
 	</software>
 
 	<software name="mu21">
-		<description>Micro User Vol.2-1</description>
+		<description>Micro User Vol.2, No.1: Maze-Munch</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17177,7 +17179,7 @@
 	</software>
 
 	<software name="mu22">
-		<description>Micro User Vol.2-2</description>
+		<description>Micro User Vol.2, No.2: Micro Golf</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17188,7 +17190,7 @@
 	</software>
 
 	<software name="mu23">
-		<description>Micro User Vol.2-3</description>
+		<description>Micro User Vol.2, No.3: Damraiders</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17199,7 +17201,7 @@
 	</software>
 
 	<software name="mu24">
-		<description>Micro User Vol.2-4</description>
+		<description>Micro User Vol.2, No.4: Road Racer</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17210,7 +17212,7 @@
 	</software>
 
 	<software name="mu25">
-		<description>Micro User Vol.2-5</description>
+		<description>Micro User Vol.2, No.5: Doom Run &amp; Backgammon</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17221,7 +17223,7 @@
 	</software>
 
 	<software name="mu26">
-		<description>Micro User Vol.2-6</description>
+		<description>Micro User Vol.2, No.6: Castle of Fear</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17232,7 +17234,7 @@
 	</software>
 
 	<software name="mu27">
-		<description>Micro User Vol.2-7</description>
+		<description>Micro User Vol.2, No.7: Villains</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17243,7 +17245,7 @@
 	</software>
 
 	<software name="mu28">
-		<description>Micro User Vol.2-8</description>
+		<description>Micro User Vol.2, No.8: Hunt the Wampus</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17254,7 +17256,7 @@
 	</software>
 
 	<software name="mu29">
-		<description>Micro User Vol.2-9</description>
+		<description>Micro User Vol.2, No.9: Block Buster &amp; Duel!</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17265,7 +17267,7 @@
 	</software>
 
 	<software name="mu310">
-		<description>Micro User Vol.3-10</description>
+		<description>Micro User Vol.3, No.10</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17276,7 +17278,7 @@
 	</software>
 
 	<software name="mu311">
-		<description>Micro User Vol.3-11</description>
+		<description>Micro User Vol.3, No.11: Megaroids</description>
 		<year>1986</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17287,7 +17289,7 @@
 	</software>
 
 	<software name="mu31">
-		<description>Micro User Vol.3-1</description>
+		<description>Micro User Vol.3, No.1: Astro Mines</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17298,7 +17300,7 @@
 	</software>
 
 	<software name="mu32">
-		<description>Micro User Vol.3-2</description>
+		<description>Micro User Vol.3, No.2: X-15</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17309,7 +17311,7 @@
 	</software>
 
 	<software name="mu33">
-		<description>Micro User Vol.3-3</description>
+		<description>Micro User Vol.3, No.3: Stellar Rescue</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17320,7 +17322,7 @@
 	</software>
 
 	<software name="mu34">
-		<description>Micro User Vol.3-4</description>
+		<description>Micro User Vol.3, No.4: Othello</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17331,7 +17333,7 @@
 	</software>
 
 	<software name="mu35">
-		<description>Micro User Vol.3-5</description>
+		<description>Micro User Vol.3, No.5: Mutant Fly</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17342,7 +17344,7 @@
 	</software>
 
 	<software name="mu36">
-		<description>Micro User Vol.3-6</description>
+		<description>Micro User Vol.3, No.6: Battle for Harbour Command</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17353,7 +17355,7 @@
 	</software>
 
 	<software name="mu37">
-		<description>Micro User Vol.3-7</description>
+		<description>Micro User Vol.3, No.7: Ball Lightning</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17364,7 +17366,7 @@
 	</software>
 
 	<software name="mu38">
-		<description>Micro User Vol.3-8</description>
+		<description>Micro User Vol.3, No.8</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17375,7 +17377,7 @@
 	</software>
 
 	<software name="mu39">
-		<description>Micro User Vol.3-9</description>
+		<description>Micro User Vol.3, No.9</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17386,7 +17388,7 @@
 	</software>
 
 	<software name="mu410">
-		<description>Micro User Vol.4-10</description>
+		<description>Micro User Vol.4, No.10</description>
 		<year>1986</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17397,7 +17399,7 @@
 	</software>
 
 	<software name="mu42">
-		<description>Micro User Vol.4-2</description>
+		<description>Micro User Vol.4, No.2</description>
 		<year>1986</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17408,7 +17410,7 @@
 	</software>
 
 	<software name="mu47">
-		<description>Micro User Vol.4-7</description>
+		<description>Micro User Vol.4, No.7</description>
 		<year>1986</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17419,7 +17421,7 @@
 	</software>
 
 	<software name="mu48">
-		<description>Micro User Vol.4-8</description>
+		<description>Micro User Vol.4, No.8</description>
 		<year>1986</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17430,7 +17432,7 @@
 	</software>
 
 	<software name="mu511">
-		<description>Micro User Vol.5-11</description>
+		<description>Micro User Vol.5, No.11</description>
 		<year>1988</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17441,7 +17443,7 @@
 	</software>
 
 	<software name="mu710">
-		<description>Micro User Vol.7-10</description>
+		<description>Micro User Vol.7, No.10</description>
 		<year>1989</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17452,7 +17454,7 @@
 	</software>
 
 	<software name="mu711">
-		<description>Micro User Vol.7-11</description>
+		<description>Micro User Vol.7, No.11</description>
 		<year>1990</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17463,7 +17465,7 @@
 	</software>
 
 	<software name="mu712">
-		<description>Micro User Vol.7-12</description>
+		<description>Micro User Vol.7, No.12</description>
 		<year>1990</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17474,7 +17476,7 @@
 	</software>
 
 	<software name="mu73">
-		<description>Micro User Vol.7-3</description>
+		<description>Micro User Vol.7, No.3</description>
 		<year>1989</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17485,7 +17487,7 @@
 	</software>
 
 	<software name="mu74">
-		<description>Micro User Vol.7-4</description>
+		<description>Micro User Vol.7, No.4</description>
 		<year>1989</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17496,7 +17498,7 @@
 	</software>
 
 	<software name="mu75">
-		<description>Micro User Vol.7-5</description>
+		<description>Micro User Vol.7, No.5</description>
 		<year>1989</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17507,7 +17509,7 @@
 	</software>
 
 	<software name="mu76">
-		<description>Micro User Vol.7-6</description>
+		<description>Micro User Vol.7, No.6</description>
 		<year>1989</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17518,7 +17520,7 @@
 	</software>
 
 	<software name="mu77">
-		<description>Micro User Vol.7-7</description>
+		<description>Micro User Vol.7, No.7</description>
 		<year>1989</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17529,7 +17531,7 @@
 	</software>
 
 	<software name="mu78">
-		<description>Micro User Vol.7-8</description>
+		<description>Micro User Vol.7, No.8</description>
 		<year>1989</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17540,7 +17542,7 @@
 	</software>
 
 	<software name="mu79">
-		<description>Micro User Vol.7-9</description>
+		<description>Micro User Vol.7, No.9</description>
 		<year>1989</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17551,7 +17553,7 @@
 	</software>
 
 	<software name="mu810">
-		<description>Micro User Vol.8-10</description>
+		<description>Micro User Vol.8, No.10</description>
 		<year>1990</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17562,7 +17564,7 @@
 	</software>
 
 	<software name="mu81">
-		<description>Micro User Vol.8-1</description>
+		<description>Micro User Vol.8, No.1</description>
 		<year>1990</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17573,7 +17575,7 @@
 	</software>
 
 	<software name="mu82">
-		<description>Micro User Vol.8-2</description>
+		<description>Micro User Vol.8, No.2</description>
 		<year>1990</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17584,7 +17586,7 @@
 	</software>
 
 	<software name="mu87">
-		<description>Micro User Vol.8-7</description>
+		<description>Micro User Vol.8, No.7</description>
 		<year>1990</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17595,7 +17597,7 @@
 	</software>
 
 	<software name="mu88">
-		<description>Micro User Vol.8-8</description>
+		<description>Micro User Vol.8, No.8</description>
 		<year>1990</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17606,7 +17608,7 @@
 	</software>
 
 	<software name="mu89">
-		<description>Micro User Vol.8-9</description>
+		<description>Micro User Vol.8, No.9</description>
 		<year>1990</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17617,7 +17619,7 @@
 	</software>
 
 	<software name="mu911">
-		<description>Micro User Vol.9-11</description>
+		<description>Micro User Vol.9, No.11</description>
 		<year>1992</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17628,7 +17630,7 @@
 	</software>
 
 	<software name="mu91">
-		<description>Micro User Vol.9-1</description>
+		<description>Micro User Vol.9, No.1</description>
 		<year>1991</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17639,7 +17641,7 @@
 	</software>
 
 	<software name="mu92">
-		<description>Micro User Vol.9-2</description>
+		<description>Micro User Vol.9, No.2</description>
 		<year>1991</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17650,7 +17652,7 @@
 	</software>
 
 	<software name="mu93">
-		<description>Micro User Vol.9-3</description>
+		<description>Micro User Vol.9, No.3</description>
 		<year>1991</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17661,7 +17663,7 @@
 	</software>
 
 	<software name="mu94">
-		<description>Micro User Vol.9-4</description>
+		<description>Micro User Vol.9, No.4</description>
 		<year>1991</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -17672,7 +17674,7 @@
 	</software>
 
 	<software name="mu95">
-		<description>Micro User Vol.9-5</description>
+		<description>Micro User Vol.9, No.5</description>
 		<year>1991</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
