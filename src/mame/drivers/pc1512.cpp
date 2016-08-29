@@ -604,7 +604,11 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	// [RH] 29 Aug 2016: I can find no evidence to indicate that Amstrad had only 10 I/O lines, as the
+	// schematic calls for a stock 8086 and the I/O and data lines are multiplexed onto the same bus,
+	// plus address lines 20-10 are towards the middle of a standard ISA slot. If it turns out that this
+	// is not in fact accurate to hardware, please add this back in.
+	// ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x000, 0x00f) AM_DEVREADWRITE8(I8237A5_TAG, am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x020, 0x021) AM_DEVREADWRITE8(I8259A2_TAG, pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x040, 0x043) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0xffff)
