@@ -290,7 +290,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 0) Useful addresses and routines
 
-0a) "Game Corporation" bootlegs, Tayto bootlegs, 'arkmcubl', 'ark1ball'
+0a) "Game Corporation" bootlegs, Tayto bootlegs, 'arkanoidjbl', 'ark1ball'
 
   - Basic routines :
       * 0x2044 : BC += A;
@@ -384,14 +384,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 1) Bootlegs with MCU
 
-1a) 'arkmcubl'
+1a) 'arkanoidjbl'
 
   - Region = 0x76 (Japan).
   - The bootleg is based on the Japanese version.
-  - The MCU is dumped, but the game doesn't run with it.
-    However, there is no problem if I use the one from the World early version.
-    Until I know what to do with it, I use the MCU from the World early version
-    and "save" the existing one in "user1". Let me know if it's good.
+  - The MCU is dumped and used, it is based on the real Taito MCU but with the
+    MCU's security features disabled, so must have been extracted by bootleggers.
   - "(c) Taito Corporation 1986".
   - Displays the "Arkanoid" title.
   - "HARDWARE TEST" message is written, tests are performed, countdown 11 to 0.
@@ -411,9 +409,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
     However, there is still code in the game which tests the Dip Switches !
   - Region = 0x76 (Japan).
   - The bootleg is based on a Japanese early version we don't have.
-    In fact, it is completely based on 'arkmcubl' :
+    In fact, it is completely based on 'arkanoidjbl' :
 
-      Z:\MAME\roms>romcmp ark1ball.zip arkmcubl.zip -d
+      Z:\MAME\roms>romcmp ark1ball.zip arkanoidjbl.zip -d
       3 and 2 files
       e1.6d                   a-1.7d                  IDENTICAL
       e2.6f                   2palline.7f             99.957275%
@@ -434,9 +432,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
       00001EF7: 52 42
       00001EF9: 66 46
 
-  - The MCU is not dumped, and the game doesn't run with the one from 'arkmcubl'.
-    However, there is no problem if I use the one from the World early version.
-    Until I know what to do with it, I use the MCU from the World early version.
+  - The MCU is not dumped, but the game runs with either the Taito or Pirate
+    version of the A75-06 MCU. It most likely really used the latter,
+    but the actual MCU used is unknown.
   - This version is supposed to be a harder version :
       * less lives (1 or 2 instead of 3 or 5)
       * 60K for 1st bonus life instead of 20K
@@ -668,7 +666,7 @@ TO DO (2006.09.12) :
       * 'arkatour'
   - Add more notes about main addresses and routines in the Z80
   - Try to understand the problem with the MCU in the following sets :
-      * 'arkmcubl'
+      * 'arkanoidjbl'
       * 'ark1ball'
 
 
@@ -676,7 +674,7 @@ Stephh's log (2006.09.05) :
 
   - Interverted 'arkblock' and 'arkbloc2' sets for better comparaison
   - Renamed sets :
-      * 'arkbl2'   -> 'arkmcubl'
+      * 'arkbl2'   -> 'arkanoidjbl'
       * 'arkbl3'   -> 'arkgcbl'
   - Changed some games descriptions
   - Removed flags from the following sets :
@@ -696,7 +694,7 @@ Stephh's log (2006.09.12) :
       * 'arkangc2'
       * 'arkatayt'
   - Removed flags from the following sets :
-      * 'arkmcubl'
+      * 'arkanoidjbl'
     This way, even if emulation isn't perfect, people can try them and report bugs.
 
 
