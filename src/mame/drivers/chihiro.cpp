@@ -36,16 +36,16 @@ Games on this system include....
 | | 2004     | Wangan Midnight Maximum Tune (Export) (Rev A)      | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
 |*| 2004     | Wangan Midnight Maximum Tune (Export) (Rev B)      | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
 | | 2004     | OutRun 2 Special Tours (Japan)                     | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
-|*| 2004     | OutRun 2 Special Tours (Rev A) (Japan)             | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
+|*| 20041229 | OutRun 2 Special Tours (Japan) (Rev A)             | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
 |*| 2004     | Ghost Squad                                        | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
-|*| 2004     | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
-| | 2004     | Ghost Squad (Rev A)                                | Sega                     | CF     | MDA-G0013  | 317-0398-COM |
+|*| 20041209 | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
+| | 20041209 | Ghost Squad (Rev A)                                | Sega                     | CF     | MDA-G0013  | 317-0398-COM |
 |*| 2005     | Gundam Battle Operating Simulator                  | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
 | | 2004     | OutRun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0396-COM |
 |*| 2004     | OutRun 2 Special Tours (Rev A)                     | Sega                     | GDROM  | GDX-0014A  | 317-0396-COM |
 | | 2004     | OutRun 2 Special Tours (Rev A)                     | Sega                     | CF     | MDA-G0012  | 317-0396-COM |
 |*| 2005     | Wangan Midnight Maximum Tune 2 (Japan)             | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
-|*| 2005     | Wangan Midnight Maximum Tune 2 (Japan) (Rev A)     | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
+|*| 20050908 | Wangan Midnight Maximum Tune 2 (Japan) (Rev A)     | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
 | | 2005     | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
 |*| 2005     | Wangan Midnight Maximum Tune 2 (Export) (Rev A)    | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
 | | 2005     | Sega Network Taisen Mahjong MJ 3                   | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
