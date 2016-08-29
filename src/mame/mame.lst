@@ -11887,7 +11887,7 @@ poizone                         // (c) 1990 Sisteme
 deluxe5                         // (c) 2000 ESD
 deluxe5a                        // (c) 2000 ESD
 deluxe5b                        // (c) 2000 ESD
-deluxe4u						// (c) 2000 ESD
+deluxe4u                        // (c) 2000 ESD
 hedpanic                        // (c) 2000 ESD
 hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
 hedpanico                       // (c) 1999 ESD
@@ -12678,7 +12678,7 @@ gteikokb                        // bootleg
 gteikoku                        // (c) Irem
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
-jungsub							// bootleg
+jungsub                         // bootleg
 kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
 kingball                        // (c) 1980 Namco
 kingballj                       // (c) 1980 Namco
@@ -31206,7 +31206,7 @@ r2dtank                         // (c) 1980 Sigma Ent. Inc.
 
 @source:r2dx_v33.cpp
 nzeroteam                       // (c) 1997 Seibu Kaihatsu
-nzeroteama						//
+nzeroteama                      //
 r2dx_v33                        // (c) 1996 Seibu Kaihatsu
 r2dx_v33_r2                     // (c) 1996 Seibu Kaihatsu
 zerotm2k                        // (c) 2000 Seibu Kaihatsu
@@ -32289,7 +32289,7 @@ hangon1                         // (c) 1985
 hangon2                         // (c) 1985
 shangonrb                       // (c) 1992 (but bootleg, hangon hw?)
 shangonro                       // (c) 1987 (FD1094)
-shangonho						// (c) 1987 (FD1094)
+shangonho                       // (c) 1987 (FD1094)
 sharrier                        // (c) 1985
 sharrier1                       // (c) 1985
 
@@ -33740,7 +33740,7 @@ roldfrog                        // not a gaelco game but based on splash code
 roldfroga                       // not a gaelco game but based on splash code
 splash                          // (c) 1992 - Ref 922804
 splash10                        // (c) 1992 - Ref 922804
-ringball						// not a gaelco game but based on splash code
+ringball                        // not a gaelco game but based on splash code
 
 @source:splus.cpp
 spss4240                        //
