@@ -16,6 +16,49 @@
 
 device_type const DOOYONG_ROM_TILEMAP = &device_creator<dooyong_rom_tilemap_device>;
 device_type const RSHARK_ROM_TILEMAP = &device_creator<rshark_rom_tilemap_device>;
+device_type const DOOYONG_RAM_TILEMAP = &device_creator<dooyong_ram_tilemap_device>;
+
+
+dooyong_tilemap_device_base::dooyong_tilemap_device_base(
+			machine_config const &mconfig,
+			device_type type,
+			char const *name,
+			char const *tag,
+			device_t *owner,
+			UINT32 clock,
+			char const *shortname,
+			char const *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, m_gfxnum(0)
+	, m_tilemap(nullptr)
+	, m_palette_bank(0)
+{
+}
+
+void dooyong_tilemap_device_base::static_set_gfxdecode_tag(device_t &device, char const *tag)
+{
+	downcast<dooyong_tilemap_device_base &>(device).m_gfxdecode.set_tag(tag);
+}
+
+void dooyong_tilemap_device_base::static_set_gfxnum(device_t &device, int gfxnum)
+{
+	downcast<dooyong_tilemap_device_base &>(device).m_gfxnum = gfxnum;
+}
+
+void dooyong_tilemap_device_base::draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, UINT32 flags, UINT8 priority)
+{
+	m_tilemap->draw(screen, dest, cliprect, flags, priority);
+}
+
+void dooyong_tilemap_device_base::set_palette_bank(UINT16 bank)
+{
+	if (bank != m_palette_bank)
+	{
+		m_palette_bank = bank;
+		m_tilemap->mark_all_dirty();
+	}
+}
 
 
 dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
@@ -32,35 +75,21 @@ dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(
 			UINT32 clock,
 			char const *shortname,
 			char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: dooyong_tilemap_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_rows(8)
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_tilerom(*this, finder_base::DUMMY_TAG)
-	, m_gfxnum(0)
 	, m_tilerom_offset(0)
 	, m_transparent_pen(~0U)
 	, m_primella_code_mask(0x03ff)
 	, m_primella_color_mask(0x3c00)
 	, m_primella_color_shift(10)
-	, m_tilemap(nullptr)
 	, m_registers{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-	, m_palette_bank(0)
 {
-}
-
-void dooyong_rom_tilemap_device::static_set_gfxdecode_tag(device_t &device, char const *tag)
-{
-	downcast<dooyong_rom_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 void dooyong_rom_tilemap_device::static_set_tilerom_tag(device_t &device, char const *tag)
 {
 	downcast<dooyong_rom_tilemap_device &>(device).m_tilerom.set_tag(tag);
-}
-
-void dooyong_rom_tilemap_device::static_set_gfxnum(device_t &device, int gfxnum)
-{
-	downcast<dooyong_rom_tilemap_device &>(device).m_gfxnum = gfxnum;
 }
 
 void dooyong_rom_tilemap_device::static_set_tilerom_offset(device_t &device, int offset)
@@ -81,13 +110,9 @@ void dooyong_rom_tilemap_device::static_set_primella_code_bits(device_t &device,
 	tilemap_device.m_primella_color_shift = bits;
 }
 
-void dooyong_rom_tilemap_device::draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, UINT32 flags, UINT8 priority)
-{
-	m_tilemap->draw(screen, dest, cliprect, flags, priority);
-}
-
 WRITE8_MEMBER(dooyong_rom_tilemap_device::ctrl_w)
 {
+	offset &= 0x07U;
 	UINT8 const old = m_registers[offset];
 	if (old != data)
 	{
@@ -118,15 +143,6 @@ WRITE8_MEMBER(dooyong_rom_tilemap_device::ctrl_w)
 	}
 }
 
-void dooyong_rom_tilemap_device::set_palette_bank(UINT16 bank)
-{
-	if (bank != m_palette_bank)
-	{
-		m_palette_bank = bank;
-		m_tilemap->mark_all_dirty();
-	}
-}
-
 void dooyong_rom_tilemap_device::device_start()
 {
 	if (!m_gfxdecode->started())
@@ -146,7 +162,7 @@ void dooyong_rom_tilemap_device::device_start()
 	if (0 > m_tilerom_offset)
 		m_tilerom_offset = m_tilerom.length() + m_tilerom_offset;
 
-	std::fill(std::begin(m_registers), std::end(m_registers), 0);
+	std::fill(std::begin(m_registers), std::end(m_registers), 0U);
 	m_palette_bank = 0U;
 
 	save_item(NAME(m_registers));
@@ -182,7 +198,7 @@ TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 		// X = x flip
 		// Y = y flip
 		// ? = unused?
-		color = (attr & m_primella_color_mask) >> m_primella_color_shift;
+		color = m_palette_bank | ((attr & m_primella_color_mask) >> m_primella_color_shift);
 		flags = TILE_FLIPYX((attr >> 14) & 0x03U);
 		code = attr & m_primella_code_mask;
 	}
@@ -226,16 +242,81 @@ TILE_GET_INFO_MEMBER(rshark_rom_tilemap_device::tile_info)
 }
 
 
-WRITE8_MEMBER(dooyong_z80_state::txvideoram_w)
+dooyong_ram_tilemap_device::dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+	: dooyong_tilemap_device_base(mconfig, DOOYONG_RAM_TILEMAP, "Dooyong RAM Tilemap", tag, owner, clock, "dooyong_ram_tilemap", __FILE__)
+	, m_tileram()
 {
-	if (m_txvideoram[offset] != data)
+}
+
+WRITE16_MEMBER(dooyong_ram_tilemap_device::tileram_w)
+{
+	offset &= (64U * 32U) - 1U;
+	UINT16 value(m_tileram[offset]);
+	COMBINE_DATA(&value);
+	if (value != m_tileram[offset])
 	{
-		m_txvideoram[offset] = data;
-		if (m_tx_tilemap_mode == 0)
-			m_tx_tilemap->mark_tile_dirty(offset & 0x07ff);
-		else
-			m_tx_tilemap->mark_tile_dirty(offset >> 1);
+		m_tileram[offset] = value;
+		m_tilemap->mark_tile_dirty(offset);
 	}
+}
+
+void dooyong_ram_tilemap_device::device_start()
+{
+	if (!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
+	m_tilemap = &machine().tilemap().create(
+			*m_gfxdecode,
+			tilemap_get_info_delegate(FUNC(dooyong_ram_tilemap_device::tile_info), this),
+			TILEMAP_SCAN_COLS,
+			8,
+			8,
+			64,
+			32);
+	m_tilemap->set_transparent_pen(15);
+
+	m_tileram.reset(new UINT16[64 * 32]);
+	std::fill(m_tileram.get(), m_tileram.get() + (64 * 32), 0U);
+	m_palette_bank = 0U;
+
+	save_pointer(NAME(m_tileram.get()), 64 * 32);
+	save_item(NAME(m_palette_bank));
+}
+
+TILE_GET_INFO_MEMBER(dooyong_ram_tilemap_device::tile_info)
+{
+	// Each tile takes one word of memory:
+	// MSB             LSB
+	// CCCC cccc cccc cccc  (bits 3-0 of color code, bits 11-0 of gfx code)
+	// c = gfx code
+	// C = color code
+	unsigned const attr(m_tileram[tile_index]);
+	tileinfo.set(m_gfxnum, attr & 0x0fffU, m_palette_bank | ((attr >> 12) & 0x0fU), 0);
+}
+
+
+READ8_MEMBER(dooyong_z80_state::lastday_tx_r)
+{
+	bool const lane(BIT(offset, 11));
+	return m_tx->tileram_r(space, offset & 0x07ffU) >> (lane ? 8 : 0);
+}
+
+WRITE8_MEMBER(dooyong_z80_state::lastday_tx_w)
+{
+	bool const lane(BIT(offset, 11));
+	m_tx->tileram_w(space, offset & 0x07ffU, UINT16(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
+}
+
+READ8_MEMBER(dooyong_z80_state::bluehawk_tx_r)
+{
+	bool const lane(BIT(offset, 0));
+	return m_tx->tileram_r(space, offset >> 1) >> (lane ? 8 : 0);
+}
+
+WRITE8_MEMBER(dooyong_z80_state::bluehawk_tx_w)
+{
+	bool const lane(BIT(offset, 0));
+	m_tx->tileram_w(space, offset >> 1, UINT16(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
 }
 
 
@@ -274,7 +355,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 	{
 		m_bg->set_palette_bank(m_palette_bank << 6);
 		m_fg->set_palette_bank(m_palette_bank << 6);
-		m_tx_tilemap->mark_all_dirty();
+		m_tx->set_palette_bank(m_palette_bank << 6);
 	}
 
 	/* bit 2 is continuously toggled (unknown) */
@@ -332,37 +413,11 @@ WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
 	{
 		m_bg->set_palette_bank(m_palette_bank << 6);
 		m_fg->set_palette_bank(m_palette_bank << 6);
-		m_tx_tilemap->mark_all_dirty();
+		m_tx->set_palette_bank(m_palette_bank << 6);
 	}
 
 	/* bit 4 changes tilemaps priority */
 	m_flytiger_pri = data & 0x10;
-}
-
-
-TILE_GET_INFO_MEMBER(dooyong_z80_state::get_tx_tile_info)
-{
-	/* Each tile takes two bytes of memory:
-	                 MSB   LSB
-	   [offs + 0x00] cccc cccc    (bits 7-0 of gfx code)
-	   [offs + 0x01] CCCC cccc    (bits 3-0 of color code, bits 11-8 of gfx code)
-	   c = gfx code
-	   C = color code */
-	unsigned offs, attr;
-	if (m_tx_tilemap_mode == 0)
-	{   /* lastday/gulfstrm/pollux/flytiger */
-		offs = tile_index;
-		attr = m_txvideoram[offs | 0x0800];
-	}
-	else
-	{   /* bluehawk/primella */
-		offs = tile_index * 2;
-		attr = m_txvideoram[offs + 1];
-	}
-	int const code = m_txvideoram[offs] | ((attr & 0x0f) << 8);
-	int const color = (attr & 0xf0) >> 4;
-
-	tileinfo.set(0, code, color | (m_palette_bank << 6), 0);
 }
 
 
@@ -458,14 +513,11 @@ UINT32 dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bi
 	screen.priority().fill(0, cliprect);
 
 	/* Text layer is offset on this machine */
-	if (!flip_screen())
-		m_tx_tilemap->set_scrolly(0, 8);
-	else
-		m_tx_tilemap->set_scrolly(0, -8);
+	m_tx->set_scrolly(flip_screen() ? -8 : 8);
 
 	m_bg->draw(screen, bitmap, cliprect, 0, 1);
 	m_fg->draw(screen, bitmap, cliprect, 0, 2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	if (!m_sprites_disabled)
 		draw_sprites(screen, bitmap, cliprect);
@@ -479,14 +531,11 @@ UINT32 dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, b
 	screen.priority().fill(0, cliprect);
 
 	/* Text layer is offset on this machine */
-	if (!flip_screen())
-		m_tx_tilemap->set_scrolly(0, 8);
-	else
-		m_tx_tilemap->set_scrolly(0, -8);
+	m_tx->set_scrolly(flip_screen() ? -8 : 8);
 
 	m_bg->draw(screen, bitmap, cliprect, 0, 1);
 	m_fg->draw(screen, bitmap, cliprect, 0, 2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT);
 
@@ -500,7 +549,7 @@ UINT32 dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, bit
 
 	m_bg->draw(screen, bitmap, cliprect, 0, 1);
 	m_fg->draw(screen, bitmap, cliprect, 0, 2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT | SPRITE_HEIGHT);
 
@@ -522,7 +571,7 @@ UINT32 dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap_i
 		m_bg->draw(screen, bitmap, cliprect, 0, 1);
 		m_fg->draw(screen, bitmap, cliprect, 0, 2);
 	}
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT | SPRITE_HEIGHT | SPRITE_YSHIFT_FLYTIGER);
 
@@ -538,7 +587,7 @@ UINT32 dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap_i
 	m_bg->draw(screen, bitmap, cliprect, 0, 1);
 	m_fg->draw(screen, bitmap, cliprect, 0, 2);
 	m_fg2->draw(screen, bitmap, cliprect, 0, 4);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT | SPRITE_HEIGHT | SPRITE_YSHIFT_BLUEHAWK);
 
@@ -550,9 +599,9 @@ UINT32 dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap_i
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_bg->draw(screen, bitmap, cliprect, 0, 0);
-	if (m_tx_pri) m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (m_tx_pri) m_tx->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg->draw(screen, bitmap, cliprect, 0, 0);
-	if (!m_tx_pri) m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (!m_tx_pri) m_tx->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -561,17 +610,6 @@ UINT32 dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap_i
 
 VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
 {
-	/* Configure tilemap callbacks */
-	m_tx_tilemap_mode = 0;
-
-	/* Create tilemaps */
-	m_tx_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_tx_tilemap->set_transparent_pen(15);
-
 	/* Register for save/restore */
 	save_item(NAME(m_sprites_disabled));
 	save_item(NAME(m_interrupt_line_1));
@@ -580,17 +618,6 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
 
 VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
 {
-	/* Configure tilemap callbacks */
-	m_tx_tilemap_mode = 0;
-
-	/* Create tilemaps */
-	m_tx_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_tx_tilemap->set_transparent_pen(15);
-
 	m_palette_bank = 0;
 
 	/* Register for save/restore */
@@ -601,19 +628,8 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
 
 VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
 {
-	/* Configure tilemap callbacks */
-	m_tx_tilemap_mode = 0;
-
 	m_paletteram_flytiger = make_unique_clear<UINT8[]>(0x1000);
 	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
-
-	/* Create tilemaps */
-	m_tx_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_tx_tilemap->set_transparent_pen(15);
 
 	m_palette_bank = 0;
 
@@ -625,33 +641,12 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
 
 VIDEO_START_MEMBER(dooyong_z80_state, bluehawk)
 {
-	/* Configure tilemap callbacks */
-	m_tx_tilemap_mode = 1;
-
-	/* Create tilemaps */
-	m_tx_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_tx_tilemap->set_transparent_pen(15);
 }
 
 VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
 {
-	/* Configure tilemap callbacks */
-	m_tx_tilemap_mode = 0;
-
 	m_paletteram_flytiger = make_unique_clear<UINT8[]>(0x1000);
 	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
-
-	/* Create tilemaps */
-	m_tx_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_tx_tilemap->set_transparent_pen(15);
 
 	m_palette_bank = 0;
 
@@ -662,17 +657,6 @@ VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
 
 VIDEO_START_MEMBER(dooyong_z80_state, primella)
 {
-	/* Configure tilemap callbacks */
-	m_tx_tilemap_mode = 1;
-
-	/* Create tilemaps */
-	m_tx_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_tx_tilemap->set_transparent_pen(15);
-
 	/* Register for save/restore */
 	save_item(NAME(m_tx_pri));
 }
@@ -757,7 +741,8 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	}
 }
 
-UINT32 dooyong_68k_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+UINT32 rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -772,7 +757,14 @@ UINT32 dooyong_68k_state::screen_update_rshark(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-UINT32 dooyong_68k_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+VIDEO_START_MEMBER(rshark_state, rshark)
+{
+	/* Register for save/restore */
+	save_item(NAME(m_bg2_priority));
+}
+
+
+UINT32 popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -797,15 +789,7 @@ UINT32 dooyong_68k_state::screen_update_popbingo(screen_device &screen, bitmap_i
 	return 0;
 }
 
-
-
-VIDEO_START_MEMBER(dooyong_68k_state, rshark)
-{
-	/* Register for save/restore */
-	save_item(NAME(m_bg2_priority));
-}
-
-VIDEO_START_MEMBER(dooyong_68k_state, popbingo)
+VIDEO_START_MEMBER(popbingo_state, popbingo)
 {
 	m_screen->register_screen_bitmap(m_bg_bitmap);
 	m_screen->register_screen_bitmap(m_bg2_bitmap);

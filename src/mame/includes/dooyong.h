@@ -23,27 +23,58 @@
 		rshark_rom_tilemap_device::static_set_colorrom_tag(*device, "^" rom2); \
 		rshark_rom_tilemap_device::static_set_colorrom_offset(*device, (offset2));
 
+#define MCFG_DOOYONG_RAM_TILEMAP_ADD(tag, gfx, num) \
+		MCFG_DEVICE_ADD(tag, DOOYONG_RAM_TILEMAP, 0) \
+		dooyong_rom_tilemap_device::static_set_gfxdecode_tag(*device, "^" gfx); \
+		dooyong_rom_tilemap_device::static_set_gfxnum(*device, (num));
+
 
 extern device_type const DOOYONG_ROM_TILEMAP;
 extern device_type const RSHARK_ROM_TILEMAP;
+extern device_type const DOOYONG_RAM_TILEMAP;
 
 
-class dooyong_rom_tilemap_device : public device_t
+class dooyong_tilemap_device_base : public device_t
+{
+public:
+	static void static_set_gfxdecode_tag(device_t &device, char const *tag);
+	static void static_set_gfxnum(device_t &device, int gfxnum);
+
+	void draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, UINT32 flags, UINT8 priority);
+
+	void set_palette_bank(UINT16 bank);
+
+protected:
+	dooyong_tilemap_device_base(
+			machine_config const &mconfig,
+			device_type type,
+			char const *name,
+			char const *tag,
+			device_t *owner,
+			UINT32 clock,
+			char const *shortname,
+			char const *source);
+
+	gfx_element const &gfx() const { return *m_gfxdecode->gfx(m_gfxnum); }
+
+	required_device<gfxdecode_device> m_gfxdecode;
+	int m_gfxnum;
+
+	tilemap_t *m_tilemap;
+	UINT16 m_palette_bank;
+};
+
+class dooyong_rom_tilemap_device : public dooyong_tilemap_device_base
 {
 public:
 	dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_gfxdecode_tag(device_t &device, char const *tag);
 	static void static_set_tilerom_tag(device_t &device, char const *tag);
-	static void static_set_gfxnum(device_t &device, int gfxnum);
 	static void static_set_tilerom_offset(device_t &device, int offset);
 	static void static_set_transparent_pen(device_t &device, unsigned pen);
 	static void static_set_primella_code_bits(device_t &device, unsigned bits);
 
-	void draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, UINT32 flags, UINT8 priority);
-
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	void set_palette_bank(UINT16 bank);
 
 protected:
 	dooyong_rom_tilemap_device(
@@ -60,30 +91,21 @@ protected:
 
 	virtual TILE_GET_INFO_MEMBER(tile_info);
 
-	gfx_element const &gfx() const
-	{ return *m_gfxdecode->gfx(m_gfxnum); }
-
 	tilemap_memory_index adjust_tile_index(tilemap_memory_index tile_index) const
 	{ return tile_index + ((unsigned(m_registers[1]) * 256U / gfx().width()) * m_rows); }
 
 	int m_rows;
 
 private:
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_region_ptr<UINT16> m_tilerom;
-	int m_gfxnum;
 	int m_tilerom_offset;
 	unsigned m_transparent_pen;
 	unsigned m_primella_code_mask;
 	unsigned m_primella_color_mask;
 	unsigned m_primella_color_shift;
 
-	tilemap_t *m_tilemap;
-
 	UINT8 m_registers[0x10];
-	UINT16 m_palette_bank;
 };
-
 
 class rshark_rom_tilemap_device : public dooyong_rom_tilemap_device
 {
@@ -103,6 +125,24 @@ private:
 	int m_colorrom_offset;
 };
 
+class dooyong_ram_tilemap_device : public dooyong_tilemap_device_base
+{
+public:
+	dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ16_MEMBER(tileram_r) { return m_tileram[offset & ((64U * 32U) - 1)]; }
+	DECLARE_WRITE16_MEMBER(tileram_w);
+	void set_scrolly(int value) { m_tilemap->set_scrolly(value); }
+
+protected:
+	virtual void device_start() override;
+
+private:
+	TILE_GET_INFO_MEMBER(tile_info);
+
+	std::unique_ptr<UINT16[]> m_tileram;
+};
+
 
 class dooyong_state : public driver_device
 {
@@ -117,9 +157,8 @@ public:
 		, m_bg2(*this, "bg2")
 		, m_fg(*this, "fg")
 		, m_fg2(*this, "fg2")
-	{ }
-
-	tilemap_t *m_tx_tilemap = nullptr;
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -136,9 +175,10 @@ class dooyong_z80_state : public dooyong_state
 public:
 	dooyong_z80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_state(mconfig, type, tag)
-		, m_txvideoram(*this, "txvideoram")
+		, m_tx(*this, "tx")
 		, m_spriteram(*this, "spriteram")
-	{ }
+	{
+	}
 
 	enum
 	{
@@ -150,7 +190,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(txvideoram_w);
+	DECLARE_READ8_MEMBER(lastday_tx_r);
+	DECLARE_WRITE8_MEMBER(lastday_tx_w);
+	DECLARE_READ8_MEMBER(bluehawk_tx_r);
+	DECLARE_WRITE8_MEMBER(bluehawk_tx_w);
 	DECLARE_WRITE8_MEMBER(primella_ctrl_w);
 	DECLARE_READ8_MEMBER(paletteram_flytiger_r);
 	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w);
@@ -165,14 +208,13 @@ public:
 	DECLARE_VIDEO_START(flytiger);
 	DECLARE_VIDEO_START(primella);
 
-	required_shared_ptr<UINT8> m_txvideoram;
 	std::unique_ptr<UINT8[]> m_paletteram_flytiger;
 	UINT8 m_sprites_disabled = 0;
 	UINT8 m_flytiger_pri = 0;
 	UINT8 m_tx_pri = 0;
 	UINT8 m_palette_bank = 0;
-	int m_tx_tilemap_mode = 0;
 
+	required_device<dooyong_ram_tilemap_device> m_tx;
 	optional_device<buffered_spriteram8_device> m_spriteram;
 };
 
@@ -181,7 +223,8 @@ class dooyong_z80_ym2203_state : public dooyong_z80_state
 public:
 	dooyong_z80_ym2203_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_z80_state(mconfig, type, tag)
-	{ }
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(lastday_ctrl_w);
 	DECLARE_WRITE8_MEMBER(pollux_ctrl_w);
@@ -205,25 +248,49 @@ class dooyong_68k_state : public dooyong_state
 public:
 	dooyong_68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_state(mconfig, type, tag)
-		, m_bg_bitmap()
-		, m_bg2_bitmap()
-		, m_screen(*this, "screen")
 		, m_spriteram(*this, "spriteram")
-	{ }
+	{
+	}
 
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
+protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_VIDEO_START(rshark);
-	DECLARE_VIDEO_START(popbingo);
 
 	UINT16 m_bg2_priority = 0;
+	required_device<buffered_spriteram16_device> m_spriteram;
+};
 
+class rshark_state : public dooyong_68k_state
+{
+public:
+	rshark_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dooyong_68k_state(mconfig, type, tag)
+	{
+	}
+
+	UINT32 screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_VIDEO_START(rshark);
+};
+
+class popbingo_state : public dooyong_68k_state
+{
+public:
+	popbingo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dooyong_68k_state(mconfig, type, tag)
+		, m_bg_bitmap()
+		, m_bg2_bitmap()
+		, m_screen(*this, "screen")
+	{
+	}
+
+	UINT32 screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_VIDEO_START(popbingo);
+
+protected:
 	bitmap_ind16 m_bg_bitmap;
 	bitmap_ind16 m_bg2_bitmap;
 
 	required_device<screen_device> m_screen;
-	required_device<buffered_spriteram16_device> m_spriteram;
 };
