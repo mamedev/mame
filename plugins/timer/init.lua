@@ -65,7 +65,7 @@ function timer.startplugin()
 		play_count = play_count + 1
 	end)
 
-	emu.register_stop(function() 
+	emu.register_stop(function()
 		timer_started = false
 		save()
 		total_time = 0

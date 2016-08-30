@@ -85,7 +85,7 @@ function cheatfind.startplugin()
 		local ref = {} -- this is a helper for comparing two match lists
 		local bitmask = nil
 
-		local cfoper = { 
+		local cfoper = {
 			lt = function(a, b, val) return (a < b and val == 0) or (val > 0 and (a + val) == b) end,
 			gt = function(a, b, val) return (a > b and val == 0) or (val > 0 and (a - val) == b) end,
 			eq = function(a, b, val) return a == b end,
@@ -142,7 +142,7 @@ function cheatfind.startplugin()
 			newdata = olddata
 		end
 		if olddata.start ~= newdata.start or olddata.size ~= newdata.size or not cfoper[oper] then
-			return {} 
+			return {}
 		end
 		if not val then
 			val = 0
@@ -206,9 +206,9 @@ function cheatfind.startplugin()
 				resort[#resort + 1] = match
 			end
 		end
-		return resort 
+		return resort
 	end
-			 
+
 
 	-- compare a data block to the current state
 	function cheat.compcur(olddata, oper, format, val, bcd)
@@ -559,7 +559,7 @@ function cheatfind.startplugin()
 				menu_lim(rightop, 1, #menu_blocks[1], m)
 				return m, function(event) local r rightop, r = incdec(event, rightop, 1, #menu_blocks[1]) return r end
 			end
-			menu[#menu + 1] = function() 
+			menu[#menu + 1] = function()
 				if optable[opsel] == "bne" or optable[opsel] == "beq" or optable[opsel] == "eq" then
 					return nil
 				end
@@ -572,7 +572,7 @@ function cheatfind.startplugin()
 				return m, function(event) local r value, r = incdec(event, value, 0, max) return r end
 			end
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
-			menu[#menu + 1] = function() 
+			menu[#menu + 1] = function()
 				local m = { "Data Format", formname[width], 0 }
 				menu_lim(width, 1, #formtable, m)
 				return m, function(event) local r width, r = incdec(event, width, 1, #formtable) return r end
@@ -640,7 +640,7 @@ function cheatfind.startplugin()
 						end
 						return i, match
 					end
-					return mpairs_it, list, 0 
+					return mpairs_it, list, 0
 				end
 				local bitwidth = formtable[width]:sub(2, 2):lower()
 				if bitwidth == "h" then
@@ -737,8 +737,8 @@ function cheatfind.startplugin()
 							match.mode = 1
 						end
 						local modes = { "Test", "Write", "Watch" }
-						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval, 
-					                                  match.newval), modes[match.mode], 0 }
+						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval,
+													  match.newval), modes[match.mode], 0 }
 						menu_lim(match.mode, 1, #modes, m)
 						local function f(event)
 							local r
@@ -782,7 +782,7 @@ function cheatfind.startplugin()
 		return menu_func[index](event)
 	end
 	emu.register_menu(menu_callback, menu_populate, "Cheat Finder")
-	emu.register_frame_done(function () 
+	emu.register_frame_done(function ()
 			local tag, screen = next(manager:machine().screens)
 			local height = mame_manager:ui():get_line_height()
 			for num, watch in ipairs(watches) do

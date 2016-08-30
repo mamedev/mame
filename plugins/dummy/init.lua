@@ -13,7 +13,7 @@ function dummy.startplugin()
 	emu.register_start(function()
 		emu.print_verbose("Starting " .. emu.gamename())
 	end)
-    
+
 	emu.register_stop(function()
 		emu.print_verbose("Exiting " .. emu.gamename())
 	end)

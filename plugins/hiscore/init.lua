@@ -1,10 +1,10 @@
 -- hiscore.lua
 -- by borgar@borgar.net, WTFPL license
--- 
+--
 -- This uses MAME's built-in Lua scripting to implment
 -- high-score saving with hiscore.dat infom just as older
 -- builds did in the past.
--- 
+--
 local exports = {}
 exports.name = "hiscore"
 exports.version = "1.0.0"
@@ -24,7 +24,7 @@ function hiscore.startplugin()
 	local hiscoredata_path = "hiscore.dat";
 	local hiscore_path = "hi";
 	local config_path = lfs.env_replace(manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
-	
+
 	local current_checksum = 0;
 	local default_checksum = 0;
 
@@ -36,7 +36,7 @@ function hiscore.startplugin()
 	local positions = {};
 	-- Configuration file will be searched in the first path defined
 	-- in mame inipath option.
-    	local function read_config()
+		local function read_config()
 	  if config_read then return true end;
 	  local file = io.open( config_path, "r" );
 	  if file then
@@ -53,7 +53,7 @@ function hiscore.startplugin()
 	  end
 	  return false
 	end
-	
+
 	local function parse_table ( dsting )
 	  local _table = {};
 	  for line in string.gmatch(dsting, '([^\n]+)') do
@@ -75,7 +75,7 @@ function hiscore.startplugin()
 		  size = tonumber(len, 16),
 		  c_start = tonumber(chk_st, 16),
 		  c_end = tonumber(chk_ed, 16),
-		  fill = tonumber(fill, 16) 
+		  fill = tonumber(fill, 16)
 		};
 	  end
 	  return _table;
@@ -143,9 +143,9 @@ function hiscore.startplugin()
 	local function get_file_name ()
 	  local r;
 	  if emu.softname() ~= "" then
-	  	r = hiscore_path .. '/' .. emu.romname() .. "_" .. emu.softname() .. ".hi";
+		r = hiscore_path .. '/' .. emu.romname() .. "_" .. emu.softname() .. ".hi";
 	  else
-	  	r = hiscore_path .. '/' .. emu.romname() .. ".hi";
+		r = hiscore_path .. '/' .. emu.romname() .. ".hi";
 	  end
 	  return r;
 	end
@@ -194,9 +194,9 @@ function hiscore.startplugin()
 	local function check_scores ( posdata )
 	  local r = 0;
 	  for ri,row in ipairs(posdata) do
-	    for i=0,row["size"]-1 do
-		r = r + row["mem"]:read_u8( row["addr"] + i );
-	    end
+		for i=0,row["size"]-1 do
+			r = r + row["mem"]:read_u8( row["addr"] + i );
+		end
 	  end
 	  return r;
 	end
@@ -227,7 +227,7 @@ function hiscore.startplugin()
 	local function tick ()
 	  -- set up scores if they have been
 	  init();
-	  -- only allow save check to run when 
+	  -- only allow save check to run when
 	  if mem_check_passed then
 		-- The reason for this complicated mess is that
 		-- MAME does expose a hook for "exit". Once it does,
@@ -260,14 +260,14 @@ function hiscore.startplugin()
 	  mem_check_passed = false
 	  scores_have_been_read = false;
 	end
-	
+
 	emu.register_start(function()
 		found_hiscore_entry = false
 		mem_check_passed = false
-	   	scores_have_been_read = false;
+		scores_have_been_read = false;
 		last_write_time = -10
-	  	emu.print_verbose("Starting " .. emu.gamename())
-	  	config_read = read_config();
+		emu.print_verbose("Starting " .. emu.gamename())
+		config_read = read_config();
 		local dat = read_hiscore_dat()
 		if dat and dat ~= "" then
 			emu.print_verbose( "hiscore: found hiscore.dat entry for " .. emu.romname() );
@@ -284,13 +284,13 @@ function hiscore.startplugin()
 				end
 			end
 			found_hiscore_entry = true
-		end		
+		end
 	end)
 	emu.register_frame(function()
 		if found_hiscore_entry then
 			tick()
 		end
-	end)  
+	end)
 	emu.register_stop(function()
 		reset()
 	end)
