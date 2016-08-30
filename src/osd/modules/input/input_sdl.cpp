@@ -24,6 +24,7 @@
 #include <mutex>
 #include <memory>
 #include <queue>
+#include <iterator>
 #include <algorithm>
 
 // MAME headers
@@ -687,29 +688,27 @@ public:
 };
 
 
-static void devmap_register(device_map_t *devmap, int physical_idx, const std::string &name)
+static void devmap_register(device_map_t &devmap, int physical_idx, const std::string &name)
 {
-	int found = 0;
-	int stick, i;
-
-	for (i = 0; i < MAX_DEVMAP_ENTRIES; i++)
+	// Attempt to find the entry by name
+	auto entry = std::find_if(std::begin(devmap.map), std::end(devmap.map), [&name](auto &item)
 	{
-		if (strcmp(name.c_str(), devmap->map[i].name.c_str()) == 0 && devmap->map[i].physical < 0)
-		{
-			devmap->map[i].physical = physical_idx;
-			found = 1;
-			devmap->logical[physical_idx] = i;
-		}
+		return item.name == name && item.physical < 0;
+	});
+
+	// If we didn't find it by name, find the first free slot
+	if (entry == std::end(devmap.map))
+	{
+		entry = std::find_if(std::begin(devmap.map), std::end(devmap.map), [](auto &item) { return item.name.empty(); });
 	}
 
-	if (found == 0)
+	if (entry != std::end(devmap.map))
 	{
-		stick = devmap_leastfree(devmap);
-		devmap->map[stick].physical = physical_idx;
-		devmap->map[stick].name = name;
-		devmap->logical[physical_idx] = stick;
+		entry->physical = physical_idx;
+		entry->name = name;
+		int logical_idx = std::distance(std::begin(devmap.map), entry);
+		devmap.logical[physical_idx] = logical_idx;
 	}
-
 }
 
 //============================================================
@@ -757,7 +756,7 @@ public:
 		for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
 				std::string joy_name = remove_spaces(SDL_JoystickNameForIndex(physical_stick));
-				devmap_register(&m_joy_map, physical_stick, joy_name.c_str());
+				devmap_register(m_joy_map, physical_stick, joy_name);
 		}
 
 		for (int stick = 0; stick < MAX_DEVMAP_ENTRIES; stick++)
