@@ -102,7 +102,7 @@ void zeus2_device::device_start()
 	save_item(NAME(zeus_matrix));
 	save_item(NAME(zeus_point));
 	save_item(NAME(zeus_point2));
- 	save_item(NAME(zeus_texbase));
+	save_item(NAME(zeus_texbase));
 	save_item(NAME(m_renderMode));
 	save_item(NAME(zeus_quad_size));
 	save_item(NAME(m_fill_color));
