@@ -3596,7 +3596,7 @@ GAME_CUSTOM( 199?, m4luckst__b,    m4luckst,   "ls15t",                0x0000, 0
 DRIVER_INIT_MEMBER(mpu4_state,m4tenten)
 {
 	DRIVER_INIT_CALL(m4default);
-//	DRIVER_INIT_CALL(m4_showstring);
+//  DRIVER_INIT_CALL(m4_showstring);
 	//Derived from 10_x_10_(Barcrest)_[C01_v1-0_1024_10jp].gam
 	DRIVER_INIT_CALL(m4_hopper_duart_a);
 	DRIVER_INIT_CALL(m4default_reels);
@@ -3717,7 +3717,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m4andyfh)
 {
 	//Derived from Andy's_Full_House_(Barcrest)_[C01_800_10jp].gam
 	DRIVER_INIT_CALL(m4default);
-//	DRIVER_INIT_CALL(m4_showstring);
+//  DRIVER_INIT_CALL(m4_showstring);
 	DRIVER_INIT_CALL(m4_hopper_tubes);
 	DRIVER_INIT_CALL(m4default_reels);
 	//PCKEY =b

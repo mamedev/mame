@@ -37,8 +37,8 @@ end
 
 function pkgconfigcmd()
 	local pkgconfig = os.getenv("PKG_CONFIG")
-	if pkgconfig == nil then 
-		return "pkg-config" 
+	if pkgconfig == nil then
+		return "pkg-config"
 	end
 	return pkgconfig
 end
