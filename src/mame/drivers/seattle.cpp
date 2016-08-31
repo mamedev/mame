@@ -195,6 +195,7 @@
 #include "video/voodoo.h"
 #include "machine/nvram.h"
 #include "calspeed.lh"
+#include "vaportrx.lh"
 #include "hyprdriv.lh"
 
 
@@ -3277,8 +3278,8 @@ GAMEL( 1998, calspeedb,calspeed, calspeed,          calspeed, seattle_state, cal
 
 
 
-GAME( 1998, vaportrx, 0,        vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, vaportrxp,vaportrx, vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, vaportrx, 0,        vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
+GAMEL( 1998, vaportrxp,vaportrx, vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
 
 /* Midway */
 GAME( 1997, biofreak, 0,        biofreak,          biofreak, seattle_state, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", MACHINE_SUPPORTS_SAVE )
