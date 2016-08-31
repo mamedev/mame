@@ -195,6 +195,7 @@
 #include "video/voodoo.h"
 #include "machine/nvram.h"
 #include "calspeed.lh"
+#include "hyprdriv.lh"
 
 
 
@@ -1580,11 +1581,11 @@ READ32_MEMBER(seattle_state::output_r)
 WRITE32_MEMBER(seattle_state::output_w)
 {
 	UINT8 bit;
-	UINT8 op = (data >> 8) & 0xFF;
+	UINT8 op = (data >> 8) & 0x0F;
 	UINT8 arg = data & 0xFF;
 	switch (op) {
-		case 0xF7: m_output_mode = arg; break;
-		case 0xFB:
+		case 0x07: m_output_mode = arg; break;
+		case 0x0B:
 		switch (m_output_mode) {
 			case 0x04: output().set_value("wheel", arg); break; //wheel motor delta. signed byte.
 			case 0x05: for (bit = 0; bit < 8; bit++) output().set_lamp_value(bit, (arg >> bit) & 0x1); break;
@@ -3288,4 +3289,4 @@ GAME( 1998, blitz99a, blitz99,  blitz99,           blitz99, seattle_state,  blit
 GAME( 1999, blitz2k,  0,        blitz2k,           blitz99, seattle_state,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, carnevil, 0,        carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, carnevil1,carnevil, carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hyprdriv, 0,        hyprdriv,          hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, hyprdriv, 0,        hyprdriv,          hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
