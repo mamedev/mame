@@ -2142,16 +2142,18 @@ void gba_lcd_device::device_start()
 	m_vram = make_unique_clear<UINT32[]>(0x18000 / 4);
 	m_oam = make_unique_clear<UINT32[]>(0x400 / 4);
 
-	save_pointer(NAME(m_pram.get()), 0x400 / 4);
-	save_pointer(NAME(m_vram.get()), 0x18000 / 4);
-	save_pointer(NAME(m_oam.get()), 0x400 / 4);
-
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	/* create a timer to fire scanline functions */
 	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_scan),this));
 	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_hbl),this));
 	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+
+	save_item(NAME(m_regs));
+
+	save_pointer(NAME(m_pram.get()), 0x400 / 4);
+	save_pointer(NAME(m_vram.get()), 0x18000 / 4);
+	save_pointer(NAME(m_oam.get()), 0x400 / 4);
 
 	save_item(NAME(m_windowOn));
 	save_item(NAME(m_fxOn));
