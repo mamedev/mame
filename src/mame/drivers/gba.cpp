@@ -1357,7 +1357,7 @@ void gba_state::machine_start()
 
 	}
 
-	save_pointer(NAME(m_regs), sizeof(m_regs));
+	save_item(NAME(m_regs));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_dma_dst));
 	save_item(NAME(m_dma_cnt));
