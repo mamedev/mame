@@ -13,6 +13,14 @@ boot from FDD:
  press F12 after initial boot was load (indicated in screen lower part)
  hold Ctrl ("YC" key) during MicroDOS start to format RAM disk (required by some games)
 
+TODO:
+ - correct CPU speed / latency emulation, each machine cycle takes here 4 clocks,
+   i.e. INX B 4+1 will be 2*4=8clocks, SHLD addr is 4+3+3+3+3 so it will be 5*4=20clocks and so on
+ - "Card Game" wont work, jump to 0 instead of vblank interrupt RST7, something direct.explicit or banking related ?
+ - border emulaton
+ - separate base unexpanded Vector06C configuration
+ - slotify AY8910 sound boards ?
+
 ****************************************************************************/
 
 #include "includes/vector06.h"
@@ -144,7 +152,7 @@ SLOT_INTERFACE_END
 /* Machine driver */
 static MACHINE_CONFIG_START( vector06, vector06_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 3000000)
+	MCFG_CPU_ADD("maincpu", I8080, 3000000)		// actual speed is wrong due to unemulated latency
 //  MCFG_CPU_ADD("maincpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)
 	MCFG_CPU_IO_MAP(vector06_io)
@@ -188,6 +196,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","vector06_flop")
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vector06_cart")
