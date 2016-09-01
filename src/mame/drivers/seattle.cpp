@@ -1581,17 +1581,38 @@ READ32_MEMBER(seattle_state::output_r)
 
 WRITE32_MEMBER(seattle_state::output_w)
 {
-	UINT8 bit;
-	UINT8 op = (data >> 8) & 0x0F;
+	UINT8 op = (data >> 8) & 0xF;
 	UINT8 arg = data & 0xFF;
-	switch (op) {
-		case 0x07: m_output_mode = arg; break;
-		case 0x0B:
-		switch (m_output_mode) {
-			case 0x04: output().set_value("wheel", arg); break; //wheel motor delta. signed byte.
-			case 0x05: for (bit = 0; bit < 8; bit++) output().set_lamp_value(bit, (arg >> bit) & 0x1); break;
-		}
-		break;
+	
+	switch (op)
+	{
+		default:
+			if (LOG_WIDGET)
+				logerror("Output (%02X) = %02X\n", op, arg);
+			break;
+		
+		case 0x7:
+			m_output_mode = arg;
+			break;
+			
+		case 0xB:
+			switch (m_output_mode)
+			{
+				default:
+					if (LOG_WIDGET)
+						logerror("Output Mode (%02X) = %02X\n", m_output_mode, arg);
+					break;
+				
+				case 0x04:
+					output().set_value("wheel", arg); //wheel motor delta. signed byte.
+					break;
+					
+				case 0x05:
+					for (UINT8 bit = 0; bit < 8; bit++)
+						output().set_lamp_value(bit, (arg >> bit) & 0x1);
+					break;
+			}
+			break;
 	}
 }
 
