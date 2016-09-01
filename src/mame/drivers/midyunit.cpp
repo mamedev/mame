@@ -2893,12 +2893,12 @@ ROM_START( term2pa2 )
 	ROM_LOAD ( "la1_terminator_2_game_rom_u111.u111", 0x000000, 0x80000, CRC(916d0197) SHA1(3b53d3770955b10cc6002e3d3bf0f71429667af0) )
 	ROM_LOAD ( "la1_terminator_2_game_rom_u112.u112", 0x080000, 0x80000, CRC(39ae1c87) SHA1(a9d332dffc77c1e0dc50549825f5b403cf19c41d) )
 	ROM_LOAD ( "la1_terminator_2_game_rom_u113.u113", 0x100000, 0x80000, CRC(cb5084e5) SHA1(58cab00d8ebc72792f6c29899013ae6a0d2278b9) )
-	ROM_LOAD ( "pa1_terminator_2_game_rom_u114.u114", 0x180000, 0x80000, CRC(2c2bda49) SHA1(6a06ddf0eb5c6939f71f7e7a15561e9974c1505f) )
+	ROM_LOAD ( "pa1_terminator_2_game_rom_u114.u114", 0x180000, 0x80000, CRC(2c2bda49) SHA1(6a06ddf0eb5c6939f71f7e7a15561e9974c1505f) ) // labeled as PA1
 
 	ROM_LOAD ( "la1_terminator_2_game_rom_u95.u95",   0x200000, 0x80000, CRC(dd39cf73) SHA1(53bb54e66e4dfbe58385915004b0ad57583a7543) )
 	ROM_LOAD ( "la1_terminator_2_game_rom_u96.u96",   0x280000, 0x80000, CRC(31f4fd36) SHA1(766fca7d5e5043fc9e68bd3dc15e6a7830279d88) )
 	ROM_LOAD ( "la1_terminator_2_game_rom_u97.u97",   0x300000, 0x80000, CRC(7f72e775) SHA1(7e2369c6b4ed5d653700b041df58355a0960193a) )
-	ROM_LOAD ( "pa1_terminator_2_game_rom_u98.u98",   0x380000, 0x80000, CRC(3f80a9b2) SHA1(a1c8dcba55b1618e6b722c2371c7725d600372d0) )
+	ROM_LOAD ( "pa1_terminator_2_game_rom_u98.u98",   0x380000, 0x80000, CRC(3f80a9b2) SHA1(a1c8dcba55b1618e6b722c2371c7725d600372d0) ) // labeled as PA1
 
 	ROM_LOAD ( "la1_terminator_2_game_rom_u106.u106", 0x400000, 0x80000, CRC(f08a9536) SHA1(fbac314bd52f23c7a704acd3c707e75cdf204c07) )
 	ROM_LOAD ( "la1_terminator_2_game_rom_u107.u107", 0x480000, 0x80000, CRC(268d4035) SHA1(89a310830be9fbc91794fcccc57053d0933c42a3) )
@@ -3047,7 +3047,7 @@ GAME( 1991, term2,    0,        yunit_adpcm_6bit_faster, term2, midyunit_state, 
 GAME( 1991, term2la3, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, term2la2, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, term2la1, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2pa2, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2pa2, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (prototype, rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, term2lg1, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LG1 11/04/91)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, mkla4,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
