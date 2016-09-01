@@ -15,43 +15,8 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* TIMER_POOL: Must be power of two */
-#define TIMER_POOL         2
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-/* output lines on the CoCo cartridge slot */
-enum cococart_line
-{
-	COCOCART_LINE_CART,             /* connects to PIA1 CB1 */
-	COCOCART_LINE_NMI,              /* connects to NMI line on CPU */
-	COCOCART_LINE_HALT,             /* connects to HALT line on CPU */
-	COCOCART_LINE_SOUND_ENABLE      /* sound enable */
-};
-
-/* since we have a special value "Q" - we have to use a special enum here */
-enum cococart_line_value
-{
-	COCOCART_LINE_VALUE_CLEAR,
-	COCOCART_LINE_VALUE_ASSERT,
-	COCOCART_LINE_VALUE_Q
-};
-
-struct coco_cartridge_line
-{
-	emu_timer                   *timer[TIMER_POOL];
-	int                         timer_index;
-	int                         delay;
-	cococart_line_value         value;
-	int                         line;
-	int                         q_count;
-	devcb_write_line        *callback;
-};
 
 // ======================> cococart_base_update_delegate
 
@@ -76,6 +41,23 @@ class cococart_slot_device : public device_t,
 								public device_image_interface
 {
 public:
+	// output lines on the CoCo cartridge slot
+	enum class line
+	{
+		CART,             // connects to PIA1 CB1
+		NMI,              // connects to NMI line on CPU
+		HALT,             // connects to HALT line on CPU
+		SOUND_ENABLE      // sound enable
+	};
+
+	// since we have a special value "Q" - we have to use a special enum here
+	enum class line_value
+	{
+		CLEAR,
+		ASSERT,
+		Q
+	};
+
 	// construction/destruction
 	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -110,7 +92,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 	// sets a cartridge line
-	void cart_set_line(cococart_line line, cococart_line_value value);
+	void cart_set_line(line line, line_value value);
 
 	// hack to support twiddling the Q line
 	void twiddle_q_lines();
@@ -120,11 +102,25 @@ public:
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 private:
+	// TIMER_POOL: Must be power of two
+	static constexpr int TIMER_POOL = 2;
+
 	enum
 	{
 		TIMER_CART,
 		TIMER_NMI,
 		TIMER_HALT
+	};
+
+	struct coco_cartridge_line
+	{
+		emu_timer                   *timer[TIMER_POOL];
+		int                         timer_index;
+		int                         delay;
+		line_value					value;
+		int                         line;
+		int                         q_count;
+		devcb_write_line *			callback;
 	};
 
 	// configuration
@@ -140,9 +136,10 @@ private:
 	device_cococart_interface   *m_cart;
 
 	// methods
-	void set_line(const char *line_name, coco_cartridge_line &line, cococart_line_value value);
-	void set_line_timer(coco_cartridge_line &line, cococart_line_value value);
+	void set_line(const char *line_name, coco_cartridge_line &line, line_value value);
+	void set_line_timer(coco_cartridge_line &line, line_value value);
 	void twiddle_line_if_q(coco_cartridge_line &line);
+	static const char *line_value_string(line_value value);
 };
 
 // device type definition
@@ -181,4 +178,4 @@ private:
 #define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#endif /* __COCOCART_H__ */
+#endif // __COCOCART_H__

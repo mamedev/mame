@@ -252,12 +252,12 @@ void coco_fdc_device::update_lines()
 		m_dskreg &= ~0x80;  /* clear halt enable */
 
 	/* set the NMI line */
-	m_owner->cart_set_line(COCOCART_LINE_NMI,
-		((m_intrq != 0) && (m_dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+	m_owner->cart_set_line(cococart_slot_device::line::NMI,
+		((m_intrq != 0) && (m_dskreg & 0x20)) ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
 
 	/* set the HALT line */
-	m_owner->cart_set_line(COCOCART_LINE_HALT,
-		((m_drq == 0) && (m_dskreg & 0x80)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+	m_owner->cart_set_line(cococart_slot_device::line::HALT,
+		((m_drq == 0) && (m_dskreg & 0x80)) ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
 }
 
 /*-------------------------------------------------
@@ -497,12 +497,12 @@ const tiny_rom_entry *dragon_fdc_device::device_rom_region() const
 void dragon_fdc_device::update_lines()
 {
 	/* set the NMI line */
-	m_owner->cart_set_line(COCOCART_LINE_NMI,
-		((m_intrq != 0) && (m_dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+	m_owner->cart_set_line(cococart_slot_device::line::NMI,
+		((m_intrq != 0) && (m_dskreg & 0x20)) ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
 
 	/* set the CART line */
-	m_owner->cart_set_line(COCOCART_LINE_CART,
-		(m_drq != 0) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+	m_owner->cart_set_line(cococart_slot_device::line::CART,
+		(m_drq != 0) ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
 }
 
 
