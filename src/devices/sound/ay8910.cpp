@@ -239,6 +239,7 @@ has twice the steps, happening twice as fast.
  *************************************/
 
 #define ENABLE_REGISTER_TEST        (0)     /* Enable preprogrammed registers */
+#define LOG_IGNORED_WRITES          (0)
 
 #define MAX_OUTPUT 0x7fff
 
@@ -650,11 +651,13 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_a_write_cb.isnull())
 					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
 				else
-					logerror("warning - write %02x to 8910 '%s' Port A\n",m_regs[AY_PORTA],tag());
+					logerror("warning - write %02x to 8910 Port A\n", m_regs[AY_PORTA]);
 			}
 			else
 			{
-				logerror("warning: write to 8910 '%s' Port A set as input - ignored\n",tag());
+#if LOG_IGNORED_WRITES
+				logerror("warning: write %02x to 8910 Port A set as input - ignored\n", v);
+#endif
 			}
 			break;
 		case AY_PORTB:
@@ -663,11 +666,13 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_b_write_cb.isnull())
 					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
 				else
-					logerror("warning - write %02x to 8910 '%s' Port B\n",m_regs[AY_PORTB],tag());
+					logerror("warning - write %02x to 8910 Port B\n", m_regs[AY_PORTB]);
 			}
 			else
 			{
-				logerror("warning: write to 8910 '%s' Port B set as input - ignored\n",tag());
+#if LOG_IGNORED_WRITES
+				logerror("warning: write %02x to 8910 Port B set as input - ignored\n", v);
+#endif
 			}
 			break;
 	}
@@ -997,7 +1002,7 @@ int ay8910_device::ay8910_read_ym()
 	{
 	case AY_PORTA:
 		if ((m_regs[AY_ENABLE] & 0x40) != 0)
-			logerror("warning: read from 8910 '%s' Port A set as output\n",tag());
+			logerror("%s: warning - read from 8910 '%s' Port A set as output\n", machine().describe_context());
 		/*
 		   even if the port is set as output, we still need to return the external
 		   data. Some games, like kidniki, need this to work.
@@ -1011,15 +1016,15 @@ int ay8910_device::ay8910_read_ym()
 		if (!m_port_a_read_cb.isnull())
 			m_regs[AY_PORTA] = m_port_a_read_cb(0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port A\n",machine().describe_context(),tag());
+			logerror("%s: warning - read 8910 Port A\n", machine().describe_context());
 		break;
 	case AY_PORTB:
 		if ((m_regs[AY_ENABLE] & 0x80) != 0)
-			logerror("warning: read from 8910 '%s' Port B set as output\n",tag());
+			logerror("%s: warning - read from 8910 Port B set as output\n", machine().describe_context());
 		if (!m_port_b_read_cb.isnull())
 			m_regs[AY_PORTB] = m_port_b_read_cb(0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port B\n",machine().describe_context(),tag());
+			logerror("%s: warning - read 8910 Port B\n", machine().describe_context());
 		break;
 	}
 
