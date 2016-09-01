@@ -323,24 +323,25 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
-                                              Sticker      EPROM   FLASHROMs   X76F100  EPM7064S  315-5881
-Game                                          on cart      IC22#   # of SOP56  IC37#    IC41#     IC42#         Notes
-------------------------------------------------------------------------------------------------------------------------------------
-Club Kart: European Session (2003, prototype)   no cart    *       21 (64Mb)   present  315-6206  not present   * instead of EPROM have tiny PCB with 2 flashroms on it
-Crackin' DJ part 2                            840-0068C    23674   20 (64Mb)   present  315-6206  317-0311-COM  PCB have label 840-0068B-01 837-14124, requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
-Ferrari F355 Challenge (twin/deluxe, prototype) no cart    22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * flash-PCB have CRC 330B A417, the rest is the same as regular cart, not dumped but known to exist
-Ferrari F355 Challenge 2 (twin/deluxe)          no cart    23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
-House of the Dead 2 (prototype)                 no cart    A1E2    21 (64Mb)   present  315-6206  present       no label on IC42
-Inu No Osanpo / Dog Walking (Rev A)           840-0073C    22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
-Samba de Amigo (prototype)                      no cart    *       21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, instead of EPROM have tiny PCB with 2 flashroms on it
-Soul Surfer (Rev A)                           840-0095C    23838C  21 (64Mb)   present  315-6206  not present
-Star Horse (server)                           840-0055C    23626   17 (64Mb)   present  315-6206  not present   requires 837-13785 ARCNET&IO BD
-The King of Route 66 (Rev A)                  840-0087C    23819A  20 (64Mb)   present  315-6206  not present   content is the same as regular 171-8132A cart
-The Maze of the Kings (prototype)               no cart    *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
-Tokyo Bus Guide (Rev A)                       840-0045C    23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
-Virtua NBA (prototype)                          no cart    *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
-Virtua Tennis / Power Smash (prototype)         no cart    *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
-Wave Runner GP (USA, Rev A)                   840-0064C-01 23725A  12 (64Mb)   present  315-6206  317-0306-COM
+                                              Sticker    EPROM   FLASHROMs   X76F100  EPM7064S  315-5881
+Game                                          on cart    IC22#   # of SOP56  IC37#    IC41#     IC42#         Notes
+----------------------------------------------------------------------------------------------------------------------------------
+Club Kart: European Session (2003, prototype)   no cart  *       21 (64Mb)   present  315-6206  not present   * instead of EPROM have tiny PCB with 2 flashroms on it
+Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   present  315-6206  317-0311-COM  PCB have label 840-0068B-01 837-14124, requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
+Ferrari F355 Challenge (twin/deluxe, prototype) no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * flash-PCB have CRC 330B A417, the rest is the same as regular cart, not dumped but known to exist
+/Ferrari F355 Challenge 2 - International
+\Course Edition (twin/deluxe, prototype)        no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
+House of the Dead 2 (prototype)                 no cart  A1E2    21 (64Mb)   present  315-6206  present       no label on IC42
+Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
+Samba de Amigo (prototype)                      no cart  *       21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, instead of EPROM have tiny PCB with 2 flashroms on it
+Soul Surfer (Rev A)                           840-0095C  23838C  21 (64Mb)   present  315-6206  not present
+Star Horse (server)                           840-0055C  23626   17 (64Mb)   present  315-6206  not present   requires 837-13785 ARCNET&IO BD
+The King of Route 66 (Rev A)                  840-0087C  23819A  20 (64Mb)   present  315-6206  not present   content is the same as regular 171-8132A cart
+The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
+Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
+Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
+Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
+Wave Runner GP (USA, Rev A)                   840-0064C  23725A  12 (64Mb)   present  315-6206  317-0306-COM
 
 
 837-13668  171-7919A (C) Sega 1998
@@ -553,7 +554,7 @@ Virtua Tennis 2 / Power Smash 2 (Rev A)                      840-0084C    22327A
 |                                            IC41 OSC1     |
 |IC4   IC3   IC2   IC1               IC42          JP1     |
 |7/8   5/6   3/4   1/2                                     |
-|                                                          |
+|                     IC46                                 |
 |        ----CN3----                    ----CN1----        |
 |----------------------------------------------------------|
 Notes:
@@ -568,42 +569,43 @@ Notes:
       IC42  - SEGA 315-5881 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
  IC44-IC45  - SRAM (SOJ28) 32kx8, either IDT71256 or CY7C199
+      IC46  - FlashROM (SOIC8) Xicor X76F100 Secure SerialFlash
       JP2   - JUMPER unknown function
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                                                Sticker    EPROM   MASKROMs    EPM7032    XC9536    315-5881
-Game                                            on cart    IC22#   # of SOP44  IC27#      IC41#     IC42#         Notes
-----------------------------------------------------------------------------------------------------------------------------
-Alien Front (Rev A)                             840-0048C  23586A   5 (128Mb)  315-6319A  315-6213  317-0293-COM
-Alien Front (Rev T)                             840-0048C  23586T   5 (128Mb)  315-6319A  315-6213  317-0293-COM
-Capcom Vs. SNK Millennium Fight 2000            841-0011C  23511    7 (128Mb)  315-6219   315-6213  317-5059-COM  Date on screen: 000802
-Capcom Vs. SNK Millennium Fight 2000 (Rev A)    841-0011C  23511A   7 (128Mb)  315-6219   315-6213  317-5059-COM  Date on screen: 000804
-Capcom Vs. SNK Millennium Fight 2000 (Rev C)    841-0011C  23511C   7 (128Mb)  315-6319   315-6213  317-5059-COM  Date on screen: 000904
-Club Kart: European Session                     840-0062C  23704   11 (128Mb)  315-6319A  315-6213  317-0313-COM
-Club Kart: European Session (Rev C)             840-0062C      *   11 (128Mb)  315-6319A  315-6213  317-0313-COM  * EPR have handwritten Japanese label possibly readable as 'teteto 74 lcl'
-Club Kart: European Session (Rev D)             840-0062C  23704D  11 (128Mb)  315-6319A  315-6213  317-0313-COM
-Crackin' DJ                                     840-0043C  23450   10 (128Mb)  315-6319   315-6213  317-0288-COM  requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
-Derby Owners Club II Ver.2.1 (Japan) (Rev B)    840-0083C  22306B  11 (128Mb)  315-6319A  315-6213  317-0327-JPN
-Derby Owners Club World Edition (Rev C)         840-0088C  22336C   7 (128Mb)  315-6319A  315-6213  not present
-Derby Owners Club World Edition EX (Rev D)      840-0088C  22336D   7 (128Mb)  315-6319A  315-6213  not present   2 MaskROM are different from Rev C
-Giga Wing 2                                     841-0014C  22270    5 (128Mb)  315-6319A  315-6213  317-5064-COM
-Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  315-6319A  315-6213  317-5070-COM
-Moero! Justice Gakuen / Project Justice (Rev A) 841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM
-MushiKing - The King Of Beetle 2K5 1ST          840-0158C  24286    7 (128Mb)  315-6319A  315-6213  not present   requires 610-0669 barcode reader
-Oinori-daimyoujin Matsuri                       840-0126C  24053    5 (128Mb)  315-6319A  315-6213  not present   requires 837-14274 "G2 EXPANSION BD" (similar to hopper 837-14381 but with ARC NET chip)
-Samba de Amigo Ver. 2000                        840-0047C  23600   11 (128Mb)  315-6319A  315-6213  317-0295-COM
-Star Horse (big screens)                        840-0054C  23625    4 (128Mb)  315-6319   315-6213  not present   requires 837-13785 ARCNET&IO BD
-Star Horse (satellite)                          840-0056C  23627    6 (128Mb)* 315-6319   315-6213  not present   * +1 (64Mb), requires 837-13785 ARCNET&IO BD
-Star Horse Progress (satellite) (Rev A)         840-0123C  24122A   7 (128Mb)  315-6319A  315-6213  not present   requires 837-13785 ARCNET&IO BD
-The King of Route 66 (Rev A)                    840-0087C  23819A  10 (128Mb)  315-6319A  315-6213  not present
-Virtua Fighter 4                                840-0080C  23785   11 (128Mb)  ?          ?         317-0324-COM
-Virtua Striker 3                                840-0061C  23663   11 (128Mb)  315-6319A  315-6213  317-0310-COM
-Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  315-6319A  315-6213  317-0310-COM
-Wave Runner GP                                  840-0064C  24059    6 (128Mb)  315-6319A  315-6213  not present
-Wild Riders                                     840-0046C  23622   10 (128Mb)  315-6319A  315-6213  317-0301-COM
-WWF Royal Rumble                                840-0040C  22261    8 (128Mb)  315-6319   315-6213  317-0285-COM
-Zero Gunner 2                                   841-0020C  23689    5 (128Mb)  315-6319A  315-6213  317-5073-COM
+                                                Sticker    EPROM   MASKROMs    EPM7032    XC9536    315-5881      X76F100
+Game                                            on cart    IC22#   # of SOP44  IC27#      IC41#     IC42#         IC46#        Notes
+-----------------------------------------------------------------------------------------------------------------------------------------
+Alien Front (Rev A)                             840-0048C  23586A   5 (128Mb)  315-6319A  315-6213  317-0293-COM  present
+Alien Front (Rev T)                             840-0048C  23586T   5 (128Mb)  315-6319A  315-6213  317-0293-COM  ?
+Capcom Vs. SNK Millennium Fight 2000            841-0011C  23511    7 (128Mb)  315-6219   315-6213  317-5059-COM  present      Date on screen: 000802
+Capcom Vs. SNK Millennium Fight 2000 (Rev A)    841-0011C  23511A   7 (128Mb)  315-6219   315-6213  317-5059-COM  ?            Date on screen: 000804
+Capcom Vs. SNK Millennium Fight 2000 (Rev C)    841-0011C  23511C   7 (128Mb)  315-6319   315-6213  317-5059-COM  ?            Date on screen: 000904
+Club Kart: European Session                     840-0062C  23704   11 (128Mb)  315-6319A  315-6213  317-0313-COM  present
+Club Kart: European Session (Rev C)             840-0062C      *   11 (128Mb)  315-6319A  315-6213  317-0313-COM  present      * EPR have handwritten Japanese label possibly readable as 'teteto 74 lcl'
+Club Kart: European Session (Rev D)             840-0062C  23704D  11 (128Mb)  315-6319A  315-6213  317-0313-COM  present
+Crackin' DJ                                     840-0043C  23450   10 (128Mb)  315-6319   315-6213  317-0288-COM  ?            requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
+Derby Owners Club II Ver.2.1 (Japan) (Rev B)    840-0083C  22306B  11 (128Mb)  315-6319A  315-6213  317-0327-JPN  present
+Derby Owners Club World Edition (Rev C)         840-0088C  22336C   7 (128Mb)  315-6319A  315-6213  not present   not present
+Derby Owners Club World Edition EX (Rev D)      840-0088C  22336D   7 (128Mb)  315-6319A  315-6213  not present   not present  2 MaskROM are different from Rev C
+Giga Wing 2                                     841-0014C  22270    5 (128Mb)  315-6319A  315-6213  317-5064-COM  ?
+Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  315-6319A  315-6213  317-5070-COM  ?
+Moero! Justice Gakuen / Project Justice (Rev A) 841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM  present
+MushiKing - The King Of Beetle 2K5 1ST          840-0158C  24286    7 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
+Oinori-daimyoujin Matsuri                       840-0126C  24053    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-14274 "G2 EXPANSION BD" (similar to hopper 837-14381 but with ARC NET chip)
+Samba de Amigo Ver. 2000                        840-0047C  23600   11 (128Mb)  315-6319A  315-6213  317-0295-COM  ?
+Star Horse (big screens)                        840-0054C  23625    4 (128Mb)  315-6319   315-6213  not present   present      requires 837-13785 ARCNET&IO BD
+Star Horse (satellite)                          840-0056C  23627    6 (128Mb)* 315-6319   315-6213  not present   present      * +1 (64Mb), requires 837-13785 ARCNET&IO BD
+Star Horse Progress (satellite) (Rev A)         840-0123C  24122A   7 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-13785 ARCNET&IO BD
+The King of Route 66 (Rev A)                    840-0087C  23819A  10 (128Mb)  315-6319A  315-6213  not present   present
+Virtua Fighter 4                                840-0080C  23785   11 (128Mb)  ?          ?         317-0324-COM  ?
+Virtua Striker 3                                840-0061C  23663   11 (128Mb)  315-6319A  315-6213  317-0310-COM  ?
+Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  315-6319A  315-6213  317-0310-COM  present
+Wave Runner GP                                  840-0064C  24059    6 (128Mb)  315-6319A  315-6213  not present   present
+Wild Riders                                     840-0046C  23622   10 (128Mb)  315-6319A  315-6213  317-0301-COM  ?
+WWF Royal Rumble                                840-0040C  22261    8 (128Mb)  315-6319   315-6213  317-0285-COM  ?
+Zero Gunner 2                                   841-0020C  23689    5 (128Mb)  315-6319A  315-6213  317-5073-COM  present
 
 
 171-8346C (C) Sega 2005
@@ -1421,7 +1423,7 @@ Notes:
 Development ROM board:
 
 There are a few unreleased and many prototype game versions known to exist on this ROM board.
-Currently Rumble Fish 1, Rumble Fish 2 prototypes and Sushi Bar is dumped.
+Currently Rumble Fish 1, Rumble Fish 2 prototypes and Sushi Bar are dumped.
 
 PC BD SYSTEMX 3MODE FLASH Rev.B
 1111-00001402
@@ -1546,7 +1548,13 @@ Notes:
       CN5 - Gun connection for player 1 pump switch
 
 
-Other games not dumped (some may have been cancelled)
+Other games not dumped
+----------------------
+Block Pong Pong
+Miracle Stadium
+Wai Wai Drive
+
+Cancelled, prototypes known to exists
 ----------------------
 Chase 1929
 Force Five
@@ -8861,7 +8869,7 @@ ROM_START( wccf212e )
 	ROM_LOAD("fpr23911.ic18", 0x000000, 0x200000, CRC(1a1da741) SHA1(532ea7fc4dab11e012a521abcf5fdadd9b40d631) )
 ROM_END
 
-// "Drive Checker", contain only optical media ejector win32 program
+// "Drive Checker", contains only optical media ejector win32 program
 ROM_START( wccf2chk )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -9565,7 +9573,7 @@ ROM_END
 /* none   */ GAME( 1998, hotd2p,   hotd2,    naomim2, hotd2, naomi_state,   hotd2, ROT0, "Sega", "House of the Dead 2 (prototype)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* 13842  */ GAME( 1999, f355,     f355dlx,  naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge (deluxe, no link)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
 /* 13950  */ GAME( 1999, f355twin, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
-/* ?????  */ GAME( 2001, f355twn2, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
+/* none   */ GAME( 2001, f355twn2, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
 /* ?????  */ GAME( 1999, alpiltdx, airlbios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Airline Pilots (deluxe) (Rev B)", GAME_FLAGS ) /* specific BIOS "airlbios" needed */
 
 /* 840-xxxxx (Sega Naomi cart games)*/
@@ -9606,11 +9614,10 @@ ROM_END
 /* 0039 */ GAME( 2000, gram2000, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
 /* 0040 */ GAME( 2000, wwfroyal, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "WWF Royal Rumble", GAME_FLAGS )
 /* 0041 */ GAME( 2000, slasho,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Slashout", GAME_FLAGS )
-// 0042 Ferrari F355 Challenge 2 (twin) - identical to 834-????? listed above.
+// 0042 Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe) - identical to f355twn2 listed above.
 /* 0043 */ GAME( 2000, crackndj, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ", GAME_FLAGS )
 /* 0044 */ GAME( 2000, csmasho,  csmash,   naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Cosmic Smash", GAME_FLAGS )
 /* 0044 */ GAME( 2000, csmash,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Cosmic Smash (Rev A)", GAME_FLAGS )
-// 0045 1999, "FortyFive / Sega", "Tokyo Bus Guide"
 /* 0045 */ GAME( 1999, tokyobus, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Fortyfive", "Tokyo Bus Guide (Rev A)", GAME_FLAGS )
 /* 0047 */ GAME( 2000, samba2k,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Samba de Amigo ver. 2000", GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnt, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev T)", GAME_FLAGS )
@@ -9619,8 +9626,8 @@ ROM_END
 /* 0054 */ GAME( 2000, starhrse, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (big screens)", GAME_FLAGS )
 /* 0055 */ GAME( 2000, starhrct, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (server)", GAME_FLAGS )
 /* 0056 */ GAME( 2000, starhrcl, naomi,    naomim2, naomi,   naomi_state, naomi,  ROT270,"Sega", "Star Horse (satellite)", GAME_FLAGS )
-/* 0064-01*/GAME(2001, wrungpo,  wrungp,   naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
-/* 0064 */ GAME( 2001, wrungp,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
+/* 0064 */ GAME( 2001, wrungpo,  wrungp,   naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )	// ROM PCB # 840-0064B-01
+/* 0064 */ GAME( 2001, wrungp,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )	// ROM PCB # 840-0064B
 /* 0068 */ GAME( 2001, crakndj2, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ Part 2", GAME_FLAGS )
 /* 0073 */ GAME( 2001, inunoos,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Inu No Osanpo / Dog Walking (Rev A)", GAME_FLAGS )
 /* 0083 */ GAME( 2001, derbyoc2, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Derby Owners Club II Ver.2.1 (Japan) (Rev B)", GAME_FLAGS )
@@ -9667,34 +9674,34 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* none */ GAME( 2003, clubk2kp, clubk2k3,naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session (2003, prototype)", GAME_FLAGS )
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
-/* 0001 */ GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone", GAME_FLAGS )
-/* 0002 */ GAME( 1999, suchie3,  naomi, naomim2, suchie3, naomi_state,naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
-/* 0003 */ GAME( 1999, doa2,     naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (Rev A)", GAME_FLAGS )
-/* 0003 */ GAME( 2000, doa2m,    doa2,  naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium", GAME_FLAGS )
-/* 0004 */ GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (Build 0728)", GAME_FLAGS ) // version taken from service mode
-/* 0005 */ GAME( 1999, spawn,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn In the Demon's Hand (Rev B)", GAME_FLAGS )
-/* 0006 */ GAME( 1999, puyoda,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Compile",         "Puyo Puyo Da!", GAME_FLAGS )
-/* 0007-01 */     GAME(2000, mvsc2u, mvsc2, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)", GAME_FLAGS)
-/* 0007-02 -03 */ GAME(2000, mvsc2,  naomi, naomim1, naomi,   naomi_state, naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)", GAME_FLAGS)
-/* 0008 */ GAME( 2000, pstone2,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone 2", GAME_FLAGS )
-/* 0011 */ GAME( 2000, capsnk,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev C)", GAME_FLAGS )
-/* 0011 */ GAME( 2000, capsnka,  capsnk,naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev A)", GAME_FLAGS )
-/* 0011 */ GAME( 2000, capsnkb,  capsnk,naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000", GAME_FLAGS )
-/* 0012 */ GAME( 2000, cspike,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_FLAGS )
-/* 0013 */ GAME( 2000, ggx,      naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Arc System Works","Guilty Gear X (JPN)", GAME_FLAGS )
-/* 0014 */ GAME( 2000, gwing2,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Takumi / Capcom", "Giga Wing 2", GAME_FLAGS )
-/* 0015 */ GAME( 2000, pjustic,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Moero! Justice Gakuen (JPN) / Project Justice (USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )
-/* 0016 */ GAME( 2000, deathcox, naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Ecole Software",  "Death Crimson OX", GAME_FLAGS )
-/* 0017 */ GAME( 2001, gundmct,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Banpresto / Capcom","Mobile Suit Gundam: Federation Vs. Zeon", GAME_FLAGS )
-/* 0020 */ GAME( 2001, zerogu2,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Psikyo",          "Zero Gunner 2", GAME_FLAGS )
-/* 0057 */ GAME( 2007, sl2007,   naomi, naomim4, naomi,   naomi_state, naomi,  ROT270,"Triangle Service","Shooting Love 2007", GAME_FLAGS )
-/* 0058 */ GAME( 2008, ausfache, naomi, naomim4, naomi,   naomi_state, naomi,  ROT0,  "Subtle Style",    "Akatsuki Blitzkampf Ausf. Achse", GAME_FLAGS )
-/* 0059 */ GAME( 2008, illvelo,  naomi, naomim4, naomi,   naomi_state, naomi,  ROT270,"Milestone",       "Illvelo (Illmatic Envelope)", GAME_FLAGS )
-/* 0060 */ GAME( 2008, mamonoro, naomi, naomim4, naomi,   naomi_state, naomi,  ROT270,"G.Rev",           "Mamoru-kun wa Norowarete Shimatta!", GAME_FLAGS )
-/* 0061 */ GAME( 2008, mbaao,    mbaa,  naomim4, naomi,   naomi_state, naomi,  ROT0,  "Type-Moon/Ecole", "Melty Blood Actress Again", GAME_FLAGS )
-/* 0061 */ GAME( 2008, mbaa,     naomi, naomim4, naomi,   naomi_state, naomi,  ROT0,  "Type-Moon/Ecole", "Melty Blood Actress Again Version A (Rev A)", GAME_FLAGS )
-/* 0062 */ GAME( 2009, radirgyn, naomi, naomim4, naomi,   naomi_state, naomi,  ROT0,  "Milestone/Lucky", "Radirgy Noa", GAME_FLAGS )
-/* HMG016007 */ GAME( 2001,hmgeo,naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Heavy Metal Geomatrix (Rev B)", GAME_FLAGS )
+/* 0001 */       GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone", GAME_FLAGS )
+/* 0002 */       GAME( 1999, suchie3,  naomi, naomim2, suchie3, naomi_state,naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+/* 0003 */       GAME( 1999, doa2,     naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (Rev A)", GAME_FLAGS )
+/* 0003 */       GAME( 2000, doa2m,    doa2,  naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium", GAME_FLAGS )
+/* 0004 */       GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (Build 0728)", GAME_FLAGS ) // version taken from service mode
+/* 0005 */       GAME( 1999, spawn,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn In the Demon's Hand (Rev B)", GAME_FLAGS )
+/* 0006 */       GAME( 1999, puyoda,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Compile",         "Puyo Puyo Da!", GAME_FLAGS )
+/* 0007-01 */    GAME( 2000, mvsc2u,   mvsc2, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)", GAME_FLAGS)
+/* 0007-02 -03 */GAME( 2000, mvsc2,    naomi, naomim1, naomi,   naomi_state, naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)", GAME_FLAGS)
+/* 0008 */       GAME( 2000, pstone2,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone 2", GAME_FLAGS )
+/* 0011 */       GAME( 2000, capsnk,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev C)", GAME_FLAGS )
+/* 0011 */       GAME( 2000, capsnka,  capsnk,naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev A)", GAME_FLAGS )
+/* 0011 */       GAME( 2000, capsnkb,  capsnk,naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000", GAME_FLAGS )
+/* 0012 */       GAME( 2000, cspike,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_FLAGS )
+/* 0013 */       GAME( 2000, ggx,      naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Arc System Works","Guilty Gear X (JPN)", GAME_FLAGS )
+/* 0014 */       GAME( 2000, gwing2,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Takumi / Capcom", "Giga Wing 2", GAME_FLAGS )
+/* 0015 */       GAME( 2000, pjustic,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Moero! Justice Gakuen (JPN) / Project Justice (USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )
+/* 0016 */       GAME( 2000, deathcox, naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Ecole Software",  "Death Crimson OX", GAME_FLAGS )
+/* 0017 */       GAME( 2001, gundmct,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Banpresto / Capcom","Mobile Suit Gundam: Federation Vs. Zeon", GAME_FLAGS )
+/* 0020 */       GAME( 2001, zerogu2,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Psikyo",          "Zero Gunner 2", GAME_FLAGS )
+/* 0057 */       GAME( 2007, sl2007,   naomi, naomim4, naomi,   naomi_state, naomi,  ROT270,"Triangle Service","Shooting Love 2007", GAME_FLAGS )
+/* 0058 */       GAME( 2008, ausfache, naomi, naomim4, naomi,   naomi_state, naomi,  ROT0,  "Subtle Style",    "Akatsuki Blitzkampf Ausf. Achse", GAME_FLAGS )
+/* 0059 */       GAME( 2008, illvelo,  naomi, naomim4, naomi,   naomi_state, naomi,  ROT270,"Milestone",       "Illvelo (Illmatic Envelope)", GAME_FLAGS )
+/* 0060 */       GAME( 2008, mamonoro, naomi, naomim4, naomi,   naomi_state, naomi,  ROT270,"G.Rev",           "Mamoru-kun wa Norowarete Shimatta!", GAME_FLAGS )
+/* 0061 */       GAME( 2008, mbaao,    mbaa,  naomim4, naomi,   naomi_state, naomi,  ROT0,  "Type-Moon/Ecole", "Melty Blood Actress Again", GAME_FLAGS )
+/* 0061 */       GAME( 2008, mbaa,     naomi, naomim4, naomi,   naomi_state, naomi,  ROT0,  "Type-Moon/Ecole", "Melty Blood Actress Again Version A (Rev A)", GAME_FLAGS )
+/* 0062 */       GAME( 2009, radirgyn, naomi, naomim4, naomi,   naomi_state, naomi,  ROT0,  "Milestone/Lucky", "Radirgy Noa", GAME_FLAGS )
+/* HMG016007 */  GAME( 2001, hmgeo,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Heavy Metal Geomatrix (Rev B)", GAME_FLAGS )
 
 /* Cart games on Namco custom ROM board */
 /* 25209801 */ GAME( 2000, wldkicksa,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (Asia, WK2 Ver.A)", GAME_FLAGS )
@@ -9704,8 +9711,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 25469801 */ GAME( 2000, ninjaslta,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (Asia, NJA2 Ver.A)", GAME_FLAGS )
 /* 25469801 */ GAME( 2000, ninjasltu,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (US, NJA3 Ver.A)", GAME_FLAGS )
 /* 25469801 */ GAME( 2000, ninjaslt, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (World, NJA4 Ver.A)", GAME_FLAGS )
-/* Note: the game's full name is exactly "World Kicks PCB", have different s/n as well */
-/* 25509801 */ GAME( 2000, wldkicksj,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks PCB (Japan, WKC1 Ver.A)", GAME_FLAGS )
+/* 25509801 */ GAME( 2000, wldkicksj,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks PCB (Japan, WKC1 Ver.A)", GAME_FLAGS )	// "PCB" means upright version, uses analog button on control panel to kick the ball
 /* 25709801 */ GAME( 2001, gunsur2j, gunsur2, naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)", GAME_FLAGS )
 /* 25709801 */ GAME( 2001, gunsur2,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)", GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazana,   mazan,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)", GAME_FLAGS )
@@ -9758,8 +9764,8 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0025A */ GAME( 2002, initdexp, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage (Export) (Rev A) (GDS-0025A)", GAME_FLAGS )
 /* 0026  */ GAME( 2002, initdv2jo,initdv2j,naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_FLAGS )
 // 0026A Initial D Arcade Stage Ver. 2 (Japan) (Rev A) (GDS-0026A)
-/* 0026B */ GAME( 2002, initdv2j, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 2 (Japan) (Rev B) (GDS-0026B)", GAME_FLAGS )
-/* 0027  */ GAME( 2002, initdv2e, initdv2j,naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 2 (Export) (GDS-0027)", GAME_FLAGS )
+/* 0026B */ GAME( 2003, initdv2j, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 2 (Japan) (Rev B) (GDS-0026B)", GAME_FLAGS )
+/* 0027  */ GAME( 2003, initdv2e, initdv2j,naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 2 (Export) (GDS-0027)", GAME_FLAGS )
 // 0028
 // 0029  Club Kart for Cycraft (GDS-0029)
 /* 0029A */ GAME( 2003, clubkcyc, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Club Kart for Cycraft (Rev A) (GDS-0029A)", GAME_FLAGS )
@@ -9853,7 +9859,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 // 00??  ExZeus (GDL-00xx)
 
 /* CDP-xxxxx and CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
-/* CDP-10001C*/ GAME( 2003, wccf116,  naomigd, naomigd, naomi, naomi_state, naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 Ver. 2 (CDP-10001C)", GAME_FLAGS )
+/* CDP-10001C*/ GAME( 2003, wccf116,  naomigd, naomigd, naomi, naomi_state, naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 Ver.2 (CDP-10001C)", GAME_FLAGS )
 /* CDP-10003 */ GAME( 2002, wccf1dup, naomigd, naomigd, naomi, naomi_state, naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 DIMM FIRM Ver.3.03 (CDP-10003)", GAME_FLAGS )
 /* CDV-10002 */ GAME( 2004, wccf212e, naomigd, naomigd, naomi, naomi_state, naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2002-2003 Ver.2.12 (CDV-10002)", GAME_FLAGS )
 /* CDV-10007 */ GAME( 2004, wccf2chk, naomigd, naomigd, naomi, naomi_state, naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2002-2003 Drive Checker (CDV-10007)", GAME_FLAGS )  // actually just disc ejector
