@@ -125,35 +125,35 @@
 			<bounds x="1.9" y="3.0" width="0.2" height="0.1" />
 		</bezel>
 		
-		<bezel name="led0" element="led">
+		<bezel name="led4" element="led">
 			<bounds x="3.43" y="3.025" width="0.025" height="0.025" />
 		</bezel>
-		<bezel name="led1" element="led">
+		<bezel name="led3" element="led">
 			<bounds x="3.46" y="3.025" width="0.025" height="0.025" />
 		</bezel>
 		<bezel name="led2" element="led">
 			<bounds x="3.49" y="3.025" width="0.025" height="0.025" />
 		</bezel>
-		<bezel name="led3" element="led">
+		<bezel name="led1" element="led">
 			<bounds x="3.52" y="3.025" width="0.025" height="0.025" />
 		</bezel>
-		<bezel name="led4" element="led">
+		<bezel name="led0" element="led">
 			<bounds x="3.55" y="3.025" width="0.025" height="0.025" />
 		</bezel>
 		
-		<bezel name="led5" element="led">
+		<bezel name="led9" element="led">
 			<bounds x="3.43" y="3.055" width="0.025" height="0.025" />
 		</bezel>
-		<bezel name="led6" element="led">
+		<bezel name="led8" element="led">
 			<bounds x="3.46" y="3.055" width="0.025" height="0.025" />
 		</bezel>
 		<bezel name="led7" element="led">
 			<bounds x="3.49" y="3.055" width="0.025" height="0.025" />
 		</bezel>
-		<bezel name="led8" element="led">
+		<bezel name="led6" element="led">
 			<bounds x="3.52" y="3.055" width="0.025" height="0.025" />
 		</bezel>
-		<bezel name="led9" element="led">
+		<bezel name="led5" element="led">
 			<bounds x="3.55" y="3.055" width="0.025" height="0.025" />
 		</bezel>
 		
