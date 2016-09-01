@@ -747,11 +747,10 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 	fprintf(stdout, "Option           Allowed values                 Description\n");
 	fprintf(stdout, "---------------- ------------------------------ -----------\n");
 
-
+	std::stringstream description_buffer;
 	for (auto iter = resolution.entries_begin(); iter != resolution.entries_end(); iter++)
 	{
-		const auto &entry = *iter;
-		std::stringstream description_buffer;
+		const util::option_resolution::entry &entry = *iter;
 
 		std::string opt_name = string_format("--%s", entry.identifier());
 		const char *opt_desc = entry.display_name();
@@ -779,7 +778,7 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 			for (auto enum_value = entry.enum_value_begin(); enum_value != entry.enum_value_end(); enum_value++)
 			{
 				if (!description_buffer.str().empty())
-					description_buffer << "/";
+					description_buffer << '/';
 				description_buffer << enum_value->identifier();
 			}
 			break;

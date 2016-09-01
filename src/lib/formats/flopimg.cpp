@@ -224,8 +224,8 @@ floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct Flo
 	/* if this format expects creation parameters and none were specified, create some */
 	if (!parameters && format->param_guidelines)
 	{
-		alloc_resolution = std::make_unique<util::option_resolution>(floppy_option_guide);
-		if (!alloc_resolution)
+		try { alloc_resolution = std::make_unique<util::option_resolution>(floppy_option_guide); }
+		catch (...)
 		{
 			err = FLOPPY_ERROR_OUTOFMEMORY;
 			goto done;

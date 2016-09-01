@@ -116,7 +116,7 @@ option_resolution::entry *option_resolution::find(int parameter)
 	auto iter = std::find_if(
 		m_entries.begin(),
 		m_entries.end(),
-		[&](const entry &e) { return e.parameter() == parameter; });
+		[parameter](const entry &e) { return e.parameter() == parameter; });
 
 	return iter != m_entries.end()
 		? &*iter
