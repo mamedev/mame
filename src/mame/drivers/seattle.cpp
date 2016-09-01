@@ -1587,9 +1587,10 @@ WRITE32_MEMBER(seattle_state::output_w)
 	switch (op)
 	{
 		default:
-			if (LOG_WIDGET)
-				logerror("Output (%02X) = %02X\n", op, arg);
+			logerror("Unknown output (%02X) = %02X\n", op, arg);
 			break;
+			
+		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
 		
 		case 0x7:
 			m_output_mode = arg;
@@ -1599,12 +1600,11 @@ WRITE32_MEMBER(seattle_state::output_w)
 			switch (m_output_mode)
 			{
 				default:
-					if (LOG_WIDGET)
-						logerror("Output Mode (%02X) = %02X\n", m_output_mode, arg);
+					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
 					break;
 				
 				case 0x04:
-					output().set_value("wheel", arg); //wheel motor delta. signed byte.
+					output().set_value("wheel", arg); // wheel motor delta. signed byte.
 					break;
 					
 				case 0x05:
