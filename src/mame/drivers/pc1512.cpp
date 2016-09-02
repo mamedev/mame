@@ -50,6 +50,9 @@ F2=DOS.SYS
 Select operating system:
 
 If you choose F1 then DOS Plus and GEM will be booted, or if you press F2 then MS-DOS will be booted.
+
+PC1512HD10 - ?
+PC1512HD20 - ?
 */
 
 /*
@@ -84,6 +87,9 @@ The system is now installed and should be tested by rebooting the machine.
 It should be noted that if the hard disc is ok but the software has been corrupted or deleted you can
 reinstall the software without reformatting.
 This is done by following steps 11 and 12.
+
+PC1640HD20 - Amstrad 40095 (Alps DRMD20A12A) [-chs 615,4,17 -ss 512]
+PC1640HD30 - Western Digital 95038 [-chs 615,6,17 -ss 512]
 */
 
 #include "includes/pc1512.h"
