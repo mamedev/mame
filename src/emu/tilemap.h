@@ -91,7 +91,11 @@
     1. First create a new tilemap by calling tilemap_manager::create().
         The parameters are as follows:
 
-        decoder = reference to your device_gfx_interface
+        decoder = reference to your device_gfx_interface; note that the
+            graphics the tilemap will use do not have to be decoded
+            first, but the decoder must be ready to provide a palette,
+            which means device_missing_dependencies must be thrown if
+            the decoder has not already started
 
         tile_get_info = callback function which accepts a memory index
             and in return fills in a tile_data structure that describes
@@ -444,11 +448,12 @@ struct tile_data
 	UINT8           flags;          // defaults to 0; one or more of TILE_* flags above
 	UINT8           pen_mask;       // defaults to 0xff; mask to apply to pen_data while rendering the tile
 	UINT8           gfxnum;         // defaults to 0xff; specify index of gfx for auto-invalidation on dirty
+	UINT32          code;
 
 	void set(int _gfxnum, int rawcode, int rawcolor, int _flags)
 	{
 		gfx_element *gfx = decoder->gfx(_gfxnum);
-		int code = rawcode % gfx->elements();
+		code = rawcode % gfx->elements();
 		pen_data = gfx->get_data(code);
 		palette_base = gfx->colorbase() + gfx->granularity() * (rawcolor % gfx->colors());
 		flags = _flags;
@@ -498,10 +503,16 @@ public:
 	running_machine &machine() const;
 	tilemap_device *device() const { return m_device; }
 	palette_device &palette() const { return *m_palette; }
+	device_gfx_interface &decoder() const { return *m_tileinfo.decoder; }
+
 	tilemap_t *next() const { return m_next; }
 	void *user_data() const { return m_user_data; }
 	memory_array &basemem() { return m_basemem; }
 	memory_array &extmem() { return m_extmem; }
+	UINT32 rows() const { return m_rows; }
+	UINT32 cols() const { return m_cols; }
+	UINT32 tilewidth() const { return m_tilewidth; }
+	UINT32 tileheight() const { return m_tileheight; }
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	bool enabled() const { return m_enable; }
@@ -514,6 +525,7 @@ public:
 	bitmap_ind8 &flagsmap() { pixmap_update(); return m_flagsmap; }
 	UINT8 *tile_flags() { pixmap_update(); return &m_tileflags[0]; }
 	tilemap_memory_index memory_index(UINT32 col, UINT32 row) { return m_mapper(col, row, m_cols, m_rows); }
+	void get_info_debug(UINT32 col, UINT32 row, int &gfxnum, int &code, int &color);
 
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }

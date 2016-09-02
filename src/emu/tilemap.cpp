@@ -1475,6 +1475,27 @@ void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, UINT32 scr
 }
 
 
+//-------------------------------------------------
+//  get_info_debug - extract info for one tile
+//-------------------------------------------------
+
+void tilemap_t::get_info_debug(UINT32 col, UINT32 row, int &gfxnum, int &code, int &color)
+{
+	// first map to the memory index
+	tilemap_memory_index memindex = memory_index(col, row);
+
+	// next invoke the get info callback
+	m_tile_get_info(*this, m_tileinfo, memindex);
+
+	// get the GFX number and code
+	gfxnum = m_tileinfo.gfxnum;
+	code = m_tileinfo.code;
+
+	// work back from the palette base to get the color
+	gfx_element *gfx = m_tileinfo.decoder->gfx(gfxnum);
+	color = (m_tileinfo.palette_base - gfx->colorbase()) / gfx->granularity();
+}
+
 
 //**************************************************************************
 //  TILEMAP MANAGER
