@@ -1227,9 +1227,10 @@ void device_image_interface::unload()
 //  create_option_guide
 //-------------------------------------------------
 
+static const util::option_guide null_option_guide = {};
+
 const util::option_guide &device_image_interface::create_option_guide() const
 {
-	static const util::option_guide null_option_guide = {};
 	return null_option_guide;
 }
 
