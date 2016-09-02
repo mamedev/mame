@@ -2,7 +2,13 @@
 // copyright-holders:Wilbert Pol
 /*
 
-UEF format support (for electron driver)
+The UEF file format is designed to store accurate images of the common media types associated
+with the BBC Micro, Acorn Electron and Atom. Tape storage is compatible with the CUTS/BYTE/Kansas City
+Format, and hence the format is also capable of storing software for non-Acorn systems such as the
+Altair 8800, PT SOL-20, Ohio Scientific, Compukit UK101, Nascom 1/2/3, Motorola MEK D1 6800 and
+SWTPC 6800 kit based computers.
+
+UEF files are chunk based and optionally compressed.
 
 The UEF format supports gzipped images, i'm doing the gunzip step during uef_cas_to_wav_size
 because that is when the length of the original file is known. This is needed to determine
@@ -26,6 +32,7 @@ Not nice, but it works...
 #define WAVE_NULL   0
 
 static const UINT8 UEF_HEADER[10] = { 0x55, 0x45, 0x46, 0x20, 0x46, 0x69, 0x6c, 0x65, 0x21, 0x00 };
+static const UINT8 GZ_HEADER[2] = { 0x1f, 0x8b };
 
 /*
     bytes are stored as
@@ -155,7 +162,7 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 		goto cleanup;
 	}
 
-	LOG_FORMATS( "UEF: Determinig tape size\n" );
+	LOG_FORMATS( "UEF: Determining tape size\n" );
 	size = 0;
 	pos = sizeof(UEF_HEADER) + 2;
 	while( pos < caslen ) {
@@ -175,27 +182,30 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 		case 0x0102:    /* explicit tape data block */
 			size += ( ( chunk_length * 10 ) - casdata[pos] ) * 4;
 			break;
-		case 0x0104:
+		case 0x0104:    /* defined tape format data block */
 			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
-		case 0x0110:
+		case 0x0110:    /* carrier tone (previously referred to as 'high tone') */
 			baud_length = ( casdata[pos+1] << 8 ) | casdata[pos];
 			size += baud_length * 2;
 			break;
 		case 0x0111:
 			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
-		case 0x0112:
+		case 0x0112:    /* integer gap */
 			baud_length = ( casdata[pos+1] << 8 ) | casdata[pos];
 			size += baud_length * 2 ;
 			break;
-		case 0x0116:
+		case 0x0116:    /* floating point gap */
 			size += get_uef_float(casdata+pos)*UEF_WAV_FREQUENCY;
 			break;
-		case 0x0113:
-		case 0x0114:
-		case 0x0115:
-		case 0x0120:
+		case 0x0113:    /* change of base frequency */
+		case 0x0114:    /* security cycles */
+		case 0x0115:    /* phase change */
+		case 0x0117:    /* data encoding format change */
+		case 0x0120:    /* position marker */
+		case 0x0130:    /* tape set info */
+		case 0x0131:    /* start of tape side */
 			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		}
@@ -277,28 +287,26 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 				c++;
 			}
 			break;
-		case 0x0110:
+		case 0x0110:    /* carrier tone (previously referred to as 'high tone') */
 			for( baud_length = ( ( bytes[pos+1] << 8 ) | bytes[pos] ) ; baud_length; baud_length-- ) {
 				*p = WAVE_LOW; p++;
 				*p = WAVE_HIGH; p++;
 				length -= 2;
 			}
 			break;
-		case 0x0112:
+		case 0x0112:    /* integer gap */
 			for( baud_length = ( ( bytes[pos+1] << 8 ) | bytes[pos] ) ; baud_length; baud_length-- ) {
 				*p = WAVE_NULL; p++;
 				*p = WAVE_NULL; p++;
 				length -= 2;
 			}
 			break;
-		case 0x0116:
+		case 0x0116:    /* floating point gap */
 			for( baud_length = (get_uef_float(bytes+pos)*UEF_WAV_FREQUENCY); baud_length; baud_length-- ) {
 				*p = WAVE_NULL; p++;
 				length -= 1;
 			}
 			break;
-
-
 		}
 		pos += chunk_length;
 	}
@@ -306,16 +314,22 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 }
 
 static const struct CassetteLegacyWaveFiller uef_legacy_fill_wave = {
-	uef_cas_fill_wave,              /* fill_wave */
+	uef_cas_fill_wave,      /* fill_wave */
 	-1,                     /* chunk_size */
 	0,                      /* chunk_samples */
-	uef_cas_to_wav_size,                /* chunk_sample_calc */
-	UEF_WAV_FREQUENCY,              /* sample_frequency */
+	uef_cas_to_wav_size,    /* chunk_sample_calc */
+	UEF_WAV_FREQUENCY,      /* sample_frequency */
 	0,                      /* header_samples */
 	0                       /* trailer_samples */
 };
 
 static cassette_image::error uef_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+	UINT8 header[10];
+
+	cassette_image_read(cassette, header, 0, sizeof(header));
+	if (memcmp(&header[0], GZ_HEADER, sizeof(GZ_HEADER)) && memcmp(&header[0], UEF_HEADER, sizeof(UEF_HEADER))) {
+		return cassette_image::error::INVALID_IMAGE;
+	}
 	return cassette_legacy_identify( cassette, opts, &uef_legacy_fill_wave );
 }
 
