@@ -1097,21 +1097,26 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+/* Prebillian pcbs do not have the usual Taito letter-number pair code on the
+labels on the roms/MCU, they only have the mitsubishi electric logo and a
+single number.
+The PCB has a label which says "M6100211A // プレビリアン" (PuReBiRiAN)
+*/
 ROM_START( pbillian )
 	ROM_REGION( 0x018000, "maincpu", 0 )
-	ROM_LOAD( "1.6c",  0x00000, 0x08000, CRC(d379fe23) SHA1(e147a9151b1cdeacb126d9713687bd0aa92980ac) )
-	ROM_LOAD( "2.6d",  0x14000, 0x04000, CRC(1af522bc) SHA1(83e002dc831bfcedbd7096b350c9b34418b79674) )
+	ROM_LOAD( "mitsubishi__electric__1.m5l27256k.6bc",  0x00000, 0x08000, CRC(d379fe23) SHA1(e147a9151b1cdeacb126d9713687bd0aa92980ac) )
+	ROM_LOAD( "mitsubishi__electric__2.m5l27128k.6d",  0x14000, 0x04000, CRC(1af522bc) SHA1(83e002dc831bfcedbd7096b350c9b34418b79674) )
 
 	ROM_REGION( 0x0800, "cpu1", 0 )
-	ROM_LOAD( "pbillian.mcu", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "mitsubishi__electric__7.mc68705p5s.7k", 0x0000, 0x0800, NO_DUMP ) // given it is next to the sample rom, it seems likely the 68705 plays the samples among other things
 
 	ROM_REGION( 0x8000, "samples", 0 )
-	ROM_LOAD( "3.7j",  0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) )
+	ROM_LOAD( "mitsubishi__electric__3.m5l27256k.7h",  0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) )
 
 	ROM_REGION( 0x018000, "gfx1", 0 )
-	ROM_LOAD( "4.1n",  0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) )
-	ROM_LOAD( "5.1r",  0x08000, 0x08000, CRC(2dd5b83f) SHA1(b05e3a008050359d0207757b9cbd8cee87abc697) )
-	ROM_LOAD( "6.1t",  0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) )
+	ROM_LOAD( "mitsubishi__electric__4.m5l27256k.1n",  0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) )
+	ROM_LOAD( "mitsubishi__electric__5.m5l27256k.1r",  0x08000, 0x08000, CRC(2dd5b83f) SHA1(b05e3a008050359d0207757b9cbd8cee87abc697) )
+	ROM_LOAD( "mitsubishi__electric__6.m5l27256k.1t",  0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) )
 ROM_END
 
 ROM_START( hotsmash )
