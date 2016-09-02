@@ -200,6 +200,13 @@ WRITE8_MEMBER( pc1512_state::system_w )
 		update_speaker();
 
 		m_kb->clock_w(BIT(data, 6));
+
+		if (BIT(data, 7))
+		{
+			m_kb_bits = 0;
+			m_kb->data_w(1);
+			m_pic->ir1_w(CLEAR_LINE);
+		}
 		break;
 
 	case 4:
@@ -1134,7 +1141,6 @@ void pc1512_state::machine_reset()
 {
 	m_nmi_enable = 0;
 	m_toggle = 0;
-	m_kb_bits = 0;
 	m_pit2 = 1;
 
 	m_lpen = 0;
@@ -1147,7 +1153,9 @@ void pc1512_state::machine_reset()
 	m_vdu_plane = 0x0f;
 	m_vdu_border = 0;
 
-	m_kb->clock_w(0);
+	m_kb_bits = 0;
+	m_kb->data_w(1);
+	m_pic->ir1_w(CLEAR_LINE);
 }
 
 
@@ -1193,8 +1201,10 @@ void pc1640_state::machine_start()
 void pc1640_state::machine_reset()
 {
 	m_nmi_enable = 0;
+
 	m_kb_bits = 0;
-	m_kb->clock_w(0);
+	m_kb->data_w(1);
+	m_pic->ir1_w(CLEAR_LINE);
 }
 
 
