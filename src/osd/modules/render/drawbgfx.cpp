@@ -146,6 +146,50 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 }
 #endif
 
+inline void winSetHwnd(::HWND _window)
+{
+	bgfx::PlatformData pd;
+	pd.ndt          = NULL;
+	pd.nwh          = _window;
+	pd.context      = NULL;
+	pd.backBuffer   = NULL;
+	pd.backBufferDS = NULL;
+	bgfx::setPlatformData(pd);
+}
+
+#ifdef OSD_SDL
+inline bool sdlSetWindow(SDL_Window* _window)
+{
+	SDL_SysWMinfo wmi;
+	SDL_VERSION(&wmi.version);
+	if (!SDL_GetWindowWMInfo(_window, &wmi) )
+	{
+		return false;
+	}
+
+	bgfx::PlatformData pd;
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+	pd.ndt          = wmi.info.x11.display;
+	pd.nwh          = (void*)(uintptr_t)wmi.info.x11.window;
+#	elif BX_PLATFORM_OSX
+	pd.ndt          = NULL;
+	pd.nwh          = wmi.info.cocoa.window;
+#	elif BX_PLATFORM_WINDOWS
+	pd.ndt          = NULL;
+	pd.nwh          = wmi.info.win.window;
+#	elif BX_PLATFORM_STEAMLINK
+	pd.ndt          = wmi.info.vivante.display;
+	pd.nwh          = wmi.info.vivante.window;
+#	endif // BX_PLATFORM_
+	pd.context      = NULL;
+	pd.backBuffer   = NULL;
+	pd.backBufferDS = NULL;
+	bgfx::setPlatformData(pd);
+
+	return true;
+}
+#endif
+
 int renderer_bgfx::create()
 {
 	// create renderer
@@ -168,9 +212,9 @@ int renderer_bgfx::create()
 			bgfx::setPlatformData(blank_pd);
 		}
 #ifdef OSD_WINDOWS
-		bgfx::winSetHwnd(win->platform_window<HWND>());
+		winSetHwnd(win->platform_window<HWND>());
 #else
-		bgfx::sdlSetWindow(win->platform_window<SDL_Window*>());
+		sdlSetWindow(win->platform_window<SDL_Window*>());
 #endif
 		std::string backend(m_options.bgfx_backend());
 		if (backend == "auto")
@@ -285,7 +329,7 @@ void renderer_bgfx::record()
 	{
 		m_avi_writer->record(m_options.bgfx_avi_name());
 		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::RGBA8, m_width[0], m_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
-		m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
+		m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
 	}
 }
 
@@ -477,7 +521,7 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
 		tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
 
-	bgfx::TextureHandle texture = bgfx::createTexture2D(tex_width, tex_height, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
+	bgfx::TextureHandle texture = bgfx::createTexture2D(tex_width, tex_height, false, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
 
 	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
 
@@ -1084,7 +1128,7 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 			}
 			m_hash_to_entry[rect.hash()] = rect;
 			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
-			bgfx::updateTexture2D(m_texture_cache->texture(), 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
+			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
 		}
 	}
 }

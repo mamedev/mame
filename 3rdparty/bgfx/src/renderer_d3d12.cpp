@@ -1008,6 +1008,8 @@ namespace bgfx { namespace d3d12
 									| BGFX_CAPS_TEXTURE_READ_BACK
 									| BGFX_CAPS_OCCLUSION_QUERY
 									| BGFX_CAPS_ALPHA_TO_COVERAGE
+									| BGFX_CAPS_TEXTURE_2D_ARRAY
+									| BGFX_CAPS_TEXTURE_CUBE_ARRAY
 									);
 				g_caps.maxTextureSize   = 16384;
 				g_caps.maxFBAttachments = uint8_t(bx::uint32_min(16, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS) );
@@ -1476,14 +1478,14 @@ namespace bgfx { namespace d3d12
 			bx::write(&writer, magic);
 
 			TextureCreate tc;
-			tc.m_width   = _width;
-			tc.m_height  = _height;
-			tc.m_sides   = 0;
-			tc.m_depth   = 0;
-			tc.m_numMips = _numMips;
-			tc.m_format  = TextureFormat::Enum(texture.m_requestedFormat);
-			tc.m_cubeMap = false;
-			tc.m_mem     = NULL;
+			tc.m_width     = _width;
+			tc.m_height    = _height;
+			tc.m_depth     = 0;
+			tc.m_numLayers = 1;
+			tc.m_numMips   = _numMips;
+			tc.m_format    = TextureFormat::Enum(texture.m_requestedFormat);
+			tc.m_cubeMap   = false;
+			tc.m_mem       = NULL;
 			bx::write(&writer, tc);
 
 			texture.destroy();
@@ -3844,23 +3846,23 @@ data.NumQualityLevels = 0;
 		{
 			for (uint32_t ii = 0; ii < count; ++ii)
 			{
-				uint8_t nameSize;
+				uint8_t nameSize = 0;
 				bx::read(&reader, nameSize);
 
-				char name[256];
+				char name[256] = {};
 				bx::read(&reader, &name, nameSize);
 				name[nameSize] = '\0';
 
-				uint8_t type;
+				uint8_t type = 0;
 				bx::read(&reader, type);
 
-				uint8_t num;
+				uint8_t num = 0;
 				bx::read(&reader, num);
 
-				uint16_t regIndex;
+				uint16_t regIndex = 0;
 				bx::read(&reader, regIndex);
 
-				uint16_t regCount;
+				uint16_t regCount = 0;
 				bx::read(&reader, regCount);
 
 				const char* kind = "invalid";
@@ -3920,7 +3922,7 @@ data.NumQualityLevels = 0;
 
 		m_code = copy(code, shaderSize);
 
-		uint8_t numAttrs;
+		uint8_t numAttrs = 0;
 		bx::read(&reader, numAttrs);
 
 		memset(m_attrMask, 0, sizeof(m_attrMask) );
@@ -3961,6 +3963,7 @@ data.NumQualityLevels = 0;
 			const ImageBlockInfo& blockInfo = getBlockInfo(TextureFormat::Enum(imageContainer.m_format) );
 			const uint32_t textureWidth  = bx::uint32_max(blockInfo.blockWidth,  imageContainer.m_width >>startLod);
 			const uint32_t textureHeight = bx::uint32_max(blockInfo.blockHeight, imageContainer.m_height>>startLod);
+			const uint16_t numLayers     = imageContainer.m_numLayers;
 
 			m_flags  = _flags;
 			m_width  = textureWidth;
@@ -3985,9 +3988,8 @@ data.NumQualityLevels = 0;
 			}
 
 			m_numMips = numMips;
-			const uint16_t numSides = imageContainer.m_cubeMap ? 6 : 1;
-
-			uint32_t numSrd = numMips*numSides;
+			const uint16_t numSides = numLayers * (imageContainer.m_cubeMap ? 6 : 1);
+			const uint32_t numSrd   = numSides * numMips;
 			D3D12_SUBRESOURCE_DATA* srd = (D3D12_SUBRESOURCE_DATA*)alloca(numSrd*sizeof(D3D12_SUBRESOURCE_DATA) );
 
 			uint32_t kk = 0;
@@ -4185,15 +4187,63 @@ data.NumQualityLevels = 0;
 			switch (m_type)
 			{
 			case Texture2D:
+			case TextureCube:
 				resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-				m_srvd.ViewDimension                 = 1 < msaa.Count ? D3D12_SRV_DIMENSION_TEXTURE2DMS : D3D12_SRV_DIMENSION_TEXTURE2D;
-				m_srvd.Texture2D.MostDetailedMip     = 0;
-				m_srvd.Texture2D.MipLevels           = numMips;
-				m_srvd.Texture2D.ResourceMinLODClamp = 0.0f;
+				if (imageContainer.m_cubeMap)
+				{
+					if (1 < numLayers)
+					{
+						m_srvd.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
+						m_srvd.TextureCubeArray.MostDetailedMip     = 0;
+						m_srvd.TextureCubeArray.MipLevels           = numMips;
+						m_srvd.TextureCubeArray.ResourceMinLODClamp = 0.0f;
+						m_srvd.TextureCubeArray.NumCubes            = numLayers;
+					}
+					else
+					{
+						m_srvd.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+						m_srvd.TextureCube.MostDetailedMip     = 0;
+						m_srvd.TextureCube.MipLevels           = numMips;
+						m_srvd.TextureCube.ResourceMinLODClamp = 0.0f;
+					}
+				}
+				else
+				{
+					if (1 < numLayers)
+					{
+						m_srvd.ViewDimension = 1 < msaa.Count
+							? D3D12_SRV_DIMENSION_TEXTURE2DMSARRAY
+							: D3D12_SRV_DIMENSION_TEXTURE2DARRAY
+							;
+						m_srvd.Texture2DArray.MostDetailedMip     = 0;
+						m_srvd.Texture2DArray.MipLevels           = numMips;
+						m_srvd.Texture2DArray.ResourceMinLODClamp = 0.0f;
+						m_srvd.Texture2DArray.ArraySize           = numLayers;
+					}
+					else
+					{
+						m_srvd.ViewDimension = 1 < msaa.Count
+							? D3D12_SRV_DIMENSION_TEXTURE2DMS
+							: D3D12_SRV_DIMENSION_TEXTURE2D
+							;
+						m_srvd.Texture2D.MostDetailedMip     = 0;
+						m_srvd.Texture2D.MipLevels           = numMips;
+						m_srvd.Texture2D.ResourceMinLODClamp = 0.0f;
+					}
+				}
 
-				m_uavd.ViewDimension        = D3D12_UAV_DIMENSION_TEXTURE2D;
-				m_uavd.Texture2D.MipSlice   = 0;
-				m_uavd.Texture2D.PlaneSlice = 0;
+				if (1 < numLayers)
+				{
+					m_uavd.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+					m_uavd.Texture2DArray.MipSlice   = 0;
+					m_uavd.Texture2DArray.PlaneSlice = 0;
+				}
+				else
+				{
+					m_uavd.ViewDimension        = D3D12_UAV_DIMENSION_TEXTURE2D;
+					m_uavd.Texture2D.MipSlice   = 0;
+					m_uavd.Texture2D.PlaneSlice = 0;
+				}
 				break;
 
 			case Texture3D:
@@ -4207,18 +4257,6 @@ data.NumQualityLevels = 0;
 				m_uavd.Texture3D.MipSlice    = 0;
 				m_uavd.Texture3D.FirstWSlice = 0;
 				m_uavd.Texture3D.WSize       = 0;
-				break;
-
-			case TextureCube:
-				resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-				m_srvd.ViewDimension                   = D3D12_SRV_DIMENSION_TEXTURECUBE;
-				m_srvd.TextureCube.MostDetailedMip     = 0;
-				m_srvd.TextureCube.MipLevels           = numMips;
-				m_srvd.TextureCube.ResourceMinLODClamp = 0.0f;
-
-				m_uavd.ViewDimension        = D3D12_UAV_DIMENSION_TEXTURE2D;
-				m_uavd.Texture2D.MipSlice   = 0;
-				m_uavd.Texture2D.PlaneSlice = 0;
 				break;
 			}
 
@@ -4697,7 +4735,7 @@ data.NumQualityLevels = 0;
 
 	void RendererContextD3D12::submit(Frame* _render, ClearQuad& /*_clearQuad*/, TextVideoMemBlitter& _textVideoMemBlitter)
 	{
-//		PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), L"rendererSubmit");
+//		PIX_BEGINEVENT(D3DCOLOR_FRAME, L"rendererSubmit");
 
 		updateResolution(_render->m_resolution);
 
@@ -5133,7 +5171,7 @@ data.NumQualityLevels = 0;
 // 						wchar_t* viewNameW = s_viewNameW[view];
 // 						viewNameW[3] = L' ';
 // 						PIX_ENDEVENT();
-// 						PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), viewNameW);
+// 						PIX_BEGINEVENT(D3DCOLOR_DRAW, viewNameW);
 					}
 
 					commandListChanged = true;
@@ -5433,7 +5471,7 @@ data.NumQualityLevels = 0;
 
 		if (_render->m_debug & (BGFX_DEBUG_IFH | BGFX_DEBUG_STATS) )
 		{
-//			PIX_BEGINEVENT(D3DCOLOR_RGBA(0x40, 0x40, 0x40, 0xff), L"debugstats");
+//			PIX_BEGINEVENT(D3DCOLOR_FRAME, L"debugstats");
 
 			TextVideoMem& tvm = m_textVideoMem;
 
@@ -5599,7 +5637,7 @@ data.NumQualityLevels = 0;
 		}
 		else if (_render->m_debug & BGFX_DEBUG_TEXT)
 		{
-//			PIX_BEGINEVENT(D3DCOLOR_RGBA(0x40, 0x40, 0x40, 0xff), L"debugtext");
+//			PIX_BEGINEVENT(D3DCOLOR_FRAME, L"debugtext");
 
 			blit(this, _textVideoMemBlitter, _render->m_textVideoMem);
 

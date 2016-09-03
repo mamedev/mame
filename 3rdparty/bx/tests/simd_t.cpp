@@ -12,11 +12,12 @@ using namespace bx;
 
 union simd_cast
 {
-	bx::simd128_t f4;
-	float f[4];
-	uint32_t ui[4];
-	int32_t i[4];
-	char c[16];
+	bx::simd256_t simd256;
+	bx::simd128_t simd128;
+	float    f[8];
+	uint32_t ui[8];
+	int32_t  i[8];
+	char     c[32];
 };
 
 void simd_check_bool(const char* _str, bool _a, bool _0)
@@ -30,9 +31,16 @@ void simd_check_bool(const char* _str, bool _a, bool _0)
 	CHECK_EQUAL(_a, _0);
 }
 
-void simd_check_int32(const char* _str, bx::simd128_t _a, int32_t _0, int32_t _1, int32_t _2, int32_t _3)
+void simd_check_int32(
+	  const char* _str
+	, bx::simd128_t _a
+	, int32_t _0
+	, int32_t _1
+	, int32_t _2
+	, int32_t _3
+	)
 {
-	simd_cast c; c.f4 = _a;
+	simd_cast c; c.simd128 = _a;
 	DBG("%s (%d, %d, %d, %d) == (%d, %d, %d, %d)"
 		, _str
 		, c.i[0], c.i[1], c.i[2], c.i[3]
@@ -45,9 +53,48 @@ void simd_check_int32(const char* _str, bx::simd128_t _a, int32_t _0, int32_t _1
 	CHECK_EQUAL(c.i[3], _3);
 }
 
-void simd_check_uint32(const char* _str, bx::simd128_t _a, uint32_t _0, uint32_t _1, uint32_t _2, uint32_t _3)
+#if 0
+void simd_check_int32(
+	  const char* _str
+	, bx::simd256_t _a
+	, int32_t _0
+	, int32_t _1
+	, int32_t _2
+	, int32_t _3
+	, int32_t _4
+	, int32_t _5
+	, int32_t _6
+	, int32_t _7
+	)
 {
-	simd_cast c; c.f4 = _a;
+	simd_cast c; c.simd256 = _a;
+	DBG("%s (%d, %d, %d, %d, %d, %d, %d, %d) == (%d, %d, %d, %d, %d, %d, %d, %d)"
+		, _str
+		, c.i[0], c.i[1], c.i[2], c.i[3], c.i[4], c.i[5], c.i[6], c.i[7]
+		, _0, _1, _2, _3, _4, _5, _6, _7
+		);
+
+	CHECK_EQUAL(c.i[0], _0);
+	CHECK_EQUAL(c.i[1], _1);
+	CHECK_EQUAL(c.i[2], _2);
+	CHECK_EQUAL(c.i[3], _3);
+	CHECK_EQUAL(c.i[4], _4);
+	CHECK_EQUAL(c.i[5], _5);
+	CHECK_EQUAL(c.i[6], _6);
+	CHECK_EQUAL(c.i[7], _7);
+}
+#endif // 0
+
+void simd_check_uint32(
+	  const char* _str
+	, bx::simd128_t _a
+	, uint32_t _0
+	, uint32_t _1
+	, uint32_t _2
+	, uint32_t _3
+	)
+{
+	simd_cast c; c.simd128 = _a;
 
 	DBG("%s (0x%08x, 0x%08x, 0x%08x, 0x%08x) == (0x%08x, 0x%08x, 0x%08x, 0x%08x)"
 		, _str
@@ -61,9 +108,49 @@ void simd_check_uint32(const char* _str, bx::simd128_t _a, uint32_t _0, uint32_t
 	CHECK_EQUAL(c.ui[3], _3);
 }
 
-void simd_check_float(const char* _str, bx::simd128_t _a, float _0, float _1, float _2, float _3)
+#if 0
+void simd_check_uint32(
+	  const char* _str
+	, bx::simd256_t _a
+	, uint32_t _0
+	, uint32_t _1
+	, uint32_t _2
+	, uint32_t _3
+	, uint32_t _4
+	, uint32_t _5
+	, uint32_t _6
+	, uint32_t _7
+	)
 {
-	simd_cast c; c.f4 = _a;
+	simd_cast c; c.simd256 = _a;
+
+	DBG("%s (0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x) == (0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x)"
+		, _str
+		, c.ui[0], c.ui[1], c.ui[2], c.ui[3], c.ui[4], c.ui[5], c.ui[6], c.ui[7]
+		, _0, _1, _2, _3, _4, _5, _6, _7
+		);
+
+	CHECK_EQUAL(c.ui[0], _0);
+	CHECK_EQUAL(c.ui[1], _1);
+	CHECK_EQUAL(c.ui[2], _2);
+	CHECK_EQUAL(c.ui[3], _3);
+	CHECK_EQUAL(c.ui[4], _4);
+	CHECK_EQUAL(c.ui[5], _5);
+	CHECK_EQUAL(c.ui[6], _6);
+	CHECK_EQUAL(c.ui[7], _7);
+}
+#endif // 0
+
+void simd_check_float(
+	  const char* _str
+	, bx::simd128_t _a
+	, float _0
+	, float _1
+	, float _2
+	, float _3
+	)
+{
+	simd_cast c; c.simd128 = _a;
 
 	DBG("%s (%f, %f, %f, %f) == (%f, %f, %f, %f)"
 		, _str
@@ -77,9 +164,42 @@ void simd_check_float(const char* _str, bx::simd128_t _a, float _0, float _1, fl
 	CHECK(bx::fequal(c.f[3], _3, 0.0001f) );
 }
 
+#if 0
+void simd_check_float(
+	  const char* _str
+	, bx::simd256_t _a
+	, float _0
+	, float _1
+	, float _2
+	, float _3
+	, float _4
+	, float _5
+	, float _6
+	, float _7
+	)
+{
+	simd_cast c; c.simd256 = _a;
+
+	DBG("%s (%f, %f, %f, %f, %f, %f, %f, %f) == (%f, %f, %f, %f, %f, %f, %f, %f)"
+		, _str
+		, c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5], c.f[6], c.f[7]
+		, _0, _1, _2, _3, _4, _5, _6, _7
+		);
+
+	CHECK(bx::fequal(c.f[0], _0, 0.0001f) );
+	CHECK(bx::fequal(c.f[1], _1, 0.0001f) );
+	CHECK(bx::fequal(c.f[2], _2, 0.0001f) );
+	CHECK(bx::fequal(c.f[3], _3, 0.0001f) );
+	CHECK(bx::fequal(c.f[4], _4, 0.0001f) );
+	CHECK(bx::fequal(c.f[5], _5, 0.0001f) );
+	CHECK(bx::fequal(c.f[6], _6, 0.0001f) );
+	CHECK(bx::fequal(c.f[7], _7, 0.0001f) );
+}
+#endif // 0
+
 void simd_check_string(const char* _str, bx::simd128_t _a)
 {
-	simd_cast c; c.f4 = _a;
+	simd_cast c; c.simd128 = _a;
 	const char test[5] = { c.c[0], c.c[4], c.c[8], c.c[12], '\0' };
 
 	DBG("%s %s", _str, test);
@@ -200,10 +320,20 @@ TEST(simd_load)
 		, 0.0f, 1.0f, 2.0f, 3.0f
 		);
 
+//	simd_check_float("ld"
+//		, simd_ld<simd256_t>(0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f)
+//		, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f
+//		);
+
 	simd_check_int32("ild"
 		, simd_ild(uint32_t(-1), 0, 1, 2)
 		, uint32_t(-1), 0, 1, 2
 		);
+
+//	simd_check_int32("ild"
+//		, simd_ild<simd256_t>(uint32_t(-1), 0, 1, 2, 3, 4, 5, 6)
+//		, uint32_t(-1), 0, 1, 2, 3, 4, 5, 6
+//		);
 
 	simd_check_int32("ild"
 		, simd_ild(uint32_t(-1), uint32_t(-2), uint32_t(-3), uint32_t(-4) )

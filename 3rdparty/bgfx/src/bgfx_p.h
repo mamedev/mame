@@ -320,8 +320,8 @@ namespace bgfx
 		TextureFormat::Enum m_format;
 		uint16_t m_width;
 		uint16_t m_height;
-		uint16_t m_sides;
 		uint16_t m_depth;
+		uint16_t m_numLayers;
 		uint8_t m_numMips;
 		bool m_cubeMap;
 		const Memory* m_mem;
@@ -364,9 +364,9 @@ namespace bgfx
 			;
 	}
 
-	inline uint8_t calcNumMips(uint8_t _numMips, uint16_t _width, uint16_t _height, uint16_t _depth = 1)
+	inline uint8_t calcNumMips(bool _hasMips, uint16_t _width, uint16_t _height, uint16_t _depth = 1)
 	{
-		if (1 < _numMips)
+		if (_hasMips)
 		{
 			const uint32_t max = bx::uint32_max(bx::uint32_max(_width, _height), _depth);
 			const uint32_t num = 1 + uint32_t(bx::flog2(float(max) ) );
@@ -3097,7 +3097,8 @@ namespace bgfx
 					, (uint16_t)imageContainer.m_height
 					, (uint16_t)imageContainer.m_depth
 					, imageContainer.m_cubeMap
-					, imageContainer.m_numMips
+					, imageContainer.m_numMips > 1
+					, imageContainer.m_numLayers
 					, TextureFormat::Enum(imageContainer.m_format)
 					);
 			}
@@ -3170,7 +3171,7 @@ namespace bgfx
 			BX_CHECK(BackbufferRatio::Count != textureRef.m_bbRatio, "");
 
 			getTextureSizeFromRatio(BackbufferRatio::Enum(textureRef.m_bbRatio), _width, _height);
-			_numMips = calcNumMips(_numMips, _width, _height);
+			_numMips = calcNumMips(1 < _numMips, _width, _height);
 
 			BX_TRACE("Resize %3d: %4dx%d %s"
 				, _handle.idx
@@ -3214,7 +3215,19 @@ namespace bgfx
 			}
 		}
 
-		BGFX_API_FUNC(void updateTexture(TextureHandle _handle, uint8_t _side, uint8_t _mip, uint16_t _x, uint16_t _y, uint16_t _z, uint16_t _width, uint16_t _height, uint16_t _depth, uint16_t _pitch, const Memory* _mem) )
+		BGFX_API_FUNC(void updateTexture(
+			  TextureHandle _handle
+			, uint8_t _side
+			, uint8_t _mip
+			, uint16_t _x
+			, uint16_t _y
+			, uint16_t _z
+			, uint16_t _width
+			, uint16_t _height
+			, uint16_t _depth
+			, uint16_t _pitch
+			, const Memory* _mem
+		) )
 		{
 			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::UpdateTexture);
 			cmdbuf.write(_handle);
@@ -3223,7 +3236,7 @@ namespace bgfx
 			Rect rect;
 			rect.m_x = _x;
 			rect.m_y = _y;
-			rect.m_width = _width;
+			rect.m_width  = _width;
 			rect.m_height = _height;
 			cmdbuf.write(rect);
 			cmdbuf.write(_z);
