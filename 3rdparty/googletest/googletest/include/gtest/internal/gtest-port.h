@@ -396,16 +396,10 @@
 #  include <io.h>
 # endif
 // In order to avoid having to include <windows.h>, use forward declaration
-#if GTEST_OS_WINDOWS_MINGW
-// MinGW defined _CRITICAL_SECTION and _RTL_CRITICAL_SECTION as two
-// separate (equivalent) structs, instead of using typedef
-typedef struct _CRITICAL_SECTION GTEST_CRITICAL_SECTION;
-#else
 // Assume CRITICAL_SECTION is a typedef of _RTL_CRITICAL_SECTION.
 // This assumption is verified by
 // WindowsTypesTest.CRITICAL_SECTIONIs_RTL_CRITICAL_SECTION.
 typedef struct _RTL_CRITICAL_SECTION GTEST_CRITICAL_SECTION;
-#endif
 #else
 // This assumes that non-Windows OSes provide unistd.h. For OSes where this
 // is not the case, we need to include headers that provide the functions

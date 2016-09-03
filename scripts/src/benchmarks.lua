@@ -29,15 +29,15 @@ project "benchmark"
 		MAME_DIR .. "3rdparty/benchmark/src/benchmark.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/colorprint.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/commandlineflags.cc",
+		MAME_DIR .. "3rdparty/benchmark/src/complexity.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/console_reporter.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/csv_reporter.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/json_reporter.cc",
-		MAME_DIR .. "3rdparty/benchmark/src/log.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/reporter.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/sleep.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/string_util.cc",
-		MAME_DIR .. "3rdparty/benchmark/src/sysinfo.cc",
-		MAME_DIR .. "3rdparty/benchmark/src/walltime.cc",
+		MAME_DIR .. "3rdparty/benchmark/src/sysinfo.cc",		
+		MAME_DIR .. "3rdparty/benchmark/src/timers.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/re_std.cc",
 	}
 
