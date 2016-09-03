@@ -1,34 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @file test/gtx/gtx_normal.cpp
-/// @date 2013-10-25 / 2014-11-25
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <glm/gtx/wrap.hpp>
 #include <glm/gtc/epsilon.hpp>
 
@@ -52,6 +21,18 @@ namespace clamp
 
 		float E = glm::clamp(1.5f);
 		Error += glm::epsilonEqual(E, 1.0f, 0.00001f) ? 0 : 1;
+
+		glm::vec2 K = glm::clamp(glm::vec2(0.5f));
+		Error += glm::all(glm::epsilonEqual(K, glm::vec2(0.5f), glm::vec2(0.00001f))) ? 0 : 1;
+
+		glm::vec3 L = glm::clamp(glm::vec3(0.5f));
+		Error += glm::all(glm::epsilonEqual(L, glm::vec3(0.5f), glm::vec3(0.00001f))) ? 0 : 1;
+
+		glm::vec4 M = glm::clamp(glm::vec4(0.5f));
+		Error += glm::all(glm::epsilonEqual(M, glm::vec4(0.5f), glm::vec4(0.00001f))) ? 0 : 1;
+
+		glm::vec1 N = glm::clamp(glm::vec1(0.5f));
+		Error += glm::all(glm::epsilonEqual(N, glm::vec1(0.5f), glm::vec1(0.00001f))) ? 0 : 1;
 
 		return Error;
 	}
@@ -80,6 +61,18 @@ namespace repeat
 
 		float F = glm::repeat(0.9f);
 		Error += glm::epsilonEqual(F, 0.9f, 0.00001f) ? 0 : 1;
+
+		glm::vec2 K = glm::repeat(glm::vec2(0.5f));
+		Error += glm::all(glm::epsilonEqual(K, glm::vec2(0.5f), glm::vec2(0.00001f))) ? 0 : 1;
+
+		glm::vec3 L = glm::repeat(glm::vec3(0.5f));
+		Error += glm::all(glm::epsilonEqual(L, glm::vec3(0.5f), glm::vec3(0.00001f))) ? 0 : 1;
+
+		glm::vec4 M = glm::repeat(glm::vec4(0.5f));
+		Error += glm::all(glm::epsilonEqual(M, glm::vec4(0.5f), glm::vec4(0.00001f))) ? 0 : 1;
+
+		glm::vec1 N = glm::repeat(glm::vec1(0.5f));
+		Error += glm::all(glm::epsilonEqual(N, glm::vec1(0.5f), glm::vec1(0.00001f))) ? 0 : 1;
 
 		return Error;
 	}
@@ -118,6 +111,18 @@ namespace mirrorClamp
 		float I = glm::mirrorClamp(-0.9f);
 		Error += glm::epsilonEqual(I, 0.9f, 0.00001f) ? 0 : 1;
 
+		glm::vec2 K = glm::mirrorClamp(glm::vec2(0.5f));
+		Error += glm::all(glm::epsilonEqual(K, glm::vec2(0.5f), glm::vec2(0.00001f))) ? 0 : 1;
+
+		glm::vec3 L = glm::mirrorClamp(glm::vec3(0.5f));
+		Error += glm::all(glm::epsilonEqual(L, glm::vec3(0.5f), glm::vec3(0.00001f))) ? 0 : 1;
+
+		glm::vec4 M = glm::mirrorClamp(glm::vec4(0.5f));
+		Error += glm::all(glm::epsilonEqual(M, glm::vec4(0.5f), glm::vec4(0.00001f))) ? 0 : 1;
+
+		glm::vec1 N = glm::mirrorClamp(glm::vec1(0.5f));
+		Error += glm::all(glm::epsilonEqual(N, glm::vec1(0.5f), glm::vec1(0.00001f))) ? 0 : 1;
+
 		return Error;
 	}
 }//namespace mirrorClamp
@@ -154,6 +159,18 @@ namespace mirrorRepeat
 
 		float I = glm::mirrorRepeat(-1.0f);
 		Error += glm::epsilonEqual(I, 1.0f, 0.00001f) ? 0 : 1;
+
+		glm::vec2 K = glm::mirrorRepeat(glm::vec2(0.5f));
+		Error += glm::all(glm::epsilonEqual(K, glm::vec2(0.5f), glm::vec2(0.00001f))) ? 0 : 1;
+
+		glm::vec3 L = glm::mirrorRepeat(glm::vec3(0.5f));
+		Error += glm::all(glm::epsilonEqual(L, glm::vec3(0.5f), glm::vec3(0.00001f))) ? 0 : 1;
+
+		glm::vec4 M = glm::mirrorRepeat(glm::vec4(0.5f));
+		Error += glm::all(glm::epsilonEqual(M, glm::vec4(0.5f), glm::vec4(0.00001f))) ? 0 : 1;
+
+		glm::vec1 N = glm::mirrorRepeat(glm::vec1(0.5f));
+		Error += glm::all(glm::epsilonEqual(N, glm::vec1(0.5f), glm::vec1(0.00001f))) ? 0 : 1;
 
 		return Error;
 	}

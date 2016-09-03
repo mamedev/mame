@@ -6,13 +6,20 @@
 #include "type_vec4.hpp"
 #include "type_int.hpp"
 #include "_vectorize.hpp"
-#if(GLM_ARCH != GLM_ARCH_PURE)
-#if(GLM_COMPILER & GLM_COMPILER_VC)
+#if(GLM_ARCH & GLM_ARCH_X86 && GLM_COMPILER & GLM_COMPILER_VC)
 #	include <intrin.h>
 #	pragma intrinsic(_BitScanReverse)
-#endif//(GLM_COMPILER & GLM_COMPILER_VC)
-#endif//(GLM_ARCH != GLM_ARCH_PURE)
+#endif//(GLM_ARCH & GLM_ARCH_X86 && GLM_COMPILER & GLM_COMPILER_VC)
 #include <limits>
+
+#if !GLM_HAS_EXTENDED_INTEGER_TYPE
+#	if GLM_COMPILER & GLM_COMPILER_GCC
+#		pragma GCC diagnostic ignored "-Wlong-long"
+#	endif
+#	if (GLM_COMPILER & GLM_COMPILER_CLANG)
+#		pragma clang diagnostic ignored "-Wc++11-long-long"
+#	endif
+#endif
 
 namespace glm{
 namespace detail
@@ -23,40 +30,36 @@ namespace detail
 		return Bits >= sizeof(T) * 8 ? ~static_cast<T>(0) : (static_cast<T>(1) << Bits) - static_cast<T>(1);
 	}
 
-	template <bool EXEC = false>
+	template <typename T, glm::precision P, template <typename, glm::precision> class vecType, bool Aligned, bool EXEC>
 	struct compute_bitfieldReverseStep
 	{
-		template <typename T, glm::precision P, template <class, glm::precision> class vecType>
 		GLM_FUNC_QUALIFIER static vecType<T, P> call(vecType<T, P> const & v, T, T)
 		{
 			return v;
 		}
 	};
 
-	template <>
-	struct compute_bitfieldReverseStep<true>
+	template <typename T, glm::precision P, template <typename, glm::precision> class vecType, bool Aligned>
+	struct compute_bitfieldReverseStep<T, P, vecType, Aligned, true>
 	{
-		template <typename T, glm::precision P, template <class, glm::precision> class vecType>
 		GLM_FUNC_QUALIFIER static vecType<T, P> call(vecType<T, P> const & v, T Mask, T Shift)
 		{
 			return (v & Mask) << Shift | (v & (~Mask)) >> Shift;
 		}
 	};
 
-	template <bool EXEC = false>
+	template <typename T, glm::precision P, template <typename, glm::precision> class vecType, bool Aligned, bool EXEC>
 	struct compute_bitfieldBitCountStep
 	{
-		template <typename T, glm::precision P, template <class, glm::precision> class vecType>
 		GLM_FUNC_QUALIFIER static vecType<T, P> call(vecType<T, P> const & v, T, T)
 		{
 			return v;
 		}
 	};
 
-	template <>
-	struct compute_bitfieldBitCountStep<true>
+	template <typename T, glm::precision P, template <typename, glm::precision> class vecType, bool Aligned>
+	struct compute_bitfieldBitCountStep<T, P, vecType, Aligned, true>
 	{
-		template <typename T, glm::precision P, template <class, glm::precision> class vecType>
 		GLM_FUNC_QUALIFIER static vecType<T, P> call(vecType<T, P> const & v, T Mask, T Shift)
 		{
 			return (v & Mask) + ((v >> Shift) & Mask);
@@ -144,7 +147,7 @@ namespace detail
 			return IsNotNull ? int(Result) : -1;
 		}
 
-		template <typename T, glm::precision P, template <class, glm::precision> class vecType>
+		template <typename T, glm::precision P, template<typename, glm::precision> class vecType>
 		struct compute_findMSB_vec<T, P, vecType, 32>
 		{
 			GLM_FUNC_QUALIFIER static vecType<int, P> call(vecType<T, P> const & x)
@@ -295,12 +298,12 @@ namespace detail
 	GLM_FUNC_QUALIFIER vecType<T, P> bitfieldReverse(vecType<T, P> const & v)
 	{
 		vecType<T, P> x(v);
-		x = detail::compute_bitfieldReverseStep<sizeof(T) * 8 >=  2>::call(x, T(0x5555555555555555ull), static_cast<T>( 1));
-		x = detail::compute_bitfieldReverseStep<sizeof(T) * 8 >=  4>::call(x, T(0x3333333333333333ull), static_cast<T>( 2));
-		x = detail::compute_bitfieldReverseStep<sizeof(T) * 8 >=  8>::call(x, T(0x0F0F0F0F0F0F0F0Full), static_cast<T>( 4));
-		x = detail::compute_bitfieldReverseStep<sizeof(T) * 8 >= 16>::call(x, T(0x00FF00FF00FF00FFull), static_cast<T>( 8));
-		x = detail::compute_bitfieldReverseStep<sizeof(T) * 8 >= 32>::call(x, T(0x0000FFFF0000FFFFull), static_cast<T>(16));
-		x = detail::compute_bitfieldReverseStep<sizeof(T) * 8 >= 64>::call(x, T(0x00000000FFFFFFFFull), static_cast<T>(32));
+		x = detail::compute_bitfieldReverseStep<T, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>=  2>::call(x, T(0x5555555555555555ull), static_cast<T>( 1));
+		x = detail::compute_bitfieldReverseStep<T, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>=  4>::call(x, T(0x3333333333333333ull), static_cast<T>( 2));
+		x = detail::compute_bitfieldReverseStep<T, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>=  8>::call(x, T(0x0F0F0F0F0F0F0F0Full), static_cast<T>( 4));
+		x = detail::compute_bitfieldReverseStep<T, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>= 16>::call(x, T(0x00FF00FF00FF00FFull), static_cast<T>( 8));
+		x = detail::compute_bitfieldReverseStep<T, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>= 32>::call(x, T(0x0000FFFF0000FFFFull), static_cast<T>(16));
+		x = detail::compute_bitfieldReverseStep<T, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>= 64>::call(x, T(0x00000000FFFFFFFFull), static_cast<T>(32));
 		return x;
 	}
 
@@ -315,12 +318,12 @@ namespace detail
 	GLM_FUNC_QUALIFIER vecType<int, P> bitCount(vecType<T, P> const & v)
 	{
 		vecType<typename detail::make_unsigned<T>::type, P> x(*reinterpret_cast<vecType<typename detail::make_unsigned<T>::type, P> const *>(&v));
-		x = detail::compute_bitfieldBitCountStep<sizeof(T) * 8 >=  2>::call(x, typename detail::make_unsigned<T>::type(0x5555555555555555ull), typename detail::make_unsigned<T>::type( 1));
-		x = detail::compute_bitfieldBitCountStep<sizeof(T) * 8 >=  4>::call(x, typename detail::make_unsigned<T>::type(0x3333333333333333ull), typename detail::make_unsigned<T>::type( 2));
-		x = detail::compute_bitfieldBitCountStep<sizeof(T) * 8 >=  8>::call(x, typename detail::make_unsigned<T>::type(0x0F0F0F0F0F0F0F0Full), typename detail::make_unsigned<T>::type( 4));
-		x = detail::compute_bitfieldBitCountStep<sizeof(T) * 8 >= 16>::call(x, typename detail::make_unsigned<T>::type(0x00FF00FF00FF00FFull), typename detail::make_unsigned<T>::type( 8));
-		x = detail::compute_bitfieldBitCountStep<sizeof(T) * 8 >= 32>::call(x, typename detail::make_unsigned<T>::type(0x0000FFFF0000FFFFull), typename detail::make_unsigned<T>::type(16));
-		x = detail::compute_bitfieldBitCountStep<sizeof(T) * 8 >= 64>::call(x, typename detail::make_unsigned<T>::type(0x00000000FFFFFFFFull), typename detail::make_unsigned<T>::type(32));
+		x = detail::compute_bitfieldBitCountStep<typename detail::make_unsigned<T>::type, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>=  2>::call(x, typename detail::make_unsigned<T>::type(0x5555555555555555ull), typename detail::make_unsigned<T>::type( 1));
+		x = detail::compute_bitfieldBitCountStep<typename detail::make_unsigned<T>::type, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>=  4>::call(x, typename detail::make_unsigned<T>::type(0x3333333333333333ull), typename detail::make_unsigned<T>::type( 2));
+		x = detail::compute_bitfieldBitCountStep<typename detail::make_unsigned<T>::type, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>=  8>::call(x, typename detail::make_unsigned<T>::type(0x0F0F0F0F0F0F0F0Full), typename detail::make_unsigned<T>::type( 4));
+		x = detail::compute_bitfieldBitCountStep<typename detail::make_unsigned<T>::type, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>= 16>::call(x, typename detail::make_unsigned<T>::type(0x00FF00FF00FF00FFull), typename detail::make_unsigned<T>::type( 8));
+		x = detail::compute_bitfieldBitCountStep<typename detail::make_unsigned<T>::type, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>= 32>::call(x, typename detail::make_unsigned<T>::type(0x0000FFFF0000FFFFull), typename detail::make_unsigned<T>::type(16));
+		x = detail::compute_bitfieldBitCountStep<typename detail::make_unsigned<T>::type, P, vecType, detail::is_aligned<P>::value, sizeof(T) * 8>= 64>::call(x, typename detail::make_unsigned<T>::type(0x00000000FFFFFFFFull), typename detail::make_unsigned<T>::type(32));
 		return vecType<int, P>(x);
 	}
 
@@ -359,7 +362,7 @@ namespace detail
 	}
 }//namespace glm
 
-#if GLM_ARCH != GLM_ARCH_PURE
+#if GLM_ARCH != GLM_ARCH_PURE && GLM_HAS_UNRESTRICTED_UNIONS
 #	include "func_integer_simd.inl"
 #endif
 
