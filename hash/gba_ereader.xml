@@ -1537,9 +1537,9 @@
 		</part>
 	</software>
 	<software name="acr3b3s2">
-		<description></description>
-		<year>200?</year>
 		<description>Animal Crossing-e - Series 3 - Boy (USA) (3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="ereader">
 			<dataarea name="rom" size="2912">
 				<rom name="animal crossing-e - series 3 - boy (usa) (3) (strip 2).raw" size="2912" crc="9c217f4b" sha1="4b02f6147c73d4adaddc48adf3ad3d5bca699d80"/>
@@ -3297,7 +3297,7 @@
 		</part>
 	</software>
 	<software name="acr4snd">
-		<description>Animal Crossing-e - Series 4 - Sandy (USA)</description>>
+		<description>Animal Crossing-e - Series 4 - Sandy (USA)</description>
 		<year>200?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="ereader">
@@ -3366,7 +3366,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="">
+	<software name="acr4tnk">
 		<description>Animal Crossing-e - Series 4 - Tom Nook (USA)</description>
 		<year>200?</year>
 		<publisher>Nintendo</publisher>
