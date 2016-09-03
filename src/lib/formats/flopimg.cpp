@@ -58,7 +58,7 @@ struct floppy_params
 
 static floperr_t floppy_track_unload(floppy_image_legacy *floppy);
 
-OPTION_GUIDE_START(floppy_option_guide_actual)
+OPTION_GUIDE_START(floppy_option_guide)
 	OPTION_INT('H', "heads",            "Heads")
 	OPTION_INT('T', "tracks",           "Tracks")
 	OPTION_INT('S', "sectors",          "Sectors")
@@ -66,7 +66,6 @@ OPTION_GUIDE_START(floppy_option_guide_actual)
 	OPTION_INT('I', "interleave",       "Interleave")
 	OPTION_INT('F', "firstsectorid",    "First Sector")
 OPTION_GUIDE_END
-const util::option_guide &floppy_option_guide = floppy_option_guide_actual;
 
 
 static void floppy_close_internal(floppy_image_legacy *floppy, int close_file);

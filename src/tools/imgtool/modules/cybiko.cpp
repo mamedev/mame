@@ -531,7 +531,7 @@ static imgtoolerr_t cybiko_image_delete_file( imgtool_partition *partition, cons
 	return IMGTOOLERR_SUCCESS;
 }
 
-static OPTION_GUIDE_START( cybiko_image_createimage_optguide )
+OPTION_GUIDE_START( cybiko_image_createimage_optguide )
 	OPTION_ENUM_START( 'F', "flash", "Flash Type" )
 		OPTION_ENUM( 0, "AT45DB041", "AT45DB041 (528 KByte)" )
 		OPTION_ENUM( 1, "AT45DB081", "AT45DB081 (1056 KByte)" )

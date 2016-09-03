@@ -40,7 +40,7 @@
 #define OPK_HEAD_SIZE           6
 
 
-static OPTION_GUIDE_START( datapack_option_guide )
+OPTION_GUIDE_START( datapack_option_guide )
 	OPTION_INT('S', "size", "Datapack size" )
 	OPTION_INT('R', "ram", "RAM/EPROM" )
 	OPTION_INT('P', "paged", "Paged" )

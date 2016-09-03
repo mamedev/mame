@@ -2342,7 +2342,7 @@ static imgtoolerr_t amiga_image_suggesttransfer(imgtool_partition *partition, co
 *****************************************************************************/
 
 
-static OPTION_GUIDE_START(amiga_createimage_optionguide)
+OPTION_GUIDE_START(amiga_createimage_optionguide)
 	OPTION_STRING( 'N', "name", "Volume name" )
 	OPTION_ENUM_START( 'S', "density", "Density" )
 		OPTION_ENUM( 0, "dd", "Double Density" )

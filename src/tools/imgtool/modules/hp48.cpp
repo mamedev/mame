@@ -136,7 +136,7 @@ static const char* hp48_prefix = "HPHP48-R";
 
 
 
-static OPTION_GUIDE_START( hp48_create_optionguide )
+OPTION_GUIDE_START( hp48_create_optionguide )
 	OPTION_INT('S', "size", "Size in KB" )
 OPTION_GUIDE_END
 

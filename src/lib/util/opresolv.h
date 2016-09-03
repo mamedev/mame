@@ -50,19 +50,28 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-#define OPTION_GUIDE_START(option_guide_)                                   \
-	const auto option_guide_ = util::make_option_guide(0	
-#define OPTION_GUIDE_END                                                    \
-	);
-#define OPTION_GUIDE_EXTERN(option_guide_)                                  \
+#define OPTION_GUIDE_START(option_guide_)														\
+	namespace option_guide_impl_##option_guide_													\
+	{																							\
+		static const util::option_guide &get();													\
+	};																							\
+	const util::option_guide &option_guide_ = option_guide_impl_##option_guide_::get();			\
+	namespace option_guide_impl_##option_guide_													\
+	{																							\
+		static const auto actual = util::make_option_guide(0
+#define OPTION_GUIDE_END																		\
+		);																						\
+		static const util::option_guide &get() { return actual; }								\
+	};	
+#define OPTION_GUIDE_EXTERN(option_guide_)														\
 	extern const util::option_guide &option_guide_
-#define OPTION_INT(option_char, identifier, display_name)                   \
+#define OPTION_INT(option_char, identifier, display_name)										\
 	,util::option_guide::entry(util::option_guide::entry::option_type::INT, (option_char), (identifier), (display_name))
-#define OPTION_STRING(option_char, identifier, display_name)                \
+#define OPTION_STRING(option_char, identifier, display_name)                					\
 	,util::option_guide::entry(util::option_guide::entry::option_type::STRING, (option_char), (identifier), (display_name))
-#define OPTION_ENUM_START(option_char, identifier, display_name)            \
+#define OPTION_ENUM_START(option_char, identifier, display_name)            					\
 	,util::option_guide::entry(util::option_guide::entry::option_type::ENUM_BEGIN, (option_char), (identifier), (display_name))
-#define OPTION_ENUM(value, identifier, display_name)                        \
+#define OPTION_ENUM(value, identifier, display_name)                        					\
 	,util::option_guide::entry(util::option_guide::entry::option_type::ENUM_VALUE, (value), (identifier), (display_name))
 #define OPTION_ENUM_END
 

@@ -882,7 +882,7 @@ static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool_partition *partition,
     Imgtool module declaration
 *********************************************************************/
 
-static OPTION_GUIDE_START( bml3_writefile_optionguide )
+OPTION_GUIDE_START( bml3_writefile_optionguide )
 	OPTION_ENUM_START(  BML3_OPTIONS_FTYPE, "ftype", "File type" )
 		OPTION_ENUM(    0,      "basic",        "Basic" )
 		OPTION_ENUM(    1,      "data",         "Data" )

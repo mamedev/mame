@@ -579,7 +579,7 @@ static imgtoolerr_t rsdos_diskimage_suggesttransfer(imgtool_partition *partition
     Imgtool module declaration
 *********************************************************************/
 
-static OPTION_GUIDE_START( coco_rsdos_writefile_optionguide )
+OPTION_GUIDE_START( coco_rsdos_writefile_optionguide )
 	OPTION_ENUM_START(  RSDOS_OPTIONS_FTYPE, "ftype", "File type" )
 		OPTION_ENUM(    0,      "basic",        "Basic" )
 		OPTION_ENUM(    1,      "data",         "Data" )

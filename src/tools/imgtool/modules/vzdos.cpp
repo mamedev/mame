@@ -903,7 +903,7 @@ void filter_vzsnapshot_getinfo(UINT32 state, union filterinfo *info)
     Imgtool module declaration
 *********************************************************************/
 
-static OPTION_GUIDE_START(vzdos_writefile_optionguide)
+OPTION_GUIDE_START(vzdos_writefile_optionguide)
 	OPTION_ENUM_START( 'T', "ftype",  "File type" )
 		OPTION_ENUM(     0, "basic",  "Basic"  )
 		OPTION_ENUM(     1, "binary", "Binary" )

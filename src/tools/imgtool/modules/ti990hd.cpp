@@ -409,7 +409,7 @@ enum
 	ti990_createopts_sectorsize = 'E'
 };
 
-static OPTION_GUIDE_START( ti990_create_optionguide )
+OPTION_GUIDE_START( ti990_create_optionguide )
 	/*OPTION_STRING(ti990_createopts_volname, "label",  "Volume name" )*/
 	OPTION_INT(ti990_createopts_cylinders, "cylinders", "Cylinders" )
 	OPTION_INT(ti990_createopts_heads, "heads", "Heads" )

@@ -3877,7 +3877,7 @@ enum
 	dsk_createopts_density = 'F'
 };
 
-static OPTION_GUIDE_START( dsk_create_optionguide )
+OPTION_GUIDE_START( dsk_create_optionguide )
 	OPTION_STRING(dsk_createopts_volname, "label",  "Volume name" )
 	OPTION_INT(dsk_createopts_sides, "sides", "Sides" )
 	OPTION_INT(dsk_createopts_tracks, "tracks", "Tracks" )

@@ -10,7 +10,7 @@
 #include "diablo.h"
 
 
-static OPTION_GUIDE_START(dsk_option_guide)
+OPTION_GUIDE_START(dsk_option_guide)
 	OPTION_INT('C', "cylinders",        "Cylinders")
 	OPTION_INT('H', "heads",            "Heads")
 	OPTION_INT('S', "sectors",          "Sectors")
