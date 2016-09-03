@@ -51,20 +51,19 @@
 //**************************************************************************
 
 #define OPTION_GUIDE_START(option_guide_)                                   \
-	const auto option_guide_ = util::make_option_guide(	
+	const auto option_guide_ = util::make_option_guide(0	
 #define OPTION_GUIDE_END                                                    \
-	util::option_guide::entry(util::option_guide::entry::option_type::INVALID, 0, nullptr, nullptr) \
 	);
 #define OPTION_GUIDE_EXTERN(option_guide_)                                  \
 	extern const util::option_guide &option_guide_
 #define OPTION_INT(option_char, identifier, display_name)                   \
-	util::option_guide::entry(util::option_guide::entry::option_type::INT, (option_char), (identifier), (display_name)),
+	,util::option_guide::entry(util::option_guide::entry::option_type::INT, (option_char), (identifier), (display_name))
 #define OPTION_STRING(option_char, identifier, display_name)                \
-	util::option_guide::entry(util::option_guide::entry::option_type::STRING, (option_char), (identifier), (display_name)),
+	,util::option_guide::entry(util::option_guide::entry::option_type::STRING, (option_char), (identifier), (display_name))
 #define OPTION_ENUM_START(option_char, identifier, display_name)            \
-	util::option_guide::entry(util::option_guide::entry::option_type::ENUM_BEGIN, (option_char), (identifier), (display_name)),
+	,util::option_guide::entry(util::option_guide::entry::option_type::ENUM_BEGIN, (option_char), (identifier), (display_name))
 #define OPTION_ENUM(value, identifier, display_name)                        \
-	util::option_guide::entry(util::option_guide::entry::option_type::ENUM_VALUE, (value), (identifier), (display_name)),
+	,util::option_guide::entry(util::option_guide::entry::option_type::ENUM_VALUE, (value), (identifier), (display_name))
 #define OPTION_ENUM_END
 
 namespace util {
@@ -134,13 +133,13 @@ public:
 	template<typename... T>
 	option_guide_impl(T &&... elems)
 		: std::array<option_guide::entry, Count>({ std::forward<T>(elems)... })
-		, option_guide(&(*this)[0], &(*this)[0] + Count - 1)
+		, option_guide(&(*this)[0], &(*this)[0] + Count)
 	{
 	}
 };
 
 template <typename... T>
-option_guide_impl<sizeof...(T)> make_option_guide(T &&... elems)
+option_guide_impl<sizeof...(T)> make_option_guide(int dummy, T &&... elems)
 {
 	return option_guide_impl<sizeof...(T)>(std::forward<T>(elems)...);
 }
