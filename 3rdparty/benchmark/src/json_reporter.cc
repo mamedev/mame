@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include "benchmark/reporter.h"
+#include "complexity.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -21,7 +23,7 @@
 #include <vector>
 
 #include "string_util.h"
-#include "walltime.h"
+#include "timers.h"
 
 namespace benchmark {
 
@@ -52,7 +54,7 @@ int64_t RoundDouble(double v) {
 } // end namespace
 
 bool JSONReporter::ReportContext(const Context& context) {
-  std::ostream& out = std::cout;
+  std::ostream& out = GetOutputStream();
 
   out << "{\n";
   std::string inner_indent(2, ' ');
@@ -91,76 +93,86 @@ void JSONReporter::ReportRuns(std::vector<Run> const& reports) {
     return;
   }
   std::string indent(4, ' ');
-  std::ostream& out = std::cout;
+  std::ostream& out = GetOutputStream();
   if (!first_report_) {
     out << ",\n";
   }
   first_report_ = false;
-  std::vector<Run> reports_cp = reports;
-  if (reports.size() >= 2) {
-    Run mean_data;
-    Run stddev_data;
-    BenchmarkReporter::ComputeStats(reports, &mean_data, &stddev_data);
-    reports_cp.push_back(mean_data);
-    reports_cp.push_back(stddev_data);
-  }
-  for (auto it = reports_cp.begin(); it != reports_cp.end(); ++it) {
-     out << indent << "{\n";
-     PrintRunData(*it);
-     out << indent << '}';
-     auto it_cp = it;
-     if (++it_cp != reports_cp.end()) {
-         out << ",\n";
-     }
+
+  for (auto it = reports.begin(); it != reports.end(); ++it) {
+    out << indent << "{\n";
+    PrintRunData(*it);
+    out << indent << '}';
+    auto it_cp = it;
+    if (++it_cp != reports.end()) {
+      out << ",\n";
+    }
   }
 }
 
 void JSONReporter::Finalize() {
-    // Close the list of benchmarks and the top level object.
-    std::cout << "\n  ]\n}\n";
+  // Close the list of benchmarks and the top level object.
+  GetOutputStream() << "\n  ]\n}\n";
 }
 
 void JSONReporter::PrintRunData(Run const& run) {
-    double multiplier;
-    const char* timeLabel;
-    std::tie(timeLabel, multiplier) = GetTimeUnitAndMultiplier(run.time_unit);
-
-    double cpu_time = run.cpu_accumulated_time * multiplier;
-    double real_time = run.real_accumulated_time * multiplier;
-    if (run.iterations != 0) {
-        real_time = real_time / static_cast<double>(run.iterations);
-        cpu_time = cpu_time / static_cast<double>(run.iterations);
-    }
-
-    std::string indent(6, ' ');
-    std::ostream& out = std::cout;
+  std::string indent(6, ' ');
+  std::ostream& out = GetOutputStream();
     out << indent
         << FormatKV("name", run.benchmark_name)
         << ",\n";
+    if (run.error_occurred) {
+        out << indent
+            << FormatKV("error_occurred", run.error_occurred)
+            << ",\n";
+        out << indent
+            << FormatKV("error_message", run.error_message)
+            << ",\n";
+    }
+  if (!run.report_big_o && !run.report_rms) {
+        out << indent
+            << FormatKV("iterations", run.iterations)
+            << ",\n";
+        out << indent
+            << FormatKV("real_time", RoundDouble(run.GetAdjustedRealTime()))
+            << ",\n";
+        out << indent
+            << FormatKV("cpu_time", RoundDouble(run.GetAdjustedCPUTime()));
+        out << ",\n" << indent
+            << FormatKV("time_unit", GetTimeUnitString(run.time_unit));
+  } else if (run.report_big_o) {
     out << indent
-        << FormatKV("iterations", run.iterations)
+        << FormatKV("cpu_coefficient", RoundDouble(run.GetAdjustedCPUTime()))
         << ",\n";
     out << indent
-        << FormatKV("real_time", RoundDouble(real_time))
+        << FormatKV("real_coefficient", RoundDouble(run.GetAdjustedRealTime()))
         << ",\n";
     out << indent
-        << FormatKV("cpu_time", RoundDouble(cpu_time))
-        << ",\n";
-    out << indent
-        << FormatKV("time_unit", timeLabel);
-    if (run.bytes_per_second > 0.0) {
-        out << ",\n" << indent
-            << FormatKV("bytes_per_second", RoundDouble(run.bytes_per_second));
-    }
-    if (run.items_per_second > 0.0) {
-        out << ",\n" << indent
-            << FormatKV("items_per_second", RoundDouble(run.items_per_second));
-    }
-    if (!run.report_label.empty()) {
-        out << ",\n" << indent
-            << FormatKV("label", run.report_label);
-    }
-    out << '\n';
+            << FormatKV("big_o", GetBigOString(run.complexity))
+            << ",\n";
+        out << indent
+            << FormatKV("time_unit", GetTimeUnitString(run.time_unit));
+    } else if(run.report_rms) {
+        out << indent
+            << FormatKV("rms", RoundDouble(run.GetAdjustedCPUTime()*100))
+            << '%';
+  }
+  if (run.bytes_per_second > 0.0) {
+    out << ",\n"
+        << indent
+        << FormatKV("bytes_per_second", RoundDouble(run.bytes_per_second));
+  }
+  if (run.items_per_second > 0.0) {
+    out << ",\n"
+        << indent
+        << FormatKV("items_per_second", RoundDouble(run.items_per_second));
+  }
+  if (!run.report_label.empty()) {
+    out << ",\n"
+        << indent
+        << FormatKV("label", run.report_label);
+  }
+  out << '\n';
 }
 
-} // end namespace benchmark
+}  // end namespace benchmark

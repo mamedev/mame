@@ -1,6 +1,10 @@
 #ifndef BENCHMARK_COLORPRINT_H_
 #define BENCHMARK_COLORPRINT_H_
 
+#include <cstdarg>
+#include <string>
+#include <iostream>
+
 namespace benchmark {
 enum LogColor {
   COLOR_DEFAULT,
@@ -13,7 +17,12 @@ enum LogColor {
   COLOR_WHITE
 };
 
-void ColorPrintf(LogColor color, const char* fmt, ...);
+std::string FormatString(const char* msg, va_list args);
+std::string FormatString(const char* msg, ...);
+
+void ColorPrintf(std::ostream& out, LogColor color, const char* fmt, va_list args);
+void ColorPrintf(std::ostream& out, LogColor color, const char* fmt, ...);
+
 }  // end namespace benchmark
 
 #endif  // BENCHMARK_COLORPRINT_H_
