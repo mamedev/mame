@@ -29,7 +29,7 @@ enum ui_gfx_modes
 	UI_GFX_TILEMAP
 };
 
-const int MAX_GFX_DECODERS = 8;
+const UINT8 MAX_GFX_DECODERS = 8;
 
 
 
@@ -137,7 +137,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 void ui_gfx_init(running_machine &machine)
 {
 	ui_gfx_state *state = &ui_gfx;
-	int rotate = machine.system().flags & ORIENTATION_MASK;
+	UINT8 rotate = machine.system().flags & ORIENTATION_MASK;
 
 	// make sure we clean up after ourselves
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_gfx_exit), &machine));
@@ -149,8 +149,8 @@ void ui_gfx_init(running_machine &machine)
 	state->palette.columns = 16;
 
 	// set up the graphics state
-	for (int i = 0; i < MAX_GFX_DECODERS; i++)
-		for (int j = 0; j < MAX_GFX_ELEMENTS; j++)
+	for (UINT8 i = 0; i < MAX_GFX_DECODERS; i++)
+		for (UINT8 j = 0; j < MAX_GFX_ELEMENTS; j++)
 		{
 			state->gfxdev[i].rotate[j] = rotate;
 			state->gfxdev[i].columns[j] = 16;
@@ -180,7 +180,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 	for (device_gfx_interface &interface : gfx_interface_iterator(machine.root_device()))
 	{
 		// count the gfx sets in each device, skipping devices with none
-		int count = 0;
+		UINT8 count = 0;
 		while (count < MAX_GFX_ELEMENTS && interface.gfx(count) != nullptr)
 			count++;
 
@@ -1093,13 +1093,14 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 			ypixel = (mapboxheight - 1) - ypixel;
 		if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
 			std::swap(xpixel, ypixel);
-		int col = ((xpixel / pixelscale + state.tilemap.xoffs) / tilemap->tilewidth()) % tilemap->cols();
-		int row = ((ypixel / pixelscale + state.tilemap.yoffs) / tilemap->tileheight()) % tilemap->rows();
-		int gfxnum, code, color;
+		UINT32 col = ((xpixel / pixelscale + state.tilemap.xoffs) / tilemap->tilewidth()) % tilemap->cols();
+		UINT32 row = ((ypixel / pixelscale + state.tilemap.yoffs) / tilemap->tileheight()) % tilemap->rows();
+		UINT8 gfxnum;
+		UINT32 code, color;
 		tilemap->get_info_debug(col, row, gfxnum, code, color);
 		util::stream_format(title_buf, " @ %d,%d = GFX%d #%X:%X",
 							col * tilemap->tilewidth(), row * tilemap->tileheight(),
-							gfxnum, code, color);
+							int(gfxnum), code, color);
 	}
 	else
 		util::stream_format(title_buf, " %dx%d OFFS %d,%d", tilemap->width(), tilemap->height(), state.tilemap.xoffs, state.tilemap.yoffs);

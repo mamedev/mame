@@ -450,7 +450,7 @@ struct tile_data
 	UINT8           gfxnum;         // defaults to 0xff; specify index of gfx for auto-invalidation on dirty
 	UINT32          code;
 
-	void set(int _gfxnum, int rawcode, int rawcolor, int _flags)
+	void set(UINT8 _gfxnum, UINT32 rawcode, UINT32 rawcolor, UINT8 _flags)
 	{
 		gfx_element *gfx = decoder->gfx(_gfxnum);
 		code = rawcode % gfx->elements();
@@ -496,7 +496,7 @@ protected:
 	tilemap_t();
 	virtual ~tilemap_t();
 
-	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows);
+	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, UINT16 tilewidth, UINT16 tileheight, UINT32 cols, UINT32 rows);
 
 public:
 	// getters
@@ -511,12 +511,12 @@ public:
 	memory_array &extmem() { return m_extmem; }
 	UINT32 rows() const { return m_rows; }
 	UINT32 cols() const { return m_cols; }
-	UINT32 tilewidth() const { return m_tilewidth; }
-	UINT32 tileheight() const { return m_tileheight; }
+	UINT16 tilewidth() const { return m_tilewidth; }
+	UINT16 tileheight() const { return m_tileheight; }
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	bool enabled() const { return m_enable; }
-	int palette_offset() const { return m_palette_offset; }
+	UINT32 palette_offset() const { return m_palette_offset; }
 	int scrolldx() const { return (m_attributes & TILEMAP_FLIPX) ? m_dx_flipped : m_dx; }
 	int scrolldy() const { return (m_attributes & TILEMAP_FLIPY) ? m_dy_flipped : m_dy; }
 	int scrollx(int which = 0) const { return (which < m_scrollrows) ? m_rowscroll[which] : 0; }
@@ -525,7 +525,7 @@ public:
 	bitmap_ind8 &flagsmap() { pixmap_update(); return m_flagsmap; }
 	UINT8 *tile_flags() { pixmap_update(); return &m_tileflags[0]; }
 	tilemap_memory_index memory_index(UINT32 col, UINT32 row) { return m_mapper(col, row, m_cols, m_rows); }
-	void get_info_debug(UINT32 col, UINT32 row, int &gfxnum, int &code, int &color);
+	void get_info_debug(UINT32 col, UINT32 row, UINT8 &gfxnum, UINT32 &code, UINT32 &color);
 
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }
@@ -551,7 +551,7 @@ public:
 	void map_pen_to_layer(int group, pen_t pen, UINT8 layermask) { map_pens_to_layer(group, pen, ~0, layermask); }
 	void set_transparent_pen(pen_t pen);
 	void set_transmask(int group, UINT32 fgmask, UINT32 bgmask);
-	void configure_groups(gfx_element &gfx, int transcolor);
+	void configure_groups(gfx_element &gfx, indirect_pen_t transcolor);
 
 	// drawing
 	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
@@ -645,8 +645,8 @@ private:
 	// basic tilemap metrics
 	UINT32                      m_rows;                 // number of tile rows
 	UINT32                      m_cols;                 // number of tile columns
-	UINT32                      m_tilewidth;            // width of a single tile in pixels
-	UINT32                      m_tileheight;           // height of a single tile in pixels
+	UINT16                      m_tilewidth;            // width of a single tile in pixels
+	UINT16                      m_tileheight;           // height of a single tile in pixels
 	UINT32                      m_width;                // width of the full tilemap in pixels
 	UINT32                      m_height;               // height of the full tilemap in pixels
 
@@ -704,8 +704,8 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// tilemap creation
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = nullptr);
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = nullptr);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, UINT16 tilewidth, UINT16 tileheight, UINT32 cols, UINT32 rows, tilemap_t *allocated = nullptr);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, UINT16 tilewidth, UINT16 tileheight, UINT32 cols, UINT32 rows, tilemap_t *allocated = nullptr);
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
@@ -742,9 +742,9 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_bytes_per_entry(device_t &device, int bpe);
 	static void static_set_info_callback(device_t &device, tilemap_get_info_delegate tile_get_info);
-	static void static_set_layout(device_t &device, tilemap_standard_mapper mapper, int columns, int rows);
-	static void static_set_layout(device_t &device, tilemap_mapper_delegate mapper, int columns, int rows);
-	static void static_set_tile_size(device_t &device, int width, int height);
+	static void static_set_layout(device_t &device, tilemap_standard_mapper mapper, UINT32 columns, UINT32 rows);
+	static void static_set_layout(device_t &device, tilemap_mapper_delegate mapper, UINT32 columns, UINT32 rows);
+	static void static_set_tile_size(device_t &device, UINT16 width, UINT16 height);
 	static void static_set_transparent_pen(device_t &device, pen_t pen);
 
 	// write handlers
@@ -771,10 +771,10 @@ private:
 	tilemap_standard_mapper m_standard_mapper;
 	tilemap_mapper_delegate m_mapper;
 	int             m_bytes_per_entry;
-	int             m_tile_width;
-	int             m_tile_height;
-	int             m_num_columns;
-	int             m_num_rows;
+	UINT16          m_tile_width;
+	UINT16          m_tile_height;
+	UINT32          m_num_columns;
+	UINT32          m_num_rows;
 	bool            m_transparent_pen_set;
 	pen_t           m_transparent_pen;
 };
