@@ -122,7 +122,18 @@ renderer_bgfx::~renderer_bgfx()
 //  renderer_bgfx::create
 //============================================================
 
-#ifdef OSD_SDL
+#ifdef OSD_WINDOWS
+inline void winSetHwnd(::HWND _window)
+{
+	bgfx::PlatformData pd;
+	pd.ndt          = NULL;
+	pd.nwh          = _window;
+	pd.context      = NULL;
+	pd.backBuffer   = NULL;
+	pd.backBufferDS = NULL;
+	bgfx::setPlatformData(pd);
+}
+#else
 static void* sdlNativeWindowHandle(SDL_Window* _window)
 {
 	SDL_SysWMinfo wmi;
@@ -144,20 +155,7 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	return nullptr;
 #   endif // BX_PLATFORM_
 }
-#endif
 
-inline void winSetHwnd(::HWND _window)
-{
-	bgfx::PlatformData pd;
-	pd.ndt          = NULL;
-	pd.nwh          = _window;
-	pd.context      = NULL;
-	pd.backBuffer   = NULL;
-	pd.backBufferDS = NULL;
-	bgfx::setPlatformData(pd);
-}
-
-#ifdef OSD_SDL
 inline bool sdlSetWindow(SDL_Window* _window)
 {
 	SDL_SysWMinfo wmi;

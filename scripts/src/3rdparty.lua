@@ -723,6 +723,7 @@ end
 		buildoptions {
 			"-Wno-uninitialized",
 			"-Wno-unused-function",
+			"-Wno-unused-variable",
 			"-Wno-unused-but-set-variable",
 			"-Wno-format-extra-args", -- temp for mingw 6.1 till update bgfx code
 		}
