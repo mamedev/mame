@@ -1895,8 +1895,67 @@ PUGI__NS_BEGIN
 			return is_little_endian() ? encoding_utf32_le : encoding_utf32_be;
 	}
 
-	PUGI__FN xml_encoding guess_buffer_encoding(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
+	PUGI__FN bool parse_declaration_encoding(const uint8_t* data, size_t size, const uint8_t*& out_encoding, size_t& out_length)
 	{
+	#define PUGI__SCANCHAR(ch) { if (offset >= size || data[offset] != ch) return false; offset++; }
+	#define PUGI__SCANCHARTYPE(ct) { while (offset < size && PUGI__IS_CHARTYPE(data[offset], ct)) offset++; }
+
+		// check if we have a non-empty XML declaration
+		if (size < 6 || !((data[0] == '<') & (data[1] == '?') & (data[2] == 'x') & (data[3] == 'm') & (data[4] == 'l') && PUGI__IS_CHARTYPE(data[5], ct_space)))
+			return false;
+
+		// scan XML declaration until the encoding field
+		for (size_t i = 6; i + 1 < size; ++i)
+		{
+			// declaration can not contain ? in quoted values
+			if (data[i] == '?')
+				return false;
+
+			if (data[i] == 'e' && data[i + 1] == 'n')
+			{
+				size_t offset = i;
+
+				// encoding follows the version field which can't contain 'en' so this has to be the encoding if XML is well formed
+				PUGI__SCANCHAR('e'); PUGI__SCANCHAR('n'); PUGI__SCANCHAR('c'); PUGI__SCANCHAR('o');
+				PUGI__SCANCHAR('d'); PUGI__SCANCHAR('i'); PUGI__SCANCHAR('n'); PUGI__SCANCHAR('g');
+
+				// S? = S?
+				PUGI__SCANCHARTYPE(ct_space);
+				PUGI__SCANCHAR('=');
+				PUGI__SCANCHARTYPE(ct_space);
+
+				// the only two valid delimiters are ' and "
+				uint8_t delimiter = (offset < size && data[offset] == '"') ? '"' : '\'';
+
+				PUGI__SCANCHAR(delimiter);
+
+				size_t start = offset;
+
+				out_encoding = data + offset;
+
+				PUGI__SCANCHARTYPE(ct_symbol);
+
+				out_length = offset - start;
+
+				PUGI__SCANCHAR(delimiter);
+
+				return true;
+			}
+		}
+
+		return false;
+
+	#undef PUGI__SCANCHAR
+	#undef PUGI__SCANCHARTYPE
+	}
+
+	PUGI__FN xml_encoding guess_buffer_encoding(const uint8_t* data, size_t size)
+	{
+		// skip encoding autodetection if input buffer is too small
+		if (size < 4) return encoding_utf8;
+
+		uint8_t d0 = data[0], d1 = data[1], d2 = data[2], d3 = data[3];
+
 		// look for BOM in first few bytes
 		if (d0 == 0 && d1 == 0 && d2 == 0xfe && d3 == 0xff) return encoding_utf32_be;
 		if (d0 == 0xff && d1 == 0xfe && d2 == 0 && d3 == 0) return encoding_utf32_le;
@@ -1909,13 +1968,32 @@ PUGI__NS_BEGIN
 		if (d0 == 0x3c && d1 == 0 && d2 == 0 && d3 == 0) return encoding_utf32_le;
 		if (d0 == 0 && d1 == 0x3c && d2 == 0 && d3 == 0x3f) return encoding_utf16_be;
 		if (d0 == 0x3c && d1 == 0 && d2 == 0x3f && d3 == 0) return encoding_utf16_le;
-		if (d0 == 0x3c && d1 == 0x3f && d2 == 0x78 && d3 == 0x6d) return encoding_utf8;
 
 		// look for utf16 < followed by node name (this may fail, but is better than utf8 since it's zero terminated so early)
 		if (d0 == 0 && d1 == 0x3c) return encoding_utf16_be;
 		if (d0 == 0x3c && d1 == 0) return encoding_utf16_le;
 
-		// no known BOM detected, assume utf8
+		// no known BOM detected; parse declaration
+		const uint8_t* enc = 0;
+		size_t enc_length = 0;
+
+		if (d0 == 0x3c && d1 == 0x3f && d2 == 0x78 && d3 == 0x6d && parse_declaration_encoding(data, size, enc, enc_length))
+		{
+			// iso-8859-1 (case-insensitive)
+			if (enc_length == 10
+				&& (enc[0] | ' ') == 'i' && (enc[1] | ' ') == 's' && (enc[2] | ' ') == 'o'
+				&& enc[3] == '-' && enc[4] == '8' && enc[5] == '8' && enc[6] == '5' && enc[7] == '9'
+				&& enc[8] == '-' && enc[9] == '1')
+				return encoding_latin1;
+
+			// latin1 (case-insensitive)
+			if (enc_length == 6
+				&& (enc[0] | ' ') == 'l' && (enc[1] | ' ') == 'a' && (enc[2] | ' ') == 't'
+				&& (enc[3] | ' ') == 'i' && (enc[4] | ' ') == 'n'
+				&& enc[5] == '1')
+				return encoding_latin1;
+		}
+
 		return encoding_utf8;
 	}
 
@@ -1933,15 +2011,10 @@ PUGI__NS_BEGIN
 		// only do autodetection if no explicit encoding is requested
 		if (encoding != encoding_auto) return encoding;
 
-		// skip encoding autodetection if input buffer is too small
-		if (size < 4) return encoding_utf8;
-
 		// try to guess encoding (based on XML specification, Appendix F.1)
 		const uint8_t* data = static_cast<const uint8_t*>(contents);
 
-		PUGI__DMC_VOLATILE uint8_t d0 = data[0], d1 = data[1], d2 = data[2], d3 = data[3];
-
-		return guess_buffer_encoding(d0, d1, d2, d3);
+		return guess_buffer_encoding(data, size);
 	}
 
 	PUGI__FN bool get_mutable_buffer(char_t*& out_buffer, size_t& out_length, const void* contents, size_t size, bool is_mutable)
