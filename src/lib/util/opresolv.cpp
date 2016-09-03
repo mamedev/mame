@@ -31,11 +31,11 @@ namespace util {
 option_resolution::option_resolution(const option_guide &guide)
 {
 	// reserve space for entries
-	m_entries.reserve(guide.entries().size());
+	m_entries.reserve(guide.end() - guide.begin());
 
 	// initialize each of the entries; can't use foreach because we need to scan the
 	// ENUM_VALUE entries
-	for (auto iter = guide.entries().cbegin(); iter != guide.entries().cend(); iter++)
+	for (auto iter = guide.begin(); iter != guide.end(); iter++)
 	{
 		// create the entry
 		m_entries.emplace_back(*iter);
@@ -49,7 +49,7 @@ option_resolution::option_resolution(const option_guide &guide)
 			auto enum_value_end = enum_value_begin;
 
 			// and identify all entries of type ENUM_VALUE
-			while (enum_value_end != guide.entries().end() && enum_value_end->type() == option_guide::entry::option_type::ENUM_VALUE)
+			while (enum_value_end != guide.end() && enum_value_end->type() == option_guide::entry::option_type::ENUM_VALUE)
 			{
 				iter++;
 				enum_value_end++;
@@ -212,7 +212,7 @@ option_resolution::entry::entry(const option_guide::entry &guide_entry)
 //	entry::set_enum_value_range
 // -------------------------------------------------
 
-void option_resolution::entry::set_enum_value_range(option_guide::entrylist::const_iterator begin, option_guide::entrylist::const_iterator end)
+void option_resolution::entry::set_enum_value_range(const option_guide::entry *begin, const option_guide::entry *end)
 {
 	m_enum_value_begin = begin;
 	m_enum_value_end = end;

@@ -51,20 +51,20 @@
 //**************************************************************************
 
 #define OPTION_GUIDE_START(option_guide_)                                   \
-	const util::option_guide option_guide_ =										\
-	{
+	const auto option_guide_ = util::make_option_guide(	
 #define OPTION_GUIDE_END                                                    \
-	};
+	util::option_guide::entry(util::option_guide::entry::option_type::INVALID, 0, nullptr, nullptr) \
+	);
 #define OPTION_GUIDE_EXTERN(option_guide_)                                  \
-	extern const util::option_guide option_guide_
+	extern const util::option_guide &option_guide_
 #define OPTION_INT(option_char, identifier, display_name)                   \
-	{ util::option_guide::entry::option_type::INT, (option_char), (identifier), (display_name) },
+	util::option_guide::entry(util::option_guide::entry::option_type::INT, (option_char), (identifier), (display_name)),
 #define OPTION_STRING(option_char, identifier, display_name)                \
-	{ util::option_guide::entry::option_type::STRING, (option_char), (identifier), (display_name) },
+	util::option_guide::entry(util::option_guide::entry::option_type::STRING, (option_char), (identifier), (display_name)),
 #define OPTION_ENUM_START(option_char, identifier, display_name)            \
-	{ util::option_guide::entry::option_type::ENUM_BEGIN, (option_char), (identifier), (display_name) },
+	util::option_guide::entry(util::option_guide::entry::option_type::ENUM_BEGIN, (option_char), (identifier), (display_name)),
 #define OPTION_ENUM(value, identifier, display_name)                        \
-	{ util::option_guide::entry::option_type::ENUM_VALUE, (value), (identifier), (display_name) },
+	util::option_guide::entry(util::option_guide::entry::option_type::ENUM_VALUE, (value), (identifier), (display_name)),
 #define OPTION_ENUM_END
 
 namespace util {
@@ -79,11 +79,17 @@ public:
 	public:
 		enum class option_type
 		{
+			INVALID,
 			INT,
 			STRING,
 			ENUM_BEGIN,
 			ENUM_VALUE
 		};
+
+		constexpr entry()
+			: m_type(option_type::INVALID), m_parameter(0), m_identifier(nullptr), m_display_name(nullptr)
+		{
+		}
 
 		constexpr entry(option_type type, int parameter = 0, const char *identifier = nullptr, const char *display_name = nullptr)
 			: m_type(type), m_parameter(parameter), m_identifier(identifier), m_display_name(display_name)
@@ -103,19 +109,42 @@ public:
 		const char *m_display_name;
 	};
 
-	typedef std::vector<option_guide::entry> entrylist;
+	// methods
+	const entry *begin() const { return m_begin; }
+	const entry *end() const { return m_end; }
 
-	option_guide(std::initializer_list<entry> entries)
-		: m_entries(entries)
+protected:
+	option_guide(const entry *begin, const entry *end)
+		: m_begin(begin), m_end(end)
 	{
 	}
 
-	// methods
-	const entrylist &entries() const { return m_entries; }
 
 private:
-	entrylist m_entries;
+	const entry *m_begin;
+	const entry *m_end;
 };
+
+// ======================> option_guide_impl
+
+template <std::size_t Count>
+class option_guide_impl : protected std::array<option_guide::entry, Count>, public option_guide
+{
+public:
+	template<typename... T>
+	option_guide_impl(T &&... elems)
+		: std::array<option_guide::entry, Count>({ std::forward<T>(elems)... })
+		, option_guide(&(*this)[0], &(*this)[0] + Count - 1)
+	{
+	}
+};
+
+template <typename... T>
+option_guide_impl<sizeof...(T)> make_option_guide(T &&... elems)
+{
+	return option_guide_impl<sizeof...(T)>(std::forward<T>(elems)...);
+}
+
 
 // ======================> option_resolution
 
@@ -163,8 +192,8 @@ public:
 		int value_int() const;
 		const std::string &default_value() const { return m_default_value; }
 		const rangelist &ranges() const { return m_ranges; }
-		const option_guide::entrylist::const_iterator enum_value_begin() const { return m_enum_value_begin; }
-		const option_guide::entrylist::const_iterator enum_value_end() const { return m_enum_value_end; }
+		const option_guide::entry *enum_value_begin() const { return m_enum_value_begin; }
+		const option_guide::entry *enum_value_end() const { return m_enum_value_end; }
 
 		// accessors for guide data
 		option_guide::entry::option_type option_type() const { return m_guide_entry.type(); }
@@ -186,8 +215,8 @@ public:
 	private:
 		// references to the option guide
 		const option_guide::entry &				m_guide_entry;
-		option_guide::entrylist::const_iterator	m_enum_value_begin;
-		option_guide::entrylist::const_iterator	m_enum_value_end;
+		const option_guide::entry *				m_enum_value_begin;
+		const option_guide::entry *				m_enum_value_end;
 
 		// runtime state
 		bool									m_is_pertinent;
@@ -197,7 +226,7 @@ public:
 
 		// methods
 		void parse_specification(const char *specification);
-		void set_enum_value_range(option_guide::entrylist::const_iterator begin, option_guide::entrylist::const_iterator end);
+		void set_enum_value_range(const option_guide::entry *begin, const option_guide::entry *end);
 		static std::string numeric_value(int value);
 		rangelist::const_iterator find_in_ranges(int value) const;
 	};
