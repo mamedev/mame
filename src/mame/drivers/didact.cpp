@@ -47,11 +47,11 @@
 #define VERBOSE 0
 
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x)
+#define LOG(x) {}
 #define LOGSCAN(x) LOGPRINT(x)
-#define LOGSCREEN(x)
-#define RLOG(x)
-#define LOGCS(x)
+#define LOGSCREEN(x) {}
+#define RLOG(x) {}
+#define LOGCS(x) {}
 
 #if VERBOSE >= 2
 #define logerror printf
