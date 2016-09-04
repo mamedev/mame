@@ -93,6 +93,7 @@
 
 //#define CRTC_REG_DISP 1
 //#define SPR_DEBUG 1
+#define LAYER_DISABLE 0  // for debugging, allow the Q and W keys to be used for disabling graphic layers
 
 //static UINT32 pshift;  // for debugging
 
@@ -1673,33 +1674,30 @@ void towns_state::video_start()
 
 UINT32 towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bool layer1_en = true, layer2_en = true;
 	bitmap.fill(0x00000000, cliprect);
+
+	if(LAYER_DISABLE)
+	{
+		if(machine().input().code_pressed(KEYCODE_Q))
+			layer1_en = false;
+		if(machine().input().code_pressed(KEYCODE_W))
+			layer2_en = false;
+	}
 
 	if(!(m_video.towns_video_reg[1] & 0x01))
 	{
-		if(!machine().input().code_pressed(KEYCODE_Q))
-		{
-			if((m_video.towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
-		}
-		if(!machine().input().code_pressed(KEYCODE_W))
-		{
-			if((m_video.towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
-		}
+		if((m_video.towns_layer_ctrl & 0x03) != 0 && layer1_en)
+			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
+		if((m_video.towns_layer_ctrl & 0x0c) != 0 && layer2_en)
+			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
 	}
 	else
 	{
-		if(!machine().input().code_pressed(KEYCODE_Q))
-		{
-			if((m_video.towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
-		}
-		if(!machine().input().code_pressed(KEYCODE_W))
-		{
-			if((m_video.towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
-		}
+		if((m_video.towns_layer_ctrl & 0x0c) != 0 && layer1_en)
+			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
+		if((m_video.towns_layer_ctrl & 0x03) != 0 && layer2_en)
+			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
 	}
 
 #if 0
