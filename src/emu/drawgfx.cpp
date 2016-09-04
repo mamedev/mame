@@ -86,7 +86,7 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 //  gfx_element - constructor
 //-------------------------------------------------
 
-gfx_element::gfx_element(palette_device &palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
+gfx_element::gfx_element(palette_device &palette, UINT8 *base, UINT16 width, UINT16 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
 	: m_palette(&palette),
 		m_width(width),
 		m_height(height),

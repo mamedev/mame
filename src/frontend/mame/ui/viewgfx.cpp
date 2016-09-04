@@ -29,7 +29,7 @@ enum ui_gfx_modes
 	UI_GFX_TILEMAP
 };
 
-const int MAX_GFX_DECODERS = 8;
+const UINT8 MAX_GFX_DECODERS = 8;
 
 
 
@@ -137,7 +137,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 void ui_gfx_init(running_machine &machine)
 {
 	ui_gfx_state *state = &ui_gfx;
-	int rotate = machine.system().flags & ORIENTATION_MASK;
+	UINT8 rotate = machine.system().flags & ORIENTATION_MASK;
 
 	// make sure we clean up after ourselves
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_gfx_exit), &machine));
@@ -149,8 +149,8 @@ void ui_gfx_init(running_machine &machine)
 	state->palette.columns = 16;
 
 	// set up the graphics state
-	for (int i = 0; i < MAX_GFX_DECODERS; i++)
-		for (int j = 0; j < MAX_GFX_ELEMENTS; j++)
+	for (UINT8 i = 0; i < MAX_GFX_DECODERS; i++)
+		for (UINT8 j = 0; j < MAX_GFX_ELEMENTS; j++)
 		{
 			state->gfxdev[i].rotate[j] = rotate;
 			state->gfxdev[i].columns[j] = 16;
@@ -180,7 +180,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 	for (device_gfx_interface &interface : gfx_interface_iterator(machine.root_device()))
 	{
 		// count the gfx sets in each device, skipping devices with none
-		int count = 0;
+		UINT8 count = 0;
 		while (count < MAX_GFX_ELEMENTS && interface.gfx(count) != nullptr)
 			count++;
 
@@ -387,8 +387,8 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 
 	// if the mouse pointer is over one of our cells, add some info about the corresponding palette entry
 	INT32 mouse_target_x, mouse_target_y;
-	bool mouse_button;
 	float mouse_x, mouse_y;
+	bool mouse_button;
 	render_target *mouse_target = mui.machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 	if (mouse_target != nullptr && mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y)
 		&& cellboxbounds.x0 <= mouse_x && cellboxbounds.x1 > mouse_x
@@ -661,12 +661,49 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	boxbounds.y0 = (1.0f - fullheight) * 0.5f;
 	boxbounds.y1 = boxbounds.y0 + fullheight;
 
-	// figure out the title and expand the outer box to fit
-	const std::string title = string_format("'%s' %d/%d %dx%d COLOR %X",
-					interface.device().tag(),
-					set, info.setcount - 1,
-					gfx.width(), gfx.height(),
-					info.color[set]);
+	// recompute cellboxbounds
+	cellboxbounds.x0 = boxbounds.x0 + 6.0f * chwidth;
+	cellboxbounds.x1 = cellboxbounds.x0 + (float)cellboxwidth / (float)targwidth;
+	cellboxbounds.y0 = boxbounds.y0 + 3.5f * chheight;
+	cellboxbounds.y1 = cellboxbounds.y0 + (float)cellboxheight / (float)targheight;
+
+	// figure out the title
+	std::ostringstream title_buf;
+	util::stream_format(title_buf, "'%s' %d/%d", interface.device().tag(), set, info.setcount - 1);
+
+	// if the mouse pointer is over a pixel in a tile, add some info about the tile and pixel
+	bool found_pixel = false;
+	INT32 mouse_target_x, mouse_target_y;
+	float mouse_x, mouse_y;
+	bool mouse_button;
+	render_target *mouse_target = mui.machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
+	if (mouse_target != nullptr && mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y)
+		&& cellboxbounds.x0 <= mouse_x && cellboxbounds.x1 > mouse_x
+		&& cellboxbounds.y0 <= mouse_y && cellboxbounds.y1 > mouse_y)
+	{
+		int code = info.offset[set] + int((mouse_x - cellboxbounds.x0) / cellwidth) + int((mouse_y - cellboxbounds.y0) / cellheight) * xcells;
+		int xpixel = int((mouse_x - cellboxbounds.x0) / (cellwidth / cellxpix)) % cellxpix;
+		int ypixel = int((mouse_y - cellboxbounds.y0) / (cellheight / cellypix)) % cellypix;
+		if (code < gfx.elements() && xpixel < (cellxpix - 1) && ypixel < (cellypix - 1))
+		{
+			found_pixel = true;
+			if (info.rotate[set] & ORIENTATION_FLIP_X)
+				xpixel = (cellxpix - 2) - xpixel;
+			if (info.rotate[set] & ORIENTATION_FLIP_Y)
+				ypixel = (cellypix - 2) - ypixel;
+			if (info.rotate[set] & ORIENTATION_SWAP_XY)
+				std::swap(xpixel, ypixel);
+			UINT8 pixdata = gfx.get_data(code)[xpixel + ypixel * gfx.rowbytes()];
+			util::stream_format(title_buf, " #%X:%X @ %d,%d = %X",
+								code, info.color[set], xpixel, ypixel,
+								gfx.colorbase() + info.color[set] * gfx.granularity() + pixdata);
+		}
+	}
+	if (!found_pixel)
+		util::stream_format(title_buf, " %dx%d COLOR %X/%X", gfx.width(), gfx.height(), info.color[set], gfx.colors());
+
+	// expand the outer box to fit the title
+	const std::string title = title_buf.str();
 	titlewidth = ui_font->string_width(chheight, mui.machine().render().ui_aspect(), title.c_str());
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
@@ -727,9 +764,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	gfxset_update_bitmap(mui.machine(), state, xcells, ycells, gfx);
 
 	// add the final quad
-	container.add_quad(boxbounds.x0 + 6.0f * chwidth, boxbounds.y0 + 3.5f * chheight,
-						boxbounds.x0 + 6.0f * chwidth + (float)cellboxwidth / (float)targwidth,
-						boxbounds.y0 + 3.5f * chheight + (float)cellboxheight / (float)targheight,
+	container.add_quad(cellboxbounds.x0, cellboxbounds.y0, cellboxbounds.x1, cellboxbounds.y1,
 						rgb_t::white, state.texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// handle keyboard navigation before drawing
@@ -943,12 +978,11 @@ static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int ind
 			}
 			else
 			{
-				int temp;
 				if (rotate & ORIENTATION_FLIP_X)
 					effx = gfx.height() - 1 - effx;
 				if (rotate & ORIENTATION_FLIP_Y)
 					effy = gfx.width() - 1 - effy;
-				temp = effx; effx = effy; effy = temp;
+				std::swap(effx, effy);
 			}
 
 			// get a pointer to the start of this source row
@@ -982,15 +1016,13 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	float titlewidth;
 	float x0, y0;
 	int mapboxwidth, mapboxheight;
-	int maxxscale, maxyscale;
-	UINT32 mapwidth, mapheight;
 
 	// get the size of the tilemap itself
 	tilemap_t *tilemap = mui.machine().tilemap().find(state.tilemap.which);
-	mapwidth = tilemap->width();
-	mapheight = tilemap->height();
+	UINT32 mapwidth = tilemap->width();
+	UINT32 mapheight = tilemap->height();
 	if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
-		{ UINT32 temp = mapwidth; mapwidth = mapheight; mapheight = temp; }
+		std::swap(mapwidth, mapheight);
 
 	// add a half character padding for the box
 	chheight = mui.get_line_height();
@@ -1018,6 +1050,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	int pixelscale = state.tilemap.zoom;
 	if (pixelscale == 0)
 	{
+		int maxxscale, maxyscale;
 		for (maxxscale = 1; mapwidth * (maxxscale + 1) < mapboxwidth; maxxscale++) { }
 		for (maxyscale = 1; mapheight * (maxyscale + 1) < mapboxheight; maxyscale++) { }
 		pixelscale = std::min(maxxscale, maxyscale);
@@ -1039,8 +1072,41 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	boxbounds.y0 = mapboxbounds.y0 - 2.0f * chheight;
 	boxbounds.y1 = mapboxbounds.y1 + 0.5f * chheight;
 
-	// figure out the title and expand the outer box to fit
-	const std::string title = string_format("TILEMAP %d/%d %dx%d OFFS %d,%d", state.tilemap.which, mui.machine().tilemap().count() - 1, mapwidth, mapheight, state.tilemap.xoffs, state.tilemap.yoffs);
+	// figure out the title
+	std::ostringstream title_buf;
+	util::stream_format(title_buf, "TILEMAP %d/%d", state.tilemap.which, mui.machine().tilemap().count() - 1);
+
+	// if the mouse pointer is over a tile, add some info about its coordinates and color
+	INT32 mouse_target_x, mouse_target_y;
+	float mouse_x, mouse_y;
+	bool mouse_button;
+	render_target *mouse_target = mui.machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
+	if (mouse_target != nullptr && mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y)
+		&& mapboxbounds.x0 <= mouse_x && mapboxbounds.x1 > mouse_x
+		&& mapboxbounds.y0 <= mouse_y && mapboxbounds.y1 > mouse_y)
+	{
+		int xpixel = (mouse_x - mapboxbounds.x0) * targwidth;
+		int ypixel = (mouse_y - mapboxbounds.y0) * targheight;
+		if (state.tilemap.rotate & ORIENTATION_FLIP_X)
+			xpixel = (mapboxwidth - 1) - xpixel;
+		if (state.tilemap.rotate & ORIENTATION_FLIP_Y)
+			ypixel = (mapboxheight - 1) - ypixel;
+		if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
+			std::swap(xpixel, ypixel);
+		UINT32 col = ((xpixel / pixelscale + state.tilemap.xoffs) / tilemap->tilewidth()) % tilemap->cols();
+		UINT32 row = ((ypixel / pixelscale + state.tilemap.yoffs) / tilemap->tileheight()) % tilemap->rows();
+		UINT8 gfxnum;
+		UINT32 code, color;
+		tilemap->get_info_debug(col, row, gfxnum, code, color);
+		util::stream_format(title_buf, " @ %d,%d = GFX%d #%X:%X",
+							col * tilemap->tilewidth(), row * tilemap->tileheight(),
+							int(gfxnum), code, color);
+	}
+	else
+		util::stream_format(title_buf, " %dx%d OFFS %d,%d", tilemap->width(), tilemap->height(), state.tilemap.xoffs, state.tilemap.yoffs);
+
+	// expand the outer box to fit the title
+	const std::string title = title_buf.str();
 	titlewidth = ui_font->string_width(chheight, mui.machine().render().ui_aspect(), title.c_str());
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 	{
@@ -1081,9 +1147,6 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 
 static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, int viswidth, int visheight)
 {
-	UINT32 mapwidth, mapheight;
-	int step;
-
 	// handle tilemap selection (open bracket,close bracket)
 	if (machine.ui_input().pressed(IPT_UI_PREV_GROUP) && state.tilemap.which > 0)
 	{ state.tilemap.which--; state.bitmap_dirty = true; }
@@ -1092,8 +1155,8 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 
 	// cache some info in locals
 	tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
-	mapwidth = tilemap->width();
-	mapheight = tilemap->height();
+	UINT32 mapwidth = tilemap->width();
+	UINT32 mapheight = tilemap->height();
 
 	// handle zoom (minus,plus)
 	if (machine.ui_input().pressed(IPT_UI_ZOOM_OUT) && state.tilemap.zoom > 0)
@@ -1127,18 +1190,42 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 		state.bitmap_dirty = true;
 	}
 
-	// handle navigation (up,down,left,right)
-	step = 8;
+	// handle navigation (up,down,left,right), taking orientation into account
+	int step = 8; // this may be applied more than once if multiple directions are pressed
 	if (machine.input().code_pressed(KEYCODE_LSHIFT)) step = 1;
 	if (machine.input().code_pressed(KEYCODE_LCONTROL)) step = 64;
 	if (machine.ui_input().pressed_repeat(IPT_UI_UP, 4))
-	{ state.tilemap.yoffs -= step; state.bitmap_dirty = true; }
+	{
+		if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
+			state.tilemap.xoffs -= (state.tilemap.rotate & ORIENTATION_FLIP_Y) ? -step : step;
+		else
+			state.tilemap.yoffs -= (state.tilemap.rotate & ORIENTATION_FLIP_Y) ? -step : step;
+		state.bitmap_dirty = true;
+	}
 	if (machine.ui_input().pressed_repeat(IPT_UI_DOWN, 4))
-	{ state.tilemap.yoffs += step; state.bitmap_dirty = true; }
+	{
+		if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
+			state.tilemap.xoffs += (state.tilemap.rotate & ORIENTATION_FLIP_Y) ? -step : step;
+		else
+			state.tilemap.yoffs += (state.tilemap.rotate & ORIENTATION_FLIP_Y) ? -step : step;
+		state.bitmap_dirty = true;
+	}
 	if (machine.ui_input().pressed_repeat(IPT_UI_LEFT, 6))
-	{ state.tilemap.xoffs -= step; state.bitmap_dirty = true; }
+	{
+		if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
+			state.tilemap.yoffs -= (state.tilemap.rotate & ORIENTATION_FLIP_X) ? -step : step;
+		else
+			state.tilemap.xoffs -= (state.tilemap.rotate & ORIENTATION_FLIP_X) ? -step : step;
+		state.bitmap_dirty = true;
+	}
 	if (machine.ui_input().pressed_repeat(IPT_UI_RIGHT, 6))
-	{ state.tilemap.xoffs += step; state.bitmap_dirty = true; }
+	{
+		if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
+			state.tilemap.yoffs += (state.tilemap.rotate & ORIENTATION_FLIP_X) ? -step : step;
+		else
+			state.tilemap.xoffs += (state.tilemap.rotate & ORIENTATION_FLIP_X) ? -step : step;
+		state.bitmap_dirty = true;
+	}
 
 	// clamp within range
 	while (state.tilemap.xoffs < 0)
@@ -1161,7 +1248,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 {
 	// swap the coordinates back if they were talking about a rotated surface
 	if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
-		{ UINT32 temp = width; width = height; height = temp; }
+		std::swap(width, height);
 
 	// realloc the bitmap if it is too small
 	if (state.bitmap == nullptr || state.texture == nullptr || state.bitmap->width() != width || state.bitmap->height() != height)
