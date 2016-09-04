@@ -3832,8 +3832,8 @@ const dasm_s dasm_s::XX_7807[256] =
 	{DCR,    "C"       }, // 53: 0101 0011
 	{JMP,    "%w"      }, // 54: 0101 0100 llll llll hhhh hhhh
 	{OFFIW,  "%a,%b"   }, // 55: 0101 0101 oooo oooo xxxx xxxx
-	{ACI,    "A,%b"    }, // 56: 0101 0110 xxxx xxxx  
-	{OFFI,   "A,%b"    }, // 57: 0101 0111 xxxx xxxx  
+	{ACI,    "A,%b"    }, // 56: 0101 0110 xxxx xxxx
+	{OFFI,   "A,%b"    }, // 57: 0101 0111 xxxx xxxx
 	{SETB,   "%i"      }, // 58: 0101 1000 bbbb bbbb  7807
 	{NOT,    "%i"      }, // 59: 0101 1001 bbbb bbbb  7807
 	{MOV,    "%i,CY"   }, // 5a: 0101 1010 bbbb bbbb  7807
@@ -3942,7 +3942,7 @@ const dasm_s dasm_s::XX_7807[256] =
 	{STAX,   "(DE+%b)" }, // bb: 1011 1011 dddd dddd
 	{STAX,   "(HL+A)"  }, // bc: 1011 1100
 	{STAX,   "(HL+B)"  }, // bd: 1011 1101
-	{STAX,   "(HL+EA)" }, // be: 1011 1110          
+	{STAX,   "(HL+EA)" }, // be: 1011 1110
 	{STAX,   "(HL+%b)" }, // bf: 1011 1111 dddd dddd
 
 	{JR,     "%o"      }, // c0: 11oo oooo
@@ -4867,7 +4867,7 @@ const dasm_s dasm_s::d4C_78c05[256] = {
 	// 0xC0 - 0xFF
 	{ MOV,     "A,PA"  }, { MOV,     "A,PB"  }, { MOV,     "A,PC"  }, { MOV,     "A,MK"  },
 	{ MOV,     "A,MB"  }, { MOV,     "A,MC"  }, { MOV,     "A,TM0" }, { MOV,     "A,TM1" },
-	{ MOV,     "A,S"   }, {                  }, {                  }, {                  }, // TODO: Figure out what regsiter C9 indicates 
+	{ MOV,     "A,S"   }, {                  }, {                  }, {                  }, // TODO: Figure out what regsiter C9 indicates
 	{                  }, {                  }, {                  }, {                  },
 
 	{                  }, {                  }, {                  }, {                  },
@@ -5403,7 +5403,7 @@ const dasm_s dasm_s::XX_78c05[256] = {
 };
 
 
-// register names for bit manipulation instructions 
+// register names for bit manipulation instructions
 const char *const regname[32] =
 {
 	"illegal", "illegal", "illegal", "illegal",

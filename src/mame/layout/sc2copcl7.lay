@@ -8777,11 +8777,11 @@
 			</bounds>
 		</backdrop>
 
-    <!-- The DMD -->
-    <screen index="0">
-      <bounds left="261" top="29" right="523" bottom="115" />
-    </screen>
-  
+	<!-- The DMD -->
+	<screen index="0">
+	  <bounds left="261" top="29" right="523" bottom="115" />
+	</screen>
+
 		<backdrop name="label5" element="label_5">
 			<bounds x="668" y="5" width="84" height="24">
 			</bounds>

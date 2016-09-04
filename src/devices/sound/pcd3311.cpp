@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-	PCD3311 DTMF/modem/musical tone generator emulation
+    PCD3311 DTMF/modem/musical tone generator emulation
 
 **********************************************************************/
 

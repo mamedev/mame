@@ -13,7 +13,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define UPD7220_TAG		"upd7220"
+#define UPD7220_TAG     "upd7220"
 #define SCREEN_TAG      "screen"
 
 

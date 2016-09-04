@@ -26,10 +26,10 @@ package.path = dir .. "/?.lua;" .. dir .. "/?/init.lua"
 
 local json = require('json')
 local function readAll(file)
-    local f = io.open(file, "rb")
-    local content = f:read("*all")
-    f:close()
-    return content
+	local f = io.open(file, "rb")
+	local content = f:read("*all")
+	f:close()
+	return content
 end
 
 for file in lfs.dir(dir) do
@@ -37,7 +37,7 @@ for file in lfs.dir(dir) do
 		local filename = dir .. "/" .. file .. "/plugin.json"
 		local meta = json.parse(readAll(filename))
 		if (meta["plugin"]["type"]=="plugin") and (mame_manager:plugins().entries[meta["plugin"]["name"]]~=nil) then
-			local entry = mame_manager:plugins().entries[meta["plugin"]["name"]]	
+			local entry = mame_manager:plugins().entries[meta["plugin"]["name"]]
 			if (entry:value()==true) then
 				emu.print_verbose("Starting plugin " .. meta["plugin"]["name"] .. "...")
 				plugin = require(meta["plugin"]["name"])

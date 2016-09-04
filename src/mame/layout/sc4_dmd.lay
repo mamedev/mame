@@ -99,7 +99,7 @@
 
   <!-- The DMD -->
   <screen index="0">
-    <bounds left="210" top="200" right="340" bottom="233" />
+	<bounds left="210" top="200" right="340" bottom="233" />
   </screen>
 
 	<backdrop name="reel1" element="Steppers" state="0">
@@ -1837,5 +1837,5 @@
 		<bounds x="250" y="124" width="9" height="19"/>
 	</backdrop>
 	</view>
-	
+
 </mamelayout>

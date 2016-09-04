@@ -1041,6 +1041,8 @@ private:
 	simple_list<item>   m_bezel_list;       // list of bezel items
 	simple_list<item>   m_cpanel_list;      // list of marquee items
 	simple_list<item>   m_marquee_list;     // list of marquee items
+
+	static const simple_list<item> s_null_list;
 };
 
 

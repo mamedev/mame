@@ -55,12 +55,12 @@ ADDRESS_MAP_END
 // RS and ST key input
 INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
 {
-    	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER(kim1_state::trigger_nmi)
 {
-    	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 //**************************************************************************

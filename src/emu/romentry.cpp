@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria,Aaron Giles
 /*********************************************************************
 
-	romentry.cpp
+    romentry.cpp
 
-	ROM loading functions.
+    ROM loading functions.
 
 *********************************************************************/
 
@@ -13,13 +13,13 @@
 
 
 /***************************************************************************
-	HELPERS
+    HELPERS
 ***************************************************************************/
 
 //-------------------------------------------------
 //  hashdata_from_tiny_rom_entry - calculates the
-//	proper hashdata string from the value in the
-//	tiny_rom_entry
+//  proper hashdata string from the value in the
+//  tiny_rom_entry
 //-------------------------------------------------
 
 static std::string hashdata_from_tiny_rom_entry(const tiny_rom_entry &ent)
@@ -29,7 +29,7 @@ static std::string hashdata_from_tiny_rom_entry(const tiny_rom_entry &ent)
 	{
 	case ROMENTRYTYPE_FILL:
 	case ROMENTRYTYPE_COPY:
-		// for these types, tiny_rom_entry::hashdata is an integer typecasted to a pointer 
+		// for these types, tiny_rom_entry::hashdata is an integer typecasted to a pointer
 		result = string_format("0x%x", (unsigned)(FPTR)ent.hashdata);
 		break;
 
@@ -43,7 +43,7 @@ static std::string hashdata_from_tiny_rom_entry(const tiny_rom_entry &ent)
 
 
 /***************************************************************************
-	ROM ENTRY
+    ROM ENTRY
 ***************************************************************************/
 
 //-------------------------------------------------

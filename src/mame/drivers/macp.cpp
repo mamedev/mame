@@ -37,7 +37,7 @@ static ADDRESS_MAP_START( macp_io, AS_IO, 8, macp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( macp )
 INPUT_PORTS_END
 
@@ -120,16 +120,16 @@ ROM_END
 
 /*  not dumped yet
 ROM_START(glxplay)
-	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("1083-1.cpu", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD("1083-2.cpu", 0x2000, 0x2000, NO_DUMP)
+    ROM_REGION(0x4000, "maincpu", 0)
+    ROM_LOAD("1083-1.cpu", 0x0000, 0x2000, NO_DUMP)
+    ROM_LOAD("1083-2.cpu", 0x2000, 0x2000, NO_DUMP)
 ROM_END
 */
 
 ROM_START(glxplay2)
 	ROM_REGION(0x4000, "maincpu", 0)
-    ROM_LOAD("1382-1.cpu", 0x0000, 0x2000, CRC(da43b0b9) SHA1(b13b260c61b3bd0b7632aabcdbcf4cdd5cbe4b22))
-    ROM_LOAD("1382-2.cpu", 0x2000, 0x2000, CRC(945c90fd) SHA1(8367992f8db8b402d82e4a3f02a35b796756ce0f))
+	ROM_LOAD("1382-1.cpu", 0x0000, 0x2000, CRC(da43b0b9) SHA1(b13b260c61b3bd0b7632aabcdbcf4cdd5cbe4b22))
+	ROM_LOAD("1382-2.cpu", 0x2000, 0x2000, CRC(945c90fd) SHA1(8367992f8db8b402d82e4a3f02a35b796756ce0f))
 ROM_END
 
 // MAC S.A. pinballs

@@ -15,86 +15,86 @@
     * MASTER 'TIM' test fails
     * LGTST  'TIM' test is out of tolerance without 6840 hack.
 
-	Information from:
+    Information from:
 
-		     CMI SYSTEM SERVICE MANUAL
-		FAIRLIGHT INSTRUMENTS, FEBRUARY 1985
-		          Revision 2.1
+             CMI SYSTEM SERVICE MANUAL
+        FAIRLIGHT INSTRUMENTS, FEBRUARY 1985
+                  Revision 2.1
 
-	This document is available on archive.org at the following URL:
+    This document is available on archive.org at the following URL:
 
-	https://archive.org/details/fairlight_CMI-IIx_SERVICE_MANUAL
+    https://archive.org/details/fairlight_CMI-IIx_SERVICE_MANUAL
 
-	Summary:
+    Summary:
 
-		The Fairlight CMI system conists typically of:
-			- One velocity-sensitive unweighted keyboard, with a numeric
-			  keypad and several control surfaces
-			- (Optionally) one additional keyboard, not velocity-sensitive
-			- One alphanumeric keyboard for manual control
-			- A 15-inch green-screen monitor and light pen for more direct
-			  control
-			- A box consisting of:
-			  * An audio board including balanced line drivers for eight
-			    channels and mixed output
-			  * A 500-watt power supply
-			  * A 21-slot backplane
-			  * Two 8-inch double-density floppy disk drives. The format
-			    used is soft-sectored, 128 bytes per sector (single density),
-			    or 256 bytes per sector (double density), using FM
-			    recording.
-			  * And the following cards:
-			    Slot  1: Master Card CMI-02
-			    Slot  2: General Interface Card CMI-08/28 (Optional)
-			    Slots 3-11: 8 Channel Controller Cards & 1 Voice Master Module Card, order unknown
-			    Slot 12: 64K System RAM Q-096
-			    Slot 13: 256K System RAM Q-256
-			    Slot 14: 256K System RAM Q-256
-			    Slot 15: 4-Port ACIA Module Q-014 (Optional)
-				Slot 16: Processor Control Module Q-133
-				Slot 17: Central Processor Module Q-209
-				Slot 18: Lightpen/Graphics Interface Q-219
-				Slot 19: Floppy Disk Controller QFC-9
-				Slot 20: Hard Disk Controller Q-077 (Optional)
+        The Fairlight CMI system conists typically of:
+            - One velocity-sensitive unweighted keyboard, with a numeric
+              keypad and several control surfaces
+            - (Optionally) one additional keyboard, not velocity-sensitive
+            - One alphanumeric keyboard for manual control
+            - A 15-inch green-screen monitor and light pen for more direct
+              control
+            - A box consisting of:
+              * An audio board including balanced line drivers for eight
+                channels and mixed output
+              * A 500-watt power supply
+              * A 21-slot backplane
+              * Two 8-inch double-density floppy disk drives. The format
+                used is soft-sectored, 128 bytes per sector (single density),
+                or 256 bytes per sector (double density), using FM
+                recording.
+              * And the following cards:
+                Slot  1: Master Card CMI-02
+                Slot  2: General Interface Card CMI-08/28 (Optional)
+                Slots 3-11: 8 Channel Controller Cards & 1 Voice Master Module Card, order unknown
+                Slot 12: 64K System RAM Q-096
+                Slot 13: 256K System RAM Q-256
+                Slot 14: 256K System RAM Q-256
+                Slot 15: 4-Port ACIA Module Q-014 (Optional)
+                Slot 16: Processor Control Module Q-133
+                Slot 17: Central Processor Module Q-209
+                Slot 18: Lightpen/Graphics Interface Q-219
+                Slot 19: Floppy Disk Controller QFC-9
+                Slot 20: Hard Disk Controller Q-077 (Optional)
 
-		The Master Keyboard
-		-------------------
+        The Master Keyboard
+        -------------------
 
-		The master keyboard has the following features:
-			- A serial connector for communicating with the CMI mainframe
-			- A connector for a slave keyboard
-			- A connector for the alphanumeric keyboard
-			- Connectors for pedal controls
-			- Three slider-type analog controls
-			- Two switch controls (one momentary, one toggle on/off)
-			- Two lamp indicators for the switches with software-defined
-			  control
-			- A 12-character LED alphanumeric display
-			- A 16-switch keypad
+        The master keyboard has the following features:
+            - A serial connector for communicating with the CMI mainframe
+            - A connector for a slave keyboard
+            - A connector for the alphanumeric keyboard
+            - Connectors for pedal controls
+            - Three slider-type analog controls
+            - Two switch controls (one momentary, one toggle on/off)
+            - Two lamp indicators for the switches with software-defined
+              control
+            - A 12-character LED alphanumeric display
+            - A 16-switch keypad
 
-		All communications with all peripherals and controls on the master
-		keyboard is handled via the master keyboard's controller, and as
-		such there is one single serial link to the "CMI mainframe" box
-		itself.
+        All communications with all peripherals and controls on the master
+        keyboard is handled via the master keyboard's controller, and as
+        such there is one single serial link to the "CMI mainframe" box
+        itself.
 
-		Q209 Dual 6809 Central Processor Card
-		-------------------------------------
+        Q209 Dual 6809 Central Processor Card
+        -------------------------------------
 
-		The CPU card has two 6809 processors, with robust inter-CPU
-		communications capabilities including:
-			- Uninterruptible instructions
-			- CPU-specific ID register and memory map registers
-			- Interprocessor interrupts
-			- Automatic memory map-switching register
+        The CPU card has two 6809 processors, with robust inter-CPU
+        communications capabilities including:
+            - Uninterruptible instructions
+            - CPU-specific ID register and memory map registers
+            - Interprocessor interrupts
+            - Automatic memory map-switching register
 
-		The CPUs are multiplexed onto the address and data buses
-		in an interleaved manner such that there is no contention
-		on simultaneous memory accesses.
+        The CPUs are multiplexed onto the address and data buses
+        in an interleaved manner such that there is no contention
+        on simultaneous memory accesses.
 
-		All system timing is derived from a 40MHz clock crystal, which
-		is divided into two opposite-phase 20MHz squre waves.
+        All system timing is derived from a 40MHz clock crystal, which
+        is divided into two opposite-phase 20MHz squre waves.
 
-		Other data entry from service manual to be completed later - RH 12 Aug 2016
+        Other data entry from service manual to be completed later - RH 12 Aug 2016
 
 ****************************************************************************/
 
@@ -114,92 +114,92 @@
 #include "machine/input_merger.h"
 #include "video/dl1416.h"
 
-#define Q209_CPU_CLOCK		4000000 // ?
+#define Q209_CPU_CLOCK      4000000 // ?
 
-#define M6809_CLOCK				8000000 // wrong
-#define MASTER_OSCILLATOR		34291712
+#define M6809_CLOCK             8000000 // wrong
+#define MASTER_OSCILLATOR       34291712
 
-#define CPU_1					0
-#define CPU_2					1
+#define CPU_1                   0
+#define CPU_2                   1
 
-#define MAPPING_A				1
-#define MAPPING_B				0
+#define MAPPING_A               1
+#define MAPPING_B               0
 
-#define NUM_Q256_CARDS			1	// Max of 2
-#define NUM_CHANNEL_CARDS		8
+#define NUM_Q256_CARDS          1   // Max of 2
+#define NUM_CHANNEL_CARDS       8
 
-#define PAGE_SIZE				2048
-#define PAGE_COUNT				(65536 / PAGE_SIZE)
-#define PAGE_MASK				(PAGE_SIZE - 1)
-#define PAGE_SHIFT				5
+#define PAGE_SIZE               2048
+#define PAGE_COUNT              (65536 / PAGE_SIZE)
+#define PAGE_MASK               (PAGE_SIZE - 1)
+#define PAGE_SHIFT              5
 
-#define PIXEL_CLOCK				10380000		// Add to xtal.h
-#define HTOTAL					672
-#define HBLANK_END				0
-#define HBLANK_START			512
-#define VTOTAL					304
-#define VBLANK_END				0
-#define VBLANK_START			256
+#define PIXEL_CLOCK             10380000        // Add to xtal.h
+#define HTOTAL                  672
+#define HBLANK_END              0
+#define HBLANK_START            512
+#define VTOTAL                  304
+#define VBLANK_END              0
+#define VBLANK_START            256
 
-#define HBLANK_FREQ		((double)PIXEL_CLOCK / (double)HTOTAL)
-#define VBLANK_FREQ		((double)HBLANK_FREQ / (double)VTOTAL)
+#define HBLANK_FREQ     ((double)PIXEL_CLOCK / (double)HTOTAL)
+#define VBLANK_FREQ     ((double)HBLANK_FREQ / (double)VTOTAL)
 
-#define MAPSEL_P2_B				0x00
-#define MAPSEL_P2_A				0x03
-#define MAPSEL_P2_A_DMA1		0x04
-#define MAPSEL_P2_A_DMA2		0x05
-#define MAPSEL_P2_A_DMA3		0x06
-#define MAPSEL_P2_A_DMA4		0x07
-#define MAPSEL_P1_B				0x08
-#define MAPSEL_P1_A				0x0b
-#define MAPSEL_P1_A_DMA1		0x0c
-#define MAPSEL_P1_A_DMA2		0x0d
-#define MAPSEL_P1_A_DMA3		0x0e
-#define MAPSEL_P1_A_DMA4		0x0f
+#define MAPSEL_P2_B             0x00
+#define MAPSEL_P2_A             0x03
+#define MAPSEL_P2_A_DMA1        0x04
+#define MAPSEL_P2_A_DMA2        0x05
+#define MAPSEL_P2_A_DMA3        0x06
+#define MAPSEL_P2_A_DMA4        0x07
+#define MAPSEL_P1_B             0x08
+#define MAPSEL_P1_A             0x0b
+#define MAPSEL_P1_A_DMA1        0x0c
+#define MAPSEL_P1_A_DMA2        0x0d
+#define MAPSEL_P1_A_DMA3        0x0e
+#define MAPSEL_P1_A_DMA4        0x0f
 
-#define IRQ_ACINT_LEVEL			(7 - 0)
-#define IRQ_MIDINT_LEVEL		(7 - 0)
-#define IRQ_TIMINT_LEVEL		(7 - 1)
-#define IRQ_INTP1_LEVEL			(7 - 2)
-#define IRQ_IPI1_LEVEL			(7 - 3)
-#define IRQ_SMIDINT_LEVEL		(7 - 3)
-#define IRQ_AIC_LEVEL			(7 - 4)
+#define IRQ_ACINT_LEVEL         (7 - 0)
+#define IRQ_MIDINT_LEVEL        (7 - 0)
+#define IRQ_TIMINT_LEVEL        (7 - 1)
+#define IRQ_INTP1_LEVEL         (7 - 2)
+#define IRQ_IPI1_LEVEL          (7 - 3)
+#define IRQ_SMIDINT_LEVEL       (7 - 3)
+#define IRQ_AIC_LEVEL           (7 - 4)
 
-#define IRQ_CHINT2_LEVEL		(8)
-#define IRQ_CHINT4_LEVEL		(9)
-#define IRQ_CHINT6_LEVEL		(10)
-#define IRQ_CHINT8_LEVEL		(11)
-#define IRQ_CHINT1_LEVEL		(12)
-#define IRQ_CHINT3_LEVEL		(13)
-#define IRQ_CHINT5_LEVEL		(14)
-#define IRQ_CHINT7_LEVEL		(15)
+#define IRQ_CHINT2_LEVEL        (8)
+#define IRQ_CHINT4_LEVEL        (9)
+#define IRQ_CHINT6_LEVEL        (10)
+#define IRQ_CHINT8_LEVEL        (11)
+#define IRQ_CHINT1_LEVEL        (12)
+#define IRQ_CHINT3_LEVEL        (13)
+#define IRQ_CHINT5_LEVEL        (14)
+#define IRQ_CHINT7_LEVEL        (15)
 
 static const int ch_int_levels[8] =
 {
 	IRQ_CHINT8_LEVEL, IRQ_CHINT7_LEVEL, IRQ_CHINT6_LEVEL, IRQ_CHINT5_LEVEL, IRQ_CHINT4_LEVEL, IRQ_CHINT3_LEVEL, IRQ_CHINT2_LEVEL, IRQ_CHINT1_LEVEL
 };
 
-#define IRQ_PERRINT_LEVEL		(7 - 0)
-#define IRQ_RTCINT_LEVEL		(7 - 0)
-#define IRQ_RINT_LEVEL			(7 - 1)
-#define IRQ_INTP2_LEVEL			(7 - 2)
-#define IRQ_IPI2_LEVEL			(7 - 3)
-#define IRQ_TOUCHINT_LEVEL		(7 - 4)
-#define IRQ_PENINT_LEVEL		(7 - 5)
-#define IRQ_ADINT_LEVEL			(7 - 6)
-#define IRQ_DISKINT_LEVEL		(7 - 7)
+#define IRQ_PERRINT_LEVEL       (7 - 0)
+#define IRQ_RTCINT_LEVEL        (7 - 0)
+#define IRQ_RINT_LEVEL          (7 - 1)
+#define IRQ_INTP2_LEVEL         (7 - 2)
+#define IRQ_IPI2_LEVEL          (7 - 3)
+#define IRQ_TOUCHINT_LEVEL      (7 - 4)
+#define IRQ_PENINT_LEVEL        (7 - 5)
+#define IRQ_ADINT_LEVEL         (7 - 6)
+#define IRQ_DISKINT_LEVEL       (7 - 7)
 
-#define FDC_CONTROL_INTEN		(1 << 2)
+#define FDC_CONTROL_INTEN       (1 << 2)
 
-#define FDC_STATUS_READY		(1 << 3)
-#define FDC_STATUS_TWO_SIDED	(1 << 4)
-#define FDC_STATUS_DISK_CHANGE	(1 << 5)
-#define FDC_STATUS_INTERRUPT	(1 << 6)
-#define FDC_STATUS_DRIVER_LOAD	(1 << 7)
+#define FDC_STATUS_READY        (1 << 3)
+#define FDC_STATUS_TWO_SIDED    (1 << 4)
+#define FDC_STATUS_DISK_CHANGE  (1 << 5)
+#define FDC_STATUS_INTERRUPT    (1 << 6)
+#define FDC_STATUS_DRIVER_LOAD  (1 << 7)
 
 
-#define ENV_DIR_DOWN			0
-#define ENV_DIR_UP				1
+#define ENV_DIR_DOWN            0
+#define ENV_DIR_UP              1
 
 #define MCFG_CMI01A_ADD(_tag, _channel)  \
 	MCFG_DEVICE_ADD(_tag, CMI01A_CHANNEL_CARD, 0) \
@@ -254,22 +254,22 @@ private:
 	void run_voice();
 	void update_wave_addr(int inc);
 
-	emu_timer *	m_zx_timer;
-	UINT8		m_zx_flag;
-	UINT8		m_zx_ff;
+	emu_timer * m_zx_timer;
+	UINT8       m_zx_flag;
+	UINT8       m_zx_ff;
 
-	int		m_channel;
-	std::unique_ptr<UINT8[]>	m_wave_ram;
-	UINT16	m_segment_cnt;
-	UINT8	m_new_addr;		// Flag
-	UINT8	m_env_dir_ctrl;
-	UINT8	m_vol_latch;
-	UINT8	m_flt_latch;
+	int     m_channel;
+	std::unique_ptr<UINT8[]>    m_wave_ram;
+	UINT16  m_segment_cnt;
+	UINT8   m_new_addr;     // Flag
+	UINT8   m_env_dir_ctrl;
+	UINT8   m_vol_latch;
+	UINT8   m_flt_latch;
 
-	double	m_freq;
-	bool	m_active;
+	double  m_freq;
+	bool    m_active;
 
-	int		m_ptm_output;
+	int     m_ptm_output;
 };
 
 const device_type CMI01A_CHANNEL_CARD = &device_creator<cmi01a_device>;
@@ -600,50 +600,50 @@ private:
 	void write_fdc_ctrl(UINT8 data);
 	void fdc_dma_transfer();
 
-	int		m_int_state[2];
-	UINT8	m_hp_int;
-	std::unique_ptr<UINT8[]>	m_shared_ram;
-	std::unique_ptr<UINT8[]>	m_scratch_ram[2];
+	int     m_int_state[2];
+	UINT8   m_hp_int;
+	std::unique_ptr<UINT8[]>    m_shared_ram;
+	std::unique_ptr<UINT8[]>    m_scratch_ram[2];
 
 	/* Memory management */
-	UINT8	m_map_sel[16];
-	std::unique_ptr<UINT8[]>	m_map_ram[2];
-	std::unique_ptr<UINT8[]>	m_q256_ram[2];
-	UINT8	m_map_ram_latch;
-	int		m_cpu_active_space[2]; // TODO: Make one register
-	int		m_cpu_map_switch[2];
+	UINT8   m_map_sel[16];
+	std::unique_ptr<UINT8[]>    m_map_ram[2];
+	std::unique_ptr<UINT8[]>    m_q256_ram[2];
+	UINT8   m_map_ram_latch;
+	int     m_cpu_active_space[2]; // TODO: Make one register
+	int     m_cpu_map_switch[2];
 
 	/* Q219 lightpen/graphics card */
-	std::unique_ptr<UINT8[]>	m_video_ram;
-	UINT16	m_x_pos;
-	UINT8	m_y_pos;
-	UINT16	m_lp_x;
-	UINT8	m_lp_y;
-	UINT8	m_q219_b_touch;
+	std::unique_ptr<UINT8[]>    m_video_ram;
+	UINT16  m_x_pos;
+	UINT8   m_y_pos;
+	UINT16  m_lp_x;
+	UINT8   m_lp_y;
+	UINT8   m_q219_b_touch;
 
 	/* QFC9 floppy disk controller card */
-	UINT8 *	m_qfc9_region_ptr;
-	int		m_fdc_drq;
-	UINT8	m_fdc_addr;
-	UINT8	m_fdc_ctrl;
-	UINT8	m_fdc_status;
-	PAIR	m_fdc_dma_addr;
-	PAIR	m_fdc_dma_cnt;
+	UINT8 * m_qfc9_region_ptr;
+	int     m_fdc_drq;
+	UINT8   m_fdc_addr;
+	UINT8   m_fdc_ctrl;
+	UINT8   m_fdc_status;
+	PAIR    m_fdc_dma_addr;
+	PAIR    m_fdc_dma_cnt;
 
 	/* CMI-07 */
-	UINT8	m_cmi07_ctrl;
+	UINT8   m_cmi07_ctrl;
 
 	/* CMI-10 */
-	UINT8	m_scnd;
+	UINT8   m_scnd;
 
 	/* Musical keyboard */
-	UINT8 	m_msm5832_addr;
-	int		m_mkbd_kbd_acia_irq;
-	int		m_mkbd_cmi_acia_irq;
+	UINT8   m_msm5832_addr;
+	int     m_mkbd_kbd_acia_irq;
+	int     m_mkbd_cmi_acia_irq;
 
 	// Alphanumeric keyboard
-	int		m_ank_irqa;
-	int		m_ank_irqb;
+	int     m_ank_irqa;
+	int     m_ank_irqb;
 };
 
 /**************************************
@@ -714,8 +714,8 @@ void cmi_state::hblank()
 				m_q219_pia->cb1_w(1);
 			}
 		}
-  	}
-    /* Adjust for next scanline */
+	}
+	/* Adjust for next scanline */
 	if (++v >= VTOTAL)
 		v = 0;
 
@@ -766,7 +766,7 @@ void cmi_state::video_write(int offset)
 		case 0x9: update_video_pos(-1,  1, 0); break;
 		case 0xa: update_video_pos(-1, -1, 0); break;
 		case 0xb: update_video_pos(-1,  0, 1); break;
-//		default: printf("Video Write %x %x\n", offset, m_video_data);
+//      default: printf("Video Write %x %x\n", offset, m_video_data);
 	}
 }
 
@@ -1019,9 +1019,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( midicpu_map, AS_PROGRAM, 16, cmi_state )
 	AM_RANGE(0x000000, 0x003fff) AM_ROM
 	AM_RANGE(0x040000, 0x05ffff) AM_READWRITE(midi_dma_r, midi_dma_w)
-//	AM_RANGE(0x060000, 0x06001f) TIMERS
-//	AM_RANGE(0x060050, 0x06005f) ACIA
-//	AM_RANGE(0x060070, 0x06007f) SMPTE
+//  AM_RANGE(0x060000, 0x06001f) TIMERS
+//  AM_RANGE(0x060050, 0x06005f) ACIA
+//  AM_RANGE(0x060070, 0x06007f) SMPTE
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1062,84 +1062,84 @@ static INPUT_PORTS_START( cmi2x )
 	PORT_DIPSETTING(    0x30, "None, bit 7 is 1" )
 
 	PORT_START("ROW0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)				PORT_CHAR('2')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_4)				PORT_CHAR('4')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)				PORT_CHAR('6')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)				PORT_CHAR('8')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)			PORT_CHAR('-')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)			PORT_CHAR('+')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)			PORT_CHAR(':')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)				PORT_CHAR('9')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)                PORT_CHAR('2')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)                PORT_CHAR('4')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)                PORT_CHAR('6')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)                PORT_CHAR('8')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)            PORT_CHAR('-')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)         PORT_CHAR('+')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)            PORT_CHAR(':')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)                PORT_CHAR('9')
 
 	PORT_START("ROW1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)				PORT_CHAR('1')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)				PORT_CHAR('3')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)				PORT_CHAR('T')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)				PORT_CHAR('U')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)			PORT_NAME("Right")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)				PORT_NAME("Up")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)		PORT_CHAR('-')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)				PORT_CHAR('0')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)                PORT_CHAR('1')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)                PORT_CHAR('3')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)                PORT_CHAR('T')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)                PORT_CHAR('U')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)            PORT_NAME("Right")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)               PORT_NAME("Up")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)        PORT_CHAR('-')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)                PORT_CHAR('0')
 
 	PORT_START("ROW2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)				PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)				PORT_CHAR('E')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)				PORT_CHAR('5')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)				PORT_CHAR('J')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)										PORT_NAME("Set")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)										PORT_NAME("Add")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)			PORT_CHAR('/')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)			PORT_CHAR(',')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)              PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)                PORT_CHAR('E')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)                PORT_CHAR('5')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)                PORT_CHAR('J')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                     PORT_NAME("Set")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                     PORT_NAME("Add")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)            PORT_CHAR('/')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)            PORT_CHAR(',')
 
 	PORT_START("ROW3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)			PORT_NAME("LShift")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)				PORT_CHAR('X')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)				PORT_CHAR('V')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)				PORT_CHAR('N')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)				PORT_NAME("Down")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)										PORT_NAME("Clear")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)										PORT_NAME("WTF")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)				PORT_CHAR('L')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)           PORT_NAME("LShift")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)                PORT_CHAR('X')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)                PORT_CHAR('V')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)                PORT_CHAR('N')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)             PORT_NAME("Down")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                     PORT_NAME("Clear")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                     PORT_NAME("WTF")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)                PORT_CHAR('L')
 
 	PORT_START("ROW4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)				PORT_CHAR('Q')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)				PORT_CHAR('W')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)				PORT_CHAR('G')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)				PORT_CHAR('M')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)			PORT_CHAR('=')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)										PORT_NAME("Home")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)		PORT_CHAR(8)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)				PORT_CHAR('K')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)                PORT_CHAR('Q')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)                PORT_CHAR('W')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)                PORT_CHAR('G')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)                PORT_CHAR('M')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)           PORT_CHAR('=')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                     PORT_NAME("Home")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)        PORT_CHAR(8)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)                PORT_CHAR('K')
 
 	PORT_START("ROW5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)				PORT_CHAR('Z')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)				PORT_CHAR('C')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)				PORT_CHAR('F')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)				PORT_CHAR('7')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)			PORT_NAME("Return (a)")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)			PORT_NAME("Return (b)")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)				PORT_CHAR('P')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)				PORT_CHAR('I')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)                PORT_CHAR('Z')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)                PORT_CHAR('C')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)                PORT_CHAR('F')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)                PORT_CHAR('7')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)            PORT_NAME("Return (a)")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)            PORT_NAME("Return (b)")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)                PORT_CHAR('P')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)                PORT_CHAR('I')
 
 	PORT_START("ROW6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)				PORT_CHAR('A')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)				PORT_CHAR('D')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)				PORT_CHAR('S')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)				PORT_CHAR('H')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)										PORT_NAME("Sub")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)			PORT_CHAR(' ')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)			PORT_NAME("RShift")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)				PORT_CHAR('.')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)                PORT_CHAR('A')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)                PORT_CHAR('D')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)                PORT_CHAR('S')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)                PORT_CHAR('H')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                     PORT_NAME("Sub")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)            PORT_CHAR(' ')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)           PORT_NAME("RShift")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)             PORT_CHAR('.')
 
 	PORT_START("ROW7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)				PORT_CHAR('S')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)				PORT_CHAR('R')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)				PORT_CHAR('Y')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)                PORT_CHAR('S')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)                PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)                PORT_CHAR('Y')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)				PORT_NAME("Left")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)             PORT_NAME("Left")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)				PORT_CHAR('O')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)                PORT_CHAR('O')
 
 	/* Keypad */
 	PORT_START("KEYPAD_A")
@@ -1631,7 +1631,7 @@ WRITE_LINE_MEMBER( cmi01a_device::cmi01a_1_ca2_w )
 
 WRITE_LINE_MEMBER( cmi01a_device::ch_int )
 {
-//	printf("CH%d INT: %x  %x\n", ch, state, m_int_state[0]);
+//  printf("CH%d INT: %x  %x\n", ch, state, m_int_state[0]);
 	dynamic_cast<cmi_state*>(owner())->set_interrupt(CPU_1, ch_int_levels[m_channel], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -1680,7 +1680,7 @@ void cmi01a_device::run_voice()
 
 	double cfreq = ((double)(0x800 | (pitch << 1))* mfreq) / 4096.0;
 
-//	if (cfreq > 0.0)
+//  if (cfreq > 0.0)
 	{
 		/* Octave register enabled? */
 		if (!(o_val & 0x8))
@@ -1711,7 +1711,7 @@ WRITE_LINE_MEMBER( cmi01a_device::cmi01a_1_cb2_w )
 		m_new_addr = 1;
 
 		/* Clear /EOSI */
-//		pia6821_cb1_w(card->pia[1], 0, 1);
+//      pia6821_cb1_w(card->pia[1], 0, 1);
 
 		/* Clear ZX */
 		m_pia_1->ca1_w(0);
@@ -2016,7 +2016,7 @@ WRITE_LINE_MEMBER( cmi_state::ank_irqb_w )
 
 READ_LINE_MEMBER( cmi_state::ank_rts_r )
 {
-//	printf("ANK RTS?\n");
+//  printf("ANK RTS?\n");
 	return 0;
 }
 
@@ -2132,7 +2132,7 @@ IRQ_CALLBACK_MEMBER( cmi_state::cpu2_interrupt_callback )
 
 void cmi_state::set_interrupt(int cpunum, int level, int state)
 {
-//	printf("CPU%d Int: %x State: %x (Cur: %x)\n", cpunum, level, state, m_int_state[cpunum]);
+//  printf("CPU%d Int: %x State: %x (Cur: %x)\n", cpunum, level, state, m_int_state[cpunum]);
 
 	if (state == ASSERT_LINE)
 		m_int_state[cpunum] |= (1 << level);
@@ -2171,7 +2171,7 @@ WRITE_LINE_MEMBER( cmi_state::i8214_3_int_w )
 WRITE_LINE_MEMBER( cmi_state::i8214_3_enlg )
 {
 	// Not needed?
-//	m_hp_int = state;
+//  m_hp_int = state;
 }
 
 WRITE_LINE_MEMBER( cmi_state::pia_q219_irqa )
@@ -2187,19 +2187,19 @@ WRITE_LINE_MEMBER( cmi_state::pia_q219_irqb )
 
 /* E9 - E11 - MSM5832RS */
 /*
-	A0-A3  = MSM5832 A0-A3
-	A4+CA1 = MSM5832 D0
-	A5+CB1 = MSM5832 D1
-	A6     = MSM5832 D2
-	A7     = MSM5832 D3
-	B0     = HOLD
-	B1     = READ
-	B2     = WRITE
-	CB2    = OPTO
-	B3     = ----
-	B4-B7  = PC0-3
+    A0-A3  = MSM5832 A0-A3
+    A4+CA1 = MSM5832 D0
+    A5+CB1 = MSM5832 D1
+    A6     = MSM5832 D2
+    A7     = MSM5832 D3
+    B0     = HOLD
+    B1     = READ
+    B2     = WRITE
+    CB2    = OPTO
+    B3     = ----
+    B4-B7  = PC0-3
 
-	IRQA/B = /RTINT?
+    IRQA/B = /RTINT?
 */
 
 READ8_MEMBER( cmi_state::q133_1_porta_r )
@@ -2227,7 +2227,7 @@ WRITE8_MEMBER( cmi_state::q133_1_portb_w )
 
 WRITE8_MEMBER( cmi_state::master_tune_w )
 {
-//	double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
+//  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
 }
 
 WRITE8_MEMBER( cmi01a_device::cmi01a_2_a_w )
@@ -2241,19 +2241,19 @@ WRITE8_MEMBER( cmi01a_device::cmi01a_2_b_w )
 
 
 /*
-	PA0-7 = BKA0-7 (display)
+    PA0-7 = BKA0-7 (display)
 
-	PB0 = DA1
-	PB1 = DA0
-	PB2 = CS2
-	PB3 = CU2
-	PB4 = CS1
-	PB5 = CU1
-	PB6 = CS0
-	PB7 = CU0
+    PB0 = DA1
+    PB1 = DA0
+    PB2 = CS2
+    PB3 = CU2
+    PB4 = CS1
+    PB5 = CU1
+    PB6 = CS0
+    PB7 = CU0
 
-	CB1 = /KPAD
-	CB2 = /DWS
+    CB1 = /KPAD
+    CB2 = /DWS
 */
 
 WRITE8_MEMBER( cmi_state::cmi10_u20_a_w )
@@ -2263,9 +2263,9 @@ WRITE8_MEMBER( cmi_state::cmi10_u20_a_w )
 	int bit = 0;
 
 	if (BIT(bk, 3))
-		bit = BIT(input_port_read(device->machine, "KEYPAD_A"), bk & 7);
+	    bit = BIT(input_port_read(device->machine, "KEYPAD_A"), bk & 7);
 	else if (!BIT(bk, 4))
-		bit = BIT(input_port_read(device->machine, "KEYPAD_B"), bk & 7);
+	    bit = BIT(input_port_read(device->machine, "KEYPAD_B"), bk & 7);
 
 	pia6821_cb1_w(m_cmi10_pia_u20, 0, !bit);
 	*/
@@ -2333,14 +2333,14 @@ WRITE16_MEMBER( cmi_state::cmi_iix_update_dp3 )
 WRITE_LINE_MEMBER( cmi_state::cmi10_u21_cb2_w )
 {
 	// if 0
-//	state = state;
+//  state = state;
 }
 
 
 READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 {
 #if 0
-//	int thld = m_cmi10_pia_u21->ca2_output();
+//  int thld = m_cmi10_pia_u21->ca2_output();
 	int sel = m_cmi10_pia_u20->a_output();
 	int key = sel & 7;
 	int mux = (sel >> 3) & 3;
@@ -2349,7 +2349,7 @@ READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 
 	for (int module = 0; module < 3; ++module)
 	{
-//		char keyname[16];
+//      char keyname[16];
 		UINT8 keyval;
 		int state = 1;
 

@@ -6430,8 +6430,8 @@ ROM_START( intrgirl )
 	ROM_LOAD( "ka-5.rom3", 0x80000, 0x40000, CRC(2ed30171) SHA1(883d9e96df4f234652b01599e065f7f1985d1748) )
 
 	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
-	ROM_LOAD( "n82s147n.uk15", 0x000, 0x200, NO_DUMP )
-	ROM_LOAD( "n82s147n.uk16", 0x200, 0x200, NO_DUMP )
+	ROM_LOAD( "n82s147n.uk16", 0x000, 0x200, CRC(17dd1678) SHA1(4ed1beea3de44a6b35c84fb49f65a3a258e716fd) )
+	ROM_LOAD( "n82s147n.uk15", 0x200, 0x200, CRC(256e75bd) SHA1(63cb6e824742e8d45e8d69183b8f7693fc0fd6d4) )
 
 	ROM_REGION( 0x104, "pals", ROMREGION_ERASE00 )
 	ROM_LOAD( "pal16l8acn.ug6", 0x000, 0x104, NO_DUMP ) //read protected
@@ -7509,5 +7509,5 @@ GAME( 1991, ougonpaib,ougonpai, tenkai,   tenkai,   driver_device, 0,        ROT
 GAME( 1994, mjreach,  0,        tenkai,   mjreach,  dynax_state,   mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1994, cdracula, 0,        cdracula, cdracula, driver_device, 0,        ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
-GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
+GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a dynax board.
 GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

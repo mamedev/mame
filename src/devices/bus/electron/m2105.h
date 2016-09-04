@@ -14,6 +14,7 @@
 #include "exp.h"
 #include "machine/6522via.h"
 #include "machine/mc68681.h"
+#include "machine/input_merger.h"
 #include "sound/tms5220.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
@@ -31,6 +32,8 @@ public:
 	// construction/destruction
 	electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -43,8 +46,10 @@ private:
 	required_memory_region m_exp_rom;
 	required_device<via6522_device> m_via6522_0;
 	required_device<via6522_device> m_via6522_1;
+	required_device<mc68681_device> m_duart;
 	required_device<tms5220_device> m_tms;
 	required_device<centronics_device> m_centronics;
+	required_device<input_merger_active_high_device> m_irqs;
 };
 
 

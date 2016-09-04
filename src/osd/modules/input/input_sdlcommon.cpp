@@ -48,7 +48,7 @@ static std::shared_ptr<sdl_window_info> window_from_id(Uint32 windowID)
 
 	if (window == windows.end())
 		return nullptr;
-	
+
 	return std::static_pointer_cast<sdl_window_info>(*window);
 }
 

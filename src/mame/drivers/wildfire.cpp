@@ -259,7 +259,7 @@ void wildfire_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 
 	m_d = 0;
@@ -269,7 +269,7 @@ void wildfire_state::machine_start()
 
 	// register for savestates
 	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_cache));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
 
 	save_item(NAME(m_d));

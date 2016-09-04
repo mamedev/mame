@@ -355,12 +355,12 @@ constexpr inline enable_enum_t<E>
 underlying_value(E e) noexcept
 {
 	return static_cast< typename std::underlying_type<E>::type >( e );
-}   
+}
 
 // template function which takes an integral value and returns its representation as enumerator (even strongly typed)
 template <typename E , typename T>
 constexpr inline typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T>::value, E>
-enum_value(T value) noexcept 
+enum_value(T value) noexcept
 {
 	return static_cast<E>(value);
 }

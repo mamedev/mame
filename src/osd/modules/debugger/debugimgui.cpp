@@ -145,7 +145,7 @@ private:
 		std::string shortname;
 		std::string longname;
 	};
-	
+
 	void handle_mouse();
 	void handle_mouse_views();
 	void handle_keys();
@@ -999,7 +999,7 @@ void debug_imgui::refresh_filelist()
 	util::zippath_directory* dir = nullptr;
 	const char *volume_name;
 	const osd::directory::entry *dirent;
-	
+
 	// todo
 	m_filelist.clear();
 	m_filelist_refresh = false;
@@ -1044,13 +1044,13 @@ void debug_imgui::refresh_filelist()
 void debug_imgui::refresh_typelist()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(m_dialog_image);
-	
+
 	m_typelist.clear();
 	if(m_dialog_image->formatlist().empty())
 		return;
 	if(fd == nullptr)
 		return;
-	
+
 	floppy_image_format_t* format_list = fd->get_formats();
 	for(floppy_image_format_t* flist = format_list; flist; flist = flist->next)
 	{
@@ -1074,9 +1074,9 @@ void debug_imgui::draw_images_menu()
 		{
 			x++;
 			std::string str = string_format(" %s : %s##%i",img.device().name(),img.exists() ? img.filename() : "[Empty slot]",x);
-			if(ImGui::BeginMenu(str.c_str())) 
+			if(ImGui::BeginMenu(str.c_str()))
 			{
-				if(ImGui::MenuItem("Mount...")) 
+				if(ImGui::MenuItem("Mount..."))
 				{
 					m_dialog_image = &img;
 					m_filelist_refresh = true;
@@ -1100,7 +1100,7 @@ void debug_imgui::draw_images_menu()
 						refresh_typelist();
 						strcpy(m_path,img.working_directory().c_str());
 					}
-				}	
+				}
 				// TODO: Cassette controls
 				ImGui::EndMenu();
 			}
@@ -1196,7 +1196,7 @@ void debug_imgui::draw_create_dialog(const char* label)
 			ImGui::SameLine();
 			ImGui::Combo("##formatcombo",&m_format_sel,combo_str.c_str(),m_typelist.size());
 		}
-		
+
 		if(m_create_confirm_wait)
 		{
 			ImGui::Separator();
@@ -1418,7 +1418,7 @@ void debug_imgui::update()
 		view_list_remove(to_delete);
 		global_free(to_delete);
 	}
-	
+
 	ImGui::PopStyleColor(12);
 }
 

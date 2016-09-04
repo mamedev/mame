@@ -102,24 +102,20 @@ AC RETURNS (pins 3,4) - adaptor. A total of 6W may be drawn from these lines as 
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ELECTRON_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
+#define MCFG_ELECTRON_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ELECTRON_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 #define MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(_def_slot) \
-	MCFG_ELECTRON_EXPANSION_SLOT_ADD(ELECTRON_EXPANSION_SLOT_TAG, electron_expansion_devices, _def_slot) \
+	MCFG_ELECTRON_EXPANSION_SLOT_ADD(ELECTRON_EXPANSION_SLOT_TAG, electron_expansion_devices, _def_slot, false) \
 	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, irq_w)) \
-	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, nmi_w)) \
-	MCFG_ELECTRON_EXPANSION_SLOT_RES_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, reset_w))
+	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, nmi_w))
 
 #define MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
 	devcb = &electron_expansion_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
 	devcb = &electron_expansion_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_ELECTRON_EXPANSION_SLOT_RES_HANDLER(_devcb) \
-	devcb = &electron_expansion_slot_device::set_reset_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -137,8 +133,6 @@ public:
 	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~electron_expansion_slot_device();
 
-	void set_io_space(address_space *io);
-
 	// callbacks
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
 		{ return downcast<electron_expansion_slot_device &>(device).m_irq_handler.set_callback(object); }
@@ -146,14 +140,8 @@ public:
 	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
 		{ return downcast<electron_expansion_slot_device &>(device).m_nmi_handler.set_callback(object); }
 
-	template<class _Object> static devcb_base &set_reset_handler(device_t &device, _Object object)
-		{ return downcast<electron_expansion_slot_device &>(device).m_reset_handler.set_callback(object); }
-
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_reset_handler(state); }
-
-	address_space *m_io;
 
 protected:
 	// device-level overrides
@@ -165,7 +153,6 @@ protected:
 private:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_nmi_handler;
-	devcb_write_line m_reset_handler;
 };
 
 

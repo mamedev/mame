@@ -24,7 +24,7 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_text_char_w);
 	DECLARE_WRITE8_MEMBER(stfight_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
-	
+
 	UINT32 screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -45,7 +45,7 @@ private:
 	required_region_ptr<UINT8> m_spr_clut;
 	required_region_ptr<UINT8> m_fgmap;
 	required_region_ptr<UINT8> m_bgmap;
-	
+
 	// memory pointers
 	required_shared_ptr<UINT8> m_vregs;
 	required_shared_ptr<UINT8> m_sprite_ram;

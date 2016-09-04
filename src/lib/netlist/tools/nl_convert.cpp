@@ -492,14 +492,14 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 
 }
 
-/*		token_id_t m_tok_HFA;
-		token_id_t m_tok_APP;
-		token_id_t m_tok_TIM;
-		token_id_t m_tok_TYP;
-		token_id_t m_tok_ADDC;
-		token_id_t m_tok_ATTC;
-		token_id_t m_tok_NET;
-		token_id_t m_tok_TER;
+/*      token_id_t m_tok_HFA;
+        token_id_t m_tok_APP;
+        token_id_t m_tok_TIM;
+        token_id_t m_tok_TYP;
+        token_id_t m_tok_ADDC;
+        token_id_t m_tok_ATTC;
+        token_id_t m_tok_NET;
+        token_id_t m_tok_TER;
  *
  */
 void nl_convert_rinf_t::convert(const pstring &contents)

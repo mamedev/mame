@@ -830,7 +830,7 @@ ROM_START(fpwr2_l2)
 ROM_END
 
 /*--------------------------------
-/ Wild Texas 
+/ Wild Texas
 /-------------------------------*/
 // Conversion of Firepower II
 // http://www.ipdb.org/machine.cgi?id=5500

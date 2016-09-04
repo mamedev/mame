@@ -288,6 +288,12 @@ static const struct CassetteLegacyWaveFiller csw_legacy_fill_wave = {
 
 static cassette_image::error csw_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
 {
+	UINT8 header[22];
+
+	cassette_image_read(cassette, header, 0, sizeof(header));
+	if (memcmp(&header[0], CSW_HEADER, sizeof(CSW_HEADER) - 1)) {
+		return cassette_image::error::INVALID_IMAGE;
+	}
 	return cassette_legacy_identify( cassette, opts, &csw_legacy_fill_wave );
 }
 

@@ -219,7 +219,7 @@ softlist_parser::softlist_parser(util::core_file &file, const std::string &filen
 
 
 //-------------------------------------------------
-//	line
+//  line
 //-------------------------------------------------
 
 int softlist_parser::line() const
@@ -229,7 +229,7 @@ int softlist_parser::line() const
 
 
 //-------------------------------------------------
-//	column
+//  column
 //-------------------------------------------------
 
 int softlist_parser::column() const
@@ -239,7 +239,7 @@ int softlist_parser::column() const
 
 
 //-------------------------------------------------
-//	parser_error
+//  parser_error
 //-------------------------------------------------
 
 const char *softlist_parser::parser_error() const
@@ -822,8 +822,8 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 //-------------------------------------------------
 //  software_name_parse - helper that splits a
-//	software identifier (software_list:software:part)
-//	string into separate software_list, software, and part
+//  software identifier (software_list:software:part)
+//  string into separate software_list, software, and part
 //  strings.
 //
 //  str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3

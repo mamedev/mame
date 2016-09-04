@@ -915,7 +915,7 @@ TEST(document_contents_preserve_latin1)
 		{
 			// parse into document (preserve comments, declaration and whitespace pcdata)
 			xml_document doc;
-			CHECK(doc.load_buffer(files[src].data, files[src].size, parse_default | parse_ws_pcdata | parse_declaration | parse_comments, files[src].encoding));
+			CHECK(doc.load_buffer(files[src].data, files[src].size, parse_default | parse_ws_pcdata | parse_declaration | parse_comments));
 
 			// compare saved document with the original (raw formatting, without extra declaration, write bom if it was in original file)
 			CHECK(test_save_narrow(doc, format_raw | format_no_declaration | format_write_bom, files[dst].encoding, files[dst].data, files[dst].size));

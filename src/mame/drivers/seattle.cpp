@@ -194,6 +194,9 @@
 #include "machine/smc91c9x.h"
 #include "video/voodoo.h"
 #include "machine/nvram.h"
+#include "calspeed.lh"
+#include "vaportrx.lh"
+#include "hyprdriv.lh"
 
 
 
@@ -368,6 +371,7 @@
 /* Widget registers */
 #define WREG_ETHER_ADDR     (0x00/4)
 #define WREG_INTERRUPT      (0x04/4)
+#define WREG_OUTPUT         (0x0C/4)
 #define WREG_ANALOG         (0x10/4)
 #define WREG_ETHER_DATA     (0x14/4)
 
@@ -469,6 +473,8 @@ public:
 	UINT8 m_pending_analog_read;
 	UINT8 m_status_leds;
 	UINT32 m_cmos_write_enabled;
+	UINT32 m_output;
+	UINT8 m_output_mode;
 	DECLARE_READ32_MEMBER(interrupt_state_r);
 	DECLARE_READ32_MEMBER(interrupt_state2_r);
 	DECLARE_WRITE32_MEMBER(interrupt_config_w);
@@ -492,6 +498,8 @@ public:
 	DECLARE_WRITE32_MEMBER(status_leds_w);
 	DECLARE_READ32_MEMBER(ethernet_r);
 	DECLARE_WRITE32_MEMBER(ethernet_w);
+	DECLARE_READ32_MEMBER(output_r);
+	DECLARE_WRITE32_MEMBER(output_w);
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
 	DECLARE_READ32_MEMBER(seattle_ide_r);
@@ -599,6 +607,8 @@ void seattle_state::machine_start()
 	save_item(NAME(m_pending_analog_read));
 	save_item(NAME(m_status_leds));
 	save_item(NAME(m_cmos_write_enabled));
+	save_item(NAME(m_output));
+	save_item(NAME(m_output_mode));
 }
 
 
@@ -1563,6 +1573,50 @@ void seattle_state::update_widget_irq()
 }
 
 
+READ32_MEMBER(seattle_state::output_r)
+{
+	return m_output;
+}
+
+
+WRITE32_MEMBER(seattle_state::output_w)
+{
+	UINT8 op = (data >> 8) & 0xF;
+	UINT8 arg = data & 0xFF;
+	
+	switch (op)
+	{
+		default:
+			logerror("Unknown output (%02X) = %02X\n", op, arg);
+			break;
+			
+		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
+		
+		case 0x7:
+			m_output_mode = arg;
+			break;
+			
+		case 0xB:
+			switch (m_output_mode)
+			{
+				default:
+					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
+					break;
+				
+				case 0x04:
+					output().set_value("wheel", arg); // wheel motor delta. signed byte.
+					break;
+					
+				case 0x05:
+					for (UINT8 bit = 0; bit < 8; bit++)
+						output().set_lamp_value(bit, (arg >> bit) & 0x1);
+					break;
+			}
+			break;
+	}
+}
+
+
 READ32_MEMBER(seattle_state::widget_r)
 {
 	UINT32 result = ~0;
@@ -1576,6 +1630,10 @@ READ32_MEMBER(seattle_state::widget_r)
 		case WREG_INTERRUPT:
 			result = m_ethernet_irq_state << WINT_ETHERNET_SHIFT;
 			result = ~result;
+			break;
+			
+		case WREG_OUTPUT:
+			result = output_r(m_maincpu->space(AS_PROGRAM), 0, mem_mask);
 			break;
 
 		case WREG_ANALOG:
@@ -1607,6 +1665,10 @@ WRITE32_MEMBER(seattle_state::widget_w)
 		case WREG_INTERRUPT:
 			m_widget.irq_mask = data;
 			update_widget_irq();
+			break;
+			
+		case WREG_OUTPUT:
+			output_w(m_maincpu->space(AS_PROGRAM), 0, data, mem_mask);
 			break;
 
 		case WREG_ANALOG:
@@ -3231,14 +3293,14 @@ GAME( 1996, mace,     0,        mace,              mace, seattle_state,     mace
 GAME( 1997, macea,    mace,     mace,              mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sfrush,   0,        sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sfrushrk, 0,        sfrushrk,          sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, calspeed, 0,        calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, calspeeda,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, calspeedb,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, calspeed, 0,        calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAMEL( 1998, calspeeda,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAMEL( 1998, calspeedb,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 
 
 
-GAME( 1998, vaportrx, 0,        vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, vaportrxp,vaportrx, vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, vaportrx, 0,        vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
+GAMEL( 1998, vaportrxp,vaportrx, vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
 
 /* Midway */
 GAME( 1997, biofreak, 0,        biofreak,          biofreak, seattle_state, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", MACHINE_SUPPORTS_SAVE )
@@ -3249,4 +3311,4 @@ GAME( 1998, blitz99a, blitz99,  blitz99,           blitz99, seattle_state,  blit
 GAME( 1999, blitz2k,  0,        blitz2k,           blitz99, seattle_state,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, carnevil, 0,        carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, carnevil1,carnevil, carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hyprdriv, 0,        hyprdriv,          hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, hyprdriv, 0,        hyprdriv,          hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )

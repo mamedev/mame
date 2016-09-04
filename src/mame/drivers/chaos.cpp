@@ -25,7 +25,7 @@
     Don't try 'fill' - it fills all memory with zeroes, crashing the system.
 
     ToDo:
-    - Connect up floppy disk (WD1771 fdc, 5.25", single density, 
+    - Connect up floppy disk (WD1771 fdc, 5.25", single density,
       no other info available)
 
 ****************************************************************************/

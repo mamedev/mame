@@ -10,32 +10,32 @@
 /*
  * Copied from ALTOCODE24.MU
  *
- *	;Display Word Task
+ *  ;Display Word Task
  *
- *	DWT:	T← DWA;
- *		T←-3+T+1;
- *		L← AECL+T,BUS=0,TASK;	AECL CONTAINS NWRDS AT THIS TIME
- *		AECL←L, :DWTZ;
+ *  DWT:    T← DWA;
+ *      T←-3+T+1;
+ *      L← AECL+T,BUS=0,TASK;   AECL CONTAINS NWRDS AT THIS TIME
+ *      AECL←L, :DWTZ;
  *
- *	DWTY:	BLOCK;
- *		TASK, :DWTF;
+ *  DWTY:   BLOCK;
+ *      TASK, :DWTF;
  *
- *	DWTZ:	L←HTAB-1, BUS=0,TASK;
- *		HTAB←L, :DOTAB;
+ *  DWTZ:   L←HTAB-1, BUS=0,TASK;
+ *      HTAB←L, :DOTAB;
  *
- *	DOTAB:	DDR←0, :DWTZ;
- *	NOTAB:	MAR←T←DWA;
- *		L←AECL-T-1;
- *		ALUCY, L←2+T;
- *		DWA←L, :XNOMORE;
+ *  DOTAB:  DDR←0, :DWTZ;
+ *  NOTAB:  MAR←T←DWA;
+ *      L←AECL-T-1;
+ *      ALUCY, L←2+T;
+ *      DWA←L, :XNOMORE;
  *
- *	DOMORE:	DDR←MD, TASK;
- *		DDR←MD, :NOTAB;
+ *  DOMORE: DDR←MD, TASK;
+ *      DDR←MD, :NOTAB;
  *
- *	XNOMORE:DDR← MD, BLOCK;
- *		DDR← MD, TASK;
+ *  XNOMORE:DDR← MD, BLOCK;
+ *      DDR← MD, TASK;
  *
- *	DWTF:	:DWT;
+ *  DWTF:   :DWT;
  */
 
 //! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)

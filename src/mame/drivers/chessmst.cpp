@@ -5,6 +5,9 @@
         Chess-Master
 
         TODO:
+        - figure out why chessmsta won't work, for starters it assume z80 carry flag is set at poweron?
+        - the HALT button does not work as it should: it stops the computers calculation
+          (the board LEDs go OFF and the CM's LED goes ON), but the machine doesn't return any move (as it should)
         - a better artwork
 
 ****************************************************************************/
@@ -15,8 +18,6 @@
 #include "machine/z80pio.h"
 #include "sound/speaker.h"
 #include "chessmst.lh"
-
-#define MASTER_CLOCK (9830400/4) /* 9830.4kHz source */
 
 class chessmst_state : public driver_device
 {
@@ -159,7 +160,7 @@ static INPUT_PORTS_START( chessmst )
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Color    [2]")    PORT_CODE(KEYCODE_2)    PORT_CODE(KEYCODE_C)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Level    [1]")    PORT_CODE(KEYCODE_1)    PORT_CODE(KEYCODE_L)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game [0]")    PORT_CODE(KEYCODE_0)    PORT_CODE(KEYCODE_ENTER)
-	
+
 	PORT_START("EXTRA")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Halt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER("z80pio1", z80pio_device, strobe_a) // -> PIO(1) ASTB pin
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, reset_button, 0) // -> Z80 RESET pin
@@ -253,45 +254,76 @@ WRITE8_MEMBER( chessmst_state::pio2_port_b_w )
 static MACHINE_CONFIG_START( chessmst, chessmst_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK) // U880
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/4) // U880 Z80 clone
 	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
 	MCFG_CPU_IO_MAP(chessmst_io)
 
-	/* video hardware */
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_9_8304MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
+
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_9_8304MHz/4)
+	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
+
 	MCFG_DEFAULT_LAYOUT(layout_chessmst)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-	/* devices */
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, MASTER_CLOCK)
+static MACHINE_CONFIG_START( chessmsta, chessmst_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/4) // U880 Z80 clone
+	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
+	MCFG_CPU_IO_MAP(chessmst_io)
+
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_8MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_8MHz/4)
 	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
+
+	MCFG_DEFAULT_LAYOUT(layout_chessmst)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
+
 
 /* ROM definition */
 ROM_START( chessmst )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "056.bin", 0x0000, 0x0400, CRC(2b90e5d3) SHA1(c47445964b2e6cb11bd1f27e395cf980c97af196))
-	ROM_LOAD( "057.bin", 0x0400, 0x0400, CRC(e666fc56) SHA1(3fa75b82cead81973bea94191a5c35f0acaaa0e6))
-	ROM_LOAD( "058.bin", 0x0800, 0x0400, CRC(6a17fbec) SHA1(019051e93a5114477c50eaa87e1ff01b02eb404d))
-	ROM_LOAD( "059.bin", 0x0c00, 0x0400, CRC(e96e3d07) SHA1(20fab75f206f842231f0414ebc473ce2a7371e7f))
-	ROM_LOAD( "060.bin", 0x1000, 0x0400, CRC(0e31f000) SHA1(daac924b79957a71a4b276bf2cef44badcbe37d3))
-	ROM_LOAD( "061.bin", 0x1400, 0x0400, CRC(69ad896d) SHA1(25d999b59d4cc74bd339032c26889af00e64df60))
-	ROM_LOAD( "062.bin", 0x1800, 0x0400, CRC(c42925fe) SHA1(c42d8d7c30a9b6d91ac994cec0cc2723f41324e9))
-	ROM_LOAD( "063.bin", 0x1c00, 0x0400, CRC(86be4cdb) SHA1(741f984c15c6841e227a8722ba30cf9e6b86d878))
-	ROM_LOAD( "064.bin", 0x2000, 0x0400, CRC(e82f5480) SHA1(38a939158052f5e6484ee3725b86e522541fe4aa))
-	ROM_LOAD( "065.bin", 0x2400, 0x0400, CRC(4ec0e92c) SHA1(0b748231a50777391b04c1778750fbb46c21bee8))
+	ROM_LOAD( "056.bin", 0x0000, 0x0400, CRC(2b90e5d3) SHA1(c47445964b2e6cb11bd1f27e395cf980c97af196) )
+	ROM_LOAD( "057.bin", 0x0400, 0x0400, CRC(e666fc56) SHA1(3fa75b82cead81973bea94191a5c35f0acaaa0e6) )
+	ROM_LOAD( "058.bin", 0x0800, 0x0400, CRC(6a17fbec) SHA1(019051e93a5114477c50eaa87e1ff01b02eb404d) )
+	ROM_LOAD( "059.bin", 0x0c00, 0x0400, CRC(e96e3d07) SHA1(20fab75f206f842231f0414ebc473ce2a7371e7f) )
+	ROM_LOAD( "060.bin", 0x1000, 0x0400, CRC(0e31f000) SHA1(daac924b79957a71a4b276bf2cef44badcbe37d3) )
+	ROM_LOAD( "061.bin", 0x1400, 0x0400, CRC(69ad896d) SHA1(25d999b59d4cc74bd339032c26889af00e64df60) )
+	ROM_LOAD( "062.bin", 0x1800, 0x0400, CRC(c42925fe) SHA1(c42d8d7c30a9b6d91ac994cec0cc2723f41324e9) )
+	ROM_LOAD( "063.bin", 0x1c00, 0x0400, CRC(86be4cdb) SHA1(741f984c15c6841e227a8722ba30cf9e6b86d878) )
+	ROM_LOAD( "064.bin", 0x2000, 0x0400, CRC(e82f5480) SHA1(38a939158052f5e6484ee3725b86e522541fe4aa) )
+	ROM_LOAD( "065.bin", 0x2400, 0x0400, CRC(4ec0e92c) SHA1(0b748231a50777391b04c1778750fbb46c21bee8) )
 ROM_END
+
+ROM_START( chessmsta )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "2764.bin",       0x0000, 0x2000, CRC(6be28876) SHA1(fd7d77b471e7792aef3b2b3f7ff1de4cdafc94c9) )
+	ROM_LOAD( "u2616bm108.bin", 0x2000, 0x0800, CRC(6e69ace3) SHA1(e099b6b6cc505092f64b8d51ab9c70aa64f58f70) )
+ROM_END
+
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, chessmst,  0,       0,  chessmst,   chessmst, driver_device,     0,  "VEB Mikroelektronik Erfurt",   "Chess-Master",        MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT COMPAT MACHINE    INPUT     INIT              COMPANY, FULLNAME, FLAGS */
+COMP( 1984, chessmst,  0,        0,  chessmst,  chessmst, driver_device, 0, "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, chessmsta, chessmst, 0,  chessmsta, chessmst, driver_device, 0, "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

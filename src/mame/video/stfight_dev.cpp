@@ -118,7 +118,7 @@ static MACHINE_CONFIG_FRAGMENT( stfight_vid )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stfight_video_device, screen_update_stfight)
 	MCFG_SCREEN_PALETTE("^palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "^palette", stfight)
 MACHINE_CONFIG_END
 
@@ -230,9 +230,9 @@ void stfight_video_device::draw_sprites(screen_device &screen, bitmap_ind16 &bit
 			/*
 			if (flip_screen())
 			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
+			    sx = 240 - sx;
+			    sy = 240 - sy;
+			    flipx = !flipx;
 			}
 			*/
 

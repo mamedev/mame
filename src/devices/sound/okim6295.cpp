@@ -151,7 +151,9 @@ void okim6295_device::device_reset()
 
 void okim6295_device::device_post_load()
 {
-	set_bank_base(m_bank_offs, true);
+	if (m_bank_offs != 0)
+		set_bank_base(m_bank_offs, true);
+
 	device_clock_changed();
 }
 
@@ -196,7 +198,10 @@ void okim6295_device::set_bank_base(offs_t base, bool bDontUpdateStream)
 	{
 		m_stream->update();
 	}
-	set_rom_bank(base / 0x40000);
+
+	m_bank_offs = base;
+
+	set_rom_bank(m_bank_offs / 0x40000);
 }
 
 

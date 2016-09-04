@@ -650,6 +650,8 @@ if (BUSES["ELECTRON"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/electron/exp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
+		MAME_DIR .. "src/devices/bus/electron/plus3.cpp",
+		MAME_DIR .. "src/devices/bus/electron/plus3.h",
 		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
 		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
@@ -2863,7 +2865,7 @@ end
 if (BUSES["HP_OPTROM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.cpp",
-        }
+		}
 end
 
 ---------------------------------------------------
@@ -2877,5 +2879,5 @@ if (BUSES["COMPIS_GRAPHICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/compis/graphics.h",
 		MAME_DIR .. "src/devices/bus/compis/hrg.cpp",
 		MAME_DIR .. "src/devices/bus/compis/hrg.h",
-    }
+	}
 end

@@ -708,7 +708,9 @@ void coco_state::update_sound(void)
 	m_cassette->change_state(cas_sound, CASSETTE_MASK_SPEAKER);
 
 	/* determine the cartridge sound status */
-	m_cococart->cart_set_line(COCOCART_LINE_SOUND_ENABLE, bCartSoundEnable ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+	m_cococart->cart_set_line(
+		cococart_slot_device::line::SOUND_ENABLE,
+		bCartSoundEnable ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
 }
 
 

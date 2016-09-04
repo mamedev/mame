@@ -72,7 +72,7 @@ if (FORMATS["2D_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/2d_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/2d_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -84,7 +84,7 @@ if (FORMATS["A26_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/a26_cas.cpp",
 		MAME_DIR.. "src/lib/formats/a26_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -96,7 +96,7 @@ if (FORMATS["A5105_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/a5105_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/a5105_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -108,7 +108,7 @@ if (FORMATS["ABC800_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/abc800_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/abc800_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -120,7 +120,7 @@ if (FORMATS["ABCFD2_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/abcfd2_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/abcfd2_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -132,7 +132,7 @@ if (FORMATS["ACE_TAP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/ace_tap.cpp",
 		MAME_DIR.. "src/lib/formats/ace_tap.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -144,7 +144,7 @@ if (FORMATS["ACORN_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/acorn_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/acorn_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -156,7 +156,7 @@ if (FORMATS["ADAM_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/adam_cas.cpp",
 		MAME_DIR.. "src/lib/formats/adam_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -168,7 +168,7 @@ if (FORMATS["ADAM_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/adam_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/adam_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -180,7 +180,7 @@ if (FORMATS["AFS_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/afs_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/afs_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -192,7 +192,7 @@ if (FORMATS["AMI_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/ami_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ami_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -204,7 +204,7 @@ if (FORMATS["AP2_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/ap2_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ap2_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -216,7 +216,7 @@ if (FORMATS["APF_APT"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/apf_apt.cpp",
 		MAME_DIR.. "src/lib/formats/apf_apt.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -228,7 +228,7 @@ if (FORMATS["APOLLO_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/apollo_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/apollo_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -240,7 +240,7 @@ if (FORMATS["APPLIX_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/applix_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/applix_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -252,7 +252,7 @@ if (FORMATS["APRIDISK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/apridisk.cpp",
 		MAME_DIR.. "src/lib/formats/apridisk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -264,7 +264,7 @@ if (FORMATS["AP_DSK35"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/ap_dsk35.cpp",
 		MAME_DIR.. "src/lib/formats/ap_dsk35.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -276,7 +276,7 @@ if (FORMATS["ASST128_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/asst128_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/asst128_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -288,7 +288,7 @@ if (FORMATS["ATARI_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/atari_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/atari_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -300,7 +300,7 @@ if (FORMATS["ATOM_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/atom_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/atom_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -312,7 +312,7 @@ if (FORMATS["ATOM_TAP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/atom_tap.cpp",
 		MAME_DIR.. "src/lib/formats/atom_tap.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -324,7 +324,7 @@ if (FORMATS["BASICDSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/basicdsk.cpp",
 		MAME_DIR.. "src/lib/formats/basicdsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -336,7 +336,7 @@ if (FORMATS["BW12_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/bw12_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/bw12_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -348,7 +348,7 @@ if (FORMATS["BW2_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/bw2_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/bw2_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -360,7 +360,7 @@ if (FORMATS["C3040_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/c3040_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/c3040_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -372,7 +372,7 @@ if (FORMATS["C4040_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/c4040_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/c4040_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -384,7 +384,7 @@ if (FORMATS["C8280_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/c8280_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/c8280_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -396,7 +396,7 @@ if (FORMATS["CAMPLYNX_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/camplynx_cas.cpp",
 		MAME_DIR.. "src/lib/formats/camplynx_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -408,7 +408,7 @@ if (FORMATS["CAMPLYNX_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/camplynx_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/camplynx_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -420,7 +420,7 @@ if (FORMATS["CBM_CRT"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/cbm_crt.cpp",
 		MAME_DIR.. "src/lib/formats/cbm_crt.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -432,7 +432,7 @@ if (FORMATS["CBM_TAP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/cbm_tap.cpp",
 		MAME_DIR.. "src/lib/formats/cbm_tap.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -444,7 +444,7 @@ if (FORMATS["CCVF_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/ccvf_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ccvf_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -456,7 +456,7 @@ if (FORMATS["CD90_640_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/cd90_640_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/cd90_640_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -468,7 +468,7 @@ if (FORMATS["CGENIE_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/cgenie_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/cgenie_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -480,7 +480,7 @@ if (FORMATS["CGEN_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/cgen_cas.cpp",
 		MAME_DIR.. "src/lib/formats/cgen_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -492,7 +492,7 @@ if (FORMATS["COCO_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/coco_cas.cpp",
 		MAME_DIR.. "src/lib/formats/coco_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -504,7 +504,7 @@ if (FORMATS["COMX35_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/comx35_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/comx35_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -516,7 +516,7 @@ if (FORMATS["CONCEPT_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/concept_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/concept_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -528,7 +528,7 @@ if (FORMATS["COUPEDSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/coupedsk.cpp",
 		MAME_DIR.. "src/lib/formats/coupedsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -540,7 +540,7 @@ if (FORMATS["CPIS_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/cpis_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/cpis_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -552,7 +552,7 @@ if (FORMATS["CSW_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/csw_cas.cpp",
 		MAME_DIR.. "src/lib/formats/csw_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -564,7 +564,7 @@ if (FORMATS["D64_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/d64_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/d64_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -576,7 +576,7 @@ if (FORMATS["D71_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/d71_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/d71_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -588,7 +588,7 @@ if (FORMATS["D80_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/d80_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/d80_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -600,7 +600,7 @@ if (FORMATS["D81_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/d81_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/d81_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -612,7 +612,7 @@ if (FORMATS["D82_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/d82_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/d82_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -624,7 +624,7 @@ if (FORMATS["DCP_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/dcp_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/dcp_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -636,7 +636,7 @@ if (FORMATS["DIM_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/dim_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/dim_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -648,7 +648,7 @@ if (FORMATS["DIP_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/dip_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/dip_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -660,7 +660,7 @@ if (FORMATS["DMK_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/dmk_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/dmk_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -672,7 +672,7 @@ if (FORMATS["EP64_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/ep64_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ep64_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -684,7 +684,7 @@ if (FORMATS["DMV_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/dmv_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/dmv_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -696,7 +696,7 @@ if (FORMATS["ESQ16_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/esq16_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/esq16_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -708,7 +708,7 @@ if (FORMATS["ESQ8_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/esq8_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/esq8_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -720,7 +720,7 @@ if (FORMATS["EXCALI64_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/excali64_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/excali64_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -732,7 +732,7 @@ if (FORMATS["FC100_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/fc100_cas.cpp",
 		MAME_DIR.. "src/lib/formats/fc100_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -744,7 +744,7 @@ if (FORMATS["FDD_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/fdd_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/fdd_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -756,7 +756,7 @@ if (FORMATS["FLEX_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/flex_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/flex_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -768,7 +768,7 @@ if (FORMATS["FM7_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/fm7_cas.cpp",
 		MAME_DIR.. "src/lib/formats/fm7_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -780,7 +780,7 @@ if (FORMATS["FMSX_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/fmsx_cas.cpp",
 		MAME_DIR.. "src/lib/formats/fmsx_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -792,7 +792,7 @@ if (FORMATS["FMTOWNS_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/fmtowns_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/fmtowns_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -804,7 +804,7 @@ if (FORMATS["FSD_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/fsd_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/fsd_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -816,7 +816,7 @@ if (FORMATS["G64_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/g64_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/g64_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -828,7 +828,7 @@ if (FORMATS["GTP_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/gtp_cas.cpp",
 		MAME_DIR.. "src/lib/formats/gtp_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -840,7 +840,7 @@ if (FORMATS["GUAB_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/guab_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/guab_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -852,7 +852,7 @@ if (FORMATS["HECTOR_MINIDISC"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/hector_minidisc.cpp",
 		MAME_DIR.. "src/lib/formats/hector_minidisc.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -864,7 +864,7 @@ if (FORMATS["HECT_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/hect_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/hect_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -876,7 +876,7 @@ if (FORMATS["HECT_TAP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/hect_tap.cpp",
 		MAME_DIR.. "src/lib/formats/hect_tap.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -888,7 +888,7 @@ if (FORMATS["IQ151_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/iq151_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/iq151_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -900,7 +900,7 @@ if (FORMATS["ITT3030_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/itt3030_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/itt3030_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -912,7 +912,7 @@ if (FORMATS["JVC_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/jvc_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/jvc_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -924,7 +924,7 @@ if (FORMATS["KAYPRO_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/kaypro_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/kaypro_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -936,7 +936,7 @@ if (FORMATS["KC85_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/kc85_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/kc85_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -948,7 +948,7 @@ if (FORMATS["KC_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/kc_cas.cpp",
 		MAME_DIR.. "src/lib/formats/kc_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -960,7 +960,7 @@ if (FORMATS["KIM1_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/kim1_cas.cpp",
 		MAME_DIR.. "src/lib/formats/kim1_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -972,7 +972,7 @@ if (FORMATS["LVIV_LVT"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/lviv_lvt.cpp",
 		MAME_DIR.. "src/lib/formats/lviv_lvt.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -984,7 +984,7 @@ if (FORMATS["M20_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/m20_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/m20_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -996,7 +996,7 @@ if (FORMATS["M5_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/m5_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/m5_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1008,7 +1008,7 @@ if (FORMATS["MBEE_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/mbee_cas.cpp",
 		MAME_DIR.. "src/lib/formats/mbee_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1020,7 +1020,7 @@ if (FORMATS["MFM_HD"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/mfm_hd.cpp",
 		MAME_DIR.. "src/lib/formats/mfm_hd.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1032,7 +1032,7 @@ if (FORMATS["MM_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/mm_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/mm_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1044,7 +1044,7 @@ if (FORMATS["MSX_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/msx_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/msx_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1056,7 +1056,7 @@ if (FORMATS["MZ_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/mz_cas.cpp",
 		MAME_DIR.. "src/lib/formats/mz_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1068,7 +1068,7 @@ if (FORMATS["NANOS_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/nanos_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/nanos_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1080,7 +1080,7 @@ if (FORMATS["NASCOM_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/nascom_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/nascom_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1092,7 +1092,7 @@ if (FORMATS["NASLITE_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/naslite_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/naslite_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1104,7 +1104,7 @@ if (FORMATS["NES_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/nes_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/nes_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1116,7 +1116,7 @@ if (FORMATS["NFD_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/nfd_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/nfd_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1128,7 +1128,7 @@ if (FORMATS["ORAO_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/orao_cas.cpp",
 		MAME_DIR.. "src/lib/formats/orao_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1140,7 +1140,7 @@ if (FORMATS["ORIC_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/oric_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/oric_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1152,7 +1152,7 @@ if (FORMATS["ORIC_TAP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/oric_tap.cpp",
 		MAME_DIR.. "src/lib/formats/oric_tap.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1164,7 +1164,7 @@ if (FORMATS["P6001_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/p6001_cas.cpp",
 		MAME_DIR.. "src/lib/formats/p6001_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1176,7 +1176,7 @@ if (FORMATS["PASTI_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pasti_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pasti_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1188,7 +1188,7 @@ if (FORMATS["PC98FDI_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pc98fdi_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pc98fdi_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1200,7 +1200,7 @@ if (FORMATS["PC98_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pc98_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pc98_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1212,7 +1212,7 @@ if (FORMATS["PC_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pc_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pc_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1224,7 +1224,7 @@ if (FORMATS["PHC25_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/phc25_cas.cpp",
 		MAME_DIR.. "src/lib/formats/phc25_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1236,7 +1236,7 @@ if (FORMATS["PK8020_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pk8020_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pk8020_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1248,7 +1248,7 @@ if (FORMATS["PMD_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pmd_cas.cpp",
 		MAME_DIR.. "src/lib/formats/pmd_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1260,7 +1260,7 @@ if (FORMATS["PRIMOPTP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/primoptp.cpp",
 		MAME_DIR.. "src/lib/formats/primoptp.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1272,7 +1272,7 @@ if (FORMATS["PYLDIN_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pyldin_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pyldin_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1284,7 +1284,7 @@ if (FORMATS["QL_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/ql_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ql_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1296,7 +1296,7 @@ if (FORMATS["RK_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/rk_cas.cpp",
 		MAME_DIR.. "src/lib/formats/rk_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1308,7 +1308,7 @@ if (FORMATS["RX50_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/rx50_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/rx50_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1320,7 +1320,7 @@ if (FORMATS["SC3000_BIT"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/sc3000_bit.cpp",
 		MAME_DIR.. "src/lib/formats/sc3000_bit.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1332,7 +1332,7 @@ if (FORMATS["SF7000_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/sf7000_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/sf7000_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1344,7 +1344,7 @@ if (FORMATS["SMX_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/smx_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/smx_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1356,7 +1356,7 @@ if (FORMATS["SOL_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/sol_cas.cpp",
 		MAME_DIR.. "src/lib/formats/sol_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1368,7 +1368,7 @@ if (FORMATS["SORC_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/sorc_cas.cpp",
 		MAME_DIR.. "src/lib/formats/sorc_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1380,7 +1380,7 @@ if (FORMATS["SORC_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/sorc_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/sorc_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1392,7 +1392,7 @@ if (FORMATS["SORD_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/sord_cas.cpp",
 		MAME_DIR.. "src/lib/formats/sord_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1404,7 +1404,7 @@ if (FORMATS["SPC1000_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/spc1000_cas.cpp",
 		MAME_DIR.. "src/lib/formats/spc1000_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1416,7 +1416,7 @@ if (FORMATS["ST_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/st_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/st_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1428,7 +1428,7 @@ if (FORMATS["SVI_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/svi_cas.cpp",
 		MAME_DIR.. "src/lib/formats/svi_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1440,7 +1440,7 @@ if (FORMATS["SVI_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/svi_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/svi_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1452,7 +1452,7 @@ if (FORMATS["TANDY2K_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/tandy2k_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/tandy2k_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1464,7 +1464,7 @@ if (FORMATS["THOM_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/thom_cas.cpp",
 		MAME_DIR.. "src/lib/formats/thom_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1476,7 +1476,7 @@ if (FORMATS["THOM_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/thom_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/thom_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1488,7 +1488,7 @@ if (FORMATS["TI99_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/ti99_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ti99_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1500,7 +1500,7 @@ if (FORMATS["TIKI100_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/tiki100_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/tiki100_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1512,7 +1512,7 @@ if (FORMATS["TRD_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/trd_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/trd_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1524,7 +1524,7 @@ if (FORMATS["TRS80_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/trs80_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/trs80_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1536,7 +1536,7 @@ if (FORMATS["TRS_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/trs_cas.cpp",
 		MAME_DIR.. "src/lib/formats/trs_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1548,7 +1548,7 @@ if (FORMATS["TVC_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/tvc_cas.cpp",
 		MAME_DIR.. "src/lib/formats/tvc_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1560,7 +1560,7 @@ if (FORMATS["TVC_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/tvc_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/tvc_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1572,7 +1572,7 @@ if (FORMATS["TZX_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/tzx_cas.cpp",
 		MAME_DIR.. "src/lib/formats/tzx_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1584,7 +1584,7 @@ if (FORMATS["UEF_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/uef_cas.cpp",
 		MAME_DIR.. "src/lib/formats/uef_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1596,7 +1596,7 @@ if (FORMATS["UPD765_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/upd765_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/upd765_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1608,7 +1608,7 @@ if (FORMATS["VDK_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/vdk_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/vdk_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1620,7 +1620,7 @@ if (FORMATS["VECTOR06_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/vector06_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/vector06_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1632,7 +1632,7 @@ if (FORMATS["VG5K_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/vg5k_cas.cpp",
 		MAME_DIR.. "src/lib/formats/vg5k_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1644,7 +1644,7 @@ if (FORMATS["VICTOR9K_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/victor9k_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/victor9k_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1656,7 +1656,7 @@ if (FORMATS["VT_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/vt_cas.cpp",
 		MAME_DIR.. "src/lib/formats/vt_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1668,7 +1668,7 @@ if (FORMATS["WD177X_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/wd177x_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/wd177x_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1680,7 +1680,7 @@ if (FORMATS["X07_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/x07_cas.cpp",
 		MAME_DIR.. "src/lib/formats/x07_cas.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1692,7 +1692,7 @@ if (FORMATS["X1_TAP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/x1_tap.cpp",
 		MAME_DIR.. "src/lib/formats/x1_tap.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1704,7 +1704,7 @@ if (FORMATS["XDF_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/xdf_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/xdf_dsk.h",
- 	}
+	}
 end
 
 --------------------------------------------------
@@ -1716,7 +1716,7 @@ if (FORMATS["ZX81_P"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/zx81_p.cpp",
 		MAME_DIR.. "src/lib/formats/zx81_p.h",
- 	}
+	}
 end
 
 end

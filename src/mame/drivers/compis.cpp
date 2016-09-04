@@ -33,15 +33,15 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- booting system2 with disk in drive b: fails
-	- uhrg graphics are drawn wrong (upd7220 bugs?)
-	- compis2
-		- color graphics
-		- 8087
-		- programmable keyboard
-	- hard disk
+    - booting system2 with disk in drive b: fails
+    - uhrg graphics are drawn wrong (upd7220 bugs?)
+    - compis2
+        - color graphics
+        - 8087
+        - programmable keyboard
+    - hard disk
 
 */
 
@@ -77,7 +77,7 @@
 #define CENTRONICS_TAG  "centronics"
 #define ISBX_0_TAG      "isbx0"
 #define ISBX_1_TAG      "isbx1"
-#define GRAPHICS_TAG	"gfx"
+#define GRAPHICS_TAG    "gfx"
 #define COMPIS_KEYBOARD_TAG "compiskb"
 
 class compis_state : public driver_device
@@ -200,7 +200,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 		if (BIT(offset, 0))
 		{
 			return m_uart->status_r(space, 0) << 8;
-		}	
+		}
 		else
 		{
 			return m_uart->data_r(space, 0) << 8;
@@ -218,7 +218,7 @@ WRITE16_MEMBER( compis_state::pcs6_2_3_w )
 		if (BIT(offset, 0))
 		{
 			m_uart->control_w(space, 0, data >> 8);
-		}	
+		}
 		else
 		{
 			m_uart->data_w(space, 0, data >> 8);

@@ -192,6 +192,7 @@ void ym2610_postload(void *chip);
 #if (BUILD_YM2612||BUILD_YM3438)
 void * ym2612_init(void *param, device_t *device, int baseclock, int rate,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler);
+void ym2612_clock_changed(void *chip, int clock, int rate);
 void ym2612_shutdown(void *chip);
 void ym2612_reset_chip(void *chip);
 void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length);

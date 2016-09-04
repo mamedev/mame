@@ -850,6 +850,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( telstrat, oric, telestrat_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
+
+	// [RH] 30 August 2016: Based on the French Wikipedia page for the Oric, it does not appear
+	// that the Telestrat supported the same expansions as the Oric-1 and Atmos.
+	MCFG_DEVICE_REMOVE("ext")
 MACHINE_CONFIG_END
 
 

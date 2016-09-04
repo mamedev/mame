@@ -696,10 +696,10 @@ WRITE8_MEMBER(maygay1b_state::mcu_port0_w)
 {
 #ifdef USE_MCU
 // only during startup
-//	logerror("%s: mcu_port0_w %02x\n",machine().describe_context(),data);
+//  logerror("%s: mcu_port0_w %02x\n",machine().describe_context(),data);
 #endif
 }
-	
+
 WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
 {
 #ifdef USE_MCU
@@ -718,7 +718,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
 	}
 #endif
 }
-	
+
 WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
 {
 #ifdef USE_MCU
@@ -726,7 +726,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
 	logerror("%s: mcu_port2_w %02x\n",machine().describe_context(),data);
 #endif
 }
-	
+
 WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
 {
 #ifdef USE_MCU
@@ -742,12 +742,12 @@ READ8_MEMBER(maygay1b_state::mcu_port0_r)
 	// the MCU code checks to see if the input from this port is stable in
 	// the main loop
 	// it looks like it needs to read the strobe
-//	logerror("%s: mcu_port0_r returning %02x\n", machine().describe_context(), ret);
+//  logerror("%s: mcu_port0_r returning %02x\n", machine().describe_context(), ret);
 #endif
 	return ret;
 
 }
-	
+
 
 READ8_MEMBER(maygay1b_state::mcu_port2_r)
 {
@@ -810,12 +810,12 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
-	
+
 	MCFG_DEVICE_ADD("i8279", I8279, M1_MASTER_CLOCK/4)    // unknown clock
 	MCFG_I8279_OUT_SL_CB(WRITE8(maygay1b_state, scanlines_w))   // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_w))     // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(maygay1b_state, kbd_r))           // kbd RL lines
-	
+
 #ifndef USE_MCU
 	// on M1B there is a 2nd i8279, on M1 / M1A a 8051 handles this task!
 	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)        // unknown clock

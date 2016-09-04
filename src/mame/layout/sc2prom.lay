@@ -3420,7 +3420,7 @@
 			</color>
 		</led7seg>
 	</element>
-	
+
 	<element name="reel_lamp_layer_0" defstate="0">
 		<rect>
 			<color red="0.40" green="0.40" blue="0.40">
@@ -6930,10 +6930,10 @@
 			</bounds>
 		</backdrop>
 
-    <!-- The DMD -->
-    <screen index="0">
-      <bounds left="65" top="451" right="392" bottom="558" />
-    </screen>
+	<!-- The DMD -->
+	<screen index="0">
+	  <bounds left="65" top="451" right="392" bottom="558" />
+	</screen>
 
 		<backdrop name="label66" element="label_66">
 			<bounds x="232" y="780" width="111" height="26">

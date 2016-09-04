@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( play_3_io, AS_IO, 8, play_3_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // digits, scan-lines
 	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w) // sound code
-	AM_RANGE(0x03, 0x03) AM_WRITE(port03_w) // 
+	AM_RANGE(0x03, 0x03) AM_WRITE(port03_w) //
 	AM_RANGE(0x04, 0x04) AM_READ(port04_r) // switches
 	AM_RANGE(0x05, 0x05) AM_READ(port05_r) // more switches
 	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // segments
@@ -125,7 +125,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( megaaton_io, AS_IO, 8, play_3_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(megaaton_port01_w) // digits, scan-lines
 	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w) // sound code
-	AM_RANGE(0x03, 0x03) AM_WRITE(port03_w) // 
+	AM_RANGE(0x03, 0x03) AM_WRITE(port03_w) //
 	AM_RANGE(0x04, 0x04) AM_READ(port04_r) // switches
 	AM_RANGE(0x05, 0x05) AM_READ(port05_r) // more switches
 	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // segments

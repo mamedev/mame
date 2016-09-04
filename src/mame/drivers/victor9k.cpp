@@ -232,8 +232,8 @@ INPUT_PORTS_END
 
 #define DC_SECRET   0x1000
 #define DC_UNDLN    0x2000
-#define DC_LOWINT  	0x4000
-#define DC_RVS  	0x8000
+#define DC_LOWINT   0x4000
+#define DC_RVS      0x8000
 
 MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 {
@@ -250,7 +250,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	
+
 	int x = hbp;
 
 	offs_t aa = (ma & 0x7ff) << 1;
@@ -273,7 +273,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 
 			switch (rvs | undln | cursor)
 			{
-			case 0:	case 5:
+			case 0: case 5:
 				pixel = 1;
 				break;
 

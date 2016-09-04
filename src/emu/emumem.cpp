@@ -1672,7 +1672,7 @@ memory_region *memory_manager::region_containing(const void *memory, offs_t byte
 
 	// look through the region list and return the first match
 	for (auto &region : m_regionlist)
-		if (data >= region.second->base() && (data + bytes) <= region.second->end())
+		if (data >= region.second->base() && (data + bytes) < region.second->end())
 			return region.second.get();
 
 	// didn't find one
@@ -4038,7 +4038,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 		m_byteend(byteend),
 		m_data(reinterpret_cast<UINT8 *>(memory))
 {
-	offs_t length = byteend + 1 - bytestart;
+	offs_t const length = byteend + 1 - bytestart;
 	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space.device().tag(), space.name(), bytestart, byteend, memory));
 
 	// allocate a block if needed

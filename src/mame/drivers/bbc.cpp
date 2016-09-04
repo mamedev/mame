@@ -287,6 +287,13 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	if (newval)
+	{
+		if (m_via6522_1) m_via6522_1->reset();
+		if (m_adlc) m_adlc->reset();
+		if (m_rtc) m_rtc->reset();
+		if (m_i8271) m_i8271->reset();
+	}
 }
 
 
@@ -798,16 +805,15 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcmc )
 FLOPPY_FORMATS_END0
 
 static SLOT_INTERFACE_START( bbc_floppies_525 )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-	SLOT_INTERFACE("sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("dd",   FLOPPY_525_DD)
-	SLOT_INTERFACE("ssqd", FLOPPY_525_SSQD)
-	SLOT_INTERFACE("qd",   FLOPPY_525_QD)
+	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
+	SLOT_INTERFACE("525sd",   FLOPPY_525_SD)
+	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
+	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
+	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( bbc_floppies_35 )
-	SLOT_INTERFACE("qd",   FLOPPY_35_DD)
+	SLOT_INTERFACE("35dd",   FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
 
@@ -859,6 +865,9 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state, bbcb_vsync)      /* screen refresh interrupts */
 	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -915,7 +924,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bbc_state, bbc_txd_w))
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_acia6850_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in0_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
@@ -931,7 +940,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in1_w))
 
 	/* EPROM sockets */
 	MCFG_FRAGMENT_ADD(bbc_eprom_sockets)
@@ -963,7 +972,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in2_w))
 
 	/* adc */
 	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
@@ -976,14 +985,14 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* fdc */
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_state, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(bbc_state, side_w))
-	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+		MCFG_DEVICE_ADD("i8271", I8271, 0)
+		MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
+		MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_state, motor_w))
+		MCFG_I8271_OPT_CALLBACK(WRITELINE(bbc_state, side_w))
+		MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
+		MCFG_FLOPPY_DRIVE_SOUND(true)
+		MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
+		MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
@@ -995,10 +1004,10 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* expansion ports */
-	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, nullptr)
-	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
-	MCFG_BBC_TUBE_SLOT_ADD("tube", bbc_tube_ext_devices, nullptr)
-	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
+		MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, nullptr)
+		MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
+		MCFG_BBC_TUBE_SLOT_ADD("tube", bbc_tube_ext_devices, nullptr)
+		MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_b",      "bbcb_cass")
@@ -1023,16 +1032,16 @@ static MACHINE_CONFIG_DERIVED(bbcb1770, bbcb)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbcm)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbcm)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bbcb_de, bbcb )
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_de", "bbcb_cass_de")
+/* software lists */
+MCFG_SOFTWARE_LIST_ADD("flop_ls_b_de", "bbcb_cass_de")
 MACHINE_CONFIG_END
 
 
@@ -1251,6 +1260,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
+	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -1328,7 +1340,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bbc_state, bbc_txd_w))
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_acia6850_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in0_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
@@ -1349,7 +1361,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in1_w))
 
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
@@ -1357,16 +1369,16 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in2_w))
 
 	/* fdc */
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbcm)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbcm)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* econet */
@@ -1484,7 +1496,7 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_35, "qd", bbc_state::floppy_formats_bbcmc)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_35, "35dd", bbc_state::floppy_formats_bbcmc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, nullptr, bbc_state::floppy_formats_bbcmc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -1494,6 +1506,10 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcmc)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcmc)
+
+	// cartridge sockets
+	MCFG_DEVICE_REMOVE("exp_rom1")
+	MCFG_DEVICE_REMOVE("exp_rom2")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
@@ -1599,9 +1615,9 @@ ROM_START(bbcb)
 	/* rom page 9  24000 */
 	/* rom page 10 28000 */
 	/* rom page 11 2c000 */
-	/* rom page 12 30000 IC52  SPARE SOCKET */
+	/* rom page 12 30000 IC52  DFS */
 	/* rom page 13 34000 IC88  SPARE SOCKET */
-	/* rom page 14 38000 IC100 DFS */
+	/* rom page 14 38000 IC100 SPARE SOCKET */
 	/* rom page 15 3c000 IC101 BASIC */
 	ROM_DEFAULT_BIOS("os12b2")
 	ROM_SYSTEM_BIOS( 0, "os12b2", "OS 1.20 / BASIC2" )
@@ -1624,12 +1640,12 @@ ROM_START(bbcb)
 	ROM_RELOAD(             0x08000, 0x4000 )
 	ROM_RELOAD(             0x0c000, 0x4000 )
 
-	ROM_LOAD("dnfs120-201666.rom", 0x38000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
+	ROM_LOAD("dnfs120-201666.rom", 0x30000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
 
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
 ROM_END
 
@@ -1673,9 +1689,9 @@ ROM_START(bbcb1770)
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
 
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
-ROM_END
+	ROM_END
 
 
 ROM_START(bbcb_de)
@@ -1694,16 +1710,16 @@ ROM_START(bbcb_de)
 	/* rom page 9  24000 */
 	/* rom page 10 28000 */
 	/* rom page 11 2c000 */
-	/* rom page 12 30000 IC72 SPARE SOCKET */
+	/* rom page 12 30000 IC72 DFS */
 	/* rom page 13 34000 IC73 SPARE SOCKET */
-	/* rom page 14 38000 IC74 DFS */
+	/* rom page 14 38000 IC74 SPARE SOCKET */
 	/* rom page 15 3c000 IC75 BASIC */
 	ROM_DEFAULT_BIOS("os12")
 	ROM_SYSTEM_BIOS( 0, "os12", "OS 1.20 / BASIC2" )
 	ROMX_LOAD("os_de.rom",   0x40000, 0x4000, CRC(b7262caf) SHA1(aadf90338ee9d1c85dfa73beba50e930c2a38f10), ROM_BIOS(1))
 	ROMX_LOAD("basic2.rom",  0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1)) /* rom page 15 3c000 */
 
-	ROM_LOAD("dfs10.rom",    0x38000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
+	ROM_LOAD("dfs10.rom",    0x30000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1776,7 +1792,7 @@ ROM_START(torchf)
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
 
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phrom_us.bin", 0x0000, 0x4000, CRC(bf4b3b64) SHA1(66876702d1d95eecc034d20f25047f893a27cde5))
 ROM_END
 
@@ -1817,7 +1833,7 @@ ROM_START(bbcbp)
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
 
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
 ROM_END
 
@@ -1865,7 +1881,7 @@ ROM_START(abc110)
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
 
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
 ROM_END
 
@@ -1907,7 +1923,7 @@ ROM_START(acw443)
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
 
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
 ROM_END
 

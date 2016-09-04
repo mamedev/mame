@@ -2603,7 +2603,7 @@ void alto2_cpu_device::execute_run()
 		case f1_task_13:                            // f1 13 task specific
 			switch (m_task) {
 			case task_emu:                      // emulator task
-				if (m_cram_config == 3)			// 3K CRAM available?
+				if (m_cram_config == 3)         // 3K CRAM available?
 					f1_late_load_rmr();
 				else
 					f1_late_load_srb();
@@ -2946,18 +2946,18 @@ void alto2_cpu_device::soft_reset()
 	if (config)
 		m_cram_config = (config->read() >> 1) & 3;
 	switch (m_cram_config) {
-	case 0:	// invalid, default to 1
-	case 1:	// 1K CROM, 1K CRAM, 1 S register bank
+	case 0: // invalid, default to 1
+	case 1: // 1K CROM, 1K CRAM, 1 S register bank
 		m_ucode_rom_pages = 1;
 		m_ucode_ram_pages = 1;
 		m_sreg_banks = 1;
 		break;
-	case 2:	// 2K CROM, 1K CRAM, 1 S register bank
+	case 2: // 2K CROM, 1K CRAM, 1 S register bank
 		m_ucode_rom_pages = 2;
 		m_ucode_ram_pages = 1;
 		m_sreg_banks = 1;
 		break;
-	case 3:	// 1K CROM, 3K CRAM, 8 S register banks
+	case 3: // 1K CROM, 3K CRAM, 8 S register banks
 		m_ucode_rom_pages = 1;
 		m_ucode_ram_pages = 3;
 		m_sreg_banks = 8;

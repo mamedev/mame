@@ -94,8 +94,8 @@ private:
 	c352_voice_t m_c352_v[32];
 	INT16 m_mulaw_table[256];
 
-    UINT16 m_random;
-    UINT16 m_control; // control flags, purpose unknown.
+	UINT16 m_random;
+	UINT16 m_control; // control flags, purpose unknown.
 
 	void fetch_sample(c352_voice_t* v);
 

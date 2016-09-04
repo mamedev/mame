@@ -1253,7 +1253,7 @@ void device_image_interface::update_names(const device_type device_type, const c
 }
 
 //-------------------------------------------------
-//	find_software_item
+//  find_software_item
 //-------------------------------------------------
 
 const software_part *device_image_interface::find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **dev) const

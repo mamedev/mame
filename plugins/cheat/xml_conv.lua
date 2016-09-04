@@ -55,7 +55,7 @@ function xml.conv_cheat(data)
 	data = xml_parse(data)
 	local function convert_expr(data)
 		local write = false
-	
+
 		local function convert_memref(cpu, phys, space, width, addr, rw)
 			local mod = ""
 			local count
@@ -223,16 +223,16 @@ function xml.conv_cheat(data)
 			end
 		end
 		if next(spaces) then
-			data["cheat"][count]["space"] = {} 
+			data["cheat"][count]["space"] = {}
 			for name, space in pairs(spaces) do
-				data["cheat"][count]["space"] = {} 
+				data["cheat"][count]["space"] = {}
 				data["cheat"][count]["space"][name] = { type = space["type"], tag = space["tag"] }
 			end
 		end
 		if next(regions) then
-			data["cheat"][count]["region"] = {} 
+			data["cheat"][count]["region"] = {}
 			for name, region in pairs(regions) do
-				data["cheat"][count]["region"] = {} 
+				data["cheat"][count]["region"] = {}
 				data["cheat"][count]["region"][name] = region
 			end
 		end
