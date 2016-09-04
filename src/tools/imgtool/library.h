@@ -24,12 +24,12 @@
 #include "stream.h"
 #include "unicode.h"
 #include "charconv.h"
+#include "pool.h"
 
 
 struct imgtool_image;
 struct imgtool_partition;
 struct imgtool_directory;
-struct imgtool_library;
 
 enum imgtool_suggestion_viability_t
 {
@@ -51,12 +51,6 @@ union filterinfo
 };
 
 typedef void (*filter_getinfoproc)(UINT32 state, union filterinfo *info);
-
-enum imgtool_libsort_t
-{
-	ITLS_NAME,
-	ITLS_DESCRIPTION
-};
 
 struct imgtool_dirent
 {
@@ -375,34 +369,56 @@ struct imgtool_module
 	const void *extra;
 };
 
-/* creates an imgtool library */
-imgtool_library *imgtool_library_create(void);
+namespace imgtool {
 
-/* closes an imgtool library */
-void imgtool_library_close(imgtool_library *library);
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/* adds a module to an imgtool library */
-void imgtool_library_add(imgtool_library *library, imgtool_get_info get_info);
+// imgtool "library" - equivalent to the MAME driver list
+class library
+{
+public:
+	enum class sort_type
+	{
+		NAME,
+		DESCRIPTION
+	};
 
-/* seeks out and removes a module from an imgtool library */
-const imgtool_module *imgtool_library_unlink(imgtool_library *library,
-	const char *module);
+	library();
+	~library();
 
-/* sorts an imgtool library */
-void imgtool_library_sort(imgtool_library *library, imgtool_libsort_t sort);
+	// adds a module to an imgtool library
+	void add(imgtool_get_info get_info);
 
-/* finds a module */
-const imgtool_module *imgtool_library_findmodule(
-	imgtool_library *library, const char *module_name);
+	// seeks out and removes a module from an imgtool library
+	const imgtool_module *unlink(const char *module);
 
-/* memory allocators for pooled library memory */
-void *imgtool_library_malloc(imgtool_library *library, size_t mem);
-char *imgtool_library_strdup(imgtool_library *library, const char *s);
-char *imgtool_library_strdup_allow_null(imgtool_library *library, const char *s);
+	// sorts an imgtool library
+	void sort(sort_type sort);
 
-imgtool_module *imgtool_library_iterate(
-	imgtool_library *library, const imgtool_module *module);
-imgtool_module *imgtool_library_index(
-	imgtool_library *library, int i);
+	// finds a module
+	const imgtool_module *findmodule(const char *module_name);
 
-#endif /* LIBRARY_H */
+	// module iteration
+	imgtool_module *iterate(const imgtool_module *module);
+	imgtool_module *index(int i);
+
+private:
+	object_pool *					m_pool;
+	imgtool_module *				m_first;
+	imgtool_module *				m_last;
+
+	// helpers
+	void add_class(const imgtool_class *imgclass);
+	int module_compare(const imgtool_module *m1, const imgtool_module *m2, sort_type sort);
+
+	// memory allocators for pooled library memory (these should go away in further C++-ification)
+	void *imgtool_library_malloc(size_t mem);
+	char *imgtool_library_strdup(const char *s);
+	char *imgtool_library_strdup_allow_null(const char *s);
+};
+
+} // namespace imgtool
+
+#endif // LIBRARY_H
