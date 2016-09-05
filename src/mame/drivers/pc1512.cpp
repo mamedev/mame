@@ -1318,7 +1318,8 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_RAM_EXTRA_OPTIONS("544K,576K,608K,640K")
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pc1512_hdd")
 MACHINE_CONFIG_END
 
 
