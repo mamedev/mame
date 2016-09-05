@@ -36,7 +36,7 @@ private:
 	direct_read_data *m_rom_direct;
 
 	memory_bank *m_bank;
-	int m_cur_bank;
+	int m_cur_bank, m_bank_count;
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 	virtual void interface_pre_start() override;
