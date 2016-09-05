@@ -146,7 +146,7 @@ WRITE8_MEMBER(circusc_state::circusc_colorram_w)
 
 WRITE8_MEMBER(circusc_state::circusc_flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 
@@ -176,7 +176,7 @@ void circusc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = sr[offs + 1] & 0x40;
 		int flipy = sr[offs + 1] & 0x80;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

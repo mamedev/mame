@@ -96,10 +96,10 @@ WRITE8_MEMBER(rocnrope_state::rocnrope_colorram_w)
 
 WRITE8_MEMBER(rocnrope_state::rocnrope_flipscreen_w)
 {
-	if (flip_screen() != (~data & 0x01))
+	if (m_gfxdecode->flip_screen() != (~data & 0x01))
 	{
-		flip_screen_set(~data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(~data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 

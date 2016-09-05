@@ -142,7 +142,7 @@ WRITE8_MEMBER(pooyan_state::colorram_w)
 
 WRITE8_MEMBER(pooyan_state::flipscreen_w)
 {
-	flip_screen_set(~data & 0x01);
+	m_gfxdecode->flip_screen_set(~data & 0x01);
 }
 
 

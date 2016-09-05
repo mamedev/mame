@@ -118,7 +118,7 @@ WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(data & 0x01);
+		m_gfxdecode->flip_screen_set(data & 0x01);
 
 		machine().bookkeeping().coin_lockout_w(0, ~data & 0x10);
 		machine().bookkeeping().coin_lockout_w(1, ~data & 0x20);
@@ -226,7 +226,7 @@ void lastduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		flipy = attr & m_sprite_flipy_mask;  /* 0x40 for lastduel, 0x80 for madgear */
 		color = attr & 0x0f;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

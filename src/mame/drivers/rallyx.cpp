@@ -243,7 +243,7 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 			break;
 
 		case 0x03:  /* FLIP */
-			flip_screen_set(bit);
+			m_gfxdecode->flip_screen_set(bit);
 			break;
 
 		case 0x04:
@@ -284,7 +284,7 @@ WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
 			break;
 
 		case 0x03:  /* FLIP */
-			flip_screen_set(bit);
+			m_gfxdecode->flip_screen_set(bit);
 			break;
 
 		case 0x04:  /* OUT1 */

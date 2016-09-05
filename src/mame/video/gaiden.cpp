@@ -139,7 +139,7 @@ VIDEO_START_MEMBER(gaiden_state,drgnbowl)
 WRITE16_MEMBER(gaiden_state::gaiden_flip_w)
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(data & 1);
+		m_gfxdecode->flip_screen_set(data & 1);
 }
 
 WRITE16_MEMBER(gaiden_state::gaiden_txscrollx_w)
@@ -309,7 +309,7 @@ UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bi
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen(),  m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, m_gfxdecode->flip_screen(),  m_sprite_bitmap);
 	m_background->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 

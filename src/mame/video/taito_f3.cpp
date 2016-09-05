@@ -3134,7 +3134,7 @@ UINT32 taito_f3_state::screen_update_f3(screen_device &screen, bitmap_rgb32 &bit
 	UINT32 sy_fix[5],sx_fix[5];
 
 	m_f3_skip_this_frame=0;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
 	sy_fix[0]=((m_f3_control_0[4]&0xffff)<< 9) + (1<<16);

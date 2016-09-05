@@ -706,7 +706,7 @@ WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
 	if (m_gfx_bank[m_reikaids_which] != data)
 	{
 		m_gfx_bank[m_reikaids_which] = data;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	m_reikaids_which ^= 1;
@@ -718,7 +718,7 @@ WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
 	if (m_gfx_bank[0] != data)
 	{
 		m_gfx_bank[0] = data;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -738,7 +738,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
 	 */
 
 	if ((m_blitter_bank ^ data) & 0x3b)
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 
 	m_blitter_bank = data;
 }
@@ -761,7 +761,7 @@ WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
 	 */
 
 	if ((m_blitter_bank ^ data) & 0x03)
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 
 	m_blitter_bank = data;
 }
@@ -808,7 +808,7 @@ UINT32 homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind1
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	switch (m_vreg[0x3])
@@ -858,7 +858,7 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 
@@ -904,7 +904,7 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 
@@ -933,7 +933,7 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	/* bit 2 of blitter_bank stretches characters horizontally by 3/2,

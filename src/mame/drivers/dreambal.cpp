@@ -38,7 +38,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_deco104(*this, "ioprot104"),
 		m_deco_tilegen1(*this, "tilegen1"),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* devices */
@@ -46,6 +47,7 @@ public:
 	optional_device<deco104_device> m_deco104;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_DRIVER_INIT(dreambal);
 	virtual void machine_start() override;
@@ -79,7 +81,7 @@ UINT32 dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind1
 	address_space &space = generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(nullptr, nullptr);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */

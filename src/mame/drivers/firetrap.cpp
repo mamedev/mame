@@ -336,7 +336,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_adpcm_data_w)
 
 WRITE8_MEMBER(firetrap_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	m_gfxdecode->flip_screen_set(data);
 }
 
 

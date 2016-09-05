@@ -103,7 +103,7 @@ WRITE16_MEMBER(snk68_state::pow_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(data & 0x08);
+		m_gfxdecode->flip_screen_set(data & 0x08);
 		m_sprites->set_flip(data & 0x08);
 		m_sprite_flip_axis = data & 0x04;   // for streetsm? though might not be present on this board
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER(snk68_state::searchar_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(data & 0x08);
+		m_gfxdecode->flip_screen_set(data & 0x08);
 		m_sprites->set_flip(data & 0x08);
 		m_sprite_flip_axis = data & 0x04;
 	}

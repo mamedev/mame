@@ -14,7 +14,7 @@ WRITE8_MEMBER(n8080_state::n8080_video_control_w)
 {
 	m_sheriff_color_mode = (data >> 3) & 3;
 	m_sheriff_color_data = (data >> 0) & 7;
-	flip_screen_set(data & 0x20);
+	m_flip_screen = (data & 0x20) != 0;
 }
 
 
@@ -70,7 +70,7 @@ void n8080_state::helifire_next_line(  )
 	}
 	else
 	{
-		if (flip_screen())
+		if (m_flip_screen)
 			m_helifire_mv %= 255;
 		else
 			m_helifire_mv %= 257;
@@ -87,7 +87,7 @@ VIDEO_START_MEMBER(n8080_state,spacefev)
 {
 	m_cannon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::spacefev_stop_red_cannon),this));
 
-	flip_screen_set(0);
+	m_flip_screen = false;
 
 	save_item(NAME(m_spacefev_red_screen));
 	save_item(NAME(m_spacefev_red_cannon));
@@ -96,7 +96,7 @@ VIDEO_START_MEMBER(n8080_state,spacefev)
 
 VIDEO_START_MEMBER(n8080_state,sheriff)
 {
-	flip_screen_set(0);
+	m_flip_screen = false;
 
 	save_item(NAME(m_sheriff_color_mode));
 	save_item(NAME(m_sheriff_color_data));
@@ -124,13 +124,13 @@ VIDEO_START_MEMBER(n8080_state,helifire)
 		m_helifire_LSFR[i] = data;
 	}
 
-	flip_screen_set(0);
+	m_flip_screen = false;
 }
 
 
 UINT32 n8080_state::screen_update_spacefev(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 mask = flip_screen() ? 0xff : 0x00;
+	UINT8 mask = m_flip_screen ? 0xff : 0x00;
 
 	int x;
 	int y;
@@ -199,7 +199,7 @@ UINT32 n8080_state::screen_update_spacefev(screen_device &screen, bitmap_ind16 &
 
 UINT32 n8080_state::screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 mask = flip_screen() ? 0xff : 0x00;
+	UINT8 mask = m_flip_screen ? 0xff : 0x00;
 
 	const UINT8* pPROM = memregion("proms")->base();
 
@@ -310,7 +310,7 @@ UINT32 n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16 &
 
 			for (n = 0; n < 8; n++)
 			{
-				if (flip_screen())
+				if (m_flip_screen)
 				{
 					if ((m_videoram[offset ^ 0x1fff] << n) & 0x80)
 					{

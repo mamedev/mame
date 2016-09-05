@@ -22,7 +22,7 @@ WRITE8_MEMBER(shisen_state::bankswitch_w)
 	if (m_gfxbank != bank)
 	{
 		m_gfxbank = bank;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	/* bits 6-7 unknown */
@@ -62,7 +62,7 @@ UINT32 shisen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	// on Irem boards, screen flip is handled in both hardware and software.
 	// this game doesn't have cocktail mode so if there's software control we don't
 	// know where it is mapped.
-	flip_screen_set(~ioport("DSW2")->read() & 1);
+	m_gfxdecode->flip_screen_set(~ioport("DSW2")->read() & 1);
 
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

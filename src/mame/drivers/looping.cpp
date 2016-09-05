@@ -247,15 +247,15 @@ void looping_state::video_start()
 
 WRITE8_MEMBER(looping_state::flip_screen_x_w)
 {
-	flip_screen_x_set(~data & 0x01);
-	m_bg_tilemap->set_scrollx(0, flip_screen() ? 128 : 0);
+	m_gfxdecode->flip_screen_x_set(~data & 0x01);
+	m_bg_tilemap->set_scrollx(0, m_gfxdecode->flip_screen() ? 128 : 0);
 }
 
 
 WRITE8_MEMBER(looping_state::flip_screen_y_w)
 {
-	flip_screen_y_set(~data & 0x01);
-	m_bg_tilemap->set_scrollx(0, flip_screen() ? 128 : 0);
+	m_gfxdecode->flip_screen_y_set(~data & 0x01);
+	m_bg_tilemap->set_scrollx(0, m_gfxdecode->flip_screen() ? 128 : 0);
 }
 
 
@@ -307,13 +307,13 @@ void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		int code  = source[1] & 0x3f;
 		int color = source[2];
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

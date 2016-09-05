@@ -166,10 +166,10 @@ WRITE8_MEMBER(kingofb_state::kingofb_f800_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (flip_screen() != (data & 0x80))
+	if (m_gfxdecode->flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x80);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -223,7 +223,7 @@ void kingofb_state::kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 		sx = spriteram[roffs + 1];
 		sy = spriteram[roffs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -280,7 +280,7 @@ void kingofb_state::ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 		int sx = spriteram[offs + 2];
 		int sy = spriteram[offs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

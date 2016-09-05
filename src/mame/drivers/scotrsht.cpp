@@ -45,7 +45,7 @@ Stephh's notes (based on the game M6502 code and some tests) :
 WRITE8_MEMBER(scotrsht_state::ctrl_w)
 {
 	m_irq_enable = data & 0x02;
-	flip_screen_set(data & 0x08);
+	m_gfxdecode->flip_screen_set(data & 0x08);
 }
 
 INTERRUPT_GEN_MEMBER(scotrsht_state::interrupt)

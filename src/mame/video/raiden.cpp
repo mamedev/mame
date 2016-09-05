@@ -49,7 +49,7 @@ WRITE8_MEMBER(raiden_state::raiden_control_w)
 	m_sp_layer_enabled = ~data & 0x08;
 
 	m_flipscreen = data & 0x40;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 WRITE8_MEMBER(raiden_state::raidenb_control_w)
@@ -61,7 +61,7 @@ WRITE8_MEMBER(raiden_state::raidenb_control_w)
 	m_tx_layer_enabled = ~data & 0x08;
 
 	m_flipscreen = data & 0x02;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 WRITE16_MEMBER(raiden_state::raidenb_layer_enable_w)

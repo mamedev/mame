@@ -496,7 +496,7 @@ MACHINE_RESET_MEMBER(n8080_state,helifire)
 
 	m_helifire_mv = 0;
 	m_helifire_sc = 0;
-	m_helifire_flash = 0;
+	m_helifire_flash = false;
 }
 
 

@@ -137,7 +137,7 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 
 	m_nmi_mask = BIT(data,4);
 	if (!(m_nmi_mask)) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	flip_screen_set(BIT(data,5));
+	m_gfxdecode->flip_screen_set(BIT(data,5));
 }
 
 WRITE8_MEMBER(superqix_state::superqix_0410_w)
@@ -188,7 +188,7 @@ void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		int sx = spriteram[offs + 1] + 256 * (spriteram[offs] & 0x01);
 		int sy = spriteram[offs + 2];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -197,7 +197,8 @@ void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
-				flip_screen(), flip_screen(),
+				m_gfxdecode->flip_screen(),
+				m_gfxdecode->flip_screen(),
 				sx, sy, 0);
 	}
 }
@@ -217,7 +218,7 @@ void superqix_state::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 		int sx = spriteram[offs + 1];
 		int sy = spriteram[offs + 2];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -244,7 +245,10 @@ UINT32 superqix_state::screen_update_pbillian(screen_device &screen, bitmap_ind1
 UINT32 superqix_state::screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	copybitmap_trans(bitmap,*m_fg_bitmap[m_show_bitmap],flip_screen(),flip_screen(),0,0,cliprect,0);
+	copybitmap_trans(bitmap, *m_fg_bitmap[m_show_bitmap],
+		m_gfxdecode->flip_screen(),
+		m_gfxdecode->flip_screen(),
+		0, 0, cliprect, 0);
 	superqix_draw_sprites(bitmap,cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;

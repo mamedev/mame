@@ -77,13 +77,13 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 
 READ8_MEMBER(docastle_state::flipscreen_r)
 {
-	flip_screen_set(offset);
+	m_gfxdecode->flip_screen_set(offset);
 	return (offset ? 1 : 0); // is this really needed?
 }
 
 WRITE8_MEMBER(docastle_state::flipscreen_w)
 {
-	flip_screen_set(offset);
+	m_gfxdecode->flip_screen_set(offset);
 }
 
 TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
@@ -174,7 +174,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			flipy = m_spriteram[offs + 2] & 0x80;
 		}
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 176 - sy;

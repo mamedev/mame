@@ -22,7 +22,7 @@
 
 UINT32 stadhero_state::screen_update_stadhero(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	m_gfxdecode->flip_screen_set(m_tilegen1->get_flip_state());
 
 	m_tilegen1->set_bppmultmask(0x8, 0x7);
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);

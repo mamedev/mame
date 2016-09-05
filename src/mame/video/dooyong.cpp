@@ -334,7 +334,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
 	m_sprites_disabled = data & 0x10;
 
 	/* bit 6 is flip screen */
-	flip_screen_set(data & 0x40);
+	m_gfxdecode->flip_screen_set(data & 0x40);
 }
 
 WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
@@ -342,7 +342,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 //  printf("pollux_ctrl_w %02x\n", data);
 
 	/* bit 0 is flip screen */
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 
 	/* bits 6 and 7 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
@@ -374,7 +374,7 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 	m_tx_pri = data & 0x08;
 
 	/* bit 4 flips screen */
-	flip_screen_set(data & 0x10);
+	m_gfxdecode->flip_screen_set(data & 0x10);
 
 	/* bit 5 used but unknown */
 
@@ -402,7 +402,7 @@ WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
 {
 	/* bit 0 is flip screen */
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 
 	/* bits 1, 2 used but unknown */
 
@@ -483,7 +483,7 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 				sy -=(ext & 0x02) << 7;
 		}
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 498 - sx;
 			sy = 240 - (16 * height) - sy;
@@ -513,7 +513,7 @@ UINT32 dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bi
 	screen.priority().fill(0, cliprect);
 
 	/* Text layer is offset on this machine */
-	m_tx->set_scrolly(flip_screen() ? -8 : 8);
+	m_tx->set_scrolly(m_gfxdecode->flip_screen() ? -8 : 8);
 
 	m_bg->draw(screen, bitmap, cliprect, 0, 1);
 	m_fg->draw(screen, bitmap, cliprect, 0, 2);
@@ -531,7 +531,7 @@ UINT32 dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, b
 	screen.priority().fill(0, cliprect);
 
 	/* Text layer is offset on this machine */
-	m_tx->set_scrolly(flip_screen() ? -8 : 8);
+	m_tx->set_scrolly(m_gfxdecode->flip_screen() ? -8 : 8);
 
 	m_bg->draw(screen, bitmap, cliprect, 0, 1);
 	m_fg->draw(screen, bitmap, cliprect, 0, 2);
@@ -667,7 +667,7 @@ WRITE16_MEMBER(dooyong_68k_state::ctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 flips screen */
-		flip_screen_set(data & 0x0001);
+		m_gfxdecode->flip_screen_set(data & 0x0001);
 
 		/* bit 4 changes tilemaps priority */
 		m_bg2_priority = data & 0x0010;
@@ -711,7 +711,7 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 			int const width = buffered_spriteram[offs+1] & 0x000f;
 			int const height = (buffered_spriteram[offs+1] & 0x00f0) >> 4;
 
-			bool const flip = flip_screen();
+			bool const flip = m_gfxdecode->flip_screen();
 			int sx = buffered_spriteram[offs+4] & 0x01ff;
 			int sy = (INT16)buffered_spriteram[offs+6] & 0x01ff;
 			if (sy & 0x0100) sy |= ~(int)0x01ff;    // Correctly sign-extend 9-bit number

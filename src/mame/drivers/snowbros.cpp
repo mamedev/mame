@@ -87,7 +87,7 @@ a joystick.  This is not an emulation bug.
 WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
 {
 	if (ACCESSING_BITS_8_15)
-		flip_screen_set(~data & 0x8000);
+		m_gfxdecode->flip_screen_set(~data & 0x8000);
 }
 
 

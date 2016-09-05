@@ -81,12 +81,12 @@ WRITE8_MEMBER(mermaid_state::mermaid_colorram_w)
 
 WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_x_w)
 {
-	flip_screen_x_set(data & 0x01);
+	m_gfxdecode->flip_screen_x_set(data & 0x01);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_y_w)
 {
-	flip_screen_y_set(data & 0x01);
+	m_gfxdecode->flip_screen_y_set(data & 0x01);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_bg_scroll_w)
@@ -198,20 +198,20 @@ void mermaid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		code |= m_rougien_gfxbank1 * 0x2800;
 		code |= m_rougien_gfxbank2 * 0x2400;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
 		}
 
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,(flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea), code, color, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(bitmap,(m_gfxdecode->flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea), code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -280,13 +280,13 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 			code |= m_rougien_gfxbank1 * 0x2800;
 			code |= m_rougien_gfxbank2 * 0x2400;
 
-			if (flip_screen_x())
+			if (m_gfxdecode->flip_screen_x())
 			{
 				flipx = !flipx;
 				sx = 240 - sx;
 			}
 
-			if (flip_screen_y())
+			if (m_gfxdecode->flip_screen_y())
 			{
 				flipy = !flipy;
 				sy = 240 - sy;
@@ -343,13 +343,13 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 					code2 |= m_rougien_gfxbank1 * 0x2800;
 					code2 |= m_rougien_gfxbank2 * 0x2400;
 
-					if (flip_screen_x())
+					if (m_gfxdecode->flip_screen_x())
 					{
 						flipx2 = !flipx2;
 						sx2 = 240 - sx2;
 					}
 
-					if (flip_screen_y())
+					if (m_gfxdecode->flip_screen_y())
 					{
 						flipy2 = !flipy2;
 						sy2 = 240 - sy2;
@@ -383,13 +383,13 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 			code |= m_rougien_gfxbank1 * 0x2800;
 			code |= m_rougien_gfxbank2 * 0x2400;
 
-			if (flip_screen_x())
+			if (m_gfxdecode->flip_screen_x())
 			{
 				flipx = !flipx;
 				sx = 240 - sx;
 			}
 
-			if (flip_screen_y())
+			if (m_gfxdecode->flip_screen_y())
 			{
 				flipy = !flipy;
 				sy = 240 - sy;
@@ -424,13 +424,13 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 					code2 |= m_rougien_gfxbank1 * 0x2800;
 					code2 |= m_rougien_gfxbank2 * 0x2400;
 
-					if (flip_screen_x())
+					if (m_gfxdecode->flip_screen_x())
 					{
 						flipx2 = !flipx2;
 						sx2 = 240 - sx2;
 					}
 
-					if (flip_screen_y())
+					if (m_gfxdecode->flip_screen_y())
 					{
 						flipy2 = !flipy2;
 						sy2 = 240 - sy2;
@@ -464,13 +464,13 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 			code |= m_rougien_gfxbank1 * 0x2800;
 			code |= m_rougien_gfxbank2 * 0x2400;
 
-			if (flip_screen_x())
+			if (m_gfxdecode->flip_screen_x())
 			{
 				flipx = !flipx;
 				sx = 240 - sx;
 			}
 
-			if (flip_screen_y())
+			if (m_gfxdecode->flip_screen_y())
 			{
 				flipy = !flipy;
 				sy = 240 - sy;
@@ -505,13 +505,13 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 					code2 |= m_rougien_gfxbank1 * 0x2800;
 					code2 |= m_rougien_gfxbank2 * 0x2400;
 
-					if (flip_screen_x())
+					if (m_gfxdecode->flip_screen_x())
 					{
 						flipx2 = !flipx2;
 						sx2 = 240 - sx2;
 					}
 
-					if (flip_screen_y())
+					if (m_gfxdecode->flip_screen_y())
 					{
 						flipy2 = !flipy2;
 						sy2 = 240 - sy2;

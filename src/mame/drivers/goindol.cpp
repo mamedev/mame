@@ -33,10 +33,10 @@ WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
 	if (m_char_bank != ((data & 0x10) >> 4))
 	{
 		m_char_bank = (data & 0x10) >> 4;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
-	flip_screen_set(data & 0x20);
+	m_gfxdecode->flip_screen_set(data & 0x20);
 }
 
 

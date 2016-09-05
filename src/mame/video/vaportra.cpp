@@ -55,7 +55,7 @@ UINT32 vaportra_state::screen_update_vaportra(screen_device &screen, bitmap_ind1
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	int pri = m_priority[0] & 0x03;
 
-	flip_screen_set(!BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(!BIT(flip, 7));
 	m_deco_tilegen1->pf_update(nullptr, nullptr);
 	m_deco_tilegen2->pf_update(nullptr, nullptr);
 

@@ -191,7 +191,7 @@ void metlclsh_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		sy = 240 - spriteram[offs + 2];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;  flipx = !flipx;
 			sy = 240 - sy;  flipy = !flipy;     if (sizey)  sy += 16;
@@ -241,7 +241,7 @@ UINT32 metlclsh_state::screen_update_metlclsh(screen_device &screen, bitmap_ind1
 	if (m_scrollx[0] & 0x08)                    // background (if enabled)
 	{
 		/* The background seems to be always flipped along x */
-		m_bg_tilemap->set_flip((flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
+		m_bg_tilemap->set_flip((m_gfxdecode->flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
 		m_bg_tilemap->set_scrollx(0, m_scrollx[1] + ((m_scrollx[0] & 0x02) << 7) );
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}

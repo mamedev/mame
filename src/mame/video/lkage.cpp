@@ -133,12 +133,12 @@ void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 			priority_mask = 0xf0;
 		}
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			sx = 239 - sx - 24;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			sy = 254 - 16 * height - sy;
 			flipy = !flipy;
@@ -169,8 +169,8 @@ UINT32 lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bit
 {
 	int bank;
 
-	flip_screen_x_set(~m_vreg[2] & 0x01);
-	flip_screen_y_set(~m_vreg[2] & 0x02);
+	m_gfxdecode->flip_screen_x_set(~m_vreg[2] & 0x01);
+	m_gfxdecode->flip_screen_y_set(~m_vreg[2] & 0x02);
 
 	bank = m_vreg[1] & 0x08;
 

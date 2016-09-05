@@ -15,10 +15,10 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_videoram_w)
 
 WRITE8_MEMBER(pokechmp_state::pokechmp_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x80))
+	if (m_gfxdecode->flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x80);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -55,7 +55,8 @@ void pokechmp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			flipx = spriteram[offs+1] & 0x04;
 			flipy = spriteram[offs+1] & 0x02;
-			if (flip_screen()) {
+			if (m_gfxdecode->flip_screen())
+			{
 				sx=240-sx;
 				sy=240-sy;
 				if (flipx) flipx=0; else flipx=1;

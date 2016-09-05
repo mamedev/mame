@@ -149,7 +149,6 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 	MCFG_GFX_INFO(_info)
 
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -209,6 +208,10 @@ public:
 
 	void set_gfx(UINT8 index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
 
+	// tilemap operations
+	void mark_all_dirty();
+	void set_flip_all(UINT32 attributes);
+
 protected:
 	// interface-level overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
@@ -230,6 +233,55 @@ private:
 
 // iterator
 typedef device_interface_iterator<device_gfx_interface> gfx_interface_iterator;
+
+
+// ======================> gfxdecode_device
+
+// device type definition
+extern const device_type GFXDECODE;
+
+class gfxdecode_device : public device_t, public device_gfx_interface
+{
+public:
+	// construction/destruction
+	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// generic flip screen handling
+	void flip_screen_set(UINT32 on);
+	void flip_screen_set_no_update(UINT32 on);
+	void flip_screen_x_set(UINT32 on);
+	void flip_screen_y_set(UINT32 on);
+	UINT32 flip_screen() const { return m_flip_screen_x; }
+	UINT32 flip_screen_x() const { return m_flip_screen_x; }
+	UINT32 flip_screen_y() const { return m_flip_screen_y; }
+
+protected:
+	virtual void device_start() override;
+
+private:
+	// helpers
+	void updateflip();
+
+	// internal state
+	UINT8                   m_flip_screen_x;
+	UINT8                   m_flip_screen_y;
+};
+
+
+//**************************************************************************
+//  COMMON GRAPHICS LAYOUTS
+//**************************************************************************
+
+GFXDECODE_EXTERN(empty);
+
+extern const gfx_layout gfx_8x8x1;
+extern const gfx_layout gfx_8x8x2_planar;
+extern const gfx_layout gfx_8x8x3_planar;
+extern const gfx_layout gfx_8x8x4_planar;
+extern const gfx_layout gfx_8x8x5_planar;
+extern const gfx_layout gfx_8x8x6_planar;
+
+extern const gfx_layout gfx_16x16x4_planar;
 
 
 #endif  /* __DIGFX_H__ */

@@ -68,12 +68,12 @@ static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
 WRITE8_MEMBER(sauro_state::sauro_palette_bank_w)
 {
 	m_palette_bank = (data & 0x03) << 4;
-	machine().tilemap().mark_all_dirty();
+	m_gfxdecode->mark_all_dirty();
 }
 
 WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
 {
-	const int *map = (flip_screen() ? scroll2_map_flip : scroll2_map);
+	const int *map = (m_gfxdecode->flip_screen() ? scroll2_map_flip : scroll2_map);
 	int scroll = (data & 0xf8) | map[data & 7];
 
 	m_fg_tilemap->set_scrollx(0, scroll);
@@ -97,7 +97,7 @@ void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 {
 	UINT8 *spriteram = m_spriteram;
 	int offs,code,sx,sy,color,flipx;
-	int flipy = flip_screen();
+	int flipy = m_gfxdecode->flip_screen();
 
 	for (offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
 	{
@@ -160,7 +160,7 @@ void sauro_state::trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 {
 	UINT8 *spriteram = m_spriteram;
 	int offs,code,sy,color,flipx,sx;
-	int flipy = flip_screen();
+	int flipy = m_gfxdecode->flip_screen();
 
 	/* Weird, sprites entries don't start on DWORD boundary */
 	for (offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)

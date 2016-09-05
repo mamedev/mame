@@ -121,7 +121,7 @@ WRITE8_MEMBER(bankp_state::out_w)
 	m_nmi_mask = (data & 0x10) >> 4;
 
 	/* bit 5 controls screen flip */
-	flip_screen_set(data & 0x20);
+	m_gfxdecode->flip_screen_set(data & 0x20);
 
 	/* bits 6-7 unknown */
 }
@@ -161,7 +161,7 @@ void bankp_state::video_start()
 
 UINT32 bankp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		m_fg_tilemap->set_scrollx(0, 240-m_scroll_x);
 		m_bg_tilemap->set_scrollx(0, 240);

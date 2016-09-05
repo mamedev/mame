@@ -58,7 +58,7 @@ WRITE16_MEMBER(cabal_state::flipscreen_w)
 		m_background_layer->set_flip(flip);
 		m_text_layer->set_flip(flip);
 
-		flip_screen_set(data & 0x20);
+		m_gfxdecode->flip_screen_set(data & 0x20);
 	}
 }
 
@@ -116,7 +116,7 @@ void cabal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 			if ( sx>256 )   sx -= 512;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

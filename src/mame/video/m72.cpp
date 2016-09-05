@@ -390,7 +390,7 @@ WRITE16_MEMBER(m72_state::port02_w)
 		machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
+		m_gfxdecode->flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
 
 		/* bit 3 is display disable */
 		m_video_off = data & 0x08;
@@ -416,7 +416,7 @@ WRITE16_MEMBER(m72_state::rtype2_port02_w)
 		machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
+		m_gfxdecode->flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
 
 		/* bit 3 is display disable */
 		m_video_off = data & 0x08;
@@ -474,7 +474,7 @@ void m72_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		h = 1 << ((spriteram[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 512 - 16*w - sx;
 			sy = 284 - 16*h - sy;
@@ -526,7 +526,7 @@ void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 		h = 1 << ((spriteram16_2[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 512 - 16*w - sx;
 			sy = 256 - 16*h - sy;

@@ -152,7 +152,7 @@ WRITE8_MEMBER(xain_state::scrollyP1_w)
 
 WRITE8_MEMBER(xain_state::flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 
@@ -177,7 +177,7 @@ void xain_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		if (sy <= -7) sy += 256;
 		flipx = attr & 0x40;
 		flipy = 0;
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 238 - sx;
 			sy = 240 - sy;

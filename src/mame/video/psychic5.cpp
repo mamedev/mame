@@ -249,7 +249,7 @@ void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		if (attr & 0x01) sx -= 256;
 		if (attr & 0x04) sy -= 256;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 224 - sx;
 			sy = 224 - sy;
@@ -274,7 +274,7 @@ void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		}
 		else
 		{
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 				DRAW_SPRITE(code, sx + 16, sy + 16)
 			else
 				DRAW_SPRITE(code, sx, sy)
@@ -329,7 +329,7 @@ void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap
 		case 11: case 13: clip.max_x = m_sx1; break;
 		}
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 			clip.set(255 - clip.max_x, 255 - clip.min_x, 255 - clip.max_y, 255 - clip.min_y);
 	}
 

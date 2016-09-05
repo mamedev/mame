@@ -117,7 +117,7 @@ void jackal_state::draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &c
 		if (sy > 0xf0)
 			sy = sy - 256;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -130,7 +130,7 @@ void jackal_state::draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &c
 			int spritenum = sn1 * 4 + ((sn2 & (8 + 4)) >> 2) + ((sn2 & (2 + 1)) << 10);
 			int mod = -8;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx += 8;
 				sy -= 8;
@@ -139,7 +139,7 @@ void jackal_state::draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &c
 
 			if ((attr & 0x0C) == 0x0C)
 			{
-				if (flip_screen()) sy += 16;
+				if (m_gfxdecode->flip_screen()) sy += 16;
 				DRAW_SPRITE(bank + 1, spritenum, sx, sy)
 			}
 
@@ -162,7 +162,7 @@ void jackal_state::draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &c
 
 			if (attr & 0x10)
 			{
-				if (flip_screen())
+				if (m_gfxdecode->flip_screen())
 				{
 					sx -= 16;
 					sy -= 16;

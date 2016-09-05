@@ -108,7 +108,7 @@ void bogeyman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (multi) sy -= 16;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -127,7 +127,7 @@ void bogeyman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + 1, color,
 					flipx, flipy,
-					sx, sy + (flip_screen() ? -16 : 16), 0);
+					sx, sy + (m_gfxdecode->flip_screen() ? -16 : 16), 0);
 			}
 		}
 	}

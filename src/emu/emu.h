@@ -114,7 +114,6 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "dispatch.h"
 #include "drivers/xtal.h"
 #include "bookkeeping.h"
-#include "video/generic.h"
 
 // member templates that don't like incomplete types
 #include "device.ipp"

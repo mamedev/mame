@@ -72,12 +72,12 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
 {
-	flip_screen_set(~data & 0x02);
+	m_gfxdecode->flip_screen_set(~data & 0x02);
 
 	if (m_gfx_bank != ((data & 0x04) >> 2))
 	{
 		m_gfx_bank = ((data & 0x04) >> 2);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 	// hardware there was no observable brightness difference between any part of the screen so
 	// I'm not convinced the brightness implementation is correct anyway, it might simply be
 	// tied to the use of upper / lower tiles or priority instead?
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		bank = m_colorram[(tile_index+32)&0x3ff] & 0x40;
 	}
@@ -138,7 +138,7 @@ void blueprnt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int flipx = m_spriteram[offs + 2] & 0x40;
 		int flipy = m_spriteram[offs + 2 - 4] & 0x80;    // -4? Awkward, isn't it?
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 240 - sy;
@@ -155,7 +155,7 @@ UINT32 blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind1
 {
 	int i;
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		for (i = 0; i < 32; i++)
 			m_bg_tilemap->set_scrolly(i, m_scrollram[32 - i]);
 	else

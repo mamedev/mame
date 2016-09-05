@@ -241,9 +241,9 @@ void n8080_state::delayed_sound_2( int data )
 	if (~data & 0x20) m_curr_sound_pins |= 1 << 0xc;
 
 	if (m_n8080_hardware == 1)
-		flip_screen_set(data & 0x20);
+		m_flip_screen = BIT(data, 5);
 	if (m_n8080_hardware == 3)
-		m_helifire_flash = data & 0x20;
+		m_helifire_flash = BIT(data, 5);
 
 	sound_pins_changed();
 }

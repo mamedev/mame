@@ -109,7 +109,7 @@ WRITE16_MEMBER(twin16_state::video_register_w)
 			{
 				int flip = (m_video_register&TWIN16_SCREEN_FLIPX) ? TILEMAP_FLIPX : 0;
 				flip |= (m_video_register&TWIN16_SCREEN_FLIPY) ? TILEMAP_FLIPY : 0;
-				machine().tilemap().set_flip_all(flip);
+				m_gfxdecode->set_flip_all(flip);
 			}
 			if (changed & TWIN16_TILE_FLIPY)
 			{

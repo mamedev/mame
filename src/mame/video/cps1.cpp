@@ -2453,7 +2453,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                    \
 {                                                                   \
-	if (flip_screen())                                           \
+	if (m_gfxdecode->flip_screen())                                 \
 		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
 				cliprect,                            \
 				CODE,                                               \
@@ -2686,7 +2686,7 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
-	if (flip_screen())                                                           \
+	if (m_gfxdecode->flip_screen())                                                 \
 		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
 				cliprect,                                            \
 				CODE,                                                               \
@@ -2853,7 +2853,7 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 				int sy = (offs % 256);
 				sx = (sx - m_stars2x + (col & 0x1f)) & 0x1ff;
 				sy = (sy - m_stars2y) & 0xff;
-				if (flip_screen())
+				if (m_gfxdecode->flip_screen())
 				{
 					sx = 512 - sx;
 					sy = 256 - sy;
@@ -2878,7 +2878,7 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 				int sy = (offs % 256);
 				sx = (sx - m_stars1x + (col & 0x1f)) & 0x1ff;
 				sy = (sy - m_stars1y) & 0xff;
-				if (flip_screen())
+				if (m_gfxdecode->flip_screen())
 				{
 					sx = 512 - sx;
 					sy = 256 - sy;
@@ -2937,7 +2937,7 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = m_cps_a_regs[CPS1_VIDEOCONTROL];
 
-	flip_screen_set(videocontrol & 0x8000);
+	m_gfxdecode->flip_screen_set(videocontrol & 0x8000);
 
 	layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
 

@@ -292,7 +292,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 				if (flipx)
 					tile_flipx = !tile_flipx;
 
-				if (flip_screen())
+				if (m_gfxdecode->flip_screen())
 				{
 					sx = max_x - sx;
 					sy = max_y - sy;

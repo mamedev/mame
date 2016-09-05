@@ -134,7 +134,7 @@ WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
 	        set after IN0 - Coin 1 goes high AND the credit has been added
 	*/
 	m_flipscreen = data & 0x01;
-	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);

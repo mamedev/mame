@@ -41,7 +41,7 @@ UINT32 sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb3
 	// flip screen
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 

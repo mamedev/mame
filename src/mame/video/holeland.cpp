@@ -92,7 +92,7 @@ WRITE8_MEMBER(holeland_state::pal_offs_w)
 	{
 		m_po[offset] = data & 1;
 		m_palette_offset = (m_po[0] + (m_po[1] << 1)) << 4;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -104,9 +104,9 @@ WRITE8_MEMBER(holeland_state::scroll_w)
 WRITE8_MEMBER(holeland_state::flipscreen_w)
 {
 	if (offset)
-		flip_screen_y_set(data);
+		m_gfxdecode->flip_screen_y_set(data);
 	else
-		flip_screen_x_set(data);
+		m_gfxdecode->flip_screen_x_set(data);
 }
 
 
@@ -129,13 +129,13 @@ void holeland_state::holeland_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		flipx = spriteram[offs + 3] & 0x04;
 		flipy = spriteram[offs + 3] & 0x08;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
@@ -167,13 +167,13 @@ void holeland_state::crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle
 		flipx = spriteram[offs + 3] & 0x04;
 		flipy = spriteram[offs + 3] & 0x08;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;

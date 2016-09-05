@@ -52,7 +52,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE8_MEMBER(powerins_state::flipscreen_w)
 {
-	flip_screen_set(data & 1 );
+	m_gfxdecode->flip_screen_set(data & 1 );
 }
 
 WRITE8_MEMBER(powerins_state::tilebank_w)
@@ -251,7 +251,7 @@ void powerins_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		/* Handle flip_screen. Apply a global offset of 32 pixels along x too */
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = screen_w - sx - dimx*16 - 32;  flipx = !flipx;
 			sy = screen_h - sy - dimy*16;       flipy = !flipy;

@@ -150,7 +150,7 @@ void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		sx = (m_spriteram[offs + 3] - 128) + 256 * (attr & 0x01);
 		sy = 255 - m_spriteram[offs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -168,7 +168,7 @@ void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 UINT32 dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		m_bg_tilemap->set_scrollx(0, 256 - m_scroll_x);
 		m_bg_tilemap->set_scrolly(0, 256 - m_scroll_y);
@@ -205,7 +205,7 @@ WRITE8_MEMBER(dacholer_state::bg_bank_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	flip_screen_set(data & 0xc); // probably one bit for flipx and one for flipy
+	m_gfxdecode->flip_screen_set(data & 0xc); // probably one bit for flipx and one for flipy
 
 }
 

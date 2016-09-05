@@ -36,9 +36,7 @@ driver_device::driver_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, "Driver Device", tag, nullptr, 0, "", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(generic)),
-		m_system(nullptr),
-		m_flip_screen_x(0),
-		m_flip_screen_y(0)
+		m_system(nullptr)
 {
 }
 
@@ -226,10 +224,6 @@ void driver_device::device_start()
 		m_callbacks[CB_VIDEO_START]();
 	else
 		video_start();
-
-	// save generic states
-	save_item(NAME(m_flip_screen_x));
-	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -369,95 +363,6 @@ INTERRUPT_GEN_MEMBER( driver_device::irq6_line_assert ) { device.execute().set_i
 INTERRUPT_GEN_MEMBER( driver_device::irq7_line_hold )   { device.execute().set_input_line(7, HOLD_LINE); }
 INTERRUPT_GEN_MEMBER( driver_device::irq7_line_pulse )  { generic_pulse_irq_line(device.execute(), 7, 1); }
 INTERRUPT_GEN_MEMBER( driver_device::irq7_line_assert ) { device.execute().set_input_line(7, ASSERT_LINE); }
-
-
-//**************************************************************************
-//  GENERIC FLIP SCREEN HANDLING
-//**************************************************************************
-
-//-------------------------------------------------
-//  updateflip - handle global flipping
-//-------------------------------------------------
-
-void driver_device::updateflip()
-{
-	// push the flip state to all tilemaps
-	machine().tilemap().set_flip_all((TILEMAP_FLIPX & m_flip_screen_x) | (TILEMAP_FLIPY & m_flip_screen_y));
-}
-
-
-//-------------------------------------------------
-//  flip_screen_set - set global flip
-//-------------------------------------------------
-
-void driver_device::flip_screen_set(UINT32 on)
-{
-	// normalize to all 1
-	if (on)
-		on = ~0;
-
-	// if something's changed, handle it
-	if (m_flip_screen_x != on || m_flip_screen_y != on)
-	{
-		m_flip_screen_x = m_flip_screen_y = on;
-		updateflip();
-	}
-}
-
-
-//-------------------------------------------------
-//  flip_screen_set_no_update - set global flip
-//  do not call updateflip.
-//-------------------------------------------------
-
-void driver_device::flip_screen_set_no_update(UINT32 on)
-{
-	// flip_screen_y is not updated on purpose
-	// this function is for drivers which
-	// were writing to flip_screen_x to
-	// bypass updateflip
-	if (on)
-		on = ~0;
-	m_flip_screen_x = on;
-}
-
-
-//-------------------------------------------------
-//  flip_screen_x_set - set global horizontal flip
-//-------------------------------------------------
-
-void driver_device::flip_screen_x_set(UINT32 on)
-{
-	// normalize to all 1
-	if (on)
-		on = ~0;
-
-	// if something's changed, handle it
-	if (m_flip_screen_x != on)
-	{
-		m_flip_screen_x = on;
-		updateflip();
-	}
-}
-
-
-//-------------------------------------------------
-//  flip_screen_y_set - set global vertical flip
-//-------------------------------------------------
-
-void driver_device::flip_screen_y_set(UINT32 on)
-{
-	// normalize to all 1
-	if (on)
-		on = ~0;
-
-	// if something's changed, handle it
-	if (m_flip_screen_y != on)
-	{
-		m_flip_screen_y = on;
-		updateflip();
-	}
-}
 
 
 /***************************************************************************

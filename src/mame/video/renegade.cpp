@@ -26,7 +26,7 @@ WRITE8_MEMBER(renegade_state::fg_videoram_w)
 
 WRITE8_MEMBER(renegade_state::flipscreen_w)
 {
-	flip_screen_set(~data & 0x01);
+	m_gfxdecode->flip_screen_set(~data & 0x01);
 }
 
 WRITE8_MEMBER(renegade_state::scroll_lsb_w)
@@ -91,7 +91,7 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (sx > 248)
 				sx -= 256;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -104,17 +104,17 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				m_gfxdecode->gfx(sprite_bank)->transpen(bitmap,cliprect,
 					sprite_number + 1,
 					color,
-					xflip, flip_screen(),
-					sx, sy + (flip_screen() ? -16 : 16), 0);
+					xflip, m_gfxdecode->flip_screen(),
+					sx, sy + (m_gfxdecode->flip_screen() ? -16 : 16), 0);
 			}
 			else
 			{
-				sy += (flip_screen() ? -16 : 16);
+				sy += (m_gfxdecode->flip_screen() ? -16 : 16);
 			}
 			m_gfxdecode->gfx(sprite_bank)->transpen(bitmap,cliprect,
 				sprite_number,
 				color,
-				xflip, flip_screen(),
+				xflip, m_gfxdecode->flip_screen(),
 				sx, sy, 0);
 		}
 		source += 4;

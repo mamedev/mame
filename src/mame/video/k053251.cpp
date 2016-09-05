@@ -127,21 +127,10 @@ actually used, since the priority is taken from the external ports.
 const device_type K053251 = &device_creator<k053251_device>;
 
 k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053251, "K053251 Priority Encoder", tag, owner, clock, "k053251", __FILE__),
+	: device_t(mconfig, K053251, "K053251 Priority Encoder", tag, owner, clock, "k053251", __FILE__)
 	//m_dirty_tmap[5],
 	//m_ram[16],
-	m_tilemaps_set(0)
 	//m_palette_index[5]
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k053251_device::device_config_complete()
 {
 }
 
@@ -152,9 +141,9 @@ void k053251_device::device_config_complete()
 void k053251_device::device_start()
 {
 	save_item(NAME(m_ram));
-	save_item(NAME(m_tilemaps_set));
 	save_item(NAME(m_dirty_tmap));
 
+	m_tilemap_dirty_cb.bind_relative_to(*owner());
 	machine().save().register_postload(save_prepost_delegate(FUNC(k053251_device::reset_indexes), this));
 }
 
@@ -165,8 +154,6 @@ void k053251_device::device_start()
 void k053251_device::device_reset()
 {
 	int i;
-
-	m_tilemaps_set = 0;
 
 	for (i = 0; i < 0x10; i++)
 		m_ram[i] = 0;
@@ -203,8 +190,8 @@ WRITE8_MEMBER( k053251_device::write )
 				}
 			}
 
-			if (!m_tilemaps_set)
-				space.machine().tilemap().mark_all_dirty();
+			if (!m_tilemap_dirty_cb.isnull())
+				m_tilemap_dirty_cb();
 		}
 		else if (offset == 10)
 		{
@@ -219,8 +206,8 @@ WRITE8_MEMBER( k053251_device::write )
 				}
 			}
 
-			if (!m_tilemaps_set)
-				space.machine().tilemap().mark_all_dirty();
+			if (!m_tilemap_dirty_cb.isnull())
+				m_tilemap_dirty_cb();
 		}
 	}
 }

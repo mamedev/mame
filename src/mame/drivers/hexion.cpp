@@ -96,7 +96,7 @@ WRITE8_MEMBER(hexion_state::coincntr_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bit 5 = flip screen */
-	flip_screen_set(data & 0x20);
+	m_gfxdecode->flip_screen_set(data & 0x20);
 
 	/* other bit unknown */
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);

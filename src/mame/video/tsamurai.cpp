@@ -179,7 +179,7 @@ void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		/* So I'm using this specific check. -kal 11 jul 2002 */
 //      if(sprite_type == 1) sy=sy+2;
 
-		if( flip_screen() )
+		if (m_gfxdecode->flip_screen())
 		{
 			gfx->transpen(bitmap,cliprect,
 				sprite_number&0x7f,

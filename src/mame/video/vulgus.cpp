@@ -146,7 +146,7 @@ WRITE8_MEMBER(vulgus_state::c804_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 7 flips screen */
-	flip_screen_set(data & 0x80);
+	m_gfxdecode->flip_screen_set(data & 0x80);
 }
 
 
@@ -176,7 +176,7 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int color = m_spriteram[offs + 1] & 0x0f;
 		int sy = m_spriteram[offs + 2];
 		int sx = m_spriteram[offs + 3];
-		bool flip = flip_screen() ? true : false;
+		bool flip = m_gfxdecode->flip_screen() ? true : false;
 		int dir = 1;
 
 		if (sy == 0)

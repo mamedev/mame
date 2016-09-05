@@ -97,14 +97,14 @@ PALETTE_INIT_MEMBER(suprridr_state, suprridr)
 WRITE8_MEMBER(suprridr_state::flipx_w)
 {
 	m_flipx = data & 1;
-	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
+	m_gfxdecode->set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
 }
 
 
 WRITE8_MEMBER(suprridr_state::flipy_w)
 {
 	m_flipy = data & 1;
-	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
+	m_gfxdecode->set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
 }
 
 

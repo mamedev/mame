@@ -424,7 +424,7 @@ void suna8_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 				if (flipx)  tile_flipx = !tile_flipx;
 				if (flipy)  tile_flipy = !tile_flipy;
 
-				if (flip_screen())
+				if (m_gfxdecode->flip_screen())
 				{
 					sx = max_x - sx;    tile_flipx = !tile_flipx;
 					sy = max_y - sy;    tile_flipy = !tile_flipy;
@@ -512,7 +512,7 @@ void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 				int sx      =    x + tx * 8;
 				int sy      =   (0xf0 - ypos + ty * 8) & 0xff;
 
-				if (flip_screen())
+				if (m_gfxdecode->flip_screen())
 				{
 					sx = max_x - sx;    flipx = !flipx;
 					sy = max_y - sy;    flipy = !flipy;
@@ -531,7 +531,7 @@ void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		// Fill the text sprites row with high priority for masking
 		int sy = (0xf0 - ypos) & 0xff;
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 			sy = max_y - sy - 8;
 		rectangle text_clip(cliprect.min_x, cliprect.max_x, sy, sy + 0x10 - 1);
 		text_clip &= cliprect;
@@ -558,12 +558,12 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 	{
 		int max_tiles = memregion("gfx1")->bytes() / (0x400 * 0x20);
 
-		if (machine().input().code_pressed_once(KEYCODE_Q)) { m_page--;     machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_W)) { m_page++;     machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_E)) { m_tiles--;    machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_R)) { m_tiles++;    machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_A)) { m_trombank--; machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_S)) { m_trombank++; machine().tilemap().mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_Q)) { m_page--;     m_gfxdecode->mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_W)) { m_page++;     m_gfxdecode->mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_E)) { m_tiles--;    m_gfxdecode->mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_R)) { m_tiles++;    m_gfxdecode->mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_A)) { m_trombank--; m_gfxdecode->mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_S)) { m_trombank++; m_gfxdecode->mark_all_dirty();   }
 
 		m_trombank  &=  0xf;
 		m_page      &=  m_has_text ? 3 : (m_gfxdecode->gfx(1) ? 15 : 7);

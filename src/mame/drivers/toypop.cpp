@@ -334,7 +334,7 @@ READ8_MEMBER(namcos16_state::dipB_h){ return ioport("DSW2")->read() >> 4; }     
 
 WRITE8_MEMBER(namcos16_state::flip)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 WRITE8_MEMBER(namcos16_state::pal_bank_w)

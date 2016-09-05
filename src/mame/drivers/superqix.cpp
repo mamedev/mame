@@ -299,7 +299,7 @@ WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
 			machine().bookkeeping().coin_lockout_global_w((data & 1) ^ m_invert_coin_lockout);
 			break;
 		case 4:
-			flip_screen_set(data & 1);
+			m_gfxdecode->flip_screen_set(data & 1);
 			break;
 		case 5:
 			m_port1 = data;
@@ -366,7 +366,7 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 	machine().bookkeeping().coin_lockout_global_w(~data & 8);
 
 	// bit 4 = flip screen
-	flip_screen_set(data & 0x10);
+	m_gfxdecode->flip_screen_set(data & 0x10);
 
 	// bit 5 = unknown (set on startup)
 
@@ -413,7 +413,7 @@ READ8_MEMBER(superqix_state::bootleg_in0_r)
 
 WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	m_gfxdecode->flip_screen_set(~data & 1);
 }
 
 

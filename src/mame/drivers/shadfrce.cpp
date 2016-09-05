@@ -149,7 +149,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 
 WRITE16_MEMBER(shadfrce_state::flip_screen)
 {
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 }
 
 

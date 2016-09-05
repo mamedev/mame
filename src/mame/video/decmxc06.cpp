@@ -100,7 +100,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 		sx = 240 - sx;
 		sy = 240 - sy;
 
-		if (machine().driver_data()->flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;

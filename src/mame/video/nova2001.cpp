@@ -250,12 +250,12 @@ WRITE8_MEMBER(nova2001_state::nova2001_scroll_y_w)
 WRITE8_MEMBER(nova2001_state::nova2001_flipscreen_w)
 {
 	// inverted
-	flip_screen_set(~data & 1);
+	m_gfxdecode->flip_screen_set(~data & 1);
 }
 
 WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 
@@ -287,7 +287,7 @@ void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			continue;
 		}
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -324,7 +324,7 @@ void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 			continue;
 		}
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

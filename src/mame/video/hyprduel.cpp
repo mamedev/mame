@@ -533,7 +533,7 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 			UINT32 gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				flipx = !flipx;     x = max_x - x - width;
 				flipy = !flipy;     y = max_y - y - height;
@@ -702,7 +702,7 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 	    ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)
 		return 0;
-	flip_screen_set(screenctrl & 1);
+	m_gfxdecode->flip_screen_set(screenctrl & 1);
 
 #if 0
 if (machine().input().code_pressed(KEYCODE_Z))

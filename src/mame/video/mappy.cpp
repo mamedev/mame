@@ -355,12 +355,12 @@ WRITE8_MEMBER(mappy_state::mappy_videoram_w)
 
 WRITE8_MEMBER(mappy_state::superpac_flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 READ8_MEMBER(mappy_state::superpac_flipscreen_r)
 {
-	flip_screen_set(1);
+	m_gfxdecode->flip_screen_set(1);
 	return 0xff;
 }
 
@@ -410,7 +410,7 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -487,7 +487,7 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -541,7 +541,7 @@ UINT32 mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &
 UINT32 mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
+	m_gfxdecode->flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 

@@ -41,7 +41,7 @@ WRITE8_MEMBER(kchamp_state::kchamp_colorram_w)
 
 WRITE8_MEMBER(kchamp_state::kchamp_flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 }
 
 TILE_GET_INFO_MEMBER(kchamp_state::get_bg_tile_info)
@@ -83,7 +83,7 @@ void kchamp_state::kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 		int sx = spriteram[offs + 3] - 8;
 		int sy = 247 - spriteram[offs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -111,7 +111,7 @@ void kchamp_state::kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 		int sx = spriteram[offs + 3];
 		int sy = 240 - spriteram[offs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

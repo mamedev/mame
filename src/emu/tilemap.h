@@ -694,6 +694,7 @@ private:
 class tilemap_manager
 {
 	friend class tilemap_t;
+	friend class device_gfx_interface;
 
 public:
 	// construction/destuction
@@ -710,10 +711,6 @@ public:
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
 	int count() const { return m_tilemap_list.count(); }
-
-	// global operations on all tilemaps
-	void mark_all_dirty();
-	void set_flip_all(UINT32 attributes);
 
 private:
 	// allocate an instance index

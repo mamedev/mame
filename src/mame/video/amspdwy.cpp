@@ -21,7 +21,7 @@
 WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)
 {
 	m_flipscreen ^= 1;
-	flip_screen_set(m_flipscreen);
+	m_gfxdecode->flip_screen_set(m_flipscreen);
 }
 
 /***************************************************************************
@@ -108,7 +108,7 @@ void amspdwy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = attr & 0x80;
 		int flipy = attr & 0x40;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			x = max_x - x - 8;
 			y = max_y - y - 8;

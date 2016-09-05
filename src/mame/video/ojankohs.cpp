@@ -137,7 +137,7 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_flipscreen_w)
 	{
 		m_flipscreen = BIT(data, 0);
 
-		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		if (m_flipscreen)
 		{

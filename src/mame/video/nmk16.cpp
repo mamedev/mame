@@ -346,7 +346,7 @@ WRITE16_MEMBER(nmk16_state::manybloc_scroll_w)
 WRITE16_MEMBER(nmk16_state::nmk_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(data & 0x01);
+		m_gfxdecode->flip_screen_set(data & 0x01);
 }
 
 WRITE16_MEMBER(nmk16_state::nmk_tilebank_w)
@@ -406,7 +406,7 @@ inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle
 	int xx,yy,x;
 	int delta = 16;
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		sx = 368 - sx;
 		sy = 240 - sy;
@@ -423,7 +423,7 @@ inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle
 		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code,
 			color,
-			flip_screen(), flip_screen(),
+			m_gfxdecode->flip_screen(), m_gfxdecode->flip_screen(),
 			((x + 16) & 0x1FF) - 16,sy & 0x1FF,15);
 		code++;
 		x += delta;
@@ -450,10 +450,10 @@ inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, c
 	int xx,yy,x;
 	int delta = 16;
 
-	flipx ^= flip_screen();
-	flipy ^= flip_screen();
+	flipx ^= m_gfxdecode->flip_screen();
+	flipy ^= m_gfxdecode->flip_screen();
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		sx = 368 - sx;
 		sy = 240 - sy;
@@ -875,8 +875,8 @@ void nmk16_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 {
 	if (dsw_flipscreen)
 	{
-		flip_screen_x_set(~ioport("DSW1")->read() & 0x0100);
-		flip_screen_y_set(~ioport("DSW1")->read() & 0x0200);
+		m_gfxdecode->flip_screen_x_set(~ioport("DSW1")->read() & 0x0100);
+		m_gfxdecode->flip_screen_y_set(~ioport("DSW1")->read() & 0x0200);
 	}
 
 

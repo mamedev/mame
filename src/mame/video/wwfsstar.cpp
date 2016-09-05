@@ -153,7 +153,7 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			number &= ~(chain - 1);
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				flipy = !flipy;
 				flipx = !flipx;
@@ -163,7 +163,7 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			for (count=0;count<chain;count++)
 			{
-				if (flip_screen())
+				if (m_gfxdecode->flip_screen())
 				{
 					if (!flipy)
 					{

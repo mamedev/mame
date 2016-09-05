@@ -561,6 +561,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k056832", k056832_device, mark_all_dirty)
 
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
 
@@ -619,6 +620,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k056832", k056832_device, mark_all_dirty)
 
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
 

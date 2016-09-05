@@ -21,6 +21,7 @@ public:
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_sprgen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_deco_tilegen1(*this, "tilegen1")
@@ -32,6 +33,7 @@ public:
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
 	optional_device<decospr_device> m_sprgen;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

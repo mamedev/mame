@@ -159,7 +159,7 @@ WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 	if(offset == 0)
 	{
 		/* core bug with this? */
-		//flip_screen_set((data & 0x40) >> 6);
+		//m_gfxdecode->flip_screen_set((data & 0x40) >> 6);
 		m_flip_bit = (data & 0x40) >> 6;
 	}
 }

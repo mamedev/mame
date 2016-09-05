@@ -212,7 +212,7 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* bit 2 flip screen */
-	flip_screen_set(data & 0x04);
+	m_gfxdecode->flip_screen_set(data & 0x04);
 
 	/* bit 7 selects one of two ROM banks for c000-dfff */
 	membank("bank1")->set_entry((data & 0x80) >> 7);
@@ -227,7 +227,7 @@ WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
 	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* bit 2 flip screen */
-	flip_screen_set(data & 0x04);
+	m_gfxdecode->flip_screen_set(data & 0x04);
 
 	/* bit 3 unknown */
 
@@ -290,7 +290,7 @@ void galivan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	const UINT8 *spritepalettebank = memregion("user1")->base();
 	UINT8 *buffered_spriteram = m_spriteram->buffer();
 	int length = m_spriteram->bytes();
-	int flip = flip_screen();
+	int flip = m_gfxdecode->flip_screen();
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	/* draw the sprites */

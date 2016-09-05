@@ -30,7 +30,7 @@ WRITE8_MEMBER(bogeyman_state::ay8910_latch_w)
 WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
 {
 	// bit 0 is flipscreen
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((m_last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)

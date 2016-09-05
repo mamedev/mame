@@ -225,7 +225,7 @@ WRITE16_MEMBER(wwfsstar_state::sound_w)
 
 WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 WRITE16_MEMBER(wwfsstar_state::irqack_w)

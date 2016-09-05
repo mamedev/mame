@@ -424,7 +424,7 @@ UINT32 tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_ind1
 	if (flipscreen != m_flipscreen_old)
 	{
 		m_flipscreen_old = flipscreen;
-		machine().tilemap().set_flip_all(flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_gfxdecode->set_flip_all(flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	/* Flip Screen */
@@ -509,7 +509,7 @@ UINT32 tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_in
 	if (flipscreen != m_flipscreen_old)
 	{
 		m_flipscreen_old = flipscreen;
-		machine().tilemap().set_flip_all(flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_gfxdecode->set_flip_all(flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	/* Flip Screen */

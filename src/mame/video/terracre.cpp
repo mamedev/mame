@@ -33,7 +33,7 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	const UINT8 *spritepalettebank = memregion("user1")->base();
 	gfx_element *pGfx = m_gfxdecode->gfx(2);
 	const UINT16 *pSource = m_spriteram->buffer();
-	int flip = flip_screen();
+	int flip = m_gfxdecode->flip_screen();
 	int transparent_pen;
 
 	if( pGfx->elements() > 0x200 )
@@ -163,7 +163,7 @@ WRITE16_MEMBER(terracre_state::amazon_flipscreen_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data&0x01 );
 		machine().bookkeeping().coin_counter_w(1, (data&0x02)>>1 );
-		flip_screen_set(data&0x04);
+		m_gfxdecode->flip_screen_set(data & 0x04);
 	}
 }
 

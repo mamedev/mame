@@ -433,7 +433,7 @@ WRITE16_MEMBER(seta_state::twineagl_tilebank_w)
 		if (m_twineagl_tilebank[offset] != data)
 		{
 			m_twineagl_tilebank[offset] = data;
-			machine().tilemap().mark_all_dirty();
+			m_gfxdecode->mark_all_dirty();
 		}
 	}
 }
@@ -871,7 +871,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	flip ^= m_tilemaps_flip;
 
-	machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
+	m_gfxdecode->set_flip_all(flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
 
 	x_0     =   m_vctrl_0[ 0/2 ];
 	y_0     =   m_vctrl_0[ 2/2 ];

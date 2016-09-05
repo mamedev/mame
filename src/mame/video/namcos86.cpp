@@ -299,7 +299,7 @@ void namcos86_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		sx += sprite_xoffs;
 		sy -= sprite_yoffs;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
@@ -327,7 +327,7 @@ void namcos86_state::set_scroll(int layer)
 {
 	int scrollx = m_xscroll[layer];
 	int scrolly = m_yscroll[layer];
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		scrollx = -scrollx;
 		scrolly = -scrolly;
@@ -340,7 +340,7 @@ void namcos86_state::set_scroll(int layer)
 UINT32 namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen is embedded in the sprite control registers */
-	flip_screen_set(m_spriteram[0x07f6] & 1);
+	m_gfxdecode->flip_screen_set(m_spriteram[0x07f6] & 1);
 	set_scroll(0);
 	set_scroll(1);
 	set_scroll(2);

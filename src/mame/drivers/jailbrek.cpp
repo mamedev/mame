@@ -98,7 +98,7 @@ WRITE8_MEMBER(jailbrek_state::ctrl_w)
 {
 	m_nmi_enable = data & 0x01;
 	m_irq_enable = data & 0x02;
-	flip_screen_set(data & 0x08);
+	m_gfxdecode->flip_screen_set(data & 0x08);
 }
 
 WRITE8_MEMBER(jailbrek_state::coin_w)

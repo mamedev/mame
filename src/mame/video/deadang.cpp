@@ -111,7 +111,8 @@ void deadang_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		color = (m_spriteram[offs+1]>>12)&0xf;
 		sprite = m_spriteram[offs+1]&0xfff;
 
-		if (flip_screen()) {
+		if (m_gfxdecode->flip_screen())
+		{
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -148,7 +149,7 @@ UINT32 deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_pf3_layer->enable(!(m_scroll_ram[0x34]&1));
 	m_pf1_layer->enable(!(m_scroll_ram[0x34]&2));
 	m_pf2_layer->enable(!(m_scroll_ram[0x34]&4));
-	flip_screen_set(m_scroll_ram[0x34]&0x40 );
+	m_gfxdecode->flip_screen_set(m_scroll_ram[0x34] & 0x40);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);

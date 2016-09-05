@@ -82,7 +82,7 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
 	/* bit 5 resets the sound CPU? - we ignore it */
 
 	/* bit 6 flips screen */
-	flip_screen_set(data & 0x40);
+	m_gfxdecode->flip_screen_set(data & 0x40);
 
 	/* bit 7 enables characters? */
 	m_chon = data & 0x80;
@@ -153,7 +153,7 @@ void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		code += 256 * bank;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

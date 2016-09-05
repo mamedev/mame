@@ -104,10 +104,10 @@ void alpha68k_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 UINT32 alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_last_bank != m_bank_base)
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 
 	m_last_bank = m_bank_base;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(2047, cliprect);
 //AT
@@ -249,10 +249,10 @@ UINT32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_in
 	UINT16 *spriteram = m_spriteram;
 
 	if (m_last_bank != m_bank_base)
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 
 	m_last_bank = m_bank_base;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(4095, cliprect);
 
@@ -287,10 +287,10 @@ UINT32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_in
 UINT32 alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_last_bank != m_bank_base)
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 
 	m_last_bank = m_bank_base;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(4095, cliprect);
 

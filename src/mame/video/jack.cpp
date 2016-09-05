@@ -27,13 +27,13 @@ WRITE8_MEMBER(jack_state::jack_colorram_w)
 
 READ8_MEMBER(jack_state::jack_flipscreen_r)
 {
-	flip_screen_set(offset);
+	m_gfxdecode->flip_screen_set(offset);
 	return 0;
 }
 
 WRITE8_MEMBER(jack_state::jack_flipscreen_w)
 {
-	flip_screen_set(offset);
+	m_gfxdecode->flip_screen_set(offset);
 }
 
 
@@ -77,7 +77,7 @@ void jack_state::jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipr
 		int flipx = (spriteram[offs + 3] & 0x80) >> 7;
 		int flipy = (spriteram[offs + 3] & 0x40) >> 6;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -197,7 +197,7 @@ void jack_state::joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 		int flipx = (spriteram[offs + 3] & 0x80) >> 7;
 		int flipy = (spriteram[offs + 3] & 0x40) >> 6;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;

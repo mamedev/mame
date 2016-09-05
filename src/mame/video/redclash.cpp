@@ -150,13 +150,13 @@ WRITE8_MEMBER( redclash_state::redclash_gfxbank_w )
 	if (m_gfxbank != (data & 0x01))
 	{
 		m_gfxbank = data & 0x01;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
 WRITE8_MEMBER( redclash_state::redclash_flipscreen_w )
 {
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 }
 
 /*
@@ -300,7 +300,7 @@ void redclash_state::redclash_draw_bullets( bitmap_ind16 &bitmap, const rectangl
 		int sx = 8 * offs + (m_videoram[offs] & 0x07);   /* ?? */
 		int sy = 0xff - m_videoram[offs + 0x20];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 		}
@@ -461,10 +461,10 @@ WRITE8_MEMBER(redclash_state::sraider_io_w)
 	// bit3 = enable stars
 	// bit210 = stars speed/dir
 
-	if (flip_screen() != (data & 0x80))
+	if (m_gfxdecode->flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x80);
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	m_grid_color = data & 0x70;
@@ -511,7 +511,7 @@ UINT32 redclash_state::screen_update_sraider(screen_device &screen, bitmap_ind16
 		int sx = offs % 4;
 		int sy = offs / 4;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 			m_bg_tilemap->set_scrollx(offs, -m_videoram[32 * sx + sy]);
 		else
 			m_bg_tilemap->set_scrollx(offs, m_videoram[32 * sx + sy]);
@@ -521,7 +521,7 @@ UINT32 redclash_state::screen_update_sraider(screen_device &screen, bitmap_ind16
 	bitmap.fill(0, cliprect);
 
 	// draw the stars
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		redclash_draw_stars(bitmap, cliprect, 0x60, 1, 0x27, 0xff);
 	else
 		redclash_draw_stars(bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
@@ -530,7 +530,7 @@ UINT32 redclash_state::screen_update_sraider(screen_device &screen, bitmap_ind16
 	m_palette->set_indirect_color(0x40, rgb_t(m_grid_color & 0x40 ? 0xff : 0,
 																				m_grid_color & 0x20 ? 0xff : 0,
 																				m_grid_color & 0x10 ? 0xff : 0));
-	m_grid_tilemap->draw(screen, bitmap, cliprect, 0, flip_screen());
+	m_grid_tilemap->draw(screen, bitmap, cliprect, 0, m_gfxdecode->flip_screen());
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -539,7 +539,7 @@ UINT32 redclash_state::screen_update_sraider(screen_device &screen, bitmap_ind16
 			UINT8 x = i;
 			int height = cliprect.max_y - cliprect.min_y + 1;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 				x = ~x;
 
 			bitmap.plot_box(x, cliprect.min_y, 1, height, 0x81);
@@ -547,7 +547,7 @@ UINT32 redclash_state::screen_update_sraider(screen_device &screen, bitmap_ind16
 	}
 
 	// now the chars
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, flip_screen());
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, m_gfxdecode->flip_screen());
 
 	// now the sprites
 	draw_sprites(bitmap, cliprect);

@@ -179,7 +179,7 @@ WRITE8_MEMBER(appoooh_state::out_w)
 	m_nmi_mask = data & 1;
 
 	/* bit 1 flip screen */
-	flip_screen_set(data & 0x02);
+	m_gfxdecode->flip_screen_set(data & 0x02);
 
 	/* bits 2-3 unknown */
 
@@ -200,7 +200,7 @@ WRITE8_MEMBER(appoooh_state::out_w)
 void appoooh_state::appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite )
 {
 	int offs;
-	int flipy = flip_screen();
+	int flipy = m_gfxdecode->flip_screen();
 
 	for (offs = 0x20 - 4; offs >= 0; offs -= 4)
 	{
@@ -231,7 +231,7 @@ void appoooh_state::appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangl
 void appoooh_state::robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite )
 {
 	int offs;
-	int flipy = flip_screen();
+	int flipy = m_gfxdecode->flip_screen();
 
 	for (offs = 0x20 - 4; offs >= 0; offs -= 4)
 	{

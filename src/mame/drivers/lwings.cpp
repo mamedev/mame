@@ -82,7 +82,7 @@ WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 	m_sprbank = (data & 0x10)>>4; // Fireball only
 
 	/* bit 0 is flip screen */
-	flip_screen_set(~data & 0x01);
+	m_gfxdecode->flip_screen_set(~data & 0x01);
 
 	/* bits 1 and 2 select ROM bank */
 	membank("bank1")->set_entry((data & 0x06) >> 1);

@@ -117,7 +117,7 @@ WRITE8_MEMBER(liberate_state::deco16_io_w)
 				m_back_tilemap->mark_all_dirty();
 			}
 			m_background_disable = data & 0x4;
-			flip_screen_set(data & 0x01);
+			m_gfxdecode->flip_screen_set(data & 0x01);
 			break;
 		case 7: /* Background palette resistors? */
 			/* Todo */
@@ -169,7 +169,7 @@ WRITE8_MEMBER(liberate_state::prosport_io_w)
 	{
 		case 0:
 			//background_disable = ~data & 0x80;
-			flip_screen_set(data & 0x80);
+			m_gfxdecode->flip_screen_set(data & 0x80);
 			m_back_tilemap->mark_all_dirty();
 			break;
 		case 2: /* Sound */
@@ -311,7 +311,7 @@ void liberate_state::liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		if (multi && fy == 0)
 			sy -= 16;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -381,7 +381,7 @@ void liberate_state::prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 //      if (multi) sy -= 16;
 		if ((fy && multi) || (fx && multi)) { code2 = code; code++; }
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -441,7 +441,7 @@ void liberate_state::boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 //      if (multi) sy -= 16;
 		if (fy && multi) { code2 = code; code++; }
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;

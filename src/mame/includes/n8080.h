@@ -28,7 +28,8 @@ public:
 	int m_spacefev_red_cannon;
 	int m_sheriff_color_mode;
 	int m_sheriff_color_data;
-	int m_helifire_flash;
+	bool m_flip_screen;
+	bool m_helifire_flash;
 	UINT8 m_helifire_LSFR[63];
 	unsigned m_helifire_mv;
 	unsigned m_helifire_sc; /* IC56 */

@@ -235,7 +235,7 @@ UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x000), cliprect); // Palette index not confirmed

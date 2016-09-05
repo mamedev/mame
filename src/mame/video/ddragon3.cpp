@@ -18,7 +18,7 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_scroll_w)
 		case 2: COMBINE_DATA(&m_bg_scrollx);    break;  // Scroll X, BG0
 		case 3: COMBINE_DATA(&m_bg_scrolly);    break;  // Scroll Y, BG0
 		case 4:                                     break;  // Unknown write
-		case 5: flip_screen_set(data & 0x01);       break;  // Flip Screen
+		case 5: m_gfxdecode->flip_screen_set(data & 0x01); break;  // Flip Screen
 		case 6:
 			COMBINE_DATA(&m_bg_tilebase);           // BG Tile Base
 			m_bg_tilebase &= 0x1ff;
@@ -35,7 +35,7 @@ READ16_MEMBER(ddragon3_state::ddragon3_scroll_r)
 		case 1: return m_fg_scrolly;
 		case 2: return m_bg_scrollx;
 		case 3: return m_bg_scrolly;
-		case 5: return flip_screen();
+		case 5: return m_gfxdecode->flip_screen();
 		case 6: return m_bg_tilebase;
 	}
 
@@ -184,7 +184,7 @@ void ddragon3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	while( source<finish )
 	{
-		int xpos, ypos, colourbank, flipx, flipy, chain, enable, number, count;
+		int xpos, ypos, colourbank, flipx, flipy, chain, enable, number;
 
 		enable = (source[1] & 0x0001);
 
@@ -202,26 +202,29 @@ void ddragon3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			number = (source[2] & 0x00ff) | (source[3] & 0x00ff) << 8;
 			colourbank = (source[4] & 0x000f);
 
-			if (flip_screen()) {
+			if (m_gfxdecode->flip_screen())
+			{
 				if (flipy) flipy=0; else flipy=1;
 				if (flipx) flipx=0; else flipx=1;
 				ypos=240-ypos-m_sprite_xoff;
 				xpos=304-xpos;
 			}
 
-			for (count=0;count<chain;count++) {
-				if (flip_screen()) {
-					if (!flipy) {
+			for (int count = 0; count < chain; count++)
+			{
+				if (m_gfxdecode->flip_screen())
+				{
+					if (!flipy)
 						gfx->transpen(bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),0);
-					} else {
+					else
 						gfx->transpen(bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos+16*count,0);
-					}
-				} else {
-					if (flipy) {
+				}
+				else
+				{
+					if (flipy)
 						gfx->transpen(bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos-(16*(chain-1))+(16*count),0);
-					} else {
+					else
 						gfx->transpen(bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos-16*count,0);
-					}
 				}
 			}
 		}

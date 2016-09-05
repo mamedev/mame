@@ -52,13 +52,13 @@ TODO:
 WRITE8_MEMBER(exzisus_state::cpua_bankswitch_w)
 {
 	membank("cpuabank")->set_entry(data & 0x0f);
-	flip_screen_set(data & 0x40);
+	m_gfxdecode->flip_screen_set(data & 0x40);
 }
 
 WRITE8_MEMBER(exzisus_state::cpub_bankswitch_w)
 {
 	membank("cpubbank")->set_entry(data & 0x0f);
-	flip_screen_set(data & 0x40);
+	m_gfxdecode->flip_screen_set(data & 0x40);
 }
 
 WRITE8_MEMBER(exzisus_state::coincounter_w)

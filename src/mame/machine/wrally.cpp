@@ -36,7 +36,7 @@ WRITE16_MEMBER(wrally_state::vram_w)
 
 WRITE16_MEMBER(wrally_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 }
 
 WRITE16_MEMBER(wrally_state::okim6295_bankswitch_w)

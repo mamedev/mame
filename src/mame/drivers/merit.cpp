@@ -105,6 +105,7 @@ public:
 	int m_question_address;
 	int m_decryption_key;
 	optional_shared_ptr<UINT8> m_backup_ram;
+	bool m_flip_screen;
 	DECLARE_READ8_MEMBER(questions_r);
 	DECLARE_WRITE8_MEMBER(low_offset_w);
 	DECLARE_WRITE8_MEMBER(med_offset_w);
@@ -138,12 +139,14 @@ void merit_state::machine_start()
 {
 	m_question_address = 0;
 	m_ram_palette = std::make_unique<UINT8[]>(RAM_PALETTE_SIZE);
+	m_flip_screen = false;
 
 	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
 	save_item(NAME(m_lscnblk));
 	save_item(NAME(m_extra_video_bank_bit));
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_decryption_key));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -334,7 +337,7 @@ WRITE8_MEMBER(merit_state::led2_w)
 
 WRITE8_MEMBER(merit_state::misc_w)
 {
-	flip_screen_set(~data & 0x10);
+	m_flip_screen = (~data & 0x10) != 0;
 	m_extra_video_bank_bit = (data & 2) << 8;
 	m_lscnblk = (data >> 3) & 1;
 
@@ -343,7 +346,7 @@ WRITE8_MEMBER(merit_state::misc_w)
 
 WRITE8_MEMBER(merit_state::misc_couple_w)
 {
-	flip_screen_set(~data & 0x10);
+	m_flip_screen = (~data & 0x10) != 0;
 	m_extra_video_bank_bit = (data & 2) << 8;
 	m_lscnblk = (data >> 3) & 1;
 

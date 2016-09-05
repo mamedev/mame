@@ -64,7 +64,7 @@ WRITE8_MEMBER(taxidriv_state::p0c_w)
 
 	/* bit 2 toggles during gameplay */
 
-	flip_screen_set(data & 8);
+	m_gfxdecode->flip_screen_set(data & 8);
 
 //  popmessage("%02x",data&0x0f);
 }

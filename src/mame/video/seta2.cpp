@@ -136,15 +136,15 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	switch( offset*2 )
 	{
 	case 0x1c:  // FLIP SCREEN (myangel)    <- this is actually zoom
-		flip_screen_set(data & 1 );
+		m_gfxdecode->flip_screen_set(data & 1);
 		if (data & ~1)  logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",space.device().safe_pc(),data);
 		break;
 	case 0x2a:  // FLIP X (pzlbowl)
-		flip_screen_x_set(data & 1 );
+		m_gfxdecode->flip_screen_x_set(data & 1);
 		if (data & ~1)  logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",space.device().safe_pc(),data);
 		break;
 	case 0x2c:  // FLIP Y (pzlbowl)
-		flip_screen_y_set(data & 1 );
+		m_gfxdecode->flip_screen_y_set(data & 1);
 		if (data & ~1)  logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",space.device().safe_pc(),data);
 		break;
 

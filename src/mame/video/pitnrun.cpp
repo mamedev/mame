@@ -87,7 +87,7 @@ WRITE8_MEMBER(pitnrun_state::v_heed_w)
 WRITE8_MEMBER(pitnrun_state::color_select_w)
 {
 	m_color_select=data;
-	machine().tilemap().mark_all_dirty();
+	m_gfxdecode->mark_all_dirty();
 }
 
 void pitnrun_state::spotlights()
@@ -188,12 +188,12 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			sx = 256 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -242,10 +242,10 @@ UINT32 pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		dx=128-m_h_heed+((m_ha&8)<<5)+3;
 		dy=128-m_v_heed+((m_ha&0x10)<<4);
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 			dx=128-dx+16;
 
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 			dy=128-dy;
 
 		myclip.set(dx, dx+127, dy, dy+127);
@@ -257,7 +257,10 @@ UINT32 pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_sprites(bitmap,myclip);
 
 	if(m_ha&4)
-		copybitmap_trans(bitmap,*m_tmp_bitmap[m_ha&3],flip_screen_x(),flip_screen_y(),dx,dy,myclip, 1);
+		copybitmap_trans(bitmap, *m_tmp_bitmap[m_ha&3],
+			m_gfxdecode->flip_screen_x(),
+			m_gfxdecode->flip_screen_y(),
+			dx, dy, myclip, 1);
 	m_fg->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

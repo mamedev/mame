@@ -146,7 +146,7 @@ void gberet_state::gberet_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 			int flipx = attr & 0x10;
 			int flipy = attr & 0x20;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -198,7 +198,7 @@ void gberet_state::gberetb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 			int flipx = attr & 0x10;
 			int flipy = attr & 0x20;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

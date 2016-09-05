@@ -999,7 +999,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
 {
 	/*---- ----x flip screen*/
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 
 //  popmessage("%04x",data);
 }

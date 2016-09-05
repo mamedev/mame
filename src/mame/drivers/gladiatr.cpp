@@ -291,7 +291,7 @@ READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
 
 WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 

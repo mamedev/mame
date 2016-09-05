@@ -86,7 +86,7 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_gfxctrl_w)
 
 	/* bit 1 is flip screen */
 	m_flipscreen = data & 0x02;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* bit 2 is unknown - unused? */
 

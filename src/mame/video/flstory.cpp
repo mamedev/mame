@@ -127,7 +127,7 @@ WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 {
 	m_gfxctrl = data;
 
-	flip_screen_set(~data & 0x01);
+	m_gfxdecode->flip_screen_set(~data & 0x01);
 	if (m_char_bank != ((data & 0x10) >> 4))
 	{
 		m_char_bank = (data & 0x10) >> 4;
@@ -151,7 +151,7 @@ WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 	m_palette_bank = (data & 0x20) >> 5;
 
 	if (data & 0x04)
-		flip_screen_set(data & 0x01);
+		m_gfxdecode->flip_screen_set(data & 0x01);
 
 //popmessage("%04x: gfxctrl = %02x\n", space.device().safe_pc(), data);
 
@@ -166,7 +166,7 @@ WRITE8_MEMBER(flstory_state::flstory_scrlram_w)
 
 void flstory_state::flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	int flip = flip_screen();
+	int flip = m_gfxdecode->flip_screen();
 
 	for (int i = 0; i < 0x20; i++)
 	{
@@ -223,7 +223,7 @@ UINT32 flstory_state::screen_update_flstory(screen_device &screen, bitmap_ind16 
 
 void flstory_state::victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int flip = flip_screen();
+	int flip = m_gfxdecode->flip_screen();
 
 	for (int i = 0; i < 0x20; i++)
 	{

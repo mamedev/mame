@@ -136,7 +136,7 @@ WRITE8_MEMBER(vastar_state::hold_cpu2_w)
 
 WRITE8_MEMBER(vastar_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	m_gfxdecode->flip_screen_set(data);
 }
 
 WRITE8_MEMBER(vastar_state::nmi_mask_w)

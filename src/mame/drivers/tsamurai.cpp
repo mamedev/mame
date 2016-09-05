@@ -124,7 +124,7 @@ WRITE8_MEMBER(tsamurai_state::m660_sound_command3_w)
 
 WRITE8_MEMBER(tsamurai_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	m_gfxdecode->flip_screen_set(data);
 }
 
 WRITE8_MEMBER(tsamurai_state::coincounter_w)

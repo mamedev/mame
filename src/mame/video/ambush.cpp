@@ -73,7 +73,7 @@ void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		code = m_videoram[offs] | ((col & 0x60) << 3);
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 31 - sx;
 			sy = 31 - sy;
@@ -83,7 +83,8 @@ void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 			code,
 			(col & 0x0f) | ((*m_colorbank & 0x03) << 4),
-			flip_screen(), flip_screen(),
+			m_gfxdecode->flip_screen(),
+			m_gfxdecode->flip_screen(),
 			8 * sx, (8 * sy + scroll) & 0xff, transpen);
 	}
 }
@@ -120,7 +121,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 			/* 16x16 sprites */
 			gfx = 1;
 
-			if (!flip_screen())
+			if (!m_gfxdecode->flip_screen())
 				sy = 240 - sy;
 			else
 				sx = 240 - sx;
@@ -131,7 +132,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 			gfx = 0;
 			code <<= 2;
 
-			if (!flip_screen())
+			if (!m_gfxdecode->flip_screen())
 				sy = 248 - sy;
 			else
 				sx = 248 - sx;
@@ -141,7 +142,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 		flipx = m_spriteram[offs + 1] & 0x40;
 		flipy = m_spriteram[offs + 1] & 0x80;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;

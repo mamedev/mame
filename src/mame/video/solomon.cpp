@@ -29,10 +29,10 @@ WRITE8_MEMBER(solomon_state::solomon_colorram2_w)
 
 WRITE8_MEMBER(solomon_state::solomon_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_gfxdecode->flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -80,7 +80,7 @@ void solomon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		int sx = spriteram[offs + 3];
 		int sy = 241 - spriteram[offs + 2];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 242 - sy;

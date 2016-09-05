@@ -23,8 +23,8 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	flip_screen_x_set(data & 0x01);
-	flip_screen_y_set(data & 0x02);
+	m_gfxdecode->flip_screen_x_set(data & 0x01);
+	m_gfxdecode->flip_screen_y_set(data & 0x02);
 
 	/* bit 2 selects the input paddle */
 	m_paddle_select = data & 0x04;
@@ -69,8 +69,8 @@ WRITE8_MEMBER(arkanoid_state::brixian_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	flip_screen_x_set(data & 0x01);
-	flip_screen_y_set(data & 0x02);
+	m_gfxdecode->flip_screen_x_set(data & 0x01);
+	m_gfxdecode->flip_screen_y_set(data & 0x02);
 
 	/* bit 2 selects the input paddle */
 	/*  - not relevant to brixian */
@@ -109,8 +109,8 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	flip_screen_x_set(data & 0x01);
-	flip_screen_y_set(data & 0x02);
+	m_gfxdecode->flip_screen_x_set(data & 0x01);
+	m_gfxdecode->flip_screen_y_set(data & 0x02);
 
 	/* bit 2 selects the input paddle? */
 	m_paddle_select = data & 0x04;
@@ -144,8 +144,8 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
 {
 	/* bit 0 = flipx (or y?) */
-	flip_screen_x_set(data & 0x01);
-	flip_screen_y_set(data & 0x02);
+	m_gfxdecode->flip_screen_x_set(data & 0x01);
+	m_gfxdecode->flip_screen_y_set(data & 0x02);
 
 	/* bit 2 - 3 unknown */
 
@@ -186,9 +186,9 @@ void arkanoid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		sx = m_spriteram[offs];
 		sy = 248 - m_spriteram[offs + 1];
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 			sx = 248 - sx;
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 			sy = 248 - sy;
 
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8) + 1024 * m_gfxbank;
@@ -196,12 +196,14 @@ void arkanoid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code,
 				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
-				flip_screen_x(),flip_screen_y(),
-				sx,sy + (flip_screen_y() ? 8 : -8),0);
+				m_gfxdecode->flip_screen_x(),
+				m_gfxdecode->flip_screen_y(),
+				sx,sy + (m_gfxdecode->flip_screen_y() ? 8 : -8),0);
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code + 1,
 				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
-				flip_screen_x(),flip_screen_y(),
+				m_gfxdecode->flip_screen_x(),
+				m_gfxdecode->flip_screen_y(),
 				sx,sy,0);
 	}
 }

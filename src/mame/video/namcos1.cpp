@@ -246,7 +246,7 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		sx += sprite_xoffs;
 		sy -= sprite_yoffs;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
@@ -288,7 +288,7 @@ UINT32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
-	flip_screen_set(m_spriteram[0x0ff6] & 1);
+	m_gfxdecode->flip_screen_set(m_spriteram[0x0ff6] & 1);
 
 	/* background color */
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -317,7 +317,7 @@ UINT32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		scrollx = ( m_playfield_control[j+1] + (m_playfield_control[j+0]<<8) );
 		scrolly = ( m_playfield_control[j+3] + (m_playfield_control[j+2]<<8) );
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			scrollx = -scrollx;
 			scrolly = -scrolly;

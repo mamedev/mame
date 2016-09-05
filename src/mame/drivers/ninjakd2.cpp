@@ -356,7 +356,7 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
-	flip_screen_set(data & 0x80);
+	m_gfxdecode->flip_screen_set(data & 0x80);
 
 	// other bits unused
 }

@@ -257,7 +257,7 @@ void baraduke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			sy -= 16 * sizey;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 496+3 - 16 * sizex - sx;
 				sy = 240 - 16 * sizey - sy;
@@ -289,7 +289,7 @@ void baraduke_state::set_scroll(int layer)
 	int scrollx = m_xscroll[layer];
 	int scrolly = m_yscroll[layer];
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		scrollx = -scrollx;
 		scrolly = -scrolly;
@@ -306,7 +306,7 @@ UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind1
 	int back;
 
 	/* flip screen is embedded in the sprite control registers */
-	flip_screen_set(spriteram[0x07f6] & 0x01);
+	m_gfxdecode->flip_screen_set(spriteram[0x07f6] & 0x01);
 	set_scroll(0);
 	set_scroll(1);
 

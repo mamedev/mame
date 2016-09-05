@@ -127,9 +127,9 @@ TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO_MEMBER(0,
-			(code & 0x7f) | (flip_screen() ? 0x80 : 0),
+			(code & 0x7f) | (m_gfxdecode->flip_screen() ? 0x80 : 0),
 			color,
-			flip_screen() ? TILE_FLIPX : 0);
+			m_gfxdecode->flip_screen() ? TILE_FLIPX : 0);
 }
 
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( digdug_state::digdug_PORT_w )
 			break;
 
 		case 7: /* FLIP */
-			flip_screen_set(data & 1);
+			m_gfxdecode->flip_screen_set(data & 1);
 			break;
 	}
 }
@@ -271,7 +271,7 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 		sy -= 16 * size;
 		sy = (sy & 0xff) - 32;  // fix wraparound
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;

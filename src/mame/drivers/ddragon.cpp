@@ -175,7 +175,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 	*/
 	m_scrollx_hi = data & 0x01;
 	m_scrolly_hi = (data & 0x02) >> 1;
-	flip_screen_set(~data & 0x04);
+	m_gfxdecode->flip_screen_set(~data & 0x04);
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x08 ? CLEAR_LINE : ASSERT_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_HALT, data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
@@ -188,7 +188,7 @@ WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 	m_scrollx_hi = data & 0x01;
 	m_scrolly_hi = (data & 0x02) >> 1;
 
-//  flip_screen_set(machine(), ~data & 0x04);
+//  m_gfxdecode->flip_screen_set(~data & 0x04);
 
 	/* I don't know ... */
 	membank("bank1")->set_entry((data & 0x20) >> 5);
@@ -240,7 +240,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 	m_scrollx_hi = (data & 0x01);
 	m_scrolly_hi = ((data & 0x02) >> 1);
 
-//  flip_screen_set(machine(), ~data & 0x04);
+//  m_gfxdecode->flip_screen_set(~data & 0x04);
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x08 ? CLEAR_LINE : ASSERT_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_HALT, data & 0x10 ? ASSERT_LINE : CLEAR_LINE);

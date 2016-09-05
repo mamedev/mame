@@ -731,9 +731,9 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
 	MCFG_K007121_ADD("k007121_1")
-	MCFG_K007121_PALETTE("palette")
+	MCFG_K007121_GFXDECODE("gfxdecode")
 	MCFG_K007121_ADD("k007121_2")
-	MCFG_K007121_PALETTE("palette")
+	MCFG_K007121_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

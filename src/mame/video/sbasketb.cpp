@@ -108,10 +108,10 @@ WRITE8_MEMBER(sbasketb_state::sbasketb_colorram_w)
 
 WRITE8_MEMBER(sbasketb_state::sbasketb_flipscreen_w)
 {
-	if (flip_screen() != data)
+	if (m_gfxdecode->flip_screen() != data)
 	{
-		flip_screen_set(data);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -148,7 +148,7 @@ void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			int flipx =  spriteram[offs + 1] & 0x40;
 			int flipy =  spriteram[offs + 1] & 0x80;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

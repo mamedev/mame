@@ -48,7 +48,7 @@ WRITE8_MEMBER(tiamc1_state::kot_videoram_w)
 WRITE8_MEMBER(tiamc1_state::tiamc1_bankswitch_w)
 {
 	if ((data & 128) != (m_layers_ctrl & 128))
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 
 	m_layers_ctrl = data;
 }

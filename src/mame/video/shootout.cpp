@@ -116,7 +116,8 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				int flipx = (attributes & 0x04);
 				int flipy = 0;
 
-				if (flip_screen()) {
+				if (m_gfxdecode->flip_screen())
+				{
 					flipx = !flipx;
 					flipy = !flipy;
 				}
@@ -127,7 +128,8 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 					vx = sx;
 					vy = sy;
-					if (flip_screen()) {
+					if (m_gfxdecode->flip_screen())
+					{
 						vx = 240 - vx;
 						vy = 240 - vy;
 					}
@@ -146,7 +148,8 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				vx = sx;
 				vy = sy;
-				if (flip_screen()) {
+				if (m_gfxdecode->flip_screen())
+				{
 					vx = 240 - vx;
 					vy = 240 - vy;
 				}

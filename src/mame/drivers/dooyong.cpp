@@ -94,7 +94,7 @@ MACHINE_START_MEMBER(dooyong_z80_state, cpu_z80)
 
 WRITE8_MEMBER(dooyong_z80_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	m_gfxdecode->flip_screen_set(data);
 }
 
 MACHINE_RESET_MEMBER(dooyong_z80_ym2203_state, sound_ym2203)

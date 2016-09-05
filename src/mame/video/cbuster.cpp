@@ -27,7 +27,7 @@ UINT32 cbuster_state::screen_update_twocrude(screen_device &screen, bitmap_rgb32
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
-	flip_screen_set(!BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(!BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram16_buffer, 0x400);
 

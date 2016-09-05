@@ -134,7 +134,7 @@ WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
 	if (m_flipscreen != m_flipscreen_old)
 	{
 		m_flipscreen_old = m_flipscreen;
-		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 }
 

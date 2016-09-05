@@ -364,7 +364,7 @@ WRITE8_MEMBER(chanbara_state::chanbara_ay_out_1_w)
 
 	m_scrollhi = data & 0x01;
 
-	flip_screen_set(data & 0x02);
+	m_gfxdecode->flip_screen_set(data & 0x02);
 
 	membank("bank1")->set_entry((data & 0x04) >> 2);
 

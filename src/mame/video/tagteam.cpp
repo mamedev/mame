@@ -116,10 +116,10 @@ WRITE8_MEMBER(tagteam_state::control_w)
 WRITE8_MEMBER(tagteam_state::flipscreen_w)
 {
 	// d0: flip screen
-	if (flip_screen() != (data &0x01))
+	if (m_gfxdecode->flip_screen() != (data &0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	// d6/7: coin counters
@@ -159,7 +159,7 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		if (!(m_videoram[offs] & 0x01)) continue;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -177,7 +177,7 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		code = m_videoram[offs + 0x20] + 256 * spritebank;
 		color = m_palettebank;
-		sy += (flip_screen() ? -256 : 256);
+		sy += (m_gfxdecode->flip_screen() ? -256 : 256);
 
 
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,

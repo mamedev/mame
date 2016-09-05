@@ -188,7 +188,7 @@ WRITE8_MEMBER(rmhaihai_state::adpcm_w)
 
 WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 {
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 
 	// (data & 0x02) is switched on and off in service mode
 

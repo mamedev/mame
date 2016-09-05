@@ -135,7 +135,7 @@ WRITE8_MEMBER(retofinv_state::gfx_ctrl_w)
 	switch (offset)
 	{
 		case 0:
-			flip_screen_set(data & 1);
+			m_gfxdecode->flip_screen_set(data & 1);
 			break;
 
 		case 1:
@@ -193,7 +193,7 @@ void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;

@@ -157,10 +157,10 @@ WRITE8_MEMBER(olibochu_state::olibochu_colorram_w)
 
 WRITE8_MEMBER(olibochu_state::olibochu_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x80))
+	if (m_gfxdecode->flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x80);
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	/* other bits are used, but unknown */
@@ -198,7 +198,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int sx = spriteram[offs + 3];
 		int sy = ((spriteram[offs + 2] + 8) & 0xff) - 8;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -224,7 +224,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int sx = spriteram_2[offs + 3];
 		int sy = spriteram_2[offs + 2];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;

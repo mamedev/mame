@@ -124,7 +124,7 @@ void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int flipy = 0;
 		int dy = -16;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

@@ -180,7 +180,7 @@ void kaneko_pandora_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 			y = dy;
 		}
 
-		if (machine().driver_data()->flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;

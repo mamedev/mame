@@ -84,7 +84,7 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 
 WRITE8_MEMBER(bagman_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 }
 
 TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
@@ -113,7 +113,7 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		sy = 256 - m_spriteram[offs + 2] - 16;
 		flipx = m_spriteram[offs] & 0x40;
 		flipy = m_spriteram[offs] & 0x80;
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 256 - sx - 15;
 			sy = 255 - sy - 15;

@@ -102,7 +102,7 @@ void scotrsht_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = m_spriteram[i + 2] - ((attr & 0x80) << 1);
 		int sy = m_spriteram[i + 3];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

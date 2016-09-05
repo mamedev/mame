@@ -209,10 +209,10 @@ WRITE8_MEMBER(lasso_state::lasso_colorram_w)
 WRITE8_MEMBER(lasso_state::lasso_flip_screen_w)
 {
 	/* don't know which is which, but they are always set together */
-	flip_screen_x_set(data & 0x01);
-	flip_screen_y_set(data & 0x02);
+	m_gfxdecode->flip_screen_x_set(data & 0x01);
+	m_gfxdecode->flip_screen_y_set(data & 0x02);
 
-	machine().tilemap().set_flip_all((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
+	m_gfxdecode->set_flip_all((m_gfxdecode->flip_screen_x() ? TILEMAP_FLIPX : 0) | (m_gfxdecode->flip_screen_y() ? TILEMAP_FLIPY : 0));
 }
 
 
@@ -223,7 +223,7 @@ WRITE8_MEMBER(lasso_state::lasso_video_control_w)
 	if (m_gfxbank != bank)
 	{
 		m_gfxbank = bank;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	lasso_flip_screen_w(space, offset, data);
@@ -237,7 +237,7 @@ WRITE8_MEMBER(lasso_state::wwjgtin_video_control_w)
 	if (m_gfxbank != bank)
 	{
 		m_gfxbank = bank;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	lasso_flip_screen_w(space, offset, data);
@@ -286,13 +286,13 @@ void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		flipx = source[1] & 0x40;
 		flipy = source[1] & 0x80;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 			flipy = !flipy;
 		else
 			sy = 240 - sy;
@@ -323,7 +323,7 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		UINT8 x;
 		UINT8 y = offs >> 5;
 
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 			y = ~y;
 
 		if ((y < cliprect.min_y) || (y > cliprect.max_y))
@@ -332,7 +332,7 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		x = (offs & 0x1f) << 3;
 		data = m_bitmap_ram[offs];
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 			x = ~x;
 
 		for (bit = 0; bit < 8; bit++)
@@ -340,7 +340,7 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 			if ((data & 0x80) && (x >= cliprect.min_x) && (x <= cliprect.max_x))
 				bitmap.pix16(y, x) = pen;
 
-			if (flip_screen_x())
+			if (m_gfxdecode->flip_screen_x())
 				x = x - 1;
 			else
 				x = x + 1;

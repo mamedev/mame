@@ -112,7 +112,7 @@ WRITE8_MEMBER(mayumi_state::bank_sel_w)
 
 	m_int_enable = data & 1;
 
-	flip_screen_set(data & 2);
+	m_gfxdecode->flip_screen_set(data & 2);
 }
 
 /*************************************

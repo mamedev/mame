@@ -187,7 +187,7 @@ WRITE8_MEMBER(vball_state::cpu_sound_command_w)
 */
 WRITE8_MEMBER(vball_state::scrollx_hi_w)
 {
-	flip_screen_set(~data&1);
+	m_gfxdecode->flip_screen_set(~data&1);
 	m_scrollx_hi = (data & 0x02) << 7;
 	bgprombank_w((data >> 2) & 0x07);
 	spprombank_w((data >> 5) & 0x07);

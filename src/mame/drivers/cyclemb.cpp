@@ -184,13 +184,13 @@ void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 			int tile = (m_vram[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
-	//      int sx_offs = flip_screen() ? 512 : 0
+	//      int sx_offs = m_gfxdecode->flip_screen() ? 512 : 0
 			int scrollx = ((m_vram[(y/2)+odd_line]) + (m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
 			if(!(attr & 4))
 				color += 0x20;//screen.machine().rand();
 
-			if(flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
 				/* wrap-around */
@@ -256,7 +256,7 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		fx = (m_obj3_ram[i+0] & 4) >> 2;
 		fy = (m_obj3_ram[i+0] & 8) >> 3;
 
-		if(flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			fx = !fx;
 			fy = !fy;
@@ -352,7 +352,7 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		fx = (m_obj3_ram[i+0] & 4) >> 2;
 		fy = (m_obj3_ram[i+0] & 8) >> 3;
 
-		if(flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			fx = !fx;
 			fy = !fy;
@@ -406,7 +406,7 @@ WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 
 WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 
 	// a bunch of other things are setted here
 }

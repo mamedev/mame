@@ -101,7 +101,7 @@ void speedbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		flipx = flipy = 0;
 
-		if(flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			x = 246 - x;
 			y = 238 - y;

@@ -165,7 +165,7 @@ void tc0180vcu_device::video_control( UINT8 data )
 	if (m_video_control & 0x80)
 		m_framebuffer_page = (~m_video_control & 0x40) >> 6;
 
-	machine().tilemap().set_flip_all((m_video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
+	m_gfxdecode->set_flip_all((m_video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 READ16_MEMBER( tc0180vcu_device::ctrl_r )

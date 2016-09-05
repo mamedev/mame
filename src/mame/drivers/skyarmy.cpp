@@ -80,12 +80,12 @@ void skyarmy_state::machine_start()
 
 WRITE8_MEMBER(skyarmy_state::flip_screen_x_w)
 {
-	flip_screen_x_set(data & 0x01);
+	m_gfxdecode->flip_screen_x_set(data & 0x01);
 }
 
 WRITE8_MEMBER(skyarmy_state::flip_screen_y_w)
 {
-	flip_screen_y_set(data & 0x01);
+	m_gfxdecode->flip_screen_y_set(data & 0x01);
 }
 
 TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)

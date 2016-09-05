@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_PALETTE_INIT_OWNER(fastlane_state, fastlane)
 
 	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
+	MCFG_K007121_GFXDECODE("gfxdecode")
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */

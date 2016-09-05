@@ -104,16 +104,16 @@ WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
 	if (m_palettebank != (data & 0x07))
 	{
 		m_palettebank = data & 0x07;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
 WRITE8_MEMBER(mikie_state::mikie_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_gfxdecode->flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -152,7 +152,7 @@ void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int flipx = ~spriteram[offs] & 0x10;
 		int flipy = spriteram[offs] & 0x20;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 242 - sy;
 			flipy = !flipy;

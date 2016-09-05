@@ -168,7 +168,7 @@ WRITE8_MEMBER(timeplt_state::colorram_w)
 
 WRITE8_MEMBER(timeplt_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	m_gfxdecode->flip_screen_set(~data & 1);
 }
 
 WRITE8_MEMBER(timeplt_state::video_enable_w)

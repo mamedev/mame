@@ -42,12 +42,12 @@ void freekick_state::gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 		int flipy = 0;
 		int color = m_spriteram[offs + 1] & 0x1f;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;
@@ -76,12 +76,12 @@ void freekick_state::pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 		int flipy = 0;//m_spriteram[offs + 0] & 0x40;
 		int color = m_spriteram[offs + 1] & 0x0f;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;
@@ -111,12 +111,12 @@ void freekick_state::freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		int flipy = m_spriteram[offs + 2] & 0x40;
 		int color = m_spriteram[offs + 2] & 0x1f;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;

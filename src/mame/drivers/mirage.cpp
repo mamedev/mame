@@ -55,7 +55,8 @@ public:
 		m_spriteram(*this, "spriteram") ,
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 
@@ -72,6 +73,7 @@ public:
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
 	optional_device<decospr_device> m_sprgen;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE16_MEMBER(mirage_mux_w);
 	DECLARE_READ16_MEMBER(mirage_input_r);
@@ -95,7 +97,7 @@ UINT32 miragemi_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 

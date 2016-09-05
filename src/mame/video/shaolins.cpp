@@ -105,7 +105,7 @@ WRITE8_MEMBER(shaolins_state::palettebank_w)
 	if (m_palettebank != (data & 0x07))
 	{
 		m_palettebank = data & 0x07;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -119,10 +119,10 @@ WRITE8_MEMBER(shaolins_state::nmi_w)
 {
 	m_nmi_enable = data;
 
-	if (flip_screen() != (data & 0x01))
+	if (m_gfxdecode->flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -160,7 +160,7 @@ void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int sx = 240 - m_spriteram[offs + 6];
 			int sy = 248 - m_spriteram[offs + 4];
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 248 - sy;

@@ -187,7 +187,7 @@ UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 
 		ypos = 0xff - m_sprites[x + 2];
 		xpos = m_sprites[x + 3];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			if (m_sprites[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
@@ -235,7 +235,7 @@ WRITE8_MEMBER(calorie_state::bg_bank_w)
 
 WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 READ8_MEMBER(calorie_state::calorie_soundlatch_r)

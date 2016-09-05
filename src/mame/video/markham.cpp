@@ -47,10 +47,10 @@ WRITE8_MEMBER(markham_state::markham_videoram_w)
 
 WRITE8_MEMBER(markham_state::markham_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_gfxdecode->flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -80,15 +80,15 @@ void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int chr = spriteram[offs + 1];
 		int col = spriteram[offs + 2];
 
-		int fx = flip_screen();
-		int fy = flip_screen();
+		int fx = m_gfxdecode->flip_screen();
+		int fy = m_gfxdecode->flip_screen();
 
 		int x = spriteram[offs + 3];
 		int y = spriteram[offs + 0];
 		int px, py;
 		col &= 0x3f ;
 
-		if (flip_screen() == 0)
+		if (m_gfxdecode->flip_screen() == 0)
 		{
 			px = x - 2;
 			py = 240 - y;

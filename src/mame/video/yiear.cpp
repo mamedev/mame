@@ -72,10 +72,10 @@ WRITE8_MEMBER(yiear_state::yiear_videoram_w)
 WRITE8_MEMBER(yiear_state::yiear_control_w)
 {
 	/* bit 0 flips screen */
-	if (flip_screen() != (data & 0x01))
+	if (m_gfxdecode->flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	/* bit 1 is NMI enable */
@@ -121,7 +121,7 @@ void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		int sy = 240 - spriteram[offs + 1];
 		int sx = spriteram_2[offs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

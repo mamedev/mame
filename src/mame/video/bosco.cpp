@@ -271,7 +271,7 @@ UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bit
 	   the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
-	int flip = flip_screen();
+	int flip = m_gfxdecode->flip_screen();
 	if (flip)
 	{
 		bg_clip.min_x = 8*8;

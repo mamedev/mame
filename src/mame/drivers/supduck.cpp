@@ -131,7 +131,7 @@ UINT32 supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fore_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), m_gfxdecode->flip_screen(), 1 );
 
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

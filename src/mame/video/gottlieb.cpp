@@ -52,10 +52,10 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
 	m_background_priority = data & 0x01;
 
 	/* bit 1 controls horizontal flip screen */
-	flip_screen_x_set(data & 0x02);
+	m_gfxdecode->flip_screen_x_set(data & 0x02);
 
 	/* bit 2 controls vertical flip screen */
-	flip_screen_y_set(data & 0x04);
+	m_gfxdecode->flip_screen_y_set(data & 0x04);
 }
 
 
@@ -207,13 +207,13 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		int sy = (spriteram[offs]) - 13;
 		int code = (255 ^ spriteram[offs + 2]) + 256 * m_spritebank;
 
-		if (flip_screen_x()) sx = 233 - sx;
-		if (flip_screen_y()) sy = 228 - sy;
+		if (m_gfxdecode->flip_screen_x()) sx = 233 - sx;
+		if (m_gfxdecode->flip_screen_y()) sy = 228 - sy;
 
 
 			m_gfxdecode->gfx(2)->transpen(bitmap,clip,
 			code, 0,
-			flip_screen_x(), flip_screen_y(),
+			m_gfxdecode->flip_screen_x(), m_gfxdecode->flip_screen_y(),
 			sx,sy, 0);
 	}
 }

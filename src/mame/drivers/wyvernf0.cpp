@@ -202,12 +202,12 @@ yyyyyyyy fccccccc x???pppp xxxxxxxx
 		int flipx = 0;
 		int flipy = sprram[offs + 1] & 0x80;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 256 - 8 - sx - 3*8;
 		}
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 256 - 8 - sy - 3*8;
@@ -321,8 +321,8 @@ WRITE8_MEMBER(wyvernf0_state::rambank_w)
 	// bit 5 ??? set, except at boot
 	// bit 6 Coin lockout
 	// bit 7 RAM bank
-	flip_screen_x_set(data & 0x01);
-	flip_screen_y_set(data & 0x02);
+	m_gfxdecode->flip_screen_x_set(data & 0x01);
+	m_gfxdecode->flip_screen_y_set(data & 0x02);
 
 	machine().bookkeeping().coin_lockout_w(0, !(data & 0x40));
 	machine().bookkeeping().coin_lockout_w(1, !(data & 0x40));

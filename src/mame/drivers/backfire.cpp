@@ -43,6 +43,7 @@ public:
 		m_io_in1(*this, "IN1"),
 		m_io_in2(*this, "IN2"),
 		m_io_in3(*this, "IN3"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram")
 	{ }
@@ -103,6 +104,7 @@ public:
 	required_ioport m_io_in1;
 	required_ioport m_io_in2;
 	required_ioport m_io_in3;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
 };
@@ -136,7 +138,7 @@ void backfire_state::video_start()
 UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	m_gfxdecode->flip_screen_set_no_update(1);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -167,7 +169,7 @@ UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap
 UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	m_gfxdecode->flip_screen_set_no_update(1);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */

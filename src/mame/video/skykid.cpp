@@ -81,9 +81,9 @@ TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO_MEMBER(0,
-			code | (flip_screen() ? 0x100 : 0),
+			code | (m_gfxdecode->flip_screen() ? 0x100 : 0),
 			attr & 0x3f,
-			flip_screen() ? (TILE_FLIPY | TILE_FLIPX) : 0);
+			m_gfxdecode->flip_screen() ? (TILE_FLIPY | TILE_FLIPX) : 0);
 }
 
 
@@ -161,7 +161,7 @@ WRITE8_MEMBER(skykid_state::skykid_scroll_y_w)
 WRITE8_MEMBER(skykid_state::skykid_flipscreen_priority_w)
 {
 	m_priority = data;
-	flip_screen_set(offset & 1);
+	m_gfxdecode->flip_screen_set(offset & 1);
 }
 
 
@@ -200,7 +200,7 @@ void skykid_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -227,7 +227,7 @@ void skykid_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		m_bg_tilemap->set_scrollx(0, 189 - (m_scroll_x ^ 1));
 		m_bg_tilemap->set_scrolly(0, 7 - m_scroll_y);

@@ -94,7 +94,7 @@ void cninja_state::cninjabl_draw_sprites( screen_device &screen, bitmap_ind16 &b
 			inc = 1;
 		}
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			y = 240 - y;
 			x = 240 - x;
@@ -126,7 +126,7 @@ UINT32 cninja_state::screen_update_cninja(screen_device &screen, bitmap_ind16 &b
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -151,7 +151,7 @@ UINT32 cninja_state::screen_update_cninjabl(screen_device &screen, bitmap_ind16 
 	m_deco_tilegen2->set_enable(0, 1 );
 	m_deco_tilegen2->set_enable(1, 1 );
 
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -172,7 +172,7 @@ UINT32 cninja_state::screen_update_edrandy(screen_device &screen, bitmap_ind16 &
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -207,7 +207,7 @@ UINT32 cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind16 
 	}
 
 	/* Update playfields */
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -250,7 +250,7 @@ UINT32 cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32 &
 	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 

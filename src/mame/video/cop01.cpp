@@ -148,7 +148,7 @@ WRITE8_MEMBER(cop01_state::cop01_vreg_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 1);
 		machine().bookkeeping().coin_counter_w(1, data & 2);
-		flip_screen_set(data & 4);
+		m_gfxdecode->flip_screen_set(data & 4);
 	}
 }
 
@@ -179,7 +179,7 @@ void cop01_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		sx = (m_spriteram[offs + 3] - 0x80) + 256 * (attr & 0x01);
 		sy = 240 - m_spriteram[offs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

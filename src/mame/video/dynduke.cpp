@@ -119,7 +119,7 @@ WRITE16_MEMBER(dynduke_state::control_w)
 		if (data&0x4) m_txt_enable = 0; else m_txt_enable = 1;
 		if (data&0x8) m_sprite_enable=0; else m_sprite_enable=1;
 
-		flip_screen_set(data & 0x40);
+		m_gfxdecode->flip_screen_set(data & 0x40);
 	}
 }
 
@@ -147,7 +147,8 @@ void dynduke_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		sprite = buffered_spriteram16[offs+1];
 		sprite &= 0x3fff;
 
-		if (flip_screen()) {
+		if (m_gfxdecode->flip_screen())
+		{
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -177,7 +178,7 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 	scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
 	scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		scrolly = 256 - scrolly;
 		scrollx = 256 - scrollx;

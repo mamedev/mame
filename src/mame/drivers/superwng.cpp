@@ -148,7 +148,7 @@ UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	rectangle tmp = cliprect;
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 	{
 		tmp.min_x += 32;
 		m_fg_tilemap->draw(screen, bitmap, tmp, 0, 0);
@@ -295,7 +295,7 @@ WRITE8_MEMBER(superwng_state::superwng_tilebank_w)
 
 WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
 {
-	flip_screen_set(~data & 0x01);
+	m_gfxdecode->flip_screen_set(~data & 0x01);
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 }

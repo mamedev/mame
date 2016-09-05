@@ -157,7 +157,7 @@ WRITE8_MEMBER(sauro_state::coin2_w)
 
 WRITE8_MEMBER(sauro_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	m_gfxdecode->flip_screen_set(data);
 }
 
 WRITE8_MEMBER(sauro_state::adpcm_w)

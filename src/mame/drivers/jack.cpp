@@ -163,7 +163,7 @@ WRITE8_MEMBER(jack_state::joinem_control_w)
 	// d6: unused?
 
 	// d7: flip screen
-	flip_screen_set(data & 0x80);
+	m_gfxdecode->flip_screen_set(data & 0x80);
 }
 
 

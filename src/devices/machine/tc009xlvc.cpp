@@ -366,7 +366,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		int dx, dy;
 
-		machine().tilemap().set_flip_all(global_flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_gfxdecode->set_flip_all(global_flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 		dx = m_bg0_scroll[0] | (m_bg0_scroll[1] << 8);
 		if (global_flip) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; dx += 192; }

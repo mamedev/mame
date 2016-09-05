@@ -182,12 +182,12 @@ UINT32 fuuki16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	int tm_middle = pri_table[m_priority[0] & 0x0f][1];
 	int tm_back   = pri_table[m_priority[0] & 0x0f][2];
 
-	flip_screen_set(m_vregs[0x1e / 2] & 1);
+	m_gfxdecode->flip_screen_set(m_vregs[0x1e / 2] & 1);
 
 	/* Layers scrolling */
 
-	scrolly_offs = m_vregs[0xc / 2] - (flip_screen() ? 0x103 : 0x1f3);
-	scrollx_offs = m_vregs[0xe / 2] - (flip_screen() ? 0x2a7 : 0x3f6);
+	scrolly_offs = m_vregs[0xc / 2] - (m_gfxdecode->flip_screen() ? 0x103 : 0x1f3);
+	scrollx_offs = m_vregs[0xe / 2] - (m_gfxdecode->flip_screen() ? 0x2a7 : 0x3f6);
 
 	layer0_scrolly = m_vregs[0x0 / 2] + scrolly_offs;
 	layer0_scrollx = m_vregs[0x2 / 2] + scrollx_offs;
@@ -220,7 +220,7 @@ UINT32 fuuki16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
 	draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
 
-	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), nullptr);
+	m_fuukivid->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->flip_screen(), nullptr);
 
 	return 0;
 }

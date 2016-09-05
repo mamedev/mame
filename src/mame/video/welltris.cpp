@@ -27,7 +27,7 @@ WRITE16_MEMBER(welltris_state::palette_bank_w)
 			m_char_tilemap->mark_all_dirty();
 		}
 
-		flip_screen_set(data & 0x80);
+		m_gfxdecode->flip_screen_set(data & 0x80);
 
 		m_spritepalettebank = (data & 0x20) >> 5;
 		m_pixelpalettebank = (data & 0x08) >> 3;

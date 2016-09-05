@@ -29,6 +29,7 @@ public:
 		m_spriteram2(*this, "spriteram2") ,
 		m_sprgen1(*this, "spritegen1"),
 		m_sprgen2(*this, "spritegen2"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
@@ -51,6 +52,7 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram2;
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 

@@ -78,7 +78,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_w)
 		if (m_gfxbank[m_banksel] != ((data & 0x0f00) >> 8))
 		{
 			m_gfxbank[m_banksel] = (data & 0x0f00) >> 8;
-			machine().tilemap().mark_all_dirty();
+			m_gfxdecode->mark_all_dirty();
 		}
 	}
 }

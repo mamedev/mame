@@ -18,10 +18,10 @@ WRITE8_MEMBER(exprraid_state::exprraid_colorram_w)
 
 WRITE8_MEMBER(exprraid_state::exprraid_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_gfxdecode->flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -103,7 +103,7 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int sx = ((248 - m_spriteram[offs + 2]) & 0xff) - 8;
 		int sy = m_spriteram[offs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -123,7 +123,7 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code + 1, color,
 				flipx, flipy,
-				sx, sy + (flip_screen() ? -16 : 16), 0);
+				sx, sy + (m_gfxdecode->flip_screen() ? -16 : 16), 0);
 		}
 	}
 }

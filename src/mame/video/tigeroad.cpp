@@ -21,10 +21,10 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_videoctrl_w)
 
 		/* bit 1 flips screen */
 
-		if (flip_screen() != (data & 0x02))
+		if (m_gfxdecode->flip_screen() != (data & 0x02))
 		{
-			flip_screen_set(data & 0x02);
-			machine().tilemap().mark_all_dirty();
+			m_gfxdecode->flip_screen_set(data & 0x02);
+			m_gfxdecode->mark_all_dirty();
 		}
 
 		/* bit 2 selects bg char bank */
@@ -121,7 +121,7 @@ void tigeroad_state::video_start()
 UINT32 tigeroad_state::screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 2, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 2, m_spriteram->buffer(), m_spriteram->bytes(), m_gfxdecode->flip_screen(), 1 );
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 	return 0;

@@ -195,7 +195,7 @@ void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 			flipx = buffered_spriteram[offs + 1] & 0x02;
 			flipy = buffered_spriteram[offs + 1] & 0x04;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -243,7 +243,7 @@ void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				flipy = 1;
 			}
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

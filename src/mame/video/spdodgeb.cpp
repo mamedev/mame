@@ -111,7 +111,7 @@ WRITE8_MEMBER(spdodgeb_state::scrollx_lo_w)
 WRITE8_MEMBER(spdodgeb_state::ctrl_w)
 {
 	/* bit 0 = flip screen */
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 
 	/* bit 1 = ROM bank switch */
 	membank("mainbank")->set_entry((~data & 0x02) >> 1);
@@ -168,7 +168,7 @@ void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int dy = -16;
 		int cy;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -187,7 +187,7 @@ void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			break;
 
 			case 1: /* double y */
-			if (flip_screen()) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
+			if (m_gfxdecode->flip_screen()) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
 			cy = sy + dy;
 			which &= ~1;
 			DRAW_SPRITE(0,sx,cy);

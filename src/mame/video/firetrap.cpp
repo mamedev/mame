@@ -207,7 +207,7 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		color = ((m_spriteram[offs + 1] & 0x08) >> 2) | (m_spriteram[offs + 1] & 0x01);
 		flipx = m_spriteram[offs + 1] & 0x04;
 		flipy = m_spriteram[offs + 1] & 0x02;
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -217,7 +217,7 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		if (m_spriteram[offs + 1] & 0x10)    /* double width */
 		{
-			if (flip_screen()) sy -= 16;
+			if (m_gfxdecode->flip_screen()) sy -= 16;
 
 			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code & ~1,

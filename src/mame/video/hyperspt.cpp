@@ -103,10 +103,10 @@ WRITE8_MEMBER(hyperspt_state::hyperspt_colorram_w)
 
 WRITE8_MEMBER(hyperspt_state::hyperspt_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_gfxdecode->flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -139,7 +139,7 @@ void hyperspt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int flipx = ~spriteram[offs] & 0x40;
 		int flipy = spriteram[offs] & 0x80;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -175,7 +175,7 @@ UINT32 hyperspt_state::screen_update_hyperspt(screen_device &screen, bitmap_ind1
 	for (row = 0; row < 32; row++)
 	{
 		int scrollx = m_scroll[row * 2] + (m_scroll[(row * 2) + 1] & 0x01) * 256;
-		if (flip_screen()) scrollx = -scrollx;
+		if (m_gfxdecode->flip_screen()) scrollx = -scrollx;
 		m_bg_tilemap->set_scrollx(row, scrollx);
 	}
 

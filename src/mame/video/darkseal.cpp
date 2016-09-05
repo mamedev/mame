@@ -62,7 +62,7 @@ UINT32 darkseal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen2->pf_control_r(space, 0, 0xffff);
-	flip_screen_set(!BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(!BIT(flip, 7));
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 

@@ -505,7 +505,7 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		flipx = sprite_ram[offs + 0] & 0x04;
 		flipy = sprite_ram[offs + 0] & 0x02;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + sprite_y_adjust_flip_screen;
@@ -522,7 +522,7 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipx,flipy,
 				sx,sy, 0);
 
-		sy += (flip_screen() ? -256 : 256);
+		sy += (m_gfxdecode->flip_screen() ? -256 : 256);
 
 		// Wrap around
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
@@ -548,7 +548,7 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &clipre
 
 		sy = 255 - missile_ram[offs + 0 * interleave];
 		sx = 255 - missile_ram[offs + 2 * interleave];
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + missile_y_adjust_flip_screen;
@@ -564,7 +564,7 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &clipre
 
 		sy = 255 - missile_ram[offs + 1 * interleave];
 		sx = 255 - missile_ram[offs + 3 * interleave];
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + missile_y_adjust_flip_screen;

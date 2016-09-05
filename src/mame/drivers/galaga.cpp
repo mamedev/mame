@@ -732,12 +732,12 @@ READ8_MEMBER(galaga_state::bosco_dsw_r)
 
 WRITE8_MEMBER(galaga_state::galaga_flip_screen_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 WRITE8_MEMBER(bosco_state::bosco_flip_screen_w)
 {
-	flip_screen_set(~data & 1);
+	m_gfxdecode->flip_screen_set(~data & 1);
 }
 
 

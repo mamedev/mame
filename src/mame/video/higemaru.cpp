@@ -81,9 +81,9 @@ WRITE8_MEMBER(higemaru_state::higemaru_c800_w)
 	machine().bookkeeping().coin_counter_w(1,data & 1);
 
 	/* bit 7 flips screen */
-	if (flip_screen() != (data & 0x80))
+	if (m_gfxdecode->flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(data & 0x80);
+		m_gfxdecode->flip_screen_set(data & 0x80);
 		m_bg_tilemap->mark_all_dirty();
 	}
 }
@@ -116,7 +116,7 @@ void higemaru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		sy = spriteram[offs + 8];
 		flipx = spriteram[offs + 4] & 0x10;
 		flipy = spriteram[offs + 4] & 0x20;
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

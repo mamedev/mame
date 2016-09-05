@@ -237,7 +237,7 @@ WRITE8_MEMBER(btime_state::btime_video_control_w)
 	// Bit 0   = Flip screen
 	// Bit 1-7 = Unknown
 
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 }
 
 WRITE8_MEMBER(btime_state::bnj_video_control_w)
@@ -267,7 +267,7 @@ WRITE8_MEMBER(btime_state::zoar_video_control_w)
 	m_btime_palette = (data & 0x30) >> 3;
 
 	if (ioport("DSW1")->read() & 0x40) /* cocktail mode */
-		flip_screen_set(data & 0x80);
+		m_gfxdecode->flip_screen_set(data & 0x80);
 }
 
 WRITE8_MEMBER(btime_state::disco_video_control_w)
@@ -275,7 +275,7 @@ WRITE8_MEMBER(btime_state::disco_video_control_w)
 	m_btime_palette = (data >> 2) & 0x03;
 
 	if (!(ioport("DSW1")->read() & 0x40)) /* cocktail mode */
-		flip_screen_set(data & 0x01);
+		m_gfxdecode->flip_screen_set(data & 0x01);
 }
 
 
@@ -294,7 +294,7 @@ void btime_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, U
 		if ((priority != -1) && (priority != ((code >> 7) & 0x01)))
 			continue;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			x = 31 - x;
 			y = 31 - y;
@@ -303,7 +303,8 @@ void btime_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, U
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
-				flip_screen(),flip_screen(),
+				m_gfxdecode->flip_screen(),
+				m_gfxdecode->flip_screen(),
 				8*x,8*y,
 				transparency ? 0 : -1);
 	}
@@ -330,7 +331,7 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		flipx = sprite_ram[offs + 0] & 0x04;
 		flipy = sprite_ram[offs + 0] & 0x02;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			x = 240 - x;
 			y = 240 - y + sprite_y_adjust_flip_screen;
@@ -347,7 +348,7 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				flipx,flipy,
 				x, y,0);
 
-		y = y + (flip_screen() ? -256 : 256);
+		y = y + (m_gfxdecode->flip_screen() ? -256 : 256);
 
 		// Wrap around
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
@@ -382,7 +383,7 @@ void btime_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipre
 			int x = 240 - (16 * (offs / 16) + scroll) - 1;
 			int y = 16 * (offs % 16);
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				x = 240 - x;
 				y = 240 - y;
@@ -391,7 +392,8 @@ void btime_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipre
 			m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
 					gfx[tileoffset + offs],
 					color,
-					flip_screen(),flip_screen(),
+					m_gfxdecode->flip_screen(),
+					m_gfxdecode->flip_screen(),
 					x,y);
 		}
 	}
@@ -405,7 +407,7 @@ UINT32 btime_state::screen_update_btime(screen_device &screen, bitmap_ind16 &bit
 		int i, start;
 
 		// Generate tile map
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 			start = 0;
 		else
 			start = 1;
@@ -478,7 +480,7 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 			sy = 16 * (((offs % 0x100) < 0x80) ? offs % 8 : (offs % 8) + 8);
 			sx = 496 - sx;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 496 - sx;
 				sy = 240 - sy;
@@ -487,13 +489,14 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 			m_gfxdecode->gfx(2)->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
 					(m_bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
 					0,
-					flip_screen(), flip_screen(),
+					m_gfxdecode->flip_screen(),
+					m_gfxdecode->flip_screen(),
 					sx, sy);
 		}
 
 		/* copy the background bitmap to the screen */
 		scroll = (m_bnj_scroll1 & 0x02) * 128 + 511 - m_bnj_scroll2;
-		if (!flip_screen())
+		if (!m_gfxdecode->flip_screen())
 			scroll = 767 - scroll;
 		copyscrollbitmap(bitmap, *m_background_bitmap, 1, &scroll, 0, nullptr, cliprect);
 
@@ -524,7 +527,7 @@ UINT32 btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &
 		sx = 31 - (offs / 32);
 		sy = offs % 32;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 31 - sx;
 			sy = 31 - sy;
@@ -533,7 +536,8 @@ UINT32 btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &
 		m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
 				m_bnj_backgroundram[offs],
 				0,
-				flip_screen(), flip_screen(),
+				m_gfxdecode->flip_screen(),
+				m_gfxdecode->flip_screen(),
 				8*sx,8*sy);
 	}
 

@@ -70,8 +70,8 @@ PALETTE_INIT_MEMBER(karnov_state, karnov)
 void karnov_state::karnov_flipscreen_w( int data )
 {
 	m_flipscreen = data;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	flip_screen_set(m_flipscreen);
+	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->flip_screen_set(m_flipscreen);
 }
 
 void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )

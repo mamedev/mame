@@ -66,7 +66,7 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 {
 	int offs;
 	m_sprite_bitmap.fill(0, cliprect);
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 0, 0, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 0, 0, m_gfxdecode->flip_screen(), m_sprite_bitmap);
 
 
 	draw_background(bitmap, cliprect);

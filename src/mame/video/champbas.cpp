@@ -202,7 +202,7 @@ WRITE8_MEMBER(champbas_state::palette_bank_w)
 
 WRITE8_MEMBER(champbas_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	m_gfxdecode->flip_screen_set(~data & 1);
 }
 
 

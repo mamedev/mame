@@ -186,7 +186,7 @@ void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = m_spriteram[offs + 3];
 
 		// align to tilemap
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy += 1;
 			sx = 233 - sx;
@@ -229,7 +229,7 @@ WRITE8_MEMBER(carjmbre_state::nmi_enable_w)
 WRITE8_MEMBER(carjmbre_state::flipscreen_w)
 {
 	// d0: flip screen (cocktail mode)
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carjmbre_state )

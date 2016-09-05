@@ -197,7 +197,7 @@ WRITE8_MEMBER(chinagat_state::chinagat_video_ctrl_w )
 	m_scrolly_hi = ((data & 0x02) >> 1);
 	m_scrollx_hi = data & 0x01;
 
-	flip_screen_set(~data & 0x04);
+	m_gfxdecode->flip_screen_set(~data & 0x04);
 }
 
 WRITE8_MEMBER(chinagat_state::chinagat_bankswitch_w )

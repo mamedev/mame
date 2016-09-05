@@ -85,7 +85,7 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 	bitmap_ind16* sprite_bitmap2 = &m_sprgen2->get_sprite_temp_bitmap();
 
 	/* Update tilemaps */
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(nullptr, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(nullptr, m_pf4_rowscroll);
 

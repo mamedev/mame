@@ -118,7 +118,7 @@ WRITE8_MEMBER(slapfght_state::scrolly_w)
 
 WRITE8_MEMBER(slapfght_state::flipscreen_w)
 {
-	flip_screen_set(offset ? 0 : 1);
+	m_gfxdecode->flip_screen_set(offset ? 0 : 1);
 }
 
 WRITE8_MEMBER(slapfght_state::palette_bank_w)
@@ -158,7 +158,7 @@ void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle
 		int color = (src[offs + 2] >> 1 & 3) | (src[offs + 2] << 2 & 4) | (m_palette_bank << 3);
 		int fx = 0, fy = 0;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 256 - sy;
 			sx = 240 - sx;
@@ -206,7 +206,7 @@ void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangl
 		int color = src[offs + 2] >> 1 & 0xf;
 		int fx = 0, fy = 0;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = (238 - sy) & 0xff;
 			sx = 284 - sx;

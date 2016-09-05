@@ -116,7 +116,7 @@ WRITE8_MEMBER(sonson_state::sonson_scrollx_w)
 
 WRITE8_MEMBER(sonson_state::sonson_flipscreen_w)
 {
-	flip_screen_set(~data & 0x01);
+	m_gfxdecode->flip_screen_set(~data & 0x01);
 }
 
 TILE_GET_INFO_MEMBER(sonson_state::get_bg_tile_info)
@@ -148,7 +148,7 @@ void sonson_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int sx = spriteram[offs + 3];
 		int sy = spriteram[offs + 0];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

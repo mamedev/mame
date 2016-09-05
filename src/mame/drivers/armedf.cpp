@@ -327,7 +327,7 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
 	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
 
-	flip_screen_set(m_vreg & 0x1000);
+	m_gfxdecode->flip_screen_set(m_vreg & 0x1000);
 }
 
 WRITE16_MEMBER(armedf_state::terrafjb_io_w)
@@ -340,7 +340,7 @@ WRITE16_MEMBER(armedf_state::terrafjb_io_w)
 	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
 	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
 
-	flip_screen_set(m_vreg & 0x1000);
+	m_gfxdecode->flip_screen_set(m_vreg & 0x1000);
 }
 
 WRITE16_MEMBER(armedf_state::bootleg_io_w)
@@ -355,7 +355,7 @@ WRITE16_MEMBER(armedf_state::bootleg_io_w)
 	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
 	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
 
-	flip_screen_set(m_vreg & 0x1000);
+	m_gfxdecode->flip_screen_set(m_vreg & 0x1000);
 }
 
 WRITE16_MEMBER(armedf_state::sound_command_w)

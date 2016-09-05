@@ -49,7 +49,7 @@ WRITE16_MEMBER(legionna_state::tile_scroll_w)
 
 WRITE16_MEMBER(legionna_state::tile_vreg_1a_w)
 {
-	flip_screen_set(data & 1);
+	m_gfxdecode->flip_screen_set(data & 1);
 	// TODO: other bits ...
 }
 

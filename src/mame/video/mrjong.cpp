@@ -82,10 +82,10 @@ WRITE8_MEMBER(mrjong_state::mrjong_colorram_w)
 
 WRITE8_MEMBER(mrjong_state::mrjong_flipscreen_w)
 {
-	if (flip_screen() != BIT(data, 2))
+	if (m_gfxdecode->flip_screen() != BIT(data, 2))
 	{
-		flip_screen_set(BIT(data, 2));
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(BIT(data, 2));
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -124,7 +124,7 @@ void mrjong_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		sx = 224 - m_videoram[offs + 2];
 		sy = m_videoram[offs + 0];
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 208 - sx;
 			sy = 240 - sy;

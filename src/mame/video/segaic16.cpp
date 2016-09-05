@@ -1227,7 +1227,7 @@ void segaic16_video_device::tilemap_set_bank(int which, int banknum, int offset)
 	{
 		m_screen->update_partial(m_screen->vpos());
 		info->bank[banknum] = offset;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 

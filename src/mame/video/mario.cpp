@@ -89,7 +89,7 @@ WRITE8_MEMBER(mario_state::mario_gfxbank_w)
 	if (m_gfx_bank != (data & 0x01))
 	{
 		m_gfx_bank = data & 0x01;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -98,7 +98,7 @@ WRITE8_MEMBER(mario_state::mario_palettebank_w)
 	if (m_palette_bank != (data & 0x01))
 	{
 		m_palette_bank = data & 0x01;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -118,10 +118,10 @@ WRITE8_MEMBER(mario_state::mario_flip_w)
 	{
 		m_flip = data & 0x01;
 		if (m_flip)
-			machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
+			m_gfxdecode->set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
 		else
-			machine().tilemap().set_flip_all(0);
-		machine().tilemap().mark_all_dirty();
+			m_gfxdecode->set_flip_all(0);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -281,7 +281,7 @@ UINT32 mario_state::screen_update_mariobl(screen_device &screen, bitmap_ind16 &b
 {
 	// not sure
 	m_palette_bank = m_gfx_bank; // might be the 'attr' ram
-	machine().tilemap().mark_all_dirty();
+	m_gfxdecode->mark_all_dirty();
 
 
 	screen_update_common(screen, bitmap, cliprect);

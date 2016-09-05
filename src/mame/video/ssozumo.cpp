@@ -107,7 +107,7 @@ WRITE8_MEMBER(ssozumo_state::scroll_w)
 
 WRITE8_MEMBER(ssozumo_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x80);
+	m_gfxdecode->flip_screen_set(data & 0x80);
 }
 
 TILE_GET_INFO_MEMBER(ssozumo_state::get_bg_tile_info)
@@ -151,7 +151,7 @@ void ssozumo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int sx = 239 - m_spriteram[offs + 3];
 			int sy = (240 - m_spriteram[offs + 2]) & 0xff;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

@@ -331,7 +331,7 @@ WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 	if (m_gfx_bank != (data & 3))
 	{
 		m_gfx_bank = data & 3;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 

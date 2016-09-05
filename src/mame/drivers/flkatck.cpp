@@ -233,7 +233,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 
 	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
+	MCFG_K007121_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

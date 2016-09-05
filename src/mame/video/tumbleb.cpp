@@ -306,14 +306,14 @@ UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16
 {
 	int offs, offs2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -327,14 +327,14 @@ UINT32 tumbleb_state::screen_update_jumpkids(screen_device &screen, bitmap_ind16
 {
 	int offs, offs2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -347,14 +347,14 @@ UINT32 tumbleb_state::screen_update_semicom(screen_device &screen, bitmap_ind16 
 {
 	int offs, offs2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -367,7 +367,7 @@ UINT32 tumbleb_state::screen_update_semicom_altoffsets(screen_device &screen, bi
 {
 	int offsx, offsy, offsx2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
 	offsx = -1;
 	offsy = 2;
@@ -382,16 +382,16 @@ UINT32 tumbleb_state::screen_update_bcstory(screen_device &screen, bitmap_ind16 
 {
 	int offs, offs2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
 	/* not sure of this */
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs = 1;
 	else
 		offs = 8;
 
 	/* not sure of this */
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs2 = -3;
 	else
 		offs2 = 8;
@@ -404,7 +404,7 @@ UINT32 tumbleb_state::screen_update_semibase(screen_device &screen, bitmap_ind16
 {
 	int offs, offs2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
 	offs = -1;
 	offs2 = -2;
@@ -418,7 +418,7 @@ UINT32 tumbleb_state::screen_update_sdfight(screen_device &screen, bitmap_ind16 
 {
 	int offs, offs2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
 	offs = -1;
 	offs2 = -5; // foreground scroll..
@@ -433,14 +433,14 @@ UINT32 tumbleb_state::screen_update_fncywld(screen_device &screen, bitmap_ind16 
 {
 	int offs, offs2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -454,14 +454,14 @@ UINT32 tumbleb_state::screen_update_pangpang(screen_device &screen, bitmap_ind16
 {
 	int offs, offs2;
 
-	flip_screen_set(m_control_0[0] & 0x80);
+	m_gfxdecode->flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_gfxdecode->flip_screen())
 		offs2 = -3;
 	else
 		offs2 = -5;

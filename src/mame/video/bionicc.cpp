@@ -167,7 +167,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		flip_screen_set(data & 0x0100);
+		m_gfxdecode->flip_screen_set(data & 0x0100);
 
 		m_bg_tilemap->enable(data & 0x2000);    /* guess */
 		m_fg_tilemap->enable(data & 0x1000);    /* guess */
@@ -193,7 +193,7 @@ UINT32 bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 0 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), m_gfxdecode->flip_screen(), 0 );
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

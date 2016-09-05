@@ -355,7 +355,7 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 				for (row = 0; row < numrows; row++)
 				{
-					if (flip_screen())
+					if (m_gfxdecode->flip_screen())
 					{
 						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 								code + s_ptr, color, !flipx, !flipy,
@@ -429,7 +429,7 @@ void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				for (row = 0; row < numrows; row++)
 				{
-					if (flip_screen())
+					if (m_gfxdecode->flip_screen())
 					{
 						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 								code + s_ptr, color, !flipx, !flipy,
@@ -547,9 +547,9 @@ UINT32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap,
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (ioport("DSW")->read() & 0x100)
-		flip_screen_set(0);
+		m_gfxdecode->flip_screen_set(0);
 	else
-		flip_screen_set(1);
+		m_gfxdecode->flip_screen_set(1);
 	return 0;
 }
 
@@ -564,8 +564,8 @@ UINT32 m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (ioport("DSW")->read() & 0x100)
-		flip_screen_set(0);
+		m_gfxdecode->flip_screen_set(0);
 	else
-		flip_screen_set(1);
+		m_gfxdecode->flip_screen_set(1);
 	return 0;
 }

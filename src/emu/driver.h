@@ -89,8 +89,6 @@
 //**************************************************************************
 
 // forward declarations
-class gfxdecode_device;
-class palette_device;
 typedef delegate<void ()> driver_callback_delegate;
 
 
@@ -180,15 +178,6 @@ public:
 	INTERRUPT_GEN_MEMBER( irq7_line_assert );
 
 
-	// generic video
-	void flip_screen_set(UINT32 on);
-	void flip_screen_set_no_update(UINT32 on);
-	void flip_screen_x_set(UINT32 on);
-	void flip_screen_y_set(UINT32 on);
-	UINT32 flip_screen() const { return m_flip_screen_x; }
-	UINT32 flip_screen_x() const { return m_flip_screen_x; }
-	UINT32 flip_screen_y() const { return m_flip_screen_y; }
-
 	// generic input port helpers
 	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
 
@@ -220,7 +209,6 @@ protected:
 private:
 	// helpers
 	void irq_pulse_clear(void *ptr, INT32 param);
-	void updateflip();
 
 	// configuration state
 	const address_space_config  m_space_config;
@@ -228,10 +216,6 @@ private:
 	// internal state
 	const game_driver *     m_system;                   // pointer to the game driver
 	driver_callback_delegate m_callbacks[CB_COUNT];     // start/reset callbacks
-
-	// generic video
-	UINT8                   m_flip_screen_x;
-	UINT8                   m_flip_screen_y;
 };
 
 

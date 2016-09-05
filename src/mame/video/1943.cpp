@@ -142,7 +142,7 @@ WRITE8_MEMBER(_1943_state::c1943_c804_w)
 	/* bit 5 resets the sound CPU - we ignore it */
 
 	/* bit 6 flips screen */
-	flip_screen_set(data & 0x40);
+	m_gfxdecode->flip_screen_set(data & 0x40);
 
 	/* bit 7 enables characters */
 	m_char_on = data & 0x80;
@@ -223,7 +223,7 @@ void _1943_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		int sx = m_spriteram[offs + 3] - ((attr & 0x10) << 4);
 		int sy = m_spriteram[offs + 2];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -233,12 +233,12 @@ void _1943_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (priority)
 		{
 			if (color != 0x0a && color != 0x0b)
-				m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
+				m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, m_gfxdecode->flip_screen(), m_gfxdecode->flip_screen(), sx, sy, 0);
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
-				m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
+				m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, m_gfxdecode->flip_screen(), m_gfxdecode->flip_screen(), sx, sy, 0);
 		}
 	}
 }

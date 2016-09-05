@@ -148,7 +148,7 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (size >= 0x10)
 		{
 			// 32x32
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 256 - sx;
 				sy = 224 - sy;
@@ -163,7 +163,7 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 		else
 		{
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = ((size & 0x08) ? 280: 272) - sx;
 				sy = ((size & 0x04) ? 248: 240) - sy;

@@ -208,7 +208,7 @@ WRITE8_MEMBER(_1942_state::c1942_c804_w)
 
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
-	flip_screen_set(data & 0x80);
+	m_gfxdecode->flip_screen_set(data & 0x80);
 }
 
 
@@ -233,7 +233,7 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		sy = m_spriteram[offs + 2];
 		dir = 1;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -249,7 +249,8 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,col,
-					flip_screen(),flip_screen(),
+					m_gfxdecode->flip_screen(),
+					m_gfxdecode->flip_screen(),
 					sx,sy + 16 * i * dir,15);
 
 			i--;
@@ -286,7 +287,7 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sx = 240 - sx;
 			dir = -1;
@@ -308,7 +309,8 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,col,
-					flip_screen(),flip_screen(),
+					m_gfxdecode->flip_screen(),
+					m_gfxdecode->flip_screen(),
 					sx,sy + 16 * i * dir,15);
 
 			i--;

@@ -322,7 +322,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 		zoomx = 32 - zoomx;
 		zoomy = 32 - zoomy;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			x = width  - x - (nx * zoomx) / 2;
 			y = height - y - (ny * zoomy) / 2;
@@ -441,7 +441,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 		zoomy = 32 - zoomy;
 
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			x = width  - x - (nx * zoomx) / 2;
 			y = height - y - (ny * zoomy) / 2;
@@ -520,7 +520,7 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
+	m_gfxdecode->flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -693,7 +693,7 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
+	m_gfxdecode->flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 

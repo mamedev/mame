@@ -158,12 +158,12 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int xx,yy,x;
 			int delta = 16;
 
-			flipx ^= flip_screen();
-			flipy ^= flip_screen();
+			flipx ^= m_gfxdecode->flip_screen();
+			flipy ^= m_gfxdecode->flip_screen();
 
 			if ((pri&pri_mask)!=priority) continue;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;

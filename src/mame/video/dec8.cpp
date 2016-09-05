@@ -233,7 +233,7 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 		fx = buffered_spriteram[offs + 1] & 0x04;
 		multi = buffered_spriteram[offs + 1] & 0x10;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -245,13 +245,13 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 				color,
-				fx,flip_screen(),
+				fx,m_gfxdecode->flip_screen(),
 				sx,sy,0);
 		if (multi)
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code+1,
 				color,
-				fx,flip_screen(),
+				fx,m_gfxdecode->flip_screen(),
 				sx,sy2,0);
 	}
 }
@@ -260,7 +260,7 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 
 UINT32 dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	m_gfxdecode->flip_screen_set(m_tilegen1->get_flip_state());
 
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_spritegen_mxc->draw_sprites(bitmap, cliprect, m_buffered_spriteram16, 0x04, 0x00, 0x03);
@@ -331,7 +331,7 @@ VIDEO_START_MEMBER(dec8_state,ghostb)
 
 UINT32 dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	m_gfxdecode->flip_screen_set(m_tilegen1->get_flip_state());
 
 	// we mimic the priority scheme in dec0.c, this was originally a bit different, so this could be wrong
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);

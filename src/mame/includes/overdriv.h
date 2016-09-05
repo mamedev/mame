@@ -66,4 +66,5 @@ public:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);
+	K053251_CB_MEMBER(mark_tmaps_dirty);
 };

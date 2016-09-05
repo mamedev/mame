@@ -167,7 +167,7 @@ void yunsun16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		x += m_sprites_scrolldx;
 		y += m_sprites_scrolldy;
 
-		if (flip_screen())   // not used?
+		if (m_gfxdecode->flip_screen())   // not used?
 		{
 			flipx = !flipx;     x = max_x - x - 16;
 			flipy = !flipy;     y = max_y - y - 16;

@@ -34,10 +34,10 @@ WRITE8_MEMBER(bombjack_state::bombjack_background_w)
 
 WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_gfxdecode->flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->flip_screen_set(data & 0x01);
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -102,7 +102,7 @@ void bombjack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		flipx = m_spriteram[offs + 1] & 0x40;
 		flipy = m_spriteram[offs + 1] & 0x80;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			if (m_spriteram[offs + 1] & 0x20)
 			{

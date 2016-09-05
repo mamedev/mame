@@ -198,7 +198,7 @@ WRITE8_MEMBER(albazg_state::yumefuda_output_w)
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
-	flip_screen_set(~data & 0x20);
+	m_gfxdecode->flip_screen_set(~data & 0x20);
 }
 
 /***************************************************************************************/

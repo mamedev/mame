@@ -227,7 +227,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int color = src[1] & 0x1f;
 		int x,y;
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			xflip = !xflip;
 			yflip = !yflip;
@@ -295,9 +295,9 @@ UINT32 gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind1
 		int scroll;
 
 		scroll = m_bg_scrollx + ((m_video_attributes & 0x04) << 6);
-		m_bg_tilemap->set_scrollx(0, scroll ^ (flip_screen() ? 0x0f : 0));
+		m_bg_tilemap->set_scrollx(0, scroll ^ (m_gfxdecode->flip_screen() ? 0x0f : 0));
 		scroll = m_fg_scrollx + ((m_video_attributes & 0x08) << 5);
-		m_fg_tilemap->set_scrollx(0, scroll ^ (flip_screen() ? 0x0f : 0));
+		m_fg_tilemap->set_scrollx(0, scroll ^ (m_gfxdecode->flip_screen() ? 0x0f : 0));
 
 		// always 0 anyway
 		m_bg_tilemap->set_scrolly(0, m_bg_scrolly);

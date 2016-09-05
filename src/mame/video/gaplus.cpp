@@ -277,7 +277,7 @@ void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 			int duplicate = spriteram_3[offs] & 0x80;
 			int x,y;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -305,7 +305,7 @@ void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 UINT32 gaplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
+	m_gfxdecode->flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
 
 	bitmap.fill(0, cliprect);
 

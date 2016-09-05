@@ -170,12 +170,12 @@ WRITE8_MEMBER(zaccaria_state::attributes_w)
 
 WRITE8_MEMBER(zaccaria_state::flip_screen_x_w)
 {
-	flip_screen_x_set(data & 1);
+	m_gfxdecode->flip_screen_x_set(data & 1);
 }
 
 WRITE8_MEMBER(zaccaria_state::flip_screen_y_w)
 {
-	flip_screen_y_set(data & 1);
+	m_gfxdecode->flip_screen_y_set(data & 1);
 }
 
 
@@ -220,12 +220,12 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		if (sx == 1) continue;
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

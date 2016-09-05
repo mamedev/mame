@@ -119,7 +119,7 @@ WRITE8_MEMBER(safarir_state::ram_bank_w)
 {
 	m_ram_bank = data & 0x01;
 
-	machine().tilemap().mark_all_dirty();
+	m_gfxdecode->mark_all_dirty();
 }
 
 

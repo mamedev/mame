@@ -124,7 +124,7 @@ const device_type K007121 = &device_creator<k007121_device>;
 k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007121, "K007121 Sprite/Tilemap Controller", tag, owner, clock, "k007121", __FILE__)
 	, m_flipscreen(0)
-	, m_palette(*this, finder_base::DUMMY_TAG)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER( k007121_device::ctrl_w )
 	case 6:
 		/* palette bank change */
 		if ((m_ctrlram[offset] & 0x30) != (data & 0x30))
-			space.machine().tilemap().mark_all_dirty();
+			m_gfxdecode->mark_all_dirty();
 		break;
 	case 7:
 		m_flipscreen = data & 0x08;
@@ -359,11 +359,11 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfxdecode device
 //-------------------------------------------------
 
-void k007121_device::static_set_palette_tag(device_t &device, const char *tag)
+void k007121_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
-	downcast<k007121_device &>(device).m_palette.set_tag(tag);
+	downcast<k007121_device &>(device).m_gfxdecode.set_tag(tag);
 }

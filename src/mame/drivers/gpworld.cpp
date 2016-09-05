@@ -142,7 +142,7 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 	const int SPR_SKIP_HI   = 5;
 	const int SPR_GFXOFS_LO = 6;
 	const int SPR_GFXOFS_HI = 7;
-	int flip = flip_screen();
+	int flip = m_gfxdecode->flip_screen();
 
 	int i;
 

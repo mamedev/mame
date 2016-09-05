@@ -1788,7 +1788,7 @@ WRITE16_MEMBER(seta_state::usclssic_lockout_w)
 		m_usclssic_port_select = (data & 0x40) >> 6;
 
 		if (tiles_offset != m_tiles_offset)
-			machine().tilemap().mark_all_dirty();
+			m_gfxdecode->mark_all_dirty();
 		m_tiles_offset = tiles_offset;
 
 		seta_coin_lockout_w(data);

@@ -12,17 +12,16 @@
 		K053251_CI4
 	};
 
+typedef device_delegate<void ()> konami_tilemap_dirty_delegate;
+#define K053251_CB_MEMBER(_name)   void _name()
+
 class k053251_device : public device_t
 {
 public:
 	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k053251_device() {}
 
-	/*
-	Note: k053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()
-	when some palette index changes. If ALL_TILEMAPS is too expensive, use
-	k053251_set_tilemaps() to indicate which tilemap is associated with each index.
-	*/
+	static void static_set_tilemap_dirty_cb(device_t &device, konami_tilemap_dirty_delegate callback) { downcast<k053251_device &>(device).m_tilemap_dirty_cb = callback; }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE16_MEMBER( lsb_w );
@@ -37,18 +36,20 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	// internal state
 	int      m_dirty_tmap[5];
 
 	UINT8    m_ram[16];
-	int      m_tilemaps_set;
 	int      m_palette_index[5];
 
-	void reset_indexes();
+	// automatically called when some palette index changes
+	konami_tilemap_dirty_delegate m_tilemap_dirty_cb;
+
+ 	void reset_indexes();
 };
 
 extern const device_type K053251;
@@ -56,4 +57,7 @@ extern const device_type K053251;
 #define MCFG_K053251_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K053251, 0)
 
+#define MCFG_K053251_CB(_device, _class, _method) \
+	k053251_device::static_set_tilemap_dirty_cb(*device, konami_tilemap_dirty_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0));
+ 
 #endif

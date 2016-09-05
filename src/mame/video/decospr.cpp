@@ -207,7 +207,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 	int offs, end, incr;
 
-	bool flipscreen = (machine().driver_data()->flip_screen() != 0);
+	bool flipscreen = (m_gfxdecode->flip_screen() != 0);
 
 	if (invert_flip)
 		flipscreen = !flipscreen;

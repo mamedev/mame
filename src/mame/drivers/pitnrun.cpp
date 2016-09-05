@@ -86,12 +86,12 @@ WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
 
 WRITE8_MEMBER(pitnrun_state::hflip_w)
 {
-	flip_screen_x_set(data);
+	m_gfxdecode->flip_screen_x_set(data);
 }
 
 WRITE8_MEMBER(pitnrun_state::vflip_w)
 {
-	flip_screen_y_set(data);
+	m_gfxdecode->flip_screen_y_set(data);
 }
 
 static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )

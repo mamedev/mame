@@ -92,6 +92,7 @@ public:
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco104(*this, "ioprot104"),
 		m_sprgen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
@@ -110,6 +111,7 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
@@ -133,7 +135,7 @@ UINT32 dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind1
 	address_space &space = generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
-	flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */

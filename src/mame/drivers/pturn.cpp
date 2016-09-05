@@ -198,13 +198,13 @@ UINT32 pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		int flipy=m_spriteram[offs+1]&0x80;
 
 
-		if (flip_screen_x())
+		if (m_gfxdecode->flip_screen_x())
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (flip_screen_y())
+		if (m_gfxdecode->flip_screen_y())
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -289,7 +289,7 @@ WRITE8_MEMBER(pturn_state::bgbank_w)
 
 WRITE8_MEMBER(pturn_state::flip_w)
 {
-	flip_screen_set(data);
+	m_gfxdecode->flip_screen_set(data);
 }
 
 

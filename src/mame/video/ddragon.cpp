@@ -171,7 +171,7 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				which = src[i + 3] + ((src[i + 2] & 0x0f) << 8);
 			}
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - 16 - sy;

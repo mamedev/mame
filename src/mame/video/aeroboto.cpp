@@ -76,13 +76,13 @@ void aeroboto_state::video_start()
 
 READ8_MEMBER(aeroboto_state::aeroboto_in0_r)
 {
-	return ioport(flip_screen() ? "P2" : "P1")->read();
+	return ioport(m_gfxdecode->flip_screen() ? "P2" : "P1")->read();
 }
 
 WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)
 {
 	/* bit 0 selects both flip screen and player1/player2 controls */
-	flip_screen_set(data & 0x01);
+	m_gfxdecode->flip_screen_set(data & 0x01);
 
 	/* bit 1 = char bank select */
 	if (m_charbank != ((data & 0x02) >> 1))
@@ -127,7 +127,7 @@ void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int x = m_spriteram[offs + 3];
 		int y = 240 - m_spriteram[offs];
 
-		if (flip_screen())
+		if (m_gfxdecode->flip_screen())
 		{
 			x = 248 - x;
 			y = 240 - y;
@@ -136,7 +136,8 @@ void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				m_spriteram[offs + 1],
 				m_spriteram[offs + 2] & 0x07,
-				flip_screen(), flip_screen(),
+				m_gfxdecode->flip_screen(),
+				m_gfxdecode->flip_screen(),
 				((x + 8) & 0xff) - 8, y, 0);
 	}
 }

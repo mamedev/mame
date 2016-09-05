@@ -107,7 +107,7 @@ WRITE8_MEMBER(senjyo_state::irq_ctrl_w)
 
 WRITE8_MEMBER(senjyo_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	m_gfxdecode->flip_screen_set(data);
 }
 
 WRITE8_MEMBER(senjyo_state::sound_cmd_w)

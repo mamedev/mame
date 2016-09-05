@@ -109,7 +109,7 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_w)
 	m_tilemap_0->mark_all_dirty();
 	m_tilemap_0_16x16->mark_all_dirty();
 
-	flip_screen_set(data & 0x80);
+	m_gfxdecode->flip_screen_set(data & 0x80);
 }
 
 WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
@@ -118,7 +118,7 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
 	m_tilemap0_color = 2;
 	m_tilemap1_color = 1;
 
-	flip_screen_set(data & 0x80);
+	m_gfxdecode->flip_screen_set(data & 0x80);
 }
 
 

@@ -170,7 +170,7 @@ void laserbat_state_base::video_start()
 
 UINT32 laserbat_state_base::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool const flip_y = flip_screen_y(), flip_x = flip_screen_x();
+	bool const flip_y = m_gfxdecode->flip_screen_y(), flip_x = m_gfxdecode->flip_screen_x();
 	int const offs_y = m_screen->visible_area().max_y + m_screen->visible_area().min_y;
 	int const offs_x = m_screen->visible_area().max_x + m_screen->visible_area().min_x;
 

@@ -169,7 +169,7 @@ WRITE16_MEMBER(ginganin_state::ginganin_vregs16_w)
  */
 	case 6:
 		m_flipscreen = !(data & 1);
-		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
 		m_soundlatch->write(space, 0, data);

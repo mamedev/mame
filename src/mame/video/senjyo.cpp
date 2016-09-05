@@ -169,7 +169,7 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		bitmap.fill(m_palette->pen_color(0), cliprect);
 	else
 	{
-		int flip = flip_screen();
+		int flip = m_gfxdecode->flip_screen();
 
 		int pen = 0;
 		int count = 0;
@@ -207,7 +207,7 @@ void senjyo_state::draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				sx = (8 * (offs % 8) + x) + 256-64;
 				sy = ((offs & 0x1ff) / 8) + 96;
 
-				if (flip_screen())
+				if (m_gfxdecode->flip_screen())
 				{
 					sx = 255 - sx;
 					sy = 255 - sy;
@@ -238,7 +238,7 @@ void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			flipx = m_spriteram[offs+1] & 0x40;
 			flipy = m_spriteram[offs+1] & 0x80;
 
-			if (flip_screen())
+			if (m_gfxdecode->flip_screen())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -267,7 +267,7 @@ void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 UINT32 senjyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int flip = flip_screen();
+	int flip = m_gfxdecode->flip_screen();
 
 	for (int i = 0;i < 32;i++)
 		m_fg_tilemap->set_scrolly(i, m_fgscroll[i]);

@@ -300,7 +300,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 	membank("bank2")->set_entry(data & 0x3f);
 
 	m_msm_nmi_mask = data & 0x40;
-	flip_screen_set(data & 0x80);
+	m_gfxdecode->flip_screen_set(data & 0x80);
 }
 
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
