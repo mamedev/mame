@@ -29,7 +29,6 @@
 
 TODO:
 - LEDs should be dark at startup (RS key to activate)
-- add software list
 - hook up Single Step dip switch
 - slots for expansion & application ports
 - add TTY support
@@ -247,9 +246,13 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(kim1_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE ("kim1_cass")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", kim1_state, kim1_update_leds, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", kim1_state, kim1_cassette_input, attotime::from_hz(44100))
+
+	// software list
+    MCFG_SOFTWARE_LIST_ADD ("cass_list", "kim1_cass")
 
 MACHINE_CONFIG_END
 
@@ -267,5 +270,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY          FULLNAME        FLAGS
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS              INIT  COMPANY             FULLNAME  FLAGS
 COMP( 1975, kim1,     0,        0,      kim1,     kim1, driver_device,     0,    "MOS Technologies", "KIM-1" , MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
