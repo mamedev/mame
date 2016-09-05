@@ -70,7 +70,7 @@ This is done in the following way:
 4. Answer YES to the screen prompt.
 5. When HDFORMAT is completed remove disc four and replace with disc one.
 6. Type CD\ and press return.
-7. Type FDISC and press return.
+7. Type FDISK and press return.
 8. Press return key every time you are asked a question.
 9. With disc one still in drive A: type FORMAT C:/S and press return.
 10. When formatting is finished replace disc one with disc four.
@@ -1338,7 +1338,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1512hd, pc1512 )
 	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
+	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
+	MCFG_SLOT_DEFAULT_OPTION("hdc")
 MACHINE_CONFIG_END
 
 
@@ -1440,7 +1441,8 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_RAM_DEFAULT_SIZE("640K")
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pc1640_hdd")
 MACHINE_CONFIG_END
 
 
@@ -1460,7 +1462,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1640hd, pc1640 )
 	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
+	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
+	MCFG_SLOT_DEFAULT_OPTION("hdc")
 MACHINE_CONFIG_END
 
 
