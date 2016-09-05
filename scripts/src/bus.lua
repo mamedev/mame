@@ -2904,3 +2904,15 @@ if (BUSES["COMPIS_GRAPHICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/compis/hrg.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc1512/mouse.h,BUSES["PC1512"] = true
+---------------------------------------------------
+
+if (BUSES["PC1512"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc1512/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/pc1512/mouse.h",
+	}
+end

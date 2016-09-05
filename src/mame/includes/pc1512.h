@@ -6,15 +6,17 @@
 #define __PC1512__
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
+#include "bus/isa/pc1640_iga.h"
+#include "bus/pc1512/mouse.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/pc_dsk.h"
 #include "machine/am9517a.h"
 #include "machine/buffer.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/ins8250.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/isa_cards.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -23,7 +25,6 @@
 #include "machine/ram.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
-#include "bus/isa/pc1640_iga.h"
 
 #define I8086_TAG       "ic120"
 #define I8087_TAG       "ic119"
@@ -155,10 +156,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_1_changed );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_2_changed );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
@@ -167,6 +164,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE8_MEMBER( mouse_x_w );
+	DECLARE_WRITE8_MEMBER( mouse_y_w );
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	// system status register
@@ -186,6 +185,8 @@ public:
 	int m_kbdata;
 
 	// mouse state
+	UINT8 m_mouse_x_old;
+	UINT8 m_mouse_y_old;
 	UINT8 m_mouse_x;
 	UINT8 m_mouse_y;
 

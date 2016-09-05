@@ -22,7 +22,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define PC1512_KEYBOARD_TAG "pc1512_keyboard"
+#define PC1512_KEYBOARD_TAG "kb"
 
 
 
