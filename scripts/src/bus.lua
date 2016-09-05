@@ -247,6 +247,8 @@ if (BUSES["BBC_ANALOGUE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.h",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.h",
 	}
 end
 

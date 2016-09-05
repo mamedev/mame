@@ -78,6 +78,7 @@ public:
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
+		m_analog(*this, "analogue"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
 		m_i8271(*this, "i8271"),
@@ -87,7 +88,6 @@ public:
 		m_exp2(*this, "exp_rom2"),
 		m_exp3(*this, "exp_rom3"),
 		m_exp4(*this, "exp_rom4"),
-		m_joy(*this, "JOY%u", 0),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_os(*this, "os"),
 		m_region_opt(*this, "option"),
@@ -224,6 +224,7 @@ public: // HACK FOR MC6845
 	required_device<via6522_device> m_via6522_0;
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
+	optional_device<bbc_analogue_slot_device> m_analog;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;
@@ -233,7 +234,6 @@ public: // HACK FOR MC6845
 	optional_device<generic_slot_device> m_exp2;
 	optional_device<generic_slot_device> m_exp3;
 	optional_device<generic_slot_device> m_exp4;
-	optional_ioport_array<4> m_joy;
 
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_os;

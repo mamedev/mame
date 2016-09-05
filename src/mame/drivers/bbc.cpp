@@ -407,10 +407,6 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_START("COL10")
 	PORT_START("COL11")
 	PORT_START("COL12")
-
-	PORT_START("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 INPUT_PORTS_END
 
 
@@ -649,21 +645,6 @@ static INPUT_PORTS_START(bbcbp_links)
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START(bbc_joy)
-	PORT_START("JOY0")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x0,0xff ) PORT_PLAYER(1)
-
-	PORT_START("JOY1")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x0,0xff ) PORT_PLAYER(1)
-
-	PORT_START("JOY2")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x0,0xff ) PORT_PLAYER(2)
-
-	PORT_START("JOY3")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x0,0xff ) PORT_PLAYER(2)
-INPUT_PORTS_END
-
-
 INPUT_CHANGED_MEMBER(bbc_state::monitor_changed)
 {
 	m_monitortype = m_bbcconfig.read_safe(0) &0x03;
@@ -727,7 +708,6 @@ static INPUT_PORTS_START(bbcb)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
 	PORT_INCLUDE(bbcb_links)
-	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbcbp)
@@ -735,41 +715,35 @@ static INPUT_PORTS_START(bbcbp)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
 	PORT_INCLUDE(bbcbp_links)
-	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(torch)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(torch_keyboard)
 	PORT_INCLUDE(bbcb_links)
-	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(abc)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_keypad)
 	PORT_INCLUDE(bbcbp_links)
-	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbcm)
 	PORT_INCLUDE(bbc_config)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_keypad)
-	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(ltmpbp)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
 	PORT_INCLUDE(bbcbp_links)
-	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(ltmpm)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_keypad)
-	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 
@@ -999,7 +973,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* expansion ports */
-	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, nullptr)
+	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, "acornjoy")
 	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
 	MCFG_BBC_TUBE_SLOT_ADD("tube", bbc_tube_ext_devices, nullptr)
 	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
@@ -1031,8 +1005,8 @@ static MACHINE_CONFIG_DERIVED( bbcb_de, bbcb )
 	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-/* software lists */
-MCFG_SOFTWARE_LIST_ADD("flop_ls_b_de", "bbcb_cass_de")
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_de", "bbcb_cass_de")
 MACHINE_CONFIG_END
 
 
@@ -1422,7 +1396,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* expansion ports */
-	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, nullptr)
+	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, "acornjoy")
 	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
 	MCFG_BBC_TUBE_SLOT_ADD("tube_ext", bbc_tube_ext_devices, nullptr)
 	MCFG_BBC_TUBE_SLOT_ADD("tube_int", bbc_tube_int_devices, nullptr)
@@ -1485,6 +1459,9 @@ static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770")
+
+	/* expansion ports */
+	MCFG_DEVICE_REMOVE("analogue")
 MACHINE_CONFIG_END
 
 
