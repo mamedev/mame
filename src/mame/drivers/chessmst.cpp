@@ -6,8 +6,6 @@
 
         TODO:
         - figure out why chessmsta won't work, for starters it assume z80 carry flag is set at poweron?
-        - the HALT button does not work as it should: it stops the computers calculation
-          (the board LEDs go OFF and the CM's LED goes ON), but the machine doesn't return any move (as it should)
         - a better artwork
 
 ****************************************************************************/
@@ -251,12 +249,19 @@ WRITE8_MEMBER( chessmst_state::pio2_port_b_w )
 	m_led_sel = (data & 0xff) | (m_led_sel & 0x300);
 }
 
+static const z80_daisy_config chessmst_daisy_chain[] =
+{
+	{ "z80pio1" },
+	{ nullptr }
+};
+
 static MACHINE_CONFIG_START( chessmst, chessmst_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/4) // U880 Z80 clone
 	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
 	MCFG_CPU_IO_MAP(chessmst_io)
+	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_9_8304MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -281,6 +286,7 @@ static MACHINE_CONFIG_START( chessmsta, chessmst_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/4) // U880 Z80 clone
 	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
 	MCFG_CPU_IO_MAP(chessmst_io)
+	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_8MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
