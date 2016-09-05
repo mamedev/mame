@@ -219,6 +219,27 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/fds/fds.h,BUSES["BBC_FDC"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_FDC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/analogue/analogue.h,BUSES["BBC_ANALOGUE"] = true
 ---------------------------------------------------
 

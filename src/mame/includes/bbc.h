@@ -30,6 +30,7 @@
 #include "sound/tms5220.h"
 #include "imagedev/cassette.h"
 
+#include "bus/bbc/fdc/fdc.h"
 #include "bus/bbc/analogue/analogue.h"
 #include "bus/bbc/1mhzbus/1mhzbus.h"
 #include "bus/bbc/tube/tube.h"
@@ -78,6 +79,7 @@ public:
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
 		m_rtc(*this, "rtc"),
+		m_fdc(*this, "fdc"),
 		m_i8271(*this, "i8271"),
 		m_wd1770(*this, "wd1770"),
 		m_wd1772(*this, "wd1772"),
@@ -223,6 +225,7 @@ public: // HACK FOR MC6845
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<mc146818_device> m_rtc;
+	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;
 	optional_device<wd1770_t> m_wd1770;
 	optional_device<wd1772_t> m_wd1772;
