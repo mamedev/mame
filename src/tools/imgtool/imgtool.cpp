@@ -255,6 +255,15 @@ const imgtool_module *imgtool_find_module(const char *modulename)
 }
 
 
+/*-------------------------------------------------
+	imgtool_find_module - looks up a module
+-------------------------------------------------*/
+
+const imgtool::library::modulelist &imgtool_get_modules()
+{
+	return global_imgtool_library->modules();
+}
+
 
 /*-------------------------------------------------
     imgtool_get_module_features - retrieves a
@@ -385,7 +394,6 @@ imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, 
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	imgtool::library *library = global_imgtool_library.get();
-	imgtool_module *module = nullptr;
 	imgtool_module *insert_module;
 	imgtool_module *temp_module;
 	size_t i = 0;
@@ -418,15 +426,15 @@ imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, 
 		extension++;
 
 	/* iterate through all modules */
-	while((module = library->iterate(module)) != nullptr)
+	for (const auto &module : library->modules())
 	{
 		if (!extension || image_find_extension(module->extensions, extension))
 		{
-			err = evaluate_module(fname, module, &val);
+			err = evaluate_module(fname, module.get(), &val);
 			if (err)
 				goto done;
 
-			insert_module = module;
+			insert_module = module.get();
 			for (i = 0; (val > 0.0f) && (i < count); i++)
 			{
 				if (val > values[i])
@@ -927,7 +935,6 @@ int imgtool_validitychecks(void)
 {
 	int error = 0;
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
-	const imgtool_module *module = nullptr;
 	imgtool_module_features features;
 	int created_library = FALSE;
 
@@ -937,9 +944,9 @@ int imgtool_validitychecks(void)
 		created_library = TRUE;
 	}
 
-	while((module = global_imgtool_library->iterate(module)) != nullptr)
+	for (const auto &module : global_imgtool_library->modules())
 	{
-		features = imgtool_get_module_features(module);
+		features = imgtool_get_module_features(module.get());
 
 		if (!module->name)
 		{

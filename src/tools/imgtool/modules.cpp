@@ -30,7 +30,6 @@ static void (*const modules[])(const imgtool_class *imgclass, UINT32 state, unio
 imgtoolerr_t imgtool_create_cannonical_library(bool omit_untested, std::unique_ptr<imgtool::library> &library)
 {
 	size_t i;
-	imgtool_module *module;
 
 	/* list of modules that we drop */
 	static const char *const irrelevant_modules[] =
@@ -55,8 +54,7 @@ imgtoolerr_t imgtool_create_cannonical_library(bool omit_untested, std::unique_p
 	// if we are omitting untested, go through and block out the functionality in question
 	if (omit_untested)
 	{
-		module = nullptr;
-		while((module = library->iterate(module)) != nullptr)
+		for (auto &module : library->modules())
 		{
 			if (module->writing_untested)
 			{

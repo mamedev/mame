@@ -707,15 +707,11 @@ done:
 
 static int cmd_listformats(const struct command *c, int argc, char *argv[])
 {
-	const imgtool_module *mod;
-
 	fprintf(stdout, "Image formats supported by imgtool:\n\n");
 
-	mod = imgtool_find_module(nullptr);
-	while(mod)
+	for (const auto &module : imgtool_get_modules())
 	{
-		fprintf(stdout, "  %-25s%s\n", mod->name, mod->description);
-		mod = mod->next;
+		fprintf(stdout, "  %-25s%s\n", module->name, module->description);
 	}
 
 	return 0;

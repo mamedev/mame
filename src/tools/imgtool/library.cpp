@@ -10,6 +10,7 @@
 ****************************************************************************/
 
 #include <string.h>
+#include <algorithm>
 
 #include "imgtool.h"
 #include "library.h"
@@ -27,8 +28,6 @@ library::library()
 	m_pool = pool_alloc_lib(nullptr);
 	if (!m_pool)
 		throw std::bad_alloc();
-	m_first = nullptr;
-	m_last = nullptr;
 }
 
 
@@ -48,18 +47,12 @@ library::~library()
 
 void library::add_class(const imgtool_class *imgclass)
 {
-	imgtool_module *module;
 	char *s1, *s2;
 
 	// allocate the module and place it in the chain
-	module = (imgtool_module *)imgtool_library_malloc(sizeof(*module));
+	m_modules.emplace_back(std::unique_ptr<imgtool_module>(new imgtool_module));
+	imgtool_module *module = m_modules.back().get();
 	memset(module, 0, sizeof(*module));
-	module->previous = m_last;
-	if (m_last)
-		m_last->next = module;
-	else
-		m_first = module;
-	m_last = module;
 
 	// extensions have a weird format
 	s1 = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_FILE_EXTENSIONS);
@@ -139,26 +132,11 @@ void library::add(imgtool_get_info get_info)
 //  unlink
 //-------------------------------------------------
 
-const imgtool_module *library::unlink(const char *module)
+void library::unlink(const char *module_name)
 {
-	imgtool_module *m;
-	imgtool_module **previous;
-	imgtool_module **next;
-
-	for (m = m_first; m; m = m->next)
-	{
-		if (!core_stricmp(m->name, module))
-		{
-			previous = m->previous ? &m->previous->next : &m_first;
-			next = m->next ? &m->next->previous : &m_last;
-			*previous = m->next;
-			*next = m->previous;
-			m->previous = nullptr;
-			m->next = nullptr;
-			return m;
-		}
-	}
-	return nullptr;
+	modulelist::iterator iter = find(module_name);
+	if (iter != m_modules.end())
+		m_modules.erase(iter);
 }
 
 
@@ -188,40 +166,24 @@ int library::module_compare(const imgtool_module *m1, const imgtool_module *m2, 
 
 void library::sort(sort_type sort)
 {
-	imgtool_module *m1;
-	imgtool_module *m2;
-	imgtool_module *target;
-	imgtool_module **before;
-	imgtool_module **after;
-
-	for (m1 = m_first; m1; m1 = m1->next)
+	auto compare = [&](const std::unique_ptr<imgtool_module> &a, const std::unique_ptr<imgtool_module> &b)
 	{
-		target = m1;
-		for (m2 = m1->next; m2; m2 = m2->next)
-		{
-			while(module_compare(target, m2, sort) > 0)
-				target = m2;
-		}
+		return module_compare(a.get(), b.get(), sort) < 0;
+	};
+	m_modules.sort(compare);
+}
 
-		if (target != m1)
-		{
-			// unlink the target
-			before = target->previous ? &target->previous->next : &m_first;
-			after = target->next ? &target->next->previous : &m_last;
-			*before = target->next;
-			*after = target->previous;
 
-			// now place the target before m1
-			target->previous = m1->previous;
-			target->next = m1;
-			before = m1->previous ? &m1->previous->next : &m_first;
-			*before = target;
-			m1->previous = target;
+//-------------------------------------------------
+//  find
+//-------------------------------------------------
 
-			// since we changed the order, we have to replace ourselves
-			m1 = target;
-		}
-	}
+library::modulelist::iterator library::find(const char *module_name)
+{
+	return std::find_if(
+		m_modules.begin(),
+		m_modules.end(),
+		[&](std::unique_ptr<imgtool_module> &module) { return !strcmp(module->name, module_name); });
 }
 
 
@@ -231,36 +193,10 @@ void library::sort(sort_type sort)
 
 const imgtool_module *library::findmodule(const char *module_name)
 {
-	const imgtool_module *module;
-
-	module = m_first;
-	while(module && module_name && strcmp(module->name, module_name))
-		module = module->next;
-	return module;
-}
-
-
-//-------------------------------------------------
-//  iterate
-//-------------------------------------------------
-
-imgtool_module *library::iterate(const imgtool_module *module)
-{
-	return module ? module->next : m_first;
-}
-
-
-//-------------------------------------------------
-//  index
-//-------------------------------------------------
-
-imgtool_module *library::index(int i)
-{
-	imgtool_module *module;
-	module = m_first;
-	while(module && i--)
-		module = module->next;
-	return module;
+	modulelist::iterator iter = find(module_name);
+	return iter != m_modules.end()
+		? iter->get()
+		: nullptr;
 }
 
 

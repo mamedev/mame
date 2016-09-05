@@ -18,6 +18,7 @@
 #define LIBRARY_H
 
 #include <time.h>
+#include <list>
 
 #include "corestr.h"
 #include "opresolv.h"
@@ -330,9 +331,6 @@ char *imgtool_temp_str(void);
 
 struct imgtool_module
 {
-	imgtool_module *previous;
-	imgtool_module *next;
-
 	imgtool_class imgclass;
 
 	const char *name;
@@ -379,6 +377,8 @@ namespace imgtool {
 class library
 {
 public:
+	typedef std::list<std::unique_ptr<imgtool_module> > modulelist;
+
 	enum class sort_type
 	{
 		NAME,
@@ -392,7 +392,7 @@ public:
 	void add(imgtool_get_info get_info);
 
 	// seeks out and removes a module from an imgtool library
-	const imgtool_module *unlink(const char *module);
+	void unlink(const char *module_name);
 
 	// sorts an imgtool library
 	void sort(sort_type sort);
@@ -401,13 +401,14 @@ public:
 	const imgtool_module *findmodule(const char *module_name);
 
 	// module iteration
-	imgtool_module *iterate(const imgtool_module *module);
-	imgtool_module *index(int i);
+	const modulelist &modules() { return m_modules; }
 
 private:
-	object_pool *					m_pool;
-	imgtool_module *				m_first;
-	imgtool_module *				m_last;
+	object_pool *	m_pool;
+	modulelist		m_modules;
+
+	// internal lookup and iteration
+	modulelist::iterator find(const char *module_name);
 
 	// helpers
 	void add_class(const imgtool_class *imgclass);
