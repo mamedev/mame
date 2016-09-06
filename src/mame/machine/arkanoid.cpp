@@ -125,20 +125,20 @@ TIMER_CALLBACK_MEMBER(arkanoid_state::timer_68705_increment)
 
 READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
 {
-	int res = 0;
+	int port_c_in = 0;
 
 	/* bit 0 is latch 1 on ic26, is high if m_Z80HasWritten(latch 1) is set */
 	if (m_Z80HasWritten)
-		res |= 0x01;
+		port_c_in |= 0x01;
 
 	/* bit 1 is the negative output of latch 2 on ic26, is high if m_68705write is clear */
 	if (!m_MCUHasWritten)
-		res |= 0x02;
+		port_c_in |= 0x02;
 
 	/* bit 2 is an output, to clear latch 1, return whatever state it was set to in m_port_c_out */
 	/* bit 3 is an output, to set latch 2, return whatever state it was set to in m_port_c_out */
 
-	return (m_port_c_internal & m_ddr_c) | (res & ~m_ddr_c);
+	return (m_port_c_internal & m_ddr_c) | (port_c_in & ~m_ddr_c);
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
