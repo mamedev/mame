@@ -539,6 +539,34 @@ UINT32 device_image_interface::crc()
 	return crc;
 }
 
+
+//-------------------------------------------------
+//  support_command_line_image_creation - do we
+//	want to support image creation from the front
+//	end command line?
+//-------------------------------------------------
+
+bool device_image_interface::support_command_line_image_creation() const
+{
+	bool result;
+	switch (image_type())
+	{
+	case IO_PRINTER:
+	case IO_SERIAL:
+	case IO_PARALLEL:
+		// going by the assumption that these device image types should support this
+		// behavior; ideally we'd get rid of IO_* and just push this to the specific
+		// devices
+		result = true;
+		break;
+	default:
+		result = false;
+		break;
+	}
+	return result;
+}
+
+
 // ****************************************************************************
 // Battery functions
 //
@@ -1155,6 +1183,16 @@ image_init_result device_image_interface::finish_load()
 	m_create_args = nullptr;
 	m_init_phase = false;
 	return err;
+}
+
+
+//-------------------------------------------------
+//  create - create a image
+//-------------------------------------------------
+
+image_init_result device_image_interface::create(const std::string &path)
+{
+	return create(path, nullptr, nullptr);
 }
 
 
