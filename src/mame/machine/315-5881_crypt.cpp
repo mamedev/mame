@@ -694,7 +694,7 @@ void sega_315_5881_crypt_device::enc_start()
 	done_compression = 0;
 	buffer_pos = BUFFER_SIZE;
 
-	if (buffer_bit2 != 15) // if we have remaining bits in the decompression buffer we shouldn't read the next word yet but should instead use the bits we have?? (twcup98) (might just be because we should be pulling bytes not words?)
+	if (buffer_bit2 < 14) // if we have remaining bits in the decompression buffer we shouldn't read the next word yet but should instead use the bits we have?? (twcup98 needs this, twsoc98 value is 14 on title screen and expects normal logic)
 	{
 //      printf("buffer_bit2 is %d\n", buffer_bit2);
 		dec_header = (buffer2a & 0x0003) << 16;
