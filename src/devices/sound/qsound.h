@@ -62,6 +62,9 @@ private:
 		int lvol;           // left volume
 		int rvol;           // right volume
 		UINT32 step_ptr;    // current offset counter
+		
+		INT8 sample;		// current sample
+		INT8 prev_sample;	// previous sample
 	} m_channel[16];
 
 	required_device<dsp16_device> m_cpu;
