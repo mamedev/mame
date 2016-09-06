@@ -5320,8 +5320,8 @@ WRITE16_MEMBER(speechp_state::write_o)
 
 READ8_MEMBER(speechp_state::read_k)
 {
-	// K1-K4: multiplexed inputs
-	return read_inputs(10) & 7;
+	// K: multiplexed inputs
+	return m_inp_matrix[10]->read() | (read_inputs(10) & 7);
 }
 
 
@@ -5378,6 +5378,12 @@ static INPUT_PORTS_START( speechp )
 	PORT_CONFNAME( 0x04, 0x00, "Verbose" )
 	PORT_CONFSETTING(    0x04, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN.10") // K8
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Battery Status" )
+	PORT_CONFSETTING(    0x08, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( speechp, speechp_state )
