@@ -172,20 +172,20 @@ The MCU acts this way:
 READ8_MEMBER(superqix_state::in4_mcu_r)
 {
 //  logerror("%04x: in4_mcu_r\n",space.device().safe_pc());
-	return ioport("P2")->read() | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
+	return ioport("P2")->read() | (m_MCUHasWritten << 6) | (m_Z80HasWritten << 7);
 }
 
 READ8_MEMBER(superqix_state::sqix_from_mcu_r)
 {
-//  logerror("%04x: read mcu answer (%02x)\n",space.device().safe_pc(),m_from_mcu);
-	return m_from_mcu;
+//  logerror("%04x: read mcu answer (%02x)\n",space.device().safe_pc(),m_fromMCU);
+	return m_fromMCU;
 }
 
 TIMER_CALLBACK_MEMBER(superqix_state::mcu_acknowledge_callback)
 {
-	m_from_z80_pending = 1;
-	m_from_z80 = m_portb;
-//  logerror("Z80->MCU %02x\n",m_from_z80);
+	m_Z80HasWritten = 1;
+	m_fromZ80 = m_portb;
+//  logerror("Z80->MCU %02x\n",m_fromZ80);
 }
 
 READ8_MEMBER(superqix_state::mcu_acknowledge_r)
@@ -227,15 +227,15 @@ WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
 			}
 			break;
 		case 6:
-			m_from_mcu_pending = 0; // ????
+			m_MCUHasWritten = 0; // ????
 			break;
 		case 7:
 			if ((data & 1) == 0)
 			{
 //              logerror("%04x: MCU -> Z80 %02x\n",space.device().safe_pc(),m_port3);
-				m_from_mcu = m_port3_latch;
-				m_from_mcu_pending = 1;
-				m_from_z80_pending = 0; // ????
+				m_fromMCU = m_port3_latch;
+				m_MCUHasWritten = 1;
+				m_Z80HasWritten = 0; // ????
 			}
 			break;
 	}
@@ -258,16 +258,16 @@ READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 	}
 	else if ((m_port1 & 0x40) == 0)
 	{
-//      logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_from_z80);
-		m_from_z80_pending = 0;
-		return m_from_z80;
+//      logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_fromZ80);
+		m_Z80HasWritten = 0;
+		return m_fromZ80;
 	}
 	return 0;
 }
 
 READ8_MEMBER(superqix_state::sqix_system_status_r)
 {
-	return ioport("SYSTEM")->read() | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
+	return ioport("SYSTEM")->read() | (m_MCUHasWritten << 6) | (m_Z80HasWritten << 7);
 }
 
 WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
@@ -290,15 +290,15 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 
 	// bit 6 = unknown
 	if ((data & 0x40) == 0)
-		m_from_mcu_pending = 0; // ????
+		m_MCUHasWritten = 0; // ????
 
 	// bit 7 = clock latch from port 3 to Z80
 	if ((m_port2 & 0x80) != 0 && (data & 0x80) == 0)
 	{
 //      logerror("%04x: MCU -> Z80 %02x\n",space.device().safe_pc(),m_port3);
-		m_from_mcu = m_port3;
-		m_from_mcu_pending = 1;
-		m_from_z80_pending = 0; // ????
+		m_fromMCU = m_port3;
+		m_MCUHasWritten = 1;
+		m_Z80HasWritten = 0; // ????
 	}
 
 	m_port2 = data;
@@ -306,9 +306,9 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 
 READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 {
-//  logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_from_z80);
-	m_from_z80_pending = 0;
-	return m_from_z80;
+//  logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_fromZ80);
+	m_Z80HasWritten = 0;
+	return m_fromZ80;
 }
 
 
@@ -364,8 +364,8 @@ int superqix_state::read_dial(int player)
 TIMER_CALLBACK_MEMBER(superqix_state::delayed_z80_mcu_w)
 {
 //  logerror("Z80 sends command %02x\n",param);
-	m_from_z80 = param;
-	m_from_mcu_pending = 0;
+	m_fromZ80 = param;
+	m_MCUHasWritten = 0;
 	m_mcu->set_input_line(0, HOLD_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 }
@@ -373,8 +373,8 @@ TIMER_CALLBACK_MEMBER(superqix_state::delayed_z80_mcu_w)
 TIMER_CALLBACK_MEMBER(superqix_state::delayed_mcu_z80_w)
 {
 //  logerror("68705 sends answer %02x\n",param);
-	m_from_mcu = param;
-	m_from_mcu_pending = 1;
+	m_fromMCU = param;
+	m_MCUHasWritten = 1;
 }
 
 
@@ -432,8 +432,8 @@ WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
 				break;
 
 			case 0x3:   // command from Z80
-				m_portA_in = m_from_z80;
-//              logerror("%04x: z80 reads command %02x\n",space.device().safe_pc(),m_from_z80);
+				m_portA_in = m_fromZ80;
+//              logerror("%04x: z80 reads command %02x\n",space.device().safe_pc(),m_fromZ80);
 				break;
 
 			case 0x4:
@@ -461,15 +461,15 @@ WRITE8_MEMBER(superqix_state::hotsmash_z80_mcu_w)
 
 READ8_MEMBER(superqix_state::hotsmash_from_mcu_r)
 {
-//  logerror("%04x: z80 reads answer %02x\n",space.device().safe_pc(),m_from_mcu);
-	m_from_mcu_pending = 0;
-	return m_from_mcu;
+//  logerror("%04x: z80 reads answer %02x\n",space.device().safe_pc(),m_fromMCU);
+	m_MCUHasWritten = 0;
+	return m_fromMCU;
 }
 
 READ8_MEMBER(superqix_state::hotsmash_ay_port_a_r)
 {
-//  logerror("%04x: ay_port_a_r and mcu_pending is %d\n",space.device().safe_pc(),m_from_mcu_pending);
-	return ioport("SYSTEM")->read() | 0x40 | ((m_from_mcu_pending^1) << 7);
+//  logerror("%04x: ay_port_a_r and mcu_pending is %d\n",space.device().safe_pc(),m_MCUHasWritten);
+	return ioport("SYSTEM")->read() | 0x40 | ((m_MCUHasWritten^1) << 7);
 }
 
 /**************************************************************************
@@ -480,12 +480,12 @@ pbillian MCU simulation
 
 WRITE8_MEMBER(superqix_state::pbillian_z80_mcu_w)
 {
-	m_from_z80 = data;
+	m_fromZ80 = data;
 }
 
 READ8_MEMBER(superqix_state::pbillian_from_mcu_r)
 {
-	switch (m_from_z80)
+	switch (m_fromZ80)
 	{
 		case 0x01:
 		{
@@ -503,7 +503,7 @@ READ8_MEMBER(superqix_state::pbillian_from_mcu_r)
 		case 0x81: m_curr_player = 1; return 0;
 	}
 
-//  logerror("408[%x] r at %x\n",m_from_z80,space.device().safe_pc());
+//  logerror("408[%x] r at %x\n",m_fromZ80,space.device().safe_pc());
 	return 0;
 }
 
@@ -518,14 +518,14 @@ READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
 void superqix_state::machine_init_common()
 {
 	save_item(NAME(m_invert_coin_lockout));
-	save_item(NAME(m_from_mcu_pending));
-	save_item(NAME(m_from_z80_pending));
+	save_item(NAME(m_MCUHasWritten));
+	save_item(NAME(m_Z80HasWritten));
 	save_item(NAME(m_port1));
 	save_item(NAME(m_port2));
 	save_item(NAME(m_port3));
 	save_item(NAME(m_port3_latch));
-	save_item(NAME(m_from_mcu));
-	save_item(NAME(m_from_z80));
+	save_item(NAME(m_fromMCU));
+	save_item(NAME(m_fromZ80));
 	save_item(NAME(m_portb));
 	save_item(NAME(m_nmi_mask));
 
