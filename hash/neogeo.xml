@@ -6819,7 +6819,7 @@
 	</software>
 
 
-	<software name="kof98a">
+	<software name="kof98a" cloneof="kof98">
 		<description>The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420, alt board)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
