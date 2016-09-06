@@ -34,17 +34,17 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_w)
 
 READ8_MEMBER(arkanoid_state::arkanoid_68705_port_a_r)
 {
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
+	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_a_w)
 {
-	m_port_a_out = data;
+	m_portA_out = data;
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_a_w)
 {
-	m_ddr_a = data;
+	m_ddrA = data;
 }
 
 READ8_MEMBER(arkanoid_state::arkanoid_68705_tdr_r)
@@ -135,75 +135,75 @@ READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
 	if (!m_MCUHasWritten)
 		port_c_in |= 0x02;
 
-	/* bit 2 is an output, to clear latch 1, return whatever state it was set to in m_port_c_out */
-	/* bit 3 is an output, to set latch 2, return whatever state it was set to in m_port_c_out */
+	/* bit 2 is an output, to clear latch 1, return whatever state it was set to in m_portC_out */
+	/* bit 3 is an output, to set latch 2, return whatever state it was set to in m_portC_out */
 
-	return (m_port_c_internal & m_ddr_c) | (port_c_in & ~m_ddr_c);
+	return (m_portC_internal & m_ddrC) | (port_c_in & ~m_ddrC);
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
 {
-	m_port_c_internal = data|0xF0;
-	UINT8 changed_m_port_c_out = (m_port_c_out^(m_port_c_internal|(~m_ddr_c)));
-	m_port_c_out = (m_port_c_internal|(~m_ddr_c));
+	m_portC_internal = data|0xF0;
+	UINT8 changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
+	m_portC_out = (m_portC_internal|(~m_ddrC));
 
 	/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
 	/* bit 2 is an output, to clear latch 1(m_Z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
 	// if 0x04 rising edge, clear m_Z80HasWritten/latch 1 (and clear the irq line)
-	if ((changed_m_port_c_out&0x04) && (m_port_c_out&0x04))
+	if ((changed_m_portC_out&0x04) && (m_portC_out&0x04))
 	{
 		m_Z80HasWritten = 0;
 		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
-	// if 0x04 low, enable the m_port_a_in latch, otherwise set the latch value to 0xFF
-	if (~m_port_c_out&0x04)
-		m_port_a_in = m_fromZ80;
+	// if 0x04 low, enable the m_portA_in latch, otherwise set the latch value to 0xFF
+	if (~m_portC_out&0x04)
+		m_portA_in = m_fromZ80;
 	else
-		m_port_a_in = 0xFF;
+		m_portA_in = 0xFF;
 
 	/* bit 3 is an output, to set latch 2(m_MCUHasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
 	// if 0x08 low, set m_MCUHasWritten/latch 2
-	if (~m_port_c_out&0x08)
+	if (~m_portC_out&0x08)
 	{
 		/* a write from the 68705 to the Z80; remember its value */
 		m_MCUHasWritten = 1;
-		m_fromMCU = m_port_a_out;
+		m_fromMCU = m_portA_out;
 	}
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
 {
-	if ((data|0xF0)^m_ddr_c) // if ddr changed, recalculate the port c output
+	if ((data|0xF0)^m_ddrC) // if ddr changed, recalculate the port c output
 	{
-		UINT8 changed_m_port_c_out = (m_port_c_out^(m_port_c_internal|(~(data|0xF0))));
-		m_port_c_out = (m_port_c_internal|(~(data|0xF0)));
+		UINT8 changed_m_portC_out = (m_portC_out^(m_portC_internal|(~(data|0xF0))));
+		m_portC_out = (m_portC_internal|(~(data|0xF0)));
 
 		/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
 		/* bit 2 is an output, to clear latch 1(m_Z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
 		// if 0x04 rising edge, clear m_Z80HasWritten/latch 1 (and clear the irq line)
-		if ((changed_m_port_c_out&0x04) && (m_port_c_out&0x04))
+		if ((changed_m_portC_out&0x04) && (m_portC_out&0x04))
 		{
 			m_Z80HasWritten = 0;
 			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 		}
 
-		// if 0x04 low, enable the m_port_a_in latch, otherwise set the latch value to 0xFF
-		if (~m_port_c_out&0x04)
-			m_port_a_in = m_fromZ80;
+		// if 0x04 low, enable the m_portA_in latch, otherwise set the latch value to 0xFF
+		if (~m_portC_out&0x04)
+			m_portA_in = m_fromZ80;
 		else
-			m_port_a_in = 0xFF;
+			m_portA_in = 0xFF;
 
 		/* bit 3 is an output, to set latch 2(m_MCUHasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
 		// if 0x08 low, set m_MCUHasWritten/latch 2
-		if (~m_port_c_out&0x08)
+		if (~m_portC_out&0x08)
 		{
 			/* a write from the 68705 to the Z80; remember its value */
 			m_MCUHasWritten = 1;
-			m_fromMCU = m_port_a_out;
+			m_fromMCU = m_portA_out;
 		}
 	}
-	m_ddr_c = data|0xF0;
+	m_ddrC = data|0xF0;
 }
 
 CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
