@@ -35,6 +35,7 @@
 #include "bus/bbc/1mhzbus/1mhzbus.h"
 #include "bus/bbc/tube/tube.h"
 #include "bus/bbc/userport/userport.h"
+#include "bus/bbc/joyport/joyport.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -79,6 +80,7 @@ public:
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
 		m_analog(*this, "analogue"),
+		m_joyport(*this, "joyport"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
 		m_i8271(*this, "i8271"),
@@ -225,6 +227,7 @@ public: // HACK FOR MC6845
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<bbc_analogue_slot_device> m_analog;
+	optional_device<bbc_joyport_slot_device> m_joyport;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;

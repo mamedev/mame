@@ -1532,6 +1532,10 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("cart_ls_m")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_mc", "bbcmc_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_pro128s", "pro128s_flop")
+
+	/* expansion ports */
+	MCFG_DEVICE_REMOVE("analogue")
+	MCFG_COMPACT_JOYPORT_ADD("joyport", bbc_joyport_devices, "joystick")
 MACHINE_CONFIG_END
 
 
