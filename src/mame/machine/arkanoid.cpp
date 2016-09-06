@@ -21,14 +21,14 @@
 READ8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_r)
 {
 	/* return the last value the 68705 wrote, and mark that we've read it */
-	m_68705HasWritten = 0;
-	return m_toz80;
+	m_MCUHasWritten = 0;
+	return m_fromMCU;
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_w)
 {
-	m_z80HasWritten = 1;
-	m_fromz80 = data;
+	m_Z80HasWritten = 1;
+	m_fromZ80 = data;
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
@@ -127,12 +127,12 @@ READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
 {
 	int res = 0;
 
-	/* bit 0 is latch 1 on ic26, is high if m_z80HasWritten(latch 1) is set */
-	if (m_z80HasWritten)
+	/* bit 0 is latch 1 on ic26, is high if m_Z80HasWritten(latch 1) is set */
+	if (m_Z80HasWritten)
 		res |= 0x01;
 
 	/* bit 1 is the negative output of latch 2 on ic26, is high if m_68705write is clear */
-	if (!m_68705HasWritten)
+	if (!m_MCUHasWritten)
 		res |= 0x02;
 
 	/* bit 2 is an output, to clear latch 1, return whatever state it was set to in m_port_c_out */
@@ -148,27 +148,27 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
 	m_port_c_out = (m_port_c_internal|(~m_ddr_c));
 
 	/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
-	/* bit 2 is an output, to clear latch 1(m_z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
-	// if 0x04 rising edge, clear m_z80HasWritten/latch 1 (and clear the irq line)
+	/* bit 2 is an output, to clear latch 1(m_Z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
+	// if 0x04 rising edge, clear m_Z80HasWritten/latch 1 (and clear the irq line)
 	if ((changed_m_port_c_out&0x04) && (m_port_c_out&0x04))
 	{
-		m_z80HasWritten = 0;
+		m_Z80HasWritten = 0;
 		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
 	// if 0x04 low, enable the m_port_a_in latch, otherwise set the latch value to 0xFF
 	if (~m_port_c_out&0x04)
-		m_port_a_in = m_fromz80;
+		m_port_a_in = m_fromZ80;
 	else
 		m_port_a_in = 0xFF;
 
-	/* bit 3 is an output, to set latch 2(m_68705HasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
-	// if 0x08 low, set m_68705HasWritten/latch 2
+	/* bit 3 is an output, to set latch 2(m_MCUHasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
+	// if 0x08 low, set m_MCUHasWritten/latch 2
 	if (~m_port_c_out&0x08)
 	{
 		/* a write from the 68705 to the Z80; remember its value */
-		m_68705HasWritten = 1;
-		m_toz80 = m_port_a_out;
+		m_MCUHasWritten = 1;
+		m_fromMCU = m_port_a_out;
 	}
 }
 
@@ -180,42 +180,42 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
 		m_port_c_out = (m_port_c_internal|(~(data|0xF0)));
 
 		/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
-		/* bit 2 is an output, to clear latch 1(m_z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
-		// if 0x04 rising edge, clear m_z80HasWritten/latch 1 (and clear the irq line)
+		/* bit 2 is an output, to clear latch 1(m_Z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
+		// if 0x04 rising edge, clear m_Z80HasWritten/latch 1 (and clear the irq line)
 		if ((changed_m_port_c_out&0x04) && (m_port_c_out&0x04))
 		{
-			m_z80HasWritten = 0;
+			m_Z80HasWritten = 0;
 			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 		}
 
 		// if 0x04 low, enable the m_port_a_in latch, otherwise set the latch value to 0xFF
 		if (~m_port_c_out&0x04)
-			m_port_a_in = m_fromz80;
+			m_port_a_in = m_fromZ80;
 		else
 			m_port_a_in = 0xFF;
 
-		/* bit 3 is an output, to set latch 2(m_68705HasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
-		// if 0x08 low, set m_68705HasWritten/latch 2
+		/* bit 3 is an output, to set latch 2(m_MCUHasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
+		// if 0x08 low, set m_MCUHasWritten/latch 2
 		if (~m_port_c_out&0x08)
 		{
 			/* a write from the 68705 to the Z80; remember its value */
-			m_68705HasWritten = 1;
-			m_toz80 = m_port_a_out;
+			m_MCUHasWritten = 1;
+			m_fromMCU = m_port_a_out;
 		}
 	}
 	m_ddr_c = data|0xF0;
 }
 
-CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_68705_input_r)
+CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
 {
 	int res = 0;
 
-	/* bit 0x40 is latch 1 on ic26, is high if m_z80HasWritten(latch 1) is clear */
-	if (!m_z80HasWritten)
+	/* bit 0x40 is latch 1 on ic26, is high if m_Z80HasWritten(latch 1) is clear */
+	if (!m_Z80HasWritten)
 		res |= 0x01;
 
-	/* bit 0x80 is the negative output of latch 2 on ic26, is high if m_68705write is clear */
-	if (!m_68705HasWritten)
+	/* bit 0x80 is the negative output of latch 2 on ic26, is high if m_MCUHasWritten is clear */
+	if (!m_MCUHasWritten)
 		res |= 0x02;
 
 	return res;
@@ -224,7 +224,7 @@ CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_68705_input_r)
 CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
 {
 	const char *tag1 = (const char *)param;
-	const char *tag2 = tag1 + strlen(tag1) + 1;
+	const char *tag2 = tag1 + strlen(tag1) + 1; // the f***? is this right? are we intentionally pointer-mathing off the end of one array to hit another?
 	return ioport((m_paddle_select == 0) ? tag1 : tag2)->read();
 }
 
