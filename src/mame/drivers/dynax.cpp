@@ -1556,7 +1556,7 @@ WRITE8_MEMBER(dynax_state::cdracula_sound_rombank_w)
 
 	int num_banks = memregion("oki")->bytes() / 0x40000;
 	if (data < num_banks)
-		m_oki->set_bank_base(data * 0x40000);
+		m_oki->set_rom_bank(data);
 	else
 		logerror("%s: warning, invalid sound bank = %02x\n", machine().describe_context(), data);
 }

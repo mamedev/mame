@@ -115,7 +115,7 @@ WRITE8_MEMBER(paradise_state::paradise_okibank_w)
 	if (data & ~0x02)
 		logerror("%s: unknown oki bank bits %02X\n", machine().describe_context(), data);
 
-	m_oki2->set_bank_base((data & 0x02) ? 0x40000 : 0);
+	m_oki2->set_rom_bank((data & 0x02) >> 1);
 }
 
 WRITE8_MEMBER(paradise_state::torus_coin_counter_w)

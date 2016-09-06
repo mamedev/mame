@@ -31,6 +31,9 @@ public:
 	void set_rom(const void *base, UINT32 size);
 	void set_rom_bank(int bank);
 
+protected:
+	virtual void rom_bank_updated() = 0;
+
 private:
 	const address_space_config m_rom_config;
 	direct_read_data *m_rom_direct;

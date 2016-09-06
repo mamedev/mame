@@ -16,6 +16,10 @@ const address_space_config *device_rom_interface::memory_space_config(address_sp
 	return spacenum ? nullptr : &m_rom_config;
 }
 
+void device_rom_interface::rom_bank_updated()
+{
+}
+
 void device_rom_interface::set_rom_bank(int bank)
 {
 	if(!m_bank)
@@ -28,6 +32,7 @@ void device_rom_interface::set_rom_bank(int bank)
 
 	m_cur_bank = bank;
 	m_bank->set_entry(bank);
+	rom_bank_updated();
 }
 
 void device_rom_interface::reset_bank()

@@ -213,10 +213,10 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 
 	switch (data)
 	{
-		case 0xfc:  m_oki->set_bank_base((0 * 0x40000)); break;
-		case 0xfd:  m_oki->set_bank_base((2 * 0x40000)); break;
-		case 0xfe:  m_oki->set_bank_base((1 * 0x40000)); break;
-		case 0xff:  m_oki->set_bank_base((3 * 0x40000)); break;
+		case 0xfc:  m_oki->set_rom_bank(0); break;
+		case 0xfd:  m_oki->set_rom_bank(2); break;
+		case 0xfe:  m_oki->set_rom_bank(1); break;
+		case 0xff:  m_oki->set_rom_bank(3); break;
 		case 0x78:
 				m_oki->write_command(data);
 				m_snd_sam[0] = 00; m_snd_sam[1]= 00; m_snd_sam[2] = 00; m_snd_sam[3] = 00;
@@ -335,7 +335,7 @@ INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 			if (m_m6295_bank == 0x03)
 				m_m6295_bank = 0x00;
 			popmessage("Changing Bank to %02x", m_m6295_bank);
-			m_adpcm->set_bank_base(((m_m6295_bank) * 0x40000));
+			m_adpcm->set_rom_bank(m_m6295_bank);
 
 			if (m_m6295_key_delay == 0xffff)
 				m_m6295_key_delay = 0x00;
@@ -354,7 +354,7 @@ INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 			if (m_m6295_bank == 0x03)
 				m_m6295_bank = 0x02;
 			popmessage("Changing Bank to %02x", m_m6295_bank);
-			m_adpcm->set_bank_base(((m_m6295_bank) * 0x40000));
+			m_adpcm->set_rom_bank(m_m6295_bank);
 
 			if (m_m6295_key_delay == 0xffff)
 				m_m6295_key_delay = 0x00;
@@ -370,11 +370,11 @@ INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 		{
 			m_m6295_comm += 1;
 			m_m6295_comm &= 0x7f;
-			if (m_m6295_comm == 0x00) { m_adpcm->set_bank_base((0 * 0x40000)); m_m6295_bank = 0; }
-			if (m_m6295_comm == 0x60) { m_adpcm->set_bank_base((0 * 0x40000)); m_m6295_bank = 0; }
-			if (m_m6295_comm == 0x65) { m_adpcm->set_bank_base((1 * 0x40000)); m_m6295_bank = 1; }
-			if (m_m6295_comm == 0x69) { m_adpcm->set_bank_base((2 * 0x40000)); m_m6295_bank = 2; }
-			if (m_m6295_comm == 0x70) { m_adpcm->set_bank_base((1 * 0x40000)); m_m6295_bank = 1; }
+			if (m_m6295_comm == 0x00) { m_adpcm->set_rom_bank(0); m_m6295_bank = 0; }
+			if (m_m6295_comm == 0x60) { m_adpcm->set_rom_bank(0); m_m6295_bank = 0; }
+			if (m_m6295_comm == 0x65) { m_adpcm->set_rom_bank(1); m_m6295_bank = 1; }
+			if (m_m6295_comm == 0x69) { m_adpcm->set_rom_bank(2); m_m6295_bank = 2; }
+			if (m_m6295_comm == 0x70) { m_adpcm->set_rom_bank(1); m_m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x", m_m6295_comm, m_m6295_bank);
 
 			if (m_m6295_key_delay == 0xffff)
@@ -391,11 +391,11 @@ INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 		{
 			m_m6295_comm -= 1;
 			m_m6295_comm &= 0x7f;
-			if (m_m6295_comm == 0x2b) { m_adpcm->set_bank_base((0 * 0x40000)); m_m6295_bank = 0; }
-			if (m_m6295_comm == 0x64) { m_adpcm->set_bank_base((0 * 0x40000)); m_m6295_bank = 0; }
-			if (m_m6295_comm == 0x68) { m_adpcm->set_bank_base((1 * 0x40000)); m_m6295_bank = 1; }
-			if (m_m6295_comm == 0x6c) { m_adpcm->set_bank_base((2 * 0x40000)); m_m6295_bank = 2; }
-			if (m_m6295_comm == 0x76) { m_adpcm->set_bank_base((1 * 0x40000)); m_m6295_bank = 1; }
+			if (m_m6295_comm == 0x2b) { m_adpcm->set_rom_bank(0); m_m6295_bank = 0; }
+			if (m_m6295_comm == 0x64) { m_adpcm->set_rom_bank(0); m_m6295_bank = 0; }
+			if (m_m6295_comm == 0x68) { m_adpcm->set_rom_bank(1); m_m6295_bank = 1; }
+			if (m_m6295_comm == 0x6c) { m_adpcm->set_rom_bank(2); m_m6295_bank = 2; }
+			if (m_m6295_comm == 0x76) { m_adpcm->set_rom_bank(1); m_m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x", m_m6295_comm, m_m6295_bank);
 
 			if (m_m6295_key_delay == 0xffff)

@@ -58,7 +58,7 @@ WRITE8_MEMBER(ggconnie_state::output_w)
 /* TODO: banking not understood (is the ROM dumped correctly btw?) */
 WRITE8_MEMBER(ggconnie_state::oki_bank_w)
 {
-	m_oki->set_bank_base((data) ? 0x40000 : 0x00000);
+	m_oki->set_rom_bank(data != 0);
 }
 
 

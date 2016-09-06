@@ -139,7 +139,7 @@ Notes:
 WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
 {
 	if (data & 4)
-		m_oki->set_bank_base(0x40000 * (data & 3));
+		m_oki->set_rom_bank(data & 3);
 }
 
 

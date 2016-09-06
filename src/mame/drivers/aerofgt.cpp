@@ -114,7 +114,7 @@ WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
 
 WRITE16_MEMBER(aerofgt_state::pspikesb_oki_banking_w)
 {
-	m_oki->set_bank_base(0x40000 * (data & 3));
+	m_oki->set_rom_bank(data & 3);
 }
 
 /*TODO: sound banking. */

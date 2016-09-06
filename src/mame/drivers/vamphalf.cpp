@@ -293,7 +293,7 @@ F94B
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_oki_bank_w)
 {
-	m_oki->set_bank_base(0x40000 * ((data & 0x300) >> 8));
+	m_oki->set_rom_bank((data & 0x300) >> 8);
 }
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_backupram_bank_w)
@@ -331,19 +331,19 @@ WRITE32_MEMBER(vamphalf_state::finalgdr_prize_w)
 
 WRITE32_MEMBER(vamphalf_state::aoh_oki_bank_w)
 {
-	m_oki2->set_bank_base(0x40000 * (data & 0x3));
+	m_oki2->set_rom_bank(data & 0x3);
 }
 
 WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)
 {
 	if(offset)
-		m_oki->set_bank_base(0x40000 * (data & 0x7));
+		m_oki->set_rom_bank(data & 0x7);
 }
 
 
 WRITE16_MEMBER(vamphalf_state::mrkicker_oki_bank_w)
 {
-	m_oki->set_bank_base(0x40000 * (data & 0x3));
+	m_oki->set_rom_bank(data & 0x3);
 }
 
 WRITE16_MEMBER(vamphalf_state::boonggab_prize_w)

@@ -317,13 +317,13 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 		else if (m_sound >= 0x70) {
 			/* These vocals are in bank 1, but a bug in the actual MCU doesn't set the bank */
 //          if (m_snd_bank != 1)
-//          m_oki->set_bank_base((1 * 0x40000));
+//          m_oki->set_rom_bank(1);
 //          sslam_snd_bank = 1;
 			sslam_play(0, m_sound);
 		}
 		else if (m_sound >= 0x69) {
 			if (m_snd_bank != 2)
-				m_oki->set_bank_base(2 * 0x40000);
+				m_oki->set_rom_bank(2);
 			m_snd_bank = 2;
 			switch (m_sound)
 			{
@@ -336,14 +336,14 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 		}
 		else if (m_sound >= 0x65) {
 			if (m_snd_bank != 1)
-				m_oki->set_bank_base(1 * 0x40000);
+				m_oki->set_rom_bank(1);
 			m_snd_bank = 1;
 			m_melody = 4;
 			sslam_play(m_melody, m_sound);
 		}
 		else if (m_sound >= 0x60) {
 			if (m_snd_bank != 0)
-				m_oki->set_bank_base(0 * 0x40000);
+				m_oki->set_rom_bank(0);
 			m_snd_bank = 0;
 			switch (m_sound)
 			{
@@ -446,7 +446,7 @@ WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 		if (m_oki_bank != ((data & 3) - 1))
 		{
 			m_oki_bank = (data & 3) - 1;
-			m_oki->set_bank_base(0x40000 * m_oki_bank);
+			m_oki->set_rom_bank(m_oki_bank);
 		}
 	}
 

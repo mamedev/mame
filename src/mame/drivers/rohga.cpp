@@ -756,8 +756,8 @@ GFXDECODE_END
 
 WRITE8_MEMBER(rohga_state::sound_bankswitch_w)
 {
-	m_oki1->set_bank_base(BIT(data, 0) * 0x40000);
-	m_oki2->set_bank_base(BIT(data, 1) * 0x40000);
+	m_oki1->set_rom_bank(BIT(data, 0));
+	m_oki2->set_rom_bank(BIT(data, 1));
 }
 
 /**********************************************************************************/

@@ -80,10 +80,10 @@ WRITE16_MEMBER(powerbal_state::oki_banking)
 {
 	if (data & 3)
 	{
-		int addr = 0x40000 * ((data & 3) - 1);
+		int addr = (data & 3) - 1;
 
-		if (addr < memregion("oki")->bytes())
-			m_oki->set_bank_base(addr);
+		if (addr * 0x40000 < memregion("oki")->bytes())
+			m_oki->set_rom_bank(addr);
 	}
 }
 

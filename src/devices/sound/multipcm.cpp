@@ -727,3 +727,13 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		datap[1][i] = clamp_to_int16(smpr);
 	}
 }
+
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void multipcm_device::rom_bank_updated()
+{
+	m_stream->update();
+}

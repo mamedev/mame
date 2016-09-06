@@ -145,7 +145,7 @@ WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 
 WRITE16_MEMBER(mwarr_state::oki1_bank_w)
 {
-	m_oki2->set_bank_base(0x40000 * (data & 3));
+	m_oki2->set_rom_bank(data & 3);
 }
 
 WRITE16_MEMBER(mwarr_state::sprites_commands_w)

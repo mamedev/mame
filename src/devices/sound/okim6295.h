@@ -64,7 +64,6 @@ public:
 	static void static_set_pin7(device_t &device, int pin7);
 
 	// runtime configuration
-	void set_bank_base(offs_t base, bool bDontUpdateStream = false);
 	void set_pin7(int pin7);
 
 	UINT8 read_status();
@@ -82,6 +81,9 @@ protected:
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
 
 	// a single voice
 	class okim_voice
@@ -106,8 +108,6 @@ protected:
 
 	okim_voice          m_voice[OKIM6295_VOICES];
 	INT32               m_command;
-	bool                m_bank_installed;
-	offs_t              m_bank_offs;
 	sound_stream *      m_stream;
 	UINT8               m_pin7_state;
 

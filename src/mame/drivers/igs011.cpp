@@ -1574,7 +1574,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 			{
 				m_lhb2_pen_hi = data & 0x07;
 
-				m_oki->set_bank_base((data & 0x08) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 3) & 1);
 			}
 
 			if ( m_lhb2_pen_hi & ~0xf )
@@ -1708,7 +1708,7 @@ WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 				machine().bookkeeping().coin_counter_w(0,    data & 0x01);
 				//  coin out        data & 0x02
 
-				m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 4) & 1);
 				m_igs_hopper        =   data & 0x20;
 			}
 
@@ -2442,7 +2442,7 @@ WRITE16_MEMBER(igs011_state::lhb_okibank_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_oki->set_bank_base((data & 0x200) ? 0x40000 : 0);
+		m_oki->set_rom_bank((data >> 9) & 1);
 	}
 
 	if ( data & (~0x200) )

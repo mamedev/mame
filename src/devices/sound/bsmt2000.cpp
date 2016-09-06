@@ -205,6 +205,16 @@ void bsmt2000_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 
 //-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void bsmt2000_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
+//-------------------------------------------------
 //  read_status - return the write pending status
 //-------------------------------------------------
 
