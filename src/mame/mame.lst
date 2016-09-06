@@ -11228,6 +11228,7 @@ dvk_ksm                         //
 @source:dwarfd.cpp
 dwarfd                          // (c) 198? Electro-Sports
 dwarfda                         // (c) 198? Electro-Sports
+pokeresp                        // (c) 198? Electro-Sports
 qc                              // (c) 1995 ArJay Exports/Prestige Games
 quarterh                        // (c) 1983 Electro-Sports
 quarterha                       // (c) 1983 Electro-Sports
@@ -12564,6 +12565,7 @@ gal3                            // (c) 1992 (Arcade TV Game List - P.73, Right, 
 
 @source:galaga.cpp
 battles                         // bootleg
+battles2                        // bootleg
 bosco                           // (c) 1981
 boscomd                         // (c) 1981 Midway
 boscomdo                        // (c) 1981 Midway
@@ -29250,6 +29252,7 @@ msheartb                        // hack
 mspacii                         // bootleg
 mspacii2                        // bootleg
 mspacmab                        // bootleg
+mspacmab2                       // bootleg
 mspacman                        // (c) 1981 Midway  // made by General Computer
 mspacmanbcc                     // bootleg
 mspacmanbg                      // bootleg
@@ -33497,6 +33500,7 @@ ikarijpb                        // bootleg
 ikarinc                         // A5004 'IW' (c) 1986
 ikariram                        // bootleg
 jcross                          // A3006      (c) 1984
+jcrossa                         //            (c) 1984
 legofair                        // A7003 'KK' (c) 1988
 madcrash                        // A2005      (c) 1984
 madcrush                        // A2005      (c) 1984
