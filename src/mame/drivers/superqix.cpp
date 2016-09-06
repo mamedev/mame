@@ -184,7 +184,7 @@ READ8_MEMBER(superqix_state::sqix_from_mcu_r)
 TIMER_CALLBACK_MEMBER(superqix_state::mcu_acknowledge_callback)
 {
 	m_Z80HasWritten = 1;
-	m_fromZ80 = m_portb;
+	m_fromZ80 = m_fromZ80pending;
 //  logerror("Z80->MCU %02x\n",m_fromZ80);
 }
 
@@ -197,7 +197,7 @@ READ8_MEMBER(superqix_state::mcu_acknowledge_r)
 WRITE8_MEMBER(superqix_state::sqix_z80_mcu_w)
 {
 //  logerror("%04x: sqix_z80_mcu_w %02x\n",space.device().safe_pc(),data);
-	m_portb = data;
+	m_fromZ80pending = data;
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
@@ -409,12 +409,12 @@ WRITE8_MEMBER(superqix_state::hotsmash_68705_portB_w)
 
 READ8_MEMBER(superqix_state::hotsmash_68705_portC_r)
 {
-	return m_portC;
+	return m_portC_internal;
 }
 
 WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
 {
-	m_portC = data;
+	m_portC_internal = data;
 
 	if ((data & 0x08) == 0)
 	{
@@ -526,13 +526,13 @@ void superqix_state::machine_init_common()
 	save_item(NAME(m_port3_latch));
 	save_item(NAME(m_fromMCU));
 	save_item(NAME(m_fromZ80));
-	save_item(NAME(m_portb));
+	save_item(NAME(m_fromZ80pending));
 	save_item(NAME(m_nmi_mask));
 
 	// hotsmash ???
 	save_item(NAME(m_portA_in));
 	save_item(NAME(m_portB_out));
-	save_item(NAME(m_portC));
+	save_item(NAME(m_portC_internal));
 }
 
 MACHINE_START_MEMBER(superqix_state,superqix)
