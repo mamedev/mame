@@ -99,6 +99,19 @@ DSW2 stored @ $f237
 ----32-- code @ $03d8, stored @ $f293 (3600/5400/2400/1200  -> bonus  ?)
 ------10 code @ $03be, stored @ $f291/92 (8,8/0,12/16,6/24,4 -> difficulty ? )
 
+hotsmash notes for 408-41f area, related to above
+code at z80:0070:
+ set bit 3 at ram address f253 (was 0x00, now 0x08)
+ read ram address f253 to 'a' register
+ set bc to 0410, write 'a' register (0x08) to bc
+
+code at z80:0093:
+ set bc to 0418, read from bc and ignore result
+ set bit 4 at ram address f253 (was 0x08, now 0x18)
+ read ram address f253 to 'a' register
+ set bc to 0410, write 'a' register (0x18) to bc
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -307,14 +320,20 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 {
 //  logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_fromZ80);
-	m_Z80HasWritten = 0;
+	if(!space.debugger_access())
+	{
+		m_Z80HasWritten = 0;
+	}
 	return m_fromZ80;
 }
 
 
 READ8_MEMBER(superqix_state::nmi_ack_r)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	if(!space.debugger_access())
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
 	return sqix_system_status_r(space, 0);
 }
 
@@ -377,6 +396,21 @@ TIMER_CALLBACK_MEMBER(superqix_state::delayed_mcu_z80_w)
 	m_MCUHasWritten = 1;
 }
 
+/* prebillian/hotsmash hardware seems to be an evolution of the arkanoid hardware in regards to the mcu:
+arkanoid:
+Port A[7:0] <> bidir comms with z80
+Port B[7:0] <- input MUX (where does the paddle select bit come from??? port a bit 0?)
+PortC[0] <- m_Z80HasWritten
+PortC[1] <- m_MCUHasWritten
+PortC[2] -> high - clear m_Z80HasWritten and deassert MCU /INT; low - allow m_fromZ80 to be read at port A
+PortC[3] -> high - latch port A contents into m_fromMCU and set m_MCUHasWritten; low - do nothing.
+
+hotsmash/prebillian:
+PortA[] <- input MUX
+PortB[] -> output MUX
+PortC[3:0] -> select one of 8 MUX selects for m_porta_in and m_portb_out
+PortC[4] -> activates m_porta_in latch (active low)
+*/
 
 /*
  *  Port C connections:
@@ -392,7 +426,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::delayed_mcu_z80_w)
  *         110  P1 dial input (I)
  *         111  P2 dial input (I)
  *  3   W  clocks the active latch
- *  4-7 W  not used
+ *  4-7 W  nonexistent on 68705p5
  */
 
 
