@@ -115,8 +115,15 @@ private:
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
 
+	game_driver const       *m_info_driver;
+	ui_software_info const  *m_info_software;
+	int                      m_info_view;
+	std::vector<std::string> m_items_list;
+	std::string              m_info_buffer;
+
 	// draw infos
-	virtual void infos_render(float x1, float y1, float x2, float y2) = 0;
+	void infos_render(float x1, float y1, float x2, float y2);
+	virtual void general_info(const game_driver *driver, std::string &buffer) = 0;
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
