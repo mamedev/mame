@@ -23,9 +23,9 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int MAX_GFX_ELEMENTS = 32;
-const int MAX_GFX_PLANES = 8;
-const int MAX_GFX_SIZE = 32;
+const UINT8 MAX_GFX_ELEMENTS = 32;
+const UINT16 MAX_GFX_PLANES = 8;
+const UINT16 MAX_GFX_SIZE = 32;
 
 
 
@@ -201,13 +201,13 @@ public:
 
 	// getters
 	palette_device &palette() const { assert(m_palette != nullptr); return *m_palette; }
-	gfx_element *gfx(int index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
+	gfx_element *gfx(UINT8 index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
 
 	// decoding
 	void decode_gfx(const gfx_decode_entry *gfxdecodeinfo);
 	void decode_gfx() { decode_gfx(m_gfxdecodeinfo); }
 
-	void set_gfx(int index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
+	void set_gfx(UINT8 index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
 
 protected:
 	// interface-level overrides

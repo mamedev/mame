@@ -6,6 +6,8 @@ This section covers technical specifications useful to programmers working on MA
 .. toctree::
 	:titlesonly:
 
+	device_memory_interface
+	device_rom_interface
 	floppy
 	nscsi
 	luaengine

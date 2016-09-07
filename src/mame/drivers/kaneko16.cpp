@@ -338,7 +338,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(kaneko16_state::bakubrkr_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7) {
-		m_oki->set_bank_base(0x40000 * (data & 0x7) );
+		m_oki->set_rom_bank(data & 0x7);
 		logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
 	}
 }
@@ -400,7 +400,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base(0x40000 * (data & 0xf) );
+		m_oki1->set_rom_bank(data & 0xf);
 //      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -409,7 +409,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base(0x40000 * data );
+		m_oki2->set_rom_bank(data);
 //      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -464,7 +464,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base(0x40000 * (data & 0xF));
+		m_oki1->set_rom_bank(data & 0xf);
 		logerror("%s: OKI0  bank %08X\n",machine().describe_context(),data);
 	}
 }
@@ -473,7 +473,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base(0x40000 * data );
+		m_oki2->set_rom_bank(data);
 		logerror("%s: OKI1  bank %08X\n",machine().describe_context(),data);
 	}
 }
@@ -533,7 +533,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base( 0x40000 * (data & 0xF) );
+		m_oki1->set_rom_bank(data & 0xf);
 //      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -542,7 +542,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base( 0x40000 * (data & 0x1) );
+		m_oki2->set_rom_bank(data & 0x1);
 //      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -778,7 +778,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(kaneko16_state::wingforc_oki_bank_w)
 {
 	if (data <= 2)
-		m_oki->set_bank_base(0x40000 * data);
+		m_oki->set_rom_bank(data);
 	else
 		logerror("%s: unknown OKI bank %02X\n", machine().describe_context(), data);
 }

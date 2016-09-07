@@ -114,7 +114,7 @@ WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
 
 WRITE16_MEMBER(aerofgt_state::pspikesb_oki_banking_w)
 {
-	m_oki->set_bank_base(0x40000 * (data & 3));
+	m_oki->set_rom_bank(data & 3);
 }
 
 /*TODO: sound banking. */
@@ -783,7 +783,7 @@ static INPUT_PORTS_START( spinlbrk )
 	PORT_DIPSETTING(      0x0000, "1-1C 1-2 HPs" )
 	/* According to Spinal Breakers manual, here DSW2 starts */
 	/* Default in US manual is DEF_STR( Hardest ) */
-	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
@@ -802,7 +802,7 @@ static INPUT_PORTS_START( spinlbrk )
 	PORT_DIPSETTING(      0x4000, "32 Hitpoints" )
 	PORT_DIPSETTING(      0x0000, "40 Hitpoints" )
 	/* Default in US manual is "5 points" */
-	PORT_DIPNAME( 0x8000, 0x0000, "Life Restoration" )              PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Life Restoration" )              PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, "10 Points" )
 	PORT_DIPSETTING(      0x0000, "5 Points" )
 INPUT_PORTS_END
@@ -811,9 +811,17 @@ static INPUT_PORTS_START( spinlbrku )
 	PORT_INCLUDE(spinlbrk)
 
 	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x4000, 0x4000, "Health Pack" )                   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "20 Hitpoints" )
 	PORT_DIPSETTING(      0x0000, "32 Hitpoints" )
+	PORT_DIPNAME( 0x8000, 0x0000, "Life Restoration" )              PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x8000, "10 Points" )
+	PORT_DIPSETTING(      0x0000, "5 Points" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( turbofrc )

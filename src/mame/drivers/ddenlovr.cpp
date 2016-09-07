@@ -1808,14 +1808,14 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovr16_transparency_mask_w)
 
 WRITE8_MEMBER(ddenlovr_state::quizchq_oki_bank_w )
 {
-	m_oki->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_rom_bank(data & 1);
 }
 
 WRITE16_MEMBER(ddenlovr_state::ddenlovr_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki->set_bank_base((data & 7) * 0x40000);
+		m_oki->set_rom_bank(data & 7);
 	}
 }
 
@@ -1826,7 +1826,7 @@ WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank1_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		m_okibank = (m_okibank & 2) | (data & 1);
-		m_oki->set_bank_base(m_okibank * 0x40000);
+		m_oki->set_rom_bank(m_okibank);
 	}
 }
 
@@ -1835,7 +1835,7 @@ WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank2_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		m_okibank = (m_okibank & 1) | ((data & 1) << 1);
-		m_oki->set_bank_base(m_okibank * 0x40000);
+		m_oki->set_rom_bank(m_okibank);
 	}
 }
 
@@ -2078,7 +2078,7 @@ READ16_MEMBER(ddenlovr_state::ddenlovrk_protection2_r)
 WRITE16_MEMBER(ddenlovr_state::ddenlovrk_protection2_w)
 {
 	COMBINE_DATA(m_protection2);
-	m_oki->set_bank_base(((*m_protection2) & 0x7) * 0x40000);
+	m_oki->set_rom_bank((*m_protection2) & 0x7);
 }
 
 static ADDRESS_MAP_START( ddenlovrk_map, AS_PROGRAM, 16, ddenlovr_state )
@@ -2199,7 +2199,7 @@ WRITE16_MEMBER(ddenlovr_state::nettoqc_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki->set_bank_base((data & 3) * 0x40000);
+		m_oki->set_rom_bank(data & 3);
 	}
 }
 
@@ -2249,7 +2249,7 @@ READ16_MEMBER(ddenlovr_state::ultrchmp_protection2_r)
 WRITE16_MEMBER(ddenlovr_state::ultrchmp_protection2_w)
 {
 //  COMBINE_DATA(m_protection2);
-	m_oki->set_bank_base((data & 0xf) * 0x40000);
+	m_oki->set_rom_bank(data & 0xf);
 }
 
 static ADDRESS_MAP_START( ultrchmp_map, AS_PROGRAM, 16, ddenlovr_state )
@@ -2791,7 +2791,7 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_palette_w)
 
 WRITE8_MEMBER(ddenlovr_state::hanakanz_oki_bank_w )
 {
-	m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
+	m_oki->set_rom_bank((data >> 6) & 1);
 }
 
 READ8_MEMBER(ddenlovr_state::hanakanz_rand_r)
@@ -3018,7 +3018,7 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_coincounter_w)
 WRITE8_MEMBER(ddenlovr_state::mjchuuka_oki_bank_w )
 {
 	// data & 0x08 ?
-	m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
+	m_oki->set_rom_bank(data & 1);
 
 #ifdef MAME_DEBUG
 //    popmessage("1e = %02x",data);
@@ -3714,9 +3714,7 @@ WRITE16_MEMBER(ddenlovr_state::akamaru_protection1_w)
 	COMBINE_DATA(&m_prot_16);
 	// BCD number?
 	bank = (((m_prot_16 >> 4) & 0x0f) % 10) * 10 + ((m_prot_16 & 0x0f) % 10);
-	if (bank >= 12)
-		bank = 0;
-	m_oki->set_bank_base(bank * 0x40000);
+	m_oki->set_rom_bank(bank);
 
 //  popmessage("bank $%0x (%d)", m_prot_16, bank);
 }
@@ -3803,7 +3801,7 @@ WRITE8_MEMBER(ddenlovr_state::mjflove_rombank_w)
 
 WRITE8_MEMBER(ddenlovr_state::mjflove_okibank_w )
 {
-	m_oki->set_bank_base((data & 0x07) * 0x40000);
+	m_oki->set_rom_bank(data & 0x07);
 	//popmessage("SOUND = %02x", data);
 }
 
@@ -3886,7 +3884,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(ddenlovr_state::jongtei_okibank_w )
 {
-	m_oki->set_bank_base(((data >> 4) & 0x07) * 0x40000);
+	m_oki->set_rom_bank((data >> 4) & 0x07);
 }
 
 WRITE8_MEMBER(ddenlovr_state::jongtei_dsw_keyb_w)
@@ -4501,7 +4499,7 @@ READ8_MEMBER(ddenlovr_state::momotaro_protection_r)
 
 WRITE8_MEMBER(ddenlovr_state::daimyojn_okibank_w )
 {
-	m_oki->set_bank_base(((data >> 4) & 0x01) * 0x40000);
+	m_oki->set_rom_bank((data >> 4) & 0x01);
 }
 
 WRITE8_MEMBER(ddenlovr_state::daimyojn_palette_sel_w)

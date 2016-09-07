@@ -91,7 +91,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_oki->set_bank_base((((~data & 0x0100) >> 8) * 0x40000));
+		m_oki->set_rom_bank((~data & 0x0100) >> 8);
 	}
 }
 

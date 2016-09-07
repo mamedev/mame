@@ -761,10 +761,6 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 	return ret;
 }
 
-static ADDRESS_MAP_START( maygay_mcu_map, AS_PROGRAM, 8, maygay1b_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( maygay_mcu_io, AS_IO, 8, maygay1b_state )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE( mcu_port0_r, mcu_port0_w )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( mcu_port1_w )
@@ -781,7 +777,6 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
 	MCFG_CPU_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
-	MCFG_CPU_PROGRAM_MAP(maygay_mcu_map)
 	MCFG_CPU_IO_MAP(maygay_mcu_io)
 
 

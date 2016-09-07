@@ -151,7 +151,7 @@ WRITE8_MEMBER(diverboy_state::okibank_w)
 {
 	/* bit 2 might be reset */
 //  popmessage("%02x",data);
-	m_oki->set_bank_base((data & 3) * 0x40000);
+	m_oki->set_rom_bank(data & 3);
 }
 
 

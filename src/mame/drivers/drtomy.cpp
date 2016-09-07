@@ -164,7 +164,7 @@ WRITE16_MEMBER(drtomy_state::drtomy_okibank_w)
 	if (m_oki_bank != (data & 3))
 	{
 		m_oki_bank = data & 3;
-		m_oki->set_bank_base(m_oki_bank * 0x40000);
+		m_oki->set_rom_bank(m_oki_bank);
 	}
 
 	/* unknown bit 2 -> (data & 4) */

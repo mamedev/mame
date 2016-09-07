@@ -40,6 +40,16 @@ c352_device::c352_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void c352_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
 //-------------------------------------------------
 //  static_set_dividder - configuration helper to
 //  set the divider setting

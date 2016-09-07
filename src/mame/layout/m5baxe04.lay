@@ -779,6 +779,26 @@
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
+	<element name="lamp_0_1_border" defstate="0">
+		<rect state="1">
+			<color red="0.16" green="0.50" blue="0.50"/>
+		</rect>
+		<rect state="0">
+			<color red="0.04" green="0.12" blue="0.12"/>
+		</rect>
+	</element>
+	<element name="lamp_0_1" defstate="0">
+		<rect state="1">
+			<color red="0.33" green="1.00" blue="1.00"/>
+		</rect>
+		<rect state="0">
+			<color red="0.08" green="0.25" blue="0.25"/>
+		</rect>
+		<text string="&#xA3;2.40">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
 	<element name="lamp_46_1_border" defstate="0">
 		<rect state="1">
 			<color red="0.19" green="0.50" blue="0.50"/>
@@ -5127,6 +5147,12 @@
 		<backdrop name="lamp47" element="lamp_47_1" state="0">
 			<bounds x="19" y="308" width="68" height="28"/>
 		</backdrop>
+		<backdrop name="lamp0" element="lamp_0_1_border" state="0">
+			<bounds x="17" y="306" width="72" height="32"/>
+		</backdrop>
+		<backdrop name="lamp0" element="lamp_0_1" state="0">
+			<bounds x="19" y="308" width="68" height="28"/>
+		</backdrop>
 		<backdrop name="lamp46" element="lamp_46_1_border" state="0">
 			<bounds x="17" y="338" width="72" height="32"/>
 		</backdrop>
@@ -5714,7 +5740,7 @@
 		<backdrop element="debug_backdrop_colour">
 			<bounds x="0" y="0" width="1920" height="1080"/>
 		</backdrop>
-		<backdrop name="lamp0" element="debug_lamp_unreferenced" state="0">
+		<backdrop name="lamp0" element="debug_lamp_standard" state="0">
 			<bounds x="32" y="32" width="60" height="60"/>
 		</backdrop>
 		<backdrop name="debug_lamp_label_0" element="debug_lamp_label_0">

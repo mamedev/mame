@@ -65,7 +65,7 @@ bootleg todo:
 
 WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
 {
-	m_oki2->set_bank_base((data & 3) * 0x40000);
+	m_oki2->set_rom_bank(data & 3);
 }
 
 /**********************************************************************************/

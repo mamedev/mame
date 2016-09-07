@@ -400,7 +400,7 @@ ADDRESS_MAP_END
 /**** Monsters World ****/
 WRITE8_MEMBER(mitchell_state::oki_banking_w)
 {
-	m_oki->set_bank_base(0x40000 * (data & 3));
+	m_oki->set_rom_bank(data & 3);
 }
 
 static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )

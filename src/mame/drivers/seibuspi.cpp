@@ -915,7 +915,7 @@ WRITE8_MEMBER(seibuspi_state::spi_layerbanks_eeprom_w)
 
 WRITE8_MEMBER(seibuspi_state::oki_bank_w)
 {
-	m_oki2->set_bank_base((data & 0x04) ? 0x40000 : 0);
+	m_oki2->set_rom_bank((data >> 2) & 1);
 }
 
 WRITE8_MEMBER(seibuspi_state::z80_prg_transfer_w)

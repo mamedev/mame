@@ -1064,11 +1064,11 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 	// D5 of portb is joystick fire button 2
 	// D6 VSPINT
 	// D7 VSPRDY
-	int TMSint = m_tms ? m_tms->intq_r() : 0;
-	int TMSrdy = m_tms ? m_tms->readyq_r() : 0;
+	int vspint = m_tms ? m_tms->intq_r() : 0;
+	int vsprdy = m_tms ? m_tms->readyq_r() : 0;
 	//logerror("TMSint %d\n",TMSint);
 	//logerror("TMSrdy %d\n",TMSrdy);
-	return (0xf | ioport("IN0")->read() | (!TMSrdy << 7) | (!TMSint << 6));
+	return ((m_analog ? m_analog->pb_r() : 0x30) | (!vsprdy << 7) | (!vspint << 6));
 }
 
 
@@ -1099,7 +1099,7 @@ BBC Joystick Support
 
 UPD7002_GET_ANALOGUE(bbc_state::BBC_get_analogue_input)
 {
-	return ((0xff - m_joy[channel_number]->read()) << 8);
+	return ((0xff - m_analog->ch_r(channel_number)) << 8);
 }
 
 UPD7002_EOC(bbc_state::BBC_uPD7002_EOC)
@@ -1375,7 +1375,7 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 }
 
 /**************************************
-   i8271 disc control function
+i8271 disc control function
 ***************************************/
 
 

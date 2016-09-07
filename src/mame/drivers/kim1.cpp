@@ -27,9 +27,32 @@
         1873      press GO to load tape
     NOTE: save end address is next address from program end
 
+The cassette interface
+======================
+The KIM-1 stores data on cassette using 2 frequencies: ~3700Hz (high) and ~2400Hz
+(low). A high tone is output for 9 cycles and a low tone for 6 cycles. A logic bit
+is encoded using 3 sequences of high and low tones. It always starts with a high
+tone and ends with a low tone. The middle tone is high for a logic 0 and low for
+0 logic 1.
+
+These high and low tone signals are fed to a circuit containing a LM565 PLL and
+a 311 comparator. For a high tone a 1 is passed to DB7 of 6530-U2 for a low tone
+a 0 is passed. The KIM-1 software measures the time it takes for the signal to
+change from 1 to 0.
+
+Keyboard and Display logic
+==========================
+PA0-PA6 of 6530-U2 are connected to the columns of the keyboard matrix. These
+columns are also connected to segments A-G of the LEDs. PB1-PB3 of 6530-U2 are
+connected to a 74145 BCD which connects outputs 0-2 to the rows of the keyboard
+matrix. Outputs 4-9 of the 74145 are connected to LEDs U18-U23
+
+When a key is pressed the corresponding input to PA0-PA6 is set low and the KIM-1
+software reads this signal. The KIM-1 software sends an output signal to PA0-PA6
+and the corresponding segments of an LED are illuminated.
+
 TODO:
 - LEDs should be dark at startup (RS key to activate)
-- add software list
 - hook up Single Step dip switch
 - slots for expansion & application ports
 - add TTY support
@@ -247,9 +270,13 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(kim1_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE ("kim1_cass")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", kim1_state, kim1_update_leds, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", kim1_state, kim1_cassette_input, attotime::from_hz(44100))
+
+	// software list
+    MCFG_SOFTWARE_LIST_ADD ("cass_list", "kim1_cass")
 
 MACHINE_CONFIG_END
 
@@ -267,5 +294,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY          FULLNAME        FLAGS
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS              INIT  COMPANY             FULLNAME  FLAGS
 COMP( 1975, kim1,     0,        0,      kim1,     kim1, driver_device,     0,    "MOS Technologies", "KIM-1" , MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

@@ -5025,9 +5025,9 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(nmk16_state::spec2k_oki1_banking_w)
 {
 	if(data == 0xfe)
-		m_oki2->set_bank_base(0);
+		m_oki2->set_rom_bank(0);
 	else if(data == 0xff)
-		m_oki2->set_bank_base(0x40000);
+		m_oki2->set_rom_bank(1);
 }
 
 static ADDRESS_MAP_START( afega_sound_cpu, AS_PROGRAM, 8, nmk16_state )
@@ -5053,7 +5053,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(nmk16_state::twinactn_oki_bank_w)
 {
-	m_oki1->set_bank_base((data & 3) * 0x40000);
+	m_oki1->set_rom_bank(data & 3);
 
 	if (data & (~3))
 		logerror("%s: invalid oki bank %02x\n", machine().describe_context(), data);

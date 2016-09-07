@@ -155,7 +155,7 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	if ( (data&0x06) != m_oki_bank )
 	{
 		m_oki_bank = data &0x6;
-		m_oki->set_bank_base((m_oki_bank>>1) * 0x40000);
+		m_oki->set_rom_bank(m_oki_bank >> 1);
 	}
 }
 

@@ -799,7 +799,7 @@ static ADDRESS_MAP_START( arkanoid_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w)  /* gfx bank, flip screen etc. */
+	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w)  /* gfx bank, flip screen, 68705 reset, etc. */
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")     /* 2 bits from the 68705 */
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READWRITE(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
@@ -915,7 +915,7 @@ ic5 = 74ls669
 ic6 = 74ls669
 ic9 = 74ls257
 ic21 = 74ls393 (? counter)
-ic26 = 74ls74 (two semaphore latches; latch 1 is == m_z80HasWritten and is cleared by ?; latch 2 is == m_68705HasWritten and is set by PC3 being output low, and cleared by ?)
+ic26 = 74ls74 (two semaphore latches; latch 1 is == m_Z80HasWritten and is cleared by ?; latch 2 is == m_MCUHasWritten and is set by PC3 being output low, and cleared by ?)
 ic27 = 74ls374 (mcu->z80 latch)
 ic28 = 74ls374 (z80->mcu latch)
 ic31 = 74ls74
@@ -945,7 +945,7 @@ ic46.4 (A2) & ic31.4 (/preset1) & ic21.1 (1A) & ic87.9 (2Q) -> = TIMER/BOOT -> |
 
 The ic26 semaphores and the /int line:
 ic26 is a 74ls74 with two latches with positive edge triggering:
-latch 1 aka m_z80HasWritten:
+latch 1 aka m_Z80HasWritten:
 /Reset  : <- system reset generator (watchdog?)
 Data    : tied to GND on an inner plane
 Clock   : <- 68705 PC2, triggered on rising edge, this clears the bit and the /INT
@@ -953,7 +953,7 @@ Clock   : <- 68705 PC2, triggered on rising edge, this clears the bit and the /I
 Q       : -> 68705 PC0
 /Q      : -> 68705 /INT and z80, somehow
 
-latch 2 aka m_68705HasWritten:
+latch 2 aka m_MCUHasWritten:
 /Reset  : <- system reset generator (watchdog?)
 Data    : tied to GND on an inner plane
 Clock   : from z80, somehow; also is /oe of ic27
@@ -980,7 +980,7 @@ static INPUT_PORTS_START( arkanoid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state,arkanoid_68705_input_r, nullptr)  /* Inputs from the 68705 */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state,arkanoid_semaphore_input_r, nullptr)   /* Z80 and MCU Semaphores */
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1282,17 +1282,17 @@ void arkanoid_state::machine_start()
 	save_item(NAME(m_bootleg_id));
 	save_item(NAME(m_bootleg_cmd));
 
-	save_item(NAME(m_z80HasWritten));
-	save_item(NAME(m_fromz80));
-	save_item(NAME(m_68705HasWritten));
-	save_item(NAME(m_toz80));
+	save_item(NAME(m_Z80HasWritten));
+	save_item(NAME(m_fromZ80));
+	save_item(NAME(m_MCUHasWritten));
+	save_item(NAME(m_fromMCU));
 
-	save_item(NAME(m_port_a_in));
-	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_c_internal));
-	save_item(NAME(m_port_c_out));
-	save_item(NAME(m_ddr_c));
+	save_item(NAME(m_portA_in));
+	save_item(NAME(m_portA_out));
+	save_item(NAME(m_ddrA));
+	save_item(NAME(m_portC_internal));
+	save_item(NAME(m_portC_out));
+	save_item(NAME(m_ddrC));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_tcr));
 }
@@ -1307,20 +1307,20 @@ void arkanoid_state::machine_reset()
 	m_bootleg_cmd = 0;
 
 	// latched data bytes
-	m_fromz80 = 0;
-	m_toz80 = 0;
+	m_fromZ80 = 0;
+	m_fromMCU = 0;
 	// the following 3 are all part of the 74ls74 at ic26 and are cleared on reset
-	m_z80HasWritten = 0;
-	m_68705HasWritten = 0;
+	m_Z80HasWritten = 0;
+	m_MCUHasWritten = 0;
 	if (m_mcu.found()) m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	if (m_mcu.found()) m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<7)));
 
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_c_internal = 0;
-	m_port_c_out = 0;
-	m_ddr_c = 0;
+	m_portA_in = 0;
+	m_portA_out = 0;
+	m_ddrA = 0;
+	m_portC_internal = 0;
+	m_portC_out = 0;
+	m_ddrC = 0;
 	m_tdr = 0xFF;
 	m_tcr = 0x7F;
 }

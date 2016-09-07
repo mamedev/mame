@@ -6423,7 +6423,7 @@
 				<rom loadflag="load16_word_swap" name="235-p1.p1" offset="0x000000" size="0x080000" crc="afed5de2" sha1="a5d82c6dbe687505e8c8d7339908da45cd379a0b" />
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x010000" name="235-s1.s1" status="baddump" crc="5a68d91e" sha1="a8c58eb68fd7e6e2d9d1153a9da514430437f342" />
+				<rom offset="0x000000" size="0x020000" name="235-s1.s1" crc="3b13a22f" sha1="4506fc340d9658a50fa415676564f10bbfba2703" />   <!-- TC531000 -->
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
 				<rom offset="0x000000" size="0x020000" name="202-m1.m1" crc="9c0291ea" sha1="3fa67c62acba79be6b3a98cc1601e45569fa11ae" />   <!-- TC531001 -->
@@ -6819,7 +6819,7 @@
 	</software>
 
 
-	<software name="kof98a">
+	<software name="kof98a" cloneof="kof98">
 		<description>The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420, alt board)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>

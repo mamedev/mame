@@ -6,8 +6,10 @@
 <!--  ****************************************************  -->
 
 <mamelayout version="2">
-	<element name="backdrop">
-		<image file="backdrop.png"/>
+	<element name="backdrop_colour">
+		<rect>
+			<color red="0.00" green="0.00" blue="0.00"/>
+		</rect>
 	</element>
 	<element name="lamp_82_1_border" defstate="0">
 		<rect state="1">
@@ -3882,7 +3884,7 @@
 	</element>
 
 	<view name="AWP Simulated Video">
-		<backdrop element="backdrop">
+		<backdrop element="backdrop_colour">
 			<bounds x="0" y="0" width="669" height="702"/>
 		</backdrop>
 		<backdrop element="reel_background">

@@ -404,6 +404,11 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, dwarfd_state )
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( pokeresp_map, AS_PROGRAM, 8, dwarfd_state )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -793,6 +798,39 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( pokeresp, dwarfd_state )
+
+	/* basic machine hardware */
+	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
+	MCFG_CPU_ADD("maincpu", I8085A, 10595000/3*2)        /* ? MHz */
+	MCFG_I8085A_SOD(WRITELINE(dwarfd_state,dwarfd_sod_callback))
+	MCFG_CPU_PROGRAM_MAP(pokeresp_map)
+	MCFG_CPU_IO_MAP(io_map)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(272*2, 200+4*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
+
+	MCFG_DEVICE_ADD("i8275", I8275, 10595000/3)
+	MCFG_I8275_CHARACTER_WIDTH(8)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, display_pixels)
+	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(dwarfd_state, drq_w))
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dwarfd)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( qc, dwarfd )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -873,6 +911,30 @@ ROM_START( dwarfda )
 	ROM_LOAD( "74s188n.3a",0x00, 0x20, CRC(9951e47a) SHA1(d06da09af25da06ac6bd0ee1fc99f7690b36b550) )
 	/* memory map */
 	ROM_LOAD( "74s188n.7h",0x20, 0x20, CRC(c9618de2) SHA1(d5636546dbc57e6aab01dab79b2ead1dfef8fa5c) )
+ROM_END
+
+ROM_START( pokeresp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "electro.9l",         0x0000, 0x0800, CRC(38b6be0d) SHA1(ce65db8465fc459d12a940d63b228bcc63616411) )
+	ROM_LOAD( "electro.9k",         0x0800, 0x0800, CRC(9369ba5d) SHA1(b41ab071a6833ed8b048e8f45e053225ddc167b1) )
+	ROM_LOAD( "electro.9j",         0x1000, 0x0800, CRC(a0ca4bb1) SHA1(815d7af5a10f64d1ea74c87ba3387cc3f68db729) )
+	ROM_LOAD( "electro.9h",         0x1800, 0x0800, CRC(d344d75a) SHA1(9ec4d15aa0a91544c1f5572d034009049a78598f) )
+
+	ROM_REGION16_LE( 0x2000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "electro.6a",  0x0000, 0x0800, CRC(13b60985) SHA1(6a8b36a128ccffd6fae6a40a4deb88d612df4942) )
+	ROM_LOAD16_BYTE( "electro.6b",  0x1000, 0x0800, CRC(edbbdea7) SHA1(854624a2b7ea70eea929b0145b2ea0012baf8101) )
+	ROM_LOAD16_BYTE( "electro.6c",  0x0001, 0x0800, CRC(1fc1ab41) SHA1(0f8a57abedaadcf5f13523702b89b8782dedebc4) )
+	ROM_LOAD16_BYTE( "electro.6d",  0x1001, 0x0800, CRC(1d2fb528) SHA1(21b434be1526f67f8a98da0f32487270d415beb6) )
+
+	ROM_REGION( 0x4000*2, "gfx2", 0 )
+	ROM_FILL(0,  0x4000*2, 0x00)
+
+	ROM_REGION( 0x140, "proms", 0 )
+	/* ??? colors */
+	ROM_LOAD( "electro.3a",0x00, 0x020, CRC(76f42fb4) SHA1(677c00c22ac445a84a7c4abb7dfea365cb47dc93) )
+	/* memory map */
+	ROM_LOAD( "electro.7h",0x020, 0x020, CRC(666875ab) SHA1(eb14daf9171eec885749e415345b84bcd3d2becc) )
+	ROM_LOAD( "electro.6l",0x040, 0x100, CRC(37ffb79f) SHA1(59c1973f1a99bb380a1a05f5067b314206d4facb) )
 ROM_END
 
 /*
@@ -1045,6 +1107,7 @@ DRIVER_INIT_MEMBER(dwarfd_state,qc)
 }
 
 /*    YEAR  NAME      PARENT     MACHINE INPUT   INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS */
+GAME( 1979, pokeresp, 0,         pokeresp, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Poker (Electro-Sport)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, dwarfda,   dwarfd,   dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, quarterh, 0,         dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -290,6 +290,8 @@
 
 typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
+typedef UINT16 indirect_pen_t;
+
 
 // ======================> raw_to_rgb_converter
 
@@ -412,11 +414,11 @@ public:
 	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
 
 	// indirection (aka colortables)
-	UINT16 pen_indirect(int index) const { return m_indirect_pens[index]; }
+	indirect_pen_t pen_indirect(int index) const { return m_indirect_pens[index]; }
 	rgb_t indirect_color(int index) const { return m_indirect_colors[index]; }
 	void set_indirect_color(int index, rgb_t rgb);
-	void set_pen_indirect(pen_t pen, UINT16 index);
-	UINT32 transpen_mask(gfx_element &gfx, int color, int transcolor);
+	void set_pen_indirect(pen_t pen, indirect_pen_t index);
+	UINT32 transpen_mask(gfx_element &gfx, UINT32 color, indirect_pen_t transcolor);
 
 	// shadow config
 	void set_shadow_factor(double factor) { assert(m_shadow_group != 0); m_palette->group_set_contrast(m_shadow_group, factor); }
@@ -498,8 +500,8 @@ private:
 	pen_t               m_black_pen;            // precomputed black pen value
 
 	// indirection state
-	std::vector<rgb_t> m_indirect_colors;     // actual colors set for indirection
-	std::vector<UINT16> m_indirect_pens;      // indirection values
+	std::vector<rgb_t> m_indirect_colors;          // actual colors set for indirection
+	std::vector<indirect_pen_t> m_indirect_pens;   // indirection values
 
 	struct shadow_table_data
 	{

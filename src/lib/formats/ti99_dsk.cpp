@@ -339,7 +339,7 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 		if (((i-start-6)%334==0) && (i < start + 9*334))
 		{
 			// IDAM
-			raw_w(buffer, 16, 0xf57e);
+			raw_w(buffer, 16, 0xf57e, cell_size);
 		}
 		else
 		{
@@ -347,7 +347,7 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 			{
 				// DAM
 				// FB (1111010101101111) = normal data, F8 (1111010101101010)= deleted data
-				raw_w(buffer, 16, (trackdata[i]==0xf8)? 0xf56a : 0xf56f);
+				raw_w(buffer, 16, (trackdata[i]==0xf8)? 0xf56a : 0xf56f, cell_size);
 			}
 			else
 			{
@@ -391,7 +391,7 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 						}
 					}
 				}
-				fm_w(buffer, 8, trackdata[i]);
+				fm_w(buffer, 8, trackdata[i], cell_size);
 			}
 		}
 	}
@@ -433,7 +433,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 		{
 			// IDAM
 			for (int j=0; j < 3; j++)
-				raw_w(buffer, 16, 0x4489);  // 3 times A1
+				raw_w(buffer, 16, 0x4489, cell_size);  // 3 times A1
 			i += 2;
 		}
 		else
@@ -442,7 +442,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 			{
 				// DAM
 				for (int j=0; j < 3; j++)
-					raw_w(buffer, 16, 0x4489);  // 3 times A1
+					raw_w(buffer, 16, 0x4489, cell_size);  // 3 times A1
 				i += 2;
 			}
 			else
@@ -487,7 +487,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 						}
 					}
 				}
-				mfm_w(buffer, 8, trackdata[i]);
+				mfm_w(buffer, 8, trackdata[i], cell_size);
 			}
 		}
 	}

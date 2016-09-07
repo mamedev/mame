@@ -2543,10 +2543,9 @@ abc110                          // 1985 ABC 110
 abc310                          // 1985 ABC 310
 acw443                          // 1985 ABC 210/Cambridge Workstation
 bbca                            // 1981 BBC Micro Model A
-bbcb                            // 1981 BBC Micro Model B w/8271 FDC
+bbcb                            // 1981 BBC Micro Model B
 bbcb_de                         // 1982 BBC Micro Model B (German)
 bbcb_us                         // 1983 BBC Micro Model B (US)
-bbcb1770                        // 1984 BBC Micro Model B w/1770 FDC
 bbcbp                           // 1985 BBC Micro Model B+ 64K
 bbcbp128                        // 1985 BBC Micro Model B+ 128K
 bbcm                            // 1986 BBC Master 128
@@ -11229,6 +11228,7 @@ dvk_ksm                         //
 @source:dwarfd.cpp
 dwarfd                          // (c) 198? Electro-Sports
 dwarfda                         // (c) 198? Electro-Sports
+pokeresp                        // (c) 198? Electro-Sports
 qc                              // (c) 1995 ArJay Exports/Prestige Games
 quarterh                        // (c) 1983 Electro-Sports
 quarterha                       // (c) 1983 Electro-Sports
@@ -12565,6 +12565,7 @@ gal3                            // (c) 1992 (Arcade TV Game List - P.73, Right, 
 
 @source:galaga.cpp
 battles                         // bootleg
+battles2                        // bootleg
 bosco                           // (c) 1981
 boscomd                         // (c) 1981 Midway
 boscomdo                        // (c) 1981 Midway
@@ -14164,6 +14165,7 @@ mmerlin                         // Parker Bros
 phpball                         // Tomy
 raisedvl                        // Entex
 simon                           // Milton Bradley
+speechp                         // TSI
 splitsec                        // Parker Bros
 ssimon                          // Milton Bradley
 ssports4                        // US Games
@@ -29251,6 +29253,7 @@ msheartb                        // hack
 mspacii                         // bootleg
 mspacii2                        // bootleg
 mspacmab                        // bootleg
+mspacmab2                       // bootleg
 mspacman                        // (c) 1981 Midway  // made by General Computer
 mspacmanbcc                     // bootleg
 mspacmanbg                      // bootleg
@@ -33498,6 +33501,7 @@ ikarijpb                        // bootleg
 ikarinc                         // A5004 'IW' (c) 1986
 ikariram                        // bootleg
 jcross                          // A3006      (c) 1984
+jcrossa                         //            (c) 1984
 legofair                        // A7003 'KK' (c) 1988
 madcrash                        // A2005      (c) 1984
 madcrush                        // A2005      (c) 1984
@@ -34112,6 +34116,7 @@ techbowl                        // 1997.12 Technical Bowling
 thunt                           // 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License))
 thuntk                          //
 twcup98                         // 1998.04 Tecmo World Cup '98 (Tecmo)
+twsoc98
 vfkids                          // 1996.03 Virtua Fighter Kids
 vfremix                         // 1995.06 Virtua Fighter Remix
 vmahjong                        // 1997.02 Virtual Mahjong (Micronet)

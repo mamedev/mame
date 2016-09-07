@@ -74,7 +74,7 @@ WRITE8_MEMBER(funybubl_state::funybubl_soundcommand_w)
 
 WRITE8_MEMBER(funybubl_state::funybubl_oki_bank_sw)
 {
-	m_oki->set_bank_base(((data & 1) * 0x40000));
+	m_oki->set_rom_bank(data & 1);
 }
 
 

@@ -1176,7 +1176,7 @@ void igs017_state::mgcs_igs029_run()
 		switch (port)
 		{
 			case 0x01:
-				m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 4) & 1);
 				machine().bookkeeping().coin_counter_w(0, (~data) & 0x20);   // coin in
 				machine().bookkeeping().coin_counter_w(1, (~data) & 0x40);   // coin out
 
@@ -1465,7 +1465,7 @@ WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 7) & 1);
 			}
 			break;
 
@@ -1561,7 +1561,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				// bit 7?
-				m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 6) & 1);
 			}
 			break;
 
@@ -1640,7 +1640,7 @@ WRITE8_MEMBER(igs017_state::tjsb_output_w)
 			break;
 
 		case 0x02:
-			m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);   // oki bank (0x20/0x30)
+			m_oki->set_rom_bank((data >> 4) & 1);   // oki bank (0x20/0x30)
 			if (!(data & ~0x30))
 				return;
 			break;
@@ -1765,7 +1765,7 @@ WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 7) & 1);
 
 				if ( data & 0x7f )
 					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
@@ -2106,7 +2106,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		m_oki->set_bank_base((data & 0x0100) ? 0x40000 : 0);
+		m_oki->set_rom_bank((data >> 8) & 1);
 
 		if ( data & 0x0fe00 )
 			logerror("%s: warning, unknown bits written in input_select = %04x\n", machine().describe_context(), data);
@@ -2147,7 +2147,7 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
+				m_oki->set_rom_bank(data & 0x01);
 
 //              m_hopper            =           data & 0x20;    // hopper motor
 //              machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter

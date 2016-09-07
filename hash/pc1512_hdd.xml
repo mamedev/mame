@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc1512_hdd" description="Amstrad PC1512 hard disks">
+
+	<software name="hd20">
+		<description>Amstrad PC1512 HD20</description>
+		<year>1986</year>
+		<publisher>Amstrad</publisher>
+
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="hd20" sha1="f341f9ef8f6a47fd66b6977cacaa93e155c699aa" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

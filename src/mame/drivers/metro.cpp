@@ -1171,7 +1171,7 @@ ADDRESS_MAP_END
 void metro_state::gakusai_oki_bank_set()
 {
 	int bank = (m_gakusai_oki_bank_lo & 7) + (m_gakusai_oki_bank_hi & 1) * 8;
-	m_oki->set_bank_base(bank * 0x40000);
+	m_oki->set_rom_bank(bank);
 }
 
 WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)

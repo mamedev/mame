@@ -1759,8 +1759,8 @@ WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
 
 WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 {
-	m_oki1->set_bank_base(((data >> 0)& 1) * 0x40000);
-	m_oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
+	m_oki1->set_rom_bank((data >> 0) & 1);
+	m_oki2->set_rom_bank((data >> 1) & 1);
 }
 
 /**********************************************************************************/

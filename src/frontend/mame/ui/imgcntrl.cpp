@@ -68,9 +68,9 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 			m_current_directory = m_image.working_directory();
 		}
 
-		// check to see if the path exists; if not clear it
+		// check to see if the path exists; if not then set to current directory
 		if (util::zippath_opendir(m_current_directory, nullptr) != osd_file::error::NONE)
-			m_current_directory.clear();
+			osd_get_full_path(m_current_directory, ".");
 	}
 }
 

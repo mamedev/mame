@@ -856,7 +856,7 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 		output().set_led_value(6, data & 0x0400);    // not tested in service mode
 		output().set_led_value(7, data & 0x0800);    // not tested in service mode
 
-		m_oki->set_bank_base((data & 0x8000) ? 0x40000 : 0);
+		m_oki->set_rom_bank((data & 0x8000) >> 15);
 	}
 
 //  popmessage("OUT %04x", data);

@@ -239,7 +239,7 @@ WRITE16_MEMBER(bestleag_state::fgram_w)
 
 WRITE16_MEMBER(bestleag_state::oki_bank_w)
 {
-	m_oki->set_bank_base(0x40000 * ((data & 3) - 1));
+	m_oki->set_rom_bank((data - 1) & 3);
 }
 
 

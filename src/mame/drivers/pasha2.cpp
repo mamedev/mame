@@ -201,13 +201,13 @@ WRITE16_MEMBER(pasha2_state::bitmap_1_w)
 WRITE16_MEMBER(pasha2_state::oki1_bank_w)
 {
 	if (offset)
-		m_oki1->set_bank_base((data & 1) * 0x40000);
+		m_oki1->set_rom_bank(data & 1);
 }
 
 WRITE16_MEMBER(pasha2_state::oki2_bank_w)
 {
 	if (offset)
-		m_oki2->set_bank_base((data & 1) * 0x40000);
+		m_oki2->set_rom_bank(data & 1);
 }
 
 WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
