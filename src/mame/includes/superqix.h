@@ -28,21 +28,30 @@ public:
 	required_device<palette_device> m_palette;
 
 	std::unique_ptr<INT16[]> m_samplebuf;
-	UINT8 m_port1;
-	UINT8 m_port2;
-	UINT8 m_port3;
-	UINT8 m_port3_latch;
-	UINT8 m_fromMCU;
-	UINT8 m_fromZ80;
-	UINT8 m_fromZ80pending;
-	int m_MCUHasWritten;
-	int m_Z80HasWritten;
+	UINT8 m_port1;          // HLE-related for superqix
+	UINT8 m_port2;          // HLE-related for superqix
+	UINT8 m_port3;          // HLE-related for superqix
+	UINT8 m_port3_latch;    // HLE-related for superqix
+	UINT8 m_fromMCU;        // byte latch for 68705/8751->z80 comms
+	UINT8 m_fromZ80;        // byte latch for z80->68705/8751 comms
+	UINT8 m_fromZ80pending; // HLE-related for superqix, to add a delay to z80->mcu comms
+	//UINT8 m_portA_out;     // actual output on pins (post ddr)
+	UINT8 m_portB_out;     //
+	UINT8 m_portC_out;     //
+	UINT8 m_portA_in;      // actual input to pins
+	//UINT8 m_portB_in;      //
+	//UINT8 m_portC_in;      //
+	//UINT8 m_portA_internal;// output before applying ddr
+	UINT8 m_portB_internal;//
+	UINT8 m_portC_internal;//
+	UINT8 m_ddrA;
+	UINT8 m_ddrB;
+	UINT8 m_ddrC;
+	bool m_Z80HasWritten;   // z80 has written to latch flag
+	bool m_MCUHasWritten;   // 68705/8751 has written to latch flag
 	int m_invert_coin_lockout;
 	int m_oldpos[2];
 	int m_sign[2];
-	UINT8 m_portA_in;
-	UINT8 m_portB_out;
-	UINT8 m_portC_internal;
 	int m_curr_player;
 	int m_gfxbank;
 	std::unique_ptr<bitmap_ind16> m_fg_bitmap[2];
@@ -64,8 +73,12 @@ public:
 	DECLARE_WRITE8_MEMBER(hotsmash_68705_portB_w);
 	DECLARE_READ8_MEMBER(hotsmash_68705_portC_r);
 	DECLARE_WRITE8_MEMBER(hotsmash_68705_portC_w);
-	DECLARE_WRITE8_MEMBER(hotsmash_z80_mcu_w);
-	DECLARE_READ8_MEMBER(hotsmash_from_mcu_r);
+	DECLARE_WRITE8_MEMBER(hotsmash_68705_ddr_a_w);
+	DECLARE_WRITE8_MEMBER(hotsmash_68705_ddr_b_w);
+	DECLARE_WRITE8_MEMBER(hotsmash_68705_ddr_c_w);
+	DECLARE_WRITE8_MEMBER(hotsmash_Z80_mcu_w);
+	DECLARE_READ8_MEMBER(hotsmash_Z80_mcu_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(superqix_semaphore_input_r);
 	DECLARE_WRITE8_MEMBER(pbillian_z80_mcu_w);
 	DECLARE_READ8_MEMBER(pbillian_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(superqix_videoram_w);
@@ -95,8 +108,6 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
 	TIMER_CALLBACK_MEMBER(mcu_acknowledge_callback);
-	TIMER_CALLBACK_MEMBER(delayed_z80_mcu_w);
-	TIMER_CALLBACK_MEMBER(delayed_mcu_z80_w);
 	void pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	int read_dial(int player);
