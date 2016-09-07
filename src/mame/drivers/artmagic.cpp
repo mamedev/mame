@@ -437,9 +437,17 @@ static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
 ADDRESS_MAP_END
 
-READ16_MEMBER(artmagic_state::unk_r)
+// TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
+READ16_MEMBER(artmagic_state::shtstar_unk_r)
 {
-	return machine().rand();
+	// bits 7-4 should be 0 
+	// bit 2 and 0 are status ready related.
+	return 4 | 1; //machine().rand();
+}
+
+READ16_MEMBER(artmagic_state::shtstar_unk_2_r)
+{
+	return 1;
 }
 
 static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
@@ -454,8 +462,8 @@ static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x3c0008, 0x3c0009) AM_READ_PORT("3c0008")
 	AM_RANGE(0x3c000a, 0x3c000b) AM_READ_PORT("3c000a")
 
-	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(unk_r)
-	AM_RANGE(0x3c0014, 0x3c0015) AM_NOP
+	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(shtstar_unk_r)
+	AM_RANGE(0x3c0016, 0x3c0017) AM_READ(shtstar_unk_2_r)
 
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
 	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)

@@ -2317,7 +2317,7 @@ GAME( 1995, aristmk5,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk
 GAME( 1998, adonis,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (0200751V, NSW/ACT)",                   MACHINE_FLAGS )  // 602/9,    A - 25/05/98, Rev 10
 GAME( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (0100751V, NSW/ACT)",                   MACHINE_FLAGS )  // 602/9,    A - 25/05/98, Rev 9
 GAME( 2001, adonisu,   adonis,   aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                         MACHINE_FLAGS )  // MV4124/1, B - 31/07/01
-GAME( 1999, adonisce,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 602/9, C - 06/07/99
+GAME( 1999, adonisce,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",    MACHINE_FLAGS )  // 602/9, C - 06/07/99
 GAME( 1996, baddog,    aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bad Dog Poker (0200428V, NSW/ACT)",            MACHINE_FLAGS )  // 386/56, A - 17/12/96
 GAME( 1996, blackpnt,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",           MACHINE_FLAGS )  // 594/1, A - 30/07/96
 GAME( 1998, bootsctn,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (0100812V, NSW/ACT)",            MACHINE_FLAGS )  // 616/1, B - 11/12/98
@@ -2326,7 +2326,7 @@ GAME( 1996, bumblbug,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 1996, bumblbugql,bumblbug, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",           MACHINE_FLAGS )  // 593,      D - 5/07/96
 GAME( 1997, bumblbugu, bumblbug, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",                 MACHINE_FLAGS )  // 593,      D - 05/07/97
 GAME( 1995, buttdeli,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Butterfly Delight (0200143V, NSW/ACT)",        MACHINE_FLAGS )  // 571/4, A - 19/12/95
-GAME( 1999, cashcat,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Cat (0300863V, New Zealand)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // MV4089, A - 4/1/99
+GAME( 1999, cashcat,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Cat (0300863V, New Zealand)",             MACHINE_FLAGS )  // MV4089, A - 4/1/99
 GAME( 1997, cashcham,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0100438V, NSW/ACT)",           MACHINE_FLAGS )  // 603/1, C  - 15/4/97
 GAME( 1996, cashchamu, cashcham, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",              MACHINE_FLAGS )  // 603(a),   B - 06/12/96
 GAME( 1997, cashcra5,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300467V, NSW/ACT)",                MACHINE_FLAGS )  // 607, C - 14/07/97
@@ -2343,7 +2343,7 @@ GAME( 1999, diamdove,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 1997, dimtouch,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Diamond Touch (0400433V, NSW/ACT)",            MACHINE_FLAGS )  // 604,      E - 30/06/97
 GAME( 1996, dolphntr,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",         MACHINE_FLAGS )  // 602/1,    B - 06/12/96, Rev 3
 GAME( 1996, dolphntra, dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",         MACHINE_FLAGS )  // 602/1,    B - 06/12/96, Rev 1.24.4.0
-GAME( 1996, dolphntrb, dolphntr, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100388V, NSW/ACT)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 602, B - 10/12/96
+GAME( 1996, dolphntrb, dolphntr, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100388V, NSW/ACT)",         MACHINE_FLAGS )  // 602, B - 10/12/96
 GAME( 1996, dolphntru, dolphntr, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (FHG4077-02, US)",            MACHINE_FLAGS )  // 602/1,    B - 06/12/96
 GAME( 2000, dynajack,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dynamite Jack (01J00081, NSW/ACT)",            MACHINE_FLAGS )  // JB004, A - 12/07/2000
 GAME( 1998, eldorda5,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "El Dorado (0100652V, NSW/ACT)",                MACHINE_FLAGS )  // 623, B - 24/03/98
@@ -2359,13 +2359,13 @@ GAME( 1997, goldpyra,  goldpyr,  aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 2000, goldenra,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Ra (0101164V, NSW/ACT)",                MACHINE_FLAGS )  // 661, A - 10/04/00
 GAME( 1999, incasun,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT)",                 MACHINE_FLAGS )  // 631/3 B, B - 03/05/99
 GAME( 1999, incasunsp, incasun,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT, Show Program)",   MACHINE_FLAGS )  // 631/3 B, B - 03/05/99
-GAME( 2000, incasunnz, incasun,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0101108V, New Zealand)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // MV4113, A - 6/3/00
+GAME( 2000, incasunnz, incasun,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0101108V, New Zealand)",             MACHINE_FLAGS )  // MV4113, A - 6/3/00
 GAME( 1998, indrema5,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",          MACHINE_FLAGS )  // 628/1,    B - 15/12/98
 GAME( 1995, kgalah,    aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",               MACHINE_FLAGS )  // 613/6, A - 21/07/95
 GAME( 2001, koalamnt,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Koala Mint (CHG1573, US)",                     MACHINE_FLAGS )  // MV4137,   A - 12/09/01
 GAME( 1998, kookabuk,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Kooka Bucks (0100677V, NSW/ACT)",              MACHINE_FLAGS )  // 661, A - 03/04/98
 GAME( 1997, locoloot,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                MACHINE_FLAGS )  // 599/2, C - 17/06/97
-GAME( 1998, locolootnz,locoloot, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // MV4064, A - 8/7/98
+GAME( 1998, locolootnz,locoloot, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",            MACHINE_FLAGS )  // MV4064, A - 8/7/98
 GAME( 1997, lonewolf,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Lone Wolf (0100587V, NSW/ACT)",                MACHINE_FLAGS )  // 621, A - 29/10/97
 GAME( 1997, mgarden,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",                MACHINE_FLAGS )  // MV4033,   B - 10/02/97
 GAME( 2000, magimask,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Mask (DHG1309, US)",                     MACHINE_FLAGS )  // MV4115,   A - 09/05/00
@@ -2375,7 +2375,7 @@ GAME( 2000, marmagic,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk
 GAME( 2000, marmagicu, marmagic, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",                MACHINE_FLAGS )  // US003,    A - 07/07/00
 GAME( 1996, minemine,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",            MACHINE_FLAGS )  // 559/2,    E - 14/02/96
 GAME( 1997, monmouse,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Mouse (0400469V, NSW/ACT)",              MACHINE_FLAGS )  // 607/1, B - 08/04/97
-GAME( 2001, montree,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Tree (0201397V, New Zealand)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // MV4126, C - 12/04/01
+GAME( 2001, montree,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Tree (0201397V, New Zealand)",           MACHINE_FLAGS )  // MV4126, C - 12/04/01
 GAME( 1996, mountmon,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (0100294V, NSW/ACT)",           MACHINE_FLAGS )  //595/3, B - 11/06/96
 GAME( 2000, multidrw,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Multidraw - Free Games (0200956V, NSW/ACT)",   MACHINE_FLAGS )  // 386/64, E - 08/05/00
 GAME( 1996, mystgard,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mystic Garden (0100275V, NSW/ACT)",            MACHINE_FLAGS )  // 595/1, B - 11/06/96
@@ -2386,10 +2386,10 @@ GAME( 2001, partygrs,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 2001, partygrsa, partygrs, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (BHG1284, US)",                     MACHINE_FLAGS )  // MV4115/3, B - 06/02/01
 GAME( 2000, peaflut,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Peacock Flutter (02J00011, NSW/ACT)",          MACHINE_FLAGS )  // JB001, A - 10/03/00
 GAME( 1997, pengpay,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200460V, NSW/ACT)",             MACHINE_FLAGS )  // 586/4(a), D - 03/06/97
-GAME( 1996, pengpaya,  pengpay,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200357V, NSW/ACT)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 586/4, C - 12/11/96
-GAME( 1997, pengpayb,  pengpay,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200359V, NSW/ACT)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 586/3(a), D - 03/06/97
+GAME( 1996, pengpaya,  pengpay,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200357V, NSW/ACT)",             MACHINE_FLAGS )  // 586/4, C - 12/11/96
+GAME( 1997, pengpayb,  pengpay,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200359V, NSW/ACT)",             MACHINE_FLAGS )  // 586/3(a), D - 03/06/97
 GAME( 1997, pengpayu,  pengpay,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",                MACHINE_FLAGS )  // 586/7(b)  B - 14/07/97
-GAME( 1998, petshop,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 618, A - 09/03/98
+GAME( 1998, petshop,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",                 MACHINE_FLAGS )  // 618, A - 09/03/98
 GAME( 1996, przfight,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Prize Fight (0100299V, NSW/ACT)",              MACHINE_FLAGS )  // 578/4, B - 08/08/96
 GAME( 1998, qcash,     aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queens of Cash (0100706V, NSW/ACT)",           MACHINE_FLAGS )  // 603/6, C  - 23/07/98
 GAME( 1997, qnile,     aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0100439V, NSW/ACT)",        MACHINE_FLAGS )  // 602/4, B - 13/05/97
@@ -2397,28 +2397,28 @@ GAME( 1997, qnilea,    qnile,    aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 1997, qnileb,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",        MACHINE_FLAGS )  // 602/4,    B - 13/05/97
 GAME( 1997, qnilec,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300439V, NSW/ACT)",        MACHINE_FLAGS )  // 602/4,    B - 13/05/97
 GAME( 1997, qnileu,    qnile,    aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",           MACHINE_FLAGS )  // MV4091,   B - 13/05/97
-GAME( 1999, qnilemax,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 602/4, D - 18/06/99
+GAME( 1999, qnilemax,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_FLAGS )  // 602/4, D - 18/06/99
 GAME( 2000, rainwrce,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_FLAGS )  // 655, B - 02/03/00
 GAME( 1998, reelrock,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0100779V, NSW/ACT)",          MACHINE_FLAGS )  // 628,      A - 13/07/98
 GAME( 1997, retrsam,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",    MACHINE_FLAGS )  // 608, A - 17/04/97
-GAME( 1997, retrsama,  retrsam,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200506V, NSW/ACT)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 608, A - 17/04/97
-GAME( 1997, retrsamb,  retrsam,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200549V, NSW/ACT)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 608, A - 17/04/97
+GAME( 1997, retrsama,  retrsam,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200506V, NSW/ACT)",    MACHINE_FLAGS )  // 608, A - 17/04/97
+GAME( 1997, retrsamb,  retrsam,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200549V, NSW/ACT)",    MACHINE_FLAGS )  // 608, A - 17/04/97
 GAME( 1997, sumospin,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sumo Spins (0200606V, NSW/ACT)",               MACHINE_FLAGS )  // 622, A - 08/12/97
-GAME( 1999, sbuk2,     aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 578, G - 26/07/99
+GAME( 1999, sbuk2,     aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",           MACHINE_FLAGS )  // 578, G - 26/07/99
 GAME( 1998, sbuk3,     aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks III (0200711V, NSW/ACT)",          MACHINE_FLAGS )  // 626, A - 22/04/98
 GAME( 1995, swhr2,     aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200004V, NSW/ACT)",           MACHINE_FLAGS )  // 577/1, C - 07/09/95
 GAME( 1998, swhr2u,    swhr2,    aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweethearts II (PHG0742-02, US)",              MACHINE_FLAGS )  // MV4061,   A - 29/06/98
 GAME( 1995, swhr2v,    swhr2,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",        MACHINE_FLAGS )  // 577/1,    C - 07/09/95
-GAME( 199?, topbana,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, topbana,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",               MACHINE_FLAGS )
 GAME( 2000, trstrove,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Treasure Trove (01J00161, NSW/ACT)",           MACHINE_FLAGS )  // JB001/3, A - 5/10/00
 GAME( 2002, tritreat,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Triple Treat (0201692V, NSW/ACT)",             MACHINE_FLAGS )  // 692, A - 17/05/02
 GAME( 2001, trojhors,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Trojan Horse (01J00851, NSW/ACT)",             MACHINE_FLAGS )  // JB001/5, A - 30/10/01
 GAME( 1997, trpdlght,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",            MACHINE_FLAGS )  // 577/3,    D - 24/09/97
 GAME( 1998, unicornd,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100791V, NSW/ACT)",         MACHINE_FLAGS )  // 631/1, A - 31/08/98
-GAME( 1996, wamazon,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200285V, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 506/6, A - 7/5/96
-GAME( 1996, wamazona,  wamazon,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200507V, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 506/8, A - 10/10/96
+GAME( 1996, wamazon,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200285V, NSW/ACT)",              MACHINE_FLAGS )  // 506/6, A - 7/5/96
+GAME( 1996, wamazona,  wamazon,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200507V, NSW/ACT)",              MACHINE_FLAGS )  // 506/8, A - 10/10/96
 GAME( 1996, wildbill,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Bill (0100297V, NSW/ACT)",                MACHINE_FLAGS )  // 543/8, C - 15/08/96
 GAME( 1996, wcougar,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (0100167V, NSW/ACT)",              MACHINE_FLAGS )  // 569/9, B - 27/2/96
 GAME( 1997, wcougaru,  wcougar,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",                 MACHINE_FLAGS )  // 569/8,    D - 19/05/97
-GAME( 1999, wthing,    aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 608/4, B - 14/12/99
+GAME( 1999, wthing,    aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",               MACHINE_FLAGS )  // 608/4, B - 14/12/99
 GAME( 1999, wtiger,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",      MACHINE_FLAGS )  // 638/1,    B - 08/07/99
