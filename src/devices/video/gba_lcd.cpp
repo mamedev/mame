@@ -578,87 +578,93 @@ void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32
 	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
 	INT32 cx, cy, pixx, pixy, x;
 
-	if ((depth == 8) && (DISPCNT & DISPCNT_FRAMESEL))
-		src8 += 0xa000;
+	for (x = 0; x < 240; x++)
+		scanline[x] = 0x80000000;
 
-	if ((depth == 4) && (DISPCNT & DISPCNT_FRAMESEL))
-		src16 += 0xa000/2;
-
-	// sign extend roz parameters
-	if (X & 0x08000000) X |= 0xf0000000;
-	if (Y & 0x08000000) Y |= 0xf0000000;
-	if (PA & 0x8000) PA |= 0xffff0000;
-	if (PB & 0x8000) PB |= 0xffff0000;
-	if (PC & 0x8000) PC |= 0xffff0000;
-	if (PD & 0x8000) PD |= 0xffff0000;
-
-	if(ypos == 0)
-		changed = 3;
-
-	if(changed & 1)
-		*currentx = X;
-	else
-		*currentx += PB;
-
-	if(changed & 2)
-		*currenty = Y;
-	else
-		*currenty += PD;
-
-	cx = *currentx;
-	cy = *currenty;
-
-	if(ctrl & BGCNT_MOSAIC)
+	if(DISPCNT & enablemask)
 	{
-		INT32 mosaic_line = ((MOSAIC & 0xf0) >> 4) + 1;
-		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
-		cx = X + tempy*PB;
-		cy = Y + tempy*PD;
-	}
+		if ((depth == 8) && (DISPCNT & DISPCNT_FRAMESEL))
+			src8 += 0xa000;
 
-	pixx = cx >> 8;
-	pixy = cy >> 8;
+		if ((depth == 4) && (DISPCNT & DISPCNT_FRAMESEL))
+			src16 += 0xa000/2;
 
-	for(x = 0; x < 240; x++)
-	{
-		if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
-		{
-			scanline[x] = 0x80000000;
-		}
+		// sign extend roz parameters
+		if (X & 0x08000000) X |= 0xf0000000;
+		if (Y & 0x08000000) Y |= 0xf0000000;
+		if (PA & 0x8000) PA |= 0xffff0000;
+		if (PB & 0x8000) PB |= 0xffff0000;
+		if (PC & 0x8000) PC |= 0xffff0000;
+		if (PD & 0x8000) PD |= 0xffff0000;
+
+		if(ypos == 0)
+			changed = 3;
+
+		if(changed & 1)
+			*currentx = X;
 		else
-		{
-			if (depth == 8)
-			{
-				UINT8 color = src8[pixy*sx + pixx];
-				scanline[x] = color ? (palette[color] | prio) : 0x80000000;
-			}
-			else
-			{
-				scanline[x] = src16[pixy*sx + pixx] | prio;
-			}
-		}
+			*currentx += PB;
 
-		cx += PA;
-		cy += PC;
+		if(changed & 2)
+			*currenty = Y;
+		else
+			*currenty += PD;
+
+		cx = *currentx;
+		cy = *currenty;
+
+		if(ctrl & BGCNT_MOSAIC)
+		{
+			INT32 mosaic_line = ((MOSAIC & 0xf0) >> 4) + 1;
+			INT32 tempy = (ypos / mosaic_line) * mosaic_line;
+			cx = X + tempy*PB;
+			cy = Y + tempy*PD;
+		}
 
 		pixx = cx >> 8;
 		pixy = cy >> 8;
-	}
 
-	if(ctrl & BGCNT_MOSAIC)
-	{
-		INT32 mosaicx = (MOSAIC & 0x0f) + 1;
-		if(mosaicx > 1)
+		for(x = 0; x < 240; x++)
 		{
-			INT32 m = 1;
-			for(x = 0; x < 239; x++)
+			if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
 			{
-				scanline[x+1] = scanline[x];
-				m++;
-				if(m == mosaicx)
+				scanline[x] = 0x80000000;
+			}
+			else
+			{
+				if (depth == 8)
 				{
-					m = 1;
-					x++;
+					UINT8 color = src8[pixy*sx + pixx];
+					scanline[x] = color ? (palette[color] | prio) : 0x80000000;
+				}
+				else
+				{
+					scanline[x] = src16[pixy*sx + pixx] | prio;
+				}
+			}
+
+			cx += PA;
+			cy += PC;
+
+			pixx = cx >> 8;
+			pixy = cy >> 8;
+		}
+
+		if(ctrl & BGCNT_MOSAIC)
+		{
+			INT32 mosaicx = (MOSAIC & 0x0f) + 1;
+			if(mosaicx > 1)
+			{
+				INT32 m = 1;
+				for(x = 0; x < 239; x++)
+				{
+					scanline[x+1] = scanline[x];
+					m++;
+					if(m == mosaicx)
+					{
+						m = 1;
+						x++;
+					}
 				}
 			}
 		}
