@@ -496,12 +496,8 @@ public:
 		,m_io_line7(*this, "LINE7")
 		,m_io_line8(*this, "LINE8")
 		,m_io_line9(*this, "LINE9")
-		,m_line5(0)
-		,m_line6(0)
-		,m_line7(0)
-		,m_line8(0)
-		,m_line9(0)
 		,m_pia1_B(0)
+		,m_50hz(0)
 		{ }
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_kbd_74145;
@@ -518,6 +514,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pia1_kbA_w );
 	DECLARE_READ8_MEMBER( pia1_kbB_r );
 	DECLARE_WRITE8_MEMBER( pia1_kbB_w );
+	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -526,19 +523,26 @@ protected:
 	required_ioport m_io_line7;
 	required_ioport m_io_line8;
 	required_ioport m_io_line9;
-	UINT8 m_line5;
-	UINT8 m_line6;
-	UINT8 m_line7;
-	UINT8 m_line8;
-	UINT8 m_line9;
 	UINT8 m_pia1_B;
+	UINT8 m_50hz;
 };
+
+TIMER_DEVICE_CALLBACK_MEMBER(e100_state::rtc_w)
+{
+	m_pia2->ca1_w((m_50hz++ & 1));
+}
 
 void e100_state::machine_start()
 {
 	LOG(("%s()\n", FUNCNAME));
 	m_char_ptr  = memregion("chargen")->base();
 	m_vram      = (UINT8 *)m_videoram.target();
+
+	/* register for state saving */
+	save_pointer (NAME (m_char_ptr), sizeof(m_char_ptr));
+	save_pointer (NAME (m_vram), sizeof(m_vram));
+	save_item(NAME(m_50hz));
+	save_item(NAME(m_pia1_B));
 }
 
 UINT32 e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -959,8 +963,9 @@ static MACHINE_CONFIG_START( e100, e100_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(e100_state, pia1_kbB_w))
 	MCFG_PIA_READPB_HANDLER(READ8(e100_state, pia1_kbB_r))
 
-	/* The optional second PIA enables the expansion port and a software RTC with 50Hz resolution */
+	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
 	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
 	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active
@@ -978,9 +983,10 @@ static MACHINE_CONFIG_START( e100, e100_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_4MHz/2, 265, 0, 265, 265, 0, 265)
 	MCFG_SCREEN_UPDATE_DRIVER(e100_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
+	/* There is a 50Hz signal from the video circuit to CA1 which generates interrupts and drives a software RTC */
+MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( md6802, md6802_state )
