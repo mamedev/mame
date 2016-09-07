@@ -502,7 +502,7 @@ UINT8 fga002_device::do_fga002reg_istim0_r()
 }
 
 
-/* 
+/*
  * FGA-002 interrupt support
  */
 void fga002_device::do_fga002reg_localiack_w(UINT8 data)
@@ -522,14 +522,14 @@ void fga002_device::do_fga002reg_localiack_w(UINT8 data)
 
 UINT8 fga002_device::do_fga002reg_localiack_r()
 {
-	UINT8 ret = m_fga002[FGA_LOCALIACK];  
+	UINT8 ret = m_fga002[FGA_LOCALIACK];
 	LOGINT(("%s() <- %02x\n", FUNCNAME, ret));
 	return ret;
 }
 
 UINT8 fga002_device::do_fga002reg_ctl3_r()
 {
-	UINT8 ret = m_fga002[FGA_CTL3];  
+	UINT8 ret = m_fga002[FGA_CTL3];
 	LOGINT(("%s() <- %02x\n", FUNCNAME, ret));
 	return ret;
 }
@@ -571,8 +571,8 @@ UINT8 fga002_device::do_fga002reg_islocal7_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL
 
 void fga002_device::islocal_w(int status, int vector, int control, int data)
 {
-	m_fga002[status] = m_fga002[control] & REG_ICR_EDGE ? 0x80 : 0x00; 
-	LOGINT(("%s(%02x)\n", FUNCNAME, m_fga002[status])); 
+	m_fga002[status] = m_fga002[control] & REG_ICR_EDGE ? 0x80 : 0x00;
+	LOGINT(("%s(%02x)\n", FUNCNAME, m_fga002[status]));
 }
 
 //  TODO: support level triggered interrupts, only edge triggered interrupts are supported atm
@@ -587,18 +587,18 @@ void  fga002_device::do_fga002reg_islocal7_w(UINT8 data){ LOGINT(("%s\n", FUNCNA
 
 // Local IRQ callbacks
 // TODO: support level triggered interrupts, ICR bit 6, only edge triggered interrupts are supported atm
-// TODO: support programmable assertion levels ICR bit 5, a call to this function assumes assertion atm 
+// TODO: support programmable assertion levels ICR bit 5, a call to this function assumes assertion atm
 void fga002_device::lirq_w(int status, int vector, int control, int state)
 {
 	LOGINT((" - %s\n", state == ASSERT_LINE ? "Asserted" : "Cleared"));
 	if (state == ASSERT_LINE)
 	{
-		m_fga002[status] &= ~REG_ISLOCAL_IRQ; 
+		m_fga002[status] &= ~REG_ISLOCAL_IRQ;
 		trigger_interrupt(vector);
 	}
-	else 
+	else
 	{
-		m_fga002[status] |= REG_ISLOCAL_IRQ; 
+		m_fga002[status] |= REG_ISLOCAL_IRQ;
 	}
 }
 

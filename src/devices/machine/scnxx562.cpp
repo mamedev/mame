@@ -93,7 +93,7 @@ DONE (x) (p=partly)         NMOS         CMOS
 #define LOGTX(x)
 #define LOGRX(x)
 #define LOGSETUP(x)
-#define LOGINT(x) LOGPRINT(x) 
+#define LOGINT(x) LOGPRINT(x)
 
 #if VERBOSE > 1
 #define logerror printf
@@ -404,7 +404,7 @@ READ8_MEMBER( duscc_device::iack )
 void duscc_device::check_interrupts()
 {
 	LOGINT(("%s %s()\n",tag(), FUNCNAME));
-	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;	
+	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
 
 	// "If no interrupt is pending, an H'FF' is output when reading the IVRM."
 	if (state == CLEAR_LINE)
@@ -457,7 +457,7 @@ UINT8 duscc_device::modify_vector(UINT8 vec, int index, UINT8 src)
 	if ((m_icr & REG_ICR_VEC_MOD) != 0) // Affect vector?
 	{
 		// Modify vector according to "Vector Include Status" bit (REG_ICR_V2V4_MOD)
-		if ((m_icr & REG_ICR_V2V4_MOD) != 0) 
+		if ((m_icr & REG_ICR_V2V4_MOD) != 0)
 	    {                 // Affect V2-V4
 			LOGINT((" - Affect V2-V4 with status"));
 			vec &= 0x07 << 3;
@@ -479,7 +479,7 @@ UINT8 duscc_device::modify_vector(UINT8 vec, int index, UINT8 src)
    This group of registers define mechanisms for communications between the DUSCC and the processor and contain the device status
    information. Four registers, available for each channel, and four common device registers comprise this group which consists of
    the following:
-   1. Interrupt Enable Register (IERA/B). - checked by trigger_interrupt 
+   1. Interrupt Enable Register (IERA/B). - checked by trigger_interrupt
    2. Receiver Status Register (RSRA/B).
    3. Transmitter and Receiver Status Register (TRSRA/B).
    4. Input and Counter/timer Status Register (ICTSRA/B).
@@ -978,7 +978,7 @@ void duscc_channel::tra_callback()
 	else
 	{
 		LOG((LLFORMAT " %s() \"%s \"Channel %c Failed to transmit \n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index));
-		logerror("%s \"%s \"Channel %c Failed to transmit\n", FUNCNAME, m_owner->tag(), 'A' + m_index);
+		logerror("%s Channel %c Failed to transmit\n", FUNCNAME, 'A' + m_index);
 	}
 }
 
@@ -1299,15 +1299,15 @@ UINT8 duscc_channel::do_dusccreg_ictsr_r()
     receiver' command is invoked.
 */
 UINT8 duscc_channel::do_dusccreg_gsr_r()
-{ 
+{
 	static UINT8 old_gsr = 0;
 	if (m_uart->m_gsr != old_gsr) LOG(("%s <- %02x\n", FUNCNAME, m_uart->m_gsr));
-	old_gsr = m_uart->m_gsr; 
-	return m_uart->m_gsr; 
+	old_gsr = m_uart->m_gsr;
+	return m_uart->m_gsr;
 }
 
 UINT8 duscc_channel::do_dusccreg_ier_r()
-{ 
+{
 	LOGINT(("%s <- %02x\n", FUNCNAME, m_ier));
 	return (UINT8) m_ier;
 }
@@ -1912,7 +1912,7 @@ void duscc_channel::do_dusccreg_omr_w(UINT8 data)
 */
 void duscc_channel::do_dusccreg_pcr_w(UINT8 data)
 {
-	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));	
+	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
 	m_pcr = data;
 	LOG(("- The X2/IDCN pin is %s\n", m_index == duscc_device::CHANNEL_B ? "ignored for channel B" :
 			((m_pcr & REG_PCR_X2_IDC) ? "crystal input" : "daisy chain interrupt output")));
@@ -1956,7 +1956,7 @@ void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 	int rate;
 
 	m_ccr = data;
-	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));	
+	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
 	switch(m_ccr)
 	{
 	// TRANSMITTER COMMANDS
@@ -2113,8 +2113,8 @@ void duscc_channel::do_dusccreg_txfifo_w(UINT8 data)
    before reading the character data from RxFIFO. For block status, the status register is initially cleared and then read after the
    message is received. Asserted status bits can be programmed to generate an interrupt (see Interrupt Enable Register).*/
 void duscc_channel::do_dusccreg_rsr_w(UINT8 data)
-{ 
-	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));	
+{
+	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
 	m_rsr &= ~data; // Clear only bits which are 1:s
 	return;
 }
@@ -2163,7 +2163,7 @@ void duscc_channel::do_dusccreg_gsr_w(UINT8 data)
    This register controls whether the assertion of bits in the channel's status registers causes an interrupt to be generated. An additional
    condition for an interrupt to be generated is that the channel's master interrupt enabled bit, ICR[O] or ICR[1], be asserted.*/
 void duscc_channel::do_dusccreg_ier_w(UINT8 data)
-{ 
+{
 	LOGINT(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
 	if (REG_IER_DCD_CTS	& (data ^ m_ier)) LOGINT(("- DCD/CTS interrups %s\n", (data & REG_IER_DCD_CTS) ? "enabled" : "disabled" ));
 	if (REG_IER_TXRDY	& (data ^ m_ier)) LOGINT(("- TXRDY interrupts %s\n", (data & REG_IER_TXRDY) ? "enabled" : "disabled" ));
@@ -2264,7 +2264,7 @@ UINT8 duscc_channel::read(offs_t &offset)
 	// CDUSCC Extended registers - requires A7 to be set through REG_SEA
 	case REG_CID:       data = do_dusccreg_cid_r(); break;
 	default:
-		logerror(" \"%s\" %s: %c : Unsupported RRx register:%02x\n", m_owner->tag(), FUNCNAME, 'A' + m_index, reg);
+		logerror("%s: %c : Unsupported RRx register:%02x\n", FUNCNAME, 'A' + m_index, reg);
 	}
 
 	LOGR(("%s \"%s\": %c : Register R%d read '%02x'\n", FUNCNAME, m_owner->tag(), 'A' + m_index, reg, data));
@@ -2323,7 +2323,7 @@ void duscc_channel::write(UINT8 data, offs_t &offset)
 	case REG_TELR:      LOG(("REG_TELR\n")); break;
 
 	default:
-		logerror(" \"%s\" %s: %c : Unsupported WRx register:%02x(%02x)\n", m_owner->tag(), FUNCNAME, 'A' + m_index, reg, data);
+		logerror("%s: %c : Unsupported WRx register:%02x(%02x)\n", FUNCNAME, 'A' + m_index, reg, data);
 	}
 }
 

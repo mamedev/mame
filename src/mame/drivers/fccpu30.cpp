@@ -143,33 +143,33 @@
  *
  * PIT #1 hardware wiring
  * ----------------------------------------------------------
- * PA0-PA3	Rotary Switch 1 input
- * PA4-PA7	Rotary Switch 2 input
- * H1-H4	User I/O via optional B5 or optional 5-row VME P2 connector
- * PB0-PB2	Floppy Disk Drive Control output
- * PB3-PB4	Floppy Disk Drive Control input
- * PB5		Floppy Disk Drive Control output
- * PB6-PB7	DMAC control
- * PC0,PC1	User I/O via optional B5 or optional 5-row VME P2 connector
- * PC4,PC7	User I/O via optional B5 or optional 5-row VME P2 connector
- * PC2		Reserved
- * PC3		Timer interrupt request
- * PC5		Port Interrupt Request
- * PC6		68882 FPCP Sense
+ * PA0-PA3  Rotary Switch 1 input
+ * PA4-PA7  Rotary Switch 2 input
+ * H1-H4    User I/O via optional B5 or optional 5-row VME P2 connector
+ * PB0-PB2  Floppy Disk Drive Control output
+ * PB3-PB4  Floppy Disk Drive Control input
+ * PB5      Floppy Disk Drive Control output
+ * PB6-PB7  DMAC control
+ * PC0,PC1  User I/O via optional B5 or optional 5-row VME P2 connector
+ * PC4,PC7  User I/O via optional B5 or optional 5-row VME P2 connector
+ * PC2      Reserved
+ * PC3      Timer interrupt request
+ * PC5      Port Interrupt Request
+ * PC6      68882 FPCP Sense
  *
  * PIT #2 hardware setup wiring
  * ----------------------------------------------------------
- * PA0-PA7	User I/O via optional B5 or optional 5-row VME P2 connector
- * H1-H4	User I/O via optional B5 or optional 5-row VME P2 connector
- * PB0-PB2	Memory Size
- * PB3-PB7	Board ID
- * PC0-PC1	Hardware ID
- * PC2		Status of write protection for (default and optional) Boot PROMs
- * PC3		Timer Interrupt request
- * PC4		Status of write protection for SYSTEM-Flash Memory
- * PC5		DMA control
- * PC6		Flash programming voltage control
- * PC7		Reserved
+ * PA0-PA7  User I/O via optional B5 or optional 5-row VME P2 connector
+ * H1-H4    User I/O via optional B5 or optional 5-row VME P2 connector
+ * PB0-PB2  Memory Size
+ * PB3-PB7  Board ID
+ * PC0-PC1  Hardware ID
+ * PC2      Status of write protection for (default and optional) Boot PROMs
+ * PC3      Timer Interrupt request
+ * PC4      Status of write protection for SYSTEM-Flash Memory
+ * PC5      DMA control
+ * PC6      Flash programming voltage control
+ * PC7      Reserved
  *
  * DMAC Channel Assignments
  * ----------------------------------------------------------
@@ -202,7 +202,7 @@
 #define LOG(x)
 #define LOGR(x)
 #define LOGSETUP(x)
-#define LOGINT(x) LOGPRINT(x) 
+#define LOGINT(x) LOGPRINT(x)
 #if VERBOSE >= 2
 #define logerror printf
 #endif
@@ -392,7 +392,7 @@ READ8_MEMBER (fccpu30_state::rotary_rd){
 // PIT#1 Port B TODO: implement floppy and dma control
 READ8_MEMBER (fccpu30_state::flop_dmac_r){
 	LOG(("%s\n", FUNCNAME));
-	return 0xff; 
+	return 0xff;
 }
 
 WRITE8_MEMBER (fccpu30_state::flop_dmac_w){
@@ -403,7 +403,7 @@ WRITE8_MEMBER (fccpu30_state::flop_dmac_w){
 // TODO: Connect PC0, PC1, PC4 and PC7 to B5 and/or P2 connector
 READ8_MEMBER (fccpu30_state::pit1c_r){
 	LOG(("%s\n", FUNCNAME));
-	return 0xff; 
+	return 0xff;
 }
 
 WRITE8_MEMBER (fccpu30_state::pit1c_w){
@@ -414,7 +414,7 @@ WRITE8_MEMBER (fccpu30_state::pit1c_w){
 READ8_MEMBER (fccpu30_state::pit2a_r){
 	LOG(("%s\n", FUNCNAME));
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
-	return 0xff; 
+	return 0xff;
 }
 
 WRITE8_MEMBER (fccpu30_state::pit2a_w){
@@ -448,7 +448,7 @@ READ8_MEMBER (fccpu30_state::board_mem_id_rd){
 // PIT#2 Port C TODO: implement timer interrupt, DMA i/o, memory control and Hardware ID
 READ8_MEMBER (fccpu30_state::pit2c_r){
 	LOG(("%s\n", FUNCNAME));
-	return 0xff; 
+	return 0xff;
 }
 
 WRITE8_MEMBER (fccpu30_state::pit2c_w){
@@ -486,7 +486,7 @@ WRITE_LINE_MEMBER(fccpu30_state::fga_irq_callback)
 	update_irq_to_maincpu();
 }
 
-void fccpu30_state::update_irq_to_maincpu() 
+void fccpu30_state::update_irq_to_maincpu()
 {
 	LOGINT(("%s()\n", FUNCNAME));
 	LOGINT((" - fga_irq_level: %02x\n", fga_irq_level));
@@ -546,7 +546,7 @@ static MACHINE_CONFIG_START (fccpu30, fccpu30_state)
 	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
     /* DUSCC1 interrupt signal REQN is connected to LOCAL IRQ4 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq4_w)) 
+	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq4_w))
 
 	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
     /* Port 2 on Port A */
@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START (fccpu30, fccpu30_state)
 	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
     /* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq5_w)) 
+	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq5_w))
 
 	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxb_w))
@@ -642,19 +642,19 @@ ROM_END
  * :pit2 Reg    -> 70 CNTRL - Current value of timer low byte
 
  * :pit1 Reg 10 <- e0 TCR - PC3 is TOUT, PC7 is I/O, Interrupts enabled, PC2 is I/O, CLK and x32 prescaler, Preload timer on 0 (zero), Timer disabled
- * :pit1 Reg 00 <- 20 PGCR - 
- * :pit1 Reg 01 <- 08 PSRR - 
- * :pit1 Reg 06 <- c0 PACR - 
+ * :pit1 Reg 00 <- 20 PGCR -
+ * :pit1 Reg 01 <- 08 PSRR -
+ * :pit1 Reg 06 <- c0 PACR -
  * :pit1 Reg 02 <- 00 PADDR -
  * :pit1 Reg 07 <- c0 PBCR -
- * :pit1 Reg 09 <- 00 PBDR - 
+ * :pit1 Reg 09 <- 00 PBDR -
  * :pit1 Reg 03 <- 00 PBDDR -
- * :pit1 Reg 0c <- 17 PCDR - 
- * :pit1 Reg 04 <- 17 PCDDR - 
+ * :pit1 Reg 0c <- 17 PCDR -
+ * :pit1 Reg 04 <- 17 PCDDR -
  * :pit1 Reg 15 <- e2 CPRL -
  * :pit1 Reg 14 <- 04 CPRM -
  * :pit1 Reg 13 <- 00 CPRH -
- * :pit1 Reg 11 <- f2 TIVR - 
+ * :pit1 Reg 11 <- f2 TIVR -
  * :pit1 Reg 10 <- 41 TCR - PC3 is SQW at TOUT, PC7 is I/O, PC2 is I/O, CLK and x32 prescaler, Preload timer on 0 (zero), Timer enabled
 
  * :pit2 Reg 10 <- e2 PC3 is TOUT, PC7 is I/O, Interrupts enabled, PC2 is timer enable/disable, CLK and prescaler, Preload timer on 0 (zero), Timer disabled
@@ -673,7 +673,7 @@ ROM_END
 
  * DUSCC #1 channel A setup 1 sequence FGA-002 firmware (polled i/o)
  *  A Reg 0f <- 00 - reset Tx Command
- *  A Reg 0f <- 40 - reset Rx Command 
+ *  A Reg 0f <- 40 - reset Rx Command
  *  A Reg 00 <- 07 - Async mode
  *  A Reg 01 <- 38 - Normal polled or interrupt mode, no DMA
  *  A Reg 04 <- 7f - Tx 8 bits, CTS and RTS, 1 STOP bit
@@ -714,8 +714,8 @@ ROM_END
  * Repeated setup for channel B
  *
  * FGA setup
-void fga002_device::do_fga002reg_icrtim0_w(UINT8)(00)  
-void fga002_device::do_fga002reg_ctl3_w(UINT8)(0c)     
+void fga002_device::do_fga002reg_icrtim0_w(UINT8)(00)
+void fga002_device::do_fga002reg_ctl3_w(UINT8)(0c)
 void fga002_device::do_fga002reg_icrlocal0_w(UINT8)(00)
 void fga002_device::do_fga002reg_icrlocal1_w(UINT8)(00)
 void fga002_device::do_fga002reg_icrlocal2_w(UINT8)(00)
@@ -725,42 +725,40 @@ void fga002_device::do_fga002reg_icrlocal5_w(UINT8)(00)
 void fga002_device::do_fga002reg_icrlocal6_w(UINT8)(00)
 void fga002_device::do_fga002reg_icrlocal7_w(UINT8)(00)
 
- *  A Reg 10 <- 20                         
+ *  A Reg 10 <- 20
 UINT8 duscc_channel::do_dusccreg_rxfifo_r()
- - RX rp:0 wp:1 sz:4                       
- - RX reading out data:6e 'n'              
+ - RX rp:0 wp:1 sz:4
+ - RX reading out data:6e 'n'
 
-
-UINT8 duscc_channel::do_dusccreg_rxfifo_r()            
- - RX rp:1 wp:2 sz:4                                   
- - RX reading out data:6e 'n'                          
- *  A Reg 10 <- 6e                                     
- *  A Reg 10 <- 0d                                     
- *  A Reg 10 <- 0a                                     
+UINT8 duscc_channel::do_dusccreg_rxfifo_r()
+ - RX rp:1 wp:2 sz:4
+ - RX reading out data:6e 'n'
+ *  A Reg 10 <- 6e
+ *  A Reg 10 <- 0d
+ *  A Reg 10 <- 0a
 void fga002_device::do_fga002reg_icrlocal2_w(UINT8)(4d)
 void fga002_device::do_fga002reg_icrlocal4_w(UINT8)(1c)
- *  A Reg 0f <- 00                                     
- *  A Reg 0f <- 40                                     
- *  A Reg 00 <- 07                                     
- *  A Reg 01 <- 38                                     
- *  A Reg 04 <- 7f                                     
- *  A Reg 06 <- 1b                                     
- *  A Reg 0b <- e1                                     
- *  A Reg 0e <- 27                                     
- *  A Reg 07 <- 2d                                     
- *  A Reg 05 <- 3d                                     
- *  A Reg 1c <- 10                                     
-void duscc_channel::do_dusccreg_ier_w(UINT8)(10)       
-- RXRDY interrupts enabled                             
-:duscc void duscc_device::check_interrupts()()         
-:duscc virtual int duscc_device::z80daisy_irq_state() A:[00][00][00][00] B:[00][00][00][00] Interrupt State 00                                     
-void fga002_device::trigger_interrupt(UINT8)(34)                                                                                                   
-Interrupt Level 4, caused by ICR 1c with vector 34                                                                                                 
-void fga002_device::check_interrupts()()                                                                                                           
-:fga002 virtual int fga002_device::z80daisy_irq_state() Level 0-7:[00][00] [00][00] [01][00] [00][00] 
+ *  A Reg 0f <- 00
+ *  A Reg 0f <- 40
+ *  A Reg 00 <- 07
+ *  A Reg 01 <- 38
+ *  A Reg 04 <- 7f
+ *  A Reg 06 <- 1b
+ *  A Reg 0b <- e1
+ *  A Reg 0e <- 27
+ *  A Reg 07 <- 2d
+ *  A Reg 05 <- 3d
+ *  A Reg 1c <- 10
+void duscc_channel::do_dusccreg_ier_w(UINT8)(10)
+- RXRDY interrupts enabled
+:duscc void duscc_device::check_interrupts()()
+:duscc virtual int duscc_device::z80daisy_irq_state() A:[00][00][00][00] B:[00][00][00][00] Interrupt State 00
+void fga002_device::trigger_interrupt(UINT8)(34)
+Interrupt Level 4, caused by ICR 1c with vector 34
+void fga002_device::check_interrupts()()
+:fga002 virtual int fga002_device::z80daisy_irq_state() Level 0-7:[00][00] [00][00] [01][00] [00][00]
 void fccpu30_state::fga_irq_callback(int)(01)
-void fga002_device::check_interrupts()()                                                                                                           
-
+void fga002_device::check_interrupts()()
  */
 
 /* Driver */
