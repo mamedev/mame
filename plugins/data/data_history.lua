@@ -19,4 +19,8 @@ function dat.get()
 	return info
 end
 
+function dat.ver()
+	return ver
+end
+
 return dat

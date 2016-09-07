@@ -19,7 +19,7 @@ function datfile.open(file, vertag)
 		local inblock = false
 		local buffer = fh:read("a")
 		if vertag then
-			local match = buffer:match("^" .. vertag .. "%s([^%s]+)")
+			local match = buffer:match(vertag .. "%s*([^%s]+)")
 			if match then
 				ver = match
 			end

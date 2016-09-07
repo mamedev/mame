@@ -16,14 +16,12 @@
 #include "osdepend.h"
 #include "validity.h"
 #include "clifront.h"
-#include "drivenum.h"
 #include "luaengine.h"
 #include <time.h>
 #include "ui/ui.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"
 #include "cheat.h"
-#include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "xmlfile.h"
 
@@ -296,9 +294,6 @@ void mame_machine_manager::create_custom(running_machine& machine)
 
 	// allocate autoboot timer
 	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
-
-	// start datfile manager
-	m_datfile = std::make_unique<ui::datfile_manager>(machine, m_ui->options());
 
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());

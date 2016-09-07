@@ -14,7 +14,6 @@
 
 #include "ui/ui.h"
 #include "ui/datmenu.h"
-#include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
@@ -26,6 +25,7 @@
 #include "rendutil.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
+#include "luaengine.h"
 
 
 namespace ui {
@@ -246,11 +246,10 @@ void menu_select_software::handle()
 		{
 			// handle UI_DATS
 			ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
-			datfile_manager &mdat = mame_machine_manager::instance()->datfile();
 
-			if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
+			if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin(ui_swinfo->driver->name, "data_list"))
 				menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-			else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
+			else if (mame_machine_manager::instance()->lua()->call_plugin(std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str(), "data_list") || !ui_swinfo->usage.empty())
 				menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)

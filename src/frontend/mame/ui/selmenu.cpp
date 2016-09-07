@@ -498,7 +498,9 @@ void menu_select_launch::draw_common_arrow(float origx1, float origy1, float ori
 	}
 
 	// apply arrow
-	if (current == dmin)
+	if (dmax == dmin)
+		return;
+	else if (current == dmin)
 		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, ROT90);
 	else if (current == dmax)
 		draw_arrow(al_x0, al_y0, al_x1, al_y1, fgcolor_left, ROT90 ^ ORIENTATION_FLIP_X);

@@ -20,7 +20,10 @@ end
 function data.startplugin()
 	local data_scr = {}
 	local valid_lst = {}
+	local cur_set
+	local cur_list
 	emu.register_start(function()
+		data_scr = {}
 		for file in lfs.dir(data.path) do
 			local name = string.match(file, "^(data_.*).lua$")
 			if name then
@@ -32,7 +35,17 @@ function data.startplugin()
 		end
 	end)
 	emu.register_callback(function(set)
-		local ret = ""
+		local ret
+		if set == cur_set then
+			return cur_list
+		elseif set == "" then
+			set = cur_set
+		else
+			cur_set = set
+		end
+		if not set then
+			return nil
+		end
 		valid_lst = {}
 		for num, scr in ipairs(data_scr) do
 			local setname, softname = set:match("^([^,]+),?(.*)$")
@@ -41,7 +54,7 @@ function data.startplugin()
 			end
 			local name = scr.check(setname, softname)
 			if name then
-				if ret == "" then
+				if not ret then
 					ret = name
 				else
 					ret = ret .. "," .. name
@@ -49,12 +62,24 @@ function data.startplugin()
 				valid_lst[#valid_lst + 1] = scr
 			end
 		end
+		cur_list = ret
 		return ret
 	end, "data_list")
 
 	emu.register_callback(function(num)
 		return valid_lst[num + 1].get()
 	end, "data")
+
+	emu.register_callback(function(num)
+		local ver
+		if valid_lst[num + 1].ver then
+			ver = valid_lst[num + 1].ver()
+		end
+		if ver then
+			return ver
+		end
+		return ""
+	end, "data_version")
 end
 
 return exports
