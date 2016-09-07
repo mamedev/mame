@@ -36,13 +36,13 @@ function data.startplugin()
 	end)
 	emu.register_callback(function(set)
 		local ret
+		if set == "" then
+			set = emu.romname()
+		end
 		if set == cur_set then
 			return cur_list
-		elseif set == "" then
-			set = cur_set
-		else
-			cur_set = set
 		end
+		cur_set = set
 		if not set then
 			return nil
 		end

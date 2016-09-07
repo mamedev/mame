@@ -45,7 +45,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 			m_parent = image.software_entry()->parentname();
 		}
 	}
-	const char *lua_list = mame_machine_manager::instance()->lua()->call_plugin(driver->name, "data_list");
+	const char *lua_list = mame_machine_manager::instance()->lua()->call_plugin(driver ? driver->name : "", "data_list");
 	if(lua_list)
 	{
 		std::string list(lua_list);
