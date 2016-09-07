@@ -143,6 +143,7 @@ private:
 	static int l_osd_printf_error(lua_State *L);
 	static int l_osd_printf_info(lua_State *L);
 	static int l_osd_printf_debug(lua_State *L);
+	static int l_driver_find(lua_State *L);
 	static int register_function(lua_State *L, const char *id);
 
 	// "emu.machine" namespace

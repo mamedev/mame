@@ -84,20 +84,6 @@ enum
 	HIDE_BOTH
 };
 
-enum
-{
-	UI_FIRST_LOAD = 0,
-	UI_GENERAL_LOAD = UI_FIRST_LOAD,
-	UI_HISTORY_LOAD,
-	UI_MAMEINFO_LOAD,
-	UI_SYSINFO_LOAD,
-	UI_MESSINFO_LOAD,
-	UI_COMMAND_LOAD,
-	UI_GINIT_LOAD,
-	UI_STORY_LOAD,
-	UI_LAST_LOAD = UI_STORY_LOAD
-};
-
 enum : UINT16
 {
 	UI_SW_FIRST = 0,
@@ -202,7 +188,7 @@ struct c_year
 // GLOBAL CLASS
 struct ui_globals
 {
-	static UINT8        curimage_view, curdats_view, cur_sw_dats_view, rpanel;
+	static UINT8        curimage_view, curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
 	static bool         switch_image, redraw_icon, default_image, reset;
 	static int          visible_main_lines, visible_sw_lines;
 	static UINT16       panels_status;

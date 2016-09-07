@@ -12,6 +12,7 @@
 #include "crsshair.h"
 #include "emuopts.h"
 #include "mame.h"
+#include "luaengine.h"
 #include "ui/menu.h"
 #include "ui/filemngr.h"
 #include "ui/barcode.h"
@@ -29,7 +30,6 @@
 #include "ui/videoopt.h"
 #include "imagedev/cassette.h"
 #include "machine/bcreader.h"
-#include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/datmenu.h"
 #include "ui/pluginopt.h"
@@ -129,7 +129,7 @@ void menu_main::populate()
 		item_append(_("Plugin Options"), "", 0, (void *)PLUGINS);
 
 	// add dats menu
-	if (ui().options().enabled_dats() && mame_machine_manager::instance()->datfile().has_data())
+	if (ui().options().enabled_dats() && mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
 		item_append(_("External DAT View"), "", 0, (void *)EXTERNAL_DATS);
 
 	item_append(menu_item_type::SEPARATOR);

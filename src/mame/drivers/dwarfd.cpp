@@ -10,9 +10,7 @@
 
  TODO:
 
- - convert driver to use i8275 CRT device emulation
  - fix gfx glitches and banking
- - correct colors
  - DIPs
  - layout(lamps)
  - NVRAM
@@ -24,6 +22,7 @@ Setting all dipswitches active and dipswitch 10 inactive allows game/gfx switchi
 are all corrupt/scrambled.
 Also the dipswitches are active low/inverted, since on the machine this was tested on dipswitches 2,3,5,6,8 were ON, and 1,4 and 7 were OFF.
 There are only 8 dipswitches populated on the Dwarf's den boards seen so far.
+Pokeresp must be reset once to get the correct graphics (Why?).
 
 
 
@@ -341,6 +340,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dwarfd);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
 };
 
@@ -575,6 +575,29 @@ static INPUT_PORTS_START( quarterh )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Unzap") //uz unzap
 INPUT_PORTS_END
 
+I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
+{
+	int i;
+	int bank = ((gpa & 2) ? 0 : 2) + (gpa & 1);
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
+	if(!x)
+		m_back_color = false;
+
+	//if(!linecount)
+	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
+
+	for(i=0;i<8;i+=2)
+	{
+		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
+		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		bitmap.pix32(y, x + i) = palette[value];
+		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
+		if(m_back_color)
+			bitmap.pix32(y, x + i - 1) = palette[value];
+		m_back_color = pixel & 1;
+	}
+}
 
 I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 {
@@ -798,37 +821,13 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pokeresp, dwarfd_state )
-
-	/* basic machine hardware */
-	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MCFG_CPU_ADD("maincpu", I8085A, 10595000/3*2)        /* ? MHz */
-	MCFG_I8085A_SOD(WRITELINE(dwarfd_state,dwarfd_sod_callback))
+static MACHINE_CONFIG_DERIVED( pokeresp, dwarfd )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pokeresp_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(272*2, 200+4*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-
-	MCFG_DEVICE_ADD("i8275", I8275, 10595000/3)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, display_pixels)
-	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(dwarfd_state, drq_w))
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dwarfd)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_MODIFY("i8275")
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, pesp_display_pixels)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( qc, dwarfd )
@@ -1107,9 +1106,9 @@ DRIVER_INIT_MEMBER(dwarfd_state,qc)
 }
 
 /*    YEAR  NAME      PARENT     MACHINE INPUT   INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS */
-GAME( 1979, pokeresp, 0,         pokeresp, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Poker (Electro-Sport)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dwarfda,   dwarfd,   dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, pokeresp, 0,         pokeresp, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Poker (Electro-Sport)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dwarfda,   dwarfd,   dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, quarterh, 0,         dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1983, quarterha, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1983, quarterhb, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

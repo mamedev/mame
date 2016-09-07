@@ -11,7 +11,6 @@
 #include "emu.h"
 
 #include "ui/ui.h"
-#include "ui/datfile.h"
 #include "ui/datmenu.h"
 #include "ui/utils.h"
 
@@ -19,6 +18,7 @@
 #include "rendfont.h"
 #include "softlist.h"
 #include "uiinput.h"
+#include "luaengine.h"
 
 #include <cmath>
 
@@ -45,8 +45,19 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 			m_parent = image.software_entry()->parentname();
 		}
 	}
-
-	init_items();
+	const char *lua_list = mame_machine_manager::instance()->lua()->call_plugin(driver ? driver->name : "", "data_list");
+	if(lua_list)
+	{
+		std::string list(lua_list);
+		char *token = strtok((char *)list.c_str(), ",");
+		int count = 0;
+		while(token)
+		{
+			m_items_list.emplace_back(_(token), count, mame_machine_manager::instance()->lua()->call_plugin(util::string_format("%d", count).c_str(), "data_version"));
+			count++;
+			token = strtok(nullptr, ",");
+		}
+	}
 }
 
 //-------------------------------------------------
@@ -65,10 +76,21 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 	, m_issoft(true)
 
 {
-	if (mame_machine_manager::instance()->datfile().has_software(m_list, m_short, m_parent))
-		m_items_list.emplace_back(_("Software History"), UI_HISTORY_LOAD, mame_machine_manager::instance()->datfile().rev_history());
 	if (swinfo != nullptr && !swinfo->usage.empty())
 		m_items_list.emplace_back(_("Software Usage"), 0, "");
+	const char *lua_list = mame_machine_manager::instance()->lua()->call_plugin(std::string(m_short).append(1, ',').append(m_list).c_str(), "data_list");
+	if(lua_list)
+	{
+		std::string list(lua_list);
+		char *token = strtok((char *)list.c_str(), ",");
+		int count = 1;
+		while(token)
+		{
+			m_items_list.emplace_back(_(token), count, mame_machine_manager::instance()->lua()->call_plugin(util::string_format("%d", count - 1).c_str(), "data_version"));
+			count++;
+			token = strtok(nullptr, ",");
+		}
+	}
 }
 
 //-------------------------------------------------
@@ -368,25 +390,8 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 void menu_dats_view::get_data()
 {
 	std::vector<int> xstart, xend;
-	std::string buffer;
-	if (m_items_list[m_actual].option == UI_COMMAND_LOAD)
-	{
-		std::vector<std::string> m_item;
-		mame_machine_manager::instance()->datfile().command_sub_menu(m_driver, m_item);
-		if (!m_item.empty())
-		{
-			for (auto & e : m_item)
-			{
-				std::string t_buffer;
-				buffer.append(e).append("\n");
-				mame_machine_manager::instance()->datfile().load_command_info(t_buffer, e);
-				if (!t_buffer.empty()) buffer.append(t_buffer).append("\n");
-			}
-			convert_command_glyph(buffer);
-		}
-	}
-	else
-		mame_machine_manager::instance()->datfile().load_data_info(m_driver, buffer, m_items_list[m_actual].option);
+	std::string buffer(mame_machine_manager::instance()->lua()->call_plugin(util::string_format("%d", m_items_list[m_actual].option).c_str(), "data"));
+
 
 	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
@@ -404,12 +409,7 @@ void menu_dats_view::get_data_sw()
 	if (m_items_list[m_actual].option == 0)
 		buffer = m_swinfo->usage;
 	else
-	{
-		if (m_swinfo->startempty == 1)
-			mame_machine_manager::instance()->datfile().load_data_info(m_swinfo->driver, buffer, UI_HISTORY_LOAD);
-		else
-			mame_machine_manager::instance()->datfile().load_software_info(m_swinfo->listname, buffer, m_swinfo->shortname, m_swinfo->parentname);
-	}
+		buffer = mame_machine_manager::instance()->lua()->call_plugin(util::string_format("%d", m_items_list[m_actual].option - 1).c_str(), "data");
 
 	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
@@ -417,25 +417,6 @@ void menu_dats_view::get_data_sw()
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
 		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
 	}
-}
-
-void menu_dats_view::init_items()
-{
-	datfile_manager &datfile = mame_machine_manager::instance()->datfile();
-	if (datfile.has_history(m_driver))
-		m_items_list.emplace_back(_("History"), UI_HISTORY_LOAD, datfile.rev_history());
-	if (datfile.has_mameinfo(m_driver))
-		m_items_list.emplace_back(_("Mameinfo"), UI_MAMEINFO_LOAD, datfile.rev_mameinfo());
-	if (datfile.has_messinfo(m_driver))
-		m_items_list.emplace_back(_("Messinfo"), UI_MESSINFO_LOAD, datfile.rev_messinfo());
-	if (datfile.has_sysinfo(m_driver))
-		m_items_list.emplace_back(_("Sysinfo"), UI_SYSINFO_LOAD, datfile.rev_sysinfo());
-	if (datfile.has_story(m_driver))
-		m_items_list.emplace_back(_("Mamescore"), UI_STORY_LOAD, datfile.rev_storyinfo());
-	if (datfile.has_gameinit(m_driver))
-		m_items_list.emplace_back(_("Gameinit"), UI_GINIT_LOAD, datfile.rev_ginitinfo());
-	if (datfile.has_command(m_driver))
-		m_items_list.emplace_back(_("Command"), UI_COMMAND_LOAD, "");
 }
 
 } // namespace ui
