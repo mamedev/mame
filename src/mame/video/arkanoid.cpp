@@ -23,8 +23,9 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	m_gfxdecode->flip_screen_x_set(data & 0x01);
-	m_gfxdecode->flip_screen_y_set(data & 0x02);
+	m_flip_screen_x = (data & 0x01);
+	m_flip_screen_y = (data & 0x02);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 
 	/* bit 2 selects the input paddle */
 	m_paddle_select = data & 0x04;
@@ -69,8 +70,9 @@ WRITE8_MEMBER(arkanoid_state::brixian_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	m_gfxdecode->flip_screen_x_set(data & 0x01);
-	m_gfxdecode->flip_screen_y_set(data & 0x02);
+	m_flip_screen_x = (data & 0x01);
+	m_flip_screen_y = (data & 0x02);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 
 	/* bit 2 selects the input paddle */
 	/*  - not relevant to brixian */
@@ -109,8 +111,9 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	m_gfxdecode->flip_screen_x_set(data & 0x01);
-	m_gfxdecode->flip_screen_y_set(data & 0x02);
+	m_flip_screen_x = (data & 0x01);
+	m_flip_screen_y = (data & 0x02);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 
 	/* bit 2 selects the input paddle? */
 	m_paddle_select = data & 0x04;
@@ -144,8 +147,9 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
 {
 	/* bit 0 = flipx (or y?) */
-	m_gfxdecode->flip_screen_x_set(data & 0x01);
-	m_gfxdecode->flip_screen_y_set(data & 0x02);
+	m_flip_screen_x = (data & 0x01);
+	m_flip_screen_y = (data & 0x02);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 
 	/* bit 2 - 3 unknown */
 
@@ -174,6 +178,11 @@ TILE_GET_INFO_MEMBER(arkanoid_state::get_bg_tile_info)
 void arkanoid_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(arkanoid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 void arkanoid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -186,9 +195,9 @@ void arkanoid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		sx = m_spriteram[offs];
 		sy = 248 - m_spriteram[offs + 1];
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen_x)
 			sx = 248 - sx;
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen_y)
 			sy = 248 - sy;
 
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8) + 1024 * m_gfxbank;
@@ -196,14 +205,12 @@ void arkanoid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code,
 				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
-				m_gfxdecode->flip_screen_x(),
-				m_gfxdecode->flip_screen_y(),
-				sx,sy + (m_gfxdecode->flip_screen_y() ? 8 : -8),0);
+				m_flip_screen_x, m_flip_screen_y,
+				sx,sy + (m_flip_screen_y ? 8 : -8),0);
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code + 1,
 				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
-				m_gfxdecode->flip_screen_x(),
-				m_gfxdecode->flip_screen_y(),
+				m_flip_screen_x, m_flip_screen_y,
 				sx,sy,0);
 	}
 }

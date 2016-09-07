@@ -169,7 +169,9 @@ WRITE16_MEMBER(tecmo16_state::charram_w)
 WRITE16_MEMBER(tecmo16_state::flipscreen_w)
 {
 	m_flipscreen = data & 0x01;
-	m_gfxdecode->flip_screen_set(m_flipscreen);
+	m_fg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 }
 
 /******************************************************************************/
@@ -222,8 +224,8 @@ UINT32 tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 0, 0, m_gfxdecode->flip_screen(), m_sprite_bitmap);
-	else m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 2, 0, m_gfxdecode->flip_screen(), m_sprite_bitmap);
+	if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 0, 0, m_flipscreen, m_sprite_bitmap);
+	else m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 2, 0, m_flipscreen, m_sprite_bitmap);
 
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);

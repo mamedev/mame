@@ -125,7 +125,7 @@ WRITE8_MEMBER(mole_state::mole_irqack_w)
 
 WRITE8_MEMBER(mole_state::mole_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	m_bg_tilemap->set_flip((data & 0x01) ? TILEMAP_FLIPXY : 0);
 }
 
 UINT32 mole_state::screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

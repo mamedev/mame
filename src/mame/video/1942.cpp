@@ -152,6 +152,9 @@ void _1942_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1942_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void _1942_state::video_start_c1942p()
@@ -160,6 +163,9 @@ void _1942_state::video_start_c1942p()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1942_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
 	m_fg_tilemap->set_transparent_pen(3);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -208,7 +214,9 @@ WRITE8_MEMBER(_1942_state::c1942_c804_w)
 
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -233,7 +241,7 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		sy = m_spriteram[offs + 2];
 		dir = 1;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -249,8 +257,7 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,col,
-					m_gfxdecode->flip_screen(),
-					m_gfxdecode->flip_screen(),
+					m_flip_screen, m_flip_screen,
 					sx,sy + 16 * i * dir,15);
 
 			i--;
@@ -287,7 +294,7 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			dir = -1;
@@ -309,8 +316,7 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,col,
-					m_gfxdecode->flip_screen(),
-					m_gfxdecode->flip_screen(),
+					m_flip_screen, m_flip_screen,
 					sx,sy + 16 * i * dir,15);
 
 			i--;

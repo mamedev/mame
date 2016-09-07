@@ -105,7 +105,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 	membank("bank1")->set_entry(((data & 0x0c) >> 2));
 
 	m_flipscreen = (data & 0x10)>>4;
-	m_gfxdecode->flip_screen_set(m_flipscreen);
+	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	if (data & 0xe3)
 		logerror("p06_w %02x\n", data);

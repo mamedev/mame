@@ -117,11 +117,7 @@ WRITE8_MEMBER(mario_state::mario_flip_w)
 	if (m_flip != (data & 0x01))
 	{
 		m_flip = data & 0x01;
-		if (m_flip)
-			m_gfxdecode->set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
-		else
-			m_gfxdecode->set_flip_all(0);
-		m_gfxdecode->mark_all_dirty();
+		m_gfxdecode->set_flip_all(m_flip ? TILEMAP_FLIPXY : 0);
 	}
 }
 

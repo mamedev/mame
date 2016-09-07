@@ -39,6 +39,7 @@ public:
 	UINT32     m_stars_state;
 	UINT16     m_stars_offset;
 	UINT8      m_stars_count;
+	bool       m_flip_screen;
 
 	/* misc */
 	UINT8      m_sound_low;

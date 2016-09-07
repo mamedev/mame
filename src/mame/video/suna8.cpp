@@ -145,6 +145,9 @@ void suna8_state::suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_ty
 	m_gfxbank       =   0;
 	m_gfxbank_type  =   gfxbank_type;
 	m_palettebank   =   0;
+	m_flip_screen   =   false;
+
+	save_item(NAME(m_flip_screen));
 
 	if (!m_has_text)
 	{
@@ -167,6 +170,15 @@ VIDEO_START_MEMBER(suna8_state,suna8_text)              { suna8_vh_start_common(
 VIDEO_START_MEMBER(suna8_state,suna8_sparkman)          { suna8_vh_start_common( false, GFXBANK_TYPE_SPARKMAN); }
 VIDEO_START_MEMBER(suna8_state,suna8_brickzn)           { suna8_vh_start_common( false, GFXBANK_TYPE_BRICKZN);  }
 VIDEO_START_MEMBER(suna8_state,suna8_starfigh)          { suna8_vh_start_common( false, GFXBANK_TYPE_STARFIGH); }
+
+void suna8_state::flip_screen_set(bool flip)
+{
+	m_flip_screen = flip;
+
+#if TILEMAPS
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+#endif
+}
 
 /***************************************************************************
 
@@ -424,7 +436,7 @@ void suna8_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 				if (flipx)  tile_flipx = !tile_flipx;
 				if (flipy)  tile_flipy = !tile_flipy;
 
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 				{
 					sx = max_x - sx;    tile_flipx = !tile_flipx;
 					sy = max_y - sy;    tile_flipy = !tile_flipy;
@@ -512,7 +524,7 @@ void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 				int sx      =    x + tx * 8;
 				int sy      =   (0xf0 - ypos + ty * 8) & 0xff;
 
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 				{
 					sx = max_x - sx;    flipx = !flipx;
 					sy = max_y - sy;    flipy = !flipy;
@@ -531,7 +543,7 @@ void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		// Fill the text sprites row with high priority for masking
 		int sy = (0xf0 - ypos) & 0xff;
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 			sy = max_y - sy - 8;
 		rectangle text_clip(cliprect.min_x, cliprect.max_x, sy, sy + 0x10 - 1);
 		text_clip &= cliprect;

@@ -122,6 +122,8 @@ public:
 
 	/* tilemaps */
 	tilemap_t * m_bg_tilemap;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 
 	/* sound state */
 	UINT8       m_sound[8];
@@ -235,6 +237,11 @@ void looping_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(looping_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_bg_tilemap->set_scroll_cols(0x20);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -247,15 +254,17 @@ void looping_state::video_start()
 
 WRITE8_MEMBER(looping_state::flip_screen_x_w)
 {
-	m_gfxdecode->flip_screen_x_set(~data & 0x01);
-	m_bg_tilemap->set_scrollx(0, m_gfxdecode->flip_screen() ? 128 : 0);
+	m_flip_screen_x = (~data & 0x01);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+	m_bg_tilemap->set_scrollx(0, m_flip_screen_x ? 128 : 0);
 }
 
 
 WRITE8_MEMBER(looping_state::flip_screen_y_w)
 {
-	m_gfxdecode->flip_screen_y_set(~data & 0x01);
-	m_bg_tilemap->set_scrollx(0, m_gfxdecode->flip_screen() ? 128 : 0);
+	m_flip_screen_y = (~data & 0x01);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+	m_bg_tilemap->set_scrollx(0, m_flip_screen_x ? 128 : 0);
 }
 
 
@@ -307,13 +316,13 @@ void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		int code  = source[1] & 0x3f;
 		int color = source[2];
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

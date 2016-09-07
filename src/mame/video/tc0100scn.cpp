@@ -431,7 +431,7 @@ void tc0100scn_device::restore_scroll()
 	m_tilemap[2][0]->set_scrolly(0, -m_ctrl[5]);
 	m_tilemap[2][1]->set_scrolly(0, -m_ctrl[5]);
 
-	flip = (m_ctrl[7] & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	flip = (m_ctrl[7] & 0x01) ? TILEMAP_FLIPXY : 0;
 	m_tilemap[0][0]->set_flip(flip);
 	m_tilemap[1][0]->set_flip(flip);
 	m_tilemap[2][0]->set_flip(flip);
@@ -549,7 +549,7 @@ WRITE16_MEMBER( tc0100scn_device::ctrl_word_w )
 
 		case 0x07:
 		{
-			int flip = (data & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+			int flip = (data & 0x01) ? TILEMAP_FLIPXY : 0;
 
 			m_tilemap[0][0]->set_flip(flip);
 			m_tilemap[1][0]->set_flip(flip);

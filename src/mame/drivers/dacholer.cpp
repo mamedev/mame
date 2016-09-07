@@ -74,6 +74,7 @@ public:
 	int      m_bg_bank;
 	UINT8    m_scroll_x;
 	UINT8    m_scroll_y;
+	UINT8    m_flip_bits;
 
 	/* sound-related */
 	int m_msm_data;
@@ -123,6 +124,9 @@ void dacholer_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_bits = 0;
+	save_item(NAME(m_flip_bits));
 }
 
 WRITE8_MEMBER(dacholer_state::bg_scroll_x_w)
@@ -150,7 +154,7 @@ void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		sx = (m_spriteram[offs + 3] - 128) + 256 * (attr & 0x01);
 		sy = 255 - m_spriteram[offs];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_bits != 0)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -168,7 +172,7 @@ void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 UINT32 dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_bits != 0)
 	{
 		m_bg_tilemap->set_scrollx(0, 256 - m_scroll_x);
 		m_bg_tilemap->set_scrolly(0, 256 - m_scroll_y);
@@ -205,8 +209,13 @@ WRITE8_MEMBER(dacholer_state::bg_bank_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	m_gfxdecode->flip_screen_set(data & 0xc); // probably one bit for flipx and one for flipy
-
+	// probably one bit for flipx and one for flipy
+	if ((data & 0xc) != m_flip_bits)
+	{
+		m_flip_bits = data & 0xc;
+		m_bg_tilemap->set_flip(m_flip_bits ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_bits ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 WRITE8_MEMBER(dacholer_state::coins_w)

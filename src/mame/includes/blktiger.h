@@ -37,6 +37,7 @@ public:
 	UINT8   m_chon;
 	UINT8   m_objon;
 	UINT8   m_bgon;
+	bool    m_flip_screen;
 
 	/* mcu-related */
 	UINT8   m_z80_latch;

@@ -549,7 +549,7 @@ WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
 */
 WRITE8_MEMBER(suna8_state::hardhead_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x04);
+	flip_screen_set(data & 0x04);
 	machine().bookkeeping().coin_lockout_w(0, data & 0x08);
 	machine().bookkeeping().coin_lockout_w(1, data & 0x10);
 }
@@ -595,7 +595,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 
 	m_bank1->set_entry(bank);
 
-	m_gfxdecode->flip_screen_set(data & 0x20);
+	flip_screen_set(data & 0x20);
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
 	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
 }
@@ -674,7 +674,7 @@ WRITE8_MEMBER(suna8_state::brickzn_sprbank_w)
 {
 	m_protection_val = data;
 
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	flip_screen_set(data & 0x01);
 	m_spritebank = (data >> 1) & 1;
 
 	logerror("CPU #0 - PC %04X: protection_val = %02X\n",space.device().safe_pc(),data);
@@ -912,7 +912,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_nmi_w)
 */
 WRITE8_MEMBER(suna8_state::hardhea2_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	flip_screen_set(data & 0x01);
 	if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",space.device().safe_pc(),data);
 }
 
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER(suna8_state::sparkman_rombank_latch_w)
 */
 WRITE8_MEMBER(suna8_state::sparkman_spritebank_latch_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	flip_screen_set(data & 0x01);
 	m_spritebank_latch  =   (data >> 4) & 0x03;
 	logerror("CPU #0 - PC %04X: spritebank latch = %02X\n",space.device().safe_pc(),data);
 }

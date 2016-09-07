@@ -109,7 +109,7 @@ WRITE8_MEMBER(yunsung8_state::videoram_w)
 
 WRITE8_MEMBER(yunsung8_state::flipscreen_w)
 {
-	m_gfxdecode->set_flip_all((data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	m_gfxdecode->set_flip_all((data & 1) ? TILEMAP_FLIPXY : 0);
 }
 
 

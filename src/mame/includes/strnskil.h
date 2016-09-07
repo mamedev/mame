@@ -25,6 +25,7 @@ public:
 	UINT8 m_scrl_ctrl;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_irq_source;
+	bool m_flip_screen;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(strnskil_irq);
 

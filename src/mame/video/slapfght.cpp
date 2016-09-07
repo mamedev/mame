@@ -54,8 +54,12 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
 VIDEO_START_MEMBER(slapfght_state, perfrman)
 {
 	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(slapfght_state::get_pf_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fix_tilemap = nullptr;
 
 	m_pf1_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(slapfght_state, slapfight)
@@ -67,6 +71,9 @@ VIDEO_START_MEMBER(slapfght_state, slapfight)
 	m_pf1_tilemap->set_scrolldy(0, 14);
 
 	m_fix_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -118,7 +125,10 @@ WRITE8_MEMBER(slapfght_state::scrolly_w)
 
 WRITE8_MEMBER(slapfght_state::flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(offset ? 0 : 1);
+	m_flip_screen = (offset != 0) ? false : true;
+	m_pf1_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	if (m_fix_tilemap != nullptr)
+		m_fix_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 WRITE8_MEMBER(slapfght_state::palette_bank_w)
@@ -158,7 +168,7 @@ void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle
 		int color = (src[offs + 2] >> 1 & 3) | (src[offs + 2] << 2 & 4) | (m_palette_bank << 3);
 		int fx = 0, fy = 0;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 256 - sy;
 			sx = 240 - sx;
@@ -206,7 +216,7 @@ void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangl
 		int color = src[offs + 2] >> 1 & 0xf;
 		int fx = 0, fy = 0;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = (238 - sy) & 0xff;
 			sx = 284 - sx;

@@ -87,7 +87,12 @@ a joystick.  This is not an emulation bug.
 WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
 {
 	if (ACCESSING_BITS_8_15)
-		m_gfxdecode->flip_screen_set(~data & 0x8000);
+	{
+		if (m_pandora.found())
+			m_pandora->flip_screen_set(!BIT(data, 15));
+		else
+			m_flip_screen = !BIT(data, 15);
+	}
 }
 
 
@@ -1705,6 +1710,8 @@ static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_wintbob)
 	MCFG_SCREEN_VBLANK_NONE()
+
+	MCFG_VIDEO_START_OVERRIDE(snowbros_state, bootleg_video)
 MACHINE_CONFIG_END
 
 
@@ -1772,6 +1779,8 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	MCFG_PALETTE_ADD("palette", 0x800/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
+	MCFG_VIDEO_START_OVERRIDE(snowbros_state, bootleg_video)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1811,6 +1820,8 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twinadv)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	MCFG_VIDEO_START_OVERRIDE(snowbros_state, bootleg_video)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1888,6 +1899,8 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state ) /* PCB has 16MHz & 12MHz
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sb3)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	MCFG_VIDEO_START_OVERRIDE(snowbros_state, bootleg_video)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

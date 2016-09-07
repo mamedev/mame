@@ -41,6 +41,7 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
+	bool m_flip_screen;
 
 	/* misc */
 	int        m_psg_latch;
@@ -63,6 +64,7 @@ public:
 	virtual void video_start() override;
 
 	DECLARE_PALETTE_INIT(bogeyman);
+	void flip_screen_set(bool flip);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

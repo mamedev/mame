@@ -23,6 +23,7 @@ public:
 	UINT8 m_ninjakun_io_a002_ctrl;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(ninjakun_cpu1_io_A002_w);
 	DECLARE_WRITE8_MEMBER(ninjakun_cpu2_io_A002_w);

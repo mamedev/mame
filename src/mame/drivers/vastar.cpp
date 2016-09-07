@@ -134,11 +134,6 @@ WRITE8_MEMBER(vastar_state::hold_cpu2_w)
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(vastar_state::flip_screen_w)
-{
-	m_gfxdecode->flip_screen_set(data);
-}
-
 WRITE8_MEMBER(vastar_state::nmi_mask_w)
 {
 	m_nmi_mask = data & 1;

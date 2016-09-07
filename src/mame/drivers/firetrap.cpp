@@ -334,11 +334,6 @@ WRITE8_MEMBER(firetrap_state::firetrap_adpcm_data_w)
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(firetrap_state::flip_screen_w)
-{
-	m_gfxdecode->flip_screen_set(data);
-}
-
 
 static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM

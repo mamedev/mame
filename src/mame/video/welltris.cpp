@@ -27,7 +27,8 @@ WRITE16_MEMBER(welltris_state::palette_bank_w)
 			m_char_tilemap->mark_all_dirty();
 		}
 
-		m_gfxdecode->flip_screen_set(data & 0x80);
+		m_flip_screen = bool(data & 0x80);
+		m_char_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 		m_spritepalettebank = (data & 0x20) >> 5;
 		m_pixelpalettebank = (data & 0x08) >> 3;
@@ -74,12 +75,15 @@ void welltris_state::video_start()
 
 	m_char_tilemap->set_transparent_pen(15);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_charpalettebank));
 	save_item(NAME(m_spritepalettebank));
 	save_item(NAME(m_pixelpalettebank));
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
+	save_item(NAME(m_flip_screen));
 }
 
 void welltris_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)

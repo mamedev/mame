@@ -72,9 +72,11 @@ public:
 
 	  For now we have this get_flip_state function so that drivers can query the bit and set other
 	  flip flags accordingly
+
+          set_flip_state is a hack piled upon this hack due to the elimination of global flip state.
 	*/
 	UINT8 get_flip_state(void) { return m_pf_control_0[0]&0x80; };
-
+	void set_flip_state(bool state) { m_pf_control_0[0] = (m_pf_control_0[0] & 0x7f) | (state ? 0x80 : 0); }
 
 	void set_colmask(int data) { m_gfxcolmask = data; }
 	void set_bppmultmask( int mult, int mask ) { m_bppmult = mult; m_bppmask = mask; } // stadium hero has 3bpp tiles

@@ -1249,9 +1249,9 @@ void segaic16_video_device::tilemap_set_flip(int which, int flip)
 	{
 		m_screen->update_partial(m_screen->vpos());
 		info->flip = flip;
-		info->textmap->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		info->textmap->set_flip(flip ? TILEMAP_FLIPXY : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
-			info->tilemaps[pagenum]->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+			info->tilemaps[pagenum]->set_flip(flip ? TILEMAP_FLIPXY : 0);
 	}
 }
 

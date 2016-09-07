@@ -103,10 +103,10 @@ WRITE8_MEMBER(trackfld_state::trackfld_colorram_w)
 
 WRITE8_MEMBER(trackfld_state::trackfld_flipscreen_w)
 {
-	if (m_gfxdecode->flip_screen() != data)
+	if (m_flip_screen != bool(data))
 	{
-		m_gfxdecode->flip_screen_set(data);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -175,6 +175,9 @@ VIDEO_START_MEMBER(trackfld_state,trackfld)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(trackfld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_sprites_gfx_banked = 0;
+	m_flip_screen = false;
+
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -204,7 +207,7 @@ void trackfld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int sx = spriteram[offs] - 1;
 		int sy = 240 - spriteram_2[offs + 1];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -248,7 +251,7 @@ UINT32 trackfld_state::screen_update_trackfld(screen_device &screen, bitmap_ind1
 	for (row = 0; row < 32; row++)
 	{
 		scrollx = m_scroll[row] + 256 * (m_scroll2[row] & 0x01);
-		if (m_gfxdecode->flip_screen()) scrollx = -scrollx;
+		if (m_flip_screen) scrollx = -scrollx;
 		m_bg_tilemap->set_scrollx(row, scrollx);
 	}
 

@@ -122,11 +122,6 @@ WRITE8_MEMBER(tsamurai_state::m660_sound_command3_w)
 	m_audio3->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(tsamurai_state::flip_screen_w)
-{
-	m_gfxdecode->flip_screen_set(data);
-}
-
 WRITE8_MEMBER(tsamurai_state::coincounter_w)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);

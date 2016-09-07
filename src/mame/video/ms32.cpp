@@ -182,9 +182,9 @@ WRITE32_MEMBER(ms32_state::ms32_gfxctrl_w)
 	{
 		/* bit 1 = flip screen */
 		m_flipscreen = data & 0x02;
-		m_tx_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		m_bg_tilemap_alt->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_tx_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+		m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+		m_bg_tilemap_alt->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 		/* bit 2 used by f1superb, unknown */
 

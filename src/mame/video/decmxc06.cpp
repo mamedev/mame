@@ -70,7 +70,7 @@ void deco_mxc06_device::static_set_gfxdecode_tag(device_t &device, const char *t
 
 
 /* this implementation was originally from Mad Motor */
-void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+void deco_mxc06_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask, bool flip_screen)
 {
 	int offs;
 
@@ -100,7 +100,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 		sx = 240 - sx;
 		sy = 240 - sy;
 
-		if (m_gfxdecode->flip_screen())
+		if (flip_screen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;

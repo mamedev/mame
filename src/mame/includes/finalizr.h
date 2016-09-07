@@ -44,6 +44,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_spriterambank;
 	int m_charbank;
+	bool m_flip_screen;
 
 	/* misc */
 	int m_T1_line;

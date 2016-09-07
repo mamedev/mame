@@ -21,6 +21,8 @@ public:
 
 	/* video-related */
 	tilemap_t    *m_freek_tilemap;
+	bool          m_flip_screen_x;
+	bool          m_flip_screen_y;
 
 	/* misc */
 	int        m_inval;

@@ -115,6 +115,11 @@ void nmk16_state::nmk16_video_init()
 	m_videoshift = 0;        /* 256x224 screen, no shift */
 	m_background_bitmap = nullptr;
 	m_simple_scroll = 1;
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -346,7 +351,13 @@ WRITE16_MEMBER(nmk16_state::manybloc_scroll_w)
 WRITE16_MEMBER(nmk16_state::nmk_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_gfxdecode->flip_screen_set(data & 0x01);
+	{
+		if (m_flip_screen_x != (data & 0x01) || m_flip_screen_y != (data & 0x01))
+		{
+			m_flip_screen_x = m_flip_screen_y = (data & 0x01);
+			update_flip();
+		}
+	}
 }
 
 WRITE16_MEMBER(nmk16_state::nmk_tilebank_w)
@@ -382,6 +393,11 @@ WRITE16_MEMBER(nmk16_state::bioship_bank_w)
 	}
 }
 
+void nmk16_state::update_flip()
+{
+	m_gfxdecode->set_flip_all((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+}
+
 /***************************************************************************
 
   Display refresh
@@ -406,7 +422,7 @@ inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle
 	int xx,yy,x;
 	int delta = 16;
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen_x)
 	{
 		sx = 368 - sx;
 		sy = 240 - sy;
@@ -423,7 +439,7 @@ inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle
 		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code,
 			color,
-			m_gfxdecode->flip_screen(), m_gfxdecode->flip_screen(),
+			m_flip_screen_x, m_flip_screen_y,
 			((x + 16) & 0x1FF) - 16,sy & 0x1FF,15);
 		code++;
 		x += delta;
@@ -450,10 +466,10 @@ inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, c
 	int xx,yy,x;
 	int delta = 16;
 
-	flipx ^= m_gfxdecode->flip_screen();
-	flipy ^= m_gfxdecode->flip_screen();
+	flipx ^= m_flip_screen_x;
+	flipy ^= m_flip_screen_y;
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen_x)
 	{
 		sx = 368 - sx;
 		sy = 240 - sy;
@@ -875,8 +891,14 @@ void nmk16_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 {
 	if (dsw_flipscreen)
 	{
-		m_gfxdecode->flip_screen_x_set(~ioport("DSW1")->read() & 0x0100);
-		m_gfxdecode->flip_screen_y_set(~ioport("DSW1")->read() & 0x0200);
+		bool flipx = (~ioport("DSW1")->read() & 0x0100);
+		bool flipy = (~ioport("DSW1")->read() & 0x0200);
+		if (flipx != m_flip_screen_x || flipy != m_flip_screen_y)
+		{
+			m_flip_screen_x = flipx;
+			m_flip_screen_y = flipy;
+			update_flip();
+		}
 	}
 
 

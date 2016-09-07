@@ -47,6 +47,7 @@ public:
 	int         m_sprite_flipy_mask;
 	int         m_sprite_pri_mask;
 	int         m_tilemap_priority;
+	bool        m_flip_screen;
 
 	DECLARE_WRITE16_MEMBER(lastduel_sound_w);
 	DECLARE_WRITE8_MEMBER(mg_bankswitch_w);

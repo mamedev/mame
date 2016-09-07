@@ -86,8 +86,7 @@ void deco156_state::video_start()
 
 UINT32 deco156_state::screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	m_gfxdecode->flip_screen_set_no_update(1);
+	//flip_screen_set_no_update(1);
 
 	screen.priority().fill(0);
 	bitmap.fill(0);
@@ -95,7 +94,7 @@ UINT32 deco156_state::screen_update_wcvol95(screen_device &screen, bitmap_rgb32 
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram.get(), 0x800);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram.get(), 0x800, true);
 	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

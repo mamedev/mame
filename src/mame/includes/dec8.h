@@ -65,6 +65,7 @@ public:
 	int      m_bg_control[0x20];
 	int      m_pf1_control[0x20];
 	int      m_game_uses_priority;
+	bool     m_flip_screen;
 
 	/* misc */
 	int      m_i8751_port0;
@@ -165,6 +166,7 @@ public:
 	INTERRUPT_GEN_MEMBER(oscar_interrupt);
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
+	void flip_screen_set(bool flip);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

@@ -45,6 +45,8 @@ public:
 	UINT16 m_fore_gfx_bank;
 	UINT16 m_mid_gfx_bank;
 	UINT16 scrollvals[6];
+	bool m_flip_screen;
+
 	DECLARE_WRITE16_MEMBER(tilemap_enable_w);
 	DECLARE_WRITE16_MEMBER(tile_scroll_w);
 	DECLARE_WRITE16_MEMBER(tile_scroll_base_w);

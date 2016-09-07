@@ -38,6 +38,7 @@ public:
 	/* video-related */
 	tilemap_t * m_bg_tilemap;
 	UINT8       m_spritebank;
+	bool        m_flip_screen;
 
 	/* misc */
 	UINT8       m_interrupt_mask;

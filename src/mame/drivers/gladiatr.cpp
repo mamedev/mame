@@ -289,11 +289,6 @@ READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
 	return m_soundlatch->read(space,0);
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
-{
-	m_gfxdecode->flip_screen_set(data & 1);
-}
-
 
 #if 1
 /* !!!!! patch to IRQ timing for 2nd CPU !!!!! */

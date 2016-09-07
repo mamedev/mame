@@ -37,7 +37,8 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
-	int        m_scroll;
+	int         m_scroll;
+	bool        m_flip_screen;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

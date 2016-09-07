@@ -44,6 +44,8 @@ public:
 
 	UINT32 m_galaga_gfxbank; // used by catsbee
 
+	bool m_flip_screen;
+
 	/* devices */
 
 	/* bank support */

@@ -217,14 +217,17 @@ TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
 
 void travrusa_state::video_start()
 {
-	save_item(NAME(m_scrollx));
-
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(travrusa_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x3f, 0xc0); /* split type 1 has pens 6 and 7 opaque - tunnels */
 
 	m_bg_tilemap->set_scroll_rows(4);
+
+	m_flip_screen = false;
+
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -270,7 +273,8 @@ WRITE8_MEMBER(travrusa_state::travrusa_flipscreen_w)
 	/* screen flip is handled both by software and hardware */
 	data ^= ~ioport("DSW2")->read() & 1;
 
-	m_gfxdecode->flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
@@ -290,7 +294,7 @@ void travrusa_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	const rectangle spritevisiblearea(1*8, 31*8-1, 0*8, 24*8-1);
 	const rectangle spritevisibleareaflip(1*8, 31*8-1, 8*8, 32*8-1);
 	rectangle clip = cliprect;
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 		clip &= spritevisibleareaflip;
 	else
 		clip &= spritevisiblearea;
@@ -305,7 +309,7 @@ void travrusa_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

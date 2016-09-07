@@ -176,31 +176,6 @@ WRITE8_MEMBER(vball_state::cpu_sound_command_w)
 }
 
 
-/* bit 0 = flip screen
-   bit 1 = scrollx hi
-   bit 2 = bg prom bank
-   bit 3 = bg prom bank
-   bit 4 = bg prom bank
-   bit 5 = sp prom bank
-   bit 6 = sp prom bank
-   bit 7 = sp prom bank
-*/
-WRITE8_MEMBER(vball_state::scrollx_hi_w)
-{
-	m_gfxdecode->flip_screen_set(~data&1);
-	m_scrollx_hi = (data & 0x02) << 7;
-	bgprombank_w((data >> 2) & 0x07);
-	spprombank_w((data >> 5) & 0x07);
-	//logerror("%04x: scrollx_hi = %d\n", space.device().safe_pcbase(), m_scrollx_hi);
-}
-
-WRITE8_MEMBER(vball_state::scrollx_lo_w)
-{
-	m_scrollx_lo = data;
-	//logerror("%04x: scrollx_lo =%d\n", space.device().safe_pcbase(), m_scrollx_lo);
-}
-
-
 //Cheaters note: Scores are stored in ram @ 0x57-0x58 (though the space is used for other things between matches)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM

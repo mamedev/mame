@@ -325,7 +325,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 	k007121->ctrl_w(space, offset, data);
 
 	if (offset == 7)
-		m_bg_tilemap[m_video_circuit]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_bg_tilemap[m_video_circuit]->set_flip((data & 0x08) ? TILEMAP_FLIPXY : 0);
 
 	if (offset == 3)
 	{

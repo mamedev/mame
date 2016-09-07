@@ -54,7 +54,7 @@ WRITE8_MEMBER(msisaac_state::nmi_enable_w)
 #if 0
 WRITE8_MEMBER(msisaac_state::flip_screen_w)
 {
-	m_gfxdecode->flip_screen_set(data);
+	m_flip_screen = data;
 }
 
 WRITE8_MEMBER(msisaac_state::msisaac_coin_counter_w)

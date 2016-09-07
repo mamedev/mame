@@ -59,6 +59,7 @@ public:
 	int m_sprite_palbank;
 	tilemap_t *m_bg_tilemap;
 	int m_lastscroll;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(spd_adpcm_w);

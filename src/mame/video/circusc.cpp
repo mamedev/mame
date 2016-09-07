@@ -122,6 +122,9 @@ void circusc_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(circusc_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -146,7 +149,8 @@ WRITE8_MEMBER(circusc_state::circusc_colorram_w)
 
 WRITE8_MEMBER(circusc_state::circusc_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -176,7 +180,7 @@ void circusc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = sr[offs + 1] & 0x40;
 		int flipy = sr[offs + 1] & 0x80;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

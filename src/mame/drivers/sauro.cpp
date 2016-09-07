@@ -155,11 +155,6 @@ WRITE8_MEMBER(sauro_state::coin2_w)
 	machine().bookkeeping().coin_counter_w(1, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
-WRITE8_MEMBER(sauro_state::flip_screen_w)
-{
-	m_gfxdecode->flip_screen_set(data);
-}
-
 WRITE8_MEMBER(sauro_state::adpcm_w)
 {
 	m_sp0256->ald_w(space, 0, data);

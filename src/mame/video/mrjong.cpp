@@ -82,10 +82,10 @@ WRITE8_MEMBER(mrjong_state::mrjong_colorram_w)
 
 WRITE8_MEMBER(mrjong_state::mrjong_flipscreen_w)
 {
-	if (m_gfxdecode->flip_screen() != BIT(data, 2))
+	if (m_flip_screen != BIT(data, 2))
 	{
-		m_gfxdecode->flip_screen_set(BIT(data, 2));
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = BIT(data, 2);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -101,6 +101,9 @@ TILE_GET_INFO_MEMBER(mrjong_state::get_bg_tile_info)
 void mrjong_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mrjong_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_XY, 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 /*
@@ -124,7 +127,7 @@ void mrjong_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		sx = 224 - m_videoram[offs + 2];
 		sy = m_videoram[offs + 0];
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 208 - sx;
 			sy = 240 - sy;

@@ -55,11 +55,6 @@ WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE8_MEMBER(shootout_state::flipscreen_w)
-{
-	m_gfxdecode->flip_screen_set(data & 0x01);
-}
-
 WRITE8_MEMBER(shootout_state::coincounter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data);

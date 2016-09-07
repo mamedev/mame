@@ -91,6 +91,7 @@ VIDEO_START_MEMBER(n8080_state,spacefev)
 
 	save_item(NAME(m_spacefev_red_screen));
 	save_item(NAME(m_spacefev_red_cannon));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -100,6 +101,7 @@ VIDEO_START_MEMBER(n8080_state,sheriff)
 
 	save_item(NAME(m_sheriff_color_mode));
 	save_item(NAME(m_sheriff_color_data));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -108,10 +110,13 @@ VIDEO_START_MEMBER(n8080_state,helifire)
 	UINT8 data = 0;
 	int i;
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_helifire_mv));
 	save_item(NAME(m_helifire_sc));
 	save_item(NAME(m_helifire_flash));
 	save_item(NAME(m_helifire_LSFR));
+	save_item(NAME(m_flip_screen));
 
 	for (i = 0; i < 63; i++)
 	{
@@ -123,8 +128,6 @@ VIDEO_START_MEMBER(n8080_state,helifire)
 
 		m_helifire_LSFR[i] = data;
 	}
-
-	m_flip_screen = false;
 }
 
 

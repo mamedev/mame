@@ -140,7 +140,7 @@ void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 UINT32 xxmissio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_gfxdecode->mark_all_dirty();
-	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	m_bg_tilemap->set_scrollx(0, m_xscroll * 2);
 	m_bg_tilemap->set_scrolly(0, m_yscroll);

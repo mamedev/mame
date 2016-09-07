@@ -38,6 +38,7 @@ public:
 	UINT16 m_scroll1;
 	UINT8 m_main_irq_mask;
 	UINT8 m_mcu_irq_mask;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(subreset_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);

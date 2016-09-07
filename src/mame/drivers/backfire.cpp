@@ -137,9 +137,6 @@ void backfire_state::video_start()
 
 UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	m_gfxdecode->flip_screen_set_no_update(1);
-
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
@@ -152,13 +149,13 @@ UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap
 	{
 		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1.get(), 0x800);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1.get(), 0x800, true);
 	}
 	else if (m_left_priority[0] == 2)
 	{
 		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
-		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1.get(), 0x800);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1.get(), 0x800, true);
 	}
 	else
 		popmessage( "unknown left priority %08x", m_left_priority[0]);
@@ -168,9 +165,6 @@ UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap
 
 UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	m_gfxdecode->flip_screen_set_no_update(1);
-
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
@@ -183,13 +177,13 @@ UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitma
 	{
 		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2.get(), 0x800);
+		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2.get(), 0x800, true);
 	}
 	else if (m_right_priority[0] == 2)
 	{
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
-		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2.get(), 0x800);
+		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2.get(), 0x800, true);
 	}
 	else
 		popmessage( "unknown right priority %08x", m_right_priority[0]);

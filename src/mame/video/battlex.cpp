@@ -39,10 +39,10 @@ WRITE8_MEMBER(battlex_state::battlex_flipscreen_w)
 {
 	m_starfield_enabled = data & 0x10;
 
-	if (m_gfxdecode->flip_screen() != (data >> 7))
+	if (m_flip_screen != bool(data >> 7))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x80);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data >> 7);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -58,6 +58,9 @@ TILE_GET_INFO_MEMBER(battlex_state::get_bg_tile_info)
 void battlex_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(battlex_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -75,7 +78,7 @@ void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipy = source[1] & 0x80;
 		int flipx = source[1] & 0x40;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -92,7 +95,7 @@ void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 battlex_state::screen_update_battlex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (!m_gfxdecode->flip_screen())
+	if (!m_flip_screen)
 		m_bg_tilemap->set_scrollx(0, m_scroll_lsb | (m_scroll_msb << 8));
 	else
 		m_bg_tilemap->set_scrollx(0, m_scroll_lsb | m_scroll_msb);

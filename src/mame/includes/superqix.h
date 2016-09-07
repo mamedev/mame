@@ -76,6 +76,7 @@ public:
 	std::unique_ptr<bitmap_ind16> m_fg_bitmap[2];
 	tilemap_t *m_bg_tilemap;
 
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(pbillian_sample_trigger_w);
 	DECLARE_READ8_MEMBER(mcu_acknowledge_r);
@@ -129,6 +130,7 @@ public:
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
 	TIMER_CALLBACK_MEMBER(mcu_acknowledge_callback);
 	TIMER_CALLBACK_MEMBER(hle_68705_w_cb);
+	void flip_screen_set(bool flip);
 	void pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	int read_dial(int player);

@@ -33,7 +33,7 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	const UINT8 *spritepalettebank = memregion("user1")->base();
 	gfx_element *pGfx = m_gfxdecode->gfx(2);
 	const UINT16 *pSource = m_spriteram->buffer();
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 	int transparent_pen;
 
 	if( pGfx->elements() > 0x200 )
@@ -163,7 +163,9 @@ WRITE16_MEMBER(terracre_state::amazon_flipscreen_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data&0x01 );
 		machine().bookkeeping().coin_counter_w(1, (data&0x02)>>1 );
-		m_gfxdecode->flip_screen_set(data & 0x04);
+		m_flip_screen = bool(data & 0x04);
+		m_background->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_foreground->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -185,9 +187,12 @@ void terracre_state::video_start()
 	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(terracre_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
 	m_foreground->set_transparent_pen(0xf);
 
+	m_flip_screen = false;
+
 	/* register for saving */
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
+	save_item(NAME(m_flip_screen));
 }
 
 UINT32 terracre_state::screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

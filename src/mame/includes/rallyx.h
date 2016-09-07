@@ -36,6 +36,7 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
+	bool        m_flip_screen;
 
 	/* misc */
 	int      m_last_bang;
@@ -84,6 +85,7 @@ public:
 	inline void locomotn_get_tile_info(tile_data &tileinfo,int tile_index,int ram_offs);
 	void calculate_star_field(  );
 	void rallyx_video_start_common(  );
+	void flip_screen_set(bool flip);
 	void plot_star( bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, int color );
 	void draw_stars( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );

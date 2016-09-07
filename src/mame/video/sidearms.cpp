@@ -62,8 +62,7 @@ WRITE8_MEMBER(sidearms_state::c804_w)
 	if (m_flipon != (data & 0x80))
 	{
 		m_flipon = data & 0x80;
-		m_gfxdecode->flip_screen_set(m_flipon);
-		m_gfxdecode->mark_all_dirty();
+		m_gfxdecode->set_flip_all(m_flipon ? TILEMAP_FLIPXY : 0);
 	}
 }
 

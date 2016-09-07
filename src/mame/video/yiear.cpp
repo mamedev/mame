@@ -72,10 +72,10 @@ WRITE8_MEMBER(yiear_state::yiear_videoram_w)
 WRITE8_MEMBER(yiear_state::yiear_control_w)
 {
 	/* bit 0 flips screen */
-	if (m_gfxdecode->flip_screen() != (data & 0x01))
+	if (m_flip_screen != (data & 0x01))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x01);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = (data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 
 	/* bit 1 is NMI enable */
@@ -103,6 +103,9 @@ TILE_GET_INFO_MEMBER(yiear_state::get_bg_tile_info)
 void yiear_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(yiear_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -121,7 +124,7 @@ void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		int sy = 240 - spriteram[offs + 1];
 		int sx = spriteram_2[offs];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

@@ -36,7 +36,8 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	    0x01    = Y Scroll MSB
 	*/
 
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/*
 	    I think that the NMI is an inhibitor. It is constantly set
@@ -258,12 +259,15 @@ void battlane_state::machine_start()
 {
 	save_item(NAME(m_video_ctrl));
 	save_item(NAME(m_cpu_control));
+	save_item(NAME(m_flip_screen));
 }
 
 void battlane_state::machine_reset()
 {
 	m_video_ctrl = 0;
 	m_cpu_control = 0;
+	m_flip_screen = false;
+	m_bg_tilemap->set_flip(0);
 }
 
 static MACHINE_CONFIG_START( battlane, battlane_state )

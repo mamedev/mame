@@ -50,6 +50,7 @@ public:
 	UINT8    m_bnj_scroll1;
 	UINT8    m_bnj_scroll2;
 	UINT8    m_btime_tilemap[4];
+	bool     m_flip_screen;
 
 	/* audio-related */
 	UINT8    m_audio_nmi_enable_type;

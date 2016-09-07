@@ -267,7 +267,7 @@ void mcr3_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap
 UINT32 mcr3_state::screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* update the flip state */
-	m_bg_tilemap->set_flip(mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	m_bg_tilemap->set_flip(mcr_cocktail_flip ? TILEMAP_FLIPXY : 0);
 
 	/* draw the background */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

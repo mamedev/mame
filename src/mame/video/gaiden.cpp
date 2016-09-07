@@ -93,6 +93,9 @@ VIDEO_START_MEMBER(gaiden_state,gaiden)
 
 	/* set up sprites */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -112,6 +115,9 @@ VIDEO_START_MEMBER(gaiden_state,raiga)
 
 	/* set up sprites */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(gaiden_state,drgnbowl)
@@ -126,6 +132,9 @@ VIDEO_START_MEMBER(gaiden_state,drgnbowl)
 
 	m_background->set_scrolldx(-248, 248);
 	m_foreground->set_scrolldx(-252, 252);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -139,7 +148,12 @@ VIDEO_START_MEMBER(gaiden_state,drgnbowl)
 WRITE16_MEMBER(gaiden_state::gaiden_flip_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_gfxdecode->flip_screen_set(data & 1);
+	{
+		m_flip_screen = bool(data & 1);
+		m_background->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_foreground->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_text_layer->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 WRITE16_MEMBER(gaiden_state::gaiden_txscrollx_w)
@@ -309,7 +323,7 @@ UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bi
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, m_gfxdecode->flip_screen(),  m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, m_flip_screen,  m_sprite_bitmap);
 	m_background->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 

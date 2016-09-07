@@ -53,6 +53,9 @@ void hexion_state::video_start()
 	m_unkram = m_vram[1] + 0x2000;
 
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -150,6 +153,15 @@ WRITE8_MEMBER(hexion_state::gfxrom_select_w)
 	m_gfxrom_select = data;
 }
 
+void hexion_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_bg_tilemap[0]->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg_tilemap[1]->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
+}
 
 
 /***************************************************************************

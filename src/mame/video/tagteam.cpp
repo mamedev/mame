@@ -116,10 +116,10 @@ WRITE8_MEMBER(tagteam_state::control_w)
 WRITE8_MEMBER(tagteam_state::flipscreen_w)
 {
 	// d0: flip screen
-	if (m_gfxdecode->flip_screen() != (data &0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x01);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 
 	// d6/7: coin counters
@@ -140,7 +140,10 @@ void tagteam_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X,
 			8, 8, 32, 32);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_palettebank));
+	save_item(NAME(m_flip_screen));
 }
 
 void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -159,7 +162,7 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		if (!(m_videoram[offs] & 0x01)) continue;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -177,7 +180,7 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		code = m_videoram[offs + 0x20] + 256 * spritebank;
 		color = m_palettebank;
-		sy += (m_gfxdecode->flip_screen() ? -256 : 256);
+		sy += (m_flip_screen ? -256 : 256);
 
 
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,

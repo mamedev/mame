@@ -53,6 +53,9 @@ void gng_state::video_start()
 	m_fg_tilemap->set_transparent_pen(3);
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x41, 0xbe); /* split type 1 has pens 0 and 6 transparent in front half */
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -90,7 +93,9 @@ WRITE8_MEMBER(gng_state::gng_bgscrolly_w)
 
 WRITE8_MEMBER(gng_state::gng_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(~data & 1);
+	m_flip_screen = bool(~data & 1);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -116,7 +121,7 @@ void gng_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		int flipx = attributes & 0x04;
 		int flipy = attributes & 0x08;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

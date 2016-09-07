@@ -26,6 +26,8 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 
 	/* misc */
+	bool       m_flip_screen_x;
+	bool       m_flip_screen_y;
 	UINT8      m_sound_byte;
 	UINT8      m_nmi_enable;
 

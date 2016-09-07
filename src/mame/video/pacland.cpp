@@ -211,9 +211,12 @@ void pacland_state::video_start()
 
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_scroll0));
 	save_item(NAME(m_scroll1));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -358,7 +361,7 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 UINT32 pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 
 	for (int row = 5; row < 29; row++)
 		m_fg_tilemap->set_scrollx(row, m_scroll0 - (flip ? 7 : 0));

@@ -43,6 +43,7 @@ public:
 	tilemap_t       *m_bg_tilemap;
 	tilemap_t       *m_fg_tilemap;
 	int             m_bg_index[4];
+	bool            m_flip_screen;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

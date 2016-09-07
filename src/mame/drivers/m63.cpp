@@ -159,6 +159,7 @@ public:
 	int      m_pal_bank;
 	int      m_fg_flag;
 	int      m_sy_offset;
+	bool m_flip_screen;
 
 	/* sound-related */
 	UINT8    m_sound_irq;
@@ -181,6 +182,7 @@ public:
 	DECLARE_WRITE8_MEMBER(m63_colorram_w);
 	DECLARE_WRITE8_MEMBER(m63_videoram2_w);
 	DECLARE_WRITE8_MEMBER(m63_palbank_w);
+	void flip_screen_set(bool flip);
 	DECLARE_WRITE8_MEMBER(m63_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(fghtbskt_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(coin_w);
@@ -292,19 +294,25 @@ WRITE8_MEMBER(m63_state::m63_palbank_w)
 	}
 }
 
+void m63_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_fg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+		m_bg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+	}
+}
+
 WRITE8_MEMBER(m63_state::m63_flipscreen_w)
 {
-	if (m_gfxdecode->flip_screen() != (~data & 0x01))
-	{
-		m_gfxdecode->flip_screen_set(~data & 0x01);
-		m_gfxdecode->mark_all_dirty();
-	}
+	flip_screen_set(~data & 0x01);
 }
 
 WRITE8_MEMBER(m63_state::fghtbskt_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data);
-	m_fg_flag = m_gfxdecode->flip_screen() ? TILE_FLIPX : 0;
+	flip_screen_set(data);
+	m_fg_flag = m_flip_screen ? TILE_FLIPX : 0;
 }
 
 
@@ -331,6 +339,9 @@ VIDEO_START_MEMBER(m63_state,m63)
 
 	m_bg_tilemap->set_scroll_cols(32);
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -346,7 +357,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		int sx = m_spriteram[offs + 3];
 		int sy = m_sy_offset - m_spriteram[offs];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = m_sy_offset - sy;

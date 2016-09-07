@@ -98,10 +98,12 @@ TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 void suprloco_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprloco_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-
 	m_bg_tilemap->set_scroll_rows(32);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_control));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -120,7 +122,7 @@ WRITE8_MEMBER(suprloco_state::videoram_w)
 
 WRITE8_MEMBER(suprloco_state::scrollram_w)
 {
-	int adj = m_gfxdecode->flip_screen() ? -8 : 8;
+	int adj = m_flip_screen ? -8 : 8;
 
 	m_scrollram[offset] = data;
 	m_bg_tilemap->set_scrollx(offset, data - adj);
@@ -146,7 +148,8 @@ WRITE8_MEMBER(suprloco_state::control_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_control = data;
 }
@@ -174,7 +177,7 @@ inline void suprloco_state::draw_pixel(bitmap_ind16 &bitmap,const rectangle &cli
 
 void suprloco_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,int spr_number)
 {
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
 	UINT8 *gfx2;
@@ -192,7 +195,7 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 
-	if (!m_gfxdecode->flip_screen())
+	if (!m_flip_screen)
 	{
 		adjy = sy;
 		dy = 1;

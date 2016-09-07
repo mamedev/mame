@@ -49,7 +49,11 @@ WRITE16_MEMBER(legionna_state::tile_scroll_w)
 
 WRITE16_MEMBER(legionna_state::tile_vreg_1a_w)
 {
-	m_gfxdecode->flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_background_layer->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_midground_layer->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_foreground_layer->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_text_layer->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	// TODO: other bits ...
 }
 
@@ -253,6 +257,9 @@ void legionna_state::common_video_start()
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(15);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(legionna_state,legionna)

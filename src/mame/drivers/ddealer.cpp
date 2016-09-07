@@ -279,7 +279,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_back_tilemap->set_scrollx(0, m_flipscreen ? -192 : -64);
-	m_back_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
+	m_back_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* the fg tilemap handling is a little hacky right now,

@@ -51,6 +51,7 @@ public:
 		, m_coleff(0)
 		, m_neg1(false)
 		, m_neg2(false)
+		, m_flip_screen(false)
 		, m_rhsc(0)
 		, m_whsc(0)
 		, m_csound1(0)
@@ -136,6 +137,7 @@ protected:
 	unsigned        m_coleff;           // 2-bit colour effect
 	bool            m_neg1;             // 1-bit area selection
 	bool            m_neg2;             // 1-bit area selection
+	bool            m_flip_screen;      // open collector
 
 	// sound board I/O signals
 	unsigned        m_rhsc;             // 8-bit input from J7

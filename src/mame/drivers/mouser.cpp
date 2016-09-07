@@ -187,12 +187,16 @@ GFXDECODE_END
 
 void mouser_state::machine_start()
 {
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 	save_item(NAME(m_sound_byte));
 	save_item(NAME(m_nmi_enable));
 }
 
 void mouser_state::machine_reset()
 {
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
 	m_sound_byte = 0;
 	m_nmi_enable = 0;
 }

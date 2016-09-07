@@ -27,13 +27,13 @@ UINT32 supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_ind1
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
-	m_gfxdecode->flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->set_flip_all(BIT(flip, 7) ? TILEMAP_FLIPXY : 0);
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(768, cliprect);
 
 	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400, BIT(flip, 7));
 	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

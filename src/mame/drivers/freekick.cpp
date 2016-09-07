@@ -59,9 +59,10 @@ WRITE8_MEMBER(freekick_state::flipscreen_w)
 {
 	/* flip Y/X could be the other way round... */
 	if (offset)
-		m_gfxdecode->flip_screen_y_set(~data & 1);
+		m_flip_screen_y = (~data & 1);
 	else
-		m_gfxdecode->flip_screen_x_set(~data & 1);
+		m_flip_screen_x = (~data & 1);
+	m_freek_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 }
 
 WRITE8_MEMBER(freekick_state::coin_w)

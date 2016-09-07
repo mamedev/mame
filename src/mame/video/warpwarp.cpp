@@ -217,7 +217,7 @@ void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,p
 	{
 		int x,y,i,j;
 
-		if (m_gfxdecode->flip_screen() & 1)
+		if (m_cocktail_flip)
 		{
 			x = 376 - m_ball_h;
 			y = 280 - m_ball_v;

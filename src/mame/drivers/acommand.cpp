@@ -88,6 +88,7 @@ public:
 	UINT16 m_led1;
 	UINT16 m_ufo_sw1;
 	UINT16 m_ufo_sw2;
+	bool m_flip_screen;
 	DECLARE_WRITE16_MEMBER(ac_bgvram_w);
 	DECLARE_WRITE16_MEMBER(ac_txvram_w);
 	DECLARE_WRITE16_MEMBER(ac_bgscroll_w);
@@ -158,12 +159,12 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int xx,yy,x;
 			int delta = 16;
 
-			flipx ^= m_gfxdecode->flip_screen();
-			flipy ^= m_gfxdecode->flip_screen();
+			flipx ^= m_flip_screen;
+			flipy ^= m_flip_screen;
 
 			if ((pri&pri_mask)!=priority) continue;
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;
@@ -202,6 +203,9 @@ void acommand_state::video_start()
 	m_ac_vregs = std::make_unique<UINT16[]>(0x80/2);
 
 	m_tx_tilemap->set_transparent_pen(15);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 

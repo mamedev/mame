@@ -68,6 +68,7 @@ void blktiger_state::video_start()
 	m_bgon = 1;
 	m_objon = 1;
 	m_screen_layout = 0;
+	m_flip_screen = false;
 
 	m_scroll_ram = std::make_unique<UINT8[]>(BGRAM_BANK_SIZE * BGRAM_BANKS);
 
@@ -86,6 +87,7 @@ void blktiger_state::video_start()
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
 	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
 
+	save_item(NAME(m_flip_screen));
 	save_pointer(NAME(m_scroll_ram.get()), BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
@@ -154,7 +156,8 @@ WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 flips screen */
-	m_gfxdecode->flip_screen_set(data & 0x40);
+	m_flip_screen = bool(data & 0x40);
+	m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bit 7 enables characters? Just a guess */
 	m_chon = ~data & 0x80;
@@ -200,7 +203,7 @@ void blktiger_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int color = attr & 0x07;
 		int flipx = attr & 0x08;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -210,7 +213,7 @@ void blktiger_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color,
-				flipx,m_gfxdecode->flip_screen(),
+				flipx, m_flip_screen,
 				sx,sy,15);
 	}
 }

@@ -30,6 +30,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE16_MEMBER(soundcmd_w);
 	DECLARE_WRITE16_MEMBER(fg_vram_w);

@@ -493,16 +493,14 @@ void device_gfx_interface::set_flip_all(UINT32 attributes)
 
 
 //**************************************************************************
-//  GENERIC GFXDECODE DEVICE WITH FLIP SCREEN HANDLING
+//  GFXDECODE DEVICE
 //**************************************************************************
 
 const device_type GFXDECODE = &device_creator<gfxdecode_device>;
 
 gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
-	device_gfx_interface(mconfig, *this),
-	m_flip_screen_x(0),
-	m_flip_screen_y(0)
+	device_gfx_interface(mconfig, *this)
 {
 }
 
@@ -513,91 +511,4 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 
 void gfxdecode_device::device_start()
 {
-	save_item(NAME(m_flip_screen_x));
-	save_item(NAME(m_flip_screen_y));
-}
-
-
-//-------------------------------------------------
-//  updateflip - handle global flipping
-//-------------------------------------------------
-
-void gfxdecode_device::updateflip()
-{
-	// push the flip state to all tilemaps
-	set_flip_all((TILEMAP_FLIPX & m_flip_screen_x) | (TILEMAP_FLIPY & m_flip_screen_y));
-}
-
-
-//-------------------------------------------------
-//  flip_screen_set - set global flip
-//-------------------------------------------------
-
-void gfxdecode_device::flip_screen_set(UINT32 on)
-{
-	// normalize to all 1
-	if (on)
-		on = ~0;
-
-	// if something's changed, handle it
-	if (m_flip_screen_x != on || m_flip_screen_y != on)
-	{
-		m_flip_screen_x = m_flip_screen_y = on;
-		updateflip();
-	}
-}
-
-
-//-------------------------------------------------
-//  flip_screen_set_no_update - set global flip
-//  do not call updateflip.
-//-------------------------------------------------
-
-void gfxdecode_device::flip_screen_set_no_update(UINT32 on)
-{
-	// flip_screen_y is not updated on purpose
-	// this function is for drivers which
-	// were writing to flip_screen_x to
-	// bypass updateflip
-	if (on)
-		on = ~0;
-	m_flip_screen_x = on;
-}
-
-
-//-------------------------------------------------
-//  flip_screen_x_set - set global horizontal flip
-//-------------------------------------------------
-
-void gfxdecode_device::flip_screen_x_set(UINT32 on)
-{
-	// normalize to all 1
-	if (on)
-		on = ~0;
-
-	// if something's changed, handle it
-	if (m_flip_screen_x != on)
-	{
-		m_flip_screen_x = on;
-		updateflip();
-	}
-}
-
-
-//-------------------------------------------------
-//  flip_screen_y_set - set global vertical flip
-//-------------------------------------------------
-
-void gfxdecode_device::flip_screen_y_set(UINT32 on)
-{
-	// normalize to all 1
-	if (on)
-		on = ~0;
-
-	// if something's changed, handle it
-	if (m_flip_screen_y != on)
-	{
-		m_flip_screen_y = on;
-		updateflip();
-	}
 }

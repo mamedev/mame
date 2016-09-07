@@ -53,7 +53,13 @@ WRITE8_MEMBER(finalizr_state::finalizr_flipscreen_w)
 	m_nmi_enable = data & 0x01;
 	m_irq_enable = data & 0x02;
 
-	m_gfxdecode->flip_screen_set(~data & 0x08);
+	bool flip = bool(~data & 0x08);
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 WRITE8_MEMBER(finalizr_state::finalizr_i8039_irq_w)

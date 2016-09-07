@@ -39,6 +39,8 @@ public:
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[4];
 	tilemap_t *m_bg;
 	tilemap_t *m_fg;
+	UINT8 m_hflip;
+	UINT8 m_vflip;
 
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(hflip_w);

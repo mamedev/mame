@@ -86,6 +86,7 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	bool m_flip_screen;
 
 	/* misc */
 	int m_cmd;
@@ -157,10 +158,10 @@ WRITE8_MEMBER(olibochu_state::olibochu_colorram_w)
 
 WRITE8_MEMBER(olibochu_state::olibochu_flipscreen_w)
 {
-	if (m_gfxdecode->flip_screen() != (data & 0x80))
+	if (m_flip_screen != bool(data & 0x80))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x80);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data & 0x80);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 
 	/* other bits are used, but unknown */
@@ -179,6 +180,9 @@ TILE_GET_INFO_MEMBER(olibochu_state::get_bg_tile_info)
 void olibochu_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(olibochu_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -198,7 +202,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int sx = spriteram[offs + 3];
 		int sy = ((spriteram[offs + 2] + 8) & 0xff) - 8;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -224,7 +228,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int sx = spriteram_2[offs + 3];
 		int sy = spriteram_2[offs + 2];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;

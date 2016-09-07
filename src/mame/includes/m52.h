@@ -25,6 +25,8 @@ public:
 	UINT8                m_bg2xpos;
 	UINT8                m_bg2ypos;
 	UINT8                m_bgcontrol;
+	bool m_flip_screen;
+
 	DECLARE_WRITE8_MEMBER(m52_scroll_w);
 	DECLARE_WRITE8_MEMBER(m52_videoram_w);
 	DECLARE_WRITE8_MEMBER(m52_colorram_w);

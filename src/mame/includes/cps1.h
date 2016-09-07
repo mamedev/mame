@@ -181,6 +181,8 @@ public:
 	int          m_pri_ctrl;                /* Sprite layer priorities */
 	int          m_objram_bank;
 
+	bool         m_flip_screen;
+
 	/* misc */
 	int          m_dial[2];     // forgottn
 	int          m_readpaddle;  // pzloop2

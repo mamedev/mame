@@ -95,7 +95,8 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 
-	m_gfxdecode->flip_screen_set(data & 1);
+	m_bg_tilemap->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
 }
 
 READ8_MEMBER(ettrivia_state::ettrivia_question_r)

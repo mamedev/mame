@@ -167,6 +167,11 @@ void lasso_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 VIDEO_START_MEMBER(lasso_state,wwjgtin)
@@ -176,6 +181,11 @@ VIDEO_START_MEMBER(lasso_state,wwjgtin)
 	m_track_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::wwjgtin_get_track_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 64);
 
 	m_bg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 VIDEO_START_MEMBER(lasso_state,pinbo)
@@ -184,6 +194,11 @@ VIDEO_START_MEMBER(lasso_state,pinbo)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::pinbo_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -209,10 +224,10 @@ WRITE8_MEMBER(lasso_state::lasso_colorram_w)
 WRITE8_MEMBER(lasso_state::lasso_flip_screen_w)
 {
 	/* don't know which is which, but they are always set together */
-	m_gfxdecode->flip_screen_x_set(data & 0x01);
-	m_gfxdecode->flip_screen_y_set(data & 0x02);
+	m_flip_screen_x = (data & 0x01);
+	m_flip_screen_y = (data & 0x02);
 
-	m_gfxdecode->set_flip_all((m_gfxdecode->flip_screen_x() ? TILEMAP_FLIPX : 0) | (m_gfxdecode->flip_screen_y() ? TILEMAP_FLIPY : 0));
+	m_gfxdecode->set_flip_all((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 }
 
 
@@ -286,13 +301,13 @@ void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		flipx = source[1] & 0x40;
 		flipy = source[1] & 0x80;
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen_y)
 			flipy = !flipy;
 		else
 			sy = 240 - sy;
@@ -323,7 +338,7 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		UINT8 x;
 		UINT8 y = offs >> 5;
 
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen_y)
 			y = ~y;
 
 		if ((y < cliprect.min_y) || (y > cliprect.max_y))
@@ -332,7 +347,7 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		x = (offs & 0x1f) << 3;
 		data = m_bitmap_ram[offs];
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen_x)
 			x = ~x;
 
 		for (bit = 0; bit < 8; bit++)
@@ -340,7 +355,7 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 			if ((data & 0x80) && (x >= cliprect.min_x) && (x <= cliprect.max_x))
 				bitmap.pix16(y, x) = pen;
 
-			if (m_gfxdecode->flip_screen_x())
+			if (m_flip_screen_x)
 				x = x - 1;
 			else
 				x = x + 1;

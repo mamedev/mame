@@ -30,6 +30,7 @@ public:
 	tilemap_t    *m_fg_tilemap;
 	UINT8      m_scrollx[2];
 	UINT8      m_scrolly[2];
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(gng_coin_counter_w);

@@ -60,12 +60,14 @@ VIDEO_START_MEMBER(flstory_state,flstory)
 	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	m_bg_tilemap->set_scroll_cols(32);
+	m_flip_screen = false;
 
 	m_paletteram.resize(m_palette->entries());
 	m_paletteram_ext.resize(m_palette->entries());
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 1);
 	m_palette->extmem().set(m_paletteram_ext, ENDIANNESS_LITTLE, 1);
 
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_paletteram_ext));
 }
@@ -77,12 +79,14 @@ VIDEO_START_MEMBER(flstory_state,rumba)
 	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	m_bg_tilemap->set_scroll_cols(32);
+	m_flip_screen = false;
 
 	m_paletteram.resize(m_palette->entries());
 	m_paletteram_ext.resize(m_palette->entries());
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 1);
 	m_palette->extmem().set(m_paletteram_ext, ENDIANNESS_LITTLE, 1);
 
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_paletteram_ext));
 }
@@ -91,12 +95,14 @@ VIDEO_START_MEMBER(flstory_state,victnine)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
+	m_flip_screen = false;
 
 	m_paletteram.resize(m_palette->entries());
 	m_paletteram_ext.resize(m_palette->entries());
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 1);
 	m_palette->extmem().set(m_paletteram_ext, ENDIANNESS_LITTLE, 1);
 
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_paletteram_ext));
 }
@@ -127,7 +133,8 @@ WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 {
 	m_gfxctrl = data;
 
-	m_gfxdecode->flip_screen_set(~data & 0x01);
+	m_flip_screen = bool(~data & 0x01);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	if (m_char_bank != ((data & 0x10) >> 4))
 	{
 		m_char_bank = (data & 0x10) >> 4;
@@ -151,7 +158,10 @@ WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 	m_palette_bank = (data & 0x20) >> 5;
 
 	if (data & 0x04)
-		m_gfxdecode->flip_screen_set(data & 0x01);
+	{
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 
 //popmessage("%04x: gfxctrl = %02x\n", space.device().safe_pc(), data);
 
@@ -166,7 +176,7 @@ WRITE8_MEMBER(flstory_state::flstory_scrlram_w)
 
 void flstory_state::flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 
 	for (int i = 0; i < 0x20; i++)
 	{
@@ -223,7 +233,7 @@ UINT32 flstory_state::screen_update_flstory(screen_device &screen, bitmap_ind16 
 
 void flstory_state::victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 
 	for (int i = 0; i < 0x20; i++)
 	{

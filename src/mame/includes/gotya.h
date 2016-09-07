@@ -27,6 +27,7 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	int      m_scroll_bit_8;
+	bool     m_flip_screen;
 
 	/* sound-related */
 	int      m_theme_playing;

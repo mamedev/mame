@@ -46,6 +46,7 @@ public:
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	UINT8 m_mcu_p3_reg;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(nmi_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -64,6 +65,8 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_back);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
+
+	void flip_screen_set(bool flip);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

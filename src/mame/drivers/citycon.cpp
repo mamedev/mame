@@ -19,7 +19,7 @@ Dip locations added from dip listing at crazykong.com
 
 READ8_MEMBER(citycon_state::citycon_in_r)
 {
-	return ioport(m_gfxdecode->flip_screen() ? "P2" : "P1")->read();
+	return ioport(m_cocktail_flip ? "P2" : "P1")->read();
 }
 
 READ8_MEMBER(citycon_state::citycon_irq_ack_r)

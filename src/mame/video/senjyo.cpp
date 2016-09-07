@@ -105,6 +105,9 @@ void senjyo_state::video_start()
 	m_bg2_tilemap->set_transparent_pen(0);
 	m_bg3_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scroll_cols(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 PALETTE_DECODER_MEMBER( senjyo_state, IIBBGGRR )
@@ -157,6 +160,18 @@ WRITE8_MEMBER(senjyo_state::bg3videoram_w)
 	m_bg3_tilemap->mark_tile_dirty(offset);
 }
 
+WRITE8_MEMBER(senjyo_state::flip_screen_w)
+{
+	if (m_flip_screen != bool(data))
+	{
+		m_flip_screen = bool(data);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg1_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg2_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg3_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
+}
+
 /***************************************************************************
 
   Display refresh
@@ -169,7 +184,7 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		bitmap.fill(m_palette->pen_color(0), cliprect);
 	else
 	{
-		int flip = m_gfxdecode->flip_screen();
+		int flip = m_flip_screen;
 
 		int pen = 0;
 		int count = 0;
@@ -207,7 +222,7 @@ void senjyo_state::draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				sx = (8 * (offs % 8) + x) + 256-64;
 				sy = ((offs & 0x1ff) / 8) + 96;
 
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 				{
 					sx = 255 - sx;
 					sy = 255 - sy;
@@ -238,7 +253,7 @@ void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			flipx = m_spriteram[offs+1] & 0x40;
 			flipy = m_spriteram[offs+1] & 0x80;
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -267,7 +282,7 @@ void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 UINT32 senjyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 
 	for (int i = 0;i < 32;i++)
 		m_fg_tilemap->set_scrolly(i, m_fgscroll[i]);

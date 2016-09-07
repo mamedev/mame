@@ -172,6 +172,11 @@ void pitnrun_state::video_start()
 	save_item(NAME(m_scroll));
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_color_select));
+
+	m_hflip = 0;
+	m_vflip = 0;
+	save_item(NAME(m_hflip));
+	save_item(NAME(m_vflip));
 }
 
 void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -188,12 +193,12 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_hflip)
 		{
 			sx = 256 - sx;
 			flipx = !flipx;
 		}
-		if (m_gfxdecode->flip_screen_y())
+		if (m_vflip)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -242,10 +247,10 @@ UINT32 pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		dx=128-m_h_heed+((m_ha&8)<<5)+3;
 		dy=128-m_v_heed+((m_ha&0x10)<<4);
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_hflip)
 			dx=128-dx+16;
 
-		if (m_gfxdecode->flip_screen_y())
+		if (m_vflip)
 			dy=128-dy;
 
 		myclip.set(dx, dx+127, dy, dy+127);
@@ -258,8 +263,7 @@ UINT32 pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	if(m_ha&4)
 		copybitmap_trans(bitmap, *m_tmp_bitmap[m_ha&3],
-			m_gfxdecode->flip_screen_x(),
-			m_gfxdecode->flip_screen_y(),
+			m_hflip, m_vflip,
 			dx, dy, myclip, 1);
 	m_fg->draw(screen, bitmap, cliprect, 0,0);
 	return 0;

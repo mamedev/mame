@@ -179,7 +179,7 @@ void shangkid_state::shangkid_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 UINT32 shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flipscreen = m_videoreg[1]&0x80;
-	m_background->set_flip(flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
+	m_background->set_flip(flipscreen ? TILEMAP_FLIPXY : 0);
 	m_background->set_scrollx(0,m_videoreg[0]-40 );
 	m_background->set_scrolly(0,m_videoreg[2]+0x10 );
 

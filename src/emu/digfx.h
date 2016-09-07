@@ -246,25 +246,9 @@ public:
 	// construction/destruction
 	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// generic flip screen handling
-	void flip_screen_set(UINT32 on);
-	void flip_screen_set_no_update(UINT32 on);
-	void flip_screen_x_set(UINT32 on);
-	void flip_screen_y_set(UINT32 on);
-	UINT32 flip_screen() const { return m_flip_screen_x; }
-	UINT32 flip_screen_x() const { return m_flip_screen_x; }
-	UINT32 flip_screen_y() const { return m_flip_screen_y; }
-
 protected:
+	// required override
 	virtual void device_start() override;
-
-private:
-	// helpers
-	void updateflip();
-
-	// internal state
-	UINT8                   m_flip_screen_x;
-	UINT8                   m_flip_screen_y;
 };
 
 

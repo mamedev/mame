@@ -26,7 +26,8 @@ XTAL        :   18.432 MHz
 
 void clshroad_state::machine_reset()
 {
-	m_gfxdecode->flip_screen_set(0);
+	m_flip_screen = 0;
+	m_gfxdecode->set_flip_all(0);
 }
 
 

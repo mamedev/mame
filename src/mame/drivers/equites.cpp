@@ -1094,6 +1094,7 @@ void equites_state::machine_start()
 	// zerofill
 	m_fg_char_bank = 0;
 	m_bgcolor = 0;
+	m_flip_screen = false;
 	m_splndrbt_bg_scrollx = 0;
 	m_splndrbt_bg_scrolly = 0;
 	m_sound_prom_address = 0;
@@ -1112,6 +1113,7 @@ void equites_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_fg_char_bank));
 	save_item(NAME(m_bgcolor));
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_splndrbt_bg_scrollx));
 	save_item(NAME(m_splndrbt_bg_scrolly));
 	save_item(NAME(m_sound_prom_address));
@@ -1135,7 +1137,7 @@ void equites_state::machine_start()
 
 void equites_state::machine_reset()
 {
-	m_gfxdecode->flip_screen_set(0);
+	flip_screen_set(false);
 }
 
 

@@ -36,6 +36,7 @@ public:
 	UINT8 m_gfx_rom_readback;
 	int m_background_color;
 	int m_background_disable;
+	bool m_flip_screen;
 
 	tilemap_t *m_back_tilemap;
 	tilemap_t *m_fix_tilemap;

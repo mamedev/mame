@@ -25,6 +25,7 @@ public:
 	UINT32 m_leds_shiftreg;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_DRIVER_INIT(speedbal);
 	DECLARE_DRIVER_INIT(musicbal);
@@ -41,7 +42,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-
+	void flip_screen_set(bool flip);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

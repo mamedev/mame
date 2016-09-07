@@ -36,7 +36,12 @@ WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
 		m_gfxdecode->mark_all_dirty();
 	}
 
-	m_gfxdecode->flip_screen_set(data & 0x20);
+	if (m_flip_screen != ((data & 0x20) >> 5))
+	{
+		m_flip_screen = (data & 0x20) >> 5;
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 

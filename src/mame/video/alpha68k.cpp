@@ -107,7 +107,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap_i
 		m_gfxdecode->mark_all_dirty();
 
 	m_last_bank = m_bank_base;
-	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	bitmap.fill(2047, cliprect);
 //AT
@@ -252,7 +252,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_in
 		m_gfxdecode->mark_all_dirty();
 
 	m_last_bank = m_bank_base;
-	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	bitmap.fill(4095, cliprect);
 
@@ -290,7 +290,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap
 		m_gfxdecode->mark_all_dirty();
 
 	m_last_bank = m_bank_base;
-	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	bitmap.fill(4095, cliprect);
 

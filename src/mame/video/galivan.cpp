@@ -180,6 +180,9 @@ VIDEO_START_MEMBER(galivan_state,galivan)
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(galivan_state,ninjemak)
@@ -188,6 +191,9 @@ VIDEO_START_MEMBER(galivan_state,ninjemak)
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -212,7 +218,9 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* bit 2 flip screen */
-	m_gfxdecode->flip_screen_set(data & 0x04);
+	m_flip_screen = bool(data & 0x04);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bit 7 selects one of two ROM banks for c000-dfff */
 	membank("bank1")->set_entry((data & 0x80) >> 7);
@@ -227,7 +235,9 @@ WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
 	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* bit 2 flip screen */
-	m_gfxdecode->flip_screen_set(data & 0x04);
+	m_flip_screen = bool(data & 0x04);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bit 3 unknown */
 
@@ -290,7 +300,7 @@ void galivan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	const UINT8 *spritepalettebank = memregion("user1")->base();
 	UINT8 *buffered_spriteram = m_spriteram->buffer();
 	int length = m_spriteram->bytes();
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	/* draw the sprites */

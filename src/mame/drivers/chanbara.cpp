@@ -81,6 +81,7 @@ public:
 	tilemap_t  *m_bg2_tilemap;
 	UINT8    m_scroll;
 	UINT8    m_scrollhi;
+	bool m_flip_screen;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -168,6 +169,9 @@ void chanbara_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chanbara_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,8, 8, 32, 32);
 	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chanbara_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,16, 16, 16, 32);
 	m_bg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -364,7 +368,10 @@ WRITE8_MEMBER(chanbara_state::chanbara_ay_out_1_w)
 
 	m_scrollhi = data & 0x01;
 
-	m_gfxdecode->flip_screen_set(data & 0x02);
+	// flip screen
+	m_flip_screen = bool(data & 0x02);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg2_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	membank("bank1")->set_entry((data & 0x04) >> 2);
 

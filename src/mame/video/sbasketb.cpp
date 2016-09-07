@@ -108,10 +108,10 @@ WRITE8_MEMBER(sbasketb_state::sbasketb_colorram_w)
 
 WRITE8_MEMBER(sbasketb_state::sbasketb_flipscreen_w)
 {
-	if (m_gfxdecode->flip_screen() != data)
+	if (m_flip_screen != bool(data))
 	{
-		m_gfxdecode->flip_screen_set(data);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -128,6 +128,9 @@ void sbasketb_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbasketb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -148,7 +151,7 @@ void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			int flipx =  spriteram[offs + 1] & 0x40;
 			int flipy =  spriteram[offs + 1] & 0x80;
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

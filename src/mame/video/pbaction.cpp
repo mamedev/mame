@@ -38,7 +38,7 @@ WRITE8_MEMBER(pbaction_state::pbaction_colorram2_w)
 WRITE8_MEMBER(pbaction_state::pbaction_scroll_w)
 {
 	m_scroll = data - 3;
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 		m_scroll = -m_scroll;
 
 	m_bg_tilemap->set_scrollx(0, m_scroll);
@@ -47,7 +47,9 @@ WRITE8_MEMBER(pbaction_state::pbaction_scroll_w)
 
 WRITE8_MEMBER(pbaction_state::pbaction_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	m_flip_screen = bool(data & 0x01);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 TILE_GET_INFO_MEMBER(pbaction_state::get_bg_tile_info)
@@ -76,6 +78,9 @@ void pbaction_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pbaction_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void pbaction_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -101,7 +106,7 @@ void pbaction_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		flipx = spriteram[offs + 1] & 0x40;
 		flipy = spriteram[offs + 1] & 0x80;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			if (spriteram[offs] & 0x80)
 			{
@@ -121,7 +126,7 @@ void pbaction_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				spriteram[offs],
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,
-				sx + (m_gfxdecode->flip_screen() ? m_scroll : -m_scroll), sy,0);
+				sx + (m_flip_screen ? m_scroll : -m_scroll), sy,0);
 	}
 }
 

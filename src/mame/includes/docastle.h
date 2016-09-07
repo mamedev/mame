@@ -43,6 +43,7 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_do_tilemap;
+	bool        m_flip_screen;
 
 	/* misc */
 	int      m_prev_ma6;

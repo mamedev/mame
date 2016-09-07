@@ -35,6 +35,7 @@ public:
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fg_tilemap;
 	UINT16      m_char_bank;
+	bool m_flip_screen;
 
 	/* misc */
 	int         m_prot_toggle;

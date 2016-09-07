@@ -40,6 +40,7 @@ public:
 	int         m_palette_bank;
 	int         m_controller;
 	int         m_hit;
+	bool        m_flip_screen;
 
 	/* sound-related */
 	int         m_sound_nmi_enable;

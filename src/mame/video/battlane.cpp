@@ -175,7 +175,7 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = attr & 0x04;
 			flipy = attr & 0x02;
 
-			if (!m_gfxdecode->flip_screen())
+			if (!m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -217,7 +217,7 @@ void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
 
 			if (data)
 			{
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 					bitmap.pix16(255 - y, 255 - x) = data;
 				else
 					bitmap.pix16(y, x) = data;

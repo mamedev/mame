@@ -157,8 +157,8 @@ WRITE8_MEMBER( k007342_device::vreg_w )
 			/* bit 1: INT control */
 			m_int_enabled = data & 0x02;
 			m_flipscreen = data & 0x10;
-			m_tilemap[0]->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[1]->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_tilemap[0]->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+			m_tilemap[1]->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 			break;
 		case 0x01:  /* used for banking in Rock'n'Rage */
 			if (data != m_regs[1])

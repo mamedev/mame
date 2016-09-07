@@ -126,7 +126,8 @@ WRITE8_MEMBER(bking_state::bking_cont1_w)
 
 	machine().bookkeeping().coin_lockout_global_w(~data & 0x01);
 
-	m_gfxdecode->flip_screen_set(data & 0x04);
+	m_flip_screen = bool(data & 0x04);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_controller = data & 0x02;
 
@@ -223,6 +224,9 @@ void bking_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bking_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_screen->register_screen_bitmap(m_colmap_bg);
 	m_screen->register_screen_bitmap(m_colmap_ball);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -287,8 +291,8 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 		else
 			return;
 
-		m_bg_tilemap->set_scrollx(0, m_gfxdecode->flip_screen() ? -xld : xld);
-		m_bg_tilemap->set_scrolly(0, m_gfxdecode->flip_screen() ? -yld : yld);
+		m_bg_tilemap->set_scrollx(0, m_flip_screen ? -xld : xld);
+		m_bg_tilemap->set_scrolly(0, m_flip_screen ? -yld : yld);
 
 		m_bg_tilemap->draw(screen, m_colmap_bg, rect, 0, 0);
 
@@ -310,8 +314,8 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 					int col = (xld + x) / 8 + 1;
 					int row = (yld + y) / 8 + 0;
 
-					latch |= (m_gfxdecode->flip_screen() ? 31 - col : col) << 0;
-					latch |= (m_gfxdecode->flip_screen() ? 31 - row : row) << 5;
+					latch |= (m_flip_screen ? 31 - col : col) << 0;
+					latch |= (m_flip_screen ? 31 - row : row) << 5;
 
 					m_pc3259_output[0] = (latch >> 0x0) & 0xf;
 					m_pc3259_output[1] = (latch >> 0x4) & 0xf;

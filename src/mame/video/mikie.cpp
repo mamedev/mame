@@ -110,10 +110,10 @@ WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
 
 WRITE8_MEMBER(mikie_state::mikie_flipscreen_w)
 {
-	if (m_gfxdecode->flip_screen() != (data & 0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x01);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -135,6 +135,9 @@ TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
 void mikie_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mikie_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -152,7 +155,7 @@ void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int flipx = ~spriteram[offs] & 0x10;
 		int flipy = spriteram[offs] & 0x20;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 242 - sy;
 			flipy = !flipy;

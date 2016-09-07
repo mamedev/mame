@@ -248,7 +248,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 
 		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
 
-		m_gfxdecode->set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_gfxdecode->set_flip_all(m_cocktail_mode ? TILEMAP_FLIPXY : 0);
 		m_gfxdecode->mark_all_dirty();
 	}
 
@@ -271,7 +271,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 
 		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
 
-		m_gfxdecode->set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_gfxdecode->set_flip_all(m_cocktail_mode ? TILEMAP_FLIPXY : 0);
 		m_gfxdecode->mark_all_dirty();
 	}
 

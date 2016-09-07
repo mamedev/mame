@@ -184,10 +184,10 @@ UINT32 boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb3
 	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* Draw sprite planes to bitmaps for later mixing */
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, BIT(flip, 7));
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, BIT(flip, 7));
 
-	m_gfxdecode->flip_screen_set(BIT(flip, 7));
+	m_gfxdecode->set_flip_all(BIT(flip, 7) ? TILEMAP_FLIPXY : 0);
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 

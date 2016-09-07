@@ -109,7 +109,11 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_w)
 	m_tilemap_0->mark_all_dirty();
 	m_tilemap_0_16x16->mark_all_dirty();
 
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	if (m_flip_screen != bool(data & 0x80))
+	{
+		m_flip_screen = bool(data & 0x80);
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
@@ -118,7 +122,11 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
 	m_tilemap0_color = 2;
 	m_tilemap1_color = 1;
 
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	if (m_flip_screen != bool(data & 0x80))
+	{
+		m_flip_screen = bool(data & 0x80);
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 
@@ -149,6 +157,9 @@ void esd16_state::video_start()
 
 	m_tilemap_1->set_transparent_pen(0x00);
 	m_tilemap_1_16x16->set_transparent_pen(0x00);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -215,7 +226,8 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 	}
 
-	if (layers_ctrl & 4) m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	if (layers_ctrl & 4)
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400, m_flip_screen);
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
 	return 0;

@@ -151,7 +151,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	if (m_flipscreen != (data & 0x04))
 	{
 		m_flipscreen = data & 0x04;
-		m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 	}
 
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
@@ -189,7 +189,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	if (m_flipscreen != (data & 0x04))
 	{
 		m_flipscreen = data & 0x04;
-		m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 	}
 
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
@@ -223,7 +223,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	if (m_flipscreen != (data & 0x04))
 	{
 		m_flipscreen = data & 0x04;
-		m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 	}
 
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */

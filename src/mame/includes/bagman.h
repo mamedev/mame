@@ -43,6 +43,7 @@ public:
 	UINT8 m_outvalue[8];
 
 	tilemap_t *m_bg_tilemap;
+	bool m_flip_screen;
 
 	// common
 	DECLARE_WRITE8_MEMBER(coincounter_w);

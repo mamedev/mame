@@ -50,6 +50,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_gfx_bank;
 	UINT8 m_palette_bank;
+	bool m_flip_screen;
 
 	// handlers
 	DECLARE_WRITE8_MEMBER(irq_enable_w);

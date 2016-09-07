@@ -74,7 +74,7 @@ UINT32 bublbobl_state::screen_update_bublbobl(screen_device &screen, bitmap_ind1
 				x = sx + xc * 8;
 				y = (sy + yc * 8) & 0xff;
 
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 				{
 					x = 248 - x;
 					y = 248 - y;

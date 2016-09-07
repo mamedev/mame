@@ -39,6 +39,8 @@ public:
 	tilemap_t  *m_bg_tilemap;
 	UINT8    m_gfxbank;
 	UINT8    m_palettebank;
+	bool     m_flip_screen_x;
+	bool     m_flip_screen_y;
 
 	/* input-related */
 	UINT8    m_paddle_select;   // selected by d008 bit 2

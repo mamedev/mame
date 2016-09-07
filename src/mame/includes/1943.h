@@ -41,6 +41,7 @@ public:
 	int     m_obj_on;
 	int     m_bg1_on;
 	int     m_bg2_on;
+	bool    m_flip_screen;
 
 	/* protection */
 	UINT8   m_prot_value;

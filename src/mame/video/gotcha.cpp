@@ -104,6 +104,6 @@ UINT32 gotcha_state::screen_update_gotcha(screen_device &screen, bitmap_ind16 &b
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400, false);
 	return 0;
 }

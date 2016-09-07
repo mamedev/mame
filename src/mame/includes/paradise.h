@@ -45,6 +45,7 @@ public:
 	UINT8 m_pixbank;
 	int m_sprite_inc;
 	int m_irq_count;
+	bool m_flip_screen;
 
 	// common
 	DECLARE_WRITE8_MEMBER(rombank_w);

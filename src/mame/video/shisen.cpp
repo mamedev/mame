@@ -62,8 +62,7 @@ UINT32 shisen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	// on Irem boards, screen flip is handled in both hardware and software.
 	// this game doesn't have cocktail mode so if there's software control we don't
 	// know where it is mapped.
-	m_gfxdecode->flip_screen_set(~ioport("DSW2")->read() & 1);
-
+	m_bg_tilemap->set_flip((~ioport("DSW2")->read() & 1) ? TILEMAP_FLIPXY : 0);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

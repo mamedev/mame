@@ -82,6 +82,9 @@ void lwings_state::video_start()
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(3);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(lwings_state,trojan)
@@ -96,6 +99,9 @@ VIDEO_START_MEMBER(lwings_state,trojan)
 
 	m_bg2_avenger_hw = 0;
 	m_spr_avenger_hw = 0;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(lwings_state,avengers)
@@ -158,6 +164,15 @@ WRITE8_MEMBER(lwings_state::trojan_bg2_image_w)
 	}
 }
 
+void lwings_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_gfxdecode->set_flip_all(flip ? TILEMAP_FLIPXY : 0);
+	}
+}
+
 
 /***************************************************************************
 
@@ -195,7 +210,7 @@ void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 			flipx = buffered_spriteram[offs + 1] & 0x02;
 			flipy = buffered_spriteram[offs + 1] & 0x04;
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -243,7 +258,7 @@ void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				flipy = 1;
 			}
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

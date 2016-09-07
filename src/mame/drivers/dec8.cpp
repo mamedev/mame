@@ -463,7 +463,7 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 
 	if ((data&1)==0) m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_nmi_enable = (data & 2) >> 1;
-	m_gfxdecode->flip_screen_set(data & 0x08);
+	flip_screen_set(data & 0x08);
 }
 
 WRITE8_MEMBER(dec8_state::csilver_control_w)
@@ -556,7 +556,7 @@ WRITE8_MEMBER(dec8_state::shackled_int_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::flip_screen_w){ m_gfxdecode->flip_screen_set(data); }
+WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(data); }
 
 /******************************************************************************/
 

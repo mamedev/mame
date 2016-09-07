@@ -127,7 +127,7 @@ WRITE8_MEMBER(taitol_state::taitol_control_w)
 
 	/* bit 4 flip screen */
 	m_flipscreen = data & 0x10;
-	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	/* bit 5 display enable - handled in vh_screenrefresh() */
 }

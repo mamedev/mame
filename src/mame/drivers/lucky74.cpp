@@ -829,7 +829,7 @@ WRITE8_MEMBER(lucky74_state::ym2149_portb_w)
     bit 0 contains the screen orientation.
 */
 	m_ym2149_portb = data;
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	m_gfxdecode->set_flip_all((data & 0x01) ? TILEMAP_FLIPXY : 0);
 }
 
 READ8_MEMBER(lucky74_state::usart_8251_r)

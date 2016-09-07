@@ -41,7 +41,9 @@ WRITE8_MEMBER( zodiack_state::attributes_w )
 
 WRITE8_MEMBER( zodiack_state::flipscreen_w )
 {
-	m_gfxdecode->flip_screen_set(~data & 1);
+	m_flip_screen = bool(~data & 1);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 PALETTE_INIT_MEMBER(zodiack_state,zodiack)
@@ -116,6 +118,9 @@ void zodiack_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scroll_cols(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void zodiack_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -125,7 +130,7 @@ void zodiack_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = m_bulletsram[offs + 3] + 7;
 		int sy = m_bulletsram[offs + 1];
 
-		if (!(m_gfxdecode->flip_screen() && m_percuss_hardware))
+		if (!(m_flip_screen && m_percuss_hardware))
 			sy = 255 - sy;
 
 		m_gfxdecode->gfx(2)->transpen(
@@ -148,7 +153,7 @@ void zodiack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipy = m_spriteram[offs + 1] & 0x80;
 		int spritecode = m_spriteram[offs + 1] & 0x3f;
 
-		if (m_gfxdecode->flip_screen() && m_percuss_hardware)
+		if (m_flip_screen && m_percuss_hardware)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

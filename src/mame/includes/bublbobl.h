@@ -32,6 +32,7 @@ public:
 
 	/* video-related */
 	int      m_video_enable;
+	bool     m_flip_screen;
 
 	/* sound-related */
 	int      m_sound_nmi_enable;

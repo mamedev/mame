@@ -29,6 +29,9 @@ TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 void mjkjidai_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mjkjidai_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -53,7 +56,8 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 	m_nmi_enable = data & 1;
 
 	/* bit 1 = flip screen */
-	m_gfxdecode->flip_screen_set(data & 0x02);
+	m_flip_screen = bool(data & 0x02);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bit 2 =display enable */
 	m_display_enable = data & 0x04;
@@ -93,7 +97,7 @@ void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		sx += (spriteram_2[offs] & 0x20) >> 5;  // not sure about this
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

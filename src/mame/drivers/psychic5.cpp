@@ -341,6 +341,7 @@ MACHINE_START_MEMBER(psychic5_state, psychic5)
 	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_bank_latch));
+	save_item(NAME(m_flip_screen));
 }
 
 MACHINE_START_MEMBER(psychic5_state, bombsa)
@@ -348,12 +349,13 @@ MACHINE_START_MEMBER(psychic5_state, bombsa)
 	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_bank_latch));
+	save_item(NAME(m_flip_screen));
 }
 
 void psychic5_state::machine_reset()
 {
 	m_bank_latch = 0xff;
-	m_gfxdecode->flip_screen_set(0);
+	flip_screen_set(false);
 }
 
 /***************************************************************************
@@ -411,18 +413,14 @@ WRITE8_MEMBER(psychic5_state::psychic5_coin_counter_w)
 
 	// bit 7 toggles flip screen
 	if (data & 0x80)
-	{
-		m_gfxdecode->flip_screen_set(!m_gfxdecode->flip_screen());
-	}
+		flip_screen_set(!m_flip_screen);
 }
 
 WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 {
 	// bit 7 toggles flip screen
 	if (data & 0x80)
-	{
-		m_gfxdecode->flip_screen_set(!m_gfxdecode->flip_screen());
-	}
+		flip_screen_set(!m_flip_screen);
 }
 
 

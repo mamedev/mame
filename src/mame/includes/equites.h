@@ -48,6 +48,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int       m_fg_char_bank;
 	UINT8     m_bgcolor;
+	bool      m_flip_screen;
 	UINT16    m_splndrbt_bg_scrollx;
 	UINT16    m_splndrbt_bg_scrolly;
 
@@ -100,6 +101,7 @@ public:
 	DECLARE_WRITE16_MEMBER(splndrbt_selchar_w);
 	DECLARE_WRITE16_MEMBER(equites_flipw_w);
 	DECLARE_WRITE8_MEMBER(equites_flipb_w);
+	void flip_screen_set(bool flip);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);

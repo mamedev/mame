@@ -70,6 +70,9 @@ void vastar_state::video_start()
 
 	m_bg1_tilemap->set_scroll_cols(32);
 	m_bg2_tilemap->set_scroll_cols(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -95,6 +98,17 @@ WRITE8_MEMBER(vastar_state::bg2videoram_w)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+WRITE8_MEMBER(vastar_state::flip_screen_w)
+{
+	if (m_flip_screen != bool(data))
+	{
+		m_flip_screen = bool(data);
+		m_bg1_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg2_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 
@@ -126,7 +140,7 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		int flipx = m_spriteram3[offs] & 0x02;
 		int flipy = m_spriteram3[offs] & 0x01;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -134,7 +148,7 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		if (m_spriteram2[offs] & 0x08)   /* double width */
 		{
-			if (!m_gfxdecode->flip_screen())
+			if (!m_flip_screen)
 				sy = 224 - sy;
 
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
@@ -151,7 +165,7 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		}
 		else
 		{
-			if (!m_gfxdecode->flip_screen())
+			if (!m_flip_screen)
 				sy = 240 - sy;
 
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,

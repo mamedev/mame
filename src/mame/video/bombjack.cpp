@@ -34,10 +34,11 @@ WRITE8_MEMBER(bombjack_state::bombjack_background_w)
 
 WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
 {
-	if (m_gfxdecode->flip_screen() != (data & 0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x01);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -68,6 +69,9 @@ void bombjack_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bombjack_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void bombjack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -102,7 +106,7 @@ void bombjack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		flipx = m_spriteram[offs + 1] & 0x40;
 		flipy = m_spriteram[offs + 1] & 0x80;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			if (m_spriteram[offs + 1] & 0x20)
 			{

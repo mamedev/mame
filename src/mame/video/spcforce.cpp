@@ -14,14 +14,14 @@
 
 WRITE8_MEMBER(spcforce_state::flip_screen_w)
 {
-	m_gfxdecode->flip_screen_set(~data & 0x01);
+	m_flip_screen = bool(~data & 0x01);
 }
 
 
 UINT32 spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 
 	/* draw the characters as sprites because they could be overlapping */
 	bitmap.fill(0, cliprect);

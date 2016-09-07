@@ -49,6 +49,16 @@ PALETTE_INIT_MEMBER(ambush_state, ambush)
 	}
 }
 
+void ambush_state::video_start()
+{
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
+}
+
+WRITE8_MEMBER(ambush_state::flip_screen_w)
+{
+	m_flip_screen = (data != 0);
+}
 
 void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
@@ -73,7 +83,7 @@ void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		code = m_videoram[offs] | ((col & 0x60) << 3);
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 31 - sx;
 			sy = 31 - sy;
@@ -83,8 +93,7 @@ void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 			code,
 			(col & 0x0f) | ((*m_colorbank & 0x03) << 4),
-			m_gfxdecode->flip_screen(),
-			m_gfxdecode->flip_screen(),
+			m_flip_screen, m_flip_screen,
 			8 * sx, (8 * sy + scroll) & 0xff, transpen);
 	}
 }
@@ -121,7 +130,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 			/* 16x16 sprites */
 			gfx = 1;
 
-			if (!m_gfxdecode->flip_screen())
+			if (!m_flip_screen)
 				sy = 240 - sy;
 			else
 				sx = 240 - sx;
@@ -132,7 +141,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 			gfx = 0;
 			code <<= 2;
 
-			if (!m_gfxdecode->flip_screen())
+			if (!m_flip_screen)
 				sy = 248 - sy;
 			else
 				sx = 248 - sx;
@@ -142,7 +151,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 		flipx = m_spriteram[offs + 1] & 0x40;
 		flipy = m_spriteram[offs + 1] & 0x80;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			flipx = !flipx;
 			flipy = !flipy;

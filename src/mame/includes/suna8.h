@@ -62,6 +62,8 @@ public:
 	UINT8 m_remap_sound;
 	UINT8* m_decrypt;
 
+	bool m_flip_screen;
+
 	enum GFXBANK_TYPE_T
 	{
 		GFXBANK_TYPE_SPARKMAN,
@@ -160,6 +162,8 @@ public:
 	DECLARE_VIDEO_START(suna8_sparkman);
 	DECLARE_VIDEO_START(suna8_brickzn);
 	DECLARE_VIDEO_START(suna8_starfigh);
+
+	void flip_screen_set(bool flip);
 
 	DECLARE_MACHINE_RESET(brickzn);
 	DECLARE_MACHINE_RESET(hardhea2);

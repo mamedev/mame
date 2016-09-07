@@ -114,9 +114,9 @@ TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 	   characters when screen is flipped, we have to flip them back. */
 	UINT8 color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
 	SET_TILE_INFO_MEMBER(0,
-			m_xevious_fg_videoram[tile_index] | (m_gfxdecode->flip_screen() ? 0x100 : 0),
+			m_xevious_fg_videoram[tile_index] | (m_flip_screen ? 0x100 : 0),
 			color,
-			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (m_gfxdecode->flip_screen() ? TILE_FLIPX : 0));
+			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (m_flip_screen ? TILE_FLIPX : 0));
 }
 
 TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
@@ -150,8 +150,10 @@ VIDEO_START_MEMBER(xevious_state,xevious)
 	m_fg_tilemap->set_transparent_pen(0);
 	m_xevious_bs[0] = 0;
 	m_xevious_bs[1] = 0;
+	m_flip_screen = false;
 
 	save_item(NAME(m_xevious_bs));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -208,7 +210,9 @@ WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
 		m_fg_tilemap->set_scrolly(0,scroll);
 		break;
 	case 7:
-		m_gfxdecode->flip_screen_set(scroll & 1);
+		m_flip_screen = bool(scroll & 1);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 		break;
 	default:
 			logerror("CRTC WRITE REG: %x  Data: %03x\n",reg, scroll);
@@ -353,7 +357,7 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			sx = spriteram_2[offs + 1] - 40 + 0x100*(spriteram_3[offs + 1] & 1);
 			sy = 28*8-spriteram_2[offs]-1;
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				flipx = !flipx;
 				flipy = !flipy;

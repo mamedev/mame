@@ -44,6 +44,9 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_web_tilemap;
 
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
+
 	DECLARE_READ8_MEMBER(fastfred_custom_io_r);
 	DECLARE_READ8_MEMBER(flyboy_custom1_io_r);
 	DECLARE_READ8_MEMBER(flyboy_custom2_io_r);

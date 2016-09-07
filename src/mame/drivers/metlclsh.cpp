@@ -100,7 +100,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi2)
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 1);
+	flip_screen_set(data & 1);
 }
 
 static ADDRESS_MAP_START( metlclsh_slave_map, AS_PROGRAM, 8, metlclsh_state )
@@ -264,7 +264,7 @@ void metlclsh_state::machine_start()
 
 void metlclsh_state::machine_reset()
 {
-	m_gfxdecode->flip_screen_set(0);
+	flip_screen_set(0);
 
 	m_write_mask = 0;
 	m_gfxbank = 0;

@@ -27,13 +27,14 @@ WRITE8_MEMBER(jack_state::jack_colorram_w)
 
 READ8_MEMBER(jack_state::jack_flipscreen_r)
 {
-	m_gfxdecode->flip_screen_set(offset);
+	jack_flipscreen_w(space, offset, 0);
 	return 0;
 }
 
 WRITE8_MEMBER(jack_state::jack_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(offset);
+	m_flip_screen = bool(offset);
+	m_bg_tilemap->set_flip(offset ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -58,6 +59,9 @@ TILEMAP_MAPPER_MEMBER(jack_state::tilemap_scan_cols_flipy)
 void jack_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jack_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),this), 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -77,7 +81,7 @@ void jack_state::jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipr
 		int flipx = (spriteram[offs + 3] & 0x80) >> 7;
 		int flipy = (spriteram[offs + 3] & 0x40) >> 6;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -197,7 +201,7 @@ void jack_state::joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 		int flipx = (spriteram[offs + 3] & 0x80) >> 7;
 		int flipy = (spriteram[offs + 3] & 0x40) >> 6;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;

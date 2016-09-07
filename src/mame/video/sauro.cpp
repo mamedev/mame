@@ -73,10 +73,21 @@ WRITE8_MEMBER(sauro_state::sauro_palette_bank_w)
 
 WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
 {
-	const int *map = (m_gfxdecode->flip_screen() ? scroll2_map_flip : scroll2_map);
+	const int *map = (m_flip_screen ? scroll2_map_flip : scroll2_map);
 	int scroll = (data & 0xf8) | map[data & 7];
 
 	m_fg_tilemap->set_scrollx(0, scroll);
+}
+
+WRITE8_MEMBER(sauro_state::flip_screen_w)
+{
+	if (m_flip_screen != bool(data))
+	{
+		m_flip_screen = bool(data);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		if (m_fg_tilemap != nullptr)
+			m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 VIDEO_START_MEMBER(sauro_state,sauro)
@@ -89,15 +100,17 @@ VIDEO_START_MEMBER(sauro_state,sauro)
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_palette_bank = 0;
+	m_flip_screen = false;
 
 	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
 	int offs,code,sx,sy,color,flipx;
-	int flipy = m_gfxdecode->flip_screen();
+	int flipy = m_flip_screen;
 
 	for (offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
 	{
@@ -154,13 +167,17 @@ VIDEO_START_MEMBER(sauro_state,trckydoc)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);
+	m_fg_tilemap = nullptr;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void sauro_state::trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
 	int offs,code,sy,color,flipx,sx;
-	int flipy = m_gfxdecode->flip_screen();
+	int flipy = m_flip_screen;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
 	for (offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)

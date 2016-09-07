@@ -72,7 +72,11 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(~data & 0x02);
+	if (m_flip_screen != bool(~(data & 0x02) >> 1))
+	{
+		m_flip_screen = bool(~(data & 0x02) >> 1);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 
 	if (m_gfx_bank != ((data & 0x04) >> 2))
 	{
@@ -90,13 +94,13 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 
 	// It looks like the upper bank attribute bit (at least) comes from the previous tile read.
 	// Obviously if the screen is flipped the previous tile the hardware would read is different
-	// to the previous tile when it's not flipped hence the if (flip_screen()) logic
+	// to the previous tile when it's not flipped hence the if (m_flip_screen) logic
 	//
 	// note, one line still ends up darkened in the cocktail mode of grasspin, but on the real
 	// hardware there was no observable brightness difference between any part of the screen so
 	// I'm not convinced the brightness implementation is correct anyway, it might simply be
 	// tied to the use of upper / lower tiles or priority instead?
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 	{
 		bank = m_colorram[(tile_index+32)&0x3ff] & 0x40;
 	}
@@ -122,7 +126,10 @@ VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -138,7 +145,7 @@ void blueprnt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int flipx = m_spriteram[offs + 2] & 0x40;
 		int flipy = m_spriteram[offs + 2 - 4] & 0x80;    // -4? Awkward, isn't it?
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 248 - sx;
 			sy = 240 - sy;
@@ -155,7 +162,7 @@ UINT32 blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind1
 {
 	int i;
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 		for (i = 0; i < 32; i++)
 			m_bg_tilemap->set_scrolly(i, m_scrollram[32 - i]);
 	else

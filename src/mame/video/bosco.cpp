@@ -138,8 +138,11 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 	m_bosco_radarx = m_videoram + 0x03f0;
 	m_bosco_radary = m_bosco_radarx + 0x0800;
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_stars_scrollx));
 	save_item(NAME(m_stars_scrolly));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -171,6 +174,15 @@ WRITE8_MEMBER( bosco_state::bosco_scrolly_w )
 
 WRITE8_MEMBER( bosco_state::bosco_starclr_w )
 {
+}
+
+WRITE8_MEMBER(bosco_state::bosco_flip_screen_w)
+{
+	if (m_flip_screen != bool(~data & 1))
+	{
+		m_flip_screen = bool(~data & 1);
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 
@@ -271,7 +283,7 @@ UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bit
 	   the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 	if (flip)
 	{
 		bg_clip.min_x = 8*8;

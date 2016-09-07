@@ -295,10 +295,7 @@ WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 	data ^= ((~ioport("DSW2")->read()) & 1);
 
 	m_flipscreen = data & 0x01;
-	if (m_flipscreen)
-		m_gfxdecode->set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
-	else
-		m_gfxdecode->set_flip_all(0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	machine().bookkeeping().coin_counter_w(0, data & 2);
 	machine().bookkeeping().coin_counter_w(1, data & 4);

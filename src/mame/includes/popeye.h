@@ -29,6 +29,7 @@ public:
 	UINT8 m_invertmask;
 	UINT8 m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
+	bool  m_flip_screen;
 	UINT8 m_lastflip;
 	int   m_field;
 

@@ -112,7 +112,7 @@ WRITE8_MEMBER(gundealr_state::yamyam_fg_scroll_w)
 WRITE8_MEMBER(gundealr_state::gundealr_flipscreen_w)
 {
 	m_flipscreen = data;
-	m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 }
 
 

@@ -40,6 +40,7 @@ public:
 	int m_txt_enable;
 	int m_old_back;
 	int m_old_fore;
+	bool m_flip_screen;
 
 	DECLARE_WRITE16_MEMBER(background_w);
 	DECLARE_WRITE16_MEMBER(foreground_w);

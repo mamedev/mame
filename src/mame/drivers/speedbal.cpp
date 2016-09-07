@@ -46,7 +46,7 @@ WRITE8_MEMBER(speedbal_state::coincounter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-	m_gfxdecode->flip_screen_set(data & 8); // also changes data & 0x10 at the same time too (flipx and flipy?)
+	flip_screen_set(data & 8); // also changes data & 0x10 at the same time too (flipx and flipy?)
 	/* unknown: (data & 0x10) and (data & 4) */
 }
 

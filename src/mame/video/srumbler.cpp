@@ -55,7 +55,10 @@ void srumbler_state::video_start()
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x07ff,0xf800); /* split type 1 has pens 0-10 transparent in front half */
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_scroll));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -82,7 +85,9 @@ WRITE8_MEMBER(srumbler_state::background_w)
 WRITE8_MEMBER(srumbler_state::_4009_w)
 {
 	/* bit 0 flips screen */
-	m_gfxdecode->flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bits 4-5 used during attract mode, unknown */
 
@@ -139,7 +144,7 @@ void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		sx = buffered_spriteram[offs + 3] + 0x100 * ( attr & 0x01);
 		flipy = attr & 0x02;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;
@@ -149,7 +154,7 @@ void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				colour,
-				m_gfxdecode->flip_screen(),flipy,
+				m_flip_screen, flipy,
 				sx, sy,15);
 	}
 }

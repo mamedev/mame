@@ -28,6 +28,7 @@ void taxidriv_state::machine_start()
 	save_item(NAME(m_latchB));
 	save_item(NAME(m_bghide));
 	save_item(NAME(m_spritectrl));
+	save_item(NAME(m_flip_screen));
 }
 
 WRITE8_MEMBER(taxidriv_state::p2a_w){ spritectrl_w(space,0,data); }
@@ -64,7 +65,7 @@ WRITE8_MEMBER(taxidriv_state::p0c_w)
 
 	/* bit 2 toggles during gameplay */
 
-	m_gfxdecode->flip_screen_set(data & 8);
+	m_flip_screen = bool(data & 8); // not implemented yet
 
 //  popmessage("%02x",data&0x0f);
 }

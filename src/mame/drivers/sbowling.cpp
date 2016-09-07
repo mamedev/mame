@@ -67,6 +67,7 @@ public:
 	UINT32 m_color_prom_address;
 	UINT8 m_pix_sh;
 	UINT8 m_pix[2];
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(pix_shift_w);
@@ -107,7 +108,7 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 
 WRITE8_MEMBER(sbowling_state::videoram_w)
 {
-	int flip = m_gfxdecode->flip_screen();
+	int flip = m_flip_screen;
 	int x,y,v1,v2;
 
 	m_videoram[offset] = data;
@@ -140,12 +141,14 @@ void sbowling_state::video_start()
 {
 	m_tmpbitmap = std::make_unique<bitmap_ind16>(32*8,32*8);
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_flip_screen = false;
 
 	save_item(NAME(m_bgmap));
 	save_item(NAME(m_system));
 	save_item(NAME(m_color_prom_address));
 	save_item(NAME(m_pix_sh));
 	save_item(NAME(m_pix));
+	save_item(NAME(m_flip_screen));
 	machine().save().register_postload(save_prepost_delegate(FUNC(sbowling_state::postload), this));
 }
 
@@ -203,8 +206,8 @@ WRITE8_MEMBER(sbowling_state::system_w)
 	    ----x--- flip screen/controls
 	*/
 
-
-	m_gfxdecode->flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	if ((m_system^data)&1)
 	{

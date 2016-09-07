@@ -36,6 +36,7 @@ public:
 	int m_sn2_ready;
 	int m_sn3_ready;
 	UINT8 m_irq_mask;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(SN76496_latch_w);
 	DECLARE_READ8_MEMBER(SN76496_select_r);

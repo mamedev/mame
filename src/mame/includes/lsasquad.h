@@ -26,6 +26,7 @@ public:
 	int m_pending_nmi;
 	int m_sound_cmd;
 	int m_sound_result;
+	bool m_flip_screen;
 
 	/* mcu */
 	UINT8 m_from_main;

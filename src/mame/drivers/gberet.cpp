@@ -141,7 +141,8 @@ WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 	m_interrupt_mask = data & 7;
 
 	/* bit 3 = flip screen */
-	m_gfxdecode->flip_screen_set(data & 8);
+	m_flip_screen = bool(data & 8);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 WRITE8_MEMBER(gberet_state::gberet_sound_w)
@@ -193,7 +194,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(gberet_state::gberetb_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 8);
+	m_flip_screen = bool(data & 8);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 READ8_MEMBER(gberet_state::gberetb_irq_ack_r)

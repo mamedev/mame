@@ -34,6 +34,9 @@ VIDEO_START_MEMBER(galspnbl_state,galspnbl)
 {
 	/* allocate bitmaps */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
@@ -66,7 +69,7 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 {
 	int offs;
 	m_sprite_bitmap.fill(0, cliprect);
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 0, 0, m_gfxdecode->flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 0, 0, m_flip_screen, m_sprite_bitmap);
 
 
 	draw_background(bitmap, cliprect);

@@ -211,8 +211,8 @@ WRITE8_MEMBER(pacland_state::subreset_w)
 
 WRITE8_MEMBER(pacland_state::flipscreen_w)
 {
-	int bit = !BIT(offset,11);
-	m_gfxdecode->flip_screen_set(bit);
+	m_flip_screen = !BIT(offset,11);
+	m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 

@@ -23,6 +23,7 @@ public:
 	required_shared_ptr<UINT16> m_shareram;
 
 	tilemap_t *m_pant[2];
+	bool m_flip_screen;
 
 	DECLARE_READ8_MEMBER(dallas_share_r);
 	DECLARE_WRITE8_MEMBER(dallas_share_w);

@@ -82,7 +82,9 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
 	/* bit 5 resets the sound CPU? - we ignore it */
 
 	/* bit 6 flips screen */
-	m_gfxdecode->flip_screen_set(data & 0x40);
+	m_flip_screen = bool(data & 0x40);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bit 7 enables characters? */
 	m_chon = data & 0x80;
@@ -130,6 +132,9 @@ void gunsmoke_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gunsmoke_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x4f);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -153,7 +158,7 @@ void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		code += 256 * bank;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

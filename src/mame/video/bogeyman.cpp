@@ -88,6 +88,19 @@ void bogeyman_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bogeyman_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
+}
+
+void bogeyman_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_bg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 void bogeyman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -108,7 +121,7 @@ void bogeyman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (multi) sy -= 16;
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -127,7 +140,7 @@ void bogeyman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + 1, color,
 					flipx, flipy,
-					sx, sy + (m_gfxdecode->flip_screen() ? -16 : 16), 0);
+					sx, sy + (m_flip_screen ? -16 : 16), 0);
 			}
 		}
 	}

@@ -60,11 +60,13 @@ public:
 	std::unique_ptr<UINT8[]> m_robokid_bg1_videoram;
 	std::unique_ptr<UINT8[]> m_robokid_bg2_videoram;
 	UINT8 m_rom_bank_mask;
+	bool m_flip_screen;
 
 	void omegaf_io_protection_start();
 	void omegaf_io_protection_reset();
 	void robokid_motion_error_kludge(UINT16 offset);
 	void video_init_common(UINT32 vram_alloc_size);
+	void flip_screen_set(bool flip);
 
 	DECLARE_WRITE8_MEMBER(ninjakd2_bankselect_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_soundreset_w);

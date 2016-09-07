@@ -53,6 +53,8 @@ public:
 	int m_yoffset;
 	int m_keyboard_row;
 	std::unique_ptr<UINT16[]> m_buffered_spriteram;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 
 	UINT64 m_funcube_coin_start_cycles;
 	UINT8 m_funcube_hopper_motor;

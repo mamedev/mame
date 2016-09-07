@@ -32,6 +32,7 @@ public:
 	tilemap_t      *m_fg_tilemap;
 	UINT8          m_write_mask;
 	UINT8          m_gfxbank;
+	bool           m_flip_screen;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -56,6 +57,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void flip_screen_set(bool flip);
 	UINT32 screen_update_metlclsh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

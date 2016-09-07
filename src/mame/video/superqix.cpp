@@ -52,6 +52,9 @@ TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
 VIDEO_START_MEMBER(superqix_state,pbillian)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::pb_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8,32,32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(superqix_state,superqix)
@@ -63,8 +66,13 @@ VIDEO_START_MEMBER(superqix_state,superqix)
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
 
+	m_flip_screen = false;
+
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_show_bitmap));
 	save_item(NAME(*m_fg_bitmap[0]));
 	save_item(NAME(*m_fg_bitmap[1]));
+	save_item(NAME(m_flip_screen));
 }
 
 PALETTE_DECODER_MEMBER( superqix_state, BBGGRRII )
@@ -137,7 +145,7 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 
 	m_nmi_mask = BIT(data,4);
 	if (!(m_nmi_mask)) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	m_gfxdecode->flip_screen_set(BIT(data,5));
+	flip_screen_set(BIT(data,5));
 }
 
 WRITE8_MEMBER(superqix_state::superqix_0410_w)
@@ -167,6 +175,12 @@ WRITE8_MEMBER(superqix_state::superqix_0410_w)
 	membank("bank1")->set_entry((data & 0x30) >> 4);
 }
 
+void superqix_state::flip_screen_set(bool flip)
+{
+	m_flip_screen = flip;
+	m_bg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+}
+
 
 
 /***************************************************************************
@@ -188,7 +202,7 @@ void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		int sx = spriteram[offs + 1] + 256 * (spriteram[offs] & 0x01);
 		int sy = spriteram[offs + 2];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -197,8 +211,8 @@ void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
-				m_gfxdecode->flip_screen(),
-				m_gfxdecode->flip_screen(),
+				m_flip_screen,
+				m_flip_screen,
 				sx, sy, 0);
 	}
 }
@@ -218,7 +232,7 @@ void superqix_state::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 		int sx = spriteram[offs + 1];
 		int sy = spriteram[offs + 2];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -246,8 +260,8 @@ UINT32 superqix_state::screen_update_superqix(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	copybitmap_trans(bitmap, *m_fg_bitmap[m_show_bitmap],
-		m_gfxdecode->flip_screen(),
-		m_gfxdecode->flip_screen(),
+		m_flip_screen,
+		m_flip_screen,
 		0, 0, cliprect, 0);
 	superqix_draw_sprites(bitmap,cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);

@@ -128,7 +128,7 @@ WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	machine().bookkeeping().coin_counter_w(2, data & 0x04);
-	m_gfxdecode->flip_screen_set((bool(data & 0x08) && !bool(m_row1->read() & 0x10)) ? 1 : 0);
+	m_flip_screen = (bool(data & 0x08) && !bool(m_row1->read() & 0x10)) ? 1 : 0;
 	m_input_mux = (data >> 4) & 0x03;
 
 //  popmessage("ct io: %02X", data);

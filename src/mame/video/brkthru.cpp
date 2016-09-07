@@ -137,8 +137,8 @@ WRITE8_MEMBER(brkthru_state::brkthru_1800_w)
 		if (m_flipscreen != (data & 0x40))
 		{
 			m_flipscreen = data & 0x40;
-			m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_fg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+			m_fg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 		}
 

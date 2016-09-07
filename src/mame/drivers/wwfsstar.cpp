@@ -223,11 +223,6 @@ WRITE16_MEMBER(wwfsstar_state::sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
-{
-	m_gfxdecode->flip_screen_set(data & 1);
-}
-
 WRITE16_MEMBER(wwfsstar_state::irqack_w)
 {
 	if (offset == 0)

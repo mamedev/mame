@@ -240,6 +240,9 @@ VIDEO_START_MEMBER(snk_state,marvins)
 	m_bg_tilemap->set_scrolldy(8, -32);
 
 	m_tx_tile_offset = 0;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(snk_state,jcross)
@@ -259,6 +262,9 @@ VIDEO_START_MEMBER(snk_state,jcross)
 	m_yscroll_mask = 0x1ff;
 	m_bg_tile_offset = 0;
 	m_tx_tile_offset = 0;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(snk_state,sgladiat)
@@ -278,6 +284,9 @@ VIDEO_START_MEMBER(snk_state,sgladiat)
 	m_yscroll_mask = 0x0ff;
 	m_bg_tile_offset = 0;
 	m_tx_tile_offset = 0;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(snk_state,hal21)
@@ -317,6 +326,9 @@ VIDEO_START_MEMBER(snk_state,tnk3)
 	m_num_sprites = 50;
 	m_yscroll_mask = 0x1ff;
 	m_tx_tile_offset = 0;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(snk_state,ikari)
@@ -333,6 +345,9 @@ VIDEO_START_MEMBER(snk_state,ikari)
 	m_bg_tilemap->set_scrolldy(8, -32);
 
 	m_tx_tile_offset = 0;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(snk_state,gwar)
@@ -356,6 +371,9 @@ VIDEO_START_MEMBER(snk_state,gwar)
 	m_tx_tile_offset = 0;
 
 	m_is_psychos = 0;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(snk_state,psychos)
@@ -451,14 +469,19 @@ WRITE8_MEMBER(snk_state::marvins_palette_bank_w)
 
 WRITE8_MEMBER(snk_state::marvins_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	// other bits unknown
 }
 
 WRITE8_MEMBER(snk_state::sgladiat_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
 
@@ -467,7 +490,9 @@ WRITE8_MEMBER(snk_state::sgladiat_flipscreen_w)
 
 WRITE8_MEMBER(snk_state::hal21_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
 	if (m_bg_tile_offset != ((data & 0x20) << 3))
@@ -515,7 +540,9 @@ WRITE8_MEMBER(snk_state::aso_videoattrs_w)
 	*/
 
 
-	m_gfxdecode->flip_screen_set(data & 0x20);
+	m_flip_screen = bool(data & 0x20);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x10) << 4);
 	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x08) << 5);
@@ -538,7 +565,9 @@ WRITE8_MEMBER(snk_state::tnk3_videoattrs_w)
 	*/
 
 
-	m_gfxdecode->flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	if (m_tx_tile_offset != ((data & 0x40) << 2))
 	{
@@ -613,7 +642,9 @@ WRITE8_MEMBER(snk_state::gwar_tx_bank_w)
 
 WRITE8_MEMBER(snk_state::gwar_videoattrs_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x04);
+	m_flip_screen = bool(data & 0x04);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_sp32_scrollx = (m_sp32_scrollx & 0xff) | ((data & 0x80) << 1);
 	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x40) << 2);
@@ -625,7 +656,9 @@ WRITE8_MEMBER(snk_state::gwar_videoattrs_w)
 
 WRITE8_MEMBER(snk_state::gwara_videoattrs_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x10);
+	m_flip_screen = bool(data & 0x10);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
 	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x01) << 8);
@@ -679,7 +712,7 @@ void snk_state::marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		int flipy = (attributes&0x20);
 		int flipx = 0;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 89 - 16 - sx;
 			sy = 262 - 16 - sy;
@@ -745,7 +778,7 @@ void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			yflip = attributes & 0x20;
 		}
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 89 - size - sx;    // this causes slight misalignment in tnk3 but is correct for athena and fitegolf
 			sy = 262 - size - sy;
@@ -877,7 +910,7 @@ void snk_state::tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		if (hw_xflip)
 			sx = 495 - size - sx;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 495 - size - sx;
 			sy = 258 - size - sy;

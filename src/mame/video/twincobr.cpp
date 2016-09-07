@@ -129,7 +129,7 @@ void twincobr_state::twincobr_display(int enable)
 
 void twincobr_state::twincobr_flipscreen(int flip)
 {
-	m_gfxdecode->set_flip_all((flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+	m_gfxdecode->set_flip_all(flip ? TILEMAP_FLIPXY : 0);
 }
 
 

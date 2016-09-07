@@ -228,7 +228,7 @@ void stfight_video_device::draw_sprites(screen_device &screen, bitmap_ind16 &bit
 			}
 
 			/*
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 			    sx = 240 - sx;
 			    sy = 240 - sy;
@@ -241,7 +241,7 @@ void stfight_video_device::draw_sprites(screen_device &screen, bitmap_ind16 &bit
 			m_gfxdecode->gfx(4)->transpen(bitmap, cliprect,
 				code,
 				color,
-				flipx, 0/*m_gfxdecode->flip_screen()*/,
+				flipx, 0/*m_flip_screen*/,
 				sx, sy,
 				0x0f);
 		}
@@ -381,7 +381,7 @@ WRITE8_MEMBER(stfight_video_device::stfight_vh_latch_w)
 			/* 0x40 = sprites */
 			m_bg_tilemap->enable(data & 0x20);
 			m_fg_tilemap->enable(data & 0x10);
-			//m_gfxdecode->flip_screen_set(data & 0x01);
+			//m_flip_screen = bool(data & 0x01);
 			break;
 	}
 }

@@ -16,7 +16,7 @@ void lsasquad_state::draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		base = 64 * scrollram[offs + 1];
 		sx = 8 * (offs / 4) + scrollx;
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 			sx = 248 - sx;
 
 		sx &= 0xff;
@@ -26,7 +26,7 @@ void lsasquad_state::draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect
 			int attr;
 
 			sy = 8 * y + scrolly;
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 				sy = 248 - sy;
 			sy &= 0xff;
 
@@ -37,15 +37,15 @@ void lsasquad_state::draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
-					m_gfxdecode->flip_screen(),
-					m_gfxdecode->flip_screen(),
+					m_flip_screen,
+					m_flip_screen,
 					sx,sy,15);
 			if (sx > 248)   /* wraparound */
 				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code,
 						color,
-						m_gfxdecode->flip_screen(),
-						m_gfxdecode->flip_screen(),
+						m_flip_screen,
+						m_flip_screen,
 						sx-256,sy,15);
 		}
 	}
@@ -104,7 +104,7 @@ int lsasquad_state::draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &
 		base = 64 * m_scrollram[offs + 1];
 		sx = scrollx + stepx;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 			sx = 248 - sx;
 		sx &= 0xff;
 
@@ -113,7 +113,7 @@ int lsasquad_state::draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &
 			int attr;
 
 			sy = 8 * y + scrolly;
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 				sy = 248 - sy;
 			sy &= 0xff;
 
@@ -126,15 +126,15 @@ int lsasquad_state::draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &
 				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
-					m_gfxdecode->flip_screen(),
-					m_gfxdecode->flip_screen(),
+					m_flip_screen,
+					m_flip_screen,
 					sx,sy,15);
 				if (sx > 248)   /* wraparound */
 					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code,
 						color,
-						m_gfxdecode->flip_screen(),
-						m_gfxdecode->flip_screen(),
+						m_flip_screen,
+						m_flip_screen,
 						sx-256,sy,15);
 			}
 		}
@@ -178,7 +178,7 @@ void lsasquad_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		flipx = attr & 0x40;
 		flipy = attr & 0x80;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

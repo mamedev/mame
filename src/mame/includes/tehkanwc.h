@@ -50,6 +50,8 @@ public:
 	UINT8 m_led1;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(track_0_r);

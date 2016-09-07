@@ -177,7 +177,7 @@ void madalien_state::draw_edges(screen_device &screen, bitmap_ind16 &bitmap, con
 	m_tilemap_edge1[scroll_mode]->mark_all_dirty();
 	m_tilemap_edge2[scroll_mode]->mark_all_dirty();
 
-	m_tilemap_edge1[scroll_mode]->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tilemap_edge1[scroll_mode]->set_flip(flip ? TILEMAP_FLIPXY : 0);
 	m_tilemap_edge1[scroll_mode]->set_scrollx(0, -(*m_scroll & 0xfc));
 	m_tilemap_edge1[scroll_mode]->set_scrolly(0, *m_edge1_pos & 0x7f);
 
@@ -227,7 +227,7 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 
 void madalien_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
-	m_tilemap_fg->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tilemap_fg->set_flip(flip ? TILEMAP_FLIPXY : 0);
 	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 0);
 }
 

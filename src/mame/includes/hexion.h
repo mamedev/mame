@@ -23,6 +23,7 @@ public:
 	int m_pmcbank;
 	int m_gfxrom_select;
 	tilemap_t *m_bg_tilemap[2];
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(coincntr_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -37,6 +38,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
+	void flip_screen_set(bool flip);
 
 	virtual void video_start() override;
 

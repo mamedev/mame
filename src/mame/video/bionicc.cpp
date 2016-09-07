@@ -96,6 +96,9 @@ void bionicc_state::video_start()
 	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
 	m_fg_tilemap->set_transmask(1, 0xffc1, 0x803e); /* split type 1 has pens 1-5 opaque in front half */
 	m_bg_tilemap->set_transparent_pen(15);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 PALETTE_DECODER_MEMBER( bionicc_state, RRRRGGGGBBBBIIII )
@@ -167,7 +170,9 @@ WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_gfxdecode->flip_screen_set(data & 0x0100);
+		m_flip_screen = bool(data & 0x0100);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 		m_bg_tilemap->enable(data & 0x2000);    /* guess */
 		m_fg_tilemap->enable(data & 0x1000);    /* guess */
@@ -193,7 +198,7 @@ UINT32 bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), m_gfxdecode->flip_screen(), 0 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), m_flip_screen, 0 );
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

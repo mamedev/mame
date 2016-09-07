@@ -37,6 +37,7 @@ public:
 	UINT16 m_pixelpalettebank;
 	int m_scrollx;
 	int m_scrolly;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);

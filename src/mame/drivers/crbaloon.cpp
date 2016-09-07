@@ -52,7 +52,8 @@ void crbaloon_state::pc3092_reset(void)
 
 void crbaloon_state::pc3092_update()
 {
-	m_gfxdecode->flip_screen_set((m_pc3092_data[1] & 0x01) ? TRUE : FALSE);
+	// flip screen
+	m_bg_tilemap->set_flip((m_pc3092_data[1] & 0x01) ? TILEMAP_FLIPXY : 0);
 }
 
 

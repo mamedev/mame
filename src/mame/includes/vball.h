@@ -39,6 +39,7 @@ public:
 	int m_bgprombank;
 	int m_spprombank;
 	tilemap_t *m_bg_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);

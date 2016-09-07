@@ -47,10 +47,10 @@ WRITE8_MEMBER(markham_state::markham_videoram_w)
 
 WRITE8_MEMBER(markham_state::markham_flipscreen_w)
 {
-	if (m_gfxdecode->flip_screen() != (data & 0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x01);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -68,6 +68,9 @@ void markham_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(markham_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -80,15 +83,15 @@ void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int chr = spriteram[offs + 1];
 		int col = spriteram[offs + 2];
 
-		int fx = m_gfxdecode->flip_screen();
-		int fy = m_gfxdecode->flip_screen();
+		int fx = m_flip_screen;
+		int fy = m_flip_screen;
 
 		int x = spriteram[offs + 3];
 		int y = spriteram[offs + 0];
 		int px, py;
 		col &= 0x3f ;
 
-		if (m_gfxdecode->flip_screen() == 0)
+		if (!m_flip_screen)
 		{
 			px = x - 2;
 			py = 240 - y;

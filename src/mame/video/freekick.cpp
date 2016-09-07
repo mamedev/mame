@@ -19,6 +19,11 @@ TILE_GET_INFO_MEMBER(freekick_state::get_freek_tile_info)
 void freekick_state::video_start()
 {
 	m_freek_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(freekick_state::get_freek_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -42,12 +47,12 @@ void freekick_state::gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 		int flipy = 0;
 		int color = m_spriteram[offs + 1] & 0x1f;
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;
@@ -76,12 +81,12 @@ void freekick_state::pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 		int flipy = 0;//m_spriteram[offs + 0] & 0x40;
 		int color = m_spriteram[offs + 1] & 0x0f;
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;
@@ -111,12 +116,12 @@ void freekick_state::freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		int flipy = m_spriteram[offs + 2] & 0x40;
 		int color = m_spriteram[offs + 2] & 0x1f;
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;

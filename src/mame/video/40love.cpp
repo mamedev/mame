@@ -177,7 +177,7 @@ WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
 	if (m_flipscreen != f)
 	{
 		m_flipscreen = f;
-		m_gfxdecode->flip_screen_set(m_flipscreen);
+		m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 		m_pix_redraw = 1;
 
 		for (offs = 0; offs < 32; offs++)

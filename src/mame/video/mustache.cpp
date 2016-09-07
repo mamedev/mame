@@ -54,10 +54,10 @@ WRITE8_MEMBER(mustache_state::videoram_w)
 
 WRITE8_MEMBER(mustache_state::video_control_w)
 {
-	if (m_gfxdecode->flip_screen() != (data & 0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x01);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 
 	/* tile bank */
@@ -95,7 +95,10 @@ void mustache_state::video_start()
 
 	m_bg_tilemap->set_scroll_rows(4);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_control_byte));
+	save_item(NAME(m_flip_screen));
 }
 
 void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -120,12 +123,12 @@ void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if ((m_control_byte & 0xa))
 			clip.max_y = visarea.max_y;
 		else
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 				clip.min_y = visarea.min_y + 56;
 			else
 				clip.max_y = visarea.max_y - 56;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -134,8 +137,8 @@ void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		gfx->transpen(bitmap,clip,
 				code,
 				color,
-				m_gfxdecode->flip_screen(),
-				m_gfxdecode->flip_screen(),
+				m_flip_screen,
+				m_flip_screen,
 				sx,sy,0);
 	}
 }

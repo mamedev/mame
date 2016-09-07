@@ -74,6 +74,8 @@ public:
 	tilemap_t *m_bg_tilemap3;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	int m_mustang_bg_xscroll;
 	UINT8 m_scroll[4];
@@ -124,6 +126,7 @@ public:
 	DECLARE_READ16_MEMBER(atombjt_unkr_r) {return 0x0000;}
 	DECLARE_WRITE16_MEMBER(nmk16_x0016_w);
 	DECLARE_WRITE16_MEMBER(nmk16_bioship_x0016_w);
+	void update_flip();
 	DECLARE_DRIVER_INIT(nmk);
 	DECLARE_DRIVER_INIT(tharrier);
 	DECLARE_DRIVER_INIT(vandykeb);

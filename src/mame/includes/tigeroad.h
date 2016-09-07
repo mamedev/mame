@@ -36,6 +36,8 @@ public:
 	int m_bgcharbank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	bool m_flip_screen;
+
 	DECLARE_WRITE16_MEMBER(f1dream_control_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_soundcmd_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_videoram_w);

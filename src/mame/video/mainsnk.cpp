@@ -79,7 +79,10 @@ void mainsnk_state::video_start()
 	m_bg_tilemap->set_scrolldx(16, 16);
 	m_bg_tilemap->set_scrolldy(8,  8);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_bg_tile_offset));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -88,7 +91,9 @@ WRITE8_MEMBER(mainsnk_state::c600_w)
 	int bank;
 	int total_elements = m_gfxdecode->gfx(0)->elements();
 
-	m_gfxdecode->flip_screen_set(~data & 0x80);
+	m_flip_screen = bool(~data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_bg_tilemap->set_palette_offset((data & 0x07) << 4);
 	m_tx_tilemap->set_palette_offset((data & 0x07) << 4);
@@ -143,7 +148,7 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		sx = 288-16 - sx;
 		sy += 8;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 288-16 - sx;
 			sy = 224-16 - sy;

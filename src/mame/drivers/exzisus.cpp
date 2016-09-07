@@ -52,13 +52,13 @@ TODO:
 WRITE8_MEMBER(exzisus_state::cpua_bankswitch_w)
 {
 	membank("cpuabank")->set_entry(data & 0x0f);
-	m_gfxdecode->flip_screen_set(data & 0x40);
+	m_flip_screen = bool(data & 0x40);
 }
 
 WRITE8_MEMBER(exzisus_state::cpub_bankswitch_w)
 {
 	membank("cpubbank")->set_entry(data & 0x0f);
-	m_gfxdecode->flip_screen_set(data & 0x40);
+	m_flip_screen = bool(data & 0x40);
 }
 
 WRITE8_MEMBER(exzisus_state::coincounter_w)
@@ -201,6 +201,9 @@ void exzisus_state::machine_start()
 {
 	membank("cpuabank")->configure_entries(0, 16, memregion("cpua")->base(), 0x4000);
 	membank("cpubbank")->configure_entries(0, 16, memregion("cpub")->base(), 0x4000);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 static const gfx_layout charlayout =

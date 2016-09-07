@@ -16,6 +16,7 @@ public:
 
 	tilemap_t    *m_fg_tilemap; // redclash
 	int        m_gfxbank;   // redclash only
+	bool m_flip_screen;
 
 	/* misc */
 	UINT8      m_sraider_0x30;

@@ -33,6 +33,8 @@ public:
 	tilemap_t    *m_bg_tilemap;
 	int        m_palette_offset;
 	int        m_po[2];
+	bool       m_flip_screen_x;
+	bool       m_flip_screen_y;
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);

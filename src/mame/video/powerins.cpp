@@ -52,7 +52,9 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE8_MEMBER(powerins_state::flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 1 );
+	m_flip_screen = bool(data & 1);
+	m_tilemap_0->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tilemap_1->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 WRITE8_MEMBER(powerins_state::tilebank_w)
@@ -171,7 +173,10 @@ void powerins_state::video_start()
 	m_tilemap_1->set_scroll_cols(1);
 	m_tilemap_1->set_transparent_pen(15);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_tile_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -251,7 +256,7 @@ void powerins_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		/* Handle flip_screen. Apply a global offset of 32 pixels along x too */
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = screen_w - sx - dimx*16 - 32;  flipx = !flipx;
 			sy = screen_h - sy - dimy*16;       flipy = !flipy;

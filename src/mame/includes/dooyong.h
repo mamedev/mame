@@ -168,6 +168,7 @@ public:
 	optional_device<dooyong_rom_tilemap_device> m_bg2;
 	optional_device<dooyong_rom_tilemap_device> m_fg;
 	optional_device<dooyong_rom_tilemap_device> m_fg2;
+	bool m_flip_screen;
 };
 
 class dooyong_z80_state : public dooyong_state
@@ -188,7 +189,7 @@ public:
 		SPRITE_YSHIFT_FLYTIGER = 0x08
 	};
 
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(bluehawk_flip_screen_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(lastday_tx_r);
 	DECLARE_WRITE8_MEMBER(lastday_tx_w);

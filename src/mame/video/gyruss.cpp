@@ -152,7 +152,7 @@ UINT32 gyruss_state::screen_update_gyruss(screen_device &screen, bitmap_ind16 &b
 	if (cliprect.min_y == screen.visible_area().min_y)
 	{
 		m_gfxdecode->mark_all_dirty();
-		m_gfxdecode->set_flip_all((*m_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_gfxdecode->set_flip_all((*m_flipscreen & 0x01) ? TILEMAP_FLIPXY : 0);
 	}
 
 	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);

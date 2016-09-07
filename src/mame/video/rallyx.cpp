@@ -327,6 +327,9 @@ void rallyx_state::rallyx_video_start_common(  )
 		m_drawmode_table[i] = DRAWMODE_SHADOW;
 
 	m_drawmode_table[3] = DRAWMODE_NONE;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(rallyx_state,rallyx)
@@ -410,17 +413,24 @@ WRITE8_MEMBER(rallyx_state::tactcian_starson_w)
 	m_stars_enable = data & 1;
 }
 
+void rallyx_state::flip_screen_set(bool flip)
+{
+	m_flip_screen = flip;
+	m_bg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+}
+
 
 void rallyx_state::plot_star( bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, int color )
 {
 	if (!cliprect.contains(x, y))
 		return;
 
-	if (m_gfxdecode->flip_screen_x())
+	if (m_flip_screen)
+	{
 		x = 255 - x;
-
-	if (m_gfxdecode->flip_screen_y())
 		y = 255 - y;
+	}
 
 	if (m_palette->pen_indirect(bitmap.pix16(y, x) % 0x144) == 0)
 		bitmap.pix16(y, x) = STARS_COLOR_BASE + color;
@@ -498,7 +508,7 @@ void rallyx_state::rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &c
 
 		x = m_radarx[offs] + ((~m_radarattr[offs & 0x0f] & 0x01) << 8);
 		y = 253 - m_radary[offs];
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 			x -= 3;
 
 		if (transpen)
@@ -590,7 +600,7 @@ UINT32 rallyx_state::screen_update_rallyx(screen_device &screen, bitmap_ind16 &b
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 	{
 		bg_clip.min_x = 8 * 8;
 		fg_clip.max_x = 8 * 8 - 1;
@@ -623,7 +633,7 @@ UINT32 rallyx_state::screen_update_jungler(screen_device &screen, bitmap_ind16 &
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 	{
 		bg_clip.min_x = 8 * 8;
 		fg_clip.max_x = 8 * 8 - 1;
@@ -660,7 +670,7 @@ UINT32 rallyx_state::screen_update_locomotn(screen_device &screen, bitmap_ind16 
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 	{
 		/* handle reduced visible area in some games */
 		if (screen.visible_area().max_x == 32 * 8 - 1)

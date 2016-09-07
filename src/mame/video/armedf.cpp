@@ -343,7 +343,7 @@ void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int sx = buffered_spriteram[offs + 3];
 		int sy = m_sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
 
-		if (m_gfxdecode->flip_screen())
+		if ((m_vreg & 0x1000) != 0) // flip screen
 		{
 			sx = 320 - sx + 176;    /* don't ask where 176 comes from, just tried it out */
 			sy = 240 - sy + 1;  /* don't ask where 1 comes from, just tried it out */

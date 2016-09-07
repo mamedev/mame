@@ -117,7 +117,9 @@ WRITE8_MEMBER(liberate_state::deco16_io_w)
 				m_back_tilemap->mark_all_dirty();
 			}
 			m_background_disable = data & 0x4;
-			m_gfxdecode->flip_screen_set(data & 0x01);
+			m_flip_screen = bool(data & 0x01);
+			m_back_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+			m_fix_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 			break;
 		case 7: /* Background palette resistors? */
 			/* Todo */
@@ -169,8 +171,9 @@ WRITE8_MEMBER(liberate_state::prosport_io_w)
 	{
 		case 0:
 			//background_disable = ~data & 0x80;
-			m_gfxdecode->flip_screen_set(data & 0x80);
-			m_back_tilemap->mark_all_dirty();
+			m_flip_screen = bool(data & 0x80);
+			m_back_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+			m_fix_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 			break;
 		case 2: /* Sound */
 			m_soundlatch->write(space, 0, data);
@@ -212,6 +215,9 @@ VIDEO_START_MEMBER(liberate_state,prosoccr)
 	m_fg_gfx = memregion("fg_gfx")->base();
 	m_charram = std::make_unique<UINT8[]>(0x1800 * 2);
 
+	m_flip_screen = false;
+
+	save_item(NAME(m_flip_screen));
 	save_pointer(NAME(m_charram.get()), 0x1800 * 2);
 	save_pointer(NAME(m_fg_gfx), 0x6000);
 }
@@ -311,7 +317,7 @@ void liberate_state::liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		if (multi && fy == 0)
 			sy -= 16;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -381,7 +387,7 @@ void liberate_state::prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 //      if (multi) sy -= 16;
 		if ((fy && multi) || (fx && multi)) { code2 = code; code++; }
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -441,7 +447,7 @@ void liberate_state::boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 //      if (multi) sy -= 16;
 		if (fy && multi) { code2 = code; code++; }
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;

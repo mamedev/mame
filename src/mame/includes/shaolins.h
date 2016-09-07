@@ -23,6 +23,7 @@ public:
 	int m_palettebank;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_nmi_enable;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);

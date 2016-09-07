@@ -111,6 +111,7 @@ public:
 	int m_bgcolor;
 	int m_nmi_main;
 	int m_nmi_sub;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(nmi_main_enable_w);
@@ -177,12 +178,14 @@ void pturn_state::video_start()
 	m_fgmap->set_transparent_pen(0);
 	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pturn_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32*8);
 	m_bgmap->set_transparent_pen(0);
+	m_flip_screen = false;
 
 	save_item(NAME(m_bgbank));
 	save_item(NAME(m_fgbank));
 	save_item(NAME(m_bgpalette));
 	save_item(NAME(m_fgpalette));
 	save_item(NAME(m_bgcolor));
+	save_item(NAME(m_flip_screen));
 }
 
 UINT32 pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -198,13 +201,13 @@ UINT32 pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		int flipy=m_spriteram[offs+1]&0x80;
 
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen)
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen)
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -289,7 +292,9 @@ WRITE8_MEMBER(pturn_state::bgbank_w)
 
 WRITE8_MEMBER(pturn_state::flip_w)
 {
-	m_gfxdecode->flip_screen_set(data);
+	m_flip_screen = (data != 0);
+	m_fgmap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bgmap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 

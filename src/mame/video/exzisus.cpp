@@ -80,7 +80,7 @@ UINT32 exzisus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -89,7 +89,7 @@ UINT32 exzisus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code & 0x3fff,
 						color,
-						m_gfxdecode->flip_screen(), m_gfxdecode->flip_screen(),
+						m_flip_screen, m_flip_screen,
 						x, y, 15);
 				goffs += 2;
 			}
@@ -149,7 +149,7 @@ UINT32 exzisus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -158,7 +158,7 @@ UINT32 exzisus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code & 0x3fff,
 						color,
-						m_gfxdecode->flip_screen(), m_gfxdecode->flip_screen(),
+						m_flip_screen, m_flip_screen,
 						x, y, 15);
 				goffs += 2;
 			}

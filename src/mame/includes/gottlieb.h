@@ -95,6 +95,8 @@ public:
 	UINT8 m_spritebank;
 	UINT8 m_transparent0;
 	tilemap_t *m_bg_tilemap;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 	double m_weights[4];
 
 	void qbert_knocker(UINT8 knock);

@@ -46,6 +46,7 @@ public:
 	int m_adpcm_end;
 	int m_adpcm_data;
 	int m_video_type;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);

@@ -234,6 +234,12 @@ WRITE8_MEMBER(cosmic_state::cosmic_background_enable_w)
 }
 
 
+WRITE8_MEMBER(cosmic_state::flip_screen_w)
+{
+	m_flip_screen = bool(data & 0x80);
+}
+
+
 void cosmic_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	offs_t offs;
@@ -252,7 +258,7 @@ void cosmic_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			if (data & 0x80)
 			{
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 					bitmap.pix16(255-y, 255-x) = pen;
 				else
 					bitmap.pix16(y, x) = pen;
@@ -316,7 +322,7 @@ void cosmic_state::cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &
 			UINT8 x1;
 			int hc, hb_;
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 				x1 = x - screen.frame_number();
 			else
 				x1 = x + screen.frame_number();
@@ -387,7 +393,7 @@ void cosmic_state::devzone_draw_grid( bitmap_ind16 &bitmap, const rectangle &cli
 				if (!(vert_data & horz_data & 0x80))    /* NAND gate */
 				{
 					/* blue */
-					if (m_gfxdecode->flip_screen())
+					if (m_flip_screen)
 						bitmap.pix16(255-y, 255-x) = 4;
 					else
 						bitmap.pix16(y, x) = 4;
@@ -472,7 +478,7 @@ void cosmic_state::nomnlnd_draw_background( screen_device &screen, bitmap_ind16 
 				if (!hd_ && hc_ && !hb_)
 				{
 					offs_t offs = ((x >> 3) & 0x03) | ((y & 0x1f) << 2) |
-									(m_gfxdecode->flip_screen() ? 0x80 : 0);
+									(m_flip_screen ? 0x80 : 0);
 
 					UINT8 plane1 = PROM[offs         ] << (x & 0x07);
 					UINT8 plane2 = PROM[offs | 0x0400] << (x & 0x07);
@@ -506,7 +512,7 @@ void cosmic_state::nomnlnd_draw_background( screen_device &screen, bitmap_ind16 
 
 			if (color != 0)
 			{
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 					bitmap.pix16(255-y, 255-x) = color;
 				else
 					bitmap.pix16(y, x) = color;

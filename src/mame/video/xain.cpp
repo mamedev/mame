@@ -92,11 +92,14 @@ void xain_state::video_start()
 	m_bgram1_tilemap->set_transparent_pen(0);
 	m_char_tilemap->set_transparent_pen(0);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_pri));
 	save_item(NAME(m_scrollxP0));
 	save_item(NAME(m_scrollyP0));
 	save_item(NAME(m_scrollxP1));
 	save_item(NAME(m_scrollyP1));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -152,7 +155,10 @@ WRITE8_MEMBER(xain_state::scrollyP1_w)
 
 WRITE8_MEMBER(xain_state::flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_bgram0_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bgram1_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_char_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -177,7 +183,7 @@ void xain_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		if (sy <= -7) sy += 256;
 		flipx = attr & 0x40;
 		flipy = 0;
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 238 - sx;
 			sy = 240 - sy;

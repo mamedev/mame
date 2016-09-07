@@ -47,6 +47,7 @@ public:
 	int     m_sy;
 	UINT8   m_ox;
 	UINT8   m_oy;
+	bool    m_cocktail_flip;
 
 	/* misc */
 	int m_count;

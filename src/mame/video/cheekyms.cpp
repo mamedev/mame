@@ -149,7 +149,7 @@ UINT32 cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	int flip = *m_port_80 & 0x80;
 
 	m_gfxdecode->mark_all_dirty();
-	m_gfxdecode->set_flip_all(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_gfxdecode->set_flip_all(flip ? TILEMAP_FLIPXY : 0);
 
 	bitmap.fill(0, cliprect);
 	m_bitmap_buffer->fill(0, cliprect);

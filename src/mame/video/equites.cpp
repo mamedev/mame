@@ -203,13 +203,20 @@ WRITE16_MEMBER(equites_state::splndrbt_selchar_w)
 WRITE16_MEMBER(equites_state::equites_flipw_w)
 {
 	// data bit is A16 (offset)
-	m_gfxdecode->flip_screen_set(offset != 0);
+	flip_screen_set(offset != 0);
 }
 
 WRITE8_MEMBER(equites_state::equites_flipb_w)
 {
 	// data bit is A16 (offset)
-	m_gfxdecode->flip_screen_set(offset != 0);
+	flip_screen_set(offset != 0);
+}
+
+void equites_state::flip_screen_set(bool flip)
+{
+	m_flip_screen = flip;
+	m_fg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
 }
 
 WRITE16_MEMBER(equites_state::splndrbt_bg_scrollx_w)
@@ -245,7 +252,7 @@ void equites_state::equites_draw_sprites_block(bitmap_ind16 &bitmap, const recta
 			int sy = (m_spriteram[offs] & 0x00ff);
 			int transmask = m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0);
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -331,7 +338,7 @@ void equites_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 
 		sy += 16;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			// sx NOT inverted
 			fx = fx ^ 1;
@@ -383,11 +390,11 @@ void equites_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &
 	const UINT8 * const yrom = xrom + 0x2000;
 	int scroll_x = m_splndrbt_bg_scrollx;
 	int scroll_y = m_splndrbt_bg_scrolly;
-	int const dinvert = m_gfxdecode->flip_screen() ? 0xff : 0x00;
+	int const dinvert = m_flip_screen ? 0xff : 0x00;
 	int src_y = 0;
 	int dst_y;
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 	{
 		scroll_x = -scroll_x - 8;
 		scroll_y = -scroll_y;

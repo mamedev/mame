@@ -119,6 +119,9 @@ VIDEO_START_MEMBER(chinagat_state,chinagat)
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldy(-8, -8);
 	m_bg_tilemap->set_scrolldy(-8, -8);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 /*
     Based on the Solar Warrior schematics, vertical timing counts as follows:
@@ -197,7 +200,7 @@ WRITE8_MEMBER(chinagat_state::chinagat_video_ctrl_w )
 	m_scrolly_hi = ((data & 0x02) >> 1);
 	m_scrollx_hi = data & 0x01;
 
-	m_gfxdecode->flip_screen_set(~data & 0x04);
+	flip_screen_set(~data & 0x04);
 }
 
 WRITE8_MEMBER(chinagat_state::chinagat_bankswitch_w )

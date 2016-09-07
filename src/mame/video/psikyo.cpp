@@ -197,6 +197,9 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 
 	save_pointer(NAME(m_spritebuf1.get()), 0x2000 / 4);
 	save_pointer(NAME(m_spritebuf2.get()), 0x2000 / 4);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(psikyo_state,sngkace)
@@ -322,7 +325,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 		zoomx = 32 - zoomx;
 		zoomy = 32 - zoomy;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			x = width  - x - (nx * zoomx) / 2;
 			y = height - y - (ny * zoomy) / 2;
@@ -441,7 +444,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 		zoomy = 32 - zoomy;
 
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			x = width  - x - (nx * zoomx) / 2;
 			y = height - y - (ny * zoomy) / 2;
@@ -506,6 +509,15 @@ int psikyo_state::tilemap_width( int size )
 		return 0x10 * 16;
 }
 
+void psikyo_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
+}
+
 UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, layers_ctrl = -1;
@@ -520,7 +532,7 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	m_gfxdecode->flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
+	flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -693,7 +705,7 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	m_gfxdecode->flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
+	flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 

@@ -131,12 +131,15 @@ void ninjakd2_state::video_init_common(UINT32 vram_alloc_size)
 	m_robokid_sprites = 0;
 	m_vram_bank_mask = 0;
 
+	m_flip_screen = false;
+
 	// register for save states
 	save_item(NAME(m_sprites_updated));
 	save_item(NAME(m_next_sprite_overdraw_enabled));
 	save_item(NAME(m_robokid_bg0_bank));
 	save_item(NAME(m_robokid_bg1_bank));
 	save_item(NAME(m_robokid_bg2_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 static int stencil_ninjakd2( UINT16 pal );
@@ -326,6 +329,16 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_sprite_overdraw_w)
 }
 
 
+void ninjakd2_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_gfxdecode->set_flip_all(flip ? TILEMAP_FLIPXY : 0);
+	}
+}
+
+
 
 /*************************************
  *
@@ -365,7 +378,7 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 			// Ninja Kid II doesn't use the 'big' feature so it might not be available on the board
 			int const big = (sprptr[2] & 0x04) >> 2;
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - 16*big - sx;
 				sy = 240 - 16*big - sy;

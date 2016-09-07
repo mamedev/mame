@@ -86,6 +86,7 @@ public:
 	INT32     m_center_v_shift;
 	rectangle m_bg_tilemap_l_clip;
 	rectangle m_bg_tilemap_r_clip;
+	bool      m_flip_screen;
 
 	/* sound-related */
 	UINT8     m_sound_ack;  /* sound latches, ACK status bits and NMI timer */

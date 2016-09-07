@@ -41,6 +41,7 @@ public:
 	/* video-related */
 	tilemap_t* m_bg_tilemap;
 	bitmap_ind16 m_scroll_panel_bitmap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(scroll_panel_w);

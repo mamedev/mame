@@ -35,9 +35,6 @@ UINT32 simpl156_state::screen_update_simpl156(screen_device &screen, bitmap_ind1
 	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 
-	//FIXME: flip_screen_x should not be written!
-	m_gfxdecode->flip_screen_set_no_update(1);
-
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram.get(), 0x1400/4); // 0x1400/4 seems right for charlien (doesn't initialize any more RAM, so will draw a garbage 0 with more)
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram.get(), 0x1400/4, true); // 0x1400/4 seems right for charlien (doesn't initialize any more RAM, so will draw a garbage 0 with more)
 	return 0;
 }

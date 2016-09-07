@@ -86,12 +86,22 @@ WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
 
 WRITE8_MEMBER(pitnrun_state::hflip_w)
 {
-	m_gfxdecode->flip_screen_x_set(data);
+	if (m_hflip != data)
+	{
+		m_hflip = data;
+		m_fg->set_flip((m_hflip ? TILEMAP_FLIPX : 0) | (m_vflip ? TILEMAP_FLIPY : 0));
+		m_bg->set_flip((m_hflip ? TILEMAP_FLIPX : 0) | (m_vflip ? TILEMAP_FLIPY : 0));
+	}
 }
 
 WRITE8_MEMBER(pitnrun_state::vflip_w)
 {
-	m_gfxdecode->flip_screen_y_set(data);
+	if (m_vflip != data)
+	{
+		m_vflip = data;
+		m_fg->set_flip((m_hflip ? TILEMAP_FLIPX : 0) | (m_vflip ? TILEMAP_FLIPY : 0));
+		m_bg->set_flip((m_hflip ? TILEMAP_FLIPX : 0) | (m_vflip ? TILEMAP_FLIPY : 0));
+	}
 }
 
 static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )

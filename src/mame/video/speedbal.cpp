@@ -30,6 +30,16 @@ TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_fg)
 	tileinfo.group = (color == 9);
 }
 
+void speedbal_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_bg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+	}
+}
+
 /*************************************
  *                                   *
  *      Start-Stop                   *
@@ -46,6 +56,9 @@ void speedbal_state::video_start()
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001); /* split type 0 is totally transparent in front half and has pen 0 transparent in back half */
 	m_fg_tilemap->set_transmask(1,0x0001,0x0001); /* split type 1 has pen 0 transparent in front and back half */
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -101,7 +114,7 @@ void speedbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		flipx = flipy = 0;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			x = 246 - x;
 			y = 238 - y;

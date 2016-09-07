@@ -23,6 +23,8 @@ public:
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
+	bool m_flip_screen;
+
 	DECLARE_READ8_MEMBER(io_0x03_r);
 	DECLARE_WRITE8_MEMBER(mrjong_videoram_w);
 	DECLARE_WRITE8_MEMBER(mrjong_colorram_w);

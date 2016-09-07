@@ -77,13 +77,23 @@ WRITE8_MEMBER(shootout_state::textram_w)
 	m_foreground->mark_tile_dirty(offset&0x3ff );
 }
 
+WRITE8_MEMBER(shootout_state::flipscreen_w)
+{
+	m_flip_screen = bool(data & 0x01);
+	m_background->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_foreground->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+}
+
 void shootout_state::video_start()
 {
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground->set_transparent_pen(0 );
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_bFlicker));
+	save_item(NAME(m_flip_screen));
 }
 
 void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )
@@ -116,7 +126,7 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				int flipx = (attributes & 0x04);
 				int flipy = 0;
 
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 				{
 					flipx = !flipx;
 					flipy = !flipy;
@@ -128,7 +138,7 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 					vx = sx;
 					vy = sy;
-					if (m_gfxdecode->flip_screen())
+					if (m_flip_screen)
 					{
 						vx = 240 - vx;
 						vy = 240 - vy;
@@ -148,7 +158,7 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				vx = sx;
 				vy = sy;
-				if (m_gfxdecode->flip_screen())
+				if (m_flip_screen)
 				{
 					vx = 240 - vx;
 					vy = 240 - vy;

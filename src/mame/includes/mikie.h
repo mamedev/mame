@@ -26,10 +26,11 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-	int        m_palettebank;
+	int         m_palettebank;
+	bool        m_flip_screen;
 
 	/* misc */
-	int        m_last_irq;
+	int         m_last_irq;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

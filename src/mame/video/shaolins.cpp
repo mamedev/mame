@@ -119,10 +119,10 @@ WRITE8_MEMBER(shaolins_state::nmi_w)
 {
 	m_nmi_enable = data;
 
-	if (m_gfxdecode->flip_screen() != (data & 0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		m_gfxdecode->flip_screen_set(data & 0x01);
-		m_gfxdecode->mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -143,8 +143,11 @@ void shaolins_state::video_start()
 
 	m_bg_tilemap->set_scroll_cols(32);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_palettebank));
 	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_flip_screen));
 }
 
 void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -160,7 +163,7 @@ void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int sx = 240 - m_spriteram[offs + 6];
 			int sy = 248 - m_spriteram[offs + 4];
 
-			if (m_gfxdecode->flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 248 - sy;

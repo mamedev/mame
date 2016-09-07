@@ -39,6 +39,7 @@ public:
 
 	/* video-related */
 	tilemap_t        *m_bg_tilemap;
+	bool m_flip_screen;
 
 	/* sound-related */
 	UINT8          m_sn_latch;

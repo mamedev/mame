@@ -416,9 +416,9 @@ WRITE8_MEMBER( k052109_device::write )
 		else if (offset == 0x1e80)
 		{
 //if ((data & 0xfe)) logerror("%04x: 052109 register 1e80 = %02x\n",space.device().safe_pc(),data);
-			m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_tilemap[0]->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
+			m_tilemap[1]->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
+			m_tilemap[2]->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
 			if (m_tileflip_enable != ((data & 0x06) >> 1))
 			{
 				m_tileflip_enable = ((data & 0x06) >> 1);
@@ -748,8 +748,8 @@ TILE_GET_INFO_MEMBER(k052109_device::get_tile_info2)
 void k052109_device::tileflip_reset()
 {
 	int data = m_ram[0x1e80];
-	m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_tilemap[0]->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
+	m_tilemap[1]->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
+	m_tilemap[2]->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
 	m_tileflip_enable = ((data & 0x06) >> 1);
 }

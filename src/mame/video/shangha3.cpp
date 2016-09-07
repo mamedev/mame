@@ -83,8 +83,11 @@ void shangha3_state::video_start()
 			m_palette->shadow_table()[i] = i+128;
 	}
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_gfxlist_addr));
 	save_item(NAME(m_rawbitmap));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -94,7 +97,7 @@ WRITE16_MEMBER(shangha3_state::flipscreen_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 7 flips screen, the rest seems to always be set to 0x7e */
-		m_gfxdecode->flip_screen_set(data & 0x80);
+		m_flip_screen = bool(data & 0x80);
 
 		if ((data & 0x7f) != 0x7e) popmessage("flipscreen_w %02x",data);
 	}
@@ -134,7 +137,7 @@ WRITE16_MEMBER(shangha3_state::blitter_go_w)
 		zoomx = shangha3_ram[offs+10];
 		zoomy = shangha3_ram[offs+13];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 383 - sx - sizex;
 			sy = 255 - sy - sizey;

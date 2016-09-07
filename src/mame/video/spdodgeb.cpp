@@ -74,9 +74,12 @@ void spdodgeb_state::video_start()
 
 	membank("mainbank")->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_tile_palbank));
 	save_item(NAME(m_sprite_palbank));
 	save_item(NAME(m_lastscroll));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -111,7 +114,8 @@ WRITE8_MEMBER(spdodgeb_state::scrollx_lo_w)
 WRITE8_MEMBER(spdodgeb_state::ctrl_w)
 {
 	/* bit 0 = flip screen */
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	m_flip_screen = bool(data & 0x01);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bit 1 = ROM bank switch */
 	membank("mainbank")->set_entry((~data & 0x02) >> 1);
@@ -168,7 +172,7 @@ void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int dy = -16;
 		int cy;
 
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -187,7 +191,7 @@ void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			break;
 
 			case 1: /* double y */
-			if (m_gfxdecode->flip_screen()) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
+			if (m_flip_screen) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
 			cy = sy + dy;
 			which &= ~1;
 			DRAW_SPRITE(0,sx,cy);

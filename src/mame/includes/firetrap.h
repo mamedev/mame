@@ -39,6 +39,7 @@ public:
 	UINT8         m_scroll1_y[2];
 	UINT8         m_scroll2_x[2];
 	UINT8         m_scroll2_y[2];
+	bool          m_flip_screen;
 
 	/* misc */
 	int           m_sound_irq_enable;

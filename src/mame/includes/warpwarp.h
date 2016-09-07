@@ -50,6 +50,7 @@ public:
 	int m_ball_sizey;
 	int m_handle_joystick;
 	tilemap_t *m_bg_tilemap;
+	bool m_cocktail_flip;
 
 	// warpwarp and bombbee
 	DECLARE_READ8_MEMBER(warpwarp_sw_r);

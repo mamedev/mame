@@ -102,7 +102,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 
 		case 0x07:  /* flip screen + IRQ control */
 			m_flipscreen = data & 0x08;
-			m_gfxdecode->set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 			m_irq_enabled = data & 0x02;
 			break;
 	}

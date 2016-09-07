@@ -155,11 +155,14 @@ void m52_state::video_start()
 	m_bg_tilemap->set_scrolldy(16, 16);
 	m_bg_tilemap->set_scroll_rows(4); /* only lines 192-256 scroll */
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_bg1xpos));
 	save_item(NAME(m_bg1ypos));
 	save_item(NAME(m_bg2xpos));
 	save_item(NAME(m_bg2ypos));
 	save_item(NAME(m_bgcontrol));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -271,7 +274,7 @@ WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
 WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	m_gfxdecode->flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
+	m_flip_screen = bool((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
@@ -279,7 +282,7 @@ WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 
 WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
 {
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	m_flip_screen = bool(data & 0x01);
 }
 
 
@@ -296,7 +299,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	const rectangle &visarea = m_screen->visible_area();
 
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 	{
 		xpos = 127 - xpos;
 		ypos = 255 - ypos - BGHEIGHT;
@@ -310,23 +313,23 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
-		m_gfxdecode->flip_screen(),
-		m_gfxdecode->flip_screen(),
+		m_flip_screen,
+		m_flip_screen,
 		xpos,
 		ypos, 0);
 
 
 		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
-		m_gfxdecode->flip_screen(),
-		m_gfxdecode->flip_screen(),
+		m_flip_screen,
+		m_flip_screen,
 		xpos - 256,
 		ypos, 0);
 
 	rect.min_x = visarea.min_x;
 	rect.max_x = visarea.max_x;
 
-	if (m_gfxdecode->flip_screen())
+	if (m_flip_screen)
 	{
 		rect.min_y = ypos - BGHEIGHT;
 		rect.max_y = ypos - 1;
@@ -366,7 +369,7 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 4); /* cityscape */
 	}
 
-	m_bg_tilemap->set_flip(m_gfxdecode->flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -390,7 +393,7 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 			clip.min_y = 128, clip.max_y = 255;
 
 		/* adjust for flipping */
-		if (m_gfxdecode->flip_screen())
+		if (m_flip_screen)
 		{
 			int temp = clip.min_y;
 			clip.min_y = 255 - clip.max_y;

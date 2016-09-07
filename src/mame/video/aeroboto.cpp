@@ -46,12 +46,15 @@ void aeroboto_state::video_start()
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_rows(64);
 
+	m_cocktail_flip = false;
+
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_starsoff));
 	save_item(NAME(m_sx));
 	save_item(NAME(m_sy));
 	save_item(NAME(m_ox));
 	save_item(NAME(m_oy));
+	save_item(NAME(m_cocktail_flip));
 
 	#if STARS_LAYOUT
 	{
@@ -76,13 +79,14 @@ void aeroboto_state::video_start()
 
 READ8_MEMBER(aeroboto_state::aeroboto_in0_r)
 {
-	return ioport(m_gfxdecode->flip_screen() ? "P2" : "P1")->read();
+	return ioport(m_cocktail_flip ? "P2" : "P1")->read();
 }
 
 WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)
 {
 	/* bit 0 selects both flip screen and player1/player2 controls */
-	m_gfxdecode->flip_screen_set(data & 0x01);
+	m_cocktail_flip = data & 0x01;
+	m_bg_tilemap->set_flip(m_cocktail_flip ? TILEMAP_FLIPXY : 0);
 
 	/* bit 1 = char bank select */
 	if (m_charbank != ((data & 0x02) >> 1))
@@ -127,7 +131,7 @@ void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int x = m_spriteram[offs + 3];
 		int y = 240 - m_spriteram[offs];
 
-		if (m_gfxdecode->flip_screen())
+		if (m_cocktail_flip)
 		{
 			x = 248 - x;
 			y = 240 - y;
@@ -136,8 +140,7 @@ void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				m_spriteram[offs + 1],
 				m_spriteram[offs + 2] & 0x07,
-				m_gfxdecode->flip_screen(),
-				m_gfxdecode->flip_screen(),
+				m_cocktail_flip, m_cocktail_flip,
 				((x + 8) & 0xff) - 8, y, 0);
 	}
 }

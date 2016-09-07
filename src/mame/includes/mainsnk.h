@@ -31,6 +31,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_sound_cpu_busy;
 	UINT32 m_bg_tile_offset;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(sound_ack_r);

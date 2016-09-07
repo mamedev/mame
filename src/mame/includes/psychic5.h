@@ -50,6 +50,7 @@ public:
 	int m_sx1;
 	int m_sy1;
 	int m_sy2;
+	bool m_flip_screen;
 
 	DECLARE_READ8_MEMBER(bankselect_r);
 	DECLARE_READ8_MEMBER(vram_page_select_r);
@@ -88,6 +89,7 @@ public:
 	void change_palette(int offset, UINT8* palram, int palbase);
 	void change_bg_palette(int color, int lo_offs, int hi_offs);
 	void set_background_palette_intensity();
+	void flip_screen_set(bool flip);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_background(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect); //only used by psychic5
 };

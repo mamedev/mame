@@ -47,12 +47,22 @@ WRITE8_MEMBER(tehkanwc_state::scroll_y_w)
 
 WRITE8_MEMBER(tehkanwc_state::flipscreen_x_w)
 {
-	m_gfxdecode->flip_screen_x_set(data & 0x40);
+	if (BIT(data, 6) != m_flip_screen_x)
+	{
+		m_flip_screen_x = BIT(data, 6);
+		m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+		m_fg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+	}
 }
 
 WRITE8_MEMBER(tehkanwc_state::flipscreen_y_w)
 {
-	m_gfxdecode->flip_screen_y_set(data & 0x40);
+	if (BIT(data, 6) != m_flip_screen_y)
+	{
+		m_flip_screen_y = BIT(data, 6);
+		m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+		m_fg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+	}
 }
 
 WRITE8_MEMBER(tehkanwc_state::gridiron_led0_w)
@@ -99,9 +109,14 @@ void tehkanwc_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_led0));
 	save_item(NAME(m_led1));
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 /*
@@ -141,13 +156,13 @@ void tehkanwc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = m_spriteram[offs + 2] + ((attr & 0x20) << 3) - 128;
 		int sy = m_spriteram[offs + 3];
 
-		if (m_gfxdecode->flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (m_gfxdecode->flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
