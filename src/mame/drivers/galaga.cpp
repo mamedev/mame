@@ -1862,10 +1862,6 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 
 	MCFG_MACHINE_RESET_OVERRIDE(xevious_state,battles)
 
-	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(xevious_state,battles)
-
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("discrete")
 
