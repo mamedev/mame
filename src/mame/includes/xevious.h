@@ -34,7 +34,6 @@ public:
 	DECLARE_VIDEO_START(xevious);
 	DECLARE_PALETTE_INIT(xevious);
 	DECLARE_MACHINE_RESET(xevios);
-	DECLARE_PALETTE_INIT(battles);
 	DECLARE_MACHINE_RESET(battles);
 	UINT32 screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(battles_interrupt_4);
