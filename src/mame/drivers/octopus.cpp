@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Barry Rodewald, Robbbert
 /***************************************************************************
 
 Hilger Analytical AB6089 Mk. 1 (LSI Octopus)
@@ -110,6 +110,12 @@ Its BIOS performs POST and halts as there's no keyboard.
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 #include "video/scn2674.h"
+#include "machine/am9517a.h"
+#include "machine/pic8259.h"
+#include "machine/mc146818.h"
+#include "machine/i8255.h"
+#include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
 
 class octopus_state : public driver_device
 {
@@ -120,7 +126,15 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_crtc(*this, "crtc"),
 		m_vram(*this, "vram"),
-		m_fontram(*this, "fram")
+		m_fontram(*this, "fram"),
+		m_dma1(*this, "dma1"),
+		m_dma2(*this, "dma2"),
+		m_pic1(*this, "pic_master"),
+		m_pic2(*this, "pic_slave"),
+		m_rtc(*this, "rtc"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:floppy0"),
+		m_floppy1(*this, "fdc:floppy1")
 		{ }
 
 	virtual void machine_reset() override;
@@ -128,12 +142,21 @@ public:
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(get_slave_ack);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<scn2674_device> m_crtc;
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_fontram;
+	required_device<am9517a_device> m_dma1;
+	required_device<am9517a_device> m_dma2;
+	required_device<pic8259_device> m_pic1;
+	required_device<pic8259_device> m_pic2;
+	required_device<mc146818_device> m_rtc;
+	required_device<fd1793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 
@@ -150,8 +173,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	// 0x00-0f: i8237 DMA #1
-	// 0x10-1f: i8237 DMA #2
+	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("dma1", am9517a_device, read, write)
+	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma2", am9517a_device, read, write)
 	// 0x20: System type switch (read), Z80 NMI (write)
 	// 0x21: Parity fail reset (write), bit5 SLCTOUT from parallel, bit6 option board parity fail bit7 main board parity fail (read)
 	// 0x28: Z80 enable (write)
@@ -159,20 +182,21 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	// 0x32: floppy bank
 	// 0x33: RAM refresh / Z80 bank
 	// 0x50-51: Keyboard (i8251)
-	// 0x60/0xd0: FDC (WD1793) - location depends on FPLA version
 	// 0x70-73: HD controller
 	// 0x80-83: serial timers (i8253)
 	// 0xa0-a3: serial interface (Z80 SIO/2)
-	// 0xb0-b1: master interrupt controller (i8259)
-	// 0xb4-b5: slave interrupt controller (i8259)
+	AM_RANGE(0xb0, 0xb1) AM_DEVREADWRITE("pic_master", pic8259_device, read, write)
+	AM_RANGE(0xb4, 0xb5) AM_DEVREADWRITE("pic_slave", pic8259_device, read, write)
 	AM_RANGE(0xc0, 0xc7) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
 	// 0xc8: video control
-	AM_RANGE(0xc9, 0xc9) AM_DEVREADWRITE("crtc", scn2674_device, buffer_r, buffer_w) //AM_RAM // character writes go here
+	AM_RANGE(0xc9, 0xc9) AM_DEVREADWRITE("crtc", scn2674_device, buffer_r, buffer_w)
 	AM_RANGE(0xca, 0xca) AM_RAM // attribute writes go here
 	// 0xcf: mode control
+	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
 	// 0xe0: Z80 interrupt vector for RS232
 	// 0xe4: Z80 interrupt vector for RS422
 	// 0xf0-f1: Parallel interface data I/O (Centronics), and control/status
+	AM_RANGE(0xf8, 0xff) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -218,11 +242,6 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 {
 	if(!lg)
 	{
-//		UINT16 tile = m_vid_mainram[address & 0x7fff];
-//		const UINT8 *line = m_gfxdecode->gfx(m_gfx_index+0)->get_data(tile & 0xfff);
-//		int offset = m_gfxdecode->gfx(m_gfx_index+0)->rowbytes() * linecount;
-//		for(int i = 0; i < 8; i++)
-//			bitmap.pix32(y, x + i) = (tile >> 12) ? m_palette->pen(line[offset + i]) : m_palette->black_pen();
 		UINT8 tile = m_vram[address & 0x1fff];
 		UINT8 data = m_fontram[(tile * 16) + linecount];
 		for (int z=0;z<8;z++)
@@ -230,27 +249,59 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 	}
 }
 
+READ8_MEMBER( octopus_state::get_slave_ack )
+{
+	logerror("slave_ack: %i\n",offset);
+	if (offset==7)
+		return m_pic2->acknowledge();
+
+	return 0x00;
+}
+
+static SLOT_INTERFACE_START( octopus_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( octopus, octopus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24MHz / 3)  // 8MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_mem)
 	MCFG_CPU_IO_MAP(octopus_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_master", pic8259_device, inta_cb)
 
 	MCFG_CPU_ADD("subcpu",Z80, XTAL_24MHz / 4) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_sub_mem)
 	MCFG_CPU_IO_MAP(octopus_sub_io)
 
+	MCFG_DEVICE_ADD("dma1", AM9517A, XTAL_24MHz / 6)  // 4MHz
+
+	MCFG_DEVICE_ADD("dma2", AM9517A, XTAL_24MHz / 6)  // 4MHz
+
+	MCFG_PIC8259_ADD("pic_master", INPUTLINE("maincpu",0), VCC, READ8(octopus_state,get_slave_ack))
+	MCFG_PIC8259_ADD("pic_slave", DEVWRITELINE("pic_master",pic8259_device, ir7_w), GND, NOOP)
+
+	// RTC (MC146818 via i8255 PPI)  TODO: hook up RTC to PPI
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(NOOP)
+	MCFG_I8255_IN_PORTB_CB(NOOP)
+	MCFG_I8255_IN_PORTC_CB(NOOP)
+	MCFG_I8255_OUT_PORTA_CB(NOOP)
+	MCFG_I8255_OUT_PORTB_CB(NOOP)
+	MCFG_I8255_OUT_PORTC_CB(NOOP)
+	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir4_w))
+	
+	MCFG_FD1793_ADD("fdc",XTAL_16MHz / 8)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:floppy0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:floppy1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
+
 	// TODO: add components
-	// 2x i8237A DMA controller
-	// 2x i8259 PIC
 	// i8253 PIT timer (speaker output, serial timing, other stuff too?)
 	// i8251 serial controller (keyboard)
-	// MC146818 RTC
 	// i8255A PPI (RTC access, FDC)
 	// Centronics parallel interface
 	// Z80SIO/2 (serial)
-	// WD or SMC 1793 FDC
-	// Winchester HD controller (Xebec compatible? uses TTL logic)
+	// Winchester HD controller (Xebec/SASI compatible? uses TTL logic)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -262,7 +313,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 //	MCFG_SCREEN_PALETTE("palette")
 //	MCFG_PALETTE_ADD_MONOCHROME("palette")	
 
-	MCFG_SCN2674_VIDEO_ADD("crtc", 0, INPUTLINE("maincpu",1))  // character clock can be selectable, either 16MHz or 17.6MHz
+	MCFG_SCN2674_VIDEO_ADD("crtc", 0, DEVWRITELINE("pic_slave",pic8259_device,ir0_w))  // character clock can be selectable, either 16MHz or 17.6MHz
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)

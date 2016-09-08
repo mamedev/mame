@@ -6,7 +6,7 @@
 
 #include "scn2674.h"
 
-#define S674VERBOSE 1
+#define S674VERBOSE 0
 #define LOG2674(x) do { if (S674VERBOSE) logerror x; } while (0)
 
 const device_type SCN2674_VIDEO = &device_creator<scn2674_device>;
