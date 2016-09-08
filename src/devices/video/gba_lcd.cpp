@@ -21,37 +21,37 @@
 #define DISPSTAT    HWLO(0x004)  /* 0x4000004  2  R/W   General LCD Status (STAT,LYC) */
 #define VCOUNT      HWHI(0x004)  /* 0x4000006  2  R     Vertical Counter (LY) */
 #define BG0CNT      HWLO(0x008)  /* 0x4000008  2  R/W   BG0 Control */
-#define BG1CNT      HWHI(0x008)  /* 0x400000A  2  R/W   BG1 Control */
-#define BG2CNT      HWLO(0x00C)  /* 0x400000C  2  R/W   BG2 Control */
-#define BG3CNT      HWHI(0x00C)  /* 0x400000E  2  R/W   BG3 Control */
+#define BG1CNT      HWHI(0x008)  /* 0x400000a  2  R/W   BG1 Control */
+#define BG2CNT      HWLO(0x00c)  /* 0x400000c  2  R/W   BG2 Control */
+#define BG3CNT      HWHI(0x00c)  /* 0x400000e  2  R/W   BG3 Control */
 #define BG0HOFS     HWLO(0x010)  /* 0x4000010  2  W     BG0 X-Offset */
 #define BG0VOFS     HWHI(0x010)  /* 0x4000012  2  W     BG0 Y-Offset */
 #define BG1HOFS     HWLO(0x014)  /* 0x4000014  2  W     BG1 X-Offset */
 #define BG1VOFS     HWHI(0x014)  /* 0x4000016  2  W     BG1 Y-Offset */
 #define BG2HOFS     HWLO(0x018)  /* 0x4000018  2  W     BG2 X-Offset */
-#define BG2VOFS     HWHI(0x018)  /* 0x400001A  2  W     BG2 Y-Offset */
-#define BG3HOFS     HWLO(0x01C)  /* 0x400001C  2  W     BG3 X-Offset */
-#define BG3VOFS     HWHI(0x01C)  /* 0x400001E  2  W     BG3 Y-Offset */
+#define BG2VOFS     HWHI(0x018)  /* 0x400001a  2  W     BG2 Y-Offset */
+#define BG3HOFS     HWLO(0x01c)  /* 0x400001c  2  W     BG3 X-Offset */
+#define BG3VOFS     HWHI(0x01c)  /* 0x400001e  2  W     BG3 Y-Offset */
 #define BG2PA       HWLO(0x020)  /* 0x4000020  2  W     BG2 Rotation/Scaling Parameter A (dx) */
 #define BG2PB       HWHI(0x020)  /* 0x4000022  2  W     BG2 Rotation/Scaling Parameter B (dmx) */
 #define BG2PC       HWLO(0x024)  /* 0x4000024  2  W     BG2 Rotation/Scaling Parameter C (dy) */
 #define BG2PD       HWHI(0x024)  /* 0x4000026  2  W     BG2 Rotation/Scaling Parameter D (dmy) */
 #define BG2X        WORD(0x028)  /* 0x4000028  4  W     BG2 Reference Point X-Coordinate */
-#define BG2Y        WORD(0x02C)  /* 0x400002C  4  W     BG2 Reference Point Y-Coordinate */
+#define BG2Y        WORD(0x02c)  /* 0x400002c  4  W     BG2 Reference Point Y-Coordinate */
 #define BG3PA       HWLO(0x030)  /* 0x4000030  2  W     BG3 Rotation/Scaling Parameter A (dx) */
 #define BG3PB       HWHI(0x030)  /* 0x4000032  2  W     BG3 Rotation/Scaling Parameter B (dmx) */
 #define BG3PC       HWLO(0x034)  /* 0x4000034  2  W     BG3 Rotation/Scaling Parameter C (dy) */
 #define BG3PD       HWHI(0x034)  /* 0x4000036  2  W     BG3 Rotation/Scaling Parameter D (dmy) */
 #define BG3X        WORD(0x038)  /* 0x4000038  4  W     BG3 Reference Point X-Coordinate */
-#define BG3Y        WORD(0x03C)  /* 0x400003C  4  W     BG3 Reference Point Y-Coordinate */
+#define BG3Y        WORD(0x03c)  /* 0x400003c  4  W     BG3 Reference Point Y-Coordinate */
 #define WIN0H       HWLO(0x040)  /* 0x4000040  2  W     Window 0 Horizontal Dimensions */
 #define WIN1H       HWHI(0x040)  /* 0x4000042  2  W     Window 1 Horizontal Dimensions */
 #define WIN0V       HWLO(0x044)  /* 0x4000044  2  W     Window 0 Vertical Dimensions */
 #define WIN1V       HWHI(0x044)  /* 0x4000046  2  W     Window 1 Vertical Dimensions */
 #define WININ       HWLO(0x048)  /* 0x4000048  2  R/W   Inside of Window 0 and 1 */
-#define WINOUT      HWHI(0x048)  /* 0x400004A  2  R/W   Inside of OBJ Window & Outside of Windows */
-#define MOSAIC      HWLO(0x04C)  /* 0x400004C  2  W     Mosaic Size */
-								 /* 0x400004E  2  -     Unused */
+#define WINOUT      HWHI(0x048)  /* 0x400004a  2  R/W   Inside of OBJ Window & Outside of Windows */
+#define MOSAIC      HWLO(0x04c)  /* 0x400004c  2  W     Mosaic Size */
+								 /* 0x400004e  2  -     Unused */
 #define BLDCNT      HWLO(0x050)  /* 0x4000050  2  R/W   Color Special Effects Selection */
 #define BLDALPHA    HWHI(0x050)  /* 0x4000052  2  W     Alpha Blending Coefficients */
 #define BLDY        HWLO(0x054)  /* 0x4000054  2  W     Brightness (Fade-In/Out) Coefficient */
@@ -60,67 +60,18 @@
 #define DISPSTAT_SET(val)       HWLO_SET(0x004, val)
 #define DISPSTAT_RESET(val)     HWLO_RESET(0x004, val)
 
-#define DISPSTAT_VBL            0x0001
-#define DISPSTAT_HBL            0x0002
-#define DISPSTAT_VCNT           0x0004
-#define DISPSTAT_VBL_IRQ_EN     0x0008
-#define DISPSTAT_HBL_IRQ_EN     0x0010
-#define DISPSTAT_VCNT_IRQ_EN    0x0020
-#define DISPSTAT_VCNT_VALUE     0xff00
-
-#define DISPCNT_MODE            0x0007
-#define DISPCNT_FRAMESEL        0x0010
-
-#define DISPCNT_VRAM_MAP_1D     0x0040
-
-#define DISPCNT_BLANK           0x0080
-#define DISPCNT_BG0_EN          0x0100
-#define DISPCNT_BG1_EN          0x0200
-#define DISPCNT_BG2_EN          0x0400
-#define DISPCNT_BG3_EN          0x0800
-#define DISPCNT_OBJ_EN          0x1000
-#define DISPCNT_WIN0_EN         0x2000
-#define DISPCNT_WIN1_EN         0x4000
-#define DISPCNT_OBJWIN_EN       0x8000
-
-#define BGCNT_PALETTESET_WRAP   0x2000
-#define BGCNT_PALETTE256        0x0080
-#define BGCNT_MOSAIC            0x0040
-#define BGCNT_PRIORITY          0x0003
-
-#define BLDCNT_SFX              0x00c0
-#define BLDCNT_SFX_NONE         0x0000
-#define BLDCNT_SFX_ALPHA        0x0040
-#define BLDCNT_SFX_LIGHTEN      0x0080
-#define BLDCNT_SFX_DARKEN       0x00c0
-#define BLDCNT_TP2_SHIFT        8
-
-#define TILEOBJ_TILE            0x03ff
-#define TILEOBJ_HFLIP           0x0400
-#define TILEOBJ_VFLIP           0x0800
-#define TILEOBJ_PALETTE         0xf000
-
-#define GBA_MODE0               0
-#define GBA_MODE1               1
-#define GBA_MODE2               2
-#define GBA_MODE345             3
-
-#define GBA_SUBMODE0            0
-#define GBA_SUBMODE1            1
-#define GBA_SUBMODE2            2
-
 #define VERBOSE_LEVEL   (0)
 
 static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
-	if( VERBOSE_LEVEL >= n_level )
+	if (VERBOSE_LEVEL >= n_level)
 	{
 		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror( "%08x: %s", device.machine().describe_context(), buf );
+		char buf[32768];
+		va_start(v, s_fmt);
+		vsprintf(buf, s_fmt, v);
+		va_end(v);
+		device.logerror("%08x: %s", device.machine().describe_context(), buf);
 	}
 }
 
@@ -130,26 +81,26 @@ public:
 	object(device_t &device, UINT16 *oam, int index)
 		: m_device(device)
 	{
-		attr0 = oam[(4 * index) + 0];
-		attr1 = oam[(4 * index) + 1];
-		attr2 = oam[(4 * index) + 2];
+		m_attr0 = oam[(4 * index) + 0];
+		m_attr1 = oam[(4 * index) + 1];
+		m_attr2 = oam[(4 * index) + 2];
 	}
 
-	int    pos_y()       { return  attr0 & 0x00FF; }
-	bool   roz()         { return  attr0 & 0x0100; }
-	bool   roz_double()  { return  attr0 & 0x0200; }
-	UINT16 mode_mask()   { return  attr0 & 0x0C00; }
-	bool   mosaic()      { return  attr0 & 0x1000; }
-	bool   palette_256() { return  attr0 & 0x2000; }
+	int    pos_y()       { return  m_attr0 & 0x00ff; }
+	bool   roz()         { return  m_attr0 & 0x0100; }
+	bool   roz_double()  { return  m_attr0 & 0x0200; }
+	UINT16 mode_mask()   { return  m_attr0 & 0x0c00; }
+	bool   mosaic()      { return  m_attr0 & 0x1000; }
+	bool   palette_256() { return  m_attr0 & 0x2000; }
 
-	int    pos_x()       { return  attr1 & 0x01FF; }
-	int    roz_param()   { return (attr1 & 0x3E00) >> 9; }
-	bool   hflip()       { return  attr1 & 0x1000; }
-	bool   vflip()       { return  attr1 & 0x2000; }
+	int    pos_x()       { return  m_attr1 & 0x01ff; }
+	int    roz_param()   { return (m_attr1 & 0x3e00) >> 9; }
+	bool   hflip()       { return  m_attr1 & 0x1000; }
+	bool   vflip()       { return  m_attr1 & 0x2000; }
 
-	int    tile_number() { return  attr2 & 0x03FF; }
-	int    priority()    { return (attr2 & 0x0C00) >> 10; }
-	int    palette()     { return (attr2 & 0xF000) >> 8; }
+	int    tile_number() { return  m_attr2 & 0x03ff; }
+	int    priority()    { return (m_attr2 & 0x0c00) >> 10; }
+	int    palette()     { return (m_attr2 & 0xf000) >> 8; }
 
 	enum class mode : UINT16
 	{
@@ -157,7 +108,7 @@ public:
 		alpha  = 0x0400,
 		window = 0x0800
 	};
-	mode mode_enum() { return enum_value<mode>(attr0 & 0x0C00); }
+	mode mode_enum() { return enum_value<mode>(m_attr0 & 0x0c00); }
 
 	void size(int &width, int &height)
 	{
@@ -169,8 +120,8 @@ public:
 			{ { 0,   0 }, { 0,   0 }, { 0,   0 }, { 0,   0 } }  // invalid
 		};
 
-		int shape = (attr0 & 0xC000) >> 14;
-		int size  = (attr1 & 0xC000) >> 14;
+		int shape = (m_attr0 & 0xc000) >> 14;
+		int size  = (m_attr1 & 0xc000) >> 14;
 
 		width  = size_table[shape][size][0];
 		height = size_table[shape][size][1];
@@ -182,97 +133,10 @@ public:
 private:
 	device_t &m_device;
 
-	UINT16 attr0;
-	UINT16 attr1;
-	UINT16 attr2;
+	UINT16 m_attr0;
+	UINT16 m_attr1;
+	UINT16 m_attr2;
 };
-
-inline UINT32 gba_lcd_device::bg_screen_base(UINT32 bgxcnt)
-{
-	return ((bgxcnt & 0x1F00) >> 8) * 0x800;
-}
-
-inline UINT32 gba_lcd_device::bg_char_base(UINT32 bgxcnt)
-{
-	return ((bgxcnt & 0x003C) >> 2) * 0x4000;
-}
-
-inline void gba_lcd_device::bg_screen_size(UINT16 bgxcnt, bool text, int &width, int &height)
-{
-	static const int size_table[2][4][2] =
-	{
-		{ { 256, 256 }, { 512, 256 }, { 256, 512 }, { 512,   512 } }, // text mode
-		{ { 128, 128 }, { 256, 256 }, { 512, 512 }, { 1024, 1024 } }  // rotation/scaling (roz) mode
-	};
-
-	int mode = text ? 0 : 1;
-	int size = (bgxcnt & 0xC000) >> 14;
-
-	width  = size_table[mode][size][0];
-	height = size_table[mode][size][1];
-}
-
-static const int coeff[32] = {
-	0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
-};
-
-static inline UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb)
-{
-	if(color0 < 0x80000000)
-	{
-		int r0 = (color0 >>  0) & 0x1f;
-		int g0 = (color0 >>  5) & 0x1f;
-		int b0 = (color0 >> 10) & 0x1f;
-		int r1 = (color1 >>  0) & 0x1f;
-		int g1 = (color1 >>  5) & 0x1f;
-		int b1 = (color1 >> 10) & 0x1f;
-		int r = ((r0 * ca) >> 4) + ((r1 * cb) >> 4);
-		int g = ((g0 * ca) >> 4) + ((g1 * cb) >> 4);
-		int b = ((b0 * ca) >> 4) + ((b1 * cb) >> 4);
-
-		if(r > 0x1f) r = 0x1f;
-		if(g > 0x1f) g = 0x1f;
-		if(b > 0x1f) b = 0x1f;
-
-		return (color0 & 0xffff0000) | (b << 10) | (g << 5) | r;
-	}
-	return color0;
-}
-
-static inline UINT32 increase_brightness(UINT32 color, int coeff_)
-{
-	int r = (color >>  0) & 0x1f;
-	int g = (color >>  5) & 0x1f;
-	int b = (color >> 10) & 0x1f;
-
-	r += ((0x1f - r) * coeff_) >> 4;
-	g += ((0x1f - g) * coeff_) >> 4;
-	b += ((0x1f - b) * coeff_) >> 4;
-
-	if(r > 0x1f) r = 0x1f;
-	if(g > 0x1f) g = 0x1f;
-	if(b > 0x1f) b = 0x1f;
-
-	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
-}
-
-static inline UINT32 decrease_brightness(UINT32 color, int coeff_)
-{
-	int r = (color >>  0) & 0x1f;
-	int g = (color >>  5) & 0x1f;
-	int b = (color >> 10) & 0x1f;
-
-	r -= (r * coeff_) >> 4;
-	g -= (g * coeff_) >> 4;
-	b -= (b * coeff_) >> 4;
-
-	if(r < 0) r = 0;
-	if(g < 0) g = 0;
-	if(b < 0) b = 0;
-
-	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
-}
 
 const device_type GBA_LCD = &device_creator<gba_lcd_device>;
 
@@ -287,302 +151,310 @@ gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-inline void gba_lcd_device::update_mask(UINT8* mask, int mode, int submode, UINT32* obj_win, UINT8 inwin0, UINT8 inwin1, UINT8 in0_mask, UINT8 in1_mask, UINT8 out_mask)
+inline UINT8 gba_lcd_device::bg_video_mode()
 {
-	UINT8 mode_mask = 0;
-	if (submode == GBA_SUBMODE2)
+	UINT8 mode = DISPCNT & 0x0007;
+
+	if (mode > 5)
 	{
-		for (int x = 0; x < 240; x++)
-		{
-			mask[x] = out_mask;
-
-			if ((obj_win[x] & 0x80000000) == 0)
-				mask[x] = WINOUT >> 8;
-
-			if (inwin1)
-			{
-				if (is_in_window(x, 1))
-					mask[x] = in1_mask;
-			}
-
-			if (inwin0)
-			{
-				if (is_in_window(x, 0))
-					mask[x] = in0_mask;
-			}
-		}
+		verboselog(*this, 0, "WARNING: attempted to set invalid BG video mode %d\n", mode);
+		return 0;
 	}
 
-	if (mode == GBA_MODE1)
-	{
-		// disable line3
-		mode_mask = ~0x08;
-	}
-	else if (mode == GBA_MODE2)
-	{
-		// disable line0 & line1
-		mode_mask = ~0x03;
-	}
-	else if (mode == GBA_MODE345)
-	{
-		// disable line0, line1 & line3
-		mode_mask = ~0x0b;
-	}
+	return mode;
+}
 
-	if (mode_mask)
+inline bool gba_lcd_device::is_set(dispcnt flag)
+{
+	return DISPCNT & underlying_value(flag);
+}
+
+inline void gba_lcd_device::set(dispstat flag)
+{
+	DISPSTAT_SET(underlying_value(flag));
+}
+
+inline void gba_lcd_device::clear(dispstat flag)
+{
+	DISPSTAT_RESET(underlying_value(flag));
+}
+
+inline bool gba_lcd_device::is_set(dispstat flag)
+{
+	return DISPSTAT & underlying_value(flag);
+}
+
+inline bool gba_lcd_device::is_set(UINT16 bgxcnt, bgcnt flag)
+{
+	return bgxcnt & underlying_value(flag);
+}
+
+inline UINT8 gba_lcd_device::bg_priority(UINT16 bgxcnt)
+{
+	return bgxcnt & 0x0003;
+}
+
+inline UINT32 gba_lcd_device::bg_char_base(UINT16 bgxcnt)
+{
+	return ((bgxcnt & 0x003c) >> 2) * 0x4000;
+}
+
+inline UINT32 gba_lcd_device::bg_screen_base(UINT16 bgxcnt)
+{
+	return ((bgxcnt & 0x1f00) >> 8) * 0x800;
+}
+
+inline void gba_lcd_device::bg_screen_size(UINT16 bgxcnt, bool text, int &width, int &height)
+{
+	static const int size_table[2][4][2] =
 	{
-		for (int x = 0; x < 240; x++)
-			mask[x] &= mode_mask;
+		{ { 256, 256 }, { 512, 256 }, { 256, 512 }, { 512,   512 } }, // text mode
+		{ { 128, 128 }, { 256, 256 }, { 512, 512 }, { 1024, 1024 } }  // rotation/scaling (roz) mode
+	};
+
+	int mode = text ? 0 : 1;
+	int size = (bgxcnt & 0xc000) >> 14;
+
+	width  = size_table[mode][size][0];
+	height = size_table[mode][size][1];
+}
+
+inline UINT16 gba_lcd_device::mosaic_size(size_type type)
+{
+	return ((MOSAIC >> (4 * underlying_value(type))) & 0xf) + 1;
+}
+
+inline gba_lcd_device::sfx gba_lcd_device::color_sfx()
+{
+	return enum_value<sfx>(BLDCNT & 0x00c0);
+}
+
+inline UINT8 gba_lcd_device::color_sfx_target(target id)
+{
+	return (BLDCNT >> (8 * underlying_value(id))) & 0x3f;
+}
+
+inline void gba_lcd_device::update_mask(UINT8* mask, int y)
+{
+	bool inwin0 = false;
+	bool inwin1 = false;
+
+	if (is_set(dispcnt::win0_en))
+		inwin0 = is_in_window_v(y, 0);
+
+	if (is_set(dispcnt::win1_en))
+		inwin1 = is_in_window_v(y, 1);
+
+	for (auto x = 0; x < 240; x++)
+	{
+		mask[x] = WINOUT & 0x00ff;
+
+		if (m_scanline[5][x] != TRANSPARENT_PIXEL)
+			mask[x] = WINOUT >> 8;
+
+		if (inwin1 && is_in_window_h(x, 1))
+			mask[x] = WININ >> 8;
+
+		if (inwin0 && is_in_window_h(x, 0))
+			mask[x] = WININ & 0x00ff;
 	}
 }
 
-void gba_lcd_device::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
+void gba_lcd_device::draw_scanline(int y)
 {
-	UINT32 backdrop = ((UINT16*)m_pram.get())[0] | 0x30000000;
-	int inWindow0 = 0;
-	int inWindow1 = 0;
-	UINT8 inWin0Mask = WININ & 0x00ff;
-	UINT8 inWin1Mask = WININ >> 8;
-	UINT8 outMask = WINOUT & 0x00ff;
-	UINT8 masks[240];   // this puts together WinMasks with the fact that some modes/submodes skip specific layers!
+	UINT16 *scanline = &m_bitmap.pix16(y);
 
-	if (submode == GBA_SUBMODE2)
+	if (is_set(dispcnt::forced_blank))
 	{
-		if (DISPCNT & DISPCNT_WIN0_EN)
-		{
-			UINT8 v0 = WIN0V >> 8;
-			UINT8 v1 = WIN0V & 0x00ff;
-			inWindow0 = ((v0 == v1) && (v0 >= 0xe8)) ? 1 : 0;
-			if (v1 >= v0)
-				inWindow0 |= (y >= v0 && y < v1) ? 1 : 0;
-			else
-				inWindow0 |= (y >= v0 || y < v1) ? 1 : 0;
-		}
+		// forced blank is white
+		for (auto x = 0; x < 240; x++)
+			scanline[x] = 0x7fff;
 
-		if (DISPCNT & DISPCNT_WIN1_EN)
+		return;
+	}
+
+	UINT8 mode = bg_video_mode();
+
+	UINT8 submode;
+	if (is_set(dispcnt::win0_en) || is_set(dispcnt::win1_en) || is_set(dispcnt::obj_win_en))
+		submode = 2;
+	else if (color_sfx() != sfx::none)
+		submode = 1;
+	else
+		submode = 0;
+
+	int depth = 0;
+	if (mode == 3)
+		depth = 16;
+	else if (mode == 4)
+		depth = 8;
+	else if (mode == 5)
+		depth = 4;
+
+	// make all layers transparent at start
+	for (auto l = 0; l < 6; l++)
+	{
+		for (auto x = 0; x < 240; x++)
 		{
-			UINT8 v0 = WIN1V >> 8;
-			UINT8 v1 = WIN1V & 0x00ff;
-			inWindow1 = ((v0 == v1) && (v0 >= 0xe8)) ? 1 : 0;
-			if (v1 >= v0)
-				inWindow1 |= (y >= v0 && y < v1) ? 1 : 0;
-			else
-				inWindow1 |= (y >= v0 || y < v1) ? 1 : 0;
+			m_scanline[l][x] = TRANSPARENT_PIXEL;		
 		}
 	}
 
-	// Draw BG
+	// draw background
 	switch (mode)
 	{
-		case 0:
-			draw_bg_scanline(line0, y, DISPCNT_BG0_EN, BG0CNT, BG0HOFS, BG0VOFS);
-			draw_bg_scanline(line1, y, DISPCNT_BG1_EN, BG1CNT, BG1HOFS, BG1VOFS);
-			draw_bg_scanline(line2, y, DISPCNT_BG2_EN, BG2CNT, BG2HOFS, BG2VOFS);
-			draw_bg_scanline(line3, y, DISPCNT_BG3_EN, BG3CNT, BG3HOFS, BG3VOFS);
-			break;
-		case 1:
-			draw_bg_scanline(line0, y, DISPCNT_BG0_EN, BG0CNT, BG0HOFS, BG0VOFS);
-			draw_bg_scanline(line1, y, DISPCNT_BG1_EN, BG1CNT, BG1HOFS, BG1VOFS);
-			draw_roz_scanline(line2, y, DISPCNT_BG2_EN, BG2CNT, BG2X, BG2Y, BG2PA, BG2PB, BG2PC, BG2PD, &m_gfxBG2X, &m_gfxBG2Y, m_gfxBG2Changed);
-			break;
-		case 2:
-			draw_roz_scanline(line2, y, DISPCNT_BG2_EN, BG2CNT, BG2X, BG2Y, BG2PA, BG2PB, BG2PC, BG2PD, &m_gfxBG2X, &m_gfxBG2Y, m_gfxBG2Changed);
-			draw_roz_scanline(line3, y, DISPCNT_BG3_EN, BG3CNT, BG3X, BG3Y, BG3PA, BG3PB, BG3PC, BG3PD, &m_gfxBG3X, &m_gfxBG3Y, m_gfxBG3Changed);
-			break;
-		case 3:
-		case 4:
-		case 5:
-			draw_roz_bitmap_scanline(line2, y, DISPCNT_BG2_EN, BG2CNT, BG2X, BG2Y, BG2PA, BG2PB, BG2PC, BG2PD, &m_gfxBG2X, &m_gfxBG2Y, m_gfxBG2Changed, bpp);
-			break;
+	case 0:
+		draw_bg_scanline(m_scanline[0], y, dispcnt::bg0_en, BG0CNT, BG0HOFS, BG0VOFS);
+		draw_bg_scanline(m_scanline[1], y, dispcnt::bg1_en, BG1CNT, BG1HOFS, BG1VOFS);
+		draw_bg_scanline(m_scanline[2], y, dispcnt::bg2_en, BG2CNT, BG2HOFS, BG2VOFS);
+		draw_bg_scanline(m_scanline[3], y, dispcnt::bg3_en, BG3CNT, BG3HOFS, BG3VOFS);
+		break;
+	case 1:
+		draw_bg_scanline(m_scanline[0], y, dispcnt::bg0_en, BG0CNT, BG0HOFS, BG0VOFS);
+		draw_bg_scanline(m_scanline[1], y, dispcnt::bg1_en, BG1CNT, BG1HOFS, BG1VOFS);
+		draw_roz_scanline(m_scanline[2], y, dispcnt::bg2_en, BG2CNT, BG2X, BG2Y, BG2PA, BG2PB, BG2PC, BG2PD, m_bg2x, m_bg2y);
+		break;
+	case 2:
+		draw_roz_scanline(m_scanline[2], y, dispcnt::bg2_en, BG2CNT, BG2X, BG2Y, BG2PA, BG2PB, BG2PC, BG2PD, m_bg2x, m_bg2y);
+		draw_roz_scanline(m_scanline[3], y, dispcnt::bg3_en, BG3CNT, BG3X, BG3Y, BG3PA, BG3PB, BG3PC, BG3PD, m_bg3x, m_bg3y);
+		break;
+	case 3:
+	case 4:
+	case 5:
+		draw_roz_bitmap_scanline(m_scanline[2], y, dispcnt::bg2_en, BG2CNT, BG2X, BG2Y, BG2PA, BG2PB, BG2PC, BG2PD, m_bg2x, m_bg2y, depth);
+		break;
 	}
 
-	// Draw OAM
-	draw_gba_oam(lineOBJ, y);
-	if (submode == GBA_SUBMODE2)
-		draw_gba_oam_window(lineOBJWin, y);
+	UINT8 mask[240];
 
-	memset(masks, 0xff, sizeof(masks));
-	update_mask(&masks[0], mode, submode, lineOBJWin, inWindow0, inWindow1, inWin0Mask, inWin1Mask, outMask);
+	// draw objects
+	draw_oam(m_scanline[4], y);
 
-	for (int x = 0; x < 240; x++)
+	if (submode == 2)
+	{
+		draw_oam_window(m_scanline[5], y);
+		update_mask(mask, y);	
+	}
+	else
+	{
+		memset(mask, 0xff, sizeof(mask));
+	}
+
+	UINT32 backdrop = ((UINT16 *)m_pram.get())[0] | 0x30000000;
+
+	for (auto x = 0; x < 240; x++)
 	{
 		UINT32 color = backdrop;
 		UINT8 top = 0x20;
 
-		if ((UINT8)(line0[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x01)
+		for (auto l = 0; l < 5; l++)
 		{
-			color = line0[x];
-			top = 0x01;
-		}
-
-		if ((UINT8)(line1[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x02)
-		{
-			color = line1[x];
-			top = 0x02;
-		}
-
-		if ((UINT8)(line2[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x04)
-		{
-			color = line2[x];
-			top = 0x04;
-		}
-
-		if ((UINT8)(line3[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x08)
-		{
-			color = line3[x];
-			top = 0x08;
-		}
-
-		if ((UINT8)(lineOBJ[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x10)
-		{
-			color = lineOBJ[x];
-			top = 0x10;
+			if ((m_scanline[l][x] >> 24) < (color >> 24) && mask[x] & (0x01 << l))
+			{
+				color = m_scanline[l][x];
+				top = (0x01 << l);
+			}
 		}
 
 		if (color & 0x00010000)
 		{
-			if (submode != GBA_SUBMODE0 || top == 0x10)
+			if (submode != 0 || top == 0x10)
 			{
 				UINT32 back = backdrop;
 				UINT8 top2 = 0x20;
 
-				if ((UINT8)(line0[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x01)
+				for (auto l = 0; l < 4; l++)
 				{
-					back = line0[x];
-					top2 = 0x01;
-				}
-
-				if ((UINT8)(line1[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x02)
-				{
-					back = line1[x];
-					top2 = 0x02;
-				}
-
-				if ((UINT8)(line2[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x04)
-				{
-					back = line2[x];
-					top2 = 0x04;
-				}
-
-				if ((UINT8)(line3[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x08)
-				{
-					back = line3[x];
-					top2 = 0x08;
-				}
-
-				if (top2 & (BLDCNT >> BLDCNT_TP2_SHIFT))
-					color = alpha_blend_pixel(color, back, coeff[BLDALPHA & 0x1f], coeff[(BLDALPHA >> 8) & 0x1f]);
-				else
-				{
-					if (top & BLDCNT)
+					if ((m_scanline[l][x] >> 24) < (back >> 24) && mask[x] & (0x01 << l))
 					{
-						switch(BLDCNT & BLDCNT_SFX)
-						{
-							case BLDCNT_SFX_LIGHTEN:
-								color = increase_brightness(color, coeff[BLDY & 0x1f]);
-								break;
-							case BLDCNT_SFX_DARKEN:
-								color = decrease_brightness(color, coeff[BLDY & 0x1f]);
-								break;
-						}
+						back = m_scanline[l][x];
+						top2 = (0x01 << l);
+					}
+				}
+
+				if (top2 & color_sfx_target(target::second))
+				{
+					color = alpha_blend(color, back);
+				}
+				else if (top & color_sfx_target(target::first))
+				{
+					switch (color_sfx())
+					{
+					case sfx::lighten:
+						color = increase_brightness(color);
+						break;
+					case sfx::darken:
+						color = decrease_brightness(color);
+						break;
+					default:
+						break;
 					}
 				}
 			}
 		}
-		else if (submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && masks[x] & 0x20))
+		else if (submode == 1 || (submode == 2 && mask[x] & 0x20))
 		{
-			if (top & BLDCNT)
+			if (top & color_sfx_target(target::first))
 			{
-				switch(BLDCNT & BLDCNT_SFX)
+				switch (color_sfx())
 				{
-					case BLDCNT_SFX_NONE:
-						break;
-					case BLDCNT_SFX_ALPHA:
+				case sfx::none:
+					break;
+				case sfx::alpha:
+				{
+					UINT32 back = backdrop;
+					UINT8 top2 = 0x20;
+
+					for (auto l = 0; l < 5; l++)
 					{
-						UINT32 back = backdrop;
-						UINT8 top2 = 0x20;
-
-						if ((UINT8)(line0[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x01)
+						if ((m_scanline[l][x] >> 24) < (back >> 24) && mask[x] & (0x01 << l))
 						{
-							if (top != 0x01)
+							if (top != (0x01 << l))
 							{
-								back = line0[x];
-								top2 = 0x01;
+								back = m_scanline[l][x];
+								top2 = (0x01 << l);
 							}
 						}
-
-						if ((UINT8)(line1[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x02)
-						{
-							if (top != 0x02)
-							{
-								back = line1[x];
-								top2 = 0x02;
-							}
-						}
-
-						if ((UINT8)(line2[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x04)
-						{
-							if (top != 0x04)
-							{
-								back = line2[x];
-								top2 = 0x04;
-							}
-						}
-
-						if ((UINT8)(line3[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x08)
-						{
-							if (top != 0x08)
-							{
-								back = line3[x];
-								top2 = 0x08;
-							}
-						}
-
-						if ((UINT8)(lineOBJ[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x10)
-						{
-							if (top != 0x10)
-							{
-								back = lineOBJ[x];
-								top2 = 0x10;
-							}
-						}
-
-						if (top2 & (BLDCNT >> BLDCNT_TP2_SHIFT))
-							color = alpha_blend_pixel(color, back, coeff[BLDALPHA & 0x1f], coeff[(BLDALPHA >> 8) & 0x1f]);
 					}
-						break;
-					case BLDCNT_SFX_LIGHTEN:
-						color = increase_brightness(color, coeff[BLDY & 0x1f]);
-						break;
-					case BLDCNT_SFX_DARKEN:
-						color = decrease_brightness(color, coeff[BLDY & 0x1f]);
-						break;
+
+					if (top2 & color_sfx_target(target::second))
+						color = alpha_blend(color, back);
+
+					break;
+				}
+				case sfx::lighten:
+					color = increase_brightness(color);
+					break;
+				case sfx::darken:
+					color = decrease_brightness(color);
+					break;
 				}
 			}
 		}
-		lineMix[x] = color;
+		scanline[x] = color & 0x7fff;
 	}
-	if (mode == GBA_MODE1 || mode == GBA_MODE2 || mode == GBA_MODE345)
-		m_gfxBG2Changed = 0;
-	if (mode == GBA_MODE2)
-		m_gfxBG3Changed = 0;
 }
 
-void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
+void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, internal_reg &currentx, internal_reg &currenty, int depth)
 {
+	if (!is_set(bg_enable))
+		return;
+
 	UINT8 *src8 = (UINT8 *)m_vram.get();
 	UINT16 *src16 = (UINT16 *)m_vram.get();
 	UINT16 *palette = (UINT16 *)m_pram.get();
 	INT32 sx = (depth == 4) ? 160 : 240;
 	INT32 sy = (depth == 4) ? 128 : 160;
-	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
-	INT32 cx, cy, pixx, pixy, x;
+	UINT32 prio = (bg_priority(ctrl) << 25) + 0x1000000;
 
-	if ((depth == 8) && (DISPCNT & DISPCNT_FRAMESEL))
-		src8 += 0xa000;
+	if (is_set(dispcnt::alt_frame_sel))
+	{
+		if (depth == 8)
+			src8 += 0xa000;
 
-	if ((depth == 4) && (DISPCNT & DISPCNT_FRAMESEL))
-		src16 += 0xa000/2;
+		if (depth == 4)
+			src16 += 0xa000 / 2;
+	}
 
 	// sign extend roz parameters
 	if (X & 0x08000000) X |= 0xf0000000;
@@ -592,49 +464,53 @@ void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32
 	if (PC & 0x8000) PC |= 0xffff0000;
 	if (PD & 0x8000) PD |= 0xffff0000;
 
-	if(ypos == 0)
-		changed = 3;
-
-	if(changed & 1)
-		*currentx = X;
-	else
-		*currentx += PB;
-
-	if(changed & 2)
-		*currenty = Y;
-	else
-		*currenty += PD;
-
-	cx = *currentx;
-	cy = *currenty;
-
-	if(ctrl & BGCNT_MOSAIC)
+	if (currentx.update)
 	{
-		INT32 mosaic_line = ((MOSAIC & 0xf0) >> 4) + 1;
-		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
-		cx = X + tempy*PB;
-		cy = Y + tempy*PD;
+		currentx.status = X;
+		currentx.update = false;
+	}
+	else
+	{
+		currentx.status += PB;
 	}
 
-	pixx = cx >> 8;
-	pixy = cy >> 8;
-
-	for(x = 0; x < 240; x++)
+	if (currenty.update)
 	{
-		if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
-		{
-			scanline[x] = 0x80000000;
-		}
-		else
+		currenty.status = Y;
+		currenty.update = false;
+	}
+	else
+	{
+		currenty.status += PD;
+	}
+
+	INT32 cx = currentx.status;
+	INT32 cy = currenty.status;
+
+	if (is_set(ctrl, bgcnt::mosaic_en))
+	{
+		UINT16 mosaic_line = mosaic_size(size_type::bg_v);
+		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
+		cx = X + tempy * PB;
+		cy = Y + tempy * PD;
+	}
+
+	INT32 pixx = cx >> 8;
+	INT32 pixy = cy >> 8;
+
+	for (auto x = 0; x < 240; x++)
+	{
+		if (pixx >= 0 && pixy >= 0 && pixx < sx && pixy < sy)
 		{
 			if (depth == 8)
 			{
-				UINT8 color = src8[pixy*sx + pixx];
-				scanline[x] = color ? (palette[color] | prio) : 0x80000000;
+				UINT8 color = src8[pixy * sx + pixx];
+				if (color)
+					scanline[x] = palette[color] | prio;
 			}
 			else
 			{
-				scanline[x] = src16[pixy*sx + pixx] | prio;
+				scanline[x] = src16[pixy * sx + pixx] | prio;
 			}
 		}
 
@@ -645,17 +521,17 @@ void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32
 		pixy = cy >> 8;
 	}
 
-	if(ctrl & BGCNT_MOSAIC)
+	if (is_set(ctrl, bgcnt::mosaic_en))
 	{
-		INT32 mosaicx = (MOSAIC & 0x0f) + 1;
-		if(mosaicx > 1)
+		UINT16 mosaicx = mosaic_size(size_type::bg_h);
+		if (mosaicx > 1)
 		{
 			INT32 m = 1;
-			for(x = 0; x < 239; x++)
+			for (auto x = 0; x < 239; x++)
 			{
-				scanline[x+1] = scanline[x];
+				scanline[x + 1] = scanline[x];
 				m++;
-				if(m == mosaicx)
+				if (m == mosaicx)
 				{
 					m = 1;
 					x++;
@@ -665,632 +541,878 @@ void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32
 	}
 }
 
-void gba_lcd_device::draw_roz_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed)
+void gba_lcd_device::draw_roz_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, internal_reg &currentx, internal_reg &currenty)
 {
-	int width, height;
-	UINT32 base, mapbase;
-	INT32 cx, cy, pixx, pixy;
+	if (!is_set(bg_enable))
+		return;
+
 	UINT8 *mgba_vram = (UINT8 *)m_vram.get();
-	UINT32 tile;
 	UINT16 *pgba_pram = (UINT16 *)m_pram.get();
-	UINT16 pixel;
-	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
-	int x = 0;
+	UINT32 priority = (bg_priority(ctrl) << 25) + 0x1000000;
+	UINT32 base = bg_char_base(ctrl);
+	UINT32 mapbase = bg_screen_base(ctrl);
 
-	for (x = 0; x < 240; x++)
-		scanline[x] = 0x80000000;
+	// size of map in submaps
+	int width, height;
+	bg_screen_size(ctrl, false, width, height);
 
-	if (DISPCNT & enablemask)
+	// sign extend roz parameters
+	if (X & 0x08000000) X |= 0xf0000000;
+	if (Y & 0x08000000) Y |= 0xf0000000;
+	if (PA & 0x8000) PA |= 0xffff0000;
+	if (PB & 0x8000) PB |= 0xffff0000;
+	if (PC & 0x8000) PC |= 0xffff0000;
+	if (PD & 0x8000) PD |= 0xffff0000;
+
+	if (currentx.update)
 	{
-		base = bg_char_base(ctrl);                  // VRAM base of tiles
-		mapbase = bg_screen_base(ctrl);             // VRAM base of map
-		bg_screen_size(ctrl, false, width, height); // size of map in submaps
+		currentx.status = X;
+		currentx.update = false;
+	}
+	else
+	{
+		currentx.status += PB;
+	}
 
-		// sign extend roz parameters
-		if (X & 0x08000000) X |= 0xf0000000;
-		if (Y & 0x08000000) Y |= 0xf0000000;
-		if (PA & 0x8000) PA |= 0xffff0000;
-		if (PB & 0x8000) PB |= 0xffff0000;
-		if (PC & 0x8000) PC |= 0xffff0000;
-		if (PD & 0x8000) PD |= 0xffff0000;
+	if (currenty.update)
+	{
+		currenty.status = Y;
+		currenty.update = false;
+	}
+	else
+	{
+		currenty.status += PD;
+	}
 
-		if(ypos == 0)
-			changed = 3;
+	INT32 cx = currentx.status;
+	INT32 cy = currenty.status;
 
-		if(changed & 1)
-			*currentx = X;
-		else
-			*currentx += PB;
+	if (is_set(ctrl, bgcnt::mosaic_en))
+	{
+		UINT16 mosaic_line = mosaic_size(size_type::bg_v);
+		int y = ypos % mosaic_line;
+		cx -= y * PB;
+		cy -= y * PD;
+	}
 
-		if(changed & 2)
-			*currenty = Y;
-		else
-			*currenty += PD;
+	INT32 pixx = cx >> 8;
+	INT32 pixy = cy >> 8;
 
-		cx = *currentx;
-		cy = *currenty;
+	if (is_set(ctrl, bgcnt::wraparound_en))
+	{
+		pixx %= width;
+		pixy %= height;
 
-		if(ctrl & BGCNT_MOSAIC)
+		if (pixx < 0)
+			pixx += width;
+
+		if (pixy < 0)
+			pixy += height;
+	}
+
+	for (auto x = 0; x < 240; x++)
+	{
+		if (pixx >= 0 && pixy >= 0 && pixx < width && pixy < height)
 		{
-			int mosaic_line = ((MOSAIC & 0xf0) >> 4) + 1;
-			int y = ypos % mosaic_line;
-			cx -= y*PB;
-			cy -= y*PD;
+			int tilex = pixx & 7;
+			int tiley = pixy & 7;
+
+			// shall we shift for is_set(ctrl, bgcnt::palette_256)? or is not effective for ROZ?
+			UINT32 tile = mgba_vram[mapbase + (pixx >> 3) + (pixy >> 3) * (width >> 3)];
+			UINT16 pixel = mgba_vram[base + (tile << 6) + (tiley << 3) + tilex];
+
+			// plot it
+			if (pixel)
+				scanline[x] = pgba_pram[pixel] | priority;
 		}
+
+		cx += PA;
+		cy += PC;
 
 		pixx = cx >> 8;
 		pixy = cy >> 8;
 
-		if(ctrl & BGCNT_PALETTESET_WRAP)
+		if (is_set(ctrl, bgcnt::wraparound_en))
 		{
 			pixx %= width;
 			pixy %= height;
-			if(pixx < 0)
-			{
+
+			if (pixx < 0)
 				pixx += width;
-			}
-			if(pixy < 0)
-			{
+
+			if (pixy < 0)
 				pixy += height;
-			}
 		}
+	}
 
-		for(x = 0; x < 240; x++)
+	if (is_set(ctrl, bgcnt::mosaic_en))
+	{
+		UINT16 mosaicx = mosaic_size(size_type::bg_h);
+		if (mosaicx > 1)
 		{
-			if(pixx < 0 || pixy < 0 || pixx >= width || pixy >= height)
+			int m = 1;
+			for (auto x = 0; x < 239; x++)
 			{
-				scanline[x] = 0x80000000;
-			}
-			else
-			{
-				int tilex = pixx & 7;
-				int tiley = pixy & 7;
-
-				// shall we shift for (ctrl & BGCNT_PALETTE256)?? or is not effective for ROZ?
-				tile = mgba_vram[mapbase + (pixx >> 3) + (pixy >> 3) * (width >> 3)];
-				pixel = mgba_vram[base + (tile << 6) + (tiley << 3) + tilex];
-
-				// plot it
-				scanline[x] = pixel ? (pgba_pram[pixel] | prio) : 0x80000000;
-			}
-
-			cx += PA;
-			cy += PC;
-
-			pixx = cx >> 8;
-			pixy = cy >> 8;
-
-			if(ctrl & BGCNT_PALETTESET_WRAP)
-			{
-				pixx %= width;
-				pixy %= height;
-				if(pixx < 0)
+				scanline[x + 1] = scanline[x];
+				m++;
+				if (m == mosaicx)
 				{
-					pixx += width;
-				}
-				if(pixy < 0)
-				{
-					pixy += height;
-				}
-			}
-		}
-
-		if(ctrl & BGCNT_MOSAIC)
-		{
-			int mosaicx = (MOSAIC & 0x0f) + 1;
-			if(mosaicx > 1)
-			{
-				int m = 1;
-				for(x = 0; x < 239; x++)
-				{
-					scanline[x+1] = scanline[x];
-					m++;
-					if(m == mosaicx)
-					{
-						m = 1;
-						x++;
-					}
+					m = 1;
+					x++;
 				}
 			}
 		}
 	}
 }
 
-void gba_lcd_device::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs)
+void gba_lcd_device::draw_bg_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, UINT32 hofs, UINT32 vofs)
 {
+	if (!is_set(bg_enable))
+		return;
+
 	UINT8 *vram = (UINT8*)m_vram.get();
-	UINT16 *palette = (UINT16*)m_pram.get();
+	UINT16 *palette = (UINT16 *)m_pram.get();
 	UINT8 *chardata = &vram[bg_char_base(ctrl)];
-	UINT16 *screendata = (UINT16*)&vram[bg_screen_base(ctrl)];
-	UINT32 priority = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
+	UINT16 *screendata = (UINT16 *)&vram[bg_screen_base(ctrl)];
+	UINT32 priority = (bg_priority(ctrl) << 25) + 0x1000000;
+	UINT16 mosaicx = mosaic_size(size_type::bg_h);
+	UINT16 mosaicy = mosaic_size(size_type::bg_v);
+
 	int width, height;
-	INT32 maskx, masky, pixx, pixy;
-	UINT8 use_mosaic = (ctrl & BGCNT_MOSAIC) ? 1 : 0;
-	INT32 mosaicx = (MOSAIC & 0x000f) + 1;
-	INT32 mosaicy = ((MOSAIC & 0x00f0) >> 4) + 1;
-	INT32 stride;
-	int x = 0;
+	bg_screen_size(ctrl, true, width, height);
 
-	for (x = 0; x < 240; x++)
-		scanline[x] = 0x80000000;
+	INT32 pixx = hofs % width;
+	INT32 pixy = (vofs + ypos) % height;
 
-	if(DISPCNT & enablemask)
+	if (is_set(ctrl, bgcnt::mosaic_en) && ypos % mosaicy)
 	{
-		bg_screen_size(ctrl, true, width, height);
+		mosaicy = (ypos / mosaicy) * mosaicy;
+		pixy = (vofs + mosaicy) % height;
+	}
 
-		maskx = width - 1;
-		masky = height - 1;
-
-		pixx = hofs & maskx;
-		pixy = (vofs + ypos) & masky;
-
-		if(use_mosaic)
+	if (pixy > 255 && height > 256)
+	{
+		pixy &= 0x000000ff;
+		screendata += 0x400;
+		if (width > 256)
 		{
-			if((ypos % mosaicy) != 0)
-			{
-				mosaicy = (ypos / mosaicy) * mosaicy;
-				pixy = (vofs + mosaicy) & masky;
-			}
-		}
-
-		if(pixy > 255 && height > 256)
-		{
-			pixy &= 0x000000ff;
 			screendata += 0x400;
-			if(width > 256)
-			{
-				screendata += 0x400;
-			}
+		}
+	}
+
+	INT32 stride = (pixy >> 3) << 5;
+
+	UINT16 *src = screendata + 0x400 * (pixx >> 8) + ((pixx & 255) >> 3) + stride;
+
+	for (auto x = 0; x < 240; x++)
+	{
+		UINT16 data = *src;
+		INT32 tile = tile_number(data);
+		INT32 tilex = pixx & 7;
+		INT32 tiley = pixy & 7;
+		UINT8 color;
+		UINT8 palindex;
+
+		if (tile_hflip(data))
+			tilex = 7 - tilex;
+
+		if (tile_vflip(data))
+			tiley = 7 - tiley;
+
+		if (is_set(ctrl, bgcnt::palette_256))
+		{
+			color = chardata[(tile << 6) + (tiley << 3) + tilex];
+			palindex = 0;
+		}
+		else
+		{
+			color = chardata[(tile << 5) + (tiley << 2) + (tilex >> 1)];
+
+			if (tilex & 1)
+				color >>= 4;
+			else
+				color &= 0x0f;
+			palindex = (data >> 8) & 0x00f0;
 		}
 
-		stride = (pixy >> 3) << 5;
+		if (color)
+			scanline[x] = palette[palindex + color] | priority;
 
-		UINT16 *src = screendata + 0x400 * (pixx >> 8) + ((pixx & 255) >> 3) + stride;
-		for(x = 0; x < 240; x++)
+		if (tile_hflip(data))
 		{
-			UINT16 data = *src;
-			INT32 tile = data & TILEOBJ_TILE;
-			INT32 tilex = pixx & 7;
-			INT32 tiley = pixy & 7;
-			UINT8 color;
-			UINT8 palindex;
-
-			if(data & TILEOBJ_HFLIP)
-			{
-				tilex = 7 - tilex;
-			}
-			if(data & TILEOBJ_VFLIP)
-			{
-				tiley = 7 - tiley;
-			}
-
-			if (ctrl & BGCNT_PALETTE256)
-			{
-				color = chardata[(tile << 6) + (tiley << 3) + tilex];
-				palindex = 0;
-			}
-			else
-			{
-				color = chardata[(tile << 5) + (tiley << 2) + (tilex >> 1)];
-
-				if (tilex & 1)
-					color >>= 4;
-				else
-					color &= 0x0f;
-				palindex = (data >> 8) & 0x00f0;
-			}
-
-			if (color)
-				scanline[x] = palette[palindex + color] | priority;
-			else
-				scanline[x] = 0x80000000;
-
-			if (data & TILEOBJ_HFLIP)
-			{
-				if (tilex == 0)
-				{
-					src++;
-				}
-			}
-			else if (tilex == 7)
-			{
+			if (tilex == 0)
 				src++;
+		}
+		else if (tilex == 7)
+		{
+			src++;
+		}
+
+		pixx++;
+		if (pixx == 256)
+		{
+			if (width > 256)
+			{
+				src = screendata + 0x400 + stride;
+			}
+			else
+			{
+				src = screendata + stride;
+				pixx = 0;
+			}
+		}
+		else if (pixx >= width)
+		{
+			pixx = 0;
+			src = screendata + stride;
+		}
+	}
+
+	if (is_set(ctrl, bgcnt::mosaic_en) && mosaicx > 1)
+	{
+		INT32 m = 1;
+		for (auto x = 0; x < 239; x++)
+		{
+			scanline[x+1] = scanline[x];
+			m++;
+			if (m == mosaicx)
+			{
+				m = 1;
+				x++;
+			}
+		}
+	}
+}
+
+void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
+{
+	if (!is_set(dispcnt::obj_win_en))
+		return;
+
+	UINT16 *oam = (UINT16 *)m_oam.get();
+	UINT8 *src = (UINT8 *)m_vram.get();
+
+	for (auto obj_index = 127; obj_index >= 0; obj_index--)
+	{
+		object obj(*this, oam, obj_index);
+
+		if (obj.mode_enum() != object::mode::window)
+			continue;
+
+		UINT32 tile_number = obj.tile_number();
+
+		if (bg_video_mode() > 2 && tile_number < 0x200)
+			continue;
+
+		INT32 sx = obj.pos_x();
+		INT32 sy = obj.pos_y();
+
+		if (sy > 160)
+			sy -= 256;
+
+		int width, height;
+		obj.size(width, height);
+
+		if (obj.roz())
+		{
+			INT32 fx = width;
+			INT32 fy = height;
+
+			if (obj.roz_double())
+			{
+				fx *= 2;
+				fy *= 2;
 			}
 
-			pixx++;
-			if(pixx == 256)
+			INT32 cury = y - sy;
+
+			if (cury < 0 || cury >= fy)
+				continue;
+
+			if (sx >= 240 && ((sx + fx) % 512) >= 240)
+				continue;
+
+			int rot = obj.roz_param();
+			INT16 dx  = (INT16)oam[(rot << 4) + 3];
+			INT16 dmx = (INT16)oam[(rot << 4) + 7];
+			INT16 dy  = (INT16)oam[(rot << 4) + 11];
+			INT16 dmy = (INT16)oam[(rot << 4) + 15];
+
+			INT32 rx = (width << 7) - (fx >> 1) * dx - (fy >> 1) * dmx + cury * dmx;
+			INT32 ry = (height << 7) - (fx >> 1) * dy - (fy >> 1) * dmy + cury * dmy;
+
+			int inc = 32;
+
+			if (obj.palette_256())
 			{
-				if(width > 256)
+				if (is_set(dispcnt::vram_map_1d))
+					inc = sx >> 2;
+				else
+					tile_number &= 0x3fe;
+
+				for (auto x = 0; x < fx; x++)
 				{
-					src = screendata + 0x400 + stride;
+					INT32 ax = rx >> 8;
+					INT32 ay = ry >> 8;
+
+					if (ax >= 0 && ax < sx && ay >= 0 && ay < sy)
+					{
+						UINT8 color = src[0x10000 + ((((tile_number + (ay >> 3) * inc) << 5) + ((ay & 0x07) << 3) + ((ax >> 3) << 6) + (ax & 0x07)) & 0x7fff)];
+
+						if (color)
+							scanline[sx] = 1;
+					}
+
+					sx = (sx + 1) % 512;
+					rx += dx;
+					ry += dy;
+				}
+			}
+			else
+			{
+				if (is_set(dispcnt::vram_map_1d))
+					inc = sx >> 3;
+
+				for (auto x = 0; x < fx; x++)
+				{
+					INT32 ax = rx >> 8;
+					INT32 ay = ry >> 8;
+
+					if (ax >= 0 && ax < sx && ay >= 0 && ay < sy)
+					{
+						UINT8 color = src[0x10000 + ((((tile_number + (ay >> 3) * inc) << 5) + ((ay & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff)];
+
+						if (ax & 1)
+							color >>= 4;
+						else
+							color &= 0x0f;
+
+						if (color)
+							scanline[sx] = 1;
+					}
+
+					sx = (sx + 1) % 512;
+					rx += dx;
+					ry += dy;
+				}
+			}
+		}
+		else
+		{
+			// when roz bit is not set double roz bit means 'disable object'
+			if (obj.roz_double())
+				continue;
+
+			INT32 cury = y - sy;
+
+			if (cury < 0 || cury >= height)
+				continue;
+
+			if ((sx >= 240) && (((sx + width) % 512) >= 240))
+				continue;
+
+			int inc = 32;
+
+			if (obj.vflip())
+				cury = height - cury - 1;
+
+			INT32 ax = obj.hflip() ? (width - 1) : 0;
+
+			if (obj.palette_256())
+			{
+				if (is_set(dispcnt::vram_map_1d))
+					inc = width >> 2;
+				else
+					tile_number &= 0x3fe;
+
+				UINT32 address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 3) + ((ax >> 3) << 6) + (ax & 7)) & 0x7fff);
+
+				if (obj.hflip())
+					ax = 7;
+
+				for (auto x = 0; x < width; x++)
+				{
+					if (sx < 240)
+					{
+						UINT8 color = src[address];
+
+						if (color)
+							scanline[sx] = 1;
+					}
+
+					sx = (sx + 1) % 512;
+
+					if (obj.hflip())
+					{
+						ax--;
+						address--;
+
+						if (ax == -1)
+						{
+							address -= 56;
+							ax = 7;
+						}
+
+						if (address < 0x10000)
+							address += 0x8000;
+					}
+					else
+					{
+						ax++;
+						address++;
+
+						if (ax == 8)
+						{
+							address += 56;
+							ax = 0;
+						}
+
+						if (address > 0x17fff)
+							address -= 0x8000;
+					}
+				}
+			}
+			else
+			{
+				if (is_set(dispcnt::vram_map_1d))
+					inc = width >> 3;
+
+				UINT32 address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff);
+
+				if (obj.hflip())
+				{
+					ax = 7;
+
+					for (auto x = width - 1; x >= 0; x--)
+					{
+						if (sx < 240)
+						{
+							UINT8 color = src[address];
+							if (x & 1)
+								color >>= 4;
+							else
+								color &= 0x0f;
+
+							if (color)
+								scanline[sx] = 1;
+						}
+
+						sx = (sx + 1) % 512;
+						ax--;
+
+						if ((x & 1) == 0)
+							address--;
+
+						if (ax == -1)
+						{
+							ax = 7;
+							address -= 28;
+						}
+
+						if (address < 0x10000)
+							address += 0x8000;
+					}
 				}
 				else
 				{
-					src = screendata + stride;
-					pixx = 0;
-				}
-			}
-			else if(pixx >= width)
-			{
-				pixx = 0;
-				src = screendata + stride;
-			}
-		}
-
-		if(use_mosaic)
-		{
-			if(mosaicx > 1)
-			{
-				INT32 m = 1;
-				for(x = 0; x < 239; x++)
-				{
-					scanline[x+1] = scanline[x];
-					m++;
-					if(m == mosaicx)
+					for (auto x = 0; x < width; x++)
 					{
-						m = 1;
-						x++;
+						if (sx < 240)
+						{
+							UINT8 color = src[address];
+
+							if (x & 1)
+								color >>= 4;
+							else
+								color &= 0x0f;
+
+							if (color)
+								scanline[sx] = 1;
+						}
+
+						sx = (sx + 1) % 512;
+						ax++;
+
+						if (x & 1)
+							address++;
+
+						if (ax == 8)
+						{
+							address += 28;
+							ax = 0;
+						}
+
+						if (address > 0x17fff)
+							address -= 0x8000;
 					}
 				}
 			}
 		}
-
 	}
 }
 
-void gba_lcd_device::draw_gba_oam_window(UINT32 *scanline, int y)
+void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 {
-	UINT32 tilebytebase, tileindex, tiledrawindex;
-	int width, height;
+	if (!is_set(dispcnt::obj_en))
+		return;
+
+	INT32 mosaiccnt = 0;
+	UINT16 mosaicx = mosaic_size(size_type::obj_h);
+	UINT16 mosaicy = mosaic_size(size_type::obj_v);
 	UINT16 *oam = (UINT16 *)m_oam.get();
-	UINT8 *src = (UINT8*)m_vram.get();
-	int x = 0;
+	UINT8 *src = (UINT8 *)m_vram.get();
+	UINT16 *palette = (UINT16 *)m_pram.get();
 
-	for (x = 0; x < 240; x++)
-		scanline[x] = 0x80000000;
-
-	if (DISPCNT & DISPCNT_OBJWIN_EN)
+	for (auto obj_index = 0; obj_index < 128; obj_index++)
 	{
-		for( int obj_index = 127; obj_index >= 0; obj_index-- )
-		{
-			INT32 cury;
+		object obj(*this, oam, obj_index);
 
-			object obj(*this, oam, obj_index);
+		if (obj.mode_enum() == object::mode::window)
+			continue;
+
+		UINT32 priority = obj.priority();
+		UINT32 prio = (priority << 25) | (obj.mode_mask() << 6);
+
+		int width, height;
+		obj.size(width, height);
+
+		UINT32 tile_number = obj.tile_number();
+
+		if (bg_video_mode() > 2 && tile_number < 0x200)
+			continue;
+
+		if (obj.roz())
+		{
+			INT32 sx = obj.pos_x();
+			INT32 sy = obj.pos_y();
+
+			if (sy > 160)
+				sy -= 256;
+
+			INT32 fx = width;
+			INT32 fy = height;
+
+			if (obj.roz_double())
+			{
+				fx *= 2;
+				fy *= 2;
+			}
+
+			INT32 cury = y - sy;
+
+			if (cury < 0 || cury >= fy)
+				continue;
+
+			if (sx >= 240 && ((sx + fx) % 512) >= 240)
+				continue;
+
+			INT32 oamparam = obj.roz_param();
+
+			INT16 dx  = (INT16)oam[(oamparam << 4) + 3];
+			INT16 dmx = (INT16)oam[(oamparam << 4) + 7];
+			INT16 dy  = (INT16)oam[(oamparam << 4) + 11];
+			INT16 dmy = (INT16)oam[(oamparam << 4) + 15];
+
+			if (obj.mosaic())
+				cury -= (cury % mosaicy);
+
+			INT32 rx = (width << 7) - (fx >> 1) * dx - (fy >> 1) * dmx + cury * dmx;
+			INT32 ry = (height << 7) - (fx >> 1) * dy - (fy >> 1) * dmy + cury * dmy;
+
+			INT32 inc = 32;
+
+			if (obj.palette_256())
+			{
+				if (is_set(dispcnt::vram_map_1d))
+					inc = width >> 2;
+				else
+					tile_number &= 0x3fe;
+
+				for (auto x = 0; x < fx; x++)
+				{
+					INT32 pixx = rx >> 8;
+					INT32 pixy = ry >> 8;
+
+					if (!(pixx < 0 || pixx >= width || pixy < 0 || pixy >= height || sx >= 240))
+					{
+						UINT8 color = src[0x10000 + ((((tile_number + (pixy >> 3) * inc) << 5) + ((pixy & 7) << 3) + ((pixx >> 3) << 6) + (pixx & 7)) & 0x7fff)];
+
+						if (color == 0 && priority < ((scanline[sx] >> 25) & 3))
+						{
+							scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
+							if (obj.mosaic() && mosaiccnt != 0)
+							{
+								scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
+							}
+						}
+						else if (color != 0 && prio < (scanline[sx] & 0xff000000))
+						{
+							scanline[sx] = palette[256 + color] | prio;
+							if (obj.mosaic() && mosaiccnt != 0)
+							{
+								scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
+							}
+						}
+
+						if (obj.mosaic())
+							mosaiccnt = (mosaiccnt + 1) % mosaicx;
+					}
+
+					sx = (sx + 1) % 512;
+					rx += dx;
+					ry += dy;
+				}
+			}
+			else
+			{
+				if (is_set(dispcnt::vram_map_1d))
+					inc = width >> 3;
+
+				for (auto x = 0; x < fx; x++)
+				{
+					INT32 pixx = rx >> 8;
+					INT32 pixy = ry >> 8;
+
+					if (!(pixx < 0 || pixx >= width || pixy < 0 || pixy >= height || sx >= 240))
+					{
+						UINT8 color = src[0x10000 + ((((tile_number + (pixy >> 3) * inc) << 5) + ((pixy & 7) << 2) + ((pixx >> 3) << 5) + ((pixx & 7) >> 1)) & 0x7fff)];
+
+						if (pixx & 1)
+							color >>= 4;
+						else
+							color &= 0x0f;
+
+						if (color == 0 && priority < ((scanline[sx] >> 25) & 3))
+						{
+							scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
+							if (obj.mosaic() && mosaiccnt != 0)
+							{
+								scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
+							}
+						}
+						else if (color != 0 && prio < (scanline[sx] & 0xff000000))
+						{
+							scanline[sx] = palette[256 + obj.palette() + color] | prio;
+							if (obj.mosaic() && mosaiccnt != 0)
+							{
+								scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
+							}
+						}
+					}
+
+					if (obj.mosaic())
+						mosaiccnt = (mosaiccnt + 1) % mosaicx;
+
+					sx = (sx + 1) % 512;
+					rx += dx;
+					ry += dy;
+				}
+			}
+		}
+		else
+		{
+			// when roz bit is not set double roz bit means 'disable object'
+			if (obj.roz_double())
+				continue;
 
 			INT32 sx = obj.pos_x();
 			INT32 sy = obj.pos_y();
 
-			if(sy > 160)
-			{
+			if (sy > 160)
 				sy -= 256;
-			}
 
-			if (obj.mode_enum() != object::mode::window)
-			{
+			INT32 cury = y - sy;
+
+			if (cury < 0 || cury >= height)
 				continue;
+
+			if (sx >= 240 && ((sx + width) % 512) >= 240)
+				continue;
+
+			INT32 inc = 32;
+
+			if (obj.vflip())
+				cury = height - cury - 1;
+
+			INT32 pixx = obj.hflip() ? (width - 1) : 0;
+
+			if (obj.mosaic())
+				cury -= (cury % mosaicy);
+
+			if (obj.palette_256())
+			{
+				if (is_set(dispcnt::vram_map_1d))
+					inc = width >> 2;
+				else
+					tile_number &= 0x3fe;
+
+				UINT32 address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 3) + ((pixx >> 3) << 6) + (pixx & 7)) & 0x7fff);
+
+				if (obj.hflip())
+					pixx = 7;
+
+				for (auto x = 0; x < width; x++)
+				{
+					if (sx < 240)
+					{
+						UINT8 color = src[address];
+
+						if (color == 0 && priority < ((scanline[sx] >> 25) & 3))
+						{
+							scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
+							if (obj.mosaic() && mosaiccnt != 0)
+							{
+								scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
+							}
+						}
+						else if (color != 0 && prio < (scanline[sx] & 0xff000000))
+						{
+							scanline[sx] = palette[256 + color] | prio;
+							if (obj.mosaic() && mosaiccnt != 0)
+							{
+								scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
+							}
+						}
+					}
+
+					if (obj.mosaic())
+						mosaiccnt = (mosaiccnt + 1) % mosaicx;
+
+					sx = (sx + 1) % 512;
+
+					if (obj.hflip())
+					{
+						pixx--;
+						address--;
+
+						if (pixx == -1)
+						{
+							address -= 56;
+							pixx = 7;
+						}
+
+						if (address < 0x10000)
+							address += 0x8000;
+					}
+					else
+					{
+						pixx++;
+						address++;
+
+						if (pixx == 8)
+						{
+							address += 56;
+							pixx = 0;
+						}
+
+						if (address > 0x17fff)
+							address -= 0x8000;
+					}
+				}
 			}
 			else
 			{
-				obj.size(width, height);
+				if (is_set(dispcnt::vram_map_1d))
+					inc = width >> 3;
 
-				tiledrawindex = tileindex = obj.tile_number();
-				tilebytebase = 0x10000; // the index doesn't change in the higher modes, we just ignore sprites that are out of range
+				UINT32 address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 2) + ((pixx >> 3) << 5) + ((pixx & 7) >> 1)) & 0x7fff);
 
-				if (obj.roz())
+				if (obj.hflip())
 				{
-					INT32 ax, ay, rx, ry;
-					INT16 dx, dy, dmx, dmy;
-					UINT8 color;
-
-					INT32 fx = width;
-					INT32 fy = height;
-
-					if (obj.roz_double())
+					pixx = 7;
+					for (auto x = width - 1; x >= 0; x--)
 					{
-						fx *= 2;
-						fy *= 2;
-					}
-
-					cury = y - sy;
-
-					if(cury >= 0 && cury < fy)
-					{
-						if(sx < 240 || ((sx + fx) & 0x1ff) < 240)
+						if (sx < 240)
 						{
-							int rot = obj.roz_param();
-							dx  = (INT16)oam[(rot << 4)+3];
-							dmx = (INT16)oam[(rot << 4)+7];
-							dy  = (INT16)oam[(rot << 4)+11];
-							dmy = (INT16)oam[(rot << 4)+15];
+							UINT8 color = src[address];
 
-							rx = (width << 7) - (fx >> 1)*dx - (fy >> 1)*dmx + cury * dmx;
-							ry = (height << 7) - (fx >> 1)*dy - (fy >> 1)*dmy + cury * dmy;
+							if (x & 1)
+								color >>= 4;
+							else
+								color &= 0x0f;
 
-							if (obj.palette_256())
+							if (color == 0 && priority < ((scanline[sx] >> 25) & 3))
 							{
-								int inc = 32;
-								if((DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
+								scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
+								if (obj.mosaic() && mosaiccnt != 0)
 								{
-									continue;
-								}
-								if(DISPCNT & DISPCNT_VRAM_MAP_1D)
-								{
-									inc = sx >> 2;
-								}
-								else
-								{
-									tiledrawindex &= 0x3fe;
-								}
-								for(x = 0; x < fx; x++)
-								{
-									ax = rx >> 8;
-									ay = ry >> 8;
-
-									if(ax < 0 || ax >= sx || ay < 0 || ay >= sy)
-									{
-									}
-									else
-									{
-										color = src[tilebytebase + ((((tiledrawindex + (ay >> 3) * inc) << 5) + ((ay & 0x07) << 3) + ((ax >> 3) << 6) + (ax & 0x07)) & 0x7fff)];
-
-										if(color)
-										{
-											scanline[sx] = 1;
-										}
-									}
-
-									sx = (sx + 1) & 0x1ff;
-
-									rx += dx;
-									ry += dy;
+									scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
 								}
 							}
-							else
+							else if (color != 0 && prio < (scanline[sx] & 0xff000000))
 							{
-								int inc = 32;
-								if((DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
+								scanline[sx] = palette[256 + obj.palette() + color] | prio;
+								if (obj.mosaic() && mosaiccnt != 0)
 								{
-									continue;
-								}
-								if(DISPCNT & DISPCNT_VRAM_MAP_1D)
-								{
-									inc = sx >> 3;
-								}
-								for(x = 0; x < fx; x++)
-								{
-									ax = rx >> 8;
-									ay = ry >> 8;
-
-									if(ax < 0 || ax >= sx || ay < 0 || ay >= sy)
-									{
-									}
-									else
-									{
-										color = src[tilebytebase + ((((tiledrawindex + (ay >> 3) * inc) << 5) + ((ay & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff)];
-
-										if(ax & 1)
-										{
-											color >>= 4;
-										}
-										else
-										{
-											color &= 0x0f;
-										}
-
-										if(color)
-										{
-											scanline[sx] = 1;
-										}
-									}
-
-									sx = (sx + 1) & 0x1ff;
-
-									rx += dx;
-									ry += dy;
+									scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
 								}
 							}
 						}
+
+						sx = (sx + 1) % 512;
+						pixx--;
+
+						if (!(x & 1))
+							address--;
+
+						if (pixx == -1)
+						{
+							address -= 28;
+							pixx = 7;
+						}
+
+						if (address < 0x10000)
+							address += 0x8000;
 					}
 				}
 				else
 				{
-					// when roz bit is not set double roz means 'disable object'
-					if (obj.roz_double())
-						continue;
-
-					INT32 ax;
-					int cury_ = y - sy;
-
-					if(cury_ >= 0 && cury_ < height)
+					for (auto x = 0; x < width; x++)
 					{
-						if( (sx < 240) || ( ( (sx + width) & 0x1ff ) < 240 ) )
+						if (sx < 240)
 						{
-							if (obj.palette_256())
+							UINT8 color = src[address];
+
+							if (x & 1)
+								color >>= 4;
+							else
+								color &= 0x0f;
+
+							if (color == 0 && priority < ((scanline[sx] >> 25) & 3))
 							{
-								int inc = 32;
-								int address = 0;
-								if (obj.vflip())
+								scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
+								if (obj.mosaic() && mosaiccnt != 0)
 								{
-									cury_ = height - cury_ - 1;
-								}
-								if((DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
-								{
-									continue;
-								}
-
-								if(DISPCNT & DISPCNT_VRAM_MAP_1D)
-								{
-									inc = width >> 2;
-								}
-								else
-								{
-									tiledrawindex &= 0x3fe;
-								}
-
-								ax = 0;
-								if (obj.hflip())
-								{
-									ax = width - 1;
-								}
-
-								address = 0x10000 + ((((tiledrawindex + (cury_ >> 3) * inc) << 5) + ((cury_ & 7) << 3) + ((ax >> 3) << 6) + (ax & 7)) & 0x7fff);
-
-								if (obj.hflip())
-								{
-									ax = 7;
-								}
-
-								for(x = 0; x < width; x++)
-								{
-									if(sx < 240)
-									{
-										UINT8 color = src[address];
-
-										if(color)
-										{
-											scanline[sx] = 1;
-										}
-									}
-
-									sx = (sx + 1) & 0x1ff;
-
-									if (obj.hflip())
-									{
-										ax--;
-										address--;
-										if(ax == -1)
-										{
-											address -= 56;
-											ax = 7;
-										}
-										if(address < 0x10000)
-										{
-											address += 0x8000;
-										}
-									}
-									else
-									{
-										ax++;
-										address++;
-										if(ax == 8)
-										{
-											address += 56;
-											ax = 0;
-										}
-										if(address > 0x17fff)
-										{
-											address -= 0x8000;
-										}
-									}
+									scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
 								}
 							}
-							else
+							else if (color != 0 && prio < (scanline[sx] & 0xff000000))
 							{
-								int inc = 32;
-								UINT32 address;
-								if (obj.vflip())
+								scanline[sx] = palette[256 + obj.palette() + color] | prio;
+								if (obj.mosaic() && mosaiccnt != 0)
 								{
-									cury_ = height - cury_ - 1;
-								}
-								if((DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
-								{
-									continue;
-								}
-
-								if(DISPCNT & DISPCNT_VRAM_MAP_1D)
-								{
-									inc = width >> 3;
-								}
-
-								ax = 0;
-								if (obj.hflip())
-								{
-									ax = width - 1;
-								}
-
-								address = 0x10000 + ((((tiledrawindex + (cury_ >> 3) * inc) << 5) + ((cury_ & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff);
-								if (obj.hflip())
-								{
-									ax = 7;
-									for(x = width - 1; x >= 0; x--)
-									{
-										if(sx < 240)
-										{
-											UINT8 color = src[address];
-											if(x & 1)
-											{
-												color >>= 4;
-											}
-											else
-											{
-												color &= 0x0f;
-											}
-
-											if(color)
-											{
-												scanline[sx] = 1;
-											}
-										}
-
-										sx = (sx + 1) & 0x1ff;
-										ax--;
-										if((x & 1) == 0)
-										{
-											address--;
-										}
-										if(ax == -1)
-										{
-											ax = 7;
-											address -= 28;
-										}
-										if(address < 0x10000)
-										{
-											address += 0x8000;
-										}
-									}
-								}
-								else
-								{
-									for(x = 0; x < width; x++)
-									{
-										if(sx < 240)
-										{
-											UINT8 color = src[address];
-
-											if(x & 1)
-											{
-												color >>= 4;
-											}
-											else
-											{
-												color &= 0x0f;
-											}
-
-											if(color)
-											{
-												scanline[sx] = 1;
-											}
-										}
-
-										sx = (sx + 1) & 0x1ff;
-										ax++;
-										if(x & 1)
-										{
-											address++;
-										}
-										if(ax == 8)
-										{
-											address += 28;
-											ax = 0;
-										}
-										if(address > 0x17fff)
-										{
-											address -= 0x8000;
-										}
-									}
+									scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
 								}
 							}
 						}
+
+						if (obj.mosaic())
+							mosaiccnt = (mosaiccnt + 1) % mosaicx;
+
+						sx = (sx + 1) % 512;
+						pixx++;
+
+						if (x & 1)
+							address++;
+
+						if (pixx == 8)
+						{
+							address += 28;
+							pixx = 0;
+						}
+
+						if (address > 0x17fff)
+							address -= 0x8000;
 					}
 				}
 			}
@@ -1298,579 +1420,119 @@ void gba_lcd_device::draw_gba_oam_window(UINT32 *scanline, int y)
 	}
 }
 
-void gba_lcd_device::draw_gba_oam(UINT32 *scanline, int y)
+inline bool gba_lcd_device::is_in_window_h(int x, int window)
 {
-	INT32 mosaiccnt = 0;
-	INT32 mosaicy = ((MOSAIC & 0xf000) >> 12) + 1;
-	INT32 mosaicx = ((MOSAIC & 0x0f00) >>  8) + 1;
-	UINT32 tileindex, tiledrawindex; //, tilebytebase
-	int width, height;
-	UINT16 *oam = (UINT16 *)m_oam.get();
-	UINT8 *src = (UINT8 *)m_vram.get();
-	UINT16 *palette = (UINT16*)m_pram.get();
-	int x = 0;
+	UINT16 reg = (window == 0) ? WIN0H : WIN1H;
 
-	for (x = 0; x < 240; x++)
-		scanline[x] = 0x80000000;
+	UINT8 x0 = reg >> 8;
+	UINT8 x1 = reg & 0x00ff;
 
-	if( DISPCNT & DISPCNT_OBJ_EN )
+	if (x0 <= x1)
 	{
-		for( int obj_index = 0; obj_index < 128; obj_index++ )
-		{
-			INT32 cury;
-
-			object obj(*this, oam, obj_index);
-			UINT32 priority = obj.priority();
-			UINT32 prio = (priority << 25) | (obj.mode_mask() << 6);
-
-			if (obj.mode_enum() != object::mode::window)
-			{
-				obj.size(width, height);
-
-				tiledrawindex = tileindex = obj.tile_number();
-//              tilebytebase = 0x10000; // the index doesn't change in the higher modes, we just ignore sprites that are out of range
-
-				if (obj.roz())
-				{
-					INT16 dx, dy, dmx, dmy;
-
-					INT32 sx = obj.pos_x();
-					INT32 sy = obj.pos_y();
-
-					if(sy > 160)
-					{
-						sy -= 256;
-					}
-
-					INT32 fx = width;
-					INT32 fy = height;
-
-					if (obj.roz_double())
-					{
-						fx *= 2;
-						fy *= 2;
-					}
-
-					cury = y - sy;
-
-					if(cury >= 0 && cury < fy)
-					{
-						if(sx < 240 || ((sx + fx) & 0x1ff) < 240)
-						{
-							INT32 oamparam = obj.roz_param();
-
-							dx  = (INT16)oam[(oamparam << 4)+3];
-							dmx = (INT16)oam[(oamparam << 4)+7];
-							dy  = (INT16)oam[(oamparam << 4)+11];
-							dmy = (INT16)oam[(oamparam << 4)+15];
-
-							if (obj.mosaic())
-							{
-								cury -= (cury % mosaicy);
-							}
-
-							INT32 rx = (width << 7) - (fx >> 1)*dx - (fy >> 1)*dmx + cury*dmx;
-							INT32 ry = (height << 7) - (fx >> 1)*dy - (fy >> 1)*dmy + cury*dmy;
-
-							if (obj.palette_256())
-							{
-								INT32 inc = 32;
-
-								if((DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
-								{
-									continue;
-								}
-
-								if(DISPCNT & DISPCNT_VRAM_MAP_1D)
-								{
-									inc = width >> 2;
-								}
-								else
-								{
-									tiledrawindex &= 0x3fe;
-								}
-
-								for(x = 0; x < fx; x++)
-								{
-									INT32 pixx = rx >> 8;
-									INT32 pixy = ry >> 8;
-
-									if(!(pixx < 0 || pixx >= width || pixy < 0 || pixy >= height || sx >= 240))
-									{
-										UINT8 color = src[0x10000 + ((((tiledrawindex + (pixy >> 3) * inc) << 5) + ((pixy & 7) << 3) + ((pixx >> 3) << 6) + (pixx & 7)) & 0x7fff)];
-										if(color == 0 && priority < ((scanline[sx] >> 25) & 3))
-										{
-											scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
-											if (obj.mosaic() && mosaiccnt != 0)
-											{
-												scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-											}
-										}
-										else if(color != 0 && prio < (scanline[sx] & 0xff000000))
-										{
-											scanline[sx] = palette[256 + color] | prio;
-											if (obj.mosaic() && mosaiccnt != 0)
-											{
-												scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-											}
-										}
-
-										if (obj.mosaic())
-										{
-											mosaiccnt++;
-											if(mosaiccnt == mosaicx)
-											{
-												mosaiccnt = 0;
-											}
-										}
-									}
-
-									sx++;
-									sx &= 0x1ff;
-
-									rx += dx;
-									ry += dy;
-								}
-							}
-							else
-							{
-								INT32 inc = 32;
-
-								if((DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
-								{
-									continue;
-								}
-
-								if(DISPCNT & DISPCNT_VRAM_MAP_1D)
-								{
-									inc = width >> 3;
-								}
-
-								for(x = 0; x < fx; x++)
-								{
-									INT32 pixx = rx >> 8;
-									INT32 pixy = ry >> 8;
-
-									if(!(pixx < 0 || pixx >= width || pixy < 0 || pixy >= height || sx >= 240))
-									{
-										UINT8 color = src[0x10000 + ((((tiledrawindex + (pixy >> 3) * inc) << 5) + ((pixy & 7) << 2) + ((pixx >> 3) << 5) + ((pixx & 7) >> 1)) & 0x7fff)];
-
-										if(pixx & 1)
-										{
-											color >>= 4;
-										}
-										else
-										{
-											color &= 0x0f;
-										}
-
-										if(color == 0 && priority < ((scanline[sx] >> 25) & 3))
-										{
-											scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
-											if (obj.mosaic() && mosaiccnt != 0)
-											{
-												scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-											}
-										}
-										else if(color != 0 && prio < (scanline[sx] & 0xff000000))
-										{
-											scanline[sx] = palette[256 + obj.palette() + color] | prio;
-											if (obj.mosaic() && mosaiccnt != 0)
-											{
-												scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-											}
-										}
-									}
-
-									if (obj.mosaic())
-									{
-										mosaiccnt++;
-										if(mosaiccnt == mosaicx)
-										{
-											mosaiccnt = 0;
-										}
-									}
-
-									sx++;
-
-									sx &= 0x1ff;
-
-									rx += dx;
-									ry += dy;
-								}
-							}
-						}
-					}
-				}
-				else
-				{
-					// when roz bit is not set double roz means 'disable object'
-					if (obj.roz_double())
-						continue;
-
-					INT32 sx = obj.pos_x();
-					INT32 sy = obj.pos_y();
-
-					if(sy > 160)
-					{
-						sy -= 256;
-					}
-
-					cury = y - sy;
-					if(cury >= 0 && cury < height)
-					{
-						if(sx < 240 || ((sx + width) & 0x1ff) < 240)
-						{
-							if (obj.palette_256())
-							{
-								INT32 pixx;
-								INT32 inc = 32;
-								INT32 address = 0;
-
-								if (obj.vflip())
-								{
-									cury = height - cury - 1;
-								}
-
-								if((DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
-								{
-									continue;
-								}
-
-								if(DISPCNT & DISPCNT_VRAM_MAP_1D)
-								{
-									inc = width >> 2;
-								}
-								else
-								{
-									tiledrawindex &= 0x3fe;
-								}
-
-								pixx = 0;
-								if (obj.hflip())
-								{
-									pixx = width - 1;
-								}
-
-								if (obj.mosaic())
-								{
-									cury -= (cury % mosaicy);
-								}
-
-								address = 0x10000 + ((((tiledrawindex + (cury >> 3) * inc) << 5) + ((cury & 7) << 3) + ((pixx >> 3) << 6) + (pixx & 7)) & 0x7fff);
-
-								if (obj.hflip())
-								{
-									pixx = 7;
-								}
-
-								for(x = 0; x < width; x++)
-								{
-									if(sx < 240)
-									{
-										UINT8 color = src[address];
-										if(color == 0 && priority < ((scanline[sx] >> 25) & 3))
-										{
-											scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
-											if(obj.mosaic() && mosaiccnt != 0)
-											{
-												scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-											}
-										}
-										else if(color != 0 && prio < (scanline[sx] & 0xff000000))
-										{
-											scanline[sx] = palette[256 + color] | prio;
-											if(obj.mosaic() && mosaiccnt != 0)
-											{
-												scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-											}
-										}
-									}
-
-									if (obj.mosaic())
-									{
-										mosaiccnt++;
-										if(mosaiccnt == mosaicx)
-										{
-											mosaiccnt = 0;
-										}
-									}
-
-									sx++;
-									sx &= 0x1ff;
-
-									if (obj.hflip())
-									{
-										pixx--;
-										address--;
-										if(pixx == -1)
-										{
-											address -= 56;
-											pixx = 7;
-										}
-										if(address < 0x10000)
-										{
-											address += 0x8000;
-										}
-									}
-									else
-									{
-										pixx++;
-										address++;
-										if(pixx == 8)
-										{
-											address += 56;
-											pixx = 0;
-										}
-										if(address > 0x17fff)
-										{
-											address -= 0x8000;
-										}
-									}
-								}
-							}
-							else
-							{
-								INT32 pixx;
-								INT32 inc = 32;
-								UINT32 address = 0;
-
-								if (obj.vflip())
-								{
-									cury = height - cury - 1;
-								}
-
-								if((DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
-								{
-									continue;
-								}
-
-								if(DISPCNT & DISPCNT_VRAM_MAP_1D)
-								{
-									inc = width >> 3;
-								}
-
-								pixx = 0;
-								if (obj.hflip())
-								{
-									pixx = width - 1;
-								}
-
-								if (obj.mosaic())
-								{
-									cury -= (cury % mosaicy);
-								}
-
-								address = 0x10000 + ((((tiledrawindex + (cury >> 3) * inc) << 5) + ((cury & 7) << 2) + ((pixx >> 3) << 5) + ((pixx & 7) >> 1)) & 0x7fff);
-
-								if (obj.hflip())
-								{
-									pixx = 7;
-									for(x = width - 1; x >= 0; x--)
-									{
-										if(sx < 240)
-										{
-											UINT8 color = src[address];
-
-											if(x & 1)
-											{
-												color >>= 4;
-											}
-											else
-											{
-												color &= 0x0f;
-											}
-
-											if(color == 0 && priority < ((scanline[sx] >> 25) & 3))
-											{
-												scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
-												if (obj.mosaic() && mosaiccnt != 0)
-												{
-													scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-												}
-											}
-											else if(color != 0 && prio < (scanline[sx] & 0xff000000))
-											{
-												scanline[sx] = palette[256 + obj.palette() + color] | prio;
-												if (obj.mosaic() && mosaiccnt != 0)
-												{
-													scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-												}
-											}
-										}
-
-										sx++;
-										sx &= 0x1ff;
-
-										pixx--;
-										if(!(x & 1))
-										{
-											address--;
-										}
-										if(pixx == -1)
-										{
-											address -= 28;
-											pixx = 7;
-										}
-										if(address < 0x10000)
-										{
-											address += 0x8000;
-										}
-									}
-								}
-								else
-								{
-									for(x = 0; x < width; x++)
-									{
-										if(sx < 240)
-										{
-											UINT8 color = src[address];
-
-											if(x & 1)
-											{
-												color >>= 4;
-											}
-											else
-											{
-												color &= 0x0f;
-											}
-
-											if(color == 0 && priority < ((scanline[sx] >> 25) & 3))
-											{
-												scanline[sx] = (scanline[sx] & 0xf9ffffff) | prio;
-												if (obj.mosaic() && mosaiccnt != 0)
-												{
-													scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-												}
-											}
-											else if(color != 0 && prio < (scanline[sx] & 0xff000000))
-											{
-												scanline[sx] = palette[256 + obj.palette() + color] | prio;
-												if (obj.mosaic() && mosaiccnt != 0)
-												{
-													scanline[sx] = (scanline[sx - 1] & 0xf9ffffff) | prio;
-												}
-											}
-										}
-
-										if (obj.mosaic())
-										{
-											mosaiccnt++;
-											if(mosaiccnt == mosaicx)
-											{
-												mosaiccnt = 0;
-											}
-										}
-
-										sx++;
-										sx &= 0x1ff;
-
-										pixx++;
-										if(x & 1)
-										{
-											address++;
-										}
-										if(pixx == 8)
-										{
-											address += 28;
-											pixx = 0;
-										}
-										if(address > 0x17fff)
-										{
-											address -= 0x8000;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-inline int gba_lcd_device::is_in_window(int x, int window)
-{
-	int x0 = WIN0H >> 8;
-	int x1 = WIN0H & 0x00ff;
-
-	if(window == 1)
-	{
-		x0 = WIN1H >> 8;
-		x1 = WIN1H & 0x00ff;
-	}
-
-	if(x0 <= x1)
-	{
-		if(x >= x0 && x < x1)
-		{
-			return 1;
-		}
+		if (x >= x0 && x < x1)
+			return true;
 	}
 	else
 	{
-		if(x >= x0 || x < x1)
-		{
-			return 1;
-		}
+		if (x >= x0 || x < x1)
+			return true;
 	}
 
-	return 0;
+	return false;
 }
 
-void gba_lcd_device::draw_scanline(int y)
+inline bool gba_lcd_device::is_in_window_v(int y, int window)
 {
-	bitmap_ind16 &bitmap = m_bitmap;
-	UINT16 *scanline = &bitmap.pix16(y);
-	UINT8 submode = 0;
-	int depth = 0;
+	UINT16 reg = (window == 0) ? WIN0V : WIN1V;
 
-	// forced blank
-	if (DISPCNT & DISPCNT_BLANK)
+	UINT8 v0 = reg >> 8;
+	UINT8 v1 = reg & 0x00ff;
+
+	if ((v0 == v1) && (v0 >= 0xe8))
+		return true;
+
+	if (v1 >= v0)
 	{
-		// forced blank is white
-		for (int x = 0; x < 240; x++)
-			scanline[x] = 0x7fff;
-		return;
+		if (y >= v0 && y < v1)
+			return true;
 	}
-
-	if(!m_fxOn && !m_windowOn && !(DISPCNT & DISPCNT_OBJWIN_EN))
-		submode = GBA_SUBMODE0;
-	else if(m_fxOn && !m_windowOn && !(DISPCNT & DISPCNT_OBJWIN_EN))
-		submode = GBA_SUBMODE1;
 	else
-		submode = GBA_SUBMODE2;
-
-	if ((DISPCNT & 7) == 3)
-		depth = 16;
-	else if ((DISPCNT & 7) == 4)
-		depth = 8;
-	else if ((DISPCNT & 7) == 5)
-		depth = 4;
-
-	//printf("mode = %d, %d\n", DISPCNT & 7, submode);
-
-	switch(DISPCNT & 7)
 	{
-		case 0:
-		case 1:
-		case 2:
-			draw_modes(DISPCNT & 7, submode, y, &m_xferscan[0][1024], &m_xferscan[1][1024], &m_xferscan[2][1024], &m_xferscan[3][1024], &m_xferscan[4][1024], &m_xferscan[5][1024], &m_xferscan[6][1024], depth);
-			break;
-		case 3:
-		case 4:
-		case 5:
-			draw_modes(GBA_MODE345, submode, y, &m_xferscan[0][1024], &m_xferscan[1][1024], &m_xferscan[2][1024], &m_xferscan[3][1024], &m_xferscan[4][1024], &m_xferscan[5][1024], &m_xferscan[6][1024], depth);
-			break;
-		default:
-			fatalerror("Invalid screen mode (6 or 7)!\n");
+		if (y >= v0 || y < v1)
+			return true;
 	}
 
-	for (int x = 0; x < 240; x++)
+	return false;
+}
+
+static const int coeff[32] = {
+	0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+};
+
+inline UINT32 gba_lcd_device::alpha_blend(UINT32 color0, UINT32 color1)
+{
+	int ca = coeff[BLDALPHA & 0x1f];
+	int cb = coeff[(BLDALPHA >> 8) & 0x1f];
+
+	if (color0 != TRANSPARENT_PIXEL)
 	{
-		scanline[x] = m_xferscan[6][1024 + x] & 0x7fff;
+		int r0 = (color0 >>  0) & 0x1f;
+		int g0 = (color0 >>  5) & 0x1f;
+		int b0 = (color0 >> 10) & 0x1f;
+		int r1 = (color1 >>  0) & 0x1f;
+		int g1 = (color1 >>  5) & 0x1f;
+		int b1 = (color1 >> 10) & 0x1f;
+		int r = ((r0 * ca) >> 4) + ((r1 * cb) >> 4);
+		int g = ((g0 * ca) >> 4) + ((g1 * cb) >> 4);
+		int b = ((b0 * ca) >> 4) + ((b1 * cb) >> 4);
+
+		if (r > 0x1f) r = 0x1f;
+		if (g > 0x1f) g = 0x1f;
+		if (b > 0x1f) b = 0x1f;
+
+		return (color0 & 0xffff0000) | (b << 10) | (g << 5) | r;
 	}
+
+	return color0;
+}
+
+inline UINT32 gba_lcd_device::increase_brightness(UINT32 color)
+{
+	int cc = coeff[BLDY & 0x1f];
+
+	int r = (color >>  0) & 0x1f;
+	int g = (color >>  5) & 0x1f;
+	int b = (color >> 10) & 0x1f;
+
+	r += ((0x1f - r) * cc) >> 4;
+	g += ((0x1f - g) * cc) >> 4;
+	b += ((0x1f - b) * cc) >> 4;
+
+	if (r > 0x1f) r = 0x1f;
+	if (g > 0x1f) g = 0x1f;
+	if (b > 0x1f) b = 0x1f;
+
+	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
+}
+
+inline UINT32 gba_lcd_device::decrease_brightness(UINT32 color)
+{
+	int cc = coeff[BLDY & 0x1f];
+
+	int r = (color >>  0) & 0x1f;
+	int g = (color >>  5) & 0x1f;
+	int b = (color >> 10) & 0x1f;
+
+	r -= (r * cc) >> 4;
+	g -= (g * cc) >> 4;
+	b -= (b * cc) >> 4;
+
+	if (r < 0) r = 0;
+	if (g < 0) g = 0;
+	if (b < 0) b = 0;
+
+	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
 }
 
 static const char *reg_names[] = {
@@ -1893,21 +1555,21 @@ READ32_MEMBER(gba_lcd_device::video_r)
 {
 	UINT32 retval = 0;
 
-	switch( offset )
+	switch (offset)
 	{
-		case 0x0004/4:
-			retval = (DISPSTAT & 0xffff) | (machine().first_screen()->vpos()<<16);
-			break;
-		default:
-			if( ACCESSING_BITS_0_15 )
-			{
-				retval |= m_regs[offset] & 0x0000ffff;
-			}
-			if( ACCESSING_BITS_16_31 )
-			{
-				retval |= m_regs[offset] & 0xffff0000;
-			}
-			break;
+	case 0x0004/4:
+		retval = DISPSTAT | (machine().first_screen()->vpos() << 16);
+		break;
+	default:
+		if (ACCESSING_BITS_0_15)
+		{
+			retval |= m_regs[offset] & 0x0000ffff;
+		}
+		if (ACCESSING_BITS_16_31)
+		{
+			retval |= m_regs[offset] & 0xffff0000;
+		}
+		break;
 	}
 
 	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_lcd_device");
@@ -1939,72 +1601,47 @@ WRITE32_MEMBER(gba_lcd_device::video_w)
 		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2 + 1], (data & 0xffff0000) >> 16);
 	}
 
-	switch( offset )
+	switch (offset)
 	{
-		case 0x0000/4:
-			if( ACCESSING_BITS_0_15 )
-			{
-				if(DISPCNT & (DISPCNT_WIN0_EN | DISPCNT_WIN1_EN))
-				{
-					m_windowOn = 1;
-				}
-				else
-				{
-					m_windowOn = 0;
-				}
-			}
-			break;
-		case 0x0028/4:
-			m_gfxBG2Changed |= 1;
-			break;
-		case 0x002c/4:
-			m_gfxBG2Changed |= 2;
-			break;
-		case 0x0038/4:
-			m_gfxBG3Changed |= 1;
-			break;
-		case 0x003c/4:
-			m_gfxBG3Changed |= 2;
-			break;
-		case 0x0050/4:
-			if( ACCESSING_BITS_0_15 )
-			{
-				if(BLDCNT & BLDCNT_SFX)
-				{
-					m_fxOn = 1;
-				}
-				else
-				{
-					m_fxOn = 0;
-				}
-			}
-			break;
+	case 0x0028/4:
+		m_bg2x.update = true;
+		break;
+	case 0x002c/4:
+		m_bg2y.update = true;
+		break;
+	case 0x0038/4:
+		m_bg3x.update = true;
+		break;
+	case 0x003c/4:
+		m_bg3y.update = true;
+		break;
 	}
 }
 
 static inline UINT32 combine_data_32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&prev);
-	switch(mem_mask)
+
+	switch (mem_mask)
 	{
-		case 0x000000ff:
-			prev &= 0xffff00ff;
-			prev |= data << 8;
-			break;
-		case 0x0000ff00:
-			prev &= 0xffffff00;
-			prev |= data >> 8;
-			break;
-		case 0x00ff0000:
-			prev &= 0x00ffffff;
-			prev |= data << 8;
-			break;
-		case 0xff000000:
-			prev &= 0xff00ffff;
-			prev |= data >> 8;
-			break;
-		default:
-			break;
+	case 0x000000ff:
+		prev &= 0xffff00ff;
+		prev |= data << 8;
+		break;
+	case 0x0000ff00:
+		prev &= 0xffffff00;
+		prev |= data >> 8;
+		break;
+	case 0x00ff0000:
+		prev &= 0x00ffffff;
+		prev |= data << 8;
+		break;
+	case 0xff000000:
+		prev &= 0xff00ffff;
+		prev |= data >> 8;
+		break;
+	default:
+		break;
 	}
 	return prev;
 }
@@ -2043,6 +1680,15 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
 {
 	int scanline = machine().first_screen()->vpos();
 
+	// reload LCD controller internal registers from I/O ones at vblank
+	if (scanline == 0)
+	{
+		m_bg2x.update = true;
+		m_bg2y.update = true;
+		m_bg3x.update = true;
+		m_bg3y.update = true;
+	}
+
 	// draw only visible scanlines
 	if (scanline < 160)
 	{
@@ -2052,33 +1698,33 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
 			m_dma_hblank_cb(ASSERT_LINE);
 	}
 
-	if ((DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
+	if (is_set(dispstat::hblank_irq_en))
 	{
 		if (!m_int_hblank_cb.isnull())
 			m_int_hblank_cb(ASSERT_LINE);
 	}
 
-	DISPSTAT_SET(DISPSTAT_HBL);
+	set(dispstat::hblank);
 
 	m_hbl_timer->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 {
-	// clear hblank and raster IRQ flags
-	DISPSTAT_RESET(DISPSTAT_HBL|DISPSTAT_VCNT);
+	clear(dispstat::hblank);
+	clear(dispstat::vcount);
 
 	int scanline = machine().first_screen()->vpos();
 
-	// VBL is set for scanlines 160 through 226 (but not 227, which is the last line)
+	// VBLANK is set for scanlines 160 through 226 (but not 227, which is the last line)
 	if (scanline >= 160 && scanline < 227)
 	{
-		DISPSTAT_SET(DISPSTAT_VBL);
+		set(dispstat::vblank);
 
 		// VBL IRQ and DMA on line 160
 		if (scanline == 160)
 		{
-			if (DISPSTAT & DISPSTAT_VBL_IRQ_EN)
+			if (is_set(dispstat::vblank_irq_en))
 			{
 				if (!m_int_vblank_cb.isnull())
 					m_int_vblank_cb(ASSERT_LINE);
@@ -2090,15 +1736,15 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 	}
 	else
 	{
-		DISPSTAT_RESET(DISPSTAT_VBL);
+		clear(dispstat::vblank);
 	}
 
-	// handle VCNT match interrupt/flag
+	// handle VCOUNT match interrupt flag
 	if (scanline == ((DISPSTAT >> 8) & 0xff))
 	{
-		DISPSTAT_SET(DISPSTAT_VCNT);
+		set(dispstat::vcount);
 
-		if (DISPSTAT & DISPSTAT_VCNT_IRQ_EN)
+		if (is_set(dispstat::vcount_irq_en))
 		{
 			if (!m_int_vcount_cb.isnull())
 				m_int_vcount_cb(ASSERT_LINE);
@@ -2106,18 +1752,18 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 	}
 
 	m_hbl_timer->adjust(machine().first_screen()->time_until_pos(scanline, 240));
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos(( scanline + 1 ) % 228, 0));
+	m_scan_timer->adjust(machine().first_screen()->time_until_pos((scanline + 1) % 228, 0));
 }
 
 PALETTE_INIT_MEMBER(gba_lcd_device, gba)
 {
-	for( UINT8 b = 0; b < 32; b++ )
+	for (UINT8 b = 0; b < 32; b++)
 	{
-		for( UINT8 g = 0; g < 32; g++ )
+		for (UINT8 g = 0; g < 32; g++)
 		{
-			for( UINT8 r = 0; r < 32; r++ )
+			for (UINT8 r = 0; r < 32; r++)
 			{
-				palette.set_pen_color( ( b << 10 ) | ( g << 5 ) | r, pal5bit(r), pal5bit(g), pal5bit(b) );
+				palette.set_pen_color((b << 10) | (g << 5) | r, pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 		}
 	}
@@ -2126,6 +1772,7 @@ PALETTE_INIT_MEMBER(gba_lcd_device, gba)
 UINT32 gba_lcd_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+
 	return 0;
 }
 
@@ -2155,37 +1802,37 @@ void gba_lcd_device::device_start()
 	save_pointer(NAME(m_vram.get()), 0x18000 / 4);
 	save_pointer(NAME(m_oam.get()), 0x400 / 4);
 
-	save_item(NAME(m_windowOn));
-	save_item(NAME(m_fxOn));
-	save_item(NAME(m_gfxBG2Changed));
-	save_item(NAME(m_gfxBG3Changed));
-	save_item(NAME(m_gfxBG2X));
-	save_item(NAME(m_gfxBG2Y));
-	save_item(NAME(m_gfxBG3X));
-	save_item(NAME(m_gfxBG3Y));
-	save_item(NAME(m_xferscan));
+	save_item(NAME(m_bg2x.status));
+	save_item(NAME(m_bg2x.update));
+
+	save_item(NAME(m_bg2y.status));
+	save_item(NAME(m_bg2y.update));
+
+	save_item(NAME(m_bg3x.status));
+	save_item(NAME(m_bg3x.update));
+
+	save_item(NAME(m_bg3y.status));
+	save_item(NAME(m_bg3y.update));
+
+	save_item(NAME(m_scanline));
 }
 
 void gba_lcd_device::device_reset()
 {
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_gfxBG2Changed = 0;
-	m_gfxBG3Changed = 0;
-	m_gfxBG2X = 0;
-	m_gfxBG2Y = 0;
-	m_gfxBG3X = 0;
-	m_gfxBG3Y = 0;
-	m_windowOn = 0;
-	m_fxOn = 0;
+	m_bg2x = { 0, false };
+	m_bg2y = { 0, false };
+	m_bg3x = { 0, false };
+	m_bg3y = { 0, false };
 
 	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
 	m_hbl_timer->adjust(attotime::never);
 }
 
-static MACHINE_CONFIG_FRAGMENT( gba_lcd )
+static MACHINE_CONFIG_FRAGMENT(gba_lcd)
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16_777216MHz/4, 308, 0, 240, 228, 0, 160)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16_777216MHz / 4, 308, 0, 240, 228, 0, 160)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2196,5 +1843,5 @@ MACHINE_CONFIG_END
 
 machine_config_constructor gba_lcd_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( gba_lcd );
+	return MACHINE_CONFIG_NAME(gba_lcd);
 }
