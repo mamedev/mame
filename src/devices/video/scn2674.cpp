@@ -6,7 +6,7 @@
 
 #include "scn2674.h"
 
-#define S674VERBOSE 0
+#define S674VERBOSE 1
 #define LOG2674(x) do { if (S674VERBOSE) logerror x; } while (0)
 
 const device_type SCN2674_VIDEO = &device_creator<scn2674_device>;
@@ -461,6 +461,7 @@ void scn2674_device::write_command(UINT8 data)
 			break;
 
 		case 0xab:
+		case 0xaf:  // LSI Octopus sends command 0xAF
 			/* write at cursor address + increment */
 			space().write_byte(m_cursor_l | (m_cursor_h << 8), m_buffer);
 			if(!(++m_cursor_l))
