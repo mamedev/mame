@@ -22,7 +22,7 @@
  *  TODO:
  *  Didact designs:    mp68a, md6802, Modulab, Esselte 100, Candela
  * --------------------------------------------------------------------------
- *  - Add PCB layouts   OK     OK				 rev1
+ *  - Add PCB layouts   OK     OK				 OK
  *  - Dump ROM:s,       OK     OK				 rev2
  *  - Keyboard          OK     OK				 rev2
  *  - Display/CRT       OK     OK				 OK
@@ -31,6 +31,7 @@
  *  - Cassette i/f								 OK
  *  - Expansion bus
  *  - Expansion overlay
+ *  - Interrupts        OK                       OK
  *
  ****************************************************************************/
 
@@ -452,33 +453,60 @@ void mp68a_state::machine_start()
 }
 
 /*  __________________________________________________________________________________________________________________________________________
- * | The Didact Esselte 100 CPU board rev1                                                                                     in-PCB coil     +----
+ * | The Didact Esselte 100 CPU board rev1, 14/8 1980                                                                          in-PCB coil     +----
  * |   +--+     +--+     +--+     +--+        +--+     +--+                                                                 +--------+    |VHF
  * |   74       74       74       74          74       74                   7805CT              7805CT        trim 3,5-13pF |+-----+ |    |  TV
  * |    157      393       04       10          00       03                                                        2N2369 | || o-+ | |    +----
  * |   +--+     +--+     +--+     +--+        +--+     +--+                                                               | |+---+ | |       |
  * |1Kohm                                                                                                                 | +------+ |    +----
  * |trim                                                                                                                  +----------+    |CVS
- * |   +--+              +--+          +--+                                                              7805CP                           | MON
- * |   74                74            74                                                                                                 +----
- * |    132               157            93                                                                                                  |
- * |   +--+              +--+          +--+                                                                          J401                    |
- * |   +--+                                                                          +--+  +--+                                     LM339    |
- * |   74                +--+          +--+                                          74    74     +--+ +--+                   J402           |
+ * | 8 +--+              +--+          +--+                                                              7805CP                           | MON
+ * | 0 74                74            74                                                                                                 +----
+ * | 0  132               157            93                                                                                                  |
+ * | 8 +--+              +--+          +--+                                                                          J401                    |
+ * | 1 +--+                                                                          +--+  +--+                                     LM339    |
+ * | 4 74                +--+          +--+                                          74    74     +--+ +--+                   J402           |
  * |    165              74            74                                             122    00   74   74    4Mhz                            |
- * |   +--+               157           393                                          +--+  +--+    138  138  XTAL                         +----
- * |                     +--+          +--+                                                       +--+ +--+    +----+  +----+  +----+     |TAPE
+ * | J +--+               157           393                                          +--+  +--+    138  138  XTAL                         +----
+ * | G                   +--+          +--+                                                       +--+ +--+    +----+  +----+  +----+     |TAPE
  * | +----+      +----+                                                                                               optional            |
  * |  CHAR       VIDEO                 +--+    +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+ +====++  CPU     PIA2    PIA1      +----
  * |   ROM        RAM                  74      6116   6116   6116   6116                                    ||                               |
  * |  2716       MK4118                 245      alt    alt    alt    alt                                2x ||  6802    6821    6821      +----
  * | +----+      +----+                +--+    MK4118 MK4118 MK4118 MK4118  2716   2716   2716   2716   2716||                            |PRNT
- * |                                           +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----++                            |
+ * |DIDACT ESS 100 CPU                         +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----++                            |
  * |___________________________________________________________________________________________________________+----+__+----+__+----+_____+----
  *
- * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the piggy back on righ most 2716) with funny address decoding.
+ * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggy back on righ most 2716) with funny address decoding.
  * Once we get a rom dump for rev 1 the driver need to accomodate another keymap too so probably needs to be splitted somehow.
+ *  __________________________________________________________________________________________________________________________________________
+ * | The Didact Esselte 100 CPU board rev2, 15/4 1983                                                                     in-PCB coil     +----
+ * |           +--+     +--+     +--+     +--+     +--+     +--+                                                            +--------+    |VHF
+ * |           74       74       74       74       74       74              7805CT              7805CT        trim 3,5-13pF |+-----+ |    |  TV
+ * |             93      393       10      393       00       03                                                   2N2369 | || o-+ | |    +----
+ * |           +--+     +--+     +--+     +--+     +--+     +--+                                                          | |+---+ | |       |
+ * |1Kohm                                                                                                                 | +------+ |    +----
+ * |trim                                                                                                                  +----------+    |CVS
+ * |   +--+    +--+     +--+    +--+   +--+   J                                                          7805CP                           | MON
+ * |   74      74       74      74     74     2                                                                                           +----
+ * |    165     132      157     157     04   0                                                                                              |
+ * |   +--+    +--+     +--+    +--+   +--+   1       J 2 0 2                     +----+ +----+                      J401                    |
+ * |                                                                                                                                         |
+ * | +----+            +----+          +--+             +--+   +--+   +--+  +--+   U202   U201                                J402           |
+ * |  CHAR             VIDEO           74               74     74     74    74                               4Mhz                            |
+ * |   ROM              RAM             157              138    08     00    138   2764   2764               XTAL                         +----
+ * |  2716             HM6116          +--+             +--+   +--+   +--+  +--+                               +----+  +----+  +----+     |TAPE
+ * | +----+            +----+                J                                    +----+ +----+                       optional            |
+ * |                                   +--+  2        +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+   CPU     PIA2    PIA1      +----
+ * |                                   74    0        6116   6116   6116   6116   6116   6116   6116   6116                          +--+    |
+ * |   8169 830415                      245  3                                     opt    opt    opt    opt     6802    6821    6821 LM   +----
+ * |  ESSELTE 100                      +--+                                                                                           339 |PRNT
+ * |  CPU 100                                         +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+                        +--+ |
+ * |___________________________________________________________________________________________________________+----+__+----+__+----+_____+----
+ *
+ *   Both rev1 and rev2 has a matrix keyboard PCB with a 74LS145 connected to J402 (PIA2)
  */
+
 /* Esselte 100 driver class */
 class e100_state : public didact_state
 {
@@ -726,13 +754,13 @@ ADDRESS_MAP_END
  * Four e100 keys are not mapped yet,
  * - The redundant '*' on the keyboard together with the '\'' single quote, both on same e100 key
  * - The 'E' key on the keypad, presumably used for calculator applications to remove the last entered number
- * - The 'Break' key will be mapped to NMI at some point
+ * - The 'Break' key on rev2 will be mapped to NMI at some point, a recomended modification of the rev1 mother board
  * - The 'REPT' key has a so far unknown function
  */
 static INPUT_PORTS_START( e100 )
 /*	Bits read on PIA1 A when issueing line number on PIA1 B bits 0-3 through a 74145 demultiplexer */
 	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_UNUSED)	  
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD) 								PORT_CODE(KEYCODE_SPACE)		PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD) 								PORT_CODE(KEYCODE_LSHIFT)		PORT_CODE(KEYCODE_RSHIFT)		PORT_CHAR(UCHAR_SHIFT_1)
