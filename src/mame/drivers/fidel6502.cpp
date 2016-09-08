@@ -6,7 +6,8 @@
     Fidelity Electronics 6502 based board driver
 
     TODO:
-    - EAS doesn't work, there's some activity if you boot/reset with 1-key held down
+    - EAS doesn't work, there's some activity if you boot/reset with 1-key held down.
+      Also need to verify if the program rom addresses are right, especially for feasgla
 
 ******************************************************************************
 
@@ -569,7 +570,12 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
-	// speech chip?
+	// d0-d5: TSI C0-C5
+	// d6: TSI START line
+	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->start_w(data >> 6 & 1);
+	
+	// d7: ? (black wire to LED pcb)
 }
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
@@ -578,13 +584,23 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 	m_led_select = data & 0xf;
 	csc_prepare_display();
 
-	// other: ?
+	// d4: enable/reset speech chip?
+	// d5: speech ROM A12?
+	// d6,d7: N/C?
 }
 
 READ8_MEMBER(fidel6502_state::eas_ppi_portb_r)
 {
-	// ?
-	return 0;
+	// d0: ? white wire from LED pcb
+	UINT8 data = 0;
+	
+	// d1: TSI BUSY line
+	if (m_speech->busy_r())
+		data |= 2;
+	
+	// d2,d3: not sure, language switch?
+	// d4-d7: N/C
+	return data | 0xc;
 }
 
 
