@@ -1582,6 +1582,23 @@ ROM_START(winner82)
 ROM_END
 
 
+ROM_START(legrandc)
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 18*22 pins PCB?? */
+	ROM_LOAD("t10.bin",  0x0000, 0x0800, CRC(3b8f9293) SHA1(8af15b15f91568c8d8ba4910bac5fa63a05eab6a) )
+	ROM_LOAD("t1.bin",   0x0800, 0x0800, CRC(99a8876b) SHA1(eaea6a6daf97f7baa021f6f4f8df4b9c220410b0) )
+	ROM_LOAD("t2.bin",   0x1000, 0x0800, CRC(a4658a30) SHA1(a655b12a1669e73963c2861f91d0a8bfa7df8b1f) )
+	ROM_LOAD("t3.bin",   0x1800, 0x0800, CRC(8ca8c20e) SHA1(0d4ab3f30189653871eee12385f8515734020b34) )
+	ROM_LOAD("t4.bin",   0x2000, 0x0800, CRC(8a558bef) SHA1(9f8560864a60fa4c34ffb4c4b16f05bb4170cb42) )
+	ROM_LOAD("t5.bin",   0x2800, 0x0800, CRC(8172f711) SHA1(9504ba3f931719489541e876a109da52175250a4) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* IM1 instead of NMI. Identical halves */
+	ROM_LOAD("t7.bin",   0x0000, 0x0800, CRC(aaaaa37a) SHA1(60daf9bf8f1e25da0e55e2d652a3a232f0717e9b) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) ) // not dumped, taken from parent
+ROM_END
+
+
 /***************************************************
 
   Ruleta RE-800
@@ -1698,6 +1715,7 @@ ROM_END
 GAME(  1981, winner81,  winner82, winner81, winner81, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
 GAME(  1981, winner81b, winner82, winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
 GAME(  1982, winner82,  0,        winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
+GAME(  198?, legrandc,  winner82, winner82, winner82, driver_device, 0,        ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
 GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                      layout_re800 )
 GAMEL( 1991, re800v1,   0,        re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                      layout_re800 )
 GAMEL( 1991, re800v3,   0,        re800,    re800v3,  driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS,  layout_re800 )
