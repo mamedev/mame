@@ -341,7 +341,7 @@ The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   pre
 Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
 Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
-Wave Runner GP (USA, Rev A)                   840-0064C  23725A  12 (64Mb)   present  315-6206  317-0306-COM
+Wave Runner GP (USA, Rev A)                   840-0064C  23725A  12 (64Mb)   present  315-6206  317-0306-COM  PCB s/n is 840-0064B-01
 
 
 837-13668  171-7919A (C) Sega 1998
@@ -400,7 +400,7 @@ Guilty Gear X                                   841-0013C    23356   14 (64Mb)  
 Gun Spike / Cannon Spike                        841-0012C    23210   12 (64Mb)   present     315-6213  317-5060-COM
 Heavy Metal Geomatrix (Rev B)                   HMG016007    23716A  11 (64Mb)   present     315-6213  317-5071-COM   joystick + 2 buttons
 House of the Dead 2                             834-13636    21385   20 (64Mb)   not present 315-6213  not present
-House of the Dead 2 (USA)                       834-13636-01 21585   20 (64Mb)   not present 315-6213  not present
+House of the Dead 2 (USA)                       834-13636    21585   20 (64Mb)   not present 315-6213  not present    PCB s/n is 834-13636-01
 Idol Janshi Suchie-Pai 3                        841-0002C    21979   14 (64Mb)   ?           315-6213  317-5047-JPN   requires mahjong panel
 Jambo! Safari (Rev A)                           840-0013C    22826A   8 (64Mb)   ?           315-6213  317-0264-COM
 Mars TV                                         840-0025C    22993   15 (64Mb)   present     315-6213  317-0274-JPN
@@ -422,7 +422,7 @@ The Typing of the Dead                          840-0026C    23021   20 (64Mb)  
 The Typing of the Dead (Rev A)                  840-0026C    23021A  20 (64Mb)   present     315-6213  not present
 Touch de UNO! / Unou Nouryoku Check Machine     840-0008C    22073    4 (64Mb)   present     315-6213  317-0255-JPN   requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
 Toy Fighter / Waffupu                           840-0011C    22035   10 (64Mb)   present     315-6212  317-0257-COM   joystick + 3 buttons
-Virtua NBA (USA)                                840-0021C-01 23073   21 (64Mb)   present     315-6213  not present
+Virtua NBA (USA)                                840-0021C-01 23073   21 (64Mb)   present     315-6213  not present    PCB s/n is 840-0021B-01
 Virtua NBA                                      840-0021C    22949   21 (64Mb)   present     315-6213  317-0271-COM
 Virtua Striker 2 Ver. 2000 (Rev C)              840-0010C    21929C  14 (64Mb)*  present     315-6213  317-0258-COM   joystick + 3 buttons *(+1x 32Mb)
 Virtua Tennis / Power Smash                     840-0015C    22927   11 (64Mb)   present     315-6213  317-0263-COM
@@ -648,7 +648,7 @@ Akatsuki Blitzkampf Ausf. Achse                     841-0058C    not present  4 
 Dynamite Deka EX / Asian Dynamite                   840-0175C    not present  4 (512Mb)   present  317-0495-COM  present  IC2# is labeled "VER.2"
 Illvelo (Illmatic Envelope)                         841-0059C    not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2" - IC#11 is empty
 Mamoru-kun wa Norowarete Shimatta                   841-0060C    not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
-Manic Panic Ghost! (USA)                            840-0170C-01 not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based)
+Manic Panic Ghost! (USA)                            840-0170C-01 not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based) - PCB s/n is 840-0170B-01
 Melty Blood Actress Again                           841-0061C    not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
 Melty Blood Actress Again Version A (Rev A)         841-0061C    24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
 Mushiking - The King Of Beetles II ENG (Ver. 1.001) 840-0164C    not present  2 (512Mb)   present  317-0437-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
@@ -2958,10 +2958,13 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 	ROM_SYSTEM_BIOS( 21, "bios21", "Naomi Dev BIOS v1.10" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) ) \
 	ROM_SYSTEM_BIOS( 22, "bios22", "Naomi Unknown Dev board" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ipl", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) )
-/* dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096 */
+	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ipl", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) ) \
+	ROM_REGION( 0x4000, "altera_pof", 0) \
+	ROM_LOAD("315-6188.ic31", 0x0000, 0x2034, CRC(7c9fea46) SHA1(f77c07ae65dfed18c1c4c632c8945be21d02ddaf) )
 
-/*
+/* 
+ dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096 
+
  zukinver0930.ipl comes from 837-13502-01 / 837-13663 PCB which contains:
   22 empty sockets ROM0 - ROM21
   315-6187 Altera EPM7064LC68-10
@@ -9626,8 +9629,8 @@ ROM_END
 /* 0054 */ GAME( 2000, starhrse, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (big screens)", GAME_FLAGS )
 /* 0055 */ GAME( 2000, starhrct, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (server)", GAME_FLAGS )
 /* 0056 */ GAME( 2000, starhrcl, naomi,    naomim2, naomi,   naomi_state, naomi,  ROT270,"Sega", "Star Horse (satellite)", GAME_FLAGS )
-/* 0064 */ GAME( 2001, wrungpo,  wrungp,   naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )	// ROM PCB # 840-0064B-01
-/* 0064 */ GAME( 2001, wrungp,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )	// ROM PCB # 840-0064B
+/* 0064 */ GAME( 2001, wrungpo,  wrungp,   naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
+/* 0064 */ GAME( 2001, wrungp,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068 */ GAME( 2001, crakndj2, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ Part 2", GAME_FLAGS )
 /* 0073 */ GAME( 2001, inunoos,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Inu No Osanpo / Dog Walking (Rev A)", GAME_FLAGS )
 /* 0083 */ GAME( 2001, derbyoc2, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Derby Owners Club II Ver.2.1 (Japan) (Rev B)", GAME_FLAGS )
