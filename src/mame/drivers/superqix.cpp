@@ -18,6 +18,7 @@ Notes:
   implying that the gfx hardware draws to this as a backing framebuffer
   during display. It is unclear how this ram is tested, or if it even is.
 
+Super Qix:
 - The sq07.108 ROM came from a bootleg where the 8751 MCU was replaced by a
   model using external ROM. The ROM was bad (bit 3 was stuck high). It was
   recovered by carefully checking the disassembly but there might still be
@@ -48,6 +49,8 @@ TODO:
 - I'm not sure about the NMI ack at 0418 in the original sqix, but the game hangs
   at the end of a game without it. Note that the bootleg replaces that call with
   something else.
+- Given the behavior of prebillian and hotsmash, I'm guessing 0418 resetting the
+  NMI latch (i.e. NMI ACK) is correct. [LN]
 
 
 Prebillian :
