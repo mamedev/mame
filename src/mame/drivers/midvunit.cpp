@@ -399,7 +399,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 				m_galil_output_index = 0;
 				memset(m_galil_output, 0, 450);
 			break; //device init? 3C 1C are the only 2 writes at boot.
-			case 0x04: output().set_value("wheel", (arg&0x80)?(0x7F-(arg&0x7F)):(arg|0x80)); break; //wheel motor delta. left < 128 < right. 128 is no change.
+			case 0x04: output().set_value("wheel", arg); break; //wheel motor delta. signed byte.
 			case 0x05: for (bit = 0; bit < 8; bit++) output().set_lamp_value(bit, (arg >> bit) & 0x1); break;
 			case 0x08: m_output = m_galil_input[m_galil_input_index++] << 8; break; //get next character from input string.
 			case 0x09:
