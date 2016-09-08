@@ -52,7 +52,7 @@ Select operating system:
 If you choose F1 then DOS Plus and GEM will be booted, or if you press F2 then MS-DOS will be booted.
 
 PC1512-HD10: ?
-PC1512-HD20: ?
+PC1512-HD20: Tandon TM-262 [-chs 615,4,17 -ss 512]
 */
 
 /*
