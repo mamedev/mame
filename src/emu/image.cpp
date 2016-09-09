@@ -55,6 +55,10 @@ image_manager::image_manager(running_machine &machine)
 			if (result != image_init_result::PASS)
 				result = image.load(image_name);
 
+			// failing that, try creating it (if appropriate)
+			if (result != image_init_result::PASS && image.support_command_line_image_creation())
+				result = image.create(image_name);
+
 			// did the image load fail?
 			if (result != image_init_result::PASS)
 			{

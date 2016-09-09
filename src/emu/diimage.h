@@ -158,6 +158,7 @@ public:
 	virtual bool is_creatable() const = 0;
 	virtual bool must_be_loaded() const = 0;
 	virtual bool is_reset_on_load() const = 0;
+	virtual bool support_command_line_image_creation() const;
 	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const { return nullptr; }
@@ -235,6 +236,7 @@ public:
 	image_init_result finish_load();
 	void unload();
 	image_init_result create(const std::string &path, const image_device_format *create_format, util::option_resolution *create_args);
+	image_init_result create(const std::string &path);
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const std::string &path);
 
