@@ -287,7 +287,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 		{
 			// Timings for Rapid Fire and LED verified by Charles MacDonald.
 
-			// Read state is changed at each 256 C-Sync pulses
+			// Read state is probably changed at each 256 C-Sync pulses
 			if ((m_csync_counter & 0xff) == 0)
 			{
 				m_rapid_read_state ^= 0xff;
