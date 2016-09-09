@@ -654,9 +654,14 @@ floperr_t floppy_format_track(floppy_image_legacy *floppy, int head, int track, 
 	/* create a dummy resolution; if no parameters were specified */
 	if (!parameters)
 	{
-		alloc_resolution = std::make_unique<util::option_resolution>(floppy_option_guide);
-		if (!alloc_resolution)
+		try
+		{
+			alloc_resolution = std::make_unique<util::option_resolution>(floppy_option_guide);
+		}
+		catch (...)
+		{
 			return FLOPPY_ERROR_OUTOFMEMORY;
+		}
 		alloc_resolution->set_specification(floppy->floppy_option->param_guidelines);
 
 		parameters = alloc_resolution.get();
