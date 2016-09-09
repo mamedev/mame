@@ -1357,7 +1357,6 @@ end
 
 if (CPUS["M6809"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m6809/6x09dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m6809/knmidasm.cpp")
 end
 
 --------------------------------------------------
