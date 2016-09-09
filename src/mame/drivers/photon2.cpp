@@ -1,12 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Mariusz Wojcieszek
 /*
-    Photon IK2 system
+    Photon IK-3 system
 
     Driver by Mariusz Wojcieszek
 
-    Russian arcade system based on ZX Spectrum home computer.
-
+    Russian arcade system based on ZX Spectrum home computer clone "Leningrad-1". Changes are:
+    - ROM bank switching added
+    - original IO addressing replaced by:
+       A7 A0
+       0  0  ROM bank switch
+       0  1  i8255
+       1  0  standard ZX FEh port (beeper, border color)
+       1  1  nothing
+	- added i8255, uses A5 and A6 to select ports, usage are:
+       PortA - joystick
+	   PortB - joystick (unused)
+       PortC - bit 0 - Coin in, 1-3 - Time per Coin switches, 4 - block Coin in (out), 5 - NMI (out)
+	
     Each coin buys you 1-6 minutes of game time.
 */
 
