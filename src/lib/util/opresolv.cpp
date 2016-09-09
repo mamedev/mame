@@ -316,8 +316,8 @@ void option_resolution::entry::parse_specification(const char *specification)
 			}
 			else
 			{
-				// invalid character
-				assert(false && "Syntax error in specification");
+				// invalid character - abort because we cannot recover from this syntax error
+				throw false;
 			}
 		}
 
