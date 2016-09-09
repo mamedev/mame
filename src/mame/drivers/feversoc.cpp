@@ -163,7 +163,7 @@ WRITE32_MEMBER(feversoc_state::output_w)
 		//data>>16 & 2 coin out
 		machine().bookkeeping().coin_counter_w(1,data>>16 & 4);
 		//data>>16 & 8 coin hopper
-		m_oki->set_bank_base(0x40000 * (((data>>16) & 0x20)>>5));
+		m_oki->set_rom_bank(((data>>16) & 0x20)>>5);
 
 		m_eeprom->di_write((data & 0x80000000) ? 1 : 0);
 		m_eeprom->clk_write((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);

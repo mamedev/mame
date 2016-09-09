@@ -345,7 +345,7 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 
 WRITE8_MEMBER(nmg5_state::oki_banking_w)
 {
-	m_oki->set_bank_base((data & 1) ? 0x40000 : 0);
+	m_oki->set_rom_bank(data & 1);
 }
 
 /*******************************************************************

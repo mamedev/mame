@@ -2878,12 +2878,15 @@ ROM_END
 
 // it runs in an Alpha-68K96III system board
 ROM_START( goldmedla )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "gm3-7.bin", 0x00000, 0x10000, CRC(11a63f4c) SHA1(840a8f1f6d80d0395c65f8ad30cc6bfe5a9693f4) )
 	ROM_LOAD16_BYTE( "gm4-7.bin", 0x00001, 0x10000, CRC(e19966af) SHA1(a2523627fcc9f5e4a82b4ebec937880fc0e0e9f3) )
-	ROM_LOAD16_BYTE( "gm1-7.bin", 0x20000, 0x10000, CRC(6d87b8a6) SHA1(6f47b42d6577691334784e961a991de2ad67f677) )
-	ROM_LOAD16_BYTE( "gm2-7.bin", 0x20001, 0x10000, CRC(8d579505) SHA1(81f225edbba1cac65275e2929336d076afbbd2bf) )
-
+	
+	ROM_REGION16_BE( 0x40000, "data_bank", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "gm1-7.bin", 0x00000, 0x10000, CRC(6d87b8a6) SHA1(6f47b42d6577691334784e961a991de2ad67f677) )
+	ROM_LOAD16_BYTE( "gm2-7.bin", 0x00001, 0x10000, CRC(8d579505) SHA1(81f225edbba1cac65275e2929336d076afbbd2bf) )
+	ROM_COPY( "data_bank", 0, 0x20000, 0x20000 )
+	
 	ROM_REGION( 0x80000, "audiocpu", 0 ) // banking is slightly different from other Alpha68kII games
 	ROM_LOAD( "38.bin",          0x00000,  0x08000, BAD_DUMP CRC(4bf251b8) SHA1(d69a6607e92dbe8081c7c66b6853f02d578ef73f) ) // we use the bootleg set instead
 	ROM_CONTINUE(                0x18000,  0x08000 )
@@ -2910,11 +2913,14 @@ ROM_END
 
 //AT: the bootleg set has strong resemblance of "goldmed7" on an Alpha-68K96III system board
 ROM_START( goldmedlb )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "l_3.bin",   0x00000,  0x10000, CRC(5e106bcf) SHA1(421ddfdd5ef1e9b5b7c45617fd690df982d63c4b) )
 	ROM_LOAD16_BYTE( "l_4.bin",   0x00001,  0x10000, CRC(e19966af) SHA1(a2523627fcc9f5e4a82b4ebec937880fc0e0e9f3) )
-	ROM_LOAD16_BYTE( "l_1.bin",   0x20000,  0x08000, CRC(7eec7ee5) SHA1(4fbb0832f50a83e5060c6891aacccc8f28a84086) )
-	ROM_LOAD16_BYTE( "l_2.bin",   0x20001,  0x08000, CRC(bf59e4f9) SHA1(76c276c54f0f1cc08db7f0169fb7a1357278a1fd) )
+
+	ROM_REGION16_BE( 0x40000, "data_bank", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "l_1.bin",   0x00000,  0x08000, CRC(7eec7ee5) SHA1(4fbb0832f50a83e5060c6891aacccc8f28a84086) )
+	ROM_LOAD16_BYTE( "l_2.bin",   0x00001,  0x08000, CRC(bf59e4f9) SHA1(76c276c54f0f1cc08db7f0169fb7a1357278a1fd) )
+	ROM_COPY( "data_bank", 0, 0x20000, 0x20000 )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 ) //AT: looks identical to goldsnd0.c47
 	ROM_LOAD( "38.bin",          0x00000,  0x08000, CRC(4bf251b8) SHA1(d69a6607e92dbe8081c7c66b6853f02d578ef73f) )
@@ -2926,6 +2932,7 @@ ROM_START( goldmedlb )
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
 	ROM_LOAD16_BYTE( "gm.6",     0x00000, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
 	ROM_LOAD16_BYTE( "gm.5",     0x00001, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
+	// TODO: recover this!
 	//  ROM_LOAD( "33.bin",          0x00000, 0x10000, CRC(05600b13) )
 
 	/* I haven't yet verified if these are the same as the bootleg */
@@ -3392,7 +3399,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,goldmedl)
 
 DRIVER_INIT_MEMBER(alpha68k_state,goldmedla)
 {
-	membank("bank8")->set_base(memregion("maincpu")->base() + 0x20000);
+	membank("bank8")->set_base(memregion("data_bank")->base());
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	m_coin_id = 0x23 | (0x24 << 8);
@@ -3495,8 +3502,8 @@ GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr, alpha68k_state, skyso
 
 
 GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl, alpha68k_state, goldmedl, ROT0,  "SNK",                                               "Gold Medalist (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "SNK",                                               "Gold Medalist (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "SNK",                                               "Gold Medalist (set 2)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // current handling never really accesses video banking other than boot time.
+GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // same as above
 
 GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt, alpha68k_state, skyadvnt, ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu, alpha68k_state,skyadvntu,ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )
@@ -3507,8 +3514,8 @@ GAME( 1989, gangwarsj, gangwars, alpha68k_V,     gangwars, alpha68k_state, gangw
 GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu, alpha68k_state,gangwarsu,ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gangwarsb, gangwars, alpha68k_V,     gangwars, alpha68k_state, gangwars, ROT0,  "bootleg",                                           "Gang Wars (bootleg)", MACHINE_SUPPORTS_SAVE ) // has (undumped) 68705 MCU in place of Alpha MCU, otherwise the same as 'gangwars'
 
-GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, alpha68k_state, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1989, sbasebalj, sbasebal, alpha68k_V_sb,  sbasebalj,alpha68k_state, sbasebalj,ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, alpha68k_state, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
+GAME( 1989, sbasebalj, sbasebal, alpha68k_V_sb,  sbasebalj,alpha68k_state, sbasebalj,ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
 
 GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1989, tnextspc2, tnextspc, tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

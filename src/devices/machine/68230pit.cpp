@@ -27,8 +27,11 @@
 
 #define VERBOSE 0
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOGR(x) LOG(x)
+#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)
+#define LOGR(x)
+#define LOGINT(x) 	LOGPRINT(x)
+#define LOGSETUP(x) LOGPRINT(x)
 #if VERBOSE == 2
 #define logerror printf
 #endif
@@ -231,42 +234,42 @@ static INT32 ow_ofs = 0;
 
 void pit68230_device::wr_pitreg_pgcr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_pgcr = data;
 }
 
 void pit68230_device::wr_pitreg_psrr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_psrr = data;
 }
 
 void pit68230_device::wr_pitreg_paddr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_paddr = data;
 }
 
 void pit68230_device::wr_pitreg_pbddr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_pbddr = data;
 }
 
 void pit68230_device::wr_pitreg_pcddr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_pcddr = data;
 }
 
 void pit68230_device::wr_pitreg_pivr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": Not implemented yet\n", FUNCNAME, data, m_owner->tag()));
+	LOG(("%s(%02x) \"%s\": Not implemented yet\n", FUNCNAME, data, tag()));
 }
 
 void pit68230_device::wr_pitreg_pacr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_pacr = data;
 	// callbacks
 	/*PACR in Mode 0
@@ -289,13 +292,13 @@ void pit68230_device::wr_pitreg_pacr(UINT8 data)
 
 void pit68230_device::wr_pitreg_pbcr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_pbcr = data;
 }
 
 void pit68230_device::wr_pitreg_padr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_padr |= (data & m_paddr);
 	// callbacks
 	m_pa_out_cb ((offs_t)0, m_padr);
@@ -303,7 +306,7 @@ void pit68230_device::wr_pitreg_padr(UINT8 data)
 
 void pit68230_device::wr_pitreg_pbdr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_pbdr |= (data & m_pbddr);
 	// callbacks
 	m_pb_out_cb ((offs_t)0, m_pbdr & m_pbddr);
@@ -311,7 +314,7 @@ void pit68230_device::wr_pitreg_pbdr(UINT8 data)
 
 void pit68230_device::wr_pitreg_pcdr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_pcdr |= (data & m_pcddr);
 	// callbacks
 	m_pc_out_cb ((offs_t)0, m_pcdr);
@@ -319,7 +322,7 @@ void pit68230_device::wr_pitreg_pcdr(UINT8 data)
 
 void pit68230_device::wr_pitreg_psr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_psr = data;
 }
 
@@ -395,7 +398,7 @@ void pit68230_device::wr_pitreg_tcr(UINT8 data)
 	int pen   = 0;
 	int sqr   = 0;
 
-	LOG(("%s(%02x) %s\n", FUNCNAME, data, m_owner->tag()));
+	LOG(("%s(%02x) %s\n", FUNCNAME, data, tag()));
 	m_tcr = data;
 	switch (m_tcr & REG_TCR_TOUT_TIACK_MASK)
 	{
@@ -440,40 +443,41 @@ void pit68230_device::wr_pitreg_tcr(UINT8 data)
 
 void pit68230_device::wr_pitreg_tivr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": \n", FUNCNAME, data, m_owner->tag()));
+	LOG(("%s(%02x) \"%s\": \n", FUNCNAME, data, tag()));
 	m_tivr = data;
 }
 
 void pit68230_device::wr_pitreg_cprh(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_cpr &= ~0xff0000;
 	m_cpr |= ((data << 16) & 0xff0000);
 }
 
 void pit68230_device::wr_pitreg_cprm(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_cpr &= ~0x00ff00;
 	m_cpr |= ((data << 8) & 0x00ff00);
 }
 
 void pit68230_device::wr_pitreg_cprl(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, m_owner->tag(), FUNCNAME, data));
+	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	m_cpr &= ~0x0000ff;
 	m_cpr |= ((data << 0) & 0x0000ff);
 }
 
 void pit68230_device::wr_pitreg_tsr(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": \n", FUNCNAME, data, m_owner->tag()));
+	LOG(("%s(%02x) \"%s\": \n", FUNCNAME, data, tag()));
 	m_tsr = data;
 }
 
 WRITE8_MEMBER (pit68230_device::write)
 {
-	LOG(("%s %s \n",tag(), FUNCNAME));
+	LOG(("\"%s\" %s: Register write '%02x' -> [%02x]\n", tag(), FUNCNAME, data, offset ));
+	LOGSETUP((" * %s Reg %02x <- %02x  \n", tag(), offset, data));
 	switch (offset) {
 	case PIT_68230_PGCR:    wr_pitreg_pgcr(data); break;
 	case PIT_68230_PSRR:    wr_pitreg_psrr(data); break;

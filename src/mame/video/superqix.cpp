@@ -131,17 +131,26 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 	 --5-----  flip screen
 	*/
 
-	machine().bookkeeping().coin_counter_w(0,data & 0x02);
-	machine().bookkeeping().coin_counter_w(1,data & 0x04);
+	if (data&0xc1) logerror("%04x: pbillian_0410_w with invalid bits: %02x\n",space.device().safe_pc(),data);
+	machine().bookkeeping().coin_counter_w(0,BIT(data,1));
+	machine().bookkeeping().coin_counter_w(1,BIT(data,2));
 
-	membank("bank1")->set_entry((data & 0x08) >> 3);
+	membank("bank1")->set_entry(BIT(data,3));
 
-	m_nmi_mask = data & 0x10;
-	flip_screen_set(data & 0x20);
+	m_nmi_mask = BIT(data,4);
+	if (!(m_nmi_mask)) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	flip_screen_set(BIT(data,5));
 }
 
 WRITE8_MEMBER(superqix_state::superqix_0410_w)
 {
+	/*
+	 ------10  tile bank
+	 -----2--  bitmap page select
+	 ----3---  nmi enable/disable
+	 --54----  rom bank 
+	*/
+	if (data&0xc0) logerror("%04x: superqix_0410_w with invalid high bits: %02x\n",space.device().safe_pc(),data);
 	/* bits 0-1 select the tile bank */
 	if (m_gfxbank != (data & 0x03))
 	{

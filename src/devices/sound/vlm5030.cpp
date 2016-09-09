@@ -263,6 +263,11 @@ void vlm5030_device::device_reset()
 	setup_parameter( 0x00);
 }
 
+void vlm5030_device::rom_bank_updated()
+{
+	m_channel->update();
+}
+
 int vlm5030_device::get_bits(int sbit,int bits)
 {
 	int offset = m_address + (sbit>>3);

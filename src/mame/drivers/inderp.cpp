@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ivan Vangelista
-
+// PINBALL
 // Skeleton driver for early Inder pinballs on "Indertronic B-1" hardware.
 // Known pinballs to be dumped: Topaz (1979), Skateboard (1980)
 // Hardware listing and ROM definitions from PinMAME.
@@ -18,9 +18,8 @@ DISPLAY: 6-digit, both 9-segment & 7-segment panels with direct segment access
 SOUND:   simple tones, needs comparison with real machine
  */
 
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "machine/genpin.h"
+#include "cpu/m6502/m6502.h"
 
 class inderp_state : public genpin_class
 {

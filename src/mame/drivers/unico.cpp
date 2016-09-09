@@ -49,7 +49,7 @@ WRITE16_MEMBER(unico_state::burglarx_sound_bank_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		int bank = (data >> 8 ) & 1;
-		m_oki->set_bank_base(0x40000 * bank );
+		m_oki->set_rom_bank(bank);
 	}
 }
 

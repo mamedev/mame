@@ -93,6 +93,8 @@
 
 //#define CRTC_REG_DISP 1
 //#define SPR_DEBUG 1
+#define LAYER_DISABLE 0  // for debugging, allow the Q and W keys to be used for disabling graphic layers
+#define LOG_VID 0
 
 //static UINT32 pshift;  // for debugging
 
@@ -306,19 +308,19 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 		case 0x14:  // Kanji offset (high)
 			m_video.towns_kanji_code_h = data & 0x7f;
 			towns_update_kanji_offset();
-			//logerror("VID: Kanji code set (high) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
+			//if(LOG_VID) logerror("VID: Kanji code set (high) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x15:  // Kanji offset (low)
 			m_video.towns_kanji_code_l = data & 0x7f;
 			towns_update_kanji_offset();
-			//logerror("VID: Kanji code set (low) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
+			//if(LOG_VID) logerror("VID: Kanji code set (low) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x19:  // ANK CG ROM
 			m_towns_ankcg_enable = data & 0x01;
 			towns_update_video_banks(space);
 			break;
 		default:
-			logerror("VGA: write %08x to invalid or unimplemented memory-mapped port %05x\n",data,0xcff80+offset);
+			logerror("VID: write %08x to invalid or unimplemented memory-mapped port %05x\n",data,0xcff80+offset);
 	}
 }
 
@@ -389,7 +391,7 @@ READ8_MEMBER(towns_state::towns_video_440_r)
 		case 0x08:
 			return m_video.towns_video_sel;
 		case 0x0a:
-			logerror("Video: reading register %i (0x44a) [%02x]\n",m_video.towns_video_sel,m_video.towns_video_reg[m_video.towns_video_sel]);
+			if(LOG_VID) logerror("Video: reading register %i (0x44a) [%02x]\n",m_video.towns_video_sel,m_video.towns_video_reg[m_video.towns_video_sel]);
 			return m_video.towns_video_reg[m_video.towns_video_sel];
 		case 0x0c:
 			if(m_video.towns_dpmd_flag != 0)
@@ -403,10 +405,10 @@ READ8_MEMBER(towns_state::towns_video_440_r)
 		case 0x10:
 			return m_video.towns_sprite_sel;
 		case 0x12:
-			logerror("SPR: reading register %i (0x452) [%02x]\n",m_video.towns_sprite_sel,m_video.towns_sprite_reg[m_video.towns_sprite_sel]);
+			if(LOG_VID) logerror("SPR: reading register %i (0x452) [%02x]\n",m_video.towns_sprite_sel,m_video.towns_sprite_reg[m_video.towns_sprite_sel]);
 			return m_video.towns_sprite_reg[m_video.towns_sprite_sel];
 		//default:
-			//logerror("VID: read port %04x\n",offset+0x440);
+			//if(LOG_VID) logerror("VID: read port %04x\n",offset+0x440);
 	}
 	return 0x00;
 }
@@ -445,13 +447,13 @@ WRITE8_MEMBER(towns_state::towns_video_440_w)
 			m_video.towns_sprite_reg[m_video.towns_sprite_sel] = data;
 			break;
 		default:
-			logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
+			if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
 	}
 }
 
 READ8_MEMBER(towns_state::towns_video_5c8_r)
 {
-	//logerror("VID: read port %04x\n",offset+0x5c8);
+	//if(LOG_VID) logerror("VID: read port %04x\n",offset+0x5c8);
 	switch(offset)
 	{
 		case 0x00:  // 0x5c8 - disable TVRAM?
@@ -478,7 +480,7 @@ WRITE8_MEMBER(towns_state::towns_video_5c8_w)
 			//towns_vblank_flag = 0;
 			break;
 	}
-	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x5c8);
+	if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x5c8);
 }
 
 void towns_state::towns_update_palette()
@@ -501,7 +503,7 @@ READ8_MEMBER(towns_state::towns_video_fd90_r)
 	UINT8 ret = 0;
 	UINT16 xpos;
 
-//    logerror("VID: read port %04x\n",offset+0xfd90);
+//    if(LOG_VID) logerror("VID: read port %04x\n",offset+0xfd90);
 	switch(offset)
 	{
 		case 0x00:
@@ -568,7 +570,7 @@ WRITE8_MEMBER(towns_state::towns_video_fd90_w)
 			m_video.towns_layer_ctrl = data;
 			break;
 	}
-	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
+	if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
 READ8_MEMBER(towns_state::towns_video_ff81_r)
@@ -581,7 +583,7 @@ WRITE8_MEMBER(towns_state::towns_video_ff81_w)
 	m_video.towns_vram_wplane = data & 0x0f;
 	m_video.towns_vram_rplane = (data & 0xc0) >> 6;
 	towns_update_video_banks(space);
-	logerror("VGA: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
+	logerror("VID: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
 }
 
 READ8_MEMBER(towns_state::towns_video_unknown_r)
@@ -1673,33 +1675,30 @@ void towns_state::video_start()
 
 UINT32 towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bool layer1_en = true, layer2_en = true;
 	bitmap.fill(0x00000000, cliprect);
+
+	if(LAYER_DISABLE)
+	{
+		if(machine().input().code_pressed(KEYCODE_Q))
+			layer1_en = false;
+		if(machine().input().code_pressed(KEYCODE_W))
+			layer2_en = false;
+	}
 
 	if(!(m_video.towns_video_reg[1] & 0x01))
 	{
-		if(!machine().input().code_pressed(KEYCODE_Q))
-		{
-			if((m_video.towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
-		}
-		if(!machine().input().code_pressed(KEYCODE_W))
-		{
-			if((m_video.towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
-		}
+		if((m_video.towns_layer_ctrl & 0x03) != 0 && layer1_en)
+			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
+		if((m_video.towns_layer_ctrl & 0x0c) != 0 && layer2_en)
+			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
 	}
 	else
 	{
-		if(!machine().input().code_pressed(KEYCODE_Q))
-		{
-			if((m_video.towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
-		}
-		if(!machine().input().code_pressed(KEYCODE_W))
-		{
-			if((m_video.towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
-		}
+		if((m_video.towns_layer_ctrl & 0x0c) != 0 && layer1_en)
+			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
+		if((m_video.towns_layer_ctrl & 0x03) != 0 && layer2_en)
+			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
 	}
 
 #if 0

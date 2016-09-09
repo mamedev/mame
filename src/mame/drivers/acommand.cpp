@@ -418,8 +418,8 @@ WRITE16_MEMBER(acommand_state::ac_devices_w)
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_oki1->set_bank_base(0x40000 * (data & 0x3));
-				m_oki2->set_bank_base(0x40000 * (data & 0x30) >> 4);
+				m_oki1->set_rom_bank(data & 0x3);
+				m_oki2->set_rom_bank((data & 0x30) >> 4);
 			}
 			break;
 		case 0x14/2:

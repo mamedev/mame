@@ -16,13 +16,23 @@ const address_space_config *device_rom_interface::memory_space_config(address_sp
 	return spacenum ? nullptr : &m_rom_config;
 }
 
+void device_rom_interface::rom_bank_updated()
+{
+}
+
 void device_rom_interface::set_rom_bank(int bank)
 {
 	if(!m_bank)
 		emu_fatalerror("%s: device_rom_interface::set_rom_bank called without banking setup", device().tag());
 
+	if(bank >= m_bank_count) {
+		device().logerror("Warning: requested bank %x higher than actual bank count %x\n", bank, m_bank_count);
+		bank = bank % m_bank_count;
+	}
+
 	m_cur_bank = bank;
 	m_bank->set_entry(bank);
+	rom_bank_updated();
 }
 
 void device_rom_interface::reset_bank()
@@ -35,14 +45,14 @@ void device_rom_interface::set_rom(const void *base, UINT32 size)
 {
 	UINT32 mend = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
 	UINT32 rend = size-1;
-	UINT32 banks = mend == 0xffffffff ? 1 : (rend+1) / (mend+1);
-	if(banks < 1)
-		banks = 1;
+	m_bank_count = mend == 0xffffffff ? 1 : (rend+1) / (mend+1);
+	if(m_bank_count < 1)
+		m_bank_count = 1;
 
 	if(rend >= mend) {
 		space().install_read_bank(0, mend, device().tag());
 		m_bank = device().machine().memory().banks().find(device().tag())->second.get();
-		m_bank->configure_entries(0, banks, const_cast<void *>(base), mend+1);
+		m_bank->configure_entries(0, m_bank_count, const_cast<void *>(base), mend+1);
 		m_cur_bank = 0;
 
 	} else {
@@ -67,6 +77,7 @@ void device_rom_interface::interface_pre_start()
 	m_bank = nullptr;
 	m_cur_bank = -1;
 	device().save_item(NAME(m_cur_bank));
+	device().save_item(NAME(m_bank_count));
 	device().machine().save().register_postload(save_prepost_delegate(FUNC(device_rom_interface::reset_bank), this));
 
 	if(!has_configured_map(0)) {

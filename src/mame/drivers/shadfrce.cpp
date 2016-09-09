@@ -388,7 +388,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 {
-	m_oki->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_rom_bank(data & 1);
 }
 
 static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )

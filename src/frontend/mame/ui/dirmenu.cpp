@@ -12,7 +12,6 @@
 
 #include "ui/ui.h"
 #include "ui/dirmenu.h"
-#include "ui/datfile.h"
 #include "ui/utils.h"
 #include "ui/optsmenu.h"
 
@@ -79,7 +78,6 @@ menu_directory::~menu_directory()
 {
 	ui().save_ui_options();
 	ui_globals::reset = true;
-	mame_machine_manager::instance()->datfile().reset_run();
 }
 
 //-------------------------------------------------
@@ -369,7 +367,6 @@ void menu_add_change_folder::handle()
 						machine().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 						machine().options().mark_changed(s_folders[m_ref].option);
 					}
-					mame_machine_manager::instance()->datfile().reset_run();
 				}
 				else
 				{

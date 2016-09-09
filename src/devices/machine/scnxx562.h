@@ -112,6 +112,9 @@
 #define MCFG_DUSCC_OUT_RTXCB_CB(_devcb) \
 	devcb = &duscc_device::set_out_rtxcb_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_DUSCC_OUT_INT_CB(_devcb) \
+	devcb = &duscc_device::set_out_int_callback(*device, DEVCB_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -620,6 +623,7 @@ public:
 	template<class _Object> static devcb_base &set_out_syncb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_syncb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rtxcb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_rtxcb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_trxcb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_trxcb_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_int_cb.set_callback(object); }
 
 	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
 	{
@@ -636,7 +640,12 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	// interrupt acknowledge
-	//  int m1_r();
+ 	DECLARE_READ8_MEMBER( iack );
+
+	// device_z80daisy_interface overrides
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 
 	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_chanA->write_rx(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_chanB->write_rx(state); }
@@ -661,11 +670,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// device_z80daisy_interface overrides
-	virtual int z80daisy_irq_state() override;
-	virtual int z80daisy_irq_ack() override;
-	virtual void z80daisy_irq_reti() override;
 
 	// internal interrupt management
 	void check_interrupts();
@@ -720,7 +724,6 @@ protected:
 
 	devcb_write_line    m_out_int_cb;
 
-
 	int m_int_state[8]; // interrupt state
 
 	int m_variant;
@@ -731,15 +734,17 @@ protected:
 
 	enum
 	{
-		REG_ICR_CHB             = 0x01,
-		REG_ICR_CHA             = 0x02,
-		REG_ICR_VEC_MOD         = 0x04,
-		REG_ICR_V2V4_MOD        = 0x08,
-		REG_ICR_PRIO_MASK       = 0xC0,
-		REG_ICR_PRIO_AHI        = 0x00,
-		REG_ICR_PRIO_BHI        = 0x40,
-		REG_ICR_PRIO_AINT       = 0x80,
-		REG_ICR_PRIO_BINT       = 0xC0,
+		REG_ICR_CHB				= 0x01,
+		REG_ICR_CHA				= 0x02,
+		REG_ICR_VEC_MOD			= 0x04,
+		REG_ICR_V2V4_MOD		= 0x08,
+		REG_ICR_VEC_MODE_MASK	= 0x30,
+		REG_ICR_VEC_MODE_NONE	= 0x30,
+		REG_ICR_PRIO_MASK		= 0xC0,
+		REG_ICR_PRIO_AHI		= 0x00,
+		REG_ICR_PRIO_BHI		= 0x40,
+		REG_ICR_PRIO_AINT		= 0x80,
+		REG_ICR_PRIO_BINT		= 0xC0,
 	};
 };
 

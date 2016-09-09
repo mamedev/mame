@@ -133,7 +133,7 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 //  set_pen_indirect - set an indirect pen index
 //-------------------------------------------------
 
-void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
+void palette_device::set_pen_indirect(pen_t pen, indirect_pen_t index)
 {
 	// make sure we are in range
 	assert(pen < m_entries && index < m_indirect_entries);
@@ -150,7 +150,7 @@ void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 //  transcolor
 //-------------------------------------------------
 
-UINT32 palette_device::transpen_mask(gfx_element &gfx, int color, int transcolor)
+UINT32 palette_device::transpen_mask(gfx_element &gfx, UINT32 color, indirect_pen_t transcolor)
 {
 	UINT32 entry = gfx.colorbase() + (color % gfx.colors()) * gfx.granularity();
 

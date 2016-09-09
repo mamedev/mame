@@ -128,7 +128,7 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 	std::vector<UINT32> extyoffs(0);
 
 	// loop over all elements
-	for (int curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != nullptr; curgfx++)
+	for (UINT8 curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != nullptr; curgfx++)
 	{
 		const gfx_decode_entry &gfx = gfxdecodeinfo[curgfx];
 

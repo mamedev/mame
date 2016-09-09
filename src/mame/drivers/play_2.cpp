@@ -496,11 +496,11 @@ ROM_START(madrace)
 ROM_END
 
 
-GAME(1979,  antar,     0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL )
-GAME(1979,  antar2,    antar, play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL )
-GAME(1980,  evlfight,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL )
-GAME(1980,  attack,    0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL )
-GAME(1980,  blkfever,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL )
+GAME(1979,  antar,     0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  antar2,    antar, play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  evlfight,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  attack,    0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  blkfever,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1982,  cerberup,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1985,  madrace,   0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NO_SOUND)
+GAME(1985,  madrace,   0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1980,  zira,      0,     zira,   play_2, play_2_state,  zira, ROT0, "Playmatic", "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

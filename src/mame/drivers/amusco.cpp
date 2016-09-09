@@ -41,6 +41,15 @@
   22.1184 MHz. Crystal
   15.000  MHz. Crystal
 
+  An unidentified but similar Amusco PCB auctioned on eBay had an AMD P8088 filling the
+  CPU socket. Some of the other chips on this board were replaced with clones (e.g.
+  AMD P8253, SY6545-1).
+
+  The program code reads from and writes to what must be a line printer and a RTC
+  (probably a MSM5832), though neither is present on the main board. The I/O write
+  patterns also suggest that each or both of these devices are accessed through an
+  unknown interface chip or gate array (not i8255-compatible).
+
 *****************************************************************************************
 
   DRIVER UPDATES:

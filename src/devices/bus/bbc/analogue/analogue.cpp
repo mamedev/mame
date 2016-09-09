@@ -41,7 +41,6 @@ device_bbc_analogue_interface::~device_bbc_analogue_interface()
 }
 
 
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -66,6 +65,21 @@ void bbc_analogue_slot_device::device_start()
 	m_card = dynamic_cast<device_bbc_analogue_interface *>(get_card_device());
 }
 
+UINT8 bbc_analogue_slot_device::ch_r(int channel)
+{
+	if (m_card)
+		return m_card->ch_r(channel);
+	else
+		return 0x00;
+}
+
+UINT8 bbc_analogue_slot_device::pb_r()
+{
+	if (m_card)
+		return m_card->pb_r();
+	else
+		return 0x30;
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -86,11 +100,12 @@ void bbc_analogue_slot_device::device_reset()
 
 
 // slot devices
-//#include "joystick.h"
+#include "joystick.h"
 //#include "quinkey.h"
 
 
 SLOT_INTERFACE_START( bbc_analogue_devices )
-//  SLOT_INTERFACE("joystick",  BBC_JOYSTICKS)        /* Acorn ANH01 BBC Micro Joysticks */
+	SLOT_INTERFACE("acornjoy",    BBC_ACORNJOY)         /* Acorn ANH01 Joysticks */
+	SLOT_INTERFACE("voltmace3b",  BBC_VOLTMACE3B)       /* Voltmace Delta 3b "Twin" Joysticks */
 //  SLOT_INTERFACE("quinkey",   BBC_QUINKEY)          /* Microwriter Quinkey */
 SLOT_INTERFACE_END

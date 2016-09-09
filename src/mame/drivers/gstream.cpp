@@ -351,8 +351,8 @@ WRITE32_MEMBER(gstream_state::gstream_oki_banking_w)
 
 	//popmessage("oki bank = %X\noki_1 = %X\noki_2 = %X\n",data, m_oki_bank_1, m_oki_bank_2);
 
-	m_oki_1->set_bank_base(m_oki_bank_1 * 0x40000);
-	m_oki_2->set_bank_base(m_oki_bank_2 * 0x40000);
+	m_oki_1->set_rom_bank(m_oki_bank_1);
+	m_oki_2->set_rom_bank(m_oki_bank_2);
 }
 
 // Some clocking?

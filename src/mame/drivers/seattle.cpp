@@ -1611,6 +1611,21 @@ WRITE32_MEMBER(seattle_state::output_w)
 					for (UINT8 bit = 0; bit < 8; bit++)
 						output().set_lamp_value(bit, (arg >> bit) & 0x1);
 					break;
+					
+				case 0x06: // Hyperdrive LEDs 0-7
+					for (UINT8 bit = 0; bit < 8; bit++)
+						output().set_led_value(bit, (arg >> bit) & 0x1);
+					break;
+					
+				case 0x07: // Hyperdrive LEDs 8-15
+					for (UINT8 bit = 0; bit < 8; bit++)
+						output().set_led_value(8 + bit, (arg >> bit) & 0x1);
+					break;
+					
+				case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
+					for (UINT8 bit = 0; bit < 8; bit++)
+						output().set_led_value(16 + bit, (arg >> bit) & 0x1);
+					break;
 			}
 			break;
 	}

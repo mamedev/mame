@@ -841,6 +841,11 @@ void ymf278b_device::device_stop()
 	m_ymf262 = nullptr;
 }
 
+void ymf278b_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
 void ymf278b_device::precompute_rate_tables()
 {
 	int i;

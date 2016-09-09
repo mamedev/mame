@@ -86,8 +86,6 @@ okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag,
 		device_rom_interface(mconfig, *this, 18),
 		m_region(*this, DEVICE_SELF),
 		m_command(-1),
-		m_bank_installed(false),
-		m_bank_offs(0),
 		m_stream(nullptr),
 		m_pin7_state(0)
 {
@@ -117,7 +115,6 @@ void okim6295_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
 
 	save_item(NAME(m_command));
-	save_item(NAME(m_bank_offs));
 	save_item(NAME(m_pin7_state));
 
 	for (int voicenum = 0; voicenum < OKIM6295_VOICES; voicenum++)
@@ -151,9 +148,6 @@ void okim6295_device::device_reset()
 
 void okim6295_device::device_post_load()
 {
-	if (m_bank_offs != 0)
-		set_bank_base(m_bank_offs, true);
-
 	device_clock_changed();
 }
 
@@ -187,21 +181,12 @@ void okim6295_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 
 //-------------------------------------------------
-//  set_bank_base - old-style bank management;
-//  assumes multiple 256k banks
+//  rom_bank_updated - the rom bank has changed
 //-------------------------------------------------
 
-void okim6295_device::set_bank_base(offs_t base, bool bDontUpdateStream)
+void okim6295_device::rom_bank_updated()
 {
-	// flush out anything pending (but not on e.g. a state load)
-	if (!bDontUpdateStream)
-	{
-		m_stream->update();
-	}
-
-	m_bank_offs = base;
-
-	set_rom_bank(m_bank_offs / 0x40000);
+	m_stream->update();
 }
 
 

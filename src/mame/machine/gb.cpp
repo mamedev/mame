@@ -714,44 +714,40 @@ WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 }
 
 /* Map megaduck audio offset to game boy audio offsets */
+/* Envelope and LFSR register nibbles are reversed relative to the game boy */
 
 static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 {
-	m_custom->sound_w(space, megaduck_sound_offsets[offset], data);
+	if ((offset == 0x01) || (offset == 0x07))
+		m_custom->sound_w(space, megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
+	else
+		m_custom->sound_w(space, megaduck_sound_offsets[offset], data);
 }
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 {
-	return m_custom->sound_r(space, megaduck_sound_offsets[offset]);
+	UINT8 data = m_custom->sound_r(space, megaduck_sound_offsets[offset]);
+	if ((offset == 0x01) || (offset == 0x07))
+		return ((data & 0x0f)<<4) | ((data & 0xf0)>>4);
+	else
+		return data;
 }
 
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 {
-	switch(offset)
-	{
-		case 0x00:  m_custom->sound_w(space, 0x10, data); break;
-		case 0x01:  m_custom->sound_w(space, 0x12, data); break;
-		case 0x02:  m_custom->sound_w(space, 0x11, data); break;
-		case 0x03:  m_custom->sound_w(space, 0x13, data); break;
-		case 0x04:  m_custom->sound_w(space, 0x14, data); break;
-		case 0x05:  m_custom->sound_w(space, 0x16, data); break;
-		case 0x06:  m_custom->sound_w(space, 0x15, data); break;
-		case 0x07:
-		case 0x08:
-		case 0x09:
-		case 0x0A:
-		case 0x0B:
-		case 0x0C:
-		case 0x0D:
-		case 0x0E:
-		case 0x0F:
-			break;
-	}
+	if ((offset == 0x01) || (offset == 0x02))
+		m_custom->sound_w(space, 0x10 + megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
+	else
+		m_custom->sound_w(space, 0x10 + megaduck_sound_offsets[offset], data);
 }
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r2)
 {
-	return m_custom->sound_r(space, 0x10 + megaduck_sound_offsets[offset]);
+	UINT8 data = m_custom->sound_r(space, 0x10 + megaduck_sound_offsets[offset]);
+	if ((offset == 0x01) || (offset == 0x02))
+		return ((data & 0x0f)<<4) | ((data & 0xf0)>>4);
+	else
+		return data;
 }

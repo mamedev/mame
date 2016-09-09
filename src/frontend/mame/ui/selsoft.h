@@ -61,11 +61,11 @@ private:
 	void find_matches(const char *str, int count);
 	void load_sw_custom_filters();
 
-	virtual void infos_render(float x1, float y1, float x2, float y2) override;
-
 	// handlers
 	void inkey_select(const event *menu_event);
 	void inkey_special(const event *menu_event);
+
+	virtual void general_info(const game_driver *driver, std::string &buffer) override {}
 };
 
 class software_parts : public menu

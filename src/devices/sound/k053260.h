@@ -52,6 +52,9 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
+
 private:
 	// configuration
 	sound_stream *  m_stream;

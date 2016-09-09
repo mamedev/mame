@@ -975,10 +975,10 @@ ROM_START(sys1test)
 ROM_END
 
 
-GAME(1977,  gts1,       0,          gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1", MACHINE_IS_BIOS_ROOT)
+GAME(1977,  gts1,       0,          gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
 
 //Exact same roms as gts1 with added hardware we'll likely need roms for to emulate properly
-GAME(1979,  gts1s,      gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1 with sound board", MACHINE_IS_BIOS_ROOT)
+GAME(1979,  gts1s,      gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1 with sound board", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
 GAME(19??,  sys1test,   gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL)
 
 // chimes

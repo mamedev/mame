@@ -2280,6 +2280,17 @@ int lua_engine::l_osd_printf_debug(lua_State *L)
 	return 0;
 }
 
+int lua_engine::l_driver_find(lua_State *L)
+{
+	luaL_argcheck(L, lua_isstring(L, 1), 1, "message (string) expected");
+	int index = driver_list::find(lua_tostring(L, 1));
+	if(index == -1)
+		lua_pushnil(L);
+	else
+		luabridge::Stack<const game_driver &>::push(L, driver_list::driver(index));
+	return 1;
+}
+
 //-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
 //-------------------------------------------------
@@ -2316,6 +2327,7 @@ void lua_engine::initialize()
 			.addCFunction ("print_error",   l_osd_printf_error )
 			.addCFunction ("print_info",    l_osd_printf_info )
 			.addCFunction ("print_debug",   l_osd_printf_debug )
+			.addCFunction ("driver_find",   l_driver_find )
 			.beginClass <machine_manager>("manager")
 				.addFunction("machine", &machine_manager::machine)
 				.addFunction("options", &machine_manager::options)
@@ -2577,6 +2589,8 @@ void lua_engine::initialize()
 				.addProperty <bool, bool> ("show_profiler", &mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler)
 				.addProperty <bool, bool> ("single_step", &mame_ui_manager::single_step, &mame_ui_manager::set_single_step)
 				.addFunction ("get_line_height", &mame_ui_manager::get_line_height)
+				.addFunction ("get_string_width", &mame_ui_manager::get_string_width)
+				.addFunction ("get_char_width", &mame_ui_manager::get_char_width)
 			.endClass()
 			.beginClass <lua_screen> ("lua_screen_dev")
 				.addCFunction ("draw_box",  &lua_screen::l_draw_box)
