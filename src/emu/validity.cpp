@@ -1373,8 +1373,8 @@ void validity_checker::validate_driver()
 		osd_printf_error("Driver is a clone of a clone\n");
 
 	// make sure the driver name is not too long
-	if (!is_clone && strlen(m_current_driver->name) > 8)
-		osd_printf_error("Parent driver name must be 8 characters or less\n");
+	if (!is_clone && strlen(m_current_driver->name) > 16)
+		osd_printf_error("Parent driver name must be 16 characters or less\n");
 	if (is_clone && strlen(m_current_driver->name) > 16)
 		osd_printf_error("Clone driver name must be 16 characters or less\n");
 
