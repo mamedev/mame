@@ -252,6 +252,7 @@ public:
 
 protected:
 	virtual const software_list_loader &get_software_list_loader() const;
+	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
 
 	image_init_result load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	image_error_t load_image_by_path(UINT32 open_flags, const std::string &path);
