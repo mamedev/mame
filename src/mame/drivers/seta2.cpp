@@ -30,6 +30,7 @@ P-FG01-1                1995    Guardians / Denjin Makai II             Banprest
 P0-113A                 1994    Mobile Suit Gundam EX Revue             Banpresto
 P0-123A                 1996    Wakakusamonogatari Mahjong Yonshimai    Maboroshi Ware
 P0-125A ; KE (Namco)    1996    Kosodate Quiz My Angel                  Namco
+P0-130B ; M-133 (Namco) 1997    Star Audition                           Namco
 P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
 P-FG-02                 1997    Reel'N Quake                            <unknown>
 P-FG-03              <unknown>  Endless Riches                          E.N.Tiger
@@ -109,15 +110,11 @@ reelquak:
 #include "emu.h"
 #include "includes/seta2.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/tmp68301.h"
 #include "cpu/h8/h83006.h"
-#include "sound/okim9810.h"
-#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
 #include "machine/mcf5206e.h"
-
 
 /***************************************************************************
 
@@ -509,6 +506,108 @@ static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 
 	AM_RANGE( 0xfffc00, 0xffffff ) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)    // TMP68301 Registers
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+                              Star Audition
+***************************************************************************/
+
+// Outputs
+
+void seta2_state::staraudi_debug_outputs()
+{
+//	popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
+}
+
+WRITE16_MEMBER(seta2_state::staraudi_lamps1_w)
+{
+	COMBINE_DATA(&m_lamps1);
+	if (ACCESSING_BITS_0_7)
+	{
+		output().set_led_value(0, data & 0x0001 );  // Lamp 1 |
+		output().set_led_value(1, data & 0x0002 );  // Lamp 2 |- Camera Lamps
+		output().set_led_value(2, data & 0x0004 );  // Lamp 3 |
+        //                        data & 0x0008 );  // Degauss
+	}
+	staraudi_debug_outputs();
+}
+
+WRITE16_MEMBER(seta2_state::staraudi_lamps2_w)
+{
+	COMBINE_DATA(&m_lamps2);
+	if (ACCESSING_BITS_0_7)
+	{
+        //                        data & 0x0020 );  // ? Always On
+		output().set_led_value(3, data & 0x0040 );  // 2P Switch Lamp
+		output().set_led_value(4, data & 0x0080 );  // 1P Switch Lamp
+	}
+	staraudi_debug_outputs();
+}
+
+WRITE16_MEMBER(seta2_state::staraudi_camera_w)
+{
+	COMBINE_DATA(&m_cam);
+	if (ACCESSING_BITS_0_7)
+	{
+        //                        data & 0x0001 );  // ? Always On
+        //                        data & 0x0002 );  // ? Print Test
+        //                        data & 0x0008 );  // Camera On (Test Mode)
+        //                        data & 0x0020 );  // ?
+	}
+	staraudi_debug_outputs();
+}
+
+// Tile RAM
+
+#define TILE0 (0x7c000)
+#define TILERAM(offset) ((UINT16*)(memregion("sprites")->base() + TILE0 * 8*8 + (offset * 2 / 0x20000) * 2 + ((offset * 2) % 0x20000) / 2 * 8))
+
+READ16_MEMBER(seta2_state::staraudi_tileram_r)
+{
+	return *TILERAM(offset);
+}
+
+WRITE16_MEMBER(seta2_state::staraudi_tileram_w)
+{
+	COMBINE_DATA(TILERAM(offset));
+	int tile = TILE0 + ((offset * 2) % 0x20000) / (8*2);
+	for (int i = 0; m_gfxdecode->gfx(i); ++i)
+		m_gfxdecode->gfx(i)->mark_dirty(tile);
+}
+
+static ADDRESS_MAP_START( staraudi_map, AS_PROGRAM, 16, seta2_state )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
+	AM_RANGE(0x200000, 0x23ffff) AM_RAM                             // RAM
+
+	AM_RANGE(0x400000, 0x45ffff) AM_READWRITE(staraudi_tileram_r, staraudi_tileram_w) AM_SHARE("tileram") // Tile RAM
+
+//	AM_RANGE(0x500000, 0x53ffff) AM_RAM                             // Camera RAM (r8g8)
+//	AM_RANGE(0x540000, 0x57ffff) AM_RAM                             // Camera RAM (00b8)
+	AM_RANGE(0x500000, 0x57ffff) AM_RAM AM_SHARE("rgbram")
+
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(staraudi_camera_w)        // Camera Outputs
+
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")                 // P1
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")                 // P2
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")             // Coins
+	AM_RANGE(0x700006, 0x700007) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
+
+	AM_RANGE(0x700100, 0x700101) AM_WRITE(staraudi_lamps1_w)        // Lamps 1
+	AM_RANGE(0x700180, 0x70018f) AM_DEVREADWRITE8("rtc", upd4992_device, read, write, 0x00ff )
+	AM_RANGE(0x700200, 0x700201) AM_WRITE(staraudi_lamps2_w)        // Lamps 2
+	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")               // DSW 1
+	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")               // DSW 2
+	AM_RANGE(0x700300, 0x70030f) AM_WRITE(sound_bank_w)             // Samples Banks
+
+	AM_RANGE(0x800000, 0x9fffff) AM_DEVREADWRITE("flash", intelfsh16_device, read, write)
+
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM                             // cleared
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -1679,6 +1778,80 @@ static INPUT_PORTS_START( endrichs )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
+/***************************************************************************
+                              Star Audition
+***************************************************************************/
+
+// To activate ROM HACK items, use the debugger memory viewer:
+// patch offsets 1E60,1E62,1E64 of the ':maincpu' region with 4E71
+
+static INPUT_PORTS_START( staraudi )
+	PORT_START("DSW1")  // $700300.w
+	PORT_DIPUNKNOWN_DIPLOC(0x0001, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Monitor Sync (ROM HACK)" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x0004, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC(0x0008, IP_ACTIVE_LOW, "SW1:4" )
+	PORT_DIPNAME( 0x0010, 0x0010, "Show Camera Variables" ) PORT_DIPLOCATION("SW1:5")	// camera test in service mode
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, "Parallel/Serial" ) PORT_DIPLOCATION("SW1:6")	// activates parallel / serial reading (ERROR if not active)
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x0040, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_SERVICE_DIPLOC(   0x0080, IP_ACTIVE_LOW, "SW1:8" )	// service mode
+	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW2")  // $700302.w
+	PORT_DIPUNKNOWN_DIPLOC(0x0001, IP_ACTIVE_LOW, "SW2:1" )	// ?
+	PORT_DIPUNKNOWN_DIPLOC(0x0002, IP_ACTIVE_LOW, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC(0x0004, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC(0x0008, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC(0x0010, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC(0x0020, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Show Game Variables (ROM HACK)" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "? (ROM HACK)" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1") // $700000.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Camera Variables? (Cheat)")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Flip Screen / Monitor Sync (Cheat)")	// keep pressed during boot / press together with up
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Reset Monitor Sync (Cheat)")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2") // $700002.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Slow Motion (Cheat)")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Pause (Cheat)")	// something in monitor sync menu too
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) // unused?
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM") // $700004.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Degauss")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )	PORT_NAME("Reset")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE4 ) // unused?
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2   )	// something (flash activity)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3   ) // unused?
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_VBLANK("screen")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_START4   ) // unused?
+INPUT_PORTS_END
+
 
 /***************************************************************************
                             Sammy Outdoor Shooting
@@ -2083,6 +2256,43 @@ static GFXDECODE_START( funcube )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_2bpp_hi, 0, 0x8000/16 )   // 2bpp, but 4bpp color granularity
 GFXDECODE_END
 
+/***************************************************************************
+                              Star Audition
+***************************************************************************/
+
+static const gfx_layout staraudi_layout_4bpp_lo =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 3*8, 2*8, 1*8, 0*8 },  // needed by staraudi
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+static const gfx_layout staraudi_layout_6bpp =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	6,
+	{ 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },  // needed by staraudi
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+/*  Tiles are 8bpp, but the hardware is additionally able to discard
+    some bitplanes and use the low 4 bits only, or the high 4 bits only */
+static GFXDECODE_START( staraudi )
+	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_4bpp_lo, 0, 0x8000/16 )
+	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi,  0, 0x8000/16 )
+	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
+	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_8bpp,     0, 0x8000/16 )   // 8bpp, but 4bpp color granularity
+	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_3bpp_lo,  0, 0x8000/16 )   // 3bpp, but 4bpp color granularity
+	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_2bpp_hi,  0, 0x8000/16 )   // 2bpp, but 4bpp color granularity
+GFXDECODE_END
+
 
 /***************************************************************************
 
@@ -2240,6 +2450,22 @@ static MACHINE_CONFIG_DERIVED( samshoot, seta2 )
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( staraudi, seta2 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(staraudi_map)
+
+	MCFG_SHARP_LH28F016S_16BIT_ADD("flash")
+	MCFG_UPD4992_ADD("rtc")
+
+	// video hardware
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
+	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x100, 0x1f0-1)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", staraudi)
 MACHINE_CONFIG_END
 
 
@@ -3252,6 +3478,62 @@ ROM_END
 
 /***************************************************************************
 
+Star Audition
+(c)1997 Namco
+
+The PCB has Namco number: M-133 MAIN PCB. On the back it has a Seta number: P0-130B.
+There's a small plug-in sub board containing a Sony A1585Q chip. It's an RGB decoder.
+There's no video outout on this PCB.
+
+TMP68301-16
+Only one OSC at 50MHz, so cpu clock is probably 50/4
+1x NEC DX101
+3x NEC DX102 graphics chips
+Allumer X1-010 sound chip
+
+RTC - NEC D4992 and 3.6v nicad barrel battery
+
+Main RAM looks like 3x 128kx8 SRAMs
+8kx8 SRAM near Allumer chip/SND ROM
+4x 128kx8 near top of big NEC DX101 chip
+2x 32kx8 SRAMs near bottom of big NEC DX101 chip
+6x 32kx8 SRAMs near bottom right corner of PCB near CGx ROMs
+Flash: Sharp LH28F016SAT-70 (TSOP56)
+
+***************************************************************************/
+
+ROM_START( staraudi )
+	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "su1_mpr2.u02", 0x000000, 0x80000, CRC(9e8d1943) SHA1(0a9cb7cb0e9dcd9db08f4bb7033986cb51f2cebf) )
+	ROM_LOAD16_BYTE( "su1_mpr0.u03", 0x000001, 0x80000, CRC(0a93d1d1) SHA1(7624000afc08eb65cdfa38260ff5d39ac73bba16) )
+	ROM_LOAD16_BYTE( "su1_mpr3.u04", 0x100000, 0x80000, CRC(74e07efd) SHA1(6400983c90a28c7d8e091557b0a4102b21035ac8) )
+	ROM_LOAD16_BYTE( "su1_mpr1.u05", 0x100001, 0x80000, CRC(3feb93ec) SHA1(0900d9fb37c884c472b9858002713a2b8ba4e519) )
+
+	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE )   // Sprites
+	ROM_LOAD64_WORD( "su1_cg0.u16", 0x000000, 0x200000, CRC(64281c22) SHA1(3e2b00bd623915a8be7e21812ff96280d071d08f) )
+	ROM_LOAD64_WORD( "su1_cg1.u15", 0x000002, 0x200000, CRC(cd95be41) SHA1(c19c7e6212dab69b575c0e4ce1f7bc390abba67b) )
+	ROM_LOAD64_WORD( "su1_cg2.u18", 0x000004, 0x200000, CRC(63eeee49) SHA1(14a6d358f8a0e4572065c715507d730cf2b77571) )
+	ROM_LOAD64_WORD( "su1_cg3.u17", 0x000006, 0x200000, CRC(fefb2101) SHA1(0e9d63a779210b37565cd000b9d131e9c8f4e329) )
+	// Additional tiles from RAM are decoded here (starting from tile code 7c000)
+
+	ROM_REGION( 0x200000, "flash", ROMREGION_ERASE )
+	ROM_LOAD( "lh28f016sat_flash.u08", 0x000000, 0x200000, CRC(002255bd) SHA1(5e94c29e9a785fe49229f57bc94234ac79dd2f3b) )
+
+	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
+	// Leave 1MB empty (addressable by the chip)
+	ROM_LOAD( "su1_snd.u32", 0x100000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) )	// BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
+ROM_END
+
+DRIVER_INIT_MEMBER(seta2_state,staraudi)
+{
+	// bad sound rom: replace the missing (zero) sample with the previous one
+	UINT8 *samples = memregion("x1snd")->base() + 0x100000;
+	for (int i = 0; i < 0x400000; i += 2)
+		samples[i + 1] = samples[i];
+}
+
+/***************************************************************************
+
 Sammy USA Outdoor Shooting Series PCB
 
 PCB B0-003A (or B0-003B):
@@ -3569,6 +3851,7 @@ GAME( 1996, myangel,  0,        myangel,  myangel,  driver_device, 0,        ROT
 GAME( 1997, myangel2, 0,        myangel2, myangel2, driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, reelquak, 0,        reelquak, reelquak, driver_device, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, endrichs, 0,        reelquak, endrichs, driver_device, 0,        ROT0, "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, staraudi, 0,        staraudi, staraudi, seta2_state,   staraudi, ROT0, "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl,  driver_device, 0,        ROT0, "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
 GAME( 2000, penbros,  0,        penbros,  penbros,  driver_device, 0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
 GAME( 2000, namcostr, 0,        namcostr, funcube,  driver_device, 0,        ROT0, "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )

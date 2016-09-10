@@ -17,7 +17,8 @@
     Offset:     Bits:                   Value:
 
         0.w     f--- ---- ---- ----     Last sprite
-                -ed- ---- ---- ----     ?
+                -e-- ---- ---- ----     ?
+                --d- ---- ---- ----     Opaque
                 ---c ---- ---- ----     0 = Each sprite specifies its size, 1 = Use the global size (following words)
                 ---- b--- ---- ----     Shadow
                 ---- -a98 ---- ----     Tile color depth
@@ -85,8 +86,8 @@
 
     Offset:     Bits:                   Value:
 
-    0/2/4/6                             ? Horizontal (same as ssv.c?)
-    8/a/c/e                             ? Vertical   (same as ssv.c?)
+    0/2/4/6                             Horizontal: Sync, Blank, DSPdot, Cycle (same as ssv.c?)
+    8/a/c/e                             Vertical  : Sync, Blank, DSPdot, Cycle (same as ssv.c?)
 
     10
     12                                  Offset X?
@@ -164,7 +165,7 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 
 static void seta_drawgfx(   bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
-							int shadow_depth )
+							int shadow_depth, bool opaque)
 {
 	const UINT8 *addr, *source;
 	UINT8 pen;
@@ -193,7 +194,7 @@ static void seta_drawgfx(   bitmap_ind16 &bitmap, const rectangle &cliprect, gfx
 			{                                                                   \
 				pen = *source++;                                                \
 																				\
-				if ( pen && sx >= cliprect.min_x && sx <= cliprect.max_x )  \
+				if ( (pen || opaque) && sx >= cliprect.min_x && sx <= cliprect.max_x )  \
 					SETPIXELCOLOR                                               \
 			}                                                                   \
 		}                                                                       \
@@ -217,7 +218,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	// Sprites list
 
-	// When debugging, use m_spriteram here, and run mame -update_in_pause
+	// When debugging, use m_spriteram here, and run mame -update_in_pause, i.e.:
+//	UINT16 *buffered_spriteram16 = m_spriteram;
 	UINT16 *buffered_spriteram16 = m_buffered_spriteram.get();
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
 	UINT16 *end = &buffered_spriteram16[m_spriteram.bytes()/2];
@@ -238,6 +240,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		int global_sizex = xoffs & 0xfc00;
 		int global_sizey = yoffs & 0xfc00;
 
+		bool opaque         =   num & 0x2000;
 		int use_global_size =   num & 0x1000;
 		int use_shadow      =   num & 0x0800;
 
@@ -258,7 +261,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				gfx = m_gfxdecode->gfx(3);
 				break;
 			case 0x0600:            // 6bpp tiles (--543210) (myangel sliding blocks test)
-				shadow_depth = 6;   // ?
+				shadow_depth = 5;   // staraudi
 				gfx = m_gfxdecode->gfx(2);
 				break;
 			case 0x0500:            // 4bpp tiles (3210----)
@@ -269,7 +272,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				shadow_depth = 3;   // reelquak
 				gfx = m_gfxdecode->gfx(0);
 				break;
-//          case 0x0300:
+//          case 0x0300:			// ??? (staraudi question bubble: pen %00011000 with shadow on!)
 //              unknown
 			case 0x0200:            // 3bpp tiles?  (-----210) (myangel "Graduate Tests")
 				shadow_depth = 3;   // ?
@@ -380,7 +383,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 										color,
 										flipx, flipy,
 										dst_x, dst_y,
-										shadow_depth );
+										shadow_depth, opaque );
 							}
 						}
 
@@ -424,7 +427,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 								color,
 								flipx, flipy,
 								sx + (flipx ? sizex-x : x) * 8, sy + (flipy ? sizey-y : y) * 8,
-								shadow_depth );
+								shadow_depth, opaque );
 					}
 				}
 			}
@@ -445,10 +448,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 void seta2_state::video_start()
 {
-	m_gfxdecode->gfx(2)->set_granularity(16);
-	m_gfxdecode->gfx(3)->set_granularity(16);
-	m_gfxdecode->gfx(4)->set_granularity(16);
-	m_gfxdecode->gfx(5)->set_granularity(16);
+	for (int i = 0; m_gfxdecode->gfx(i); ++i)
+		m_gfxdecode->gfx(i)->set_granularity(16);
 
 	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
 
@@ -489,4 +490,28 @@ void seta2_state::screen_eof(screen_device &screen, bool state)
 		// Buffer sprites by 1 frame
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 	}
+}
+
+// staraudi
+void seta2_state::draw_rgbram(bitmap_ind16 &bitmap)
+{
+	if (!m_rgbram || !(m_cam & 0x0008))
+		return;
+
+	for (int y = 0x100; y < 0x200; ++y)
+	{
+		for (int x = 0; x < 0x200; ++x)
+		{
+			int offs = x * 2/2 + y * 0x400/2;
+			UINT32 data = ((m_rgbram[offs + 0x40000/2] & 0xff) << 16) | m_rgbram[offs];
+			bitmap.pix16(y, x) = (data & 0x7fff);
+		}
+	}
+}
+UINT32 seta2_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen_update(screen, bitmap, cliprect);
+//	draw_rgbram(bitmap);
+
+	return 0;
 }
