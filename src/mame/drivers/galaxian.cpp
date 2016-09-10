@@ -11505,10 +11505,10 @@ ROM_START( jungsub )
 	ROM_LOAD( "J14.1D",       0x0800, 0x0800, CRC(1f8c6a58) SHA1(e07ae7e4968ac8ec3c22a30ebd1e9f75abeec776) )
 
 	/* There is twice as much GFX data here as an original 'Jungler'
-	   
+
 	   This appears to be because the Rally X / Jungler hardware supports both X and Y tile flipping, a feature
 	   which Jungler needs.  Galaxian / Scramble hardware does not support tile flipping.
-	   
+
 	   Adding flipped copies of all the tiles would require 4x ROM capacity (normal, Flip X, Flip Y, Flip XY)
 	   but instead of doing this Subelectro worked out which tiles needed flipped copies and managed to squeeze
 	   them into twice the space instead.  Unfortunately this means constructing data to replace the bad rom
@@ -11518,7 +11518,7 @@ ROM_START( jungsub )
 	ROM_LOAD( "J10.4C",       0x0800, 0x0800, CRC(4b32a431) SHA1(701a4e2dfa7686de50bdec7c7f9182192ec25159) )
 	ROM_LOAD( "JC11.4D",      0x1000, 0x0800, BAD_DUMP CRC(5dee4e2d) SHA1(86b98e55602ef2a740f978bb2fcc4b3f81fcc61a) ) // rom is bad, dump entirely garbage
 	ROM_LOAD( "JC12.4F",      0x1800, 0x0800, CRC(6de4827a) SHA1(ffd04abb9f64f88adea81892caa919f84c68ced5) )
-	
+
 	ROM_REGION( 0x0020, "cpuprom", 0 )
 	ROM_LOAD( "KAP.CPU",      0x0000, 0x0020, CRC(27efa693) SHA1(b2ad3b52c254193a7492fe5e6785c167326ce866) )
 

@@ -1,13 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ivan Vangelista
-
+// PINBALL
 // Skeleton driver for Joctronic pinballs.
 // Known pinballs to be dumped: Rider's Surf (1986), Pin Ball (1987)
 // ROM definitions from PinMAME.
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
 #include "machine/genpin.h"
+#include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"

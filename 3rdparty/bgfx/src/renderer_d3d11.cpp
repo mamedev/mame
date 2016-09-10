@@ -1251,6 +1251,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					| ( (m_featureLevel >= D3D_FEATURE_LEVEL_9_2) ? BGFX_CAPS_OCCLUSION_QUERY : 0)
 					| BGFX_CAPS_ALPHA_TO_COVERAGE
 					| ( (m_deviceInterfaceVersion >= 3) ? BGFX_CAPS_CONSERVATIVE_RASTER : 0)
+					| BGFX_CAPS_TEXTURE_2D_ARRAY
+					| BGFX_CAPS_TEXTURE_CUBE_ARRAY
 					);
 
 				m_timerQuerySupport = m_featureLevel >= D3D_FEATURE_LEVEL_10_0;
@@ -1850,14 +1852,14 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			bx::write(&writer, magic);
 
 			TextureCreate tc;
-			tc.m_width   = _width;
-			tc.m_height  = _height;
-			tc.m_sides   = 0;
-			tc.m_depth   = 0;
-			tc.m_numMips = _numMips;
-			tc.m_format  = TextureFormat::Enum(texture.m_requestedFormat);
-			tc.m_cubeMap = false;
-			tc.m_mem     = NULL;
+			tc.m_width     = _width;
+			tc.m_height    = _height;
+			tc.m_depth     = 0;
+			tc.m_numLayers = 1;
+			tc.m_numMips   = _numMips;
+			tc.m_format    = TextureFormat::Enum(texture.m_requestedFormat);
+			tc.m_cubeMap   = false;
+			tc.m_mem       = NULL;
 			bx::write(&writer, tc);
 
 			texture.destroy();
@@ -2030,7 +2032,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				uint32_t size = _size*sizeof(wchar_t);
 				wchar_t* name = (wchar_t*)alloca(size);
 				mbstowcs(name, _marker, size-2);
-				PIX_SETMARKER(D3DCOLOR_RGBA(0xff, 0xff, 0xff, 0xff), name);
+				PIX_SETMARKER(D3DCOLOR_MARKER, name);
 			}
 		}
 
@@ -4117,23 +4119,23 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{
 			for (uint32_t ii = 0; ii < count; ++ii)
 			{
-				uint8_t nameSize;
+				uint8_t nameSize = 0;
 				bx::read(&reader, nameSize);
 
-				char name[256];
+				char name[256] = { '\0' };
 				bx::read(&reader, &name, nameSize);
 				name[nameSize] = '\0';
 
-				uint8_t type;
+				uint8_t type = 0;
 				bx::read(&reader, type);
 
-				uint8_t num;
+				uint8_t num = 0;
 				bx::read(&reader, num);
 
-				uint16_t regIndex;
+				uint16_t regIndex = 0;
 				bx::read(&reader, regIndex);
 
-				uint16_t regCount;
+				uint16_t regCount = 0;
 				bx::read(&reader, regCount);
 
 				const char* kind = "invalid";
@@ -4211,7 +4213,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			BGFX_FATAL(NULL != m_ptr, bgfx::Fatal::InvalidShader, "Failed to create compute shader.");
 		}
 
-		uint8_t numAttrs;
+		uint8_t numAttrs = 0;
 		bx::read(&reader, numAttrs);
 
 		memset(m_attrMask, 0, sizeof(m_attrMask) );
@@ -4257,6 +4259,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			const ImageBlockInfo& blockInfo = getBlockInfo(TextureFormat::Enum(imageContainer.m_format) );
 			const uint32_t textureWidth  = bx::uint32_max(blockInfo.blockWidth,  imageContainer.m_width >>startLod);
 			const uint32_t textureHeight = bx::uint32_max(blockInfo.blockHeight, imageContainer.m_height>>startLod);
+			const uint16_t numLayers     = imageContainer.m_numLayers;
 
 			m_flags  = _flags;
 			m_width  = textureWidth;
@@ -4282,7 +4285,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 			m_numMips = numMips;
 
-			uint32_t numSrd = numMips*(imageContainer.m_cubeMap ? 6 : 1);
+			const uint16_t numSides = numLayers * (imageContainer.m_cubeMap ? 6 : 1);
+			const uint32_t numSrd   = numSides * numMips;
 			D3D11_SUBRESOURCE_DATA* srd = (D3D11_SUBRESOURCE_DATA*)alloca(numSrd*sizeof(D3D11_SUBRESOURCE_DATA) );
 
 			uint32_t kk = 0;
@@ -4290,10 +4294,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			const bool compressed = isCompressed(TextureFormat::Enum(m_textureFormat) );
 			const bool swizzle    = TextureFormat::BGRA8 == m_textureFormat && 0 != (m_flags&BGFX_TEXTURE_COMPUTE_WRITE);
 
-			BX_TRACE("Texture %3d: %s (requested: %s), %dx%d%s%s%s."
+			BX_TRACE("Texture %3d: %s (requested: %s), layers %d, %dx%d%s%s%s."
 				, getHandle()
 				, getName( (TextureFormat::Enum)m_textureFormat)
 				, getName( (TextureFormat::Enum)m_requestedFormat)
+				, numLayers
 				, textureWidth
 				, textureHeight
 				, imageContainer.m_cubeMap ? "x6" : ""
@@ -4301,7 +4306,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				, swizzle ? " (swizzle BGRA8 -> RGBA8)" : ""
 				);
 
-			for (uint8_t side = 0, numSides = imageContainer.m_cubeMap ? 6 : 1; side < numSides; ++side)
+			for (uint16_t side = 0; side < numSides; ++side)
 			{
 				uint32_t width  = textureWidth;
 				uint32_t height = textureHeight;
@@ -4403,6 +4408,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					desc.Width  = textureWidth;
 					desc.Height = textureHeight;
 					desc.MipLevels  = numMips;
+					desc.ArraySize  = numSides;
 					desc.Format     = format;
 					desc.SampleDesc = msaa;
 					desc.Usage      = kk == 0 || blit ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
@@ -4439,22 +4445,46 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 					if (imageContainer.m_cubeMap)
 					{
-						desc.ArraySize = 6;
 						desc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
-						srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-						srvd.TextureCube.MipLevels = numMips;
-					}
-					else
-					{
-						desc.ArraySize = 1;
-						if (msaaSample)
+						if (1 < numLayers)
 						{
-							srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+							srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBEARRAY;
+							srvd.TextureCubeArray.MipLevels = numMips;
+							srvd.TextureCubeArray.NumCubes  = numLayers;
 						}
 						else
 						{
-							srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-							srvd.Texture2D.MipLevels = numMips;
+							srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+							srvd.TextureCube.MipLevels = numMips;
+						}
+					}
+					else
+					{
+						if (msaaSample)
+						{
+							if (1 < numLayers)
+							{
+								srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
+								srvd.Texture2DMSArray.ArraySize = numLayers;
+							}
+							else
+							{
+								srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+							}
+						}
+						else
+						{
+							if (1 < numLayers)
+							{
+								srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+								srvd.Texture2DArray.MipLevels = numMips;
+								srvd.Texture2DArray.ArraySize = numLayers;
+							}
+							else
+							{
+								srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+								srvd.Texture2D.MipLevels = numMips;
+							}
 						}
 					}
 
@@ -4510,7 +4540,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			&&  0 != kk)
 			{
 				kk = 0;
-				for (uint8_t side = 0, numSides = imageContainer.m_cubeMap ? 6 : 1; side < numSides; ++side)
+				for (uint16_t side = 0; side < numSides; ++side)
 				{
 					for (uint32_t lod = 0, num = numMips; lod < num; ++lod)
 					{
@@ -4552,10 +4582,22 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		box.top    = _rect.m_y;
 		box.right  = box.left + _rect.m_width;
 		box.bottom = box.top + _rect.m_height;
-		box.front  = _z;
-		box.back   = box.front + _depth;
 
-		const uint32_t subres = _mip + (_side * m_numMips);
+		uint32_t layer = 0;
+
+		if (TextureD3D11::Texture3D == m_type)
+		{
+			box.front = _z;
+			box.back  = box.front + _depth;
+		}
+		else
+		{
+			layer = _z * (TextureD3D11::TextureCube == m_type ? 6 : 1);
+			box.front = 0;
+			box.back  = 1;
+		}
+
+		const uint32_t subres = _mip + ( (layer + _side) * m_numMips);
 		const uint32_t bpp    = getBitsPerPixel(TextureFormat::Enum(m_textureFormat) );
 		const uint32_t rectpitch = _rect.m_width*bpp/8;
 		const uint32_t srcpitch  = UINT16_MAX == _pitch ? rectpitch : _pitch;
@@ -5104,7 +5146,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			renderDocTriggerCapture();
 		}
 
-		PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), L"rendererSubmit");
+		PIX_BEGINEVENT(D3DCOLOR_FRAME, L"rendererSubmit");
 		BGFX_GPU_PROFILER_BEGIN_DYNAMIC("rendererSubmit");
 
 		ID3D11DeviceContext* deviceCtx = m_deviceCtx;
@@ -5255,7 +5297,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 							wchar_t* viewNameW = s_viewNameW[view];
 							viewNameW[3] = L' ';
 							viewNameW[4] = eye ? L'R' : L'L';
-							PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), viewNameW);
+							PIX_BEGINEVENT(0 == ( (view*2+eye)&1)
+								? D3DCOLOR_VIEW_L
+								: D3DCOLOR_VIEW_R
+								, viewNameW
+								);
 						}
 
 						if (m_ovr.isEnabled() )
@@ -5276,7 +5322,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 							wchar_t* viewNameW = s_viewNameW[view];
 							viewNameW[3] = L' ';
 							viewNameW[4] = L' ';
-							PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), viewNameW);
+							PIX_BEGINEVENT(D3DCOLOR_VIEW, viewNameW);
 						}
 					}
 
@@ -5387,7 +5433,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 							wchar_t* viewNameW = s_viewNameW[view];
 							viewNameW[3] = L'C';
 							PIX_ENDEVENT();
-							PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), viewNameW);
+							PIX_BEGINEVENT(D3DCOLOR_COMPUTE, viewNameW);
 						}
 
 						deviceCtx->IASetVertexBuffers(0, 2, s_zero.m_buffer, s_zero.m_zero, s_zero.m_zero);
@@ -5539,7 +5585,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 						wchar_t* viewNameW = s_viewNameW[view];
 						viewNameW[3] = L' ';
 						PIX_ENDEVENT();
-						PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), viewNameW);
+						PIX_BEGINEVENT(D3DCOLOR_DRAW, viewNameW);
 					}
 
 					programIdx = invalidHandle;
@@ -5988,7 +6034,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					wchar_t* viewNameW = s_viewNameW[view];
 					viewNameW[3] = L'C';
 					PIX_ENDEVENT();
-					PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), viewNameW);
+					PIX_BEGINEVENT(D3DCOLOR_DRAW, viewNameW);
 				}
 
 				invalidateCompute();
@@ -6058,7 +6104,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 		if (_render->m_debug & (BGFX_DEBUG_IFH|BGFX_DEBUG_STATS) )
 		{
-			PIX_BEGINEVENT(D3DCOLOR_RGBA(0x40, 0x40, 0x40, 0xff), L"debugstats");
+			PIX_BEGINEVENT(D3DCOLOR_FRAME, L"debugstats");
 
 			TextVideoMem& tvm = m_textVideoMem;
 
@@ -6192,7 +6238,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		}
 		else if (_render->m_debug & BGFX_DEBUG_TEXT)
 		{
-			PIX_BEGINEVENT(D3DCOLOR_RGBA(0x40, 0x40, 0x40, 0xff), L"debugtext");
+			PIX_BEGINEVENT(D3DCOLOR_FRAME, L"debugtext");
 
 			blit(this, _textVideoMemBlitter, _render->m_textVideoMem);
 

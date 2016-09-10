@@ -6,8 +6,8 @@
 
 
  Notes:  Lower Board - CPU board        S-0086-002-B0  (both games)
-		 Top Board   - GFX board        S-0086-002A-A0 (Street Fight)
-		 Top Board   - GFX board        S-0087-807     (Cross Shooter)
+         Top Board   - GFX board        S-0086-002A-A0 (Street Fight)
+         Top Board   - GFX board        S-0087-807     (Cross Shooter)
 
  for the single PCB version of Air Raid / Cross Shooter on the S-0087-011A-0 PCB,
  see airraid.cpp
@@ -1070,4 +1070,4 @@ GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,  
 GAME( 1986, stfightgb,empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* Cross Shooter uses the same base board, but different video board */
-GAME( 1987, cshootert,  airraid,      cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cshootert,  airraid,      cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

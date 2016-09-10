@@ -856,7 +856,7 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 		output().set_led_value(6, data & 0x0400);    // not tested in service mode
 		output().set_led_value(7, data & 0x0800);    // not tested in service mode
 
-		m_oki->set_bank_base((data & 0x8000) ? 0x40000 : 0);
+		m_oki->set_rom_bank((data & 0x8000) >> 15);
 	}
 
 //  popmessage("OUT %04x", data);
@@ -2622,7 +2622,7 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
-	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)   
+	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // Bidirectional Communication
 	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
@@ -2981,7 +2981,7 @@ ROM_START( agalletak )
 	ROM_LOAD16_WORD( "agallet_korea.nv", 0x0000, 0x0080, CRC(7f41c253) SHA1(50793d4da0ad6eb590941d26a729a1cf4b3c25c2) )
 ROM_END
 
-ROM_START( agalletat ) 
+ROM_START( agalletat )
 	ROMS_AGALLETA
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )

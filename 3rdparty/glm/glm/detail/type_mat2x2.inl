@@ -1,55 +1,10 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
 /// @ref core
 /// @file glm/detail/type_mat2x2.inl
-/// @date 2005-01-16 / 2011-06-15
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
 
-namespace glm{
-namespace detail
+#include "func_matrix.hpp"
+
+namespace glm
 {
-	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER tmat2x2<T, P> compute_inverse(tmat2x2<T, P> const & m)
-	{
-		T OneOverDeterminant = static_cast<T>(1) / (
-			+ m[0][0] * m[1][1]
-			- m[1][0] * m[0][1]);
-
-		tmat2x2<T, P> Inverse(
-			+ m[1][1] * OneOverDeterminant,
-			- m[0][1] * OneOverDeterminant,
-			- m[1][0] * OneOverDeterminant,
-			+ m[0][0] * OneOverDeterminant);
-
-		return Inverse;
-	}
-}//namespace detail
-
 	// -- Constructors --
 
 #	if !GLM_HAS_DEFAULTED_FUNCTIONS || !defined(GLM_FORCE_NO_CTOR_INIT)
@@ -305,7 +260,7 @@ namespace detail
 	template <typename U>
 	GLM_FUNC_QUALIFIER tmat2x2<T, P>& tmat2x2<T, P>::operator/=(tmat2x2<U, P> const & m)
 	{
-		return (*this = *this * detail::compute_inverse<T, P>(m));
+		return *this *= inverse(m);
 	}
 
 	// -- Increment and decrement operators --
@@ -503,13 +458,13 @@ namespace detail
 	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER typename tmat2x2<T, P>::col_type operator/(tmat2x2<T, P> const & m, typename tmat2x2<T, P>::row_type const & v)
 	{
-		return detail::compute_inverse<T, P>(m) * v;
+		return inverse(m) * v;
 	}
 
 	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER typename tmat2x2<T, P>::row_type operator/(typename tmat2x2<T, P>::col_type const & v, tmat2x2<T, P> const & m)
 	{
-		return v * detail::compute_inverse<T, P>(m);
+		return v *  inverse(m);
 	}
 
 	template <typename T, precision P>

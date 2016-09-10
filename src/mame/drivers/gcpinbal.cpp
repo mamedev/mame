@@ -177,7 +177,7 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 		// MSM6585 bank, coin LEDs, maybe others?
 		case 0x44:
 			m_msm_bank = data & 0x1000 ? 0x100000 : 0;
-			m_oki->set_bank_base(0x40000 * ((data & 0x800 )>> 11));
+			m_oki->set_rom_bank((data & 0x800) >> 11);
 			break;
 
 		case 0x45:

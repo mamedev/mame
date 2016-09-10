@@ -59,7 +59,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
  - Suspect*
  - Voodoo Island*
  - Wizard and the Princess
- - Wizball*
  - Word Spinner
 
 -->
@@ -123,6 +122,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="adventure in serenia.img" size="163840" crc="d05ae01e" sha1="f584b46530359f781b809a61d1bef0a56115eb02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advmath" supported="no">
+		<description>Adventures in Math</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "87136">
+				<rom name="Adventures In Math [1983] [5.25] [1 of 1].td0" size="87136" crc="37c2c084" sha1="87d6d6e3bb5a1ad44cdff8f1a349acb2d743bf6b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -426,7 +436,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="conflict">
 		<description>Conflict in Vietnam</description>
 		<year>1986</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -475,7 +485,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="crusade">
 		<description>Crusade in Europe</description>
 		<year>1985</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -666,7 +676,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="f15se">
 		<description>F-15 Strike Eagle (CGA)</description>
 		<year>1985</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -678,7 +688,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="f15see" cloneof="f15se">
 		<description>F-15 Strike Eagle (EGA)</description>
 		<year>1985</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
@@ -950,7 +960,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="hellcat">
 		<description>Hellcat Ace</description>
 		<year>1984</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -1009,6 +1019,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="ikari warriors (disk 2 of 2).img" size="409600" crc="a8ee4437" sha1="2ccffc837351ebdb13796fc492246b82cb08bfe0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inca" supported="no">
+		<description>Inca</description>
+		<year>1985</year>
+		<publisher>Hayden Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Inca [DC] (1985)(Hayden Software) [Adventure, Interactive Fiction].img" size="368640" crc="1f9fe250" sha1="e9d213695501f9d163d402310b3f5e34f1c4ff88" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1614,7 +1635,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="pirates">
 		<description>Sid Meier's Pirates! [cr]</description>
 		<year>1987</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1819,8 +1840,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="silentsr">
 		<description>Silent Service</description>
-		<year>1986</year>
-		<publisher>Microprose</publisher>
+		<year>1985</year>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -1830,13 +1851,25 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="silentsra" cloneof="silentsr">
-		<description>Silent Service (Alt)</description>
-		<year>1986</year>
-		<publisher>Microprose</publisher>
+		<description>Silent Service [cr]</description>
+		<year>1985</year>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="silent service (alt).img" size="327680" crc="4cbe0758" sha1="7ef3d8ea15f1e3e802dd1059767b73dac2cd2fb9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silentsrb" cloneof="silentsr">
+		<description>Silent Service (3.5")</description>
+		<year>1985</year>
+		<publisher>MicroProse</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Silent Service [1985] [MicroProse Software] [1 of 1].img" size="737280" crc="47e12110" sha1="23dc97774af28197331e102315a6ab42b9ae7ed5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1868,7 +1901,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="soloflt">
 		<description>Solo Flight</description>
 		<year>1983</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -1905,7 +1938,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="spitfire">
 		<description>Spitfire Ace</description>
 		<year>1984</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -2299,6 +2332,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="wizball">
+		<description>Wizball</description>
+		<year>1987</year>
+		<publisher>Ocean Software</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Wizball [DC] (1987)(Ocean Software Ltd.) [Action].img" size="368640" crc="ecf3812f" sha1="da1041836f68c1fd231b3d05371bc6468f29441e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wldgames">
 		<description>World Games</description>
 		<year>1986</year>
@@ -2419,14 +2464,33 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<!-- These won't work as emulation of floppy drive emulation isn't complete enough-->
+	<!-- These won't work as the floppy drive emulation isn't complete enough-->
 
 	<software name="baddudes" supported="no">
-		<description>Bad Dudes</description>
+		<description>Bad Dudes (5.25")</description>
 		<year>1988</year>
 		<publisher>Data East</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk"/>
+			<dataarea name="flop" size = "357775">
+				<rom name="Bad Dudes [1988] [5.25] [1 of 2].td0" size="357775" crc="4a19fc60" sha1="4d0a52c62b64a709d9ce5a42137418595a675f63" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size = "362884">
+				<rom name="Bad Dudes [1988] [5.25] [2 of 2].td0" size="362884" crc="2425c6a0" sha1="4fbb64b9da9d726fba670423815361f4928380ca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baddudes35" cloneof="baddudes" supported="no">
+		<description>Bad Dudes (3.5")</description>
+		<year>1988</year>
+		<publisher>Data East</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="656393">
 				<rom name="bad dudes.td0" size="656393" crc="dc74c1ce" sha1="e28ff95cb1793d08a1e373a7096f9024aa1f0d89" offset="0" />
 			</dataarea>
@@ -2777,6 +2841,29 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="academy" supported="no">
+		<description>Academy - Tau Ceti 2</description>
+		<year>1987</year>
+		<publisher>CRL Group</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Academy - Tau Ceti 2 [1987] [CRL Group] [5.25] [1 of 1].img" size="368640" crc="d9047aa4" sha1="09198868eb826dc1be90b941f66c336d21f5df92" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aceoface">
+		<description>Ace of Aces</description>
+		<year>1987</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Artech" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Ace of Aces [Accolade] [1987] [3.5].img" size="737280" crc="9f5d1734" sha1="db70bf0ede554db32c8bf3142b199e627f7ecebd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aaow">
 		<description>The Ancient Art of War</description>
 		<year>1984</year>
@@ -2789,7 +2876,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="aaowas">
-		<description>The Ancient Art Of War At Sea</description>
+		<description>The Ancient Art of War at Sea</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="version" value="1.0" />
@@ -2801,13 +2888,53 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="aaowasa" cloneof="aaowas">
-		<description>The Ancient Art Of War At Sea (Alt)</description>
+		<description>The Ancient Art of War at Sea (Alt)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="version" value="1.5?" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="the ancient art of war at sea (alt).img" size="368640" crc="ac538af6" sha1="143b797aa13d71af042fa6f4b21679f25338c633" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bargames">
+		<description>Bar Games</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bar Games [Accolade] [1989] [5.25] [1].img" size="368640" crc="deb3e64c" sha1="727ae13bd59b19feee0269e08dc831e1393c4a71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bar Games [Accolade] [1989] [5.25] [2].img" size="368640" crc="684dbc8b" sha1="667d77f7a441e461160545dfb16602898c2e1b2d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armorik">
+		<description>Les 8 Conquêtes d'Armorik le Viking</description>
+		<year>1988</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Frédéric Sénégas" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Armorik le Viking (Fr).img" size="368640" crc="3445e3da" sha1="c3496901029e162c0e59a028a28e3c6286ca987f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huntred">
+		<!-- 1994 Slash Corporation re-release -->
+		<description>The Hunt for Red October</description>
+		<year>1988</year>
+		<publisher>Datasoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Hunt for Red October [Datasoft] [1988] [3.5].img" size="737280" crc="1a943c80" sha1="99a52ddcfeae6785afa46eceea061d64020a9e05" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2823,7 +2950,63 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="kingqst4">
+	<software name="shogun">
+		<description>James Clavell's Shogun (set 1)</description>
+		<year>1987</year>
+		<publisher>Mastertronic Group</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "327680">
+				<rom name="Shogun [1987] [Mastertronic Group] [5.25] [1 of 1] [a2].img" size="327680" crc="24730354" sha1="0278ca7aae1c254aaf362940f5a67479cf9638ea" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shoguna">
+		<description>James Clavell's Shogun (set 2)</description>
+		<year>1987</year>
+		<publisher>Mastertronic Group</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Shogun [1987] [Mastertronic Group] [5.25] [1 of 1].img" size="184320" crc="87dec0fb" sha1="4158a195e267687639bc0540638f3ce4f48e6226" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shogunb">
+		<description>James Clavell's Shogun (set 3)</description>
+		<year>1987</year>
+		<publisher>Mastertronic Group</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Shogun [1987] [Mastertronic Group] [5.25] [1 of 1] [a1].img" size="184320" crc="4a4daf48" sha1="337c9934218a351bce352996c84ae14f45435485" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karateka">
+		<description>Karateka</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "211218">
+				<rom name="Karateka [1986] [5.25] [1 of 1].td0" size="211218" crc="deef4ce2" sha1="8e4b167469c0d1dae9a63a652ac9358019e68d2a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karatekap" cloneof="karateka">
+		<description>Karateka (Beta 1986-03-03)</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="Karateka - IBM Beta (1986-03-03) (ID 952).img" size="368640" crc="bae37409" sha1="2997a137038e9cd98ad95931cbf22b03cb6c6ad7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst4_35" cloneof="kingqst4">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>King's Quest IV: The Perils of Rosella (Version #2.2, 3.5")</description>
 		<year>1988</year>
@@ -2848,7 +3031,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="kingqst4m" cloneof="kingqst4">
+	<software name="kingqst4">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>King's Quest IV: The Perils of Rosella (Version #2.2, 5.25")</description>
 		<year>1988</year>
@@ -2887,6 +3070,115 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Disk 6 of 6" />
 			<dataarea name="flop" size="368640">
 				<rom name="disk6_525.img" size="368640" crc="3852ba12" sha1="09767b94985c3ef81547bca74964d6bff95faf00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kult">
+		<description>Kult [cr]</description>
+		<year>1989</year>
+		<publisher>Infogrames Multimedia SA</publisher>
+		<info name="developer" value="Exxos/ERE Informatique" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Kult (1989) (cracked).img" size="368640" crc="fddcaf43" sha1="e0789a5656461e6abd21c293c490b3d52cc89c9e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasrsurg">
+		<description>Laser Surgeon - The Microscopic Mission</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "327680">
+				<rom name="Laser Surgeon - The Microscopic Mission [1987] [Activision] [5.25] [1 of 1].img" size="327680" crc="728e2c05" sha1="f5293c2860fa6dea89d89d00d2d63cdc4c8f8e6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leatherg">
+		<description>Leather Goddesses of Phobos</description>
+		<year>1988</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leather Goddesses of Phobos [1988] [5.25] [1 of 1].img" size="368640" crc="8e586c8d" sha1="865cf5dc0de66b0ef06e7bd710eee8a6b0351154" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lurkingh">
+		<description>The Lurking Horror</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Lurking Horror [1987] [5.25] [1 of 1].img" size="368640" crc="4dbd2ab2" sha1="175a7890f776f93c1b7ef6f0a3bc8afc4b634cc1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflg2">
+		<description>Starflight 2: Trade Routes of the Cloud Nebula</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Binary Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "346788">
+				<rom name="Starflight 2 - Trade Routes Of The Cloud Nebula [1989] [5.25] [1 of 2].td0" size="346788" crc="f5dbaa16" sha1="7598cf40e631cd762501030f98b43fa284be8cf3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "347616">
+				<rom name="Starflight 2 - Trade Routes Of The Cloud Nebula [1989] [5.25] [2 of 2].td0" size="347616" crc="ca35b501" sha1="bcd941785a84b5fb36b23077a7c41686ed2cb188" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strkforc">
+		<description>Strike Force</description>
+		<!-- compilation of Striker, Flightmare, The Red Baron, and Kamikazi Alien -->
+		<year>1987</year>
+		<publisher>Keypunch Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Strike Force.img" size="368640" crc="285ff956" sha1="d7d364682d17ca3958f100cb82f544af5807ca43" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris (5.25")</description>
+		<year>1987</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "249700">
+				<rom name="Tetris [1987] [5.25] [1 of 1].td0" size="249700" crc="52cc8d82" sha1="36fbecba43a112c600595fe2c0a4b009379c63f5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris35">
+		<description>Tetris (3.5")</description>
+		<year>1987</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "242382">
+				<rom name="Tetris [1987] [3.5] [1 of 1].td0" size="242382" crc="a64eb149" sha1="a467d7d8bed7bd268374e282de1f92c298b665c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="weirddrm">
+		<description>Weird Dreams</description>
+		<year>1989</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Weird Dreams [MicroProse] [1989] [3.5].img" size="737280" crc="cc8996dd" sha1="ecd07fbf4b23ffac08f50c970a9f0acdaf86781c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

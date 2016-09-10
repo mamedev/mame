@@ -2481,7 +2481,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 
 TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 {
-//  logerror("CPU Timer 4 fired! value = %d\n", (unsigned)m_timer_value[4]);
+//  logerror("CPU Timer 4 fired! value = %d\n", (unsigned)m_timer4_value);
 
 	m_timer4_value++;
 
@@ -2502,7 +2502,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 	// Overflow
 
-	if ( m_timer_value == nullptr )
+	if ( m_timer4_value == 0 )
 	{
 //      logerror("CPU Timer 4 overflow\n");
 	}

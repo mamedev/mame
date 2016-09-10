@@ -534,8 +534,8 @@ ROM_END
 
 
 /* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978, bigtown,  0,       play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL )
-GAME(1978, lastlap,  bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL )
-GAME(1979, party,    bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL )
-GAME(1978, spcgambl, 0,       play_1, spcgambl, driver_device, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL )
-GAME(1978, chance,   0,       chance, chance,   driver_device, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL )
+GAME(1978, bigtown,  0,       play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, lastlap,  bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, party,    bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, spcgambl, 0,       play_1, spcgambl, driver_device, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, chance,   0,       chance, chance,   driver_device, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

@@ -314,7 +314,7 @@ WRITE16_MEMBER(moo_state::moobl_oki_bank_w)
 {
 	logerror("%x to OKI bank\n", data);
 
-	m_oki->set_bank_base((data & 0x0f) * 0x40000);
+	m_oki->set_rom_bank(data & 0x0f);
 }
 
 static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )

@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    main.c
+    main.cpp
 
     Imgtool command line front end
 
@@ -17,6 +17,8 @@
 #include "imgtool.h"
 #include "main.h"
 #include "modules.h"
+#include "strformat.h"
+
 /* ---------------------------------------------------------------------- */
 
 static void writeusage(FILE *f, int write_word_usage, const struct command *c, char *argv[])
@@ -40,7 +42,6 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 	char *s;
 	char *name = nullptr;
 	char *value = nullptr;
-	util::option_resolution::error oerr;
 	static char buf[256];
 
 	if (filter)
@@ -97,9 +98,7 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 				if (i < minunnamed)
 					goto error; /* Too few unnamed */
 
-				oerr = resolution->add_param(name, value);
-				if (oerr != util::option_resolution::error::SUCCESS)
-					goto opterror;
+				resolution->find(name)->set_value(value);
 			}
 		}
 	}
@@ -111,10 +110,6 @@ filternotfound:
 
 optionalreadyspecified:
 	fprintf(stderr, "Cannot specify multiple %ss\n", name);
-	return -1;
-
-opterror:
-	fprintf(stderr, "%s: %s\n", name, util::option_resolution::error_string(oerr));
 	return -1;
 
 error:
@@ -328,7 +323,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	char **filename_list;
 	int filename_count;
 	int partition_index = 0;
-	const option_guide *writefile_optguide;
+	const util::option_guide *writefile_optguide;
 	const char *writefile_optspec;
 
 	module = imgtool_find_module(argv[0]);
@@ -353,17 +348,18 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 		if (err)
 			goto done;
 
-		writefile_optguide = (const option_guide *) imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
+		writefile_optguide = (const util::option_guide *) imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 		writefile_optspec = (const char *)imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
 
 		if (writefile_optguide && writefile_optspec)
 		{
-			try { resolution.reset(new util::option_resolution(writefile_optguide, writefile_optspec)); }
+			try { resolution.reset(new util::option_resolution(*writefile_optguide)); }
 			catch (...)
 			{
 				err = IMGTOOLERR_OUTOFMEMORY;
 				goto done;
 			}
+			resolution->set_specification(writefile_optspec);
 		}
 	}
 
@@ -592,12 +588,13 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 
 	if (module->createimage_optguide && module->createimage_optspec)
 	{
-		try { resolution.reset(new util::option_resolution(module->createimage_optguide, module->createimage_optspec)); }
+		try { resolution.reset(new util::option_resolution(*module->createimage_optguide)); }
 		catch (...)
 		{
 			err = IMGTOOLERR_OUTOFMEMORY;
 			goto error;
 		}
+		resolution->set_specification(module->createimage_optspec);
 	}
 
 	unnamedargs = parse_options(argc, argv, 2, 3, resolution.get(), nullptr, nullptr);
@@ -742,77 +739,63 @@ static int cmd_listfilters(const struct command *c, int argc, char *argv[])
 	return 0;
 }
 
-static void listoptions(const option_guide *opt_guide, const char *opt_spec)
+static void listoptions(const util::option_guide &opt_guide, const char *opt_spec)
 {
-	char opt_name[32];
-	const char *opt_desc;
-	util::option_resolution::range range[32];
-	char range_buffer[512];
-	char buf[32];
-	int i;
-
-	assert(opt_guide);
+	util::option_resolution resolution(opt_guide);
+	resolution.set_specification(opt_spec);
 
 	fprintf(stdout, "Option           Allowed values                 Description\n");
 	fprintf(stdout, "---------------- ------------------------------ -----------\n");
 
-	while(opt_guide->option_type != OPTIONTYPE_END)
+	std::stringstream description_buffer;
+	for (auto iter = resolution.entries_begin(); iter != resolution.entries_end(); iter++)
 	{
-		range_buffer[0] = 0;
-		snprintf(opt_name, ARRAY_LENGTH(opt_name), "--%s", opt_guide->identifier);
-		opt_desc = opt_guide->display_name;
+		const util::option_resolution::entry &entry = *iter;
 
-		/* is this option relevant? */
-		if (!strchr(opt_spec, opt_guide->parameter))
-		{
-			opt_guide++;
+		std::string opt_name = string_format("--%s", entry.identifier());
+		const char *opt_desc = entry.display_name();
+
+		// is this option relevant?
+		if (!strchr(opt_spec, entry.parameter()))
 			continue;
-		}
 
-		switch(opt_guide->option_type) {
-		case OPTIONTYPE_INT:
-			util::option_resolution::list_ranges(opt_spec, opt_guide->parameter,
-				range, ARRAY_LENGTH(range));
-
-			for (i = 0; range[i].max >= 0; i++)
+		switch (entry.option_type())
+		{
+		case util::option_guide::entry::option_type::INT:
+			for (const auto &range : entry.ranges())
 			{
-				if (range[i].min == range[i].max)
-					snprintf(buf, ARRAY_LENGTH(buf), "%i", range[i].min);
+				if (!description_buffer.str().empty())
+					description_buffer << "/";
+
+				if (range.min == range.max)
+					util::stream_format(description_buffer, "%d", range.min);
 				else
-					snprintf(buf, ARRAY_LENGTH(buf), "%i-%i", range[i].min, range[i].max);
-
-				if (i > 0)
-					strncatz(range_buffer, "/", sizeof(range_buffer));
-				strncatz(range_buffer, buf, sizeof(range_buffer));
+					util::stream_format(description_buffer, "%d-%d", range.min, range.max);
 			}
 			break;
 
-		case OPTIONTYPE_ENUM_BEGIN:
-			i = 0;
-			while(opt_guide[1].option_type == OPTIONTYPE_ENUM_VALUE)
+		case util::option_guide::entry::option_type::ENUM_BEGIN:
+			for (auto enum_value = entry.enum_value_begin(); enum_value != entry.enum_value_end(); enum_value++)
 			{
-				if (i > 0)
-					strncatz(range_buffer, "/", sizeof(range_buffer));
-				strncatz(range_buffer, opt_guide[1].identifier, sizeof(range_buffer));
-
-				opt_guide++;
-				i++;
+				if (!description_buffer.str().empty())
+					description_buffer << '/';
+				description_buffer << enum_value->identifier();
 			}
 			break;
 
-		case OPTIONTYPE_STRING:
-			snprintf(range_buffer, sizeof(range_buffer), "(string)");
+		case util::option_guide::entry::option_type::STRING:
+			description_buffer << "(string)";
 			break;
+
 		default:
 			assert(0);
 			break;
 		}
 
 		fprintf(stdout, "%16s %-30s %s\n",
-			opt_name,
-			range_buffer,
+			opt_name.c_str(),
+			description_buffer.str().c_str(),
 			opt_desc);
-		opt_guide++;
 	}
 }
 
@@ -821,7 +804,7 @@ static void listoptions(const option_guide *opt_guide, const char *opt_spec)
 static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[])
 {
 	const imgtool_module *mod;
-	const option_guide *opt_guide;
+	const util::option_guide *opt_guide;
 	const char *opt_spec;
 
 	mod = imgtool_find_module(argv[0]);
@@ -834,12 +817,12 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 	fprintf(stdout, "Driver specific options for module '%s':\n\n", argv[0]);
 
 	/* list write options */
-	opt_guide = (const option_guide *) imgtool_get_info_ptr(&mod->imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
+	opt_guide = (const util::option_guide *) imgtool_get_info_ptr(&mod->imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	opt_spec = imgtool_get_info_string(&mod->imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
 	if (opt_guide)
 	{
 		fprintf(stdout, "Image specific file options (usable on the 'put' command):\n\n");
-		listoptions(opt_guide, opt_spec);
+		listoptions(*opt_guide, opt_spec);
 		puts("\n");
 	}
 	else
@@ -852,7 +835,7 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 	if (opt_guide)
 	{
 		fprintf(stdout, "Image specific creation options (usable on the 'create' command):\n\n");
-		listoptions(opt_guide, mod->createimage_optspec);
+		listoptions(*opt_guide, mod->createimage_optspec);
 		puts("\n");
 	}
 	else
@@ -940,7 +923,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	}
 
 	/* Usage */
-	fprintf(stderr, "imgtool - Generic image manipulation tool for use with MESS\n\n");
+	fprintf(stderr, "imgtool - Generic image manipulation tool for use with MAME\n\n");
 	for (i = 0; i < ARRAY_LENGTH(cmds); i++)
 	{
 		writeusage(stdout, (i == 0), &cmds[i], argv);

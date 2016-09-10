@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ivan Vangelista
-
+// PINBALL
 // Skeleton driver for Barni pinballs. At this time only Red Baron is dumped.
 // Known pinballs to be dumped: Shield (1985)
 // Hardware listing and ROM definitions from PinMAME.
@@ -16,10 +16,9 @@ DISPLAY: 5x6 digit 7 or 16 segment display
 SOUND:   basically the same as Bally's Squalk & Talk -61 board but missing AY8912 synth chip
 */
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/genpin.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "sound/dac.h"
@@ -49,11 +48,11 @@ static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, barni_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audiocpu_map, AS_IO, 8, barni_state )
+static ADDRESS_MAP_START( audiocpu_map, AS_PROGRAM, 8, barni_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( barni )
 INPUT_PORTS_END
 

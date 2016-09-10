@@ -177,14 +177,14 @@ Adder hardware:
 #include "machine/bfm_comn.h"
 
 #include "sc2ptytm1.lh"
-#include "sc2cpe.lh"   
-#include "sc2casr2.lh"   
-#include "sc2majes.lh"  
-#include "sc2eggs1.lh"   
-#include "sc2prom.lh" 
-#include "sc2cpg.lh"  
+#include "sc2cpe.lh"
+#include "sc2casr2.lh"
+#include "sc2majes.lh"
+#include "sc2eggs1.lh"
+#include "sc2prom.lh"
+#include "sc2cpg.lh"
 #include "sc2copcl7.lh"
-#include "sc2town2.lh"  
+#include "sc2town2.lh"
 #include "sc2suprz1.lh"
 #include "sc2heypr.lh"
 #include "sc2prem2.lh"
@@ -225,7 +225,7 @@ public:
 	required_ioport_array<12> m_strobein;
 	optional_memory_bank m_rombank1;
 	optional_device<ym2413_device> m_ym2413;
-	
+
 
 	required_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_t> m_vfd0;
@@ -722,7 +722,7 @@ WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 	if ( old != m_volume_override )
 	{
 		ym2413_device *ym = m_ym2413;
-		
+
 		if (!m_ym2413)
 			return;
 
@@ -5555,7 +5555,7 @@ ROM_START( sc2copcl3p )
 	sc2_copcl_sound
 
 	ROM_REGION( 0x20000, "dm01:matrix", 0 )
-	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )	
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl4 )
@@ -5573,7 +5573,7 @@ ROM_START( sc2copcl5 )
 	sc2_copcl_sound
 
 	ROM_REGION( 0x20000, "dm01:matrix", 0 )
-	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )	
+	ROM_LOAD( "95000569.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
 ROM_END
 
 ROM_START( sc2copcl6 )
@@ -8514,20 +8514,20 @@ GAME( 1996, sc2luvv1p   , sc2luvv   ,  scorpion2_dm01   , luvjub    , bfm_sc2_st
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER PR6331  PUBLIC ENEMY NO.1 - 26-JUL-1994 09:24:19
-GAMEL( 1996, sc2cpe3     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 1, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)			// GAME No 95-750-257
-GAMEL( 1996, sc2cpe3p    , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)	// GAME No 95-751-257
+GAMEL( 1996, sc2cpe3     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 1, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)            // GAME No 95-750-257
+GAMEL( 1996, sc2cpe3p    , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)  // GAME No 95-751-257
 // PROJECT NUMBER PR6331  PUBLIC ENEMY NO.1 FIXED 65% - 10-AUG-1994 11:26:30
-GAMEL( 1996, sc2cpe4     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 2, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)			// GAME No 95-750-273
-GAMEL( 1996, sc2cpe4p    , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)	// GAME No 95-751-273
+GAMEL( 1996, sc2cpe4     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 2, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)            // GAME No 95-750-273
+GAMEL( 1996, sc2cpe4p    , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)  // GAME No 95-751-273
 // PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 STENA SEALINK - 3-JAN-1996 12:17:33
-GAMEL( 1996, sc2cpe2     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 3, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)			// GAME No 95-750-597
-GAMEL( 1996, sc2cpe2p    , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)	// GAME No 95-751-597
+GAMEL( 1996, sc2cpe2     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 3, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)            // GAME No 95-750-597
+GAMEL( 1996, sc2cpe2p    , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)  // GAME No 95-751-597
 // PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 FIXED 65% - 3-JAN-1996 12:19:01
-GAMEL( 1996, sc2cpe1     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 4, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)			// GAME No 95-750-598
-GAMEL( 1996, sc2cpe1p    , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)	// GAME No 95-751-598
+GAMEL( 1996, sc2cpe1     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 4, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)            // GAME No 95-750-598
+GAMEL( 1996, sc2cpe1p    , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)  // GAME No 95-751-598
 // PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 - 20-AUG-1996 10:05:21
-GAMEL( 1996, sc2cpe      , 0         ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 5, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)			// GAME No 95-750-846
-GAMEL( 1996, sc2cpep     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 5, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)	// GAME No 95-751-846
+GAMEL( 1996, sc2cpe      , 0         ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 5, UK) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)            // GAME No 95-750-846
+GAMEL( 1996, sc2cpep     , sc2cpe    ,  scorpion2_dm01_5m   , cpeno1    , bfm_sc2_state, cpeno1 , 0,         "BFM",      "Club Public Enemy No.1 (set 5, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS, layout_sc2cpe)  // GAME No 95-751-846
 
 /********************************************************************************************************************************************************************************************************************
  Cops 'n' Robbers

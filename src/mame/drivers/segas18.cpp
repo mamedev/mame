@@ -405,7 +405,7 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 
 			pos_value_x = ioport("GUNX1")->read();
 			pos_value_y = 255 - ioport("GUNY1")->read();
-			
+
 			// Offset adjustment is disabled?
 			if (!ioport("FAKE")->read())
 				m_lghost_value = pos_value_y;

@@ -35,20 +35,26 @@
     the PIO port. When zero it will stay on current address.  Now this works exactly the same for DMA, and even if DMA engine is 32-byte
     per block it will repeatedly read only the first 16-bit word.
 
-    * bit 30 (mode bit 2) is most often as special mode switch
+    * bit 30 (mode bit 2)
+	DMA_OFFSET: 0 = enable DMA (all cart types), enabled during trasfer only because there can be other devices which uses G1 bus DMA (comm.board, multiboard, etc)
+	ROM_OFFSET:
+      "M2" type carts: 1 = select decryption/decompression device registers or its RAM space
+      "M1" type carts: ???
+      "M4" type carts: 1 = enable data decryption, for both PIO and DMA.
+    is most often as special mode switch
     DMA transfer with this bit set will hang. PIO will return semi-random data (floating bus?). So one function of that bit is "disable".
     PIO read will return all ones if DMA mode has this bit cleared, so it seems you can do either PIO or DMA but not both at the same time.
     In other words, disable DMA once before using PIO (most games using both access types do that when the DMA terminates).
     This bit is also used to reset the chip's internal protection mechanism on "Oh! My Goddess" to a known state.
-    "M4" type carts: ROM_OFFSET bit 30 enables data decryption, for both PIO and DMA.
 
-    * bit 29 (mode bit 1) is "M1" compression bit on Actel carts, other functions on others
-    It's actually the opposite, when set the addressing is following the chip layout and when cleared the protection chip will have it's fun
-    doing a decompression + XOR on the data for Actel carts.
-    "M2" type carts: ROM size/mapping select, 0 - 4MB ROM-mode, 1 - 8MB ROM mode. ROM_OFFSET bit 29 select cart mapping for both PIO and DMA, DMA_OFFSET bit 29 looks have no any effect.
-    "M4" type carts: no effect
+    * bit 29 (mode bit 1)
+    "M2" type carts: DMA_OFFSET - no effect, ROM_OFFSET - ROM size/mapping select, 0 - 4MB ROM-mode, 1 - 8MB ROM mode. for both PIO and DMA
+    "M1" type carts: DMA_OFFSET 0 = enable decryptyon/decompression during DMA transfer, ROM_OFFSET - ROM size/mapping select similar to M2 cart type
+    "M4" type carts: no effect, ROM_OFFSET bit 29 always return 1 then read, used by BIOS to determine this cart is encrypted and require bit 30 set then read ROM header
 
-    Normal address starts with 0xa0000000 to enable auto-advance and standard addressing mode.
+	* bit 0 can be set for "M4" type carts, function unknown
+
+    Normal address starts with 0xa0000000 to enable auto-advance and 8MB ROM addressing mode.
 */
 
 DEVICE_ADDRESS_MAP_START(submap, 16, naomi_board)

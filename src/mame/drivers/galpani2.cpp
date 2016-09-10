@@ -338,7 +338,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_oki1_bank_w)
 
 WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 {
-	m_oki2->set_bank_base(0x40000 * (data & 0xf) );
+	m_oki2->set_rom_bank(data & 0xf);
 	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
 }
 

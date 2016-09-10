@@ -124,7 +124,7 @@ files{
   MAME_DIR .. "src/mame/includes/mario.h",
   MAME_DIR .. "src/mame/video/mario.cpp",
   MAME_DIR .. "src/mame/audio/mario.cpp",
-	
+
 	MAME_DIR .. "src/mame/drivers/m62.cpp",
 	MAME_DIR .. "src/mame/includes/m62.h",
 	MAME_DIR .. "src/mame/video/m62.cpp",

@@ -10,7 +10,7 @@
 #include "diablo.h"
 
 
-static OPTION_GUIDE_START(dsk_option_guide)
+OPTION_GUIDE_START(dsk_option_guide)
 	OPTION_INT('C', "cylinders",        "Cylinders")
 	OPTION_INT('H', "heads",            "Heads")
 	OPTION_INT('S', "sectors",          "Sectors")
@@ -62,7 +62,7 @@ void diablo_image_device::device_config_complete()
 	update_names();
 }
 
-const option_guide *diablo_image_device::create_option_guide() const
+const util::option_guide &diablo_image_device::create_option_guide() const
 {
 	return dsk_option_guide;
 }

@@ -61,7 +61,7 @@ void cococart_slot_device::device_start()
 
 	m_cart_line.timer_index     = 0;
 	m_cart_line.delay           = 0;
-	m_cart_line.value           = COCOCART_LINE_VALUE_CLEAR;
+	m_cart_line.value           = line_value::CLEAR;
 	m_cart_line.line            = 0;
 	m_cart_line.q_count         = 0;
 	m_cart_callback.resolve();
@@ -70,7 +70,7 @@ void cococart_slot_device::device_start()
 	m_nmi_line.timer_index      = 0;
 	/* 12 allowed one more instruction to finished after the line is pulled */
 	m_nmi_line.delay            = 12;
-	m_nmi_line.value            = COCOCART_LINE_VALUE_CLEAR;
+	m_nmi_line.value            = line_value::CLEAR;
 	m_nmi_line.line             = 0;
 	m_nmi_line.q_count          = 0;
 	m_nmi_callback.resolve();
@@ -79,7 +79,7 @@ void cococart_slot_device::device_start()
 	m_halt_line.timer_index     = 0;
 	/* 6 allowed one more instruction to finished after the line is pulled */
 	m_halt_line.delay           = 6;
-	m_halt_line.value           = COCOCART_LINE_VALUE_CLEAR;
+	m_halt_line.value           = line_value::CLEAR;
 	m_halt_line.line            = 0;
 	m_halt_line.q_count         = 0;
 	m_halt_callback.resolve();
@@ -113,15 +113,15 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 	switch(id)
 	{
 		case TIMER_CART:
-			set_line("CART", m_cart_line, (cococart_line_value) param);
+			set_line("CART", m_cart_line, (line_value) param);
 			break;
 
 		case TIMER_NMI:
-			set_line("NMI", m_nmi_line, (cococart_line_value) param);
+			set_line("NMI", m_nmi_line, (line_value) param);
 			break;
 
 		case TIMER_HALT:
-			set_line("HALT", m_halt_line, (cococart_line_value) param);
+			set_line("HALT", m_halt_line, (line_value) param);
 			break;
 	}
 }
@@ -157,18 +157,18 @@ WRITE8_MEMBER(cococart_slot_device::write)
 //  line_value_string
 //-------------------------------------------------
 
-static const char *line_value_string(cococart_line_value value)
+const char *cococart_slot_device::line_value_string(line_value value)
 {
 	const char *s;
 	switch(value)
 	{
-		case COCOCART_LINE_VALUE_CLEAR:
+		case line_value::CLEAR:
 			s = "CLEAR";
 			break;
-		case COCOCART_LINE_VALUE_ASSERT:
+		case line_value::ASSERT:
 			s = "ASSERT";
 			break;
-		case COCOCART_LINE_VALUE_Q:
+		case line_value::Q:
 			s = "Q";
 			break;
 		default:
@@ -183,28 +183,29 @@ static const char *line_value_string(cococart_line_value value)
 //  set_line
 //-------------------------------------------------
 
-void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &line, cococart_line_value value)
+void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &line, cococart_slot_device::line_value value)
 {
-	if ((line.value != value) || (value == COCOCART_LINE_VALUE_Q))
+	if ((line.value != value) || (value == line_value::Q))
 	{
 		line.value = value;
 
 		if (LOG_LINE)
 			logerror("[%s]: set_line(): %s <= %s\n", machine().describe_context(), line_name, line_value_string(value));
-		/* engage in a bit of gymnastics for this odious 'Q' value */
+
+		// engage in a bit of gymnastics for this odious 'Q' value 
 		switch(line.value)
 		{
-			case COCOCART_LINE_VALUE_CLEAR:
+			case line_value::CLEAR:
 				line.line = 0x00;
 				line.q_count = 0;
 				break;
 
-			case COCOCART_LINE_VALUE_ASSERT:
+			case line_value::ASSERT:
 				line.line = 0x01;
 				line.q_count = 0;
 				break;
 
-			case COCOCART_LINE_VALUE_Q:
+			case line_value::Q:
 				line.line = line.line ? 0x00 : 0x01;
 				if (line.q_count++ < 4)
 					set_line_timer(line, value);
@@ -223,9 +224,9 @@ void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &
 //  set_line_timer()
 //-------------------------------------------------
 
-void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_line_value value)
+void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_slot_device::line_value value)
 {
-	/* calculate delay; delay dependant on cycles per second */
+	// calculate delay; delay dependant on cycles per second
 	attotime delay = (line.delay != 0)
 		? machine().firstcpu->cycles_to_attotime(line.delay)
 		: attotime::zero;
@@ -242,10 +243,10 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_li
 
 void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line &line)
 {
-	if (line.value == COCOCART_LINE_VALUE_Q)
+	if (line.value == line_value::Q)
 	{
 		line.q_count = 0;
-		set_line_timer(line, COCOCART_LINE_VALUE_Q);
+		set_line_timer(line, line_value::Q);
 	}
 }
 
@@ -268,23 +269,23 @@ void cococart_slot_device::twiddle_q_lines()
 //  coco_cartridge_set_line
 //-------------------------------------------------
 
-void cococart_slot_device::cart_set_line(cococart_line line, cococart_line_value value)
+void cococart_slot_device::cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
 {
-	switch (line)
+	switch (which)
 	{
-		case COCOCART_LINE_CART:
+		case line::CART:
 			set_line_timer(m_cart_line, value);
 			break;
 
-		case COCOCART_LINE_NMI:
+		case line::NMI:
 			set_line_timer(m_nmi_line, value);
 			break;
 
-		case COCOCART_LINE_HALT:
+		case line::HALT:
 			set_line_timer(m_halt_line, value);
 			break;
 
-		case COCOCART_LINE_SOUND_ENABLE:
+		case line::SOUND_ENABLE:
 			// do nothing for now
 			break;
 	}

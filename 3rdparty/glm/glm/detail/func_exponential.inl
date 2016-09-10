@@ -20,7 +20,7 @@ namespace detail
 		}
 #	endif
 
-	template <typename T, precision P, template <class, precision> class vecType, bool isFloat = true>
+	template <typename T, precision P, template <class, precision> class vecType, bool isFloat, bool Aligned>
 	struct compute_log2
 	{
 		GLM_FUNC_QUALIFIER static vecType<T, P> call(vecType<T, P> const & vec)
@@ -29,7 +29,16 @@ namespace detail
 		}
 	};
 
-	template <template <class, precision> class vecType, typename T, precision P>
+	template <template <class, precision> class vecType, typename T, precision P, bool Aligned>
+	struct compute_sqrt
+	{
+		GLM_FUNC_QUALIFIER static vecType<T, P> call(vecType<T, P> const & x)
+		{
+			return detail::functor1<T, T, P, vecType>::call(std::sqrt, x);
+		}
+	};
+
+	template <template <class, precision> class vecType, typename T, precision P, bool Aligned>
 	struct compute_inversesqrt
 	{
 		GLM_FUNC_QUALIFIER static vecType<T, P> call(vecType<T, P> const & x)
@@ -38,8 +47,8 @@ namespace detail
 		}
 	};
 		
-	template <template <class, precision> class vecType>
-	struct compute_inversesqrt<vecType, float, lowp>
+	template <template <class, precision> class vecType, bool Aligned>
+	struct compute_inversesqrt<vecType, float, lowp, Aligned>
 	{
 		GLM_FUNC_QUALIFIER static vecType<float, lowp> call(vecType<float, lowp> const & x)
 		{
@@ -104,7 +113,7 @@ namespace detail
 	template <typename T, precision P, template <typename, precision> class vecType>
 	GLM_FUNC_QUALIFIER vecType<T, P> log2(vecType<T, P> const & x)
 	{
-		return detail::compute_log2<T, P, vecType, std::numeric_limits<T>::is_iec559>::call(x);
+		return detail::compute_log2<T, P, vecType, std::numeric_limits<T>::is_iec559, detail::is_aligned<P>::value>::call(x);
 	}
 
 	// sqrt
@@ -113,7 +122,7 @@ namespace detail
 	GLM_FUNC_QUALIFIER vecType<T, P> sqrt(vecType<T, P> const & x)
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'sqrt' only accept floating-point inputs");
-		return detail::functor1<T, T, P, vecType>::call(sqrt, x);
+		return detail::compute_sqrt<vecType, T, P, detail::is_aligned<P>::value>::call(x);
 	}
 
 	// inversesqrt
@@ -127,6 +136,11 @@ namespace detail
 	GLM_FUNC_QUALIFIER vecType<T, P> inversesqrt(vecType<T, P> const & x)
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'inversesqrt' only accept floating-point inputs");
-		return detail::compute_inversesqrt<vecType, T, P>::call(x);
+		return detail::compute_inversesqrt<vecType, T, P, detail::is_aligned<P>::value>::call(x);
 	}
 }//namespace glm
+
+#if GLM_ARCH != GLM_ARCH_PURE && GLM_HAS_UNRESTRICTED_UNIONS
+#	include "func_exponential_simd.inl"
+#endif
+

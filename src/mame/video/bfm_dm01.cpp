@@ -100,9 +100,9 @@ void bfmdm01_device::device_start()
 	save_item(NAME(m_scanline), i);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap);
-	m_palette->set_pen_color(0, rgb_t(0, 0, 0));		// background
-	m_palette->set_pen_color(1, rgb_t(32, 16, 0));		// off dot
-	m_palette->set_pen_color(2, rgb_t(255, 160, 0));	// on dot
+	m_palette->set_pen_color(0, rgb_t(0, 0, 0));        // background
+	m_palette->set_pen_color(1, rgb_t(15, 1, 1));       // off dot
+	m_palette->set_pen_color(2, rgb_t(255, 31, 31));    // on dot
 }
 
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( bfmdm01_device::mux_w )
 				pix[1 + (pos * 2)] = 0;
 				pix2[0 + (pos * 2)] = 0;
 				pix2[1 + (pos * 2)] = 0;
-			}		
+			}
 		}
 	}
 

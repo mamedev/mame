@@ -367,7 +367,7 @@ WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
 
 	if (data&0xfd) logerror ("Unused bank bits! %02x\n",data);
 
-	m_oki->set_bank_base(bank * 0x40000);
+	m_oki->set_rom_bank(bank);
 }
 
 static ADDRESS_MAP_START( twinadv_sound_io_map, AS_IO, 8, snowbros_state )

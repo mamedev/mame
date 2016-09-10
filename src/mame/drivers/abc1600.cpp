@@ -34,14 +34,14 @@
 
     TODO:
 
-	- starting from MAME 0.151, the Z80 DMA reads 0x08 as the 257th byte to transfer from disk t0s14 thus failing a comparison @ 37cfa, leading to a watchdog reset
-	  changing z80dma.cpp:477 to "done = (m_count == 0);" fixes this but isn't the real reason
-	- abcenix boot stuck in a loop @ 37cfa
+    - starting from MAME 0.151, the Z80 DMA reads 0x08 as the 257th byte to transfer from disk t0s14 thus failing a comparison @ 37cfa, leading to a watchdog reset
+      changing z80dma.cpp:477 to "done = (m_count == 0);" fixes this but isn't the real reason
+    - abcenix boot stuck in a loop @ 37cfa
     - segment/page RAM addresses are not correctly decoded, "sas/format/format" after abcenix is booted can't find the SASI interface because of this
-		[:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0)
-			should be
-		[:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1)
-		
+        [:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0)
+            should be
+        [:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1)
+
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!
@@ -904,7 +904,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
-	
+
 	MCFG_FD1797_ADD(SAB1797_02P_TAG, XTAL_64MHz/64)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pb7_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(abc1600_state, fdc_drq_w))

@@ -86,6 +86,8 @@ enum
 {
 	SCALE_FRACTIONAL = 0,                               // compute fractional scaling factors for both axes
 	SCALE_FRACTIONAL_X,                                 // compute fractional scaling factor for x-axis, and integer factor for y-axis
+	SCALE_FRACTIONAL_Y,                                 // compute fractional scaling factor for y-axis, and integer factor for x-axis
+	SCALE_FRACTIONAL_AUTO,                              // automatically compute fractional scaling for x/y-axes based on source native orientation
 	SCALE_INTEGER                                       // compute integer scaling factors for both axes, based on target dimensions
 };
 
@@ -1039,6 +1041,8 @@ private:
 	simple_list<item>   m_bezel_list;       // list of bezel items
 	simple_list<item>   m_cpanel_list;      // list of marquee items
 	simple_list<item>   m_marquee_list;     // list of marquee items
+
+	static const simple_list<item> s_null_list;
 };
 
 

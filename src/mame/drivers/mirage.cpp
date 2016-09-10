@@ -133,13 +133,13 @@ READ16_MEMBER(miragemi_state::mirage_input_r)
 
 WRITE16_MEMBER(miragemi_state::okim1_rombank_w)
 {
-	m_oki_sfx->set_bank_base(0x40000 * (data & 0x3));
+	m_oki_sfx->set_rom_bank(data & 0x3);
 }
 
 WRITE16_MEMBER(miragemi_state::okim0_rombank_w)
 {
 	/*bits 4-6 used on POST? */
-	m_oki_bgm->set_bank_base(0x40000 * (data & 0x7));
+	m_oki_bgm->set_rom_bank(data & 0x7);
 }
 
 static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16, miragemi_state )

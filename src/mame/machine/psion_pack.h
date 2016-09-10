@@ -40,7 +40,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return "psion_pack"; }
 	virtual const char *file_extensions() const override { return "opk"; }
-	virtual const option_guide *create_option_guide() const override;
+	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
 	UINT8 data_r();

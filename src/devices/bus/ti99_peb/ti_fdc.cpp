@@ -113,8 +113,27 @@ SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
 	operate_ready_line();
 }
 
+/*
+    Access for debugger. This is a stripped-down version of the
+    main methods below. We only allow ROM access.
+*/
+void ti_fdc_device::debug_read(offs_t offset, UINT8* value)
+{
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	{
+		if ((offset & 0x1ff1)!=0x1ff0)
+			*value = m_dsrrom[offset & 0x1fff];
+	}
+}
+
 READ8Z_MEMBER(ti_fdc_device::readz)
 {
+	if (space.debugger_access())
+	{
+		debug_read(offset, value);
+		return;
+	}
+
 	if (m_inDsrArea && m_selected)
 	{
 		// Read ports of 1771 are mapped to 5FF0,2,4,6: 0101 1111 1111 0xx0
@@ -150,6 +169,8 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 
 WRITE8_MEMBER(ti_fdc_device::write)
 {
+	if (space.debugger_access()) return;
+
 	if (m_inDsrArea && m_selected)
 	{
 		// Write ports of 1771 are mapped to 5FF8,A,C,E: 0101 1111 1111 1xx0

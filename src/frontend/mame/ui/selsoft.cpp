@@ -14,7 +14,6 @@
 
 #include "ui/ui.h"
 #include "ui/datmenu.h"
-#include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
@@ -26,6 +25,7 @@
 #include "rendutil.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
+#include "luaengine.h"
 
 
 namespace ui {
@@ -142,7 +142,8 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 
 	ui_globals::curimage_view = SNAPSHOT_VIEW;
 	ui_globals::switch_image = true;
-	ui_globals::cur_sw_dats_view = UI_FIRST_LOAD;
+	ui_globals::cur_sw_dats_view = 0;
+	ui_globals::cur_sw_dats_total = 1;
 
 	std::string error_string;
 	mui.machine().options().set_value(OPTION_SOFTWARENAME, "", OPTION_PRIORITY_CMDLINE, error_string);
@@ -224,7 +225,7 @@ void menu_select_software::handle()
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < 1)
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < ui_globals::cur_sw_dats_total)
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view++;
@@ -245,11 +246,10 @@ void menu_select_software::handle()
 		{
 			// handle UI_DATS
 			ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
-			datfile_manager &mdat = mame_machine_manager::instance()->datfile();
 
-			if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
+			if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin(ui_swinfo->driver->name, "data_list"))
 				menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-			else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
+			else if (mame_machine_manager::instance()->lua()->call_plugin(std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str(), "data_list") || !ui_swinfo->usage.empty())
 				menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
@@ -339,7 +339,7 @@ void menu_select_software::handle()
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < 1)
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < ui_globals::cur_sw_dats_total)
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view++;
@@ -1257,151 +1257,6 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 		return x2 + UI_BOX_LR_BORDER;
 	}
 }
-
-//-------------------------------------------------
-//  draw infos
-//-------------------------------------------------
-
-void menu_select_software::infos_render(float origx1, float origy1, float origx2, float origy2)
-{
-	float line_height = ui().get_line_height();
-	static std::string buffer;
-	std::vector<int> xstart;
-	std::vector<int> xend;
-	float text_size = ui().options().infos_size();
-	ui_software_info *soft = (get_selection_ref() != nullptr) ? (ui_software_info *)get_selection_ref() : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
-	static ui_software_info *oldsoft = nullptr;
-	static int old_sw_view = -1;
-
-	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-	float ud_arrow_width = line_height * machine().render().ui_aspect();
-	float oy1 = origy1 + line_height;
-
-	// apply title to right panel
-	if (soft != nullptr && soft->usage.empty())
-	{
-		float title_size = 0.0f;
-
-		ui().draw_text_full(container(), _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-				mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &title_size, nullptr);
-		title_size += 0.01f;
-
-		rgb_t fgcolor = UI_TEXT_COLOR;
-		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (get_focus() == focused_menu::rightbottom)
-		{
-			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-		}
-
-		float middle = origx2 - origx1;
-
-		if (bgcolor != UI_TEXT_BG_COLOR)
-			ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-					origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-
-		ui().draw_text_full(container(), _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
-		ui_globals::cur_sw_dats_view = 0;
-	}
-	else
-	{
-		float title_size = 0.0f;
-		float txt_lenght = 0.0f;
-		std::string t_text[2];
-		t_text[0] = _("History");
-		t_text[1] = _("Usage");
-
-		for (auto & elem : t_text)
-		{
-			ui().draw_text_full(container(), elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-					mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
-			txt_lenght += 0.01f;
-			title_size = std::max(txt_lenght, title_size);
-		}
-
-		rgb_t fgcolor = UI_TEXT_COLOR;
-		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (get_focus() == focused_menu::rightbottom)
-		{
-			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-		}
-
-		float middle = origx2 - origx1;
-
-		// check size
-		float sc = title_size + 2.0f * gutter_width;
-		float tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
-		title_size *= tmp_size;
-
-		if (bgcolor != UI_TEXT_BG_COLOR)
-			ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-					origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-
-		ui().draw_text_full(container(), t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-				ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
-
-		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
-	}
-
-	if (oldsoft != soft || old_sw_view != ui_globals::cur_sw_dats_view)
-	{
-		buffer.clear();
-		old_sw_view = ui_globals::cur_sw_dats_view;
-		oldsoft = soft;
-		if (ui_globals::cur_sw_dats_view == 0)
-		{
-			if (soft->startempty == 1)
-				mame_machine_manager::instance()->datfile().load_data_info(soft->driver, buffer, UI_HISTORY_LOAD);
-			else
-				mame_machine_manager::instance()->datfile().load_software_info(soft->listname, buffer, soft->shortname, soft->parentname);
-		}
-		else
-			buffer = soft->usage;
-	}
-
-	if (buffer.empty())
-	{
-		ui().draw_text_full(container(), _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
-				ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-		return;
-	}
-	else
-		m_total_lines = ui().wrap_text(container(), buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
-
-	int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
-	if (m_total_lines < r_visible_lines)
-		r_visible_lines = m_total_lines;
-	if (m_topline_datsview < 0)
-		m_topline_datsview = 0;
-	if (m_topline_datsview + r_visible_lines >= m_total_lines)
-		m_topline_datsview = m_total_lines - r_visible_lines;
-
-	for (int r = 0; r < r_visible_lines; ++r)
-	{
-		int itemline = r + m_topline_datsview;
-		std::string tempbuf;
-		tempbuf.assign(buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
-
-		// up arrow
-		if (r == 0 && m_topline_datsview != 0)
-			draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-		// bottom arrow
-		else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
-			draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-		else
-			ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
-					ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-					nullptr, nullptr, text_size);
-		oy1 += (line_height * text_size);
-	}
-
-	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
-}
-
-
 
 //-------------------------------------------------
 //  ctor

@@ -215,7 +215,7 @@ WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 
 		if (((m_old_oki_bank - 1) * 0x40000) < memregion("oki")->bytes())
 		{
-			m_oki->set_bank_base(0x40000 * (m_old_oki_bank - 1));
+			m_oki->set_rom_bank(m_old_oki_bank - 1);
 		}
 	}
 }
@@ -260,7 +260,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 		if ((m_old_oki_bank * 0x40000) < memregion("oki")->bytes())
 		{
-			m_oki->set_bank_base(0x40000 * m_old_oki_bank);
+			m_oki->set_rom_bank(m_old_oki_bank);
 		}
 	}
 

@@ -2,9 +2,9 @@
 // copyright-holders:Wilbert Pol
 /*********************************************************************
 
-	softlist_dev.h
+    softlist_dev.h
 
-	Software and software list information.
+    Software and software list information.
 
 *********************************************************************/
 

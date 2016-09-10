@@ -1,79 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
 /*
- *__________________________________________________________________________________________________________
- * The Didact Esselte 100 CPU board                                                                         |
- *__________________________________________________________________________________________________________|
- *
- *  ___________________________________________________________________________________________________________           _____________________________________________________
- * | The Didact Mp68A CPU board, by Anders Andersson 1979                                                      |         |The Didact Mp68A keypad/display  PB6   +oooo+        |
- * |                  +------+ +-------+     +--+                                                              |         |  by Anders Andersson 1979  +-------+  |cass|        |
- * |                  | 7402 | | 74490 |     |  |      +-------+               +--+                            |         |                    +--+    | 9368  |  +----+    +--+|
- * |       +-------+  +------+ +-------+     |  |      |       |               |  |                            |         |+-------+    2x5082-|B |    +-------+            |  ||
- * |       |       |    2112   2112          |  |      | EXP   |               |  |                            |         || 74132 |       7433|CD| 145  PA0-PA3            |E ||
- * |       | ROM   |    +--+   +--+          +--+      | ANS   |               |P |                            |         |+-------+           |DI| +--+               132  |X ||
- * |       | 7641  |    |  |   |  |                    | ION   |               |I |                            |         |+------+------+     | S| |  |               +--+ |P ||
- * |       |       |    |A |   |B |       +-----+      | BUSES |               |A |                            |         ||      |SHIFT |     | P| |  | PA4-PA6       |  | |A ||
- * |       | 512x8 |    |  |   |  |       |     |      | (2 x) |               |  |                            |         || RES  |(led) |     +--+ |  |               |  | |N ||
- * |       |       |    +--+   +--+       |     |      | FOR   |               |A |                            |         ||      |  *   |          +--+               |  | |S ||
- * |       +-------+    RAMS 4x256x4      |     |      |       |               |  |                            |         |+------+------+------+------+               +--+ |I ||
- * |     ROMS 2x512x8   2112   2112       |     |      | KEY   |               |E |                            |         ||      |      |      |      |                    |O ||
- * |       +-------+    +--+   +--+       |CPU  |      | BOARD | +------+      |X |                            |         || ADR  | RUN  | SST  | REG  |                    |N ||
- * |       |       |    |  |   |  |       |6800 |      |       | |      |      |P |                            |         ||  0   |  4   |  8   |  C   |                    |  ||
- * |       | ROM   |    |A |   |B |       |     |      | AND   | |      |      |A |                            |         |+------+------+------+------+                    |C ||
- * |       | 7641  |    |  |   |  |       |     |      |       | |      |      |N |                            |         ||      |      |      |      |                    |O ||
- * |       |       |    +--+   +--+       |     |      | I/O   | | 6820 |      |S |                            |         || STA  | STO  | BPR  | BPS  |                    |N ||
- * |       | 512x8 |    512 bytes RAM     |     |      | BOARDS| | PIA  |      |I |                            |         ||  1   |  5   |  9   |  D   |                    |N ||
- * |       +-------+                      |     |      |       | |  #1  |      |O |                         +-----+      |+------+------+------+------+           +------+ |E ||
- * |     1024 bytes ROM                   |     |      |       | |      |      |N |                         |     |      ||      |      |      |      |           |      | |C ||
- * |                                      +-----+      |       | |      |      |  |                  PIA A  |    |       || EXF  | EXB  | MOV  | PRM  |           |      | |T ||
- * |        7402  7412                                 |       | |      |      |B |                EXPANSION|    |       ||  2   |  6   |  A   |  E   |           |      | |O ||
- * |        +--+  +--+                                 |       | |      |      |U |                CONNECTOR|    |       |+------+------+------+------+           | 6820 | |R ||
- * |        |  |  |  |                                 |       | |      |      |S |                         |   _|       ||      |      |      |      |           | PIA  | |  ||
- * |        |  |  |  |                                 |       | |      |      |  |                     J4  |  |         || CLR  | REL  | REC  | PLA  |           |  #2  | |  ||
- * |        |  |  |  |                                 |       | +------+      |  |                         |  |_        ||  3   |  7   |  B   |  F   |           |      | |  ||
- * |        +--+  +--+         +--------+              |       |               |  |                         |    |       |+------+------+------+------+           |      | |  ||
- * |                  +-+      | 96LS02 |              |       |               |  |                         |    |       | +-------+ +-------+  +------+          |      | |  ||
- * |       R * * * R  |T|      +--------+              |       |               |  |                         |    |       | | 74148 | | 74148 |  | 7400 |          |      | |  ||
- * |       O  X    A  |R|                              |       |               |  |                         |    |       | +-------+ +-------+  +------+          |      | +--+|
- * |       M * * * M  |M|  Oscillator circuits         +-------+               +--+                         |     |      |                PB3    PB0-PB2          |      |     |
- * |                  |_|                               J1   J2                 J3                          +-----+      |       +---------+                      +------+  J1 |
- * |____________________________________________________________________________________________________________|        |______ |  _|||_  |___________________________________|
- *
- *  _____________________________________________________________________________________________   ___________________________________________________________________________
- * |The Didact Mikrodator 6802 CPU board by Lars Bjorklund 1983                            (  ) |  |The Didact Mikrodator 6802 TB16 board by Lars Bj??rklund 1983               |
- * |                                                                                     +----= |  |             +-|||||||-+                                         ______    |
- * |                                                                                     |    = |  | CA2 Tx      |terminal |                                        |  ()  |   |
- * |                                                                                     |    = |  | PA7 Rx      +---------+               +----------+  C1nF,<=R18k|      |   |
- * |     Photo of CPU board mainly covered by TB16 Keypad/Display board                  +--- = |  | CA1 DTR               +-----------+   |          |   CB2->CB1  |  E   |   |
- * |                                                                                            |  |               PA4-PA6 |           | 1 | BCD      |    +----+   |  X   |   |
- * |                                                                                            |  |               ------->| 74LS145   |   | digit 5  |    |LS  |   |  P   |   |
- * |                                                                                            |  |                       +-----------+   |----------|    | 122|   |  A   |   |
- * |                                                                                     +-----=|  |                                   |   |          |    |    |   |  N   |   |
- * |                                                                          +-------+  |     =|  |------ +--------+                  | 2 | BCD      |    |    |   |  S   |   |
- * |                                                                          |       |  |     =|  | RES*  | SHIFT  |  LED( )          |   | digit 4  |    |    |   |  I   |   |
- * |                                                                          |       |  |     =|  |       |  '*'   |    CA2           v   |----------|    +----+   |  O   |   |
- * |                                                                          | 6821  |  |     =|  |   PA3 |PA7 PA2 | PA1      PA0         |          |        +----|  N   |   |
- * |                                                                          | PIA   |  |     =|  |----|--+-----|--+--|-----+--|---+    3 |          |    PB0-|LS  |      |   |
- * |                                                                          |       |  |     =|  |    v  |     v  |  v     |  v   |      | BCD      |     PB7| 244|  C   |   |
- * |                                                                          |       |  |     =|  | ADR   | RUN    | SST    | CON  | 1    | digit 3  |    --->|    |  O   |   |
- * |                                                                          |       |  |     =|  |  0    |  4     |  8     |  C   |      |----------|        |    |  N   |   |
- * |                                                                          |       |  |     =|  |-------+--------+--------+------+      |          |<-------|    |  N   |   |
- * |                                                                          |       |  |     =|  |       |        |        |      |    4 |          |        +----|  E   |   |
- * |                                                                          |       |  |     =|  | STA   | BPS    | USERV  |      | 2    | BCD      |             |  C   |   |
- * |                                                                          |       |  |     =|  |  1    |  5     |  9     |  D   |      | digit 2  |             |  T   |   |
- * |                                                                          |       |  |     =|  |-------+--------+--------+------+      |----------|             |  O   |   |
- * |                                                                          |       |  |     =|  |       |        |        |      |      |          |             |  R   |   |
- * |                                                                          |       |  |     =|  | EXF   | EXB    | MOV    | LOAD | 3  5 | BCD      |             |      |   |
- * |                                                                          |       |  |     =|  |  2    |  6     |  A     |  E   |      | digit 1  |             |      |   |
- * |                                                                          +-------+  |     =|  |-------+--------+--------+------+      |----------|             |      |   |
- * |                                                                                     |     =|  |       |        |        |      |      |          |             |      |   |
- * |                                                                                     +-----=|  | CLR   |  SP    | USERJ  | FLAG | 4  6 | BCD      |             |      |   |
- * |                                                                                            |  |  3    |  7     |  B     |  F   |      | digit 0  |             |  ()  |   |
- * |                                                                                            |  |-------+--------+--------+------+      +----------+             +------+   |
- * |                                                                                            |  |                                                                           |
- * |                                                                                            |  |                                                                           |
- * |____________________________________________________________________________________________|  |___________________________________________________________________________|
  *
  * History of Didact
  *------------------
@@ -93,17 +20,18 @@
  * http://elektronikforumet.com/forum/viewtopic.php?f=2&t=79576&start=150#p1203915
  *
  *  TODO:
- *  Didact designs:    mp68a, md6802, md6802v3, Esselte 100, Candela
+ *  Didact designs:    mp68a, md6802, Modulab, Esselte 100, Candela
  * --------------------------------------------------------------------------
- *  - Add PCB layouts   OK     OK
- *  - Dump ROM:s,       OK     OK
- *  - Keyboard          OK     OK
- *  - Display/CRT       OK     OK
+ *  - Add PCB layouts   OK     OK				 OK
+ *  - Dump ROM:s,       OK     OK				 rev2
+ *  - Keyboard          OK     OK				 rev2
+ *  - Display/CRT       OK     OK				 OK
  *  - Clickable Artwork RQ     RQ
  *  - Sound             NA     NA
- *  - Cassette i/f
+ *  - Cassette i/f								 OK
  *  - Expansion bus
  *  - Expansion overlay
+ *  - Interrupts        OK                       OK
  *
  ****************************************************************************/
 
@@ -111,14 +39,21 @@
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h" // For all boards
 #include "video/dm9368.h"    // For the mp68a
-#include "machine/74145.h"   // For the md6802
+#include "machine/74145.h"   // For the md6802 and e100
+#include "imagedev/cassette.h"
 // Generated artwork includes
 #include "mp68a.lh"
 #include "md6802.lh"
 
 #define VERBOSE 0
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x) {}
+#define LOGSCAN(x) LOGPRINT(x)
+#define LOGSCREEN(x) {}
+#define RLOG(x) {}
+#define LOGCS(x) {}
+
 #if VERBOSE >= 2
 #define logerror printf
 #endif
@@ -128,6 +63,9 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+#define PIA1_TAG "pia1"
+#define PIA2_TAG "pia2"
 
 /* Didact base class */
 class didact_state : public driver_device
@@ -163,22 +101,42 @@ class didact_state : public driver_device
 	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
 };
 
-/* Esselte 100 driver class */
-class e100_state : public didact_state
-{
-	public:
-	e100_state(const machine_config &mconfig, device_type type, const char * tag)
-		: didact_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pia1(*this, "pia1"),
-		m_pia2(*this, "pia2")
-		{ }
-	required_device<m6802_cpu_device> m_maincpu;
-	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
-protected:
-	required_device<pia6821_device> m_pia1;
-	required_device<pia6821_device> m_pia2;
-};
+
+/*  _____________________________________________________________________________________________   ___________________________________________________________________________
+ * |The Didact Mikrodator 6802 CPU board by Lars Bjorklund 1983                            (  ) |  |The Didact Mikrodator 6802 TB16 board by Lars Bjorklund 1983               |
+ * |                                                                                     +----= |  |             +-|||||||-+                                         ______    |
+ * |                                                                                     |    = |  | CA2 Tx      |terminal |                                        |  ()  |   |
+ * |                                                                                     |    = |  | PA7 Rx      +---------+               +----------+  C1nF,<=R18k|      |   |
+ * |     Photo of CPU board mainly covered by TB16 Keypad/Display board                  +--- = |  | CA1 DTR               +-----------+   |          |   CB2->CB1  |  E   |   |
+ * |                                                                                            |  |               PA4-PA6 |           | 1 | BCD      |    +----+   |  X   |   |
+ * |                                                                                            |  |               ------->| 74LS145   |   | digit 5  |    |LS  |   |  P   |   |
+ * |                                                                                            |  |                       +-----------+   |----------|    | 122|   |  A   |   |
+ * |                                                                                     +-----=|  |                                   |   |          |    |    |   |  N   |   |
+ * |                                                                          +-------+  |     =|  |------ +--------+                  | 2 | BCD      |    |    |   |  S   |   |
+ * |                                                                          |       |  |     =|  | RES*  | SHIFT  |  LED( )          |   | digit 4  |    |    |   |  I   |   |
+ * |                                                                          |       |  |     =|  |       |  '*'   |    CA2           v   |----------|    +----+   |  O   |   |
+ * |                                                                          | 6821  |  |     =|  |   PA3 |PA7 PA2 | PA1      PA0         |          |        +----|  N   |   |
+ * |                                                                          | PIA   |  |     =|  |----|--+-----|--+--|-----+--|---+    3 |          |    PB0-|LS  |      |   |
+ * |                                                                          |       |  |     =|  |    v  |     v  |  v     |  v   |      | BCD      |     PB7| 244|  C   |   |
+ * |                                                                          |       |  |     =|  | ADR   | RUN    | SST    | CON  | 1    | digit 3  |    --->|    |  O   |   |
+ * |                                                                          |       |  |     =|  |  0    |  4     |  8     |  C   |      |----------|        |    |  N   |   |
+ * |                                                                          |       |  |     =|  |-------+--------+--------+------+      |          |<-------|    |  N   |   |
+ * |                                                                          |       |  |     =|  |       |        |        |      |    4 |          |        +----|  E   |   |
+ * |                                                                          |       |  |     =|  | STA   | BPS    | USERV  |      | 2    | BCD      |             |  C   |   |
+ * |                                                                          |       |  |     =|  |  1    |  5     |  9     |  D   |      | digit 2  |             |  T   |   |
+ * |                                                                          |       |  |     =|  |-------+--------+--------+------+      |----------|             |  O   |   |
+ * |                                                                          |       |  |     =|  |       |        |        |      |      |          |             |  R   |   |
+ * |                                                                          |       |  |     =|  | EXF   | EXB    | MOV    | LOAD | 3  5 | BCD      |             |      |   |
+ * |                                                                          |       |  |     =|  |  2    |  6     |  A     |  E   |      | digit 1  |             |      |   |
+ * |                                                                          +-------+  |     =|  |-------+--------+--------+------+      |----------|             |      |   |
+ * |                                                                                     |     =|  |       |        |        |      |      |          |             |      |   |
+ * |                                                                                     +-----=|  | CLR   |  SP    | USERJ  | FLAG | 4  6 | BCD      |             |      |   |
+ * |                                                                                            |  |  3    |  7     |  B     |  F   |      | digit 0  |             |  ()  |   |
+ * |                                                                                            |  |-------+--------+--------+------+      +----------+             +------+   |
+ * |                                                                                            |  |                                                                           |
+ * |                                                                                            |  |                                                                           |
+ * |____________________________________________________________________________________________|  |___________________________________________________________________________|
+ */
 
 /* Mikrodator 6802 driver class */
 class md6802_state : public didact_state
@@ -189,8 +147,8 @@ class md6802_state : public didact_state
 		,m_maincpu(*this, "maincpu")
 		,m_tb16_74145(*this, "tb16_74145")
 		,m_segments(0)
-		,m_pia1(*this, "pia1")
-		,m_pia2(*this, "pia2")
+		,m_pia1(*this, PIA1_TAG)
+		,m_pia2(*this, PIA2_TAG)
 		{ }
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_tb16_74145;
@@ -302,6 +260,43 @@ void md6802_state::machine_reset()
 	m_maincpu->reset();
 }
 
+/*
+ *  ___________________________________________________________________________________________________________           _____________________________________________________
+ * | The Didact Mp68A CPU board, by Anders Andersson 1979                                                      |         |The Didact Mp68A keypad/display  PB6   +oooo+        |
+ * |                  +------+ +-------+     +--+                                                              |         |  by Anders Andersson 1979  +-------+  |cass|        |
+ * |                  | 7402 | | 74490 |     |  |      +-------+               +--+                            |         |                    +--+    | 9368  |  +----+    +--+|
+ * |       +-------+  +------+ +-------+     |  |      |       |               |  |                            |         |+-------+    2x5082-|B |    +-------+            |  ||
+ * |       |       |    2112   2112          |  |      | EXP   |               |  |                            |         || 74132 |       7433|CD| 145  PA0-PA3            |E ||
+ * |       | ROM   |    +--+   +--+          +--+      | ANS   |               |P |                            |         |+-------+           |DI| +--+               132  |X ||
+ * |       | 7641  |    |  |   |  |                    | ION   |               |I |                            |         |+------+------+     | S| |  |               +--+ |P ||
+ * |       |       |    |A |   |B |       +-----+      | BUSES |               |A |                            |         ||      |SHIFT |     | P| |  | PA4-PA6       |  | |A ||
+ * |       | 512x8 |    |  |   |  |       |     |      | (2 x) |               |  |                            |         || RES  |(led) |     +--+ |  |               |  | |N ||
+ * |       |       |    +--+   +--+       |     |      | FOR   |               |A |                            |         ||      |  *   |          +--+               |  | |S ||
+ * |       +-------+    RAMS 4x256x4      |     |      |       |               |  |                            |         |+------+------+------+------+               +--+ |I ||
+ * |     ROMS 2x512x8   2112   2112       |     |      | KEY   |               |E |                            |         ||      |      |      |      |                    |O ||
+ * |       +-------+    +--+   +--+       |CPU  |      | BOARD | +------+      |X |                            |         || ADR  | RUN  | SST  | REG  |                    |N ||
+ * |       |       |    |  |   |  |       |6800 |      |       | |      |      |P |                            |         ||  0   |  4   |  8   |  C   |                    |  ||
+ * |       | ROM   |    |A |   |B |       |     |      | AND   | |      |      |A |                            |         |+------+------+------+------+                    |C ||
+ * |       | 7641  |    |  |   |  |       |     |      |       | |      |      |N |                            |         ||      |      |      |      |                    |O ||
+ * |       |       |    +--+   +--+       |     |      | I/O   | | 6820 |      |S |                            |         || STA  | STO  | BPR  | BPS  |                    |N ||
+ * |       | 512x8 |    512 bytes RAM     |     |      | BOARDS| | PIA  |      |I |                            |         ||  1   |  5   |  9   |  D   |                    |N ||
+ * |       +-------+                      |     |      |       | |  #1  |      |O |                         +-----+      |+------+------+------+------+           +------+ |E ||
+ * |     1024 bytes ROM                   |     |      |       | |      |      |N |                         |     |      ||      |      |      |      |           |      | |C ||
+ * |                                      +-----+      |       | |      |      |  |                  PIA A  |    |       || EXF  | EXB  | MOV  | PRM  |           |      | |T ||
+ * |        7402  7412                                 |       | |      |      |B |                EXPANSION|    |       ||  2   |  6   |  A   |  E   |           |      | |O ||
+ * |        +--+  +--+                                 |       | |      |      |U |                CONNECTOR|    |       |+------+------+------+------+           | 6820 | |R ||
+ * |        |  |  |  |                                 |       | |      |      |S |                         |   _|       ||      |      |      |      |           | PIA  | |  ||
+ * |        |  |  |  |                                 |       | |      |      |  |                     J4  |  |         || CLR  | REL  | REC  | PLA  |           |  #2  | |  ||
+ * |        |  |  |  |                                 |       | +------+      |  |                         |  |_        ||  3   |  7   |  B   |  F   |           |      | |  ||
+ * |        +--+  +--+         +--------+              |       |               |  |                         |    |       |+------+------+------+------+           |      | |  ||
+ * |                  +-+      | 96LS02 |              |       |               |  |                         |    |       | +-------+ +-------+  +------+          |      | |  ||
+ * |       R * * * R  |T|      +--------+              |       |               |  |                         |    |       | | 74148 | | 74148 |  | 7400 |          |      | |  ||
+ * |       O  X    A  |R|                              |       |               |  |                         |    |       | +-------+ +-------+  +------+          |      | +--+|
+ * |       M * * * M  |M|  Oscillator circuits         +-------+               +--+                         |     |      |                PB3    PB0-PB2          |      |     |
+ * |                  |_|                               J1   J2                 J3                          +-----+      |       +---------+                      +------+  J1 |
+ * |____________________________________________________________________________________________________________|        |______ |  _|||_  |___________________________________|
+ *
+ */
 /* Didact mp68a driver class */
 
 // Just a statement that the real mp68a hardware was designed with 6820 and not 6821
@@ -320,8 +315,8 @@ class mp68a_state : public didact_state
 		,m_digit3(*this, "digit3")
 		,m_digit4(*this, "digit4")
 		,m_digit5(*this, "digit5")
-		,m_pia1(*this, "pia1")
-		,m_pia2(*this, "pia2")
+		,m_pia1(*this, PIA1_TAG)
+		,m_pia2(*this, PIA2_TAG)
 		{ }
 
 	required_device<m6800_cpu_device> m_maincpu;
@@ -358,7 +353,7 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 {
 	UINT8 digit_nbr;
 
-#if VERBOSE > 1
+#if 0
 	static UINT8 display[] = {' ',' ',' ',' ',' ',' ',' ',' ','\0'};
 	const UINT8 hex[] = {' ','0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 #endif
@@ -381,7 +376,7 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 	default: logerror("Invalid digit index %d\n", digit_nbr);
 	}
 
-#if VERBOSE > 1
+#if 0
 	display[(data >> 4) & 0x07] = hex[data & 0x0f];
 	LOG(("--->%s(%02x) ==> %s\n", FUNCNAME, data, display));
 #endif
@@ -457,34 +452,412 @@ void mp68a_state::machine_start()
 	save_item(NAME(m_reset));
 }
 
+/*  __________________________________________________________________________________________________________________________________________
+ * | The Didact Esselte 100 CPU board rev1, 14/8 1980                                                                          in-PCB coil     +----
+ * |   +--+     +--+     +--+     +--+        +--+     +--+                                                                 +--------+    |VHF
+ * |   74       74       74       74          74       74                   7805CT              7805CT        trim 3,5-13pF |+-----+ |    |  TV
+ * |    157      393       04       10          00       03                                                        2N2369 | || o-+ | |    +----
+ * |   +--+     +--+     +--+     +--+        +--+     +--+                                                               | |+---+ | |       |
+ * |1Kohm                                                                                                                 | +------+ |    +----
+ * |trim                                                                                                                  +----------+    |CVS
+ * | 8 +--+              +--+          +--+                                                              7805CP                           | MON
+ * | 0 74                74            74                                                                                                 +----
+ * | 0  132               157            93                                                                                                  |
+ * | 8 +--+              +--+          +--+                                                                          J401                    |
+ * | 1 +--+                                                                          +--+  +--+                                     LM339    |
+ * | 4 74                +--+          +--+                                          74    74     +--+ +--+                   J402           |
+ * |    165              74            74                                             122    00   74   74    4Mhz                            |
+ * | J +--+               157           393                                          +--+  +--+    138  138  XTAL                         +----
+ * | G                   +--+          +--+                                                       +--+ +--+    +----+  +----+  +----+     |TAPE
+ * | +----+      +----+                                                                                               optional            |
+ * |  CHAR       VIDEO                 +--+    +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+ +====++  CPU     PIA2    PIA1      +----
+ * |   ROM        RAM                  74      6116   6116   6116   6116                                    ||                               |
+ * |  2716       MK4118                 245      alt    alt    alt    alt                                2x ||  6802    6821    6821      +----
+ * | +----+      +----+                +--+    MK4118 MK4118 MK4118 MK4118  2716   2716   2716   2716   2716||                            |PRNT
+ * |DIDACT ESS 100 CPU                         +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----++                            |
+ * |___________________________________________________________________________________________________________+----+__+----+__+----+_____+----
+ *
+ * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggy back on righ most 2716) with funny address decoding.
+ * Once we get a rom dump for rev 1 the driver need to accomodate another keymap too so probably needs to be splitted somehow.
+ *  __________________________________________________________________________________________________________________________________________
+ * | The Didact Esselte 100 CPU board rev2, 15/4 1983                                                                     in-PCB coil     +----
+ * |           +--+     +--+     +--+     +--+     +--+     +--+                                                            +--------+    |VHF
+ * |           74       74       74       74       74       74              7805CT              7805CT        trim 3,5-13pF |+-----+ |    |  TV
+ * |             93      393       10      393       00       03                                                   2N2369 | || o-+ | |    +----
+ * |           +--+     +--+     +--+     +--+     +--+     +--+                                                          | |+---+ | |       |
+ * |1Kohm                                                                                                                 | +------+ |    +----
+ * |trim                                                                                                                  +----------+    |CVS
+ * |   +--+    +--+     +--+    +--+   +--+   J                                                          7805CP                           | MON
+ * |   74      74       74      74     74     2                                                                                           +----
+ * |    165     132      157     157     04   0                                                                                              |
+ * |   +--+    +--+     +--+    +--+   +--+   1       J 2 0 2                     +----+ +----+                      J401                    |
+ * |                                                                                                                                         |
+ * | +----+            +----+          +--+             +--+   +--+   +--+  +--+   U202   U201                                J402           |
+ * |  CHAR             VIDEO           74               74     74     74    74                               4Mhz                            |
+ * |   ROM              RAM             157              138    08     00    138   2764   2764               XTAL                         +----
+ * |  2716             HM6116          +--+             +--+   +--+   +--+  +--+                               +----+  +----+  +----+     |TAPE
+ * | +----+            +----+                J                                    +----+ +----+                       optional            |
+ * |                                   +--+  2        +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+   CPU     PIA2    PIA1      +----
+ * |                                   74    0        6116   6116   6116   6116   6116   6116   6116   6116                          +--+    |
+ * |   8169 830415                      245  3                                     opt    opt    opt    opt     6802    6821    6821 LM   +----
+ * |  ESSELTE 100                      +--+                                                                                           339 |PRNT
+ * |  CPU 100                                         +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+                        +--+ |
+ * |___________________________________________________________________________________________________________+----+__+----+__+----+_____+----
+ *
+ *   Both rev1 and rev2 has a matrix keyboard PCB with a 74LS145 connected to J402 (PIA2)
+ */
+
+/* Esselte 100 driver class */
+class e100_state : public didact_state
+{
+public:
+	e100_state(const machine_config &mconfig, device_type type, const char * tag)
+		: didact_state(mconfig, type, tag)
+		,m_maincpu(*this, "maincpu")
+		,m_kbd_74145(*this, "kbd_74145")
+		,m_videoram(*this, "videoram")
+		,m_cassette(*this, "cassette")
+		,m_pia1(*this, PIA1_TAG)
+		,m_pia2(*this, PIA2_TAG)
+		,m_io_line5(*this, "LINE5")
+		,m_io_line6(*this, "LINE6")
+		,m_io_line7(*this, "LINE7")
+		,m_io_line8(*this, "LINE8")
+		,m_io_line9(*this, "LINE9")
+		,m_pia1_B(0)
+		,m_50hz(0)
+		{ }
+	required_device<m6802_cpu_device> m_maincpu;
+	required_device<ttl74145_device> m_kbd_74145;
+	required_shared_ptr<UINT8> m_videoram;
+	required_device<cassette_image_device> m_cassette;
+	UINT8 *m_char_ptr;
+	UINT8 *m_vram;
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
+	virtual void machine_start() override;
+	DECLARE_READ8_MEMBER( pia_r );
+	DECLARE_WRITE8_MEMBER( pia_w );
+	DECLARE_READ8_MEMBER( pia1_kbA_r );
+	DECLARE_WRITE8_MEMBER( pia1_kbA_w );
+	DECLARE_READ8_MEMBER( pia1_kbB_r );
+	DECLARE_WRITE8_MEMBER( pia1_kbB_w );
+	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
+protected:
+	required_device<pia6821_device> m_pia1;
+	required_device<pia6821_device> m_pia2;
+	required_ioport m_io_line5;
+	required_ioport m_io_line6;
+	required_ioport m_io_line7;
+	required_ioport m_io_line8;
+	required_ioport m_io_line9;
+	UINT8 m_pia1_B;
+	UINT8 m_50hz;
+};
+
+TIMER_DEVICE_CALLBACK_MEMBER(e100_state::rtc_w)
+{
+	m_pia2->ca1_w((m_50hz++ & 1));
+}
+
+void e100_state::machine_start()
+{
+	LOG(("%s()\n", FUNCNAME));
+	m_char_ptr  = memregion("chargen")->base();
+	m_vram      = (UINT8 *)m_videoram.target();
+
+	/* register for state saving */
+	save_pointer (NAME (m_char_ptr), sizeof(m_char_ptr));
+	save_pointer (NAME (m_vram), sizeof(m_vram));
+	save_item(NAME(m_50hz));
+	save_item(NAME(m_pia1_B));
+}
+
+UINT32 e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int x, y;
+	int vramad;
+	UINT8 *chardata;
+	UINT8 charcode;
+
+	LOGSCREEN(("%s()\n", FUNCNAME));
+	vramad = 0;
+	for (int row = 0; row < 32 * 8; row += 8)
+	{
+		for (int col = 0; col < 32 * 8; col += 8)
+		{
+			/* look up the character data */
+			charcode = m_vram[vramad];
+			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n %c at X=%d Y=%d: ", charcode, col, row));
+			chardata = &m_char_ptr[(charcode * 8)];
+			/* plot the character */
+			for (y = 0; y < 8; y++)
+			{
+				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n  %02x: ", *chardata));
+				for (x = 0; x < 8; x++)
+				{
+					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN((" %02x: ", *chardata));
+					bitmap.pix16(row + y, col + x) = (*chardata & (1 << x)) ? 1 : 0;
+				}
+				chardata++;
+			}
+			vramad++;
+		}
+		if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n"));
+	}
+
+	return 0;
+}
+
+/* PIA write - the Esselte 100 allows the PIA:s to be accessed simultaneously */
+WRITE8_MEMBER( e100_state::pia_w )
+{
+	LOG(("%s(%02x)\n", FUNCNAME, data));
+	if ((offset & 0x08) == 0x08)
+	{
+		LOG(("- PIA1\n"));
+		m_pia1->write(space, offset, data);
+	}
+	if ((offset & 0x10) == 0x10)
+	{
+		LOG(("- PIA2\n"));
+		m_pia2->write(space, offset, data);
+	}
+	if (VERBOSE && (offset & 0x18) == 0x18)
+	{
+		LOGCS(("- Dual device write access!\n"));
+	}
+	if (VERBOSE && (offset & 0x18) == 0x00)
+	{
+		logerror("- Funny write at offset %02x!\n", offset);
+	}
+}
+
+/* PIA read  - the Esselte 100 allows the PIA:s to be accessed simultaneously */
+READ8_MEMBER( e100_state::pia_r )
+{
+	UINT8 data = 0;
+
+	switch (offset & 0x18)
+	{
+	case 0x18: // read PIA1 and PIA2 at the same time, should really only happen for writes...
+		{
+			UINT8 data1 =  m_pia1->read(space, offset);
+			UINT8 data2 =  m_pia2->read(space, offset);
+			logerror("%s: Dual device read may have caused unpredictable results on real hardware\n", FUNCNAME);
+			data = data1 & data2; // We assume that the stable behaviour is that data lines with a low level by either device succeeds
+			LOGCS(("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", PIA1_TAG "/" PIA2_TAG, FUNCNAME, offset, data1, data2, data));
+		}
+		break;
+	case 0x08: // PIA1
+		data = m_pia1->read(space, offset);
+		LOGCS(("%s %s(%02x)\n", PIA1_TAG, FUNCNAME, data));
+		break;
+	case 0x10: // PIA2
+		data = m_pia2->read(space, offset);
+		LOGCS(("%s %s(%02x)\n", PIA2_TAG, FUNCNAME, data));
+		break;
+	default: // None of the devices are selected
+		logerror("%s: Funny read at offset %02x\n", FUNCNAME, offset);
+	}
+	return data;
+}
+
+WRITE8_MEMBER( e100_state::pia1_kbA_w )
+{
+	LOG(("%s(%02x)\n", FUNCNAME, data));
+}
+
+READ8_MEMBER( e100_state::pia1_kbA_r )
+{
+	int ls145;
+	UINT8 pa = 0x00;
+
+	// Read out the selected column
+	ls145 = m_kbd_74145->read() & 0x3ff;
+
+	// read out the artwork
+	switch (ls145)
+	{
+	case 0: pa = 0x00; break;
+	case 1 << 0: pa = (~m_io_line0->read()) & 0xff; break;
+	case 1 << 1: pa = (~m_io_line1->read()) & 0xff; break;
+	case 1 << 2: pa = (~m_io_line2->read()) & 0xff; break;
+	case 1 << 3: pa = (~m_io_line3->read()) & 0xff; break;
+	case 1 << 4: pa = (~m_io_line4->read()) & 0xff; break;
+	case 1 << 5: pa = (~m_io_line5->read()) & 0xff; break;
+	case 1 << 6: pa = (~m_io_line6->read()) & 0xff; break;
+	case 1 << 7: pa = (~m_io_line7->read()) & 0xff; break;
+	case 1 << 8: pa = (~m_io_line8->read()) & 0xff; break;
+	case 1 << 9: pa = (~m_io_line9->read()) & 0xff; break;
+	default: logerror("Keyboard is misconfigured, please report!: %04x", ls145); break;
+	}
+	if (VERBOSE && ls145 && pa) LOGSCAN(("%s  [%03x]%04x\n", FUNCNAME, ls145, pa));
+
+	return ~pa;
+}
+
+/*
+  PB0-PB3 is connected to U601 (74LS145) which select a column to scan
+  PB4-PB5 together with CA1, CA2, CB1 and CB2 are used for the printer interface
+  PB6-PB7 forms the cassette interface
+*/
+WRITE8_MEMBER( e100_state::pia1_kbB_w )
+{
+	UINT8 col;
+
+	// Keyboard
+	//	if (VERBOSE && data != m_pia1_B) LOGSCAN(("%s(%02x)\n", FUNCNAME, data));
+	m_pia1_B = data;
+	col = data & 0x0f;
+	m_kbd_74145->write( col );
+
+	// Cassette
+	m_cassette->output(data & 0x40 ? 1.0 : -1.0);
+}
+
+READ8_MEMBER( e100_state::pia1_kbB_r )
+{
+	m_pia1_B &= 0x7F;
+	m_pia1_B |= (m_cassette->input() > 0.03 ? 0x80 : 0x00);
+
+	return m_pia1_B;
+}
+
 // This map is derived from info in "TEMAL 100 - teknisk manual Esselte 100"
 static ADDRESS_MAP_START( e100_map, AS_PROGRAM, 8, e100_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x8000, 0x87ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc808, 0xc80b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0xc810, 0xc813) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xd000, 0xffff) AM_ROM AM_REGION("maincpu", 0xd000)
+	AM_RANGE(0xc800, 0xc81f) AM_READWRITE(pia_r, pia_w) AM_MIRROR(0x07e0)
+	AM_RANGE(0xd000, 0xffff) AM_ROM AM_REGION("roms", 0x1000)
 ADDRESS_MAP_END
 
 // This address map is traced from schema
 static ADDRESS_MAP_START( md6802_map, AS_PROGRAM, 8, md6802_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("pia2", pia6821_device, read, write) AM_MIRROR(0x1ffc)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read, write) AM_MIRROR(0x1ffc)
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PIA2_TAG, pia6821_device, read, write) AM_MIRROR(0x1ffc)
 	AM_RANGE(0xe000, 0xe7ff) AM_ROM AM_MIRROR(0x1800) AM_REGION("maincpu", 0xe000)
 ADDRESS_MAP_END
 
 // This address map is traced from pcb
 static ADDRESS_MAP_START( mp68a_map, AS_PROGRAM, 8, mp68a_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0xf000)
-	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("pia1", pia6820_device, read, write) AM_MIRROR(0xf0fc)
-	AM_RANGE(0x0600, 0x0603) AM_DEVREADWRITE("pia2", pia6820_device, read, write) AM_MIRROR(0xf0fc)
+	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE(PIA1_TAG, pia6820_device, read, write) AM_MIRROR(0xf0fc)
+	AM_RANGE(0x0600, 0x0603) AM_DEVREADWRITE(PIA2_TAG, pia6820_device, read, write) AM_MIRROR(0xf0fc)
 	AM_RANGE(0x0700, 0x07ff) AM_RAM AM_MIRROR(0xf000)
 	AM_RANGE(0x0800, 0x0bff) AM_ROM AM_MIRROR(0xf400) AM_REGION("maincpu", 0x0800)
 ADDRESS_MAP_END
 
-/* Input ports */
+/* Input ports
+ * Four e100 keys are not mapped yet,
+ * - The redundant '*' on the keyboard together with the '\'' single quote, both on same e100 key
+ * - The 'E' key on the keypad, presumably used for calculator applications to remove the last entered number
+ * - The 'Break' key on rev2 will be mapped to NMI at some point, a recomended modification of the rev1 mother board
+ * - The 'REPT' key has a so far unknown function
+ */
 static INPUT_PORTS_START( e100 )
+/*	Bits read on PIA1 A when issueing line number on PIA1 B bits 0-3 through a 74145 demultiplexer */
+	PORT_START("LINE0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD) 								PORT_CODE(KEYCODE_SPACE)		PORT_CHAR(' ')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD) 								PORT_CODE(KEYCODE_LSHIFT)		PORT_CODE(KEYCODE_RSHIFT)		PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD) 								PORT_CODE(KEYCODE_LCONTROL)		PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)	PORT_NAME("REPT") /* Not mapped yet */
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_UNUSED)
+
+	PORT_START("LINE1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_Z)  			PORT_CHAR('z')	PORT_CHAR('Z')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_A)  			PORT_CHAR('a')	PORT_CHAR('A')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_Q)  			PORT_CHAR('q')  PORT_CHAR('Q')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_1)  			PORT_CHAR('1')	PORT_CHAR('!')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_UNUSED)
+
+	PORT_START("LINE2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_PLUS_PAD)  	PORT_CHAR('+')
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_MINUS_PAD)	PORT_CHAR('-')
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_X)  			PORT_CHAR('x')  PORT_CHAR('X')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_S)  			PORT_CHAR('s')  PORT_CHAR('S')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_W)  			PORT_CHAR('w')  PORT_CHAR('W')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_2)  			PORT_CHAR('2')  PORT_CHAR('"')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_SLASH_PAD)  	PORT_CHAR('/')
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_ASTERISK)		PORT_CHAR('*')
+
+	PORT_START("LINE3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_COLON) 		PORT_CHAR(0xF6) PORT_CHAR(0xD6)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_STOP) 		PORT_CHAR('.')  PORT_CHAR(':')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_L)  			PORT_CHAR('l')  PORT_CHAR('L')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_O)  			PORT_CHAR('o')  PORT_CHAR('O')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_9)  			PORT_CHAR(')')  PORT_CHAR('9')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_P)  			PORT_CHAR('p')  PORT_CHAR('P')
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_0)  			PORT_CHAR('0')  PORT_CHAR('=')
+
+	PORT_START("LINE4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR(0xE4) PORT_CHAR(0xC4)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_SLASH)		PORT_CHAR('-')  PORT_CHAR('_')
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_COMMA)		PORT_CHAR(',')  PORT_CHAR(';')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_K)  			PORT_CHAR('k')  PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_I)  			PORT_CHAR('i')  PORT_CHAR('I')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_8)  			PORT_CHAR('8')  PORT_CHAR('(')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_OPENBRACE) 	PORT_CHAR(0xE5) PORT_CHAR(0xC5)
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_MINUS)		PORT_CHAR('+')  PORT_CHAR('?')
+
+	PORT_START("LINE5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD) PORT_NAME("'/*") /* No good mapping */
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_M)  			PORT_CHAR('m')	PORT_CHAR('M')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_J)  			PORT_CHAR('j')  PORT_CHAR('J')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_U)  			PORT_CHAR('u')  PORT_CHAR('U')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_7)  			PORT_CHAR('7')  PORT_CHAR('/')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_CLOSEBRACE)	PORT_CHAR('^')
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD) PORT_NAME("PI")				PORT_CODE(KEYCODE_ESC)			PORT_CHAR(0x27)
+
+	PORT_START("LINE6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_LEFT)			PORT_CHAR(UCHAR_MAMEKEY(LEFT))  PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_RIGHT)	  	PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_N)  			PORT_CHAR('n')  PORT_CHAR('N')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_H)  			PORT_CHAR('h')  PORT_CHAR('H')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_Y)  			PORT_CHAR('y')  PORT_CHAR('Y')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_6)  			PORT_CHAR('&')  PORT_CHAR('6')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_ENTER)		PORT_CHAR('\r')
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_BACKSLASH2)	PORT_CHAR('<')  PORT_CHAR('>')
+
+	PORT_START("LINE7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_1_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_0_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_B)			PORT_CHAR('b')	PORT_CHAR('B')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_G)			PORT_CHAR('g')  PORT_CHAR('G')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_T)  			PORT_CHAR('t')  PORT_CHAR('T')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_5)  			PORT_CHAR('5')  PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_4_PAD)		PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_7_PAD)		PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+
+	PORT_START("LINE8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_2_PAD)		PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_DEL_PAD)		PORT_CHAR(UCHAR_MAMEKEY(STOP))
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_V)  			PORT_CHAR('v')	PORT_CHAR('V')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_F)  			PORT_CHAR('f')  PORT_CHAR('F')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_R)  			PORT_CHAR('r')  PORT_CHAR('R')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_4)  			PORT_CHAR('4')  PORT_CHAR('$')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_5_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_8_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+
+	PORT_START("LINE9")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD) PORT_NAME("Keypad E") /* No good mapping */
+	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_C)			PORT_CHAR('c')	PORT_CHAR('C')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_D)			PORT_CHAR('d')  PORT_CHAR('D')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_E)			PORT_CHAR('e')  PORT_CHAR('E')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_3)			PORT_CHAR('3')  PORT_CHAR('#')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_6_PAD)		PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_9_PAD)		PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( md6802 )
@@ -594,9 +967,54 @@ static MACHINE_CONFIG_START( e100, e100_state )
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(e100_map)
 
-	/* devices */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	/* Devices */
+	MCFG_DEVICE_ADD("kbd_74145", TTL74145, 0)
+
+	/* --PIA inits----------------------- */
+	/* 0xF883 0xC818 (PIA1 DDR A)     = 0x00 - Port A all inputs */
+	/* 0xF883 0xC818 (PIA2 DDR A)     = 0x00 - Port A all inputs */
+	/* 0xF883 0xC818 (PIA1 Control A) = 0x00 - Channel A IRQ disabled */
+	/* 0xF883 0xC818 (PIA2 Control A) = 0x00 - Channel A IRQ disabled */
+	/* 0xF886 0xC81A (PIA1 DDR B)     = 0x00 - Port B all inputs */
+	/* 0xF886 0xC81A (PIA2 DDR B)     = 0x00 - Port B all inputs */
+	/* 0xF886 0xC81A (PIA1 Control B) = 0x00 - Channel B IRQ disabled */
+	/* 0xF886 0xC81A (PIA2 Control B) = 0x00 - Channel B IRQ disabled */
+	/* 0xF88e 0xC80A (PIA1 DDR B)     = 0x4F - Port B 5 outputs set to 0 */
+	/* 0xF890 0xC812 (PIA2 DDR B)     = 0xFF - Port B all outputs set to 0 */
+	/* 0xF894 0xC818 (PIA1 Control A) = 0x34 - CA2 is low and lock DDRA */
+	/* 0xF894 0xC818 (PIA2 Control A) = 0x34 - CA2 is low and lock DDRA */
+	/* 0xF896 0xC818 (PIA1 Control B) = 0x34 - CB2 is low and lock DDRB */
+	/* 0xF896 0xC818 (PIA2 Control B) = 0x34 - CB2 is low and lock DDRB */
+	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(e100_state, pia1_kbA_w))
+	MCFG_PIA_READPA_HANDLER(READ8(e100_state, pia1_kbA_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(e100_state, pia1_kbB_w))
+	MCFG_PIA_READPB_HANDLER(READ8(e100_state, pia1_kbB_r))
+
+	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
+	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+
+	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
+	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active
+     * Once running enable/disable internal UI by pressing Scroll Lock in case it interferes with target keys
+	 * Open the internal UI by pressing TAB and then select 'Tape Control' or use F2/Shift F2 for PLAY/PAUSE
+     * In order to use a wav file it has first to be created using TAB and select the 'File manager'
+     * Once created it may be given on the commandline or mounted via TAB and select
+     * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
+     */
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED)
+
+	/* screen TODO: simplify the screen config, look at zx.cpp */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_4MHz/2, 265, 0, 265, 265, 0, 265)
+	MCFG_SCREEN_UPDATE_DRIVER(e100_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	/* There is a 50Hz signal from the video circuit to CA1 which generates interrupts and drives a software RTC */
+MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( md6802, md6802_state )
@@ -607,11 +1025,11 @@ static MACHINE_CONFIG_START( md6802, md6802_state )
 	/* Devices */
 	MCFG_DEVICE_ADD("tb16_74145", TTL74145, 0)
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
 
 	/* PIA #2 Keyboard & Display 0xC000-0xC003 */
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	/* --init----------------------- */
+	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
+	/* --PIA init----------------------- */
 	/* 0xE007 0xC002 (DDR B)     = 0xFF - Port B all outputs and set to 0 (zero) */
 	/* 0xE00B 0xC000 (DDR A)     = 0x70 - Port A three outputs and set to 0 (zero) */
 	/* 0xE00F 0xC001 (Control A) = 0x3C - */
@@ -639,11 +1057,11 @@ static MACHINE_CONFIG_START( mp68a, mp68a_state )
 
 	/* Devices */
 	/* PIA #1 0x500-0x503 - used differently by laborations and loaded software */
-	MCFG_DEVICE_ADD("pia1", PIA6820, 0)
+	MCFG_DEVICE_ADD(PIA1_TAG, PIA6820, 0)
 
 	/* PIA #2 Keyboard & Display 0x600-0x603 */
-	MCFG_DEVICE_ADD("pia2", PIA6820, 0)
-	/* --init----------------------- */
+	MCFG_DEVICE_ADD(PIA2_TAG, PIA6820, 0)
+	/* --PIA inits----------------------- */
 	/* 0x0BAF 0x601 (Control A) = 0x30 - CA2 is low and enable DDRA */
 	/* 0x0BB1 0x603 (Control B) = 0x30 - CB2 is low and enable DDRB */
 	/* 0x0BB5 0x600 (DDR A)     = 0xFF - Port A all outputs and set to 0 (zero) */
@@ -653,7 +1071,7 @@ static MACHINE_CONFIG_START( mp68a, mp68a_state )
 	/* 0x0BC3 0x602 (Port B)    = 0x40 - Turn on display via RBI* on  */
 	/* --execution-wait for key loop-- */
 	/* 0x086B Update display sequnc, see below                            */
-	/* 0x0826 CB1 read          = 0x603 (Control B)  - is a key presssed? */
+	/* 0x0826 CB1 read          = 0x603 (Control B)  - is a key pressed? */
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mp68a_state, pia2_kbA_w))
 	MCFG_PIA_READPA_HANDLER(READ8(mp68a_state, pia2_kbA_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mp68a_state, pia2_kbB_w))
@@ -691,15 +1109,28 @@ static MACHINE_CONFIG_START( mp68a, mp68a_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mp68a_state, scan_artwork, attotime::from_hz(10))
 MACHINE_CONFIG_END
 
-// TODO: Get a ROM set
+/* ROM sets from Didact was not versioned in general, so the numbering are just assumptions */
 ROM_START( e100 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "e100U201.bin", 0xd000, 0x0800, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
-	ROM_LOAD( "e100U202.bin", 0xd800, 0x0800, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
-	ROM_LOAD( "e100U203.bin", 0xe000, 0x0800, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
-	ROM_LOAD( "e100U204.bin", 0xe800, 0x0800, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
-	ROM_LOAD( "e100U205.bin", 0xf000, 0x0800, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
-	ROM_LOAD( "e100U206.bin", 0xf800, 0x0800, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
+	ROM_REGION(0x4000, "roms", 0)
+	ROM_DEFAULT_BIOS("rev2 BASIC")
+
+	/* TODO: Get the original ROMs */
+	ROM_SYSTEM_BIOS(0, "rev1 BASIC", "Esselte 100 rev1 BASIC")
+	ROMX_LOAD( "e100r1U201.bin", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "e100r1U202.bin", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "e100r1U203.bin", 0x2000, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "e100r1U204.bin", 0x2800, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "e100r1U205.bin", 0x3000, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "e100r1U206.bin", 0x3800, 0x0800, NO_DUMP, ROM_BIOS(1) )
+
+	/* This is a prototype ROM, commercial relase not verified. The prototype also have different keyboard and supports
+	   more ram so might need to be split out as a clone later */
+	ROM_SYSTEM_BIOS(1, "rev2 BASIC", "Esselte 100 rev2 BASIC")
+	ROMX_LOAD( "e100r2U201.bin", 0x0000, 0x2000, CRC(53513b67) SHA1(a91c5c32aead82dcc87db5d818ff286a7fc6a5c8), ROM_BIOS(2) )
+	ROMX_LOAD( "e100r2U202.bin", 0x2000, 0x2000, CRC(eab3adf2) SHA1(ff3f5f5c8ea8732702a39cff76d0706ab6b751ee), ROM_BIOS(2) )
+
+	ROM_REGION(0x0800, "chargen",0)
+	ROM_LOAD( "e100U506.bin", 0x0000, 0x0800, CRC(fff9f288) SHA1(2dfb3eb551fe1ef67da328f61ef51ae8d1abdfb8) )
 ROM_END
 
 // TODO split ROM image into proper ROM set
@@ -716,5 +1147,5 @@ ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS            INIT        COMPANY             FULLNAME           FLAGS
 COMP( 1979, mp68a,      0,          0,      mp68a,      mp68a,  driver_device,   0,          "Didact AB",        "mp68a",           MACHINE_NO_SOUND_HW )
-COMP( 1982, e100,       0,          0,      e100,       e100,   driver_device,   0,          "Didact AB",        "Esselte 100",     MACHINE_IS_SKELETON )
+COMP( 1982, e100,       0,          0,      e100,       e100,   driver_device,   0,          "Didact AB",        "Esselte 100",     MACHINE_NO_SOUND_HW )
 COMP( 1983, md6802,     0,          0,      md6802,     md6802, driver_device,   0,          "Didact AB",        "Mikrodator 6802", MACHINE_NO_SOUND_HW )

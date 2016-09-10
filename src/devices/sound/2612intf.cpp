@@ -117,6 +117,21 @@ void ym2612_device::device_start()
 	assert_always(m_chip != nullptr, "Error creating YM2612 chip");
 }
 
+void ym2612_device::device_clock_changed()
+{
+	calculate_rates();
+	ym2612_clock_changed(m_chip, clock(), clock() / 72);
+}
+
+void ym2612_device::calculate_rates()
+{
+	int rate = clock() / 72;
+
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this,0,2,rate);
+}
 
 //-------------------------------------------------
 //  device_stop - device-specific stop

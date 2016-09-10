@@ -903,7 +903,7 @@ void filter_vzsnapshot_getinfo(UINT32 state, union filterinfo *info)
     Imgtool module declaration
 *********************************************************************/
 
-static OPTION_GUIDE_START(vzdos_writefile_optionguide)
+OPTION_GUIDE_START(vzdos_writefile_optionguide)
 	OPTION_ENUM_START( 'T', "ftype",  "File type" )
 		OPTION_ENUM(     0, "basic",  "Basic"  )
 		OPTION_ENUM(     1, "binary", "Binary" )
@@ -953,7 +953,7 @@ void vzdos_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolin
 		case IMGTOOLINFO_PTR_WRITE_FILE:                    info->write_file = vzdos_diskimage_writefile; break;
 		case IMGTOOLINFO_PTR_DELETE_FILE:                   info->delete_file = vzdos_diskimage_deletefile; break;
 		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = vzdos_diskimage_create; break;
-		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:            info->writefile_optguide = vzdos_writefile_optionguide; break;
+		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:            info->writefile_optguide = &vzdos_writefile_optionguide; break;
 		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = vzdos_diskimage_suggesttransfer; break;
 		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_vz; break;
 	}

@@ -269,7 +269,7 @@ static void imgtool_floppy_get_info(const imgtool_class *imgclass, UINT32 state,
 		case IMGTOOLINFO_PTR_OPEN:                  info->open = imgtool_floppy_open; break;
 		case IMGTOOLINFO_PTR_CREATE:                info->create = imgtool_floppy_create; break;
 		case IMGTOOLINFO_PTR_CLOSE:                 info->close = imgtool_floppy_close; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = format->param_guidelines ? floppy_option_guide : nullptr; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = format->param_guidelines ? &floppy_option_guide : nullptr; break;
 		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:       info->get_sector_size = imgtool_floppy_get_sector_size; break;
 		case IMGTOOLINFO_PTR_READ_SECTOR:           info->read_sector = imgtool_floppy_read_sector; break;
 		case IMGTOOLINFO_PTR_WRITE_SECTOR:          info->write_sector = imgtool_floppy_write_sector; break;

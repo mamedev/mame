@@ -23,12 +23,14 @@
 #include "machine/wd_fdc.h"
 #include "machine/upd7002.h"
 #include "machine/mc146818.h"
+#include "machine/input_merger.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
 #include "imagedev/cassette.h"
 
+#include "bus/bbc/fdc/fdc.h"
 #include "bus/bbc/analogue/analogue.h"
 #include "bus/bbc/1mhzbus/1mhzbus.h"
 #include "bus/bbc/tube/tube.h"
@@ -66,6 +68,7 @@ public:
 		m_hd6845(*this, "hd6845"),
 		m_adlc(*this, "mc6854"),
 		m_sn(*this, "sn76489"),
+		m_keyboard(*this, "COL%u", 0),
 		m_trom(*this, "saa5050"),
 		m_tms(*this, "tms5220"),
 		m_cassette(*this, "cassette"),
@@ -75,7 +78,9 @@ public:
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
+		m_analog(*this, "analogue"),
 		m_rtc(*this, "rtc"),
+		m_fdc(*this, "fdc"),
 		m_i8271(*this, "i8271"),
 		m_wd1770(*this, "wd1770"),
 		m_wd1772(*this, "wd1772"),
@@ -83,10 +88,6 @@ public:
 		m_exp2(*this, "exp_rom2"),
 		m_exp3(*this, "exp_rom3"),
 		m_exp4(*this, "exp_rom4"),
-		m_joy0(*this, "JOY0"),
-		m_joy1(*this, "JOY1"),
-		m_joy2(*this, "JOY2"),
-		m_joy3(*this, "JOY3"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_os(*this, "os"),
 		m_region_opt(*this, "option"),
@@ -98,10 +99,7 @@ public:
 		m_bank6(*this, "bank6"),
 		m_bank7(*this, "bank7"),
 		m_bank8(*this, "bank8"),
-		m_ACCCON_IRR(CLEAR_LINE),
-		m_via_system_irq(CLEAR_LINE),
-		m_via_user_irq(CLEAR_LINE),
-		m_acia_irq(CLEAR_LINE),
+		m_irqs(*this, "irqs"),
 		m_palette(*this, "palette"),
 		m_bbcconfig(*this, "BBCCONFIG")
 	{ }
@@ -164,17 +162,14 @@ public:
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(adlc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
-	DECLARE_WRITE_LINE_MEMBER(bbcb_via_system_irq_w);
 	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
 	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
-	DECLARE_WRITE_LINE_MEMBER(bbcb_via_user_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
@@ -218,6 +213,7 @@ private:
 	required_device<hd6845_device> m_hd6845;
 	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489_device> m_sn;
+	required_ioport_array<13> m_keyboard;
 public: // HACK FOR MC6845
 	optional_device<saa5050_device> m_trom;
 	optional_device<tms5220_device> m_tms;
@@ -228,15 +224,16 @@ public: // HACK FOR MC6845
 	required_device<via6522_device> m_via6522_0;
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
+	optional_device<bbc_analogue_slot_device> m_analog;
 	optional_device<mc146818_device> m_rtc;
+	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;
 	optional_device<wd1770_t> m_wd1770;
 	optional_device<wd1772_t> m_wd1772;
-	required_device<generic_slot_device> m_exp1;
-	required_device<generic_slot_device> m_exp2;
+	optional_device<generic_slot_device> m_exp1;
+	optional_device<generic_slot_device> m_exp2;
 	optional_device<generic_slot_device> m_exp3;
 	optional_device<generic_slot_device> m_exp4;
-	optional_ioport m_joy0, m_joy1, m_joy2, m_joy3;
 
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_os;
@@ -250,7 +247,7 @@ public: // HACK FOR MC6845
 	required_memory_bank m_bank7; // bbca bbcb bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank8; //                          bbcm
 
-	void check_interrupts();
+	required_device<input_merger_active_high_device> m_irqs;
 
 	machine_type_t m_machinetype;
 
@@ -309,16 +306,18 @@ public: // HACK FOR MC6845
 							The function of the 8 output bits from this latch are:-
 
 							B0 - Write Enable to the sound generator IC
-							B1 - READ select on the speech processor
+							B1 - READ select on the speech processor (B and B+)
+							     R/nW control on CMOS RAM (Master only)
 							B2 - WRITE select on the speech processor
+							     DS control on CMOS RAM (Master only)
 							B3 - Keyboard write enable
 							B4,B5 - these two outputs define the number to be added to the
 							start of screen address in hardware to control hardware scrolling:-
-							Mode    Size    Start of screen  Number to add  B5      B4
-							0,1,2   20K &3000        12K        1       1
-							3       16K &4000        16K        0   0
-							4,5     10K &5800 (or &1800) 22K        1   0
-							6       8K  &6000 (or &2000) 24K        0   1
+							Mode    Size    Start of screen  Size  No.to add  B5      B4
+							0,1,2   20K     &3000            12K              1       1
+							3       16K     &4000            16K              0       0
+							4,5     10K     &5800 (or &1800) 22K              1       0
+							6       8K      &6000 (or &2000) 24K              0       1
 							B6 - Operates the CAPS lock LED  (Pin 17 keyboard connector)
 							B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
 							*/
@@ -340,9 +339,6 @@ public: // HACK FOR MC6845
 	int m_via_system_porta;
 
 	// interrupt state
-	int m_via_system_irq;
-	int m_via_user_irq;
-	int m_acia_irq;
 	int m_adlc_irq;
 
 	int m_column;           // this is a counter in the keyboard circuit

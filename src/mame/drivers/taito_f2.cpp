@@ -618,7 +618,7 @@ READ8_MEMBER(taitof2_state::driveout_sound_command_r)
 
 void taitof2_state::reset_driveout_sound_region()
 {
-	m_oki->set_bank_base(m_oki_bank * 0x40000);
+	m_oki->set_rom_bank(m_oki_bank);
 }
 
 WRITE8_MEMBER(taitof2_state::oki_bank_w)

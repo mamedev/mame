@@ -15,6 +15,20 @@
 #include "imagedev/cassette.h"
 
 
+void electron_state::waitforramsync()
+{
+	int cycles = 0;
+
+	if (!(m_ula.screen_mode & 4) && machine().first_screen()->hpos()<640)
+	{
+		cycles += (640 - machine().first_screen()->hpos()) / 8;
+	}
+	if (cycles & 1) cycles++;
+
+	m_maincpu->adjust_icount(-cycles);
+}
+
+
 void electron_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -145,8 +159,21 @@ READ8_MEMBER(electron_state::electron_read_keyboard)
 	return data;
 }
 
+READ8_MEMBER(electron_state::electron_mem_r)
+{
+	//waitforramsync();
+	return m_ram->read(offset);
+}
+
+WRITE8_MEMBER(electron_state::electron_mem_w)
+{
+	//waitforramsync();
+	m_ram->write(offset, data);
+}
+
 READ8_MEMBER(electron_state::electron_fred_r)
 {
+	logerror("FRED: read fc%02x\n", offset);
 	return 0xff;
 }
 
@@ -156,6 +183,7 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 
 READ8_MEMBER(electron_state::electron_jim_r)
 {
+	logerror("JIM: read fd%02x\n", offset);
 	return 0xff;
 }
 
@@ -174,7 +202,7 @@ READ8_MEMBER(electron_state::electron_sheila_r)
 		break;
 	case 0x01:  /* Unknown */
 		break;
-	case 0x04:  /* Casette data shift register */
+	case 0x04:  /* Cassette data shift register */
 		electron_interrupt_handler(INT_CLEAR, INT_RECEIVE_FULL );
 		data = m_ula.tape_byte;
 		break;
@@ -201,7 +229,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.screen_start = ( m_ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
-	case 0x03:  /* Screen start addres #2 */
+	case 0x03:  /* Screen start address #2 */
 		m_ula.screen_start = ( m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
@@ -279,7 +307,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.screen_mode = ( data >> 3 ) & 0x07;
 		m_ula.screen_base = electron_screen_base[ m_ula.screen_mode ];
 		m_ula.screen_size = 0x8000 - m_ula.screen_base;
-		m_ula.vram = (UINT8 *)space.get_read_ptr(m_ula.screen_base );
+		m_ula.vram = (UINT8 *)m_ram->pointer() + m_ula.screen_base;
 		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
 		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
 		m_cassette->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
@@ -342,13 +370,12 @@ void electron_state::machine_reset()
 	m_ula.screen_mode = 0;
 	m_ula.cassette_motor_mode = 0;
 	m_ula.capslock_mode = 0;
-	m_ula.screen_mode = 0;
 	m_ula.screen_start = 0x3000;
 	m_ula.screen_base = 0x3000;
 	m_ula.screen_size = 0x8000 - 0x3000;
 	m_ula.screen_addr = 0;
 	m_ula.tape_running = 0;
-	m_ula.vram = (UINT8 *)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_ula.screen_base);
+	m_ula.vram = (UINT8 *)m_ram->pointer() + m_ula.screen_base;
 }
 
 void electron_state::machine_start()
@@ -371,32 +398,6 @@ void electron_state::machine_start()
 
 	for (int page = 2; page < 16; page++)
 		membank("bank2")->configure_entries(page, 1, memregion("user1")->base() + page * 0x4000, 0x4000);
-
-	/* enumerate expansion ROMs */
-	electron_expansion_slot_device* exp_port = m_exp;
-
-	while (exp_port != nullptr)
-	{
-		device_t* temp;
-
-		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
-		if (temp != nullptr)
-		{
-			for (int page = 4; page < 16; page++)
-			{
-				memory_region *temp_region = temp->memregion("exp_rom");
-				if (temp_region != nullptr && temp_region->base() != nullptr && temp_region->base()[page * 0x4000 + 0x06] != 0x00)
-				{
-					membank("bank2")->configure_entries(page, 1, temp_region->base() + page * 0x4000, 0x4000);
-				}
-				exp_port = temp->subdevice<electron_expansion_slot_device>("exp");
-			}
-		}
-		else
-		{
-			exp_port = nullptr;
-		}
-	}
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;

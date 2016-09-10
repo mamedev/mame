@@ -363,7 +363,7 @@ READ16_MEMBER(joystand_state::fpga_r)
 WRITE16_MEMBER(joystand_state::oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_oki->set_bank_base(((data >> 6) & 3) * 0x40000);
+		m_oki->set_rom_bank((data >> 6) & 3);
 }
 
 READ16_MEMBER(joystand_state::eeprom_r)

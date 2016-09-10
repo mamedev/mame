@@ -31,12 +31,15 @@ public:
 	void set_rom(const void *base, UINT32 size);
 	void set_rom_bank(int bank);
 
+protected:
+	virtual void rom_bank_updated() = 0;
+
 private:
 	const address_space_config m_rom_config;
 	direct_read_data *m_rom_direct;
 
 	memory_bank *m_bank;
-	int m_cur_bank;
+	int m_cur_bank, m_bank_count;
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 	virtual void interface_pre_start() override;

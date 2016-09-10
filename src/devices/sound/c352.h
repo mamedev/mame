@@ -47,6 +47,9 @@ protected:
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
+
 private:
 	enum {
 		C352_FLG_BUSY       = 0x8000,   // channel is busy
@@ -94,8 +97,8 @@ private:
 	c352_voice_t m_c352_v[32];
 	INT16 m_mulaw_table[256];
 
-    UINT16 m_random;
-    UINT16 m_control; // control flags, purpose unknown.
+	UINT16 m_random;
+	UINT16 m_control; // control flags, purpose unknown.
 
 	void fetch_sample(c352_voice_t* v);
 

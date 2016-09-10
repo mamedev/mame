@@ -2543,10 +2543,9 @@ abc110                          // 1985 ABC 110
 abc310                          // 1985 ABC 310
 acw443                          // 1985 ABC 210/Cambridge Workstation
 bbca                            // 1981 BBC Micro Model A
-bbcb                            // 1981 BBC Micro Model B w/8271 FDC
+bbcb                            // 1981 BBC Micro Model B
 bbcb_de                         // 1982 BBC Micro Model B (German)
 bbcb_us                         // 1983 BBC Micro Model B (US)
-bbcb1770                        // 1984 BBC Micro Model B w/1770 FDC
 bbcbp                           // 1985 BBC Micro Model B+ 64K
 bbcbp128                        // 1985 BBC Micro Model B+ 128K
 bbcm                            // 1986 BBC Master 128
@@ -9351,6 +9350,7 @@ cheekyms                        // 8004 (c) [1980?]
 
 @source:chessmst.cpp
 chessmst                        //
+chessmsta                       //
 
 @source:chesstrv.cpp
 borisdpl                        //
@@ -9684,6 +9684,7 @@ revlatns                        // (c) 199?
 copsnrob                        // 005625           1976/07 [6502]
 
 @source:corona.cpp
+legrandc                        // (c) 198? Isermatic France S.A.
 luckyrlt                        // (c) 1990 unknown
 rcirulet                        // (c) 199? Entretenimientos GEMINIS
 re800ea                         // (c) 1991 Entretenimientos GEMINIS
@@ -10959,6 +10960,7 @@ xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored fo
 @source:didact.cpp
 md6802                          //
 mp68a                           //
+e100                            //
 
 @source:dietgo.cpp
 dietgo                          // MAY (c) 1993
@@ -11227,6 +11229,7 @@ dvk_ksm                         //
 @source:dwarfd.cpp
 dwarfd                          // (c) 198? Electro-Sports
 dwarfda                         // (c) 198? Electro-Sports
+pokeresp                        // (c) 198? Electro-Sports
 qc                              // (c) 1995 ArJay Exports/Prestige Games
 quarterh                        // (c) 1983 Electro-Sports
 quarterha                       // (c) 1983 Electro-Sports
@@ -11887,7 +11890,7 @@ poizone                         // (c) 1990 Sisteme
 deluxe5                         // (c) 2000 ESD
 deluxe5a                        // (c) 2000 ESD
 deluxe5b                        // (c) 2000 ESD
-deluxe4u						// (c) 2000 ESD
+deluxe4u                        // (c) 2000 ESD
 hedpanic                        // (c) 2000 ESD
 hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
 hedpanico                       // (c) 1999 ESD
@@ -12563,6 +12566,7 @@ gal3                            // (c) 1992 (Arcade TV Game List - P.73, Right, 
 
 @source:galaga.cpp
 battles                         // bootleg
+battles2                        // bootleg
 bosco                           // (c) 1981
 boscomd                         // (c) 1981 Midway
 boscomdo                        // (c) 1981 Midway
@@ -12678,7 +12682,7 @@ gteikokb                        // bootleg
 gteikoku                        // (c) Irem
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
-jungsub							// bootleg
+jungsub                         // bootleg
 kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
 kingball                        // (c) 1980 Namco
 kingballj                       // (c) 1980 Namco
@@ -14162,6 +14166,7 @@ mmerlin                         // Parker Bros
 phpball                         // Tomy
 raisedvl                        // Entex
 simon                           // Milton Bradley
+speechp                         // TSI
 splitsec                        // Parker Bros
 ssimon                          // Milton Bradley
 ssports4                        // US Games
@@ -20151,6 +20156,7 @@ term2la1                        // (c) 1992 Midway
 term2la2                        // (c) 1992 Midway
 term2la3                        // (c) 1992 Midway
 term2lg1                        // (c) 1992 Midway
+term2pa2                        // (c) 1992 Midway
 totcarn                         // (c) 1992 Midway
 totcarnp                        // (c) 1992 Midway
 trog                            // (c) 1990 Midway
@@ -29248,6 +29254,7 @@ msheartb                        // hack
 mspacii                         // bootleg
 mspacii2                        // bootleg
 mspacmab                        // bootleg
+mspacmab2                       // bootleg
 mspacman                        // (c) 1981 Midway  // made by General Computer
 mspacmanbcc                     // bootleg
 mspacmanbg                      // bootleg
@@ -31206,7 +31213,7 @@ r2dtank                         // (c) 1980 Sigma Ent. Inc.
 
 @source:r2dx_v33.cpp
 nzeroteam                       // (c) 1997 Seibu Kaihatsu
-nzeroteama						//
+nzeroteama                      //
 r2dx_v33                        // (c) 1996 Seibu Kaihatsu
 r2dx_v33_r2                     // (c) 1996 Seibu Kaihatsu
 zerotm2k                        // (c) 2000 Seibu Kaihatsu
@@ -32289,7 +32296,7 @@ hangon1                         // (c) 1985
 hangon2                         // (c) 1985
 shangonrb                       // (c) 1992 (but bootleg, hangon hw?)
 shangonro                       // (c) 1987 (FD1094)
-shangonho						// (c) 1987 (FD1094)
+shangonho                       // (c) 1987 (FD1094)
 sharrier                        // (c) 1985
 sharrier1                       // (c) 1985
 
@@ -33495,6 +33502,7 @@ ikarijpb                        // bootleg
 ikarinc                         // A5004 'IW' (c) 1986
 ikariram                        // bootleg
 jcross                          // A3006      (c) 1984
+jcrossa                         //            (c) 1984
 legofair                        // A7003 'KK' (c) 1988
 madcrash                        // A2005      (c) 1984
 madcrush                        // A2005      (c) 1984
@@ -33740,7 +33748,7 @@ roldfrog                        // not a gaelco game but based on splash code
 roldfroga                       // not a gaelco game but based on splash code
 splash                          // (c) 1992 - Ref 922804
 splash10                        // (c) 1992 - Ref 922804
-ringball						// not a gaelco game but based on splash code
+ringball                        // not a gaelco game but based on splash code
 
 @source:splus.cpp
 spss4240                        //
@@ -34109,6 +34117,7 @@ techbowl                        // 1997.12 Technical Bowling
 thunt                           // 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License))
 thuntk                          //
 twcup98                         // 1998.04 Tecmo World Cup '98 (Tecmo)
+twsoc98
 vfkids                          // 1996.03 Virtua Fighter Kids
 vfremix                         // 1995.06 Virtua Fighter Remix
 vmahjong                        // 1997.02 Virtual Mahjong (Micronet)
@@ -36392,10 +36401,10 @@ iceclmrd                        // (c) 1984 Nintendo (Dual game version)
 jajamaru                        // (c) 1985 Jaleco
 ladygolf                        // (c) 1984 Nintendo
 ladygolfe                       // (c) 1984 Nintendo
-machridr                        // (c) 1985 Nintendo
-machridra                       // (c) 1985 Nintendo
-mightybj                        // (c) 1986 Tecmo
-platoon                         // (c) 1987 Ocean
+nvs_machrider                   // (c) 1985 Nintendo
+nvs_machridera                  // (c) 1985 Nintendo
+nvs_mightybj                    // (c) 1986 Tecmo
+nvs_platoon                     // (c) 1987 Ocean
 rbibb                           // (c) 1987 Namco
 rbibba                          // (c) 1987 Namco
 skatekds                        // (c) 1988 (hack)
@@ -37600,6 +37609,7 @@ mfjump                          // Monster Farm Jump (JAPAN)
 mgcldate                        // Magical Date (JAPAN Ver 2.02J)
 mgcldtex                        // Magical Date EX (JAPAN Ver 2.01J)
 nbajamex                        // NBA Jam Extreme
+nbajamexa						//
 plsmaswd                        // Plasma Sword (USA 980316)
 plsmaswda                       // Plasma Sword (ASIA 980316)
 primrag2                        // Primal Rage 2

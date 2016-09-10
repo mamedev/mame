@@ -154,8 +154,8 @@ WRITE16_MEMBER(k3_state::k3_scrolly_w)
 
 WRITE16_MEMBER(k3_state::k3_soundbanks_w)
 {
-	m_oki2->set_bank_base((data & 4) ? 0x40000 : 0);
-	m_oki1->set_bank_base((data & 2) ? 0x40000 : 0);
+	m_oki2->set_rom_bank((data & 4) >> 2);
+	m_oki1->set_rom_bank((data & 2) >> 1);
 }
 
 WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
@@ -176,7 +176,7 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 	if (data & 0xfcc9)
 		popmessage("unk control %04x", data & 0xfcc9);
 
-	m_oki1->set_bank_base(0x40000 * ((data & 0x6)>>1) );
+	m_oki1->set_rom_bank((data & 0x6) >> 1);
 
 }
 
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( flagrall )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) // needed to use the continue feature even if it's not used to start the game
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -410,8 +410,8 @@ WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base(0x40000 * ((data >> 0) & 0x3) );
-		m_oki2->set_bank_base(0x40000 * ((data >> 4) & 0x3) );
+		m_oki1->set_rom_bank((data >> 0) & 0x3);
+		m_oki2->set_rom_bank((data >> 4) & 0x3);
 	}
 }
 
@@ -758,8 +758,8 @@ WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base(0x40000 * ((data >> 0) & 1) );
-		m_oki2->set_bank_base(0x40000 * ((data >> 4) & 1) );
+		m_oki1->set_rom_bank((data >> 0) & 1);
+		m_oki2->set_rom_bank((data >> 4) & 1);
 	}
 }
 
@@ -780,13 +780,14 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(cischeat_state::cischeat_soundbank_1_w)
 {
-	if (ACCESSING_BITS_0_7) m_oki1->set_bank_base(0x40000 * (data & 1) );
+	if (ACCESSING_BITS_0_7) m_oki1->set_rom_bank(data & 1);
 }
 
 WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
 {
-	if (ACCESSING_BITS_0_7) m_oki2->set_bank_base(0x40000 * (data & 1) );
+	if (ACCESSING_BITS_0_7) m_oki2->set_rom_bank(data & 1);
 }
+
 static ADDRESS_MAP_START( cischeat_sound_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040002, 0x040003) AM_WRITE(cischeat_soundbank_1_w)               // Sample Banking

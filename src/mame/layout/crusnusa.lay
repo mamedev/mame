@@ -70,7 +70,7 @@
 			<bounds x="0.0" y="0.0" width="5.0" height="1.0" />
 		</text>
 	</element>
-	
+
 	<element name="counter" defstate="0">
 		<simplecounter digits="3">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -96,7 +96,7 @@
 		<bezel name="lamp3" element="view3">
 			<bounds x="0.1" y="3.325" width="0.5" height="0.1" />
 		</bezel>
-		
+
 		<bezel name="lamp4" element="lamp">
 			<bounds x="1.785" y="3.2" width="0.1" height="0.1" />
 		</bezel>
@@ -109,7 +109,7 @@
 		<bezel name="lamp7" element="lamp">
 			<bounds x="2.115" y="3.2" width="0.1" height="0.1" />
 		</bezel>
-		
+
 		<bezel name="wheel" element="counter">
 			<bounds x="1.9" y="3.0" width="0.2" height="0.1" />
 		</bezel>

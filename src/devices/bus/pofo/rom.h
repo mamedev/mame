@@ -23,7 +23,7 @@
 // ======================> portfolio_rom_card_t
 
 class portfolio_rom_card_t :  public device_t,
-				  			  public device_portfolio_memory_card_slot_interface
+							  public device_portfolio_memory_card_slot_interface
 {
 public:
 	// construction/destruction

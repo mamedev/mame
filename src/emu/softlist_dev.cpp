@@ -2,9 +2,9 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-	softlist_dev.cpp
+    softlist_dev.cpp
 
-	Software list construction helpers.
+    Software list construction helpers.
 
 ***************************************************************************/
 
@@ -413,7 +413,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 
 void software_list_device::internal_validity_check(validity_checker &valid)
 {
-	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
+	enum { NAME_LEN_PARENT = 16, NAME_LEN_CLONE = 16 };
 
 	softlist_map names;
 	softlist_map descriptions;

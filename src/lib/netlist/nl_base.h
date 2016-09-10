@@ -144,7 +144,7 @@ class NETLIB_NAME(name) : public device_t
 #define NL_NOEXCEPT
 #else
 #define nl_assert(x)    do { if (0) if (!(x)) { /*throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); */} } while (0)
-#define NL_NOEXCEPT		noexcept
+#define NL_NOEXCEPT     noexcept
 #endif
 #define nl_assert_always(x, msg)    do { if (!(x)) throw nl_exception(plib::pfmt("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
 

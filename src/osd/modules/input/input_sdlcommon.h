@@ -148,17 +148,6 @@ private:
 //  INLINE FUNCTIONS
 //============================================================
 
-static inline int devmap_leastfree(device_map_t *devmap)
-{
-	for (int i = 0; i < MAX_DEVMAP_ENTRIES; i++)
-	{
-		if (devmap->map[i].name.length() == 0)
-			return i;
-	}
-
-	return -1;
-}
-
 static inline std::string remove_spaces(const char *s)
 {
 	// Remove the spaces
@@ -184,6 +173,7 @@ static inline void devmap_init(running_machine &machine, device_map_t *devmap, c
 	// Initialize the map to default uninitialized values
 	for (dev = 0; dev < MAX_DEVMAP_ENTRIES; dev++)
 	{
+		devmap->map[dev].name.clear();
 		devmap->map[dev].physical = -1;
 		devmap->logical[dev] = -1;
 	}

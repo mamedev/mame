@@ -161,6 +161,16 @@ void okim9810_device::device_clock_changed()
 
 
 //-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void okim9810_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
+//-------------------------------------------------
 //  stream_generate - handle update requests for
 //  our sound stream
 //-------------------------------------------------

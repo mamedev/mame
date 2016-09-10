@@ -152,7 +152,7 @@ public:
 	gfx_element();
 #endif
 	gfx_element(palette_device &palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base);
-	gfx_element(palette_device &palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity);
+	gfx_element(palette_device &palette, UINT8 *base, UINT16 width, UINT16 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity);
 
 	// getters
 	palette_device &palette() const { return *m_palette; }

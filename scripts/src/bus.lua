@@ -219,6 +219,27 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/fds/fds.h,BUSES["BBC_FDC"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_FDC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/analogue/analogue.h,BUSES["BBC_ANALOGUE"] = true
 ---------------------------------------------------
 
@@ -226,6 +247,8 @@ if (BUSES["BBC_ANALOGUE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.h",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.h",
 	}
 end
 
@@ -650,6 +673,8 @@ if (BUSES["ELECTRON"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/electron/exp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
+		MAME_DIR .. "src/devices/bus/electron/plus3.cpp",
+		MAME_DIR .. "src/devices/bus/electron/plus3.h",
 		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
 		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
@@ -2863,7 +2888,7 @@ end
 if (BUSES["HP_OPTROM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.cpp",
-        }
+		}
 end
 
 ---------------------------------------------------
@@ -2877,5 +2902,17 @@ if (BUSES["COMPIS_GRAPHICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/compis/graphics.h",
 		MAME_DIR .. "src/devices/bus/compis/hrg.cpp",
 		MAME_DIR .. "src/devices/bus/compis/hrg.h",
-    }
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc1512/mouse.h,BUSES["PC1512"] = true
+---------------------------------------------------
+
+if (BUSES["PC1512"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc1512/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/pc1512/mouse.h",
+	}
 end

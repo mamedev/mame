@@ -347,7 +347,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
 {
 //  popmessage("%08x",0x40000 * (data & 0x07));
-	m_oki->set_bank_base(0x40000 * (data & 0x7));
+	m_oki->set_rom_bank(data & 0x7);
 }
 
 static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8, seicupbl_state )

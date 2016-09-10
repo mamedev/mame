@@ -229,7 +229,7 @@ READ8_MEMBER(egghunt_state::egghunt_okibanking_r)
 WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
 {
 	m_okibanking = data;
-	m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
+	m_oki->set_rom_bank((data >> 4) & 1);
 }
 
 static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )

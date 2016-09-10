@@ -252,8 +252,8 @@ TODO: - Distinguish door switches using manual
       start modelling the individual hysteresis curves of filament lamps.
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
       - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
-	  
-	  - Per game inputs not currently supported, may need to do something about DIPs, inverted lines etc.
+
+      - Per game inputs not currently supported, may need to do something about DIPs, inverted lines etc.
 ***********************************************************************************************************/
 #include "emu.h"
 
@@ -2648,7 +2648,7 @@ ADDRESS_MAP_END
 	MCFG_STEPPER_END_INDEX(2)\
 	MCFG_STEPPER_INDEX_PATTERN(0x00)\
 	MCFG_STEPPER_INIT_PHASE(2)
-	
+
 #define MCFG_MPU4_BWB_REEL_ADD(_tag)\
 	MCFG_STEPPER_ADD(_tag)\
 	MCFG_STEPPER_REEL_TYPE(BARCREST_48STEP_REEL)\

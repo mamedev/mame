@@ -22,13 +22,6 @@
 #include "imagedev/cassette.h"
 
 
-void bbc_state::check_interrupts()
-{
-	int irq = (m_via_system_irq || m_via_user_irq || m_acia_irq || m_ACCCON_IRR) ? ASSERT_LINE : CLEAR_LINE;
-
-	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
-}
-
 /*************************
 Model A memory handling functions
 *************************/
@@ -336,7 +329,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 
 	if (tempIRR!=m_ACCCON_IRR)
 	{
-		check_interrupts();
+		m_irqs->in3_w(m_ACCCON_IRR);
 	}
 
 	if (m_ACCCON_Y)
@@ -711,12 +704,6 @@ B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
 
 INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 {
-	static const char *const colnames[] = {
-		"COL0", "COL1", "COL2", "COL3", "COL4",
-		"COL5", "COL6", "COL7", "COL8", "COL9",
-		"COL10", "COL11", "COL12"
-	};
-
 	/* only do auto scan if keyboard is not enabled */
 	if (m_b3_keyboard == 1)
 	{
@@ -733,7 +720,7 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
 			     being pressed on the selected m_column */
-			if ((ioport(colnames[m_column])->read() | 0x01) != 0xff)
+			if ((m_keyboard[m_column]->read() | 0x01) != 0xff)
 			{
 				m_via6522_0->write_ca2(1);
 			}
@@ -755,11 +742,6 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 	int bit;
 	int row;
 	int res;
-	static const char *const colnames[] = {
-		"COL0", "COL1", "COL2", "COL3", "COL4",
-		"COL5", "COL6", "COL7", "COL8", "COL9",
-		"COL10", "COL11", "COL12"
-	};
 
 	m_column = data & 0x0f;
 	row = (data>>4) & 0x07;
@@ -768,7 +750,7 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 
 	if (m_column < 13)
 	{
-		res = ioport(colnames[m_column])->read();
+		res = m_keyboard[m_column]->read();
 	}
 	else
 	{
@@ -799,14 +781,14 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 
 void bbc_state::bbcb_IC32_initialise(bbc_state *state)
 {
-	m_b0_sound=0x01;             // Write Enable to the sound generator IC
-	m_b1_speech_read=0x01;       // READ select on the speech processor
-	m_b2_speech_write=0x01;      // WRITE select on the speech processor
-	m_b3_keyboard=0x01;          // Keyboard write enable
-	m_b4_video0=0x01;            // These two outputs define the number to be added to the start of screen address
-	m_b5_video1=0x01;            // in hardware to control hardware scrolling
-	m_b6_caps_lock_led=0x01;     // Operates the CAPS lock LED
-	m_b7_shift_lock_led=0x01;    // Operates the SHIFT lock LED
+	m_b0_sound = 0x01;             // Write Enable to the sound generator IC
+	m_b1_speech_read = 0x01;       // READ select on the speech processor
+	m_b2_speech_write = 0x01;      // WRITE select on the speech processor
+	m_b3_keyboard = 0x01;          // Keyboard write enable
+	m_b4_video0 = 0x01;            // These two outputs define the number to be added to the start of screen address
+	m_b5_video1 = 0x01;            // in hardware to control hardware scrolling
+	m_b6_caps_lock_led = 0x01;     // Operates the CAPS lock LED
+	m_b7_shift_lock_led = 0x01;    // Operates the SHIFT lock LED
 }
 
 
@@ -877,7 +859,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 {
 	int bit, value;
 	bit = data & 0x07;
-	value = BIT(data,3);
+	value = BIT(data, 3);
 
 	//logerror("SYSTEM write portb %d %d %d\n",data,bit,value);
 
@@ -1082,20 +1064,13 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 	// D5 of portb is joystick fire button 2
 	// D6 VSPINT
 	// D7 VSPRDY
-	int TMSint = m_tms ? m_tms->intq_r() : 0;
-	int TMSrdy = m_tms ? m_tms->readyq_r() : 0;
+	int vspint = m_tms ? m_tms->intq_r() : 0;
+	int vsprdy = m_tms ? m_tms->readyq_r() : 0;
 	//logerror("TMSint %d\n",TMSint);
 	//logerror("TMSrdy %d\n",TMSrdy);
-	return (0xf | ioport("IN0")->read() | (!TMSrdy << 7) | (!TMSint << 6));
+	return ((m_analog ? m_analog->pb_r() : 0x30) | (!vsprdy << 7) | (!vspint << 6));
 }
 
-
-WRITE_LINE_MEMBER(bbc_state::bbcb_via_system_irq_w)
-{
-	m_via_system_irq = state;
-
-	check_interrupts();
-}
 
 /**********************************************************************
 USER VIA
@@ -1117,13 +1092,6 @@ WRITE8_MEMBER(bbc_state::bbcb_via_user_write_portb)
 	m_userport = data;
 }
 
-WRITE_LINE_MEMBER(bbc_state::bbcb_via_user_irq_w)
-{
-	m_via_user_irq = state;
-
-	check_interrupts();
-}
-
 
 /**************************************
 BBC Joystick Support
@@ -1131,19 +1099,7 @@ BBC Joystick Support
 
 UPD7002_GET_ANALOGUE(bbc_state::BBC_get_analogue_input)
 {
-	switch (channel_number)
-	{
-		case 0:
-			return ((0xff - m_joy0->read()) << 8);
-		case 1:
-			return ((0xff - m_joy1->read()) << 8);
-		case 2:
-			return ((0xff - m_joy2->read()) << 8);
-		case 3:
-			return ((0xff - m_joy3->read()) << 8);
-	}
-
-	return 0;
+	return ((0xff - m_analog->ch_r(channel_number)) << 8);
 }
 
 UPD7002_EOC(bbc_state::BBC_uPD7002_EOC)
@@ -1346,14 +1302,6 @@ WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::bbcb_acia6850_irq_w )
-{
-	m_acia_irq = state;
-
-	check_interrupts();
-}
-
-
 void bbc_state::BBC_Cassette_motor(unsigned char status)
 {
 	if (status)
@@ -1427,7 +1375,7 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 }
 
 /**************************************
-   i8271 disc control function
+i8271 disc control function
 ***************************************/
 
 
@@ -1476,15 +1424,20 @@ WRITE_LINE_MEMBER(bbc_state::side_w)
 
 void bbc_state::bbc_update_nmi()
 {
-	if (m_fdc_irq || m_fdc_drq)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_fdc_irq || m_fdc_drq || m_adlc_irq)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER(bbc_state::fdc_intrq_w)
 {
 	m_fdc_irq = state;
 	bbc_update_nmi();
-
 }
 
 WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)

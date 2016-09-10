@@ -142,7 +142,7 @@ READ8_MEMBER(h8_sci_device::tdr_r)
 WRITE8_MEMBER(h8_sci_device::ssr_w)
 {
 	cpu->synchronize();
-	
+
 	if(!(scr & SCR_TE)) {
 		data |= SSR_TDRE;
 		ssr |= SSR_TDRE;

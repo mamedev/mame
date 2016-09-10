@@ -1243,6 +1243,11 @@ ROM_START( vr )
 
 	ROM_REGION( 0x100, "nvram", 0 ) // default nvram
 	ROM_LOAD( "vr_defaults.nv", 0x000, 0x100, CRC(5ccdc835) SHA1(7e809de470f78fb897b938ca2aee2e12f1c8f3a4) )
+
+	ROM_REGION ( 0x10000, "io_board", 0)
+	ROM_LOAD("epr-14869.25",  0x00000, 0x10000, CRC(6187cd7a) SHA1(b65fdd0ad31794a565a0ca4dc67a3f16b329fd71) )
+	ROM_LOAD("epr-14869b.25", 0x00000, 0x10000, CRC(b410f22b) SHA1(75c5009ca4d21ebb53d54d4e3fb8aa55a4c74a07) )
+	// there is also epr-14869c in model2 daytona
 ROM_END
 
 ROM_START( vformula )

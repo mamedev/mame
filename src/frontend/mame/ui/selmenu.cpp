@@ -29,6 +29,7 @@
 #include "rendutil.h"
 #include "softlist.h"
 #include "uiinput.h"
+#include "luaengine.h"
 
 #include <algorithm>
 #include <cmath>
@@ -153,6 +154,10 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_total_lines(0)
 	, m_topline_datsview(0)
 	, m_ui_error(false)
+	, m_info_driver(nullptr)
+	, m_info_software(nullptr)
+	, m_info_view(-1)
+	, m_info_buffer()
 	, m_cache()
 	, m_is_swlist(is_swlist)
 	, m_focus(focused_menu::main)
@@ -493,7 +498,9 @@ void menu_select_launch::draw_common_arrow(float origx1, float origy1, float ori
 	}
 
 	// apply arrow
-	if (current == dmin)
+	if (dmax == dmin)
+		return;
+	else if (current == dmin)
 		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, ROT90);
 	else if (current == dmax)
 		draw_arrow(al_x0, al_y0, al_x1, al_y1, fgcolor_left, ROT90 ^ ORIENTATION_FLIP_X);
@@ -1869,6 +1876,213 @@ void menu_select_launch::exit(running_machine &machine)
 {
 	std::lock_guard<std::mutex> guard(s_cache_guard);
 	s_caches.erase(&machine);
+}
+
+//-------------------------------------------------
+//  draw infos
+//-------------------------------------------------
+
+void menu_select_launch::infos_render(float origx1, float origy1, float origx2, float origy2)
+{
+	float const line_height = ui().get_line_height();
+	float text_size = ui().options().infos_size();
+	std::vector<int> xstart;
+	std::vector<int> xend;
+	const char *first = "";
+	ui_software_info const *software;
+	game_driver const *driver;
+	int total;
+	get_selection(software, driver);
+
+	if (software && ((software->startempty != 1) || !driver))
+	{
+		m_info_driver = nullptr;
+		first = "Usage";
+
+		if (m_info_software != software || m_info_view != ui_globals::cur_sw_dats_view)
+		{
+			m_info_buffer.clear();
+			if (software == m_info_software)
+			{
+				m_info_view = ui_globals::cur_sw_dats_view;
+			}
+			else
+			{
+				m_info_view = 0;
+				m_info_software = software;
+				ui_globals::cur_sw_dats_view = 0;
+				ui_globals::cur_sw_dats_total = 1;
+
+				const char *lua_list = mame_machine_manager::instance()->lua()->call_plugin(std::string(software->shortname).append(1, ',').append(software->listname).c_str(), "data_list");
+				m_items_list.clear();
+				if(lua_list)
+				{
+					std::string list(lua_list);
+					char *token = strtok((char *)list.c_str(), ",");
+					while(token)
+					{
+						ui_globals::cur_sw_dats_total++;
+						m_items_list.emplace_back(token);
+						token = strtok(nullptr, ",");
+					}
+				}
+			}
+
+			if (m_info_view == 0)
+				m_info_buffer = software->usage;
+			else
+				m_info_buffer = mame_machine_manager::instance()->lua()->call_plugin(util::string_format("%d", m_info_view - 1).c_str(), "data");
+		}
+		total = ui_globals::cur_sw_dats_total;
+	}
+	else if (driver)
+	{
+		m_info_software = nullptr;
+		first = "General Info";
+
+		if (driver != m_info_driver || ui_globals::curdats_view != m_info_view)
+		{
+			m_info_buffer.clear();
+			if (driver == m_info_driver)
+			{
+				m_info_view = ui_globals::curdats_view;
+			}
+			else
+			{
+				m_info_driver = driver;
+				m_info_view = 0;
+				ui_globals::curdats_view = 0;
+				ui_globals::curdats_total = 1;
+
+				const char *lua_list = mame_machine_manager::instance()->lua()->call_plugin(driver->name, "data_list");
+				m_items_list.clear();
+				if(lua_list)
+				{
+					std::string list(lua_list);
+					char *token = strtok((char *)list.c_str(), ",");
+					while(token)
+					{
+						ui_globals::curdats_total++;
+						m_items_list.emplace_back(token);
+						token = strtok(nullptr, ",");
+					}
+				}
+			}
+
+			if (m_info_view == 0)
+				general_info(driver, m_info_buffer);
+			else
+				m_info_buffer = mame_machine_manager::instance()->lua()->call_plugin(util::string_format("%d", m_info_view - 1).c_str(), "data");
+		}
+		total = ui_globals::curdats_total;
+	}
+	else
+		return;
+
+	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
+	float ud_arrow_width = line_height * machine().render().ui_aspect();
+	float oy1 = origy1 + line_height;
+
+	std::string snaptext;
+	if (m_info_view)
+		snaptext = _(m_items_list[m_info_view - 1].c_str());
+	else
+		snaptext = _(first);
+
+	// apply title to right panel
+	float title_size = 0.0f;
+	float txt_length = 0.0f;
+
+	for (int x = 0; x < ui_globals::curdats_total; ++x)
+	{
+		const char *name;
+		if(!x)
+			name = first;
+		else
+			name = m_items_list[x - 1].c_str();
+		ui().draw_text_full(container(), _(name), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
+				ui::text_layout::NEVER, mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
+		txt_length += 0.01f;
+		title_size = (std::max)(txt_length, title_size);
+	}
+
+	rgb_t fgcolor = UI_TEXT_COLOR;
+	rgb_t bgcolor = UI_TEXT_BG_COLOR;
+	if (get_focus() == focused_menu::rightbottom)
+	{
+		fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+		bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+	}
+
+	float middle = origx2 - origx1;
+
+	// check size
+	float sc = title_size + 2.0f * gutter_width;
+	float tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
+	title_size *= tmp_size;
+
+	if (bgcolor != UI_TEXT_BG_COLOR)
+	{
+		ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+	}
+
+	ui().draw_text_full(container(), snaptext.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
+			ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
+
+	char justify = 'l'; // left justify
+	if ((m_info_buffer.length() >= 3) && (m_info_buffer[0] == '#'))
+	{
+		if (m_info_buffer[1] == 'j')
+			justify = m_info_buffer[2];
+	}
+
+	draw_common_arrow(origx1, origy1, origx2, origy2, m_info_view, 0, total - 1, title_size);
+	if (justify == 'f')
+		m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * gutter_width), xstart, xend, text_size);
+	else
+		m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
+
+	int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
+	if (m_total_lines < r_visible_lines)
+		r_visible_lines = m_total_lines;
+	if (m_topline_datsview < 0)
+		m_topline_datsview = 0;
+	if (m_topline_datsview + r_visible_lines >= m_total_lines)
+		m_topline_datsview = m_total_lines - r_visible_lines;
+
+	sc = origx2 - origx1 - (2.0f * UI_BOX_LR_BORDER);
+	for (int r = 0; r < r_visible_lines; ++r)
+	{
+		int itemline = r + m_topline_datsview;
+		std::string tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
+		if (tempbuf[0] == '#')
+			continue;
+
+		// up arrow
+		if (r == 0 && m_topline_datsview != 0)
+			draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
+		// bottom arrow
+		else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
+			draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
+		else if (justify == 'f' || justify == 'p') // full or partial justify
+		{
+			// check size
+			float textlen = ui().get_string_width(tempbuf.c_str(), text_size);
+			float tmp_size3 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
+			ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
+					ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
+		}
+		else
+		{
+			ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
+					ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
+		}
+
+		oy1 += (line_height * text_size);
+	}
+	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
 }
 
 } // namespace ui

@@ -343,7 +343,7 @@ tilemap_t::tilemap_t()
 //  init - initialize the tilemap
 //-------------------------------------------------
 
-tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows)
+tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, UINT16 tilewidth, UINT16 tileheight, UINT32 cols, UINT32 rows)
 {
 	// populate managers and devices
 	m_manager = &manager;
@@ -533,14 +533,12 @@ void tilemap_t::set_transmask(int group, UINT32 fgmask, UINT32 bgmask)
 //  matches the given transcolor are transparent
 //-------------------------------------------------
 
-void tilemap_t::configure_groups(gfx_element &gfx, int transcolor)
+void tilemap_t::configure_groups(gfx_element &gfx, indirect_pen_t transcolor)
 {
-	int color;
-
 	assert(gfx.colors() <= TILEMAP_NUM_GROUPS);
 
 	// iterate over all colors in the tilemap
-	for (color = 0; color < gfx.colors(); color++)
+	for (UINT32 color = 0; color < gfx.colors(); color++)
 		set_transmask(color, m_palette->transpen_mask(gfx, color, transcolor), 0);
 }
 
@@ -632,7 +630,7 @@ void tilemap_t::postload()
 void tilemap_t::mappings_create()
 {
 	// compute the maximum logical index
-	int max_logical_index = m_rows * m_cols;
+	const logical_index max_logical_index = m_rows * m_cols;
 
 	// compute the maximum memory index
 	tilemap_memory_index max_memory_index = 0;
@@ -726,8 +724,8 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 	// iterate over rows and columns
 	logical_index logindex = 0;
-	for (int row = 0; row < m_rows; row++)
-		for (int col = 0; col < m_cols; col++, logindex++)
+	for (UINT32 row = 0; row < m_rows; row++)
+		for (UINT32 col = 0; col < m_cols; col++, logindex++)
 			if (m_tileflags[logindex] == TILE_FLAG_DIRTY)
 				tile_update(logindex, col, row);
 
@@ -805,7 +803,7 @@ UINT8 tilemap_t::tile_draw(const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 pa
 	// iterate over rows
 	const UINT8 *penmap = m_pen_to_flags + group * MAX_PEN_TO_FLAGS;
 	UINT8 andmask = ~0, ormask = 0;
-	for (int ty = 0; ty < m_tileheight; ty++)
+	for (UINT16 ty = 0; ty < m_tileheight; ty++)
 	{
 		UINT16 *pixptr = &m_pixmap.pix16(y0, x0);
 		UINT8 *flagsptr = &m_flagsmap.pix8(y0, x0);
@@ -814,7 +812,8 @@ UINT8 tilemap_t::tile_draw(const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 pa
 		y0 += dy0;
 
 		// 8bpp data
-		for (int tx = 0, xoffs = 0; tx < m_tilewidth; tx++, xoffs += dx0)
+		int xoffs = 0;
+		for (UINT16 tx = 0; tx < m_tilewidth; tx++)
 		{
 			UINT8 pen = (*pendata++) & pen_mask;
 			UINT8 map = penmap[pen];
@@ -822,6 +821,7 @@ UINT8 tilemap_t::tile_draw(const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 pa
 			flagsptr[xoffs] = map | category;
 			andmask &= map;
 			ormask |= map;
+			xoffs += dx0;
 		}
 	}
 	return andmask ^ ormask;
@@ -855,14 +855,15 @@ UINT8 tilemap_t::tile_apply_bitmask(const UINT8 *maskdata, UINT32 x0, UINT32 y0,
 	// iterate over rows
 	UINT8 andmask = ~0, ormask = 0;
 	int bitoffs = 0;
-	for (int ty = 0; ty < m_tileheight; ty++)
+	for (UINT16 ty = 0; ty < m_tileheight; ty++)
 	{
 		// pre-advance to the next row
 		UINT8 *flagsptr = &m_flagsmap.pix8(y0, x0);
 		y0 += dy0;
 
 		// anywhere the bitmask is 0 should be transparent
-		for (int tx = 0, xoffs = 0; tx < m_tilewidth; tx++, xoffs += dx0)
+		int xoffs = 0;
+		for (UINT16 tx = 0; tx < m_tilewidth; tx++)
 		{
 			UINT8 map = flagsptr[xoffs];
 
@@ -871,6 +872,7 @@ UINT8 tilemap_t::tile_apply_bitmask(const UINT8 *maskdata, UINT32 x0, UINT32 y0,
 			andmask &= map;
 			ormask |= map;
 			bitoffs++;
+			xoffs += dx0;
 		}
 	}
 	return andmask ^ ormask;
@@ -1475,6 +1477,27 @@ void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, UINT32 scr
 }
 
 
+//-------------------------------------------------
+//  get_info_debug - extract info for one tile
+//-------------------------------------------------
+
+void tilemap_t::get_info_debug(UINT32 col, UINT32 row, UINT8 &gfxnum, UINT32 &code, UINT32 &color)
+{
+	// first map to the memory index
+	tilemap_memory_index memindex = memory_index(col, row);
+
+	// next invoke the get info callback
+	m_tile_get_info(*this, m_tileinfo, memindex);
+
+	// get the GFX number and code
+	gfxnum = m_tileinfo.gfxnum;
+	code = m_tileinfo.code;
+
+	// work back from the palette base to get the color
+	const gfx_element &gfx = *m_tileinfo.decoder->gfx(gfxnum);
+	color = (m_tileinfo.palette_base - gfx.colorbase()) / gfx.granularity();
+}
+
 
 //**************************************************************************
 //  TILEMAP MANAGER
@@ -1519,14 +1542,14 @@ tilemap_manager::~tilemap_manager()
 //  tilemaps
 //-------------------------------------------------
 
-tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
+tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, UINT16 tilewidth, UINT16 tileheight, UINT32 cols, UINT32 rows, tilemap_t *allocated)
 {
 	if (allocated == nullptr)
 		allocated = global_alloc(tilemap_t);
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 
-tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
+tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, UINT16 tilewidth, UINT16 tileheight, UINT32 cols, UINT32 rows, tilemap_t *allocated)
 {
 	if (allocated == nullptr)
 		allocated = global_alloc(tilemap_t);
@@ -1635,7 +1658,7 @@ void tilemap_device::static_set_info_callback(device_t &device, tilemap_get_info
 //  layout
 //-------------------------------------------------
 
-void tilemap_device::static_set_layout(device_t &device, tilemap_standard_mapper mapper, int columns, int rows)
+void tilemap_device::static_set_layout(device_t &device, tilemap_standard_mapper mapper, UINT32 columns, UINT32 rows)
 {
 	tilemap_device &target = downcast<tilemap_device &>(device);
 	target.m_standard_mapper = mapper;
@@ -1643,7 +1666,7 @@ void tilemap_device::static_set_layout(device_t &device, tilemap_standard_mapper
 	target.m_num_rows = rows;
 }
 
-void tilemap_device::static_set_layout(device_t &device, tilemap_mapper_delegate mapper, int columns, int rows)
+void tilemap_device::static_set_layout(device_t &device, tilemap_mapper_delegate mapper, UINT32 columns, UINT32 rows)
 {
 	tilemap_device &target = downcast<tilemap_device &>(device);
 	target.m_standard_mapper = TILEMAP_STANDARD_COUNT;
@@ -1657,7 +1680,7 @@ void tilemap_device::static_set_layout(device_t &device, tilemap_mapper_delegate
 //  static_set_tile_size: Set the tile size
 //-------------------------------------------------
 
-void tilemap_device::static_set_tile_size(device_t &device, int width, int height)
+void tilemap_device::static_set_tile_size(device_t &device, UINT16 width, UINT16 height)
 {
 	tilemap_device &target = downcast<tilemap_device &>(device);
 	target.m_tile_width = width;

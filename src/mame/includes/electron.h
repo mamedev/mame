@@ -13,6 +13,7 @@
 #ifndef ELECTRON_H_
 #define ELECTRON_H_
 
+#include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 
@@ -76,7 +77,8 @@ public:
 		m_beeper(*this, "beeper"),
 		m_cart(*this, "cartslot"),
 		m_keybd(*this, "LINE.%u", 0),
-		m_exp(*this, "exp")
+		m_exp(*this, "exp"),
+		m_ram(*this, RAM_TAG)
 	{ }
 
 	ULA m_ula;
@@ -85,12 +87,15 @@ public:
 	int m_map16[256];
 	emu_timer *m_scanline_timer;
 	DECLARE_READ8_MEMBER(electron_read_keyboard);
+	DECLARE_READ8_MEMBER(electron_mem_r);
+	DECLARE_WRITE8_MEMBER(electron_mem_w);
 	DECLARE_READ8_MEMBER(electron_fred_r);
 	DECLARE_WRITE8_MEMBER(electron_fred_w);
 	DECLARE_READ8_MEMBER(electron_jim_r);
 	DECLARE_WRITE8_MEMBER(electron_jim_w);
 	DECLARE_READ8_MEMBER(electron_sheila_r);
 	DECLARE_WRITE8_MEMBER(electron_sheila_w);
+	void waitforramsync();
 	void electron_tape_start();
 	void electron_tape_stop();
 	virtual void machine_start() override;
@@ -107,6 +112,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<14> m_keybd;
 	required_device<electron_expansion_slot_device> m_exp;
+	required_device<ram_device> m_ram;
 	inline UINT8 read_vram( UINT16 addr );
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void electron_interrupt_handler(int mode, int interrupt);

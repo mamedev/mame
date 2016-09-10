@@ -6,13 +6,19 @@ Common Issues and Questions (FAQ)
 **Disclaimer: The following information is not legal advice and was not written by a lawyer.**
 
 
-
-New for 0.174: Why does my game show an error screen if I insert coins rapidly?
--------------------------------------------------------------------------------
+Why does my game show an error screen if I insert coins rapidly?
+----------------------------------------------------------------
 
 This is not a bug in MAME. On original arcade hardware, you simply could not insert coins as fast as you can mashing the button. The only ways you could get credit feeding at that kind of pace was if the coin mech hardware was defective or if you were physically trying to cheat the coin mech.
 
 In either case, the game would display an error for the operator to look into the situation to prevent cheating them out of their hard-earned cash. Keep a slow, coin-insert-ish pace and you'll not trigger this. 
+
+Why is my non-official MAME package (e.g. EmuCR build) broken?
+--------------------------------------------------------------
+
+In many cases, updates to various subsystems such as HLSL, BGFX, or Lua plugins come as updates to the external shader files as well as to the core MAME code. Unfortunately, builds that come from third parties may come as just a main MAME executable or with outdated external files, which can break the coupling between these external files and MAME core code. Despite repeated attempts at contacting some of these third parties to warn them, they persist in distributing broken MAME updates.
+
+As we have no control over how third parties distribute these, all we really can do is disclaim the use of sites like EmuCR and say that we cannot provide support for packages we didn't build. Compile your own MAME or use one of the official packages provided by us.
 
 Why do my Neo Geo ROMs no longer work? How do I get the Humble Bundle Neo Geo sets working?
 -------------------------------------------------------------------------------------------

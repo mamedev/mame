@@ -236,7 +236,7 @@ void alto2_cpu_device::f1_late_swmode()
 	UINT16 next;
 
 	switch (m_cram_config) {
-	case 1:	// 1K CROM, 1K CRAM
+	case 1: // 1K CROM, 1K CRAM
 		switch (page) {
 		case 0:
 			branch_RAM("ROM0", 0);
@@ -249,7 +249,7 @@ void alto2_cpu_device::f1_late_swmode()
 		}
 		break;
 
-	case 2:	// 2K CROM, 1K CRAM
+	case 2: // 2K CROM, 1K CRAM
 		next = X_RDBITS(m_next2,10,1,1);
 		switch (page) {
 		case 0: /* ROM0 to RAM0 or ROM1 */
@@ -293,7 +293,7 @@ void alto2_cpu_device::f1_late_swmode()
 		}
 		break;
 
-	case 3:	// 1K CROM, 3K CRAM
+	case 3: // 1K CROM, 3K CRAM
 		next = X_RDBITS(m_next2,10,1,2);
 
 		switch (page) {

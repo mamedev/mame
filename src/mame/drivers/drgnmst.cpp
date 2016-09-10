@@ -149,14 +149,14 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 		m_oki0_bank = oki_new_bank;
 		if (m_oki0_bank)
 			oki_new_bank--;
-		m_oki_1->set_bank_base(oki_new_bank * 0x40000);
+		m_oki_1->set_rom_bank(oki_new_bank);
 	}
 
 	oki_new_bank = ((m_pic16c5x_port0 & 0x3) >> 0) | ((m_oki_control & 0x20) >> 3);
 	if (oki_new_bank != m_oki1_bank)
 	{
 		m_oki1_bank = oki_new_bank;
-		m_oki_2->set_bank_base(oki_new_bank * 0x40000);
+		m_oki_2->set_rom_bank(oki_new_bank);
 	}
 
 	switch (m_oki_control & 0x1f)
