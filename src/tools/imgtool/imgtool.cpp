@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    imgtool.c
+    imgtool.cpp
 
     Core code for Imgtool
 
@@ -66,7 +66,7 @@ struct imgtool_partition
 	imgtoolerr_t    (*suggest_transfer)(imgtool_partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length);
 	imgtoolerr_t    (*get_chain)    (imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size);
 
-	const option_guide *writefile_optguide;
+	const util::option_guide *writefile_optguide;
 	const char *writefile_optspec;
 };
 
@@ -800,7 +800,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	p->get_iconinfo                 = (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_iconinfo *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ICON_INFO);
 	p->suggest_transfer             = (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
 	p->get_chain                    = (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
-	p->writefile_optguide           = (const option_guide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
+	p->writefile_optguide           = (const util::option_guide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	p->writefile_optspec            = pool_strdup_allow_null(p->pool, (char*)imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC));
 
 	/* mask out if writing is untested */
@@ -928,10 +928,8 @@ void imgtool_partition_get_attribute_name(imgtool_partition *partition, UINT32 a
 int imgtool_validitychecks(void)
 {
 	int error = 0;
-	int val;
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	const imgtool_module *module = nullptr;
-	const option_guide *guide_entry;
 	imgtool_module_features features;
 	int created_library = FALSE;
 
@@ -1017,44 +1015,12 @@ int imgtool_validitychecks(void)
 
 			if (module->createimage_optguide && module->createimage_optspec)
 			{
-				guide_entry = module->createimage_optguide;
-				while (guide_entry->option_type != OPTIONTYPE_END)
-				{
-					if (util::option_resolution::contains(module->createimage_optspec, guide_entry->parameter))
-					{
-						switch (guide_entry->option_type)
-						{
-							case OPTIONTYPE_INT:
-							case OPTIONTYPE_ENUM_BEGIN:
-								err = (imgtoolerr_t)util::option_resolution::get_default(module->createimage_optspec,
-									guide_entry->parameter, &val);
-								if (err)
-									goto done;
-								break;
-
-							default:
-								break;
-						}
-						if (!guide_entry->identifier)
-						{
-							printf("imgtool module %s creation option %d has null identifier\n",
-								module->name, (int) (guide_entry - module->createimage_optguide));
-							error = 1;
-						}
-						if (!guide_entry->display_name)
-						{
-							printf("imgtool module %s creation option %d has null display_name\n",
-								module->name, (int) (guide_entry - module->createimage_optguide));
-							error = 1;
-						}
-					}
-					guide_entry++;
-				}
+				auto resolution = std::make_unique<util::option_resolution>(*module->createimage_optguide);
+				resolution->set_specification(module->createimage_optspec);
 			}
 		}
 	}
 
-done:
 	if (created_library)
 		imgtool_exit();
 	if (err)
@@ -1218,12 +1184,14 @@ imgtoolerr_t imgtool_image_create(const imgtool_module *module, const char *fnam
 	/* allocate dummy options if necessary */
 	if (!opts && module->createimage_optguide)
 	{
-		try { alloc_resolution.reset(new util::option_resolution(module->createimage_optguide, module->createimage_optspec)); }
+		try { alloc_resolution.reset(new util::option_resolution(*module->createimage_optguide)); }
 		catch (...) { return (imgtoolerr_t)IMGTOOLERR_OUTOFMEMORY; }
+
+		if (module->createimage_optspec)
+			alloc_resolution->set_specification(module->createimage_optspec);
+
 		opts = alloc_resolution.get();
 	}
-	if (opts)
-		opts->finish();
 
 	return internal_open(module, fname, OSD_FOPEN_RW_CREATE, opts, image);
 }
@@ -2000,16 +1968,16 @@ imgtoolerr_t imgtool_partition_write_file(imgtool_partition *partition, const ch
 		/* allocate dummy options if necessary */
 		if (!opts && partition->writefile_optguide)
 		{
-			try { alloc_resolution.reset(new util::option_resolution(partition->writefile_optguide, partition->writefile_optspec)); }
+			try { alloc_resolution.reset(new util::option_resolution(*partition->writefile_optguide)); }
 			catch (...)
 			{
 				err = IMGTOOLERR_OUTOFMEMORY;
 				goto done;
 			}
+			if (partition->writefile_optspec)
+				alloc_resolution->set_specification(partition->writefile_optspec);
 			opts = alloc_resolution.get();
 		}
-		if (opts)
-			opts->finish();
 
 		/* if free_space is implemented; do a quick check to see if space is available */
 		if (partition->free_space)

@@ -1065,7 +1065,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 	}
 
 	/* comment */
-	char const *const comment = opts->lookup_string('C');
+	char const *const comment = opts->lookup_string('C').c_str();
 	if (comment && *comment)
 		strncpy(d.comment, comment, 8);
 
@@ -1132,7 +1132,7 @@ static imgtoolerr_t thom_create(imgtool_image* img,
 	/* get parameters */
 	f->heads = opts->lookup_int('H');
 	f->tracks = opts->lookup_int('T');
-	name = opts->lookup_string('N');
+	name = opts->lookup_string('N').c_str();
 	switch ( opts->lookup_int('D') ) {
 	case 0: f->sector_size = 128; f->sectuse_size = 128; break;
 	case 1: f->sector_size = 256; f->sectuse_size = 255; break;
@@ -1519,7 +1519,7 @@ FILTER( thombas128,
 
 /************************* driver ***************************/
 
-static OPTION_GUIDE_START( thom_createimage_optguide )
+OPTION_GUIDE_START( thom_createimage_optguide )
 	OPTION_INT( 'H', "heads", "Heads" )
 	OPTION_INT( 'T', "tracks", "Tracks" )
 	OPTION_ENUM_START( 'D', "density", "Density" )
@@ -1529,7 +1529,7 @@ static OPTION_GUIDE_START( thom_createimage_optguide )
 	OPTION_STRING( 'N', "name", "Floppy name" )
 OPTION_GUIDE_END
 
-static OPTION_GUIDE_START( thom_writefile_optguide )
+OPTION_GUIDE_START( thom_writefile_optguide )
 	OPTION_ENUM_START( 'T', "ftype", "File type" )
 	OPTION_ENUM( 0, "auto", "Automatic (by extension)" )
 	OPTION_ENUM( 1, "B", "Program" )
@@ -1571,7 +1571,7 @@ static void thom_basic_get_info(const imgtool_class *clas,
 	case IMGTOOLINFO_PTR_CREATE:
 	info->create = thom_create; break;
 	case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:
-	info->createimage_optguide = thom_createimage_optguide; break;
+	info->createimage_optguide = &thom_createimage_optguide; break;
 	case IMGTOOLINFO_PTR_BEGIN_ENUM:
 	info->begin_enum = thom_begin_enum; break;
 	case IMGTOOLINFO_PTR_NEXT_ENUM:
@@ -1581,7 +1581,7 @@ static void thom_basic_get_info(const imgtool_class *clas,
 	case IMGTOOLINFO_PTR_WRITE_FILE:
 	info->write_file = thom_write_file; break;
 	case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:
-	info->writefile_optguide = thom_writefile_optguide; break;
+	info->writefile_optguide = &thom_writefile_optguide; break;
 	case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:
 	strcpy( info->s = imgtool_temp_str(), "T[0]-4;F[0]-2;C" ); break;
 	case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:

@@ -2193,7 +2193,7 @@ static imgtoolerr_t amiga_image_writefile(imgtool_partition *partition, const ch
 static imgtoolerr_t amiga_image_create(imgtool_image *img, imgtool_stream *stream, util::option_resolution *opts)
 {
 	amiga_floppy *f = (amiga_floppy *) imgtool_image_extra_bytes(img);
-	const char *dskname = opts->lookup_string('N');
+	const std::string &dskname = opts->lookup_string('N');
 	imgtoolerr_t ret;
 	UINT8 buffer[BSIZE];
 	root_block root;
@@ -2252,10 +2252,10 @@ static imgtoolerr_t amiga_image_create(imgtool_image *img, imgtool_stream *strea
 	amiga_setup_time(now, &root.c);
 
 	/* volume name */
-	if (dskname)
+	if (!dskname.empty())
 	{
-		root.name_len = strlen(dskname);
-		memcpy(&root.diskname, dskname, root.name_len);
+		root.name_len = dskname.length();
+		memcpy(&root.diskname, dskname.c_str(), root.name_len);
 	}
 	else
 	{
@@ -2342,7 +2342,7 @@ static imgtoolerr_t amiga_image_suggesttransfer(imgtool_partition *partition, co
 *****************************************************************************/
 
 
-static OPTION_GUIDE_START(amiga_createimage_optionguide)
+OPTION_GUIDE_START(amiga_createimage_optionguide)
 	OPTION_STRING( 'N', "name", "Volume name" )
 	OPTION_ENUM_START( 'S', "density", "Density" )
 		OPTION_ENUM( 0, "dd", "Double Density" )
@@ -2406,6 +2406,6 @@ void amiga_floppy_get_info(const imgtool_class *imgclass, UINT32 state, union im
 		case IMGTOOLINFO_PTR_SET_ATTRS:                  info->set_attrs = amiga_image_setattrs; break;
 		case IMGTOOLINFO_PTR_GET_ICON_INFO:              info->get_iconinfo = amiga_image_geticoninfo; break;
 		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:           info->suggest_transfer = amiga_image_suggesttransfer; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:       info->createimage_optguide = amiga_createimage_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:       info->createimage_optguide = &amiga_createimage_optionguide; break;
 	}
 }

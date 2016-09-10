@@ -161,11 +161,11 @@ public:
 	virtual bool support_command_line_image_creation() const;
 	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual const util::option_guide &create_option_guide() const;
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
 	const image_device_format *device_get_named_creatable_format(const std::string &format_name);
-	const option_guide *device_get_creation_option_guide() const { return create_option_guide(); }
+	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
 
 	const char *error();
 	void seterror(image_error_t err, const char *message);

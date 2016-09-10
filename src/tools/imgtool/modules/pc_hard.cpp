@@ -55,7 +55,7 @@
 
 #define FAT_SECLEN  512
 
-static OPTION_GUIDE_START( pc_chd_create_optionguide )
+OPTION_GUIDE_START( pc_chd_create_optionguide )
 	OPTION_INT('T', "cylinders",    "Cylinders" )
 	OPTION_INT('H', "heads",        "Heads" )
 	OPTION_INT('S', "sectors",      "Sectors" )
@@ -463,7 +463,7 @@ void pc_chd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtooli
 		case IMGTOOLINFO_PTR_READ_BLOCK:                    info->read_block = pc_chd_image_readblock; break;
 		case IMGTOOLINFO_PTR_WRITE_BLOCK:                   info->write_block = pc_chd_image_writeblock; break;
 		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:               info->get_sector_size = pc_chd_image_getsectorsize; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = pc_chd_create_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = &pc_chd_create_optionguide; break;
 		case IMGTOOLINFO_PTR_GET_GEOMETRY:                  info->get_geometry = pc_chd_image_get_geometry; break;
 		case IMGTOOLINFO_PTR_LIST_PARTITIONS:               info->list_partitions = pc_chd_list_partitions; break;
 	}

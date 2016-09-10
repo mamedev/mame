@@ -626,7 +626,7 @@ static imgtoolerr_t datapack_delete_file( imgtool_partition *partition, const ch
 		return IMGTOOLERR_FILENOTFOUND;
 }
 
-static OPTION_GUIDE_START( psion_create_optguide )
+OPTION_GUIDE_START( psion_create_optguide )
 	OPTION_ENUM_START( 'S', "size", "datapack size" )
 		OPTION_ENUM( 1, "8k", "8 kbyte" )
 		OPTION_ENUM( 2, "16k", "16 kbyts" )
@@ -641,7 +641,7 @@ static OPTION_GUIDE_START( psion_create_optguide )
 	OPTION_INT('C', "copy", "copyable datapack" )
 OPTION_GUIDE_END
 
-static OPTION_GUIDE_START( psion_write_optguide )
+OPTION_GUIDE_START( psion_write_optguide )
 	OPTION_ENUM_START( 'T', "type", "file type" )
 		OPTION_ENUM( 1, "OB3", "OB3 files" )
 		OPTION_ENUM( 2, "OPL", "OPL files" )
@@ -669,8 +669,8 @@ void psion_get_info( const imgtool_class *imgclass, UINT32 state, union imgtooli
 		case IMGTOOLINFO_PTR_READ_FILE   : info->read_file   = datapack_read_file; break;
 		case IMGTOOLINFO_PTR_WRITE_FILE  : info->write_file  = datapack_write_file; break;
 		case IMGTOOLINFO_PTR_DELETE_FILE : info->delete_file = datapack_delete_file; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE : info->createimage_optguide = psion_create_optguide; break;
-		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE : info->createimage_optguide = psion_write_optguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE : info->createimage_optguide = &psion_create_optguide; break;
+		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE : info->createimage_optguide = &psion_write_optguide; break;
 
 		// --- the following bits of info are returned as NULL-terminated strings ---
 		case IMGTOOLINFO_STR_NAME            : strcpy( info->s = imgtool_temp_str(), "psionpack"); break;

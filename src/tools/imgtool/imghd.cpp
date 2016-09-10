@@ -226,7 +226,7 @@ enum
 	mess_hd_createopts_seclen    = 'F'
 };
 
-static OPTION_GUIDE_START( mess_hd_create_optionguide )
+OPTION_GUIDE_START( mess_hd_create_optionguide )
 	OPTION_INT(mess_hd_createopts_blocksize, "blocksize", "Sectors Per Block" )
 	OPTION_INT(mess_hd_createopts_cylinders, "cylinders", "Cylinders" )
 	OPTION_INT(mess_hd_createopts_heads, "heads",   "Heads" )
@@ -247,7 +247,7 @@ void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo 
 
 		case IMGTOOLINFO_PTR_CREATE:                        info->create = mess_hd_image_create; break;
 
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = mess_hd_create_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = &mess_hd_create_optionguide; break;
 		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:           strcpy(info->s = imgtool_temp_str(), mess_hd_create_optionspecs); break;
 	}
 }

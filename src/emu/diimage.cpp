@@ -1264,6 +1264,18 @@ void device_image_interface::unload()
 
 
 //-------------------------------------------------
+//  create_option_guide
+//-------------------------------------------------
+
+OPTION_GUIDE_START(null_option_guide)
+OPTION_GUIDE_END
+
+const util::option_guide &device_image_interface::create_option_guide() const
+{
+	return null_option_guide;
+}
+
+//-------------------------------------------------
 //  update_names - update brief and instance names
 //-------------------------------------------------
 
