@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( witch, witch_state )
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
-	// Code writes to two PPIs, even though only one is visible on PCB picture
+	// 82C255 (actual chip on PCB) is equivalent to two 8255s
 	MCFG_DEVICE_ADD("ppi1", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(witch_state, read_a000))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("UNK"))
