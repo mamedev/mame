@@ -2937,8 +2937,14 @@
 
 <!-- Utilities -->
 
+<!-- CBS Colecovision Monitor Test (1982)(CBS).bin 
+		This image may not have been on a real cartridge so until proof of this being something that was actually on a physical chip
+		or any dump history can be discovered (research has produced nothing) it will remain commented.  The "cbsmon.2" image is a 100%
+		dupe of the normal Colecovision BIOS image.  The program itself doesn't have the telltale AA55/55AA header which is present on
+		ALL Colecovision cartridges. -->
+
+<!--
 	<software name="cbsmon">
-		<!-- CBS Colecovision Monitor Test (1982)(CBS).bin -->
 		<description>CBS Colecovision Monitor Test</description>
 		<year>1982</year>
 		<publisher>CBS</publisher>
@@ -2949,6 +2955,7 @@
 			</dataarea>
 		</part>
 	</software>
+-->
 
 	<software name="finaltst">
 		<!-- Final Test Cartridge (1982)(Coleco).bin -->
