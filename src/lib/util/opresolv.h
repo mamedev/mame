@@ -142,7 +142,7 @@ public:
 	template<typename... T>
 	option_guide_impl(T &&... elems)
 		: std::array<option_guide::entry, Count>({ std::forward<T>(elems)... })
-		, option_guide(&(*this)[0], &(*this)[0] + Count)
+		, option_guide(Count > 0 ? &(*this)[0] : nullptr, Count > 0 ? &(*this)[0] + Count : nullptr)
 	{
 	}
 };
