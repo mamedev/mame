@@ -5,7 +5,7 @@
 Witch / Pinball Champ '95
 
 
-            Witch: press F1 to initialize NVRAM
+            Witch: press F1 (Memory Reset) to initialize NVRAM
 
 Pinball Champ '95: Seems to be a simple mod with the following differences:
                    -The title screen is changed
@@ -151,7 +151,7 @@ Memory
             -CPU2's SP is set to 0xf080 on reset
         we may suppose that this memory range (0xf000-0xf0ff) is shared too.
 
-        Moreover, range 0xf100-0xf17f is checked after reset without prior initialization and
+        Moreover, range 0xf100-0xf1ff is checked after reset without prior initialization and
         is being reset ONLY by changing a particular port bit whose modification ends up with
         a soft reboot. This looks like a good candidate for an NVRAM segment.
         Whether CPU2 can access the NVRAM or not is still a mystery considering that it never
@@ -225,12 +225,15 @@ TODO :
 #define YM2203_CLOCK      MAIN_CLOCK / 4
 #define ES8712_CLOCK      8000              // 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
 
+#define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/es8712.h"
 #include "sound/2203intf.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 
 
 class witch_state : public driver_device
@@ -246,7 +249,10 @@ public:
 		m_gfx1_vram(*this, "gfx1_vram"),
 		m_gfx1_cram(*this, "gfx1_cram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper")
+	{
+	}
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
@@ -263,6 +269,8 @@ public:
 	required_shared_ptr<UINT8> m_sprite_ram;
 	required_device<palette_device> m_palette;
 
+	required_device<ticket_dispenser_device> m_hopper;
+
 	int m_scrollx;
 	int m_scrolly;
 	UINT8 m_reg_a002;
@@ -272,8 +280,10 @@ public:
 	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
 	DECLARE_READ8_MEMBER(gfx1_vram_r);
 	DECLARE_READ8_MEMBER(gfx1_cram_r);
-	DECLARE_READ8_MEMBER(read_a00x);
-	DECLARE_WRITE8_MEMBER(write_a00x);
+	DECLARE_READ8_MEMBER(read_a000);
+	DECLARE_WRITE8_MEMBER(write_a002);
+	DECLARE_WRITE8_MEMBER(write_a006);
+	DECLARE_WRITE8_MEMBER(write_a008);
 	DECLARE_READ8_MEMBER(prot_read_700x);
 	DECLARE_READ8_MEMBER(read_8010);
 	DECLARE_WRITE8_MEMBER(xscroll_w);
@@ -380,21 +390,10 @@ READ8_MEMBER(witch_state::gfx1_cram_r)
 	return m_gfx1_cram[offset];
 }
 
-READ8_MEMBER(witch_state::read_a00x)
+READ8_MEMBER(witch_state::read_a000)
 {
-	switch(offset)
+	switch (m_reg_a002 & 0x3f)
 	{
-		case 0x02: return m_reg_a002;
-		case 0x04: return ioport("A004")->read();
-		case 0x05: return ioport("A005")->read();
-		case 0x0c: return ioport("SERVICE")->read();    // stats / reset
-		case 0x0e: return ioport("A00E")->read();       // coin/reset
-	}
-
-	if(offset == 0x00) //muxed with A002?
-	{
-		switch(m_reg_a002 & 0x3f)
-		{
 		case 0x3b:
 			return ioport("UNK")->read();   //bet10 / pay out
 		case 0x3e:
@@ -403,30 +402,36 @@ READ8_MEMBER(witch_state::read_a00x)
 			return ioport("A005")->read();
 		default:
 			logerror("A000 read with mux=0x%02x\n", m_reg_a002 & 0x3f);
-		}
+			return 0xff;
 	}
-	return 0xff;
 }
 
-WRITE8_MEMBER(witch_state::write_a00x)
+WRITE8_MEMBER(witch_state::write_a002)
 {
-	switch(offset)
-	{
-		case 0x02: //A002 bit 7&6 = m_bank ????
-		{
-			m_reg_a002 = data;
+	//A002 bit 7&6 = m_bank ????
+	m_reg_a002 = data;
 
-			membank("bank1")->set_entry((data>>6)&3);
-		}
-		break;
+	membank("bank1")->set_entry((data >> 6) & 3);
+}
 
-		case 0x06: // bit 1 = coin lockout/counter ?
-		break;
+WRITE8_MEMBER(witch_state::write_a006)
+{
+	// don't write when zeroed on reset
+	if (data == 0)
+		return;
 
-		case 0x08: //A008
-			space.device().execute().set_input_line(0,CLEAR_LINE);
-		break;
-	}
+	// TODO: this assumes the "Hopper Active" DSW is "Low"
+	m_hopper->write(space, 0, !BIT(data, 1) ? 0x80 : 0);
+
+	// TODO: Bit 3 = Attendant Pay
+
+	machine().bookkeeping().coin_counter_w(2, !BIT(data, 5)); // key in counter
+	machine().bookkeeping().coin_counter_w(0, !BIT(data, 6)); // coin in counter
+}
+
+WRITE8_MEMBER(witch_state::write_a008)
+{
+	space.device().execute().set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER(witch_state::prot_read_700x)
@@ -474,7 +479,11 @@ static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
+	AM_RANGE(0xa008, 0xa008) AM_WRITE(write_a008)
+	AM_RANGE(0xa00c, 0xa00c) AM_READ_PORT("SERVICE")    // stats / reset
+	AM_RANGE(0xa00e, 0xa00e) AM_READ_PORT("COINS")      // coins/attendant keys
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_WRITE(gfx0_vram_w) AM_SHARE("gfx0_vram")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_WRITE(gfx0_cram_w) AM_SHARE("gfx0_cram")
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_SHARE("gfx1_vram")
@@ -483,8 +492,8 @@ static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xf100, 0xf1ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xf200, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 
@@ -493,85 +502,43 @@ static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0x8010, 0x8016) AM_READ(read_8010) AM_DEVWRITE("essnd", es8712_device, es8712_w)
-	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
+	AM_RANGE(0xa008, 0xa008) AM_WRITE(write_a008)
+	AM_RANGE(0xa00c, 0xa00c) AM_READ_PORT("SERVICE")    // stats / reset
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xf200, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( witch )
-	PORT_START("SERVICE")   /* DSW */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("NVRAM Init") PORT_CODE(KEYCODE_F1)
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Stats")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("A00E")  /* DSW */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Key In")
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset ?")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Attendant Pay")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("UNK")   /* Not a DSW */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS")    /* Inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Big")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Take")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Double Up")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
 
 /*
@@ -581,7 +548,7 @@ F180 kkkbbppp ; Read onPORT 0xA005
  kkk  = KEY IN  | 1-10 ; 1-20 ; 1-40 ; 1-50 ; 1-100 ; 1-200 ; 1-250 ; 1-500
 */
 	PORT_START("A005")  /* DSW "SW2" */
-	PORT_DIPNAME( 0x07, 0x07, "PAY OUT" )   PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Pay Out" )   PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, "60" )
 	PORT_DIPSETTING(    0x06, "65" )
 	PORT_DIPSETTING(    0x05, "70" )
@@ -590,12 +557,12 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x02, "85" )
 	PORT_DIPSETTING(    0x01, "90" )
 	PORT_DIPSETTING(    0x00, "95" )
-	PORT_DIPNAME( 0x18, 0x00, "MAX BET" )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x00, "Max Bet" )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20" )
 	PORT_DIPSETTING(    0x10, "30" )
 	PORT_DIPSETTING(    0x08, "40" )
 	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPNAME( 0xe0, 0xe0, "KEY IN" )    PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPNAME( 0xe0, 0xe0, "Key In" )    PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0xE0, "1-10"  )
 	PORT_DIPSETTING(    0xC0, "1-20"  )
 	PORT_DIPSETTING(    0xA0, "1-40"  )
@@ -610,13 +577,13 @@ F180 kkkbbppp ; Read onPORT 0xA005
  cccc = COIN IN1 | 1-1 ; 1-2 ; 1-3 ; 1-4 ; 1-5 ; 1-6 ; 1-7 ; 1-8 ; 1-9 ; 1-10 ; 1-15 ; 1-20 ; 1-25 ; 1-30 ; 1-40 ; 1-50
 */
 	PORT_START("A004")  /* DSW "SW3" Switches 2-4 not defined in manual */
-	PORT_DIPNAME( 0x01, 0x00, "DOUBLE UP" )     PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x00, "Double Up" )     PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPNAME( 0xf0, 0xf0, "COIN IN1" )      PORT_DIPLOCATION("SW3:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, "Coin In 1" )     PORT_DIPLOCATION("SW3:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, "1-1" )
 	PORT_DIPSETTING(    0xe0, "1-2" )
 	PORT_DIPSETTING(    0xd0, "1-3" )
@@ -642,7 +609,7 @@ F180 kkkbbppp ; Read onPORT 0xA005
  s    = DEMO SOUND | ON ; OFF
 */
 	PORT_START("YM_PortA")  /* DSW "SW4" */
-	PORT_DIPNAME( 0x0f, 0x0f, "COIN IN2" )      PORT_DIPLOCATION("SW4:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, "Coin In 2" )     PORT_DIPLOCATION("SW4:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, "1-1" )
 	PORT_DIPSETTING(    0x0e, "1-2" )
 	PORT_DIPSETTING(    0x0d, "1-3" )
@@ -659,15 +626,15 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x02, "5-1" )
 	PORT_DIPSETTING(    0x01, "6-1" )
 	PORT_DIPSETTING(    0x00, "10-1" )
-	PORT_DIPNAME( 0x10, 0x00, "PAYOUT SWITCH" ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPNAME( 0x10, 0x00, "Payout Switch" ) PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x00, "TIME" )      PORT_DIPLOCATION("SW4:6,7")
+	PORT_DIPNAME( 0x60, 0x00, "Time" )      PORT_DIPLOCATION("SW4:6,7")
 	PORT_DIPSETTING(    0x60, "40" )
 	PORT_DIPSETTING(    0x40, "45" )
 	PORT_DIPSETTING(    0x20, "50" )
 	PORT_DIPSETTING(    0x00, "55" )
-	PORT_DIPNAME( 0x80, 0x00, "DEMO SOUND" )    PORT_DIPLOCATION("SW4:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -678,15 +645,15 @@ F180 kkkbbppp ; Read onPORT 0xA005
  h    = HOPPER ACTIVE | LOW ; HIGH
 */
 	PORT_START("YM_PortB")  /* DSW "SW5" Switches 5, 6 & 8 undefined in manual */
-	PORT_DIPNAME( 0x01, 0x01, "AUTO BET" )      PORT_DIPLOCATION("SW5:1")
+	PORT_DIPNAME( 0x01, 0x01, "Auto Bet" )      PORT_DIPLOCATION("SW5:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "GAME LIMIT" )    PORT_DIPLOCATION("SW5:2,3")
+	PORT_DIPNAME( 0x06, 0x06, "Game Limit" )    PORT_DIPLOCATION("SW5:2,3")
 	PORT_DIPSETTING(    0x06, "500" )
 	PORT_DIPSETTING(    0x04, "1000" )
 	PORT_DIPSETTING(    0x02, "5000" )
 	PORT_DIPSETTING(    0x00, "990000" ) /* 10000 as defined in the Excellent System version manual */
-	PORT_DIPNAME( 0x08, 0x08, "HOPPER" )        PORT_DIPLOCATION("SW5:4")
+	PORT_DIPNAME( 0x08, 0x08, "Hopper Active" ) PORT_DIPLOCATION("SW5:4")
 	PORT_DIPSETTING(    0x08, DEF_STR(Low) )
 	PORT_DIPSETTING(    0x00, DEF_STR(High) )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW5:5" )
@@ -803,6 +770,19 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+
+	// 82C255 (actual chip on PCB) is equivalent to two 8255s
+	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(witch_state, read_a000))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("UNK"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(witch_state, write_a002))
+
+	MCFG_DEVICE_ADD("ppi2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("A004"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("A005"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(witch_state, write_a006))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
