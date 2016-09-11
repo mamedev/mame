@@ -4092,6 +4092,32 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="jazz">
+		<description>Jazz Jackrabbit</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="jazz16-1.img" size="1474560" crc="7d5e0539" sha1="c373b19efe307b5c92ccbc004a8b65b94a3cba16" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="jazz16-2.img" size="1474560" crc="9dfa9d71" sha1="0ebe3dfa15f151d0f923334c2a7f44b521edd639" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="jazz16-3.img" size="1474560" crc="b647de5f" sha1="12b97ee5c2eb060cc5c69cf76e63f303f9522d19" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="jazz16-4.img" size="1474560" crc="c0f0bffe" sha1="f4ca79c4ff3ce3a3142e0bd522cb071a4f7f2547" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kilo1">
 		<description>Kiloblaster: Death of a Starship (Shareware, B&amp;N)</description>
 		<year>1994</year>
