@@ -93,6 +93,7 @@ project "utils"
 		MAME_DIR .. "src/lib/util/vbiparse.h",
 		MAME_DIR .. "src/lib/util/vecstream.cpp",
 		MAME_DIR .. "src/lib/util/vecstream.h",
+		MAME_DIR .. "src/lib/util/view.h",
 		MAME_DIR .. "src/lib/util/wavwrite.cpp",
 		MAME_DIR .. "src/lib/util/wavwrite.h",
 		MAME_DIR .. "src/lib/util/xmlfile.cpp",
