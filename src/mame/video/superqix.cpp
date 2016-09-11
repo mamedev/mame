@@ -63,8 +63,6 @@ VIDEO_START_MEMBER(superqix_state,superqix)
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
 
-	save_item(NAME(m_gfxbank));
-	save_item(NAME(m_show_bitmap));
 	save_item(NAME(*m_fg_bitmap[0]));
 	save_item(NAME(*m_fg_bitmap[1]));
 }

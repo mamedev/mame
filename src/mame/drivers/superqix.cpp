@@ -131,8 +131,6 @@ code at z80:0093:
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "includes/superqix.h"
-//#include "machine/watchdog.h" // this doesn't quite work yet...
-
 
 SAMPLES_START_CB_MEMBER(superqix_state::pbillian_sh_start)
 {
@@ -795,8 +793,16 @@ WRITE8_MEMBER(superqix_state::hotsmash_Z80_mcu_w)
 	m_fromZ80 = data;
 	m_MCUHasWritten = 0; // this is cleared here, strangely enough. Doesn't make a lot of sense, but doesn't work otherwise.
 	m_Z80HasWritten = 1; // set the semaphore, and assert interrupt on the mcu
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250)); //boost the interleave temporarily, or the game will crash.
-	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+	if (m_mcu.found()) // hotsmash
+	{
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250)); //boost the interleave temporarily, or the game will crash.
+		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+	}
+	else // prebillian hle
+	{
+		// set a timer here for hle of mcu to processes the command;
+		timer_set(attotime::from_hz(10000), HLE_68705_WRITE); // 10000hz is a guess.
+	}
 }
 
 READ8_MEMBER(superqix_state::hotsmash_Z80_mcu_r)
@@ -820,6 +826,22 @@ CUSTOM_INPUT_MEMBER(superqix_state::superqix_semaphore_input_r)
 	return res;
 }
 
+READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
+{
+	//logerror("%04x: ay_port_a_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_state_interface &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
+	UINT8 temp = ioport("BUTTONS")->read();
+	//logerror("returning %02X\n", temp);
+	return temp;
+}
+
+READ8_MEMBER(superqix_state::pbillian_ay_port_b_r)
+{
+	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
+	UINT8 temp = ioport("SYSTEM")->read();
+	//logerror("returning %02X\n", temp);
+	return temp;
+}
+
 /**************************************************************************
 
  Prebillian MCU HLE simulation
@@ -837,15 +859,6 @@ Seems to act like an older version of hotsmash mcu code
  other - probably Echo (writes whatever the command number was back to the z80 immediately)? (guess)
 
 **************************************************************************/
-
-WRITE8_MEMBER(superqix_state::pbillian_Z80_mcu_w)
-{
-	m_fromZ80 = data;
-	m_MCUHasWritten = 0;
-	m_Z80HasWritten = 1;
-	// set a timer here which unsets m_Z80HasWritten and processes the command;
-	timer_set(attotime::from_hz(10000), HLE_68705_WRITE); // 10000hz is a guess.
-}
 
 TIMER_CALLBACK_MEMBER(superqix_state::hle_68705_w_cb)
 {
@@ -873,22 +886,6 @@ TIMER_CALLBACK_MEMBER(superqix_state::hle_68705_w_cb)
 
 //  logerror("408[%x] r at %x\n",m_fromZ80,space.device().safe_pc());
 	if (m_fromZ80 != 0) m_MCUHasWritten = 1; // set the mcu->z80 semaphore, except for command 0 (mcu reset)
-}
-
-READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
-{
-	//logerror("%04x: ay_port_a_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_state_interface &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
-	UINT8 temp = ioport("BUTTONS")->read();
-	//logerror("returning %02X\n", temp);
-	return temp;
-}
-
-READ8_MEMBER(superqix_state::pbillian_ay_port_b_r)
-{
-	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
-	UINT8 temp = ioport("SYSTEM")->read();
-	//logerror("returning %02X\n", temp);
-	return temp;
 }
 
 void superqix_state::machine_init_common()
@@ -923,9 +920,14 @@ void superqix_state::machine_init_common()
 
 	//general machine stuff
 	save_item(NAME(m_invert_coin_lockout));
+	save_item(NAME(m_nmi_mask));
+
+	// superqix specific stuff
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_show_bitmap));
-	save_item(NAME(m_nmi_mask));
+	// the following are saved in VIDEO_START_MEMBER(superqix_state,superqix):
+	//save_item(NAME(*m_fg_bitmap[0]));
+	//save_item(NAME(*m_fg_bitmap[1]));
 
 	// spinner quadrature stuff
 	save_item(NAME(m_oldpos));
@@ -959,31 +961,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state )
+static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state ) // used by both pbillian and hotsmash
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 6116 sram near the jamma connector, "COLOR RAM" during POST
 	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r) // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x0408, 0x0408) AM_READWRITE(hotsmash_Z80_mcu_r, pbillian_Z80_mcu_w)
-	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w) /* Coin Counters, ROM bank, NMI enable, Flipscreen */
-	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
-	AM_RANGE(0x0419, 0x0419) AM_WRITENOP // ???
-	//AM_RANGE(0x0419, 0x0419) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x041a, 0x041a) AM_WRITE(pbillian_sample_trigger_w)
-	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 6116 sram near the jamma connector, "COLOR RAM" during POST
-	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	//AM_RANGE(0x0408, 0x0408) AM_READWRITE(hotsmash_Z80_mcu_r, pbillian_Z80_mcu_w)
 	AM_RANGE(0x0408, 0x0408) AM_READWRITE(hotsmash_Z80_mcu_r, hotsmash_Z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w) /* Coin Counters, ROM bank, NMI enable, Flipscreen */
 	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
-	//AM_RANGE(0x0419, 0x0419) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0x0419, 0x0419) AM_WRITENOP // ??? is this a watchdog, or something else? manual reset of mcu semaphores? manual nmi TRIGGER? used by prebillian
 	AM_RANGE(0x041a, 0x041a) AM_WRITE(pbillian_sample_trigger_w)
-	//AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used
+	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used, may be 'sample has stopped playing' flag? used by prebillian
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
@@ -1339,8 +1328,6 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_CPU_IO_MAP(pbillian_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", superqix_state,  vblank_irq)
 
-	//MCFG_WATCHDOG_ADD("watchdog")
-
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,pbillian)
 
 	/* video hardware */
@@ -1375,10 +1362,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)      /* 6 MHz, ROHM Z80B? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(hotsmash_port_map)
+	MCFG_CPU_IO_MAP(pbillian_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", superqix_state,  vblank_irq)
-
-	//MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* 3mhz???? */
 	MCFG_CPU_PROGRAM_MAP(m68705_map)
