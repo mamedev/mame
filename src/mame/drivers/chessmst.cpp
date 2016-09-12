@@ -563,12 +563,12 @@ static MACHINE_CONFIG_START( chessmst, chessmst_state )
 	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_update", chessmst_state, led_update, attotime::from_msec(250))
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_9_8304MHz/4)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_9_8304MHz/4) // U880 Z80 clone
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_9_8304MHz/4)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_9_8304MHz/4) // U880 Z80 clone
 	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
 
