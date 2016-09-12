@@ -50,6 +50,14 @@ public:
 	const_iterator end() const { return m_end; }
 	const_iterator cend() const { return m_end; }
 
+	// reverse iteration
+	std::reverse_iterator<iterator> rbegin() { return std::reverse_iterator<iterator>(end() - 1); }
+	std::reverse_iterator<const_iterator> rbegin() const { return std::reverse_iterator<const_iterator>(end() - 1); }
+	std::reverse_iterator<const_iterator> crbegin() const { return std::reverse_iterator<const_iterator>(cend() - 1); }
+	std::reverse_iterator<iterator> rend() { return std::reverse_iterator<iterator>(begin() - 1); }
+	std::reverse_iterator<const_iterator> rend() const { return std::reverse_iterator<iterator>(begin() - 1); }
+	std::reverse_iterator<const_iterator> crend() const { return std::reverse_iterator<iterator>(begin() - 1); }
+
 	// capacity
 	size_type size() const { return m_end - m_begin; }
 	size_type max_size() const { return size(); }
