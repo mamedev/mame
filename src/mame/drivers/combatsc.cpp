@@ -339,6 +339,11 @@ WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
 	/* unknown. always write 0 */
 }
 
+// causes scores to disappear during fire ranges, either sprite busy flag or screen frame number related
+READ8_MEMBER(combatsc_state::unk_r)
+{
+	return 0; //m_screen->frame_number() & 1;
+}
 
 /*************************************
  *
@@ -348,6 +353,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
 
 static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(combatsc_pf_control_w)
+	AM_RANGE(0x001f, 0x001f) AM_READ(unk_r)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combatsc_scrollram_r, combatsc_scrollram_w)
 //  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
 
@@ -361,7 +367,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0404, 0x0407) AM_READ(trackball_r)           /* 1P & 2P controls / trackball */
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(combatsc_coin_counter_w)  /* coin counters */
 	AM_RANGE(0x040c, 0x040c) AM_WRITE(combatsc_vreg_w)
-	AM_RANGE(0x0410, 0x0410) AM_WRITE(combatsc_bankselect_w)
+	AM_RANGE(0x0410, 0x0410) AM_READNOP AM_WRITE(combatsc_bankselect_w) // read is clr a (discarded)
 	AM_RANGE(0x0414, 0x0414) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combatsc_sh_irqtrigger_w)
 	AM_RANGE(0x041c, 0x041c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog reset? */
@@ -708,10 +714,11 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 	MCFG_SCREEN_PALETTE("palette")
 
