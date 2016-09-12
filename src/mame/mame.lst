@@ -4,7 +4,7 @@
 
     mame.lst
 
-    This is automaticaly generated file, that should be manually updated when
+    This is not automatically generated file, and should be manually updated when
     new driver is added. From time to time we will auto update comments
     according to meta-data from source files.
 
@@ -31351,6 +31351,9 @@ rbislando                       // B22 (c) 1987 Taito Corporation
 
 @source:rbmk.cpp
 rbmk                            // (c) 1995 GMS
+
+@source:rc702.cpp
+rc702                           // 1979 RC702
 
 @source:rc759.cpp
 rc759                           // 1984 RC759
