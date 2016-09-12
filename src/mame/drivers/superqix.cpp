@@ -881,7 +881,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::hle_68705_w_cb)
 
 		case 0x80: m_fromMCU = m_curr_player = 0; break;
 		case 0x81: m_fromMCU = m_curr_player = 1; break;
-		default: logerror("unknown prebillian MCU command %02X, HLE is returning the same value as result!\n", m_fromZ80); m_fromMCU = m_fromZ80; break;
+		default: logerror("unknown prebillian MCU command %02X, HLE is returning the command value as result!\n", m_fromZ80); m_fromMCU = m_fromZ80; break;
 	}
 
 //  logerror("408[%x] r at %x\n",m_fromZ80,space.device().safe_pc());
@@ -966,7 +966,6 @@ static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state ) // used 
 	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r) // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	//AM_RANGE(0x0408, 0x0408) AM_READWRITE(hotsmash_Z80_mcu_r, pbillian_Z80_mcu_w)
 	AM_RANGE(0x0408, 0x0408) AM_READWRITE(hotsmash_Z80_mcu_r, hotsmash_Z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w) /* Coin Counters, ROM bank, NMI enable, Flipscreen */
 	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
@@ -1359,43 +1358,10 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hotsmash, superqix_state )
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)      /* 6 MHz, ROHM Z80B? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(pbillian_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superqix_state,  vblank_irq)
+static MACHINE_CONFIG_DERIVED( hotsmash, pbillian )
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* 3mhz???? */
 	MCFG_CPU_PROGRAM_MAP(m68705_map)
-
-	MCFG_MACHINE_START_OVERRIDE(superqix_state,pbillian)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_pbillian)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
-
-	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(superqix_state, pbillian_ay_port_a_r))   /* port Aread */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, pbillian_ay_port_b_r))   /* port Bread */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(superqix_state, pbillian_sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sqix, superqix_state )
