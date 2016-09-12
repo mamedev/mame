@@ -45,7 +45,7 @@
 #include <vector>
 #include <string>
 
-#include "view.h"
+#include "contiguous_sequence_wrapper.h"
 
 
 //**************************************************************************
@@ -120,7 +120,7 @@ public:
 	};
 
 	// methods
-	const util::view<const entry> &entries() const { return m_entries; }
+	const util::contiguous_sequence_wrapper<const entry> &entries() const { return m_entries; }
 
 protected:
 	option_guide(const entry *begin, size_t count)
@@ -130,7 +130,7 @@ protected:
 
 
 private:
-	util::view<const entry> m_entries;
+	util::contiguous_sequence_wrapper<const entry> m_entries;
 };
 
 // ======================> option_guide_impl
