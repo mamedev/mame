@@ -3730,7 +3730,7 @@
 		</part>
 	</software>
 
-	<software name="fs2-68">
+	<software name="fs2_68">
 		<description>Fun School 2 (For 6-8 year olds)</description>
 		<year>1989</year>
 		<publisher>Database Educational Software</publisher>
@@ -3741,7 +3741,7 @@
 		</part>
 	</software>
 
-	<software name="fs2-ov8">
+	<software name="fs2_ov8">
 		<description>Fun School 2 (For the Over-8s)</description>
 		<year>1989</year>
 		<publisher>Database Educational Software</publisher>
