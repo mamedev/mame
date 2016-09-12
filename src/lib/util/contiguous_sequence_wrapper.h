@@ -68,8 +68,8 @@ public:
 	const_reference front() const { return operator[](0); }
 	reference back() { return operator[](size() - 1); }
 	const_reference back() const { return operator[](size() - 1); }
-	reference operator[] (size_type n) { return m_begin.m_ptr[n]; }
-	const_reference operator[] (size_type n) const { return m_begin.m_ptr[n]; }
+	reference operator[] (size_type n) { return m_begin[n]; }
+	const_reference operator[] (size_type n) const { return m_begin[n]; }
 	reference at(size_type n) { check_in_bounds(n); return operator[](n); }
 	const_reference at(size_type n) const { check_in_bounds(n); return operator[](n); }
 
