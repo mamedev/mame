@@ -555,37 +555,31 @@ void menu_select_game::populate()
 		m_search[0] = '\0';
 		int curitem = 0;
 
-		// sort favorites list by longname (description)
-		std::multimap<std::string, ui_software_info*> sorted;
-		for (auto & e : mame_machine_manager::instance()->favorite().m_list)
-			sorted.emplace(e.longname, &e);
-
 		// iterate over entries
-		for (auto & favmap : sorted)
+		for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
 		{
-			auto &mfavorite = *favmap.second;
 			auto flags = flags_ui | FLAG_UI_FAVORITE;
-			if (mfavorite.startempty == 1)
+			if (favmap.second.startempty == 1)
 			{
-				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
+				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver)
 					old_item_selected = curitem;
 
-				bool cloneof = strcmp(mfavorite.driver->parent, "0");
+				bool cloneof = strcmp(favmap.second.driver->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(mfavorite.driver->parent);
+					int cx = driver_list::find(favmap.second.driver->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
-				item_append(mfavorite.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&mfavorite);
+				item_append(favmap.second.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&favmap.second);
 			}
 			else
 			{
-				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
+				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver)
 					old_item_selected = curitem;
-				item_append(mfavorite.longname, mfavorite.devicetype,
-					mfavorite.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&mfavorite);
+				item_append(favmap.second.longname, favmap.second.devicetype,
+							favmap.second.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&favmap.second);
 			}
 			curitem++;
 		}

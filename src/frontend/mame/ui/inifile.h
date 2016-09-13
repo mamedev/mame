@@ -84,7 +84,7 @@ public:
 	favorite_manager(running_machine &machine, ui_options &moptions);
 
 	// favorite indices
-	std::vector<ui_software_info> m_list;
+	std::multimap<std::string, ui_software_info> m_list;
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -110,7 +110,7 @@ private:
 	const char *favorite_filename = "favorites.ini";
 
 	// current
-	int m_current;
+	std::multimap<std::string, ui_software_info>::iterator m_current;
 
 	// parse file ui_favorite
 	void parse_favorite();
