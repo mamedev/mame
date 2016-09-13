@@ -82,7 +82,7 @@
 
 	function layout.frame()
 		local value = ports[":EXTRA"]:read()
-		if value &amp; 0x02 == 0x02 then
+		if value &amp; 0x03 == 0x03 then
 			layout.reset()
 			return
 		end
@@ -122,9 +122,19 @@
 		end
 	end
 
-	return layout, "chessmst"
+	return layout, "chessmstdm"
 	</script>
 
+	<element name="black_rect">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="digit" defstate="0">
+		<led16segsc>
+			<color red="0.5" green="1.0" blue="0.0" />
+		</led16segsc>
+	</element>
 	<element name="led" defstate="1">
 		<disk state="0">
 			<color red="0.95" green="0.0" blue="0.0" />
@@ -154,7 +164,7 @@
 		</disk>
 	</element>
 
-	<element name="black"><rect><color red="0.64" green="0.08" blue="0.11" /></rect></element>
+	<element name="black"><rect><color red="0.44" green="0.08" blue="0.01" /></rect></element>
 	<element name="white"><rect><color red="1.00" green="0.88" blue="0.55" /></rect></element>
 
 	<element name="text_1"> <text string="1"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
@@ -175,30 +185,24 @@
 	<element name="text_g"> <text string="G"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
 	<element name="text_h"> <text string="H"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
 
-	<element name="text_chessmaster">      <text string="CHESS-MASTER" align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_newgame">          <text string="NEW GAME"     align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_level">            <text string="LEVEL"        align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_color">            <text string="COLOR"        align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_board">            <text string="BOARD"        align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_selfplay">         <text string="SELF PLAY"    align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_referee">          <text string="REFEREE"      align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_random">           <text string="RANDOM"       align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_hint">             <text string="HINT"         align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_white">            <text string="WHITE"        align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_black">            <text string="BLACK"        align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_king" >            <text string="&#x2654;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_queen" >           <text string="&#x2655;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_rook" >            <text string="&#x2656;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_bishop" >          <text string="&#x2657;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_knight" >          <text string="&#x2658;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_pawn" >            <text string="&#x2659;"     align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_change">           <text string="CHANGE"       align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_board">            <text string="BOARD"        align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_halt">             <text string="HALT"         align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_reset">            <text string="RESET"        align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_check">            <text string="CHECK"        align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_your">             <text string="YOUR"         align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_cms">              <text string="CM'S"         align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_chessmaster"> <text string="CHESS-MASTER" align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_diamond">     <text string="diamond"      align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_monitor">     <text string="MONITOR"      align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_view">        <text string="VIEW"         align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_reset">       <text string="RESET"        align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_selection">   <text string="SELECTION"    align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_dialogue">    <text string="DIALOGUE"     align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_function">    <text string="FUNCTION"     align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_notation">    <text string="NOTATION"     align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_parameter">   <text string="PARAMETER"    align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_information"> <text string="INFORMATION"  align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_board">       <text string="BOARD"        align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_match">       <text string="MATCH"        align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_time">        <text string="TIME"         align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_enter">       <text string="ENTER"        align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_playmode">    <text string="PLAYMODE"     align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_move_fore">   <text string="MOVE FORE"    align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_move_back">   <text string="MOVE BACK"    align="0"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 
 	<element name="piece" defstate="0">
 		<text string="&#x265a;" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
@@ -249,8 +253,7 @@
 	<view name="Internal Layout">
 		<bounds left="-2" right="117.5" top="-2" bottom="88" />
 
-		<bezel element="black"><bounds x="-2.5" y="-2" width="120" height="90.5" /></bezel>
-		<bezel element="white"><bounds x="89" y="-2" width="30" height="90.5" /></bezel>
+		<bezel element="white"><bounds x="-2.5" y="-2" width="120" height="90.5" /></bezel>
 
 	<!-- chessboard coords -->
 
@@ -274,7 +277,7 @@
 
 	<!-- chessboard bezel -->
 
-		<bezel element="white"><bounds x="2" y="2" width="82" height="82" /></bezel>
+		<bezel element="black"><bounds x="2" y="2" width="82" height="82" /></bezel>
 		<bezel element="white"><bounds x="3" y="3" width="80" height="80" /></bezel>
 
 		<bezel element="black"><bounds x="13" y="2.5" width="10" height="10.5" /></bezel>
@@ -283,9 +286,9 @@
 		<bezel element="black"><bounds x="73" y="2.5" width="10.5" height="10.5" /></bezel>
 
 		<bezel element="black"><bounds x="2.5" y="13" width="10.5" height="10" /></bezel>
-		<bezel element="black"><bounds x="23"  y="13" width="10" height="10" /></bezel>
-		<bezel element="black"><bounds x="43"  y="13" width="10" height="10" /></bezel>
-		<bezel element="black"><bounds x="63"  y="13" width="10" height="10" /></bezel>
+		<bezel element="black"><bounds x="23" y="13" width="10" height="10" /></bezel>
+		<bezel element="black"><bounds x="43" y="13" width="10" height="10" /></bezel>
+		<bezel element="black"><bounds x="63" y="13" width="10" height="10" /></bezel>
 
 		<bezel element="black"><bounds x="13" y="23" width="10" height="10" /></bezel>
 		<bezel element="black"><bounds x="33" y="23" width="10" height="10" /></bezel>
@@ -293,9 +296,9 @@
 		<bezel element="black"><bounds x="73" y="23" width="10.5" height="10" /></bezel>
 
 		<bezel element="black"><bounds x="2.5" y="33" width="10.5" height="10" /></bezel>
-		<bezel element="black"><bounds x="23"  y="33" width="10" height="10" /></bezel>
-		<bezel element="black"><bounds x="43"  y="33" width="10" height="10" /></bezel>
-		<bezel element="black"><bounds x="63"  y="33" width="10" height="10" /></bezel>
+		<bezel element="black"><bounds x="23" y="33" width="10" height="10" /></bezel>
+		<bezel element="black"><bounds x="43" y="33" width="10" height="10" /></bezel>
+		<bezel element="black"><bounds x="63" y="33" width="10" height="10" /></bezel>
 
 		<bezel element="black"><bounds x="13" y="43" width="10" height="10" /></bezel>
 		<bezel element="black"><bounds x="33" y="43" width="10" height="10" /></bezel>
@@ -539,71 +542,48 @@
 
 	<!-- right side -->
 
-		<bezel element="text_chessmaster"><bounds x="94" y="0" width="24" height="3" /></bezel>
-		<bezel element="text_newgame"> <bounds x="98"    y="16" width="18" height="1.8" /></bezel>
-		<bezel element="text_level">   <bounds x="98"    y="23" width="18" height="1.8" /></bezel>
-		<bezel element="text_color">   <bounds x="98"    y="30" width="18" height="1.8" /></bezel>
-		<bezel element="text_board">   <bounds x="98"    y="37" width="18" height="1.8" /></bezel>
-		<bezel element="text_selfplay"><bounds x="98"    y="44" width="18" height="1.8" /></bezel>
-		<bezel element="text_referee"> <bounds x="98"    y="51" width="18" height="1.8" /></bezel>
-		<bezel element="text_random">  <bounds x="98"    y="58" width="18" height="1.8" /></bezel>
-		<bezel element="text_hint">    <bounds x="98"    y="65" width="18" height="1.8" /></bezel>
-		<bezel element="text_reset">   <bounds x="92.5"  y="82" width="10" height="2" /></bezel>
-		<bezel element="text_halt">    <bounds x="107.5" y="82" width="8"  height="2" /></bezel>
+		<bezel element="text_chessmaster"><bounds x="89"  y="12"   width="22" height="2.8" /></bezel>
+		<bezel element="text_diamond">    <bounds x="106" y="15"   width="14" height="2.5" /></bezel>
+		<bezel element="text_monitor">    <bounds x="91"  y="19.5" width="14" height="2" /></bezel>
+		<bezel element="text_view">       <bounds x="91"  y="26.5" width="8"  height="2" /></bezel>
+		<bezel element="text_reset">      <bounds x="99"  y="23.0" width="10" height="2" /></bezel>
+		<bezel element="text_function">   <bounds x="91"  y="32.3" width="16" height="2" /></bezel>
+		<bezel element="text_notation">   <bounds x="91"  y="34.7" width="16" height="2" /></bezel>
+		<bezel element="text_selection">  <bounds x="91"  y="39.3" width="18" height="2" /></bezel>
+		<bezel element="text_dialogue">   <bounds x="91"  y="41.7" width="16" height="2" /></bezel>
+		<bezel element="text_parameter">  <bounds x="91"  y="46.3" width="18" height="2" /></bezel>
+		<bezel element="text_information"><bounds x="91"  y="48.7" width="22" height="2" /></bezel>
+		<bezel element="text_match">      <bounds x="91"  y="53.3" width="10" height="2" /></bezel>
+		<bezel element="text_time">       <bounds x="91"  y="55.7" width="8"  height="2" /></bezel>
+		<bezel element="text_board">      <bounds x="91"  y="61.5" width="10" height="2" /></bezel>
+		<bezel element="text_enter">      <bounds x="91"  y="68.5" width="10" height="2" /></bezel>
+		<bezel element="text_move_back">  <bounds x="87"  y="83"   width="18" height="2" /></bezel>
+		<bezel element="text_move_fore">  <bounds x="101" y="83"   width="18" height="2" /></bezel>
+		<bezel element="text_playmode">   <bounds x="92"  y="73"   width="16" height="2" /></bezel>
 
-		<bezel element="text_pawn">    <bounds x="95" y="18" width="4"  height="4" /></bezel>
-		<bezel element="text_knight">  <bounds x="95" y="25" width="4"  height="4" /></bezel>
-		<bezel element="text_bishop">  <bounds x="95" y="32" width="4"  height="4" /></bezel>
-		<bezel element="text_rook">    <bounds x="95" y="39" width="4"  height="4" /></bezel>
-		<bezel element="text_queen">   <bounds x="95" y="46" width="4"  height="4" /></bezel>
-		<bezel element="text_king">    <bounds x="95" y="53" width="4"  height="4" /></bezel>
-		<bezel element="text_white">   <bounds x="88" y="61" width="10" height="1.8" /></bezel>
-		<bezel element="text_black">   <bounds x="88" y="68" width="10" height="1.8" /></bezel>
+		<bezel name="monitor_led"  element="led">        <bounds x="101"  y="19.63" width="1.5" height="1.5" /> </bezel>
+		<bezel name="playmode_led" element="led">        <bounds x="103"  y="73.13" width="1.5" height="1.5" /> </bezel>
+		<bezel name="reset_line0"  element="black_rect"> <bounds x="107.4" y="23.2" width="0.2" height="1.6" /> </bezel>
+		<bezel name="reset_line1"  element="black_rect"> <bounds x="104.7" y="24.0" width="2.9" height="0.2" /> </bezel>
 
-		<bezel element="text_check">   <bounds x="91"   y="6"  width="10" height="1.8" /></bezel>
-		<bezel element="text_your">    <bounds x="98"   y="6"  width="8"  height="1.8" /></bezel>
-		<bezel element="text_cms">     <bounds x="104"  y="6"  width="8"  height="1.8" /></bezel>
-		<bezel element="text_change">  <bounds x="95.3" y="73" width="12" height="1.8" /></bezel>
-		<bezel element="text_board">   <bounds x="103"  y="73" width="10" height="1.8" /></bezel>
+		<bezel element="hlb" inputtag="EXTRA"   inputmask="0x01"><bounds x="105" y="18" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="EXTRA"   inputmask="0x02"><bounds x="105" y="25" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x40"><bounds x="105" y="32" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x20"><bounds x="105" y="39" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x10"><bounds x="105" y="46" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x08"><bounds x="105" y="53" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x04"><bounds x="105" y="60" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x80"><bounds x="105" y="67" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x02"><bounds x="94"  y="77" width="5" height="5" /></bezel>
+		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x01"><bounds x="108" y="77" width="5" height="5" /></bezel>
 
-		<bezel element="text_1"><bounds x="111" y="19" width="2" height="1.8" /></bezel>
-		<bezel element="text_2"><bounds x="111" y="26" width="2" height="1.8" /></bezel>
-		<bezel element="text_3"><bounds x="111" y="33" width="2" height="1.8" /></bezel>
-		<bezel element="text_4"><bounds x="111" y="40" width="2" height="1.8" /></bezel>
-		<bezel element="text_5"><bounds x="111" y="47" width="2" height="1.8" /></bezel>
-		<bezel element="text_6"><bounds x="111" y="54" width="2" height="1.8" /></bezel>
-		<bezel element="text_7"><bounds x="111" y="62" width="2" height="1.8" /></bezel>
-		<bezel element="text_8"><bounds x="111" y="69" width="2" height="1.8" /></bezel>
+	<!-- panel 16seg leds -->
 
-		<bezel name="led_i1" element="led"> <bounds x="100" y="19" width="2" height="2" /></bezel>
-		<bezel name="led_i2" element="led"> <bounds x="100" y="26" width="2" height="2" /></bezel>
-		<bezel name="led_i3" element="led"> <bounds x="100" y="33" width="2" height="2" /></bezel>
-		<bezel name="led_i4" element="led"> <bounds x="100" y="40" width="2" height="2" /></bezel>
-		<bezel name="led_i5" element="led"> <bounds x="100" y="47" width="2" height="2" /></bezel>
-		<bezel name="led_i6" element="led"> <bounds x="100" y="54" width="2" height="2" /></bezel>
-		<bezel name="led_i7" element="led"> <bounds x="100" y="61" width="2" height="2" /></bezel>
-		<bezel name="led_i8" element="led"> <bounds x="100" y="68" width="2" height="2" /></bezel>
-
-		<bezel name="led_j7" element="led"> <bounds x="95" y="8" width="2" height="2" /></bezel>
-		<bezel name="led_j5" element="led"> <bounds x="101" y="8" width="2" height="2" /></bezel>
-		<bezel name="led_j6" element="led"> <bounds x="107" y="8" width="2" height="2" /></bezel>
-
-		<bezel name="led_j2" element="led"> <bounds x="95" y="12" width="2" height="2" /></bezel>
-		<bezel name="led_j3" element="led"> <bounds x="101" y="12" width="2" height="2" /></bezel>
-		<bezel name="led_j4" element="led"> <bounds x="107" y="12" width="2" height="2" /></bezel>
-
-		<bezel name="led_j8" element="led"> <bounds x="102.5" y="73" width="2" height="2" /></bezel>
-
-		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x80"><bounds x="105" y="18" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x40"><bounds x="105" y="25" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x20"><bounds x="105" y="32" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x10"><bounds x="105" y="39" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x08"><bounds x="105" y="46" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x04"><bounds x="105" y="53" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x02"><bounds x="105" y="60" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="BUTTONS" inputmask="0x01"><bounds x="105" y="67" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="EXTRA"   inputmask="0x02"><bounds x="95"  y="77" width="4" height="4" /></bezel>
-		<bezel element="hlb" inputtag="EXTRA"   inputmask="0x01"><bounds x="109" y="77" width="4" height="4" /></bezel>
+		<bezel name="display_background" element="black_rect"> <bounds x="89" y="2" width="26" height="9.2" /> </bezel>
+		<bezel name="digit3" element="digit"> <bounds x="90"  y="2.5" width="5.66" height="8.5" /></bezel>
+		<bezel name="digit2" element="digit"> <bounds x="96"  y="2.5" width="5.66" height="8.5" /></bezel>
+		<bezel name="digit1" element="digit"> <bounds x="102" y="2.5" width="5.66" height="8.5" /></bezel>
+		<bezel name="digit0" element="digit"> <bounds x="108" y="2.5" width="5.66" height="8.5" /></bezel>
 
 	</view>
 </mamelayout>
