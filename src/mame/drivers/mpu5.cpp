@@ -281,7 +281,7 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 {
 	int pc = space.device().safe_pc();
 	int addr = offset *4;
-	int cs = m68340_get_cs(m_maincpu, addr);
+	int cs = m_maincpu->get_cs(addr);
 
 	switch ( cs )
 	{
@@ -477,7 +477,7 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 {
 	int pc = space.device().safe_pc();
 	int addr = offset *4;
-	int cs = m68340_get_cs(m_maincpu, addr);
+	int cs = m_maincpu->get_cs(addr);
 
 	switch ( cs )
 	{
