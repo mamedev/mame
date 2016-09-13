@@ -45,6 +45,8 @@
 #include <vector>
 #include <string>
 
+#include "coretmpl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -118,19 +120,17 @@ public:
 	};
 
 	// methods
-	const entry *begin() const { return m_begin; }
-	const entry *end() const { return m_end; }
+	const util::contiguous_sequence_wrapper<const entry> &entries() const { return m_entries; }
 
 protected:
-	option_guide(const entry *begin, const entry *end)
-		: m_begin(begin), m_end(end)
+	option_guide(const entry *begin, size_t count)
+		: m_entries(begin, count)
 	{
 	}
 
 
 private:
-	const entry *m_begin;
-	const entry *m_end;
+	util::contiguous_sequence_wrapper<const entry> m_entries;
 };
 
 // ======================> option_guide_impl
@@ -142,7 +142,7 @@ public:
 	template<typename... T>
 	option_guide_impl(T &&... elems)
 		: std::array<option_guide::entry, Count>({ std::forward<T>(elems)... })
-		, option_guide(Count > 0 ? &(*this)[0] : nullptr, Count > 0 ? &(*this)[0] + Count : nullptr)
+		, option_guide(Count > 0 ? &(*this)[0] : nullptr, Count)
 	{
 	}
 };

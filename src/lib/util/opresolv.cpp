@@ -31,11 +31,11 @@ namespace util {
 option_resolution::option_resolution(const option_guide &guide)
 {
 	// reserve space for entries
-	m_entries.reserve(guide.end() - guide.begin());
+	m_entries.reserve(guide.entries().size());
 
 	// initialize each of the entries; can't use foreach because we need to scan the
 	// ENUM_VALUE entries
-	for (auto iter = guide.begin(); iter != guide.end(); iter++)
+	for (auto iter = guide.entries().begin(); iter != guide.entries().end(); iter++)
 	{
 		// create the entry
 		m_entries.emplace_back(*iter);
@@ -49,7 +49,7 @@ option_resolution::option_resolution(const option_guide &guide)
 			auto enum_value_end = enum_value_begin;
 
 			// and identify all entries of type ENUM_VALUE
-			while (enum_value_end != guide.end() && enum_value_end->type() == option_guide::entry::option_type::ENUM_VALUE)
+			while (enum_value_end != guide.entries().end() && enum_value_end->type() == option_guide::entry::option_type::ENUM_VALUE)
 			{
 				iter++;
 				enum_value_end++;
