@@ -45,7 +45,7 @@
 #include <vector>
 #include <string>
 
-#include "contiguous_sequence_wrapper.h"
+#include "coretmpl.h"
 
 
 //**************************************************************************

@@ -41,7 +41,6 @@ project "utils"
 		MAME_DIR .. "src/lib/util/chdcd.h",
 		MAME_DIR .. "src/lib/util/chdcodec.cpp",
 		MAME_DIR .. "src/lib/util/chdcodec.h",
-		MAME_DIR .. "src/lib/util/contiguous_sequence_wrapper.h",
 		MAME_DIR .. "src/lib/util/corealloc.h",
 		MAME_DIR .. "src/lib/util/corefile.cpp",
 		MAME_DIR .. "src/lib/util/corefile.h",
