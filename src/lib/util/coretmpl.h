@@ -17,9 +17,9 @@
 #include "corealloc.h"
 
 #include <iterator>
+#include <stdexcept>
 #include <utility>
 #include <vector>
-#include <stdexcept>
 
 
 typedef std::vector<UINT8> dynamic_buffer;
@@ -357,7 +357,7 @@ private:
 namespace util {
 
 // wraps an existing sequence of values
-template<typename T >
+template<typename T>
 class contiguous_sequence_wrapper
 {
 public:
@@ -369,6 +369,8 @@ public:
 	typedef T *pointer;
 	typedef T *iterator;
 	typedef const T *const_iterator;
+	typedef std::reverse_iterator<iterator> reverse_iterator;
+	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	contiguous_sequence_wrapper(T *ptr, std::size_t size)
 		: m_begin(ptr)
@@ -387,12 +389,12 @@ public:
 	const_iterator cend() const { return m_end; }
 
 	// reverse iteration
-	std::reverse_iterator<iterator> rbegin() { return std::reverse_iterator<iterator>(end()); }
-	std::reverse_iterator<const_iterator> rbegin() const { return std::reverse_iterator<const_iterator>(end()); }
-	std::reverse_iterator<const_iterator> crbegin() const { return std::reverse_iterator<const_iterator>(cend()); }
-	std::reverse_iterator<iterator> rend() { return std::reverse_iterator<iterator>(begin()); }
-	std::reverse_iterator<const_iterator> rend() const { return std::reverse_iterator<iterator>(begin()); }
-	std::reverse_iterator<const_iterator> crend() const { return std::reverse_iterator<iterator>(begin()); }
+	reverse_iterator rbegin() { return std::reverse_iterator<iterator>(end()); }
+	const_reverse_iterator rbegin() const { return std::reverse_iterator<const_iterator>(end()); }
+	const_reverse_iterator crbegin() const { return std::reverse_iterator<const_iterator>(cend()); }
+	reverse_iterator rend() { return std::reverse_iterator<iterator>(begin()); }
+	const_reverse_iterator rend() const { return std::reverse_iterator<iterator>(begin()); }
+	const_reverse_iterator crend() const { return std::reverse_iterator<iterator>(begin()); }
 
 	// capacity
 	size_type size() const { return m_end - m_begin; }
