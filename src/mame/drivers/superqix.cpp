@@ -22,20 +22,37 @@ Notes:
              5P and 5M are the Sprite framebuffer
 
 Super Qix:
-- The sq07.108 ROM came from a bootleg where the 8751 MCU was replaced by a
-  model using external ROM. The ROM was bad (bit 3 was stuck high). It was
-  recovered by carefully checking the disassembly but there might still be
-  some mistakes.
-  The bootleg MCU code is different from the original; it was modified by the
-  bootleggers to avoid use of port 2.
+- The sq07.ic108 ROM came from a bootleg where the 8751 MCU was replaced by an
+  8031 MCU plus an external ROM (i.e. the sqixb1 romset). The 8031 ROM was bad
+  (bit 3 was stuck high). It was originally recovered by carefully checking
+  the disassembly, and this repair was later verified from another dump to be
+  correct. The majority of the bootleg 8031 MCU code matches the decapped
+  sqixu b03-03.l2 mcu code, implying the sq07.ic108 8031 MCU code ROM was
+  derived from code dumped from an original Taito b03-03.l2 8751 MCU somehow.
+  The bootleg MCU code is different from the original b03-03.l2 MCU since
+  an 8031 when running in external ROM mode cannot use ports 0 or 2, hence
+  the code was extensively patched by the bootleggers to avoid use of those
+  ports, by adding an additional multiplexer to port 1, and moving various
+  read and write pins around.
+  An important note about the sqixb1 bootleg pcb: the SOCKET on the pcb for
+  sq07.ic108 is populated backwards compared to the way the ROM will fit into
+  it! This is probably the cause of the bad bit 3 in the original dump in MAME
+  (due to someone inserting and powering the chip backwards) and is definitely
+  the cause of at least one other ROM failure during a repair. Be aware of
+  this, if you find or own one of these PCBs!
 
 - The MCU sends some ID to the Z80 on startup, but the Z80 happily ignores it.
   This happens in all sets. There appears to be code that would check part of
   the MCU init sequence ($5973 onwards), but it doesn't seem to be called.
 
-- sqixb1 might be an earlier version because there is a bug with coin lockout:
-  it is activated after inesrting 10 coins instead of 9. sqix doesn't have
-  that bug and also inverts the coin lockout output.
+- sqixb1 might be based on an earlier version because there is a bug with coin
+  lockout: it is activated after inserting 10 coins instead of 9.
+  sqix doesn't have that bug and also inverts the coin lockout output compared
+  to the bootleg.
+  The older sqixr1 non-bootleg set does not have the 10 coin lockout bug
+  either, so it is possible that the bootleggers introduced it themselves, or
+  the bootleg is based on some sort of early (location test?) set (older than
+  the sqixr1 set) which we don't have a dump of.
 
 - sqixb2 is a bootleg of sqixb1, with the MCU removed.
 
@@ -210,11 +227,26 @@ The MCU acts this way:
 
 **************************************************************************/
 
+CUSTOM_INPUT_MEMBER(superqix_state::superqix_semaphore_input_r) // similar to pbillian_semaphore_input_r below, but reverse order and polarity
+{
+	int res = 0;
+
+	if (m_MCUHasWritten)
+		res |= 0x01;
+
+	if (m_Z80HasWritten)
+		res |= 0x02;
+
+	return res;
+}
 
 READ8_MEMBER(superqix_state::in4_mcu_r)
 {
 //  logerror("%04x: in4_mcu_r\n",space.device().safe_pc());
-	return ioport("P2")->read() | (m_MCUHasWritten << 6) | (m_Z80HasWritten << 7);
+	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
+	UINT8 temp = ioport("P2")->read();
+	//logerror("returning %02X\n", temp);
+	return temp;
 }
 
 READ8_MEMBER(superqix_state::sqix_from_mcu_r)
@@ -225,7 +257,15 @@ READ8_MEMBER(superqix_state::sqix_from_mcu_r)
 
 TIMER_CALLBACK_MEMBER(superqix_state::mcu_acknowledge_callback)
 {
-	m_Z80HasWritten = 1;
+	/* if we're on a set with no mcu, namely sqixb2, perestro or perestrof,
+	   do not set the mcu flags since at least a few checks in sqixb2 were
+	   not patched out by the bootleggers nor the read from the
+	   mcu_acknowledge_r register which sets the m_Z80HasWritten semaphore,
+	   hence the semaphore flags must both be hard-wired inactive on the pcb,
+	   or else it will never boot to the title screen.
+	   perestro and perestrof seem to completely ignore the semaphores.
+	 */
+	if (m_mcu.found()) m_Z80HasWritten = 1; // only set this if we have an actual mcu
 	m_fromZ80 = m_fromZ80pending;
 //  logerror("Z80->MCU %02x\n",m_fromZ80);
 }
@@ -309,12 +349,12 @@ READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 
 READ8_MEMBER(superqix_state::sqix_system_status_r)
 {
-	return ioport("SYSTEM")->read() | (m_MCUHasWritten << 6) | (m_Z80HasWritten << 7);
+	return ioport("SYSTEM")->read();
 }
 
 WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 {
-	// bit 0 = unknown (clocked often), watchdog?
+	// bit 0 = enable latch for bits 1-6 below on high level or falling edge (doesn't particularly matter which, either one works)
 
 	// bit 1 = coin cointer 1
 	machine().bookkeeping().coin_counter_w(0,data & 2);
@@ -812,7 +852,7 @@ READ8_MEMBER(superqix_state::hotsmash_Z80_mcu_r)
 	return m_fromMCU;
 }
 
-CUSTOM_INPUT_MEMBER(superqix_state::superqix_semaphore_input_r)
+CUSTOM_INPUT_MEMBER(superqix_state::pbillian_semaphore_input_r)
 {
 	int res = 0;
 	/* bit 0x40 is PROBABLY latch 1 on 74ls74.7c, is high if m_Z80HasWritten is clear */
@@ -1006,12 +1046,12 @@ ADDRESS_MAP_END
 
 /* I8751 memory handlers */
 
-static ADDRESS_MAP_START( bootleg_mcu_io_map, AS_IO, 8, superqix_state )
+static ADDRESS_MAP_START( sqix_8031_mcu_io_map, AS_IO, 8, superqix_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(bootleg_mcu_p1_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(bootleg_mcu_p3_r, mcu_p3_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sqixu_mcu_io_map, AS_IO, 8, superqix_state )
+static ADDRESS_MAP_START( sqix_mcu_io_map, AS_IO, 8, superqix_state )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ(sqix_system_status_r)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("DSW1")
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(sqixu_mcu_p2_w)
@@ -1077,7 +1117,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state,superqix_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     // N/C
@@ -1086,7 +1126,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // P2 fire (M powerup) + high score initials
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state,superqix_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
 
 	PORT_START("PLUNGER1")  // plunger mechanism for shot (BUTTON1 and PEDAL mapped to the same key in MAME)
 	PORT_BIT( 0x3f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
@@ -1159,7 +1199,7 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )//$49c
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )//$42d
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state,superqix_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1168,7 +1208,7 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // p2 button 2, unused on this game?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state,superqix_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
 
 	PORT_START("DIAL1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(30) PORT_CENTERDELTA(0) PORT_PLAYER(1)
@@ -1233,8 +1273,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )   // doesn't work in bootleg
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   // Z80 status (pending mcu->z80)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   // Z80 status (pending z80->mcu)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, superqix_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -1253,8 +1292,8 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   // mcu status (pending mcu->z80)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   // mcu status (pending z80->mcu)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, superqix_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+
 INPUT_PORTS_END
 
 
@@ -1359,7 +1398,6 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hotsmash, pbillian )
-
 	MCFG_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* 3mhz???? */
 	MCFG_CPU_PROGRAM_MAP(m68705_map)
 MACHINE_CONFIG_END
@@ -1373,7 +1411,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
 	MCFG_CPU_ADD("mcu", I8751, 12000000/3)  /* ??? */
-	MCFG_CPU_IO_MAP(bootleg_mcu_io_map)
+	MCFG_CPU_IO_MAP(sqix_mcu_io_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1410,14 +1448,13 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sqixu, sqix )
-
+static MACHINE_CONFIG_DERIVED( sqix_8031, sqix )
 	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_IO_MAP(sqixu_mcu_io_map)
+	MCFG_CPU_IO_MAP(sqix_8031_mcu_io_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sqixbl, superqix_state )
+static MACHINE_CONFIG_START( sqix_nomcu, superqix_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */
@@ -1447,7 +1484,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, in4_mcu_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
@@ -1510,7 +1547,7 @@ ROM_START( sqix )
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
 	ROM_LOAD( "b03-03.l2",    0x00000, 0x1000, NO_DUMP ) /* Original Taito ID code for this set's MCU */
 	/* sq07.108 is from the sqixb1 set, it will be removed once the actual MCU code from b03-03.l2 is decapped / dumped */
-	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1530,7 +1567,7 @@ ROM_START( sqixr1 )
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
 	ROM_LOAD( "b03-03.l2",    0x00000, 0x1000, NO_DUMP ) /* Original Taito ID code for this set's MCU */
 	/* sq07.108 is from the sqixb1 set, it will be removed once the actual MCU code from b03-03.l2 is decapped / dumped */
-	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1563,14 +1600,14 @@ ROM_END
 /* this is a bootleg with an 8031+external rom in place of the 8751 of the
    original board; The mcu code is extensively hacked to avoid use of port 2,
    which is used as the rom data bus, using a multiplexed latch on one of the
-   other ports instead. Is this based on dumped original b03-03.l2 code? */
+   other ports instead. This is based on dumped original b03-03.l2 code. */
 ROM_START( sqixb1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
 	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I8031 code */
-	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1705,12 +1742,12 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 
 
 
-GAME( 1986, pbillian, 0,        pbillian, pbillian, driver_device, 0,        ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, driver_device, 0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix,     superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix,     superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqixu,    superqix, driver_device, 0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb1,   sqix,     sqix,     superqix, superqix_state, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb2,   sqix,     sqixbl,   superqix, driver_device, 0,        ROT90, "bootleg", "Super Qix (bootleg set 2, No MCU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, perestro, 0,        sqixbl,   superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, perestrof,perestro, sqixbl,   superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, pbillian, 0,        pbillian,   pbillian, driver_device,  0,        ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hotsmash, 0,        hotsmash,   hotsmash, driver_device,  0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqix,     0,        sqix_8031,  superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix_8031,  superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqix,       superqix, driver_device,  0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1, 8031 MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
+GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, driver_device,  0,        ROT90, "bootleg", "Super Qix (bootleg set 2, No MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
+GAME( 1994, perestro, 0,        sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, perestrof,perestro, sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )

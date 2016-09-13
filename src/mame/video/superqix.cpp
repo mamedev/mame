@@ -157,10 +157,11 @@ WRITE8_MEMBER(superqix_state::superqix_0410_w)
 	}
 
 	/* bit 2 selects which of the two bitmaps to display (for 2 players game) */
-	m_show_bitmap = (data & 0x04) >> 2;
+	m_show_bitmap = BIT(data,2);
 
 	/* bit 3 enables NMI */
-	m_nmi_mask = data & 0x08;
+	m_nmi_mask = BIT(data,3);
+	//if (!(m_nmi_mask)) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // test for later, could this explain the need for 4 NMIs per frame instead of one? Is the game manually retriggering NMI using the mask register, several times during the vblank period?
 
 	/* bits 4-5 control ROM bank */
 	membank("bank1")->set_entry((data & 0x30) >> 4);
