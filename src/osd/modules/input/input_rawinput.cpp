@@ -572,8 +572,16 @@ protected:
 		// improve the name and then allocate a device
 		std::wstring name = rawinput_device_improve_name(tname.get());
 
-		// convert name to utf8
-		std::string utf8_name = utf8_from_wstring(name.c_str());
+		// convert name to utf8. Preserve raw name as well (if different than improved name) to allow mapping of device to controller.
+		std::string utf8_name;
+		if (0 == name.compare(tname.get()))
+		{
+			utf8_name = utf8_from_wstring(name.c_str());
+		}
+		else
+		{
+			utf8_name = util::string_format("%s (%s)", utf8_from_wstring(name.c_str()), utf8_from_wstring(tname.get()));
+		}
 
 		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.c_str(), *this);
 

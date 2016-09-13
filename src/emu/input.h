@@ -352,6 +352,8 @@ class input_manager;
 // callback for getting the value of an item on a device
 typedef INT32 (*item_get_state_func)(void *device_internal, void *item_internal);
 
+// controller alias table typedef
+typedef std::map<std::string, std::string> devicemap_table_type;
 
 // ======================> joystick_map
 
@@ -562,6 +564,9 @@ public:
 	bool steadykey_enabled() const { return m_steadykey_enabled; }
 	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
 
+	// setters
+	void set_devindex(int devindex) { m_devindex = devindex; }
+
 	// item management
 	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
 	void set_joystick_map(const joystick_map &map) { m_joymap = map; }
@@ -569,6 +574,7 @@ public:
 	// helpers
 	INT32 apply_deadzone_and_saturation(INT32 value) const;
 	void apply_steadykey() const;
+	bool match_device_name(const char * devicename);
 
 private:
 	// internal state
@@ -616,6 +622,7 @@ public:
 
 	// misc helpers
 	input_item_class standard_item_class(input_item_id itemid);
+	void remap_device_index(int oldindex, int newindex);
 
 private:
 	// internal helpers
@@ -679,6 +686,7 @@ public:
 
 	// misc
 	bool set_global_joystick_map(const char *mapstring);
+	bool map_device_to_controller(const devicemap_table_type *devicemap_table = nullptr);
 
 private:
 	// internal helpers
