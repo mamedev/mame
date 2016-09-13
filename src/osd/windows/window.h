@@ -20,7 +20,6 @@
 #include <memory>
 #include <list>
 
-#include "video.h"
 #include "render.h"
 
 #include "modules/osdwindow.h"
@@ -55,8 +54,6 @@ public:
 	int fullscreen() const override { return m_fullscreen; }
 
 	void update() override;
-
-	virtual std::shared_ptr<osd_monitor_info> winwindow_video_window_monitor(const osd_rect *proposed) override;
 
 	virtual bool win_has_menu() override
 	{
@@ -139,6 +136,7 @@ private:
 	void maximize_window();
 	void adjust_window_position_after_major_change();
 	void set_fullscreen(int fullscreen);
+	std::shared_ptr<osd_monitor_info> monitor_from_rect(const osd_rect* proposed) const;
 
 	static POINT        s_saved_cursor_pos;
 

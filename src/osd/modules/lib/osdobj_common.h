@@ -23,6 +23,7 @@
 #include "modules/netdev/netdev_module.h"
 #include "modules/midi/midi_module.h"
 #include "modules/output/output_module.h"
+#include "modules/monitor/monitor_module.h"
 #include "emuopts.h"
 #include "../frontend/mame/ui/menuitem.h"
 
@@ -278,14 +279,15 @@ private:
 	}
 
 protected:
-	sound_module*  m_sound;
-	debug_module*  m_debugger;
-	midi_module*   m_midi;
-	input_module*  m_keyboard_input;
-	input_module*  m_mouse_input;
-	input_module*  m_lightgun_input;
-	input_module*  m_joystick_input;
-	output_module* m_output;
+	sound_module*   m_sound;
+	debug_module*   m_debugger;
+	midi_module*    m_midi;
+	input_module*   m_keyboard_input;
+	input_module*   m_mouse_input;
+	input_module*   m_lightgun_input;
+	input_module*   m_joystick_input;
+	output_module*  m_output;
+	monitor_module* m_monitor_module;
 	std::unique_ptr<osd_watchdog> m_watchdog;
 	std::vector<ui::menu_item> m_sliders;
 
