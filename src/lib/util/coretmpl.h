@@ -19,6 +19,7 @@
 #include <iterator>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 
 typedef std::vector<UINT8> dynamic_buffer;
@@ -396,7 +397,7 @@ public:
 	// capacity
 	size_type size() const { return m_end - m_begin; }
 	size_type max_size() const { return size(); }
-	bool empty() const { return size() > 0; }
+	bool empty() const { return size() == 0; }
 
 	// element access
 	reference front() { return operator[](0); }
@@ -415,7 +416,7 @@ private:
 	void check_in_bounds(size_type n)
 	{
 		if (n < 0 || n >= size())
-			throw new std::out_of_range("invalid contiguous_sequence_wrapper<T> subscript");
+			throw std::out_of_range("invalid contiguous_sequence_wrapper<T> subscript");
 	}
 };
 
