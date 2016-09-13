@@ -6,6 +6,61 @@
 
 	HP-9845 tape format
 
+	This imgtool module manipulates HTI files. These are image files
+	of the DC-100 tape cartridges that are simulated for the HP9845B
+	driver.
+	HP9845 filesystem for tapes has the following features:
+	* File names are 1 to 6 characters long.
+	* Case is significant in file names.
+	* There is no file "extension", file type is encoded separately
+	  in file metadata.
+	* There are 8 file types. File type is encoded in 5 bits.
+	  Only 8 out of the 32 possible values are valid.
+	* This module handles the file type as a fake file extension.
+	  For example, a file named "TEST" having DATA type is get/put/shown
+	  as "TEST.DATA".
+	* File type is deduced from host file extension when putting files
+	  into image. File type can be overridden by the "ftype" option.
+	* Files are always stored in units of 256-byte physical records.
+	* An important metadata of files is WPR: Words Per Records. This
+	  is a numeric value that sets the length of each logical record of
+	  the file (in units of 16-bit words). It defaults to 128 (i.e.
+	  logical and physical records are the same thing). It can be
+	  set by the "wpr" option when putting files into the image.
+	* There is no fragmentation map in the filesystem: each file
+	  always occupy a contiguous set of physical records. This fact
+	  could prevent the putting of a file into an image when there
+	  is no single block of free records big enough to hold the file
+	  even though the total amount of free space would be sufficient.
+
+	**** dir command ****
+	The format of the "attr" part of file listing is as follows:
+	%c		'*' if file has the protection bit set, else ' '
+	%02x	Hexadecimal value of file type (00-1f)
+	%c      '?' if file type is not valid, else ' '
+	%4u		Number of logical records
+	%4u		WPR * 2 (i.e. bytes per logical record)
+	%3u		First physical record of file
+
+	**** get command ****
+	A file can be extracted from an image with or without an explicit
+	extension. If an extension is given, it must match the one corresponding
+	to file type.
+
+	**** getall command ****
+	Files are extracted with their "fake" extension.
+
+	**** put command ****
+	File type can be specified explicitly through the "ftype" option.
+	If this option is "auto" (the default), type is deduced from file
+	extension, if present. When extension is not given or it doesn't
+	match any known type, file type is set to "DATA".
+	WPR can be set through the "wpr" option. If it's 0 (the default),
+	WPR is set to 128.
+
+	**** del command ****
+	File extension is ignored, if present.
+
 *********************************************************************/
 #include <bitset>
 
@@ -26,7 +81,8 @@
 #define MAX_DIR_ENTRIES		42	// And the answer is.... the maximum number of entries in the directory!
 #define DIR_COPIES			2	// Count of directory copies
 #define CHARS_PER_FNAME		6	// Maximum characters in a filename
-#define CHARS_PER_FNAME_EXT	(CHARS_PER_FNAME + 1 + 4)	// Characters in filename + extension
+#define CHARS_PER_EXT		4	// Characters in file extension. Extension is encoded as file type, it's not actually stored in directory as characters.
+#define CHARS_PER_FNAME_EXT	(CHARS_PER_FNAME + 1 + CHARS_PER_EXT)	// Characters in filename + extension
 #define PAD_WORD			0xffff	// Word value for padding
 #define FIRST_FILE_SECTOR	(FIRST_DIR_SECTOR + SECTORS_PER_DIR * DIR_COPIES)	// First file sector
 #define MAGIC				0x5441434f	// Magic value at start of image file: "TACO"
@@ -112,13 +168,20 @@ public:
 	void unset_sector(unsigned s_no);
 	bool get_sector(unsigned s_no , tape_word_t *s_data);
 
-	bool get_dir_entry(unsigned idx , dir_entry_t& entry);
-	bool get_dir_entry(const char* filename , dir_entry_t& entry);
+	bool get_dir_entry(unsigned idx , const dir_entry_t*& entry) const;
+	bool find_file(const char *filename , bool ignore_ext , unsigned& idx) const;
+
+	void delete_dir_entry(unsigned idx);
+
+	bool find_free_block(unsigned blocks , unsigned& first_s) const;
+
+	bool alloc_new_file(unsigned blocks , dir_entry_t*& entry);
 
 	static void tape_word_to_bytes(tape_word_t w , UINT8& bh , UINT8& bl);
 	static void bytes_to_tape_word(UINT8 bh , UINT8 bl , tape_word_t& w);
 
-	static void get_filename_and_ext(const dir_entry_t& ent , char *out , bool& qmark);
+	static void get_filename_and_ext(const dir_entry_t& ent , bool inc_ext , char *out , bool& qmark);
+	static void split_filename_and_ext(const char *filename , char *fname , char *ext);
 
 private:
 	bool dirty;
@@ -463,7 +526,14 @@ imgtoolerr_t tape_image_t::save_to_file(imgtool_stream *stream)
 
 unsigned tape_image_t::free_sectors(void) const
 {
-	return TOT_SECTORS - alloc_map.count();
+	std::bitset<TOT_SECTORS> tmp(alloc_map);
+
+	// Reserve sectors that cannot be allocated to files
+	for (unsigned i = 0; i < FIRST_FILE_SECTOR; i++) {
+		tmp[ i ] = true;
+	}
+
+	return TOT_SECTORS - tmp.count();
 }
 
 void tape_image_t::set_sector(unsigned s_no , const tape_word_t *s_data)
@@ -493,30 +563,133 @@ bool tape_image_t::get_sector(unsigned s_no , tape_word_t *s_data)
 	}
 }
 
-bool tape_image_t::get_dir_entry(unsigned idx , dir_entry_t& entry)
+bool tape_image_t::get_dir_entry(unsigned idx , const dir_entry_t*& entry) const
 {
 	if (idx >= dir.size()) {
 		return false;
 	} else {
-		entry = dir[ idx ];
+		entry = &dir[ idx ];
 		return true;
 	}
 }
 
-bool tape_image_t::get_dir_entry(const char* filename , dir_entry_t& entry)
+bool tape_image_t::find_file(const char *filename , bool ignore_ext , unsigned& idx) const
 {
-	for (const dir_entry_t& ent : dir) {
+	char fname[ CHARS_PER_FNAME_EXT + 1 ];
+	char ext[ CHARS_PER_EXT + 1 ];
+
+	split_filename_and_ext(filename, fname, ext);
+
+	bool has_ext = !ignore_ext && *ext != '\0';
+
+	if (has_ext) {
+		strcat(fname , ".");
+		strcat(fname , ext);
+	}
+
+	for (auto i = dir.cbegin(); i < dir.cend(); i++) {
 		char full_fname[ CHARS_PER_FNAME_EXT + 1 ];
 		bool qmark;
 
-		get_filename_and_ext(ent, full_fname, qmark);
+		get_filename_and_ext(*i, has_ext, full_fname, qmark);
 
-		if (strcmp(filename , full_fname) == 0) {
-			entry = ent;
+		if (strcmp(fname , full_fname) == 0) {
+			idx = i - dir.cbegin();
 			return true;
 		}
 	}
+
 	return false;
+}
+
+void tape_image_t::delete_dir_entry(unsigned idx)
+{
+	const dir_entry_t& ent = dir[ idx ];
+
+	// Release all sectors of file
+	for (unsigned i = ent.filepos; i < ent.filepos + ent.n_sects; i++) {
+		unset_sector(i);
+	}
+
+	dir.erase(dir.begin() + idx);
+	dirty = true;
+}
+
+bool tape_image_t::find_free_block(unsigned blocks , unsigned& first_s) const
+{
+	if (blocks >= (TOT_SECTORS - FIRST_FILE_SECTOR)) {
+		return false;
+	}
+
+	std::bitset<TOT_SECTORS> scanner;
+
+	for (unsigned i = FIRST_FILE_SECTOR; i < (FIRST_FILE_SECTOR + blocks); i++) {
+		scanner[ i ] = true;
+	}
+
+	for (unsigned i = FIRST_FILE_SECTOR; i <= (TOT_SECTORS - blocks); i++) {
+		std::bitset<TOT_SECTORS> tmp_map(alloc_map & scanner);
+		if (tmp_map.none()) {
+			first_s = i;
+			return true;
+		}
+		scanner <<= 1;
+	}
+
+	return false;
+}
+
+bool tape_image_t::alloc_new_file(unsigned blocks , dir_entry_t*& entry)
+{
+	if (dir.size() >= MAX_DIR_ENTRIES) {
+		return false;
+	}
+
+	dir_entry_t new_entry;
+
+	memset(&new_entry.filename[ 0 ] , 0 , sizeof(new_entry.filename));
+	new_entry.protection = 0;
+	new_entry.filetype = 0;
+	new_entry.n_recs = 0;
+	new_entry.wpr = 0;
+
+	unsigned first_s;
+
+	if (!find_free_block(blocks, first_s)) {
+		return false;
+	}
+
+	new_entry.filepos = (UINT16)first_s;
+	new_entry.n_sects = blocks;
+
+	dir.push_back(new_entry);
+	entry = &dir.back();
+	dirty = true;
+
+	return true;
+}
+
+void tape_image_t::split_filename_and_ext(const char *filename , char *fname , char *ext)
+{
+	char *fname_fence = fname + CHARS_PER_FNAME;
+
+	while (fname < fname_fence && *filename != '\0' && *filename != '.') {
+		*fname++ = *filename++;
+	}
+
+	*fname = '\0';
+
+	while (*filename != '\0' && *filename != '.') {
+		filename++;
+	}
+
+	if (*filename == '\0') {
+		*ext = '\0';
+	} else {
+		filename++;
+		strncpy(ext , filename , CHARS_PER_EXT);
+		ext[ CHARS_PER_EXT ] = '\0';
+	}
 }
 
 void tape_image_t::wipe_sector(tape_word_t *s)
@@ -660,7 +833,7 @@ static const char *const filetype_attrs[] = {
 	OPRM_ATTR_STR	// 7
 };
 
-void tape_image_t::get_filename_and_ext(const dir_entry_t& ent , char *out , bool& qmark)
+void tape_image_t::get_filename_and_ext(const dir_entry_t& ent , bool inc_ext , char *out , bool& qmark)
 {
 	strncpy(&out[ 0 ] , (const char*)&ent.filename[ 0 ] , CHARS_PER_FNAME);
 	out[ CHARS_PER_FNAME ] = '\0';
@@ -675,8 +848,10 @@ void tape_image_t::get_filename_and_ext(const dir_entry_t& ent , char *out , boo
 	qmark = (type_low == DATA_FILETYPE && type_hi == 3) ||
 				  (type_low != DATA_FILETYPE && type_hi != 2);
 
-	strcat(out , ".");
-	strcat(out , filetype_str);
+	if (inc_ext) {
+		strcat(out , ".");
+		strcat(out , filetype_str);
+	}
 }
 
 bool tape_image_t::decode_dir(void)
@@ -864,7 +1039,7 @@ static imgtoolerr_t hp9845_tape_next_enum (imgtool_directory *enumeration, imgto
 	tape_image_t& tape_image = get_tape_image(state);
 	dir_state_t *ds = (dir_state_t*)imgtool_directory_extrabytes(enumeration);
 
-	dir_entry_t entry;
+	const dir_entry_t *entry = nullptr;
 
 	if (!tape_image.get_dir_entry(ds->dir_idx, entry)) {
 		ent->eof = 1;
@@ -873,12 +1048,12 @@ static imgtoolerr_t hp9845_tape_next_enum (imgtool_directory *enumeration, imgto
 
 		bool qmark;
 
-		tape_image_t::get_filename_and_ext(entry, ent->filename, qmark);
+		tape_image_t::get_filename_and_ext(*entry, true, ent->filename, qmark);
 
 		// "filename" and "attr" fields try to look like the output of the "CAT" command
-		snprintf(ent->attr , sizeof(ent->attr) , "%c %02x%c %4u %4u %3u" , entry.protection ? '*' : ' ' , entry.filetype , qmark ? '?' : ' ' , entry.n_recs , entry.wpr * 2 , entry.filepos);
+		snprintf(ent->attr , sizeof(ent->attr) , "%c %02x%c %4u %4u %3u" , entry->protection ? '*' : ' ' , entry->filetype , qmark ? '?' : ' ' , entry->n_recs , entry->wpr * 2 , entry->filepos);
 
-		ent->filesize = entry.n_sects * SECTOR_LEN;
+		ent->filesize = entry->n_sects * SECTOR_LEN;
 	}
 	return IMGTOOLERR_SUCCESS;
 }
@@ -898,17 +1073,22 @@ static imgtoolerr_t hp9845_tape_read_file(imgtool_partition *partition, const ch
 	tape_state_t& state = get_tape_state(imgtool_partition_image(partition));
 	tape_image_t& tape_image = get_tape_image(state);
 
-	dir_entry_t ent;
+	unsigned idx;
 
-	if (!tape_image.get_dir_entry(filename, ent)) {
+	if (!tape_image.find_file(filename , false , idx)) {
 		return IMGTOOLERR_FILENOTFOUND;
 	}
 
-	unsigned sect_no = ent.filepos;
+	const dir_entry_t *ent = nullptr;
+
+	tape_image.get_dir_entry(idx, ent);
+
+	unsigned sect_no = ent->filepos;
+	unsigned n_sects = ent->n_sects;
 	tape_word_t buff_w[ WORDS_PER_SECTOR ];
 	UINT8 buff_b[ SECTOR_LEN ];
 
-	while (ent.n_sects--) {
+	while (n_sects--) {
 		if (!tape_image.get_sector(sect_no++, &buff_w[ 0 ])) {
 			return IMGTOOLERR_READERROR;
 		}
@@ -921,6 +1101,125 @@ static imgtoolerr_t hp9845_tape_read_file(imgtool_partition *partition, const ch
 
 	return IMGTOOLERR_SUCCESS;
 }
+
+static imgtoolerr_t hp9845_tape_write_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+{
+	tape_state_t& state = get_tape_state(imgtool_partition_image(partition));
+	tape_image_t& tape_image = get_tape_image(state);
+
+	unsigned idx;
+
+	if (tape_image.find_file(filename , true , idx)) {
+		// When overwriting a file, delete its old version first
+		tape_image.delete_dir_entry(idx);
+	}
+
+	unsigned blocks = (unsigned)((stream_size(sourcef) + SECTOR_LEN - 1) / SECTOR_LEN);
+
+	if (!blocks) {
+		fprintf(stderr , "Null file, not writing..\n");
+		return IMGTOOLERR_SUCCESS;
+	}
+
+	dir_entry_t *ent = nullptr;
+
+	if (!tape_image.alloc_new_file(blocks, ent)) {
+		return IMGTOOLERR_NOSPACE;
+	}
+
+	unsigned s_no = ent->filepos;
+
+	char fname[ CHARS_PER_FNAME + 1 ];
+	char ext[ CHARS_PER_EXT + 1 ];
+
+	tape_image_t::split_filename_and_ext(filename, fname, ext);
+
+	strncpy((char*)&ent->filename[ 0 ] , fname , CHARS_PER_FNAME);
+
+	for (unsigned i = 0; i < blocks; i++) {
+		tape_word_t buff_w[ WORDS_PER_SECTOR ];
+		UINT8 buff_b[ SECTOR_LEN ];
+
+		memset(&buff_b[ 0 ] , 0 , sizeof(buff_b));
+
+		if (stream_read(sourcef , buff_b , SECTOR_LEN) != SECTOR_LEN && i != (blocks - 1)) {
+			return IMGTOOLERR_READERROR;
+		}
+		for (unsigned j = 0; j < WORDS_PER_SECTOR; j++) {
+			tape_image_t::bytes_to_tape_word(buff_b[ 2 * j ], buff_b[ 2 * j + 1 ], buff_w[ j ]);
+		}
+		tape_image.set_sector(s_no, buff_w);
+		s_no++;
+	}
+
+	int wpr = opts->lookup_int('W');
+	if (wpr == 0) {
+		wpr = WORDS_PER_SECTOR;
+	} else if (wpr > (blocks * WORDS_PER_SECTOR)) {
+		fprintf(stderr , "WPR value too large, using %u\n" , WORDS_PER_SECTOR);
+		wpr = WORDS_PER_SECTOR;
+	}
+	ent->wpr = (UINT16)wpr;
+
+	ent->n_recs = (UINT16)((blocks * WORDS_PER_SECTOR) / wpr);
+
+	unsigned type_low;
+
+	if (opts->lookup_int('T') == 0) {
+		// File type defaults to DATA if no extension is given or extension is invalid
+		type_low = DATA_FILETYPE;
+		for (unsigned i = 0; i < 8; i++) {
+			if (strcmp(filetype_attrs[ i ] , ext) == 0) {
+				type_low = i;
+				break;
+			}
+		}
+	} else {
+		type_low = opts->lookup_int('T') - 1;
+	}
+
+	// See tape_image_t::get_filename_and_ext for the logic behind file type
+	if (type_low == DATA_FILETYPE) {
+		ent->filetype = (UINT8)type_low + (1U << 3);
+	} else {
+		ent->filetype = (UINT8)type_low + (2U << 3);
+	}
+
+	return IMGTOOLERR_SUCCESS;
+}
+
+static imgtoolerr_t hp9845_tape_delete_file(imgtool_partition *partition, const char *filename)
+{
+	tape_state_t& state = get_tape_state(imgtool_partition_image(partition));
+	tape_image_t& tape_image = get_tape_image(state);
+
+	unsigned idx;
+
+	if (!tape_image.find_file(filename , true , idx)) {
+		return IMGTOOLERR_FILENOTFOUND;
+	}
+
+	tape_image.delete_dir_entry(idx);
+
+	return IMGTOOLERR_SUCCESS;
+}
+
+#define HP9845_WRITEFILE_OPTSPEC	"W[0]-65535;T[0]-8"
+
+OPTION_GUIDE_START(hp9845_write_optguide)
+	OPTION_INT('W' , "wpr" , "Words per record")
+	OPTION_ENUM_START('T' , "ftype" , "File type")
+	OPTION_ENUM(0 , "auto" , "Automatic (\"DATA\" or by extension)")
+	OPTION_ENUM(1 , "U"    , "BKUP")
+	OPTION_ENUM(2 , "D"    , "DATA")
+	OPTION_ENUM(3 , "P"    , "PROG")
+	OPTION_ENUM(4 , "K"    , "KEYS")
+	OPTION_ENUM(5 , "T"    , "BDAT")
+	OPTION_ENUM(6 , "A"    , "ALL")
+	OPTION_ENUM(7 , "B"    , "BPRG")
+	OPTION_ENUM(8 , "O"    , "OPRM")
+	OPTION_ENUM_END
+OPTION_GUIDE_END
 
 void hp9845_tape_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
 {
@@ -975,6 +1274,22 @@ void hp9845_tape_get_info(const imgtool_class *imgclass, UINT32 state, union img
 
 	case IMGTOOLINFO_PTR_READ_FILE:
 		info->read_file = hp9845_tape_read_file;
+		break;
+
+	case IMGTOOLINFO_PTR_WRITE_FILE:
+		info->write_file = hp9845_tape_write_file;
+		break;
+
+	case IMGTOOLINFO_PTR_DELETE_FILE:
+		info->delete_file = hp9845_tape_delete_file;
+		break;
+
+	case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:
+		info->writefile_optguide = &hp9845_write_optguide;
+		break;
+
+	case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:
+		strcpy(info->s = imgtool_temp_str(), HP9845_WRITEFILE_OPTSPEC);
 		break;
 	}
 }
