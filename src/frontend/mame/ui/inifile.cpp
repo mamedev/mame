@@ -310,6 +310,8 @@ bool favorite_manager::isgame_favorite(const game_driver *driver)
 			m_current = current;
 			return true;
 		}
+
+	m_current = m_list.begin();
 	return false;
 }
 
@@ -325,6 +327,8 @@ bool favorite_manager::isgame_favorite(ui_software_info const &swinfo)
 			m_current = current;
 			return true;
 		}
+
+	m_current = m_list.begin();
 	return false;
 }
 
