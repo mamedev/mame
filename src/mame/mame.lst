@@ -4,7 +4,7 @@
 
     mame.lst
 
-    This is automaticaly generated file, that should be manually updated when
+    This is not automatically generated file, and should be manually updated when
     new driver is added. From time to time we will auto update comments
     according to meta-data from source files.
 
@@ -14139,6 +14139,7 @@ astro                           // Kosmos
 bankshot                        // Parker Bros
 bigtrak                         // Milton Bradley
 bship                           // Milton Bradley
+bshipb                          // Milton Bradley
 copycat                         // Tiger Electronics
 copycatm2                       // Tiger Electronics
 cnfball                         // Conic
@@ -29221,8 +29222,9 @@ clubpacmb                       // Miky SRL
 crockman                        // 1980 bootleg (RENE PIERRE)
 crush                           // (c) 1981 Kural Samno Electric Ltd
 crush2                          // (c) 1981 Kural Esco Electric Ltd - bootleg?
-crush3                          // Kural Electric Ltd - bootleg?
-crush4                          // Kural TWT
+crush3                          // Kural Electric Ltd
+crush4                          // Kural Electric Ltd - bootleg?
+crush5                          // Kural TWT
 crushbl                         // bootleg
 crushbl2                        // bootleg
 crushbl3                        // bootleg
@@ -29545,6 +29547,9 @@ pcg850v                         // Pocket Computer G850V
 @source:pcfx.cpp
 pcfx                            // PC-FX NEC 1994
 pcfxga                          // PC-FX NEC 199? (PC-FX on a PC ISA Card)
+
+@source:pcipc.cpp
+pcipc                           //
 
 @source:pcktgal.cpp
 pcktgal                         // (c) 1987 Data East Corporation (Japan)
@@ -31350,6 +31355,9 @@ rbislando                       // B22 (c) 1987 Taito Corporation
 
 @source:rbmk.cpp
 rbmk                            // (c) 1995 GMS
+
+@source:rc702.cpp
+rc702                           // 1979 RC702
 
 @source:rc759.cpp
 rc759                           // 1984 RC759

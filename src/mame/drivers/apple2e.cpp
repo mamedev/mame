@@ -1265,26 +1265,6 @@ READ8_MEMBER(apple2e_state::c000_r)
 		case 0x00:  // keyboard latch
 			return m_transchar | m_strobe;
 
-		case 0x02:  // RAMRDOFF
-			m_ramrd = false;
-			auxbank_update();
-			break;
-
-		case 0x03:  // RAMRDON
-			m_ramrd = true;
-			auxbank_update();
-			break;
-
-		case 0x04:  // RAMWRTOFF
-			m_ramwrt = false;
-			auxbank_update();
-			break;
-
-		case 0x05:  // RAMWRTON
-			m_ramwrt = true;
-			auxbank_update();
-			break;
-
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
 				UINT8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);

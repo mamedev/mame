@@ -22,6 +22,7 @@ public:
 		m_k007121_2(*this, "k007121_2"),
 		m_upd7759(*this, "upd"),
 		m_msm5205(*this, "msm5205"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
@@ -62,10 +63,11 @@ public:
 	optional_device<k007121_device> m_k007121_2;
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<msm5205_device> m_msm5205;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-
+	
 	optional_ioport_array<4> m_track_ports;
 
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
@@ -79,6 +81,7 @@ public:
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(protection_clock_w);
 	DECLARE_WRITE8_MEMBER(combatsc_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(combatsc_video_r);
