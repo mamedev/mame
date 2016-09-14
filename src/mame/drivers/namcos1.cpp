@@ -182,7 +182,8 @@ Notes:
 - The ROM/RAM test is NOT performed by default. It is only done if the test mode
   switch is on when the game powers up (setting it and resetting is not enough).
   You can manage to make it work if you press F2 quickly enough after the MAME
-  startup screen, without having to exit MAME and restarting.
+  startup screen, without having to exit MAME and restarting [or just use hard 
+  reset].
 
 - There are three watchdogs, one per CPU. Handling them separately is necessary
   to allow entering service mode without manually resetting: only one of the CPUs
