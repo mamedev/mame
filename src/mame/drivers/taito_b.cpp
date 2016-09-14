@@ -1444,15 +1444,15 @@ static INPUT_PORTS_START( silentd ) /* World Version */
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x04, 0x04, "Invulnerability (Cheat)" )   PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Friendly Fire" )   PORT_DIPLOCATION("SW2:3") // "hit of players" or "invincible player mode"
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Power-Up Bonus" )        PORT_DIPLOCATION("SW2:4") /* Manual States "Power-Up at Stage Clear" */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Regain Power" )      PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Power-Up at Stage Clear" )	PORT_DIPLOCATION("SW2:4") // "clear stage power-up"
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Regain Power buy-in" )      PORT_DIPLOCATION("SW2:5") // If enabled player can use a credit to refill his HP and get a "rage" mode for few seconds
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 
 /*  Manual Shows "1 Coin Slot (Shared)" and "4 Coin Slot (1 Per Player)"
 
