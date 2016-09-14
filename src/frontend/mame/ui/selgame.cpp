@@ -549,36 +549,37 @@ void menu_select_game::populate()
 			}
 		}
 	}
-	// populate favorites list
 	else
 	{
+		// populate favorites list
 		m_search[0] = '\0';
 		int curitem = 0;
+
 		// iterate over entries
-		for (auto & mfavorite : mame_machine_manager::instance()->favorite().m_list)
+		for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
 		{
 			auto flags = flags_ui | FLAG_UI_FAVORITE;
-			if (mfavorite.startempty == 1)
+			if (favmap.second.startempty == 1)
 			{
-				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
+				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver)
 					old_item_selected = curitem;
 
-				bool cloneof = strcmp(mfavorite.driver->parent, "0");
+				bool cloneof = strcmp(favmap.second.driver->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(mfavorite.driver->parent);
+					int cx = driver_list::find(favmap.second.driver->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
-				item_append(mfavorite.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&mfavorite);
+				item_append(favmap.second.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&favmap.second);
 			}
 			else
 			{
-				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
+				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver)
 					old_item_selected = curitem;
-				item_append(mfavorite.longname, mfavorite.devicetype,
-					mfavorite.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&mfavorite);
+				item_append(favmap.second.longname, favmap.second.devicetype,
+							favmap.second.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&favmap.second);
 			}
 			curitem++;
 		}
@@ -993,9 +994,6 @@ void menu_select_game::inkey_special(const event *menu_event)
 
 void menu_select_game::build_list(const char *filter_text, int filter, bool bioscheck, std::vector<const game_driver *> s_drivers)
 {
-	int cx = 0;
-	bool cloneof = false;
-
 	if (s_drivers.empty())
 	{
 		filter = main_filters::actual;
@@ -1037,20 +1035,21 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 
 		case FILTER_PARENT:
 		case FILTER_CLONES:
-			cloneof = strcmp(s_driver->parent, "0");
-			if (cloneof)
 			{
-				cx = driver_list::find(s_driver->parent);
-				if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
-					cloneof = false;
+				bool cloneof = strcmp(s_driver->parent, "0");
+				if (cloneof)
+				{
+					auto cx = driver_list::find(s_driver->parent);
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+						cloneof = false;
+				}
+
+				if (filter == FILTER_CLONES && cloneof)
+					m_displaylist.push_back(s_driver);
+				else if (filter == FILTER_PARENT && !cloneof)
+					m_displaylist.push_back(s_driver);
 			}
-
-			if (filter == FILTER_CLONES && cloneof)
-				m_displaylist.push_back(s_driver);
-			else if (filter == FILTER_PARENT && !cloneof)
-				m_displaylist.push_back(s_driver);
 			break;
-
 		case FILTER_NOT_WORKING:
 			if (s_driver->flags & MACHINE_NOT_WORKING)
 				m_displaylist.push_back(s_driver);
@@ -1417,11 +1416,10 @@ bool menu_select_game::load_available_machines()
 
 	file.gets(rbuf, MAX_CHAR_INFO);
 	file.gets(rbuf, MAX_CHAR_INFO);
-	int avsize = 0, unavsize = 0;
 	file.gets(rbuf, MAX_CHAR_INFO);
-	avsize = atoi(rbuf);
+	auto avsize = atoi(rbuf);
 	file.gets(rbuf, MAX_CHAR_INFO);
-	unavsize = atoi(rbuf);
+	auto unavsize = atoi(rbuf);
 
 	// load available list
 	for (int x = 0; x < avsize; ++x)

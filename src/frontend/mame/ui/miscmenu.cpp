@@ -691,7 +691,7 @@ menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_cont
 
 menu_machine_configure::~menu_machine_configure()
 {
-	if (m_fav_reset && main_filters::actual == FILTER_FAVORITE)
+	if (m_fav_reset)
 		reset_topmost(reset_options::SELECT_FIRST);
 }
 
@@ -729,8 +729,13 @@ void menu_machine_configure::handle()
 					break;
 				case DELFAV:
 					mame_machine_manager::instance()->favorite().remove_favorite_game();
-					m_fav_reset = true;
-					reset(reset_options::REMEMBER_POSITION);
+					if (main_filters::actual == FILTER_FAVORITE)
+					{
+						m_fav_reset = true;
+						menu::stack_pop();
+					}
+					else
+						reset(reset_options::REMEMBER_POSITION);
 					break;
 				case CONTROLLER:
 					if (menu_event->iptkey == IPT_UI_SELECT)
