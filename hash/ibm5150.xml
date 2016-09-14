@@ -3021,6 +3021,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="budokan">
+		<description>Budokan - The Martial Spirit</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Budokan - The Martial Spirit [Electronic Arts] [1989] [3.5] [1 of 1].img" size="737280" crc="fea46e33" sha1="bf874ea08695344cc9c3db8bc1b2db2e0b62ca9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="armorik">
 		<description>Les 8 Conquêtes d'Armorik le Viking</description>
 		<year>1988</year>
@@ -3046,7 +3057,23 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="indy500">
-		<description>Indianapolis 500: The Simulation</description>
+		<description>Indianapolis 500: The Simulation (5.25")</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indianapolis 500 - The Simulation [1989] [5.25] [1 of 2].img" size="368640" crc="5d8f3b23" sha1="c3abf7a4cbc444ee1d60c5de278812502e529932" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indianapolis 500 - The Simulation [1989] [5.25] [2 of 2].img" size="368640" crc="ca21e0ee" sha1="875c81518345d100444457b610873d36061c3602" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indy500_35" cloneof="indy500">
+		<description>Indianapolis 500: The Simulation (3.5")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3221,6 +3248,23 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="The Lurking Horror [1987] [5.25] [1 of 1].img" size="368640" crc="4dbd2ab2" sha1="175a7890f776f93c1b7ef6f0a3bc8afc4b634cc1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360 -->
+	<software name="purplesa" supported="no">
+		<description>Purple Saturn Day</description>
+		<year>1989</year>
+		<publisher>Epyx</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "354497">
+				<rom name="Purple Saturn Day [1989] [5.25] [1 of 2].td0" size="354497" crc="8832e9eb" sha1="84a4d1f85ad8f34f11686d3f8c5725a5f332b652" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "339570">
+				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

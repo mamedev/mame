@@ -7,7 +7,7 @@ class superqix_state : public driver_device
 public:
 	enum
 	{
-		MCU_ACKNOWLEDGE,
+		MCU_ACKNOWLEDGE, /// TODO: get rid of this hack!
 		HLE_68705_WRITE
 	};
 
@@ -96,6 +96,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hotsmash_68705_ddr_c_w);
 	DECLARE_WRITE8_MEMBER(hotsmash_Z80_mcu_w);
 	DECLARE_READ8_MEMBER(hotsmash_Z80_mcu_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(superqix_semaphore_input_r);
 	DECLARE_WRITE8_MEMBER(pbillian_Z80_mcu_w);
 	DECLARE_WRITE8_MEMBER(superqix_videoram_w);
@@ -103,8 +104,9 @@ public:
 	DECLARE_WRITE8_MEMBER(superqix_bitmapram2_w);
 	DECLARE_WRITE8_MEMBER(pbillian_0410_w);
 	DECLARE_WRITE8_MEMBER(superqix_0410_w);
-	DECLARE_READ8_MEMBER(in4_mcu_r);
 	DECLARE_READ8_MEMBER(sqix_from_mcu_r);
+	//DECLARE_READ8_MEMBER(superqix_ay1_a_r);
+	DECLARE_READ8_MEMBER(in4_mcu_r); //DECLARE_READ8_MEMBER(superqix_ay1_b_r);
 	DECLARE_WRITE8_MEMBER(sqix_z80_mcu_w);
 	DECLARE_READ8_MEMBER(bootleg_in0_r);
 	DECLARE_READ8_MEMBER(hotsmash_ay_port_a_r);

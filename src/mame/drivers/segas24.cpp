@@ -354,6 +354,9 @@ Notes:
 #define FRC_CLOCK_MODE0     (MASTER_CLOCK/2)/24 // /16 according to Charles
 #define FRC_CLOCK_MODE1     (MASTER_CLOCK/2)/1536 // /1024 according to Charles, but /1536 sounds better
 
+#define FDC_LEGACY_LOG		0
+#define FDC_LOG(x) do { if (FDC_LEGACY_LOG) logerror x; } while (0)
+
 enum {
 	IRQ_YM2151 = 1,
 	IRQ_TIMER  = 2,
@@ -394,18 +397,18 @@ READ16_MEMBER( segas24_state::fdc_r )
 		int res = fdc_data;
 		if(fdc_drq) {
 			fdc_span--;
-			// logerror("Read %02x (%d)\n", res, fdc_span);
+			// FDC_LOG(("Read %02x (%d)\n", res, fdc_span));
 			if(fdc_span) {
 				fdc_pt++;
 				fdc_data = *fdc_pt;
 			} else {
-				logerror("FDC: transfert complete\n");
+				FDC_LOG(("FDC: transfert complete\n"));
 				fdc_drq = 0;
 				fdc_status = 0;
 				fdc_irq = 1;
 			}
 		} else
-			logerror("FDC: data read with drq down\n");
+			FDC_LOG(("FDC: data read with drq down\n"));
 		return res;
 	}
 	}
@@ -423,19 +426,19 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 			fdc_irq = 0;
 			switch(data >> 4) {
 			case 0x0:
-				logerror("FDC: Restore\n");
+				FDC_LOG(("FDC: Restore\n"));
 				fdc_phys_track = fdc_track = 0;
 				fdc_irq = 1;
 				fdc_status = 4;
 				break;
 			case 0x1:
-				logerror("FDC: Seek %d\n", fdc_data);
+				FDC_LOG(("FDC: Seek %d\n", fdc_data));
 				fdc_phys_track = fdc_track = fdc_data;
 				fdc_irq = 1;
 				fdc_status = fdc_track ? 0 : 4;
 				break;
 			case 0x9:
-				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
+				FDC_LOG(("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track));
 				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
@@ -443,14 +446,14 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 				fdc_data = *fdc_pt;
 				break;
 			case 0xb:
-				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
+				FDC_LOG(("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track));
 				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
 				break;
 			case 0xd:
-				logerror("FDC: Forced interrupt\n");
+				FDC_LOG(("FDC: Forced interrupt\n"));
 				fdc_span = 0;
 				fdc_drq = 0;
 				fdc_irq = data & 1;
@@ -458,38 +461,38 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 				break;
 			case 0xf:
 				if(data == 0xfe)
-					logerror("FDC: Assign mode %02x\n", fdc_data);
+					FDC_LOG(("FDC: Assign mode %02x\n", fdc_data));
 				else if(data == 0xfd)
-					logerror("FDC: Assign parameter %02x\n", fdc_data);
+					FDC_LOG(("FDC: Assign parameter %02x\n", fdc_data));
 				else
-					logerror("FDC: Unknown command %02x\n", data);
+					FDC_LOG(("FDC: Unknown command %02x\n", data));
 				break;
 			default:
-				logerror("FDC: Unknown command %02x\n", data);
+				FDC_LOG(("FDC: Unknown command %02x\n", data));
 				break;
 			}
 			break;
 		case 1:
-			logerror("FDC: Track register %02x\n", data);
+			FDC_LOG(("FDC: Track register %02x\n", data));
 			fdc_track = data;
 			break;
 		case 2:
-			logerror("FDC: Sector register %02x\n", data);
+			FDC_LOG(("FDC: Sector register %02x\n", data));
 			fdc_sector = data;
 			break;
 		case 3:
 			if(fdc_drq) {
-				//              logerror("Write %02x (%d)\n", data, fdc_span);
+				//              FDC_LOG("Write %02x (%d)\n", data, fdc_span);
 				*fdc_pt++ = data;
 				fdc_span--;
 				if(!fdc_span) {
-					logerror("FDC: transfert complete\n");
+					FDC_LOG(("FDC: transfert complete\n"));
 					fdc_drq = 0;
 					fdc_status = 0;
 					fdc_irq = 1;
 				}
 			} else
-				logerror("FDC: Data register %02x\n", data);
+				FDC_LOG(("FDC: Data register %02x\n", data));
 			fdc_data = data;
 			break;
 		}
@@ -507,7 +510,7 @@ READ16_MEMBER( segas24_state::fdc_status_r )
 WRITE16_MEMBER( segas24_state::fdc_ctrl_w )
 {
 	if(ACCESSING_BITS_0_7)
-		logerror("FDC control %02x\n", data & 0xff);
+		FDC_LOG(("FDC control %02x\n", data & 0xff));
 }
 
 
