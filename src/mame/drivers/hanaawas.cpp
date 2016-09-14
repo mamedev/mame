@@ -70,6 +70,12 @@ WRITE8_MEMBER(hanaawas_state::hanaawas_inputs_mux_w)
 	m_mux = data;
 }
 
+WRITE8_MEMBER(hanaawas_state::irq_ack_w)
+{
+	m_maincpu->set_input_line(0,CLEAR_LINE);
+}
+
+
 static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
@@ -77,6 +83,7 @@ static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(hanaawas_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(hanaawas_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(irq_ack_w)
 ADDRESS_MAP_END
 
 
@@ -86,6 +93,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, hanaawas_state )
 	AM_RANGE(0x01, 0x01) AM_READNOP /* it must return 0 */
 	AM_RANGE(0x10, 0x10) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITENOP // watchdog
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hanaawas )
@@ -189,7 +197,7 @@ static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(hanaawas_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_assert)
 
 
 	/* video hardware */
