@@ -180,7 +180,7 @@ UINT32 rollrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		sx =  offs % 32;
 		sy =  offs / 32;
 
-		scroll = ( 8 * sy + m_colorram[2 * sx] ) % 256;
+		scroll = ( 8 * sy - m_colorram[2 * sx] ) % 256;
 		col = m_colorram[ sx * 2 + 1 ]&0x1f;
 
 		if (!m_flipy)
