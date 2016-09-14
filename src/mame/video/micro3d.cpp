@@ -72,7 +72,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 
 	UINT16 *frame_src;
 
-	scanline = MAX((scanline - params->veblnk), 0);
+	scanline = std::max((scanline - params->veblnk), 0);
 	frame_src = m_frame_buffers[m_display_buffer].get() + (scanline << 10);
 
 	/* TODO: XFER3DK - X/Y offsets for 3D */

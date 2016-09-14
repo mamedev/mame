@@ -750,7 +750,7 @@ void tmp95c061_device::tlcs900_check_irqs()
 	}
 
 	/* Check highest allowed priority irq */
-	for ( i = MAX( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
+	for ( i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
 	{
 		if ( irq_vectors[i] >= 0 )
 		{
@@ -1704,7 +1704,7 @@ void tmp95c063_device::tlcs900_check_irqs()
 	}
 
 	/* Check highest allowed priority irq */
-	for ( i = MAX( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
+	for ( i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
 	{
 		if ( irq_vectors[i] >= 0 )
 		{

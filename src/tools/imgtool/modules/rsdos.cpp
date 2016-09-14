@@ -465,7 +465,7 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool_partition *partition, cons
 		gptr = &granule_map[g];
 
 
-		i = MIN(sz, (9*256));
+		i = std::min(sz, UINT64(9*256));
 		err = transfer_to_granule(img, g, i, sourcef);
 		if (err)
 			return err;

@@ -153,17 +153,32 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/apricot/expansion.h,BUSES["APRICOT_EXPANSION"] = true
+--@src/devices/bus/apricot/expansion/expansion.h,BUSES["APRICOT_EXPANSION"] = true
 ---------------------------------------------------
 
 if (BUSES["APRICOT_EXPANSION"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/apricot/expansion.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/expansion.h",
-		MAME_DIR .. "src/devices/bus/apricot/cards.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/cards.h",
-		MAME_DIR .. "src/devices/bus/apricot/ram.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/ram.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/expansion.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/expansion.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/apricot/keyboard/keyboard.h,BUSES["APRICOT_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["APRICOT_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/hle.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/hle.h",
 	}
 end
 
@@ -198,6 +213,58 @@ if (BUSES["ASTROCADE"]~=null) then
 		MAME_DIR .. "src/devices/bus/astrocde/exp.h",
 		MAME_DIR .. "src/devices/bus/astrocde/ram.cpp",
 		MAME_DIR .. "src/devices/bus/astrocde/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/analogue/analogue.h,BUSES["BBC_ANALOGUE"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_ANALOGUE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/1mhzbus/1mhzbus.h,BUSES["BBC_1MHZBUS"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_1MHZBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/tube/tube.h,BUSES["BBC_TUBE"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_TUBE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/userport/userport.h,BUSES["BBC_USERPORT"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_USERPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/userport/userport.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/userport.h",
 	}
 end
 
@@ -583,6 +650,8 @@ if (BUSES["ELECTRON"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/electron/exp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
+		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
+		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
 end
 
@@ -831,6 +900,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/p1_hdc.h",
 		MAME_DIR .. "src/devices/bus/isa/p1_rom.cpp",
 		MAME_DIR .. "src/devices/bus/isa/p1_rom.h",
+		MAME_DIR .. "src/devices/bus/isa/p1_sound.cpp",
+		MAME_DIR .. "src/devices/bus/isa/p1_sound.h",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_fdc.h",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_rom.cpp",
@@ -1606,6 +1677,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/pty.h",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.h",
+		MAME_DIR .. "src/devices/bus/rs232/sun_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/sun_kbd.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.h",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.cpp",
@@ -2514,6 +2587,20 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sunkbd/sunkbd.h,BUSES["SUNKBD"] = true
+---------------------------------------------------
+
+if (BUSES["SUNKBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sunkbd/hlekbd.cpp",
+		MAME_DIR .. "src/devices/bus/sunkbd/hlekbd.h",
+		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.cpp",
+		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.h",
 	}
 end
 

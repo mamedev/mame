@@ -127,7 +127,7 @@ bool flac_encoder::encode_interleaved(const INT16 *samples, UINT32 samples_per_c
 		// process in batches of 2k samples
 		FLAC__int32 converted_buffer[2048];
 		FLAC__int32 *dest = converted_buffer;
-		UINT32 cur_samples = MIN(ARRAY_LENGTH(converted_buffer) / num_channels, samples_per_channel);
+		UINT32 cur_samples = (std::min<size_t>)(ARRAY_LENGTH(converted_buffer) / num_channels, samples_per_channel);
 
 		// convert a buffers' worth
 		for (UINT32 sampnum = 0; sampnum < cur_samples; sampnum++)
@@ -160,7 +160,7 @@ bool flac_encoder::encode(INT16 *const *samples, UINT32 samples_per_channel, boo
 		// process in batches of 2k samples
 		FLAC__int32 converted_buffer[2048];
 		FLAC__int32 *dest = converted_buffer;
-		UINT32 cur_samples = MIN(ARRAY_LENGTH(converted_buffer) / num_channels, samples_per_channel);
+		UINT32 cur_samples = (std::min<size_t>)(ARRAY_LENGTH(converted_buffer) / num_channels, samples_per_channel);
 
 		// convert a buffers' worth
 		for (UINT32 sampnum = 0; sampnum < cur_samples; sampnum++, srcindex++)
@@ -233,7 +233,7 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 		// if we're ignoring, continue to do so
 		if (m_ignore_bytes != 0)
 		{
-			int ignore = MIN(bytes - offset, m_ignore_bytes);
+			size_t ignore = std::min(bytes - offset, size_t(m_ignore_bytes));
 			offset += ignore;
 			m_ignore_bytes -= ignore;
 		}
@@ -526,7 +526,7 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 		UINT32 outputpos = 0;
 		if (outputpos < *bytes && m_compressed_offset < m_compressed_length)
 		{
-			UINT32 bytes_to_copy = MIN(*bytes - outputpos, m_compressed_length - m_compressed_offset);
+			UINT32 bytes_to_copy = (std::min<size_t>)(*bytes - outputpos, m_compressed_length - m_compressed_offset);
 			memcpy(&buffer[outputpos], m_compressed_start + m_compressed_offset, bytes_to_copy);
 			outputpos += bytes_to_copy;
 			m_compressed_offset += bytes_to_copy;
@@ -535,7 +535,7 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 		// once we're out of that, copy from the secondary buffer
 		if (outputpos < *bytes && m_compressed_offset < m_compressed_length + m_compressed2_length)
 		{
-			UINT32 bytes_to_copy = MIN(*bytes - outputpos, m_compressed2_length - (m_compressed_offset - m_compressed_length));
+			UINT32 bytes_to_copy = (std::min<size_t>)(*bytes - outputpos, m_compressed2_length - (m_compressed_offset - m_compressed_length));
 			memcpy(&buffer[outputpos], m_compressed2_start + m_compressed_offset - m_compressed_length, bytes_to_copy);
 			outputpos += bytes_to_copy;
 			m_compressed_offset += bytes_to_copy;

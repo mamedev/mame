@@ -43,21 +43,20 @@ namespace plib
 	pstring_vector_t::pstring_vector_t(const pstring &str, const pstring &onstr, bool ignore_empty)
 	: std::vector<pstring>()
 	{
-		int p = 0;
-		int pn;
+		pstring::iterator p = str.begin();
+		pstring::iterator pn = str.find(onstr, p);
 
-		pn = str.find(onstr, p);
-		while (pn>=0)
+		while (pn != str.end())
 		{
-			pstring t = str.substr(p, pn - p);
+			pstring t = str.substr(p, pn);
 			if (!ignore_empty || t.len() != 0)
 				this->push_back(t);
 			p = pn + onstr.len();
 			pn = str.find(onstr, p);
 		}
-		if (p < (int) str.len())
+		if (p != str.end())
 		{
-			pstring t = str.substr(p);
+			pstring t = str.substr(p, str.end());
 			if (!ignore_empty || t.len() != 0)
 				this->push_back(t);
 		}
@@ -71,7 +70,7 @@ namespace plib
 		unsigned i = 0;
 		while (i<str.blen())
 		{
-			int p = -1;
+			std::size_t p = static_cast<std::size_t>(-1);
 			for (std::size_t j=0; j < onstrl.size(); j++)
 			{
 				if (std::memcmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].blen())==0)
@@ -80,7 +79,7 @@ namespace plib
 					break;
 				}
 			}
-			if (p>=0)
+			if (p != static_cast<std::size_t>(-1))
 			{
 				if (col != "")
 					this->push_back(col);
@@ -105,13 +104,13 @@ namespace plib
 	{
 		int cnt = 0;
 		const char *cur = str;
-		int lx = strlen(x);
+		std::size_t lx = strlen(x);
 		while (*str)
 		{
 			if (*str == ',')
 			{
-				int l = str-cur;
-				if (l == lx)
+				std::ptrdiff_t l = str-cur;
+				if (static_cast<std::size_t>(l) == lx)
 					if (strncmp(cur, x, lx) == 0)
 						return cnt;
 			}
@@ -122,8 +121,8 @@ namespace plib
 			}
 			str++;
 		}
-		int l = str-cur;
-		if (l == lx)
+		std::ptrdiff_t l = str-cur;
+		if (static_cast<std::size_t>(l) == lx)
 			if (strncmp(cur, x, lx) == 0)
 				return cnt;
 		return -1;

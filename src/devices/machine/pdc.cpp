@@ -324,7 +324,6 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
-
 	/* Save States */
 	save_item(NAME(reg_p0));
 	save_item(NAME(reg_p1));

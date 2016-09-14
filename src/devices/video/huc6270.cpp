@@ -393,7 +393,7 @@ inline void huc6270_device::next_horz_state()
 
 	case HUC6270_HSW:
 		m_horz_state = HUC6270_HDS;
-		m_horz_to_go = MAX( ( ( m_hsr >> 8 ) & 0x7F ), 2 ) + 1;
+		m_horz_to_go = std::max( ( ( m_hsr >> 8 ) & 0x7F ), 2 ) + 1;
 
 		/* If section has ended, advance to next vertical state */
 		while ( m_vert_to_go == 0 )

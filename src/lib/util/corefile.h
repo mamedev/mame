@@ -139,11 +139,14 @@ protected:
 
 /* ----- filename utilities ----- */
 
-/* extract the base part of a filename (remove extensions and paths) */
-std::string core_filename_extract_base(const char *name, bool strip_extension = false);
+// extract the base part of a filename (remove extensions and paths)
+std::string core_filename_extract_base(const std::string &name, bool strip_extension = false);
 
-/* true if the given filename ends with a particular extension */
-int core_filename_ends_with(const char *filename, const char *extension);
+// extracts the file extension from a filename
+std::string core_filename_extract_extension(const std::string &filename, bool strip_period = false);
+
+// true if the given filename ends with a particular extension
+bool core_filename_ends_with(const std::string &filename, const std::string &extension);
 
 
 #endif // MAME_LIB_UTIL_COREFILE_H

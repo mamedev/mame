@@ -366,10 +366,37 @@ void electron_state::machine_start()
 	else
 		lo_rom = memregion("user1")->base();
 
-	membank("bank2")->configure_entries(0,  1, lo_rom, 0x4000);
-	membank("bank2")->configure_entries(1, 11, memregion("user1")->base() + 0x04000, 0x4000);
-	membank("bank2")->configure_entries(12, 1, up_rom, 0x4000);
-	membank("bank2")->configure_entries(13, 3, memregion("user1")->base() + 0x34000, 0x4000);
+	membank("bank2")->configure_entries(0, 1, lo_rom, 0x4000);
+	membank("bank2")->configure_entries(1, 1, up_rom, 0x4000);
+
+	for (int page = 2; page < 16; page++)
+		membank("bank2")->configure_entries(page, 1, memregion("user1")->base() + page * 0x4000, 0x4000);
+
+	/* enumerate expansion ROMs */
+	electron_expansion_slot_device* exp_port = m_exp;
+
+	while (exp_port != nullptr)
+	{
+		device_t* temp;
+
+		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
+		if (temp != nullptr)
+		{
+			for (int page = 4; page < 16; page++)
+			{
+				memory_region *temp_region = temp->memregion("exp_rom");
+				if (temp_region != nullptr && temp_region->base() != nullptr && temp_region->base()[page * 0x4000 + 0x06] != 0x00)
+				{
+					membank("bank2")->configure_entries(page, 1, temp_region->base() + page * 0x4000, 0x4000);
+				}
+				exp_port = temp->subdevice<electron_expansion_slot_device>("exp");
+			}
+		}
+		else
+		{
+			exp_port = nullptr;
+		}
+	}
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
@@ -386,12 +413,12 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 		if (filesize != 16384)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only size 16384 is supported");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		image.fread(m_cart->get_rom_base(), filesize);
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 	else
 	{
@@ -401,13 +428,13 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 		if (upsize != 16384 && upsize != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		if (losize != 16384 && losize != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(upsize + losize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -418,6 +445,6 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 		if (losize)
 			memcpy(m_cart->get_rom_base() + upsize, image.get_software_region("lorom"), losize);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 }

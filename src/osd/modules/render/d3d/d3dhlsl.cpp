@@ -25,7 +25,9 @@
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
-
+#undef min
+#undef max
+#include <utility>
 
 //============================================================
 //  PROTOTYPES
@@ -48,12 +50,12 @@ public:
 	{
 		HRESULT result;
 
-		m_avi_writer = std::make_unique<avi_write>(machine, width, height);				
+		m_avi_writer = std::make_unique<avi_write>(machine, width, height);
 
 		m_frame.allocate(width, height);
 		if (!m_frame.valid())
 			return;
-	
+
 		result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &m_sys_texture, nullptr);
 		if (FAILED(result))
 		{
@@ -69,7 +71,7 @@ public:
 			return;
 		}
 		m_vid_texture->GetSurfaceLevel(0, &m_vid_surface);
-		
+
 		m_initialized = true;
 	}
 
@@ -127,6 +129,14 @@ public:
 			osd_printf_verbose("Direct3D: Error %08lX during texture UnlockRect call\n", result);
 
 		m_avi_writer->video_frame(m_frame);
+	}
+
+	void add_audio(const INT16 *buffer, int samples_this_frame)
+	{
+		if (!m_initialized)
+			return;
+
+		m_avi_writer->audio_frame(buffer, samples_this_frame);
 	}
 
 	IDirect3DSurface9 * target_surface() { return m_vid_surface; }
@@ -194,7 +204,16 @@ void shaders::save_snapshot()
 	if (!enabled())
 		return;
 
-	HRESULT result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture, nullptr);
+	auto win = d3d->assert_window();
+
+	int width = snap_width;
+	int height = snap_height;
+	if (win->swap_xy())
+	{
+		std::swap(width, height);
+	}
+
+	HRESULT result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture, nullptr);
 	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL snapshot (%08lX), bailing\n", result);
@@ -202,7 +221,7 @@ void shaders::save_snapshot()
 	}
 	snap_copy_texture->GetSurfaceLevel(0, &snap_copy_target);
 
-	result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &snap_texture, nullptr);
+	result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &snap_texture, nullptr);
 	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL snapshot (%08lX), bailing\n", result);
@@ -230,9 +249,28 @@ void shaders::record_movie()
 		return;
 	}
 
-	recorder = std::make_unique<movie_recorder>(*machine, d3d, snap_width, snap_height);
+	auto win = d3d->assert_window();
+	osd_dim wdim = win->get_size();
+
+	recorder = std::make_unique<movie_recorder>(*machine, d3d, wdim.width(), wdim.height());
 	recorder->record(downcast<windows_options &>(machine->options()).d3d_hlsl_write());
 	recording_movie = true;
+}
+
+
+//============================================================
+//  shaders::record_audio
+//============================================================
+
+void shaders::record_audio(const INT16 *buffer, int samples_this_frame)
+{
+	if (!enabled())
+		return;
+
+	if (recording_movie)
+	{
+		recorder->add_audio(buffer, samples_this_frame);
+	}
 }
 
 
@@ -245,7 +283,16 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	if (!enabled())
 		return;
 
-	bitmap_rgb32 snapshot(snap_width, snap_height);
+	auto win = d3d->assert_window();
+
+	int width = snap_width;
+	int height = snap_height;
+	if (win->swap_xy())
+	{
+		std::swap(width, height);
+	}
+
+	bitmap_rgb32 snapshot(width, height);
 	if (!snapshot.valid())
 		return;
 
@@ -259,12 +306,12 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	if (FAILED(result))
 		return;
 
-	for (int y = 0; y < snap_height; y++)
+	for (int y = 0; y < height; y++)
 	{
 		DWORD *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
 		UINT32 *dst = &snapshot.pix32(y);
 
-		for (int x = 0; x < snap_width; x++)
+		for (int x = 0; x < width; x++)
 		{
 			*dst++ = *src++;
 		}
@@ -493,19 +540,19 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->scanline_bright_offset = winoptions.screen_scanline_bright_offset();
 		options->scanline_jitter = winoptions.screen_scanline_jitter();
 		options->hum_bar_alpha = winoptions.screen_hum_bar_alpha();
-		get_vector(winoptions.screen_defocus(), 2, options->defocus, TRUE);
-		get_vector(winoptions.screen_converge_x(), 3, options->converge_x, TRUE);
-		get_vector(winoptions.screen_converge_y(), 3, options->converge_y, TRUE);
-		get_vector(winoptions.screen_radial_converge_x(), 3, options->radial_converge_x, TRUE);
-		get_vector(winoptions.screen_radial_converge_y(), 3, options->radial_converge_y, TRUE);
-		get_vector(winoptions.screen_red_ratio(), 3, options->red_ratio, TRUE);
-		get_vector(winoptions.screen_grn_ratio(), 3, options->grn_ratio, TRUE);
-		get_vector(winoptions.screen_blu_ratio(), 3, options->blu_ratio, TRUE);
-		get_vector(winoptions.screen_offset(), 3, options->offset, TRUE);
-		get_vector(winoptions.screen_scale(), 3, options->scale, TRUE);
-		get_vector(winoptions.screen_power(), 3, options->power, TRUE);
-		get_vector(winoptions.screen_floor(), 3, options->floor, TRUE);
-		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, TRUE);
+		get_vector(winoptions.screen_defocus(), 2, options->defocus, true);
+		get_vector(winoptions.screen_converge_x(), 3, options->converge_x, true);
+		get_vector(winoptions.screen_converge_y(), 3, options->converge_y, true);
+		get_vector(winoptions.screen_radial_converge_x(), 3, options->radial_converge_x, true);
+		get_vector(winoptions.screen_radial_converge_y(), 3, options->radial_converge_y, true);
+		get_vector(winoptions.screen_red_ratio(), 3, options->red_ratio, true);
+		get_vector(winoptions.screen_grn_ratio(), 3, options->grn_ratio, true);
+		get_vector(winoptions.screen_blu_ratio(), 3, options->blu_ratio, true);
+		get_vector(winoptions.screen_offset(), 3, options->offset, true);
+		get_vector(winoptions.screen_scale(), 3, options->scale, true);
+		get_vector(winoptions.screen_power(), 3, options->power, true);
+		get_vector(winoptions.screen_floor(), 3, options->floor, true);
+		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, true);
 		options->saturation = winoptions.screen_saturation();
 		options->yiq_enable = winoptions.screen_yiq_enable();
 		options->yiq_jitter = winoptions.screen_yiq_jitter();
@@ -525,7 +572,7 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->vector_length_ratio = winoptions.screen_vector_length_ratio();
 		options->bloom_blend_mode = winoptions.screen_bloom_blend_mode();
 		options->bloom_scale = winoptions.screen_bloom_scale();
-		get_vector(winoptions.screen_bloom_overdrive(), 3, options->bloom_overdrive, TRUE);
+		get_vector(winoptions.screen_bloom_overdrive(), 3, options->bloom_overdrive, true);
 		options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
 		options->bloom_level1_weight = winoptions.screen_bloom_lvl1_weight();
 		options->bloom_level2_weight = winoptions.screen_bloom_lvl2_weight();
@@ -1002,9 +1049,9 @@ rgb_t shaders::apply_color_convolution(rgb_t color)
 	b = chroma[2] * saturation + luma;
 
 	return rgb_t(
-		MAX(0, MIN(255, static_cast<int>(r * 255.0f))),
-		MAX(0, MIN(255, static_cast<int>(g * 255.0f))),
-		MAX(0, MIN(255, static_cast<int>(b * 255.0f))));
+		std::max(0, std::min(255, static_cast<int>(r * 255.0f))),
+		std::max(0, std::min(255, static_cast<int>(g * 255.0f))),
+		std::max(0, std::min(255, static_cast<int>(b * 255.0f))));
 }
 
 int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
@@ -2524,9 +2571,9 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 
 	char name_cstr[1024];
 	sprintf(name_cstr, "%s\\%s", path, name);
-	TCHAR *effect_name = tstring_from_utf8(name_cstr);
+	auto effect_name = tstring_from_utf8(name_cstr);
 
-	HRESULT hr = (*shadersys->d3dx_create_effect_from_file_ptr)(dev, effect_name, nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
+	HRESULT hr = (*shadersys->d3dx_create_effect_from_file_ptr)(dev, effect_name.c_str(), nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
 	if (FAILED(hr))
 	{
 		if (buffer_errors != nullptr)
@@ -2543,8 +2590,6 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 	{
 		m_valid = true;
 	}
-
-	osd_free(effect_name);
 }
 
 effect::~effect()

@@ -107,18 +107,18 @@ inline std::string number_and_format::format() const
 {
 	switch (m_format)
 	{
-		default:
-		case XML_INT_FORMAT_DECIMAL:
-			return string_format("%d", (UINT32)m_value);
+	default:
+	case XML_INT_FORMAT_DECIMAL:
+		return string_format("%d", UINT32(m_value));
 
-		case XML_INT_FORMAT_DECIMAL_POUND:
-			return string_format("#%d", (UINT32)m_value);
+	case XML_INT_FORMAT_DECIMAL_POUND:
+		return string_format("#%d", UINT32(m_value));
 
-		case XML_INT_FORMAT_HEX_DOLLAR:
-			return string_format("$%X", (UINT32)m_value);
+	case XML_INT_FORMAT_HEX_DOLLAR:
+		return string_format("$%X", UINT32(m_value));
 
-		case XML_INT_FORMAT_HEX_C:
-			return string_format("0x%X", (UINT32)m_value);
+	case XML_INT_FORMAT_HEX_C:
+		return string_format("0x%X", UINT32(m_value));
 	}
 }
 
@@ -159,7 +159,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		auto curitem = std::make_unique<item>(itemnode->value, value, format);
 
 		// ensure the maximum expands to suit
-		m_maxval = MAX(m_maxval, curitem->value());
+		m_maxval = std::max(m_maxval, curitem->value());
 
 		m_itemlist.push_back(std::move(curitem));
 	}
@@ -1235,7 +1235,7 @@ void cheat_manager::render_text(mame_ui_manager &mui, render_container &containe
 		if (!m_output[linenum].empty())
 		{
 			// output the text
-			mui.draw_text_full(&container, m_output[linenum].c_str(),
+			mui.draw_text_full(container, m_output[linenum].c_str(),
 					0.0f, (float)linenum * mui.get_line_height(), 1.0f,
 					m_justify[linenum], ui::text_layout::NEVER, mame_ui_manager::OPAQUE_,
 					rgb_t::white, rgb_t::black, nullptr, nullptr);
@@ -1262,8 +1262,8 @@ std::string &cheat_manager::get_output_string(int row, ui::text_layout::text_jus
 	row = (row < 0) ? m_numlines + row : row - 1;
 
 	// clamp within range
-	row = MAX(row, 0);
-	row = MIN(row, m_numlines - 1);
+	row = std::max(row, 0);
+	row = std::min(row, m_numlines - 1);
 
 	// return the appropriate string
 	m_justify[row] = justify;
@@ -1359,7 +1359,7 @@ void cheat_manager::frame_update()
 	// set up for accumulating output
 	m_lastline = 0;
 	m_numlines = floor(1.0f / mame_machine_manager::instance()->ui().get_line_height());
-	m_numlines = MIN(m_numlines, m_output.size());
+	m_numlines = std::min<UINT8>(m_numlines, m_output.size());
 	for (auto & elem : m_output)
 		elem.clear();
 

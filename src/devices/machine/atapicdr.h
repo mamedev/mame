@@ -35,11 +35,19 @@ protected:
 	virtual void identify_packet_device() override;
 	virtual void process_buffer() override;
 	virtual void ExecCommand() override;
-private:
 	bool m_media_change;
+};
+
+class atapi_fixed_cdrom_device : public atapi_cdrom_device
+{
+public:
+	atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	virtual void device_reset() override;
 };
 
 // device type definition
 extern const device_type ATAPI_CDROM;
+extern const device_type ATAPI_FIXED_CDROM;
 
 #endif

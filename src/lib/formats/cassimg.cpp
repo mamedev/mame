@@ -13,6 +13,7 @@
 
 #include "imageutl.h"
 #include "cassimg.h"
+#include <algorithm>
 
 
 /* debugging parameters */
@@ -460,13 +461,13 @@ casserr_t cassette_get_samples(cassette_image *cassette, int channel,
 			case 2:
 				word = interpolate16(sum);
 				if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-					word = FLIPENDIAN_INT16(word);
+					word = flipendian_int16(word);
 				*((INT16 *) dest_ptr) = word;
 				break;
 			case 4:
 				dword = sum;
 				if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-					dword = FLIPENDIAN_INT32(dword);
+					dword = flipendian_int32(dword);
 				*((INT32 *) dest_ptr) = dword;
 				break;
 		}
@@ -529,13 +530,13 @@ casserr_t cassette_put_samples(cassette_image *cassette, int channel,
 		case 2:
 			word = *((INT16 *) source_ptr);
 			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-				word = FLIPENDIAN_INT16(word);
+				word = flipendian_int16(word);
 			dest_value = extrapolate16(word);
 			break;
 		case 4:
 			dword = *((INT32 *) source_ptr);
 			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-				dword = FLIPENDIAN_INT32(dword);
+				dword = flipendian_int32(dword);
 			dest_value = dword;
 			break;
 		default:
@@ -596,7 +597,7 @@ casserr_t cassette_read_samples(cassette_image *cassette, int channels, double t
 
 	while(samples_loaded < sample_count)
 	{
-		chunk_sample_count = MIN(sizeof(buffer) / sample_bytes, (sample_count - samples_loaded));
+		chunk_sample_count = std::min(sizeof(buffer) / sample_bytes, (sample_count - samples_loaded));
 		chunk_sample_period = map_double(sample_period, 0, sample_count, chunk_sample_count);
 		chunk_time_index = time_index + map_double(sample_period, 0, sample_count, samples_loaded);
 
@@ -636,7 +637,7 @@ casserr_t cassette_write_samples(cassette_image *cassette, int channels, double 
 
 	while(samples_saved < sample_count)
 	{
-		chunk_sample_count = MIN(sizeof(buffer) / sample_bytes, (sample_count - samples_saved));
+		chunk_sample_count = std::min(sizeof(buffer) / sample_bytes, (sample_count - samples_saved));
 		chunk_sample_period = map_double(sample_period, 0, sample_count, chunk_sample_count);
 		chunk_time_index = time_index + map_double(sample_period, 0, sample_count, samples_saved);
 
@@ -688,7 +689,7 @@ casserr_t cassette_modulation_identify(cassette_image *cassette, const struct Ca
 	choose_wave(modulation, &wave_bytes_length);
 	opts->bits_per_sample = 8;
 	opts->channels = 1;
-	opts->sample_frequency = (UINT32) (MAX(modulation->zero_frequency_high, modulation->one_frequency_high) * wave_bytes_length * 2);
+	opts->sample_frequency = (UINT32) (std::max(modulation->zero_frequency_high, modulation->one_frequency_high) * wave_bytes_length * 2);
 	return CASSETTE_ERROR_SUCCESS;
 }
 
@@ -778,7 +779,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 	}
 	else
 	{
-		buffer_length = MIN(length, 100000);
+		buffer_length = std::min<UINT64>(length, 100000);
 		alloc_buffer = (UINT8*)malloc(buffer_length);
 		if (!alloc_buffer)
 		{
@@ -790,7 +791,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 
 	while(length > 0)
 	{
-		this_length = (size_t) MIN(length, buffer_length);
+		this_length = (std::min<UINT64>)(length, buffer_length);
 		cassette_image_read(cassette, buffer, offset, this_length);
 
 		err = cassette_put_modulated_data(cassette, channel, time_index, buffer, this_length, modulation, &delta);

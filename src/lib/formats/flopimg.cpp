@@ -492,7 +492,7 @@ static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, 
 				if (err)
 					goto done;
 
-				this_buffer_len = MIN(buffer_len, sector_length - offset);
+				this_buffer_len = std::min(buffer_len, size_t(sector_length - offset));
 
 				if (writing)
 				{

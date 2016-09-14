@@ -376,8 +376,8 @@ void mame_options::set_system_name(emu_options &options, const char *name)
 		// look up the software part
 		machine_config config(*cursystem, options);
 		software_list_device *swlist = software_list_device::find_by_name(config, sw_list.c_str());
-		software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
-		software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
+		const software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
+		const software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
 
 		// then add the options
 		if (new_system)
@@ -421,6 +421,7 @@ bool mame_options::parse_one_ini(emu_options &options, const char *basename, int
 
 	// open the file; if we fail, that's ok
 	emu_file file(options.ini_path(), OPEN_FLAG_READ);
+	osd_printf_verbose("Attempting load of %s.ini\n", basename);
 	osd_file::error filerr = file.open(basename, ".ini");
 	if (filerr != osd_file::error::NONE)
 		return false;

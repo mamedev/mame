@@ -160,7 +160,7 @@ static const char *scv_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool scv_cart_slot_device::call_load()
+image_init_result scv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -171,7 +171,7 @@ bool scv_cart_slot_device::call_load()
 		if (len > 0x20000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(len, tag());
@@ -203,23 +203,11 @@ bool scv_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", scv_get_slot(m_type));
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
-
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool scv_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
-}
-
 
 
 /*-------------------------------------------------

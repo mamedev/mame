@@ -36,7 +36,7 @@ public:
 		opt_help(*this,     "h", "help",                    "display help and exit"),
 		opt_grp2(*this,     "Options for run and static commands",   "These options apply to run and static commands."),
 		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
-		opt_grp3(*this,     "Options for run command",		"These options are only used by the run command."),
+		opt_grp3(*this,     "Options for run command",      "These options are only used by the run command."),
 		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
@@ -145,9 +145,10 @@ protected:
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const override
 	{
-		pout("{}: {}\n", l.name().cstr(), ls.cstr());
+		pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.cstr());
+		pout("{}", err);
 		if (l == plib::plog_level::FATAL)
-			throw std::exception();
+			throw netlist::nl_exception(err);
 	}
 
 private:
@@ -179,7 +180,7 @@ struct input_t
 		double t;
 		int e = sscanf(line.cstr(), "%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
-			throw netlist::fatalerror_e(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
+			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
 		m_param = setup.find_param(buf, true);
 	}
@@ -190,15 +191,15 @@ struct input_t
 		{
 			case netlist::param_t::MODEL:
 			case netlist::param_t::STRING:
-				throw netlist::fatalerror_e(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
+				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
 				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
 				break;
 			case netlist::param_t::INTEGER:
-				static_cast<netlist::param_int_t*>(m_param)->setTo((int)m_value);
+				static_cast<netlist::param_int_t*>(m_param)->setTo(static_cast<int>(m_value));
 				break;
 			case netlist::param_t::LOGIC:
-				static_cast<netlist::param_logic_t*>(m_param)->setTo((int) m_value);
+				static_cast<netlist::param_logic_t*>(m_param)->setTo(static_cast<bool>(m_value));
 				break;
 		}
 	}
@@ -334,7 +335,7 @@ static void listdevices(tool_options_t &opts)
 			if (t.second->name().startsWith(d->name()))
 			{
 				pstring tn(t.second->name().substr(d->name().len()+1));
-				if (tn.find(".")<0)
+				if (tn.find(".") == tn.end())
 					terms.push_back(tn);
 			}
 		}
@@ -344,7 +345,7 @@ static void listdevices(tool_options_t &opts)
 			if (t.first.startsWith(d->name()))
 			{
 				pstring tn(t.first.substr(d->name().len()+1));
-				if (tn.find(".")<0)
+				if (tn.find(".") == tn.end())
 				{
 					terms.push_back(tn);
 					pstring resolved = nt.setup().resolve_alias(t.first);
@@ -432,50 +433,61 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	pstring cmd = opts.opt_cmd();
-	if (cmd == "listdevices")
-		listdevices(opts);
-	else if (cmd == "run")
-		run(opts);
-	else if (cmd == "static")
-		static_compile(opts);
-	else if (cmd == "convert")
+	try
 	{
-		pstring contents;
-		plib::postringstream ostrm;
-		if (opts.opt_file() == "-")
+		pstring cmd = opts.opt_cmd();
+		if (cmd == "listdevices")
+			listdevices(opts);
+		else if (cmd == "run")
+			run(opts);
+		else if (cmd == "static")
+			static_compile(opts);
+		else if (cmd == "convert")
 		{
-			plib::pstdin f;
-			ostrm.write(f);
-		}
-		else
-		{
-			plib::pifilestream f(opts.opt_file());
-			ostrm.write(f);
-		}
-		contents = ostrm.str();
+			pstring contents;
+			plib::postringstream ostrm;
+			if (opts.opt_file() == "-")
+			{
+				plib::pstdin f;
+				ostrm.write(f);
+			}
+			else
+			{
+				plib::pifilestream f(opts.opt_file());
+				ostrm.write(f);
+			}
+			contents = ostrm.str();
 
-		pstring result;
-		if (opts.opt_type().equals("spice"))
-		{
-			nl_convert_spice_t c;
-			c.convert(contents);
-			result = c.result();
+			pstring result;
+			if (opts.opt_type().equals("spice"))
+			{
+				nl_convert_spice_t c;
+				c.convert(contents);
+				result = c.result();
+			}
+			else
+			{
+				nl_convert_eagle_t c;
+				c.convert(contents);
+				result = c.result();
+			}
+			/* present result */
+			pout_strm.write(result.cstr());
 		}
 		else
 		{
-			nl_convert_eagle_t c;
-			c.convert(contents);
-			result = c.result();
+			perr("Unknown command {}\n", cmd.cstr());
+			usage(opts);
+			return 1;
 		}
-		/* present result */
-		pout_strm.write(result.cstr());
 	}
-	else
+	catch (netlist::nl_exception &e)
 	{
-		perr("Unknown command {}\n", cmd.cstr());
-		usage(opts);
-		return 1;
+		perr("Netlist exception caught: {}\n", e.text());
+	}
+	catch (plib::pexception &e)
+	{
+		perr("plib exception caught: {}\n", e.text());
 	}
 
 	pstring::resetmem();

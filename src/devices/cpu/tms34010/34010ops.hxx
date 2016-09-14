@@ -522,7 +522,7 @@ void tms340x0_device::dint(UINT16 op)
 			INT64 quotient = dividend / *rs;                \
 			INT32 remainder = dividend % *rs;               \
 			UINT32 signbits = (INT32)quotient >> 31;        \
-			if (EXTRACT_64HI(quotient) != signbits)         \
+			if (extract_64hi(quotient) != signbits)         \
 			{                                               \
 				SET_V_LOG(1);                              \
 			}                                               \
@@ -569,7 +569,7 @@ void tms340x0_device::divs_b(UINT16 op) { DIVS(B); }
 			UINT64 dividend  = ((UINT64)*rd1 << 32) | (UINT32)*rd2; \
 			UINT64 quotient  = dividend / (UINT32)*rs;      \
 			UINT32 remainder = dividend % (UINT32)*rs;      \
-			if (EXTRACT_64HI(quotient) != 0)                \
+			if (extract_64hi(quotient) != 0)                \
 			{                                               \
 				SET_V_LOG(1);                              \
 			}                                               \
@@ -736,8 +736,8 @@ void tms340x0_device::modu_b(UINT16 op) { MODU(B); }
 	SET_Z_LOG(product == 0);                                   \
 	SET_N_BIT(product >> 32, 31);                              \
 																\
-	*rd1             = EXTRACT_64HI(product);                       \
-	R##REG(DSTREG(op)|1) = EXTRACT_64LO(product);                       \
+	*rd1             = extract_64hi(product);                       \
+	R##REG(DSTREG(op)|1) = extract_64lo(product);                       \
 																\
 	COUNT_CYCLES(20);                                           \
 }
@@ -755,8 +755,8 @@ void tms340x0_device::mpys_b(UINT16 op) { MPYS(B); }
 	product = mulu_32x32(m1, *rd1);                     \
 	SET_Z_LOG(product == 0);                                   \
 																\
-	*rd1             = EXTRACT_64HI(product);                       \
-	R##REG(DSTREG(op)|1) = EXTRACT_64LO(product);                       \
+	*rd1             = extract_64hi(product);                       \
+	R##REG(DSTREG(op)|1) = extract_64lo(product);                       \
 																\
 	COUNT_CYCLES(21);                                           \
 }

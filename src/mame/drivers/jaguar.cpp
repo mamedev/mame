@@ -1979,12 +1979,12 @@ QUICKLOAD_LOAD_MEMBER( jaguar_state, jaguar )
 	return quickload(image, file_type, quickload_size);
 }
 
-int jaguar_state::quickload(device_image_interface &image, const char *file_type, int quickload_size)
+image_init_result jaguar_state::quickload(device_image_interface &image, const char *file_type, int quickload_size)
 {
 	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
 
 	memset(m_shared_ram, 0, 0x200000);
-	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
+	quickload_size = std::min(quickload_size, int(0x200000 - quickload_begin));
 
 	image.fread( &memregion("maincpu")->base()[quickload_begin], quickload_size);
 
@@ -2018,11 +2018,11 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 		skip = 96;
 
 	else    /* ABS binary */
-	if (!core_stricmp(image.filetype(), "abs"))
+	if (image.is_filetype("abs"))
 		start = 0xc000;
 
 	else    /* JAG binary */
-	if (!core_stricmp(image.filetype(), "jag"))
+	if (image.is_filetype("jag"))
 		start = 0x5000;
 
 
@@ -2044,7 +2044,7 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 	/* Transfer control to image */
 	m_maincpu->set_pc(quickload_begin);
 	m_shared_ram[1]=quickload_begin;
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void jaguar_state::cart_start()
@@ -2063,7 +2063,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 		size = image.length();
 
 		/* .rom files load & run at 802000 */
-		if (!core_stricmp(image.filetype(), "rom"))
+		if (image.is_filetype("rom"))
 		{
 			load_offset = 0x2000;             // fix load address
 			m_cart_base[0x101] = 0x802000;    // fix exec address
@@ -2089,7 +2089,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 
 	/* Transfer control to the bios */
 	m_maincpu->set_pc(m_rom_base[1]);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*************************************

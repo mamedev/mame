@@ -16,6 +16,8 @@
 #include <windows.h>
 #include <tchar.h>
 #undef interface
+#undef min
+#undef max
 
 #include <mutex>
 #include <functional>
@@ -507,10 +509,9 @@ protected:
 		std::wstring name = rawinput_device_improve_name(tname.get());
 
 		// convert name to utf8
-		auto osd_deleter = [](void *ptr) { osd_free(ptr); };
-		auto utf8_name = std::unique_ptr<char, decltype(osd_deleter)>(utf8_from_wstring(name.c_str()), osd_deleter);
+		std::string utf8_name = utf8_from_wstring(name.c_str());
 
-		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.get(), *this);
+		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.c_str(), *this);
 
 		// Add the handle
 		devinfo->set_handle(rawinputdevice->hDevice);
@@ -522,23 +523,22 @@ protected:
 	{
 		// Only handle raw input data
 		if (!input_enabled() || eventid != INPUT_EVENT_RAWINPUT)
-			return FALSE;
+			return false;
 
 		HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT*>(eventdata);
 
 		BYTE small_buffer[4096];
 		std::unique_ptr<BYTE[]> larger_buffer;
 		LPBYTE data = small_buffer;
-		BOOL result;
 		UINT size;
 
 		// ignore if not enabled
 		if (!input_enabled())
-			return FALSE;
+			return false;
 
 		// determine the size of databuffer we need
 		if ((*get_rawinput_data)(rawinputdevice, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != 0)
-			return FALSE;
+			return false;
 
 		// if necessary, allocate a temporary buffer and fetch the data
 		if (size > sizeof(small_buffer))
@@ -546,11 +546,11 @@ protected:
 			larger_buffer = std::make_unique<BYTE[]>(size);
 			data = larger_buffer.get();
 			if (data == nullptr)
-				return FALSE;
+				return false;
 		}
 
 		// fetch the data and process the appropriate message types
-		result = (*get_rawinput_data)(static_cast<HRAWINPUT>(rawinputdevice), RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
+		bool result = (*get_rawinput_data)(static_cast<HRAWINPUT>(rawinputdevice), RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
 		if (result)
 		{
 			std::lock_guard<std::mutex> scope_lock(m_module_lock);
@@ -566,7 +566,7 @@ protected:
 					if (input->header.hDevice == devinfo->device_handle())
 					{
 						devinfo->queue_events(input, 1);
-						result = TRUE;
+						result = true;
 					}
 				}
 			}
@@ -609,16 +609,14 @@ protected:
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
 			TCHAR keyname[100];
-			char *name;
 
 			// generate the name
 			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
 				_sntprintf(keyname, ARRAY_LENGTH(keyname), TEXT("Scan%03d"), keynum);
-			name = utf8_from_tstring(keyname);
+			std::string name = utf8_from_tstring(keyname);
 
 			// add the item to the device
-			devinfo->device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
-			osd_free(name);
+			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 		}
 	}
 };

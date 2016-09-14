@@ -387,7 +387,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<software name="asylum" supported="no">
 		<description>Asylum</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Digital Psychosis</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -1223,7 +1223,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<software name="paradr2k" supported="no">
 		<description>Paradroid 2000</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Coin-Age</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1234,7 +1234,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<software name="paradr2ka" cloneof="paradr2k" supported="no">
 		<description>Paradroid 2000 (Alt)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Coin-Age</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -2299,7 +2299,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	<software name="vzap" supported="no">
 		<description>VZap</description>
 		<year>2000</year>
-		<publisher>Paul Vigay</publisher>
+		<publisher>Digital Phenomena</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
@@ -2665,5 +2665,225 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
+
+	<!-- Educational -->
+
+	<software name="dinosaur" supported="no">
+		<description>10 out of 10 - Dinosaurs</description>
+		<year>1993</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - dinosaurs (1993).adf" size="819200" crc="440a6294" sha1="b4894f321bbc2bdfddc727207f150b5847f4e046" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drivtest" supported="no">
+		<description>10 out of 10 - Driving Test</description>
+		<year>1994</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - driving test (disk 1) (1994).adf" size="819200" crc="44d3d133" sha1="ea23a86d067b115cfcb9fc9b8bb2c32793b26975" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - driving test (disk 2) (1994).adf" size="819200" crc="e181d252" sha1="330edc4cc6b4347e1ae67436340523011fab0840" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earlyess" supported="no">
+		<description>10 out of 10 - Early Essentials</description>
+		<year>1993</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - early essentials (disk 1) (1993).adf" size="819200" crc="188a6209" sha1="a1eca639dd01a69caf629d8fe2aa8f335c961bf4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - early essentials (disk 2) (1993).adf" size="819200" crc="82ade207" sha1="3f689f5c10d732c804904647d6270b90d45a9f32" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="english" supported="no">
+		<description>10 out of 10 - English</description>
+		<year>1994</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - english (1994).adf" size="819200" crc="a6fe2571" sha1="aa0c2f3bcffa5c23d6022325e52114f5b4af9a2c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="essit" supported="no">
+		<description>10 out of 10 - Essential I.T.</description>
+		<year>1996</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - essential it (1996).adf" size="819200" crc="13b05bf5" sha1="c703fc18470a0f8782698b1a21d302eaa453a61c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="essmaths" supported="no">
+		<description>10 out of 10 - Essential Maths</description>
+		<year>1994</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - essential maths (1994).adf" size="819200" crc="324e77ca" sha1="7c811c1b26eddbeb9657dfea033c243768a3d5fb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="essscien" supported="no">
+		<description>10 out of 10 - Essential Science</description>
+		<year>1994</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - essential science (1994).adf" size="819200" crc="1573d2b9" sha1="8eae18f2a6d32caac6a21141b6d1257bf0f5d3d1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="french" supported="no">
+		<description>10 out of 10 - French</description>
+		<year>1993</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - french (1993).adf" size="819200" crc="382b85b4" sha1="799e5381d4e7d7fcc8204171ed746fce8d8b9708" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="german" supported="no">
+		<description>10 out of 10 - German</description>
+		<year>1994</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - german (1994).adf" size="819200" crc="68893666" sha1="135a1118294561b96bb1145c73599fd2d8390e4d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jnress" supported="no">
+		<description>10 out of 10 - Junior Essentials</description>
+		<year>1993</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - junior essentials (1993).adf" size="819200" crc="a4d50204" sha1="a1bc1b416aa1b1079e819557ed25de3e3a241a25" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathalge" supported="no">
+		<description>10 out of 10 - Maths - Algebra</description>
+		<year>1993</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - maths - algebra (disk 1) (1993).adf" size="819200" crc="46d3007a" sha1="bb5c75ba559b37a858040418054f53b9be66866f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - maths - algebra (disk 2) (1993).adf" size="819200" crc="e5b5fb4c" sha1="257671f4f2e7fad26ecef7e289a2082b55d70876" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathgeom" supported="no">
+		<description>10 out of 10 - Maths - Geometry</description>
+		<year>1995</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - maths - geometry (1995).adf" size="819200" crc="f493c44d" sha1="eca7c754fa3de9e88a223e85883dded31ea8512c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathnumb" supported="no">
+		<description>10 out of 10 - Maths - Number</description>
+		<year>1994</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - maths - number (1994).adf" size="819200" crc="6e207aa0" sha1="ea313d85d29787d5547a4f2052721817b0937fc2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathstat" supported="no">
+		<description>10 out of 10 - Maths - Statistics</description>
+		<year>1993</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - maths - statistics (disk 1) (1993).adf" size="819200" crc="074816d6" sha1="38c25831ed9dc5ddf99761a2a6013fca630d50e2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - maths - statistics (disk 2) (1993).adf" size="819200" crc="935346d3" sha1="c80f98ef7385924a3b0ad070de05a21afd86f970" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellpun" supported="no">
+		<description>Spelling &amp; Punctuation</description>
+		<year>1994</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - spelling and punctuation (1994).adf" size="819200" crc="28afe11d" sha1="010a01df70ba4bcc2814d3ac409a0cb4d2873991" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellstr" supported="no">
+		<description>10 out of 10 - Spelling - Structured</description>
+		<year>1994</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - spelling - structured (1994).adf" size="819200" crc="074816d6" sha1="38c25831ed9dc5ddf99761a2a6013fca630d50e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tables" supported="no">
+		<description>10 out of 10 - Tables</description>
+		<year>1997</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - tables (1997).adf" size="819200" crc="b68428da" sha1="70c25c311a820d39573da0596dcb45e902f9f138" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="words" supported="no">
+		<description>10 out of 10 - Words</description>
+		<year>1997</year>
+		<publisher>Ten Out Of Ten Educational Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="10 out of 10 - words (1997).adf" size="819200" crc="007e280c" sha1="e541a88667e1b6c4bc216bdaa4c0787e95f8fe46" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

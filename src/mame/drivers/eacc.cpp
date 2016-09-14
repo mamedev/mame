@@ -140,7 +140,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_cb1)
 {
 	m_cb1 ^= 1; // 15hz
 	if (m_cb2)
-		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_nmi)
@@ -252,8 +252,8 @@ static MACHINE_CONFIG_START( eacc, eacc_state )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eacc_state, eacc_segment_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(eacc_state, eacc_digit_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(eacc_state, eacc_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_nmi", eacc_state, eacc_nmi, attotime::from_hz(600))

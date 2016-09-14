@@ -176,6 +176,7 @@ private:
 	UINT8                       m_firq;
 	UINT16                      m_timer_value;
 	bool                        m_is_blinking;
+	bool                        m_composite_phase_invert;
 
 	// video state
 	bool                        m_legacy_video;
@@ -262,6 +263,8 @@ private:
 	// video
 	bool update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pixel_t *palette);
 	void update_geometry(void);
+	void update_rgb_palette(void);
+	void update_composite_palette(void);
 	void update_border(UINT16 physical_scanline);
 	pixel_t get_composite_color(int color);
 	pixel_t get_rgb_color(int color);

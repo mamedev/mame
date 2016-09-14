@@ -711,7 +711,11 @@ READ8_MEMBER(napple2_state::c800_r)
 {
 	if (offset == 0x7ff)
 	{
-		m_cnxx_slot = -1;
+		if (!space.debugger_access())
+		{
+			m_cnxx_slot = -1;
+		}
+
 		return 0xff;
 	}
 
@@ -727,7 +731,11 @@ WRITE8_MEMBER(napple2_state::c800_w)
 {
 	if (offset == 0x7ff)
 	{
-		m_cnxx_slot = -1;
+		if (!space.debugger_access())
+		{
+			m_cnxx_slot = -1;
+		}
+
 		return;
 	}
 

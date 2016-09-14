@@ -176,7 +176,7 @@ static const char *gba_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool gba_cart_slot_device::call_load()
+image_init_result gba_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -185,7 +185,7 @@ bool gba_cart_slot_device::call_load()
 		if (size > 0x4000000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 64MB");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(size, tag());
@@ -235,10 +235,10 @@ bool gba_cart_slot_device::call_load()
 		if (m_cart->get_nvram_size())
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -250,18 +250,6 @@ void gba_cart_slot_device::call_unload()
 {
 	if (m_cart && m_cart->get_nvram_size())
 		battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());
-}
-
-
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
 }
 
 

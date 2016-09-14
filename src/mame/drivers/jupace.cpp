@@ -169,7 +169,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	logerror("Loading file %s.\r\n", image.filename());
@@ -206,7 +206,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "EOF marker not found");
 		image.message("EOF marker not found");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 		// patch CPU registers
@@ -244,7 +244,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	for (ace_index = 0x2000; ace_index < 0x8000; ace_index++)
 		space.write_byte(ace_index, RAM[ace_index]);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 //**************************************************************************

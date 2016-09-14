@@ -317,14 +317,14 @@ public:
 	bool compressed() const { return (m_compression[0] != CHD_CODEC_NONE); }
 	chd_codec_type compression(int index) const { return m_compression[index]; }
 	chd_file *parent() const { return m_parent; }
-	sha1_t sha1();
-	sha1_t raw_sha1();
-	sha1_t parent_sha1();
+	util::sha1_t sha1();
+	util::sha1_t raw_sha1();
+	util::sha1_t parent_sha1();
 	chd_error hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32 &compbytes);
 
 	// setters
-	void set_raw_sha1(sha1_t rawdata);
-	void set_parent_sha1(sha1_t parent);
+	void set_raw_sha1(util::sha1_t rawdata);
+	void set_parent_sha1(util::sha1_t parent);
 
 	// file create
 	chd_error create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4]);
@@ -359,7 +359,7 @@ public:
 	chd_error clone_all_metadata(chd_file &source);
 
 	// hashing helper
-	sha1_t compute_overall_sha1(sha1_t rawsha1);
+	util::sha1_t compute_overall_sha1(util::sha1_t rawsha1);
 
 	// codec interfaces
 	chd_error codec_configure(chd_codec_type codec, int param, void *config);
@@ -374,8 +374,8 @@ private:
 	// inline helpers
 	UINT64 be_read(const UINT8 *base, int numbytes);
 	void be_write(UINT8 *base, UINT64 value, int numbytes);
-	sha1_t be_read_sha1(const UINT8 *base);
-	void be_write_sha1(UINT8 *base, sha1_t value);
+	util::sha1_t be_read_sha1(const UINT8 *base);
+	void be_write_sha1(UINT8 *base, util::sha1_t value);
 	void file_read(UINT64 offset, void *dest, UINT32 length);
 	void file_write(UINT64 offset, const void *source, UINT32 length);
 	UINT64 file_append(const void *source, UINT32 length, UINT32 alignment = 0);
@@ -383,16 +383,16 @@ private:
 
 	// internal helpers
 	UINT32 guess_unitbytes();
-	void parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1);
-	void parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1);
-	void parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1);
+	void parse_v3_header(UINT8 *rawheader, util::sha1_t &parentsha1);
+	void parse_v4_header(UINT8 *rawheader, util::sha1_t &parentsha1);
+	void parse_v5_header(UINT8 *rawheader, util::sha1_t &parentsha1);
 	chd_error compress_v5_map();
 	void decompress_v5_map();
 	chd_error create_common();
 	chd_error open_common(bool writeable);
 	void create_open_common();
 	void verify_proper_compression_append(UINT32 hunknum);
-	void hunk_write_compressed(UINT32 hunknum, INT8 compression, const UINT8 *compressed, UINT32 complength, crc16_t crc16);
+	void hunk_write_compressed(UINT32 hunknum, INT8 compression, const UINT8 *compressed, UINT32 complength, util::crc16_t crc16);
 	void hunk_copy_from_self(UINT32 hunknum, UINT32 otherhunk);
 	void hunk_copy_from_parent(UINT32 hunknum, UINT64 parentunit);
 	bool metadata_find(chd_metadata_tag metatag, INT32 metaindex, metadata_entry &metaentry, bool resume = false);
@@ -469,8 +469,8 @@ private:
 
 		// operations
 		void reset();
-		UINT64 find(crc16_t crc16, sha1_t sha1);
-		void add(UINT64 itemnum, crc16_t crc16, sha1_t sha1);
+		UINT64 find(util::crc16_t crc16, util::sha1_t sha1);
+		void add(UINT64 itemnum, util::crc16_t crc16, util::sha1_t sha1);
 
 		// constants
 		static const UINT64 NOT_FOUND = ~UINT64(0);
@@ -480,7 +480,7 @@ private:
 		{
 			entry_t *           m_next;             // next entry in list
 			UINT64              m_itemnum;          // item number
-			sha1_t              m_sha1;             // SHA-1 of the block
+			util::sha1_t        m_sha1;             // SHA-1 of the block
 		};
 
 		// block of entries
@@ -511,8 +511,8 @@ private:
 	// a CRC-16/SHA-1 pair
 	struct hash_pair
 	{
-		crc16_t             m_crc16;            // calculated CRC-16
-		sha1_t              m_sha1;             // calculated SHA-1
+		util::crc16_t             m_crc16;            // calculated CRC-16
+		util::sha1_t              m_sha1;             // calculated SHA-1
 	};
 
 	// a single work item
@@ -556,7 +556,7 @@ private:
 	bool                    m_walking_parent;   // are we building the parent map?
 	UINT64                  m_total_in;         // total bytes in
 	UINT64                  m_total_out;        // total bytes out
-	sha1_creator            m_compsha1;         // running SHA-1 on raw data
+	util::sha1_creator      m_compsha1;         // running SHA-1 on raw data
 
 	// hash lookup maps
 	hashmap                 m_parent_map;       // hash map for parent

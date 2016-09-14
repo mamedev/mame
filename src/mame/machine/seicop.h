@@ -6,7 +6,7 @@
 
 
 class seibu_cop_bootleg_device : public device_t,
-       							public device_memory_interface
+								public device_memory_interface
 {
 public:
 	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -34,7 +34,7 @@ protected:
 
 private:
 	cpu_device *m_host_cpu;      /**< reference to the host cpu */
-	address_space *m_host_space; 							/**< reference to the host cpu space */
+	address_space *m_host_space;                            /**< reference to the host cpu space */
 	const address_space_config      m_space_config;
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);

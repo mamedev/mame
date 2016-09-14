@@ -531,8 +531,8 @@ void laser3k_state::text_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 	m_flash = ((machine().time() * 4).seconds() & 1) ? 1 : 0;
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row += 8)
 	{

@@ -17,7 +17,7 @@
 #define MAX_CUST_FILTER          8
 
 // GLOBAL ENUMERATORS
-enum
+enum : UINT16
 {
 	FILTER_FIRST = 0,
 	FILTER_ALL = FILTER_FIRST,
@@ -96,7 +96,7 @@ enum
 	UI_LAST_LOAD = UI_STORY_LOAD
 };
 
-enum
+enum : UINT16
 {
 	UI_SW_FIRST = 0,
 	UI_SW_ALL = UI_SW_FIRST,

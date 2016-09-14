@@ -100,7 +100,7 @@ int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 	{
 		auxchar = utf8char[i];
 
-		// all auxillary chars must be between 0x80-0xbf 
+		// all auxillary chars must be between 0x80-0xbf
 		if ((auxchar & 0xc0) != 0x80)
 			return -1;
 
@@ -161,9 +161,9 @@ int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t c
 {
 	utf16_char buf[2] = {0};
 	if (count > 0)
-		buf[0] = FLIPENDIAN_INT16(utf16char[0]);
+		buf[0] = flipendian_int16(utf16char[0]);
 	if (count > 1)
-		buf[1] = FLIPENDIAN_INT16(utf16char[1]);
+		buf[1] = flipendian_int16(utf16char[1]);
 	return uchar_from_utf16(uchar, buf, count);
 }
 
@@ -309,9 +309,9 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 	rc = utf16_from_uchar(buf, count, uchar);
 
 	if (rc >= 1)
-		utf16string[0] = FLIPENDIAN_INT16(buf[0]);
+		utf16string[0] = flipendian_int16(buf[0]);
 	if (rc >= 2)
-		utf16string[1] = FLIPENDIAN_INT16(buf[1]);
+		utf16string[1] = flipendian_int16(buf[1]);
 	return rc;
 }
 

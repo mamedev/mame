@@ -64,7 +64,7 @@ public:
 	bool hit_test(float x, float y, size_t &start, size_t &span) const;
 	void restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor);
 	int get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend) const;
-	void emit(render_container *container, float x, float y);
+	void emit(render_container &container, float x, float y);
 	void add_text(const char *text, rgb_t fgcolor = rgb_t::white, rgb_t bgcolor = rgb_t::transparent, float size = 1.0)
 	{
 		// create the style

@@ -320,9 +320,9 @@ void apple525_floppy_image_device::device_start()
 	memset(track_data, 0, sizeof(track_data));
 }
 
-bool apple525_floppy_image_device::call_load()
+image_init_result apple525_floppy_image_device::call_load()
 {
-	int result = legacy_floppy_image_device::call_load();
+	image_init_result result = legacy_floppy_image_device::call_load();
 	floppy_drive_seek(-999);
 	floppy_drive_seek(+35/2);
 	return result;

@@ -491,7 +491,7 @@ void sound_stream::recompute_sample_rate_data()
 			// okay, we have a new sample rate; recompute the latency to be the maximum
 			// sample period between us and our input
 			attoseconds_t new_attosecs_per_sample = ATTOSECONDS_PER_SECOND / input.m_source->m_stream->m_sample_rate;
-			attoseconds_t latency = MAX(new_attosecs_per_sample, m_attoseconds_per_sample);
+			attoseconds_t latency = std::max(new_attosecs_per_sample, m_attoseconds_per_sample);
 
 			// if the input stream's sample rate is lower, we will use linear interpolation
 			// this requires an extra sample from the source
@@ -504,7 +504,7 @@ void sound_stream::recompute_sample_rate_data()
 
 			// we generally don't want to tweak the latency, so we just keep the greatest
 			// one we've computed thus far
-			input.m_latency_attoseconds = MAX(input.m_latency_attoseconds, latency);
+			input.m_latency_attoseconds = std::max(input.m_latency_attoseconds, latency);
 			assert(input.m_latency_attoseconds < update_attoseconds);
 		}
 	}

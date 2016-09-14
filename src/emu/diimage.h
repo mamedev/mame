@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "softlist.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -86,10 +88,10 @@ public:
 	const std::string &optspec() const { return m_optspec; }
 
 private:
-	std::string					m_name;
-	std::string					m_description;
-	std::vector<std::string>	m_extensions;
-	std::string					m_optspec;
+	std::string                 m_name;
+	std::string                 m_description;
+	std::vector<std::string>    m_extensions;
+	std::string                 m_optspec;
 };
 
 
@@ -98,25 +100,23 @@ struct feature_list;
 class software_part;
 class software_info;
 
+enum class image_init_result { PASS, FAIL };
+enum class image_verify_result { PASS, FAIL };
+
 // device image interface function types
-typedef delegate<int (device_image_interface &)> device_image_load_delegate;
+typedef delegate<image_init_result (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 // legacy
-typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned char *, unsigned long, const char *);
+typedef void (*device_image_partialhash_func)(util::hash_collection &, const unsigned char *, unsigned long, const char *);
 
 //**************************************************************************
 //  MACROS
 //**************************************************************************
 
-#define IMAGE_INIT_PASS     FALSE
-#define IMAGE_INIT_FAIL     TRUE
-#define IMAGE_VERIFY_PASS   FALSE
-#define IMAGE_VERIFY_FAIL   TRUE
-
 #define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
 #define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        int DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         int DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        image_init_result DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
+#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         image_init_result DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
 #define DEVICE_IMAGE_LOAD_DELEGATE(_class,_name)       device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_name),#_class "::device_image_load_" #_name, downcast<_class *>(device->owner()))
 
 #define DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)          device_image_unload_##_name
@@ -145,15 +145,14 @@ public:
 	static const char *device_brieftypename(iodevice_t type);
 	static iodevice_t device_typeid(const char *name);
 
-	virtual void device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const;
+	virtual void device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
-	virtual bool call_load() { return FALSE; }
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return FALSE; }
-	virtual bool call_create(int format_type, util::option_resolution *format_options) { return FALSE; }
+	virtual image_init_result call_load() { return image_init_result::PASS; }
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) { return image_init_result::PASS; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }
-	virtual bool core_opens_image_file() const { return TRUE; }
+	virtual bool core_opens_image_file() const { return true; }
 	virtual iodevice_t image_type()  const = 0;
 	virtual bool is_readable()  const = 0;
 	virtual bool is_writeable() const = 0;
@@ -162,10 +161,10 @@ public:
 	virtual bool is_reset_on_load() const = 0;
 	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
-	virtual const option_guide *create_option_guide() const = 0;
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
-	const image_device_format *device_get_named_creatable_format(const char *format_name);
+	const image_device_format *device_get_named_creatable_format(const std::string &format_name);
 	const option_guide *device_get_creation_option_guide() const { return create_option_guide(); }
 
 	const char *error();
@@ -176,12 +175,12 @@ public:
 	const char *filename() const { if (m_image_name.empty()) return nullptr; else return m_image_name.c_str(); }
 	const char *basename() const { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
 	const char *basename_noext()  const { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
-	const char *filetype() const { if (m_filetype.empty()) return nullptr; else return m_filetype.c_str(); }
+	const std::string &filetype() const { return m_filetype; }
+	bool is_filetype(const std::string &candidate_filetype) { return !core_stricmp(filetype().c_str(), candidate_filetype.c_str()); }
 	bool is_open() const { return bool(m_file); }
 	util::core_file &image_core_file() const { return *m_file; }
 	UINT64 length() { check_for_file(); return m_file->size(); }
 	bool is_readonly() const { return m_readonly; }
-	bool has_been_created() const { return m_created; }
 	void make_readonly() { m_readonly = true; }
 	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return m_file->read(buffer, length); }
 	UINT32 fread(optional_shared_ptr<UINT8> &ptr, UINT32 length) { ptr.allocate(length); return fread(ptr.target(), length); }
@@ -194,7 +193,7 @@ public:
 	int image_feof() { check_for_file(); return m_file->eof(); }
 	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
-	void set_init_phase() { m_init_phase = TRUE; }
+	void set_init_phase() { m_init_phase = true; }
 
 	const char* longname() const { return m_longname.c_str(); }
 	const char* manufacturer() const { return m_manufacturer.c_str(); }
@@ -204,6 +203,7 @@ public:
 	const software_info *software_entry() const { return m_software_info_ptr; }
 	const software_part *part_entry() const { return m_software_part_ptr; }
 	const char *software_list_name() const { return m_software_list_name.c_str(); }
+	bool loaded_through_softlist() const { return m_software_info_ptr != nullptr; }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
@@ -214,7 +214,7 @@ public:
 	bool load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr);
 
 	UINT32 crc();
-	hash_collection& hash() { return m_hash; }
+	util::hash_collection& hash() { return m_hash; }
 
 	void battery_load(void *buffer, int length, int fill);
 	void battery_load(void *buffer, int length, void *def_buffer);
@@ -227,11 +227,16 @@ public:
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
-	bool load(const char *path);
+	// loads an image file
+	image_init_result load(const char *path);
+
+	// loads a softlist item by name
+	image_init_result load_software(const std::string &softlist_name);
+
 	bool open_image_file(emu_options &options);
-	bool finish_load();
+	image_init_result finish_load();
 	void unload();
-	bool create(const char *path, const image_device_format *create_format, util::option_resolution *create_args);
+	image_init_result create(const char *path, const image_device_format *create_format, util::option_resolution *create_args);
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const char *path);
 
@@ -247,13 +252,15 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
-	bool load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
+	virtual const software_list_loader &get_software_list_loader() const { return false_software_list_loader::instance(); }
+
+	image_init_result load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
-	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
+	image_error_t load_image_by_path(UINT32 open_flags, const std::string &path);
 	void clear();
 	bool is_loaded();
 
-	image_error_t set_image_filename(const char *filename);
+	void set_image_filename(const std::string &filename);
 
 	void clear_error();
 
@@ -262,13 +269,16 @@ protected:
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
 
-	void run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *), hash_collection &hashes, const char *types);
+	void run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	software_part *find_software_item(const char *path, bool restrict_to_interface) const;
-	bool load_software_part(const char *path, software_part *&swpart);
+	const software_part *find_software_item(const char *path, bool restrict_to_interface) const;
+	bool load_software_part(const char *path, const software_part *&swpart);
 	std::string software_get_default_slot(const char *default_card_slot) const;
+
+	void add_format(std::unique_ptr<image_device_format> &&format);
+	void add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec);
 
 	// derived class overrides
 
@@ -276,11 +286,11 @@ protected:
 	static const image_device_type_info *find_device_type(iodevice_t type);
 	static const image_device_type_info m_device_info_array[];
 
-	/* error related info */
+	// error related info
 	image_error_t m_err;
 	std::string m_err_message;
 
-	/* variables that are only non-zero when an image is mounted */
+	// variables that are only non-zero when an image is mounted
 	util::core_file::ptr m_file;
 	std::unique_ptr<emu_file> m_mame_file;
 	std::string m_image_name;
@@ -288,41 +298,44 @@ protected:
 	std::string m_basename_noext;
 	std::string m_filetype;
 
-	/* working directory; persists across mounts */
-	std::string m_working_directory;
-
-	/* Software information */
+	// Software information
 	std::string m_full_software_name;
-	software_info *m_software_info_ptr;
-	software_part *m_software_part_ptr;
+	const software_info *m_software_info_ptr;
+	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
-	/* info read from the hash file/software list */
+private:
+	static image_error_t image_error_from_file_error(osd_file::error filerr);
+	bool schedule_postload_hard_reset_if_needed();
+
+	// creation info
+	formatlist_type m_formatlist;
+
+	// working directory; persists across mounts
+	std::string m_working_directory;
+
+	// info read from the hash file/software list
 	std::string m_longname;
 	std::string m_manufacturer;
 	std::string m_year;
 	UINT32  m_supported;
 
-	/* flags */
+	// flags
 	bool m_readonly;
 	bool m_created;
 	bool m_init_phase;
-	bool m_from_swlist;
 
-	/* special - used when creating */
+	// special - used when creating
 	int m_create_format;
 	util::option_resolution *m_create_args;
 
-	hash_collection m_hash;
+	util::hash_collection m_hash;
 
 	std::string m_brief_instance_name;
 	std::string m_instance_name;
 
-	/* creation info */
-	formatlist_type m_formatlist;
-
-	/* in the case of arcade cabinet with fixed carts inserted,
-	 we want to disable command line cart loading... */
+	// in the case of arcade cabinet with fixed carts inserted,
+	// we want to disable command line cart loading...
 	bool m_user_loadable;
 
 	bool m_is_loading;

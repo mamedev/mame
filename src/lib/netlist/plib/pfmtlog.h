@@ -21,6 +21,14 @@ struct ptype_treats
 };
 
 template<>
+struct ptype_treats<bool>
+{
+	static unsigned int cast(bool x) { return static_cast<unsigned int>(x); }
+	static const bool is_signed = false;
+	static const char *size_specifier() { return ""; }
+};
+
+template<>
 struct ptype_treats<char>
 {
 	static short cast(char x) { return x; }
@@ -119,6 +127,7 @@ public:
 	P &operator ()(char *x, const char *f = "") { format_element(f, "", "s", x); return static_cast<P &>(*this);  }
 	P &operator ()(const void *x, const char *f = "") { format_element(f, "", "p", x); return static_cast<P &>(*this);  }
 	P &operator ()(const pstring &x, const char *f = "") { format_element(f, "", "s", x.cstr() ); return static_cast<P &>(*this);  }
+	P &operator ()(const pstring_t<putf8_traits> &x, const char *f = "") { format_element(f, "", "s", x.cstr() ); return static_cast<P &>(*this);  }
 
 	template<typename T>
 	P &operator ()(const T x, const char *f = "")
@@ -169,7 +178,7 @@ private:
 
 	char *m_str;
 	char m_str_buf[256];
-	unsigned m_allocated;
+	std::size_t m_allocated;
 	unsigned m_arg;
 };
 

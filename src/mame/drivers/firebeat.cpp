@@ -144,6 +144,7 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 #include "machine/rtc65271.h"
 #include "machine/ins8250.h"
 #include "machine/midikbd.h"
+#include "machine/atapicdr.h"
 #include "sound/ymz280b.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
@@ -1268,6 +1269,10 @@ static MACHINE_CONFIG_FRAGMENT( cdrom_config )
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static SLOT_INTERFACE_START(firebeat_ata_devices)
+	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( firebeat, firebeat_state )
 
 	/* basic machine hardware */
@@ -1284,7 +1289,7 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "cdrom", "cdrom", true)
+	MCFG_ATA_INTERFACE_ADD("ata", firebeat_ata_devices, "cdrom", "cdrom", true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:1")
@@ -1344,7 +1349,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "cdrom", "cdrom", true)
+	MCFG_ATA_INTERFACE_ADD("ata", firebeat_ata_devices, "cdrom", "cdrom", true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:1")
@@ -1410,7 +1415,7 @@ static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_ATA_INTERFACE_ADD("spu_ata", ata_devices, "cdrom", nullptr, true)
+	MCFG_ATA_INTERFACE_ADD("spu_ata", firebeat_ata_devices, "cdrom", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, spu_ata_interrupt))
 MACHINE_CONFIG_END
 

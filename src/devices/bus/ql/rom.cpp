@@ -75,7 +75,7 @@ void ql_rom_cartridge_slot_t::device_start()
 //  call_load -
 //-------------------------------------------------
 
-bool ql_rom_cartridge_slot_t::call_load()
+image_init_result ql_rom_cartridge_slot_t::call_load()
 {
 	if (m_card)
 	{
@@ -94,19 +94,7 @@ bool ql_rom_cartridge_slot_t::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-
-//-------------------------------------------------
-//  call_softlist_load -
-//-------------------------------------------------
-
-bool ql_rom_cartridge_slot_t::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-
-	return true;
+	return image_init_result::PASS;
 }
 
 

@@ -1732,8 +1732,8 @@ void saturn_state::stv_vdp1_draw_normal_sprite(const rectangle &cliprect, int sp
 		xsize -= (cliprect.min_x - x);
 		x = cliprect.min_x;
 	}
-	maxdrawypos = MIN(y+ysize-1,cliprect.max_y);
-	maxdrawxpos = MIN(x+xsize-1,cliprect.max_x);
+	maxdrawypos = std::min(y+ysize-1,cliprect.max_y);
+	maxdrawxpos = std::min(x+xsize-1,cliprect.max_x);
 	for (drawypos = y; drawypos <= maxdrawypos; drawypos++ )
 	{
 		//destline = m_vdp1.framebuffer_draw_lines[drawypos];

@@ -305,7 +305,7 @@ static imgtoolerr_t fat_read_sector(imgtool_partition *partition, UINT32 sector_
 		if (err)
 			return err;
 
-		len = MIN(buffer_len, sizeof(data) - offset);
+		len = std::min(buffer_len, sizeof(data) - offset);
 		memcpy(buffer, data + offset, len);
 
 		buffer = ((UINT8 *) buffer) + len;
@@ -337,7 +337,7 @@ static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector
 
 	while(buffer_len > 0)
 	{
-		len = MIN(buffer_len, sizeof(data) - offset);
+		len = std::min(buffer_len, sizeof(data) - offset);
 
 		if ((offset != 0) || (buffer_len < sizeof(data)))
 		{
@@ -578,7 +578,7 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 	first_fat_entries = ((UINT64) media_descriptor) | 0xFFFFFF00;
 	first_fat_entries &= (((UINT64) 1) << fat_bits) - 1;
 	first_fat_entries |= ((((UINT64) 1) << fat_bits) - 1) << fat_bits;
-	first_fat_entries = LITTLE_ENDIANIZE_INT64(first_fat_entries);
+	first_fat_entries = little_endianize_int64(first_fat_entries);
 
 	for (i = 0; i < fat_count; i++)
 	{
@@ -620,7 +620,7 @@ static imgtoolerr_t fat_load_fat(imgtool_partition *partition, UINT8 **fat_table
 
 	while(pos < table_size)
 	{
-		len = MIN(table_size - pos, FAT_SECLEN);
+		len = std::min(table_size - pos, UINT32(FAT_SECLEN));
 
 		err = fat_read_sector(partition, sector_index++, 0, &table[pos], len);
 		if (err)
@@ -658,7 +658,7 @@ static imgtoolerr_t fat_save_fat(imgtool_partition *partition, const UINT8 *fat_
 
 	while(pos < table_size)
 	{
-		len = MIN(table_size - pos, FAT_SECLEN);
+		len = std::min(table_size - pos, UINT32(FAT_SECLEN));
 
 		err = fat_write_sector(partition, sector_index++, 0, &fat_table[pos], len);
 		if (err)
@@ -698,7 +698,7 @@ static UINT32 fat_get_fat_entry(imgtool_partition *partition, const UINT8 *fat_t
 			* disk_info->sectors_per_fat) + (bit_index / 8), sizeof(entry));
 
 		/* we've extracted the bytes; we now need to normalize it */
-		entry = LITTLE_ENDIANIZE_INT64(entry);
+		entry = little_endianize_int64(entry);
 		entry >>= bit_index % 8;
 		entry &= bit_mask;
 
@@ -735,10 +735,10 @@ static void fat_set_fat_entry(imgtool_partition *partition, UINT8 *fat_table, UI
 		memcpy(&entry, fat_table + (i * FAT_SECLEN
 			* disk_info->sectors_per_fat) + (bit_index / 8), sizeof(entry));
 
-		entry = LITTLE_ENDIANIZE_INT64(entry);
+		entry = little_endianize_int64(entry);
 		entry &= (~((UINT64) 0xFFFFFFFF >> (32 - disk_info->fat_bits)) << (bit_index % 8)) | ((1 << (bit_index % 8)) - 1);
 		entry |= ((UINT64) value) << (bit_index % 8);
-		entry = LITTLE_ENDIANIZE_INT64(entry);
+		entry = little_endianize_int64(entry);
 
 		memcpy(fat_table + (i * FAT_SECLEN
 			* disk_info->sectors_per_fat) + (bit_index / 8), &entry, sizeof(entry));
@@ -887,7 +887,7 @@ static imgtoolerr_t fat_readwrite_file(imgtool_partition *partition, fat_file *f
 	if (bytes_read)
 		*bytes_read = 0;
 	if (!file->directory)
-		buffer_len = MIN(buffer_len, file->filesize - file->index);
+		buffer_len = std::min(buffer_len, size_t(file->filesize - file->index));
 
 	while(!file->eof && (buffer_len > 0))
 	{
@@ -896,7 +896,7 @@ static imgtoolerr_t fat_readwrite_file(imgtool_partition *partition, fat_file *f
 			return fat_corrupt_file_error(file);
 
 		offset = file->index % FAT_SECLEN;
-		len = MIN(buffer_len, FAT_SECLEN - offset);
+		len = std::min(buffer_len, size_t(FAT_SECLEN - offset));
 
 		/* read or write the data from the disk */
 		if (read_or_write)
@@ -993,7 +993,7 @@ static imgtoolerr_t fat_set_file_size(imgtool_partition *partition, fat_file *fi
 	}
 
 	/* what is the new position? */
-	new_pos = MIN(file->index, new_size);
+	new_pos = std::min(file->index, new_size);
 
 	if (file->root)
 	{
@@ -1110,7 +1110,7 @@ static imgtoolerr_t fat_set_file_size(imgtool_partition *partition, fat_file *fi
 	if (file->directory && !delete_file)
 	{
 		if (file->root)
-			clear_size = MIN(file->filesize - new_size, FAT_DIRENT_SIZE);
+			clear_size = std::min(file->filesize - new_size, UINT32(FAT_DIRENT_SIZE));
 		else
 			clear_size = (disk_info->cluster_size - (new_size % disk_info->cluster_size)) % disk_info->cluster_size;
 
@@ -1159,14 +1159,14 @@ static void prepend_lfn_bytes(utf16_char *lfn_buf, size_t lfn_buflen, size_t *lf
 	int i;
 	size_t move_len;
 
-	move_len = MIN(*lfn_len + 1, lfn_buflen - chars - 1);
+	move_len = std::min(*lfn_len + 1, lfn_buflen - chars - 1);
 	memmove(&lfn_buf[chars], &lfn_buf[0], move_len * sizeof(*lfn_buf));
 
 	for (i = 0; i < chars; i++)
 	{
 		/* read the character */
 		memcpy(&w, &entry[offset + i * 2], 2);
-		w = LITTLE_ENDIANIZE_INT16(w);
+		w = little_endianize_int16(w);
 
 		/* append to buffer */
 		lfn_buf[i] = (w != 0xFFFF) ? w : 0;
@@ -1466,7 +1466,7 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 		if (!short_char || (short_char != cannonical_short_char))
 		{
 			if (toupper(short_char) == toupper(cannonical_short_char))
-				sfn_disposition = MAX(sfn_disposition, SFN_DERIVATIVE);
+				sfn_disposition = std::max(sfn_disposition, SFN_DERIVATIVE);
 			else
 				sfn_disposition = SFN_MANGLED;
 		}
@@ -1478,7 +1478,7 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 			if (sfn_in_extension)
 				sfn_disposition = SFN_MANGLED;
 			else if (last_short_char == ' ')
-				sfn_disposition = MAX(sfn_disposition, SFN_DERIVATIVE);
+				sfn_disposition = std::max(sfn_disposition, SFN_DERIVATIVE);
 
 			sfn_in_extension = 1;
 			sfn_pos = 8;
@@ -1554,7 +1554,7 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 
 	/* trailing spaces? */
 	if (short_char == ' ')
-		sfn_disposition = MAX(sfn_disposition, SFN_DERIVATIVE);
+		sfn_disposition = std::max(sfn_disposition, SFN_DERIVATIVE);
 
 	if (sfn_disposition == SFN_SUFFICIENT)
 	{
@@ -1758,7 +1758,7 @@ static imgtoolerr_t fat_lookup_path(imgtool_partition *partition, const char *pa
 
 			LOG(("fat_lookup_path(): creating entry; pos=%u length=%u\n", freeent.position, freeent.required_size));
 
-			err = fat_set_file_size(partition, file, MAX(file->filesize, freeent.position + created_entry_len));
+			err = fat_set_file_size(partition, file, std::max(file->filesize, UINT32(freeent.position + created_entry_len)));
 			if (err)
 				goto done;
 
@@ -1957,7 +1957,7 @@ static imgtoolerr_t fat_partition_writefile(imgtool_partition *partition, const 
 
 	while(bytes_left > 0)
 	{
-		len = MIN(bytes_left, sizeof(buffer));
+		len = (std::min<size_t>)(bytes_left, sizeof(buffer));
 		stream_read(sourcef, buffer, len);
 
 		err = fat_write_file(partition, &file, buffer, len, NULL);

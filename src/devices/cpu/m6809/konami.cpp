@@ -136,7 +136,7 @@ inline UINT8 konami_cpu_device::read_operand(int ordinal)
 	{
 		case ADDRESSING_MODE_EA:            return read_memory(m_ea.w + ordinal);
 		case ADDRESSING_MODE_IMMEDIATE:     return read_opcode_arg();
-		case ADDRESSING_MODE_REGISTER_D:    return (ordinal & 1) ? m_d.b.l : m_d.b.h;
+		case ADDRESSING_MODE_REGISTER_D:    return (ordinal & 1) ? m_q.r.b : m_q.r.a;
 		default:                            fatalerror("Unexpected");
 	}
 }
@@ -163,7 +163,7 @@ inline void konami_cpu_device::write_operand(int ordinal, UINT8 data)
 	{
 		case ADDRESSING_MODE_IMMEDIATE:     /* do nothing */                                break;
 		case ADDRESSING_MODE_EA:            write_memory(m_ea.w + ordinal, data);           break;
-		case ADDRESSING_MODE_REGISTER_D:    *((ordinal & 1) ? &m_d.b.l : &m_d.b.h) = data;  break;
+		case ADDRESSING_MODE_REGISTER_D:    *((ordinal & 1) ? &m_q.r.b : &m_q.r.a) = data;  break;
 		default:                            fatalerror("Unexpected");
 	}
 }
@@ -201,8 +201,8 @@ inline m6809_base_device::exgtfr_register konami_cpu_device::read_exgtfr_registe
 
 	switch(reg & 0x07)
 	{
-		case  0: result.word_value = m_d.b.h;   break;  // A
-		case  1: result.word_value = m_d.b.l;   break;  // B
+		case  0: result.word_value = m_q.r.a;   break;  // A
+		case  1: result.word_value = m_q.r.b;   break;  // B
 		case  2: result.word_value = m_x.w;     break;  // X
 		case  3: result.word_value = m_y.w;     break;  // Y
 		case  4: result.word_value = m_s.w;     break;  // S
@@ -221,8 +221,8 @@ inline void konami_cpu_device::write_exgtfr_register(UINT8 reg, m6809_base_devic
 {
 	switch(reg & 0x07)
 	{
-		case  0: m_d.b.h = value.byte_value;    break;  // A
-		case  1: m_d.b.l = value.byte_value;    break;  // B
+		case  0: m_q.r.a = value.byte_value;    break;  // A
+		case  1: m_q.r.b = value.byte_value;    break;  // B
 		case  2: m_x.w   = value.word_value;    break;  // X
 		case  3: m_y.w   = value.word_value;    break;  // Y
 		case  4: m_s.w   = value.word_value;    break;  // S
@@ -318,10 +318,10 @@ inline void konami_cpu_device::divx()
 	UINT16 result;
 	UINT8 remainder;
 
-	if (m_d.b.l != 0)
+	if (m_q.r.b != 0)
 	{
-		result = m_x.w / m_d.b.l;
-		remainder = m_x.w % m_d.b.l;
+		result = m_x.w / m_q.r.b;
+		remainder = m_x.w % m_q.r.b;
 	}
 	else
 	{
@@ -332,7 +332,7 @@ inline void konami_cpu_device::divx()
 
 	// set results and Z flag
 	m_x.w = set_flags<UINT16>(CC_Z, result);
-	m_d.b.l = remainder;
+	m_q.r.b = remainder;
 
 	// set C flag
 	if (result & 0x0080)

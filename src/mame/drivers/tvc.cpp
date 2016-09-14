@@ -742,11 +742,11 @@ QUICKLOAD_LOAD_MEMBER( tvc_state, tvc64)
 	{
 		image.fseek(0x90, SEEK_SET);
 		image.fread(m_ram->pointer() + 0x19ef, image.length() - 0x90);
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 	else
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 }
 

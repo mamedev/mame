@@ -76,40 +76,34 @@ READ8_MEMBER(nes_ntb_slot_device::read)
 }
 
 
-bool nes_ntb_slot_device::call_load()
+image_init_result nes_ntb_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		UINT8 *ROM = m_cart->get_cart_base();
 
 		if (!ROM)
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 
 		if (software_entry() == nullptr)
 		{
 			if (length() != 0x4000)
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 
 			fread(&ROM, 0x4000);
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x4000)
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 
 			memcpy(ROM, get_software_region("rom"), 0x4000);
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-
-bool nes_ntb_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
-	return TRUE;
-}
 
 std::string nes_ntb_slot_device::get_default_card_software()
 {

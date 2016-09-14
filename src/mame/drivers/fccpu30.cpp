@@ -352,11 +352,11 @@ READ8_MEMBER (fccpu30_state::rotary_rd){
  */
 READ8_MEMBER (fccpu30_state::board_mem_id_rd){
 	LOG(("%s\n", FUNCNAME));
-	//	return 0x6A; // CPU-30 R4 with 4Mb of shared RAM. TODO: make this configurable from commandline or artwork
-	//	return 0x57; // blankt 53 56
-	//		return 0x36; // CPU-26 1Mb 36 MHz 
-	//		return 0x35; // CPU-26 1Mb 36 MHz 
-			return 0x36; // CPU-26 1Mb 36 MHz 
+	//  return 0x6A; // CPU-30 R4 with 4Mb of shared RAM. TODO: make this configurable from commandline or artwork
+	//  return 0x57; // blankt 53 56
+	//      return 0x36; // CPU-26 1Mb 36 MHz
+	//      return 0x35; // CPU-26 1Mb 36 MHz
+			return 0x36; // CPU-26 1Mb 36 MHz
 }
 
 #if 0
@@ -415,7 +415,7 @@ MACHINE_CONFIG_END
 ROM_START (fccpu30)
 	ROM_REGION32_BE(0x900000, "roms", 0)
 
-// Boots with Board ID set to: 0x36 
+// Boots with Board ID set to: 0x36
 	ROM_LOAD16_BYTE("CPU33LO.BIN",  0x000001, 0x40000, CRC (49895fdf) SHA1 (733abd144c95225a2faf920490e31df2a27f8e03))
 	ROM_LOAD16_BYTE("CPU33UP.BIN",  0x000000, 0x40000, CRC (cfe75e94) SHA1 (d40e0635a48607be25f7c58c74b53b7e58fe735d))
 
@@ -425,9 +425,9 @@ ROM_START (fccpu30)
 	ROM_LOAD32_BYTE("CPU30LO.BIN",  0x000002, 0x20000, CRC (fefa88ed) SHA1 (71a9ad807c0c2da5c6f6a6dc68c73ad8b52f3ea9))
 	ROM_LOAD32_BYTE("CPU30UP.BIN",  0x000001, 0x20000, CRC (dfed1f68) SHA1 (71478a77d5ab5da0fabcd78e69537919b560e3b8))
 	ROM_LOAD32_BYTE("CPU30UU.BIN",  0x000000, 0x20000, CRC (66e95cc2) SHA1 (acdb468a3a5974295b81271d617de7f101098891))
-#endif 
+#endif
 
-// Same binary for many boards, attempts to detect CPU speed etc, currently failing detection but boots system roms anyway 
+// Same binary for many boards, attempts to detect CPU speed etc, currently failing detection but boots system roms anyway
 	ROM_LOAD       ("PGA-002.bin",  0x800000, 0x10000, CRC(faa38972) SHA1(651dfc2f9a865fc6adf49dad90f9e705f2889919) )
 ROM_END
 

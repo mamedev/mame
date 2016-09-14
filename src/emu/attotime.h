@@ -30,11 +30,10 @@
  * full 64-bit value, there is headroom to make some operations simpler.
  */
 /**************************************************************************/
+#ifndef MAME_EMU_ATTOTIME_H
+#define MAME_EMU_ATTOTIME_H
 
 #pragma once
-
-#ifndef __ATTOTIME_H__
-#define __ATTOTIME_H__
 
 #include <math.h>
 #undef min
@@ -49,13 +48,13 @@ typedef INT64 attoseconds_t;
 typedef INT32 seconds_t;
 
 // core definitions
-const attoseconds_t ATTOSECONDS_PER_SECOND_SQRT = 1000000000;
+const attoseconds_t ATTOSECONDS_PER_SECOND_SQRT = 1'000'000'000;
 const attoseconds_t ATTOSECONDS_PER_SECOND = ATTOSECONDS_PER_SECOND_SQRT * ATTOSECONDS_PER_SECOND_SQRT;
-const attoseconds_t ATTOSECONDS_PER_MILLISECOND = ATTOSECONDS_PER_SECOND / 1000;
-const attoseconds_t ATTOSECONDS_PER_MICROSECOND = ATTOSECONDS_PER_SECOND / 1000000;
-const attoseconds_t ATTOSECONDS_PER_NANOSECOND = ATTOSECONDS_PER_SECOND / 1000000000;
+const attoseconds_t ATTOSECONDS_PER_MILLISECOND = ATTOSECONDS_PER_SECOND / 1'000;
+const attoseconds_t ATTOSECONDS_PER_MICROSECOND = ATTOSECONDS_PER_SECOND / 1'000'000;
+const attoseconds_t ATTOSECONDS_PER_NANOSECOND = ATTOSECONDS_PER_SECOND / 1'000'000'000;
 
-const seconds_t ATTOTIME_MAX_SECONDS = 1000000000;
+const seconds_t ATTOTIME_MAX_SECONDS = 1'000'000'000;
 
 
 
@@ -64,18 +63,18 @@ const seconds_t ATTOTIME_MAX_SECONDS = 1000000000;
 //**************************************************************************
 
 // convert between a double and attoseconds
-#define ATTOSECONDS_TO_DOUBLE(x)        ((double)(x) * 1e-18)
-#define DOUBLE_TO_ATTOSECONDS(x)        ((attoseconds_t)((x) * 1e18))
+inline constexpr double ATTOSECONDS_TO_DOUBLE(attoseconds_t x) { return double(x) * 1e-18; }
+inline constexpr attoseconds_t DOUBLE_TO_ATTOSECONDS(double x) { return attoseconds_t(x * 1e18); }
 
 // convert between hertz (as a double) and attoseconds
-#define ATTOSECONDS_TO_HZ(x)            ((double)ATTOSECONDS_PER_SECOND / (double)(x))
-#define HZ_TO_ATTOSECONDS(x)            ((attoseconds_t)(ATTOSECONDS_PER_SECOND / (x)))
+inline constexpr double ATTOSECONDS_TO_HZ(attoseconds_t x) { return double(ATTOSECONDS_PER_SECOND) / double(x); }
+template <typename T> inline constexpr attoseconds_t HZ_TO_ATTOSECONDS(T &&x) { return attoseconds_t(ATTOSECONDS_PER_SECOND / x); }
 
 // macros for converting other seconds types to attoseconds
-#define ATTOSECONDS_IN_SEC(x)           ((attoseconds_t)(x) * ATTOSECONDS_PER_SECOND)
-#define ATTOSECONDS_IN_MSEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_MILLISECOND)
-#define ATTOSECONDS_IN_USEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_MICROSECOND)
-#define ATTOSECONDS_IN_NSEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_NANOSECOND)
+template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_SEC(T &&x) { return attoseconds_t(x) * ATTOSECONDS_PER_SECOND; }
+template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_MSEC(T &&x) { return attoseconds_t(x) * ATTOSECONDS_PER_MILLISECOND; }
+template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_USEC(T &&x) { return attoseconds_t(x) * ATTOSECONDS_PER_MICROSECOND; }
+template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_NSEC(T &&x) { return attoseconds_t(x) * ATTOSECONDS_PER_NANOSECOND; }
 
 
 
@@ -88,18 +87,12 @@ class attotime
 {
 public:
 	// construction/destruction
-	attotime()
-		: m_seconds(0),
-			m_attoseconds(0) { }
+	constexpr attotime() : m_seconds(0), m_attoseconds(0) { }
 
 	/** Constructs with @p secs seconds and @p attos attoseconds. */
-	attotime(seconds_t secs, attoseconds_t attos)
-		: m_seconds(secs),
-			m_attoseconds(attos) { }
+	constexpr attotime(seconds_t secs, attoseconds_t attos) : m_seconds(secs), m_attoseconds(attos) { }
 
-	attotime(const attotime& that)
-		: m_seconds(that.m_seconds),
-			m_attoseconds(that.m_attoseconds) { }
+	constexpr attotime(const attotime& that) : m_seconds(that.m_seconds), m_attoseconds(that.m_attoseconds) { }
 
 	// assignment
 	attotime& operator=(const attotime& that)
@@ -110,32 +103,32 @@ public:
 	}
 
 	// queries
-	bool is_zero() const { return (m_seconds == 0 && m_attoseconds == 0); }
+	constexpr bool is_zero() const { return (m_seconds == 0 && m_attoseconds == 0); }
 	/** Test if value is above @ref ATTOTIME_MAX_SECONDS (considered an overflow) */
-	bool is_never() const { return (m_seconds >= ATTOTIME_MAX_SECONDS); }
+	constexpr bool is_never() const { return (m_seconds >= ATTOTIME_MAX_SECONDS); }
 
 	// conversion to other forms
-	double as_double() const { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
-	attoseconds_t as_attoseconds() const;
+	constexpr double as_double() const { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
+	constexpr attoseconds_t as_attoseconds() const;
 	UINT64 as_ticks(UINT32 frequency) const;
 	/** Convert to string using at @p precision */
 	const char *as_string(int precision = 9) const;
 
 	/** @return the attoseconds portion. */
-	attoseconds_t attoseconds() const { return m_attoseconds; }
+	constexpr attoseconds_t attoseconds() const { return m_attoseconds; }
 	/** @return the seconds portion. */
-	seconds_t seconds() const { return m_seconds; }
+	constexpr seconds_t seconds() const { return m_seconds; }
 
 	static attotime from_double(double _time);
 	static attotime from_ticks(UINT64 ticks, UINT32 frequency);
 	/** Create an attotime from a integer count of seconds @seconds */
-	static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
+	static constexpr attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
 	/** Create an attotime from a integer count of milliseconds @msec */
-	static attotime from_msec(INT64 msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
+	static constexpr attotime from_msec(INT64 msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
 	/** Create an attotime from a integer count of microseconds @usec */
-	static attotime from_usec(INT64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
+	static constexpr attotime from_usec(INT64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
 	/** Create an attotime from a integer count of nanoseconds @nsec */
-	static attotime from_nsec(INT64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
+	static constexpr attotime from_nsec(INT64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
 	/** Create an attotime from at the given frequency @frequency */
 	static attotime from_hz(double frequency) { assert(frequency > 0); double d = 1 / frequency; return attotime(floor(d), modf(d, &d) * ATTOSECONDS_PER_SECOND); }
 
@@ -277,32 +270,32 @@ inline attotime operator/(const attotime &left, UINT32 factor)
 
 
 /** handle comparisons between attotimes */
-inline bool operator==(const attotime &left, const attotime &right)
+inline constexpr bool operator==(const attotime &left, const attotime &right)
 {
 	return (left.m_seconds == right.m_seconds && left.m_attoseconds == right.m_attoseconds);
 }
 
-inline bool operator!=(const attotime &left, const attotime &right)
+inline constexpr bool operator!=(const attotime &left, const attotime &right)
 {
 	return (left.m_seconds != right.m_seconds || left.m_attoseconds != right.m_attoseconds);
 }
 
-inline bool operator<(const attotime &left, const attotime &right)
+inline constexpr bool operator<(const attotime &left, const attotime &right)
 {
 	return (left.m_seconds < right.m_seconds || (left.m_seconds == right.m_seconds && left.m_attoseconds < right.m_attoseconds));
 }
 
-inline bool operator<=(const attotime &left, const attotime &right)
+inline constexpr bool operator<=(const attotime &left, const attotime &right)
 {
 	return (left.m_seconds < right.m_seconds || (left.m_seconds == right.m_seconds && left.m_attoseconds <= right.m_attoseconds));
 }
 
-inline bool operator>(const attotime &left, const attotime &right)
+inline constexpr bool operator>(const attotime &left, const attotime &right)
 {
 	return (left.m_seconds > right.m_seconds || (left.m_seconds == right.m_seconds && left.m_attoseconds > right.m_attoseconds));
 }
 
-inline bool operator>=(const attotime &left, const attotime &right)
+inline constexpr bool operator>=(const attotime &left, const attotime &right)
 {
 	return (left.m_seconds > right.m_seconds || (left.m_seconds == right.m_seconds && left.m_attoseconds >= right.m_attoseconds));
 }
@@ -312,15 +305,9 @@ inline bool operator>=(const attotime &left, const attotime &right)
 //  min - return the minimum of two attotimes
 //-------------------------------------------------
 
-inline attotime min(const attotime &left, const attotime &right)
+inline constexpr attotime min(const attotime &left, const attotime &right)
 {
-	if (left.m_seconds > right.m_seconds)
-		return right;
-	if (left.m_seconds < right.m_seconds)
-		return left;
-	if (left.m_attoseconds > right.m_attoseconds)
-		return right;
-	return left;
+	return (left.m_seconds > right.m_seconds) ? right : (left.m_seconds < right.m_seconds) ? left : (left.m_attoseconds > right.m_attoseconds) ? right : left;
 }
 
 
@@ -328,35 +315,19 @@ inline attotime min(const attotime &left, const attotime &right)
 //  max - return the maximum of two attotimes
 //-------------------------------------------------
 
-inline attotime max(const attotime &left, const attotime &right)
+inline constexpr attotime max(const attotime &left, const attotime &right)
 {
-	if (left.m_seconds > right.m_seconds)
-		return left;
-	if (left.m_seconds < right.m_seconds)
-		return right;
-	if (left.m_attoseconds > right.m_attoseconds)
-		return left;
-	return right;
+	return (left.m_seconds > right.m_seconds) ? left : (left.m_seconds < right.m_seconds) ? right : (left.m_attoseconds > right.m_attoseconds) ? left : right;
 }
 
 /** Convert to an attoseconds value, clamping to +/- 1 second */
-inline attoseconds_t attotime::as_attoseconds() const
+inline constexpr attoseconds_t attotime::as_attoseconds() const
 {
-	// positive values between 0 and 1 second
-	if (m_seconds == 0)
-		return m_attoseconds;
-
-	// negative values between -1 and 0 seconds
-	else if (m_seconds == -1)
-		return m_attoseconds - ATTOSECONDS_PER_SECOND;
-
-	// out-of-range positive values
-	else if (m_seconds > 0)
-		return ATTOSECONDS_PER_SECOND;
-
-	// out-of-range negative values
-	else
-		return -ATTOSECONDS_PER_SECOND;
+	return
+			(m_seconds == 0) ? m_attoseconds :                              // positive values between 0 and 1 second
+			(m_seconds == -1) ? (m_attoseconds - ATTOSECONDS_PER_SECOND) :  // negative values between -1 and 0 seconds
+			(m_seconds > 0) ? ATTOSECONDS_PER_SECOND :                      // out-of-range positive values
+			-ATTOSECONDS_PER_SECOND;                                        // out-of-range negative values
 }
 
 
@@ -391,4 +362,4 @@ inline attotime attotime::from_double(double _time)
 }
 
 
-#endif  // __ATTOTIME_H__
+#endif  // MAME_EMU_ATTOTIME_H

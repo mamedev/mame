@@ -27,7 +27,7 @@ static UINT32 get_leuint32(const void *ptr)
 {
 	UINT32 value;
 	memcpy(&value, ptr, sizeof(value));
-	return LITTLE_ENDIANIZE_INT32(value);
+	return little_endianize_int32(value);
 }
 
 
@@ -36,14 +36,14 @@ static UINT16 get_leuint16(const void *ptr)
 {
 	UINT16 value;
 	memcpy(&value, ptr, sizeof(value));
-	return LITTLE_ENDIANIZE_INT16(value);
+	return little_endianize_int16(value);
 }
 
 
 
 static void put_leuint32(void *ptr, UINT32 value)
 {
-	value = LITTLE_ENDIANIZE_INT32(value);
+	value = little_endianize_int32(value);
 	memcpy(ptr, &value, sizeof(value));
 }
 
@@ -51,7 +51,7 @@ static void put_leuint32(void *ptr, UINT32 value)
 
 static void put_leuint16(void *ptr, UINT16 value)
 {
-	value = LITTLE_ENDIANIZE_INT16(value);
+	value = little_endianize_int16(value);
 	memcpy(ptr, &value, sizeof(value));
 }
 

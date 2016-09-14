@@ -20,7 +20,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 const char *rtc4543_device::s_reg_names[7] =
 {

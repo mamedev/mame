@@ -4,6 +4,7 @@
 
 2013-07-31 Skeleton Driver [Curt Coder]
 2013-07-31 Connected to terminal [Robbbert]
+2016-07-11 After 10 seconds the monitor program will start [Robbbert]
 
 
 The photos show 3 boards:
@@ -22,15 +23,14 @@ Both roms contain Z80 code.
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class dsb46_state : public driver_device
 {
 public:
 	dsb46_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
 	{
 	}
 
@@ -53,9 +53,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsb46_io, AS_IO, 8, dsb46_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00, 0x00) AM_READ(port00_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
 	AM_RANGE(0x1a, 0x1a) AM_WRITE(port1a_w)
+	//AM_RANGE(0x00, 0x01) uartch1
+	//AM_RANGE(0x02, 0x03) uartch2
+	//AM_RANGE(0x08, 0x08) ??
+	//AM_RANGE(0x0a, 0x0b) ??
+	//AM_RANGE(0x10, 0x10) disk related
+	//AM_RANGE(0x14, 0x14) ??
+	//AM_RANGE(0x18, 0x18) ??
+	//AM_RANGE(0x1c, 0x1c) disk data
+	//AM_RANGE(0x1d, 0x1d) disk status (FF = no fdc)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dsb46 )
@@ -107,7 +117,7 @@ static MACHINE_CONFIG_START( dsb46, dsb46_state )
 	MCFG_MACHINE_RESET_OVERRIDE(dsb46_state, dsb46)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dsb46_state, kbd_put))
 MACHINE_CONFIG_END
 

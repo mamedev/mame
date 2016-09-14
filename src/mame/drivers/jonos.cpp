@@ -2,18 +2,23 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    Jonos Escort
+Jonos Escort
 
-    2013-09-12 Skeleton driver
+2013-09-12 Skeleton driver
 
-    This computer is some sort of portable Z80-based system.
+It seems there were about 6 models of Escort, mostly Z-80A based running
+CP/M. However, this one appears to be an 8085-based terminal.
 
-    Haven't found any info.
+Haven't found any info.
+
+There are interrupt handlers at 5.5 (0x002c) and 6.5 (0x0034).
+Data presented at 5000 will appear on screen in a dumb-terminal format.
+
 
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 
 
 class jonos_state : public driver_device
@@ -40,13 +45,11 @@ private:
 static ADDRESS_MAP_START(jonos_mem, AS_PROGRAM, 8, jonos_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( jonos_io, AS_IO, 8, jonos_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x1800, 0x27ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x3001) // unknown device
+	AM_RANGE(0x4000, 0x4001) // unknown device
+	AM_RANGE(0x5000, 0x5003) // unknown device
+	AM_RANGE(0x6000, 0x6001) // unknown device
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -119,9 +122,8 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( jonos, jonos_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(jonos_mem)
-	MCFG_CPU_IO_MAP(jonos_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1216,8 +1216,8 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UI
 		clipvert[i].x += 200.5f;
 		clipvert[i].y += 128.5f;
 
-		maxx = MAX(maxx, clipvert[i].x);
-		maxy = MAX(maxy, clipvert[i].y);
+		maxx = std::max(maxx, clipvert[i].x);
+		maxy = std::max(maxy, clipvert[i].y);
 
 		if (logit)
 			m_state.logerror("\t\t\tTranslated=(%f,%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y, (double) clipvert[i].p[0]);

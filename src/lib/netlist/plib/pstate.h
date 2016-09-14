@@ -113,7 +113,7 @@ public:
 		save_state_ptr(owner, stname, datatype_f<C>::f(), N, &(state[0]));
 	}
 
-	template<typename C> void save_item(const void *owner, C *state, const pstring &stname, const int count)
+	template<typename C> void save_item(const void *owner, C *state, const pstring &stname, const std::size_t count)
 	{
 		save_state_ptr(owner, stname, datatype_f<C>::f(), count, state);
 	}
@@ -130,7 +130,7 @@ public:
 
 	const entry_t::list_t &save_list() const { return m_save; }
 
-	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t dt, const int count, void *ptr);
+	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t dt, const std::size_t count, void *ptr);
 
 protected:
 

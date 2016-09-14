@@ -35,7 +35,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_container *container, cassette_image_device *device)
+menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_container &container, cassette_image_device *device)
 	: menu_device_control<cassette_image_device>(mui, container, device)
 {
 }

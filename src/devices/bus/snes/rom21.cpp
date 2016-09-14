@@ -129,9 +129,9 @@ UINT8 sns_rom21_srtc_device::srtc_weekday( UINT32 year, UINT32 month, UINT32 day
 	UINT32 y = 1900, m = 1; // Epoch is 1900-01-01
 	UINT32 sum = 0;         // Number of days passed since epoch
 
-	year = MAX(1900, year);
-	month = MAX(1, MIN(12, month));
-	day = MAX(1, MIN(31, day));
+	year = std::max(1900U, year);
+	month = std::max(1U, std::min(12U, month));
+	day = std::max(1U, std::min(31U, day));
 
 	while (y < year)
 	{

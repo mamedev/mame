@@ -158,7 +158,7 @@ static const char *vboy_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool vboy_cart_slot_device::call_load()
+image_init_result vboy_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -169,7 +169,7 @@ bool vboy_cart_slot_device::call_load()
 		if (len > 0x200000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		// always alloc 0x200000 so to be able to directly map the region
@@ -200,10 +200,10 @@ bool vboy_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", vboy_get_slot(m_type));
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -216,18 +216,6 @@ void vboy_cart_slot_device::call_unload()
 	if (m_cart && m_cart->get_eeprom_base() && m_cart->get_eeprom_size())
 		battery_save(m_cart->get_eeprom_base(), m_cart->get_eeprom_size() * 4);
 }
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool vboy_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
-}
-
-
 
 /*-------------------------------------------------
  get default card software

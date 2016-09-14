@@ -600,7 +600,7 @@ static int snes_find_addon_chip( UINT8 *buffer, UINT32 start_offs )
  -------------------------------------------------*/
 
 
-bool base_sns_cart_slot_device::call_load()
+image_init_result base_sns_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -677,10 +677,10 @@ bool base_sns_cart_slot_device::call_load()
 
 		internal_header_logging(ROM, len);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -879,16 +879,6 @@ void base_sns_cart_slot_device::setup_nvram()
 }
 
 
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool base_sns_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
-	return TRUE;
-}
 
 void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon)
 {

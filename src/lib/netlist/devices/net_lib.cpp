@@ -71,7 +71,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 static void initialize_factory(factory_list_t &factory)
 {
 	ENTRY(R,                    RES,                    "R")

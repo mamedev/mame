@@ -5597,8 +5597,8 @@ void z8002_device::ZB1_dddd_0000()
 void z8002_device::ZB1_dddd_0111()
 {
 	GET_DST(OP0,NIB2);
-	RQ(dst) = CONCAT_64((RQ(dst) & S32) ?
-		0xfffffffful : 0, EXTRACT_64LO(RQ(dst)));
+	RQ(dst) = concat_64((RQ(dst) & S32) ?
+		0xfffffffful : 0, extract_64lo(RQ(dst)));
 }
 
 /******************************************

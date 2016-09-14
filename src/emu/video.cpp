@@ -1011,7 +1011,7 @@ void video_manager::update_refresh_speed()
 			{
 				attoseconds_t period = screen.frame_period().attoseconds();
 				if (period != 0)
-					min_frame_period = MIN(min_frame_period, period);
+					min_frame_period = std::min(min_frame_period, period);
 			}
 
 			// compute a target speed as an integral percentage
@@ -1019,7 +1019,7 @@ void video_manager::update_refresh_speed()
 			// the fact that most refresh rates are not accurate to 10 digits...
 			UINT32 target_speed = floor((minrefresh - 0.25) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
 			UINT32 original_speed = original_speed_setting();
-			target_speed = MIN(target_speed, original_speed);
+			target_speed = std::min(target_speed, original_speed);
 
 			// if we changed, log that verbosely
 			if (target_speed != m_speed)
@@ -1180,7 +1180,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension)
 			int end;
 
 			if ((end1 != -1) && (end2 != -1))
-				end = MIN(end1, end2);
+				end = std::min(end1, end2);
 			else if (end1 != -1)
 				end = end1;
 			else if (end2 != -1)

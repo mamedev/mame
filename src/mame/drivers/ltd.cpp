@@ -387,7 +387,7 @@ DRIVER_INIT_MEMBER( ltd_state, zephy )
 TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 {
 	m_timer_r ^= 1;
-	m_maincpu->set_input_line(M6800_IRQ_LINE, (m_timer_r) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(M6802_IRQ_LINE, (m_timer_r) ? CLEAR_LINE : ASSERT_LINE);
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	m_out_offs++;
 	if (m_out_offs > 0x7f) m_out_offs = 0x60;

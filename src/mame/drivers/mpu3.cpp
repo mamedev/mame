@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER(mpu3_state::cpu0_irq)
 							pia6->irq_a_state() | pia6->irq_b_state() |
 							ptm2->irq_state();
 
-		m_maincpu->set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6808 int%d \n", combined_state));
 }
 

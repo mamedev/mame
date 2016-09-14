@@ -962,20 +962,20 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 	UINT32 size = image.length();
 
 	if (size != 0x20f40)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	image.fread(cart_id, 0xf40);
 
 	for (int i = 0; i < strlen(gme_id); i++)
 	{
 		if (cart_id[i] != gme_id[i])
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(0x20000, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	image.fread(m_cart->get_rom_base(), 0x20000);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static MACHINE_CONFIG_START( pockstat, pockstat_state )

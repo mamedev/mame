@@ -849,7 +849,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	vtotal = SMART_IOREG(VTOTAL);
 	if (!master)
 	{
-		vtotal = MIN(m_screen->height() - 1, vtotal);
+		vtotal = std::min(m_screen->height() - 1, vtotal);
 		vcount = m_screen->vpos();
 	}
 

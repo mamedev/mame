@@ -824,15 +824,7 @@ void alto2_cpu_device::init_memory()
 
 void alto2_cpu_device::exit_memory()
 {
-	// no need for this since it free on exit by itself
-	// if (m_mem.ram) {
-		// auto_free(machine(), m_mem.ram);
-		// m_mem.ram = 0;
-	// }
-	// if (m_mem.hpb) {
-		// auto_free(machine(), m_mem.hpb);
-		// m_mem.hpb = 0;
-	// }
+	// nothing to do
 }
 
 void alto2_cpu_device::reset_memory()

@@ -102,7 +102,7 @@ void msx_slot_cartridge_device::device_start()
 }
 
 
-bool msx_slot_cartridge_device::call_load()
+image_init_result msx_slot_cartridge_device::call_load()
 {
 	if ( m_cartridge )
 	{
@@ -164,7 +164,7 @@ bool msx_slot_cartridge_device::call_load()
 			if (fread(m_cartridge->get_rom_base(), length) != length)
 			{
 				seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read file");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			// Check if there's some mapper related
@@ -182,7 +182,7 @@ bool msx_slot_cartridge_device::call_load()
 			battery_load(m_cartridge->get_sram_base(), m_cartridge->get_sram_size(), 0x00);
 		}
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -195,13 +195,6 @@ void msx_slot_cartridge_device::call_unload()
 			battery_save(m_cartridge->get_sram_base(), m_cartridge->get_sram_size());
 		}
 	}
-}
-
-
-bool msx_slot_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return true;
 }
 
 
@@ -267,7 +260,7 @@ int msx_slot_cartridge_device::get_cart_type(UINT8 *rom, UINT32 length)
 		}
 	}
 
-	if (MAX (kon4, kon5) > MAX (asc8, asc16) )
+	if (std::max(kon4, kon5) > std::max(asc8, asc16))
 	{
 		return (kon5 > kon4) ? KONAMI_SCC : KONAMI;
 	}

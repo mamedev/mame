@@ -289,7 +289,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 			if (m_imager_freq > 1)
 			{
 				m_imager_timer->adjust(
-										attotime::from_double(MIN(1.0 / m_imager_freq, m_imager_timer->remaining().as_double())),
+										attotime::from_double(std::min(1.0 / m_imager_freq, m_imager_timer->remaining().as_double())),
 										2,
 										attotime::from_double(1.0 / m_imager_freq));
 			}

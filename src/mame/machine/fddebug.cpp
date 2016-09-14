@@ -600,7 +600,7 @@ static void load_overlay_file(running_machine &machine)
 
 		/* convert from big-endian */
 		for (pcaddr = 0; pcaddr < keystatus_words; pcaddr++)
-			keystatus[pcaddr] = BIG_ENDIANIZE_INT16(keystatus[pcaddr]) & ~SEARCH_MASK;
+			keystatus[pcaddr] = big_endianize_int16(keystatus[pcaddr]) & ~SEARCH_MASK;
 	}
 
 	/* mark the key dirty */
@@ -624,14 +624,14 @@ static void save_overlay_file(running_machine &machine)
 	{
 		/* convert to big-endian */
 		for (pcaddr = 0; pcaddr < keystatus_words; pcaddr++)
-			keystatus[pcaddr] = BIG_ENDIANIZE_INT16(keystatus[pcaddr]);
+			keystatus[pcaddr] = big_endianize_int16(keystatus[pcaddr]);
 
 		/* write the data */
 		file.write(keystatus, keystatus_words * 2);
 
 		/* convert from big-endian */
 		for (pcaddr = 0; pcaddr < keystatus_words; pcaddr++)
-			keystatus[pcaddr] = BIG_ENDIANIZE_INT16(keystatus[pcaddr]);
+			keystatus[pcaddr] = big_endianize_int16(keystatus[pcaddr]);
 	}
 }
 

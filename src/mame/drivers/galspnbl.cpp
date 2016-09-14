@@ -11,7 +11,7 @@ Notes:
 - to start a 2 or more players game, press the start button multiple times
 - the sprite graphics contain a "(c) Tecmo", and the sprite system is
   indeed similar to other Tecmo games like Ninja Gaiden.
-- Clearly based on Temco's Super Pinball Action (see spbactn.c)
+- Clearly based on Tecmo's Super Pinball Action (see spbactn.c)
 - There seems to be a bug in Hot Pinball's Demo Sounds. If you start the
   game normally you get no demo sounds. However if you select the "Slide
   Show" and run all the way through the game will start with demo sounds.
@@ -213,11 +213,11 @@ void galspnbl_state::machine_start()
 static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12 MHz ??? - Use value from Temco's Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galspnbl_state,  irq3_line_hold)/* also has vector for 6, but it does nothing */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)    /* 4 MHz ??? - Use value from Temco's Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)    /* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 								/* NMI is caused by the main CPU */
 

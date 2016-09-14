@@ -498,7 +498,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 		DST[i + 3] = tempb;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static MACHINE_CONFIG_START( casloopy, casloopy_state )

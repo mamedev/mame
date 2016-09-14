@@ -1172,6 +1172,6 @@ offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op)
 CPU_DISASSEMBLE( powerpc )
 {
 	UINT32 op = *(UINT32 *)oprom;
-	op = BIG_ENDIANIZE_INT32(op);
+	op = big_endianize_int32(op);
 	return ppc_dasm_one(buffer, pc, op);
 }

@@ -57,16 +57,16 @@ Games on this system include....
 |*| 2009     | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
 |*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C |              |
 |*| 2005     | Sangokushi Taisen Ver.1.002                        | Sega                     | DVDROM | CDV-10009D |              |
-| | 2005     | Mobile Suit Gundam 0079 Card Builder               | Banpresto                | DVDROM | CDV-10010  |              |
+|*| 2005     | Mobile Suit Gundam 0079 Card Builder               | Banpresto                | DVDROM | CDV-10010  | 317-0415-JPN |
 |*| 2006     | Sangokushi Taisen 2 Ver.2.007                      | Sega                     | DVDROM | CDV-10019A |              |
 |*| 2005     | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
 |*| 2006     | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
-| | 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02      | Banpresto                | DVDROM | CDV-10024B |              |
+|*| 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02      | Banpresto                | DVDROM | CDV-10024B | 317-0415-JPN |
 |*| 2006     | Sangokushi Taisen 2                                | Sega                     | DVDROM | CDV-10029  |              |
-|*| 2007     | Mobile Suit Gundam 0083 Card Builder               | Banpresto                | DVDROM | CDV-10030  |              |
+|*| 2007     | Mobile Suit Gundam 0083 Card Builder               | Banpresto                | DVDROM | CDV-10030  | 317-0484-JPN |
 |*| 2008     | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
 |*| 2008     | Sangokushi Taisen 3 Ver.J                          | Sega                     | DVDROM | CDV-10036J |              |
-| | 2007     | Mobile Suit Gundam 0083 Card Builder Ver.2.10      | Bandai Namco - Banpresto | DVDROM | CDV-10037B |              |
+|*| 2008     | Mobile Suit Gundam 0083 Card Builder Ver.2.10      | Bandai Namco - Banpresto | DVDROM | CDV-10037B | 317-0484-JPN |
 |*| 2008     | Sangokushi Taisen 3 War Begins Ver.3.59            | Sega                     | DVDROM | CDV-10041  |              |
 |*| 2008     | Sangokushi Taisen 3 War Begins                     | Sega                     | DVDROM | CDV-10042  |              |
 +-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------+
@@ -381,9 +381,70 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 #include "includes/xbox_usb.h"
+#include "machine/jvshost.h"
+#include "machine/jvs13551.h"
 
 #define LOG_PCI
 //#define LOG_BASEBOARD
+//#define VERBOSE_MSG
+
+/////////////////////////
+extern const device_type JVS_MASTER;
+
+class jvs_master : public jvs_host
+{
+public:
+	//friend class mie_device;
+
+	// construction/destruction
+	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	int get_sense_line();
+	void send_packet(int destination, int length, UINT8 *data);
+	int received_packet(UINT8 *buffer);
+};
+
+const device_type JVS_MASTER = &device_creator<jvs_master>;
+
+jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: jvs_host(mconfig, JVS_MASTER, "JVS MASTER", tag, owner, clock, "jvs_master", __FILE__)
+{
+}
+
+int jvs_master::get_sense_line()
+{
+	if (get_presence_line() == false)
+		return 50;
+	if (get_address_set_line() == true)
+		return 0;
+	return 25;
+}
+
+void jvs_master::send_packet(int destination, int length, UINT8 *data)
+{
+	push((UINT8)destination);
+	push((UINT8)length);
+	length--;
+	while (length > 0)
+	{
+		push(*data);
+		data++;
+		length--;
+	}
+	commit_raw();
+}
+
+int jvs_master::received_packet(UINT8 *buffer)
+{
+	UINT32 length;
+	const UINT8 *data;
+
+	get_raw_reply(data, length);
+	if (length > 0)
+		memcpy(buffer, data, length);
+	return (int)length;
+}
+
+/////////////////////////
 
 extern const device_type OHCI_HLEAN2131QC;
 
@@ -417,6 +478,15 @@ private:
 	static const UINT8 strdesc2[];
 	int maximum_send;
 	UINT8 *region;
+	struct
+	{
+		UINT8 buffer_in[32768];
+		int buffer_in_expected;
+		UINT8 buffer_out[32768];
+		int buffer_out_used;
+		int buffer_out_packets;
+		jvs_master *master;
+	} jvs;
 };
 
 const device_type OHCI_HLEAN2131QC = &device_creator<ohci_hlean2131qc_device>;
@@ -429,6 +499,8 @@ public:
 	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+	int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
+	void set_region_base(UINT8 *data);
 
 protected:
 	virtual void device_start() override;
@@ -445,6 +517,7 @@ private:
 	static const UINT8 strdesc0[];
 	static const UINT8 strdesc1[];
 	static const UINT8 strdesc2[];
+	UINT8 *region;
 };
 
 const device_type OHCI_HLEAN2131SC = &device_creator<ohci_hlean2131sc_device>;
@@ -637,22 +710,25 @@ void chihiro_state::hack_eeprom()
 	m_maincpu->space(0).write_byte(0x3b767, 0xc3);
 }
 
+#define HACK_ITEMS 4
 static const struct {
 	const char *game_name;
+	const bool disable_usb;
 	struct {
 		UINT32 address;
 		UINT8 write_byte;
 	} modify[16];
-} hacks[3] = { { "chihiro", { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
-				{ "outr2", { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
-				{ "crtaxihr", { { 0x121dce/*f6dce*/, 0xeb }, { 0x121deb/*f6deb*/, 0xeb }, { 0x121fa0/*f6fa0*/, 0xeb }, { 0x14ada5/*11fda5*/, 0x90 }, { 0x14ada6/*11fda6*/, 0x90 }, /*{ 0x8d0bc 620bc , 0xeb },*/ { 0, 0 } } }
-				};
+} hacks[HACK_ITEMS] = { { "chihiro",  false, { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
+					    { "outr2",    true,  { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
+						{ "crtaxihr", false, { { 0x14ada5/*11fda5*/, 0x90 },{ 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
+						{ "ghostsqu", false, { { 0x78833/*4d833*/, 0x90 },{ 0x78834/*4d834*/, 0x90 }, { 0, 0 } } },
+};
 
 void chihiro_state::hack_usb()
 {
 	int p;
 
-	if (usbhack_counter == 0)
+	if ((usbhack_counter == 0) && (usb_hack_enabled))
 		p = 0;
 	else if (usbhack_counter == 1) // after game loaded
 		p = usbhack_index;
@@ -696,6 +772,10 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, 
 {
 	maximum_send = 0;
 	region = nullptr;
+	jvs.buffer_in_expected = 0;
+	jvs.buffer_out_used = 0;
+	jvs.buffer_out_packets = 0;
+	jvs.master = nullptr;
 }
 
 void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
@@ -718,6 +798,7 @@ void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_cont
 	add_string_descriptor(strdesc0);
 	add_string_descriptor(strdesc1);
 	add_string_descriptor(strdesc2);
+	jvs.master = machine.device<jvs_master>("jvs_master");
 }
 
 void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
@@ -727,15 +808,28 @@ void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
 
 int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
+	int sense;
+
+#ifdef VERBOSE_MSG
+	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+#endif
 	if (endpoint != 0)
 		return -1;
-	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
-	endpoints[endpoint].buffer[1] = 0x4b; // PINSA register, bits 4-1 special value, must be 10 xor 15, but bit 3 is ignored since its used as the CS pin of the chip
-	endpoints[endpoint].buffer[2] = 0x52; // PINSB register, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0 is the sense pin of the jvs connector
-	endpoints[endpoint].buffer[3] = 0x53; // OUTB register
+	sense = jvs.master->get_sense_line();
+	if (sense == 25)
+		sense = 3;
+	else
+		sense = 0; // need to check
+	// PINSA register, bits 4-1 special value, must be 10 xor 15, but bit 3 is ignored since its used as the CS pin of the chip
+	endpoints[endpoint].buffer[1] = 0x4b;
+	// PINSB register, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 is the sense pin of the jvs connector
+	// if bits 0-1 are 11, the not all the connected jvs devices have been assigned an address yet
+	endpoints[endpoint].buffer[2] = 0x52 | sense;
+	// OUTB register
+	endpoints[endpoint].buffer[3] = 0x53;
 	// bRequest is a command value
 	if (setup->bRequest == 0x16)
 	{
@@ -767,19 +861,19 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x19)
 	{
-		const int tosend = 20;
 		// this command is used to retreive the jvs packets that have been received in response to the ones of 0x20
 		// data for the packets will be transferred to the host using endpoint 4 (IN)
 		// the nuber of bytes to transfer is returned at bytes 4 and 5 in the data stage of this control transfer
 		// data transferred starts with a byte with value 0, then a byte with value the number of packets received, then a block of bytes for each packet
-		// the bytes for a packet start with the jvs node address, then a dummy one, then a 16 bit number in little endian format that specifies how many bytes follow
-		// the bytes that follow contain the body of the packet as received from the jvs bus
+		// the bytes for a packet start with the jvs node address of the sender, then a dummy one (must be 0), then a 16 bit number in little endian format that specifies how many bytes follow
+		// the bytes that follow contain the body of the packet as received from the jvs bus, from the 0xa0 byte to the checksum
 		endpoints[endpoint].buffer[0] = 0; // 0 if not busy
-		endpoints[endpoint].buffer[5] = tosend >> 8; // amount to transfer with endpoint 4
-		endpoints[endpoint].buffer[4] = (tosend & 0xff);
-		endpoints[4].remain = tosend;
-		endpoints[4].position = endpoints[4].buffer;
-		memset(endpoints[4].buffer, 0, 20);
+		endpoints[endpoint].buffer[5] = jvs.buffer_out_used >> 8; // amount to transfer with endpoint 4
+		endpoints[endpoint].buffer[4] = (jvs.buffer_out_used & 0xff);
+		// the data to be sent is prepared in command 0x20
+		endpoints[4].remain = jvs.buffer_out_used;
+		endpoints[4].position = jvs.buffer_out;
+		jvs.buffer_out_used = 0;
 		endpoints[endpoint].buffer[0] = 0;
 	}
 	else if (setup->bRequest == 0x1c)
@@ -807,7 +901,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// setup->wIndex = number of bytes to write
 		// data will be transferred from the host using endpoint 2 (OUT)
 		endpoints[endpoint].buffer[0] = 0;
-	} 
+	}
 	else if (setup->bRequest == 0x1f)
 	{
 		// this command is used to write data to external memory (with respect to the internal 8051 cpu)
@@ -815,7 +909,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// setup->wIndex = number of bytes to write
 		// data will be transferred from the host using endpoint 3 (OUT)
 		endpoints[endpoint].buffer[0] = 0;
-	} 
+	}
 	else if (setup->bRequest == 0x20)
 	{
 		// this command is used to send a set of jvs packets, each to a different node
@@ -824,8 +918,21 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// data for the packets will be transferred from the host using endpoint 4 (OUT)
 		// data sent by the host contains first a byte with value 0 that is ignored, then a byte specifying the number of packets that follow, then the data for each packet
 		// the data for each packet contains first a byte with value 0, then the sync byte (0xe0) then all the other bytes of the packet ending with the checksum byte
+		// broadcast packets must have a destination node address of value 0xff
+#ifdef VERBOSE_MSG
 		printf(" Jvs packets data of %d bytes\n\r", setup->wIndex);
+#endif
 		endpoints[endpoint].buffer[0] = 0;
+		if (jvs.buffer_out_used == 0)
+		{
+			jvs.buffer_out_packets = 0;
+			jvs.buffer_out[0] = 0;
+			jvs.buffer_out[1] = (UINT8)jvs.buffer_out_packets;
+			jvs.buffer_out_used = 2;
+		}
+		jvs.buffer_in_expected = setup->wIndex;
+		endpoints[4].remain = jvs.buffer_in_expected;
+		endpoints[4].position = jvs.buffer_in;
 	}
 	else if (setup->bRequest == 0x24)
 	{
@@ -837,7 +944,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x30)
 	{
-		// this command first disables external interrupt 0 if the lower 8 bits of setup->wValue are 0 
+		// this command first disables external interrupt 0 if the lower 8 bits of setup->wValue are 0
 		// or enables it if those bits, seen as a signed 8 bit value, represent a number greater than 0
 		// then it will return in byte 4 of the data stage the value 0 if external interrupt 0 has been disabled or value 1 if it has been enabled
 		// and in byte 5 the value of an 8 bit counter that is incremented at every external interrupt 0
@@ -857,8 +964,10 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
 {
-	printf("Bulk request: %x %d %x\n\r", endpoint, pid, size);
-	if (((endpoint == 1) || (endpoint == 2) || (endpoint == 4)) && (pid == InPid))
+#ifdef VERBOSE_MSG
+	printf("Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
+#endif
+	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
 			size = endpoints[endpoint].remain;
@@ -866,11 +975,87 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 		endpoints[endpoint].position = endpoints[endpoint].position + size;
 		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 	}
+	if ((endpoint == 4) && (pid == InPid))
+	{
+		if (size > endpoints[4].remain)
+			size = endpoints[4].remain;
+		memcpy(buffer, endpoints[4].position, size);
+		endpoints[4].position = endpoints[4].position + size;
+		endpoints[4].remain = endpoints[4].remain - size;
+	}
 	if ((endpoint == 4) && (pid == OutPid))
 	{
+		if (size > endpoints[4].remain)
+			size = endpoints[4].remain;
+#ifdef VERBOSE_MSG
 		for (int n = 0; n < size; n++)
-			printf(" %02x",buffer[n]);
-		printf("\n\r");
+			printf(" %02x", buffer[n]);
+#endif
+		if (size > 0) {
+			memcpy(endpoints[4].position, buffer, size);
+			endpoints[4].position = endpoints[4].position + size;
+			endpoints[4].remain = endpoints[4].remain - size;
+			if (endpoints[4].remain == 0)
+			{
+#ifdef VERBOSE_MSG
+				printf("\n\r");
+#endif
+				// extract packets
+				int numpk = jvs.buffer_in[1];
+				int p = 2;
+
+				for (int n = 0;n < numpk;n++)
+				{
+					p++;
+					if (jvs.buffer_in[p] != 0xe0)
+						break;
+					p++;
+					int dest = jvs.buffer_in[p];
+					p++;
+					int len = jvs.buffer_in[p];
+					p++;
+					if ((p + len) > jvs.buffer_in_expected)
+						break;
+					int chk = dest + len;
+					for (int m = len - 1; m > 0; m--)
+						chk = chk + (int)jvs.buffer_in[p + m - 1];
+					chk = chk & 255;
+					if (chk != (int)jvs.buffer_in[p + len - 1])
+					{
+						p = p + len;
+						continue;
+					}
+					// use data of this packet
+					jvs.master->send_packet(dest, len, jvs.buffer_in + p);
+					// generate response
+					if (dest == 0xff)
+						dest = 0;
+					int recv = jvs.master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
+					// update buffer_out
+					if (recv > 0)
+					{
+						chk = 0;
+						for (int m = 0; m < recv; m++)
+							chk = chk + jvs.buffer_out[jvs.buffer_out_used + 5 + m];
+						jvs.buffer_out[jvs.buffer_out_used + 5 + recv] = chk & 255;
+						jvs.buffer_out_packets++;
+						// jvs node address
+						jvs.buffer_out[jvs.buffer_out_used] = (UINT8)dest;
+						// dummy
+						jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
+						// length following
+						recv += 2;
+						jvs.buffer_out[jvs.buffer_out_used + 2] = recv & 255;
+						jvs.buffer_out[jvs.buffer_out_used + 3] = (recv >> 8) & 255;
+						// body
+						jvs.buffer_out[jvs.buffer_out_used + 4] = 0xe0;
+						jvs.buffer_out_used = jvs.buffer_out_used + recv + 5 - 1;
+						jvs.buffer_out[1] = (UINT8)jvs.buffer_out_packets;
+					}
+					p = p + len;
+				}
+			}
+		}
 	}
 	return size;
 }
@@ -897,6 +1082,12 @@ ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, 
 	device_t(mconfig, OHCI_HLEAN2131SC, "OHCI Hlean2131sc", tag, owner, clock, "ohci_hlean2131sc", __FILE__),
 	ohci_function_device()
 {
+	region = nullptr;
+}
+
+void ohci_hlean2131sc_device::set_region_base(UINT8 *data)
+{
+	region = data;
 }
 
 void ohci_hlean2131sc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
@@ -919,14 +1110,137 @@ void ohci_hlean2131sc_device::initialize(running_machine &machine, ohci_usb_cont
 
 int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
+//#ifdef VERBOSE_MSG
+	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+//#endif
 	if (endpoint != 0)
 		return -1;
-	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	for (int n = 0; n < setup->wLength; n++)
-		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
+		endpoints[endpoint].buffer[n] = 0x50 ^ n;
+	endpoints[endpoint].buffer[1] = 0;
+	endpoints[endpoint].buffer[2] = 0x52; // PINSB
+	endpoints[endpoint].buffer[3] = 0x53; // OUTB
+	endpoints[endpoint].buffer[4] = 0;
+	endpoints[endpoint].buffer[5] = 0;
+	endpoints[endpoint].buffer[6] = 0x56; // PINSC
+	endpoints[endpoint].buffer[7] = 0x57; // OUTC
+	// bRequest is a command value
+	if (setup->bRequest == 0x16)
+	{
+		// this command is used to read data from the first i2c serial eeprom connected to the chip
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 1 (IN)
+		endpoints[1].remain = setup->wIndex & 255;
+		endpoints[1].position = region + setup->wValue; // usually wValue is 0x1f00
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x17)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x1a)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x1b)
+	{
+		endpoints[endpoint].buffer[0] = 0; //
+	}
+	else if (setup->bRequest == 0x1d)
+	{
+		// this command is used to write data to the first i2c serial eeprom connected to the chip
+		// no more than 32 bytes can be written at a time
+		// setup->wValue = start address to write to
+		// setup->wIndex = number of bytes to write
+		// data will be transferred from the host using endpoint 1 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x1e)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x22)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x23)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x25) //
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x26) //
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x27) //
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x28)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x29)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2a)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2b)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2c)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2d)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2e) //
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2f)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x30)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x31)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	} else
+		endpoints[endpoint].buffer[0] = 0x99; // usnupported command
+
 	endpoints[endpoint].position = endpoints[endpoint].buffer;
 	endpoints[endpoint].remain = setup->wLength;
 	return 0;
+}
+
+int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
+{
+//#ifdef VERBOSE_MSG
+	printf("Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
+//#endif
+	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
+	{
+		if (size > endpoints[endpoint].remain)
+			size = endpoints[endpoint].remain;
+		memcpy(buffer, endpoints[endpoint].position, size);
+		endpoints[endpoint].position = endpoints[endpoint].position + size;
+		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
+	}
+	return size;
 }
 
 void ohci_hlean2131sc_device::device_start()
@@ -1182,12 +1496,68 @@ static ADDRESS_MAP_START(chihiro_map_io, AS_IO, 32, chihiro_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(chihiro)
+	PORT_START("TILT")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT)
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("P1")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_8WAY
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_8WAY
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_8WAY
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6)
+	PORT_BIT(0x400f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("P2")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_START2)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2)
+	PORT_BIT(0x400f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	/* Dummy so we can easily get the analog ch # */
+	PORT_START("A0")
+	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A1")
+	PORT_BIT(0x01ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A2")
+	PORT_BIT(0x02ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A3")
+	PORT_BIT(0x03ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A4")
+	PORT_BIT(0x04ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A5")
+	PORT_BIT(0x05ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A6")
+	PORT_BIT(0x06ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A7")
+	PORT_BIT(0x07ff, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 void chihiro_state::machine_start()
 {
-	ohci_hlean2131qc_device *usb_device;
-	//ohci_hlean2131sc_device *usb_device;
+	ohci_hlean2131qc_device *usb_device1;
+	ohci_hlean2131sc_device *usb_device2;
 
 	xbox_base_state::machine_start();
 	chihiro_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
@@ -1201,17 +1571,22 @@ void chihiro_state::machine_start()
 		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2, _3));
 	}
 	usbhack_index = -1;
-	for (int a = 1; a < 3; a++)
+	for (int a = 1; a < HACK_ITEMS; a++)
 		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
 			usbhack_index = a;
+			if (hacks[a].disable_usb == true)
+				usb_hack_enabled = true;
 			break;
 		}
 	usbhack_counter = 0;
-	usb_device = machine().device<ohci_hlean2131qc_device>("ohci_hlean2131qc");
-	usb_device->initialize(machine(), ohci_usb);
-	usb_device->set_region_base(memregion(":others")->base()); // temporary
-	//usb_device = machine().device<ohci_hlean2131sc_device>("ohci_hlean2131sc");
-	ohci_usb->usb_ohci_plug(1, usb_device); // connect
+	usb_device1 = machine().device<ohci_hlean2131qc_device>("ohci_hlean2131qc");
+	usb_device1->initialize(machine(), ohci_usb);
+	usb_device1->set_region_base(memregion(":others")->base()); // temporary
+	ohci_usb->usb_ohci_plug(1, usb_device1); // connect
+	usb_device2 = machine().device<ohci_hlean2131sc_device>("ohci_hlean2131sc");
+	usb_device2->initialize(machine(), ohci_usb);
+	usb_device2->set_region_base(memregion(":others")->base() + 0x2080); // temporary
+	ohci_usb->usb_ohci_plug(2, usb_device2); // connect
 	// savestates
 	save_item(NAME(usbhack_counter));
 }
@@ -1231,9 +1606,12 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 	MCFG_DEVICE_MODIFY("ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
 
-	// next line is temporary
+	// next lines are temporary
 	MCFG_DEVICE_ADD("ohci_hlean2131qc", OHCI_HLEAN2131QC, 0)
-MACHINE_CONFIG_END
+	MCFG_DEVICE_ADD("ohci_hlean2131sc", OHCI_HLEAN2131SC, 0)
+	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
+	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+	MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
@@ -1584,6 +1962,78 @@ ROM_START( ccfboxa )
 	ROM_LOAD("317-0567-exp.pic", 0x00, 0x4000, CRC(cd1d2b2d) SHA1(78203ee0339f76eb76da08d7de43e7e44e4b7d32) )
 ROM_END
 
+/* CDV-1xxxx (Sega network DVD-ROM games) */
+
+ROM_START( questofd )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10005c", 0, SHA1(b30238cf8697fb7313fedbe75b70641e9418090f) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A brute-forced key, label is unknown
+	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, CRC(c6914d97) SHA1(e86897efcca86f303117d1ead6ede53ac410add8) )
+ROM_END
+
+ROM_START( gundcb79 )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10010", 0, SHA1(88b97408315515909e79d101b37f580fd1f079ce) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0415-JPN)
+	//(sticker 253-5508-0415J)
+	ROM_LOAD("317-0415-jpn.pic", 0x00, 0x4000, CRC(e5490747) SHA1(91de42a562a265e4cfa1788e40985a5b9055a10a) )
+ROM_END
+
+ROM_START( gundcb79a )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10024b", 0, SHA1(acc344d7583df191e7c60ff968dedcfe12600018) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0415-JPN)
+	//(sticker 253-5508-0415J)
+	ROM_LOAD("317-0415-jpn.pic", 0x00, 0x4000, CRC(e5490747) SHA1(91de42a562a265e4cfa1788e40985a5b9055a10a) )
+ROM_END
+
+ROM_START( gundcb83 )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10030", 0, SHA1(fc4afdd465e397a12a58714ed9c7a35863580869) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0484-JPN)
+	//(sticker 253-5508-0484J)
+	ROM_LOAD("317-0484-jpn.pic", 0x00, 0x4000, CRC(308995bb) SHA1(9459ca99bfb5c3cf227821739e7008ae9bd6e710) )
+ROM_END
+
+ROM_START( gundcb83a )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10031", 0, SHA1(ab165b0c8753c1ab5d9cce82af7ed720a2f83c45) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0484-JPN)
+	//(sticker 253-5508-0484J)
+	ROM_LOAD("317-0484-jpn.pic", 0x00, 0x4000, CRC(308995bb) SHA1(9459ca99bfb5c3cf227821739e7008ae9bd6e710) )
+ROM_END
+
+ROM_START( gundcb83b )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10037b", 0, SHA1(f25cb967127d06bef24c64c731c087fc44c1face) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0484-JPN)
+	//(sticker 253-5508-0484J)
+	ROM_LOAD("317-0484-jpn.pic", 0x00, 0x4000, CRC(308995bb) SHA1(9459ca99bfb5c3cf227821739e7008ae9bd6e710) )
+ROM_END
 
 /* Main board */
 /*Chihiro*/ GAME( 2002, chihiro,  0,        chihiro_base, chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
@@ -1641,3 +2091,11 @@ ROM_END
 // 0023
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (4.01) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+
+/* CDV-1xxxx (Sega network DVD-ROM games) */
+/* 0005C */ GAME( 2004, questofd, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Quest of D (CDV-10005C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0010  */ GAME( 2005, gundcb79, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0079 Card Builder (CDV-10010)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0024B */ GAME( 2006, gundcb79a,gundcb79, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0079 Card Builder Ver.2.02 (CDV-10024B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0030  */ GAME( 2007, gundcb83, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder (CDV-10030)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0031  */ GAME( 2007, gundcb83a,gundcb83, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder Check Disk (CDV-10031)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0037B */ GAME( 2008, gundcb83b,gundcb83, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder Ver.2.10 (CDV-10037B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

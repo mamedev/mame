@@ -65,7 +65,7 @@ void midiout_device::device_config_complete(void)
     call_load
 -------------------------------------------------*/
 
-bool midiout_device::call_load(void)
+image_init_result midiout_device::call_load(void)
 {
 	m_midi = machine().osd().create_midi_device();
 
@@ -73,10 +73,10 @@ bool midiout_device::call_load(void)
 	{
 		global_free(m_midi);
 		m_midi = nullptr;
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------

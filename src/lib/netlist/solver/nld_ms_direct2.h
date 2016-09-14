@@ -22,7 +22,7 @@ public:
 	matrix_solver_direct2_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params)
 		: matrix_solver_direct_t<2, 2>(anetlist, name, params, 2)
 		{}
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 };
 
@@ -30,7 +30,7 @@ public:
 // matrix_solver - Direct2
 // ----------------------------------------------------------------------------------------
 
-inline int matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+inline unsigned matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	build_LE_A<matrix_solver_direct2_t>();
 	build_LE_RHS<matrix_solver_direct2_t>();

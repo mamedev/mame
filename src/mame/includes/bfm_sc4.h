@@ -59,19 +59,19 @@
 
 #define SC45_BUTTON_MATRIX_20_0 IPT_SERVICE1 // green / test
 
-static const UINT8 SEGMENT_34_ENCODING_LOOKUP[16] = 
+static const UINT8 SEGMENT_34_ENCODING_LOOKUP[16] =
 {
-	63,	// 0
-	6,	// 1
-	91,	// 2
-	79,	// 3
+	63, // 0
+	6,  // 1
+	91, // 2
+	79, // 3
 	102,// 4
 	109,// 5
 	125,// 6
-	7,	// 7
+	7,  // 7
 	127,// 8
 	103,// 9
-	0,	// 10
+	0,  // 10
 	121,// 11
 	121,// 12
 	121,// 13

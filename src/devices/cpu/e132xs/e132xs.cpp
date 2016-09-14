@@ -2008,7 +2008,7 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 		SET_DREG(SREG);
 		SET_DREGF(SREGF);
 
-		tmp = CONCAT_64(SREG, SREGF);
+		tmp = concat_64(SREG, SREGF);
 		SET_Z( tmp == 0 ? 1 : 0 );
 		SET_N( SIGN_BIT(SREG) );
 
@@ -2032,7 +2032,7 @@ void hyperstone_device::hyperstone_divu(struct hyperstone_device::regs_decode *d
 		{
 			UINT64 dividend;
 
-			dividend = CONCAT_64(DREG, DREGF);
+			dividend = concat_64(DREG, DREGF);
 
 			if( SREG == 0 )
 			{
@@ -2081,7 +2081,7 @@ void hyperstone_device::hyperstone_divs(struct hyperstone_device::regs_decode *d
 		{
 			INT64 dividend;
 
-			dividend = (INT64) CONCAT_64(DREG, DREGF);
+			dividend = (INT64) concat_64(DREG, DREGF);
 
 			if( SREG == 0 || (DREG & 0x80000000) )
 			{
@@ -2750,7 +2750,7 @@ void hyperstone_device::hyperstone_shrdi(struct hyperstone_device::regs_decode *
 	high_order = DREG;
 	low_order  = DREGF;
 
-	val = CONCAT_64(high_order, low_order);
+	val = concat_64(high_order, low_order);
 
 	if( N_VALUE )
 		SET_C((val >> (N_VALUE - 1)) & 1);
@@ -2759,8 +2759,8 @@ void hyperstone_device::hyperstone_shrdi(struct hyperstone_device::regs_decode *
 
 	val >>= N_VALUE;
 
-	high_order = EXTRACT_64HI(val);
-	low_order  = EXTRACT_64LO(val);
+	high_order = extract_64hi(val);
+	low_order  = extract_64lo(val);
 
 	SET_DREG(high_order);
 	SET_DREGF(low_order);
@@ -2786,7 +2786,7 @@ void hyperstone_device::hyperstone_shrd(struct hyperstone_device::regs_decode *d
 		high_order = DREG;
 		low_order  = DREGF;
 
-		val = CONCAT_64(high_order, low_order);
+		val = concat_64(high_order, low_order);
 
 		if( n )
 			SET_C((val >> (n - 1)) & 1);
@@ -2795,8 +2795,8 @@ void hyperstone_device::hyperstone_shrd(struct hyperstone_device::regs_decode *d
 
 		val >>= n;
 
-		high_order = EXTRACT_64HI(val);
-		low_order  = EXTRACT_64LO(val);
+		high_order = extract_64hi(val);
+		low_order  = extract_64lo(val);
 
 		SET_DREG(high_order);
 		SET_DREGF(low_order);
@@ -2839,7 +2839,7 @@ void hyperstone_device::hyperstone_sardi(struct hyperstone_device::regs_decode *
 	high_order = DREG;
 	low_order  = DREGF;
 
-	val = CONCAT_64(high_order, low_order);
+	val = concat_64(high_order, low_order);
 
 	if( N_VALUE )
 		SET_C((val >> (N_VALUE - 1)) & 1);
@@ -2888,7 +2888,7 @@ void hyperstone_device::hyperstone_sard(struct hyperstone_device::regs_decode *d
 		high_order = DREG;
 		low_order  = DREGF;
 
-		val = CONCAT_64(high_order, low_order);
+		val = concat_64(high_order, low_order);
 
 		if( n )
 			SET_C((val >> (n - 1)) & 1);
@@ -2960,7 +2960,7 @@ void hyperstone_device::hyperstone_shldi(struct hyperstone_device::regs_decode *
 	high_order = DREG;
 	low_order  = DREGF;
 
-	val  = CONCAT_64(high_order, low_order);
+	val  = concat_64(high_order, low_order);
 	SET_C( (N_VALUE)?(((val<<(N_VALUE-1))&U64(0x8000000000000000))?1:0):0);
 	mask = ((((UINT64)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
 	tmp  = high_order << N_VALUE;
@@ -2973,8 +2973,8 @@ void hyperstone_device::hyperstone_shldi(struct hyperstone_device::regs_decode *
 
 	val <<= N_VALUE;
 
-	high_order = EXTRACT_64HI(val);
-	low_order  = EXTRACT_64LO(val);
+	high_order = extract_64hi(val);
+	low_order  = extract_64lo(val);
 
 	SET_DREG(high_order);
 	SET_DREGF(low_order);
@@ -3004,7 +3004,7 @@ void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *d
 
 		mask = ((((UINT64)1) << (32 - n)) - 1) ^ 0xffffffff;
 
-		val = CONCAT_64(high_order, low_order);
+		val = concat_64(high_order, low_order);
 		SET_C( (n)?(((val<<(n-1))&U64(0x8000000000000000))?1:0):0);
 		tmp = high_order << n;
 
@@ -3016,8 +3016,8 @@ void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *d
 
 		val <<= n;
 
-		high_order = EXTRACT_64HI(val);
-		low_order  = EXTRACT_64LO(val);
+		high_order = extract_64hi(val);
+		low_order  = extract_64lo(val);
 
 		SET_DREG(high_order);
 		SET_DREGF(low_order);
@@ -4270,7 +4270,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		{
 			INT64 result;
 
-			result = (INT64)CONCAT_64(GET_G_REG(14), GET_G_REG(15)) + (INT64)((INT64)(INT32)(vals) * (INT64)(INT32)(vald));
+			result = (INT64)concat_64(GET_G_REG(14), GET_G_REG(15)) + (INT64)((INT64)(INT32)(vals) * (INT64)(INT32)(vald));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;
@@ -4294,7 +4294,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		{
 			INT64 result;
 
-			result = (INT64)CONCAT_64(GET_G_REG(14), GET_G_REG(15)) - (INT64)((INT64)(INT32)(vals) * (INT64)(INT32)(vald));
+			result = (INT64)concat_64(GET_G_REG(14), GET_G_REG(15)) - (INT64)((INT64)(INT32)(vals) * (INT64)(INT32)(vald));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;
@@ -4318,7 +4318,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		{
 			INT64 result;
 
-			result = (INT64)CONCAT_64(GET_G_REG(14), GET_G_REG(15)) + (INT64)((INT64)(INT32)((vald & 0xffff0000) >> 16) * (INT64)(INT32)((vals & 0xffff0000) >> 16)) + ((INT64)(INT32)(vald & 0xffff) * (INT64)(INT32)(vals & 0xffff));
+			result = (INT64)concat_64(GET_G_REG(14), GET_G_REG(15)) + (INT64)((INT64)(INT32)((vald & 0xffff0000) >> 16) * (INT64)(INT32)((vals & 0xffff0000) >> 16)) + ((INT64)(INT32)(vald & 0xffff) * (INT64)(INT32)(vals & 0xffff));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;

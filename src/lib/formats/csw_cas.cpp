@@ -38,7 +38,7 @@ static UINT32 get_leuint32(const void *ptr)
 {
 	UINT32 value;
 	memcpy(&value, ptr, sizeof(value));
-	return LITTLE_ENDIANIZE_INT32(value);
+	return little_endianize_int32(value);
 }
 
 static int mycaslen;

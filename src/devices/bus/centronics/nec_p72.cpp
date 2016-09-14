@@ -35,7 +35,7 @@ const rom_entry *nec_p72_t::device_rom_region() const
 //  ADDRESS_MAP( p72_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( p72_mem, AS_PROGRAM, 8, nec_p72_t )
+static ADDRESS_MAP_START( p72_mem, AS_PROGRAM, 16, nec_p72_t )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* 1Mbit firmware */
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM /* 1Mbit external RAM */ /* TODO might be 2x1Mbit */
 ADDRESS_MAP_END

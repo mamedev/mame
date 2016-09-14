@@ -172,13 +172,13 @@ DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device, socket_load )
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_socket->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_socket->common_load_rom(m_socket->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 WRITE_LINE_MEMBER( cgenie_fdc_device::intrq_w )

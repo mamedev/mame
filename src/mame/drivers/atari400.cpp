@@ -1707,14 +1707,14 @@ void a400_state::setup_ram(int bank, UINT32 size)
 	switch (bank)
 	{
 		case 0: // 0x0000-0x7fff
-			ram_top = MIN(size, 0x8000) - 1;
+			ram_top = std::min(size, UINT32(0x8000)) - 1;
 			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
 			if (m_0000 == nullptr)
 				m_0000.findit();
 			m_0000->set_base(m_ram->pointer());
 			break;
 		case 1: // 0x8000-0x9fff
-			ram_top = MIN(size, 0xa000) - 1;
+			ram_top = std::min(size, UINT32(0xa000)) - 1;
 			if (ram_top > 0x8000)
 			{
 				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
@@ -1724,7 +1724,7 @@ void a400_state::setup_ram(int bank, UINT32 size)
 			}
 			break;
 		case 2: // 0xa000-0xbfff
-			ram_top = MIN(size, 0xc000) - 1;
+			ram_top = std::min(size, UINT32(0xc000)) - 1;
 			if (ram_top > 0xa000)
 			{
 				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");

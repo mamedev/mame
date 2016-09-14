@@ -120,7 +120,7 @@ void plus4_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-bool plus4_expansion_slot_device::call_load()
+image_init_result plus4_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -137,19 +137,7 @@ bool plus4_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-
-//-------------------------------------------------
-//  call_softlist_load -
-//-------------------------------------------------
-
-bool plus4_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-
-	return true;
+	return image_init_result::PASS;
 }
 
 

@@ -342,7 +342,7 @@ static const char *a78_get_slot(int type)
 	return "a78_rom";
 }
 
-bool a78_cart_slot_device::call_load()
+image_init_result a78_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -378,8 +378,8 @@ bool a78_cart_slot_device::call_load()
 			char head[128];
 			fread(head, 128);
 
-			if (verify_header((char *)head) == IMAGE_VERIFY_FAIL)
-				return IMAGE_INIT_FAIL;
+			if (verify_header((char *)head) != image_verify_result::PASS)
+				return image_init_result::FAIL;
 
 			len = (head[49] << 24) | (head[50] << 16) | (head[51] << 8) | head[52];
 			if (len + 128 > length())
@@ -469,11 +469,11 @@ bool a78_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", a78_get_slot(m_type));
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
-void a78_partialhash(hash_collection &dest, const unsigned char *data,
+void a78_partialhash(util::hash_collection &dest, const unsigned char *data,
 						unsigned long length, const char *functions)
 {
 	if (length <= 128)
@@ -495,32 +495,22 @@ void a78_cart_slot_device::call_unload()
 
 
 /*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool a78_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
-}
-
-/*-------------------------------------------------
  verify_header - check the image (from fullpath)
  has an admissible header
  -------------------------------------------------*/
 
-int a78_cart_slot_device::verify_header(char *header)
+image_verify_result a78_cart_slot_device::verify_header(char *header)
 {
 	const char *magic = "ATARI7800";
 
 	if (strncmp(magic, header + 1, 9))
 	{
 		logerror("Not a valid A7800 image\n");
-		return IMAGE_VERIFY_FAIL;
+		return image_verify_result::FAIL;
 	}
 
 	logerror("returning ID_OK\n");
-	return IMAGE_VERIFY_PASS;
+	return image_verify_result::PASS;
 }
 
 

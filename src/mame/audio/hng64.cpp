@@ -70,15 +70,15 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 
 	/* swap data around.. keep the v53 happy */
 	data = data32 >> 16;
-	data = FLIPENDIAN_INT16(data);
+	data = flipendian_int16(data);
 	mem_mask = mem_mask32 >> 16;
-	mem_mask = FLIPENDIAN_INT16(mem_mask);
+	mem_mask = flipendian_int16(mem_mask);
 	COMBINE_DATA(&m_soundram[offset * 2 + 0]);
 
 	data = data32 & 0xffff;
-	data = FLIPENDIAN_INT16(data);
+	data = flipendian_int16(data);
 	mem_mask = mem_mask32 & 0xffff;
-	mem_mask = FLIPENDIAN_INT16(mem_mask);
+	mem_mask = flipendian_int16(mem_mask);
 	COMBINE_DATA(&m_soundram[offset * 2 + 1]);
 
 	if (DUMP_SOUNDPRG)
@@ -105,7 +105,7 @@ READ32_MEMBER(hng64_state::hng64_soundram_r)
 	UINT16 datalo = m_soundram[offset * 2 + 0];
 	UINT16 datahi = m_soundram[offset * 2 + 1];
 
-	return FLIPENDIAN_INT16(datahi) | (FLIPENDIAN_INT16(datalo) << 16);
+	return flipendian_int16(datahi) | (flipendian_int16(datalo) << 16);
 }
 
 WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )

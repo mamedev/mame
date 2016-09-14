@@ -531,8 +531,8 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apf_state, pia0_portb_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(apf_state, pia0_ca2_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, nullptr)
 

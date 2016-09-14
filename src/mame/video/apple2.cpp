@@ -73,8 +73,8 @@ void apple2_state::adjust_begin_and_end_row(const rectangle &cliprect, int *begi
 	assert((*beginrow % 8) == 0);
 	assert((*endrow % 8) == 7);
 
-	*beginrow = MAX(*beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	*endrow = MIN(*endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	*beginrow = std::max(*beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	*endrow = std::min(*endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	/* sanity check again */
 	assert((*beginrow % 8) == 0);
@@ -948,8 +948,8 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 
 	/* perform adjustments */
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	if (!(m_sysconfig & 0x03))
 	{
@@ -1030,8 +1030,8 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 
 	/* perform adjustments */
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	if (!(m_sysconfig & 0x03))
 	{
@@ -1176,8 +1176,8 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		start_address = m_page2 ? 0x800 : 0x400;
 	}
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -1223,8 +1223,8 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -1254,8 +1254,8 @@ void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bit
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -1285,8 +1285,8 @@ void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitm
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{

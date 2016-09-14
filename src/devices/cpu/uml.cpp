@@ -661,9 +661,9 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(FLIPENDIAN_INT32(m_param[1].immediate()));
+						convert_to_mov_immediate(flipendian_int32(m_param[1].immediate()));
 					else if (m_size == 8)
-						convert_to_mov_immediate(FLIPENDIAN_INT64(m_param[1].immediate()));
+						convert_to_mov_immediate(flipendian_int64(m_param[1].immediate()));
 				}
 				break;
 

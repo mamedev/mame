@@ -21,7 +21,9 @@
 #include <atomic>
 #include <thread>
 #include <vector>
-
+#undef min
+#undef max
+#include <algorithm>
 // MAME headers
 #include "osdcore.h"
 #include "osdsync.h"
@@ -89,7 +91,7 @@ static void spin_while_not(const volatile _AtomType * volatile atom, const _Main
 int osd_get_num_processors(void)
 {
 	// max out at 4 for now since scaling above that seems to do poorly
-	return MIN(std::thread::hardware_concurrency(), 4);
+	return std::min(std::thread::hardware_concurrency(), 4U);
 }
 
 //============================================================
@@ -272,7 +274,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 		threadnum = osdthreadnum;
 
 	// clamp to the maximum
-	queue->threads = MIN(threadnum, WORK_MAX_THREADS);
+	queue->threads = std::min(threadnum, WORK_MAX_THREADS);
 
 	// allocate memory for thread array (+1 to count the calling thread if WORK_QUEUE_FLAG_MULTI)
 	if (flags & WORK_QUEUE_FLAG_MULTI)
@@ -639,7 +641,7 @@ static int effective_num_processors(void)
 	// osd_num_processors == 0 for 'auto'
 	if (osd_num_processors > 0)
 	{
-		return MIN(4 * physprocs, osd_num_processors);
+		return std::min(4 * physprocs, osd_num_processors);
 	}
 	else
 	{
@@ -649,7 +651,7 @@ static int effective_num_processors(void)
 		// note that we permit more than the real number of processors for testing
 		const char *procsoverride = osd_getenv(ENV_PROCESSORS);
 		if (procsoverride != nullptr && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
-			return MIN(4 * physprocs, numprocs);
+			return std::min(4 * physprocs, numprocs);
 
 		// otherwise, return the info from the system
 		return physprocs;

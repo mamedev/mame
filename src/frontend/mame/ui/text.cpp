@@ -464,7 +464,7 @@ int text_layout::get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend)
 //  emit
 //-------------------------------------------------
 
-void text_layout::emit(render_container *container, float x, float y)
+void text_layout::emit(render_container &container, float x, float y)
 {
 	for (const auto &line : m_lines)
 	{
@@ -484,10 +484,10 @@ void text_layout::emit(render_container *container, float x, float y)
 
 			// render the background of the character (if present)
 			if (ch.style.bgcolor.a() != 0)
-				container->add_rect(char_x, char_y, char_x + char_width, char_y + char_height, ch.style.bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container.add_rect(char_x, char_y, char_x + char_width, char_y + char_height, ch.style.bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// render the foreground
-			container->add_char(
+			container.add_char(
 				char_x,
 				char_y,
 				char_height,

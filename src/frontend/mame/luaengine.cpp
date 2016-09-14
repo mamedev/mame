@@ -663,7 +663,7 @@ luabridge::LuaRef lua_engine::l_ioport_get_ports(const ioport_manager *m)
 	luabridge::LuaRef port_table = luabridge::LuaRef::newTable(L);
 
 	for (auto &port : im->ports()) {
-		port_table[port.second->tag()] = &port;
+		port_table[port.second->tag()] = port.second.get();
 	}
 
 	return port_table;
@@ -762,7 +762,7 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	for (auto &s : dev->state().state_entries())
 	{
 		// XXX: refrain from exporting non-visible entries?
-		st_table[s->symbol()] = &s;
+		st_table[s->symbol()] = s.get();
 	}
 
 	return st_table;
@@ -1621,16 +1621,16 @@ int lua_engine::lua_screen::l_draw_box(lua_State *L)
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
 	float x1, y1, x2, y2;
-	x1 = MIN(MAX(0, (float) lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	y1 = MIN(MAX(0, (float) lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
-	x2 = MIN(MAX(0, (float) lua_tonumber(L, 4)), sc_width-1) / static_cast<float>(sc_width);
-	y2 = MIN(MAX(0, (float) lua_tonumber(L, 5)), sc_height-1) / static_cast<float>(sc_height);
+	x1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 2)), float(sc_width-1)) / float(sc_width);
+	y1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 3)), float(sc_height-1)) / float(sc_height);
+	x2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 4)), float(sc_width-1)) / float(sc_width);
+	y2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 5)), float(sc_height-1)) / float(sc_height);
 	UINT32 bgcolor = lua_tounsigned(L, 6);
 	UINT32 fgcolor = lua_tounsigned(L, 7);
 
 	// draw the box
 	render_container &rc = sc->container();
-	mame_machine_manager::instance()->ui().draw_outlined_box(&rc, x1, y1, x2, y2, fgcolor, bgcolor);
+	mame_machine_manager::instance()->ui().draw_outlined_box(rc, x1, y1, x2, y2, fgcolor, bgcolor);
 
 	return 0;
 }
@@ -1658,10 +1658,10 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
 	float x1, y1, x2, y2;
-	x1 = MIN(MAX(0, (float) lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	y1 = MIN(MAX(0, (float) lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
-	x2 = MIN(MAX(0, (float) lua_tonumber(L, 4)), sc_width-1) / static_cast<float>(sc_width);
-	y2 = MIN(MAX(0, (float) lua_tonumber(L, 5)), sc_height-1) / static_cast<float>(sc_height);
+	x1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 2)), float(sc_width-1)) / float(sc_width);
+	y1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 3)), float(sc_height-1)) / float(sc_height);
+	x2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 4)), float(sc_width-1)) / float(sc_width);
+	y2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 5)), float(sc_height-1)) / float(sc_height);
 	UINT32 color = lua_tounsigned(L, 6);
 
 	// draw the line
@@ -1695,8 +1695,8 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	float y, x = 0;
 	if(lua_isnumber(L, 2))
 	{
-		x = MIN(MAX(0, (float) lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-		y = MIN(MAX(0, (float) lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+		x = std::min(std::max(0.0f, (float) lua_tonumber(L, 2)), float(sc_width-1)) / float(sc_width);
+		y = std::min(std::max(0.0f, (float) lua_tonumber(L, 3)), float(sc_height-1)) / float(sc_height);
 	}
 	else
 	{
@@ -1716,7 +1716,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 
 	// draw the text
 	render_container &rc = sc->container();
-	mame_machine_manager::instance()->ui().draw_text_full(&rc, msg, x, y, (1.0f - x),
+	mame_machine_manager::instance()->ui().draw_text_full(rc, msg, x, y, (1.0f - x),
 						justify, ui::text_layout::WORD, mame_ui_manager::NORMAL, textcolor,
 						bgcolor, nullptr, nullptr);
 	return 0;
@@ -2006,7 +2006,8 @@ void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_l
 	{
 		if(lua_istable(m_lua_state, -1))
 		{
-			menu_item item;
+			menu_list.emplace_back();
+			menu_item &item = menu_list.back();
 			lua_rawgeti(m_lua_state, -1, 1);
 			item.text = lua_tostring(m_lua_state, -1);
 			lua_pop(m_lua_state, 1);
@@ -2016,7 +2017,6 @@ void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_l
 			lua_rawgeti(m_lua_state, -1, 3);
 			item.flags = lua_tostring(m_lua_state, -1);
 			lua_pop(m_lua_state, 1);
-			menu_list.push_back(item);
 		}
 		lua_pop(m_lua_state, 1);
 	}

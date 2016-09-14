@@ -708,7 +708,7 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	image.fread(&data[0], image.length());
 
 	if(strncmp((const char*)&data[0], magic, 21))
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	img_start = strlen((const char*)&data[0]) + 5;
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
@@ -716,7 +716,7 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	for (UINT32 i=0; i<image.length() - img_start ;i++)
 		m_flash0b->write_raw(i, data[img_start + i]);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 int oz750_state::oz_wzd_extract_tag(const dynamic_buffer &data, const char *tag, char *dest_buf)
@@ -764,7 +764,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 
 	oz_wzd_extract_tag(data, "<DATA TYPE>", data_type);
 	if (strcmp(data_type, "MY PROGRAMS"))
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	oz_wzd_extract_tag(data, "<TITLE>", app_name);
 	oz_wzd_extract_tag(data, "<DATA>", file_name);
@@ -774,7 +774,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 	UINT32 img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
 
 	if (img_start == 0)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	UINT16 icon_size = data[img_start++];
 
@@ -814,7 +814,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 	for (int i=img_start; i<image.length(); i++)
 		flash->write_byte(pos++, data[i]);                      // data
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

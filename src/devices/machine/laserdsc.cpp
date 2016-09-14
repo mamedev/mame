@@ -162,7 +162,7 @@ UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		rectangle clip(m_overclip);
 		clip.min_y = cliprect.min_y * overbitmap.height() / bitmap.height();
 		if (cliprect.min_y == screen.visible_area().min_y)
-			clip.min_y = MIN(clip.min_y, m_overclip.min_y);
+			clip.min_y = std::min(clip.min_y, m_overclip.min_y);
 		clip.max_y = (cliprect.max_y + 1) * overbitmap.height() / bitmap.height() - 1;
 
 		// call the update callback
@@ -700,8 +700,8 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, co
 					if (delta < 0)
 						delta--;
 					advanceby = delta;
-					advanceby = MIN(advanceby, GENERIC_SEARCH_SPEED);
-					advanceby = MAX(advanceby, -GENERIC_SEARCH_SPEED);
+					advanceby = std::min(advanceby, GENERIC_SEARCH_SPEED);
+					advanceby = std::max(advanceby, -GENERIC_SEARCH_SPEED);
 				}
 			}
 
@@ -780,7 +780,7 @@ void laserdisc_device::init_disc()
 		if (err != CHDERR_NONE || m_vbidata.size() != totalhunks * VBI_PACKED_BYTES)
 			throw emu_fatalerror("Precomputed VBI metadata missing or incorrect size");
 	}
-	m_maxtrack = MAX(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
+	m_maxtrack = std::max(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
 }
 
 
@@ -987,8 +987,8 @@ void laserdisc_device::read_track_data()
 {
 	// compute the chdhunk number we are going to read
 	INT32 chdtrack = m_curtrack - 1 - VIRTUAL_LEAD_IN_TRACKS;
-	chdtrack = MAX(chdtrack, 0);
-	chdtrack = MIN(chdtrack, m_chdtracks - 1);
+	chdtrack = (std::max<INT32>)(chdtrack, 0);
+	chdtrack = (std::min<UINT32>)(chdtrack, m_chdtracks - 1);
 	UINT32 readhunk = chdtrack * 2 + m_fieldnum;
 
 	// cheat and look up the metadata we are about to retrieve
@@ -1118,8 +1118,8 @@ void laserdisc_device::process_track_data()
 			if (m_avhuff_config.audio[chnum] == &m_audiobuffer[chnum][0])
 			{
 				// move data to the end
-				int samplesleft = m_audiobufsize - m_audiobufin;
-				samplesleft = MIN(samplesleft, m_audiocursamples);
+				UINT32 samplesleft = m_audiobufsize - m_audiobufin;
+				samplesleft = std::min(samplesleft, m_audiocursamples);
 				memmove(&m_audiobuffer[chnum][m_audiobufin], &m_audiobuffer[chnum][0], samplesleft * 2);
 
 				// shift data at the beginning

@@ -17,7 +17,7 @@
 #include "ui/slider.h"
 
 namespace ui {
-menu_sliders::menu_sliders(mame_ui_manager &mui, render_container *container, bool menuless_mode) : menu(mui, container)
+menu_sliders::menu_sliders(mame_ui_manager &mui, render_container &container, bool menuless_mode) : menu(mui, container)
 {
 	m_menuless_mode = m_hidden = menuless_mode;
 }
@@ -53,7 +53,7 @@ void menu_sliders::handle()
 				// toggle visibility
 				case IPT_UI_ON_SCREEN_DISPLAY:
 					if (m_menuless_mode)
-						menu::stack_pop(machine());
+						stack_pop();
 					else
 						m_hidden = !m_hidden;
 					break;
@@ -220,11 +220,11 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		x2 = 1.0f - UI_BOX_LR_BORDER;
 
 		// draw extra menu area
-		ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 		y1 += UI_BOX_TB_BORDER;
 
 		// determine the text height
-		ui().draw_text_full(container, tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, nullptr, &text_height);
 
 		// draw the thermometer
@@ -240,18 +240,18 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		current_x = bar_left + bar_width * percentage;
 
 		// fill in the percentage
-		container->add_rect(bar_left, bar_top, current_x, bar_bottom, UI_SLIDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_rect(bar_left, bar_top, current_x, bar_bottom, UI_SLIDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the top and bottom lines
-		container->add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		container->add_line(bar_left, bar_bottom, bar_left + bar_width, bar_bottom, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(bar_left, bar_bottom, bar_left + bar_width, bar_bottom, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw default marker
-		container->add_line(default_x, bar_area_top, default_x, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		container->add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(default_x, bar_area_top, default_x, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the actual text
-		ui().draw_text_full(container, tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		ui().draw_text_full(container(), tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
 					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, &text_height);
 	}
 }
@@ -263,12 +263,12 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 //  standard menu handler
 //-------------------------------------------------
 
-UINT32 menu_sliders::ui_handler(render_container *container, mame_ui_manager &mui)
+UINT32 menu_sliders::ui_handler(render_container &container, mame_ui_manager &mui)
 {
 	UINT32 result;
 
 	// if this is the first call, push the sliders menu
-	if (topmost_menu<menu_sliders>() == nullptr)
+	if (topmost_menu<menu_sliders>(mui.machine()) == nullptr)
 		menu::stack_push<menu_sliders>(mui, container, true);
 
 	// handle standard menus
@@ -278,7 +278,7 @@ UINT32 menu_sliders::ui_handler(render_container *container, mame_ui_manager &mu
 	if (result == UI_HANDLER_CANCEL)
 		menu::stack_pop(mui.machine());
 
-	menu_sliders *uim = topmost_menu<menu_sliders>();
+	menu_sliders *uim = topmost_menu<menu_sliders>(mui.machine());
 	return uim && uim->m_menuless_mode ? 0 : UI_HANDLER_CANCEL;
 }
 

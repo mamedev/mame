@@ -125,9 +125,7 @@ void win_monitor_info::refresh()
 	result = GetMonitorInfo(m_handle, static_cast<LPMONITORINFO>(&m_info));
 	assert(result);
 
-	osd_unique_str temp(utf8_from_tstring(m_info.szDevice));
-
-	if (temp) m_name.assign(temp.get());
+	m_name = utf8_from_tstring(m_info.szDevice);
 
 	m_pos_size = RECT_to_osd_rect(m_info.rcMonitor);
 	m_usuable_pos_size = RECT_to_osd_rect(m_info.rcWork);
@@ -147,7 +145,7 @@ std::shared_ptr<osd_monitor_info> win_monitor_info::monitor_from_handle(HMONITOR
 	for (auto monitor : osd_monitor_info::list)
 		if (*((HMONITOR*)monitor->oshandle()) == hmonitor)
 			return monitor;
-	
+
 	return nullptr;
 }
 
@@ -202,10 +200,10 @@ BOOL CALLBACK win_monitor_info::monitor_enum_callback(HMONITOR handle, HDC dc, L
 	float aspect = static_cast<float>(info.rcMonitor.right - info.rcMonitor.left) / static_cast<float>(info.rcMonitor.bottom - info.rcMonitor.top);
 
 	// allocate a new monitor info
-	osd_unique_str temp(utf8_from_tstring(info.szDevice));
+	auto temp = utf8_from_tstring(info.szDevice);
 
 	// copy in the data
-	auto monitor = std::make_shared<win_monitor_info>(handle, temp.get(), aspect);
+	auto monitor = std::make_shared<win_monitor_info>(handle, temp.c_str(), aspect);
 
 	// hook us into the list
 	osd_monitor_info::list.push_back(monitor);

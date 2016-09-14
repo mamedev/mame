@@ -2549,8 +2549,8 @@ INT32 voodoo_device::register_w(voodoo_device *vd, offs_t offset, UINT32 data)
 					visarea.set(hbp, hbp + hvis - 1, vbp, vbp + vvis - 1);
 
 					/* keep within bounds */
-					visarea.max_x = MIN(visarea.max_x, htotal - 1);
-					visarea.max_y = MIN(visarea.max_y, vtotal - 1);
+					visarea.max_x = std::min(visarea.max_x, htotal - 1);
+					visarea.max_y = std::min(visarea.max_y, vtotal - 1);
 
 					/* compute the new period for standard res, medium res, and VGA res */
 					stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
@@ -2889,8 +2889,8 @@ INT32 voodoo_device::lfb_direct_w(voodoo_device *vd, offs_t offset, UINT32 data,
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_WRITES(vd->reg[lfbMode].u))
 	{
-		data = FLIPENDIAN_INT32(data);
-		mem_mask = FLIPENDIAN_INT32(mem_mask);
+		data = flipendian_int32(data);
+		mem_mask = flipendian_int32(mem_mask);
 	}
 
 	/* word swapping */
@@ -2935,8 +2935,8 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_WRITES(vd->reg[lfbMode].u))
 	{
-		data = FLIPENDIAN_INT32(data);
-		mem_mask = FLIPENDIAN_INT32(mem_mask);
+		data = flipendian_int32(data);
+		mem_mask = flipendian_int32(mem_mask);
 	}
 
 	/* word swapping */
@@ -3377,7 +3377,7 @@ INT32 voodoo_device::texture_w(voodoo_device *vd, offs_t offset, UINT32 data)
 
 	/* swizzle the data */
 	if (TEXLOD_TDATA_SWIZZLE(t->reg[tLOD].u))
-		data = FLIPENDIAN_INT32(data);
+		data = flipendian_int32(data);
 	if (TEXLOD_TDATA_SWAP(t->reg[tLOD].u))
 		data = (data >> 16) | (data << 16);
 
@@ -3635,7 +3635,7 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 				{
 					/* check for byte swizzling (bit 18) */
 					if (offset & 0x40000/4)
-						data = FLIPENDIAN_INT32(data);
+						data = flipendian_int32(data);
 					cmdfifo_w(this, &fbi.cmdfifo[0], offset & 0xffff, data);
 					g_profiler.stop();
 					return;
@@ -3657,7 +3657,7 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 
 			/* if not, we might be byte swizzled (bit 20) */
 			else if (offset & 0x100000/4)
-				data = FLIPENDIAN_INT32(data);
+				data = flipendian_int32(data);
 		}
 
 		/* check the access behavior; note that the table works even if the */
@@ -4037,7 +4037,7 @@ static UINT32 lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_READS(vd->reg[lfbMode].u))
-		data = FLIPENDIAN_INT32(data);
+		data = flipendian_int32(data);
 
 	if (LOG_LFB) vd->device->logerror("VOODOO.%d.LFB:read (%d,%d) = %08X\n", vd->index, x, y, data);
 	return data;
@@ -5180,7 +5180,7 @@ INT32 voodoo_device::fastfill(voodoo_device *vd)
 	for (y = sy; y < ey; y += ARRAY_LENGTH(extents))
 	{
 		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(vd->poly);
-		int count = MIN(ey - y, ARRAY_LENGTH(extents));
+		int count = std::min(ey - y, int(ARRAY_LENGTH(extents)));
 
 		extra->device= vd;
 		memcpy(extra->dither, dithermatrix, sizeof(extra->dither));

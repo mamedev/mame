@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( proteus3, proteus3_state )
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(proteus3_state, video_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(proteus3_state, ca2_w))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(proteus3_state, kbd_put))
 

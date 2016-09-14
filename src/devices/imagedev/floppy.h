@@ -61,7 +61,7 @@ class floppy_image_device : public device_t,
 							public device_slot_card_interface
 {
 public:
-	typedef delegate<int (floppy_image_device *)> load_cb;
+	typedef delegate<image_init_result (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
 	typedef delegate<void (floppy_image_device *, int)> ready_cb;
@@ -80,10 +80,10 @@ public:
 	void set_rpm(float rpm);
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 	virtual const char *image_interface() const override = 0;
 	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
 
@@ -93,7 +93,6 @@ public:
 	virtual bool must_be_loaded() const override { return false; }
 	virtual bool is_reset_on_load() const override { return false; }
 	virtual const char *file_extensions() const override { return extension_list; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	void setup_write(floppy_image_format_t *output_format);
 
 	void setup_load_cb(load_cb cb);

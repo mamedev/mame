@@ -53,10 +53,12 @@ void factory_list_t::error(const pstring &s)
 base_factory_t * factory_list_t::factory_by_name(const pstring &devname)
 {
 	for (auto & e : *this)
+	{
 		if (e->name() == devname)
 			return e.get();
+	}
 
-	m_setup.log().fatal("Class {1} not found!\n", devname);
+	m_setup.log().fatal("Class <{1}> not found!\n", devname);
 	return nullptr; // appease code analysis
 }
 

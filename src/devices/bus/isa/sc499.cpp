@@ -1325,7 +1325,7 @@ void sc499_ctape_image_device::write_block(int block_num, UINT8 *ptr)
 		memcpy(&m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE], ptr, SC499_CTAPE_BLOCK_SIZE);
 }
 
-bool sc499_ctape_image_device::call_load()
+image_init_result sc499_ctape_image_device::call_load()
 {
 	UINT32 size;
 	io_generic io;
@@ -1338,7 +1338,7 @@ bool sc499_ctape_image_device::call_load()
 
 	io_generic_read(&io, &m_ctape_data[0], 0, size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void sc499_ctape_image_device::call_unload()

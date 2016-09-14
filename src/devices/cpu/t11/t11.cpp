@@ -48,6 +48,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
+	, m_out_reset_func(*this)
 {
 	m_program_config.m_is_octal = true;
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -58,6 +59,7 @@ t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t 
 	: cpu_device(mconfig, T11, "T11", tag, owner, clock, "t11", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
+	, m_out_reset_func(*this)
 {
 	m_program_config.m_is_octal = true;
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -261,6 +263,7 @@ void t11_device::device_start()
 	m_initial_pc = initial_pc[c_initial_mode >> 13];
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
+	m_out_reset_func.resolve_safe();
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_reg[0].w.l));

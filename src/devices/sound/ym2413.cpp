@@ -1679,6 +1679,6 @@ const device_type YM2413 = &device_creator<ym2413_device>;
 
 ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2413, "YM2413", tag, owner, clock, "ym2413", __FILE__),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }

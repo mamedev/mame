@@ -121,8 +121,8 @@ namespace netlist
 	{
 		const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
 
-		OUTLOGIC(m_Q, state, delay[state]);
-		OUTLOGIC(m_QQ, state ^ 1, delay[state ^ 1]);
+		m_Q.push(state, delay[state]);
+		m_QQ.push(state ^ 1, delay[state ^ 1]);
 	}
 
 	NETLIB_UPDATE(74107Asub)
@@ -135,7 +135,7 @@ namespace netlist
 
 	NETLIB_UPDATE(74107A)
 	{
-		const auto JK = (INPLOGIC(m_J) << 1) | INPLOGIC(m_K);
+		const auto JK = (m_J() << 1) | m_K();
 
 		switch (JK)
 		{
@@ -145,17 +145,17 @@ namespace netlist
 				m_sub.m_F  = 0;
 				m_sub.m_clk.inactivate();
 				break;
-			case 1:             // (!INPLOGIC(m_J) & INPLOGIC(m_K))
+			case 1:             // (!m_J) & m_K))
 				m_sub.m_Q1 = 0;
 				m_sub.m_Q2 = 0;
 				m_sub.m_F  = 0;
 				break;
-			case 2:             // (INPLOGIC(m_J) & !INPLOGIC(m_K))
+			case 2:             // (m_J) & !m_K))
 				m_sub.m_Q1 = 0;
 				m_sub.m_Q2 = 0;
 				m_sub.m_F  = 1;
 				break;
-			case 3:             // (INPLOGIC(m_J) & INPLOGIC(m_K))
+			case 3:             // (m_J) & m_K))
 				m_sub.m_Q1 = 1;
 				m_sub.m_Q2 = 0;
 				m_sub.m_F  = 0;
@@ -164,7 +164,7 @@ namespace netlist
 				break;
 		}
 
-		if (!INPLOGIC(m_clrQ))
+		if (!m_clrQ())
 		{
 			m_sub.m_clk.inactivate();
 			m_sub.newstate(0);

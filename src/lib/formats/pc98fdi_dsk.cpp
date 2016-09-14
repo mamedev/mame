@@ -36,12 +36,12 @@ int pc98fdi_format::identify(io_generic *io, UINT32 form_factor)
 	UINT8 h[32];
 
 	io_generic_read(io, h, 0, 32);
-	UINT32 hsize = LITTLE_ENDIANIZE_INT32(*(UINT32 *) (h + 0x8));
-	UINT32 psize = LITTLE_ENDIANIZE_INT32(*(UINT32 *) (h + 0xc));
-	UINT32 ssize = LITTLE_ENDIANIZE_INT32(*(UINT32 *) (h + 0x10));
-	UINT32 scnt = LITTLE_ENDIANIZE_INT32(*(UINT32 *) (h + 0x14));
-	UINT32 sides = LITTLE_ENDIANIZE_INT32(*(UINT32 *) (h + 0x18));
-	UINT32 ntrk = LITTLE_ENDIANIZE_INT32(*(UINT32 *) (h + 0x1c));
+	UINT32 hsize = little_endianize_int32(*(UINT32 *) (h + 0x8));
+	UINT32 psize = little_endianize_int32(*(UINT32 *) (h + 0xc));
+	UINT32 ssize = little_endianize_int32(*(UINT32 *) (h + 0x10));
+	UINT32 scnt = little_endianize_int32(*(UINT32 *) (h + 0x14));
+	UINT32 sides = little_endianize_int32(*(UINT32 *) (h + 0x18));
+	UINT32 ntrk = little_endianize_int32(*(UINT32 *) (h + 0x1c));
 	if(size == hsize + psize && psize == ssize*scnt*sides*ntrk)
 		return 100;
 
@@ -54,11 +54,11 @@ bool pc98fdi_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 
 	io_generic_read(io, h, 0, 32);
 
-	UINT32 hsize         = LITTLE_ENDIANIZE_INT32(*(UINT32 *)(h+0x8));
-	UINT32 sector_size   = LITTLE_ENDIANIZE_INT32(*(UINT32 *)(h+0x10));
-	UINT32 sector_count  = LITTLE_ENDIANIZE_INT32(*(UINT32 *)(h+0x14));
-	UINT32 head_count    = LITTLE_ENDIANIZE_INT32(*(UINT32 *)(h+0x18));
-	UINT32 track_count   = LITTLE_ENDIANIZE_INT32(*(UINT32 *)(h+0x1c));
+	UINT32 hsize         = little_endianize_int32(*(UINT32 *)(h+0x8));
+	UINT32 sector_size   = little_endianize_int32(*(UINT32 *)(h+0x10));
+	UINT32 sector_count  = little_endianize_int32(*(UINT32 *)(h+0x14));
+	UINT32 head_count    = little_endianize_int32(*(UINT32 *)(h+0x18));
+	UINT32 track_count   = little_endianize_int32(*(UINT32 *)(h+0x1c));
 
 	int cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
 

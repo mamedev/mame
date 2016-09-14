@@ -94,7 +94,7 @@ void datapack_device::device_start()
 
 void datapack_device::device_config_complete()
 {
-	m_formatlist.push_back(std::make_unique<image_device_format>("opk", "Psion Datapack image", "opk", datapack_option_spec));
+	add_format("opk", "Psion Datapack image", "opk", datapack_option_spec);
 
 	// set brief and instance name
 	update_names();
@@ -256,7 +256,7 @@ void datapack_device::control_w(UINT8 data)
     DEVICE_IMAGE_LOAD( datapack )
 -------------------------------------------------*/
 
-bool datapack_device::call_load()
+image_init_result datapack_device::call_load()
 {
 	UINT8 data[0x10];
 
@@ -264,13 +264,13 @@ bool datapack_device::call_load()
 
 	// check the OPK head
 	if(strncmp((const char*)data, "OPK", 3))
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	// get datapack ID and size
 	m_id   = data[OPK_HEAD_SIZE + 0];
 	m_size = data[OPK_HEAD_SIZE + 1];
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -278,7 +278,7 @@ bool datapack_device::call_load()
     DEVICE_IMAGE_CREATE( datapack )
 -------------------------------------------------*/
 
-bool datapack_device::call_create(int format_type, util::option_resolution *create_args)
+image_init_result datapack_device::call_create(int format_type, util::option_resolution *create_args)
 {
 	static const UINT8 opk_head[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
 
@@ -303,7 +303,7 @@ bool datapack_device::call_create(int format_type, util::option_resolution *crea
 	fwrite(&m_id, 1);
 	fwrite(&m_size, 1);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

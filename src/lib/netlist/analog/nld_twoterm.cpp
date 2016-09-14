@@ -65,15 +65,15 @@ NETLIB_UPDATE(twoterm)
 
 NETLIB_UPDATE_PARAM(POT)
 {
-	nl_double v = m_Dial.Value();
-	if (m_DialIsLog.Value())
+	nl_double v = m_Dial();
+	if (m_DialIsLog())
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.update_dev();
 	m_R2.update_dev();
 
-	m_R1.set_R(std::max(m_R.Value() * v, netlist().gmin()));
-	m_R2.set_R(std::max(m_R.Value() * (NL_FCONST(1.0) - v), netlist().gmin()));
+	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
+	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), netlist().gmin()));
 
 }
 
@@ -83,16 +83,16 @@ NETLIB_UPDATE_PARAM(POT)
 
 NETLIB_UPDATE_PARAM(POT2)
 {
-	nl_double v = m_Dial.Value();
+	nl_double v = m_Dial();
 
-	if (m_DialIsLog.Value())
+	if (m_DialIsLog())
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
-	if (m_Reverse.Value())
+	if (m_Reverse())
 		v = 1.0 - v;
 
 	m_R1.update_dev();
 
-	m_R1.set_R(std::max(m_R.Value() * v, netlist().gmin()));
+	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ NETLIB_RESET(C)
 NETLIB_UPDATE_PARAM(C)
 {
 	//step_time(1.0/48000.0);
-	m_GParallel = netlist().gmin() * m_C.Value();
+	m_GParallel = netlist().gmin() * m_C();
 }
 
 NETLIB_UPDATE(C)
@@ -146,7 +146,7 @@ NETLIB_UPDATE_TERMINALS(D)
 NETLIB_RESET(VS)
 {
 	NETLIB_NAME(twoterm)::reset();
-	this->set(1.0 / m_R, m_V, 0.0);
+	this->set(1.0 / m_R(), m_V(), 0.0);
 }
 
 NETLIB_UPDATE(VS)
@@ -161,7 +161,7 @@ NETLIB_UPDATE(VS)
 NETLIB_RESET(CS)
 {
 	NETLIB_NAME(twoterm)::reset();
-	this->set(0.0, 0.0, m_I);
+	this->set(0.0, 0.0, m_I());
 }
 
 NETLIB_UPDATE(CS)

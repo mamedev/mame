@@ -35,25 +35,25 @@
 #include "emu.h"
 #include "includes/airbustr.h"
 
-WRITE8_MEMBER(airbustr_state::airbustr_videoram_w)
+WRITE8_MEMBER(airbustr_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(airbustr_state::airbustr_colorram_w)
+WRITE8_MEMBER(airbustr_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(airbustr_state::airbustr_videoram2_w)
+WRITE8_MEMBER(airbustr_state::videoram2_w)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(airbustr_state::airbustr_colorram2_w)
+WRITE8_MEMBER(airbustr_state::colorram2_w)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -71,7 +71,7 @@ WRITE8_MEMBER(airbustr_state::airbustr_colorram2_w)
             Bg Y    Bg X    Fg Y    Fg X    <-Scroll High Bits (complemented!)
 */
 
-WRITE8_MEMBER(airbustr_state::airbustr_scrollregs_w)
+WRITE8_MEMBER(airbustr_state::scrollregs_w)
 {
 	switch (offset)     // offset 0 <-> port 4
 	{
@@ -125,7 +125,7 @@ void airbustr_state::video_start()
 }
 
 
-UINT32 airbustr_state::screen_update_airbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -136,7 +136,7 @@ UINT32 airbustr_state::screen_update_airbustr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void airbustr_state::screen_eof_airbustr(screen_device &screen, bool state)
+void airbustr_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)

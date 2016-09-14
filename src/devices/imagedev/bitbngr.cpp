@@ -82,16 +82,16 @@ void bitbanger_device::device_config_complete(void)
     call_load
 -------------------------------------------------*/
 
-bool bitbanger_device::call_load(void)
+image_init_result bitbanger_device::call_load(void)
 {
 	/* we don't need to do anything special */
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool bitbanger_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result bitbanger_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	/* we don't need to do anything special */
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------

@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "rendlay.h"
+#include "sound/speaker.h"
 #include "cpu/alto2/alto2cpu.h"
 #include "machine/diablo_hd.h"
 
@@ -16,6 +17,7 @@ public:
 	alto2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_speaker(*this, "speaker"),
 		m_io_row0(*this, "ROW0"),
 		m_io_row1(*this, "ROW1"),
 		m_io_row2(*this, "ROW2"),
@@ -32,6 +34,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
@@ -154,6 +157,9 @@ static INPUT_PORTS_START( alto2 )
 
 	PORT_START("mousey")    // Mouse - Y AXIS
 	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, nullptr )
+
+	PORT_START("utilout")	// Speaker connected to UTILOUT
+	PORT_BIT( 0xff, 0x00, IPT_PORT ) PORT_WRITE_LINE_DEVICE_MEMBER(":speaker", speaker_sound_device, level_w)
 
 	PORT_START("CONFIG")    /* Memory switch on AIM board */
 	PORT_CONFNAME( 0x01, 0x01, "Memory switch")
@@ -284,6 +290,11 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
 	MCFG_DIABLO_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -295,9 +306,10 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
 	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
 	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
+	cpu->set_speaker(m_speaker);
 }
 
 /* Game Drivers */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME   FLAGS
-COMP( 1977, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", MACHINE_NO_SOUND )
+COMP( 1977, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", 0 )

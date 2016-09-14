@@ -21,6 +21,8 @@
 #include <windowsx.h>
 #include <mmsystem.h>
 #endif
+#undef min
+#undef max
 
 #ifdef OSD_SDL
 // forward declaration

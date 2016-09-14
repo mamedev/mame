@@ -359,6 +359,6 @@ offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op)
 CPU_DISASSEMBLE( rsp )
 {
 	UINT32 op = *(UINT32 *)opram;
-	op = BIG_ENDIANIZE_INT32(op);
+	op = big_endianize_int32(op);
 	return rsp_dasm_one(buffer, pc, op);
 }

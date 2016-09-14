@@ -647,10 +647,10 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 				if (reg_store != m_gpu_regs[offset])
 				{
 					int hperiod = 2 * ((m_gpu_regs[HP] & 0x3ff) + 1);
-					int hbend = effective_hvalue(ENABLE_BORDERS ? m_gpu_regs[HBE] : MIN(m_gpu_regs[HDB1], m_gpu_regs[HDB2]));
+					int hbend = effective_hvalue(ENABLE_BORDERS ? m_gpu_regs[HBE] : std::min(m_gpu_regs[HDB1], m_gpu_regs[HDB2]));
 					int hbstart = effective_hvalue(m_gpu_regs[ENABLE_BORDERS ? HBB : HDE]);
 					int vperiod = (m_gpu_regs[VP] & 0x7ff) + 1;
-					int vbend = MAX(m_gpu_regs[VBE],m_gpu_regs[VDB]) & 0x7ff;
+					int vbend = std::max(m_gpu_regs[VBE],m_gpu_regs[VDB]) & 0x7ff;
 					int vbstart = m_gpu_regs[VBB] & 0x7ff;
 
 					/* adjust for the half-lines */

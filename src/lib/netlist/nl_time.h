@@ -104,7 +104,8 @@ namespace netlist
 		}
 
 		constexpr internal_type as_raw() const { return m_time; }
-		constexpr double as_double() const { return (double) m_time / (double) resolution; }
+		constexpr double as_double() const { return static_cast<double>(m_time)
+				/ static_cast<double>(resolution); }
 
 		// for save states ....
 		internal_type *get_internaltype_ptr() { return &m_time; }
@@ -114,7 +115,7 @@ namespace netlist
 		static constexpr ptime from_msec(const internal_type ms) { return ptime(ms, UINT64_C(1000)); }
 		static constexpr ptime from_hz(const internal_type hz) { return ptime(1 , hz); }
 		static constexpr ptime from_raw(const internal_type raw) { return ptime(raw, resolution); }
-		static constexpr ptime from_double(const double t) { return ptime((internal_type) ( t * (double) resolution), resolution); }
+		static constexpr ptime from_double(const double t) { return ptime(static_cast<internal_type>( t * static_cast<double>(resolution)), resolution); }
 
 		static constexpr ptime zero() { return ptime(0, resolution); }
 		static constexpr ptime quantum() { return ptime(1, resolution); }

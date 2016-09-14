@@ -41,7 +41,7 @@ namespace ui {
     input groups menu
 -------------------------------------------------*/
 
-menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -73,7 +73,7 @@ void menu_input_groups::handle()
 	/* process the menu */
 	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		menu::stack_push<menu_input_general>(ui(), container, int((long long)(menu_event->itemref)-1));
+		menu::stack_push<menu_input_general>(ui(), container(), int((long long)(menu_event->itemref)-1));
 }
 
 
@@ -83,7 +83,7 @@ void menu_input_groups::handle()
     input menu
 -------------------------------------------------*/
 
-menu_input_general::menu_input_general(mame_ui_manager &mui, render_container *container, int _group) : menu_input(mui, container)
+menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &container, int _group) : menu_input(mui, container)
 {
 	group = _group;
 }
@@ -146,7 +146,7 @@ menu_input_general::~menu_input_general()
     input menu
 -------------------------------------------------*/
 
-menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container *container) : menu_input(mui, container)
+menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container &container) : menu_input(mui, container)
 {
 }
 
@@ -223,7 +223,7 @@ menu_input_specific::~menu_input_specific()
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
-menu_input::menu_input(mame_ui_manager &mui, render_container *container) : menu(mui, container), last_sortorder(0), record_next(false)
+menu_input::menu_input(mame_ui_manager &mui, render_container &container) : menu(mui, container), last_sortorder(0), record_next(false)
 {
 	pollingitem = nullptr;
 	pollingref = nullptr;
@@ -446,7 +446,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
     switches menu
 -------------------------------------------------*/
 
-menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, render_container *container) : menu_settings(mui, container, IPT_DIPSWITCH)
+menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, render_container &container) : menu_settings(mui, container, IPT_DIPSWITCH)
 {
 }
 
@@ -459,7 +459,7 @@ menu_settings_dip_switches::~menu_settings_dip_switches()
     driver config menu
 -------------------------------------------------*/
 
-menu_settings_driver_config::menu_settings_driver_config(mame_ui_manager &mui, render_container *container) : menu_settings(mui, container, IPT_CONFIG)
+menu_settings_driver_config::menu_settings_driver_config(mame_ui_manager &mui, render_container &container) : menu_settings(mui, container, IPT_CONFIG)
 {
 }
 
@@ -529,7 +529,7 @@ void menu_settings::handle()
     switches menus
 -------------------------------------------------*/
 
-menu_settings::menu_settings(mame_ui_manager &mui, render_container *container, UINT32 _type) : menu(mui, container), diplist(nullptr), dipcount(0)
+menu_settings::menu_settings(mame_ui_manager &mui, render_container &container, UINT32 _type) : menu(mui, container), diplist(nullptr), dipcount(0)
 {
 	type = _type;
 }
@@ -641,7 +641,7 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 	y2 = y1 + bottom;
 
 	// draw extra menu area
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 	y1 += (float)DIP_SWITCH_SPACING;
 
 	// iterate over DIP switches
@@ -674,8 +674,8 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 
 void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask)
 {
-	float switch_field_width = SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * container->manager().ui_aspect();
-	float switch_width = SINGLE_TOGGLE_SWITCH_WIDTH * container->manager().ui_aspect();
+	float switch_field_width = SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * container().manager().ui_aspect();
+	float switch_width = SINGLE_TOGGLE_SWITCH_WIDTH * container().manager().ui_aspect();
 	int numtoggles, toggle;
 	float switch_toggle_gap;
 	float y1_off, y1_on;
@@ -687,7 +687,7 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 	x1 += (x2 - x1 - numtoggles * switch_field_width) / 2;
 
 	/* draw the dip switch name */
-	ui().draw_text_full(  container,
+	ui().draw_text_full(container(),
 						dip->name,
 						0,
 						y1 + (DIP_SWITCH_HEIGHT - UI_TARGET_FONT_HEIGHT) / 2,
@@ -711,7 +711,7 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 		float innerx1;
 
 		/* first outline the switch */
-		ui().draw_outlined_box(container, x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
+		ui().draw_outlined_box(container(), x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
 
 		/* compute x1/x2 for the inner filled in switch */
 		innerx1 = x1 + (switch_field_width - switch_width) / 2;
@@ -720,13 +720,13 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 		if (dip->mask & (1 << toggle))
 		{
 			float innery1 = (dip->state & (1 << toggle)) ? y1_on : y1_off;
-			container->add_rect(innerx1, innery1, innerx1 + switch_width, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
+			container().add_rect(innerx1, innery1, innerx1 + switch_width, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
 								(selectedmask & (1 << toggle)) ? UI_DIPSW_COLOR : UI_TEXT_COLOR,
 								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 		else
 		{
-			container->add_rect(innerx1, y1_off, innerx1 + switch_width, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
+			container().add_rect(innerx1, y1_off, innerx1 + switch_width, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
 								UI_UNAVAILABLE_COLOR,
 								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
@@ -804,7 +804,7 @@ void menu_analog::handle()
     settings menu
 -------------------------------------------------*/
 
-menu_analog::menu_analog(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_analog::menu_analog(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 

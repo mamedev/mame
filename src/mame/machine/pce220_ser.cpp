@@ -224,7 +224,7 @@ void pce220_serial_device::device_timer(emu_timer &timer, device_timer_id id, in
     DEVICE_IMAGE_LOAD( pce220_serial )
 -------------------------------------------------*/
 
-bool pce220_serial_device::call_load()
+image_init_result pce220_serial_device::call_load()
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
@@ -233,21 +233,21 @@ bool pce220_serial_device::call_load()
 	//read the first byte
 	fread(&m_current_byte, 1);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------
     DEVICE_IMAGE_CREATE( pce220_serial )
 -------------------------------------------------*/
 
-bool pce220_serial_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result pce220_serial_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
 	m_current_byte = 0;
 	m_receive_timer->adjust(attotime::from_hz(SIO_BAUD_RATE), 0, attotime::from_hz(SIO_BAUD_RATE));
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

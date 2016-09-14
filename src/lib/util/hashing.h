@@ -20,6 +20,7 @@
 #include "sha1.h"
 
 
+namespace util {
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -216,5 +217,7 @@ protected:
 	crc16_t             m_accum;        // internal accumulator
 };
 
+
+} // namespace util
 
 #endif // __HASHING_H__

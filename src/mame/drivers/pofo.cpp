@@ -684,7 +684,7 @@ WRITE_LINE_MEMBER( portfolio_state::eint_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( portfolio_state, portfolio_cart )
 {
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 

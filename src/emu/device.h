@@ -69,7 +69,7 @@ class device_execute_interface;
 class device_memory_interface;
 class device_state_interface;
 class validity_checker;
-struct rom_entry;
+class rom_entry;
 class machine_config;
 class emu_timer;
 struct input_device_default;

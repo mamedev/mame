@@ -1138,7 +1138,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 				else
 				{
 					sprite_col_occurred = true;
-					sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
+					sprite_col_x = std::min(sprite_col_x, pixel_plot_x);
 				}
 			}
 		}
@@ -1218,7 +1218,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 						else
 						{
 							sprite_col_occurred = true;
-							sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
+							sprite_col_x = std::min(sprite_col_x, pixel_plot_x);
 						}
 					}
 				}

@@ -24,13 +24,11 @@ WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = memregion("oki")->base();
-
 		/* ADPCM bank switch */
 		if (m_sndbank != ((data >> m_adpcm_bank_shift) & 0x0f))
 		{
 			m_sndbank = (data >> m_adpcm_bank_shift) & 0x0f;
-			memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * m_sndbank, 0x20000);
+			membank("okibank")->set_entry(m_sndbank);
 		}
 	}
 	if (ACCESSING_BITS_8_15)
@@ -61,6 +59,10 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(ohmygod_spritebank_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( oki_map, AS_0, 8, ohmygod_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ohmygod )
 	PORT_START("P1")
@@ -297,6 +299,8 @@ GFXDECODE_END
 
 void ohmygod_state::machine_start()
 {
+	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x20000);
+
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
@@ -305,11 +309,7 @@ void ohmygod_state::machine_start()
 
 void ohmygod_state::machine_reset()
 {
-	UINT8 *rom = memregion("oki")->base();
-
 	m_sndbank = 0;
-	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * m_sndbank, 0x20000);
-
 	m_spritebank = 0;
 	m_scrollx = 0;
 	m_scrolly = 0;
@@ -344,6 +344,7 @@ static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 14000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -364,10 +365,8 @@ ROM_START( ohmygod )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "omg-s.120",    0x00000, 0x80000, CRC(6413bd36) SHA1(52c455d727496eae80bfab9460127c4c5a874e32) )
 
-	ROM_REGION( 0x240000, "oki", 0 )
-	ROM_LOAD( "omg-g.107",    0x00000, 0x200000, CRC(7405573c) SHA1(f4e7318c0a58f43d3c6370490637aea53b28547e) )
-	/* 00000-1ffff is fixed, 20000-3ffff is banked */
-	ROM_RELOAD(               0x40000, 0x200000 )
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "omg-g.107",    0x00000, 0x200000, CRC(7405573c) SHA1(f4e7318c0a58f43d3c6370490637aea53b28547e) ) /* 00000-1ffff is fixed, 20000-3ffff is banked */
 ROM_END
 
 ROM_START( naname )
@@ -380,10 +379,8 @@ ROM_START( naname )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "036-spr.120",   0x00000, 0x80000, CRC(e36d8731) SHA1(652709d7884d40459c95761c8abcb394c4b712bf) )
 
-	ROM_REGION( 0x240000, "oki", 0 )
-	ROM_LOAD( "036-snd.107",  0x00000, 0x200000, CRC(a3e0caf4) SHA1(35b0eb4ae5b9df1b7c99ec2476a6d834ea50d2e3) )
-	/* 00000-1ffff is fixed, 20000-3ffff is banked */
-	ROM_RELOAD(               0x40000, 0x200000 )
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "036-snd.107",  0x00000, 0x200000, CRC(a3e0caf4) SHA1(35b0eb4ae5b9df1b7c99ec2476a6d834ea50d2e3) ) /* 00000-1ffff is fixed, 20000-3ffff is banked */
 ROM_END
 
 

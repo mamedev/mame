@@ -28,7 +28,7 @@ class matrix_solver_GMRES_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 public:
 
-	matrix_solver_GMRES_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, int size)
+	matrix_solver_GMRES_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const unsigned size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_use_iLU_preconditioning(true)
 		, m_use_more_precise_stop_condition(false)
@@ -41,13 +41,13 @@ public:
 	}
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
 
-	int solve_ilu_gmres(nl_double * RESTRICT x, const nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy);
+	unsigned solve_ilu_gmres(nl_double * RESTRICT x, const nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy);
 
-	std::vector<int> m_term_cr[storage_N];
+	std::vector<unsigned> m_term_cr[storage_N];
 
 	bool m_use_iLU_preconditioning;
 	bool m_use_more_precise_stop_condition;
@@ -97,7 +97,7 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		for (unsigned j=0; j< this->m_terms[k]->m_railstart;j++)
 		{
 			for (unsigned i = mat.ia[k]; i<nz; i++)
-				if (this->m_terms[k]->net_other()[j] == (int) mat.ja[i])
+				if (this->m_terms[k]->net_other()[j] == static_cast<int>(mat.ja[i]))
 				{
 					m_term_cr[k].push_back(i);
 					break;
@@ -111,7 +111,7 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 }
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const unsigned iN = this->N();
 
@@ -135,8 +135,8 @@ int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_
 		nl_double gtot_t = 0.0;
 		nl_double RHS_t = 0.0;
 
-		const unsigned term_count = this->m_terms[k]->count();
-		const unsigned railstart = this->m_terms[k]->m_railstart;
+		const std::size_t term_count = this->m_terms[k]->count();
+		const std::size_t railstart = this->m_terms[k]->m_railstart;
 		const nl_double * const RESTRICT gt = this->m_terms[k]->gt();
 		const nl_double * const RESTRICT go = this->m_terms[k]->go();
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
@@ -144,13 +144,13 @@ int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_
 
 		new_V[k] = this->m_nets[k]->m_cur_Analog;
 
-		for (unsigned i = 0; i < term_count; i++)
+		for (std::size_t i = 0; i < term_count; i++)
 		{
 			gtot_t = gtot_t + gt[i];
 			RHS_t = RHS_t + Idr[i];
 		}
 
-		for (unsigned i = railstart; i < term_count; i++)
+		for (std::size_t i = railstart; i < term_count; i++)
 			RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
 
 		RHS[k] = RHS_t;
@@ -158,7 +158,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_
 		// add diagonal element
 		m_A[mat.diag[k]] = gtot_t;
 
-		for (unsigned i = 0; i < railstart; i++)
+		for (std::size_t i = 0; i < railstart; i++)
 		{
 			const unsigned pi = m_term_cr[k][i];
 			m_A[pi] -= go[i];
@@ -168,12 +168,12 @@ int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 
-	int mr = iN;
+	unsigned mr = iN;
 	if (iN > 3 )
-		mr = (int) sqrt(iN) * 2;
-	int iter = std::max(1, this->m_params.m_gs_loops);
-	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
-	int failed = mr * iter;
+		mr = static_cast<unsigned>(std::sqrt(iN) * 2.0);
+	unsigned iter = std::max(1u, this->m_params.m_gs_loops);
+	unsigned gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
+	unsigned failed = mr * iter;
 
 	this->m_iterative_total += gsl;
 	this->m_stat_calculations++;
@@ -210,7 +210,7 @@ inline void givens_mult( const T & c, const T & s, T & g0, T & g1 )
 }
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT x, const nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy)
+unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT x, const nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy)
 {
 	/*-------------------------------------------------------------------------
 	 * The code below was inspired by code published by John Burkardt under
@@ -266,7 +266,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 		rho_delta = accuracy * rho_to_accuracy;
 	}
 	else
-		rho_delta = accuracy * std::sqrt((double) n) * m_accuracy_mult;
+		rho_delta = accuracy * std::sqrt(n) * m_accuracy_mult;
 
 	for (unsigned itr = 0; itr < restart_max; itr++)
 	{
@@ -344,7 +344,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 
 		/* Solve the system H * y = g */
 		/* x += m_v[j] * m_y[j]       */
-		for (int i = last_k; i >= 0; i--)
+		for (unsigned i = last_k + 1; i-- > 0;)
 		{
 			double tmp = m_g[i];
 			for (unsigned j = i + 1; j <= last_k; j++)

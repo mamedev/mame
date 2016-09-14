@@ -60,6 +60,12 @@
 #include <utime.h>
 #endif
 
+#ifdef __GNU__
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+#endif
+
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>

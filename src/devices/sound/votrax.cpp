@@ -1372,6 +1372,6 @@ osd_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
 	}
 
 	// plus 1/2
-	clocks_until_request = MAX(clocks_until_request, (1 << P_CLOCK_BIT) / 2);
+	clocks_until_request = std::max(clocks_until_request, UINT32(1 << P_CLOCK_BIT) / 2);
 	timer.adjust(attotime::from_ticks(clocks_until_request, m_master_clock_freq));
 }

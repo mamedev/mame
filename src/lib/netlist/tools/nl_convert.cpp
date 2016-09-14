@@ -153,12 +153,11 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 
 double nl_convert_base_t::get_sp_val(const pstring &sin)
 {
-	int p = sin.len() - 1;
-	while (p>=0 && (sin.substr(p,1) < "0" || sin.substr(p,1) > "9"))
-		p--;
-	pstring val = sin.substr(0,p + 1);
-	pstring unit = sin.substr(p + 1);
-
+	auto p = sin.begin();
+	while (p != sin.end() && (m_numberchars.find(*p) != m_numberchars.end()))
+		++p;
+	pstring val = sin.left(p);
+	pstring unit = sin.substr(p);
 	double ret = get_sp_unit(unit) * val.as_double();
 	return ret;
 }
@@ -223,7 +222,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 		switch (tt[0].code_at(0))
 		{
 			case ';':
-				out("// {}\n", line.substr(1).cstr());
+				out("// {}\n", line.substr(1));
 				break;
 			case '*':
 				out("// {}\n", line.substr(1).cstr());
@@ -249,7 +248,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				/* check for fourth terminal ... should be numeric net
 				 * including "0" or start with "N" (ltspice)
 				 */
-				ATTR_UNUSED int nval =tt[4].as_long(&cerr);
+				ATTR_UNUSED long nval =tt[4].as_long(&cerr);
 				pstring model;
 				pstring pins ="CBE";
 
@@ -262,7 +261,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				{
 					if (m[1].len() != 4)
 						fprintf(stderr, "error with model desc %s\n", model.cstr());
-					pins = m[1].left(3);
+					pins = m[1].left(m[1].begin() + 3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
 				add_term(tt[1], tt[0] + "." + pins.code_at(0));

@@ -13,6 +13,7 @@ public:
 		nvidia_nv2a(nullptr),
 		debug_irq_active(false),
 		debug_irq_number(0),
+		usb_hack_enabled(false),
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ32_MEMBER(geforce_r);
@@ -111,6 +112,7 @@ public:
 	std::unique_ptr<nv2a_renderer> nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;
+	bool usb_hack_enabled;
 	required_device<cpu_device> m_maincpu;
 	ohci_usb_controller *ohci_usb;
 

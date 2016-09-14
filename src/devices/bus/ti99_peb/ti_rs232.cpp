@@ -174,7 +174,7 @@ int ti_rs232_attached_device::get_index_from_tagname()
 /*
     Initialize rs232 unit and open image
 */
-bool ti_rs232_attached_device::call_load()
+image_init_result ti_rs232_attached_device::call_load()
 {
 	tms9902_device* tms9902;
 //  ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
@@ -195,13 +195,13 @@ bool ti_rs232_attached_device::call_load()
 	else
 	{
 		LOG("ti99/rs232: Could not find device tag number\n");
-		return true;
+		return image_init_result::FAIL;
 	}
 
 	// The following line may cause trouble in the init phase
 	// card->incoming_dtr(devnumber, (m_file!=nullptr)? ASSERT_LINE : CLEAR_LINE);
 
-	return false;  // OK
+	return image_init_result::PASS;  // OK
 }
 
 void ti_rs232_attached_device::call_unload()
@@ -226,12 +226,12 @@ void ti_rs232_attached_device::call_unload()
 /*
     Initialize pio unit and open image
 */
-bool ti_pio_attached_device::call_load()
+image_init_result ti_pio_attached_device::call_load()
 {
 	ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
 
 	// tell whether the image is readable
-	card->m_pio_readable = !has_been_created();
+	card->m_pio_readable = true;
 	// tell whether the image is writable
 	card->m_pio_writable = !is_readonly();
 
@@ -240,7 +240,7 @@ bool ti_pio_attached_device::call_load()
 	else
 		card->m_pio_handshakein = true;
 
-	return false;  // OK
+	return image_init_result::PASS;  // OK
 }
 
 /*

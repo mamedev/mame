@@ -969,7 +969,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 	if (size < 0x800000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
@@ -977,7 +977,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 
 	test_centered(m_cart->get_rom_base());
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
@@ -987,7 +987,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

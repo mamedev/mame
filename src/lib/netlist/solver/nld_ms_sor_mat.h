@@ -29,7 +29,7 @@ class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, storage_N>
 
 public:
 
-	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, int size)
+	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const unsigned size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::DESCENDING, params, size)
 		, m_Vdelta(*this, "m_Vdelta", 0.0)
 		, m_omega(*this, "m_omega", params->m_sor)
@@ -43,7 +43,7 @@ public:
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
 	state_var<nl_double[storage_N]> m_Vdelta;
@@ -114,7 +114,7 @@ nl_double matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
 #endif
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	/* The matrix based code looks a lot nicer but actually is 30% slower than
 	 * the optimized code which works directly on the data structures.
@@ -130,7 +130,7 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 
 	bool resched = false;
 
-	int  resched_cnt = 0;
+	unsigned resched_cnt = 0;
 
 
 #if 0
@@ -181,9 +181,9 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 			nl_double Idrive = 0;
 
 			const auto *p = this->m_terms[k]->m_nz.data();
-			const unsigned e = this->m_terms[k]->m_nz.size();
+			const std::size_t e = this->m_terms[k]->m_nz.size();
 
-			for (unsigned i = 0; i < e; i++)
+			for (std::size_t i = 0; i < e; i++)
 				Idrive = Idrive + this->A(k,p[i]) * new_v[p[i]];
 
 			const nl_double delta = m_omega * (this->RHS(k) - Idrive) / this->A(k,k);

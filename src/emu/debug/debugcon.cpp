@@ -332,7 +332,7 @@ CMDERR debugger_console::execute_command(const char *command, bool echo)
 		printf(">%s\n", command);
 
 	/* parse and execute */
-	result = internal_parse_command(command, TRUE);
+	result = internal_parse_command(command, true);
 
 	/* display errors */
 	if (result != CMDERR_NONE)

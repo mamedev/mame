@@ -560,8 +560,8 @@ WRITE32_MEMBER( magictg_state::f0_w )
 
 	offset *= 4;
 
-	data = FLIPENDIAN_INT32(data);
-	mem_mask = FLIPENDIAN_INT32(mem_mask);
+	data = flipendian_int32(data);
+	mem_mask = flipendian_int32(mem_mask);
 
 	ch = ((offset >> 2) & 3) - 1;
 
@@ -606,7 +606,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 
 				while (m_dma_ch[ch].count > 3)
 				{
-					UINT32 src_dword = FLIPENDIAN_INT32(space.read_dword(src_addr));
+					UINT32 src_dword = flipendian_int32(space.read_dword(src_addr));
 					space.write_dword(dst_addr, src_dword);
 					src_addr += 4;
 					dst_addr += 4;
@@ -616,7 +616,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 				// FIXME!
 				if (m_dma_ch[ch].count & 3)
 				{
-					UINT32 src_dword = FLIPENDIAN_INT32(space.read_dword(src_addr));
+					UINT32 src_dword = flipendian_int32(space.read_dword(src_addr));
 					UINT32 dst_dword = space.read_dword(dst_addr);
 					UINT32 mask = 0xffffffff >> ((m_dma_ch[ch].count & 3) << 3);
 
@@ -667,19 +667,19 @@ READ32_MEMBER( magictg_state::f0_r )
 
 		case 0xcf8:
 		{
-			val = m_pci->read(space, 0, FLIPENDIAN_INT32(mem_mask));
+			val = m_pci->read(space, 0, flipendian_int32(mem_mask));
 			break;
 		}
 		case 0xcfc:
 		{
-			val = m_pci->read(space, 1, FLIPENDIAN_INT32(mem_mask));
+			val = m_pci->read(space, 1, flipendian_int32(mem_mask));
 			break;
 		}
 //      default:
 //          osd_printf_debug("R: %.8x\n", 0x0f000000 + offset);
 	}
 
-	return FLIPENDIAN_INT32(val);
+	return flipendian_int32(val);
 }
 
 

@@ -212,7 +212,7 @@ INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
 {
 	/* fake something toggling the sense input line of the S2650 */
 	m_main_sense_state ^= 1;
-	m_maincpu->write_sense(m_main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(S2650_SENSE_LINE, m_main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -308,7 +308,7 @@ INTERRUPT_GEN_MEMBER(meadows_state::audio_interrupt)
 {
 	/* fake something toggling the sense input line of the S2650 */
 	m_audio_sense_state ^= 1;
-	m_audiocpu->write_sense(m_audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(S2650_SENSE_LINE, m_audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

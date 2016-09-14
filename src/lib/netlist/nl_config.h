@@ -1,7 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nlconfig.h
+/*!
+ *
+ * \file nl_config.h
  *
  */
 
@@ -75,7 +76,15 @@
 //  GENERAL
 //============================================================
 
-#define NL_USE_MEMPOOL              (0)
+/*! Make use of a memory pool for performance related objects.
+ *
+ * Set to 1 to compile netlist with memory allocations from a
+ * linear memory pool. This is based of the assumption that
+ * due to enhanced locality there will be less cache misses.
+ * Your mileage may vary.
+ *
+ */
+#define USE_MEMPOOL                 (1)
 #define USE_TRUTHTABLE              (1)
 
 //============================================================

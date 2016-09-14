@@ -686,7 +686,7 @@
 		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).ccd" size="3636" crc="8317e961" sha1="57b2aa6bf0a6cf0db7c8d4dfab48d9bc84822736"/>
 		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).img" size="589771056" crc="b49423ab" sha1="66817c10f4cbc7bdf2d7b6dbc46720ccd64b30da"/>
 		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).sub" size="24072288" crc="669c9cdf" sha1="fa434b92fad08829bd67d57b23385c856e77ac9f"/>
-		
+
 		*after conversion with IsoBuster+EAC *
 		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).cue" size="2073" crc="7d4b0d08" sha1="515751787775ca770e3c431914b71f89759d8b1c"/>
 		<rom name="Track01.bin" size="22226400" crc="db0ebcdb" sha1="6eb45ea96131da6a27b47589999b4363a4fe9cfb"/>
@@ -1661,7 +1661,7 @@
 		<rom name="Schwarzschild GX CD (1997)(KOGADO).ccd" size="7542" crc="ac4f05b3" sha1="add60653a0482dddd836c9de107b90b61eae96d2"/>
 		<rom name="Schwarzschild GX CD (1997)(KOGADO).img" size="560345184" crc="5b18f6a7" sha1="55605ee1ef9d3c316de2bf6d2f40265423a9b0a6"/>
 		<rom name="Schwarzschild GX CD (1997)(KOGADO).sub" size="22871232" crc="5a7443c6" sha1="c3e385106fe5994a935f1e6245502c5df7646383"/>
-		
+
 		*after conversion with IsoBuster+EAC *
 		<rom name="Schwarzschild GX CD (1997)(KOGADO).cue" size="4493" crc="a777c5dc" sha1="82d1aa50f8bebaa042eb1ffc3ca3a84994474a4b"/>
 		<rom name="Track01.bin" size="22111152" crc="ea405f75" sha1="010e133a25f397140eefdcf98a1f47a8a52d9391"/>

@@ -170,7 +170,7 @@ static const char *vc4000_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool vc4000_cart_slot_device::call_load()
+image_init_result vc4000_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -179,7 +179,7 @@ bool vc4000_cart_slot_device::call_load()
 		if (size > 0x1800)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for a VC4000 cart");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(size, tag());
@@ -213,21 +213,10 @@ bool vc4000_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", vc4000_get_slot(m_type));
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool vc4000_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
+	return image_init_result::PASS;
 }
 
 

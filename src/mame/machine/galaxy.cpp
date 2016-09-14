@@ -133,14 +133,14 @@ SNAPSHOT_LOAD_MEMBER( galaxy_state, galaxy )
 			snapshot_data = auto_alloc_array(machine(), UINT8, snapshot_size);
 			break;
 		default:
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 	}
 
 	image.fread( snapshot_data, snapshot_size);
 
 	galaxy_setup_snapshot(snapshot_data, snapshot_size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

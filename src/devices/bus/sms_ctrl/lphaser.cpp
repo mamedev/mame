@@ -157,8 +157,8 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 	double dx_radius;
 	bool new_check_point = false;
 
-	aim_area.min_y = MAX(lgun_y - LGUN_RADIUS, visarea.min_y);
-	aim_area.max_y = MIN(lgun_y + LGUN_RADIUS, visarea.max_y);
+	aim_area.min_y = std::max(lgun_y - LGUN_RADIUS, visarea.min_y);
+	aim_area.max_y = std::min(lgun_y + LGUN_RADIUS, visarea.max_y);
 
 	while (!new_check_point)
 	{
@@ -187,8 +187,8 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 			dx_radius = ceil((float) sqrt((float) (r_x_r - (dy * dy))));
 		}
 
-		aim_area.min_x = MAX(lgun_x - dx_radius, visarea.min_x);
-		aim_area.max_x = MIN(lgun_x + dx_radius, visarea.max_x);
+		aim_area.min_x = std::max(INT32(lgun_x - dx_radius), visarea.min_x);
+		aim_area.max_x = std::min(INT32(lgun_x + dx_radius), visarea.max_x);
 
 		while (!new_check_point)
 		{

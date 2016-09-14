@@ -155,7 +155,7 @@ void raiden2cop_device::dma_fill()
 void raiden2cop_device::dma_zsorting(UINT16 data)
 {
 	struct sort_entry {
-		INT16 sorting_key;
+		INT32 sorting_key;
 		UINT16 val;
 	};
 
@@ -163,13 +163,13 @@ void raiden2cop_device::dma_zsorting(UINT16 data)
 	for(int i=0; i<data; i++) {
 		sort_entry &e = entries[i];
 		e.val = m_host_space->read_word(cop_sort_lookup + 2*i);
-		e.sorting_key = m_host_space->read_word(cop_sort_ram_addr + e.val);
+		e.sorting_key = m_host_space->read_dword(cop_sort_ram_addr + e.val);
 	}
 	switch(cop_sort_param) {
-	case 1:
+	case 2:
 		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key > b.sorting_key; });
 		break;
-	case 2:
+	case 1:
 		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key < b.sorting_key; });
 		break;
 	}

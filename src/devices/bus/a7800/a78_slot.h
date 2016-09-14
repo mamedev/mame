@@ -75,7 +75,7 @@ protected:
 };
 
 
-void a78_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
+void a78_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 
 // ======================> a78_cart_slot_device
@@ -94,9 +94,9 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type() { return m_type; };
 	bool has_cart() { return m_cart != nullptr; }
@@ -107,7 +107,6 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	virtual const char *image_interface() const override { return "a7800_cart"; }
 	virtual const char *file_extensions() const override { return "bin,a78"; }
 	virtual device_image_partialhash_func get_partial_hash() const override { return &a78_partialhash; }
@@ -129,7 +128,7 @@ private:
 	device_a78_cart_interface*       m_cart;
 	int m_type;
 
-	int verify_header(char *header);
+	image_verify_result verify_header(char *header);
 	int validate_header(int head, bool log);
 	void internal_header_logging(UINT8 *header, UINT32 len);
 };

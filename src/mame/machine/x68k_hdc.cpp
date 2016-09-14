@@ -47,7 +47,7 @@ void x68k_hdc_image_device::device_start()
 	m_phase = SASI_PHASE_BUSFREE;
 }
 
-bool x68k_hdc_image_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result x68k_hdc_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	// create 20MB HD
 	int x;
@@ -59,10 +59,10 @@ bool x68k_hdc_image_device::call_create(int format_type, util::option_resolution
 	{
 		ret = fwrite(sectordata,256);
 		if(ret < 256)
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )

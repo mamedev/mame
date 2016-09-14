@@ -149,8 +149,8 @@ static const int ENVCNT[0x20]
 #define SR( v )         (m_dsp_regs[((v) << 4) + 6] & 0x1f)       /* Returns SUSTAIN rate         */
 
 /* Handle endianness */
-#define LEtoME16( x ) LITTLE_ENDIANIZE_INT16(x)
-#define MEtoLE16( x ) LITTLE_ENDIANIZE_INT16(x)
+#define LEtoME16( x ) little_endianize_int16(x)
+#define MEtoLE16( x ) little_endianize_int16(x)
 
 
 const device_type SNES = &device_creator<snes_sound_device>;

@@ -505,7 +505,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 	m_cart_rom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart_rom->common_load_rom(m_cart_rom->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

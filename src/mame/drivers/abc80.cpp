@@ -506,7 +506,7 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 	space.write_byte(HEAD + 1, head >> 8);
 	if (LOG) logerror("HEAD %04x\n",address);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

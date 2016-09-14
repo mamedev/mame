@@ -22,6 +22,7 @@
 // misc
 #include "mc1502_rom.h"
 #include "p1_rom.h"
+#include "p1_sound.h"
 
 // non-native
 #include "com.h"

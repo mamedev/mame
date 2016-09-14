@@ -20,7 +20,7 @@ namespace plib {
 pfmt::pfmt(const pstring &fmt)
 : m_str(m_str_buf), m_allocated(0), m_arg(0)
 {
-	unsigned l = fmt.blen() + 1;
+	std::size_t l = fmt.blen() + 1;
 	if (l>sizeof(m_str_buf))
 	{
 		m_allocated = 2 * l;
@@ -32,7 +32,7 @@ pfmt::pfmt(const pstring &fmt)
 pfmt::pfmt(const char *fmt)
 : m_str(m_str_buf), m_allocated(0), m_arg(0)
 {
-	unsigned l = strlen(fmt) + 1;
+	std::size_t l = strlen(fmt) + 1;
 	if (l>sizeof(m_str_buf))
 	{
 		m_allocated = 2 * l;
@@ -55,11 +55,11 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 	char search[10] = "";
 	char buf[2048];
 	m_arg++;
-	int sl = sprintf(search, "{%d:", m_arg);
+	std::size_t sl = static_cast<std::size_t>(sprintf(search, "{%d:", m_arg));
 	char *p = strstr(m_str, search);
 	if (p == nullptr)
 	{
-		sl = sprintf(search, "{%d}", m_arg);
+		sl = static_cast<std::size_t>(sprintf(search, "{%d}", m_arg));
 		p = strstr(m_str, search);
 		if (p == nullptr)
 		{
@@ -75,8 +75,8 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 				char *p1 = strstr(p, "}");
 				if (p1 != nullptr)
 				{
-					sl = p1 - p + 1;
-					strncat(fmt, p+1, p1 - p - 2);
+					sl = static_cast<std::size_t>(p1 - p + 1);
+					strncat(fmt, p+1, static_cast<std::size_t>(p1 - p - 2));
 				}
 				else
 					strcat(fmt, f);
@@ -90,11 +90,11 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 		char *p1 = strstr(p, "}");
 		if (p1 != nullptr)
 		{
-			sl = p1 - p + 1;
+			sl = static_cast<std::size_t>(p1 - p + 1);
 			if (m_arg>=10)
-				strncat(fmt, p+4, p1 - p - 4);
+				strncat(fmt, p+4, static_cast<std::size_t>(p1 - p - 4));
 			else
-				strncat(fmt, p+3, p1 - p - 3);
+				strncat(fmt, p+3, static_cast<std::size_t>(p1 - p - 3));
 		}
 		else
 			strcat(fmt, f);
@@ -113,14 +113,14 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 	}
 	else
 		strcat(fmt, fmt_spec);
-	int nl = vsprintf(buf, fmt, ap);
+	std::size_t nl = static_cast<std::size_t>(vsprintf(buf, fmt, ap));
 	if (p != nullptr)
 	{
 		// check room
-		unsigned new_size = (p - m_str) + nl + strlen(p) + 1 - sl;
+		std::size_t new_size = static_cast<std::size_t>(p - m_str) + nl + strlen(p) + 1 - sl;
 		if (new_size > m_allocated)
 		{
-			unsigned old_alloc = std::max(m_allocated, (unsigned) sizeof(m_str_buf));
+			std::size_t old_alloc = std::max(m_allocated, sizeof(m_str_buf));
 			if (m_allocated < old_alloc)
 				m_allocated = old_alloc;
 			while (new_size > m_allocated)

@@ -11,43 +11,13 @@
 
 #include "sparcdasm.h"
 
-#define SPARCV8			(0)
-#define LOG_FCODES		(0)
+#define SPARCV8         (0)
+#define LOG_FCODES      (0)
 
 #if LOG_FCODES
 #include <map>
 #endif
 
-#define SPARC_NO_TRAP						256
-#define SPARC_RESET							0
-#define SPARC_INSTRUCTION_ACCESS_EXCEPTION	1
-#define SPARC_ILLEGAL_INSTRUCTION			2
-#define SPARC_PRIVILEGED_INSTRUCTION		3
-#define SPARC_FP_DISABLED					4
-#define SPARC_WINDOW_OVERFLOW				5
-#define SPARC_WINDOW_UNDERFLOW				6
-#define SPARC_MEM_ADDRESS_NOT_ALIGNED		7
-#define SPARC_FLOATING_POINT_EXCEPTION		8
-#define SPARC_DATA_ACCESS_EXCEPTION			9
-#define SPARC_TAG_OVERFLOW					10
-#define SPARC_INT1							17
-#define SPARC_INT2							18
-#define SPARC_INT3							19
-#define SPARC_INT4							20
-#define SPARC_INT5							21
-#define SPARC_INT6							22
-#define SPARC_INT7							23
-#define SPARC_INT8							24
-#define SPARC_INT9							25
-#define SPARC_INT10							26
-#define SPARC_INT11							27
-#define SPARC_INT12							28
-#define SPARC_INT13							29
-#define SPARC_INT14							30
-#define SPARC_INT15							31
-#define SPARC_TRAP_INSTRUCTION				128
-
-#define SPARC_FPU_SEQUENCE_ERROR
 // TODO: when there are more SPARC CPUs, move setter to a base class
 #define MCFG_SPARC_ADD_ASI_DESC(desc) \
 	mb86901_device::add_asi_desc(*device, desc);
@@ -84,6 +54,12 @@ public:
 	UINT32 pc() { return m_pc; }
 
 	template<typename T> static void add_asi_desc(device_t &device, const T &desc) { return downcast<mb86901_device &>(device).add_asi_desc(desc); }
+
+#if LOG_FCODES
+	void enable_log_fcodes(bool enable) { m_log_fcodes = enable; }
+#else
+	void enable_log_fcodes(bool /*enable*/) { }
+#endif
 
 protected:
 	template<typename T> void add_asi_desc(const T &desc) { m_dasm.add_asi_desc(desc); }
@@ -133,6 +109,7 @@ protected:
 #if LOG_FCODES
 	void indent();
 	void disassemble_ss1_fcode(UINT32 r5, UINT32 opcode, UINT32 handler_base, UINT32 entry_point, UINT32 stack);
+	void log_fcodes();
 #endif
 
 	// address spaces
@@ -248,6 +225,7 @@ protected:
 	UINT32 m_ss1_next_entry_point;
 	UINT32 m_ss1_next_stack;
 	std::map<UINT16, std::string> m_ss1_fcode_table;
+	bool m_log_fcodes;
 #endif
 
 	// processor configuration
@@ -308,7 +286,8 @@ enum
 	SPARC_IRQ13,
 	SPARC_IRQ14,
 	SPARC_NMI,
-	SPARC_MAE
+	SPARC_MAE,
+	SPARC_RESET
 };
 
 #endif /* __SPARC_H__ */

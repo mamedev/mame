@@ -193,7 +193,7 @@ static MACHINE_CONFIG_START( igt_gameking, igt_gameking_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz) // enhanced sound on optional Media-Lite sub board
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

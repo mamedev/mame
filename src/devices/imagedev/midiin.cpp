@@ -103,7 +103,7 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
     call_load
 -------------------------------------------------*/
 
-bool midiin_device::call_load(void)
+image_init_result midiin_device::call_load(void)
 {
 	m_midi = machine().osd().create_midi_device();
 
@@ -111,12 +111,12 @@ bool midiin_device::call_load(void)
 	{
 		global_free(m_midi);
 		m_midi = nullptr;
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
 	m_timer->enable(true);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------

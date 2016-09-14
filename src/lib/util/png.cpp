@@ -62,13 +62,13 @@ static inline UINT8 fetch_8bit(UINT8 *v)
 #ifdef UNUSED_FUNCTION
 static inline UINT16 fetch_16bit(UINT8 *v)
 {
-	return BIG_ENDIANIZE_INT16(*(UINT16 *)v);
+	return big_endianize_int16(*(UINT16 *)v);
 }
 #endif
 
 static inline UINT32 fetch_32bit(UINT8 *v)
 {
-	return BIG_ENDIANIZE_INT32(*(UINT32 *)v);
+	return big_endianize_int32(*(UINT32 *)v);
 }
 
 
@@ -81,13 +81,13 @@ static inline void put_8bit(UINT8 *v, UINT8 data)
 #ifdef UNUSED_FUNCTION
 static inline void put_16bit(UINT8 *v, UINT16 data)
 {
-	*(UINT16 *)v = BIG_ENDIANIZE_INT16(data);
+	*(UINT16 *)v = big_endianize_int16(data);
 }
 #endif
 
 static inline void put_32bit(UINT8 *v, UINT32 data)
 {
-	*(UINT32 *)v = BIG_ENDIANIZE_INT32(data);
+	*(UINT32 *)v = big_endianize_int32(data);
 }
 
 

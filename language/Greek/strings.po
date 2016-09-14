@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-07 23:13+0200\n"
-"PO-Revision-Date: 2016-04-16 17:53+0300\n"
+"PO-Revision-Date: 2016-07-09 10:52+0300\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -1429,91 +1429,91 @@ msgstr "Χρήση Εξωτερικών Δειγμάτων Ήχου"
 
 #: src/frontend/mame/ui/submenu.cpp:21
 msgid "Miscellaneous Options"
-msgstr ""
+msgstr "Διάφορες Επιλογές"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Re-select last machine played"
-msgstr ""
+msgstr "Επιλογή του τελευταίου μηχανήματος που έπαιζε"
 
 #: src/frontend/mame/ui/submenu.cpp:23
 msgid "Enlarge images in the right panel"
-msgstr ""
+msgstr "Μεγέθυνση εικόνων στο δεξιό πίνακα"
 
 #: src/frontend/mame/ui/submenu.cpp:24
 msgid "DATs info"
-msgstr ""
+msgstr "Πληροφορίες DATs"
 
 #: src/frontend/mame/ui/submenu.cpp:26
 msgid "Show mouse pointer"
-msgstr ""
+msgstr "Εμφάνιση δείκτη ποντικιού"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
-msgstr ""
+msgstr "Επιβεβαίωση εγκατάληψης από μηχάνημα"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
-msgstr ""
+msgstr "Να μην εμφανίζεται η οθόνη πληροφοριών κατά την εκκίνηση"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
-msgstr ""
+msgstr "Επιβολή 4:3 Εμφάνισης για το στιγμιότυπο"
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Use image as background"
-msgstr ""
+msgstr "Χρήση εικόνας ως φόντου"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip bios selection menu"
-msgstr ""
+msgstr "Παράλειψη μενού επιλογής bios"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
-msgstr ""
+msgstr "Παράλειψη μενού επιλογής τμημάτων λογισμικού"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
-msgstr ""
+msgstr "Αυτόματος έλεγχος πληροφοριών"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Hide romless machine from available list"
-msgstr ""
+msgstr "Απόκρυψη μηχανημάτων που δεν χρειάζονται roms από τη λίστα διαθέσιμων"
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Advanced Options"
-msgstr ""
+msgstr "Επιλογές για προχωρημένους"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Performance Options"
-msgstr ""
+msgstr "Επιλογές Επιδόσεων"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
-msgstr ""
+msgstr "Αυτόματη παράβλεψη καρέ"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
-msgstr ""
+msgstr "Παράβλεψη καρέ"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Throttle"
-msgstr ""
+msgstr "Πλήρης ισχύς"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Sleep"
-msgstr ""
+msgstr "Λειτουργία ύπνου"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Speed"
-msgstr ""
+msgstr "Ταχύτητα"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Refresh speed"
-msgstr ""
+msgstr "Ταχύτητα ανανέωσης"
 
 #: src/frontend/mame/ui/submenu.cpp:47
 msgid "Rotation Options"
-msgstr ""
+msgstr "Επιλογές περιστροφής"
 
 #: src/frontend/mame/ui/submenu.cpp:48 src/frontend/mame/ui/videoopt.cpp:204
 msgid "Rotate"
@@ -1521,215 +1521,215 @@ msgstr "Περιστροφή"
 
 #: src/frontend/mame/ui/submenu.cpp:49
 msgid "Rotate right"
-msgstr ""
+msgstr "Περιστροφή δεξιά"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate left"
-msgstr ""
+msgstr "Περιστροφή αριστερά"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
-msgstr ""
+msgstr "Αυτόματη περιστροφή δεξιά"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Auto rotate left"
-msgstr ""
+msgstr "Αυτόματη περιστροφή αριστερά"
 
 #: src/frontend/mame/ui/submenu.cpp:53
 msgid "Flip X"
-msgstr ""
+msgstr "Οριζόντια περιστροφή"
 
 #: src/frontend/mame/ui/submenu.cpp:54
 msgid "Flip Y"
-msgstr ""
+msgstr "Κάθετη περιστροφή"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Artwork Options"
-msgstr ""
+msgstr "Επιλογές artwork"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Crop"
-msgstr ""
+msgstr "Αποκοπή Artworks"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Use Backdrops"
-msgstr ""
+msgstr "Χρήση Backdrops"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Use Overlays"
-msgstr ""
+msgstr "Χρήση Overlays"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Use Bezels"
-msgstr ""
+msgstr "Χρήση Bezels"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Use Control Panels"
-msgstr ""
+msgstr "Χρήση Control Panels"
 
 #: src/frontend/mame/ui/submenu.cpp:62
 msgid "Use Marquees"
-msgstr ""
+msgstr "Χρήση Marquees"
 
 #: src/frontend/mame/ui/submenu.cpp:64
 msgid "State/Playback Options"
-msgstr ""
+msgstr "Επιλογές Κατάστασης/Αναπαραγωγής"
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "Αυτόματη αποθήκευση/επαναφορά"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Bilinear snapshot"
-msgstr ""
+msgstr "Στιγμιότυπο Bilinear"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Burn-in"
-msgstr ""
+msgstr "Burn-in"
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Input Options"
-msgstr ""
+msgstr "Επιλογές Χειρισμού"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Coin lockout"
-msgstr ""
+msgstr "Κλειδωμα κερμάτων"
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Mouse"
-msgstr ""
+msgstr "Ποντίκι"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Joystick"
-msgstr ""
+msgstr "Μοχλός"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Lightgun"
-msgstr ""
+msgstr "Lightgun"
 
 #: src/frontend/mame/ui/submenu.cpp:74
 msgid "Multi-keyboard"
-msgstr ""
+msgstr "Πολλαπλό-πληκτρολόγιο"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "Multi-mouse"
-msgstr ""
+msgstr "Πολλαπλό-ποντίκι"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Steadykey"
-msgstr ""
+msgstr "Σταθερά πλήκτρα"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "UI active"
-msgstr ""
+msgstr "UI ενεργοποιημένο"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Offscreen reload"
-msgstr ""
+msgstr "Επαναφόρτωση εκτός οθόνης"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Joystick deadzone"
-msgstr ""
+msgstr "Νεκρή ζώνη μοχλού"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Joystick saturation"
-msgstr ""
+msgstr "Κορεσμός μοχλού"
 
 #: src/frontend/mame/ui/submenu.cpp:81
 msgid "Natural keyboard"
-msgstr ""
+msgstr "Φυσικό πληκτρολόγιο"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Simultaneous contradictory"
-msgstr ""
+msgstr "Ταυτόχρονη αναίρεση"
 
 #: src/frontend/mame/ui/submenu.cpp:83
 msgid "Coin impulse"
-msgstr ""
+msgstr "Ώθηση κερμάτων"
 
 #: src/frontend/mame/ui/submenu.cpp:87
 msgid "Device Mapping"
-msgstr ""
+msgstr "Χαρτογράφηση Συσκευών"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Lightgun Device Assignment"
-msgstr ""
+msgstr "Ανάθεση Συσκευής Lightgun "
 
 #: src/frontend/mame/ui/submenu.cpp:89
 msgid "Trackball Device Assignment"
-msgstr ""
+msgstr "Ανάθεση Συσκευής Trackball"
 
 #: src/frontend/mame/ui/submenu.cpp:90
 msgid "Pedal Device Assignment"
-msgstr ""
+msgstr "Ανάθεση Συσκευής Pedal"
 
 #: src/frontend/mame/ui/submenu.cpp:91
 msgid "Adstick Device Assignment"
-msgstr ""
+msgstr "Ανάθεση Συσκευής Adstick"
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Paddle Device Assignment"
-msgstr ""
+msgstr "Ανάθεση Συσκευής Paddle"
 
 #: src/frontend/mame/ui/submenu.cpp:93
 msgid "Dial Device Assignment"
-msgstr ""
+msgstr "Ανάθεση Συσκευής Dial"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Positional Device Assignment"
-msgstr ""
+msgstr "Ανάθεση Συσκευής Posisional"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Mouse Device Assignment"
-msgstr ""
+msgstr "Ανάθεση Συσκευής Ποντικιού"
 
 #: src/frontend/mame/ui/submenu.cpp:100
 msgid "Video Mode"
-msgstr ""
+msgstr "Λειτουργία βίντεο"
 
 #: src/frontend/mame/ui/submenu.cpp:101
 msgid "Number Of Screens"
-msgstr ""
+msgstr "Αριθμός οθονών"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Triple Buffering"
-msgstr ""
+msgstr "Triple Buffering"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "HLSL"
-msgstr ""
+msgstr "HLSL"
 
 #: src/frontend/mame/ui/submenu.cpp:106
 msgid "GLSL"
-msgstr ""
+msgstr "GLSL"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Bilinear Filtering"
-msgstr ""
+msgstr "Bilinear Filtering"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "Bitmap Prescaling"
 
 #: src/frontend/mame/ui/submenu.cpp:109
 msgid "Window Mode"
-msgstr ""
+msgstr "Λειτουργία παραθύρου"
 
 #: src/frontend/mame/ui/submenu.cpp:110
 msgid "Enforce Aspect Ratio"
-msgstr ""
+msgstr "Επιβολή Αναλογίας Εικόνας"
 
 #: src/frontend/mame/ui/submenu.cpp:111
 msgid "Start Out Maximized"
-msgstr ""
+msgstr "Εκκίνηση μεγιστοποιημένο"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "Συγχρονισμένη Ανανέωση"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "Αναμονή για Κάθετο Συγχρονισμό"
 
 #: src/frontend/mame/ui/swlist.cpp:72
 msgid "[file manager]"

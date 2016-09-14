@@ -489,7 +489,7 @@ public:
 			x11_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
 		}
 
-		osd_printf_verbose("Lightgun: End initialization\n"); 
+		osd_printf_verbose("Lightgun: End initialization\n");
 	}
 
 	bool should_poll_devices(running_machine &machine) override

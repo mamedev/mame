@@ -123,8 +123,8 @@ void astrocade_device::sound_stream_update(sound_stream &stream, stream_sample_t
 
 		/* compute the number of cycles until the next master oscillator reset */
 		/* or until the next noise boundary */
-		samples_this_time = MIN(samples, 256 - master_count);
-		samples_this_time = MIN(samples_this_time, 64 - noise_clock);
+		samples_this_time = std::min(samples, 256 - master_count);
+		samples_this_time = std::min(samples_this_time, 64 - noise_clock);
 		samples -= samples_this_time;
 
 		/* sum the output of the tone generators */

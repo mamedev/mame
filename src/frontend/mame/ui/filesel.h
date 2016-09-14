@@ -30,13 +30,11 @@ public:
 		FILE
 	};
 
-	menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, result &result);
+	menu_file_selector(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, result &result);
 	virtual ~menu_file_selector() override;
-	virtual void populate() override;
-	virtual void handle() override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 protected:
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool custom_mouse_down() override;
 
 private:
@@ -65,9 +63,12 @@ private:
 	bool                        m_has_softlist;
 	bool                        m_has_create;
 	result &                    m_result;
-	std::vector<file_selector_entry>	m_entrylist;
+	std::vector<file_selector_entry>    m_entrylist;
 	std::string                 m_hover_directory;
-	std::string					m_filename;
+	std::string                 m_filename;
+
+	virtual void populate() override;
+	virtual void handle() override;
 
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
@@ -91,7 +92,7 @@ public:
 		WRITE_OTHER,
 		WRITE_DIFF
 	};
-	menu_select_rw(mame_ui_manager &mui, render_container *container,
+	menu_select_rw(mame_ui_manager &mui, render_container &container,
 						bool can_in_place, result &result);
 	virtual ~menu_select_rw() override;
 	virtual void populate() override;

@@ -876,12 +876,12 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 		int curwidth;
 
 		/* determine the maximal width */
-		maxwidth = MAX(maxwidth, bitmaps[bmnum].width());
+		maxwidth = std::max(maxwidth, bitmaps[bmnum].width());
 		curwidth = bitmaps[0].width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE + maxwidth;
-		width = MAX(width, curwidth);
+		width = std::max(width, curwidth);
 
 		/* add to the height */
-		height += MAX(bitmaps[0].height(), bitmaps[bmnum].height());
+		height += std::max(bitmaps[0].height(), bitmaps[bmnum].height());
 		if (bmnum != 1)
 			height += BITMAP_SPACE;
 	}
@@ -895,7 +895,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	{
 		bitmap_argb32 &bitmap1 = bitmaps[0];
 		bitmap_argb32 &bitmap2 = bitmaps[bmnum];
-		int curheight = MAX(bitmap1.height(), bitmap2.height());
+		int curheight = std::max(bitmap1.height(), bitmap2.height());
 		int x, y;
 
 		/* iterate over rows in these bitmaps */
@@ -921,7 +921,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 		}
 
 		/* update the starting Y position */
-		starty += BITMAP_SPACE + MAX(bitmap1.height(), bitmap2.height());
+		starty += BITMAP_SPACE + std::max(bitmap1.height(), bitmap2.height());
 	}
 
 	/* write the final PNG */

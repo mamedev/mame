@@ -586,6 +586,7 @@ MACHINES["APPLE_FDC"] = true
 MACHINES["SONY_DRIVE"] = true
 MACHINES["SCNXX562"] = true
 MACHINES["FGA002"] = true
+MACHINES["INPUT_MERGER"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -601,8 +602,13 @@ BUSES["ADAM"] = true
 BUSES["ADAMNET"] = true
 BUSES["APF"] = true
 BUSES["APRICOT_EXPANSION"] = true
+BUSES["APRICOT_KEYBOARD"] = true
 BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
+BUSES["BBC_ANALOGUE"] = true
+BUSES["BBC_1MHZBUS"] = true
+BUSES["BBC_TUBE"] = true
+BUSES["BBC_USERPORT"] = true
 BUSES["BML3"] = true
 BUSES["BW2"] = true
 BUSES["C64"] = true
@@ -673,6 +679,7 @@ BUSES["SMS_EXP"] = true
 BUSES["SNES"] = true
 BUSES["SNES_CTRL"] = true
 BUSES["SPC1000"] = true
+BUSES["SUNKBD"] = true
 BUSES["SVI_EXPANDER"] = true
 BUSES["SVI_SLOT"] = true
 BUSES["TI99PEB"] = true
@@ -1127,8 +1134,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/apricotp.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
-	MAME_DIR .. "src/mame/machine/apricotkb_hle.cpp",
-	MAME_DIR .. "src/mame/machine/apricotkb_hle.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",
 	MAME_DIR .. "src/mame/includes/victor9k.h",
 	MAME_DIR .. "src/mame/machine/victor9kb.cpp",
@@ -1448,6 +1453,9 @@ files {
 	MAME_DIR .. "src/mame/video/pk8020.cpp",
 	MAME_DIR .. "src/mame/drivers/pyl601.cpp",
 	MAME_DIR .. "src/mame/drivers/sm1800.cpp",
+	MAME_DIR .. "src/mame/drivers/sm7238.cpp",
+	MAME_DIR .. "src/mame/machine/km035.cpp",
+	MAME_DIR .. "src/mame/machine/km035.h",
 	MAME_DIR .. "src/mame/drivers/uknc.cpp",
 	MAME_DIR .. "src/mame/drivers/unior.cpp",
 	MAME_DIR .. "src/mame/drivers/ut88.cpp",
@@ -2719,6 +2727,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ts803.cpp",
 	MAME_DIR .. "src/mame/drivers/ts816.cpp",
 	MAME_DIR .. "src/mame/drivers/tv950.cpp",
+	MAME_DIR .. "src/mame/drivers/tv990.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "tem")
@@ -3091,6 +3100,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/dim68k.cpp",
 	MAME_DIR .. "src/mame/drivers/dm7000.cpp",
 	MAME_DIR .. "src/mame/includes/dm7000.h",
+	MAME_DIR .. "src/mame/drivers/dmax8000.cpp",
 	MAME_DIR .. "src/mame/drivers/dmv.cpp",
 	MAME_DIR .. "src/mame/machine/dmv_keyb.cpp",
 	MAME_DIR .. "src/mame/machine/dmv_keyb.h",

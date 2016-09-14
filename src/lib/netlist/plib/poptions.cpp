@@ -113,11 +113,13 @@ namespace plib {
 			}
 			else if (arg.startsWith("-"))
 			{
-				opt = getopt_short(arg.substr(1,1));
-				if (arg.len() > 2)
+				auto p = arg.begin() + 1;
+				opt = getopt_short(arg.substr(p,p + 1));
+				++p;
+				if (p != arg.end())
 				{
 					has_equal_arg = true;
-					opt_arg = arg.substr(2);
+					opt_arg = arg.substr(p);
 				}
 			}
 			else
@@ -204,7 +206,7 @@ namespace plib {
 							{
 								line += v + "|";
 							}
-							line = line.left(line.len() - 1);
+							line = line.left(line.begin() + (line.len() - 1));
 						}
 						else
 							line += "Value";

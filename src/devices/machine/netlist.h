@@ -62,6 +62,14 @@
 	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_analog_input_t, input_changed, 0)
 
 
+#define MEMREGION_SOURCE(_name) \
+		setup.register_source(plib::make_unique_base<netlist::source_t, netlist_source_memregion_t>(_name));
+
+#define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
+	void _name(const double data, const attotime &time)
+
+
+
 // ----------------------------------------------------------------------------------------
 // Extensions to interface netlist with MAME code ....
 // ----------------------------------------------------------------------------------------
@@ -78,12 +86,6 @@ public:
 private:
 	pstring m_name;
 };
-
-#define MEMREGION_SOURCE(_name) \
-		setup.register_source(plib::make_unique_base<netlist::source_t, netlist_source_memregion_t>(_name));
-
-#define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
-	void _name(const double data, const attotime &time)
 
 class netlist_mame_device_t;
 
@@ -427,7 +429,7 @@ public:
 	inline void write(const UINT32 val)
 	{
 		const UINT32 v = (val >> m_shift) & m_mask;
-		if (v != m_param->Value())
+		if (v != (*m_param)())
 			synchronize(0, v);
 	}
 
@@ -473,7 +475,7 @@ public:
 	inline void write(const UINT32 val)
 	{
 		const UINT32 v = (val >> m_shift) & 1;
-		if (v != m_param->Value())
+		if (v != (*m_param)())
 			synchronize(0, v);
 	}
 
@@ -575,11 +577,11 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		nl_double cur = INPANALOG(m_in);
+		nl_double cur = m_in();
 
 		// FIXME: make this a parameter
 		// avoid calls due to noise
-		if (fabs(cur - m_last) > 1e-6)
+		if (std::fabs(cur - m_last) > 1e-6)
 		{
 			m_cpu_device->update_time_x();
 			m_callback(cur, m_cpu_device->local_time());
@@ -635,7 +637,7 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		nl_double val = INPANALOG(m_in) * m_mult.Value() + m_offset.Value();
+		nl_double val = m_in() * m_mult() + m_offset();
 		sound_update(netlist().time());
 		/* ignore spikes */
 		if (std::abs(val) < 32767.0)
@@ -707,12 +709,12 @@ public:
 		m_pos = 0;
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			if (m_param_name[i]->Value() != "")
+			if ((*m_param_name[i])() != pstring(""))
 			{
 				if (i != m_num_channel)
 					netlist().log().fatal("sound input numbering has to be sequential!");
 				m_num_channel++;
-				m_param[i] = dynamic_cast<netlist::param_double_t *>(setup().find_param(m_param_name[i]->Value(), true));
+				m_param[i] = dynamic_cast<netlist::param_double_t *>(setup().find_param((*m_param_name[i])(), true));
 			}
 		}
 		return m_num_channel;
@@ -725,10 +727,10 @@ public:
 			if (m_buffer[i] == nullptr)
 				break; // stop, called outside of stream_update
 			const nl_double v = m_buffer[i][m_pos];
-			m_param[i]->setTo(v * m_param_mult[i]->Value() + m_param_offset[i]->Value());
+			m_param[i]->setTo(v * (*m_param_mult[i])() + (*m_param_offset[i])());
 		}
 		m_pos++;
-		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
+		m_Q.push(!m_Q.net().new_Q(), m_inc  );
 	}
 
 public:

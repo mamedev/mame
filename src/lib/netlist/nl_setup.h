@@ -120,8 +120,8 @@ namespace netlist
 	{
 		pstring name;
 		pstring classname;
-		unsigned ni;
-		unsigned no;
+		unsigned long ni;
+		unsigned long no;
 		pstring def_param;
 		plib::pstring_vector_t desc;
 		pstring family;
@@ -184,7 +184,7 @@ namespace netlist
 
 		void register_and_set_param(pstring name, param_t &param);
 
-		void register_term(core_terminal_t &obj);
+		void register_term(detail::core_terminal_t &obj);
 
 		void register_dev(const pstring &classname, const pstring &name);
 
@@ -207,7 +207,7 @@ namespace netlist
 
 		void remove_connections(const pstring attach);
 
-		bool connect(core_terminal_t &t1, core_terminal_t &t2);
+		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		bool device_exists(const pstring name) const;
 
@@ -250,11 +250,6 @@ namespace netlist
 
 		void model_parse(const pstring &model, model_map_t &map);
 
-		plib::plog_base<NL_DEBUG> &log();
-		const plib::plog_base<NL_DEBUG> &log() const;
-
-		std::vector<std::pair<pstring, base_factory_t *>> m_device_factory;
-
 		/* FIXME: truth table trampoline */
 
 		void tt_factory_create(tt_desc &desc);
@@ -262,47 +257,44 @@ namespace netlist
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
 
-	protected:
+		plib::plog_base<NL_DEBUG> &log();
+		const plib::plog_base<NL_DEBUG> &log() const;
+
+		std::vector<std::pair<pstring, base_factory_t *>> m_device_factory;
+
+		std::unordered_map<pstring, pstring> m_alias;
+		std::unordered_map<pstring, pstring> m_param_values;
+		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 	private:
 
-		core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
-		core_terminal_t *find_terminal(const pstring &outname_in, device_object_t::type_t atype, bool required = true);
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::device_object_t::type_t atype, bool required = true);
 
-		void connect_terminals(core_terminal_t &in, core_terminal_t &out);
-		void connect_input_output(core_terminal_t &in, core_terminal_t &out);
-		void connect_terminal_output(terminal_t &in, core_terminal_t &out);
-		void connect_terminal_input(terminal_t &term, core_terminal_t &inp);
-		bool connect_input_input(core_terminal_t &t1, core_terminal_t &t2);
+		void connect_terminals(detail::core_terminal_t &in, detail::core_terminal_t &out);
+		void connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out);
+		void connect_terminal_output(terminal_t &in, detail::core_terminal_t &out);
+		void connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp);
+		bool connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		// helpers
-		pstring objtype_as_str(device_object_t &in) const;
+		pstring objtype_as_str(detail::device_object_t &in) const;
 
-		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);
+		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 
-		netlist_t &m_netlist;
+		netlist_t                                   &m_netlist;
+		std::unordered_map<pstring, param_ref_t>    m_params;
+		std::vector<link_t>                         m_links;
+		factory_list_t                              m_factory;
+		std::unordered_map<pstring, pstring>        m_models;
 
-	public:
-		std::unordered_map<pstring, pstring> m_alias;
-		std::unordered_map<pstring, param_ref_t>  m_params;
-		std::unordered_map<pstring, pstring> m_param_values;
-		std::unordered_map<pstring, core_terminal_t *> m_terminals;
-	private:
+		std::stack<pstring>                         m_namespace_stack;
+		source_t::list_t                            m_sources;
+		std::vector<plib::ppreprocessor::define_t>  m_defines;
+		std::vector<pstring>                        m_lib;
 
-		std::vector<link_t> m_links;
-
-		factory_list_t m_factory;
-
-		std::unordered_map<pstring, pstring> m_models;
-
-		int m_proxy_cnt;
-		int m_frontier_cnt;
-
-		std::stack<pstring> m_namespace_stack;
-		source_t::list_t m_sources;
-		std::vector<plib::ppreprocessor::define_t> m_defines;
-		std::vector<pstring> m_lib;
-
+		unsigned m_proxy_cnt;
+		unsigned m_frontier_cnt;
 	};
 
 	// ----------------------------------------------------------------------------------------

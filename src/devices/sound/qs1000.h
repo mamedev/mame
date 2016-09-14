@@ -102,7 +102,7 @@ public:
 
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
-	
+
 	DECLARE_READ8_MEMBER( data_to_i8052 );
 
 	enum

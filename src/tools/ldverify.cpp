@@ -536,8 +536,8 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 		}
 
 		// update the overall min/max
-		video.min_overall = MIN(yminval, video.min_overall);
-		video.max_overall = MAX(ymaxval, video.max_overall);
+		video.min_overall = std::min(yminval, video.min_overall);
+		video.max_overall = std::max(ymaxval, video.max_overall);
 
 		// track low fields
 		if (yminval <= 0)

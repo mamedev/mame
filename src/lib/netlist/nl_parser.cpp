@@ -152,9 +152,9 @@ void parser_t::net_truthtable_start()
 {
 	pstring name = get_identifier();
 	require_token(m_tok_comma);
-	unsigned ni = get_number_long();
+	long ni = get_number_long();
 	require_token(m_tok_comma);
-	unsigned no = get_number_long();
+	long no = get_number_long();
 	require_token(m_tok_comma);
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
@@ -162,8 +162,8 @@ void parser_t::net_truthtable_start()
 	netlist::tt_desc desc;
 	desc.classname = name;
 	desc.name = name;
-	desc.ni = ni;
-	desc.no = no;
+	desc.ni = static_cast<unsigned long>(ni);
+	desc.no = static_cast<unsigned long>(no);
 	desc.def_param = "+" + def_param;
 	desc.family = "";
 
@@ -317,8 +317,8 @@ void parser_t::dippins()
 	}
 	if ((pins.size() % 2) == 1)
 		error("You must pass an equal number of pins to DIPPINS");
-	unsigned n = pins.size();
-	for (unsigned i = 0; i < n / 2; i++)
+	std::size_t n = pins.size();
+	for (std::size_t i = 0; i < n / 2; i++)
 	{
 		m_setup.register_alias(plib::pfmt("{1}")(i+1), pins[i*2]);
 		m_setup.register_alias(plib::pfmt("{1}")(n-i), pins[i*2 + 1]);
@@ -410,7 +410,7 @@ void parser_t::device(const pstring &dev_type)
 			tok = get_token();
 		}
 		if (cnt != termlist.size())
-			m_setup.log().fatal("netlist: input count mismatch for {1} - expected {2} found {3}\n", devname, termlist.size(), cnt);
+			error(plib::pfmt("Input count mismatch for {1} - expected {2} found {3}")(devname)(termlist.size())(cnt));
 		require_token(tok, m_tok_param_right);
 	}
 }
@@ -446,7 +446,7 @@ nl_double parser_t::eval_param(const token_t tok)
 		val = tok.str();
 		ret = val.as_double(&e);
 		if (e)
-			error(plib::pfmt("Error with parameter {1}...\n")(val));
+			error(plib::pfmt("Parameter value <{1}> not double \n")(val));
 	}
 	return ret * facs[f];
 

@@ -4,31 +4,31 @@
 *
 *   Force Computer FGA-002 Force Gate Array
 *
-*	Documetation: http://bitsavers.informatik.uni-stuttgart.de/pdf/forceComputers/201559_FGA-002_Nov96.pdf
+*   Documetation: http://bitsavers.informatik.uni-stuttgart.de/pdf/forceComputers/201559_FGA-002_Nov96.pdf
 *
-*	The FGA-002 gate array is a high speed CMOS device manufactured in 1.2 micron technology and containing 24,000 gates in a 281 pin PGA
-*	package. It provides interfaces to the 68020/30 microprocessor as well as a VMEbus compatible interface.
-*	The auxilary interface of the gate array is a high speed data channel used by the internal 32 bit DMA controller. The interface
-*	allows data transfer rates of up to 6 MByte/second. The timing of the local I/O interface is programmable and provides
-*	easy interfacing of local I/O devices. All control, address and data lines of the CPU and the VMEbus are either directly connected or 
-*	connected via buffers to the gate array allowing easy implementation and usage. The gate array registers are programmed by the local CPU.
+*   The FGA-002 gate array is a high speed CMOS device manufactured in 1.2 micron technology and containing 24,000 gates in a 281 pin PGA
+*   package. It provides interfaces to the 68020/30 microprocessor as well as a VMEbus compatible interface.
+*   The auxilary interface of the gate array is a high speed data channel used by the internal 32 bit DMA controller. The interface
+*   allows data transfer rates of up to 6 MByte/second. The timing of the local I/O interface is programmable and provides
+*   easy interfacing of local I/O devices. All control, address and data lines of the CPU and the VMEbus are either directly connected or
+*   connected via buffers to the gate array allowing easy implementation and usage. The gate array registers are programmed by the local CPU.
 *
-*	FEATURES:
-*	- Programmable decoding for CPU and VME access to the local main memory
-*	- Interrupt management for internal and external interrupt sources
-*	- 32 bit multi-port DMA Controller 
-*	- FORCE Message Broadcast slave interface with 2 message channels
-*	- 8 interrupt capable MAILBOXES
-*	- 8 bit TIMER with 16 selectable internal source clocks
+*   FEATURES:
+*   - Programmable decoding for CPU and VME access to the local main memory
+*   - Interrupt management for internal and external interrupt sources
+*   - 32 bit multi-port DMA Controller
+*   - FORCE Message Broadcast slave interface with 2 message channels
+*   - 8 interrupt capable MAILBOXES
+*   - 8 bit TIMER with 16 selectable internal source clocks
 *
 *
-*	CAUTION (from the documentation - no unducumented registers are currently emulated )
-*	The FGA-002 gate array contains registers, which are used to configure the gate array for special external hardware
-*	requirements. These registers are reserved and will be setup by the boot software according to the hardware environment in which the gate array is
-*	implemented. These registers must not be changed by the user. Some of these hardware configuration registers also contain user selectable bits.
-*	Programming the contents of these registers has to be done carefully without changing the bits initialized by the boot software.
-*	Registers not described must not be programmed. Unqualified changes of register bits may have unpredictable consequences for the gate array and 
-*	external hardware. It is expressly forbidden to change register bits, except those defined for the user.
+*   CAUTION (from the documentation - no unducumented registers are currently emulated )
+*   The FGA-002 gate array contains registers, which are used to configure the gate array for special external hardware
+*   requirements. These registers are reserved and will be setup by the boot software according to the hardware environment in which the gate array is
+*   implemented. These registers must not be changed by the user. Some of these hardware configuration registers also contain user selectable bits.
+*   Programming the contents of these registers has to be done carefully without changing the bits initialized by the boot software.
+*   Registers not described must not be programmed. Unqualified changes of register bits may have unpredictable consequences for the gate array and
+*   external hardware. It is expressly forbidden to change register bits, except those defined for the user.
 *
 */
 #include "fga002.h"
@@ -112,14 +112,14 @@ void fga002_device::device_timer (emu_timer &timer, device_timer_id id, INT32 pa
 {
 	switch(id)
 	{
-	case TIMER_ID_FGA: 
+	case TIMER_ID_FGA:
 		if (m_tim0count-- == 0) // Zero detect
-	    {
+		{
 			if ((m_fga002[FGA_TIM0CTL] & REG_TIM0CTL_ZERO_STOP) == 0)
 			{
 				fga_timer->adjust(attotime::never, TIMER_ID_FGA, attotime::never);
 			}
-			else 
+			else
 			{
 				if ((m_fga002[FGA_TIM0CTL] & REG_TIM0CTL_AUTOPRELOAD) == 0)
 					m_tim0count &= 0xff;
@@ -128,34 +128,34 @@ void fga002_device::device_timer (emu_timer &timer, device_timer_id id, INT32 pa
 			}
 		}
 		break;
-	default: 
-		LOG(("Unhandled Timer ID %d\n", id)); 
-		break; 
+	default:
+		LOG(("Unhandled Timer ID %d\n", id));
+		break;
 	}
 }
 
 
 
-/*	The FGA002 Timer
+/*  The FGA002 Timer
 
-	FEATURES
-	- 8 bit Synchronous Counter
-	- 16 selectable clocks with frequencies from 1MHz to 0.5 Hz
-	- Autopreload and Zerostop operating modes
-	- Watchdog Timer operation
-	- SYSFAIL and/or interrupt generation
-	- Vectored interrupt
-	- Interrupt levels selectable by software
+    FEATURES
+    - 8 bit Synchronous Counter
+    - 16 selectable clocks with frequencies from 1MHz to 0.5 Hz
+    - Autopreload and Zerostop operating modes
+    - Watchdog Timer operation
+    - SYSFAIL and/or interrupt generation
+    - Vectored interrupt
+    - Interrupt levels selectable by software
 */
 
-/*	Timer Preload Register TIM0PRELOAD
-	The Timer Preload Register TIM0PRELOAD contains the preset value which can be loaded into the counter circuit. The default
-	value of this register after reset is $00. The TIM0PRELOAD register can be read at any time but must not be altered if the
-	timer is running.
-	[7:0] The Timer Preload register contains the 8 bit value that is loaded into the counter if the
-	Autopreload option in the TIM0CTL register is selected and the counter reaches the value zero.
-	Also, if a write access to the TIM0COUNT register is performed, the counter is loaded with the value
-	stored in the Timer Preload Register.
+/*  Timer Preload Register TIM0PRELOAD
+    The Timer Preload Register TIM0PRELOAD contains the preset value which can be loaded into the counter circuit. The default
+    value of this register after reset is $00. The TIM0PRELOAD register can be read at any time but must not be altered if the
+    timer is running.
+    [7:0] The Timer Preload register contains the 8 bit value that is loaded into the counter if the
+    Autopreload option in the TIM0CTL register is selected and the counter reaches the value zero.
+    Also, if a write access to the TIM0COUNT register is performed, the counter is loaded with the value
+    stored in the Timer Preload Register.
 */
 void fga002_device::do_fga002reg_tim0preload_w(UINT8 data)
 {
@@ -169,44 +169,44 @@ UINT8 fga002_device::do_fga002reg_tim0preload_r()
 	return m_fga002[FGA_TIM0PRELOAD];
 }
 
-/*	Timer Control Register TIM0CTL
-	In the Timer Control Register TIM0CTL the operating mode and the clock source of the timer can be selected. The Timer
-	Control Register is grouped into two major fields. Bits 7-4 define the operating mode of the timer and the sysfail option.
-	Bits 3-0 select the source clock applied to the timer. The TIM0CTL register is cleared to $00 after any reset operation.
-	[7] Zerostop This bit selects whether the counter stops when reaching zero count or continues counting down. The value the
-	counter will decrement to next depends on the setting of bit 6 of this register, which is the Autopreload bit.
-	1 = The counter continues counting down.
-	0 = The counter stops on zero count.
-	[6] Autopreload This bit selects whether the counter rolls over from $00 to the value $FF and continues counting down or is
-	preset by the contents of the timer preload register after reaching the zero count. The Autopreload option may be
-	ignored if the counter is programmed to stop on zero count.
-	1 The Autopreload option is enabled. When the counter has passed from $01 to $00, the value stored in the Preload
-	register will be transferred to the counter on the first clock edge following the zero count clock. After
-	that transfer the counter continues decrementing from the new value. 
-	0 The Autopreload option is disabled. After the counter has reached zero it will roll over to the value $FF and
-	continue counting down.
-	[5] Sysfail This bit enables/disables the sysfail generation by the timer. If this option is enabled, the SFAILO output pin of the FGA-002
-	gate array will be asserted low when the timer triggers the timer interrupt. The sysfail signal is negated when the timer
-	interrupt is cleared. 1 = enabled 0 = disabled
-	[4] Start/Stop: This bit controls the timer start and stop operation. 1 = start 0 = stop
-	[3:0] Clock select This bitfield provides selection of the source clock for timer operation.
-	3..0 source clock period
-	0000   1 microsecond
-	0001   2 microseconds
-	0010   4 microseconds
-	0011   8 microseconds
-	0100  16 microseconds
-	0101  32 microseconds
-	0110  64 microseconds
-	0111 128 microseconds
-	1000 256 microseconds
-	1001 512 microseconds
-	1010   2 milliseconds
-	1011   8 milliseconds
-	1100  32 milliseconds
-	1101 125 milliseconds
-	1110 500 milliseconds
-	1111   2 seconds
+/*  Timer Control Register TIM0CTL
+    In the Timer Control Register TIM0CTL the operating mode and the clock source of the timer can be selected. The Timer
+    Control Register is grouped into two major fields. Bits 7-4 define the operating mode of the timer and the sysfail option.
+    Bits 3-0 select the source clock applied to the timer. The TIM0CTL register is cleared to $00 after any reset operation.
+    [7] Zerostop This bit selects whether the counter stops when reaching zero count or continues counting down. The value the
+    counter will decrement to next depends on the setting of bit 6 of this register, which is the Autopreload bit.
+    1 = The counter continues counting down.
+    0 = The counter stops on zero count.
+    [6] Autopreload This bit selects whether the counter rolls over from $00 to the value $FF and continues counting down or is
+    preset by the contents of the timer preload register after reaching the zero count. The Autopreload option may be
+    ignored if the counter is programmed to stop on zero count.
+    1 The Autopreload option is enabled. When the counter has passed from $01 to $00, the value stored in the Preload
+    register will be transferred to the counter on the first clock edge following the zero count clock. After
+    that transfer the counter continues decrementing from the new value.
+    0 The Autopreload option is disabled. After the counter has reached zero it will roll over to the value $FF and
+    continue counting down.
+    [5] Sysfail This bit enables/disables the sysfail generation by the timer. If this option is enabled, the SFAILO output pin of the FGA-002
+    gate array will be asserted low when the timer triggers the timer interrupt. The sysfail signal is negated when the timer
+    interrupt is cleared. 1 = enabled 0 = disabled
+    [4] Start/Stop: This bit controls the timer start and stop operation. 1 = start 0 = stop
+    [3:0] Clock select This bitfield provides selection of the source clock for timer operation.
+    3..0 source clock period
+    0000   1 microsecond
+    0001   2 microseconds
+    0010   4 microseconds
+    0011   8 microseconds
+    0100  16 microseconds
+    0101  32 microseconds
+    0110  64 microseconds
+    0111 128 microseconds
+    1000 256 microseconds
+    1001 512 microseconds
+    1010   2 milliseconds
+    1011   8 milliseconds
+    1100  32 milliseconds
+    1101 125 milliseconds
+    1110 500 milliseconds
+    1111   2 seconds
 */
 
 void fga002_device::do_fga002reg_tim0ctl_w(UINT8 data)
@@ -250,12 +250,12 @@ UINT8 fga002_device::do_fga002reg_tim0ctl_r()
 	return m_fga002[FGA_TIM0CTL];
 }
 
-/*	Timer Count Register TIM0COUNT
-	The Timer Count Register TIM0COUNT contains the current value of the timer/counter. A write access to this register will
-	load the counter with the value stored in the Timer Preload Register. The written data will be ignored.
-	It is permitted to perform read/write accesses to the Timer Count Register when the timer is running.
-	The Timer Count Register is initialized to the value $FF after reset.
-	[7:0] Timer Count Value
+/*  Timer Count Register TIM0COUNT
+    The Timer Count Register TIM0COUNT contains the current value of the timer/counter. A write access to this register will
+    load the counter with the value stored in the Timer Preload Register. The written data will be ignored.
+    It is permitted to perform read/write accesses to the Timer Count Register when the timer is running.
+    The Timer Count Register is initialized to the value $FF after reset.
+    [7:0] Timer Count Value
 */
 void fga002_device::do_fga002reg_tim0count_w(UINT8 data)
 {
@@ -269,11 +269,11 @@ UINT8 fga002_device::do_fga002reg_tim0count_r()
 	return m_tim0count;
 }
 
-/*	Timer Interrupt Control Register ICRTIM0
-	Timer Interrupt Control is performed by the Timer Interrupt Control Register ICRTIM0 which enables/disables the interrupt
-	and selects the interrupt level.
-	[3] IRQ enable, 1 = timer interrupt channel enabled, 0 = disabled
-	[2:0] IRQ level 000 = interrupt disabled 001-111 = Level 1 to 7  interrupt
+/*  Timer Interrupt Control Register ICRTIM0
+    Timer Interrupt Control is performed by the Timer Interrupt Control Register ICRTIM0 which enables/disables the interrupt
+    and selects the interrupt level.
+    [3] IRQ enable, 1 = timer interrupt channel enabled, 0 = disabled
+    [2:0] IRQ level 000 = interrupt disabled 001-111 = Level 1 to 7  interrupt
 */
 void fga002_device::do_fga002reg_icrtim0_w(UINT8 data)
 {
@@ -287,10 +287,10 @@ UINT8 fga002_device::do_fga002reg_icrtim0_r()
 	return m_fga002[FGA_ICRTIM0];
 }
 
-/*	Timer Interrupt Status Register ISTIM0
-	ISTIM0 displays a pending timer interrupt. This bit is always readable and indicates 0 if the timer interrupt has been triggered. A write access to the
-	ISTIM0 register clears the timer interrupt. The data written to this register will be ignored.
-	[7] The IRQ Status register bit displays if a timer interrupt request is pending. 1 = no interrupt is pending. 0 = interrupt is pending
+/*  Timer Interrupt Status Register ISTIM0
+    ISTIM0 displays a pending timer interrupt. This bit is always readable and indicates 0 if the timer interrupt has been triggered. A write access to the
+    ISTIM0 register clears the timer interrupt. The data written to this register will be ignored.
+    [7] The IRQ Status register bit displays if a timer interrupt request is pending. 1 = no interrupt is pending. 0 = interrupt is pending
     [6:0] not used
 */
 void fga002_device::do_fga002reg_istim0_w(UINT8 data)
@@ -390,7 +390,7 @@ WRITE8_MEMBER (fga002_device::write){
 	case FGA_CTL14          : LOG(("FGA_CTL14 - not implemented\n")); m_fga002[FGA_CTL14] = data; break;
 	case FGA_CTL15          : LOG(("FGA_CTL15 - not implemented\n")); m_fga002[FGA_CTL15] = data; break;
 	case FGA_CTL16          : LOG(("FGA_CTL16 - not implemented\n")); m_fga002[FGA_CTL16] = data; break;
-	case FGA_ISTIM0			: do_fga002reg_istim0_w(data); break;
+	case FGA_ISTIM0         : do_fga002reg_istim0_w(data); break;
 	case FGA_ISDMANORM      : LOG(("FGA_ISDMANORM - not implemented\n")); m_fga002[FGA_ISDMANORM] = data; break;
 	case FGA_ISDMAERR       : LOG(("FGA_ISDMAERR - not implemented\n")); m_fga002[FGA_ISDMAERR] = data; break;
 	case FGA_ISFMB0REF      : LOG(("FGA_ISFMB0REF - not implemented\n")); m_fga002[FGA_ISFMB0REF] = data; break;
@@ -401,7 +401,7 @@ WRITE8_MEMBER (fga002_device::write){
 	case FGA_ISFMB0MES      : LOG(("FGA_ISFMB0MES - not implemented\n")); m_fga002[FGA_ISFMB0MES] = data; break;
 	case FGA_ISFMB1MES      : LOG(("FGA_ISFMB1MES - not implemented\n")); m_fga002[FGA_ISFMB1MES] = data; break;
 	case FGA_ABORTPIN       : LOG(("FGA_ABORTPIN - not implemented\n")); m_fga002[FGA_ABORTPIN] = data; break;
-	case FGA_TIM0COUNT		: do_fga002reg_tim0count_w(data); break;
+	case FGA_TIM0COUNT      : do_fga002reg_tim0count_w(data); break;
 	default:
 		LOG(("Unsupported register %04x\n", offset));
 	}
@@ -493,7 +493,7 @@ READ8_MEMBER (fga002_device::read){
 	case FGA_CTL14          : ret = m_fga002[FGA_CTL14]; LOG(("FGA_CTL14 returns %02x - not implemented\n", ret)); break;
 	case FGA_CTL15          : ret = m_fga002[FGA_CTL15]; LOG(("FGA_CTL15 returns %02x - not implemented\n", ret)); break;
 	case FGA_CTL16          : ret = m_fga002[FGA_CTL16]; LOG(("FGA_CTL16 returns %02x - not implemented\n", ret)); break;
-	case FGA_ISTIM0			: ret = do_fga002reg_istim0_r(); break;
+	case FGA_ISTIM0         : ret = do_fga002reg_istim0_r(); break;
 	case FGA_ISDMANORM      : ret = m_fga002[FGA_ISDMANORM]; LOG(("FGA_ISDMANORM returns %02x - not implemented\n", ret)); break;
 	case FGA_ISDMAERR       : ret = m_fga002[FGA_ISDMAERR]; LOG(("FGA_ISDMAERR returns %02x - not implemented\n", ret)); break;
 	case FGA_ISFMB0REF      : ret = m_fga002[FGA_ISFMB0REF]; LOG(("FGA_ISFMB0REF returns %02x - not implemented\n", ret)); break;
@@ -504,7 +504,7 @@ READ8_MEMBER (fga002_device::read){
 	case FGA_ISFMB0MES      : ret = m_fga002[FGA_ISFMB0MES]; LOG(("FGA_ISFMB0MES returns %02x - not implemented\n", ret)); break;
 	case FGA_ISFMB1MES      : ret = m_fga002[FGA_ISFMB1MES]; LOG(("FGA_ISFMB1MES returns %02x - not implemented\n", ret)); break;
 	case FGA_ABORTPIN       : ret = m_fga002[FGA_ABORTPIN]; LOG(("FGA_ABORTPIN returns %02x - not implemented\n", ret)); break;
-	case FGA_TIM0COUNT		: ret = do_fga002reg_tim0count_r(); break;
+	case FGA_TIM0COUNT      : ret = do_fga002reg_tim0count_r(); break;
 	default:
 		LOG(("Unsupported register %04x\n", offset));
 	}

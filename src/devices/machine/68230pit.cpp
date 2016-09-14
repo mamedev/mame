@@ -5,13 +5,13 @@
 *   Motorola MC68230 PI/T Parallell Interface and Timer
 *
 * PORT MODES INCLUDE :
-* - BIT I/O 
+* - BIT I/O
 * - UNIDIRECTIONAL 8 BIT AND 16 BIT
-* - BIDIRECTIONAL 8 BIT AND 16 BIT 
-* PROGRAMMABLE HANDSHAKING OPTIONS 
-* 24-BIT PROGRAMMABLE TIMER MODES 
-* FIVE SEPARATE INTERRUPT VECTORS SEPARATE PORT AND TIMER INTERRUPT SERVICE REQUESTS 
-* REGISTERS AREREAD/WRITEAND DIRECTLY ADDRESSABLE 
+* - BIDIRECTIONAL 8 BIT AND 16 BIT
+* PROGRAMMABLE HANDSHAKING OPTIONS
+* 24-BIT PROGRAMMABLE TIMER MODES
+* FIVE SEPARATE INTERRUPT VECTORS SEPARATE PORT AND TIMER INTERRUPT SERVICE REQUESTS
+* REGISTERS AREREAD/WRITEAND DIRECTLY ADDRESSABLE
 * REGISTERS ARE ADDRESSED FOR MOVEP (Move Peripheral) AND DMAC COMPATIBILITY
 *
 *  Revisions: 2015-07-15 JLE initial
@@ -77,9 +77,9 @@ pit68230_device::pit68230_device(const machine_config &mconfig, device_type type
 	, m_tcr(0)
 	, m_tivr(0)
 	, m_cpr(0)
-	//	, m_cprh(0) // Collectivelly handled by m_cpr
-	//	, m_cprm(0) // Collectivelly handled by m_cpr
-	//	, m_cprl(0) // Collectivelly handled by m_cpr
+	//  , m_cprh(0) // Collectivelly handled by m_cpr
+	//  , m_cprm(0) // Collectivelly handled by m_cpr
+	//  , m_cprl(0) // Collectivelly handled by m_cpr
 	, m_cntr(0)
 	, m_tsr(0)
 {
@@ -113,9 +113,9 @@ pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag,
 	, m_tcr(0)
 	, m_tivr(0)
 	, m_cpr(0)
-	//	, m_cprh(0) // Collectivelly handled by m_cpr
-	//	, m_cprm(0) // Collectivelly handled by m_cpr
-	//	, m_cprl(0) // Collectivelly handled by m_cpr
+	//  , m_cprh(0) // Collectivelly handled by m_cpr
+	//  , m_cprm(0) // Collectivelly handled by m_cpr
+	//  , m_cprl(0) // Collectivelly handled by m_cpr
 	, m_cntr(0)
 	, m_tsr(0)
 {
@@ -193,9 +193,9 @@ void pit68230_device::device_timer (emu_timer &timer, device_timer_id id, INT32 
 {
 	switch(id)
 	{
-	case TIMER_ID_PIT: 
+	case TIMER_ID_PIT:
 		if (m_cntr-- == 0) // Zero detect
-	    {
+		{
 			/* TODO: Check mode and use preload value if required or just rollover 24 bit */
 			if ((m_tcr & REG_TCR_ZD) == 0)
 				m_cntr = m_cpr;
@@ -203,9 +203,9 @@ void pit68230_device::device_timer (emu_timer &timer, device_timer_id id, INT32 
 				m_cntr &= 0xffffff;
 		}
 		break;
-	default: 
-		LOG(("Unhandled Timer ID %d\n", id)); 
-		break; 
+	default:
+		LOG(("Unhandled Timer ID %d\n", id));
+		break;
 	}
 }
 
@@ -400,21 +400,21 @@ void pit68230_device::wr_pitreg_tcr(UINT8 data)
 	switch (m_tcr & REG_TCR_TOUT_TIACK_MASK)
 	{
 	case REG_TCR_PC3_PC7:
-	case REG_TCR_PC3_PC7_DC: 		LOG(("- PC3 and PC7 used as I/O pins\n")); break;
+	case REG_TCR_PC3_PC7_DC:        LOG(("- PC3 and PC7 used as I/O pins\n")); break;
 	case REG_TCR_TOUT_PC7_SQ:
-	case REG_TCR_TOUT_PC7_SQ_DC:	LOG(("- PC3 used as SQuare wave TOUT and PC7 used as I/O pin - not supported yet\n")); sqr = 1; break;
-	case REG_TCR_TOUT_TIACK:		LOG(("- PC3 used as TOUT and PC7 used as TIACK - not supported yet\n")); tout = 1; tiack = 1; break;
-	case REG_TCR_TOUT_TIACK_INT:	LOG(("- PC3 used as TOUT and PC7 used as TIACK, Interrupts enabled - not supported yet\n")); tout = 1; tiack = 1; irq = 1; break;
-	case REG_TCR_TOUT_PC7:			LOG(("- PC3 used as TOUT and PC7 used as I/O pin - not supported yet\n")); break;
-	case REG_TCR_TOUT_PC7_INT:		LOG(("- PC3 used as TOUT and PC7 used as I/O pin, Interrupts enabled - not supported yet\n")); break;
+	case REG_TCR_TOUT_PC7_SQ_DC:    LOG(("- PC3 used as SQuare wave TOUT and PC7 used as I/O pin - not supported yet\n")); sqr = 1; break;
+	case REG_TCR_TOUT_TIACK:        LOG(("- PC3 used as TOUT and PC7 used as TIACK - not supported yet\n")); tout = 1; tiack = 1; break;
+	case REG_TCR_TOUT_TIACK_INT:    LOG(("- PC3 used as TOUT and PC7 used as TIACK, Interrupts enabled - not supported yet\n")); tout = 1; tiack = 1; irq = 1; break;
+	case REG_TCR_TOUT_PC7:          LOG(("- PC3 used as TOUT and PC7 used as I/O pin - not supported yet\n")); break;
+	case REG_TCR_TOUT_PC7_INT:      LOG(("- PC3 used as TOUT and PC7 used as I/O pin, Interrupts enabled - not supported yet\n")); break;
 	}
 
 	switch (m_tcr & REG_TCR_CC_MASK)
 	{
-	case REG_TCR_CC_PC2_CLK_PSC:	LOG(("- PC2 used as I/O pin,CLK and x32 prescaler are used\n")); clk = 1; psc = 1; break;
-	case REG_TCR_CC_TEN_CLK_PSC:	LOG(("- PC2 used as Timer enable/disable, CLK and presacaler are used\n")); pen = 1; clk = 1; psc = 1; break;
-	case REG_TCR_CC_TIN_PSC:		LOG(("- PC2 used as Timer clock and the presacaler is used - not supported yet\n")); psc = 1; break;
-	case REG_TCR_CC_TIN_RAW:		LOG(("- PC2 used as Timer clock and the presacaler is NOT used - not supported yet\n")); break;
+	case REG_TCR_CC_PC2_CLK_PSC:    LOG(("- PC2 used as I/O pin,CLK and x32 prescaler are used\n")); clk = 1; psc = 1; break;
+	case REG_TCR_CC_TEN_CLK_PSC:    LOG(("- PC2 used as Timer enable/disable, CLK and presacaler are used\n")); pen = 1; clk = 1; psc = 1; break;
+	case REG_TCR_CC_TIN_PSC:        LOG(("- PC2 used as Timer clock and the presacaler is used - not supported yet\n")); psc = 1; break;
+	case REG_TCR_CC_TIN_RAW:        LOG(("- PC2 used as Timer clock and the presacaler is NOT used - not supported yet\n")); break;
 	}
 	LOG(("%s", m_tcr & REG_TCR_ZR ? "- Spec violation, should always be 0!\n" : ""));
 	LOG(("- Timer %s when reaching 0 (zero)\n", m_tcr & REG_TCR_ZD ? "rolls over" : "reload the preload values"));
@@ -475,29 +475,29 @@ WRITE8_MEMBER (pit68230_device::write)
 {
 	LOG(("%s %s \n",tag(), FUNCNAME));
 	switch (offset) {
-	case PIT_68230_PGCR:	wr_pitreg_pgcr(data); break;
-	case PIT_68230_PSRR:	wr_pitreg_psrr(data); break;
-	case PIT_68230_PADDR:	wr_pitreg_paddr(data); break;
-	case PIT_68230_PBDDR:	wr_pitreg_pbddr(data); break;
-	case PIT_68230_PCDDR:	wr_pitreg_pcddr(data); break;
-	case PIT_68230_PIVR:	wr_pitreg_pivr(data); break;
-	case PIT_68230_PACR:	wr_pitreg_pacr(data); break;
-	case PIT_68230_PBCR:	wr_pitreg_pbcr(data); break;
-	case PIT_68230_PADR:	wr_pitreg_padr(data); break;
-	case PIT_68230_PBDR:	wr_pitreg_pbdr(data); break;
-	case PIT_68230_PAAR:	break; // Ignores write per spec, read only register
-	case PIT_68230_PBAR:	break; // Ignores write per spec, read only register
-	case PIT_68230_PCDR:	wr_pitreg_pcdr(data); break;
-	case PIT_68230_PSR:		wr_pitreg_psr(data); break;
-	case PIT_68230_TCR:		wr_pitreg_tcr(data); break;
-	case PIT_68230_TIVR:	wr_pitreg_tivr(data); break;
-	case PIT_68230_CPRH:	wr_pitreg_cprh(data); break;
-	case PIT_68230_CPRM:	wr_pitreg_cprm(data); break;
-	case PIT_68230_CPRL:	wr_pitreg_cprl(data); break;
-	case PIT_68230_CNTRH:	break; // Ignores write per spec, read only register
-	case PIT_68230_CNTRM:	break; // Ignores write per spec, read only register
-	case PIT_68230_CNTRL:	break; // Ignores write per spec, read only register
-	case PIT_68230_TSR:		wr_pitreg_tsr(data); break;
+	case PIT_68230_PGCR:    wr_pitreg_pgcr(data); break;
+	case PIT_68230_PSRR:    wr_pitreg_psrr(data); break;
+	case PIT_68230_PADDR:   wr_pitreg_paddr(data); break;
+	case PIT_68230_PBDDR:   wr_pitreg_pbddr(data); break;
+	case PIT_68230_PCDDR:   wr_pitreg_pcddr(data); break;
+	case PIT_68230_PIVR:    wr_pitreg_pivr(data); break;
+	case PIT_68230_PACR:    wr_pitreg_pacr(data); break;
+	case PIT_68230_PBCR:    wr_pitreg_pbcr(data); break;
+	case PIT_68230_PADR:    wr_pitreg_padr(data); break;
+	case PIT_68230_PBDR:    wr_pitreg_pbdr(data); break;
+	case PIT_68230_PAAR:    break; // Ignores write per spec, read only register
+	case PIT_68230_PBAR:    break; // Ignores write per spec, read only register
+	case PIT_68230_PCDR:    wr_pitreg_pcdr(data); break;
+	case PIT_68230_PSR:     wr_pitreg_psr(data); break;
+	case PIT_68230_TCR:     wr_pitreg_tcr(data); break;
+	case PIT_68230_TIVR:    wr_pitreg_tivr(data); break;
+	case PIT_68230_CPRH:    wr_pitreg_cprh(data); break;
+	case PIT_68230_CPRM:    wr_pitreg_cprm(data); break;
+	case PIT_68230_CPRL:    wr_pitreg_cprl(data); break;
+	case PIT_68230_CNTRH:   break; // Ignores write per spec, read only register
+	case PIT_68230_CNTRM:   break; // Ignores write per spec, read only register
+	case PIT_68230_CNTRL:   break; // Ignores write per spec, read only register
+	case PIT_68230_TSR:     wr_pitreg_tsr(data); break;
 	default:
 		LOG (("Unhandled Write of %02x to register %02x", data, offset));
 	}
@@ -601,7 +601,7 @@ UINT8 pit68230_device::rr_pitreg_pcdr()
 	return m_pcdr;
 }
 
-/* The port A alternate register is an alternate register for reading the port A pins. 
+/* The port A alternate register is an alternate register for reading the port A pins.
 It is a read-only address and no other PI/T condition is affected. In all modes,
 the instantaneous pin level is read and no input latching is performed except at the
 data bus interface. Writes to this address are answered with DTACK, but the data is ignored.*/
@@ -697,29 +697,29 @@ READ8_MEMBER (pit68230_device::read){
 	UINT8 data;
 
 	switch (offset) {
-	case PIT_68230_PGCR:	data = rr_pitreg_pgcr(); break;
-	case PIT_68230_PSRR:	data = rr_pitreg_psrr(); break;
-	case PIT_68230_PADDR:	data = rr_pitreg_paddr(); break;
-	case PIT_68230_PBDDR:	data = rr_pitreg_pbddr(); break;
-	case PIT_68230_PCDDR:	data = rr_pitreg_pcddr(); break;
-	case PIT_68230_PIVR:	data = rr_pitreg_pivr(); break;
-	case PIT_68230_PACR:	data = rr_pitreg_pacr(); break;
-	case PIT_68230_PBCR:	data = rr_pitreg_pbcr(); break;
-	case PIT_68230_PADR:	data = rr_pitreg_padr(); break;
-	case PIT_68230_PBDR:	data = rr_pitreg_pbdr(); break;
-	case PIT_68230_PAAR:	data = rr_pitreg_paar(); break;
-	case PIT_68230_PBAR:	data = rr_pitreg_pbar(); break;
-	case PIT_68230_PCDR:	data = rr_pitreg_pcdr(); break;
-	case PIT_68230_PSR:		data = rr_pitreg_psr(); break;
-	case PIT_68230_TCR:		data = rr_pitreg_tcr(); break;
-	case PIT_68230_TIVR:	data = rr_pitreg_tivr(); break;
-	case PIT_68230_CPRH:	data = rr_pitreg_cprh(); break;
-	case PIT_68230_CPRM:	data = rr_pitreg_cprm(); break;
-	case PIT_68230_CPRL:	data = rr_pitreg_cprl(); break;
-	case PIT_68230_CNTRH:	data = rr_pitreg_cntrh(); break;
-	case PIT_68230_CNTRM:	data = rr_pitreg_cntrm(); break;
-	case PIT_68230_CNTRL:	data = rr_pitreg_cntrl(); break;
-	case PIT_68230_TSR:		data = rr_pitreg_tsr(); break;
+	case PIT_68230_PGCR:    data = rr_pitreg_pgcr(); break;
+	case PIT_68230_PSRR:    data = rr_pitreg_psrr(); break;
+	case PIT_68230_PADDR:   data = rr_pitreg_paddr(); break;
+	case PIT_68230_PBDDR:   data = rr_pitreg_pbddr(); break;
+	case PIT_68230_PCDDR:   data = rr_pitreg_pcddr(); break;
+	case PIT_68230_PIVR:    data = rr_pitreg_pivr(); break;
+	case PIT_68230_PACR:    data = rr_pitreg_pacr(); break;
+	case PIT_68230_PBCR:    data = rr_pitreg_pbcr(); break;
+	case PIT_68230_PADR:    data = rr_pitreg_padr(); break;
+	case PIT_68230_PBDR:    data = rr_pitreg_pbdr(); break;
+	case PIT_68230_PAAR:    data = rr_pitreg_paar(); break;
+	case PIT_68230_PBAR:    data = rr_pitreg_pbar(); break;
+	case PIT_68230_PCDR:    data = rr_pitreg_pcdr(); break;
+	case PIT_68230_PSR:     data = rr_pitreg_psr(); break;
+	case PIT_68230_TCR:     data = rr_pitreg_tcr(); break;
+	case PIT_68230_TIVR:    data = rr_pitreg_tivr(); break;
+	case PIT_68230_CPRH:    data = rr_pitreg_cprh(); break;
+	case PIT_68230_CPRM:    data = rr_pitreg_cprm(); break;
+	case PIT_68230_CPRL:    data = rr_pitreg_cprl(); break;
+	case PIT_68230_CNTRH:   data = rr_pitreg_cntrh(); break;
+	case PIT_68230_CNTRM:   data = rr_pitreg_cntrm(); break;
+	case PIT_68230_CNTRL:   data = rr_pitreg_cntrl(); break;
+	case PIT_68230_TSR:     data = rr_pitreg_tsr(); break;
 	default:
 		LOG (("Unhandled read register %02x\n", offset));
 		data = 0;

@@ -20,10 +20,13 @@ class osd_interface;
 //**************************************************************************
 class lua_engine;
 class cheat_manager;
-class datfile_manager;
 class inifile_manager;
 class favorite_manager;
 class mame_ui_manager;
+
+namespace ui {
+class datfile_manager;
+} // namespace ui
 
 // ======================> machine_manager
 
@@ -58,7 +61,7 @@ public:
 	void schedule_new_driver(const game_driver &driver);
 	mame_ui_manager& ui() const { assert(m_ui != nullptr); return *m_ui; }
 	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
-	datfile_manager &datfile() const { assert(m_datfile != nullptr); return *m_datfile; }
+	ui::datfile_manager &datfile() const { assert(m_datfile != nullptr); return *m_datfile; }
 	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
 	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
 private:
@@ -72,7 +75,7 @@ private:
 	emu_timer               *m_autoboot_timer;      // autoboot timer
 	std::unique_ptr<mame_ui_manager> m_ui;                  // internal data from ui.cpp
 	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.cpp
-	std::unique_ptr<datfile_manager>   m_datfile;      // internal data from datfile.c
+	std::unique_ptr<ui::datfile_manager>   m_datfile;      // internal data from datfile.c
 	std::unique_ptr<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs
 	std::unique_ptr<favorite_manager>  m_favorite;     // internal data from inifile.c for favorites
 

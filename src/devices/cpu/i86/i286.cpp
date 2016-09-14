@@ -1737,7 +1737,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					break;
 
 				case 0xf4: // i_hlt
-					if(PM && (CPL > m_IOPL))
+					if(PM && CPL)
 						throw TRAP(FAULT_GP, 0);
 					m_icount = 0;
 					m_halt = true;

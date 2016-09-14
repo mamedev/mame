@@ -50,7 +50,7 @@ K053246_CB_MEMBER(vendetta_state::sprite_callback)
 
 ***************************************************************************/
 
-UINT32 vendetta_state::screen_update_vendetta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vendetta_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3];
 

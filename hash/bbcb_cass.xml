@@ -143,6 +143,7 @@
 		<description>3D Pool</description>
 		<year>1989</year>
 		<publisher>Firebird</publisher>
+		<info name="author" value="Nick Pelling" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="24122">
 				<rom name="3dpool(1989)(firebird).uef" size="24122" crc="e9d8538b" sha1="4f3a80b4d22515a9fc0ab3d4d23e49eccf348011" offset="0" />
@@ -1219,7 +1220,7 @@
 		</part>
 	</software>
 
-	<software name="battlebr">
+	<software name="battbrit">
 		<description>Battle of Britain</description>
 		<year>1984</year>
 		<publisher>Betasoft</publisher>
@@ -4314,8 +4315,9 @@
 
 	<software name="estra">
 		<description>Estra</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Firebird</publisher>
+		<info name="author" value="Mike Granby" />
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Game and Instructions"/>
 			<dataarea name="cass" size="18898">
@@ -4576,17 +4578,6 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3964">
 				<rom name="fighterpilot(1984)(kansas).uef" size="3964" crc="53a650dd" sha1="2eb9d5badd8931f93e0de80c68a42e74ac8304a8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="filer">
-		<description>Filer</description>
-		<year>1982</year>
-		<publisher>Micro Power</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7092">
-				<rom name="filer-bbcb(micropower).uef" size="7092" crc="2833bfc6" sha1="88561cf141b8cefff00f290def6ed98b67e839b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5495,6 +5486,7 @@
 		<description>Gold Digger</description>
 		<year>1984</year>
 		<publisher>Firebird</publisher>
+		<info name="author" value="Neil Forsyth" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10102">
 				<rom name="golddigger(1984)(firebird).hq.uef" size="10102" crc="28a1b04d" sha1="91db4b539d674ef857f4e4063cd846a4429fc219" offset="0" />
@@ -8333,6 +8325,7 @@
 		<description>Mr Freeze</description>
 		<year>1984</year>
 		<publisher>Firebird</publisher>
+		<info name="author" value="Timothy J. Wilkinson" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13835">
 				<rom name="mrfreeze(1984)(firebird).hq.uef" size="13835" crc="cd9e8f34" sha1="52bd7e1a7af8770375eb224368c6a81e3914b58d" offset="0" />
@@ -8689,11 +8682,11 @@
 
 	<software name="nightwld">
 		<description>Night World</description>
-		<year>1986</year>
+		<year>1985</year>
 		<publisher>Alligata</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="2068">
-				<rom name="nightworld(1986)(alligata).uef" size="2068" crc="3b6ddb7a" sha1="74be0fea0a5ba882e2d906d664e2457e8c551048" offset="0" />
+				<rom name="nightworld(1985)(alligata).uef" size="2068" crc="3b6ddb7a" sha1="74be0fea0a5ba882e2d906d664e2457e8c551048" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13165,6 +13158,7 @@
 		<description>The Sentinel</description>
 		<year>1986</year>
 		<publisher>Firebird</publisher>
+		<info name="author" value="Geoff Crammond" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21473">
 				<rom name="thesentinel(1986)(firebird).hq.uef" size="21473" crc="0e91ace3" sha1="05b98f9d22289d05f7f37fc7c83204eb7b2a9be0" offset="0" />
@@ -15372,17 +15366,6 @@
 		</part>
 	</software>
 
-	<software name="jnrmath">
-		<description>Junior Maths Pack</description>
-		<year>1982</year>
-		<publisher>Micro Power</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="5641">
-				<rom name="juniormathspack(micropower).uef" size="5641" crc="d3395b2d" sha1="313973307a473a961b6ac04efffe7f17f951d767" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lsrlettr">
 		<description>Laser Letters</description>
 		<year>1984</year>
@@ -15520,17 +15503,6 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14793">
 				<rom name="numeracy2(shiva).uef" size="14793" crc="46f65411" sha1="733a338cd39b4c50201e350be7fa58a37315677b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="physic">
-		<description>Physics</description>
-		<year>198?</year>
-		<publisher>Micro Power</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="3111">
-				<rom name="physics(micropower).uef" size="3111" crc="36c7ac0e" sha1="794354c9763654c7477b2bb0d5fe5bea35cea179" offset="0" />
 			</dataarea>
 		</part>
 	</software>

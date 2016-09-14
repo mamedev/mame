@@ -30,8 +30,8 @@ public:
 	template<class _Object> static devcb_base &set_online_callback(device_t &device, _Object object) { return downcast<printer_image_device &>(device).m_online_cb.set_callback(object); }
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
+	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	// image device
@@ -42,7 +42,6 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "prn"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// specific implementation
 

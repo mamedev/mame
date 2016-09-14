@@ -80,7 +80,7 @@ public:
 	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
 	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
 
-	int load_cart(device_image_interface &image, generic_slot_device *slot);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart1 ) { return load_cart(image, m_cart1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart2 ) { return load_cart(image, m_cart2); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart3 ) { return load_cart(image, m_cart3); }

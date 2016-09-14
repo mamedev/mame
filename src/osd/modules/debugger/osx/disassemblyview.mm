@@ -47,8 +47,8 @@
 	{
 		view->set_source(*source);
 		debug_view_xy const current = view->total_size();
-		max.x = MAX(max.x, current.x);
-		max.y = MAX(max.y, current.y);
+		max.x = std::max(max.x, current.x);
+		max.y = std::max(max.y, current.y);
 	}
 	view->set_source(*source);
 	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),

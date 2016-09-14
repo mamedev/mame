@@ -1985,8 +1985,12 @@ READ8_MEMBER(apple2e_state::c800_r)
 
 	if (offset == 0x7ff)
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
-		update_slotrom_banks();
+		if (!space.debugger_access())
+		{
+			m_cnxx_slot = CNXX_UNCLAIMED;
+			update_slotrom_banks();
+		}
+
 		return 0xff;
 	}
 
@@ -2005,7 +2009,7 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 		return m_iicplus_ce00[offset-0x600];
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !space.debugger_access())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
@@ -2021,7 +2025,7 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 		return m_iicplus_ce00[offset-0x600];
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !space.debugger_access())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
@@ -2040,8 +2044,12 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 
 	if (offset == 0x7ff)
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
-		update_slotrom_banks();
+		if (!space.debugger_access())
+		{
+			m_cnxx_slot = CNXX_UNCLAIMED;
+			update_slotrom_banks();
+		}
+
 		return;
 	}
 

@@ -945,7 +945,7 @@ void hp48_port_image_device::hp48_unfill_port()
 }
 
 
-bool hp48_port_image_device::call_load()
+image_init_result hp48_port_image_device::call_load()
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
 	int size = length();
@@ -956,7 +956,7 @@ bool hp48_port_image_device::call_load()
 	if ( (size < 32*1024) || (size > m_max_size) || (size & (size-1)) )
 	{
 		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size );
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	state->m_port_size[m_port] = size;
@@ -964,10 +964,10 @@ bool hp48_port_image_device::call_load()
 	hp48_fill_port( );
 	fread(state->m_port_data[m_port].get(), state->m_port_size[m_port] );
 	state->hp48_decode_nibble( state->m_port_data[m_port].get(), state->m_port_data[m_port].get(), state->m_port_size[m_port] );
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool hp48_port_image_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result hp48_port_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
 	int size = m_max_size;
@@ -979,13 +979,13 @@ bool hp48_port_image_device::call_create(int format_type, util::option_resolutio
 	if ( (size < 32*1024) || (size > m_max_size) || (size & (size-1)) )
 	{
 		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size );
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	state->m_port_size[m_port] = size;
 	state->m_port_write[m_port] = 1;
 	hp48_fill_port();
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void hp48_port_image_device::call_unload()

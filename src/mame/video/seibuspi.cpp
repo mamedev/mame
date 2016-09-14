@@ -10,6 +10,142 @@
 
 #include "emu.h"
 #include "includes/seibuspi.h"
+#include "machine/seibuspi.h"
+
+
+/**************************************************************************
+
+Tile encryption
+---------------
+
+The tile graphics encryption uses the same algorithm in all games. This is
+similar to, but simpler than, that used by the SEI252, RISE10 and RISE11
+custom chips.
+
+- Take 24 bits of gfx data (used to decrypt 4 pixels at 6 bpp) and perform
+  a bit permutation on them (the permutation is the same in all games).
+- Take the low 12 bits of the tile code and add a 24-bit number (KEY1) to it.
+- Add the two 24-bit numbers resulting from the above steps, but with a
+  catch: while performing the sum, some bits generate carry as usual, other
+  bits don't, depending on a 24-bit key (KEY2). Note that the carry generated
+  by bit 23 (if enabled) wraps around to bit 0.
+- XOR the result with a 24-bit number (KEY3).
+
+The decryption is actually programmable; the games write the key to the
+custom CRTC on startup!! (writes to 000414)
+
+**************************************************************************/
+
+
+static UINT32 decrypt_tile(UINT32 val, int tileno, UINT32 key1, UINT32 key2, UINT32 key3)
+{
+	val = BITSWAP24(val, 18,19,9,5, 10,17,16,20, 21,22,6,11, 15,14,4,23, 0,1,7,8, 13,12,3,2);
+
+	return partial_carry_sum24( val, tileno + key1, key2 ) ^ key3;
+}
+
+static void decrypt_text(UINT8 *rom, UINT32 key1, UINT32 key2, UINT32 key3)
+{
+	int i;
+	for(i=0; i<0x10000; i++)
+	{
+		UINT32 w;
+
+		w = (rom[(i*3) + 0] << 16) | (rom[(i*3) + 1] << 8) | (rom[(i*3) +2]);
+
+		w = decrypt_tile(w, i >> 4, key1, key2, key3);
+
+		rom[(i*3) + 0] = (w >> 16) & 0xff;
+		rom[(i*3) + 1] = (w >> 8) & 0xff;
+		rom[(i*3) + 2] = w & 0xff;
+	}
+}
+
+static void decrypt_bg(UINT8 *rom, int size, UINT32 key1, UINT32 key2, UINT32 key3)
+{
+	int i,j;
+	for(j=0; j<size; j+=0xc0000)
+	{
+		for(i=0; i<0x40000; i++)
+		{
+			UINT32 w;
+
+			w = (rom[j + (i*3) + 0] << 16) | (rom[j + (i*3) + 1] << 8) | (rom[j + (i*3) + 2]);
+
+			w = decrypt_tile(w, i >> 6, key1, key2, key3);
+
+			rom[j + (i*3) + 0] = (w >> 16) & 0xff;
+			rom[j + (i*3) + 1] = (w >> 8) & 0xff;
+			rom[j + (i*3) + 2] = w & 0xff;
+		}
+	}
+}
+
+/******************************************************************************************
+cpu #0 (PC=0033B2EB): unmapped program memory dword write to 00000414 = 00000000 & 0000FFFF
+cpu #0 (PC=0033B2EB): unmapped program memory dword write to 00000414 = 0000DF5B & 0000FFFF
+cpu #0 (PC=0033B2EB): unmapped program memory dword write to 00000414 = 000078CF & 0000FFFF
+cpu #0 (PC=0033B2EB): unmapped program memory dword write to 00000414 = 00001377 & 0000FFFF
+cpu #0 (PC=0033B2EB): unmapped program memory dword write to 00000414 = 00002538 & 0000FFFF
+cpu #0 (PC=0033B2EB): unmapped program memory dword write to 00000414 = 00004535 & 0000FFFF
+cpu #0 (PC=0033B2EB): unmapped program memory dword write to 00000414 = 06DC0000 & FFFF0000
+******************************************************************************************/
+
+void seibuspi_state::text_decrypt(UINT8 *rom)
+{
+	decrypt_text( rom, 0x5a3845, 0x77cf5b, 0x1378df);
+}
+
+void seibuspi_state::bg_decrypt(UINT8 *rom, int size)
+{
+	decrypt_bg( rom, size, 0x5a3845, 0x77cf5b, 0x1378df);
+}
+
+/******************************************************************************************
+cpu #0 (PC=002A097D): unmapped program memory dword write to 00000414 = 00000001 & 0000FFFF
+cpu #0 (PC=002A097D): unmapped program memory dword write to 00000414 = 0000DCF8 & 0000FFFF
+cpu #0 (PC=002A097D): unmapped program memory dword write to 00000414 = 00007AE2 & 0000FFFF
+cpu #0 (PC=002A097D): unmapped program memory dword write to 00000414 = 0000154D & 0000FFFF
+cpu #0 (PC=002A097D): unmapped program memory dword write to 00000414 = 00001731 & 0000FFFF
+cpu #0 (PC=002A097D): unmapped program memory dword write to 00000414 = 0000466B & 0000FFFF
+cpu #0 (PC=002A097D): unmapped program memory dword write to 00000414 = 3EDC0000 & FFFF0000
+******************************************************************************************/
+
+void seibuspi_state::rdft2_text_decrypt(UINT8 *rom)
+{
+	decrypt_text( rom, 0x823146, 0x4de2f8, 0x157adc);
+}
+
+void seibuspi_state::rdft2_bg_decrypt(UINT8 *rom, int size)
+{
+	decrypt_bg( rom, size, 0x823146, 0x4de2f8, 0x157adc);
+}
+
+/******************************************************************************************
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 00000414 = 00000001 & 0000FFFF
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 00000414 = 00006630 & 0000FFFF
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 00000414 = 0000B685 & 0000FFFF
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 00000414 = 0000CCFE & 0000FFFF
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 00000414 = 000032A7 & 0000FFFF
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 00000414 = 0000547C & 0000FFFF
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 00000414 = 3EDC0000 & FFFF0000
+******************************************************************************************/
+
+void seibuspi_state::rfjet_text_decrypt(UINT8 *rom)
+{
+	decrypt_text( rom, 0xaea754, 0xfe8530, 0xccb666);
+}
+
+void seibuspi_state::rfjet_bg_decrypt(UINT8 *rom, int size)
+{
+	decrypt_bg( rom, size, 0xaea754, 0xfe8530, 0xccb666);
+}
+
+WRITE16_MEMBER(seibuspi_state::tile_decrypt_key_w)
+{
+	if (data != 0 && data != 1)
+		logerror("Decryption key: %04X\n", data);
+}
 
 
 /*****************************************************************************/
@@ -29,30 +165,27 @@ void seibuspi_state::set_layer_offsets()
 		m_text_layer_offset = 0x3000 / 4 / 2;
 	}
 
-	m_fore_layer_d13 = m_layer_bank >> 14 & 0x2000;
+	m_fore_layer_d13 = m_layer_bank << 2 & 0x2000;
 	m_back_layer_d14 = m_rf2_layer_bank << 14 & 0x4000;
 	m_midl_layer_d14 = m_rf2_layer_bank << 13 & 0x4000;
 	m_fore_layer_d14 = m_rf2_layer_bank << 12 & 0x4000;
 }
 
-READ32_MEMBER(seibuspi_state::spi_layer_bank_r)
+WRITE16_MEMBER(seibuspi_state::spi_layer_bank_w)
 {
-	return m_layer_bank;
-}
+	//logerror("Writing %04X to layer register\n", data);
 
-WRITE32_MEMBER(seibuspi_state::spi_layer_bank_w)
-{
-	// r000f000 0010100a 00000000 00000000
+	// r000f000 0010100a
 	// r: rowscroll enable
 	// f: fore layer d13
 	// a: ? (0 in ejanhs and rdft22kc, 1 in all other games)
-	UINT32 prev = m_layer_bank;
+	UINT16 prev = m_layer_bank;
 	COMBINE_DATA(&m_layer_bank);
 
-	m_rowscroll_enable = m_layer_bank >> 31 & 1;
+	m_rowscroll_enable = m_layer_bank >> 15 & 1;
 	set_layer_offsets();
 
-	if ((prev ^ m_layer_bank) & 0x08000000)
+	if ((prev ^ m_layer_bank) & 0x0800)
 		m_fore_layer->mark_all_dirty();
 }
 
@@ -77,15 +210,20 @@ WRITE8_MEMBER(seibuspi_state::rf2_layer_bank_w)
 		m_fore_layer->mark_all_dirty();
 }
 
-WRITE32_MEMBER(seibuspi_state::spi_layer_enable_w)
+WRITE16_MEMBER(seibuspi_state::spi_layer_enable_w)
 {
-	// 00000000 00000000 00000000 000stfmb (0=on, 1=off)
+	// 00000000 000stfmb (0=on, 1=off)
 	// s: sprite layer
 	// t: text layer
 	// f: fore layer
 	// m: middle layer
 	// b: back layer
 	COMBINE_DATA(&m_layer_enable);
+}
+
+WRITE16_MEMBER(seibuspi_state::scroll_w)
+{
+	COMBINE_DATA(&m_scrollram[offset]);
 }
 
 WRITE32_MEMBER(seibuspi_state::video_dma_length_w)
@@ -480,20 +618,20 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 	if (m_layer_enable & 1)
 		bitmap.fill(0, cliprect);
 	else
-		combine_tilemap(bitmap, cliprect, m_back_layer, m_scrollram[0] & 0xffff, (m_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
+		combine_tilemap(bitmap, cliprect, m_back_layer, m_scrollram[0], m_scrollram[1], 1, back_rowscroll);
 
 	draw_sprites(bitmap, cliprect, screen.priority(), 0);
 
 	// if fore layer is enabled, draw priority 0 sprites behind back layer
 	if ((m_layer_enable & 0x15) == 0)
-		combine_tilemap(bitmap, cliprect, m_back_layer, m_scrollram[0] & 0xffff, (m_scrollram[0] >> 16) & 0xffff, 0, back_rowscroll);
+		combine_tilemap(bitmap, cliprect, m_back_layer, m_scrollram[0], m_scrollram[1], 0, back_rowscroll);
 
 	// if fore layer is enabled, draw priority 1 sprites behind middle layer
 	if (~m_layer_enable & 4)
 		draw_sprites(bitmap, cliprect, screen.priority(), 1);
 
 	if (~m_layer_enable & 2)
-		combine_tilemap(bitmap, cliprect, m_midl_layer, m_scrollram[1] & 0xffff, (m_scrollram[1] >> 16) & 0xffff, 0, midl_rowscroll);
+		combine_tilemap(bitmap, cliprect, m_midl_layer, m_scrollram[2], m_scrollram[3], 0, midl_rowscroll);
 
 	// if fore layer is disabled, draw priority 1 sprites above middle layer
 	if (m_layer_enable & 4)
@@ -502,7 +640,7 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 	draw_sprites(bitmap, cliprect, screen.priority(), 2);
 
 	if (~m_layer_enable & 4)
-		combine_tilemap(bitmap, cliprect, m_fore_layer, m_scrollram[2] & 0xffff, (m_scrollram[2] >> 16) & 0xffff, 0, fore_rowscroll);
+		combine_tilemap(bitmap, cliprect, m_fore_layer, m_scrollram[4], m_scrollram[5], 0, fore_rowscroll);
 
 	draw_sprites(bitmap, cliprect, screen.priority(), 3);
 
@@ -587,6 +725,12 @@ void seibuspi_state::video_start()
 	m_layer_bank = 0;
 	m_rf2_layer_bank = 0;
 	m_rowscroll_enable = 0;
+	m_scrollram[0] = 0;
+	m_scrollram[1] = 0;
+	m_scrollram[2] = 0;
+	m_scrollram[3] = 0;
+	m_scrollram[4] = 0;
+	m_scrollram[5] = 0;
 	set_layer_offsets();
 
 	UINT32 region_length = memregion("gfx2")->bytes();
@@ -682,6 +826,7 @@ void seibuspi_state::register_video_state()
 	save_item(NAME(m_layer_bank));
 	save_item(NAME(m_rf2_layer_bank));
 	save_item(NAME(m_rowscroll_enable));
+	save_item(NAME(m_scrollram));
 
 	save_item(NAME(m_midl_layer_offset));
 	save_item(NAME(m_fore_layer_offset));

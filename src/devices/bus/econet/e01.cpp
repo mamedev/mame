@@ -130,7 +130,7 @@ const rom_entry *e01_device::device_rom_region() const
 //  MC146818_INTERFACE( rtc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e01_device::rtc_irq_w )
+WRITE_LINE_MEMBER(e01_device::rtc_irq_w)
 {
 	m_rtc_irq = state;
 
@@ -154,7 +154,7 @@ WRITE_LINE_MEMBER( e01_device::econet_data_w )
 	m_econet->data_w(this, state);
 }
 
-WRITE_LINE_MEMBER( e01_device::via_irq_w )
+WRITE_LINE_MEMBER(e01_device::via_irq_w)
 {
 	m_via_irq = state;
 
@@ -247,7 +247,7 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(e01_device, rtc_irq_w))
 
 	// devices
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, XTAL_8MHz/4)
+	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, XTAL_8MHz / 4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(e01_device, via_irq_w))
 
@@ -339,8 +339,8 @@ inline void e01_device::update_interrupts()
 	int irq = (m_via_irq || (m_hdc_ie & m_hdc_irq) || m_rtc_irq) ? ASSERT_LINE : CLEAR_LINE;
 	int nmi = (m_fdc_irq || m_fdc_drq || (m_adlc_ie & m_adlc_irq)) ? ASSERT_LINE : CLEAR_LINE;
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, irq);
-	m_maincpu->set_input_line(INPUT_LINE_NMI, nmi);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
+	m_maincpu->set_input_line(M6502_NMI_LINE, nmi);
 }
 
 

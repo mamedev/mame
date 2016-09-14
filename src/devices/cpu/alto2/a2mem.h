@@ -25,8 +25,8 @@ enum {
 
 struct {
 	UINT32 size;                        //!< main memory size (64K or 128K)
-	std::unique_ptr<UINT32[]> ram;                        //!< main memory organized as double-words
-	std::unique_ptr<UINT8[]> hpb;                         //!< Hamming Code bits (6) and Parity bits (1) per double word
+	std::unique_ptr<UINT32[]> ram;      //!< main memory organized as double-words
+	std::unique_ptr<UINT8[]> hpb;       //!< Hamming Code bits (6) and Parity bits (1) per double word
 	UINT32 mar;                         //!< memory address register
 	UINT32 rmdd;                        //!< read memory data double-word
 	UINT32 wmdd;                        //!< write memory data double-word
@@ -48,8 +48,8 @@ struct {
 }   m_mem;
 
 /**
- * @brief check if memory address register load is yet possible
- * suspend if accessing RAM and previous MAR<- was less than 5 cycles ago
+ * @brief Check if memory address register load is yet possible.
+ * Suspend if accessing RAM and previous MAR<- was less than 5 cycles ago.
  *
  * 1.  MAR<- ANY
  * 2.  REQUIRED
@@ -61,13 +61,13 @@ struct {
  * @return false, if memory address can be loaded
  */
 inline bool check_mem_load_mar_stall(UINT8 rsel) {
-	if (ALTO2_MEM_NONE == m_mem.access)
+	if (ALTO2_MEM_NONE == m_mem.access || ALTO2_MEM_REFRESH == m_mem.access)
 		return false;
 	return cycle() < m_mem.cycle+5;
 }
 
 /**
- * @brief check if memory read is yet possible
+ * @brief Check if memory read is yet possible.
  * MAR<- = cycle #1, earliest read at cycle #5, i.e. + 4
  *
  * 1.  MAR<- ANY
@@ -79,13 +79,13 @@ inline bool check_mem_load_mar_stall(UINT8 rsel) {
  * @return false, if memory can be read without wait cycle
  */
 inline bool check_mem_read_stall() {
-	if (ALTO2_MEM_NONE == m_mem.access)
+	if (ALTO2_MEM_NONE == m_mem.access || ALTO2_MEM_REFRESH == m_mem.access)
 		return false;
 	return cycle() < m_mem.cycle+4;
 }
 
 /**
- * @brief check if memory write is yet possible
+ * @brief Check if memory write is yet possible.
  * MAR<- = cycle #1, earliest write at cycle #3, i.e. + 2
  *
  * 1.  MAR<- ANY
@@ -96,7 +96,7 @@ inline bool check_mem_read_stall() {
  * @return false, if memory can be written without wait cycle
  */
 inline bool check_mem_write_stall() {
-	if (ALTO2_MEM_NONE == m_mem.access)
+	if (ALTO2_MEM_NONE == m_mem.access || ALTO2_MEM_REFRESH == m_mem.access)
 		return false;
 	return cycle() < m_mem.cycle+2;
 }
@@ -108,22 +108,22 @@ DECLARE_WRITE16_MEMBER( mesr_w );       //!< memory error status register write 
 DECLARE_READ16_MEMBER ( mecr_r );       //!< memory error control register read
 DECLARE_WRITE16_MEMBER( mecr_w );       //!< memory error control register write
 
-//! read or write a memory double-word and caluclate its Hamming code
+//! Read or write a memory double-word and caluclate its Hamming code.
 UINT32 hamming_code(int write, UINT32 dw_addr, UINT32 dw_data);
 
-//! load the memory address register with some value
+//! Load the memory address register with some value.
 void load_mar(UINT8 rsel, UINT32 addr);
 
-//! read memory or memory mapped I/O from the address in mar to md
+//! Read memory or memory mapped I/O from the address in mar to md.
 UINT16 read_mem();
 
-//! write memory or memory mapped I/O from md to the address in mar
+//! Write memory or memory mapped I/O from md to the address in mar.
 void write_mem(UINT16 data);
 
-//! debugger interface to read memory
+//! Debugger interface to read memory.
 UINT16 debug_read_mem(UINT32 addr);
 
-//! debugger interface to write memory
+//! Debugger interface to write memory.
 void debug_write_mem(UINT32 addr, UINT16 data);
 
 #if ALTO2_DEBUG

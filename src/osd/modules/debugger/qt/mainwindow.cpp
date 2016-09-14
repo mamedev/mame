@@ -357,7 +357,7 @@ void MainWindow::mountImage(bool changedTo)
 													QDir::currentPath(),
 													tr("All files (*.*)"));
 
-	if (img->load(filename.toUtf8().data()) != IMAGE_INIT_PASS)
+	if (img->load(filename.toUtf8().data()) != image_init_result::PASS)
 	{
 		m_machine->debugger().console().printf("Image could not be mounted.\n");
 		refreshAll();

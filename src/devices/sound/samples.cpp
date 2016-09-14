@@ -429,7 +429,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 		osd_printf_warning("Unexpected size offset %u (%s)\n", offset, file.filename());
 		return false;
 	}
-	filesize = LITTLE_ENDIANIZE_INT32(filesize);
+	filesize = little_endianize_int32(filesize);
 
 	// read the RIFF file type and make sure it's a WAVE file
 	char buf[32];
@@ -451,7 +451,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	{
 		offset += file.read(buf, 4);
 		offset += file.read(&length, 4);
-		length = LITTLE_ENDIANIZE_INT32(length);
+		length = little_endianize_int32(length);
 		if (memcmp(&buf[0], "fmt ", 4) == 0)
 			break;
 
@@ -468,7 +468,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	// read the format -- make sure it is PCM
 	UINT16 temp16;
 	offset += file.read(&temp16, 2);
-	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
+	temp16 = little_endianize_int16(temp16);
 	if (temp16 != 1)
 	{
 		osd_printf_warning("unsupported format %u - only PCM is supported (%s)\n", temp16, file.filename());
@@ -477,7 +477,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 
 	// number of channels -- only mono is supported
 	offset += file.read(&temp16, 2);
-	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
+	temp16 = little_endianize_int16(temp16);
 	if (temp16 != 1)
 	{
 		osd_printf_warning("unsupported number of channels %u - only mono is supported (%s)\n", temp16, file.filename());
@@ -487,7 +487,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	// sample rate
 	UINT32 rate;
 	offset += file.read(&rate, 4);
-	rate = LITTLE_ENDIANIZE_INT32(rate);
+	rate = little_endianize_int32(rate);
 
 	// bytes/second and block alignment are ignored
 	offset += file.read(buf, 6);
@@ -495,7 +495,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	// bits/sample
 	UINT16 bits;
 	offset += file.read(&bits, 2);
-	bits = LITTLE_ENDIANIZE_INT16(bits);
+	bits = little_endianize_int16(bits);
 	if (bits != 8 && bits != 16)
 	{
 		osd_printf_warning("unsupported bits/sample %u - only 8 and 16 are supported (%s)\n", bits, file.filename());
@@ -511,7 +511,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	{
 		offset += file.read(buf, 4);
 		offset += file.read(&length, 4);
-		length = LITTLE_ENDIANIZE_INT32(length);
+		length = little_endianize_int32(length);
 		if (memcmp(&buf[0], "data", 4) == 0)
 			break;
 
@@ -555,7 +555,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 		// swap high/low on big-endian systems
 		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
 			for (UINT32 sindex = 0; sindex < length / 2; sindex++)
-				sample.data[sindex] = LITTLE_ENDIANIZE_INT16(sample.data[sindex]);
+				sample.data[sindex] = little_endianize_int16(sample.data[sindex]);
 	}
 	return true;
 }

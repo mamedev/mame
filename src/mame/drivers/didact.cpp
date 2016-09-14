@@ -659,8 +659,8 @@ static MACHINE_CONFIG_START( mp68a, mp68a_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mp68a_state, pia2_kbB_w))
 	MCFG_PIA_READPB_HANDLER(READ8(mp68a_state, pia2_kbB_r))
 	MCFG_PIA_READCB1_HANDLER(READLINE(mp68a_state, pia2_cb1_r))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line)) /* Not used by ROM. Combined trace to CPU IRQ with IRQB */
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line)) /* Not used by ROM. Combined trace to CPU IRQ with IRQA */
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE)) /* Not used by ROM. Combined trace to CPU IRQ with IRQB */
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE)) /* Not used by ROM. Combined trace to CPU IRQ with IRQA */
 
 	/* Display - sequence outputting all '0':s at start */
 	/* 0x086B 0x600 (Port A)    = 0x00 */

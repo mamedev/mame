@@ -31,7 +31,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_container *container, barcode_reader_device *device)
+menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_container &container, barcode_reader_device *device)
 	: menu_device_control<barcode_reader_device>(mui, container, device)
 {
 }
@@ -60,7 +60,7 @@ void menu_barcode_reader::populate()
 		item_append(current_display_name(), "", current_display_flags(), ITEMREF_SELECT_READER);
 
 		// append the "New Barcode" item
-		if (get_selection() == ITEMREF_NEW_BARCODE)
+		if (get_selection_ref() == ITEMREF_NEW_BARCODE)
 		{
 			buffer.append(m_barcode_buffer);
 			new_barcode = buffer.c_str();
@@ -129,7 +129,7 @@ void menu_barcode_reader::handle()
 			break;
 
 		case IPT_SPECIAL:
-			if (get_selection() == ITEMREF_NEW_BARCODE)
+			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
 			{
 				auto const buflen = std::strlen(m_barcode_buffer);
 

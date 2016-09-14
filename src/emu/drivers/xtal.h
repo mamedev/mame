@@ -144,6 +144,7 @@ enum
 	XTAL_15_8976MHz     = 15897600,     /* IAI Swyft */
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_16_384MHz      = 16384000,
+	XTAL_16_5888MHz     = 16588800,     /* SM 7238 */
 	XTAL_16_9344MHz     = 16934400,     /* Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
 	XTAL_17_36MHz       = 17360000,     /* OMTI Series 10 SCSI controller */
 	XTAL_17_73447MHz    = 17734470,     /* (~4x PAL subcarrier) */
@@ -159,6 +160,7 @@ enum
 	XTAL_20MHz          = 20000000,
 	XTAL_20_16MHz       = 20160000,     /* Nintendo 8080 */
 	XTAL_20_079MHz      = 20790000,     /* Blockade-hardware Gremlin games */
+	XTAL_20_625MHz      = 20625000,     /* SM 7238 */
 	XTAL_21MHz          = 21000000,     /* Lock-On pixel clock */
 	XTAL_21_3MHz        = 21300000,
 	XTAL_21_4772MHz     = 21477272,     /* BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */

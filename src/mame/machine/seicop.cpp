@@ -5,10 +5,10 @@
   COPDX bootleg simulation
     - Seibu Cup Soccer (bootleg)
 
-  Notice that only the bare minimum is supported, which is what the bootleg device actually 
-  do.
-  Apparently it's an Actel PL84c FPGA programmed to be a Seibu COP clone. 
-  The internal operations are actually loaded via the ROMs, we use the original algorithm 
+  Notice that only the bare minimum is supported, which is what the bootleg device actually
+  provides. Unlike the original device and many other Seibu customs, it has no DMA.
+  Apparently it's an Actel PL84c FPGA programmed to be a Seibu COP clone.
+  The internal operations are actually loaded via the ROMs, we use the original algorithm
   for the trigger until we find the proper hookup.
 
 ********************************************************************************************/
@@ -46,7 +46,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 	UINT8 offs;
 
 	offs = (offset & 3) * 4;
-	
+
 	switch(data)
 	{
 		default:
@@ -54,7 +54,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			break;
 		case 0x0000:
 			break;
-		
+
 		case 0xf105:
 			break;
 
@@ -89,7 +89,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			int target_reg = data & 0x200 ? 2 : 1;
 			int dy = (m_host_space->read_dword(m_reg[target_reg]+4) >> 16) - (m_host_space->read_dword(m_reg[0]+4) >> 16);
 			int dx = (m_host_space->read_dword(m_reg[target_reg]+8) >> 16) - (m_host_space->read_dword(m_reg[0]+8) >> 16);
-			
+
 			//m_status = 7;
 			if(!dy) {
 				m_status = 0x8000;
@@ -112,7 +112,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 
 			break;
 		}
-		
+
 		case 0x3bb0:
 		{
 			int dy = m_dy;
@@ -121,13 +121,13 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			dx >>= 16;
 			dy >>= 16;
 			m_dist = sqrt((double)(dx*dx+dy*dy));
-	
+
 			// TODO: is this right?
 			m_host_space->write_word(m_reg[0]+(0x38), m_dist);
 
 			break;
 		}
-		
+
 		// TODO: wrong
 		case 0x42c2:
 		{
@@ -143,18 +143,18 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_host_space->write_dword(m_reg[0] + (0x38), (m_dist << (5 - 1)) / div);
 			break;
 		}
-		
+
 		/*
-	        00000-0ffff:
-	        amp = x/256
-	        ang = x & 255
-	        s = sin(ang*2*pi/256)
-	        val = trunc(s*amp)
-	        if(s<0)
-	        val--
-	        if(s == 192)
-	        val = -2*amp
-	    */
+		    00000-0ffff:
+		    amp = x/256
+		    ang = x & 255
+		    s = sin(ang*2*pi/256)
+		    val = trunc(s*amp)
+		    if(s<0)
+		    val--
+		    if(s == 192)
+		    val = -2*amp
+		*/
 		case 0x8100:
 		{
 			UINT16 sin_offs; //= m_host_space->read_dword(m_reg[0]+(0x34));
@@ -164,7 +164,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			double angle = raw_angle * M_PI / 128;
 			double amp = (65536 >> 5)*(m_host_space->read_word(m_reg[0]+(0x36^2)) & 0xff);
 			int res;
-			
+
 
 			/* TODO: up direction, why? */
 			if(raw_angle == 0xc0)
@@ -176,7 +176,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 
 			break;
 		}
-		
+
 		case 0x8900:
 		{
 			int raw_angle = (m_host_space->read_word(m_reg[0]+(0x34^2)) & 0xff);
@@ -201,7 +201,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			break;
 		}
 	}
-	
+
 }
 
 READ16_MEMBER(seibu_cop_bootleg_device::status_r)
@@ -227,9 +227,9 @@ READ16_MEMBER(seibu_cop_bootleg_device::d104_move_r)
 WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
 {
 	if(offset == 1)
-		m_d104_move_offset = (m_d104_move_offset & 0xffff0000) | (data & 0xffff); 
+		m_d104_move_offset = (m_d104_move_offset & 0xffff0000) | (data & 0xffff);
 	else
-		m_d104_move_offset = (m_d104_move_offset & 0xffff) | (data << 16); 
+		m_d104_move_offset = (m_d104_move_offset & 0xffff) | (data << 16);
 }
 
 // anything that is read thru ROM range 0xc**** is replacement code, therefore on this HW they are latches.
@@ -247,8 +247,8 @@ ADDRESS_MAP_END
 
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, "Seibu COP (Bootleg)", tag, owner, clock, "seibu_cop_boot", __FILE__),
-      device_memory_interface(mconfig, *this),
- 		m_space_config("regs", ENDIANNESS_LITTLE, 16, 9, 0, nullptr, *ADDRESS_MAP_NAME(seibucopbl_map))
+		device_memory_interface(mconfig, *this),
+		m_space_config("regs", ENDIANNESS_LITTLE, 16, 9, 0, nullptr, *ADDRESS_MAP_NAME(seibucopbl_map))
 {
 }
 
@@ -275,7 +275,7 @@ void seibu_cop_bootleg_device::device_config_complete()
 
 void seibu_cop_bootleg_device::device_start()
 {
-//	m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
+//  m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
 
 }
 

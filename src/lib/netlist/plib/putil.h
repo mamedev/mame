@@ -29,19 +29,20 @@ namespace plib
 			return std::find(con.begin(), con.end(), elem) != con.end();
 		}
 
+		static constexpr const std::size_t npos = static_cast<std::size_t>(-1);
 		template <class C>
-		int indexof(C &con, const typename C::value_type &elem)
+		std::size_t indexof(C &con, const typename C::value_type &elem)
 		{
 			auto it = std::find(con.begin(), con.end(), elem);
 			if (it != con.end())
-				return it - con.begin();
-			return -1;
+				return static_cast<std::size_t>(it - con.begin());
+			return npos;
 		}
 
 		template <class C>
 		void insert_at(C &con, const std::size_t index, const typename C::value_type &elem)
 		{
-			con.insert(con.begin() + index, elem);
+			con.insert(con.begin() + static_cast<std::ptrdiff_t>(index), elem);
 		}
 
 	}

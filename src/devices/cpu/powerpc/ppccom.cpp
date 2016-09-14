@@ -409,7 +409,7 @@ inline void ppc_device::set_timebase(UINT64 newtb)
 inline UINT32 ppc_device::get_decrementer()
 {
 	INT64 cycles_until_zero = m_dec_zero_cycles - total_cycles();
-	cycles_until_zero = MAX(cycles_until_zero, 0);
+	cycles_until_zero = std::max<INT64>(cycles_until_zero, 0);
 
 	if (!m_tb_divisor)
 	{
@@ -1235,7 +1235,7 @@ offs_t ppc_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 {
 	extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 	UINT32 op = *(UINT32 *)oprom;
-	op = BIG_ENDIANIZE_INT32(op);
+	op = big_endianize_int32(op);
 	return ppc_dasm_one(buffer, pc, op);
 }
 

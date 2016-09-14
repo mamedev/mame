@@ -78,7 +78,7 @@ namespace netlist
 
 	NETLIB_UPDATE(MM5837_dip)
 	{
-		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
+		m_Q.push(!m_Q.net().new_Q(), m_inc);
 
 		/* shift register
 		 *
@@ -94,7 +94,7 @@ namespace netlist
 		if (state != last_state)
 		{
 			const nl_double R = state ? R_HIGH : R_LOW;
-			const nl_double V = state ? INPANALOG(m_VDD) : INPANALOG(m_VSS);
+			const nl_double V = state ? m_VDD() : m_VSS();
 
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)

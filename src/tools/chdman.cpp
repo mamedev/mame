@@ -5,7 +5,7 @@
     CHD compression frontend
 
 ****************************************************************************/
-
+#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
 #include <assert.h>
 
 #include "osdcore.h"
@@ -268,7 +268,7 @@ public:
 		: m_toc(nullptr),
 			m_file(file),
 			m_offset(offset),
-			m_maxoffset(MIN(maxoffset, file.logical_bytes())) { }
+			m_maxoffset(std::min(maxoffset, file.logical_bytes())) { }
 
 	// read interface
 	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
@@ -361,7 +361,7 @@ public:
 		for (int tracknum = 0; tracknum < m_toc.numtrks; tracknum++)
 		{
 			const cdrom_track_info &trackinfo = m_toc.tracks[tracknum];
-			UINT64 endoffs = startoffs + (trackinfo.frames + trackinfo.extraframes) * CD_FRAME_SIZE;
+			UINT64 endoffs = startoffs + (UINT64)(trackinfo.frames + trackinfo.extraframes) * CD_FRAME_SIZE;
 			if (offset >= startoffs && offset < endoffs)
 			{
 				// if we don't already have this file open, open it now
@@ -375,10 +375,10 @@ public:
 				}
 
 				// iterate over frames
-				UINT32 bytesperframe = trackinfo.datasize + trackinfo.subsize;
+				UINT64 bytesperframe = trackinfo.datasize + trackinfo.subsize;
 				UINT64 src_track_start = m_info.track[tracknum].offset;
-				UINT64 src_track_end = src_track_start + bytesperframe * trackinfo.frames;
-				UINT64 pad_track_start = src_track_end - (m_toc.tracks[tracknum].padframes * bytesperframe);
+				UINT64 src_track_end = src_track_start + bytesperframe * (UINT64)trackinfo.frames;
+				UINT64 pad_track_start = src_track_end - ((UINT64)m_toc.tracks[tracknum].padframes * bytesperframe);
 				while (length_remaining != 0 && offset < endoffs)
 				{
 					// determine start of current frame
@@ -469,7 +469,7 @@ public:
 				UINT32 samples = (UINT64(m_info.rate) * UINT64(effframe + 1) * UINT64(1000000) + m_info.fps_times_1million - 1) / UINT64(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = MIN(m_info.channels, ARRAY_LENGTH(m_audio));
+				int channels = unsigned((std::min<std::size_t>)(m_info.channels, ARRAY_LENGTH(m_audio)));
 				EQUIVALENT_ARRAY(m_audio, INT16 *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
@@ -509,7 +509,7 @@ public:
 				// copy to the destination
 				UINT64 start_offset = UINT64(framenum) * UINT64(m_info.bytes_per_frame);
 				UINT64 end_offset = start_offset + m_info.bytes_per_frame;
-				UINT32 bytes_to_copy = MIN(length_remaining, end_offset - offset);
+				UINT32 bytes_to_copy = (std::min<UINT64>)(length_remaining, end_offset - offset);
 				memcpy(dest, &m_rawdata[offset - start_offset], bytes_to_copy);
 
 				// advance
@@ -1399,15 +1399,15 @@ static void do_info(parameters_t &params)
 		printf("Ratio:        %.1f%%\n", 100.0 * double(static_cast<util::core_file &>(input_chd).size()) / double(input_chd.logical_bytes()));
 
 	// add SHA1 output
-	sha1_t overall = input_chd.sha1();
-	if (overall != sha1_t::null)
+	util::sha1_t overall = input_chd.sha1();
+	if (overall != util::sha1_t::null)
 	{
 		printf("SHA1:         %s\n", overall.as_string().c_str());
 		if (input_chd.version() >= 4)
 			printf("Data SHA1:    %s\n", input_chd.raw_sha1().as_string().c_str());
 	}
-	sha1_t parent = input_chd.parent_sha1();
-	if (parent != sha1_t::null)
+	util::sha1_t parent = input_chd.parent_sha1();
+	if (parent != util::sha1_t::null)
 		printf("Parent SHA1:  %s\n", parent.as_string().c_str());
 
 	// print out metadata
@@ -1449,7 +1449,7 @@ static void do_info(parameters_t &params)
 		UINT32 count = buffer.size();
 		// limit output to 60 characters of metadata if not verbose
 		if (!verbose)
-			count = MIN(60, count);
+			count = std::min(60U, count);
 		for (int chnum = 0; chnum < count; chnum++)
 			printf("%c", isprint(UINT8(buffer[chnum])) ? buffer[chnum] : '.');
 		printf("\n");
@@ -1530,21 +1530,21 @@ static void do_verify(parameters_t &params)
 	// only makes sense for compressed CHDs with valid SHA1's
 	if (!input_chd.compressed())
 		report_error(0, "No verification to be done; CHD is uncompressed");
-	sha1_t raw_sha1 = (input_chd.version() <= 3) ? input_chd.sha1() : input_chd.raw_sha1();
-	if (raw_sha1 == sha1_t::null)
+	util::sha1_t raw_sha1 = (input_chd.version() <= 3) ? input_chd.sha1() : input_chd.raw_sha1();
+	if (raw_sha1 == util::sha1_t::null)
 		report_error(0, "No verification to be done; CHD has no checksum");
 
 	// create an array to read into
 	dynamic_buffer buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
 
 	// read all the data and build up an SHA-1
-	sha1_creator rawsha1;
+	util::sha1_creator rawsha1;
 	for (UINT64 offset = 0; offset < input_chd.logical_bytes(); )
 	{
 		progress(false, "Verifying, %.1f%% complete... \r", 100.0 * double(offset) / double(input_chd.logical_bytes()));
 
 		// determine how much to read
-		UINT32 bytes_to_read = MIN((UINT32)buffer.size(), input_chd.logical_bytes() - offset);
+		UINT32 bytes_to_read = (std::min<UINT64>)(buffer.size(), input_chd.logical_bytes() - offset);
 		chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
@@ -1553,7 +1553,7 @@ static void do_verify(parameters_t &params)
 		rawsha1.append(&buffer[0], bytes_to_read);
 		offset += bytes_to_read;
 	}
-	sha1_t computed_sha1 = rawsha1.finish();
+	util::sha1_t computed_sha1 = rawsha1.finish();
 
 	// finish up
 	if (raw_sha1 != computed_sha1)
@@ -1575,7 +1575,7 @@ static void do_verify(parameters_t &params)
 		// now include the metadata for >= v4
 		if (input_chd.version() >= 4)
 		{
-			sha1_t computed_overall_sha1 = input_chd.compute_overall_sha1(computed_sha1);
+			util::sha1_t computed_overall_sha1 = input_chd.compute_overall_sha1(computed_sha1);
 			if (input_chd.sha1() == computed_overall_sha1)
 				printf("Overall SHA1 verification successful!\n");
 			else
@@ -1721,7 +1721,7 @@ static void do_create_hd(parameters_t &params)
 	}
 
 	// process hunk size (needs to know sector_size)
-	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : MAX((4096 / sector_size) * sector_size, sector_size);
+	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : std::max((4096 / sector_size) * sector_size, sector_size);
 	parse_hunk_size(params, sector_size, hunk_size);
 
 	// process input start/end (needs to know hunk_size)
@@ -2284,7 +2284,7 @@ static void do_extract_raw(parameters_t &params)
 			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
 
 			// determine how much to read
-			UINT32 bytes_to_read = MIN((UINT32)buffer.size(), input_end - offset);
+			UINT32 bytes_to_read = (std::min<UINT64>)(buffer.size(), input_end - offset);
 			chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
@@ -2432,11 +2432,11 @@ static void do_extract_cd(parameters_t &params)
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
 			if (mode == MODE_GDI)
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name.c_str()).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name).c_str(), discoffs, outputoffs);
 			}
 			else
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(output_bin_file_str->c_str()).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(*output_bin_file_str).c_str(), discoffs, outputoffs);
 			}
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
@@ -2609,7 +2609,7 @@ static void do_extract_ld(parameters_t &params)
 		avconfig.actsamples = &actsamples;
 		for (int chnum = 0; chnum < ARRAY_LENGTH(audio_data); chnum++)
 		{
-			audio_data[chnum].resize(MAX(1,max_samples_per_frame));
+			audio_data[chnum].resize(std::max(1U,max_samples_per_frame));
 			avconfig.audio[chnum] = &audio_data[chnum][0];
 		}
 

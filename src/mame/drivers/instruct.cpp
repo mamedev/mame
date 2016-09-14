@@ -323,7 +323,7 @@ void instruct_state::machine_reset()
 QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 {
 	UINT16 i, exec_addr, quick_length, read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	if (quick_length < 0x0100)
@@ -393,7 +393,7 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 				// Start the quickload - JP exec_addr
 				m_maincpu->set_state_int(S2650_PC, 0);
 
-				result = IMAGE_INIT_PASS;
+				result = image_init_result::PASS;
 			}
 		}
 	}

@@ -1331,7 +1331,7 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 READ32_MEMBER(cps3_state::cps3_ssram_r)
 {
 	if (offset>0x8000/4)
-		return LITTLE_ENDIANIZE_INT32(m_ss_ram[offset]);
+		return little_endianize_int32(m_ss_ram[offset]);
 	else
 		return m_ss_ram[offset];
 }
@@ -1341,8 +1341,8 @@ WRITE32_MEMBER(cps3_state::cps3_ssram_w)
 	if (offset>0x8000/4)
 	{
 		// we only want to endian-flip the character data, the tilemap info is fine
-		data = LITTLE_ENDIANIZE_INT32(data);
-		mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
+		data = little_endianize_int32(data);
+		mem_mask = little_endianize_int32(mem_mask);
 		m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 	}
 
@@ -1389,14 +1389,14 @@ READ32_MEMBER(cps3_state::cram_data_r)
 {
 	UINT32 fulloffset = (((m_cram_bank&0x7)*0x100000)/4) + offset;
 
-	return LITTLE_ENDIANIZE_INT32(m_char_ram[fulloffset]);
+	return little_endianize_int32(m_char_ram[fulloffset]);
 }
 
 WRITE32_MEMBER(cps3_state::cram_data_w)
 {
 	UINT32 fulloffset = (((m_cram_bank&0x7)*0x100000)/4) + offset;
-	mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
-	data = LITTLE_ENDIANIZE_INT32(data);
+	mem_mask = little_endianize_int32(mem_mask);
+	data = little_endianize_int32(data);
 	COMBINE_DATA(&m_char_ram[fulloffset]);
 	m_gfxdecode->gfx(1)->mark_dirty(fulloffset/0x40);
 }
@@ -2016,9 +2016,9 @@ void cps3_state::cps3_process_character_dma(UINT32 address)
 
 	for (i = 0; i < 0x1000; i += 3)
 	{
-		UINT32 dat1 = LITTLE_ENDIANIZE_INT32(m_char_ram[i + 0 + (address)]);
-		UINT32 dat2 = LITTLE_ENDIANIZE_INT32(m_char_ram[i + 1 + (address)]);
-		UINT32 dat3 = LITTLE_ENDIANIZE_INT32(m_char_ram[i + 2 + (address)]);
+		UINT32 dat1 = little_endianize_int32(m_char_ram[i + 0 + (address)]);
+		UINT32 dat2 = little_endianize_int32(m_char_ram[i + 1 + (address)]);
+		UINT32 dat3 = little_endianize_int32(m_char_ram[i + 2 + (address)]);
 		UINT32 real_source      = (dat3 << 1) - 0x400000;
 		UINT32 real_destination =  dat2 << 3;
 		UINT32 real_length      = (((dat1 & 0x001fffff) + 1) << 3);

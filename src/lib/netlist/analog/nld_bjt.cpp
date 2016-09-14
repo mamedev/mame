@@ -113,7 +113,7 @@ NETLIB_UPDATE_TERMINALS(QBJT_switch)
 {
 	const nl_double m = (is_qtype( BJT_NPN) ? 1 : -1);
 
-	const int new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
+	const unsigned new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 	if (m_state_on ^ new_state)
 	{
 		const nl_double gb = new_state ? m_gB : netlist().gmin();

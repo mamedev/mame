@@ -81,7 +81,7 @@ private:
 		EFFECT_COUNT_MAX = 10
 	};
 
-	UINT32 clamped_latency() const { return MAX(MIN(m_audio_latency, LATENCY_MAX), LATENCY_MIN); }
+	UINT32 clamped_latency() const { return unsigned(std::max(std::min(m_audio_latency, int(LATENCY_MAX)), int(LATENCY_MIN))); }
 	UINT32 buffer_avail() const { return ((m_writepos >= m_playpos) ? m_buffer_size : 0) + m_playpos - m_writepos; }
 	UINT32 buffer_used() const { return ((m_playpos > m_writepos) ? m_buffer_size : 0) + m_writepos - m_playpos; }
 
@@ -228,7 +228,7 @@ int sound_coreaudio::init(const osd_options &options)
 
 	// Allocate buffer
 	m_headroom = m_sample_bytes * (clamped_latency() * sample_rate() / 40);
-	m_buffer_size = m_sample_bytes * MAX(sample_rate() * (clamped_latency() + 3) / 40, 256);
+	m_buffer_size = m_sample_bytes * std::max<UINT32>(sample_rate() * (clamped_latency() + 3) / 40, 256U);
 	m_buffer = global_alloc_array_clear<INT8>(m_buffer_size);
 	if (!m_buffer)
 	{
@@ -306,7 +306,7 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, INT16 const *buffer
 		return;
 	}
 
-	UINT32 const chunk = MIN(m_buffer_size - m_writepos, bytes_this_frame);
+	UINT32 const chunk = std::min(m_buffer_size - m_writepos, bytes_this_frame);
 	memcpy(m_buffer + m_writepos, (INT8 *)buffer, chunk);
 	m_writepos += chunk;
 	if (m_writepos >= m_buffer_size)
@@ -324,7 +324,7 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, INT16 const *buffer
 
 void sound_coreaudio::set_mastervolume(int attenuation)
 {
-	int const clamped_attenuation = MAX(MIN(attenuation, 0), -32);
+	int const clamped_attenuation = std::max(std::min(attenuation, 0), -32);
 	m_scale = (-32 == clamped_attenuation) ? 0 : (INT32)(pow(10.0, clamped_attenuation / 20.0) * 128);
 }
 
@@ -996,7 +996,7 @@ OSStatus sound_coreaudio::render(
 		return noErr;
 	}
 
-	UINT32 const chunk = MIN(m_buffer_size - m_playpos, number_bytes);
+	UINT32 const chunk = std::min(m_buffer_size - m_playpos, number_bytes);
 	copy_scaled((INT8 *)data->mBuffers[0].mData, m_buffer + m_playpos, chunk);
 	m_playpos += chunk;
 	if (m_playpos >= m_buffer_size)

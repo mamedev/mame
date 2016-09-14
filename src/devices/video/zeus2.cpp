@@ -967,7 +967,7 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 				if (logit)
 				{
 					//if ((cmd == 0x38) || (cmd == 0x2d))
-					//	log_render_info();
+					//  log_render_info();
 					int offs;
 					logerror("\t");
 					for (offs = 0; offs < databufcount; offs++)
@@ -1014,8 +1014,8 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 					default:
 						//if (quadsize == 10)
 						//{
-						//	logerror("Correcting quad size\n");
-						//	quadsize = 14;
+						//  logerror("Correcting quad size\n");
+						//  quadsize = 14;
 						//}
 						if (logit)
 							logerror("unknown model data\n");
@@ -1212,9 +1212,9 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 		float y = vert[i].y;
 		float z = vert[i].p[0];
 		//if (0) {
-		//	x *= xScale;
-		//	y *= yScale;
-		//	z *= zScale;
+		//  x *= xScale;
+		//  y *= yScale;
+		//  z *= zScale;
 
 		//}
 		vert[i].x = x * m_state->zeus_matrix[0][0] + y * m_state->zeus_matrix[0][1] + z * m_state->zeus_matrix[0][2];
@@ -1311,8 +1311,8 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 
 		clipvert[i].p[0] *= 65536.0f * 16.0f;
 
-		maxx = MAX(maxx, clipvert[i].x);
-		maxy = MAX(maxy, clipvert[i].y);
+		maxx = std::max(maxx, clipvert[i].x);
+		maxy = std::max(maxy, clipvert[i].y);
 		if (logextra & logit)
 			m_state->logerror("\t\t\tTranslated=(%f,%f)\n", (double)clipvert[i].x, (double)clipvert[i].y);
 	}

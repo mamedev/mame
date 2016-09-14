@@ -282,7 +282,7 @@ void renderer_sdl2::render_quad(texture_info *texture, const render_primitive &p
 		texture->render_quad(prim, x, y);
 		copyinfo->time += osd_ticks();
 
-		copyinfo->pixel_count += MAX(STAT_PIXEL_THRESHOLD , (texture->raw_width() * texture->raw_height()));
+		copyinfo->pixel_count += std::max(STAT_PIXEL_THRESHOLD , (texture->raw_width() * texture->raw_height()));
 		if (m_last_blit_pixels)
 		{
 			copyinfo->time += (m_last_blit_time * (INT64) (texture->raw_width() * texture->raw_height())) / (INT64) m_last_blit_pixels;

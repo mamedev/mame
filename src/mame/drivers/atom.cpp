@@ -170,7 +170,7 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 
 	m_maincpu->set_pc(run_address);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /***************************************************************************
@@ -675,20 +675,20 @@ void atomeb_state::machine_start()
     MACHINE DRIVERS
 ***************************************************************************/
 
-int atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	UINT32 size = slot->common_get_size("rom");
 
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static SLOT_INTERFACE_START(atom_floppies)
@@ -725,7 +725,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
@@ -834,7 +834,7 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))

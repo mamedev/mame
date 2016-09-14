@@ -292,7 +292,7 @@ QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 		vmufat_write_word(flash, 253, 0x1a, 0x0001);        // offset of header (in blocks) from file start
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

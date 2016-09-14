@@ -235,10 +235,10 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		spectrum_setup_z80(machine(), &snapshot_data[0], snapshot_size);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 
 error:
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 /*******************************************************************
@@ -2473,10 +2473,10 @@ QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 		spectrum_setup_raw(machine(), &quickload_data[0], quickload_size);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 
 error:
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 /*******************************************************************

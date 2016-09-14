@@ -221,12 +221,12 @@ QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 
 	if (size > m_ram->size())
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	image.fread(m_ram->pointer(), size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static MACHINE_CONFIG_START( elf2, elf2_state )

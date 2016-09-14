@@ -53,7 +53,8 @@ public:
 		m_ymsnd(*this,"ymsnd"),
 		m_vdp(*this,"gen_vdp"),
 		m_snsnd(*this, "snsnd"),
-		m_megadrive_ram(*this,"megadrive_ram")
+		m_megadrive_ram(*this,"megadrive_ram"),
+		m_io_reset(*this, "RESET")
 	{ }
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
@@ -63,7 +64,7 @@ public:
 	optional_shared_ptr<UINT16> m_megadrive_ram;
 
 
-	ioport_port *m_io_reset;
+	optional_ioport m_io_reset;
 	ioport_port *m_io_pad_3b[4];
 	ioport_port *m_io_pad_6b[4];
 

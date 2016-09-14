@@ -540,8 +540,8 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
 	/* according to the schematics, it should be the first 16 pixels */
-	clip.min_x = MAX(clip.min_x, (!m_flipscreen_x) * (16 + hoffset) * GALAXIAN_XSCALE);
-	clip.max_x = MIN(clip.max_x, (256 - m_flipscreen_x * (16 + hoffset)) * GALAXIAN_XSCALE - 1);
+	clip.min_x = std::max(clip.min_x, (!m_flipscreen_x) * (16 + hoffset) * GALAXIAN_XSCALE);
+	clip.max_x = std::min(clip.max_x, (256 - m_flipscreen_x * (16 + hoffset)) * GALAXIAN_XSCALE - 1);
 
 	/* The line buffer is only written if it contains a '0' currently; */
 	/* it is cleared during the visible area, and populated during HBLANK */
@@ -946,24 +946,24 @@ void galaxian_state::background_draw_colorsplit(bitmap_rgb32 &bitmap, const rect
 	if (m_flipscreen_x)
 	{
 		rectangle draw = cliprect;
-		draw.max_x = MIN(draw.max_x, split_flipped * GALAXIAN_XSCALE - 1);
+		draw.max_x = std::min(draw.max_x, split_flipped * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
 			bitmap.fill(rgb_t::black, draw);
 
 		draw = cliprect;
-		draw.min_x = MAX(draw.min_x, split_flipped * GALAXIAN_XSCALE);
+		draw.min_x = std::max(draw.min_x, split_flipped * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
 			bitmap.fill(color, draw);
 	}
 	else
 	{
 		rectangle draw = cliprect;
-		draw.max_x = MIN(draw.max_x, split * GALAXIAN_XSCALE - 1);
+		draw.max_x = std::min(draw.max_x, split * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
 			bitmap.fill(color, draw);
 
 		draw = cliprect;
-		draw.min_x = MAX(draw.min_x, split * GALAXIAN_XSCALE);
+		draw.min_x = std::max(draw.min_x, split * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
 			bitmap.fill(rgb_t::black, draw);
 	}

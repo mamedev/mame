@@ -192,11 +192,11 @@ void psxcd_device::device_reset()
 	curpos.w = 0;
 }
 
-bool psxcd_device::call_load()
+image_init_result psxcd_device::call_load()
 {
-	bool ret = cdrom_image_device::call_load();
+	image_init_result ret = cdrom_image_device::call_load();
 	open = true;
-	if(ret == IMAGE_INIT_PASS)
+	if(ret == image_init_result::PASS)
 		add_system_event(event_change_disk, m_sysclock, nullptr); // 1 sec to spin up the disk
 	return ret;
 }

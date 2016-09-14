@@ -13,6 +13,7 @@
 #include "palette.h"
 #include <stdlib.h>
 #include <math.h>
+#include <algorithm>
 
 
 //**************************************************************************
@@ -107,8 +108,8 @@ void palette_client::dirty_state::resize(UINT32 colors)
 void palette_client::dirty_state::mark_dirty(UINT32 index)
 {
 	m_dirty[index / 32] |= 1 << (index % 32);
-	m_mindirty = MIN(m_mindirty, index);
-	m_maxdirty = MAX(m_maxdirty, index);
+	m_mindirty = std::min(m_mindirty, index);
+	m_maxdirty = std::max(m_maxdirty, index);
 }
 
 
@@ -504,8 +505,8 @@ void palette_t::group_set_contrast(UINT32 group, float contrast)
 void palette_t::normalize_range(UINT32 start, UINT32 end, int lum_min, int lum_max)
 {
 	// clamp within range
-	start = MAX(start, 0);
-	end = MIN(end, m_numcolors - 1);
+	start = std::max(start, 0U);
+	end = std::min(end, m_numcolors - 1);
 
 	// find the minimum and maximum brightness of all the colors in the range
 	INT32 ymin = 1000 * 255, ymax = 0;
@@ -513,8 +514,8 @@ void palette_t::normalize_range(UINT32 start, UINT32 end, int lum_min, int lum_m
 	{
 		rgb_t rgb = m_entry_color[index];
 		UINT32 y = 299 * rgb.r() + 587 * rgb.g() + 114 * rgb.b();
-		ymin = MIN(ymin, y);
-		ymax = MAX(ymax, y);
+		ymin = (std::min<UINT32>)(ymin, y);
+		ymax = (std::max<UINT32>)(ymax, y);
 	}
 
 	// determine target minimum/maximum

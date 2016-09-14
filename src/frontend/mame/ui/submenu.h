@@ -49,24 +49,28 @@ public:
 		const char  *description;
 		const char  *name;
 		core_options::entry *entry;
-		core_options (*options);
+		core_options *options;
 		std::vector<std::string> value;
 	};
 
-	submenu(mame_ui_manager &mui, render_container *container, std::vector<option> &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
+	submenu(mame_ui_manager &mui, render_container &container, std::vector<option> const &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
+	submenu(mame_ui_manager &mui, render_container &container, std::vector<option> &&suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
 	virtual ~submenu();
-	virtual void populate() override;
-	virtual void handle() override;
+
+	static std::vector<option> const misc_options;
+	static std::vector<option> const advanced_options;
+	static std::vector<option> const control_options;
+	static std::vector<option> const video_options;
+	//static std::vector<option> const export_options;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	static std::vector<option> misc_options;
-	static std::vector<option> advanced_options;
-	static std::vector<option> control_options;
-	static std::vector<option> video_options;
-	//static std::vector<option> export_options;
-
 private:
-	std::vector<option> &m_options;
+	virtual void populate() override;
+	virtual void handle() override;
+
+	std::vector<option> m_options;
 	game_driver const   *m_driver;
 };
 

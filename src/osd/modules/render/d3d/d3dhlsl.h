@@ -296,6 +296,7 @@ public:
 
 	void save_snapshot();
 	void record_movie();
+	void record_audio(const INT16 *buffer, int samples_this_frame);
 
 	void init_fsfx_quad();
 

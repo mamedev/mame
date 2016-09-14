@@ -360,8 +360,6 @@ static MACHINE_CONFIG_START( ksm, ksm_state )
 	// serial connection to host
 	MCFG_DEVICE_ADD( "i8251line", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
@@ -369,6 +367,7 @@ static MACHINE_CONFIG_START( ksm, ksm_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_dsr))
 
+	// XXX /RTS, /DTR, PC5 and PC6 are wired to baud rate generator.
 	MCFG_DEVICE_ADD("line_clock", CLOCK, 9600*16) // 8251 is set to /16 on the clock input
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ksm_state, write_line_clock))
 

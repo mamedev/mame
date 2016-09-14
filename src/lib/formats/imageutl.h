@@ -34,12 +34,12 @@ static inline void place_integer_be(void *ptr, size_t offset, size_t size, UINT6
 	switch(size)
 	{
 		case 2:
-			val16 = BIG_ENDIANIZE_INT16((UINT16) value);
+			val16 = big_endianize_int16((UINT16) value);
 			memcpy(byte_ptr, &val16, sizeof(val16));
 			break;
 
 		case 4:
-			val32 = BIG_ENDIANIZE_INT32((UINT32) value);
+			val32 = big_endianize_int32((UINT32) value);
 			memcpy(byte_ptr, &val32, sizeof(val32));
 			break;
 
@@ -71,12 +71,12 @@ static inline UINT64 pick_integer_be(const void *ptr, size_t offset, size_t size
 
 		case 2:
 			memcpy(&val16, byte_ptr, sizeof(val16));
-			result = BIG_ENDIANIZE_INT16(val16);
+			result = big_endianize_int16(val16);
 			break;
 
 		case 4:
 			memcpy(&val32, byte_ptr, sizeof(val32));
-			result = BIG_ENDIANIZE_INT32(val32);
+			result = big_endianize_int32(val32);
 			break;
 
 		default:
@@ -102,12 +102,12 @@ static inline void place_integer_le(void *ptr, size_t offset, size_t size, UINT6
 	switch(size)
 	{
 		case 2:
-			val16 = LITTLE_ENDIANIZE_INT16((UINT16) value);
+			val16 = little_endianize_int16((UINT16) value);
 			memcpy(byte_ptr, &val16, sizeof(val16));
 			break;
 
 		case 4:
-			val32 = LITTLE_ENDIANIZE_INT32((UINT32) value);
+			val32 = little_endianize_int32((UINT32) value);
 			memcpy(byte_ptr, &val32, sizeof(val32));
 			break;
 
@@ -139,12 +139,12 @@ static inline UINT64 pick_integer_le(const void *ptr, size_t offset, size_t size
 
 		case 2:
 			memcpy(&val16, byte_ptr, sizeof(val16));
-			result = LITTLE_ENDIANIZE_INT16(val16);
+			result = little_endianize_int16(val16);
 			break;
 
 		case 4:
 			memcpy(&val32, byte_ptr, sizeof(val32));
-			result = LITTLE_ENDIANIZE_INT32(val32);
+			result = little_endianize_int32(val32);
 			break;
 
 		default:

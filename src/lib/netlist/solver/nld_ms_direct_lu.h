@@ -28,8 +28,8 @@ class matrix_solver_direct_t: public matrix_solver_t
 {
 public:
 
-	matrix_solver_direct_t(const solver_parameters_t *params, const int size);
-	matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size);
+	matrix_solver_direct_t(const solver_parameters_t *params, const unsigned size);
+	matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const unsigned size);
 
 	virtual ~matrix_solver_direct_t();
 
@@ -568,7 +568,7 @@ void matrix_solver_direct_t<m_N, storage_N>::store(
 
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
 	nl_double new_V[storage_N]; // = { 0.0 };
 
@@ -602,7 +602,7 @@ inline int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool
 }
 
 template <unsigned m_N, unsigned storage_N>
-matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const solver_parameters_t *params, const int size)
+matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const solver_parameters_t *params, const unsigned size)
 : matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
 , m_lp_fact(0)
@@ -616,7 +616,7 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const solver_para
 }
 
 template <unsigned m_N, unsigned storage_N>
-matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size)
+matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const unsigned size)
 : matrix_solver_t(type, params)
 , m_dim(size)
 , m_lp_fact(0)

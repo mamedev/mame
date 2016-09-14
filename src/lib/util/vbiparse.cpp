@@ -11,7 +11,7 @@
 #include "osdcore.h"
 #include "vbiparse.h"
 #include <math.h>
-
+#include <algorithm>
 
 
 /***************************************************************************
@@ -58,8 +58,8 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 	for (x = 0; x < sourcewidth; x++)
 	{
 		UINT8 rawsrc = source[x] >> sourceshift;
-		min = MIN(min, rawsrc);
-		max = MAX(max, rawsrc);
+		min = std::min(min, rawsrc);
+		max = std::max(max, rawsrc);
 	}
 
 	/* bail if the line is all black or all white */

@@ -341,14 +341,11 @@ static const z80_daisy_config daisy_chain_intf[] =
 ************************************************************/
 
 // baud rate generator. All inputs are 1.2288MHz.
-TIMER_DEVICE_CALLBACK_MEMBER( aussiebyte_state::ctc_tick )
+WRITE_LINE_MEMBER( aussiebyte_state::clock_w )
 {
-	m_ctc->trg0(1);
-	m_ctc->trg0(0);
-	m_ctc->trg1(1);
-	m_ctc->trg1(0);
-	m_ctc->trg2(1);
-	m_ctc->trg2(0);
+	m_ctc->trg0(state);
+	m_ctc->trg1(state);
+	m_ctc->trg2(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::ctc_z0_w )
@@ -475,6 +472,9 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4_9152MHz / 4)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(aussiebyte_state, clock_w))
+
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(aussiebyte_state, ctc_z0_w))    // SIO1 Ch A
@@ -532,7 +532,6 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_MC6845_ADDR_CHANGED_CB(aussiebyte_state, crtc_update_addr)
 
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", aussiebyte_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz / 4))
 MACHINE_CONFIG_END
 
 

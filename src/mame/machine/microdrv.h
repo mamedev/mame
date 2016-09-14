@@ -48,9 +48,9 @@ public:
 	template<class _Object> static devcb_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CASSETTE; }
 
@@ -61,7 +61,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return "ql_cass"; }
 	virtual const char *file_extensions() const override { return "mdv"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// specific implementation
 	DECLARE_WRITE_LINE_MEMBER( clk_w );

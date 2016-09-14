@@ -285,11 +285,11 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 		}
 		else
 		{
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static MACHINE_CONFIG_START( cp1, cp1_state )

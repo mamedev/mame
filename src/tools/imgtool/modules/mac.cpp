@@ -5644,7 +5644,7 @@ static imgtoolerr_t mac_image_readfile(imgtool_partition *partition, const char 
 	i = 0;
 	while(i < data_len)
 	{
-		run_len = MIN(data_len - i, sizeof(buf));
+		run_len = std::min(size_t(data_len - i), sizeof(buf));
 
 		err = mac_file_read(&fileref, run_len, buf);
 		if (err)

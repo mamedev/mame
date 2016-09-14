@@ -255,22 +255,7 @@ void alto2_cpu_device::update_bitmap_word(UINT16* bitmap, int x, int y, UINT16 w
 		return;
 	bitmap[x] = word;
 	UINT8* pix = m_dsp.scanline[y] + x * 16;
-	*pix++ = (word >> 15) & 1;
-	*pix++ = (word >> 14) & 1;
-	*pix++ = (word >> 13) & 1;
-	*pix++ = (word >> 12) & 1;
-	*pix++ = (word >> 11) & 1;
-	*pix++ = (word >> 10) & 1;
-	*pix++ = (word >>  9) & 1;
-	*pix++ = (word >>  8) & 1;
-	*pix++ = (word >>  7) & 1;
-	*pix++ = (word >>  6) & 1;
-	*pix++ = (word >>  5) & 1;
-	*pix++ = (word >>  4) & 1;
-	*pix++ = (word >>  3) & 1;
-	*pix++ = (word >>  2) & 1;
-	*pix++ = (word >>  1) & 1;
-	*pix++ = (word >>  0) & 1;
+	memcpy(pix, m_dsp.patterns + 16 * word, 16);
 }
 
 /**
@@ -364,18 +349,15 @@ void alto2_cpu_device::display_state_machine()
 		LOG((this,LOG_DISPL,1, " VBLANK"));
 
 		// VSYNC is always within VBLANK, thus we handle it only here
-		if (A66_VSYNC(a66))
+		if (A66_VSYNC(a66) && !A66_VSYNC(m_dsp.a66))
 		{
-			if (!A66_VSYNC(m_dsp.a66))
-			{
-				LOG((this,LOG_DISPL,1, " VSYNC/ (wake DVT)"));
-				/*
-				 * The display vertical task DVT is woken once per field
-				 * at the beginning of vertical retrace.
-				 */
-				m_task_wakeup |= 1 << task_dvt;
-				// TODO: upade odd or even field of the internal bitmap now?
-			}
+			LOG((this,LOG_DISPL,1, " VSYNC/ (wake DVT)"));
+			/*
+			 * The display vertical task DVT is woken once per field
+			 * at the beginning of vertical retrace.
+			 */
+			m_task_wakeup |= 1 << task_dvt;
+			// TODO: upade odd or even field of the internal bitmap now?
 		}
 	}
 	else
@@ -533,6 +515,12 @@ void alto2_cpu_device::init_disp()
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 
 	m_dsp.raw_bitmap = std::make_unique<UINT16[]>(ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	m_dsp.patterns = auto_alloc_array(machine(), UINT8, 65536 * 16);
+	for (int y = 0; y < 65536; y++) {
+		UINT8* dst = m_dsp.patterns + y * 16;
+		for (int x = 0; x < 16; x++)
+			*dst++ = (y >> (15 - x)) & 1;
+	}
 	m_dsp.scanline = auto_alloc_array(machine(), UINT8*, ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H);
 	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H; y++)
 		m_dsp.scanline[y] = auto_alloc_array(machine(), UINT8, ALTO2_DISPLAY_TOTAL_WIDTH);
@@ -574,7 +562,7 @@ void alto2_cpu_device::reset_disp()
 
 	for (int y = ALTO2_DISPLAY_HEIGHT; y < ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H; y++)
 		memset(m_dsp.scanline[y], 1, sizeof(UINT8) * ALTO2_DISPLAY_TOTAL_WIDTH);
-	fake_status_printf(1, "* Fake Status *");
+	fake_status_printf(1, "Disk status info");
 }
 
 /* Video update */
@@ -583,13 +571,10 @@ UINT32 alto2_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	pen_t palette_bw[2];
 	palette_bw[0] = screen.palette().white_pen();
 	palette_bw[1] = screen.palette().black_pen();
-	// copy even or odd field
-	for (int y = m_dsp.odd_frame ? 0 : 1; y < ALTO2_DISPLAY_HEIGHT; y += 2)
+	for (int y = m_dsp.odd_frame ? 1 : 0; y < ALTO2_DISPLAY_HEIGHT; y += 2)
 		draw_scanline8(*m_dsp.bitmap, 0, y, ALTO2_DISPLAY_WIDTH, m_dsp.scanline[y], palette_bw);
-	// copy fake status scanlines
 	for (int y = ALTO2_DISPLAY_HEIGHT; y < ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H; y++)
 		draw_scanline8(*m_dsp.bitmap, 0, y, ALTO2_DISPLAY_WIDTH, m_dsp.scanline[y], palette_bw);
-	// copy bitmap
 	copybitmap(bitmap, *m_dsp.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

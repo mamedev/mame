@@ -4095,9 +4095,9 @@ static void chunky_to_planar(memory_region *rgn)
 
 	for (int i = 0; i < len; i++)
 	{
-		UINT32 data = LITTLE_ENDIANIZE_INT32(ROM[i]);
+		UINT32 data = little_endianize_int32(ROM[i]);
 		data = BITSWAP32(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
-		ROM[i] = LITTLE_ENDIANIZE_INT32(data);
+		ROM[i] = little_endianize_int32(data);
 	}
 }
 

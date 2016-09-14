@@ -241,13 +241,13 @@ public:
 	UINT8 m_ttr;
 	UINT8 m_rpr;
 	UINT8 m_rtr;
-	//	UINT8 m_ctprh;
-	//	UINT8 m_ctprl;
+	//  UINT8 m_ctprh;
+	//  UINT8 m_ctprl;
 	unsigned int m_ctpr;
 	UINT8 m_ctcr;
 	UINT8 m_omr;
-	//	UINT8 m_cth;
-	//	UINT8 m_ctl;
+	//  UINT8 m_cth;
+	//  UINT8 m_ctl;
 	unsigned int m_ct;
 	UINT8 m_pcr;
 	UINT8 m_ccr;
@@ -256,13 +256,13 @@ public:
 	UINT8 m_rsr;
 	UINT8 m_trsr;
 	UINT8 m_ictsr;
-	//	UINT8 m_gsr; // moved to the device since it is global
+	//  UINT8 m_gsr; // moved to the device since it is global
 	UINT8 m_ier;
 	//  UINT8 m_rea;
 	UINT8 m_cid;
 	//UINT8 m_ivr;
 	//UINT8 m_icr;
-	//	UINT8 m_sea;
+	//  UINT8 m_sea;
 	//UINT8 m_ivrm;
 	UINT8 m_mrr;
 	UINT8 m_ier1;
@@ -275,12 +275,12 @@ public:
 	UINT8 m_telr;
 
 protected:
-	enum // Needs to be 0-3 in unmodified prio level 
+	enum // Needs to be 0-3 in unmodified prio level
 	{
-		INT_RXREADY		= 0,
-		INT_TXREADY		= 1,
-		INT_RXTXSTAT	= 2,
-		INT_EXTCTSTAT	= 3
+		INT_RXREADY     = 0,
+		INT_TXREADY     = 1,
+		INT_RXTXSTAT    = 2,
+		INT_EXTCTSTAT   = 3
 	};
 
 	enum
@@ -292,9 +292,9 @@ protected:
 		REG_CCR_ENABLE_RX   = 0x42,
 		REG_CCR_DISABLE_RX  = 0x43,
 		REG_CCR_START_TIMER = 0x80,
-		REG_CCR_STOP_TIMER	= 0x81,
-		REG_CCR_PRST_FFFF	= 0x82,
-		REG_CCR_PRST_CTPR	= 0x83,
+		REG_CCR_STOP_TIMER  = 0x81,
+		REG_CCR_PRST_FFFF   = 0x82,
+		REG_CCR_PRST_CTPR   = 0x83,
 	};
 
 	enum
@@ -403,24 +403,24 @@ protected:
 
 	enum
 	{
-		REG_RSR_CHAR_COMPARE 		= 0x80,
-		REG_RSR_OVERRUN_ERROR		= 0x20,
-		REG_RSR_FRAMING_ERROR		= 0x02,
-		REG_RSR_PARITY_ERROR		= 0x01,
+		REG_RSR_CHAR_COMPARE        = 0x80,
+		REG_RSR_OVERRUN_ERROR       = 0x20,
+		REG_RSR_FRAMING_ERROR       = 0x02,
+		REG_RSR_PARITY_ERROR        = 0x01,
 	};
 
 	enum
 	{
-		REG_GSR_CHAN_A_RXREADY 		= 0x01,
-		REG_GSR_CHAN_B_RXREADY 		= 0x10,
-		REG_GSR_CHAN_A_TXREADY 		= 0x02,
-		REG_GSR_CHAN_B_TXREADY 		= 0x20,
-		REG_GSR_XXREADY_MASK		= 0x33
+		REG_GSR_CHAN_A_RXREADY      = 0x01,
+		REG_GSR_CHAN_B_RXREADY      = 0x10,
+		REG_GSR_CHAN_A_TXREADY      = 0x02,
+		REG_GSR_CHAN_B_TXREADY      = 0x20,
+		REG_GSR_XXREADY_MASK        = 0x33
 	};
 
 	enum
 	{
-		REG_ICTSR_ZERO_DET			= 0x40,
+		REG_ICTSR_ZERO_DET          = 0x40,
 		REG_ICTSR_DELTA_CTS         = 0x10,
 		REG_ICTSR_DCD               = 0x08,
 		REG_ICTSR_CTS               = 0x04,
@@ -428,14 +428,14 @@ protected:
 
 	enum
 	{
-		REG_IER_DCD_CTS				= 0x80,
-		REG_IER_TXRDY				= 0x40,
-		REG_IER_TRSR73				= 0x20,
-		REG_IER_RXRDY 				= 0x10,
-		REG_IER_RSR76 				= 0x08,
-		REG_IER_RSR54 				= 0x04,
-		REG_IER_RSR32 				= 0x02,
-		REG_IER_RSR10 				= 0x01,
+		REG_IER_DCD_CTS             = 0x80,
+		REG_IER_TXRDY               = 0x40,
+		REG_IER_TRSR73              = 0x20,
+		REG_IER_RXRDY               = 0x10,
+		REG_IER_RSR76               = 0x08,
+		REG_IER_RSR54               = 0x04,
+		REG_IER_RSR32               = 0x02,
+		REG_IER_RSR10               = 0x01,
 	};
 
 	// Register offsets, stripped from channel bit 0x20 but including A7 bit
@@ -494,13 +494,13 @@ protected:
 
 	UINT8 m_rtxc;
 	UINT8 m_trxc;
-	
+
 
 	enum
 	{
-		REG_CTCR_ZERO_DET_INT	= 0x80,
-		REG_CTCR_ZERO_DET_CTL	= 0x40,
-		REG_CTCR_TIM_OC			= 0x20,
+		REG_CTCR_ZERO_DET_INT   = 0x80,
+		REG_CTCR_ZERO_DET_CTL   = 0x40,
+		REG_CTCR_TIM_OC         = 0x20,
 	};
 
 	enum
@@ -731,15 +731,15 @@ protected:
 
 	enum
 	{
-		REG_ICR_CHB				= 0x01,
-		REG_ICR_CHA				= 0x02,
-		REG_ICR_VEC_MOD			= 0x04,
-		REG_ICR_V2V4_MOD		= 0x08,
-		REG_ICR_PRIO_MASK		= 0xC0,
-		REG_ICR_PRIO_AHI		= 0x00,
-		REG_ICR_PRIO_BHI		= 0x40,
-		REG_ICR_PRIO_AINT		= 0x80,
-		REG_ICR_PRIO_BINT		= 0xC0,
+		REG_ICR_CHB             = 0x01,
+		REG_ICR_CHA             = 0x02,
+		REG_ICR_VEC_MOD         = 0x04,
+		REG_ICR_V2V4_MOD        = 0x08,
+		REG_ICR_PRIO_MASK       = 0xC0,
+		REG_ICR_PRIO_AHI        = 0x00,
+		REG_ICR_PRIO_BHI        = 0x40,
+		REG_ICR_PRIO_AINT       = 0x80,
+		REG_ICR_PRIO_BINT       = 0xC0,
 	};
 };
 

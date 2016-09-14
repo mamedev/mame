@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:smf
-#ifndef __BUS_RS232_H__
-#define __BUS_RS232_H__
+// copyright-holders:smf,Vas Crabb
+#ifndef MAME_BUS_RS232_H
+#define MAME_BUS_RS232_H
 
 #pragma once
 
@@ -256,8 +256,38 @@ protected:
 	}
 };
 
+template <UINT32 FIFO_LENGTH>
+class buffered_rs232_device : public device_t, public device_buffered_serial_interface<FIFO_LENGTH>, public device_rs232_port_interface
+{
+public:
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override
+	{
+		device_buffered_serial_interface<FIFO_LENGTH>::rx_w(state);
+	}
+
+protected:
+	buffered_rs232_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+		: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		, device_buffered_serial_interface<FIFO_LENGTH>(mconfig, *this)
+		, device_rs232_port_interface(mconfig, *this)
+	{
+	}
+
+	virtual void device_start() override
+	{
+		device_buffered_serial_interface<FIFO_LENGTH>::register_save_state(machine().save(), this);
+	}
+
+	virtual void tra_callback() override
+	{
+		output_rxd(this->transmit_register_get_data_bit());
+	}
+
+	using device_buffered_serial_interface<FIFO_LENGTH>::device_timer;
+};
+
 extern const device_type RS232_PORT;
 
 SLOT_INTERFACE_EXTERN( default_rs232_devices );
 
-#endif
+#endif // MAME_BUS_RS232_H

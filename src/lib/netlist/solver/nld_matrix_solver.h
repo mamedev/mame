@@ -29,8 +29,8 @@ namespace netlist
 		nl_double m_max_timestep;
 		nl_double m_sor;
 		bool m_dynamic;
-		int m_gs_loops;
-		int m_nr_loops;
+		unsigned m_gs_loops;
+		unsigned m_nr_loops;
 		netlist_time m_nt_sync_delay;
 		bool m_log_stats;
 	};
@@ -60,7 +60,7 @@ public:
 
 	void add(terminal_t *term, int net_other, bool sorted);
 
-	inline unsigned count() { return m_term.size(); }
+	inline std::size_t count() { return m_term.size(); }
 
 	inline terminal_t **terms() { return m_term.data(); }
 	inline int *net_other() { return m_net_other.data(); }
@@ -71,7 +71,7 @@ public:
 
 	void set_pointers();
 
-	unsigned m_railstart;
+	std::size_t m_railstart;
 
 	std::vector<unsigned> m_nz;   /* all non zero for multiplication */
 	std::vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
@@ -157,7 +157,7 @@ public:
 	NETLIB_RESETI();
 
 public:
-	int get_net_idx(net_t *net);
+	int get_net_idx(detail::net_t *net);
 
 	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
@@ -174,10 +174,10 @@ protected:
 	void update_dynamic();
 
 	virtual void vsetup(analog_net_t::list_t &nets) = 0;
-	virtual int vsolve_non_dynamic(const bool newton_raphson) = 0;
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
 
 	netlist_time compute_next_timestep(const double cur_ts);
-	/* virtual */ void  add_term(int net_idx, terminal_t *term);
+	/* virtual */ void  add_term(std::size_t net_idx, terminal_t *term);
 
 	template <typename T>
 	void store(const T * RESTRICT V);
@@ -230,17 +230,17 @@ T matrix_solver_t::delta(const T * RESTRICT V)
 	 * and thus belong into a different calculation. This applies to all solvers.
 	 */
 
-	const unsigned iN = this->m_terms.size();
+	std::size_t iN = this->m_terms.size();
 	T cerr = 0;
 	for (unsigned i = 0; i < iN; i++)
-		cerr = std::max(cerr, std::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
+		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->m_cur_Analog)));
 	return cerr;
 }
 
 template <typename T>
 void matrix_solver_t::store(const T * RESTRICT V)
 {
-	for (unsigned i = 0, iN=m_terms.size(); i < iN; i++)
+	for (std::size_t i = 0, iN=m_terms.size(); i < iN; i++)
 		this->m_nets[i]->m_cur_Analog = V[i];
 }
 
@@ -257,8 +257,8 @@ void matrix_solver_t::build_LE_A()
 		for (unsigned i=0; i < iN; i++)
 			child.A(k,i) = 0.0;
 
-		const unsigned terms_count = m_terms[k]->count();
-		const unsigned railstart =  m_terms[k]->m_railstart;
+		const std::size_t terms_count = m_terms[k]->count();
+		const std::size_t railstart =  m_terms[k]->m_railstart;
 		const nl_double * RESTRICT gt = m_terms[k]->gt();
 
 		{
@@ -272,7 +272,7 @@ void matrix_solver_t::build_LE_A()
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const int * RESTRICT net_other = m_terms[k]->net_other();
 
-		for (unsigned i = 0; i < railstart; i++)
+		for (std::size_t i = 0; i < railstart; i++)
 			child.A(k,net_other[i]) -= go[i];
 	}
 }
@@ -289,15 +289,15 @@ void matrix_solver_t::build_LE_RHS()
 		nl_double rhsk_a = 0.0;
 		nl_double rhsk_b = 0.0;
 
-		const unsigned terms_count = m_terms[k]->count();
+		const std::size_t terms_count = m_terms[k]->count();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
 
-		for (unsigned i = 0; i < terms_count; i++)
+		for (std::size_t i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];
 
-		for (unsigned i = m_terms[k]->m_railstart; i < terms_count; i++)
+		for (std::size_t i = m_terms[k]->m_railstart; i < terms_count; i++)
 			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
 			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
 

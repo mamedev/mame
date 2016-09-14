@@ -160,7 +160,7 @@ static const char *ws_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool ws_cart_slot_device::call_load()
+image_init_result ws_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -223,7 +223,7 @@ bool ws_cart_slot_device::call_load()
 		internal_header_logging(ROM, ((size >> 16) - 1) << 16, size);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------
@@ -234,17 +234,6 @@ void ws_cart_slot_device::call_unload()
 {
 	if (m_cart && m_cart->get_nvram_base() && m_cart->get_nvram_size())
 		battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());
-}
-
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool ws_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
 }
 
 

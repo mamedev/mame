@@ -90,8 +90,8 @@ const opcode_desc *drc_frontend::describe_code(offs_t startpc)
 	pcstackptr++;
 
 	// loop while we still have a stack
-	offs_t minpc = startpc - MIN(m_window_start, startpc);
-	offs_t maxpc = startpc + MIN(m_window_end, 0xffffffff - startpc);
+	offs_t minpc = startpc - std::min(m_window_start, startpc);
+	offs_t maxpc = startpc + std::min(m_window_end, 0xffffffff - startpc);
 	while (pcstackptr != &pcstack[0])
 	{
 		// if we've already hit this PC, just mark it a branch target and continue

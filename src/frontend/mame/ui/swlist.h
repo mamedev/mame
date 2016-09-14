@@ -29,16 +29,17 @@ public:
 		ENTRY
 	};
 
-	menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
+	menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
 	virtual ~menu_software_parts() override;
-	virtual void populate() override;
-	virtual void handle() override;
 
 private:
 	struct software_part_menu_entry {
 		result type;
 		const software_part *part;
 	};
+
+	virtual void populate() override;
+	virtual void handle() override;
 
 	// variables
 	const software_info *   m_info;
@@ -54,7 +55,7 @@ private:
 class menu_software_list : public menu
 {
 public:
-	menu_software_list(mame_ui_manager &mui, render_container *container, software_list_device *swlist, const char *interface, std::string &result);
+	menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result);
 	virtual ~menu_software_list() override;
 	virtual void populate() override;
 	virtual void handle() override;
@@ -76,7 +77,7 @@ private:
 	software_list_device *          m_swlist; // currently selected list
 	const char *                    m_interface;
 	std::string &                   m_result;
-	std::vector<entry_info>			m_entrylist;
+	std::vector<entry_info>         m_entrylist;
 	char                            m_filename_buffer[1024];
 	bool                            m_ordered_by_shortname;
 
@@ -91,7 +92,7 @@ private:
 class menu_software : public menu
 {
 public:
-	menu_software(mame_ui_manager &mui, render_container *container, const char *interface, software_list_device **result);
+	menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result);
 	virtual ~menu_software() override;
 	virtual void populate() override;
 	virtual void handle() override;

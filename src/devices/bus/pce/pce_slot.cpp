@@ -222,7 +222,7 @@ static const char *pce_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool pce_cart_slot_device::call_load()
+image_init_result pce_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -278,10 +278,10 @@ bool pce_cart_slot_device::call_load()
 		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U)
 			m_cart->ram_alloc(0x30000);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -292,18 +292,6 @@ bool pce_cart_slot_device::call_load()
 void pce_cart_slot_device::call_unload()
 {
 }
-
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool pce_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
-}
-
 
 
 /*-------------------------------------------------

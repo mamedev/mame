@@ -178,26 +178,26 @@ SNAPSHOT_LOAD_MEMBER( apple1_state, apple1 )
 	if (snapsize < 12)
 	{
 		logerror("Snapshot is too short\n");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if ((snapsize - 12) > 65535)
 	{
 		logerror("Snapshot is too long\n");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	data = (UINT8 *)image.ptr();
 	if (!data)
 	{
 		logerror("Internal error loading snapshot\n");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if ((memcmp(hd1, data, 5)) || (memcmp(hd2, &data[7], 5)))
 	{
 		logerror("Snapshot is invalid\n");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	start = (data[5]<<8) | data[6];
@@ -208,7 +208,7 @@ SNAPSHOT_LOAD_MEMBER( apple1_state, apple1 )
 	if (((start < 0xe000) && (end > (m_ram_size - 1))) || (end > 0xefff))
 	{
 		logerror("Snapshot can't fit in RAM\n");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (start < 0xe000)
@@ -222,10 +222,10 @@ SNAPSHOT_LOAD_MEMBER( apple1_state, apple1 )
 	else
 	{
 		logerror("Snapshot has invalid load address %04x\n", start);
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void apple1_state::poll_keyboard()

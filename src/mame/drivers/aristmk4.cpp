@@ -1741,7 +1741,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aristmk4_state, via_b_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(aristmk4_state, via_ca2_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(aristmk4_state, via_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, firq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 	// CA1 is connected to +5V, CB1 is not connected.
 
 	MCFG_DEVICE_ADD("pia6821_0", PIA6821, 0)

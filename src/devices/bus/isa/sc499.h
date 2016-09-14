@@ -29,8 +29,8 @@ public:
 	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
+	virtual image_init_result call_load() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 	virtual void call_unload() override;
 	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
 
@@ -41,7 +41,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return "sc499_cass"; }
 	virtual const char *file_extensions() const override { return "act,ct"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	UINT8 *read_block(int block_num);
 	void write_block(int block_num, UINT8 *ptr);

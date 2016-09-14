@@ -42,7 +42,7 @@ function maintargetosdoptions(_target,_subtarget)
 		links {
 			"SDL2_ttf",
 		}
-		local str = backtick("pkg-config --libs fontconfig")
+		local str = backtick(pkgconfigcmd() .. " --libs fontconfig")
 		addlibfromstring(str)
 		addoptionsfromstring(str)
 	end
@@ -132,7 +132,7 @@ function sdlconfigcmd()
 	if _OPTIONS["targetos"]=="asmjs" then
 		return "sdl2-config"
 	elseif not _OPTIONS["SDL_INSTALL_ROOT"] then
-		return _OPTIONS['TOOLCHAIN'] .. "pkg-config sdl2"
+		return pkgconfigcmd() .. " sdl2"
 	else
 		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin","sdl2") .. "-config"
 	end
@@ -340,7 +340,7 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/render",
 		MAME_DIR .. "3rdparty",
 	}
-	configuration { "linux-*" }
+	configuration { "linux-* or freebsd" }
 		buildoptions {
 			"-fPIC",
 		}

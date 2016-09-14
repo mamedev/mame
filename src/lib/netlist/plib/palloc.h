@@ -24,7 +24,7 @@ namespace plib {
 class pexception : public std::exception
 {
 public:
-	explicit pexception(const pstring text);
+	pexception(const pstring text);
 	pexception(const pexception &e) : std::exception(e) { m_text = e.m_text; }
 
 	virtual ~pexception() noexcept {}
@@ -33,6 +33,42 @@ public:
 
 private:
 	pstring m_text;
+};
+
+class file_e : public plib::pexception
+{
+public:
+	explicit file_e(const pstring fmt, const pstring &filename);
+};
+
+class file_open_e : public file_e
+{
+public:
+	explicit file_open_e(const pstring &filename);
+};
+
+class file_read_e : public file_e
+{
+public:
+	explicit file_read_e(const pstring &filename);
+};
+
+class file_write_e : public file_e
+{
+public:
+	explicit file_write_e(const pstring &filename);
+};
+
+class null_argument_e : public plib::pexception
+{
+public:
+	explicit null_argument_e(const pstring &argument);
+};
+
+class out_of_mem_e : public plib::pexception
+{
+public:
+	explicit out_of_mem_e(const pstring &location);
 };
 
 //============================================================
@@ -167,7 +203,7 @@ private:
 		char *data;
 	};
 
-	int new_block();
+	size_t new_block();
 
 	struct info
 	{
@@ -176,14 +212,14 @@ private:
 	};
 
 public:
-	mempool(int min_alloc, int min_align);
+	mempool(size_t min_alloc, size_t min_align);
 	~mempool();
 
 	void *alloc(size_t size);
 	void free(void *ptr);
 
-	int m_min_alloc;
-	int m_min_align;
+	size_t m_min_alloc;
+	size_t m_min_align;
 
 	std::vector<block> m_blocks;
 };

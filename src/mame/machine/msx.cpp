@@ -386,7 +386,7 @@ void msx_state::install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8
 	msx_state &msx = downcast<msx_state &>(owner);
 	msx_internal_slot_interface *internal_slot = dynamic_cast<msx_internal_slot_interface *>(device);
 
-	for ( int i = page; i < MIN(page + numpages, 4); i++ )
+	for ( int i = page; i < std::min(page + numpages, 4); i++ )
 	{
 		msx.m_all_slots[prim][sec][i] = internal_slot;
 	}

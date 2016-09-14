@@ -91,7 +91,7 @@ public:
 	const char *filename() const { return m_filename.c_str(); }
 	const char *fullpath() const { return m_fullpath.c_str(); }
 	UINT32 openflags() const { return m_openflags; }
-	hash_collection &hashes(const char *types);
+	util::hash_collection &hashes(const char *types);
 	bool restrict_to_mediapath() const { return m_restrict_to_mediapath; }
 	bool part_of_mediapath(std::string path);
 
@@ -101,14 +101,14 @@ public:
 	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
-	osd_file::error open(const char *name);
-	osd_file::error open(const char *name1, const char *name2);
-	osd_file::error open(const char *name1, const char *name2, const char *name3);
-	osd_file::error open(const char *name1, const char *name2, const char *name3, const char *name4);
-	osd_file::error open(const char *name, UINT32 crc);
-	osd_file::error open(const char *name1, const char *name2, UINT32 crc);
-	osd_file::error open(const char *name1, const char *name2, const char *name3, UINT32 crc);
-	osd_file::error open(const char *name1, const char *name2, const char *name3, const char *name4, UINT32 crc);
+	osd_file::error open(const std::string &name);
+	osd_file::error open(const std::string &name1, const std::string &name2);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4);
+	osd_file::error open(const std::string &name, UINT32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, UINT32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, UINT32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, UINT32 crc);
 	osd_file::error open_next();
 	osd_file::error open_ram(const void *data, UINT32 length);
 	void close();
@@ -155,7 +155,7 @@ private:
 	path_iterator   m_mediapaths;                   // media-path iterator
 	UINT32          m_crc;                          // file's CRC
 	UINT32          m_openflags;                    // flags we used for the open
-	hash_collection m_hashes;                       // collection of hashes
+	util::hash_collection m_hashes;                       // collection of hashes
 
 	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
 	dynamic_buffer  m_zipdata;                      // ZIP file data

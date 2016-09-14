@@ -159,8 +159,8 @@ private:
 	required_device<via6522_device> m_via4;
 	required_device<via6522_device> m_via5;
 	required_device<via6522_device> m_via6;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_gcr_rom;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
@@ -168,10 +168,10 @@ private:
 	void set_rdy0(int state);
 	void set_rdy1(int state);
 
-	int load0_cb(floppy_image_device *device);
+	image_init_result load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);
 
-	int load1_cb(floppy_image_device *device);
+	image_init_result load1_cb(floppy_image_device *device);
 	void unload1_cb(floppy_image_device *device);
 
 	UINT8 m_p2;

@@ -46,6 +46,8 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const override;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
+	virtual bool is_6809() override { return false; };
+
 private:
 	typedef m6809_base_device super;
 
@@ -73,7 +75,6 @@ private:
 	};
 
 	// CPU registers
-	PAIR16  m_w;
 	PAIR16  m_v;
 	UINT8   m_md;
 
@@ -100,10 +101,6 @@ private:
 	void muld();
 	bool divq();
 	bool divd();
-
-	// the Q register
-	UINT32 get_q();
-	void put_q(UINT32 value);
 
 	// miscellaneous
 	void set_e()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_E; }
@@ -136,6 +133,7 @@ enum
 	HD6309_E = 1000,
 	HD6309_F,
 	HD6309_W,
+	HD6309_Q,
 	HD6309_V,
 	HD6309_MD,
 	HD6309_ZERO_BYTE,

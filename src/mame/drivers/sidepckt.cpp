@@ -11,7 +11,7 @@ ernesto@imagina.com
 
 Thanks must go to Mirko Buffoni for testing the music.
 
-i8751 protection simluation and other fixes by Bryan McPhail, 15/10/00.
+i8751 protection simulation and other fixes by Bryan McPhail, 15/10/00.
 
 
 ToDo:
@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

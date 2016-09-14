@@ -79,4 +79,9 @@ struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which m
 #undef _FORTIFY_SOURCE
 #endif
 
+// nasty hack to stop altivec #define vector/bool/pixel screwing us over
+#if defined(__ALTIVEC__) && !defined(__APPLE_ALTIVEC__)
+#define __APPLE_ALTIVEC__ 1
+#endif
+
 #endif /* SDLMAME_UNIX */

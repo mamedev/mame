@@ -1442,10 +1442,10 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 	}
 }
 
-int x68k_state::floppy_load(floppy_image_device *dev)
+image_init_result x68k_state::floppy_load(floppy_image_device *dev)
 {
 	floppy_load_unload(true, dev);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void x68k_state::floppy_unload(floppy_image_device *dev)

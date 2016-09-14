@@ -10,6 +10,7 @@
         - M48T37
         - M48T58
         - MK48T08
+        - MK48T12
 
 ***************************************************************************/
 
@@ -40,6 +41,9 @@
 
 #define MCFG_MK48T08_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MK48T08, 0)
+
+#define MCFG_MK48T12_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MK48T12, 0)
 
 
 
@@ -134,11 +138,18 @@ public:
 	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class mk48t12_device : public timekeeper_device
+{
+public:
+	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 // device type definition
 extern const device_type M48T02;
 extern const device_type M48T35;
 extern const device_type M48T37;
 extern const device_type M48T58;
 extern const device_type MK48T08;
+extern const device_type MK48T12;
 
 #endif // __TIMEKPR_H__

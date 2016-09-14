@@ -25,16 +25,16 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc"),
-	m_floppy0(*this, "fdc:0:8dsdd"),
-	m_floppy1(*this, "fdc:1:8dsdd"),
+	m_floppy0(*this, "fdc:0"),
+	m_floppy1(*this, "fdc:1"),
 	m_p_vram(*this, "p_vram"),
 	m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mb8877_t> m_fdc;
 	required_device<mc6845_device> m_crtc;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
 	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
@@ -130,8 +130,8 @@ WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
 	floppy_image_device *floppy = nullptr;
 
-	if (data & 1) floppy = m_floppy0;
-	if (data & 2) floppy = m_floppy1;
+	if (data & 1) floppy = m_floppy0->get_device();
+	if (data & 2) floppy = m_floppy1->get_device();
 
 	if (floppy)
 	{

@@ -779,6 +779,6 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 CPU_DISASSEMBLE( mb86233 )
 {
 	UINT32 op = *(UINT32 *)oprom;
-	op = LITTLE_ENDIANIZE_INT32(op);
+	op = little_endianize_int32(op);
 	return dasm_mb86233(buffer, op);
 }

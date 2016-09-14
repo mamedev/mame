@@ -93,7 +93,7 @@ void mpc105_device::update_memory()
 				|   (((m_bank_registers[(bank / 4) + 6] >> (bank % 4) * 8)) & 0x03) << 28
 				| 0x000FFFFF;
 
-			end = MIN(end, begin + machine().device<ram_device>(RAM_TAG)->size() - 1);
+			end = std::min(end, begin + machine().device<ram_device>(RAM_TAG)->size() - 1);
 
 			if ((begin + 0x100000) <= end)
 			{

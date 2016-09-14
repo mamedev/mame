@@ -326,7 +326,7 @@ SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Not a Z1013 image");
 		image.message(" Not a Z1013 image");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	memcpy (m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr),
@@ -340,7 +340,7 @@ SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
 		image.message(" Loaded but cannot run");
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* F4 Character Displayer */

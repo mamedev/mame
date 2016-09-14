@@ -142,7 +142,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.devi
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
 	m_soundlatch->write(space, 0, ~data);
-	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.device().safe_pc(), data^0xff);
 }

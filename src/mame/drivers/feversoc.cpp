@@ -8,11 +8,14 @@ A down-grade of the Seibu SPI Hardware with SH-2 as main cpu.
 
 driver by Angelo Salese & Nicola Salmoria
 
+The input routines are very convoluted in comparison to previous Seibu games,
+looping over a complex control structure. Could these be derived from the
+"Touch Panel System" DVD mahjong games Seibu released under the CATS label?
+
 TODO:
-- Determine what buttons 5-7 actually do
-- Find out where the NVRAM maps to
 - Layout including lamps
-- Add hopper, etc.
+- Hook up a ticket dispenser and solve the "HOPPER ERROR" issue
+- Do button 5 or remaining DIPs actually do anything outside service mode?
 
 ============================================================================
 
@@ -68,6 +71,7 @@ U0564 LH28F800SU OBJ4-1
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/rtc4543.h"
+#include "machine/nvram.h"
 
 
 class feversoc_state : public driver_device
@@ -75,7 +79,9 @@ class feversoc_state : public driver_device
 public:
 	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_mainram(*this, "workram"),
+		m_mainram1(*this, "workram1"),
+		m_mainram2(*this, "workram2"),
+		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -84,7 +90,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<UINT32> m_mainram1;
+	required_shared_ptr<UINT32> m_mainram2;
+	required_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_spriteram;
 	DECLARE_READ32_MEMBER(in0_r);
 	DECLARE_WRITE32_MEMBER(output_w);
@@ -183,14 +191,16 @@ WRITE32_MEMBER(feversoc_state::output_w)
 
 static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
-	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM AM_SHARE("workram") //work ram
+	AM_RANGE(0x02000000, 0x0202ffff) AM_RAM AM_SHARE("workram1") //work ram
+	AM_RANGE(0x02030000, 0x0203ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x02034000, 0x0203dfff) AM_RAM AM_SHARE("workram2") //work ram
 	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
 	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
-//  AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
-	AM_RANGE(0x06010060, 0x06010063) AM_WRITENOP
+	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
+	AM_RANGE(0x06010060, 0x06010063) AM_WRITENOP // sprite buffering
 	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
@@ -215,47 +225,36 @@ static GFXDECODE_START( feversoc )
 GFXDECODE_END
 
 static INPUT_PORTS_START( feversoc )
+	// The "ANALIZE" input shown in test mode does not exist on this hardware.
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In (Service)")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("rtc", rtc4543_device, data_r)
-	PORT_DIPNAME( 0x0100, 0x0100, "DIP 1-1" )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION( "DIP1:1" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, "DIP 1-2"  )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "DIP 1-3"  )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "DIP 1-4"  )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "DIP 1-5"  )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "DIP 1-6"  )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "DIP 1-7"  )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "DIP 1-8" )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "DIP1:2" )
+	PORT_DIPNAME( 0x0400, 0x0400, "Backup Memory" ) PORT_DIPLOCATION( "DIP1:3" )
+	PORT_DIPSETTING(    0x0400, "Use" )
+	PORT_DIPSETTING(    0x0000, "Reset" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "DIP1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "DIP1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "DIP1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "DIP1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DIP1:8" )
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 (BTN1)")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 (BTN2)")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 (BTN3)")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet (BTN4)")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("BTN5") // ?
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("BTN6") // ?
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("BTN7") // ?
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown (BTN5)") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out (BTN6)")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Coin Out (BTN7)")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -294,6 +293,8 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
 	MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -302,6 +303,8 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+// Date of build, as displayed in service mode, is Apr 30 2004/22:44:21.
+// Program ROMs also contain leftover strings and tables from a previous build dated Apr 26 2004/20:25:31.
 ROM_START( feversoc )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prog0.u0139",   0x00001, 0x20000, CRC(fa699503) SHA1(96a834d4f7d5b764aa51db745afc2cd9a7c9783d) )
@@ -324,7 +327,9 @@ DRIVER_INIT_MEMBER(feversoc_state,feversoc)
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0003ffff, 1, rom);
-	m_maincpu->sh2drc_add_fastram(0x02000000, 0x0203dfff, 0, &m_mainram[0]);
+	m_maincpu->sh2drc_add_fastram(0x02000000, 0x0202ffff, 0, &m_mainram1[0]);
+	m_maincpu->sh2drc_add_fastram(0x02030000, 0x02033fff, 0, &m_nvram[0]);
+	m_maincpu->sh2drc_add_fastram(0x02034000, 0x0203dfff, 0, &m_mainram2[0]);
 	m_maincpu->sh2drc_add_fastram(0x0203e000, 0x0203ffff, 0, &m_spriteram[0]);
 }
 

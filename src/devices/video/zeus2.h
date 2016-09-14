@@ -227,7 +227,7 @@ public:
 	// Convert 0xRRRRCCCC to frame buffer addresss
 	//inline UINT32 frame_addr_from_expanded_addr(UINT32 addr)
 	//{
-	//	return (((addr & 0x3ff0000) >> (16 - 9 + 1)) | (addr & 0x1ff)) << 1;
+	//  return (((addr & 0x3ff0000) >> (16 - 9 + 1)) | (addr & 0x1ff)) << 1;
 	//}
 
 	// Convert Physical 0xRRRRCCCC to frame buffer addresss

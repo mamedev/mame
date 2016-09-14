@@ -1272,13 +1272,13 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 	m_vdp2.old_tvmd = -1;
 }
 
-int stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	UINT8 *ROM;
 	UINT32 size = slot->common_get_size("rom");
 
 	if (image.software_entry() == nullptr)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	slot->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
 	ROM = slot->get_rom_base();
@@ -1301,7 +1301,7 @@ int stv_state::load_cart(device_image_interface &image, generic_slot_device *slo
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

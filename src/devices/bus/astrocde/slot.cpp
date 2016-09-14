@@ -146,7 +146,7 @@ static const char *astrocade_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool astrocade_cart_slot_device::call_load()
+image_init_result astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -176,21 +176,10 @@ bool astrocade_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", astrocade_get_slot(m_type));
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool astrocade_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
+	return image_init_result::PASS;
 }
 
 

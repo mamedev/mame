@@ -381,7 +381,7 @@ static unsigned dasmr3k(char *buffer, unsigned pc, UINT32 op)
 CPU_DISASSEMBLE( r3000be )
 {
 	UINT32 op = *(UINT32 *)oprom;
-	op = BIG_ENDIANIZE_INT32(op);
+	op = big_endianize_int32(op);
 	return dasmr3k(buffer, pc, op);
 }
 
@@ -389,6 +389,6 @@ CPU_DISASSEMBLE( r3000be )
 CPU_DISASSEMBLE( r3000le )
 {
 	UINT32 op = *(UINT32 *)oprom;
-	op = LITTLE_ENDIANIZE_INT32(op);
+	op = little_endianize_int32(op);
 	return dasmr3k(buffer, pc, op);
 }

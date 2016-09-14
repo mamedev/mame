@@ -36,7 +36,7 @@ public:
 	renderer_bgfx(std::shared_ptr<osd_window> w);
 	virtual ~renderer_bgfx();
 
-	static void init(running_machine &machine) { }
+	static bool init(running_machine &machine);
 	static void exit();
 
 	virtual int create() override;

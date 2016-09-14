@@ -16,6 +16,7 @@
 #include "formats/basicdsk.h"
 #include "formats/imageutl.h"
 #include "coretmpl.h"
+#include <algorithm>
 
 /* -----------------------------------------------------------------------
  * JVC (Jeff Vavasour CoCo) format
@@ -1024,7 +1025,7 @@ static floperr_t internal_coco_dmk_read_sector(floppy_image_legacy *floppy, int 
 	if (calculated_crc != crc_on_disk)
 		return FLOPPY_ERROR_INVALIDIMAGE;
 
-	memcpy(buffer, sector_data, MIN(sector_length, buflen));
+	memcpy(buffer, sector_data, std::min(size_t(sector_length), buflen));
 
 	return FLOPPY_ERROR_SUCCESS;
 }

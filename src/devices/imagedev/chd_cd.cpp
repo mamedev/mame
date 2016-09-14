@@ -61,7 +61,7 @@ void cdrom_image_device::device_config_complete()
 {
 	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
-	m_formatlist.push_back(std::make_unique<image_device_format>("chdcd", "CD-ROM drive", m_extension_list, cd_option_spec));
+	add_format("chdcd", "CD-ROM drive", m_extension_list, cd_option_spec);
 
 	// set brief and instance name
 	update_names();
@@ -98,7 +98,7 @@ void cdrom_image_device::device_stop()
 		m_self_chd.close();
 }
 
-bool cdrom_image_device::call_load()
+image_init_result cdrom_image_device::call_load()
 {
 	chd_error   err = (chd_error)0;
 	chd_file    *chd = nullptr;
@@ -108,7 +108,7 @@ bool cdrom_image_device::call_load()
 
 	if (software_entry() == nullptr)
 	{
-		if (strstr(m_image_name.c_str(), ".chd") && is_loaded()) {
+		if (is_filetype("chd") && is_loaded()) {
 			err = m_self_chd.open( image_core_file() );    /* CDs are never writeable */
 			if ( err )
 				goto error;
@@ -127,14 +127,14 @@ bool cdrom_image_device::call_load()
 	if ( ! m_cdrom_handle )
 		goto error;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 
 error:
 	if ( chd && chd == &m_self_chd )
 		m_self_chd.close( );
 	if ( err )
 		seterror( IMAGE_ERROR_UNSPECIFIED, chd_file::error_string( err ) );
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 void cdrom_image_device::call_unload()

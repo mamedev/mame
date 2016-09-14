@@ -1,13 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
 
-#include <functional>
-
 #include "emu.h"
-#include "cpu/i386/i386.h"
-#include "machine/lpci.h"
 #include "machine/pic8259.h"
-#include "machine/pit8253.h"
 #include "machine/idectrl.h"
 #include "video/poly.h"
 #include "bitmap.h"
@@ -18,7 +13,7 @@
 //#define LOG_OHCI
 
 /*
- * ohci usb controller
+ * Ohci usb controller
  */
 
 #ifdef LOG_OHCI

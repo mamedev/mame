@@ -17,6 +17,7 @@
 #include <string>
 
 
+const int core_options::MAX_UNADORNED_OPTIONS;
 
 //**************************************************************************
 //  GLOBAL VARIABLES

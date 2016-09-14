@@ -19,8 +19,10 @@ namespace ui {
 class menu_game_info : public menu
 {
 public:
-	menu_game_info(mame_ui_manager &mui, render_container *container);
+	menu_game_info(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_game_info() override;
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
 };
@@ -29,12 +31,12 @@ public:
 class menu_image_info : public menu
 {
 public:
-	menu_image_info(mame_ui_manager &mui, render_container *container);
+	menu_image_info(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_image_info() override;
-	virtual void populate() override;
-	virtual void handle() override;
 
 private:
+	virtual void populate() override;
+	virtual void handle() override;
 	void image_info(device_image_interface *image);
 };
 

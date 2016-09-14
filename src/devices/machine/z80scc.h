@@ -523,6 +523,7 @@ protected:
 #else
 	unsigned int m_brg_rate;
 #endif
+	unsigned int m_delayed_tx_brg_change;
 	unsigned int m_brg_const;
 
 	void update_serial();

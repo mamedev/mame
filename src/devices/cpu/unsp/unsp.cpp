@@ -797,7 +797,7 @@ void unsp_device::execute_run()
 		}
 
 		m_icount -= 5;
-		m_icount = MAX(m_icount, 0);
+		m_icount = std::max(m_icount, 0);
 	}
 }
 

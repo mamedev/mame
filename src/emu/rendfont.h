@@ -109,7 +109,7 @@ private:
 	// constants
 	static const int CACHED_CHAR_SIZE       = 12;
 	static const int CACHED_HEADER_SIZE     = 16;
-	static const int CACHED_BDF_HASH_SIZE   = 1024;
+	static const UINT64 CACHED_BDF_HASH_SIZE   = 1024;
 };
 
 void convert_command_glyph(std::string &s);

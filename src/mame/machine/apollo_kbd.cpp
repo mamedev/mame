@@ -518,8 +518,8 @@ int apollo_kbd_device::push_scancode(UINT8 code, UINT8 repeat)
 		switch (code)
 		{
 		case 0x00: code = 0x68; break; // _
-		case 0x0e: code = 0x6b; break; // #
-		case 0x29: code = 0x69; break; // <>
+		case 0x0e: code = 0x69; break; // #
+		case 0x29: code = 0x6b; break; // <>
 		case 0x42: code = 0x6f; break; // NP-
 		case 0x46: code = 0x6e; break; // NP+
 		case 0x4e: code = 0x73; break; // NP ENTER
@@ -633,7 +633,7 @@ void apollo_kbd_device::scan_keyboard()
 				m_keytime[x] = 0;
 				m_keyon[x] = 0;
 				m_last_pressed = 0;
-				LOG2(("released key 0x%02x at time %d",x, m_keytime[x]));
+				LOG1(("released key 0x%02x at time %d",x, m_keytime[x]));
 			}
 		}
 		else if (m_keyon[x] == 0)
@@ -644,7 +644,7 @@ void apollo_kbd_device::scan_keyboard()
 				m_keytime[x] = m_mode == KBD_MODE_0_COMPATIBILITY ? m_delay : m_repeat;
 				m_keyon[x] = 1;
 				m_last_pressed = x;
-				LOG2(("pushed key 0x%02x at time %d",x, m_keytime[x]));
+				LOG1(("pushed key 0x%02x at time %d",x, m_keytime[x]));
 			}
 		}
 		else if (m_last_pressed == x)
@@ -690,7 +690,7 @@ UINT16 apollo_kbd_device::m_code_table[] = {
 		/* B11     ) 0         */ 0x21, 0xA1, 0x30,     0x29,   NOP,    0x30,     NOP,     No,
 		/* B12     _ -         */ 0x22, 0xA2, 0x2D,     0x5F,   NOP,    0x2D,     NOP,     Yes,
 		/* B13     + =         */ 0x23, 0xA3, 0x3D,     0x2B,   NOP,    0x3D,     NOP,     Yes,
-		/* B14     ~ ' / BS    */ 0x24, 0xA4, 0x60,     0x7E,   0x1E,   0x60,     NOP,     No,
+		/* D14     \\ |        */ 0x53, 0xD3, 0xC8,     0xC9,   NOP,    0xC8,     NOP,     No,
 		/* B15     BACKSPACE   */ 0x25, 0xA5, 0xDE,     0xDE,   NOP,    0xDE,     NOP,     Yes,
 
 		/* C1      TAB         */ 0x2C, 0xAC, 0xCA,     0xDA,   0xFA,   0xCA,     NOP,     No,
@@ -717,22 +717,22 @@ UINT16 apollo_kbd_device::m_code_table[] = {
 		/* D8      J           */ 0x4C, 0xCC, 0x6A,     0x4A,   0x0A,   0x4A,     NOP,     No,
 		/* D9      K           */ 0x4D, 0xCD, 0x6B,     0x4B,   0x0B,   0x4B,     NOP,     No,
 		/* D10     L           */ 0x4E, 0xCE, 0x6C,     0x4C,   0x0C,   0x4C,     NOP,     No,
-		/* D11     : ;         */ 0x4F, 0xCF, 0x3B,     0x3A,   0xFB,   0x3B,     NOP,     No,
+		/* D11     : ; / Oe    */ 0x4F, 0xCF, 0x3B,     0x3A,   0xFB,   0x3B,     NOP,     No,
 		/* D12     " ' / Ae    */ 0x50, 0xD0, 0x27,     0x22,   0xF8,   0x27,     NOP,     No,
-		/* D14     ! \         */ 0x53, 0xD3, 0xC8,     0xC9,   NOP,    0xC8,     NOP,     No,
+// Apollo US keyboards have no hash key (#)
+		/* D14     ' #         */ NOP,  NOP,  0x23,     0x27,   NOP,    0x23,     NOP,     No,
 
 		/* E2      Z           */ 0x60, 0xE0, 0x7A,     0x5A,   0x1A,   0x5A,     NOP,     No,
 		/* E3      X           */ 0x61, 0xE1, 0x78,     0x58,   0x18,   0x58,     NOP,     No,
 		/* E4      C           */ 0x62, 0xE2, 0x63,     0x43,   0x03,   0x43,     NOP,     No,
 		/* E5      V           */ 0x63, 0xE3, 0x76,     0x56,   0x16,   0x56,     NOP,     No,
-		/* E6      8           */ 0x64, 0xE4, 0x62,     0x42,   0x02,   0x42,     NOP,     No,
+		/* E6      B           */ 0x64, 0xE4, 0x62,     0x42,   0x02,   0x42,     NOP,     No,
 		/* E7      N           */ 0x65, 0xE5, 0x6E,     0x4E,   0x0E,   0x4E,     NOP,     No,
 		/* E8      M           */ 0x66, 0xE6, 0x6D,     0x4D,   0x0D,   0x4D,     NOP,     No,
 		/* E9      < ,         */ 0x67, 0xE7, 0x2C,     0x3C,   NOP,    0x2C,     NOP,     No,
 		/* E10     > .         */ 0x68, 0xE8, 0x2E,     0x3E,   NOP,    0x2E,     NOP,     Yes,
 		/* E11     ? /         */ 0x69, 0xE9, 0xCC,     0xDC,   0xFC,   0xCC,     NOP,     No,
 
-//      /* B14     ~ '         */ 0x24, 0xA4, 0x60,     0x7E,   0x1E,   0x60,     NOP,     No,
 		/*         _           */ NOP,  NOP,  NOP,      NOP,    NOP,    NOP,      NOP,     NOP,
 		/* F1      (space bar) */ 0x76, 0xF6, 0x20,     0x20,   0x20,   0x20,     NOP,     Yes,
 		/* LC0     Home        */ 0x27, 0xA7, 0x84,     0x94,   0x84,   0x84,     0xA4,    No,

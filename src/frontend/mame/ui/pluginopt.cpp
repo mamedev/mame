@@ -24,11 +24,11 @@ void menu_plugin::handle()
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_plugin_opt>(ui(), container, (char *)menu_event->itemref);
+			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)menu_event->itemref);
 	}
 }
 
-menu_plugin::menu_plugin(mame_ui_manager &mui, render_container *container) :
+menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
 		menu(mui, container),
 		m_plugins(mame_machine_manager::instance()->lua()->get_menu())
 {
@@ -45,7 +45,7 @@ menu_plugin::~menu_plugin()
 {
 }
 
-menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container *container, char *menu) :
+menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, char *menu) :
 		ui::menu(mui, container),
 		m_menu(menu)
 {

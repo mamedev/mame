@@ -269,7 +269,7 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 	int quick_length;
 	dynamic_buffer quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
@@ -286,12 +286,12 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 				space.write_byte(i + quick_addr, quick_data[i]);
 
 		/* display a message about the loaded quickload */
-		if (strcmp(image.filetype(), "bin") == 0)
+		if (image.is_filetype("bin"))
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 6 to start",quick_length,quick_addr,quick_addr+quick_length);
 		else
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start",quick_length,quick_addr,quick_addr+quick_length);
 
-		result = IMAGE_INIT_PASS;
+		result = image_init_result::PASS;
 	}
 
 	return result;
@@ -325,8 +325,8 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(eti660_state, pia_pa_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eti660_state, pia_pa_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE(CDP1802_TAG, cosmac_device, int_w)) MCFG_DEVCB_INVERT
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE(CDP1802_TAG, cosmac_device, int_w)) MCFG_DEVCB_INVERT
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT)) MCFG_DEVCB_INVERT
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT)) MCFG_DEVCB_INVERT
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

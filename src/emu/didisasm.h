@@ -60,7 +60,6 @@ typedef device_delegate<offs_t (device_t &device, char *buffer, offs_t pc, const
 // class representing interface-specific live disasm
 class device_disasm_interface : public device_interface
 {
-
 public:
 	// construction/destruction
 	device_disasm_interface(const machine_config &mconfig, device_t &device);

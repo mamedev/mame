@@ -1655,7 +1655,7 @@ void antic_device::linerefresh()
 	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
 
-	draw_scanline8(*m_bitmap, 12, y, MIN(m_bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, nullptr);
+	draw_scanline8(*m_bitmap, 12, y, std::min(size_t(m_bitmap->width() - 12), sizeof(scanline)), (const UINT8 *) scanline, nullptr);
 }
 
 

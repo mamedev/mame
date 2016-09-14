@@ -102,9 +102,9 @@ void mb86901_device::device_start()
 			if (pos >= filesize)
 				break;
 
-			// read description
+			// read description up to the first space
 			std::string description;
-			while (buf[pos] != ';' && pos < filesize)
+			while (buf[pos] != ' ' && pos < filesize)
 			{
 				description += char(buf[pos]);
 				pos++;
@@ -113,14 +113,23 @@ void mb86901_device::device_start()
 			if (pos >= filesize)
 				break;
 
+			// skip everything else up to the trailing semicolon
+			while (buf[pos] != ';' && pos < filesize)
+				pos++;
+
+			if (pos >= filesize)
+				break;
+
 			if (buf[pos] == ';')
 				pos++;
 
-			m_ss1_fcode_table[opcode & ~1] = description;
+			m_ss1_fcode_table[opcode] = description;
 		}
 		delete [] buf;
 	}
+	m_log_fcodes = false;
 #endif
+
 	m_bp_reset_in = false;
 	m_bp_fpu_present = false;
 	m_bp_cp_present = false;
@@ -397,18 +406,8 @@ void mb86901_device::device_reset()
 	TBR = 0;
 	Y = 0;
 
-	m_impl = 0;
-	m_ver = 0;
-	m_icc = 0;
-	m_ec = false;
-	m_ef = false;
-	m_pil = 0;
-	m_s = true;
-	m_ps = true;
-	m_et = false;
-	m_cwp = 0;
+	PSR = PSR_S_MASK | PSR_PS_MASK;
 
-	MAKE_PSR;
 	for (int i = 0; i < 8; i++)
 	{
 		m_regs[i] = m_r + i;
@@ -551,7 +550,7 @@ UINT32 mb86901_device::disasm_max_opcode_bytes() const
 offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return m_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
+	return m_dasm.dasm(buffer, pc, big_endianize_int32(op));
 }
 
 
@@ -642,6 +641,10 @@ void mb86901_device::execute_set_input(int inputnum, int state)
 		case SPARC_MAE:
 			m_mae = (state != 0) ? 1 : 0;
 			break;
+
+		case SPARC_RESET:
+			m_bp_reset_in = (state != 0) ? 1 : 0;
+			break;
 	}
 }
 
@@ -692,9 +695,9 @@ void mb86901_device::execute_add(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
-		       (!BIT31(rs1) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+				(!BIT31(rs1) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
-			   (!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -737,8 +740,8 @@ void mb86901_device::execute_taddcc(UINT32 op)
 	UINT32 result = rs1 + operand2;
 
 	bool temp_v = (BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
-	              (!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
-	              ((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
+					(!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
+					((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TADDCCTV && temp_v)
 	{
@@ -752,7 +755,7 @@ void mb86901_device::execute_taddcc(UINT32 op)
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
-		       (!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -807,9 +810,9 @@ void mb86901_device::execute_sub(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= ((BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
-		       (!BIT31(rs1) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+				(!BIT31(rs1) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
 		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
-		       (BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -853,8 +856,8 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 	UINT32 result = rs1 - operand2;
 
 	bool temp_v = (BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
-	              (!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
-	              ((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
+					(!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
+					((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TSUBCCTV && temp_v)
 	{
@@ -868,7 +871,7 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
 		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
-		       (BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -1006,7 +1009,7 @@ void mb86901_device::execute_mulscc(UINT32 op)
 	C <- (operand1<31> and operand2<31>) or
 	     ((not result<31>) and (operand1<31> or operand2<31>))
 	*/
-	UINT32 operand1 = (ICC_N != ICC_V ? 0x80000000 : 0) | (RS1REG >> 1);
+	UINT32 operand1 = ((ICC_N != ICC_V) ? 0x80000000 : 0) | (RS1REG >> 1);
 
 	UINT32 operand2 = (Y & 1) ? (USEIMM ? SIMM13 : RS2REG) : 0;
 
@@ -1072,7 +1075,6 @@ void mb86901_device::execute_rdsr(UINT32 op)
 		}
 		else if (RDPSR)
 		{
-			MAKE_PSR;
 			RDREG = PSR;
 		}
 		else if (RDWIM)
@@ -1173,8 +1175,8 @@ void mb86901_device::execute_wrsr(UINT32 op)
 		else
 		{
 			PSR = result &~ PSR_ZERO_MASK;
+			update_gpr_pointers();
 		}
-		BREAK_PSR;
 	}
 	else if (WRWIM)
 	{
@@ -1246,9 +1248,9 @@ void mb86901_device::execute_rett(UINT32 op)
 	)
 	*/
 
-	UINT8 new_cwp = (CWP + 1) % NWINDOWS;
+	UINT8 new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
 	UINT32 address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-	if (ET)
+	if (PSR & PSR_ET_MASK)
 	{
 		m_trap = 1;
 		if (IS_USER)
@@ -1286,14 +1288,19 @@ void mb86901_device::execute_rett(UINT32 op)
 	}
 	else
 	{
-		ET = 1;
+		PSR |= PSR_ET_MASK;
 		PC = nPC;
 		nPC = address;
-		CWP = new_cwp;
-		S = PS;
+
+		PSR &= ~PSR_CWP_MASK;
+		PSR |= new_cwp;
+
+		if (PSR & PSR_PS_MASK)
+			PSR |= PSR_S_MASK;
+		else
+			PSR &= ~PSR_S_MASK;
 	}
 
-	MAKE_PSR;
 	update_gpr_pointers();
 }
 
@@ -1342,7 +1349,7 @@ void mb86901_device::execute_saverestore(UINT32 op)
 	UINT32 result = 0;
 	if (SAVE)
 	{
-		UINT8 new_cwp = ((CWP + NWINDOWS) - 1) % NWINDOWS;
+		UINT8 new_cwp = (((PSR & PSR_CWP_MASK) + NWINDOWS) - 1) % NWINDOWS;
 		if ((WIM & (1 << new_cwp)) != 0)
 		{
 			m_trap = 1;
@@ -1351,12 +1358,13 @@ void mb86901_device::execute_saverestore(UINT32 op)
 		else
 		{
 			result = rs1 + operand2;
-			CWP = new_cwp;
+			PSR &= ~PSR_CWP_MASK;
+			PSR |= new_cwp;
 		}
 	}
 	else if (RESTORE)
 	{
-		UINT8 new_cwp = (CWP + 1) % NWINDOWS;
+		UINT8 new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
 		if ((WIM & (1 << new_cwp)) != 0)
 		{
 			m_trap = 1;
@@ -1365,11 +1373,11 @@ void mb86901_device::execute_saverestore(UINT32 op)
 		else
 		{
 			result = rs1 + operand2;
-			CWP = new_cwp;
+			PSR &= ~PSR_CWP_MASK;
+			PSR |= new_cwp;
 		}
 	}
 
-	MAKE_PSR;
 	update_gpr_pointers();
 
 	if (m_trap == 0 && RD != 0)
@@ -1546,11 +1554,12 @@ void mb86901_device::execute_group2(UINT32 op)
 
 void mb86901_device::update_gpr_pointers()
 {
+	int cwp = PSR & PSR_CWP_MASK;
 	for (int i = 0; i < 8; i++)
 	{
-		m_regs[ 8 + i] = &m_r[8 + (( 0 + m_cwp * 16 + i) % (NWINDOWS * 16))];
-		m_regs[16 + i] = &m_r[8 + (( 8 + m_cwp * 16 + i) % (NWINDOWS * 16))];
-		m_regs[24 + i] = &m_r[8 + ((16 + m_cwp * 16 + i) % (NWINDOWS * 16))];
+		m_regs[ 8 + i] = &m_r[8 + (( 0 + cwp * 16 + i) % (NWINDOWS * 16))];
+		m_regs[16 + i] = &m_r[8 + (( 8 + cwp * 16 + i) % (NWINDOWS * 16))];
+		m_regs[24 + i] = &m_r[8 + ((16 + cwp * 16 + i) % (NWINDOWS * 16))];
 	}
 }
 
@@ -1705,12 +1714,12 @@ void mb86901_device::execute_store(UINT32 op)
 			address = RS1REG + RS2REG;
 			addr_space = ASI;
 		}
-		if ((STF || STDF || STFSR || STDFQ) && (!EF || !m_bp_fpu_present))
+		if ((STF || STDF || STFSR || STDFQ) && (!(PSR & PSR_EF_MASK) || !m_bp_fpu_present))
 		{
 			m_trap = 1;
 			m_fp_disabled = 1;
 		}
-		if ((STC || STDC || STCSR || STDCQ) && (!EC || !m_bp_cp_present))
+		if ((STC || STDC || STCSR || STDCQ) && (!(PSR & PSR_EC_MASK) || !m_bp_cp_present))
 		{
 			m_trap = 1;
 			m_cp_disabled = 1;
@@ -2032,12 +2041,12 @@ void mb86901_device::execute_load(UINT32 op)
 
 	if (!m_trap)
 	{
-		if ((LDF || LDDF || LDFSR) && (EF == 0 || m_bp_fpu_present == 0))
+		if ((LDF || LDDF || LDFSR) && (!(PSR & PSR_EF_MASK) || m_bp_fpu_present == 0))
 		{
 			m_trap = 1;
 			m_fp_disabled = 1;
 		}
-		else if ((LDC || LDDC || LDCSR) && (EC == 0 || m_bp_cp_present == 0))
+		else if ((LDC || LDDC || LDCSR) && (!(PSR & PSR_EC_MASK) || m_bp_cp_present == 0))
 		{
 			m_trap = 1;
 			m_cp_disabled = 1;
@@ -2118,10 +2127,8 @@ void mb86901_device::execute_load(UINT32 op)
 
 	if (!m_trap)
 	{
-		if ((RD != 0) && (LD || LDA || LDSH || LDSHA || LDUHA || LDUH || LDSB || LDSBA || LDUB || LDUBA))
-		{
-			RDREG = word0;
-		}
+		if (RD == 0) { }
+		else if (LD || LDA || LDSH || LDSHA || LDUHA || LDUH || LDSB || LDSBA || LDUB || LDUBA) RDREG = word0;
 		else if (LDF) FDREG = word0;
 		else if (LDC) { } // implementation-dependent actions
 		else if (LDFSR) FSR = word0;
@@ -2555,11 +2562,10 @@ void mb86901_device::select_trap()
 
 	if (m_reset_trap)
 	{
-		m_reset_trap = 0;
 		m_trap = 0;
 		return;
 	}
-	else if (!ET)
+	else if (!(PSR & PSR_ET_MASK))
 	{
 		m_execute_mode = 0;
 		m_error_mode = 1;
@@ -2722,11 +2728,21 @@ void mb86901_device::execute_trap()
 
 	if (!m_error_mode)
 	{
-		ET = 0;
-		PS = S;
-		S = 1;
-		CWP = ((CWP + NWINDOWS) - 1) % NWINDOWS;
-		MAKE_PSR;
+		PSR &= ~PSR_ET_MASK;
+
+		if (IS_USER)
+			PSR &= ~PSR_PS_MASK;
+		else
+			PSR |= PSR_PS_MASK;
+
+		PSR |= PSR_S_MASK;
+
+		int cwp = PSR & PSR_CWP_MASK;
+		int new_cwp = ((cwp + NWINDOWS) - 1) % NWINDOWS;
+
+		PSR &= ~PSR_CWP_MASK;
+		PSR |= new_cwp;
+
 		update_gpr_pointers();
 
 		if (m_annul == 0)
@@ -2852,15 +2868,16 @@ void mb86901_device::dispatch_instruction(UINT32 op)
 
 	if (illegal_IU_instr)
 	{
+		printf("illegal instruction at %08x\n", PC);
 		m_trap = 1;
 		m_illegal_instruction = 1;
 	}
-	if (((OP == OP_ALU && (FPOP1 || FPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_FBFCC)) && (!EF || !m_bp_fpu_present))
+	if (((OP == OP_ALU && (FPOP1 || FPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_FBFCC)) && (!(PSR & PSR_EF_MASK) || !m_bp_fpu_present))
 	{
 		m_trap = 1;
 		m_fp_disabled = 1;
 	}
-	if (((OP == OP_ALU && (CPOP1 || CPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_CBCCC)) && (!EC || !m_bp_cp_present))
+	if (((OP == OP_ALU && (CPOP1 || CPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_CBCCC)) && (!(PSR & PSR_EC_MASK) || !m_bp_cp_present))
 	{
 		m_trap = 1;
 		m_cp_disabled = 1;
@@ -2944,10 +2961,12 @@ void mb86901_device::execute_step()
 	if (m_bp_reset_in)
 	{
 		m_execute_mode = 0;
+		m_error_mode = 0;
 		m_reset_mode = 1;
+		printf("Entering reset mode\n");
 		return;
 	}
-	else if (ET && (m_bp_irl == 15 || m_bp_irl > PIL))
+	else if ((PSR & PSR_ET_MASK) && (m_bp_irl == 15 || m_bp_irl > ((PSR & PSR_PIL_MASK) >> PSR_PIL_SHIFT)))
 	{
 		m_trap = 1;
 		m_interrupt_level = m_bp_irl;
@@ -2956,6 +2975,7 @@ void mb86901_device::execute_step()
 	if (m_trap)
 	{
 		execute_trap();
+		BREAK_PSR;
 		debugger_instruction_hook(this, PC);
 	}
 
@@ -2967,54 +2987,9 @@ void mb86901_device::execute_step()
 		UINT32 op = read_sized_word(addr_space, PC, 4);
 
 #if LOG_FCODES
-		if (PC == 0xffef0000)
+		//if (m_log_fcodes)
 		{
-			UINT32 opcode = read_sized_word(11, REG(5), 2);
-			if (!(REG(5) & 2))
-			{
-				opcode >>= 16;
-			}
-
-			UINT32 handler_base = opcode << 2;
-			handler_base += REG(2); // l1 = r2 + opcode << 2
-
-			UINT32 entry_point = read_sized_word(11, handler_base, 2);
-			if (!(handler_base & 2))
-			{
-				entry_point >>= 16;
-			}
-			entry_point <<= 2;
-			entry_point += REG(2); // l0 = r2 + entry_point << 2
-
-#if 0
-			// Doesn't seem to work
-			UINT32 name_length_addr = (REG(2) + ((opcode & ~1) << 2)) - 1;
-			UINT32 name_length_shift = (3 - (name_length_addr & 3)) * 8;
-			UINT32 name_length = (read_sized_word(11, name_length_addr, 1) >> name_length_shift) & 0x7f;
-			UINT32 name_start_addr = name_length_addr - name_length;
-			char name_buf[129];
-			memset(name_buf, 0, 129);
-			if (name_length > 0)
-			{
-				for (int i = 0; i < name_length; i++)
-				{
-					UINT32 char_addr = name_start_addr + i;
-					UINT32 char_shift = (3 - (char_addr & 3)) * 8;
-					name_buf[i] = (read_sized_word(11, char_addr, 1) >> char_shift) & 0xff;
-				}
-			}
-#endif
-
-			disassemble_ss1_fcode(REG(5), opcode, handler_base, entry_point, REG(7));
-		}
-		else if (PC == m_ss1_next_entry_point)
-		{
-			disassemble_ss1_fcode(m_ss1_next_pc, m_ss1_next_opcode, m_ss1_next_handler_base, m_ss1_next_entry_point, m_ss1_next_stack);
-			m_ss1_next_pc = ~0;
-			m_ss1_next_opcode = ~0;
-			m_ss1_next_handler_base = ~0;
-			m_ss1_next_entry_point = ~0;
-			m_ss1_next_stack = ~0;
+			log_fcodes();
 		}
 #endif
 
@@ -3075,6 +3050,7 @@ void mb86901_device::reset_step()
 		m_execute_mode = 1;
 		m_trap = 1;
 		m_reset_trap = 1;
+		printf("m_bp_reset_in is false, resetting\n");
 	}
 }
 
@@ -3122,6 +3098,7 @@ void mb86901_device::execute_run()
 			continue;
 		}
 
+		BREAK_PSR;
 		debugger_instruction_hook(this, PC);
 
 		if (m_reset_mode)

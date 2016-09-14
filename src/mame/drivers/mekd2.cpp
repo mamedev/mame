@@ -312,18 +312,18 @@ QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 	if (memcmp(buff, magic, sizeof (buff)))
 	{
 		logerror("mekd2 rom load: magic '%s' not found\n", magic);
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 	image.fread(&addr, 2);
-	addr = LITTLE_ENDIANIZE_INT16(addr);
+	addr = little_endianize_int16(addr);
 	image.fread(&size, 2);
-	size = LITTLE_ENDIANIZE_INT16(size);
+	size = little_endianize_int16(size);
 	image.fread(&ident, 1);
 	logerror("mekd2 rom load: $%04X $%04X $%02X\n", addr, size, ident);
 	while (size-- > 0)
 		image.fread(&RAM[addr++], 1);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_c)
@@ -383,12 +383,12 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mekd2_state, mekd2_segment_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mekd2_state, mekd2_digit_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(mekd2_state, mekd2_nmi_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, nmi_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, nmi_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("pia_u", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(mekd2_state, cass_w))

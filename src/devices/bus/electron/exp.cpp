@@ -32,7 +32,7 @@ device_electron_expansion_interface::device_electron_expansion_interface(const m
 
 
 //-------------------------------------------------
-//  ~device_electron_expansion_card_interface - destructor
+//  ~device_electron_expansion_interface - destructor
 //-------------------------------------------------
 
 device_electron_expansion_interface::~device_electron_expansion_interface()
@@ -49,8 +49,22 @@ device_electron_expansion_interface::~device_electron_expansion_interface()
 //-------------------------------------------------
 
 electron_expansion_slot_device::electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ELECTRON_EXPANSION_SLOT, "Expansion port", tag, owner, clock, "electron_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_t(mconfig, ELECTRON_EXPANSION_SLOT, "Acorn Electron Expansion port", tag, owner, clock, "electron_expansion_slot", __FILE__),
+		device_slot_interface(mconfig, *this),
+	m_io(nullptr),
+	m_card(nullptr),
+	m_irq_handler(*this),
+	m_nmi_handler(*this),
+	m_reset_handler(*this)
+{
+}
+
+
+//-------------------------------------------------
+//  expansion_slot_device - destructor
+//-------------------------------------------------
+
+electron_expansion_slot_device::~electron_expansion_slot_device()
 {
 }
 
@@ -61,9 +75,11 @@ electron_expansion_slot_device::electron_expansion_slot_device(const machine_con
 
 void electron_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_electron_expansion_interface *>(get_card_device());
+	// resolve callbacks
+	m_irq_handler.resolve_safe();
+	m_nmi_handler.resolve_safe();
+	m_reset_handler.resolve_safe();
 }
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -75,6 +91,15 @@ void electron_expansion_slot_device::device_reset()
 	{
 		get_card_device()->reset();
 	}
+}
+
+//-------------------------------------------------
+//  set_io_space - set address space we are attached to
+//-------------------------------------------------
+
+void electron_expansion_slot_device::set_io_space(address_space *io)
+{
+	m_io = io;
 }
 
 
@@ -90,7 +115,7 @@ void electron_expansion_slot_device::device_reset()
 //#include "aplus5.h"
 //#include "slogger.h"
 //#include "fbjoy.h"
-//#include "m2105.h"
+#include "m2105.h"
 
 
 SLOT_INTERFACE_START( electron_expansion_devices )
@@ -100,5 +125,5 @@ SLOT_INTERFACE_START( electron_expansion_devices )
 	//SLOT_INTERFACE("aplus5", ELECTRON_APLUS5)
 	//SLOT_INTERFACE("slogger", ELECTRON_SLOGGER)
 	//SLOT_INTERFACE("fbjoy", ELECTRON_FBJOY)
-	//SLOT_INTERFACE("m2105", ELECTRON_M2105)
+	SLOT_INTERFACE("m2105", ELECTRON_M2105)
 SLOT_INTERFACE_END

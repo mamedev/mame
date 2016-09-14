@@ -273,7 +273,7 @@ void rsp_device::execute_run_drc()
 	{
 		if( m_sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
 		{
-			m_rsp_state->icount = MIN(m_rsp_state->icount, 0);
+			m_rsp_state->icount = std::min(m_rsp_state->icount, 0);
 			break;
 		}
 

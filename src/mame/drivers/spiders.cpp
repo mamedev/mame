@@ -236,18 +236,6 @@ WRITE_LINE_MEMBER(spiders_state::main_cpu_irq)
 }
 
 
-WRITE_LINE_MEMBER(spiders_state::main_cpu_firq)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(spiders_state::audio_cpu_irq)
-{
-	m_audiocpu->set_input_line(M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 
 /*************************************
  *
@@ -588,7 +576,7 @@ static MACHINE_CONFIG_START( spiders, spiders_state )
 	MCFG_PIA_READPA_HANDLER(READ8(spiders_state,gfx_rom_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state,gfx_rom_intf_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(spiders_state,flipscreen_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state,main_cpu_firq))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
 
 	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
@@ -600,7 +588,7 @@ static MACHINE_CONFIG_START( spiders, spiders_state )
 	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spiders_state, spiders_audio_a_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state, spiders_audio_b_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state, audio_cpu_irq))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("ic60", TTL74123, 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */

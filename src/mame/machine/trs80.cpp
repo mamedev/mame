@@ -931,5 +931,5 @@ QUICKLOAD_LOAD_MEMBER( trs80_state, trs80_cmd )
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

@@ -149,7 +149,7 @@ static MACHINE_CONFIG_FRAGMENT( pcx_video )
 	MCFG_CPU_ADD("graphics", I8031, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
 	MCFG_CPU_IO_MAP(pcx_vid_io)
-	
+
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pcx_video_device, tx_callback))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(pcx_video_device, rx_callback))
 

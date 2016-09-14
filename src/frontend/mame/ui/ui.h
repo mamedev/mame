@@ -8,12 +8,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_FRONTEND_UI_UI_H
+#define MAME_FRONTEND_UI_UI_H
+
 #pragma once
-
-#ifndef __USRINTRF_H__
-#define __USRINTRF_H__
-
-#include <vector>
 
 #include "render.h"
 #include "moptions.h"
@@ -22,6 +20,9 @@
 #include "ui/menuitem.h"
 #include "ui/slider.h"
 #include "ui/text.h"
+
+#include <functional>
+#include <vector>
 
 namespace ui {
 class menu_item;
@@ -128,13 +129,13 @@ enum
 ***************************************************************************/
 
 class mame_ui_manager;
-typedef UINT32 (*ui_callback)(mame_ui_manager &, render_container *, UINT32);
+typedef UINT32 (*ui_callback)(mame_ui_manager &, render_container &, UINT32);
 
-enum ui_callback_type
+enum class ui_callback_type
 {
-	UI_CALLBACK_TYPE_GENERAL,
-	UI_CALLBACK_TYPE_MODAL,
-	UI_CALLBACK_TYPE_MENU
+	GENERAL,
+	MODAL,
+	MENU
 };
 
 // ======================> mame_ui_manager
@@ -166,48 +167,22 @@ public:
 	void initialize(running_machine &machine);
 	std::vector<ui::menu_item> slider_init(running_machine &machine);
 
-	void set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container *)> callback);
-
-	template<typename T, typename... Params>
-	void set_handler(ui_callback_type callback_type, T &obj, UINT32(T::*callback)(render_container *, Params...), Params ...args)
-	{
-		auto lambda = [=, &obj](render_container *container)
-		{
-			return ((obj).*(callback))(container, args...);
-		};
-		set_handler(callback_type, lambda);
-	}
-
-	template<typename... Params>
-	void set_handler(ui_callback_type callback_type, UINT32(mame_ui_manager::*callback)(render_container *, Params...), Params ...args)
-	{
-		set_handler(callback_type, *this, callback, args...);
-	}
-
-	template<typename... Params>
-	void set_handler(ui_callback_type callback_type, UINT32(*callback)(render_container *, Params...), Params ...args)
-	{
-		auto lambda = [&, callback](render_container *container)
-		{
-			return callback(container, args...);
-		};
-		set_handler(callback_type, lambda);
-	}
+	void set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container &)> &&callback);
 
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
-	void update_and_render(render_container *container);
+	void update_and_render(render_container &container);
 	render_font *get_font();
 	float get_line_height();
 	float get_char_width(unicode_char ch);
 	float get_string_width(const char *s, float text_size = 1.0f);
-	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
-	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
-	void draw_text(render_container *container, const char *buf, float x, float y);
-	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr, float text_size = 1.0f);
-	void draw_text_box(render_container *container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor);
-	void draw_text_box(render_container *container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor);
-	void draw_message_window(render_container *container, const char *text);
+	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor);
+	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
+	void draw_text(render_container &container, const char *buf, float x, float y);
+	void draw_text_full(render_container &container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr, float text_size = 1.0f);
+	void draw_text_box(render_container &container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor);
+	void draw_text_box(render_container &container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor);
+	void draw_message_window(render_container &container, const char *text);
 
 	// load/save options to file
 	void load_ui_options();
@@ -231,10 +206,10 @@ public:
 	void increase_frameskip();
 	void decrease_frameskip();
 	void request_quit();
-	void draw_fps_counter(render_container *container);
-	void draw_timecode_counter(render_container *container);
-	void draw_timecode_total(render_container *container);
-	void draw_profiler(render_container *container);
+	void draw_fps_counter(render_container &container);
+	void draw_timecode_counter(render_container &container);
+	void draw_timecode_total(render_container &container);
+	void draw_profiler(render_container &container);
 	void start_save_state();
 	void start_load_state();
 
@@ -246,13 +221,13 @@ public:
 
 	// other
 	void process_natural_keyboard();
-	ui::text_layout create_layout(render_container *container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
+	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
 
 	// word wrap
-	int wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
+	int wrap_text(render_container &container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
 
 	// draw an outlined box with given line color and filled with a texture
-	void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	void draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	virtual void popup_time_string(int seconds, std::string message) override;
 
 	virtual void menu_reset() override;
@@ -260,7 +235,7 @@ public:
 private:
 	// instance variables
 	render_font *           m_font;
-	std::function<UINT32 (render_container *)> m_handler_callback;
+	std::function<UINT32 (render_container &)> m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
 	UINT32                  m_handler_param;
 	bool                    m_single_step;
@@ -286,11 +261,11 @@ private:
 	std::string &warnings_string(std::string &buffer);
 
 	// UI handlers
-	UINT32 handler_messagebox(render_container *container);
-	UINT32 handler_messagebox_anykey(render_container *container);
-	UINT32 handler_ingame(render_container *container);
-	UINT32 handler_load_save(render_container *container, UINT32 state);
-	UINT32 handler_confirm_quit(render_container *container);
+	UINT32 handler_messagebox(render_container &container);
+	UINT32 handler_messagebox_anykey(render_container &container);
+	UINT32 handler_ingame(render_container &container);
+	UINT32 handler_load_save(render_container &container, UINT32 state);
+	UINT32 handler_confirm_quit(render_container &container);
 
 	// private methods
 	void exit();
@@ -340,4 +315,4 @@ inline void mame_ui_manager::popup_time(int seconds, Format &&fmt, Params &&... 
 	popup_time_string(seconds, string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 }
 
-#endif  /* __USRINTRF_H__ */
+#endif  /* MAME_FRONTEND_UI_UI_H */

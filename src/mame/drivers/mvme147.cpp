@@ -179,11 +179,11 @@
 class mvme147_state : public driver_device
 {
 public:
-mvme147_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device (mconfig, type, tag),
-		m_maincpu (*this, "maincpu")
-		,m_sccterm(*this, "scc")
-		,m_sccterm2(*this, "scc2")
+mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device (mconfig, type, tag)
+		, m_maincpu (*this, "maincpu")
+		, m_sccterm(*this, "scc")
+		, m_sccterm2(*this, "scc2")
 	{
 	}
 
@@ -227,8 +227,8 @@ static ADDRESS_MAP_START (mvme147_mem, AS_PROGRAM, 32, mvme147_state)
 	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just during reset */
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)       /* After first write we act as RAM */
 	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* 4 Mb RAM */
-	AM_RANGE (0xff800000, 0xff9fffff) AM_ROM AM_REGION("maincpu", 0xff800000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 1 - 147bug */
-	AM_RANGE (0xffa00000, 0xffbfffff) AM_ROM AM_REGION("maincpu", 0xffa00000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 2 - unpopulated */
+	AM_RANGE (0xff800000, 0xff9fffff) AM_ROM AM_REGION("roms", 0x800000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 1 - 147bug */
+	AM_RANGE (0xffa00000, 0xffbfffff) AM_ROM AM_REGION("roms", 0xa00000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 2 - unpopulated */
 
 		/*  SGS-Thompson M48T18 RAM and clock chip, only 4088 bytes used,  and 8 bytes for the RTC, out of 8Kb though */
 	AM_RANGE (0xfffe0000, 0xfffe0fff) AM_DEVREADWRITE8("m48t18", timekeeper_device, read, write, 0xffffffff)
@@ -255,7 +255,7 @@ void mvme147_state::machine_start ()
 	LOG(("--->%s\n", FUNCNAME));
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (UINT32*)(memregion ("maincpu")->base () + 0xff800000);
+	m_sysrom = (UINT32*)(memregion ("roms")->base () + 0x800000);
 	m_genpurp_stat = 0x02; /* Indicate power up reset */
 	m_vc_cntl_conf = 0x01; /* We are the system controller */
 }
@@ -266,7 +266,7 @@ void mvme147_state::machine_reset ()
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-		m_sysrom = (UINT32*)(memregion ("maincpu")->base () + 0xff800000);
+		m_sysrom = (UINT32*)(memregion ("roms")->base () + 0x800000);
 	m_genpurp_stat &= 0xfe; /* Clear parity error bit - not used by MAME at this point so just for the record */
 }
 
@@ -651,11 +651,11 @@ MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (mvme147)
-	ROM_REGION32_BE(0xfff00000, "maincpu", 0)
+	ROM_REGION32_BE(0xf00000, "roms", 0)
 
 	ROM_SYSTEM_BIOS(0, "147bug v2.44", "MVME147 147bug v2.44")
-	ROMX_LOAD("147bug-2.44-U22.BIN", 0xff800000, 0x20000, CRC (da09ce8a) SHA1 (3eaa8fa802187d9b08f453ff1ba64f5113a195a9), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("147bug-2.44-U30.BIN", 0xff800001, 0x20000, CRC (f883e17d) SHA1 (01fe43e5ddfd3cf8aabb5a5959c80a8b5ec5d895), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("147bug-2.44-U22.BIN", 0x800000, 0x20000, CRC (da09ce8a) SHA1 (3eaa8fa802187d9b08f453ff1ba64f5113a195a9), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("147bug-2.44-U30.BIN", 0x800001, 0x20000, CRC (f883e17d) SHA1 (01fe43e5ddfd3cf8aabb5a5959c80a8b5ec5d895), ROM_SKIP(1) | ROM_BIOS(1))
 /*
  * System ROM information
  *
@@ -681,8 +681,8 @@ ROM_START (mvme147)
  */
 
 	ROM_SYSTEM_BIOS(1, "147bug v2.43", "MVME147 147bug v2.43")
-	ROMX_LOAD("5741B42E.BIN", 0xff800000, 0x20000, CRC (2ba98f97) SHA1 (5f18c6dd6a7b03067890f0164ef3d37ced907d7f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("5741B41E.BIN", 0xff800001, 0x20000, CRC (dfa014f2) SHA1 (ff9db90a05c295819ce7ca7c1a6ac67b04003728), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("5741B42E.BIN", 0x800000, 0x20000, CRC (2ba98f97) SHA1 (5f18c6dd6a7b03067890f0164ef3d37ced907d7f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("5741B41E.BIN", 0x800001, 0x20000, CRC (dfa014f2) SHA1 (ff9db90a05c295819ce7ca7c1a6ac67b04003728), ROM_SKIP(1) | ROM_BIOS(2))
 /*
  * System ROM information
  *

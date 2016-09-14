@@ -56,7 +56,7 @@ DEVICE_IMAGE_LOAD_MEMBER( nc_state, nc_pcmcia_card )
 	set_card_present_state(1);
 	m_membank_card_ram_mask = card_calculate_mask(size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

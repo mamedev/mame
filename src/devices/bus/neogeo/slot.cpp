@@ -234,7 +234,7 @@ void neogeo_cart_slot_device::set_cart_type(const char *slot)
  -------------------------------------------------*/
 
 
-bool neogeo_cart_slot_device::call_load()
+image_init_result neogeo_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -314,11 +314,11 @@ bool neogeo_cart_slot_device::call_load()
 			// a different format (we then always access such alt format for drawing)
 			m_cart->optimize_sprites(m_cart->get_sprites_base(), m_cart->get_sprites_size());
 
-			return IMAGE_INIT_PASS;
+			return image_init_result::PASS;
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -329,17 +329,6 @@ bool neogeo_cart_slot_device::call_load()
 void neogeo_cart_slot_device::call_unload()
 {
 }
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool neogeo_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
-	return TRUE;
-}
-
 
 /*-------------------------------------------------
  get default card software

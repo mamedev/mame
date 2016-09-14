@@ -2030,14 +2030,14 @@ void lynx_state::machine_start()
 
 ****************************************/
 
-int lynx_state::lynx_verify_cart (char *header, int kind)
+image_verify_result lynx_state::lynx_verify_cart(char *header, int kind)
 {
 	if (kind)
 	{
 		if (strncmp("BS93", &header[6], 4))
 		{
 			logerror("This is not a valid Lynx image\n");
-			return IMAGE_VERIFY_FAIL;
+			return image_verify_result::FAIL;
 		}
 	}
 	else
@@ -2051,11 +2051,11 @@ int lynx_state::lynx_verify_cart (char *header, int kind)
 			}
 			else
 				logerror("This is not a valid Lynx image\n");
-			return IMAGE_VERIFY_FAIL;
+			return image_verify_result::FAIL;
 		}
 	}
 
-	return IMAGE_VERIFY_PASS;
+	return image_verify_result::PASS;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
@@ -2069,8 +2069,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	if (image.software_entry() == nullptr)
 	{
 		// check for lnx header
-		const char *filetype = image.filetype();
-		if (!core_stricmp(filetype, "lnx"))
+		if (image.is_filetype("lnx"))
 		{
 			// 64 byte header
 			// LYNX
@@ -2082,8 +2081,8 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 			image.fread(header, 0x40);
 
 			// Check the image
-			if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
-				return IMAGE_INIT_FAIL;
+			if (lynx_verify_cart((char*)header, LYNX_CART) != image_verify_result::PASS)
+				return image_init_result::FAIL;
 
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
 			 it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
@@ -2101,10 +2100,9 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	// set-up granularity
 	if (image.software_entry() == nullptr)
 	{
-		const char *filetype = image.filetype();
-		if (!core_stricmp(filetype, "lnx"))     // from header
+		if (image.is_filetype("lnx"))     // from header
 			m_granularity = gran;
-		else if (!core_stricmp(filetype, "lyx"))
+		else if (image.is_filetype("lyx"))
 		{
 			/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
 			(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
@@ -2140,5 +2138,5 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

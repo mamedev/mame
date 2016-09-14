@@ -326,7 +326,7 @@ protected:
 	std::vector<UINT16> m_prg_bank_map;
 };
 
-void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
+void nes_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 // ======================> nes_cart_slot_device
 
@@ -344,9 +344,9 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	void call_load_ines();
 	void call_load_unif();
@@ -360,7 +360,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "nes_cart"; }
 	virtual const char *file_extensions() const override { return "nes,unf,unif"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	virtual device_image_partialhash_func get_partial_hash() const override { return &nes_partialhash; }
 
 	// slot interface overrides

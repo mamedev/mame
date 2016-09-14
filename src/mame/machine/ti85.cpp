@@ -1176,7 +1176,7 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 	if (snapshot_size != expected_snapshot_size)
 	{
 		logerror ("Incomplete snapshot file\n");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	ti8x_snapshot_data.resize(snapshot_size);
@@ -1188,5 +1188,5 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 	else if (!strncmp(machine().system().name, "ti86", 4))
 		ti86_setup_snapshot(&ti8x_snapshot_data[0]);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

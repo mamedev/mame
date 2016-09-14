@@ -397,7 +397,7 @@ static imgtoolerr_t pc_chd_list_partitions(imgtool_image *image, imgtool_partiti
 
 	info = pc_chd_get_image_info(image);
 
-	for (i = 0; i < MIN(4, len); i++)
+	for (i = 0; i < std::min(size_t(4), len); i++)
 	{
 		partitions[i].base_block    = info->partitions[i].sector_index;
 		partitions[i].block_count   = info->partitions[i].total_sectors;

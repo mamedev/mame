@@ -47,33 +47,33 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	fwrite("fmt ", 1, 4, wav->file);
 
 	/* write the format length */
-	temp32 = LITTLE_ENDIANIZE_INT32(16);
+	temp32 = little_endianize_int32(16);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the format (PCM) */
-	temp16 = LITTLE_ENDIANIZE_INT16(1);
+	temp16 = little_endianize_int16(1);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the channels */
-	temp16 = LITTLE_ENDIANIZE_INT16(channels);
+	temp16 = little_endianize_int16(channels);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the sample rate */
-	temp32 = LITTLE_ENDIANIZE_INT32(sample_rate);
+	temp32 = little_endianize_int32(sample_rate);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the bytes/second */
 	bps = sample_rate * 2 * channels;
-	temp32 = LITTLE_ENDIANIZE_INT32(bps);
+	temp32 = little_endianize_int32(bps);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the block align */
 	align = 2 * channels;
-	temp16 = LITTLE_ENDIANIZE_INT16(align);
+	temp16 = little_endianize_int16(align);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the bits/sample */
-	temp16 = LITTLE_ENDIANIZE_INT16(16);
+	temp16 = little_endianize_int16(16);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the 'data' tag */
@@ -100,13 +100,13 @@ void wav_close(wav_file *wav)
 	/* update the total file size */
 	fseek(wav->file, wav->total_offs, SEEK_SET);
 	temp32 = total - (wav->total_offs + 4);
-	temp32 = LITTLE_ENDIANIZE_INT32(temp32);
+	temp32 = little_endianize_int32(temp32);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* update the data size */
 	fseek(wav->file, wav->data_offs, SEEK_SET);
 	temp32 = total - (wav->data_offs + 4);
-	temp32 = LITTLE_ENDIANIZE_INT32(temp32);
+	temp32 = little_endianize_int32(temp32);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	fclose(wav->file);

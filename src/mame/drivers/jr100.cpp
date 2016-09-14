@@ -321,19 +321,19 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 	int read_;
 	quick_length = image.length();
 	if (quick_length >= 0xffff)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	read_ = image.fread(buf, quick_length);
 	if (read_ != quick_length)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	if (buf[0]!=0x50 || buf[1]!=0x52 || buf[2]!=0x4F || buf[3]!=0x47) {
 		// this is not PRG
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 	int pos = 4;
 	if (readByLittleEndian(buf,pos)!=1) {
 		// not version 1 of PRG file
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 	pos += 4;
 	UINT32 len =readByLittleEndian(buf,pos); pos+= 4;
@@ -359,7 +359,7 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 		m_ram[13] = ((end_address + 3) & 0xFF);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static MACHINE_CONFIG_START( jr100, jr100_state )

@@ -38,7 +38,7 @@ function hiscore.startplugin()
 	  local _table = {};
 	  for line in string.gmatch(dsting, '([^\n]+)') do
 		local cpu, mem;
-		cputag, space, offs, len, chk_st, chk_ed = string.match(line, '^@([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)');
+		cputag, space, offs, len, chk_st, chk_ed, fill = string.match(line, '^@([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),?(%x?%x?)');
 		cpu = manager:machine().devices[cputag];
 		if not cpu then
 		  emu.print_verbose("hiscore: " .. cputag .. " device not found")
@@ -55,6 +55,7 @@ function hiscore.startplugin()
 		  size = tonumber(len, 16),
 		  c_start = tonumber(chk_st, 16),
 		  c_end = tonumber(chk_ed, 16),
+		  fill = tonumber(fill, 16) 
 		};
 	  end
 	  return _table;
@@ -253,6 +254,13 @@ function hiscore.startplugin()
 			if not positions then
 				emu.print_error("hiscore: hiscore.dat parse error");
 				return;
+			end
+			for i, row in pairs(positions) do
+				if row.fill then
+					for i=0,row["size"]-1 do
+						row["mem"]:write_u8(row["addr"] + i, row.fill)
+					end
+				end
 			end
 			found_hiscore_entry = true
 		end		

@@ -193,7 +193,7 @@ void m62_state::m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
 	{
 		rgb_t rgb = palette->entry_color(i);
 		UINT32 y = 299 * rgb.r() + 587 * rgb.g() + 114 * rgb.b();
-		ymax = MAX(ymax, y);
+		ymax = std::max(ymax, y);
 	}
 
 	palette->set_contrast(255000.0/ymax);

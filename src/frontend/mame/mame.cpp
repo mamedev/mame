@@ -160,7 +160,9 @@ void mame_machine_manager::start_luaengine()
 		osd_file::error filerr = file.open("boot.lua");
 		if (filerr == osd_file::error::NONE)
 		{
-			m_lua->load_script(file.fullpath());
+			std::string exppath;
+			osd_subst_env(exppath, std::string(file.fullpath()));
+			m_lua->load_script(exppath.c_str());
 		}
 	}
 }
@@ -296,7 +298,7 @@ void mame_machine_manager::create_custom(running_machine& machine)
 	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
 
 	// start datfile manager
-	m_datfile = std::make_unique<datfile_manager>(machine, m_ui->options());
+	m_datfile = std::make_unique<ui::datfile_manager>(machine, m_ui->options());
 
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());
@@ -312,7 +314,7 @@ void emulator_info::display_ui_chooser(running_machine& machine)
 {
 	// force the UI to show the game select screen
 	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
-	render_container *container = &machine.render().ui_container();
+	render_container &container = machine.render().ui_container();
 	if (machine.options().ui() == emu_options::UI_SIMPLE)
 		ui::simple_menu_select_game::force_game_select(mui, container);
 	else
@@ -327,7 +329,7 @@ int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int 
 
 void emulator_info::draw_user_interface(running_machine& machine)
 {
-	mame_machine_manager::instance()->ui().update_and_render(&machine.render().ui_container());
+	mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
 }
 
 void emulator_info::periodic_check()

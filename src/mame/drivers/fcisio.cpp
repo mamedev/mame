@@ -118,7 +118,7 @@ static ADDRESS_MAP_START (fcisio1_mem, AS_PROGRAM, 16, fcisio1_state)
 	AM_RANGE (0xe60000, 0xe601ff) AM_DEVREADWRITE8("duscc3", duscc68562_device, read, write, 0x00ff)
 	AM_RANGE (0xe80000, 0xe80dff) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff)
 	AM_RANGE (0xf00000, 0xf7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
-//	AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
+//  AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
 ADDRESS_MAP_END
 
 /* Start it up */
@@ -155,14 +155,14 @@ WRITE8_MEMBER (fcisio1_state::not_implemented_w){
 
 // TODO: Get a manual to understand the config options for real
 READ8_MEMBER (fcisio1_state::config_rd){
-	UINT8 ret = 0; 
+	UINT8 ret = 0;
 	LOG(("%s\n", FUNCNAME));
 
 	// Port B bit #7, 0x80 Self test bit, choose either of these two lines
 	ret &= ~0x80; // 0 = selftest
-	//	ret |=  0x80; // 1 = no selftest
+	//  ret |=  0x80; // 1 = no selftest
 
-	return ret; 
+	return ret;
 }
 
 /* Input ports */
@@ -211,7 +211,7 @@ ROM_START (fcisio1)
 /* ISIO ROM:s v2.1 information
  * PIT setup sequence
  *     00 -> REG_PGCR
- *     18 -> REG_PSRR 
+ *     18 -> REG_PSRR
  *     0f -> Reg PADDR
  *     0f -> REG_PBDDR
  *     fa -> REG_PACR
@@ -225,7 +225,7 @@ ROM_START (fcisio1)
  *     40 -> Reg PIVR
  *     00 -> REG_TCR   - timer disabled, all C pins, use preload, CLK and prescaler are used
  *     a0 -> REG_TCR   - timer disabled, The dual-function pin PC3/TOUT carries the TOUTfunction and is used as a timer interrupt request
- *                       output. The timer interrupt is enabled ; thus, the pin is low when the timer ZDS status bit is one. The dual-function 
+ *                       output. The timer interrupt is enabled ; thus, the pin is low when the timer ZDS status bit is one. The dual-function
  *                       pin PC7/TIACK carries the TIACK function and is used as a timer interrupt acknowledge input.
  *     00 -> Reg 0x12
  *     00 -> REG_CPRH
@@ -263,39 +263,39 @@ ROM_START (fcisio1)
  *     00 -> REG_PCDR
  * ------- repeated 16 times -------------------
  *     a1 -> REG_TCR   - timer enabled, The dual-function pin PC3/TOUT carries the TOUTfunction and is used as a timer interrupt request
- *                       output. The timer interrupt is enabled ; thus, the pin is low when the timer ZDS status bit is one. The dual-function 
+ *                       output. The timer interrupt is enabled ; thus, the pin is low when the timer ZDS status bit is one. The dual-function
  *                       pin PC7/TIACK carries the TIACK function and is used as a timer interrupt acknowledge input.
  *     ?? <- Reg 0x0c
  * ---------------------------------------------
  *
  * DUSCC0 channel A setup sequence
- *  0f 00 -> REG_CCR	- Reset Tx
- *  0f 40 -> REG_CCR	- Reset Rx
- *  00 07 -> REG_CMR1 	- Async mode
- *  01 38 -> REG_CMR2	- Normal polled or interrupt mode, no DMA
- *  02 00 -> REG_S1R	- SYN1, Secondary Address 1 Register, 0 = no sync
- *  03 00 -> REG_S2R	- SYN2, only used in COP dual Sync mode but alao 0 = no sync
+ *  0f 00 -> REG_CCR    - Reset Tx
+ *  0f 40 -> REG_CCR    - Reset Rx
+ *  00 07 -> REG_CMR1   - Async mode
+ *  01 38 -> REG_CMR2   - Normal polled or interrupt mode, no DMA
+ *  02 00 -> REG_S1R    - SYN1, Secondary Address 1 Register, 0 = no sync
+ *  03 00 -> REG_S2R    - SYN2, only used in COP dual Sync mode but alao 0 = no sync
  *  04 7F -> REG_TPR    - Tx 8 bits, CTS and RTS, 1 STOP bit
  *  05 3d -> REG_TTR    - Tx BRG 9600 (assuming a 14.7456 crystal)
  *  06 1b -> REG_RPR    - Rx RTS, 8 bits, no DCD, no parity
  *  07 2d -> REG_RTR    - Rx BRG 9600 (assuming a 14.7456 crystal)
- *  0b e1 -> REG_OMR    - RTS high, OUT1 = OUT2 = high, RxRdy asserted for each character, 
- *						  TxRdy asserted on threshold, Same Tx Residual Character Length as for REG_TPR
- *  0a 00 -> REG_CTCR	- Counter/Timer control register 00 = Zero Det Int: disabled, Zero Det Control: preset,
- * 						  Output Control: square, Prescaler: 1, Clock Source: RTxC pin
- *  09 00 -> REG_CTPRL	- Counter/Timer Prescaler Register Low = 0 
- *  08 00 -> REG_CTPRH	- Counter/Timer Prescaler Register High = 0 
- *  0f 00 -> REG_CCR	- Reset Tx
- *  0f 02 -> REG_CCR	- Enable Tx
- *  0f 40 -> REG_CCR	- Reset Rx
- *  0f 42 -> REG_CCR	- Enable Rx
- *  0f 02 -> REG_CCR	- Enable Tx
- *  0f 42 -> REG_CCR	- Enable Rx
+ *  0b e1 -> REG_OMR    - RTS high, OUT1 = OUT2 = high, RxRdy asserted for each character,
+ *                        TxRdy asserted on threshold, Same Tx Residual Character Length as for REG_TPR
+ *  0a 00 -> REG_CTCR   - Counter/Timer control register 00 = Zero Det Int: disabled, Zero Det Control: preset,
+ *                        Output Control: square, Prescaler: 1, Clock Source: RTxC pin
+ *  09 00 -> REG_CTPRL  - Counter/Timer Prescaler Register Low = 0
+ *  08 00 -> REG_CTPRH  - Counter/Timer Prescaler Register High = 0
+ *  0f 00 -> REG_CCR    - Reset Tx
+ *  0f 02 -> REG_CCR    - Enable Tx
+ *  0f 40 -> REG_CCR    - Reset Rx
+ *  0f 42 -> REG_CCR    - Enable Rx
+ *  0f 02 -> REG_CCR    - Enable Tx
+ *  0f 42 -> REG_CCR    - Enable Rx
  *  0e 27 -> REG_PCR    - TRxC = RxCLK 1x, RTxC is input, RTS, GPO2, crystal oscillator connected to X2
- *  1c 10 -> REG_IER	- Interrupt Enable Register: RxRdy generates interrupt
+ *  1c 10 -> REG_IER    - Interrupt Enable Register: RxRdy generates interrupt
  *  ... chan B setup with same data....
  * ---- DUSCC0 to DUSCC3, setup with same data except at the end of each setup:
- *  1e 1c -> DUSCC0 REG_IVR	- 
+ *  1e 1c -> DUSCC0 REG_IVR -
  *  1e 1b -> DUSCC1 REG_IVR
  *  1e 1a -> DUSCC2 REG_IVR
  *  1e 19 -> DUSCC3 REG_IVR

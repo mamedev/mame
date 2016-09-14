@@ -26,8 +26,8 @@ namespace netlist
 		NETLIB_RESETI() {}
 
 	public:
-		inline nl_double vdd() { return INPANALOG(m_vdd); }
-		inline nl_double vss() { return INPANALOG(m_vss); }
+		nl_double vdd() { return m_vdd(); }
+		nl_double vss() { return m_vss(); }
 
 		analog_input_t m_vdd;
 		analog_input_t m_vss;

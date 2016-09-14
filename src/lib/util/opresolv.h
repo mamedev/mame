@@ -86,7 +86,6 @@ struct option_guide
 #define OPTION_ENUM_END
 
 namespace util {
-
 class option_resolution
 {
 public:

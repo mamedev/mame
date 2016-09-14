@@ -28,7 +28,6 @@
 #include "includes/neogeo.h"
 #include "machine/nvram.h"
 #include "imagedev/chd_cd.h"
-#include "sound/cdda.h"
 #include "machine/megacdcd.h"
 #include "softlist.h"
 

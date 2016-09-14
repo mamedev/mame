@@ -132,7 +132,7 @@ void generic_slot_device::device_config_complete()
  call load
  -------------------------------------------------*/
 
-bool generic_slot_device::call_load()
+image_init_result generic_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -145,11 +145,11 @@ bool generic_slot_device::call_load()
 			rom_alloc(len, m_width, m_endianness);
 			common_load_rom(get_rom_base(), len, "rom");
 
-			return IMAGE_INIT_PASS;
+			return image_init_result::PASS;
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -162,18 +162,6 @@ void generic_slot_device::call_unload()
 	if (!m_device_image_unload.isnull())
 		return m_device_image_unload(*this);
 }
-
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool generic_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
-}
-
 
 
 /*-------------------------------------------------

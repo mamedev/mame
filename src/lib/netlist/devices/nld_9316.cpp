@@ -32,10 +32,9 @@ namespace netlist
 		logic_input_t m_C;
 		logic_input_t m_D;
 
-		uint_fast8_t read_ABCD() const
+		unsigned read_ABCD() const
 		{
-			//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
-			return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
+			return (m_D() << 3) | (m_C() << 2) | (m_B() << 1) | (m_A() << 0);
 		}
 	};
 
@@ -59,19 +58,19 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs_all(const uint_fast8_t cnt, const netlist_time out_delay)
+		void update_outputs_all(const unsigned cnt, const netlist_time out_delay)
 		{
-			OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
-			OUTLOGIC(m_QB, (cnt >> 1) & 1, out_delay);
-			OUTLOGIC(m_QC, (cnt >> 2) & 1, out_delay);
-			OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
+			m_QA.push((cnt >> 0) & 1, out_delay);
+			m_QB.push((cnt >> 1) & 1, out_delay);
+			m_QC.push((cnt >> 2) & 1, out_delay);
+			m_QD.push((cnt >> 3) & 1, out_delay);
 		}
 
 		logic_input_t m_CLK;
 
-		state_var_u8 m_cnt;
-		state_var_u8 m_loadq;
-		state_var_u8 m_ent;
+		state_var<unsigned> m_cnt;
+		state_var<netlist_sig_t> m_loadq;
+		state_var<netlist_sig_t> m_ent;
 
 		logic_output_t m_QA;
 		logic_output_t m_QB;
@@ -166,11 +165,11 @@ namespace netlist
 			{
 				case MAXCNT - 1:
 					m_cnt = MAXCNT;
-					OUTLOGIC(m_RC, m_ent, NLTIME_FROM_NS(27));
-					OUTLOGIC(m_QA, 1, NLTIME_FROM_NS(20));
+					m_RC.push(m_ent, NLTIME_FROM_NS(27));
+					m_QA.push(1, NLTIME_FROM_NS(20));
 					break;
 				case MAXCNT:
-					OUTLOGIC(m_RC, 0, NLTIME_FROM_NS(27));
+					m_RC.push(0, NLTIME_FROM_NS(27));
 					m_cnt = 0;
 					update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
 					break;
@@ -183,21 +182,21 @@ namespace netlist
 		else
 		{
 			m_cnt = m_ABCD->read_ABCD();
-			OUTLOGIC(m_RC, m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			m_RC.push(m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 			update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
 		}
 	}
 
 	NETLIB_UPDATE(9316)
 	{
-		sub.m_loadq = INPLOGIC(m_LOADQ);
-		sub.m_ent = INPLOGIC(m_ENT);
-		const netlist_sig_t clrq = INPLOGIC(m_CLRQ);
+		sub.m_loadq = m_LOADQ();
+		sub.m_ent = m_ENT();
+		const netlist_sig_t clrq = m_CLRQ();
 
-		if (((sub.m_loadq ^ 1) | (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
+		if (((sub.m_loadq ^ 1) | (sub.m_ent & m_ENP())) & clrq)
 		{
 			sub.m_CLK.activate_lh();
-			OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			sub.m_RC.push(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 		}
 		else
 		{
@@ -208,7 +207,7 @@ namespace netlist
 				sub.m_cnt = 0;
 				//return;
 			}
-			OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			sub.m_RC.push(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 		}
 	}
 

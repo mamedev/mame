@@ -367,7 +367,7 @@ static void copy_integer_array_be(UINT32 *dest, const UINT32 *source, int size)
 
 	for (i = 0; i < size; i++)
 	{
-		dest[i] = BIG_ENDIANIZE_INT32(source[i]);
+		dest[i] = big_endianize_int32(source[i]);
 	}
 }
 
@@ -375,9 +375,9 @@ static void copy_integer_array_be(UINT32 *dest, const UINT32 *source, int size)
 /* This function converts an array of UINT32s to an amiga_date */
 static void copy_date_be(amiga_date *dest, const UINT32 *source)
 {
-	dest->days  = BIG_ENDIANIZE_INT32(source[0]);
-	dest->mins  = BIG_ENDIANIZE_INT32(source[1]);
-	dest->ticks = BIG_ENDIANIZE_INT32(source[2]);
+	dest->days  = big_endianize_int32(source[0]);
+	dest->mins  = big_endianize_int32(source[1]);
+	dest->ticks = big_endianize_int32(source[2]);
 }
 
 

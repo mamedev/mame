@@ -2,8 +2,8 @@
 // copyright-holders:Barry Rodewald
 // Convergent NGEN keyboard
 
-#ifndef NGEN_KB_H_
-#define NGEN_KB_H_
+#ifndef MAME_MACHINE_NGEN_KB_H
+#define MAME_MACHINE_NGEN_KB_H
 
 #include "bus/rs232/keyboard.h"
 
@@ -12,22 +12,21 @@ class ngen_keyboard_device : public serial_keyboard_device
 public:
 	ngen_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ioport_constructor device_input_ports() const override;
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void rcv_complete() override;
+	virtual void key_make(UINT8 row, UINT8 column) override;
+	virtual void key_break(UINT8 row, UINT8 column) override;
 
 private:
-	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line) override;
-	UINT8 row_number(UINT8 code);
 	void write(UINT8 data);
 
-	bool m_keys_down;
-	bool m_last_reset;
+	UINT8 m_keys_down;
+	UINT8 m_last_reset;
 };
 
 extern const device_type NGEN_KEYBOARD;
 
-#endif /* NGENKB_H_ */
+#endif // MAME_MACHINE_NGEN_KB_H
