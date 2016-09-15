@@ -1032,13 +1032,20 @@ int ay8910_device::ay8910_read_ym()
 	Untested chips are assumed to regard them as 'ram'
 	Tested and confirmed on hardware:
 	- AY-3-8910: inaccessible bits (see masks below) read back as 0
+	- AY-3-8914: same as 8910 except regs B,C,D (8,9,A below due to 8910->8914 remapping) are 0x3f
+	- AY-3-8916/8917 (used on ECS INTV expansion): inaccessible bits mirror one of the i/o ports, needs further testing
 	- YM2149: no anomaly
 	*/
 	if (chip_type == AY8910) {
 		const UINT8 mask[0x10]={
 			0xff,0x0f,0xff,0x0f,0xff,0x0f,0x1f,0xff,0x1f,0x1f,0x1f,0xff,0xff,0x0f,0xff,0xff
 		};
-
+		return m_regs[r] & mask[r];
+	}
+	else if (chip_type == AY8914) {
+		const UINT8 mask[0x10]={
+			0xff,0x0f,0xff,0x0f,0xff,0x0f,0x1f,0xff,0x3f,0x3f,0x3f,0xff,0xff,0x0f,0xff,0xff
+		};
 		return m_regs[r] & mask[r];
 	}
 	else return m_regs[r];
