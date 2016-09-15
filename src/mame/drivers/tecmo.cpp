@@ -6,6 +6,10 @@ tecmo.cpp
 
 driver by Nicola Salmoria
 
+TODO:
+- raster effect in Gemini Wing THE END ending, needs accurate clocks measured 
+  on a genuine board (waitstates too?) and a side-by-side test;
+
 Notes:
 - btanb: missing drums in backfirt, there isn't any ADPCM / rom that makes
   that to happen (code still tries to writes on that, but it's just nop'ed);
@@ -627,10 +631,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396,0,256,256,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -661,7 +662,6 @@ static MACHINE_CONFIG_DERIVED( gemini, rygar )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)
 	MCFG_CPU_PROGRAM_MAP(gemini_map)
 
 	MCFG_CPU_MODIFY("soundcpu")

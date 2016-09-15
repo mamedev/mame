@@ -133,6 +133,7 @@ WRITE8_MEMBER(tecmo_state::fgscroll_w)
 
 	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] + 256 * m_fgscroll[1]);
 	m_fg_tilemap->set_scrolly(0, m_fgscroll[2]);
+	m_screen->update_partial(m_screen->vpos());
 }
 
 WRITE8_MEMBER(tecmo_state::bgscroll_w)
@@ -141,6 +142,7 @@ WRITE8_MEMBER(tecmo_state::bgscroll_w)
 
 	m_bg_tilemap->set_scrollx(0, m_bgscroll[0] + 256 * m_bgscroll[1]);
 	m_bg_tilemap->set_scrolly(0, m_bgscroll[2]);
+	m_screen->update_partial(m_screen->vpos());
 }
 
 WRITE8_MEMBER(tecmo_state::flipscreen_w)
@@ -160,12 +162,20 @@ WRITE8_MEMBER(tecmo_state::flipscreen_w)
 
 UINT32 tecmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.priority().fill(0, cliprect);
-	bitmap.fill(0x100, cliprect);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,1);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
+	rectangle clip;
+	clip.min_x = cliprect.min_x;
+	clip.max_x = cliprect.max_x;
 
-	m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode,cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
+	for (int line = cliprect.min_y; line <= cliprect.max_y;line++)
+	{
+		clip.min_y = clip.max_y = line;
+		screen.priority().fill(0, clip);
+		bitmap.fill(0x100, clip);
+		m_bg_tilemap->draw(screen, bitmap, clip, 0,1);
+		m_fg_tilemap->draw(screen, bitmap, clip, 0,2);
+		m_tx_tilemap->draw(screen, bitmap, clip, 0,4);
+
+		m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode,clip, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
+	}
 	return 0;
 }
