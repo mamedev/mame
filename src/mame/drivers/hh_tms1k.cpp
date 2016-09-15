@@ -45,7 +45,7 @@
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
  *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000 (? note: VFD-capable)
- *MP1801   TMS1100?  1981, Tiger Copycat Jr/Ditto/Tandy Pocket Repeat
+ @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
  @MP2105   TMS1370   1979, Gakken/Entex Poker
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
  @MP2726   TMS1040   1979, Tomy Break Up
@@ -141,6 +141,7 @@
 #include "comp4.lh" // clickable
 #include "copycat.lh" // clickable
 #include "copycatm2.lh" // clickable
+#include "ditto.lh" // clickable
 #include "cqback.lh"
 #include "ebball.lh"
 #include "ebball2.lh"
@@ -3733,11 +3734,12 @@ MACHINE_CONFIG_END
   This is a 2-player electronic board game. It still needs game pieces like the
   original Battleship board game.
 
-  It went through 4 hardware revisions:
-  1977: model 4750A, see notes above
-  1977: model 4750B, see notes at bshipb (driver below this)
-  1979: model 4750C: cost-reduced single chip design, lesser quality game board.
+  It went through at least 5 hardware revisions (not counting Talking Battleship):
+  1977: model 4750A, TMS1000 discrete sound, see notes above
+  1977: model 4750B, TMS1000 SN76477 sound, see notes at bshipb (driver below this)
+  1979: model 4750C: cost-reduced single-chip design, lesser quality game board.
         The chip is assumed to be custom, no MCU: 28-pin DIP, label 4750, SCUS 0462
+  1982: similar custom single-chip hardware, chip label MB4750 SCUS 0562
   1982: back to MCU, COP420 instead of choosing TI, emulated in hh_cop400.cpp
 
 ***************************************************************************/
@@ -5591,7 +5593,8 @@ MACHINE_CONFIG_END
   * TMS1730 MCU, label MP3005N (die label 1700 MP3005)
   * 4 LEDs, 1-bit sound
 
-  This is a simplified rerelease of Copy Cat, 10(!) years later.
+  This is a simplified rerelease of Copy Cat, 10(!) years later. The gameplay
+  is identical to Ditto.
 
   3 variations exist, each with a different colored case. Let's assume that
   they're on the same hardware.
@@ -5647,6 +5650,77 @@ static MACHINE_CONFIG_START( copycatm2, copycatm2_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_copycatm2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Ditto (model 7-530)
+  * TMS1700 MCU, label MP1801-N2LL (die label 1700 MP1801)
+  * 4 LEDs, 1-bit sound
+
+  known releases:
+  - World: Ditto
+  - USA: Electronic Pocket Repeat (model 60-2152/60-2468A), distributed by Tandy
+    model 60-2482 from 1996 is assumed to be a clone of Tiger Copycat Jr.
+
+***************************************************************************/
+
+class ditto_state : public hh_tms1k_state
+{
+public:
+	ditto_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+};
+
+// handlers
+
+WRITE16_MEMBER(ditto_state::write_r)
+{
+	// R0-R3: leds
+	display_matrix(4, 1, data & 0xf, 1);
+}
+
+WRITE16_MEMBER(ditto_state::write_o)
+{
+	// O5,O6: speaker out
+	m_speaker->level_w(data >> 5 & 3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( ditto )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Yellow Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Blue Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Orange Button")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Red Button")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( ditto, ditto_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ditto_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ditto_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ditto)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6608,6 +6682,16 @@ ROM_START( copycat )
 	ROM_LOAD( "tms1000_copycat_output.pla", 0, 365, CRC(b1d0c96d) SHA1(ac1a003eab3f69e09e9050cb24ea17211e0523fe) )
 ROM_END
 
+ROM_START( ditto )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "mp1801", 0x0000, 0x0200, CRC(cee6043b) SHA1(4ec334be6835688413637ff9d9d7a5f0d61eba27) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ditto_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ditto_output.pla", 0, 365, CRC(2b708a27) SHA1(e95415e51ffbe5da3bde1484fcd20467dde9f09a) )
+ROM_END
+
 ROM_START( copycatm2 )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "mp3005n", 0x0000, 0x0200, CRC(a87649cb) SHA1(14ef7967a80578885f0b905772c3bb417b5b3255) )
@@ -6710,6 +6794,7 @@ COMP( 1976, speechp,   0,        0, speechp,   speechp,   driver_device, 0, "Tel
 
 CONS( 1979, copycat,   0,        0, copycat,   copycat,   driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2, copycat,  0, copycatm2, copycatm2, driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, ditto,     0,        0, ditto,     ditto,     driver_device, 0, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,   0,        0, phpball,   phpball,   driver_device, 0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
