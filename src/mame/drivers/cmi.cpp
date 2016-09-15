@@ -1540,12 +1540,15 @@ void cmi_state::fdc_dma_transfer()
 		/* Read a byte at a time */
 		UINT8 data = m_wd1791->data_r() ^ 0xff;
 
+		if (m_fdc_dma_cnt.w.l == 0xffff)
+			return;
+
 		if (m_cmi07_ctrl & 0x30)
-		if (BIT(m_cmi07_ctrl, 6) && !BIT(m_cmi07_ctrl, 7))
-		{
-			if ((m_fdc_dma_addr.w.l & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
-				m_cmi07_ram[m_fdc_dma_addr.w.l & 0x3fff] = data;
-		}
+			if (BIT(m_cmi07_ctrl, 6) && !BIT(m_cmi07_ctrl, 7))
+			{
+				if ((m_fdc_dma_addr.w.l & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
+					m_cmi07_ram[m_fdc_dma_addr.w.l & 0x3fff] = data;
+			}
 
 		if (phys_page & 0x80)
 			m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)] = data;
@@ -1557,6 +1560,9 @@ void cmi_state::fdc_dma_transfer()
 	// Transfer from RAM to disk
 	else
 	{
+		if (m_fdc_dma_cnt.w.l == 0xffff)
+			return;
+
 		/* Write a byte at a time */
 		UINT8 data = 0;
 
@@ -1569,6 +1575,8 @@ void cmi_state::fdc_dma_transfer()
 		if (!BIT(m_fdc_ctrl, 3))
 			m_fdc_dma_addr.w.l++;
 	}
+
+	m_fdc_dma_cnt.w.l++;
 }
 
 WRITE_LINE_MEMBER( cmi_state::wd1791_irq )
