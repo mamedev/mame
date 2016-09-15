@@ -143,6 +143,7 @@ decwritr.cpp
 dgn_beta.cpp
 didact.cpp
 digel804.cpp
+digijet.cpp
 dim68k.cpp
 dm7000.cpp
 dmax8000.cpp
