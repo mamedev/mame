@@ -133,8 +133,8 @@ public:
 		m_pic2(*this, "pic_slave"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:floppy0"),
-		m_floppy1(*this, "fdc:floppy1"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
 		m_current_dma(-1)
 		{ }
 
@@ -156,6 +156,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cntl_w);
 	DECLARE_READ8_MEMBER(gpo_r);
 	DECLARE_WRITE8_MEMBER(gpo_w);
+	DECLARE_READ8_MEMBER(vidcontrol_r);
+	DECLARE_WRITE8_MEMBER(vidcontrol_w);
 	
 	DECLARE_WRITE_LINE_MEMBER(dack0_w) { m_dma1->hack_w(state ? 0 : 1); }  // for all unused DMA channel?
 	DECLARE_WRITE_LINE_MEMBER(dack1_w) { if(!state) m_current_dma = 1; else if(m_current_dma == 1) m_current_dma = -1; }  // HD
@@ -187,6 +189,7 @@ private:
 	UINT8 m_current_drive;
 	UINT8 m_cntl;  // RTC / FDC control (PPI port B)
 	UINT8 m_gpo;  // General purpose outputs (PPI port C)
+	UINT8 m_vidctrl;
 };
 
 
@@ -211,18 +214,16 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma2", am9517a_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWA")
 	AM_RANGE(0x21, 0x2f) AM_READWRITE(system_r, system_w)
-	// 0x31: hard disk bank
-	// 0x32: floppy bank
-	// 0x33: RAM refresh / Z80 bank
 	AM_RANGE(0x31, 0x33) AM_READWRITE(bank_sel_r, bank_sel_w)
 	// 0x50-51: Keyboard (i8251)
+	AM_RANGE(0x50, 0x51) AM_NOP
 	// 0x70-73: HD controller
 	// 0x80-83: serial timers (i8253)
 	// 0xa0-a3: serial interface (Z80 SIO/2)
 	AM_RANGE(0xb0, 0xb1) AM_DEVREADWRITE("pic_master", pic8259_device, read, write)
 	AM_RANGE(0xb4, 0xb5) AM_DEVREADWRITE("pic_slave", pic8259_device, read, write)
 	AM_RANGE(0xc0, 0xc7) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
-	// 0xc8: video control
+	AM_RANGE(0xc8, 0xc8) AM_READWRITE(vidcontrol_r, vidcontrol_w)
 	AM_RANGE(0xc9, 0xc9) AM_DEVREADWRITE("crtc", scn2674_device, buffer_r, buffer_w)
 	AM_RANGE(0xca, 0xca) AM_RAM // attribute writes go here
 	// 0xcf: mode control
@@ -248,7 +249,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( octopus )
-
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x02, "Number of floppy drives" ) PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING( 0x00, "None" )
@@ -273,7 +273,6 @@ static INPUT_PORTS_START( octopus )
 	PORT_DIPNAME( 0x80, 0x80, "Colour monitor connected" ) PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
-
 INPUT_PORTS_END
 
 
@@ -347,7 +346,7 @@ READ8_MEMBER(octopus_state::system_r)
 	return 0xff;
 }
 
-// RTC/FDC control
+// RTC/FDC control - PPI port B
 // bit4-5: write precomp.
 // bit6-7: drive select
 READ8_MEMBER(octopus_state::cntl_r)
@@ -363,12 +362,14 @@ WRITE8_MEMBER(octopus_state::cntl_w)
 	{
 	case 1:
 		m_fdc->set_floppy(m_floppy0->get_device());
+		m_floppy0->get_device()->mon_w(0);
 		break;
 	case 2:
 		m_fdc->set_floppy(m_floppy1->get_device());
+		m_floppy1->get_device()->mon_w(0);
 		break;
 	}
-	logerror("Selected floppy drive %i\n",m_current_drive);
+	logerror("Selected floppy drive %i (%02x)\n",m_current_drive,data);
 }
 
 // General Purpose Outputs - PPI port C
@@ -386,14 +387,33 @@ WRITE8_MEMBER(octopus_state::gpo_w)
 	switch(m_current_drive)
 	{
 	case 1:
-		m_floppy0->get_device()->ss_w(data & 0x04);
+		m_floppy0->get_device()->ss_w((data & 0x04) >> 2);
 		break;
 	case 2:
-		m_floppy1->get_device()->ss_w(data & 0x04);
+		m_floppy1->get_device()->ss_w((data & 0x04) >> 2);
 		break;
 	default:
 		logerror("Attempted to set side on unknown drive %i\n",m_current_drive);
 	}
+}
+
+// Video control register
+// bit 0 - video dot clock - 0=17.6MHz, 1=16MHz
+// bit 2 - floppy DDEN line
+// bit 3 - floppy FCLOCK line - 0=1MHz, 1=2MHz
+// bits 4-5 - character width - 0=10 dots, 1=6 dots, 2=8 dots, 3=9 dots
+// bit 6 - cursor mode (colour only) - 0=inverse cursor, 1=white cursor (normal)
+// bit 7 - 1=monochrome mode, 0=colour mode
+READ8_MEMBER(octopus_state::vidcontrol_r)
+{
+	return m_vidctrl;
+}
+
+WRITE8_MEMBER(octopus_state::vidcontrol_w)
+{
+	m_vidctrl = data;
+	m_fdc->dden_w(data & 0x04);
+	m_fdc->set_unscaled_clock((data & 0x08) ? XTAL_16MHz / 16 : XTAL_16MHz / 8);
 }
 
 READ8_MEMBER(octopus_state::dma_read)
@@ -402,8 +422,7 @@ READ8_MEMBER(octopus_state::dma_read)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_current_dma == -1)
 		return 0;
-	logerror("DMA: MEMR off %06x\n",offset);
-	byte = prog_space.read_byte(offset);
+	byte = prog_space.read_byte((m_fd_bank << 16) + offset);
 	return byte;
 }
 
@@ -412,8 +431,7 @@ WRITE8_MEMBER(octopus_state::dma_write)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_current_dma == -1)
 		return;
-	logerror("DMA: MEMW off %06x data %02x\n",offset,data);
-	prog_space.write_byte(offset, data);
+	prog_space.write_byte((m_fd_bank << 16) + offset, data);
 }
 
 WRITE_LINE_MEMBER( octopus_state::dma_hrq_changed )
@@ -474,29 +492,30 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(octopus_state,dma_read))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(octopus_state,dma_write))
-	MCFG_I8237_IN_IOR_0_CB(NOOP)
-	MCFG_I8237_IN_IOR_1_CB(NOOP)  // HDC
-	MCFG_I8237_IN_IOR_2_CB(NOOP)  // RAM Refresh
-	MCFG_I8237_IN_IOR_3_CB(NOOP)
-	MCFG_I8237_OUT_IOW_0_CB(NOOP)
-	MCFG_I8237_OUT_IOW_1_CB(NOOP)  // HDC
-	MCFG_I8237_OUT_IOW_2_CB(NOOP)  // RAM Refresh
-	MCFG_I8237_OUT_IOW_3_CB(NOOP)
+	//MCFG_I8237_IN_IOR_0_CB(NOOP)
+	//MCFG_I8237_IN_IOR_1_CB(NOOP)  // HDC
+	//MCFG_I8237_IN_IOR_2_CB(NOOP)  // RAM Refresh
+	//MCFG_I8237_IN_IOR_3_CB(NOOP)
+	//MCFG_I8237_OUT_IOW_0_CB(NOOP)
+	//MCFG_I8237_OUT_IOW_1_CB(NOOP)  // HDC
+	//MCFG_I8237_OUT_IOW_2_CB(NOOP)  // RAM Refresh
+	//MCFG_I8237_OUT_IOW_3_CB(NOOP)
 	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(octopus_state, dack0_w))
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(octopus_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(octopus_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(octopus_state, dack3_w))
 	MCFG_DEVICE_ADD("dma2", AM9517A, XTAL_24MHz / 6)  // 4MHz
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(octopus_state, dma_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(octopus_state,dma_read))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(octopus_state,dma_write))
-	MCFG_I8237_IN_IOR_0_CB(NOOP)
+	//MCFG_I8237_IN_IOR_0_CB(NOOP)
 	MCFG_I8237_IN_IOR_1_CB(DEVREAD8("fdc",fd1793_t,data_r))  // FDC
-	MCFG_I8237_IN_IOR_2_CB(NOOP)
-	MCFG_I8237_IN_IOR_3_CB(NOOP)
-	MCFG_I8237_OUT_IOW_0_CB(NOOP)
+	//MCFG_I8237_IN_IOR_2_CB(NOOP)
+	//MCFG_I8237_IN_IOR_3_CB(NOOP)
+	//MCFG_I8237_OUT_IOW_0_CB(NOOP)
 	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("fdc",fd1793_t,data_w))  // FDC
-	MCFG_I8237_OUT_IOW_2_CB(NOOP)
-	MCFG_I8237_OUT_IOW_3_CB(NOOP)
+	//MCFG_I8237_OUT_IOW_2_CB(NOOP)
+	//MCFG_I8237_OUT_IOW_3_CB(NOOP)
 	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(octopus_state, dack4_w))
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(octopus_state, dack5_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(octopus_state, dack6_w))
@@ -519,13 +538,12 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_FD1793_ADD("fdc",XTAL_16MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic_master",pic8259_device, ir5_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma2",am9517a_device, dreq1_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:floppy0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:floppy1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	// TODO: add components
 	// i8253 PIT timer (speaker output, serial timing, other stuff too?)
 	// i8251 serial controller (keyboard)
-	// i8255A PPI (RTC access, FDC)
 	// Centronics parallel interface
 	// Z80SIO/2 (serial)
 	// Winchester HD controller (Xebec/SASI compatible? uses TTL logic)
