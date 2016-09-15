@@ -546,13 +546,14 @@ UINT8 segas24_state::dcclub_io_r(UINT8 port)
 	{
 	case 0:
 	{
-		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9 };
+		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9, 0, 0, 0 };
 		return (m_p1->read() & 0xf) | ((~pos[m_paddle->read()>>4]<<4) & 0xf0);
 	}
 	case 1:
 		return m_p2->read();
 	case 2:
-		return 0xff;
+		static const UINT8 pos[16] = { 0, 0, 0, 0, 0, 0,  0, 0, 0, 1, 3, 2 };
+		return(~pos[m_paddle->read()>>4] & 0x03) | 0xfc;
 	case 3:
 		return 0xff;
 	case 4:
@@ -1664,7 +1665,31 @@ static INPUT_PORTS_START( dcclub ) /* In the Japan set missing angle input */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-
+	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Start Credit" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "1" )
@@ -1691,7 +1716,7 @@ static INPUT_PORTS_START( dcclub ) /* In the Japan set missing angle input */
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
 	PORT_START("PADDLE")
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0x00,0x8f) PORT_SENSITIVITY(64) PORT_KEYDELTA(64) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0x00,0xbf) PORT_SENSITIVITY(64) PORT_KEYDELTA(64) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sgmast )
