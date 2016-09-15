@@ -74,8 +74,8 @@ Then, when MAME is started, it will list available devices to the console. For e
 
 Furthermore, when devices are mapped using mapdevice, you'll see that in the verbose logging too, such as:
 
-|     Mapped device 'HID-compliant mouse (\\?\HID#VID_D209&PID_1601&MI_02#9&375eebb1&0&0000#{378de44c-56ef-11d1-bc8c-00a0c91405dd})' to Gun #0
-|     Mapped device 'HID-compliant mouse (\\?\HID#VID_D209&PID_1602&MI_02#8&389ab7f3&0&0000#{378de44c-56ef-11d1-bc8c-00a0c91405dd})' to Gun #1
-|     Mapped device 'XInput Player 1' to Joy #0
-|     Mapped device 'XInput Player 2' to Joy #1
+|     Input: Remapped Gun #0: HID-compliant mouse (\\?\HID#VID_D209&PID_1601&MI_02#9&375eebb1&0&0000#{378de44c-56ef-11d1-bc8c-00a0c91405dd})
+|     Input: Remapped Gun #1: HID-compliant mouse (\\?\HID#VID_D209&PID_1602&MI_02#8&389ab7f3&0&0000#{378de44c-56ef-11d1-bc8c-00a0c91405dd})
+|     Input: Remapped Joy #0: XInput Player 1
+|     Input: Remapped Joy #1: XInput Player 2
 |

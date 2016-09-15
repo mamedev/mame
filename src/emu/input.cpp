@@ -2152,7 +2152,7 @@ bool input_manager::map_device_to_controller(const devicemap_table_type *devicem
 			{
 				// remap devindex
 				input_devclass->remap_device_index(device->devindex(), devindex);
-				osd_printf_info("Mapped device '%s' to %s #%d\n", device->name(), (*devclass_string_table)[input_devclass->devclass()], devindex);
+				osd_printf_info("Input: Remapped %s #%d: %s\n", (*devclass_string_table)[input_devclass->devclass()], devindex, device->name());
 				break;
 			}
 		}
