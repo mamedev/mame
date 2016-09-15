@@ -18,18 +18,19 @@
 #define LIBRARY_H
 
 #include <time.h>
+#include <list>
 
 #include "corestr.h"
 #include "opresolv.h"
 #include "stream.h"
 #include "unicode.h"
 #include "charconv.h"
+#include "pool.h"
 
 
 struct imgtool_image;
 struct imgtool_partition;
 struct imgtool_directory;
-struct imgtool_library;
 
 enum imgtool_suggestion_viability_t
 {
@@ -51,12 +52,6 @@ union filterinfo
 };
 
 typedef void (*filter_getinfoproc)(UINT32 state, union filterinfo *info);
-
-enum imgtool_libsort_t
-{
-	ITLS_NAME,
-	ITLS_DESCRIPTION
-};
 
 struct imgtool_dirent
 {
@@ -336,9 +331,6 @@ char *imgtool_temp_str(void);
 
 struct imgtool_module
 {
-	imgtool_module *previous;
-	imgtool_module *next;
-
 	imgtool_class imgclass;
 
 	const char *name;
@@ -375,34 +367,59 @@ struct imgtool_module
 	const void *extra;
 };
 
-/* creates an imgtool library */
-imgtool_library *imgtool_library_create(void);
+namespace imgtool {
 
-/* closes an imgtool library */
-void imgtool_library_close(imgtool_library *library);
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/* adds a module to an imgtool library */
-void imgtool_library_add(imgtool_library *library, imgtool_get_info get_info);
+// imgtool "library" - equivalent to the MAME driver list
+class library
+{
+public:
+	typedef std::list<std::unique_ptr<imgtool_module> > modulelist;
 
-/* seeks out and removes a module from an imgtool library */
-const imgtool_module *imgtool_library_unlink(imgtool_library *library,
-	const char *module);
+	enum class sort_type
+	{
+		NAME,
+		DESCRIPTION
+	};
 
-/* sorts an imgtool library */
-void imgtool_library_sort(imgtool_library *library, imgtool_libsort_t sort);
+	library();
+	~library();
 
-/* finds a module */
-const imgtool_module *imgtool_library_findmodule(
-	imgtool_library *library, const char *module_name);
+	// adds a module to an imgtool library
+	void add(imgtool_get_info get_info);
 
-/* memory allocators for pooled library memory */
-void *imgtool_library_malloc(imgtool_library *library, size_t mem);
-char *imgtool_library_strdup(imgtool_library *library, const char *s);
-char *imgtool_library_strdup_allow_null(imgtool_library *library, const char *s);
+	// seeks out and removes a module from an imgtool library
+	void unlink(const char *module_name);
 
-imgtool_module *imgtool_library_iterate(
-	imgtool_library *library, const imgtool_module *module);
-imgtool_module *imgtool_library_index(
-	imgtool_library *library, int i);
+	// sorts an imgtool library
+	void sort(sort_type sort);
 
-#endif /* LIBRARY_H */
+	// finds a module
+	const imgtool_module *findmodule(const char *module_name);
+
+	// module iteration
+	const modulelist &modules() { return m_modules; }
+
+private:
+	object_pool *	m_pool;
+	modulelist		m_modules;
+
+	// internal lookup and iteration
+	modulelist::iterator find(const char *module_name);
+
+	// helpers
+	void add_class(const imgtool_class *imgclass);
+	int module_compare(const imgtool_module *m1, const imgtool_module *m2, sort_type sort);
+
+	// memory allocators for pooled library memory (these should go away in further C++-ification)
+	void *imgtool_library_malloc(size_t mem);
+	char *imgtool_library_strdup(const char *s);
+	char *imgtool_library_strdup_allow_null(const char *s);
+};
+
+} // namespace imgtool
+
+#endif // LIBRARY_H

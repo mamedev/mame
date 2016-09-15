@@ -81,7 +81,7 @@ struct imgtool_directory
     GLOBALS
 ***************************************************************************/
 
-static imgtool_library *global_imgtool_library;
+static std::unique_ptr<imgtool::library> global_imgtool_library;
 
 static int global_omit_untested;
 static void (*global_warn)(const char *message);
@@ -216,14 +216,14 @@ static char *normalize_filename(imgtool_partition *partition, const char *src)
     imgtool_init - initializes the imgtool core
 -------------------------------------------------*/
 
-void imgtool_init(int omit_untested, void (*warn)(const char *message))
+void imgtool_init(bool omit_untested, void (*warn)(const char *message))
 {
 	imgtoolerr_t err;
-	err = imgtool_create_cannonical_library(omit_untested, &global_imgtool_library);
+	err = imgtool_create_cannonical_library(omit_untested, global_imgtool_library);
 	assert(err == IMGTOOLERR_SUCCESS);
 	if (err == IMGTOOLERR_SUCCESS)
 	{
-		imgtool_library_sort(global_imgtool_library, ITLS_DESCRIPTION);
+		global_imgtool_library->sort(imgtool::library::sort_type::DESCRIPTION);
 	}
 	global_omit_untested = omit_untested;
 	global_warn = warn;
@@ -238,10 +238,8 @@ void imgtool_init(int omit_untested, void (*warn)(const char *message))
 void imgtool_exit(void)
 {
 	if (global_imgtool_library)
-	{
-		imgtool_library_close(global_imgtool_library);
-		global_imgtool_library = nullptr;
-	}
+		global_imgtool_library.reset();
+
 	global_warn = nullptr;
 }
 
@@ -253,9 +251,18 @@ void imgtool_exit(void)
 
 const imgtool_module *imgtool_find_module(const char *modulename)
 {
-	return imgtool_library_findmodule(global_imgtool_library, modulename);
+	return global_imgtool_library->findmodule(modulename);
 }
 
+
+/*-------------------------------------------------
+	imgtool_find_module - looks up a module
+-------------------------------------------------*/
+
+const imgtool::library::modulelist &imgtool_get_modules()
+{
+	return global_imgtool_library->modules();
+}
 
 
 /*-------------------------------------------------
@@ -386,8 +393,7 @@ imgtool_image *imgtool_partition_image(imgtool_partition *partition)
 imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, size_t count)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	imgtool_library *library = global_imgtool_library;
-	imgtool_module *module = nullptr;
+	imgtool::library &library = *global_imgtool_library.get();
 	imgtool_module *insert_module;
 	imgtool_module *temp_module;
 	size_t i = 0;
@@ -420,15 +426,15 @@ imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, 
 		extension++;
 
 	/* iterate through all modules */
-	while((module = imgtool_library_iterate(library, module)) != nullptr)
+	for (const auto &module : library.modules())
 	{
 		if (!extension || image_find_extension(module->extensions, extension))
 		{
-			err = evaluate_module(fname, module, &val);
+			err = evaluate_module(fname, module.get(), &val);
 			if (err)
 				goto done;
 
-			insert_module = module;
+			insert_module = module.get();
 			for (i = 0; (val > 0.0f) && (i < count); i++)
 			{
 				if (val > values[i])
@@ -929,7 +935,6 @@ int imgtool_validitychecks(void)
 {
 	int error = 0;
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
-	const imgtool_module *module = nullptr;
 	imgtool_module_features features;
 	int created_library = FALSE;
 
@@ -939,9 +944,9 @@ int imgtool_validitychecks(void)
 		created_library = TRUE;
 	}
 
-	while((module = imgtool_library_iterate(global_imgtool_library, module)) != nullptr)
+	for (const auto &module : global_imgtool_library->modules())
 	{
-		features = imgtool_get_module_features(module);
+		features = imgtool_get_module_features(module.get());
 
 		if (!module->name)
 		{

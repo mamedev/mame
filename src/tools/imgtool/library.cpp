@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /****************************************************************************
 
-    library.c
+    library.cpp
 
     Code relevant to the Imgtool library; analgous to the MESS/MAME driver
     list.
@@ -10,81 +10,60 @@
 ****************************************************************************/
 
 #include <string.h>
+#include <algorithm>
 
 #include "imgtool.h"
 #include "library.h"
 #include "pool.h"
 
-struct imgtool_library
+namespace imgtool {
+
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+library::library()
 {
-	object_pool *pool;
-	imgtool_module *first;
-	imgtool_module *last;
-};
-
-
-
-imgtool_library *imgtool_library_create(void)
-{
-	imgtool_library *library;
-	object_pool *pool;
-
-	/* create a memory pool */
-	pool = pool_alloc_lib(nullptr);
-	if (!pool)
-		goto error;
-
-	/* allocate the main structure */
-	library = (imgtool_library *)pool_malloc_lib(pool, sizeof(imgtool_library));
-	if (!library)
-		goto error;
-
-	/* initialize the structure */
-	memset(library, 0, sizeof(*library));
-	library->pool = pool;
-
-	return library;
-
-error:
-	if (pool)
-		pool_free_lib(pool);
-	return nullptr;
+	m_pool = pool_alloc_lib(nullptr);
+	if (!m_pool)
+		throw std::bad_alloc();
 }
 
 
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
 
-void imgtool_library_close(imgtool_library *library)
+library::~library()
 {
-	pool_free_lib(library->pool);
+	pool_free_lib(m_pool);
 }
 
 
+//-------------------------------------------------
+//  add_class
+//-------------------------------------------------
 
-static void imgtool_library_add_class(imgtool_library *library, const imgtool_class *imgclass)
+void library::add_class(const imgtool_class *imgclass)
 {
-	imgtool_module *module;
 	char *s1, *s2;
 
-	/* allocate the module and place it in the chain */
-	module = (imgtool_module *)imgtool_library_malloc(library, sizeof(*module));
+	// allocate the module and place it in the chain
+	m_modules.emplace_back(std::make_unique<imgtool_module>());
+	imgtool_module *module = m_modules.back().get();
 	memset(module, 0, sizeof(*module));
-	module->previous = library->last;
-	if (library->last)
-		library->last->next = module;
-	else
-		library->first = module;
-	library->last = module;
 
-	/* extensions have a weird format */
+	// extensions have a weird format
 	s1 = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_FILE_EXTENSIONS);
-	s2 = (char*)imgtool_library_malloc(library, strlen(s1) + 1);
+	s2 = (char*)imgtool_library_malloc(strlen(s1) + 1);
 	strcpy(s2, s1);
 	module->extensions = s2;
 
 	module->imgclass                    = *imgclass;
-	module->name                        = imgtool_library_strdup(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME));
-	module->description                 = imgtool_library_strdup(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_DESCRIPTION));
-	module->eoln                        = imgtool_library_strdup_allow_null(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_EOLN));
+	module->name                        = imgtool_library_strdup(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME));
+	module->description                 = imgtool_library_strdup(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_DESCRIPTION));
+	module->eoln                        = imgtool_library_strdup_allow_null(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_EOLN));
 	module->initial_path_separator      = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR) ? 1 : 0;
 	module->open_is_strict              = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_OPEN_IS_STRICT) ? 1 : 0;
 	module->tracks_are_called_cylinders = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? 1 : 0;
@@ -103,23 +82,26 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 	module->list_partitions             = (imgtoolerr_t (*)(imgtool_image *, imgtool_partition_info *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
 	module->block_size                  = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_BLOCK_SIZE);
 	module->createimage_optguide        = (const util::option_guide *) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE);
-	module->createimage_optspec         = imgtool_library_strdup_allow_null(library, (const char*)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
+	module->createimage_optspec         = imgtool_library_strdup_allow_null((const char*)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
 	module->image_extra_bytes           += imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES);
 }
 
 
+//-------------------------------------------------
+//  add
+//-------------------------------------------------
 
-void imgtool_library_add(imgtool_library *library, imgtool_get_info get_info)
+void library::add(imgtool_get_info get_info)
 {
 	int (*make_class)(int index, imgtool_class *imgclass);
 	imgtool_class imgclass;
 	int i, result;
 
-	/* try this class */
+	// try this class
 	memset(&imgclass, 0, sizeof(imgclass));
 	imgclass.get_info = get_info;
 
-	/* do we have derived getinfo functions? */
+	// do we have derived getinfo functions?
 	make_class = (int (*)(int index, imgtool_class *imgclass))
 		imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_MAKE_CLASS);
 
@@ -128,155 +110,124 @@ void imgtool_library_add(imgtool_library *library, imgtool_get_info get_info)
 		i = 0;
 		do
 		{
-			/* clear out the class */
+			// clear out the class
 			memset(&imgclass, 0, sizeof(imgclass));
 			imgclass.get_info = get_info;
 
-			/* make the class */
+			// make the class
 			result = make_class(i++, &imgclass);
 			if (result)
-				imgtool_library_add_class(library, &imgclass);
+				add_class(&imgclass);
 		}
 		while(result);
 	}
 	else
 	{
-		imgtool_library_add_class(library, &imgclass);
+		add_class(&imgclass);
 	}
 }
 
 
+//-------------------------------------------------
+//  unlink
+//-------------------------------------------------
 
-const imgtool_module *imgtool_library_unlink(imgtool_library *library,
-	const char *module)
+void library::unlink(const char *module_name)
 {
-	imgtool_module *m;
-	imgtool_module **previous;
-	imgtool_module **next;
-
-	for (m = library->first; m; m = m->next)
-	{
-		if (!core_stricmp(m->name, module))
-		{
-			previous = m->previous ? &m->previous->next : &library->first;
-			next = m->next ? &m->next->previous : &library->last;
-			*previous = m->next;
-			*next = m->previous;
-			m->previous = nullptr;
-			m->next = nullptr;
-			return m;
-		}
-	}
-	return nullptr;
+	const modulelist::iterator iter = find(module_name);
+	if (iter != m_modules.end())
+		m_modules.erase(iter);
 }
 
 
+//-------------------------------------------------
+//  module_compare
+//-------------------------------------------------
 
-static int module_compare(const imgtool_module *m1,
-	const imgtool_module *m2, imgtool_libsort_t sort)
+int library::module_compare(const imgtool_module *m1, const imgtool_module *m2, sort_type sort)
 {
 	int rc = 0;
 	switch(sort)
 	{
-		case ITLS_NAME:
-			rc = strcmp(m1->name, m2->name);
-			break;
-		case ITLS_DESCRIPTION:
-			rc = core_stricmp(m1->name, m2->name);
-			break;
+	case sort_type::NAME:
+		rc = strcmp(m1->name, m2->name);
+		break;
+	case sort_type::DESCRIPTION:
+		rc = core_stricmp(m1->description, m2->description);
+		break;
 	}
 	return rc;
 }
 
 
+//-------------------------------------------------
+//  sort
+//-------------------------------------------------
 
-void imgtool_library_sort(imgtool_library *library, imgtool_libsort_t sort)
+void library::sort(sort_type sort)
 {
-	imgtool_module *m1;
-	imgtool_module *m2;
-	imgtool_module *target;
-	imgtool_module **before;
-	imgtool_module **after;
-
-	for (m1 = library->first; m1; m1 = m1->next)
+	auto compare = [this, sort](const std::unique_ptr<imgtool_module> &a, const std::unique_ptr<imgtool_module> &b)
 	{
-		target = m1;
-		for (m2 = m1->next; m2; m2 = m2->next)
-		{
-			while(module_compare(target, m2, sort) > 0)
-				target = m2;
-		}
-
-		if (target != m1)
-		{
-			/* unlink the target */
-			before = target->previous ? &target->previous->next : &library->first;
-			after = target->next ? &target->next->previous : &library->last;
-			*before = target->next;
-			*after = target->previous;
-
-			/* now place the target before m1 */
-			target->previous = m1->previous;
-			target->next = m1;
-			before = m1->previous ? &m1->previous->next : &library->first;
-			*before = target;
-			m1->previous = target;
-
-			/* since we changed the order, we have to replace ourselves */
-			m1 = target;
-		}
-	}
+		return module_compare(a.get(), b.get(), sort) < 0;
+	};
+	m_modules.sort(compare);
 }
 
 
+//-------------------------------------------------
+//  find
+//-------------------------------------------------
 
-const imgtool_module *imgtool_library_findmodule(
-	imgtool_library *library, const char *module_name)
+library::modulelist::iterator library::find(const char *module_name)
 {
-	const imgtool_module *module;
-
-	assert(library);
-	module = library->first;
-	while(module && module_name && strcmp(module->name, module_name))
-		module = module->next;
-	return module;
+	return std::find_if(
+		m_modules.begin(),
+		m_modules.end(),
+		[this, module_name](std::unique_ptr<imgtool_module> &module) { return !strcmp(module->name, module_name); });
 }
 
 
+//-------------------------------------------------
+//  findmodule
+//-------------------------------------------------
 
-imgtool_module *imgtool_library_iterate(imgtool_library *library, const imgtool_module *module)
+const imgtool_module *library::findmodule(const char *module_name)
 {
-	return module ? module->next : library->first;
+	modulelist::iterator iter = find(module_name);
+	return iter != m_modules.end()
+		? iter->get()
+		: nullptr;
 }
 
 
+//-------------------------------------------------
+//  imgtool_library_malloc
+//-------------------------------------------------
 
-imgtool_module *imgtool_library_index(imgtool_library *library, int i)
+void *library::imgtool_library_malloc(size_t mem)
 {
-	imgtool_module *module;
-	module = library->first;
-	while(module && i--)
-		module = module->next;
-	return module;
+	return pool_malloc_lib(m_pool, mem);
 }
 
 
+//-------------------------------------------------
+//  imgtool_library_malloc
+//-------------------------------------------------
 
-void *imgtool_library_malloc(imgtool_library *library, size_t mem)
+char *library::imgtool_library_strdup(const char *s)
 {
-	return pool_malloc_lib(library->pool, mem);
+	return pool_strdup_lib(m_pool, s);
 }
 
 
+//-------------------------------------------------
+//  imgtool_library_strdup_allow_null
+//-------------------------------------------------
 
-char *imgtool_library_strdup(imgtool_library *library, const char *s)
+char *library::imgtool_library_strdup_allow_null(const char *s)
 {
-	return pool_strdup_lib(library->pool, s);
+	return s ? imgtool_library_strdup(s) : nullptr;
 }
 
 
-
-char *imgtool_library_strdup_allow_null(imgtool_library *library, const char *s)
-{
-	return s ? imgtool_library_strdup(library, s) : nullptr;
-}
+} // namespace imgtool
