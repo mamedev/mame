@@ -393,7 +393,7 @@ imgtool_image *imgtool_partition_image(imgtool_partition *partition)
 imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, size_t count)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	imgtool::library *library = global_imgtool_library.get();
+	imgtool::library &library = *global_imgtool_library.get();
 	imgtool_module *insert_module;
 	imgtool_module *temp_module;
 	size_t i = 0;
@@ -426,7 +426,7 @@ imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, 
 		extension++;
 
 	/* iterate through all modules */
-	for (const auto &module : library->modules())
+	for (const auto &module : library.modules())
 	{
 		if (!extension || image_find_extension(module->extensions, extension))
 		{

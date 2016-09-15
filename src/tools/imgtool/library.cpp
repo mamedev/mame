@@ -50,7 +50,7 @@ void library::add_class(const imgtool_class *imgclass)
 	char *s1, *s2;
 
 	// allocate the module and place it in the chain
-	m_modules.emplace_back(std::unique_ptr<imgtool_module>(new imgtool_module));
+	m_modules.emplace_back(std::make_unique<imgtool_module>());
 	imgtool_module *module = m_modules.back().get();
 	memset(module, 0, sizeof(*module));
 
@@ -134,7 +134,7 @@ void library::add(imgtool_get_info get_info)
 
 void library::unlink(const char *module_name)
 {
-	modulelist::iterator iter = find(module_name);
+	const modulelist::iterator iter = find(module_name);
 	if (iter != m_modules.end())
 		m_modules.erase(iter);
 }
@@ -166,7 +166,7 @@ int library::module_compare(const imgtool_module *m1, const imgtool_module *m2, 
 
 void library::sort(sort_type sort)
 {
-	auto compare = [&](const std::unique_ptr<imgtool_module> &a, const std::unique_ptr<imgtool_module> &b)
+	auto compare = [this, sort](const std::unique_ptr<imgtool_module> &a, const std::unique_ptr<imgtool_module> &b)
 	{
 		return module_compare(a.get(), b.get(), sort) < 0;
 	};
@@ -183,7 +183,7 @@ library::modulelist::iterator library::find(const char *module_name)
 	return std::find_if(
 		m_modules.begin(),
 		m_modules.end(),
-		[&](std::unique_ptr<imgtool_module> &module) { return !strcmp(module->name, module_name); });
+		[this, module_name](std::unique_ptr<imgtool_module> &module) { return !strcmp(module->name, module_name); });
 }
 
 

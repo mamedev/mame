@@ -43,7 +43,7 @@ imgtoolerr_t imgtool_create_cannonical_library(bool omit_untested, std::unique_p
 
 	// create all modules
 	for (i = 0; i < ARRAY_LENGTH(modules); i++)
-		library->add( modules[i]);
+		library->add(modules[i]);
 
 	// remove irrelevant modules
 	for (i = 0; i < ARRAY_LENGTH(irrelevant_modules); i++)
