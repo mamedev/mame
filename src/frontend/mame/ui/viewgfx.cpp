@@ -1103,7 +1103,11 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 							int(gfxnum), code, color);
 	}
 	else
+	{
 		util::stream_format(title_buf, " %dx%d OFFS %d,%d", tilemap->width(), tilemap->height(), state.tilemap.xoffs, state.tilemap.yoffs);
+		if (!tilemap->debug_enabled())
+			title_buf << " DISABLED";
+	}
 
 	// expand the outer box to fit the title
 	const std::string title = title_buf.str();
@@ -1157,6 +1161,10 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 	tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
 	UINT32 mapwidth = tilemap->width();
 	UINT32 mapheight = tilemap->height();
+
+	// handle disable/enable (backspace)
+	if (machine.ui_input().pressed(IPT_UI_DISABLE_GROUP))
+		tilemap->set_debug_enable(!tilemap->debug_enabled());
 
 	// handle zoom (minus,plus)
 	if (machine.ui_input().pressed(IPT_UI_ZOOM_OUT) && state.tilemap.zoom > 0)

@@ -368,6 +368,7 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 
 	// reset global states
 	m_enable = true;
+	m_debug_enable = true;
 	m_attributes = 0;
 	m_all_tiles_dirty = true;
 	m_all_tiles_clean = false;
@@ -939,7 +940,7 @@ template<class _BitmapClass>
 void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask)
 {
 	// skip if disabled
-	if (!m_enable)
+	if (!m_enable || !m_debug_enable)
 		return;
 
 g_profiler.start(PROFILER_TILEMAP_DRAW);
@@ -1067,7 +1068,7 @@ void tilemap_t::draw_roz_common(screen_device &screen, _BitmapClass &dest, const
 // - srcbim_width and height are assumed to be a power of 2 to speed up wraparound
 
 	// skip if disabled
-	if (!m_enable)
+	if (!m_enable || !m_debug_enable)
 		return;
 
 	// see if this is just a regular render and if so, do a regular render

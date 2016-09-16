@@ -565,6 +565,9 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 	UINT8 *flags;
 	UINT32 xscroll_mask, yscroll_mask;
 
+	if (!tile->debug_enabled())
+		return;
+
 	bitmap_ind16 &pen_bitmap = tile->pixmap();
 	bitmap_ind8 &flags_bitmap = tile->flagsmap();
 	xscroll_mask = pen_bitmap.width() - 1;
@@ -615,7 +618,7 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 
 	screen.priority().fill(0, cliprect);
 
-	if (m_layer_enable & 1)
+	if (m_layer_enable & 1 || !m_back_layer->debug_enabled())
 		bitmap.fill(0, cliprect);
 	else
 		combine_tilemap(bitmap, cliprect, m_back_layer, m_scrollram[0], m_scrollram[1], 1, back_rowscroll);

@@ -516,6 +516,7 @@ public:
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	bool enabled() const { return m_enable; }
+	bool debug_enabled() const { return m_debug_enable; }
 	UINT32 palette_offset() const { return m_palette_offset; }
 	int scrolldx() const { return (m_attributes & TILEMAP_FLIPX) ? m_dx_flipped : m_dx; }
 	int scrolldy() const { return (m_attributes & TILEMAP_FLIPY) ? m_dy_flipped : m_dy; }
@@ -529,6 +530,7 @@ public:
 
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }
+	void set_debug_enable(bool enable) { m_debug_enable = enable; }
 	void set_user_data(void *user_data) { m_user_data = user_data; }
 	void set_palette(palette_device &palette) { m_palette = &palette; }
 	void set_palette_offset(UINT32 offset) { m_palette_offset = offset; }
@@ -661,6 +663,7 @@ private:
 
 	// global tilemap states
 	bool                        m_enable;               // true if we are enabled
+	bool                        m_debug_enable;         // true unless we are disabled for debugging
 	UINT8                       m_attributes;           // global attributes (flipx/y)
 	bool                        m_all_tiles_dirty;      // true if all tiles are dirty
 	bool                        m_all_tiles_clean;      // true if all tiles are clean
