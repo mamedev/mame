@@ -742,23 +742,50 @@ struct game_keys
 
 DRIVER_INIT_MEMBER(cps_state,cps2crypt)
 {
-	UINT32 key[2];
-	UINT32 lower;
-	UINT32 upper;
+	if (m_region_key)
+	{
+		UINT32 key[2];
+		UINT32 lower;
+		UINT32 upper;
 
-	std::string skey1 = parameter("cryptkey1");;
-	key[0] = strtoll(skey1.c_str(), nullptr, 16);
+		int b;
 
-	std::string skey2 = parameter("cryptkey2");
-	key[1] = strtoll(skey2.c_str(), nullptr, 16);
+		unsigned short decoded[10];
+		memset(decoded, 0, sizeof(decoded));
 
-	std::string slower = parameter("cryptlower");
-	lower = strtoll(slower.c_str(), nullptr, 16);
+		for (b = 0; b < 10 * 16; b++)
+		{
+			int bit = (317 - b) % 160;
+			if ((m_region_key->base()[bit / 8] >> ((bit ^ 7) % 8)) & 1)
+			{
+				decoded[b / 16] |= (0x8000 >> (b % 16));
+			}
+		}
 
-	std::string supper = parameter("cryptupper");
-	upper = strtoll(supper.c_str(), nullptr, 16);
+		key[0] = (decoded[0] << 16) | decoded[1];
+		key[1] = (decoded[2] << 16) | decoded[3];
+ 		// decoded[4] == watchdog instruction third word
+		// decoded[5] == watchdog instruction second word
+		// decoded[6] == watchdog instruction first word
+		// decoded[7] == 0x4000
+		// decoded[8] == 0x0900
 
-	// we have a proper key so use it to decrypt
-	if (lower!=0xff0000) // don't run the decrypt on 'dead key' games for now
-		cps2_decrypt(machine(), (UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, memregion("maincpu")->bytes(), key, lower,upper);
+		if (decoded[9] == 0xffff)
+		{
+			// On a dead board, the only encrypted range is actually FF0000-FFFFFF.
+			// It doesn't start from 0, and it's the upper half of a 128kB bank.
+			upper = 0xffffffff;
+			lower = 0xff0000;
+		}
+		else
+		{
+			// This matches two thirds of the old values 
+			upper = (((decoded[9] ^ 0x3f0) << 14) | 0x3ffff) + 1;
+			lower = 0;
+		}
+
+		// we have a proper key so use it to decrypt
+		if (lower != 0xff0000) // don't run the decrypt on 'dead key' games for now
+			cps2_decrypt(machine(), (UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, memregion("maincpu")->bytes(), key, lower, upper);
+	}
 }
