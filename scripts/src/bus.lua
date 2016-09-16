@@ -941,6 +941,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/svga_trident.h",
 		MAME_DIR .. "src/devices/bus/isa/num9rev.cpp",
 		MAME_DIR .. "src/devices/bus/isa/num9rev.h",
+		MAME_DIR .. "src/devices/bus/isa/mcd.cpp",
+		MAME_DIR .. "src/devices/bus/isa/mcd.h",
 	}
 end
 

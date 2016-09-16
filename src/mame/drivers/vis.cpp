@@ -66,38 +66,6 @@ READ8_MEMBER(vis_state::unk3_r)
 	return 0x00;
 }
 
-// probably a mitsumi isa non-atapi cdrom controller, mcd.c in older linux versions
-READ8_MEMBER(vis_state::cdrom_r)
-{
-	if(m_cdcmd)
-	{
-		if(offset)
-		{
-			int ret = m_cdstat;
-			m_cdstat = 0;
-			return ret;
-		}
-		else
-		{
-			m_cdcmd = 0;
-			return 0x80;
-		}
-	}
-	if(offset)
-		return 0;
-	else
-		return 0x20;
-}
-
-WRITE8_MEMBER(vis_state::cdrom_w)
-{
-	if(!offset)
-	{
-		m_cdcmd = data;
-		m_cdstat = 4;
-	}
-}
-
 READ8_MEMBER(vis_state::sysctl_r)
 {
 	return m_sysctl;
@@ -125,7 +93,6 @@ static ADDRESS_MAP_START( at16_io, AS_IO, 16, vis_state )
 	AM_RANGE(0x006a, 0x006b) AM_READ8(unk2_r, 0x00ff)
 	AM_RANGE(0x0092, 0x0093) AM_READWRITE8(sysctl_r, sysctl_w, 0x00ff)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
-	AM_RANGE(0x0310, 0x0311) AM_READWRITE8(cdrom_r, cdrom_w, 0xffff)
 	AM_RANGE(0x031a, 0x031b) AM_READ8(unk3_r, 0x00ff)
 ADDRESS_MAP_END
 
@@ -140,6 +107,7 @@ static MACHINE_CONFIG_START( vis, vis_state )
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 
 	MCFG_ISA16_SLOT_ADD("mb:isabus","vga", pc_isa16_cards, "clgd542x", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","mcd", pc_isa16_cards, "mcd", true)
 MACHINE_CONFIG_END
 
 ROM_START(vis)
