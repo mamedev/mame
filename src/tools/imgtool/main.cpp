@@ -743,10 +743,10 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 	fprintf(stdout, "Option           Allowed values                 Description\n");
 	fprintf(stdout, "---------------- ------------------------------ -----------\n");
 
-	std::stringstream description_buffer;
 	for (auto iter = resolution.entries_begin(); iter != resolution.entries_end(); iter++)
 	{
 		const util::option_resolution::entry &entry = *iter;
+                std::stringstream description_buffer;
 
 		std::string opt_name = string_format("--%s", entry.identifier());
 		const char *opt_desc = entry.display_name();
