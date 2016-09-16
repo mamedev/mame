@@ -7,9 +7,18 @@ Regnecentralen Piccolo RC702
 2016-09-10 Skeleton driver
 
 Undumped prom at IC55 type 74S287
+Keyboard has 8048 and 2758, both undumped.
 
 ToDo:
 - Everything
+
+Issues:
+- Floppy disc isn't being detected.
+
+(bios 1 issues)
+- Daisy chain:
+  - Hitting a key causes CTC to interrupt, even though CTC and PIO are not connected.
+  - After that, IRQ isn't released, causing the system to be stuck in a loop.
 
 
 ****************************************************************************************************************/
@@ -64,15 +73,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(q_w);
 	DECLARE_WRITE_LINE_MEMBER(qbar_w);
+	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
 private:
-	UINT8 *m_charmap;
+	UINT8 *m_p_chargen;
 	bool m_q_state;
 	bool m_qbar_state;
 	bool m_drq_state;
 	UINT16 m_beepcnt;
+	UINT8 m_dack;
+	bool m_tc;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_sio1;
@@ -96,7 +108,7 @@ static ADDRESS_MAP_START(rc702_io, AS_IO, 8, rc702_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("crtc", i8275_device, read, write)
 	AM_RANGE(0x04, 0x05) AM_DEVICE("fdc", upd765a_device, map)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio1", z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio1", z80dart_device, cd_ba_r, cd_ba_w) // boot sequence doesn't program this
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("pio", z80pio_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_READ_PORT("DSW") AM_WRITE(port14_w) // motors
@@ -139,6 +151,11 @@ MACHINE_RESET_MEMBER( rc702_state, rc702 )
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	m_beepcnt = 0xffff;
+	m_dack = 0;
+	m_tc = 0;
+	m_7474->preset_w(1);
+	m_fdc->set_ready_line_connected(1); // always ready for minifloppy; controlled by fdc for 20cm
+	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy; 8MHz for 20cm
 	m_maincpu->reset();
 }
 
@@ -179,7 +196,26 @@ WRITE_LINE_MEMBER( rc702_state::crtc_drq_w )
 
 WRITE_LINE_MEMBER( rc702_state::tc_w )
 {
-	m_fdc->tc_w(state);
+	m_tc = state;
+	if ((m_dack == 1) && m_tc)
+	{
+		m_dack = 0;
+		m_fdc->tc_w(1);
+	}
+	else
+		m_fdc->tc_w(0);
+}
+
+WRITE_LINE_MEMBER( rc702_state::dack1_w )
+{
+	m_dack = 1;
+	if ((m_dack == 1) && m_tc)
+	{
+		m_dack = 0;
+		m_fdc->tc_w(1);
+	}
+	else
+		m_fdc->tc_w(0);
 }
 
 WRITE8_MEMBER( rc702_state::port14_w )
@@ -200,10 +236,10 @@ WRITE8_MEMBER( rc702_state::port1c_w )
 		m_beepcnt = 0x3000;
 }
 
+// monitor is orange even when powered off
 static const rgb_t our_palette[3] = {
-	rgb_t(0x00, 0x00, 0x00), // black
-	rgb_t(0xa0, 0xa0, 0xa0), // white
-	rgb_t(0xff, 0xff, 0xff)  // highlight
+	rgb_t(0xc0, 0x60, 0x00), // off
+	rgb_t(0xff, 0xb4, 0x00), // on
 };
 
 DRIVER_INIT_MEMBER( rc702_state, rc702 )
@@ -213,31 +249,32 @@ DRIVER_INIT_MEMBER( rc702_state, rc702 )
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
-	m_charmap = memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 	m_palette->set_pen_colors(0, our_palette, ARRAY_LENGTH(our_palette));
 }
 
 I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 pixels = m_charmap[(linecount & 15) | (charcode << 4)];
+	UINT8 gfx = 0;
 
-	if (vsp)
-		pixels = 0;
+	if (!vsp)
+		gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
 
 	if (lten)
-		pixels = 0xff;
+		gfx = 0xff;
 
 	if (rvv)
-		pixels ^= 0xff;
+		gfx ^= 0xff;
 
-	bitmap.pix32(y, x++) = palette[BIT(pixels, 1) ? (hlgt ? 2 : 1) : 0];
-	bitmap.pix32(y, x++) = palette[BIT(pixels, 2) ? (hlgt ? 2 : 1) : 0];
-	bitmap.pix32(y, x++) = palette[BIT(pixels, 3) ? (hlgt ? 2 : 1) : 0];
-	bitmap.pix32(y, x++) = palette[BIT(pixels, 4) ? (hlgt ? 2 : 1) : 0];
-	bitmap.pix32(y, x++) = palette[BIT(pixels, 5) ? (hlgt ? 2 : 1) : 0];
-	bitmap.pix32(y, x++) = palette[BIT(pixels, 6) ? (hlgt ? 2 : 1) : 0];
-	bitmap.pix32(y, x++) = palette[BIT(pixels, 7) ? (hlgt ? 2 : 1) : 0];
+	// Highlight not used
+	bitmap.pix32(y, x++) = palette[BIT(gfx, 1) ? 1 : 0];
+	bitmap.pix32(y, x++) = palette[BIT(gfx, 2) ? 1 : 0];
+	bitmap.pix32(y, x++) = palette[BIT(gfx, 3) ? 1 : 0];
+	bitmap.pix32(y, x++) = palette[BIT(gfx, 4) ? 1 : 0];
+	bitmap.pix32(y, x++) = palette[BIT(gfx, 5) ? 1 : 0];
+	bitmap.pix32(y, x++) = palette[BIT(gfx, 6) ? 1 : 0];
+	bitmap.pix32(y, x++) = palette[BIT(gfx, 7) ? 1 : 0];
 }
 
 // Baud rate generator. All inputs are 0.614MHz.
@@ -259,10 +296,8 @@ WRITE_LINE_MEMBER( rc702_state::zc0_w )
 
 WRITE_LINE_MEMBER( rc702_state::crtc_irq_w )
 {
-	m_7474->clear_w(0);
-	m_ctc1->trg2(1);
-	m_7474->clear_w(1);
-	m_ctc1->trg2(0);
+	m_7474->clear_w(!state);
+	m_ctc1->trg2(state);
 }
 
 WRITE_LINE_MEMBER( rc702_state::busreq_w )
@@ -328,15 +363,16 @@ static MACHINE_CONFIG_START( rc702, rc702_state )
 
 	MCFG_DEVICE_ADD("dma", AM9517A, XTAL_8MHz / 2)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(rc702_state, busreq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(rc702_state, tc_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(rc702_state, tc_w)) // inverted
 	MCFG_I8237_IN_MEMR_CB(READ8(rc702_state, memory_read_byte))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(rc702_state, memory_write_byte))
 	MCFG_I8237_IN_IOR_1_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
 	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
 	MCFG_I8237_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
 	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8("crtc", i8275_device, dack_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(rc702_state, dack1_w)) // inverted
 
-	MCFG_UPD765A_ADD("fdc", true, true)
+	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc1", z80ctc_device, trg3))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma", am9517a_device, dreq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "drive0", floppy_image_device::default_floppy_formats)
@@ -362,7 +398,7 @@ static MACHINE_CONFIG_START( rc702, rc702_state )
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rc702_state, display_pixels)
 	MCFG_I8275_IRQ_CALLBACK(WRITELINE(rc702_state, crtc_irq_w))
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(rc702_state, crtc_drq_w))
-	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_ADD("palette", 2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -374,11 +410,12 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( rc702 )
 	ROM_REGION( 0x10800, "maincpu", 0 )
-		ROM_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084) ) // rc702_boot
-
-	ROM_REGION( 0x14000, "user1", 0 ) // not connected up yet
-		ROM_LOAD( "rob357.rom", 0x0000, 0x0800, CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef) ) // rc703_boot
-		ROM_LOAD( "rob358.rom", 0x0800, 0x0800, CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc) ) // rc700_boot
+		ROM_SYSTEM_BIOS(0, "rc700", "RC700")
+		ROMX_LOAD( "rob358.rom", 0x10000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(1))
+		ROM_SYSTEM_BIOS(1, "rc702", "RC702")
+		ROMX_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(2))
+		ROM_SYSTEM_BIOS(2, "rc703", "RC703")
+		ROMX_LOAD( "rob357.rom", 0x10000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(3))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 		ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char
