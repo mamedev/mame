@@ -343,7 +343,7 @@ void cmi01a_device::device_start()
 	m_zx_timer = timer_alloc(TIMER_ZX);
 	m_zx_timer->adjust(attotime::never);
 
-	m_stream = stream_alloc(0,1,44100);
+	m_stream = stream_alloc(0, 1, 44100);
 }
 
 void cmi01a_device::device_reset()
@@ -1965,6 +1965,7 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 
 			case 0x30:
 				m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+				data ^= 0xff;
 				m_i8214_2->b_w(data & 0x7);
 				m_i8214_2->sgs_w((data >> 3) & 1);
 				break;
@@ -1996,7 +1997,9 @@ void cmi_state::install_video_ram(int cpunum)
 
 WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 {
+	//printf("i8214_cpu1_w: %02x\n", data);
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	data ^= 0xff;
 	m_i8214_0->b_w(data & 0x7);
 	m_i8214_0->sgs_w((data >> 3) & 1);
 }
@@ -2005,6 +2008,7 @@ WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 {
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	data ^= 0xff;
 	m_i8214_1->b_w(data & 0x7);
 	m_i8214_1->sgs_w((data >> 3) & 1);
 }
@@ -2158,14 +2162,16 @@ IRQ_CALLBACK_MEMBER( cmi_state::cpu2_interrupt_callback )
 
 void cmi_state::set_interrupt(int cpunum, int level, int state)
 {
-//  printf("CPU%d Int: %x State: %x (Cur: %x)\n", cpunum, level, state, m_int_state[cpunum]);
+	//printf("CPU%d Int: %x State: %x (Cur: %x)\n", cpunum, level, state, m_int_state[cpunum]);
 
 	if (state == ASSERT_LINE)
 		m_int_state[cpunum] |= (1 << level);
 	else
 		m_int_state[cpunum] &= ~(1 << level);
 
-	if (cpunum == 0)
+	//printf("New int state: %02x\n", m_int_state[cpunum]);
+
+	if (cpunum == CPU_1)
 	{
 		if (level < 8)
 			m_i8214_2->r_w(~m_int_state[cpunum]);
@@ -2173,21 +2179,26 @@ void cmi_state::set_interrupt(int cpunum, int level, int state)
 			m_i8214_0->r_w(~(m_int_state[cpunum] >> 8));
 	}
 	else
+	{
 		m_i8214_1->r_w(~m_int_state[cpunum]);
+	}
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_1_int_w )
 {
+	//printf("i8214_1_int_w: %d\n", state);
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_2_int_w )
 {
+	//printf("i8214_2_int_w: %d\n", state);
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_3_int_w )
 {
+	//printf("i8214_3_int_w: %d\n", state);
 	//if (state)
 		m_hp_int = state;
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
@@ -2718,16 +2729,6 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
-	// Channel cards
-	MCFG_CMI01A_ADD("cmi01a_0", 0)
-	MCFG_CMI01A_ADD("cmi01a_1", 1)
-	MCFG_CMI01A_ADD("cmi01a_2", 2)
-	MCFG_CMI01A_ADD("cmi01a_3", 3)
-	MCFG_CMI01A_ADD("cmi01a_4", 4)
-	MCFG_CMI01A_ADD("cmi01a_5", 5)
-	MCFG_CMI01A_ADD("cmi01a_6", 6)
-	MCFG_CMI01A_ADD("cmi01a_7", 7)
-
 	/* Musical keyboard */
 	MCFG_DEVICE_ADD("cmi10_pia_u20", PIA6821, 0)
 	MCFG_PIA_READCB1_HANDLER(READLINE(cmi_state, cmi10_u20_cb1_r))
@@ -2738,6 +2739,26 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_DEVICE_ADD("cmi10_pia_u21", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(cmi_state, cmi10_u21_a_r))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi_state, cmi10_u21_cb2_w))
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	// Channel cards
+	MCFG_CMI01A_ADD("cmi01a_0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_1", 1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_2", 2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_3", 3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_4", 4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_5", 5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_6", 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_7", 7)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 ROM_START( cmi2x )
