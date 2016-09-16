@@ -32,6 +32,7 @@
 #include "winutil.h"
 #include "winfile.h"
 #include "modules/diagnostics/diagnostics_module.h"
+#include "modules/monitor/monitor_common.h"
 
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 using namespace Windows::ApplicationModel;

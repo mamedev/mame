@@ -60,6 +60,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/netdev/netdev_module.h",
 		MAME_DIR .. "src/osd/modules/sound/sound_module.h",
 		MAME_DIR .. "src/osd/modules/diagnostics/diagnostics_module.h",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_module.h",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.h",
 		MAME_DIR .. "src/osd/modules/diagnostics/none.cpp",
@@ -118,6 +119,11 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_connection.h",
 		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_server.cpp",
 		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_server.h",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_common.h",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_common.cpp",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_win32.cpp",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_dxgi.cpp",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_sdl.cpp",
 	}
 	includedirs {
 		ext_includedir("uv"),

@@ -15,6 +15,7 @@
 #undef interface
 
 #include "window.h"
+#include "winmain.h"
 
 //============================================================
 //  TYPEDEFS
