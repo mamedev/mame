@@ -67,10 +67,10 @@ Address          Dir Data     Name       Description
 11010101----1001   W xxxxxxxx EXROM1     low 8 bits of address to read from graphics ROMs
 11010101----1010   W xxxxxxxx EXROM2     high 8 bits of address to read from graphics ROMs
 11010101----1011   W xxxxxxxx EPORT1     command to sound CPU
-11010101----1100   W -------x EPORT2     single bit signal to audio CPU (not used?)
+11010101----1100   W -------x EPORT2     single bit signal to audio CPU (used in jungle hunt to disable music in attract mode)
 11010101----1101   W -------- TIME RESET watchdog reset
 11010101----1110   W -------x COIN LOCK  coin lockout
-11010101----1110   W ------x- SOUND STOP mute sound
+11010101----1110   W ------x- SOUND STOP mute sound (time tunnel bogus coin sample at POST needs this?)
 11010101----1110   W -xxxxx-- n.c.
 11010101----1110   W x------- BANK SEL   program ROM bank select
 11010101----1111   W ---xxxxx EXPORT     to a PAL (ROM6 @ 14)
@@ -178,9 +178,10 @@ WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
 	m_sndnmi_disable = data & 0x01;
 }
 
-WRITE8_MEMBER(taitosj_state::taitosj_soundcommand_w)
+WRITE8_MEMBER(taitosj_state::sound_command_w)
 {
-	m_soundlatch->write(space,offset,data);
+	m_sound_cmd_ack = true;
+	m_soundlatch->write(space,0,data);
 	if (!m_sndnmi_disable) m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -188,6 +189,12 @@ WRITE8_MEMBER(taitosj_state::taitosj_soundcommand_w)
 WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
 {
 	m_input_port_4_f0 = data >> 4;
+}
+
+// EPORT2
+WRITE8_MEMBER(taitosj_state::sound_semaphore_assert_w)
+{
+	m_sound_semaphore = (data & 1) == 1;
 }
 
 CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
@@ -225,7 +232,8 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("gfxpointer")
-	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(sound_command_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_MIRROR(0x00f0) AM_WRITE(sound_semaphore_assert_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
@@ -265,7 +273,8 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("gfxpointer")
-	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(sound_command_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_MIRROR(0x00f0) AM_WRITE(sound_semaphore_assert_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
@@ -328,13 +337,39 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD("ay1", ay8910_device, data_r) /* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_SHARE("gfxpointer")
-	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(sound_command_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_WRITE(sound_semaphore_assert_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_SHARE("video_mode")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("kikstart_scroll")// scroll ram + ???
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 ADDRESS_MAP_END
+
+// RD5000
+READ8_MEMBER(taitosj_state::sound_command_r)
+{
+	m_sound_cmd_ack = false;
+	return m_soundlatch->read(space,0);
+}
+
+// RD5001
+READ8_MEMBER(taitosj_state::sound_status_r)
+{
+	return (m_sound_cmd_ack == true ? 8 : 0) | (m_sound_semaphore == true ? 4 : 0) | 3;
+}
+
+// WR5000
+WRITE8_MEMBER(taitosj_state::sound_command_ack_w)
+{
+	m_soundlatch->write(space,0, m_soundlatch->read(space,0) & 0x7f);
+}
+
+// WR5001
+WRITE8_MEMBER(taitosj_state::sound_semaphore_clear_w)
+{
+	m_sound_semaphore = false;
+}
 
 
 static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
@@ -346,7 +381,8 @@ static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x5000, 0x5000) AM_READWRITE(sound_command_r, sound_command_ack_w)
+	AM_RANGE(0x5001, 0x5001) AM_READWRITE(sound_status_r,  sound_semaphore_clear_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM */
 ADDRESS_MAP_END
 
