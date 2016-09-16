@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles, Brad Hughes
 /*
-* font_dwrite.c
+* font_dwrite.cpp
 *
 */
 
@@ -9,9 +9,7 @@
 #include "modules/osdmodule.h"
 #include "modules/lib/osdlib.h"
 
-// We take dependencies on WRL client headers and
-// we can only build with a high enough version
-#if defined(OSD_WINDOWS) && (_WIN32_WINNT >= 0x0602)
+#if defined(OSD_WINDOWS)
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -68,19 +66,10 @@ static const float POINTS_PER_DIP = (3.0f / 4.0f);
 #define HR_RET0( CALL ) HR_RET(CALL, 0)
 #define HR_RET1( CALL ) HR_RET(CALL, 1)
 
-struct osd_deleter
-{
-	void operator () (void * osd_pointer) const
-	{
-		osd_free(osd_pointer);
-	}
-};
-
-typedef std::unique_ptr<char, osd_deleter> osd_utf8_ptr;
-
 // Typedefs for dynamically loaded functions
 typedef HRESULT (WINAPI *d2d_create_factory_fn)(D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
 typedef HRESULT (WINAPI *dwrite_create_factory_fn)(DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
+typedef int (WINAPI *get_user_default_locale_name)(LPWSTR, int);
 
 // Debugging functions
 #ifdef DWRITE_DEBUGGING
@@ -373,11 +362,11 @@ public:
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
 		// convert the face name
-		std::unique_ptr<WCHAR, void(*)(void *)> familyName(wstring_from_utf8(name.c_str()), osd_free);
+		std::wstring familyName = wstring_from_utf8(name.c_str());
 
 		// find the font
 		HR_RET0(find_font(
-			familyName.get(),
+			familyName.c_str(),
 			bold ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
 			DWRITE_FONT_STRETCH_NORMAL,
 			italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,
@@ -657,18 +646,23 @@ private:
 class font_dwrite : public osd_module, public font_module
 {
 private:
-	osd::dynamic_module::ptr   m_d2d1_dll;
-	osd::dynamic_module::ptr   m_dwrite_dll;
-	d2d_create_factory_fn      m_pfnD2D1CreateFactory;
-	dwrite_create_factory_fn   m_pfnDWriteCreateFactory;
-	ComPtr<ID2D1Factory>       m_d2dfactory;
-	ComPtr<IDWriteFactory>     m_dwriteFactory;
-	ComPtr<IWICImagingFactory> m_wicFactory;
+	osd::dynamic_module::ptr     m_d2d1_dll;
+	osd::dynamic_module::ptr     m_dwrite_dll;
+	osd::dynamic_module::ptr     m_kernel32_dll;
+	d2d_create_factory_fn        m_pfnD2D1CreateFactory;
+	dwrite_create_factory_fn     m_pfnDWriteCreateFactory;
+	get_user_default_locale_name m_pfnGetUserDefaultLocaleName;
+	ComPtr<ID2D1Factory>         m_d2dfactory;
+	ComPtr<IDWriteFactory>       m_dwriteFactory;
+	ComPtr<IWICImagingFactory>   m_wicFactory;
 
 public:
 	font_dwrite() :
 		osd_module(OSD_FONT_PROVIDER, "dwrite"),
 		font_module(),
+		m_pfnD2D1CreateFactory(nullptr),
+		m_pfnDWriteCreateFactory(nullptr),
+		m_pfnGetUserDefaultLocaleName(nullptr),
 		m_d2dfactory(nullptr),
 		m_dwriteFactory(nullptr),
 		m_wicFactory(nullptr)
@@ -702,6 +696,13 @@ public:
 			osd_printf_error("ERROR: FontProvider: Failed to load DirectWrite functions.\n");
 			return -1;
 		}
+
+		// Init our kernel32 dynamic functions
+		m_kernel32_dll = osd::dynamic_module::open({ "Kernel32.dll" });
+		assert(m_kernel32_dll != nullptr);
+
+		// Attempt to map this function. It only exists on Vista+, so we don't fail if it can't be mapped
+		m_pfnGetUserDefaultLocaleName = m_kernel32_dll->bind<get_user_default_locale_name>("GetUserDefaultLocaleName");
 
 		// Create a Direct2D factory.
 		HR_RET1((*m_pfnD2D1CreateFactory)(
@@ -756,17 +757,12 @@ public:
 			std::unique_ptr<WCHAR[]> name = nullptr;
 			HR_RET0(get_localized_familyname(names, name));
 
-			auto utf8_name = osd_utf8_ptr(utf8_from_wstring(name.get()));
+			std::string utf8_name = utf8_from_wstring(name.get());
 			name.reset();
 
 			// Review: should the config name, be unlocalized?
 			// maybe the english name?
-			fontresult.push_back(
-				make_pair(
-					std::string(utf8_name.get()),
-					std::string(utf8_name.get())));
-
-			utf8_name.reset();
+			fontresult.emplace_back(make_pair(utf8_name, utf8_name));
 		}
 
 		std::stable_sort(fontresult.begin(), fontresult.end());
@@ -774,13 +770,13 @@ public:
 	}
 
 private:
-	HRESULT get_family_for_locale(ComPtr<IDWriteLocalizedStrings> family_names, const WCHAR* locale, std::unique_ptr<WCHAR[]> &family_name) const
+	HRESULT get_family_for_locale(ComPtr<IDWriteLocalizedStrings> family_names, const std::wstring &locale, std::unique_ptr<WCHAR[]> &family_name) const
 	{
 		HRESULT result;
 		UINT32 index;
 		BOOL exists = false;
 
-		result = family_names->FindLocaleName(locale, &index, &exists);
+		result = family_names->FindLocaleName(locale.c_str(), &index, &exists);
 
 		// if the above find did not find a match, retry with US English
 		if (SUCCEEDED(result) && !exists)
@@ -802,16 +798,23 @@ private:
 		return S_OK;
 	}
 
-	HRESULT get_localized_familyname(ComPtr<IDWriteLocalizedStrings> family_names, std::unique_ptr<WCHAR[]> &family_name) const
+	HRESULT get_localized_familyname(ComPtr<IDWriteLocalizedStrings> family_names, std::unique_ptr<WCHAR[]> &family_name)
 	{
-		wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
+		std::wstring locale_name;
 
-		// Get the default locale for this user.
-		int defaultLocaleSuccess = GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH);
+		// Get the default locale for this user if possible.
+		// GetUserDefaultLocaleName doesn't exist on XP, so don't assume.
+		if (m_pfnGetUserDefaultLocaleName)
+		{
+			wchar_t name_buffer[LOCALE_NAME_MAX_LENGTH];
+			int len = m_pfnGetUserDefaultLocaleName(name_buffer, LOCALE_NAME_MAX_LENGTH);
+			if (len != 0)
+				locale_name = name_buffer;
+		}
 
-		// If the default locale is returned, find that locale name, otherwise use "en-us".
-		if (defaultLocaleSuccess)
-			return get_family_for_locale(family_names, localeName, family_name);
+		// If the default locale is returned, find that locale name
+		if (!locale_name.empty())
+			return get_family_for_locale(family_names, locale_name, family_name);
 
 		// If locale can't be determined, fall back to US English
 		return get_family_for_locale(family_names, L"en-us", family_name);
