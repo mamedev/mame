@@ -314,7 +314,7 @@ private:
 		I2CP_RECIEVE_ACK_1,
 		I2CP_RECIEVE_ACK_0
 	};
-	UINT16 key;
+
 	UINT32 bank_base;
 	UINT32 nand_address;
 	UINT16 block[0x1ff];
