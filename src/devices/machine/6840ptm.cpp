@@ -594,7 +594,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 			update_interrupts();
 
 			// Reload the count if in an appropriate mode
-			if (!(m_control_reg[idx] & 0x10))
+			if (!(m_control_reg[idx] & 0x10) || (m_control_reg[0] & RESET_TIMERS))
 			{
 				reload_count(idx);
 			}
