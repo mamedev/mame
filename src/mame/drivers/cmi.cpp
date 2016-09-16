@@ -290,6 +290,8 @@ MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
 	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi01a_device, cmi01a_1_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi01a_device, cmi01a_1_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, ch_int))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, ch_int))
 
 	MCFG_DEVICE_ADD("cmi01a_pia_1", PIA6821, 0) // pia_cmi01a_2_config
 	MCFG_PIA_READCA1_HANDLER(READLINE(cmi01a_device, zx_r))
@@ -300,7 +302,10 @@ MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, ch_int))
 
 	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 0) // ptm_cmi01a_config
+	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
 	MCFG_PTM6840_OUT0_CB(WRITE8(cmi01a_device, cmi01a_ptm_c0))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ch_int))
 MACHINE_CONFIG_END
 
 machine_config_constructor cmi01a_device::device_mconfig_additions() const
@@ -477,6 +482,7 @@ public:
 	DECLARE_READ8_MEMBER( cmi02_r );
 	DECLARE_WRITE8_MEMBER( cmi02_w );
 	DECLARE_WRITE8_MEMBER( master_tune_w );
+	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
 
 	// Alphanumeric keyboard
 	DECLARE_READ8_MEMBER( ank_col_r );
@@ -644,6 +650,9 @@ private:
 	// Alphanumeric keyboard
 	int     m_ank_irqa;
 	int     m_ank_irqb;
+
+	// Master card (CMI-02)
+	int		m_cmi02_ptm_irq;
 };
 
 /**************************************
@@ -1639,7 +1648,7 @@ WRITE_LINE_MEMBER( cmi01a_device::cmi01a_1_ca2_w )
 
 WRITE_LINE_MEMBER( cmi01a_device::ch_int )
 {
-//  printf("CH%d INT: %x  %x\n", ch, state, m_int_state[0]);
+	//printf("CH%d INT: %x\n", m_channel, state);
 	dynamic_cast<cmi_state*>(owner())->set_interrupt(CPU_1, ch_int_levels[m_channel], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -1819,7 +1828,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 			int a1 = (m_ptm_output && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
-			//printf("CH%d PTM: [%x] %x\n", ch, (a2 << 2) | (a1 << 1) | a0, data);
+			//printf("CH%d PTM: [%x] %x, %d %d %d, %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data, a2, a1, a0, offset);
 			m_ptm->write(space, (a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
@@ -1877,6 +1886,13 @@ WRITE8_MEMBER( cmi01a_device::cmi01a_ptm_c0 )
 	m_ptm_output = data;
 }
 
+WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
+{
+	m_cmi02_ptm_irq = state;
+	set_interrupt(CPU_1, IRQ_TIMINT_LEVEL, m_cmi02_ptm_irq ? ASSERT_LINE : CLEAR_LINE);
+	//printf("CMI-02 PTM IRQ: %d\n", state);
+}
+
 READ8_MEMBER( cmi_state::cmi02_r )
 {
 	if (offset <= 0x1f)
@@ -1886,7 +1902,9 @@ READ8_MEMBER( cmi_state::cmi02_r )
 		for (int i = 0; i < 8; ++i)
 		{
 			if (ch_mask & (1 << i))
-				return m_channels[i]->read(space, i, offset & 0x1f);
+			{
+				return m_channels[i]->read(space, offset & 0x1f, 0xff);
+			}
 		}
 
 		return 0xff;
@@ -2509,6 +2527,7 @@ void cmi_state::machine_reset()
 	m_ank_irqa = 0;
 	m_ank_irqb = 0;
 	m_q133_acia_irq = 0;
+	m_cmi02_ptm_irq = 0;
 }
 
 void cmi_state::machine_start()
@@ -2636,6 +2655,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 
 	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 0) // ptm_cmi02_config
 	MCFG_PTM6840_INTERNAL_CLOCK(2000000) // TODO
+	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
 
 	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, 9600*16)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cmi_state, mkbd_acia_clock))
