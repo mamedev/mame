@@ -30,7 +30,7 @@ protected:
 	ns10_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	virtual void init(int iv)=0;
-	virtual void device_start()=0;
+	virtual void device_start()override=0;
 	
 	bool _active;
 };
@@ -40,7 +40,7 @@ class ns10_type1_decrypter_device : public ns10_decrypter_device
 public:
 	// with just only type-1 game known, we cannot say which parts of the crypto_logic is common, if any,
 	// and which is game-specific. In practice, this class is just an alias for the decrypter device of mrdrilr2
-	uint16_t decrypt(uint16_t cipherword);
+	uint16_t decrypt(uint16_t cipherword)override;
 
 protected:
 	ns10_type1_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -50,7 +50,7 @@ private:
 	uint8_t _counter;
 	static const int initSbox[16];
 
-	void init(int iv);
+	void init(int iv)override;
 	void device_start()override;
 };
 
@@ -68,7 +68,7 @@ public:
 		uint16_t(*nonlinear_calculation)(uint64_t, uint64_t, const gf2_reducer&);  // preliminary encoding; need research
 	};
 
-	uint16_t decrypt(uint16_t cipherword);
+	uint16_t decrypt(uint16_t cipherword)override;
 
 protected:
 	ns10_type2_decrypter_device(
@@ -83,7 +83,7 @@ private:
 	std::unique_ptr<const gf2_reducer>_reducer;
 	static const int initSbox[16];
 
-	void init(int iv);
+	void init(int iv)override;
 	void device_start()override;
 };
 
