@@ -37,6 +37,9 @@ private:
 	s_filter            m_filter;
 	int                 highlight;
 
+	static std::pair<UINT16, UINT16> m_sub_filter;
+	static std::pair<const game_driver *, std::pair<UINT16, UINT16>> m_last_filter;
+
 	virtual void populate() override;
 	virtual void handle() override;
 

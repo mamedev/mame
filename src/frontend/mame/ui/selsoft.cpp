@@ -38,6 +38,9 @@ static const char *region_lists[] = { "arab", "arg", "asia", "aus", "aut", "bel"
 										"isv", "ita", "jpn", "kaz", "kor", "lat", "lux", "mex", "ned", "nld", "nor", "nzl",
 										"pol", "rus", "slo", "spa", "sui", "swe", "tha", "tpe", "tw", "uk", "ukr", "usa" };
 
+std::pair<UINT16, UINT16> menu_select_software::m_sub_filter;
+std::pair<const game_driver *, std::pair<UINT16, UINT16>> menu_select_software::m_last_filter;
+
 //-------------------------------------------------
 //  compares two items in the software list and
 //  sort them by parent-clone
@@ -45,8 +48,8 @@ static const char *region_lists[] = { "arab", "arg", "asia", "aus", "aut", "bel"
 
 bool compare_software(ui_software_info a, ui_software_info b)
 {
-	ui_software_info *x = &a;
-	ui_software_info *y = &b;
+	auto x = &a;
+	auto y = &b;
 
 	bool clonex = (x->parentname[0] != '\0');
 	bool cloney = (y->parentname[0] != '\0');
@@ -133,7 +136,37 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 	if (reselect_last::get())
 		reselect_last::set(false);
 
-	sw_filters::actual = 0;
+	if (m_last_filter.first == driver)
+	{
+		switch (sw_filters::actual)
+		{
+			case UI_SW_PUBLISHERS:
+				m_filter.publisher.actual = m_last_filter.second.second;
+				break;
+
+			case UI_SW_LIST:
+				m_filter.swlist.actual = m_last_filter.second.second;
+				break;
+
+			case UI_SW_YEARS:
+				m_filter.year.actual = m_last_filter.second.second;
+				break;
+
+			case UI_SW_TYPE:
+				m_filter.type.actual = m_last_filter.second.second;
+				break;
+
+			case UI_SW_REGION:
+				m_filter.region.actual = m_last_filter.second.second;
+				break;
+
+			default:
+				break;
+		}
+	}
+	else
+		sw_filters::actual = 0;
+
 	highlight = 0;
 
 	m_driver = driver;
@@ -157,6 +190,32 @@ menu_select_software::~menu_select_software()
 {
 	ui_globals::curimage_view = CABINETS_VIEW;
 	ui_globals::switch_image = true;
+	switch (sw_filters::actual)
+	{
+		case UI_SW_PUBLISHERS:
+			m_last_filter = std::make_pair(m_driver, std::make_pair(sw_filters::actual, m_filter.publisher.actual));
+			break;
+
+		case UI_SW_LIST:
+			m_last_filter = std::make_pair(m_driver, std::make_pair(sw_filters::actual, m_filter.swlist.actual));
+			break;
+
+		case UI_SW_YEARS:
+			m_last_filter = std::make_pair(m_driver, std::make_pair(sw_filters::actual, m_filter.year.actual));
+			break;
+
+		case UI_SW_TYPE:
+			m_last_filter = std::make_pair(m_driver, std::make_pair(sw_filters::actual, m_filter.type.actual));
+			break;
+
+		case UI_SW_REGION:
+			m_last_filter = std::make_pair(m_driver, std::make_pair(sw_filters::actual, m_filter.region.actual));
+			break;
+
+		default:
+			m_last_filter = std::make_pair(m_driver, std::make_pair(sw_filters::actual, 0));
+			break;
+	}
 }
 
 //-------------------------------------------------
