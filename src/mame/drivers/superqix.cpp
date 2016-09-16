@@ -1545,9 +1545,8 @@ ROM_START( sqix )
 	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03-03.l2",    0x00000, 0x1000, NO_DUMP ) /* Original Taito ID code for this set's MCU */
-	/* sq07.108 is from the sqixb1 set, it will be removed once the actual MCU code from b03-03.l2 is decapped / dumped */
-	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "b03-03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
+	/* the above file is derived from b03-08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03-03 MCU */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1565,9 +1564,8 @@ ROM_START( sqixr1 )
 	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03-03.l2",    0x00000, 0x1000, NO_DUMP ) /* Original Taito ID code for this set's MCU */
-	/* sq07.108 is from the sqixb1 set, it will be removed once the actual MCU code from b03-03.l2 is decapped / dumped */
-	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "b03-03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
+	/* the above file is derived from b03-08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03-03 MCU */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1668,11 +1666,6 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(superqix_state,sqix)
-{
-	m_invert_coin_lockout = 1;
-}
-
 DRIVER_INIT_MEMBER(superqix_state,sqixa)
 {
 	m_invert_coin_lockout = 0;
@@ -1744,8 +1737,8 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 
 GAME( 1986, pbillian, 0,        pbillian,   pbillian, driver_device,  0,        ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hotsmash, 0,        hotsmash,   hotsmash, driver_device,  0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix_8031,  superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix_8031,  superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqix,     0,        sqix,       superqix, driver_device,  0,        ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix,       superqix, driver_device,  0,        ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, sqixu,    sqix,     sqix,       superqix, driver_device,  0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1, 8031 MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
 GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, driver_device,  0,        ROT90, "bootleg", "Super Qix (bootleg set 2, No MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1

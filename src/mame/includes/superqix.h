@@ -113,7 +113,6 @@ public:
 	DECLARE_READ8_MEMBER(pbillian_ay_port_a_r);
 	DECLARE_READ8_MEMBER(pbillian_ay_port_b_r);
 	SAMPLES_START_CB_MEMBER(pbillian_sh_start);
-	DECLARE_DRIVER_INIT(sqix);
 	DECLARE_DRIVER_INIT(perestro);
 	DECLARE_DRIVER_INIT(sqixa);
 	TILE_GET_INFO_MEMBER(pb_get_bg_tile_info);
