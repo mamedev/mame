@@ -3333,6 +3333,8 @@ files {
 	MAME_DIR .. "src/mame/machine/ngen_kb.cpp",
 	MAME_DIR .. "src/mame/machine/ngen_kb.h",
 	MAME_DIR .. "src/mame/drivers/octopus.cpp",
+	MAME_DIR .. "src/mame/machine/octo_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/octo_kbd.h",
 	MAME_DIR .. "src/mame/drivers/onyx.cpp",
 	MAME_DIR .. "src/mame/drivers/okean240.cpp",
 	MAME_DIR .. "src/mame/drivers/p8k.cpp",

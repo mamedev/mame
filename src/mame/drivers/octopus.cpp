@@ -115,7 +115,10 @@ Its BIOS performs POST and halts as there's no keyboard.
 #include "machine/mc146818.h"
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
+#include "machine/i8251.h"
+#include "machine/clock.h"
 #include "imagedev/floppy.h"
+#include "machine/octo_kbd.h"
 
 class octopus_state : public driver_device
 {
@@ -135,6 +138,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
+		m_kb_uart(*this, "keyboard"),
 		m_current_dma(-1)
 		{ }
 
@@ -181,6 +185,7 @@ private:
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_device<i8251_device> m_kb_uart;
 	
 	UINT8 m_hd_bank;  // HD bank select
 	UINT8 m_fd_bank;  // Floppy bank select
@@ -215,8 +220,8 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWA")
 	AM_RANGE(0x21, 0x2f) AM_READWRITE(system_r, system_w)
 	AM_RANGE(0x31, 0x33) AM_READWRITE(bank_sel_r, bank_sel_w)
-	// 0x50-51: Keyboard (i8251)
-	AM_RANGE(0x50, 0x51) AM_NOP
+	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("keyboard", i8251_device, data_r, data_w)
+	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("keyboard", i8251_device, status_r, control_w)
 	// 0x70-73: HD controller
 	// 0x80-83: serial timers (i8253)
 	// 0xa0-a3: serial interface (Z80 SIO/2)
@@ -340,7 +345,7 @@ READ8_MEMBER(octopus_state::system_r)
 	switch(offset)
 	{
 	case 0:
-		return 0x1f;  // do bits 0-4 mean anything?  Language?
+		return 0x1f;  // do bits 0-4 mean anything?  Language DIPs?
 	}
 	
 	return 0xff;
@@ -477,6 +482,10 @@ static SLOT_INTERFACE_START( octopus_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START(keyboard)
+	SLOT_INTERFACE("octopus", OCTOPUS_KEYBOARD)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( octopus, octopus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24MHz / 3)  // 8MHz
@@ -533,8 +542,19 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(octopus_state,cntl_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(octopus_state,gpo_w))
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir4_w))
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir2_w))
 	
+	// Keyboard UART
+	MCFG_DEVICE_ADD("keyboard", I8251, 0)
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir4_w))
+	MCFG_RS232_PORT_ADD("keyboard_port", keyboard, "octopus")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("keyboard", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("keyboard", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("keyboard_clock_rx", CLOCK, 9600 * 64)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("keyboard",i8251_device,write_rxc))
+	MCFG_DEVICE_ADD("keyboard_clock_tx", CLOCK, 1200 * 64)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("keyboard",i8251_device,write_txc))
+
 	MCFG_FD1793_ADD("fdc",XTAL_16MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic_master",pic8259_device, ir5_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma2",am9517a_device, dreq1_w))
@@ -543,7 +563,6 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 
 	// TODO: add components
 	// i8253 PIT timer (speaker output, serial timing, other stuff too?)
-	// i8251 serial controller (keyboard)
 	// Centronics parallel interface
 	// Z80SIO/2 (serial)
 	// Winchester HD controller (Xebec/SASI compatible? uses TTL logic)
