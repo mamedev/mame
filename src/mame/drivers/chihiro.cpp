@@ -562,7 +562,8 @@ public:
 private:
 	void jamtable_disasm(address_space &space, UINT32 address, UINT32 size);
 	void jamtable_disasm_command(int ref, int params, const char **param);
-	void help_command(int ref, int params, const char **param);
+	void threadlist_command(int ref, int params, const char **param);
+	void chihiro_help_command(int ref, int params, const char **param);
 	void debug_commands(int ref, int params, const char **param);
 };
 
@@ -691,11 +692,43 @@ void chihiro_state::jamtable_disasm_command(int ref, int params, const char **pa
 	jamtable_disasm(space, (UINT32)addr, (UINT32)size);
 }
 
-void chihiro_state::help_command(int ref, int params, const char **param)
+void chihiro_state::threadlist_command(int ref, int params, const char **param)
 {
-	machine().debugger().console().printf("Available Chihiro commands:\n");
-	machine().debugger().console().printf("  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
-	machine().debugger().console().printf("  chihiro help -- this list\n");
+	const UINT32 thlists = 0x8003aae0; // magic address
+	address_space &space = m_maincpu->space();
+	debugger_console con = machine().debugger().console();
+
+	con.printf("Pri. _KTHREAD   Stack  Function\n");
+	con.printf("-------------------------------\n");
+	for (int pri=0;pri < 16;pri++)
+	{
+		UINT32 curr = thlists + pri * 8;
+		UINT32 next = machine().debugger().cpu().read_dword(space, curr, true);
+
+		while (next != curr)
+		{
+			UINT32 kthrd = next - 0x5c;
+			UINT32 topstack = machine().debugger().cpu().read_dword(space, kthrd + 0x1c, true);
+			UINT32 tlsdata = machine().debugger().cpu().read_dword(space, kthrd + 0x28, true);
+			UINT32 function;
+			if (tlsdata == 0)
+				function = machine().debugger().cpu().read_dword(space, topstack - 0x210 - 8, true);
+			else
+				function = machine().debugger().cpu().read_dword(space, tlsdata - 8, true);
+			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
+			next = machine().debugger().cpu().read_dword(space, next, true);
+		}
+	}
+}
+
+void chihiro_state::chihiro_help_command(int ref, int params, const char **param)
+{
+	debugger_console con = machine().debugger().console();
+
+	con.printf("Available Chihiro commands:\n");
+	con.printf("  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
+	con.printf("  chihiro threadlist -- list of currently active threads\n");
+	con.printf("  chihiro help -- this list\n");
 }
 
 void chihiro_state::debug_commands(int ref, int params, const char **param)
@@ -704,8 +737,10 @@ void chihiro_state::debug_commands(int ref, int params, const char **param)
 		return;
 	if (strcmp("jamdis", param[0]) == 0)
 		jamtable_disasm_command(ref, params - 1, param + 1);
+	else if (strcmp("threadlist", param[0]) == 0)
+		threadlist_command(ref, params - 1, param + 1);
 	else
-		help_command(ref, params - 1, param + 1);
+		chihiro_help_command(ref, params - 1, param + 1);
 }
 
 void chihiro_state::hack_eeprom()
