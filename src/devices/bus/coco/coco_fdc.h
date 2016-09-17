@@ -1,180 +1,88 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#pragma once
+/*********************************************************************
 
-#ifndef __COCO_FDC_H__
-#define __COCO_FDC_H__
+	coco_fdc.h
+
+	CoCo/Dragon Floppy Disk Controller
+
+*********************************************************************/
+
+#ifndef MAME_DEVICES_BUS_COCO_FDC_H
+#define MAME_DEVICES_BUS_COCO_FDC_H
 
 #include "emu.h"
 #include "cococart.h"
-#include "machine/msm6242.h"
-#include "machine/ds1315.h"
-#include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
 
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
+/***************************************************************************
+	TYPE DEFINITIONS
+***************************************************************************/
 
-// ======================> coco_rtc_type_t
+// ======================> coco_family_fdc_device_base
 
-enum coco_rtc_type_t
-{
-	RTC_DISTO   = 0x00,
-	RTC_CLOUD9  = 0x01,
-
-	RTC_NONE    = 0xFF
-};
-
-// ======================> coco_fdc_device
-
-class coco_fdc_device :
-		public device_t,
-		public device_cococart_interface
+class coco_family_fdc_device_base :
+	public device_t,
+	public device_cococart_interface
 {
 public:
-		// construction/destruction
-		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	// construction/destruction
+	coco_family_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+		: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		, device_cococart_interface(mconfig, *this)
+	{
+		m_owner = dynamic_cast<cococart_slot_device *>(owner);
+	};
 
-		DECLARE_FLOPPY_FORMATS(floppy_formats);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w) { m_intrq = state; update_lines(); }
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w) { m_drq = state; update_lines(); }
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const tiny_rom_entry *device_rom_region() const override;
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-		virtual UINT8* get_cart_base() override;
-
-		virtual void update_lines();
-		virtual void dskreg_w(UINT8 data);
-
-		void set_intrq(UINT8 val) { m_intrq = val; }
-		void set_drq(UINT8 val) { m_drq = val; }
-
-		DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-		DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual DECLARE_READ8_MEMBER(read) override;
-		virtual DECLARE_WRITE8_MEMBER(write) override;
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-		coco_rtc_type_t real_time_clock();
+	// FDC overrides 
+	virtual void update_lines() = 0;
+	virtual UINT8* get_cart_base() override;
 
-		// internal state
-		cococart_slot_device *m_owner;
+	// wrapper for setting the cart line
+	void cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
+	{
+		m_owner->cart_set_line(which, value);
+	}
+	void cart_set_line(cococart_slot_device::line which, bool value)
+	{
+		cart_set_line(which, value ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
+	}
 
-		UINT8 m_dskreg;
-		UINT8 m_drq : 1;
-		UINT8 m_intrq : 1;
+	// accessors
+	UINT8 dskreg() const { return m_dskreg; }
+	bool intrq() const { return m_intrq; }
+	bool drq() const { return m_drq; }
+	void set_dskreg(UINT8 data) { m_dskreg = data; }
 
-		optional_device<wd1773_t> m_wd17xx;              /* WD17xx */
-		optional_device<wd2797_t> m_wd2797;              /* WD2797 */
-		optional_device<ds1315_device> m_ds1315;         /* DS1315 */
+private:
+	// internal state
+	cococart_slot_device *m_owner;
 
-		/* Disto RTC */
-		optional_device<msm6242_device> m_disto_msm6242;        /* 6242 RTC on Disto interface */
-
-		offs_t m_msm6242_rtc_address;
-		optional_ioport m_rtc;
+	// registers
+	UINT8 m_dskreg;
+	bool m_intrq;
+	bool m_drq;
 };
 
-
-// device type definition
+// device type definitions - CoCo FDC
 extern const device_type COCO_FDC;
-
-// ======================> coco_fdc_v11_device
-
-class coco_fdc_v11_device :
-		public coco_fdc_device
-{
-public:
-		// construction/destruction
-		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-
-// device type definition
 extern const device_type COCO_FDC_V11;
-
-// ======================> coco3_hdb1_device
-
-class coco3_hdb1_device :
-		public coco_fdc_device
-{
-public:
-		// construction/destruction
-		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-
-// device type definition
 extern const device_type COCO3_HDB1;
-
-// ======================> cp400_fdc_device
-
-class cp400_fdc_device :
-		public coco_fdc_device
-{
-public:
-		// construction/destruction
-		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-
-// device type definition
 extern const device_type CP400_FDC;
 
-// ======================> dragon_fdc_device
-
-class dragon_fdc_device :
-		public coco_fdc_device
-{
-public:
-		// construction/destruction
-		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const tiny_rom_entry *device_rom_region() const override;
-		virtual void update_lines() override;
-		virtual void dskreg_w(UINT8 data) override;
-protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual DECLARE_READ8_MEMBER(read) override;
-		virtual DECLARE_WRITE8_MEMBER(write) override;
-};
-
-
-// device type definition
+// device type definitions - Dragon FDC
 extern const device_type DRAGON_FDC;
-
-// ======================> sdtandy_fdc_device
-
-class sdtandy_fdc_device :
-		public dragon_fdc_device
-{
-public:
-		// construction/destruction
-		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
-
-// device type definition
 extern const device_type SDTANDY_FDC;
 
-#endif  /* __COCO_FDC_H__ */
+#endif // MAME_DEVICES_BUS_COCO_FDC_H
