@@ -91,6 +91,7 @@ public:
 	static UINT32 ui_handler(render_container &container, mame_ui_manager &mui);
 
 	// Used by sliders
+	void move_selection(int delta, UINT32 flags = 0);
 	void validate_selection(int scandir);
 
 	void do_handle();
