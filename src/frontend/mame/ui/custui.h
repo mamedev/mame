@@ -41,8 +41,7 @@ private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-	static const char *const    HIDE_STATUS[];
-
+	std::vector<std::string>    m_hide_status;
 	std::vector<std::string>    m_lang;
 	std::uint16_t               m_currlang;
 };
@@ -188,7 +187,7 @@ private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-	static std::pair<const char *, const char *> const s_palette[];
+	std::vector<std::pair<const char *, const char *>> m_palette;
 	rgb_t &m_original;
 };
 
