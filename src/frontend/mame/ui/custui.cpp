@@ -26,11 +26,6 @@
 
 
 namespace ui {
-const char *const menu_custom_ui::HIDE_STATUS[] = {
-	__("Show All"),
-	__("Hide Filters"),
-	__("Hide Info/Image"),
-	__("Hide Both") };
 
 //-------------------------------------------------
 //  ctor
@@ -38,12 +33,18 @@ const char *const menu_custom_ui::HIDE_STATUS[] = {
 
 menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
+	// add hide options
+	m_hide_status.emplace_back(_("Show All"));
+	m_hide_status.emplace_back(_("Hide Filters"));
+	m_hide_status.emplace_back(_("Hide Info/Image"));
+	m_hide_status.emplace_back(_("Hide Both"));
+
 	// load languages
 	file_enumerator path(mui.machine().options().language_path());
 	auto lang = mui.machine().options().language();
 	const osd::directory::entry *dirent;
 	std::size_t cnt = 0;
-	while ((dirent = path.next()) != nullptr)
+	while ((dirent = path.next()))
 	{
 		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
 		{
@@ -107,8 +108,7 @@ void menu_custom_ui::handle()
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					std::vector<std::string> s_sel(ARRAY_LENGTH(HIDE_STATUS));
-					std::transform(std::begin(HIDE_STATUS), std::end(HIDE_STATUS), s_sel.begin(), [](auto &s) { return _(s); });
+					auto s_sel = m_hide_status;
 					menu::stack_push<menu_selector>(ui(), container(), std::move(s_sel), ui_globals::panels_status);
 				}
 				break;
@@ -126,6 +126,7 @@ void menu_custom_ui::handle()
 				}
 				break;
 			}
+			default: break;
 		}
 	}
 
@@ -150,7 +151,7 @@ void menu_custom_ui::populate()
 	}
 
 	arrow_flags = get_arrow_flags<UINT16>(0, HIDE_BOTH, ui_globals::panels_status);
-	item_append(_("Show side panels"), _(HIDE_STATUS[ui_globals::panels_status]), arrow_flags, (void *)(FPTR)HIDE_MENU);
+	item_append(_("Show side panels"), _(m_hide_status[ui_globals::panels_status].c_str()), arrow_flags, (void *)(FPTR)HIDE_MENU);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -328,6 +329,7 @@ void menu_font_ui::handle()
 				}
 				break;
 #endif
+			default: break;
 		}
 
 	if (changed)
@@ -813,6 +815,8 @@ void menu_rgb_ui::handle()
 				if (menu_event->iptkey == IPT_UI_SELECT)
 					menu::stack_push<menu_palette_sel>(ui(), container(), *m_color);
 				break;
+
+			default: break;
 		}
 	}
 
@@ -969,6 +973,8 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 			case RGB_BLUE:
 				m_color->set_b(val);
 				break;
+			
+			default: break;
 			}
 
 			m_search[0] = 0;
@@ -1001,19 +1007,6 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 	}
 }
 
-std::pair<const char *, const char *> const menu_palette_sel::s_palette[] = {
-	{ __("White"),  "FFFFFFFF" },
-	{ __("Silver"), "FFC0C0C0" },
-	{ __("Gray"),   "FF808080" },
-	{ __("Black"),  "FF000000" },
-	{ __("Red"),    "FFFF0000" },
-	{ __("Orange"), "FFFFA500" },
-	{ __("Yellow"), "FFFFFF00" },
-	{ __("Green"),  "FF00FF00" },
-	{ __("Blue"),   "FF0000FF" },
-	{ __("Violet"), "FF8F00FF" }
-};
-
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
@@ -1021,6 +1014,17 @@ std::pair<const char *, const char *> const menu_palette_sel::s_palette[] = {
 menu_palette_sel::menu_palette_sel(mame_ui_manager &mui, render_container &container, rgb_t &_color)
 	: menu(mui, container), m_original(_color)
 {
+	// popolate palette colors
+	m_palette.emplace_back(_("White"), "FFFFFFFF");
+	m_palette.emplace_back(_("Silver"), "FFC0C0C0");
+	m_palette.emplace_back(_("Gray"), "FF808080");
+	m_palette.emplace_back(_("Black"), "FF000000");
+	m_palette.emplace_back(_("Red"), "FFFF0000");
+	m_palette.emplace_back(_("Orange"), "FFFFA500");
+	m_palette.emplace_back(_("Yellow"), "FFFFFF00");
+	m_palette.emplace_back(_("Green"), "FF00FF00");
+	m_palette.emplace_back(_("Blue"), "FF0000FF");
+	m_palette.emplace_back(_("Violet"), "FF8F00FF");
 }
 
 //-------------------------------------------------
@@ -1056,8 +1060,9 @@ void menu_palette_sel::handle()
 
 void menu_palette_sel::populate()
 {
-	for (unsigned x = 0; x < ARRAY_LENGTH(s_palette); ++x)
-		item_append(_(s_palette[x].first), s_palette[x].second, 0, (void *)(FPTR)(x + 1));
+	unsigned x = 0;
+	for (auto & e : m_palette)
+		item_append(_(e.first), e.second, 0, (void *)(FPTR)++x);
 
 	item_append(menu_item_type::SEPARATOR);
 }
