@@ -34875,6 +34875,7 @@ topland                         // B62 (c) 1988 Taito Corporation Japan (World)
 @source:taitogn.cpp
 chaoshea                        // 1998.10 Chaos Heat (V2.09O)
 chaosheaj                       // 1998.10 Chaos Heat (V2.08J)
+coh3002t                        //
 flipmaze                        // 1999.09 Flip Maze (V2.04J)
 gobyrc                          // 1999.?? Go By RC (V2.03O)
 kollon                          // 2003.11 Kollon (V2.04J)
@@ -34895,7 +34896,6 @@ sianniv                         // 2003.10 Space Invaders Anniversary (V2.02J)
 soutenry                        // 2001.02 Soutenryu (V2.07J)
 spuzbobl                        // 1999.?? Super Puzzle Bobble (V2.05O)
 spuzboblj                       // 1999.03 Super Puzzle Bobble (Japan)
-taitogn                         //
 usagi                           // 2001.12 Usagi (V2.02J)
 xiistag                         // 2002.07 XII Stag (V2.01J)
 zokuoten                        // 2000.12 Zoku Otenamihaiken (V2.03J)
@@ -37590,10 +37590,7 @@ zexall                          // zexall z80 test suite with kevtris' preloader
 
 @source:zn.cpp
 1on1gov                         // 1 on 1 Government (JAPAN)
-acpsx                           //
 aerofgts                        // Aero Fighters Special (TAIWAN)
-atluspsx                        //
-atpsx                           //
 bam2                            // Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00)
 beastrzr                        // Beastorizer (USA)
 beastrzrb                       // Beastorizer (USA Bootleg)
@@ -37607,8 +37604,15 @@ brvbladea                       // Brave Blade (ASIA)
 brvbladej                       // Brave Blade (JAPAN)
 brvbladeu                       // Brave Blade (USA)
 cbaj                            // Cool Boaders Arcade Jam
-cpzn1                           //
-cpzn2                           //
+coh1000a                        //
+coh1000c                        //
+coh1000t                        //
+coh1000w                        //
+coh1001l                        //
+coh1002v                        //
+coh1002e                        //
+coh1002m                        //
+coh3002c                        //
 doapp                           // Dead Or Alive ++ (JAPAN)
 flamegun                        // Flame Gunner (USA)
 flamegunj                       // Flame Gunner (JAPAN)
@@ -37635,12 +37639,11 @@ lpadv                           // Logic Pro Adventure (JAPAN)
 mfjump                          // Monster Farm Jump (JAPAN)
 mgcldate                        // Magical Date (JAPAN Ver 2.02J)
 mgcldtex                        // Magical Date EX (JAPAN Ver 2.01J)
-nbajamex                        // NBA Jam Extreme
-nbajamexa						//
+nbajamex                        // NBA Jam Extreme (ver. 1.10I)
+nbajamexa                       // NBA Jam Extreme (ver. 1.04)
 plsmaswd                        // Plasma Sword (USA 980316)
 plsmaswda                       // Plasma Sword (ASIA 980316)
 primrag2                        // Primal Rage 2
-psarc95                         //
 psyforce                        // Psychic Force (Ver 2.4O)
 psyforcej                       // Psychic Force (Ver 2.4J)
 psyforcex                       // Psychic Force EX (Ver 2.0J)
@@ -37679,18 +37682,15 @@ stargladj                       // Star Gladiator (JAPAN 960627)
 stargld2                        // Star Gladiator 2 (JAPAN 980316)
 strider2                        // Strider 2 (USA 991213)
 strider2a                       // Strider 2 (ASIA 991213)
-taitofx1                        //
 tblkkuzu                        // The Block Kuzushi (JAPAN)
 techromn                        // Tech Romancer (EURO 980914)
 techromnu                       // Tech Romancer (USA 980914)
 tecmowcm                        // Tecmo World Cup Millennium (JAPAN)
 tgmj                            // Tetris The Grand Master (JAPAN 980710)
 tondemo                         // Tondemo Crisis (JAPAN)
-tps                             //
 ts2                             // Battle Arena Toshinden 2 (USA 951124)
 ts2a                            // Battle Arena Toshinden 2 (USA 951124)
 ts2j                            // Battle Arena Toshinden 2 (JAPAN 951124)
-vspsx                           //
 
 @source:zodiack.cpp
 bounty                          // (c) 1982 Orca
