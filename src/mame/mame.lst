@@ -936,6 +936,9 @@ hr16b                           //
 mmt8                            //
 sr16                            //
 
+@source:alesis_qs.cpp
+alesqs7                         //
+
 @source:alg.cpp
 alg_bios                        //
 aplatoon                        // (c) 199? Nova?
