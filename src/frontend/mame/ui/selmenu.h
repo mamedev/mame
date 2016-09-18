@@ -56,6 +56,7 @@ protected:
 	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width);
 
 	int     visible_items;
+	int		skip_main_items;
 	void    *m_prev_selected;
 	int     m_total_lines;
 	int     m_topline_datsview;   // right box top line
@@ -127,24 +128,6 @@ private:
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
-	void select_prev()
-	{
-		if (!m_prev_selected)
-		{
-			selected = 0;
-		}
-		else
-		{
-			for (int x = 0; x < item.size(); ++x)
-			{
-				if (item[x].ref == m_prev_selected)
-				{
-					selected = x;
-					break;
-				}
-			}
-		}
-	}
 
 	void draw_toolbar(float x1, float y1, float x2, float y2);
 	void draw_star(float x0, float y0);

@@ -145,7 +145,7 @@ void menu_selector::populate()
 			if (m_str_items[index] != "_skip_")
 			{
 				if (m_first_pass && m_selector == index)
-					selected = added;
+					set_selection(added);
 
 				added++;
 				item_append(m_str_items[index], "", 0, (void *)&m_str_items[index]);

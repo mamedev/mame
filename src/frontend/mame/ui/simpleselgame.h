@@ -46,6 +46,7 @@ private:
 	UINT8                   m_error;
 	bool                    m_rerandomize;
 	char                    m_search[40];
+	int						m_skip_main_items;
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
 	std::vector<const game_driver *> m_driverlist;
 	std::unique_ptr<driver_enumerator> m_drivlist;

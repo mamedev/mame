@@ -91,7 +91,6 @@ public:
 	static UINT32 ui_handler(render_container &container, mame_ui_manager &mui);
 
 	// Used by sliders
-	void move_selection(int delta, UINT32 flags = 0);
 	void validate_selection(int scandir);
 
 	void do_handle();
@@ -166,11 +165,8 @@ protected:
 		}
 	};
 
-	int top_line;           // main box top line
 	int l_sw_hover;
 	int l_hover;
-	int skip_main_items;
-	int selected;           // which item is selected
 
 	int m_visible_lines;    // main box visible lines
 	int m_visible_items;    // number of visible items
@@ -201,16 +197,21 @@ protected:
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
 
 	// retrieves the ref of the currently selected menu item or nullptr
-	void *get_selection_ref() const { return selection_valid() ? item[selected].ref : nullptr; }
+	const ui::menu_item *get_selection_item() const { return selection_valid() ? &item[selected] : nullptr; }
+	void *get_selection_ref() const { return get_selection_item() != nullptr ? get_selection_item()->ref : nullptr; }
+	int get_selection() const { return selection_valid() ? selected : -1; }
 	bool selection_valid() const { return (0 <= selected) && (item.size() > selected); }
-	bool is_first_selected() const { return 0 == selected; }
-	bool is_last_selected() const { return (item.size() - 1) == selected; }
+	bool is_first_selected() const { return 0 == get_selection(); }
+	bool is_last_selected() const { return (item.size() - 1) == get_selection(); }
 
 	// changes the index of the currently selected menu item
 	void set_selection(void *selected_itemref);
+	void set_selection(int new_selection);
+	void move_selection(int delta, UINT32 flags = 0);
 
-	// scroll position control
-	void centre_selection() { top_line = selected - (m_visible_lines / 2); }
+	// accessor for top_line
+	int get_top_line() const { return top_line; }
+	int calculate_visible_lines() const;
 
 	// test if the given key is pressed and we haven't already reported a key
 	bool exclusive_input_pressed(int &iptkey, int key, int repeat);
@@ -236,6 +237,7 @@ protected:
 	virtual void handle_events(UINT32 flags, event &ev);
 	virtual void handle_keys(UINT32 flags, int &iptkey);
 	virtual bool custom_mouse_down() { return false; }
+	virtual int reserved_lines() const;
 
 	// test if search is active
 	virtual bool menu_has_search_active() { return false; }
@@ -318,6 +320,10 @@ private:
 
 	bool first_item_visible() const { return top_line <= 0; }
 	bool last_item_visible() const { return (top_line + m_visible_lines) >= item.size(); }
+	bool is_selection_visible() const;
+
+	// if selection is no longer visible, adjust top_line
+	void set_top_line(int new_top_line);
 
 	static void exit(running_machine &machine);
 	static global_state_ptr get_global_state(running_machine &machine);
@@ -332,6 +338,9 @@ private:
 
 	int                     m_resetpos;         // reset position
 	void                    *m_resetref;        // reset reference
+
+	int top_line;								// main box top line
+	int selected;								// which item is selected
 
 	static std::mutex       s_global_state_guard;
 	static global_state_map s_global_states;

@@ -410,10 +410,10 @@ void menu_select_launch::inkey_navigation()
 	switch (get_focus())
 	{
 	case focused_menu::main:
-		if (selected <= visible_items)
+		if (menu::get_selection() <= visible_items)
 		{
-			m_prev_selected = item[selected].ref;
-			selected = visible_items + 1;
+			m_prev_selected = get_selection_ref();
+			set_selection(visible_items + 1);
 		}
 		else
 		{
@@ -424,7 +424,7 @@ void menu_select_launch::inkey_navigation()
 			{
 				for (int x = 0; x < item.size(); ++x)
 					if (item[x].ref == m_prev_selected)
-						selected = x;
+						set_selection(menu::get_selection());
 			}
 			else
 			{
@@ -441,7 +441,7 @@ void menu_select_launch::inkey_navigation()
 		else
 		{
 			set_focus(focused_menu::main);
-			select_prev();
+			move_selection(-1);
 		}
 		break;
 
@@ -451,7 +451,7 @@ void menu_select_launch::inkey_navigation()
 
 	case focused_menu::rightbottom:
 		set_focus(focused_menu::main);
-		select_prev();
+		move_selection(-1);
 		break;
 	}
 }
@@ -793,8 +793,8 @@ void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((item[selected].flags & FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((item[selected].flags & FLAG_RIGHT_ARROW) == 0);
+	bool ignoreleft = get_selection_item() == nullptr || (get_selection_item()->flags & FLAG_LEFT_ARROW) == 0;
+	bool ignoreright = get_selection_item() == nullptr || (get_selection_item()->flags & FLAG_RIGHT_ARROW) == 0;
 	bool leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
 	bool rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
 
@@ -833,13 +833,7 @@ void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
 			return;
 		}
 
-		if (selected == visible_items + 1 || is_first_selected() || m_ui_error)
-			return;
-
-		selected--;
-
-		if (selected == top_line && top_line != 0)
-			top_line--;
+		move_selection(-1);
 	}
 
 	// down advances by one item
@@ -860,13 +854,7 @@ void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
 			return;
 		}
 
-		if (is_last_selected() || selected == visible_items - 1 || m_ui_error)
-			return;
-
-		selected++;
-
-		if (selected == top_line + m_visible_items + (top_line != 0))
-			top_line++;
+		move_selection(+1);
 	}
 
 	// page up backs up by m_visible_items
@@ -880,15 +868,7 @@ void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
 			return;
 		}
 
-		if (selected < visible_items && !m_ui_error)
-		{
-			selected -= m_visible_items;
-
-			if (selected < 0)
-				selected = 0;
-
-			top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
-		}
+		move_selection(-m_visible_items);
 	}
 
 	// page down advances by m_visible_items
@@ -902,15 +882,7 @@ void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
 			return;
 		}
 
-		if (selected < visible_items && !m_ui_error)
-		{
-			selected += m_visible_lines - 2 + (selected == 0);
-
-			if (selected >= visible_items)
-				selected = visible_items - 1;
-
-			top_line += m_visible_lines - 2;
-		}
+		move_selection(+m_visible_lines);
 	}
 
 	// home goes to the start
@@ -924,11 +896,7 @@ void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
 			return;
 		}
 
-		if (selected < visible_items && !m_ui_error)
-		{
-			selected = 0;
-			top_line = 0;
-		}
+		set_selection(0);
 	}
 
 	// end goes to the last
@@ -941,9 +909,7 @@ void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
 			m_topline_datsview = m_total_lines;
 			return;
 		}
-
-		if (selected < visible_items && !m_ui_error)
-			selected = top_line = visible_items - 1;
+		set_selection(visible_items - 1);
 	}
 
 	// pause enables/disables pause
@@ -1015,25 +981,19 @@ void menu_select_launch::handle_events(UINT32 flags, event &ev)
 				{
 					if (hover >= 0 && hover < item.size())
 					{
-						if (hover >= visible_items - 1 && selected < visible_items)
-							m_prev_selected = item[selected].ref;
-						selected = hover;
+						if (hover >= visible_items - 1 && menu::get_selection() < visible_items)
+							m_prev_selected = get_selection_ref();
+						set_selection(hover);
 						m_focus = focused_menu::main;
 					}
 					else if (hover == HOVER_ARROW_UP)
 					{
-						selected -= m_visible_items;
-						if (selected < 0)
-							selected = 0;
-						top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
+						move_selection(-m_visible_items);
 						set_pressed();
 					}
 					else if (hover == HOVER_ARROW_DOWN)
 					{
-						selected += m_visible_lines - 2 + (selected == 0);
-						if (selected >= visible_items)
-							selected = visible_items - 1;
-						top_line += m_visible_lines - 2;
+						move_selection(+m_visible_items);
 						set_pressed();
 					}
 					else if (hover == HOVER_UI_RIGHT)
@@ -1106,11 +1066,11 @@ void menu_select_launch::handle_events(UINT32 flags, event &ev)
 			case UI_EVENT_MOUSE_DOUBLE_CLICK:
 				if (hover >= 0 && hover < item.size())
 				{
-					selected = hover;
+					set_selection(hover);
 					ev.iptkey = IPT_UI_SELECT;
 				}
 
-				if (selected == item.size() - 1)
+				if (menu::get_selection() == item.size() - 1)
 				{
 					ev.iptkey = IPT_UI_CANCEL;
 					stack_pop();
@@ -1122,24 +1082,10 @@ void menu_select_launch::handle_events(UINT32 flags, event &ev)
 			case UI_EVENT_MOUSE_WHEEL:
 				if (hover >= 0 && hover < item.size() - skip_main_items - 1)
 				{
-					if (local_menu_event.zdelta > 0)
-					{
-						if (selected >= visible_items || selected == 0 || m_ui_error)
-							break;
-						selected -= local_menu_event.num_lines;
-						if (selected < top_line + (top_line != 0))
-							top_line -= local_menu_event.num_lines;
-					}
-					else
-					{
-						if (selected >= visible_items - 1 || m_ui_error)
-							break;
-						selected += local_menu_event.num_lines;
-						if (selected > visible_items - 1)
-							selected = visible_items - 1;
-						if (selected >= top_line + m_visible_items + (top_line != 0))
-							top_line += local_menu_event.num_lines;
-					}
+					int delta = local_menu_event.zdelta > 0
+						? -local_menu_event.num_lines
+						: +local_menu_event.num_lines;
+					move_selection(delta);
 				}
 				break;
 
@@ -1161,8 +1107,8 @@ void menu_select_launch::handle_events(UINT32 flags, event &ev)
 			case UI_EVENT_MOUSE_RDOWN:
 				if (hover >= 0 && hover < item.size() - skip_main_items - 1)
 				{
-					selected = hover;
-					m_prev_selected = item[selected].ref;
+					set_selection(hover);
+					m_prev_selected = get_selection_ref();
 					m_focus = focused_menu::main;
 					ev.iptkey = IPT_CUSTOM;
 					ev.mouse.x0 = local_menu_event.mouse_x;
@@ -1248,23 +1194,19 @@ void menu_select_launch::draw(UINT32 flags)
 
 	if (visible_items < m_visible_lines)
 		m_visible_lines = visible_items;
-	if (top_line < 0 || is_first_selected())
-		top_line = 0;
-	if (selected < visible_items && top_line + m_visible_lines >= visible_items)
-		top_line = visible_items - m_visible_lines;
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
 	float effective_left = visible_left + gutter_width;
 
-	if ((m_focus == focused_menu::main) && (selected < visible_items))
+	if ((m_focus == focused_menu::main) && (menu::get_selection() < visible_items))
 		m_prev_selected = nullptr;
 
 	int const n_loop = (std::min)(m_visible_lines, visible_items);
 	for (int linenum = 0; linenum < n_loop; linenum++)
 	{
 		float line_y = visible_top + (float)linenum * line_height;
-		int itemnum = top_line + linenum;
+		int itemnum = get_top_line() + linenum;
 		const menu_item &pitem = item[itemnum];
 		const char *itemtext = pitem.text.c_str();
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -1280,7 +1222,7 @@ void menu_select_launch::draw(UINT32 flags)
 			hover = itemnum;
 
 		// if we're selected, draw with a different background
-		if (itemnum == selected && m_focus == focused_menu::main)
+		if (itemnum == menu::get_selection() && m_focus == focused_menu::main)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
@@ -1303,7 +1245,7 @@ void menu_select_launch::draw(UINT32 flags)
 					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 
-		if (linenum == 0 && top_line != 0)
+		if (linenum == 0 && get_top_line() != 0)
 		{
 			// if we're on the top line, display the up arrow
 			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
@@ -1371,7 +1313,7 @@ void menu_select_launch::draw(UINT32 flags)
 			hover = count;
 
 		// if we're selected, draw with a different background
-		if (count == selected && m_focus == focused_menu::main)
+		if (count == menu::get_selection() && m_focus == focused_menu::main)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
@@ -1411,7 +1353,7 @@ void menu_select_launch::draw(UINT32 flags)
 	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
+	m_visible_items = m_visible_lines - (get_top_line() != 0) - (get_top_line() + m_visible_lines != visible_items);
 
 	// reset redraw icon stage
 	if (!m_is_swlist) ui_globals::redraw_icon = false;

@@ -182,7 +182,7 @@ void menu_select_game::handle()
 	// if i have to reselect a software, force software list submenu
 	if (reselect_last::get())
 	{
-		const game_driver *driver = (const game_driver *)item[selected].ref;
+		const game_driver *driver = (const game_driver *) get_selection_ref();
 		menu::stack_push<menu_select_software>(ui(), container(), driver);
 		return;
 	}
@@ -609,11 +609,7 @@ void menu_select_game::populate()
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
 	{
-		selected = old_item_selected;
-		if (ui_globals::visible_main_lines == 0)
-			top_line = (selected != 0) ? selected - 1 : 0;
-		else
-			top_line = selected - (ui_globals::visible_main_lines / 2);
+		set_selection(old_item_selected);
 
 		if (reselect_last::software.empty())
 			reselect_last::reset();
@@ -1732,5 +1728,23 @@ std::string menu_select_game::make_software_description(ui_software_info const &
 	// first line is system
 	return string_format(_("System: %1$-.100s"), software.driver->description);
 }
+
+
+//-------------------------------------------------
+//  reserved_lines
+//-------------------------------------------------
+
+int menu_select_game::reserved_lines() const
+{
+	// skip_main_items identifies the menu items in the reserved area:
+	//	- Configure Options
+	//	- Configure Machines
+	//	- Plugins
+	//
+	// in addition, we have a separator and the "Exit" menu
+	return skip_main_items + 2;
+}
+
+
 
 } // namespace ui

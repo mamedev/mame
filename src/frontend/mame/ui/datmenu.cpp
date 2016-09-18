@@ -193,9 +193,6 @@ void menu_dats_view::draw(UINT32 flags)
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	m_visible_lines = (std::min)(visible_items, m_visible_lines);
-	top_line = (std::max)(0, top_line);
-	if (top_line + m_visible_lines >= visible_items)
-		top_line = visible_items - m_visible_lines;
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
@@ -205,7 +202,7 @@ void menu_dats_view::draw(UINT32 flags)
 	for (int linenum = 0; linenum < n_loop; linenum++)
 	{
 		float line_y = visible_top + (float)linenum * line_height;
-		int itemnum = top_line + linenum;
+		int itemnum = get_top_line() + linenum;
 		const menu_item &pitem = item[itemnum];
 		const char *itemtext = pitem.text.c_str();
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -216,7 +213,7 @@ void menu_dats_view::draw(UINT32 flags)
 		float line_y1 = line_y + line_height;
 
 		// if we're on the top line, display the up arrow
-		if (linenum == 0 && top_line != 0)
+		if (linenum == 0 && get_top_line() != 0)
 		{
 			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
 				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
@@ -282,7 +279,7 @@ void menu_dats_view::draw(UINT32 flags)
 	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
+	m_visible_items = m_visible_lines - (get_top_line() != 0) - (get_top_line() + m_visible_lines != visible_items);
 }
 
 //-------------------------------------------------

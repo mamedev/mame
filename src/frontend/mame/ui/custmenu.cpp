@@ -168,7 +168,7 @@ void menu_custom_filter::populate()
 		item_append(_("Other filter"), main_filters::text[custfltr::other[x]], arrow_flags, (void *)(FPTR)(OTHER_FILTER + x));
 
 		if (m_added)
-			selected = item.size() - 2;
+			set_selection(item.size() - 2);
 
 		// add manufacturer subitem
 		if (custfltr::other[x] == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
@@ -455,7 +455,7 @@ void menu_swcustom_filter::populate()
 		item_append(_("Other filter"), sw_filters::text[sw_custfltr::other[x]], arrow_flags, (void *)(FPTR)(OTHER_FILTER + x));
 
 		if (m_added)
-			selected = item.size() - 2;
+			set_selection(item.size() - 2);
 
 		// add publisher subitem
 		if (sw_custfltr::other[x] == UI_SW_PUBLISHERS && m_filter.publisher.ui.size() > 0)

@@ -485,7 +485,7 @@ void menu_colors_ui::handle()
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 	{
 		if ((FPTR)menu_event->itemref != MUI_RESTORE)
-			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(FPTR)menu_event->itemref].color, item[selected].text);
+			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(FPTR)menu_event->itemref].color, get_selection_item()->text);
 		else
 		{
 			changed = true;
@@ -1043,7 +1043,7 @@ void menu_palette_sel::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			m_original = rgb_t((UINT32)strtoul(item[selected].subtext.c_str(), nullptr, 16));
+			m_original = rgb_t((UINT32)strtoul(get_selection_item()->subtext.c_str(), nullptr, 16));
 			reset_parent(reset_options::SELECT_FIRST);
 			stack_pop();
 		}
@@ -1137,12 +1137,9 @@ void menu_palette_sel::draw(UINT32 flags)
 	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
-	// determine the first visible line based on the current selection
-	int top_line = selected - visible_lines / 2;
-	if (top_line < 0)
-		top_line = 0;
-	if (top_line + visible_lines >= item.size())
-		top_line = item.size() - visible_lines;
+	// determine the first visible line based on the current selection (this theoretically
+	// should be unnecessary; leaving in for now)
+	set_selection(get_selection());
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
@@ -1164,7 +1161,7 @@ void menu_palette_sel::draw(UINT32 flags)
 	for (linenum = 0; linenum < visible_lines; linenum++)
 	{
 		float line_y = visible_top + (float)linenum * line_height;
-		itemnum = top_line + linenum;
+		itemnum = get_top_line() + linenum;
 		const menu_item &pitem = item[itemnum];
 		const char *itemtext = pitem.text.c_str();
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -1177,7 +1174,7 @@ void menu_palette_sel::draw(UINT32 flags)
 			hover = itemnum;
 
 		// if we're selected, draw with a different background
-		if (itemnum == selected)
+		if (itemnum == get_selection())
 		{
 			fgcolor = UI_SELECTED_COLOR;
 			bgcolor = UI_SELECTED_BG_COLOR;
@@ -1195,7 +1192,7 @@ void menu_palette_sel::draw(UINT32 flags)
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 
 		// if we're on the top line, display the up arrow
-		if (linenum == 0 && top_line != 0)
+		if (linenum == 0 && get_top_line() != 0)
 		{
 			draw_arrow(
 				0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
@@ -1253,7 +1250,7 @@ void menu_palette_sel::draw(UINT32 flags)
 	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_visible_items = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
+	m_visible_items = visible_lines - (get_top_line() != 0) - (get_top_line() + visible_lines != item.size());
 }
 
 } // namespace ui

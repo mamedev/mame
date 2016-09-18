@@ -90,7 +90,7 @@ void menu_directory::handle()
 	const event *menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		menu::stack_push<menu_display_actual>(ui(), container(), selected);
+		menu::stack_push<menu_display_actual>(ui(), container(), get_selection());
 }
 
 //-------------------------------------------------
@@ -401,7 +401,7 @@ void menu_add_change_folder::handle()
 			// check for entries which matches our search buffer
 			if (update_selected)
 			{
-				const int cur_selected = selected;
+				const int cur_selected = get_selection();
 				int entry, bestmatch = 0;
 
 				// from current item to the end
@@ -418,7 +418,7 @@ void menu_add_change_folder::handle()
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected = entry;
+							set_selection(entry);
 						}
 					}
 
@@ -437,11 +437,10 @@ void menu_add_change_folder::handle()
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected = entry;
+							set_selection(entry);
 						}
 					}
 				}
-				centre_selection();
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_CANCEL)
@@ -594,7 +593,7 @@ void menu_remove_folder::handle()
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 	{
 		std::string tmppath, error_string;
-		m_folders.erase(m_folders.begin() + selected);
+		m_folders.erase(m_folders.begin() + get_selection());
 		for (int x = 0; x < m_folders.size(); ++x)
 		{
 			tmppath.append(m_folders[x]);
