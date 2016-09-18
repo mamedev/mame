@@ -13,11 +13,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
-		m_pic1(*this, "mb:pic8259_slave")
+		m_pic1(*this, "mb:pic8259_slave"),
+		m_vga(*this, "vga")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<pic8259_device> m_pic1;
+	required_device<vga_device> m_vga;
 
 	DECLARE_READ8_MEMBER(sysctl_r);
 	DECLARE_WRITE8_MEMBER(sysctl_w);
@@ -27,6 +29,8 @@ public:
 	DECLARE_READ8_MEMBER(unk3_r);
 	DECLARE_READ8_MEMBER(pad_r);
 	DECLARE_WRITE8_MEMBER(pad_w);
+	DECLARE_READ8_MEMBER(vga_r);
+	DECLARE_WRITE8_MEMBER(vga_w);
 protected:
 	void machine_reset() override;
 private:
@@ -34,6 +38,8 @@ private:
 	UINT8 m_unkidx;
 	UINT8 m_unk[16];
 	UINT8 m_pad[4];
+	UINT8 m_crtcidx;
+	UINT8 m_gfxidx;
 };
 
 void vis_state::machine_reset()
@@ -88,6 +94,45 @@ WRITE8_MEMBER(vis_state::pad_w)
 	m_pad[offset] = data;
 }
 
+READ8_MEMBER(vis_state::vga_r)
+{
+	if(offset < 0x10)
+		return m_vga->port_03b0_r(space, offset, mem_mask);
+	else if(offset < 0x20)
+		return m_vga->port_03c0_r(space, offset - 0x10, mem_mask);
+	else
+		return m_vga->port_03d0_r(space, offset - 0x20, mem_mask);
+}
+
+WRITE8_MEMBER(vis_state::vga_w)
+{
+	switch(offset)
+	{
+		case 0x1e:
+			m_gfxidx = data;
+			break;
+		case 0x1f:
+			if(m_gfxidx == 0x05)
+				data |= 0x40;
+			break;
+		case 0x04:
+		case 0x24:
+			m_crtcidx = data;
+			break;
+		case 0x05:
+		case 0x25:
+			if(m_crtcidx == 0x14)
+				data |= 0x40;
+			break;
+	}
+	if(offset < 0x10)
+		m_vga->port_03b0_w(space, offset, data, mem_mask);
+	else if(offset < 0x20)
+		m_vga->port_03c0_w(space, offset - 0x10, data, mem_mask);
+	else
+		m_vga->port_03d0_w(space, offset - 0x20, data, mem_mask);
+}
+
 READ8_MEMBER(vis_state::sysctl_r)
 {
 	return m_sysctl;
@@ -104,6 +149,7 @@ WRITE8_MEMBER(vis_state::sysctl_w)
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, vis_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x09ffff) AM_RAM
+	AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffff)
 	AM_RANGE(0x0d8000, 0x0fffff) AM_ROM AM_REGION("bios", 0xd8000)
 	AM_RANGE(0x100000, 0x15ffff) AM_RAM
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("bios", 0)
@@ -118,6 +164,7 @@ static ADDRESS_MAP_START( at16_io, AS_IO, 16, vis_state )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
 	AM_RANGE(0x023c, 0x023f) AM_READWRITE8(pad_r, pad_w, 0xffff)
 	AM_RANGE(0x031a, 0x031b) AM_READ8(unk3_r, 0x00ff)
+	AM_RANGE(0x03b0, 0x03df) AM_READWRITE8(vga_r, vga_w, 0xffff)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( vis, vis_state )
@@ -130,8 +177,8 @@ static MACHINE_CONFIG_START( vis, vis_state )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus","vga", pc_isa16_cards, "clgd542x", true)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","mcd", pc_isa16_cards, "mcd", true)
+	MCFG_FRAGMENT_ADD(pcvideo_vga)
 MACHINE_CONFIG_END
 
 ROM_START(vis)
