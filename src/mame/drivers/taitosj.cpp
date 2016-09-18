@@ -186,7 +186,6 @@ WRITE8_MEMBER(taitosj_state::sound_command_w)
 {
 	m_sound_cmd_written = true;
 	m_soundlatch->write(space,0,data);
-	// figure out NMI State
 	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else

@@ -62,7 +62,7 @@ public:
 	UINT8 m_spacecr_prot_value;
 	UINT8 m_protection_value;
 	UINT32 m_address;
-	bool m_sndnmi_disable; // AKA "CIOB0" on schematic
+	bool m_sndnmi_disable; // AKA "CIOB0" on schematic, bit 0 of AY-3-8910 @ IC50 Port B
 	bool m_sound_cmd_written;  // 74ls74 1/2 @ GAME BOARD IC42
 	bool m_sound_semaphore;  // 74ls74 2/2 @ GAME BOARD IC42
 	bitmap_ind16 m_layer_bitmap[3];
