@@ -14168,8 +14168,10 @@ fxmcr165                        // Gakken
 gjackpot                        // Gakken
 gpoker                          // Gakken
 h2hbaseb                        // Coleco
+h2hboxing                       // Coleco
 h2hfootb                        // Coleco
 lostreas                        // Parker Bros
+matchnum                        // A-One
 mathmagi                        // APF
 mdndclab                        // Mattel
 merlin                          // Parker Bros
@@ -14183,11 +14185,12 @@ ssimon                          // Milton Bradley
 ssports4                        // US Games
 starwbc                         // Kenner
 starwbcp                        // Kenner (patent)
-stopthie                        // Parker Bros
-stopthiep                       // Parker Bros (patent)
+stopthief                       // Parker Bros
+stopthiefp                      // Parker Bros (patent)
 tandy12                         // Tandy Radio Shack
 tbreakup                        // Tomy
 tc4                             // Coleco
+tcfball                         // Tandy Radio Shack
 zodiac                          // Coleco
 
 @source:hh_ucom4.cpp
