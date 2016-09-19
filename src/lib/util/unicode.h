@@ -90,6 +90,12 @@ typedef UINT32 unicode_char;
 // tests to see if a unicode char is a valid code point
 bool uchar_isvalid(unicode_char uchar);
 
+// tests to see if a unicode char is printable
+bool uchar_is_printable(unicode_char uchar);
+
+// tests to see if a unicode char is a digit
+bool uchar_is_digit(unicode_char uchar);
+
 // converting strings to 32-bit Unicode chars
 int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count);
 int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t count);

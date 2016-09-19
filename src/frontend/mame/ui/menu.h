@@ -138,31 +138,6 @@ protected:
 		int                 iptkey;     // one of the IPT_* values from inptport.h
 		unicode_char        unichar;    // unicode character if iptkey == IPT_SPECIAL
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
-
-		bool is_char_printable() const
-		{
-			return
-				!(0x0001f >= unichar) &&                            // C0 control
-				!((0x0007f <= unichar) && (0x0009f >= unichar)) &&  // DEL and C1 control
-				!((0x0fdd0 <= unichar) && (0x0fddf >= unichar)) &&  // noncharacters
-				!(0x0fffe == (unichar & 0x0ffff)) &&                // byte-order detection noncharacter
-				!(0x0ffff == (unichar & 0x0ffff));                  // the other noncharacter
-		}
-
-		template <std::size_t N>
-		bool append_char(char (&buffer)[N], std::size_t offset) const
-		{
-			auto const chlen = utf8_from_uchar(&buffer[offset], N - offset - 1, unichar);
-			if (0 < chlen)
-			{
-				buffer[offset + chlen] = '\0';
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
 	};
 
 	int top_line;           // main box top line

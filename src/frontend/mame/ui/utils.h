@@ -244,7 +244,7 @@ std::vector<std::string> tokenize(const std::string &text, char sep);
 //-------------------------------------------------
 
 template <typename F>
-bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
+bool input_character(std::string &buffer, std::size_t size, unicode_char unichar, F &&filter)
 {
 	bool result = false;
 	auto buflen = buffer.size();
@@ -260,13 +260,25 @@ bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
 			result = true;
 		}
 	}
-	else if ((unichar >= ' ') && filter(unichar))
+	else if ((unichar >= ' ') && (size == ~0 || buffer.size() < size) && filter(unichar))
 	{
 		// append this character
 		buffer += utf8_from_uchar(unichar);
 		result = true;
 	}
 	return result;
+}
+
+
+//-------------------------------------------------
+//  input_character - inputs a typed character
+//  into a buffer
+//-------------------------------------------------
+
+template <typename F>
+bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
+{
+	return input_character(buffer, ~0, unichar, filter);
 }
 
 
