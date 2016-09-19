@@ -187,7 +187,7 @@ public:
 	DECLARE_WRITE8_MEMBER(set_gromlines) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
-	bool is_grom_idle();
+	bool is_grom_idle() override;
 
 protected:
 	virtual void device_start() override;
@@ -224,7 +224,7 @@ public:
 	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
 
-	bool is_grom_idle();
+	bool is_grom_idle() override;
 
 protected:
 	virtual void device_start() override;
@@ -264,7 +264,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
 
 	// We may have a cartridge plugged into the GK
-	bool is_grom_idle();
+	bool is_grom_idle() override;
 
 protected:
 	virtual void device_start() override;
