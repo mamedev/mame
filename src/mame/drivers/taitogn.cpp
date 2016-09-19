@@ -1095,7 +1095,7 @@ GAME( 2000, zokuoten, coh3002t, coh3002t,    coh3002t,    taitogn_state, coh3002
 GAME( 2004, zooo,     coh3002t, coh3002t,    coh3002t,    taitogn_state, coh3002t_nz, ROT0,   "Success", "Zooo (V2.01J)", 0 )
 
 GAME( 1999, mahjngoh, coh3002t, coh3002t_mp, coh3002t_mp, driver_device, 0,           ROT0,   "Warashi / Mahjong Kobo / Taito", "Mahjong Oh (V2.06J)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, usagi,    coh3002t, coh3002t_mp, coh3002t_mp, driver_device, 0,           ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi (V2.02J)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, usagi,    coh3002t, coh3002t_mp, coh3002t_mp, driver_device, 0,           ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi (V2.02J)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // missing transparencies, see MT #06258
 GAME( 2000, soutenry, coh3002t, coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Warashi", "Soutenryu (V2.07J)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, shanghss, coh3002t, coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, shangtou, coh3002t, coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Warashi / Sunsoft / Taito", "Shanghai Sangokuhai Tougi (Ver 2.01J)", MACHINE_IMPERFECT_SOUND )
