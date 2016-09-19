@@ -121,6 +121,8 @@ Its BIOS performs POST and halts as there's no keyboard.
 #include "machine/pit8253.h"
 #include "sound/speaker.h"
 #include "machine/octo_kbd.h"
+#include "machine/bankdev.h"
+#include "machine/ram.h"
 
 class octopus_state : public driver_device
 {
@@ -143,9 +145,12 @@ public:
 		m_kb_uart(*this, "keyboard"),
 		m_pit(*this, "pit"),
 		m_speaker(*this, "speaker"),
+		m_z80_bankdev(*this, "z80_bank"),
+		m_ram(*this, "main_ram"),
 		m_current_dma(-1),
 		m_speaker_active(false),
-		m_beep_active(false)
+		m_beep_active(false),
+		m_z80_active(false)
 		{ }
 
 	virtual void machine_reset() override;
@@ -169,6 +174,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gpo_w);
 	DECLARE_READ8_MEMBER(vidcontrol_r);
 	DECLARE_WRITE8_MEMBER(vidcontrol_w);
+	DECLARE_READ8_MEMBER(z80_io_r);
+	DECLARE_WRITE8_MEMBER(z80_io_w);
+	IRQ_CALLBACK_MEMBER(x86_irq_cb);
 
 	DECLARE_WRITE_LINE_MEMBER(spk_w);
 	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
@@ -208,6 +216,8 @@ private:
 	required_device<i8251_device> m_kb_uart;
 	required_device<pit8253_device> m_pit;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<address_map_bank_device> m_z80_bankdev;
+	required_device<ram_device> m_ram;
 	
 	UINT8 m_hd_bank;  // HD bank select
 	UINT8 m_fd_bank;  // Floppy bank select
@@ -220,14 +230,14 @@ private:
 	bool m_speaker_active;
 	bool m_beep_active;
 	bool m_speaker_level;
+	bool m_z80_active;
 	
 	emu_timer* m_timer_beep;
 };
 
 
 static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+	AM_RANGE(0x00000, 0x1ffff) AM_RAMBANK("main_ram_bank")
 	// second 128kB for 256kB system
 	// expansion RAM, up to 512kB extra
 	AM_RANGE(0x20000, 0xcffff) AM_NOP
@@ -268,11 +278,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( octopus_sub_mem, AS_PROGRAM, 8, octopus_state )
-	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("z80_bank", address_map_bank_device, read8, write8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( octopus_sub_io, AS_IO, 8, octopus_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( octopus_vram, AS_0, 8, octopus_state )
@@ -360,6 +371,7 @@ WRITE8_MEMBER(octopus_state::bank_sel_w)
 		break;
 	case 2:
 		m_z80_bank = data;
+		m_z80_bankdev->set_bank(m_z80_bank & 0x0f);
 		logerror("Z80/RAM bank = %i\n",data);
 		break;
 	}
@@ -373,7 +385,15 @@ WRITE8_MEMBER(octopus_state::bank_sel_w)
 // 0x28: write: Z80 enable
 WRITE8_MEMBER(octopus_state::system_w)
 {
-	logerror("SYS: System control offset %i data %02x\n",offset,data);
+	logerror("SYS: System control offset %i data %02x\n",offset+1,data);
+	switch(offset)
+	{
+	case 7:  // enable Z80, halt 8088
+		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_z80_active = true;
+		break;
+	}
 }
 
 READ8_MEMBER(octopus_state::system_r)
@@ -385,6 +405,20 @@ READ8_MEMBER(octopus_state::system_r)
 	}
 	
 	return 0xff;
+}
+
+// Any I/O cycle relinquishes control of the bus
+READ8_MEMBER(octopus_state::z80_io_r)
+{
+	z80_io_w(space,offset,0);
+	return 0x00;
+}
+
+WRITE8_MEMBER(octopus_state::z80_io_w)
+{
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_z80_active = false;
 }
 
 // RTC/FDC control - PPI port B
@@ -509,16 +543,32 @@ WRITE_LINE_MEMBER( octopus_state::dma_hrq_changed )
 	m_dma2->hack_w(state);
 }
 
+// Any interrupt will also give bus control back to the 8088
+IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
+{
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_z80_active = false;
+	return m_pic1->inta_cb(device,irqline);
+}
+
 void octopus_state::machine_start()
 {
 	m_timer_beep = timer_alloc(BEEP_TIMER);
+	
+	// install extra RAM
+	if(m_ram->size() > 0x20000)
+		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"extra_ram_bank");
 }
 
 void octopus_state::machine_reset()
 {
-	m_subcpu->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);  // halt Z80 to start with
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);  // halt Z80 to start with
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_z80_active = false;
 	m_current_dma = -1;
 	m_current_drive = 0;
+	membank("main_ram_bank")->set_base(m_ram->pointer());
 }
 
 void octopus_state::video_start()
@@ -558,7 +608,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24MHz / 3)  // 8MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_mem)
 	MCFG_CPU_IO_MAP(octopus_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_master", pic8259_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(octopus_state, x86_irq_cb)
 
 	MCFG_CPU_ADD("subcpu",Z80, XTAL_24MHz / 4) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_sub_mem)
@@ -631,8 +681,8 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(2457500)  // DART channel A
-	MCFG_PIT8253_CLK1(2457500)  // DART channel B
+	MCFG_PIT8253_CLK0(500)  // DART channel A
+	MCFG_PIT8253_CLK1(500)  // DART channel B
 	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(octopus_state,spk_freq_w))
 	
@@ -661,6 +711,16 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, octopus_vram)
+
+	MCFG_DEVICE_ADD("z80_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(octopus_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+
+	MCFG_RAM_ADD("main_ram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("256K")
 
 MACHINE_CONFIG_END
 
