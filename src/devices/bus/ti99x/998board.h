@@ -505,17 +505,15 @@ private:
 	required_device<amigo_device>    m_amigo;
 	required_device<oso_device>       m_oso;
 
+	// More devices
+	required_device<tms9928a_device>        m_video;
+	required_device<sn76496_base_device>    m_sound;
+	required_device<cd2501ecd_device>       m_speech;
+	required_device<gromport_device>        m_gromport;
+	required_device<peribox_device>         m_peb;
+
 	// Debugging
 	line_state m_last_ready;
-
-	// Video processor
-	tms9118_device* m_video;
-
-	// Sound generator
-	sn76496_base_device* m_sound;
-
-	// Speech processor
-	cd2501ecd_device* m_speech;
 
 	// System GROM library
 	tmc0430_device* m_sgrom[3];
@@ -529,11 +527,11 @@ private:
 	// Pascal 3 GROM library
 	tmc0430_device* m_p3grom[3];
 
-	// Gromport (cartridge port)
-	gromport_device* m_gromport;
-
-	// Peripheral box
-	peribox_device* m_peb;
+	// Idle flags for GROMs
+	bool m_sgrom_idle;
+	bool m_tsgrom_idle;
+	bool m_p8grom_idle;
+	bool m_p3grom_idle;
 
 	// Memory
 	std::unique_ptr<UINT8[]>    m_sram;

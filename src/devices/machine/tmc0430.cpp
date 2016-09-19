@@ -211,7 +211,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
 	if ((m_current_clock_level==CLEAR_LINE) || (oldlevel==ASSERT_LINE))
 		return;
 
-	if (TRACE_CLOCK) logerror("GROMCLK in, phase=%d, m_add=%d\n", m_phase, m_address);
+	if (TRACE_CLOCK) logerror("GROMCLK in, phase=%d, m_add=%04x\n", m_phase, m_address);
 
 	switch (m_phase)
 	{

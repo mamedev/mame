@@ -87,7 +87,8 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
 	m_ram16b(nullptr),
 	m_use32k(false),
 	m_base32k(0),
-	m_console_groms_present(false)
+	m_console_groms_present(false),
+	m_grom_idle(true)
 	{ }
 
 #define TRACE_READY 0
@@ -119,6 +120,7 @@ void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *val
 			}
 			// GROMport (GROMs)
 			m_gromport->readz(space, addr, value);
+			m_grom_idle = false;
 		}
 
 		// Video
@@ -149,6 +151,7 @@ void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 val
 		}
 		// GROMport
 		m_gromport->write(space, addr, value);
+		m_grom_idle = false;
 	}
 
 	// Cartridge port and sound
@@ -189,6 +192,8 @@ void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
 	int lines = (m_dbin==ASSERT_LINE)? 1 : 0;
 	if (a14==ASSERT_LINE) lines |= 2;
 	line_state select = isgrom? ASSERT_LINE : CLEAR_LINE;
+
+	if (select) m_grom_idle = false;
 
 	if (m_console_groms_present)
 		for (int i=0; i < 3; i++)
@@ -519,14 +524,23 @@ WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
 	ready_join();
 }
 
+/* Called from VDP via console. */
 WRITE_LINE_MEMBER( ti99_datamux_device::gromclk_in )
 {
+	// Don't propagate the clock in idle phase
+	if (m_grom_idle) return;
+
 	// Propagate to the GROMs
 	if (m_console_groms_present)
 	{
 		for (int i=0; i < 3; i++) m_grom[i]->gclock_in(state);
+		m_grom_idle = m_grom[0]->idle();
 	}
 	m_gromport->gclock_in(state);
+
+	// Only ask the gromport when we don't have GROMs in the console
+	if (!m_console_groms_present)
+		m_grom_idle = m_gromport->is_grom_idle();
 }
 
 /***************************************************************************
