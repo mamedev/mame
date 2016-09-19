@@ -989,6 +989,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 #endif
 
+// TODO: Fix shift led for mp68a correctly, workaround doesn't work anymore! Shift works though...
 TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 {
 	//  LOG(("--->%s()\n", FUNCNAME));
