@@ -244,9 +244,8 @@ static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xe0000, 0xe3fff) AM_NOP
 	AM_RANGE(0xe4000, 0xe5fff) AM_RAM AM_SHARE("fram")
-	AM_RANGE(0xe6000, 0xf3fff) AM_NOP
-	AM_RANGE(0xf4000, 0xf5fff) AM_ROM AM_REGION("chargen",0)
-	AM_RANGE(0xf6000, 0xfbfff) AM_NOP
+	AM_RANGE(0xe6000, 0xe7fff) AM_ROM AM_REGION("chargen",0)
+	AM_RANGE(0xe8000, 0xfbfff) AM_NOP
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
