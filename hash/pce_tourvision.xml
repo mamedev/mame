@@ -128,7 +128,7 @@
 
 	<!--Barunba -->
 	<software name="barunba">
-		<description>Barnuba (Tourvision PCE bootleg)</description>
+		<description>Barunba (Tourvision PCE bootleg)</description>
 		<year>1989</year>
 		<publisher>bootleg (Tourvision) / Zap / Namcot</publisher>
 		<part name="cart" interface="tourvision_cart">
