@@ -704,17 +704,18 @@ static void cps2_decrypt(running_machine &machine, UINT16 *rom, UINT16 *dec, int
 
 
 		// decrypt the opcodes
-		for (a = i; a < length/2 && a < upper_limit/2; a += 0x10000)
+		for (a = i; a < length/2; a += 0x10000)
 		{
-			dec[a] = feistel(rom[a], fn2_groupA, fn2_groupB,
-				&sboxes2[0*4], &sboxes2[1*4], &sboxes2[2*4], &sboxes2[3*4],
-				key2[0], key2[1], key2[2], key2[3]);
-		}
-		// copy the unencrypted part
-		while (a < length/2)
-		{
-			dec[a] = rom[a];
-			a += 0x10000;
+			if (a >= lower_limit && a <= upper_limit)
+			{
+				dec[a] = feistel(rom[a], fn2_groupA, fn2_groupB,
+					&sboxes2[0 * 4], &sboxes2[1 * 4], &sboxes2[2 * 4], &sboxes2[3 * 4],
+					key2[0], key2[1], key2[2], key2[3]);
+			}
+			else
+			{
+				dec[a] = rom[a];
+			}
 		}
 	}
 }
@@ -774,18 +775,18 @@ DRIVER_INIT_MEMBER(cps_state,cps2crypt)
 		{
 			// On a dead board, the only encrypted range is actually FF0000-FFFFFF.
 			// It doesn't start from 0, and it's the upper half of a 128kB bank.
-			upper = 0xffffffff;
+			upper = 0xffffff;
 			lower = 0xff0000;
 		}
 		else
 		{
-			// This matches two thirds of the old values 
-			upper = (((decoded[9] ^ 0x3f0) << 14) | 0x3ffff) + 1;
+			upper = (((~decoded[9] & 0x3ff) << 14) | 0x3fff) + 1;
 			lower = 0;
 		}
 
+		logerror("cps2 decrypt 0x%08x,0x%08x,0x%08x,0x%08x\n", key[0], key[1], lower, upper);
+
 		// we have a proper key so use it to decrypt
-		if (lower != 0xff0000) // don't run the decrypt on 'dead key' games for now
-			cps2_decrypt(machine(), (UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, memregion("maincpu")->bytes(), key, lower, upper);
+		cps2_decrypt(machine(), (UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, memregion("maincpu")->bytes(), key, lower / 2, upper / 2);
 	}
 }
