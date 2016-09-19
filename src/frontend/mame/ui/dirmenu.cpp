@@ -398,7 +398,7 @@ void menu_add_change_folder::handle()
 					if (item[entry].ref != nullptr && !m_search.empty())
 					{
 						int match = 0;
-						for (int i = 0; i < m_search.size(); i++)
+						for (int i = 0; i < m_search.size() + 1; i++)
 						{
 							if (core_strnicmp(item[entry].text.c_str(), m_search.data(), i) == 0)
 								match = i;
@@ -417,7 +417,7 @@ void menu_add_change_folder::handle()
 					if (item[entry].ref != nullptr && !m_search.empty())
 					{
 						int match = 0;
-						for (int i = 0; i < m_search.size(); i++)
+						for (int i = 0; i < m_search.size() + 1; i++)
 						{
 							if (core_strnicmp(item[entry].text.c_str(), m_search.data(), i) == 0)
 								match = i;
