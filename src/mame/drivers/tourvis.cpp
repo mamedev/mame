@@ -24,6 +24,7 @@
   * Ankoku Densetu (Legendary Axe II)
     Armed-F (?)
     Ballistix (186)
+    Barunba (39)
   * Batman
     Be Ball (93)
   * Blodia
@@ -64,7 +65,7 @@
     Kato & Ken (42)
     Kiki Kaikai (120)
     Legend Of Hero Tomna (56)
-    Makyo Densetsu - The Legenary Axe (?)
+    Makyo Densetsu - The Legenary Axe (40)
     Mesopotamia (197)
     Mizubaku Daibouken Liquid Kids (10) (marketed as "Parasol Stars II")
     Mr. Heli (23)
@@ -83,6 +84,7 @@
   * Power Golf
     Power League IV (?)
     Power Sports (199)
+    Power Tennis (183)
     Pro Yakyuu World Stadium '91 (192)
     Psycho Chaser (14)
     Puzzle Boy (57)
@@ -106,7 +108,7 @@
     Tatsujin (31)
     Terra Cresta II (27)
     The NewZealand Story (11)
-    Thunder Blade (?)
+    Thunder Blade (34)
   * Tiger Road
   * Titan
     Toy Shop Boys (51)
