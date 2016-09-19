@@ -298,6 +298,7 @@ void overdriv_state::machine_start()
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_zoom_colorbase));
 	save_item(NAME(m_road_colorbase));
+	save_item(NAME(m_fake_timer));
 }
 
 void overdriv_state::machine_reset()
