@@ -500,8 +500,17 @@ void menu::set_selection(void *selected_itemref)
 void menu::set_selection(int new_selection)
 {
 	selected = new_selection;
+	check_top_line();
+}
 
-	// if the newly selected position is not within the current window, move top_line
+
+//-------------------------------------------------
+//  check_top_line - if the newly selected position
+//	is not within the current window, move top_line
+//-------------------------------------------------
+
+void menu::check_top_line()
+{
 	if (!is_selection_visible())
 		set_top_line(selected - calculate_visible_lines() / 2);
 }
@@ -1188,7 +1197,10 @@ void menu::validate_selection(int scandir)
 void menu::do_handle()
 {
 	if (item.size() < 2)
+	{
 		populate();
+		check_top_line();
+	}
 	handle();
 }
 

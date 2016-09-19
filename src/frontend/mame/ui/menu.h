@@ -211,7 +211,6 @@ protected:
 
 	// accessor for top_line
 	int get_top_line() const { return top_line; }
-	int calculate_visible_lines() const;
 
 	// test if the given key is pressed and we haven't already reported a key
 	bool exclusive_input_pressed(int &iptkey, int key, int repeat);
@@ -321,6 +320,8 @@ private:
 	bool first_item_visible() const { return top_line <= 0; }
 	bool last_item_visible() const { return (top_line + m_visible_lines) >= item.size(); }
 	bool is_selection_visible() const;
+	int calculate_visible_lines() const;
+	void check_top_line();
 
 	// if selection is no longer visible, adjust top_line
 	void set_top_line(int new_top_line);
