@@ -76,6 +76,7 @@ DRIVER_INIT_MEMBER(stfight_state,cshooter)
 void stfight_state::machine_start()
 {
 	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("mainbank")->set_entry(0);
 
 	save_item(NAME(m_fm_data));
 	save_item(NAME(m_cpu_to_mcu_data));
