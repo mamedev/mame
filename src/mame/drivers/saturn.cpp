@@ -591,12 +591,67 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	memcpy(data, init, sizeof(init));
 }
 
+void saturn_state::debug_scuirq_command(int ref, int params, const char **param)
+{
+	debugger_console con = machine().debugger().console();
+	const char *const irqnames[16] = {
+		"VBlank-in", "VBlank-out", "HBlank-in", "Timer 0", "Timer 1", "SCU DSP end", "Sound request", "SMPC", "Pad", "DMA lv 2", "DMA lv 1", "DMA lv 0", "DMA illegal", "VDP1 end", "A-Bus" };
+
+
+	for(int irq_lv = 0;irq_lv<16;irq_lv++)
+		con.printf("%s irq enabled: %s\n",irqnames[irq_lv],(m_scu.ism & (1 << irq_lv)) == 0 ? "1" : "0");
+}
+
+void saturn_state::debug_scudma_command(int ref, int params, const char **param)
+{
+	debugger_console con = machine().debugger().console();
+
+	for(int ch=0;ch<3;ch++)
+	{
+		con.printf("DMA LV%02d: src = %08x dst = %08x size = %08x\n",ch,m_scu.src[ch],m_scu.dst[ch],m_scu.size[ch]);
+		con.printf("    adds: src = %08x dst = %08x\n",m_scu.src_add[ch],m_scu.dst_add[ch]);
+		con.printf("indirect: index = %08x\n",m_scu.index[ch]);
+		con.printf("  enable: mask = %08x start factor = %08x\n",m_scu.enable_mask[ch],m_scu.start_factor[ch]);
+	}
+}
+
+void saturn_state::debug_help_command(int ref, int params, const char **param)
+{
+	debugger_console con = machine().debugger().console();
+
+	con.printf("Available Saturn commands:\n");
+	con.printf("   saturn scudma -- pretty prints current state of SCU DMA registers\n");
+	con.printf("   saturn scuirq -- pretty prints current state of SCU IRQ registers\n");
+	con.printf("   saturn help -- this list\n");
+}
+
+
+void saturn_state::debug_commands(int ref, int params, const char **param)
+{
+	if (params < 1)
+		return;
+
+	if (strcmp("scudma", param[0]) == 0)
+		debug_scudma_command(ref, params - 1, param + 1);
+	else if(strcmp("scuirq", param[0]) == 0)
+		debug_scuirq_command(ref, params - 1, param + 1);
+	else if(strcmp("help", param[0]) == 0)
+		debug_help_command(ref, params - 1, param + 1);
+}
+
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
 	system_time systime;
 	machine().base_datetime(systime);
 
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		//printf("HI!\n");
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2, _3));
+	}
+	
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
