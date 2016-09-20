@@ -585,21 +585,23 @@ St.     Instr.       Comment
 /* jamtable disassembler */
 void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32 size) // 0xff000080 == fff00080
 {
+	debugger_cpu &cpu = machine().debugger().cpu();
+	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
 	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
 	{
-		machine().debugger().console().printf("Address is unmapped.\n");
+		con.printf("Address is unmapped.\n");
 		return;
 	}
 	while (1)
 	{
 		offs_t base = addr;
 
-		UINT32 opcode = space.read_byte(addr);
+		UINT32 opcode = cpu.read_byte(space, address, true);
 		addr++;
-		UINT32 op1 = space.read_dword_unaligned(addr);
+		UINT32 op1 = cpu.read_dword(space, address, true);
 		addr += 4;
-		UINT32 op2 = space.read_dword_unaligned(addr);
+		UINT32 op2 = cpu.read_dword(space, address, true);
 		addr += 4;
 
 		char sop1[16];
@@ -620,7 +622,7 @@ void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32
 			sprintf(sop1, "%08X", op1);
 			sprintf(pcrel, "%08X", base + 9 + op1);
 		}
-		machine().debugger().console().printf("%08X ", base);
+		con.printf("%08X ", base);
 		// dl=instr ebx=par1 eax=par2
 		switch (opcode)
 		{
@@ -635,39 +637,39 @@ void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32
 			// | | Reserved | Bus Number | Device Number | Function Number | Register Number |0|0|
 			// +-+----------+------------+---------------+-----------------+-----------------+-+-+
 			// 31 - Enable bit
-			machine().debugger().console().printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
+			con.printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x02:
-			machine().debugger().console().printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
+			con.printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x03:
-			machine().debugger().console().printf("POKE    MEM[%s]=%s\n", sop2, sop1);
+			con.printf("POKE    MEM[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x04:
-			machine().debugger().console().printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
+			con.printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
 			break;
 		case 0x05:
 			// out cf8,op2
 			// in acc,cfc
-			machine().debugger().console().printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
+			con.printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
 			break;
 		case 0x06:
-			machine().debugger().console().printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
+			con.printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
 			break;
 		case 0x07:
-			machine().debugger().console().printf("BRA     PC=%s\n", pcrel);
+			con.printf("BRA     PC=%s\n", pcrel);
 			break;
 		case 0x08:
-			machine().debugger().console().printf("INB     ACC=PORT[%s]\n", sop2);
+			con.printf("INB     ACC=PORT[%s]\n", sop2);
 			break;
 		case 0x09:
-			machine().debugger().console().printf("PEEK    ACC=MEM[%s]\n", sop2);
+			con.printf("PEEK    ACC=MEM[%s]\n", sop2);
 			break;
 		case 0xee:
-			machine().debugger().console().printf("END\n");
+			con.printf("END\n");
 			break;
 		default:
-			machine().debugger().console().printf("NOP     ????\n");
+			con.printf("NOP     ????\n");
 			break;
 		}
 		if (opcode == 0xee)
@@ -696,34 +698,35 @@ void chihiro_state::threadlist_command(int ref, int params, const char **param)
 {
 	const UINT32 thlists = 0x8003aae0; // magic address
 	address_space &space = m_maincpu->space();
-	debugger_console con = machine().debugger().console();
+	debugger_cpu &cpu = machine().debugger().cpu();
+	debugger_console &con = machine().debugger().console();
 
 	con.printf("Pri. _KTHREAD   Stack  Function\n");
 	con.printf("-------------------------------\n");
 	for (int pri=0;pri < 16;pri++)
 	{
 		UINT32 curr = thlists + pri * 8;
-		UINT32 next = machine().debugger().cpu().read_dword(space, curr, true);
+		UINT32 next = cpu.read_dword(space, curr, true);
 
 		while (next != curr)
 		{
 			UINT32 kthrd = next - 0x5c;
-			UINT32 topstack = machine().debugger().cpu().read_dword(space, kthrd + 0x1c, true);
-			UINT32 tlsdata = machine().debugger().cpu().read_dword(space, kthrd + 0x28, true);
+			UINT32 topstack = cpu.read_dword(space, kthrd + 0x1c, true);
+			UINT32 tlsdata = cpu.read_dword(space, kthrd + 0x28, true);
 			UINT32 function;
 			if (tlsdata == 0)
-				function = machine().debugger().cpu().read_dword(space, topstack - 0x210 - 8, true);
+				function = cpu.read_dword(space, topstack - 0x210 - 8, true);
 			else
-				function = machine().debugger().cpu().read_dword(space, tlsdata - 8, true);
+				function = cpu.read_dword(space, tlsdata - 8, true);
 			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
-			next = machine().debugger().cpu().read_dword(space, next, true);
+			next = cpu.read_dword(space, next, true);
 		}
 	}
 }
 
 void chihiro_state::chihiro_help_command(int ref, int params, const char **param)
 {
-	debugger_console con = machine().debugger().console();
+	debugger_console &con = machine().debugger().console();
 
 	con.printf("Available Chihiro commands:\n");
 	con.printf("  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
@@ -746,10 +749,10 @@ void chihiro_state::debug_commands(int ref, int params, const char **param)
 void chihiro_state::hack_eeprom()
 {
 	// 8003b744,3b744=0x90 0x90
-	m_maincpu->space(0).write_byte(0x3b744, 0x90);
-	m_maincpu->space(0).write_byte(0x3b745, 0x90);
-	m_maincpu->space(0).write_byte(0x3b766, 0xc9);
-	m_maincpu->space(0).write_byte(0x3b767, 0xc3);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b744, 0x90);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b745, 0x90);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b766, 0xc9);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b767, 0xc3);
 }
 
 #define HACK_ITEMS 5
