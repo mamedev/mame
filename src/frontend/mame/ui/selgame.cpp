@@ -397,7 +397,7 @@ void menu_select_game::handle()
 				}
 			}
 		}
-		else if (menu_event->iptkey == IPT_UI_EXPORT && !isfavorite())
+		else if (menu_event->iptkey == IPT_UI_EXPORT)
 		{
 			// handle UI_EXPORT
 			inkey_export();
@@ -1355,8 +1355,23 @@ void menu_select_game::inkey_export()
 	}
 	else
 	{
-		list = m_displaylist;
+		if (isfavorite())
+		{
+			// iterate over favorites
+			for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
+			{
+				if (favmap.second.startempty == 1)
+					list.push_back(favmap.second.driver);
+				else
+					return;
+			}
+		}
+		else
+		{
+			list = m_displaylist;
+		}
 	}
+
 	menu::stack_push<menu_export>(ui(), container(), std::move(list));
 }
 
