@@ -10,3 +10,4 @@ Advanced configuration
 	bgfx
 	hlsl
 	glsl
+	devicemap

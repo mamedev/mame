@@ -794,9 +794,10 @@ void input_seq::replace(input_code oldcode, input_code newcode)
 //  input_device - constructor
 //-------------------------------------------------
 
-input_device::input_device(input_class &_class, int devindex, const char *name, void *internal)
+input_device::input_device(input_class &_class, int devindex, const char *name, const char *id, void *internal)
 	: m_class(_class),
 		m_name(name),
+		m_id(id),
 		m_devindex(devindex),
 		m_maxitem(input_item_id(0)),
 		m_internal(internal),
@@ -941,6 +942,21 @@ void input_device::apply_steadykey() const
 		}
 }
 
+//-------------------------------------------------
+//  match_device_id - match device id via
+//  substring search
+//-------------------------------------------------
+
+bool input_device::match_device_id(const char *deviceid)
+{
+	std::string deviceidupper(deviceid);
+	std::string idupper(m_id);
+
+	strmakeupper(deviceidupper);
+	strmakeupper(idupper);
+
+	return std::string::npos == idupper.find(deviceidupper) ? false : true;
+}
 
 
 //**************************************************************************
@@ -968,7 +984,7 @@ input_class::input_class(input_manager &manager, input_device_class devclass, bo
 //  add_device - add a new input device
 //-------------------------------------------------
 
-input_device *input_class::add_device(const char *name, void *internal)
+input_device *input_class::add_device(const char *name, const char *id, void *internal)
 {
 	// find the next empty index
 	int devindex;
@@ -977,23 +993,28 @@ input_device *input_class::add_device(const char *name, void *internal)
 			break;
 
 	// call through
-	return add_device(devindex, name, internal);
+	return add_device(devindex, name, id, internal);
 }
 
-input_device *input_class::add_device(int devindex, const char *name, void *internal)
+input_device *input_class::add_device(int devindex, const char *name, const char *id, void *internal)
 {
 	assert_always(machine().phase() == MACHINE_PHASE_INIT, "Can only call input_class::add_device at init time!");
 	assert(name != nullptr);
+	assert(id != nullptr);
 	assert(devindex >= 0 && devindex < DEVICE_INDEX_MAXIMUM);
 	assert(m_device[devindex] == nullptr);
 
 	// allocate a new device
-	m_device[devindex] = std::make_unique<input_device>(*this, devindex, name, internal);
+	m_device[devindex] = std::make_unique<input_device>(*this, devindex, name, id, internal);
 
 	// update the maximum index found
 	m_maxindex = std::max(m_maxindex, devindex);
 
-	osd_printf_verbose("Input: Adding %s #%d: %s\n", (*devclass_string_table)[m_devclass], devindex, name);
+	if (0 == strlen(id))
+		osd_printf_verbose("Input: Adding %s #%d: %s\n", (*devclass_string_table)[m_devclass], devindex, name);
+	else
+		osd_printf_verbose("Input: Adding %s #%d: %s (device id: %s)\n", (*devclass_string_table)[m_devclass], devindex, name, id);
+
 	return m_device[devindex].get();
 }
 
@@ -1016,6 +1037,32 @@ input_item_class input_class::standard_item_class(input_item_id itemid)
 	// all other standard axes are absolute
 	else
 		return ITEM_CLASS_ABSOLUTE;
+}
+
+
+//-------------------------------------------------
+//  remap_device_index - remaps device index by
+//  mapping oldindex to newindex
+//-------------------------------------------------
+
+void input_class::remap_device_index(int oldindex, int newindex)
+{
+	assert(oldindex >= 0 && oldindex < DEVICE_INDEX_MAXIMUM);
+	assert(newindex >= 0 && newindex < DEVICE_INDEX_MAXIMUM);
+
+	// swap indexes in m_device array
+	m_device[oldindex].swap(m_device[newindex]);
+
+	// update device indexes
+	if (nullptr != m_device[oldindex].get())
+		m_device[oldindex]->set_devindex(oldindex);
+
+	if (nullptr != m_device[newindex].get())
+		m_device[newindex]->set_devindex(newindex);
+
+	// update the maximum index found, since newindex may
+	// exceed current m_maxindex
+	m_maxindex = std::max(m_maxindex, newindex);
 }
 
 
@@ -2056,6 +2103,72 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 			return;
 		str = strtemp + 1;
 	}
+}
+
+//-------------------------------------------------
+//  map_device_to_controller - map device to 
+//  controller based on device map table
+//-------------------------------------------------
+
+bool input_manager::map_device_to_controller(const devicemap_table_type *devicemap_table)
+{
+	if (nullptr == devicemap_table)
+		return true;
+
+	for (devicemap_table_type::const_iterator it = devicemap_table->begin(); it != devicemap_table->end(); it++)
+	{
+		const char *deviceid = it->first.c_str(); 
+		const char *controllername = it->second.c_str(); 
+
+		// tokenize the controller name into device class and index (i.e. controller name should be of the form "GUNCODE_1")
+		std::string token[2];
+		int numtokens;
+		const char *_token = controllername; 
+		for (numtokens = 0; numtokens < ARRAY_LENGTH(token); )
+		{
+			// make a token up to the next underscore
+			char *score = (char *)strchr(_token, '_');
+			token[numtokens++].assign(_token, (score == nullptr) ? strlen(_token) : (score - _token));
+
+			// if we hit the end, we're done, else advance our pointer
+			if (score == nullptr)
+				break;
+			_token = score + 1;
+		}
+		if (2 != numtokens)
+			return false;
+
+		// first token should be the devclass
+		input_device_class devclass = input_device_class((*devclass_token_table)[strmakeupper(token[0]).c_str()]);
+		if (devclass == ~input_device_class(0))
+			return false;
+
+		// second token should be the devindex
+		int devindex = 0;
+		if (1 != sscanf(token[1].c_str(), "%d", &devindex))
+			return false;
+		devindex--;
+
+		if (devindex >= DEVICE_INDEX_MAXIMUM)
+			return false;
+
+		// enumerate through devices and look for a match
+		input_class *input_devclass = m_class[devclass];
+		for (int devnum = 0; devnum <= input_devclass->maxindex(); devnum++)
+		{
+			input_device *device = input_devclass->device(devnum);
+			if (device != nullptr && device->match_device_id(deviceid))
+			{
+				// remap devindex
+				input_devclass->remap_device_index(device->devindex(), devindex);
+				osd_printf_verbose("Input: Remapped %s #%d: %s (device id: %s)\n", (*devclass_string_table)[input_devclass->devclass()], devindex, device->name(), device->id());
+
+				break;
+			}
+		}
+	}
+
+	return true;
 }
 
 

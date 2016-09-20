@@ -289,8 +289,8 @@ private:
 	HANDLE  m_handle;
 
 public:
-	rawinput_device(running_machine& machine, const char* name, input_device_class deviceclass, input_module& module)
-		: event_based_device(machine, name, deviceclass, module),
+	rawinput_device(running_machine& machine, const char *name, const char *id, input_device_class deviceclass, input_module& module)
+		: event_based_device(machine, name, id, deviceclass, module),
 			m_handle(nullptr)
 	{
 	}
@@ -308,8 +308,8 @@ class rawinput_keyboard_device : public rawinput_device
 public:
 	keyboard_state keyboard;
 
-	rawinput_keyboard_device(running_machine& machine, const char* name, input_module& module)
-		: rawinput_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
+	rawinput_keyboard_device(running_machine& machine, const char *name, const char *id, input_module& module)
+		: rawinput_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
 			keyboard({{0}})
 	{
 	}
@@ -344,8 +344,8 @@ private:
 public:
 	mouse_state          mouse;
 
-	rawinput_mouse_device(running_machine& machine, const char* name, input_module& module)
-		: rawinput_device(machine, name, DEVICE_CLASS_MOUSE, module),
+	rawinput_mouse_device(running_machine& machine, const char *name, const char *id, input_module& module)
+		: rawinput_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
 			mouse({0})
 	{
 	}
@@ -404,8 +404,8 @@ private:
 public:
 	mouse_state          lightgun;
 
-	rawinput_lightgun_device(running_machine& machine, const char* name, input_module& module)
-		: rawinput_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
+	rawinput_lightgun_device(running_machine& machine, const char *name, const char *id, input_module& module)
+		: rawinput_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module),
 		lightgun({0})
 	{
 	}
@@ -574,8 +574,11 @@ protected:
 
 		// convert name to utf8
 		std::string utf8_name = utf8_from_wstring(name.c_str());
+		
+		// set device id to raw input name
+		std::string utf8_id = utf8_from_wstring(tname.get());
 
-		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.c_str(), *this);
+		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.c_str(), utf8_id.c_str(), *this);
 
 		// Add the handle
 		devinfo->set_handle(rawinputdevice->hDevice);

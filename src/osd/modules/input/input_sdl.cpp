@@ -110,8 +110,8 @@ static int lookup_sdl_code(const char *scode)
 class sdl_device : public event_based_device<SDL_Event>
 {
 public:
-	sdl_device(running_machine &machine, const char* name, input_device_class devclass, input_module &module)
-		: event_based_device(machine, name, devclass, module)
+	sdl_device(running_machine &machine, const char *name, const char *id, input_device_class devclass, input_module &module)
+		: event_based_device(machine, name, id, devclass, module)
 	{
 	}
 
@@ -132,8 +132,8 @@ class sdl_keyboard_device : public sdl_device
 public:
 	keyboard_state keyboard;
 
-	sdl_keyboard_device(running_machine &machine, const char* name, input_module &module)
-		: sdl_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
+	sdl_keyboard_device(running_machine &machine, const char *name, const char *id, input_module &module)
+		: sdl_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
 		keyboard({{0}})
 	{
 	}
@@ -201,8 +201,8 @@ private:
 public:
 	mouse_state mouse;
 
-	sdl_mouse_device(running_machine &machine, const char* name, input_module &module)
-		: sdl_device(machine, name, DEVICE_CLASS_MOUSE, module),
+	sdl_mouse_device(running_machine &machine, const char *name, const char *id, input_module &module)
+		: sdl_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
 		last_x(0),
 		last_y(0),
 		mouse({0})
@@ -338,8 +338,8 @@ public:
 	sdl_joystick_state    joystick;
 	sdl_api_state         sdl_state;
 
-	sdl_joystick_device(running_machine &machine, const char *name, input_module &module)
-		: sdl_device(machine, name, DEVICE_CLASS_JOYSTICK, module),
+	sdl_joystick_device(running_machine &machine, const char *name, const char *id, input_module &module)
+		: sdl_device(machine, name, id, DEVICE_CLASS_JOYSTICK, module),
 			joystick({{0}}),
 			sdl_state({ nullptr })
 	{
@@ -419,8 +419,8 @@ public:
 class sdl_sixaxis_joystick_device : public sdl_joystick_device
 {
 public:
-	sdl_sixaxis_joystick_device(running_machine &machine, const char *name, input_module &module)
-		: sdl_joystick_device(machine, name, module)
+	sdl_sixaxis_joystick_device(running_machine &machine, const char *name, const char *id, input_module &module)
+		: sdl_joystick_device(machine, name, id, module)
 	{
 	}
 
@@ -536,7 +536,7 @@ public:
 		osd_printf_verbose("Keyboard: Start initialization\n");
 
 		// SDL only has 1 keyboard add it now
-		devinfo = devicelist()->create_device<sdl_keyboard_device>(machine, "System keyboard", *this);
+		devinfo = devicelist()->create_device<sdl_keyboard_device>(machine, "System keyboard", "System keyboard", *this);
 
 		// populate it
 		for (int keynum = 0; local_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
@@ -672,7 +672,7 @@ public:
 		osd_printf_verbose("Mouse: Start initialization\n");
 
 		// SDL currently only supports one mouse
-		devinfo = devicelist()->create_device<sdl_mouse_device>(machine, "System mouse", *this);
+		devinfo = devicelist()->create_device<sdl_mouse_device>(machine, "System mouse", "System mouse", *this);
 
 		// add the axes
 		devinfo->device()->add_item("X", ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &devinfo->mouse.lX);
@@ -890,16 +890,16 @@ private:
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
 				m_sixaxis_mode
-					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, *this)
-					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, *this);
+					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, tempname, *this)
+					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, tempname, *this);
 			}
 
 			return nullptr;
 		}
 
 		return m_sixaxis_mode
-			? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), *this)
-			: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), *this);
+			? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), devmap->map[index].name.c_str(), *this)
+			: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), devmap->map[index].name.c_str(), *this);
 	}
 };
 
