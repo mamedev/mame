@@ -78,9 +78,10 @@ struct imgtool_partition_features
 };
 
 /* ----- initialization and basics ----- */
-void imgtool_init(int omit_untested, void (*warning)(const char *message));
+void imgtool_init(bool omit_untested, void (*warning)(const char *message));
 void imgtool_exit(void);
 const imgtool_module *imgtool_find_module(const char *modulename);
+const imgtool::library::modulelist &imgtool_get_modules();
 imgtool_module_features imgtool_get_module_features(const imgtool_module *module);
 void imgtool_warn(const char *format, ...) ATTR_PRINTF(1,2);
 char *imgtool_basename(char *filename);

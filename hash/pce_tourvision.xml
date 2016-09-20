@@ -126,6 +126,20 @@
 	</software>
 
 
+	<!--Barunba -->
+	<software name="barunba">
+		<description>Barunba (Tourvision PCE bootleg)</description>
+		<year>1989</year>
+		<publisher>bootleg (Tourvision) / Zap / Namcot</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x80000 matches PCE barnuba -->
+				<rom name="barunba.bin" size="1048576" crc="1498678e" sha1="8a8e25617425dce2ad66a545b48652d307c91be0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<!--Be Ball -->
 	<software name="beballa">
 		<description>Be Ball (alt) (Tourvision PCE bootleg)</description>
@@ -808,6 +822,20 @@ Notes:
 			<dataarea name="rom" size="262144">
 		<!-- verified identical -->
 				<rom name="psycho chaser (japan).pce" size="262144" crc="03883ee8" sha1="753fc6f1aa16770c87cc12967a43e951a7b1ec83" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!--Power Tennis -->
+	<software name="ptennis" supported="partial">
+		<description>Power Tennis (Tourvision PCE bootleg)</description>
+		<year>1993</year>
+		<publisher>bootleg (Tourvision) / Hudson Soft</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x80000 matches PCE ptennis -->
+				<rom name="power_tennis.bin" size="1048576" crc="dd67515a" sha1="968b7066286ec6f055aa8a21c8e65439ebd9d7ad" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -35744,13 +35744,14 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 
-<!-- Interactive CD Sampler Discs
+<!-- Non-redump Interactive CD Sampler discs
 
-TODO: Check if these match the corresponding redump dumps.
+'Interactive CD Sampler Disc - Volume 01 (USA, M Rated)' and 'Interactive CD Sampler Disc - Volume 11 (USA)' have not been dumped for redump.org yet. 
+'Interactive CD Sampler Disc - Volume 06 (USA, EDC)' has EDC while the redump.org version does not; no other obvious differences.
 
 -->
 
-	<software name="intcdv1m">
+	<software name="icdsmp1m">
 		<!-- Unknown source
 		<rom name="interactive cd sampler volume 1.bin" size="690918816" crc="78449608" sha1="65b45f282b1762590440fbaabac75809a6cbef63"/>
 		<rom name="interactive cd sampler volume 1.cue" size="1759" crc="451bdd86" sha1="2b28ae23bb2c85d3edf4fa38ac17dbc6c13f8481"/>
@@ -35765,43 +35766,12 @@ TODO: Check if these match the corresponding redump dumps.
 		</part>
 	</software>
 
-	<software name="intcdv4">
-		<!-- Unknown source
-		<rom name="interactive cd sampler volume 4.bin" size="692118336" crc="a86f1ae5" sha1="3d66101541737d5167f6604b5709181317acbfb8"/>
-		<rom name="interactive cd sampler volume 4.cue" size="223" crc="d6b84c58" sha1="e2c383fc8b5c26ee92619d1adac760af0e48e634"/>
-		-->
-		<description>Interactive CD Sampler Disc - Volume 04 (USA)</description>
-		<year>1997</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc - volume 4" sha1="c558a684a28ccf6afe0d3fc166814539c75863f7"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="intcdv5">
-		<!-- Unknown source
-		<rom name="interactive cd sampler volume 5 (pbpx-95003).bin" size="508638816" crc="b5c82748" sha1="1f194024c3d9c772ed5a1e9dbdf5ff409c806fbb"/>
-		<rom name="interactive cd sampler volume 5 (pbpx-95003).cue" size="428" crc="1cd96880" sha1="75e7d01603849b1cf1d57d37b5600a9bce1d03f4"/>
-		-->
-		<description>Interactive CD Sampler Disc - Volume 05 (USA)</description>
-		<year>1997</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<info name="serial" value="PBPX-95003"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc - volume 5" sha1="f1ce1f4a942af852ee67f98c7d2a3c148d835abb"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="intcdv6">
+	<software name="icdsmp6a" cloneof="icdsmp6">
 		<!-- Unknown source
 		<rom name="interactive cd sampler volume 6 (pbpx-95004).bin" size="640614240" crc="db7b1f0f" sha1="2d25bce6b5d7218aa6dceff58badf26ccf5aeb39"/>
 		<rom name="interactive cd sampler volume 6 (pbpx-95004).cue" size="300" crc="1184abe8" sha1="194b4412dfcb2a4088a62c516616a1609512d14a"/>
 		-->
-		<description>Interactive CD Sampler Disc - Volume 06 (USA)</description>
+		<description>Interactive CD Sampler Disc 6 (USA, EDC)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="PBPX-95004"/>
@@ -35812,68 +35782,7 @@ TODO: Check if these match the corresponding redump dumps.
 		</part>
 	</software>
 
-	<software name="intcdv7">
-		<!-- Unknown source
-		<rom name="interactive cd sampler volume 7.bin" size="733160736" crc="ce24e9a1" sha1="7c549f0187da1c1f870973da8492d4d237070326"/>
-		<rom name="interactive cd sampler volume 7.cue" size="415" crc="69fba598" sha1="7eb50623c569f453e83b413a7988d95e55a8c58c"/>
-		-->
-		<description>Interactive CD Sampler Disc - Volume 07 (USA)</description>
-		<year>1998</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc - volume 7" sha1="73e8215a98da98d9f2d1468c62354b46af77fa56"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="intcdv8">
-		<!-- Unknown source
-		<rom name="interactive cd sampler volume 8.bin" size="725135712" crc="ef9b3cee" sha1="d465f074dfb8344d55f4da2a4b5358981d5b6541"/>
-		<rom name="interactive cd sampler volume 8.cue" size="287" crc="e40136d8" sha1="8bea452b452528c2b429ec5cdc8de20da26e4611"/>
-		-->
-		<description>Interactive CD Sampler Disc - Volume 08 (USA)</description>
-		<year>1998</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc - volume 8" sha1="8145f022b1f44d2ed7140386acf5b293834fc6c8"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="intcdv9">
-		<!-- Unknown source
-		<rom name="interactive cd sampler volume 9.bin" size="732615072" crc="473314a1" sha1="ab797ae8e3d6fd0b477c70b609211944be477bb1"/>
-		<rom name="interactive cd sampler volume 9.cue" size="351" crc="dad567a7" sha1="995ec02b8abea297e6822b1ee1619b7e779800af"/>
-		-->
-		<description>Interactive CD Sampler Disc - Volume 09 (USA)</description>
-		<year>1998</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc - volume 9" sha1="4b504a4ce093c255b40f4cc2cf3fb59b4216f501"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="intcdv10">
-		<!-- Unknown source
-		<rom name="interactive cd sampler volume 10 [pbpx-95011].bin" size="736747536" crc="2af7ed86" sha1="6839c7bb06ab0765a2aef7e67be5a2fbba52d62d"/>
-		<rom name="interactive cd sampler volume 10 [pbpx-95011].cue" size="429" crc="65f15b6e" sha1="91e2d2d576c488d17e125bf554e7207453f4eb4b"/>
-		-->
-		<description>Interactive CD Sampler Disc - Volume 10 (USA)</description>
-		<year>1999</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<info name="serial" value="PBPX-95011"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc - volume 10" sha1="960319d09f9ca10663f06068a2ff134f343d22ad"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="intcdv11">
+	<software name="icdsmp11">
 		<!-- Unknown source
 		<rom name="interactive cd sampler volume 11 [scus-94463].bin" size="504059472" crc="0be789aa" sha1="0a0b125094f344d5552a840485021a2beda58aad"/>
 		<rom name="interactive cd sampler volume 11 [scus-94463].cue" size="301" crc="9948530c" sha1="95c782d5dca37dfd43b8c754e3a6903f2e665860"/>

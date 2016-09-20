@@ -55,7 +55,6 @@ TODO:
 
 - Hacha Mecha Fighter: mcu simulation is wrong/incorrect (see notes).
 
-- Music timing in nouryoku is a little off.
 - In Bioship, there's an occasional flicker of one of the sprites composing big
   ships. Increasing CPU speed from 12 to 16 MHz improved it, but it's still not
   100% fixed. (the CPU speed has been verified to be 10Mhz??)

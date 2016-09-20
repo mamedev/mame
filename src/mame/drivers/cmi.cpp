@@ -290,6 +290,8 @@ MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
 	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi01a_device, cmi01a_1_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi01a_device, cmi01a_1_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, ch_int))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, ch_int))
 
 	MCFG_DEVICE_ADD("cmi01a_pia_1", PIA6821, 0) // pia_cmi01a_2_config
 	MCFG_PIA_READCA1_HANDLER(READLINE(cmi01a_device, zx_r))
@@ -300,7 +302,10 @@ MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, ch_int))
 
 	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 0) // ptm_cmi01a_config
+	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
 	MCFG_PTM6840_OUT0_CB(WRITE8(cmi01a_device, cmi01a_ptm_c0))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ch_int))
 MACHINE_CONFIG_END
 
 machine_config_constructor cmi01a_device::device_mconfig_additions() const
@@ -338,7 +343,7 @@ void cmi01a_device::device_start()
 	m_zx_timer = timer_alloc(TIMER_ZX);
 	m_zx_timer->adjust(attotime::never);
 
-	m_stream = stream_alloc(0,1,44100);
+	m_stream = stream_alloc(0, 1, 44100);
 }
 
 void cmi01a_device::device_reset()
@@ -477,6 +482,7 @@ public:
 	DECLARE_READ8_MEMBER( cmi02_r );
 	DECLARE_WRITE8_MEMBER( cmi02_w );
 	DECLARE_WRITE8_MEMBER( master_tune_w );
+	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
 
 	// Alphanumeric keyboard
 	DECLARE_READ8_MEMBER( ank_col_r );
@@ -644,6 +650,9 @@ private:
 	// Alphanumeric keyboard
 	int     m_ank_irqa;
 	int     m_ank_irqb;
+
+	// Master card (CMI-02)
+	int		m_cmi02_ptm_irq;
 };
 
 /**************************************
@@ -1540,12 +1549,15 @@ void cmi_state::fdc_dma_transfer()
 		/* Read a byte at a time */
 		UINT8 data = m_wd1791->data_r() ^ 0xff;
 
+		if (m_fdc_dma_cnt.w.l == 0xffff)
+			return;
+
 		if (m_cmi07_ctrl & 0x30)
-		if (BIT(m_cmi07_ctrl, 6) && !BIT(m_cmi07_ctrl, 7))
-		{
-			if ((m_fdc_dma_addr.w.l & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
-				m_cmi07_ram[m_fdc_dma_addr.w.l & 0x3fff] = data;
-		}
+			if (BIT(m_cmi07_ctrl, 6) && !BIT(m_cmi07_ctrl, 7))
+			{
+				if ((m_fdc_dma_addr.w.l & 0xc000) == ((m_cmi07_ctrl & 0x30) << 10))
+					m_cmi07_ram[m_fdc_dma_addr.w.l & 0x3fff] = data;
+			}
 
 		if (phys_page & 0x80)
 			m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)] = data;
@@ -1557,6 +1569,9 @@ void cmi_state::fdc_dma_transfer()
 	// Transfer from RAM to disk
 	else
 	{
+		if (m_fdc_dma_cnt.w.l == 0xffff)
+			return;
+
 		/* Write a byte at a time */
 		UINT8 data = 0;
 
@@ -1569,6 +1584,8 @@ void cmi_state::fdc_dma_transfer()
 		if (!BIT(m_fdc_ctrl, 3))
 			m_fdc_dma_addr.w.l++;
 	}
+
+	m_fdc_dma_cnt.w.l++;
 }
 
 WRITE_LINE_MEMBER( cmi_state::wd1791_irq )
@@ -1631,7 +1648,7 @@ WRITE_LINE_MEMBER( cmi01a_device::cmi01a_1_ca2_w )
 
 WRITE_LINE_MEMBER( cmi01a_device::ch_int )
 {
-//  printf("CH%d INT: %x  %x\n", ch, state, m_int_state[0]);
+	//printf("CH%d INT: %x\n", m_channel, state);
 	dynamic_cast<cmi_state*>(owner())->set_interrupt(CPU_1, ch_int_levels[m_channel], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -1811,7 +1828,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 			int a1 = (m_ptm_output && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
-			//printf("CH%d PTM: [%x] %x\n", ch, (a2 << 2) | (a1 << 1) | a0, data);
+			//printf("CH%d PTM: [%x] %x, %d %d %d, %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data, a2, a1, a0, offset);
 			m_ptm->write(space, (a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
@@ -1869,6 +1886,13 @@ WRITE8_MEMBER( cmi01a_device::cmi01a_ptm_c0 )
 	m_ptm_output = data;
 }
 
+WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
+{
+	m_cmi02_ptm_irq = state;
+	set_interrupt(CPU_1, IRQ_TIMINT_LEVEL, m_cmi02_ptm_irq ? ASSERT_LINE : CLEAR_LINE);
+	//printf("CMI-02 PTM IRQ: %d\n", state);
+}
+
 READ8_MEMBER( cmi_state::cmi02_r )
 {
 	if (offset <= 0x1f)
@@ -1878,7 +1902,9 @@ READ8_MEMBER( cmi_state::cmi02_r )
 		for (int i = 0; i < 8; ++i)
 		{
 			if (ch_mask & (1 << i))
-				return m_channels[i]->read(space, i, offset & 0x1f);
+			{
+				return m_channels[i]->read(space, offset & 0x1f, 0xff);
+			}
 		}
 
 		return 0xff;
@@ -1939,6 +1965,7 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 
 			case 0x30:
 				m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+				data ^= 0xff;
 				m_i8214_2->b_w(data & 0x7);
 				m_i8214_2->sgs_w((data >> 3) & 1);
 				break;
@@ -1970,7 +1997,9 @@ void cmi_state::install_video_ram(int cpunum)
 
 WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 {
+	//printf("i8214_cpu1_w: %02x\n", data);
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	data ^= 0xff;
 	m_i8214_0->b_w(data & 0x7);
 	m_i8214_0->sgs_w((data >> 3) & 1);
 }
@@ -1979,6 +2008,7 @@ WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 {
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	data ^= 0xff;
 	m_i8214_1->b_w(data & 0x7);
 	m_i8214_1->sgs_w((data >> 3) & 1);
 }
@@ -2132,14 +2162,16 @@ IRQ_CALLBACK_MEMBER( cmi_state::cpu2_interrupt_callback )
 
 void cmi_state::set_interrupt(int cpunum, int level, int state)
 {
-//  printf("CPU%d Int: %x State: %x (Cur: %x)\n", cpunum, level, state, m_int_state[cpunum]);
+	//printf("CPU%d Int: %x State: %x (Cur: %x)\n", cpunum, level, state, m_int_state[cpunum]);
 
 	if (state == ASSERT_LINE)
 		m_int_state[cpunum] |= (1 << level);
 	else
 		m_int_state[cpunum] &= ~(1 << level);
 
-	if (cpunum == 0)
+	//printf("New int state: %02x\n", m_int_state[cpunum]);
+
+	if (cpunum == CPU_1)
 	{
 		if (level < 8)
 			m_i8214_2->r_w(~m_int_state[cpunum]);
@@ -2147,21 +2179,26 @@ void cmi_state::set_interrupt(int cpunum, int level, int state)
 			m_i8214_0->r_w(~(m_int_state[cpunum] >> 8));
 	}
 	else
+	{
 		m_i8214_1->r_w(~m_int_state[cpunum]);
+	}
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_1_int_w )
 {
+	//printf("i8214_1_int_w: %d\n", state);
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_2_int_w )
 {
+	//printf("i8214_2_int_w: %d\n", state);
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_3_int_w )
 {
+	//printf("i8214_3_int_w: %d\n", state);
 	//if (state)
 		m_hp_int = state;
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
@@ -2501,6 +2538,7 @@ void cmi_state::machine_reset()
 	m_ank_irqa = 0;
 	m_ank_irqb = 0;
 	m_q133_acia_irq = 0;
+	m_cmi02_ptm_irq = 0;
 }
 
 void cmi_state::machine_start()
@@ -2628,6 +2666,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 
 	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 0) // ptm_cmi02_config
 	MCFG_PTM6840_INTERNAL_CLOCK(2000000) // TODO
+	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
 
 	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, 9600*16)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cmi_state, mkbd_acia_clock))
@@ -2690,16 +2729,6 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
-	// Channel cards
-	MCFG_CMI01A_ADD("cmi01a_0", 0)
-	MCFG_CMI01A_ADD("cmi01a_1", 1)
-	MCFG_CMI01A_ADD("cmi01a_2", 2)
-	MCFG_CMI01A_ADD("cmi01a_3", 3)
-	MCFG_CMI01A_ADD("cmi01a_4", 4)
-	MCFG_CMI01A_ADD("cmi01a_5", 5)
-	MCFG_CMI01A_ADD("cmi01a_6", 6)
-	MCFG_CMI01A_ADD("cmi01a_7", 7)
-
 	/* Musical keyboard */
 	MCFG_DEVICE_ADD("cmi10_pia_u20", PIA6821, 0)
 	MCFG_PIA_READCB1_HANDLER(READLINE(cmi_state, cmi10_u20_cb1_r))
@@ -2710,6 +2739,26 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_DEVICE_ADD("cmi10_pia_u21", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(cmi_state, cmi10_u21_a_r))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi_state, cmi10_u21_cb2_w))
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	// Channel cards
+	MCFG_CMI01A_ADD("cmi01a_0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_1", 1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_2", 2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_3", 3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_4", 4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_5", 5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_6", 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_ADD("cmi01a_7", 7)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 ROM_START( cmi2x )

@@ -158,13 +158,14 @@ public:
 	virtual bool is_creatable() const = 0;
 	virtual bool must_be_loaded() const = 0;
 	virtual bool is_reset_on_load() const = 0;
+	virtual bool support_command_line_image_creation() const;
 	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual const util::option_guide &create_option_guide() const;
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
 	const image_device_format *device_get_named_creatable_format(const std::string &format_name);
-	const option_guide *device_get_creation_option_guide() const { return create_option_guide(); }
+	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
 
 	const char *error();
 	void seterror(image_error_t err, const char *message);
@@ -235,6 +236,7 @@ public:
 	image_init_result finish_load();
 	void unload();
 	image_init_result create(const std::string &path, const image_device_format *create_format, util::option_resolution *create_args);
+	image_init_result create(const std::string &path);
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const std::string &path);
 
@@ -250,6 +252,7 @@ public:
 
 protected:
 	virtual const software_list_loader &get_software_list_loader() const;
+	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
 
 	image_init_result load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	image_error_t load_image_by_path(UINT32 open_flags, const std::string &path);

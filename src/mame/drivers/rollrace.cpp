@@ -58,8 +58,8 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd806, 0xd806) AM_READNOP /* looks like a watchdog, bit4 checked*/
 	AM_RANGE(0xd900, 0xd900) AM_READWRITE(fake_d800_r,fake_d800_w) /* protection ??*/
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe400, 0xe47f) AM_RAM_WRITE(cram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(16,255,16, 255-16)
+	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -280,8 +280,8 @@ static MACHINE_CONFIG_DERIVED( rollace2, rollrace )
 
 	/* basic machine hardware */
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0,255-24,16, 255-16)
+//	MCFG_SCREEN_MODIFY("screen")
+//	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
 MACHINE_CONFIG_END
 
 

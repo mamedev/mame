@@ -2915,6 +2915,123 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="brdtale">
+		<description>The Bard's Tale - Tales of the Unknown (5.25")</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Interplay Productions" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [5.25] [1 of 2].img" size="368640" crc="40918452" sha1="8cb08b1a090bb7e2b4021a28db27b8f2f9c9df71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [5.25] [2 of 2].img" size="368640" crc="a90bd7ec" sha1="68c4d04fb2625766018dcb4a34e27d8348fb817d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdtalea" cloneof="brdtale">
+		<description>The Bard's Tale - Tales of the Unknown (5.25", alt)</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Interplay Productions" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [5.25] [1 of 2].img" size="368640" crc="40918452" sha1="8cb08b1a090bb7e2b4021a28db27b8f2f9c9df71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk" />
+			<dataarea name="flop" size = "309512">
+				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [5.25] [2 of 2] [a2].img" size="309512" crc="57028b32" sha1="326dffb09cc63531b7ce25b1a19368ece9744804" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdtale35" cloneof="brdtale">
+		<description>The Bard's Tale - Tales of the Unknown (3.5")</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Interplay Productions" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [3.5] [1 of 1].img" size="737280" crc="a0c0a15f" sha1="43a7487172fbce2de1284702f4e52b162582952c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdtale2">
+		<description>The Bard's Tale II - The Destiny Knight (5.25")</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Interplay Productions" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="The Bard's Tale 2 - The Destiny Knight [1988] [5.25] [1 of 2].img" size="368640" crc="15066d22" sha1="9903ff47fa92d24a0f757a86956081be33794acd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="The Bard's Tale 2 - The Destiny Knight [1988] [5.25] [2 of 2].img" size="368640" crc="447f403e" sha1="b37b5aa185c4ed60fbc03c9234bd52bb8ca4f836" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdtale2_35" cloneof="brdtale2">
+		<description>The Bard's Tale II - The Destiny Knight (3.5")</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Interplay Productions" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Bard's Tale 2 - The Destiny Knight [1988] [3.5] [1 of 1].img" size="737280" crc="65dc8cfe" sha1="24f1883d3f24abd8d313a9f99e1604350bb128e9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdtale3">
+		<description>The Bard's Tale III - Thief of Fate</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Interplay Productions" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="The Bard's Tale 3 - Thief of Fate [1990] [5.25] [1 of 3].img" size="368640" crc="5cd9891f" sha1="7df8f6751b31905701611668fc6a9e01958f476e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="The Bard's Tale 3 - Thief of Fate [1990] [5.25] [2 of 3].img" size="368640" crc="ad726a56" sha1="ab5a0ae06a067521e30a15630efe55ff168a8ce0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="The Bard's Tale 3 - Thief of Fate [1990] [5.25] [3 of 3].img" size="368640" crc="cc9d1779" sha1="e046f2459c38b67520490b9febec51e1a34aa2ca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="budokan">
+		<description>Budokan - The Martial Spirit</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Budokan - The Martial Spirit [Electronic Arts] [1989] [3.5] [1 of 1].img" size="737280" crc="fea46e33" sha1="bf874ea08695344cc9c3db8bc1b2db2e0b62ca9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="armorik">
 		<description>Les 8 Conquêtes d'Armorik le Viking</description>
 		<year>1988</year>
@@ -2940,7 +3057,23 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="indy500">
-		<description>Indianapolis 500: The Simulation</description>
+		<description>Indianapolis 500: The Simulation (5.25")</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indianapolis 500 - The Simulation [1989] [5.25] [1 of 2].img" size="368640" crc="5d8f3b23" sha1="c3abf7a4cbc444ee1d60c5de278812502e529932" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indianapolis 500 - The Simulation [1989] [5.25] [2 of 2].img" size="368640" crc="ca21e0ee" sha1="875c81518345d100444457b610873d36061c3602" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indy500_35" cloneof="indy500">
+		<description>Indianapolis 500: The Simulation (3.5")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3119,6 +3252,50 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<!-- Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360 -->
+	<software name="purplesa" supported="no">
+		<description>Purple Saturn Day</description>
+		<year>1989</year>
+		<publisher>Epyx</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "354497">
+				<rom name="Purple Saturn Day [1989] [5.25] [1 of 2].td0" size="354497" crc="8832e9eb" sha1="84a4d1f85ad8f34f11686d3f8c5725a5f332b652" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "339570">
+				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skatedie">
+		<description>Skate or Die (5.25")</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Skate or Die [1988] [Electronic Arts] [5.25] [1 of 2].img" size="368640" crc="20788bdf" sha1="45f13ce79ef36c019cb2870faacab6d64ab0a26a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Skate or Die [1988] [Electronic Arts] [5.25] [2 of 2].img" size="368640" crc="f6595453" sha1="48add340eec8961f6b14395a252d9c7e4d59bf5f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skatedie35" cloneof="skatedie">
+		<description>Skate or Die (3.5")</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Skate or Die [1988] [Electronic Arts] [3.5] [1 of 1].img" size="737280" crc="ad1fb4e3" sha1="60a315b8f744258d66c221538830808ae7184f47" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starflg2">
 		<description>Starflight 2: Trade Routes of the Cloud Nebula</description>
 		<year>1989</year>
@@ -3179,6 +3356,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Weird Dreams [MicroProse] [1989] [3.5].img" size="737280" crc="cc8996dd" sha1="ecd07fbf4b23ffac08f50c970a9f0acdaf86781c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wclead">
+		<description>World Class Leader Board</description>
+		<year>1988</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="World Class Leader Board [1988] [Access Software] [5.25] [1 of 1].img" size="368640" crc="73172ed6" sha1="08fdd895bcaace7ec060fb82a4461871603c9816" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

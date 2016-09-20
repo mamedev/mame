@@ -870,8 +870,15 @@ static MACHINE_CONFIG_DERIVED( sms1_kr, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smskr_io)
 
+	// need to replace the cartridge slot with the Japanese version, so to
+	// keep the usual media order, remove and reinsert all of them.
 	MCFG_DEVICE_REMOVE("slot")
+	MCFG_DEVICE_REMOVE("mycard")
+	MCFG_DEVICE_REMOVE("smsexp")
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
 	MCFG_DEVICE_MODIFY("sms_vdp")
@@ -890,12 +897,16 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sg1000m3_io)
 
+	// Remove and reinsert all media slots, as done with the sms1_kr config,
+	// and also replace the expansion slot with the SG-1000 version.
 	MCFG_DEVICE_REMOVE("slot")
-	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
-
+	MCFG_DEVICE_REMOVE("mycard")
 	MCFG_DEVICE_REMOVE("smsexp")
+	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SG1000_EXPANSION_ADD("sgexp", sg1000_expansion_devices, nullptr, false)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
 	// Mark III does not have TH connected.
 	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)

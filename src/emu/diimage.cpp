@@ -539,6 +539,34 @@ UINT32 device_image_interface::crc()
 	return crc;
 }
 
+
+//-------------------------------------------------
+//  support_command_line_image_creation - do we
+//	want to support image creation from the front
+//	end command line?
+//-------------------------------------------------
+
+bool device_image_interface::support_command_line_image_creation() const
+{
+	bool result;
+	switch (image_type())
+	{
+	case IO_PRINTER:
+	case IO_SERIAL:
+	case IO_PARALLEL:
+		// going by the assumption that these device image types should support this
+		// behavior; ideally we'd get rid of IO_* and just push this to the specific
+		// devices
+		result = true;
+		break;
+	default:
+		result = false;
+		break;
+	}
+	return result;
+}
+
+
 // ****************************************************************************
 // Battery functions
 //
@@ -1052,7 +1080,9 @@ image_init_result device_image_interface::load_software(const std::string &softw
 	m_image_name = m_full_software_name;
 	m_basename = m_full_software_name;
 	m_basename_noext = m_full_software_name;
-	m_filetype = "";
+	m_filetype = use_software_list_file_extension_for_filetype() && m_mame_file != nullptr
+		? core_filename_extract_extension(m_mame_file->filename(), true)
+		: "";
 
 	// check if image should be read-only
 	const char *read_only = get_feature("read_only");
@@ -1162,6 +1192,16 @@ image_init_result device_image_interface::finish_load()
 //  create - create a image
 //-------------------------------------------------
 
+image_init_result device_image_interface::create(const std::string &path)
+{
+	return create(path, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
+//  create - create a image
+//-------------------------------------------------
+
 image_init_result device_image_interface::create(const std::string &path, const image_device_format *create_format, util::option_resolution *create_args)
 {
 	int format_index = 0;
@@ -1222,6 +1262,18 @@ void device_image_interface::unload()
 	clear_error();
 }
 
+
+//-------------------------------------------------
+//  create_option_guide
+//-------------------------------------------------
+
+OPTION_GUIDE_START(null_option_guide)
+OPTION_GUIDE_END
+
+const util::option_guide &device_image_interface::create_option_guide() const
+{
+	return null_option_guide;
+}
 
 //-------------------------------------------------
 //  update_names - update brief and instance names

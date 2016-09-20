@@ -9,6 +9,15 @@ Release data from the Sega Retro project:
 
   Year: 1987    Country/region: JP    Model code: FM-70
 
+Notes:
+
+This emulation is based on Charles MacDonald's analysis of Enri's schematics
+of the FM unit hardware.
+
+Any software that access controllers through IO ports $C0/$C1 instead $DC/$DD
+(the game Fushigi no Oshiro Pit Pot is a known example) has control problems
+when the FM Sound Unit is attached (real hardware behavior).
+
 **********************************************************************/
 
 #include "fm_unit.h"
@@ -69,7 +78,7 @@ void sega_fm_unit_device::device_start()
 
 READ8_MEMBER(sega_fm_unit_device::peripheral_r)
 {
-	if (offset == 2)
+	if (offset <= 3)
 	{
 		return m_audio_control & 0x01;
 	}
@@ -98,6 +107,7 @@ WRITE8_MEMBER(sega_fm_unit_device::peripheral_w)
 			}
 			break;
 		case 2: // control port
+		case 3: // mirror
 			m_audio_control = data & 0x01;
 			break;
 		default:
@@ -108,11 +118,11 @@ WRITE8_MEMBER(sega_fm_unit_device::peripheral_w)
 
 bool sega_fm_unit_device::is_readable(UINT8 offset)
 {
-	return (offset == 2) ? true : false;
+	return (offset <= 3) ? true : false;
 }
 
 
 bool sega_fm_unit_device::is_writeable(UINT8 offset)
 {
-	return (offset <= 2) ? true : false;
+	return (offset <= 3) ? true : false;
 }

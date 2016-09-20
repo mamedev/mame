@@ -37,15 +37,18 @@ const char *jvc_format::extensions() const
 
 bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id)
 {
+	// The JVC format has a header whose size is the size of the image modulo 256.  Currently, we only
+	// handle up to five header bytes
 	UINT64 size = io_generic_size(io);
 	header_size = size % 256;
 	UINT8 header[5];
 
+	// if we know that this is a header of a bad size, we can fail
+	// immediately; otherwise read the header
+	if (header_size >= sizeof(header))
+		return false;
 	if (header_size > 0)
 		io_generic_read(io, header, 0, header_size);
-
-	if (header_size > 5)
-		return false;
 
 	// default values
 	heads = 1;

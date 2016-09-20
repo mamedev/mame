@@ -143,6 +143,7 @@ decwritr.cpp
 dgn_beta.cpp
 didact.cpp
 digel804.cpp
+digijet.cpp
 dim68k.cpp
 dm7000.cpp
 dmax8000.cpp
@@ -493,6 +494,7 @@ radio86.cpp
 rainbow.cpp
 rambo.cpp
 ravens.cpp
+rc702.cpp
 rc759.cpp
 rd100.cpp
 rd110.cpp

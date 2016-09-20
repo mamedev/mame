@@ -53,6 +53,9 @@ public:
 
 	int debug_get_address();
 
+	// Allow for checking the state of the GROM so we can turn off the clock
+	bool idle() { return m_phase == 0; }
+
 protected:
 	void device_start(void) override;
 	void device_reset(void) override;

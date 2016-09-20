@@ -30,7 +30,6 @@ Tank Force                         (c) 1991 Namco
 We are missing some alternate versions:
 - Alice In Wonderland (English version of Marchen Maze)
 - Face Off (6 sticks)
-- Tank Force (4 players)
 
 
 
@@ -183,7 +182,8 @@ Notes:
 - The ROM/RAM test is NOT performed by default. It is only done if the test mode
   switch is on when the game powers up (setting it and resetting is not enough).
   You can manage to make it work if you press F2 quickly enough after the MAME
-  startup screen, without having to exit MAME and restarting.
+  startup screen, without having to exit MAME and restarting [or just use hard 
+  reset].
 
 - There are three watchdogs, one per CPU. Handling them separately is necessary
   to allow entering service mode without manually resetting: only one of the CPUs
@@ -2701,7 +2701,8 @@ ROM_START( puzlclub )
 	ROM_LOAD( "pc1-c4.bin",         0x80000, 0x20000, CRC(f1c95296) SHA1(f093c4227b4f6f524a76d0b9409c2c6ce33e560b) )
 	ROM_LOAD( "pc1-c5.bin",         0xa0000, 0x20000, CRC(bc443c27) SHA1(af841b6a2b783b0d9b9bbc33083afbb56e8bff69) )
 	ROM_LOAD( "pc1-c6.bin",         0xc0000, 0x20000, CRC(ec0a3dc5) SHA1(a5148e99f3198196fd635ff4ac0275393e6f7033) )
-
+	ROM_LOAD( "pc1-c7.bin",         0xe0000, 0x20000, NO_DUMP ) // title screen gfxs are here, might not exist.
+	
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites */
 ROM_END
@@ -2846,7 +2847,7 @@ GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, wldcourt, ROT
 GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, faceoff,  ROT180, "Namco", "Face Off (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, faceoff,  ROT180, "Namco", "Face Off (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, blastoff,  0,        ns1,     ns1,      namcos1_state, blastoff, ROT90,  "Namco", "Blast Off (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -2857,6 +2858,6 @@ GAME( 1990, pistoldm,  0,        ns1,     ns1,      namcos1_state, pistoldm, ROT
 GAME( 1990, boxyboy,   0,        ns1,     boxyboy,  namcos1_state, soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, soukobdx,  boxyboy,  ns1,     boxyboy,  namcos1_state, soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan, SB1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, puzlclub,  0,        ns1,     puzlclub, namcos1_state, puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tankfrce,  0,        ns1,     ns1,      namcos1_state, tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Player)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tankfrce4, tankfrce, ns1,     tankfrc4, namcos1_state, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tankfrce,  0,        ns1,     ns1,      namcos1_state, tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tankfrce4, tankfrce, ns1,     tankfrc4, namcos1_state, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tankfrcej, tankfrce, ns1,     ns1,      namcos1_state, tankfrce, ROT0,   "Namco", "Tank Force (Japan)", MACHINE_SUPPORTS_SAVE )

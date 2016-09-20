@@ -681,6 +681,7 @@ menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_cont
 	, x0(_x0)
 	, y0(_y0)
 	, m_curbios(0)
+	, m_fav_reset(false)
 {
 	// parse the INI file
 	std::string error;
@@ -690,6 +691,8 @@ menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_cont
 
 menu_machine_configure::~menu_machine_configure()
 {
+	if (m_fav_reset)
+		reset_topmost(reset_options::SELECT_FIRST);
 }
 
 //-------------------------------------------------
@@ -724,10 +727,15 @@ void menu_machine_configure::handle()
 					mame_machine_manager::instance()->favorite().add_favorite_game(m_drv);
 					reset(reset_options::REMEMBER_POSITION);
 					break;
-
 				case DELFAV:
 					mame_machine_manager::instance()->favorite().remove_favorite_game();
-					reset(reset_options::REMEMBER_POSITION);
+					if (main_filters::actual == FILTER_FAVORITE)
+					{
+						m_fav_reset = true;
+						menu::stack_pop();
+					}
+					else
+						reset(reset_options::REMEMBER_POSITION);
 					break;
 				case CONTROLLER:
 					if (menu_event->iptkey == IPT_UI_SELECT)

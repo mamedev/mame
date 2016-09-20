@@ -279,12 +279,11 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	// memm variant interface
-	DECLARE_WRITE16_MEMBER(key_w);
+	DECLARE_WRITE16_MEMBER(crypto_switch_w);
 	DECLARE_READ16_MEMBER(range_r);
 	DECLARE_WRITE16_MEMBER(bank_w);
 
 	// memn variant interface
-	DECLARE_WRITE16_MEMBER(crypto_switch_w);
 	DECLARE_READ16_MEMBER(nand_status_r);
 	DECLARE_WRITE8_MEMBER(nand_address1_w);
 	DECLARE_WRITE8_MEMBER(nand_address2_w);
@@ -315,8 +314,7 @@ private:
 		I2CP_RECIEVE_ACK_1,
 		I2CP_RECIEVE_ACK_0
 	};
-	UINT16 key;
-	UINT8  cnt;
+
 	UINT32 bank_base;
 	UINT32 nand_address;
 	UINT16 block[0x1ff];
@@ -369,55 +367,36 @@ ADDRESS_MAP_END
 // know until the decryption is done.
 //
 // bios copies 62000-37ffff from the flash to 80012000 in ram through the
-// decryption in range_r then jumps there (and dies horribly, of course)
+// decryption in range_r then jumps there
 
-WRITE16_MEMBER(namcos10_state::key_w )
+WRITE16_MEMBER(namcos10_state::crypto_switch_w)
 {
-	key = (data >> 15) | (data << 1);
-	logerror("key_w %04x\n", key);
-	cnt = 0;
+	printf("crypto_switch_w: %04x\n", data);
+	if (decrypter == nullptr)
+		return;
+
+	if (BIT(data, 15) != 0)
+		decrypter->activate(data & 0xf);
+	else
+		decrypter->deactivate();
 }
 
 WRITE16_MEMBER(namcos10_state::bank_w)
 {
-	bank_base = 0x80000 * offset;
+	bank_base = 0x100000 * offset;
 }
 
 READ16_MEMBER(namcos10_state::range_r)
 {
-	UINT32 d16 = ((const UINT16 *)(memregion("maincpu:rom")->base()))[offset+bank_base];
+	UINT16 data = ((const UINT16 *)(memregion("maincpu:rom")->base()))[bank_base+offset];
+	
+	if (decrypter == nullptr)
+		return data;
 
-	/* This is not entirely correct, but not entirely incorrect either...
-	   It's also specific to mrdriller2, it seems.
-	*/
-
-	UINT16 dd16 = d16 ^ key;
-
-	key = d16;
-
-	key =
-		//((    BIT(d16,  3) ^ (BIT(cnt, 0) & !BIT(cnt, 2))) << 15) |
-		((1 ^ BIT(key,  3) ^  BIT(d16, 0))                 << 15) |
-		((1 ^ BIT(key, 13) ^  BIT(cnt, 0))                 << 14) |
-		((1 ^ BIT(key, 11) ^  BIT(d16, 5) ^  BIT(d16, 2))  << 13) |
-		((    BIT(key,  9) ^  BIT(cnt, 3))                 << 12) |
-		((1 ^ BIT(key,  2))                                << 11) |
-		((    BIT(key, 10) ^ (BIT(d16, 4) &  BIT(cnt, 1))) << 10) |
-		((1 ^ BIT(key,  6) ^  BIT(cnt, 4))                 <<  9) |
-		((1 ^ BIT(d16,  6) ^  BIT(key, 5))                 <<  8) |
-		((    BIT(key,  1) ^ (BIT(d16, 5) |  BIT(d16, 4))) <<  7) |
-		((    BIT(key, 15))                                <<  6) |
-		((1 ^ BIT(key,  4) ^  BIT(cnt, 3) ^  BIT(d16, 2))  <<  5) |
-		((1 ^ BIT(key,  7) ^  BIT(cnt, 5))                 <<  4) |
-		((1 ^ BIT(key,  8) ^ (BIT(cnt, 7) |  BIT(d16, 3))) <<  3) |
-		((    BIT(key, 14) ^ (BIT(cnt, 1) |  BIT(d16, 7))) <<  2) |
-		((1 ^ BIT(key, 12) ^ (BIT(cnt, 7) &  BIT(d16, 7))) <<  1) |
-		//((                   (BIT(cnt, 0) |  BIT(cnt, 2))) <<  0);
-		((1 ^ BIT(key,  0) ^ BIT(cnt, 2))                  <<  0);
-
-	cnt++;
-
-	return dd16;
+	if (decrypter->is_active())
+		return decrypter->decrypt(data);
+	else
+		return data;
 }
 
 READ16_MEMBER(namcos10_state::control_r)
@@ -556,7 +535,7 @@ void namcos10_state::i2c_update()
 }
 
 static ADDRESS_MAP_START( namcos10_memm_map, AS_PROGRAM, 32, namcos10_state )
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(key_w, 0x0000ffff)
+	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
 	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READ16(range_r, 0xffffffff)
 	AM_RANGE(0x1fb40000, 0x1fb4000f) AM_WRITE16(bank_w, 0xffffffff)
 
@@ -568,18 +547,6 @@ ADDRESS_MAP_END
 //
 // Block access to the nand.  Something strange is going on with the
 // status port.  Interaction with the decryption is unclear at best.
-
-WRITE16_MEMBER(namcos10_state::crypto_switch_w)
-{
-	printf("crypto_switch_w: %04x\n", data);
-	if (decrypter == nullptr)
-		return;
-
-	if (BIT(data, 15) != 0)
-		decrypter->activate(data & 0xf);
-	else
-		decrypter->deactivate();
-}
 
 READ16_MEMBER(namcos10_state::nand_status_r )
 {
@@ -703,7 +670,10 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 {
 	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
-	decrypt_bios(machine(), "maincpu:rom", 0, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
+	
+	decrypt_bios(machine(), "maincpu:rom", 0, 0x62000, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
+	decrypt_bios(machine(), "maincpu:rom", 0x380000, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
+	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,gjspace)
@@ -847,6 +817,11 @@ static MACHINE_CONFIG_START( namcos10_memn, namcos10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(ns10_mrdrilr2, namcos10_memm)
+/* decrypter device (CPLD in hardware?) */
+MCFG_DEVICE_ADD("decrypter", MRDRILR2_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(ns10_chocovdr, namcos10_memn)
@@ -1077,8 +1052,8 @@ ROM_START( konotako )
 ROM_END
 
 
-GAME( 2000, mrdrilr2,  0,        namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace , namcos10, namcos10_state, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

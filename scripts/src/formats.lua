@@ -48,6 +48,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/dsk_dsk.h",
 		MAME_DIR .. "src/lib/formats/td0_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/td0_dsk.h",
+		MAME_DIR .. "src/lib/formats/hxchfe_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/hxchfe_dsk.h",
 		MAME_DIR .. "src/lib/formats/hxcmfm_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/hxcmfm_dsk.h",
 		MAME_DIR .. "src/lib/formats/mfi_dsk.cpp",

@@ -126,6 +126,9 @@ private:
 
 	// Console GROMs are available (the HSGPL expects them to be removed)
 	bool m_console_groms_present;
+
+	// GROMs are idle, no need to propagate the clock
+	bool m_grom_idle;
 };
 
 /******************************************************************************/

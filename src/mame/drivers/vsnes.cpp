@@ -2277,7 +2277,7 @@ ROM_START( ladygolf )
 	PALETTE_2C04_0002
 ROM_END
 
-ROM_START( machridr ) /* Set ID should be something like MDS-MR4-2 xx */
+ROM_START( nvs_machrider ) /* Set ID should be something like MDS-MR4-2 xx */
 	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "mr-1d",  0x8000, 0x2000, CRC(379c44b9) SHA1(7b148ba7f7eea64509733f94b4eaafe5bfcf3527) ) /* Need to verify correct label */
 	ROM_LOAD( "mr-1c",  0xa000, 0x2000, CRC(cb864802) SHA1(65f06a8eaca3347432f3f2f673a24692415d869f) ) /* Need to verify correct label */
@@ -2291,7 +2291,7 @@ ROM_START( machridr ) /* Set ID should be something like MDS-MR4-2 xx */
 	PALETTE_2C04_0002
 ROM_END
 
-ROM_START( machridra )
+ROM_START( nvs_machridera )
 	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "mds-mr4-1 a.1d or 6d",  0x8000, 0x2000, CRC(ab7e0594) SHA1(fc5982a93791608a20e5ec9e3a4b71d702bda354) )
 	ROM_LOAD( "mds-mr4-1 a.1c or 6c",  0xa000, 0x2000, CRC(d4a341c3) SHA1(c799e40d0ebd1447032d8767fb2caeee6b33f31a) )
@@ -2475,7 +2475,7 @@ ROM_START( vsskykid )
 	PALETTE_2C04_0001
 ROM_END
 
-ROM_START( platoon )
+ROM_START( nvs_platoon )
 	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "prgver0.ic4",  0x10000, 0x20000, CRC(e2c0a2be) SHA1(1f8e33d6da8402be6a376668a424bfde38471021) )
 
@@ -2514,7 +2514,7 @@ ROM_START( supxevs )
 	PALETTE_2C04_0001
 ROM_END
 
-ROM_START( mightybj )
+ROM_START( nvs_mightybj )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "1d.bin",  0x8000, 0x2000, CRC(55dc8d77) SHA1(eafb8636d994a10caee9eb0ba544260281706058) )
 	ROM_LOAD( "1c.bin",  0xa000, 0x2000, CRC(151a6d15) SHA1(2652aef97aae122711ef471d9dc1d42f6393b91f) )
@@ -2808,8 +2808,8 @@ GAME( 1984, excitebkj,excitebk, vsnes,   excitebk, vsnes_state, vsnormal, ROT0, 
 GAME( 1986, goonies,  0,        vsnes,   goonies, vsnes_state,  vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)", 0 )
 GAME( 1984, iceclimb, 0,        vsnes,   iceclmbj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1)", 0 )
 GAME( 1984, iceclimba,iceclimb, vsnes,   iceclimb, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)", 0 )
-GAME( 1985, machridr, 0,        vsnes,   machridr, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, machridra,machridr, vsnes,   machridj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, nvs_machrider, 0,        vsnes,   machridr, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, nvs_machridera,nvs_machrider, vsnes,   machridj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1986, rbibb,    0,        vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)", 0 )
 GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
 GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
@@ -2830,9 +2830,9 @@ GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnes_state, vsnormal, ROT0, 
 GAME( 1985, vssoccer, 0,        vsnes,   vssoccer, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
 GAME( 1985, vssoccera,vssoccer, vsnes,   vssoccer, vsnes_state, bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
 GAME( 1986, vsgradus, 0,        vsnes,   vsgradus, vsnes_state, vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)", 0 )
-GAME( 1987, platoon,  0,        vsnes,   platoon, vsnes_state,  platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
+GAME( 1987, nvs_platoon,  0,    vsnes,   platoon, vsnes_state,  platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
 GAME( 1987, vstetris, 0,        vsnes,   vstetris, vsnes_state, vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
-GAME( 1986, mightybj, 0,        mightybj,mightybj, vsnes_state, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
+GAME( 1986, nvs_mightybj, 0,    mightybj,mightybj, vsnes_state, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
 GAME( 1985, jajamaru, 0,        jajamaru,jajamaru, vsnes_state, vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
 GAME( 1987, topgun,   0,        topgun,  topgun, vsnes_state,   vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
 GAME( 1985, bnglngby, 0,        vsnes,   bnglngby, vsnes_state, bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )

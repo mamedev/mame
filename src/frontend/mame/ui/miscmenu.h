@@ -165,6 +165,7 @@ private:
 	s_bios m_bios;
 	std::size_t m_curbios;
 	void setup_bios();
+	bool m_fav_reset;
 };
 
 //-------------------------------------------------

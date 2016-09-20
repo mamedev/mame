@@ -37,6 +37,7 @@
 #include "side116.h"
 #include "aha1542.h"
 #include "wd1002a_wx1.h"
+#include "mcd.h"
 
 // sound
 #include "adlib.h"

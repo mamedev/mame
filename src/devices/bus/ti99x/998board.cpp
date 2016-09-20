@@ -137,7 +137,16 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_vaquerro(*this, VAQUERRO_TAG),
 	m_mofetta(*this, MOFETTA_TAG),
 	m_amigo(*this, AMIGO_TAG),
-	m_oso(*this, OSO_TAG)
+	m_oso(*this, OSO_TAG),
+	m_video(*owner, VDP_TAG),               // subdevice of main class
+	m_sound(*owner, TISOUNDCHIP_TAG),
+	m_speech(*owner, SPEECHSYN_TAG),
+	m_gromport(*owner, GROMPORT_TAG),
+	m_peb(*owner, PERIBOX_TAG),
+	m_sgrom_idle(true),
+	m_tsgrom_idle(true),
+	m_p8grom_idle(true),
+	m_p3grom_idle(true)
 {
 }
 
@@ -252,17 +261,33 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 	if (gromclk != m_gromclk)   // when it changed, propagate to the GROMs
 	{
 		m_gromclk = gromclk;
-		for (int i=0; i < 8; i++)
+
+		// Get some more performance. We only propagate the clock line to
+		// those GROMs that are not idle.
+		// Yields about 25% in bench (hoped for more, but well)
+		if (!m_sgrom_idle)
 		{
-			if (i < 3)
-			{
-				m_sgrom[i]->gclock_in(gromclk);
-				m_p3grom[i]->gclock_in(gromclk);
-			}
-			m_tsgrom[i]->gclock_in(gromclk);
-			m_p8grom[i]->gclock_in(gromclk);
+			for (int i=0; i < 3; i++) m_sgrom[i]->gclock_in(gromclk);
+			m_gromport->gclock_in(gromclk);
+			m_sgrom_idle = m_sgrom[0]->idle();
 		}
-		m_gromport->gclock_in(gromclk);
+
+		if (!m_tsgrom_idle)
+		{
+			for (int i=0; i < 8; i++) m_tsgrom[i]->gclock_in(gromclk);
+			m_tsgrom_idle = m_tsgrom[0]->idle();
+		}
+		if (!m_p8grom_idle)
+		{
+			for (int i=0; i < 8; i++) m_p8grom[i]->gclock_in(gromclk);
+			m_p8grom_idle = m_p8grom[0]->idle();
+		}
+
+		if (!m_p3grom_idle)
+		{
+			for (int i=0; i < 3; i++) m_p3grom[i]->gclock_in(gromclk);
+			m_p3grom_idle = m_p3grom[0]->idle();
+		}
 	}
 
 	// Check video for writing
@@ -338,16 +363,23 @@ void mainboard8_device::select_groms()
 		int lines = (m_dbin_level==ASSERT_LINE)? GROM_M_LINE : 0;
 		if (m_A14_set) lines |= GROM_MO_LINE;
 
+		if (select & SGMSEL) m_sgrom_idle = false;
+		if (select & TSGSEL) m_tsgrom_idle = false;
+		if (select & P8GSEL) m_p8grom_idle = false;
+		if (select & P3GSEL) m_p3grom_idle = false;
+
+		for (int i=0; i < 3; i++)
+			m_sgrom[i]->set_lines(*m_space, lines, select & SGMSEL);
+
 		for (int i=0; i < 8; i++)
-		{
-			if (i < 3)
-			{
-				m_sgrom[i]->set_lines(*m_space, lines, select & SGMSEL);
-				m_p3grom[i]->set_lines(*m_space, lines, select & P3GSEL);
-			}
 			m_tsgrom[i]->set_lines(*m_space, lines, select & TSGSEL);
+
+		for (int i=0; i < 8; i++)
 			m_p8grom[i]->set_lines(*m_space, lines, select & P8GSEL);
-		}
+
+		for (int i=0; i < 3; i++)
+			m_p3grom[i]->set_lines(*m_space, lines, select & P3GSEL);
+
 		// Write to the cartridge port. The GROMs on cartridges are accesses as system GROMs
 		if (select & SGMSEL) m_gromport->romgq_line(CLEAR_LINE);
 		m_gromport->set_gromlines(*m_space, lines, select & SGMSEL);
@@ -476,6 +508,7 @@ READ8_MEMBER( mainboard8_device::read )
 		switch (m_vaquerro->gromcs_out())
 		{
 		case SGMSEL:
+			m_sgrom_idle = false;
 			for (int i=0; i < 3; i++)
 			{
 				m_sgrom[i]->readz(space, 0, &value);
@@ -486,6 +519,7 @@ READ8_MEMBER( mainboard8_device::read )
 			goto readdone;
 
 		case TSGSEL:
+			m_tsgrom_idle = false;
 			for (int i=0; i < 8; i++)
 			{
 				m_tsgrom[i]->readz(space, 0, &value);
@@ -495,6 +529,7 @@ READ8_MEMBER( mainboard8_device::read )
 			goto readdone;
 
 		case P8GSEL:
+			m_p8grom_idle = false;
 			for (int i=0; i < 8; i++)
 			{
 				m_p8grom[i]->readz(space, 0, &value);
@@ -504,6 +539,7 @@ READ8_MEMBER( mainboard8_device::read )
 			goto readdone;
 
 		case P3GSEL:
+			m_p3grom_idle = false;
 			for (int i=0; i < 3; i++)
 			{
 				m_p3grom[i]->readz(space, 0, &value);
@@ -750,21 +786,6 @@ void mainboard8_device::device_start()
 		m_tsgrom[i] = downcast<tmc0430_device*>(machine().device(glib1[i]));
 		m_p8grom[i] = downcast<tmc0430_device*>(machine().device(glib2[i]));
 	}
-
-	// Link to speech synthesizer
-	m_speech = downcast<cd2501ecd_device*>(machine().device(SPEECHSYN_TAG));
-
-	// Link to sound chip
-	m_sound = downcast<sn76496_base_device*>(machine().device(TISOUNDCHIP_TAG));
-
-	// Link to video
-	m_video = downcast<tms9118_device*>(machine().device(VDP_TAG));
-
-	// Link to cartridge port
-	m_gromport = downcast<gromport_device*>(machine().device(GROMPORT_TAG));
-
-	// Link to PEB
-	m_peb = downcast<peribox_device*>(machine().device(PERIBOX_TAG));
 
 	// Configure RAM and AMIGO
 	m_sram = std::make_unique<UINT8[]>(SRAM_SIZE);

@@ -708,7 +708,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="ast2k">
+	<software name="ast2k" supported="no">
 		<description>AST 2000</description>
 		<!-- AST 2000 was two cartridges in one - it contained an AST Utility cartridge, and a cartridge for Turbo 2000 (another turbo system popular in Poland).
 		     The "AST 2000" contained a 16KB ROM and a two-position switch, which allowed to choose between one of two 8KB banks. So in reality this image is
@@ -738,7 +738,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="ast2">
+	<software name="ast2" supported="no">
 		<description>AST (Atari Super Turbo) for Atari 1010</description>
 		<!-- Turbo Tape utility for Atari 1010 Tape Recorders. -->
 		<year>1988</year>
@@ -3069,7 +3069,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="lasrgats">
+	<software name="lasrgats" supported="no">
 		<description>Laser Gates (Pirate)</description>
 		<year>1984</year>
 		<publisher>Imagic</publisher>

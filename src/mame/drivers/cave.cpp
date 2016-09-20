@@ -30,7 +30,7 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
 96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
 96 Poka Poka Satan    Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
-97 Dodonpachi         Atlus         ATC03D2     038             013
+97 Dodonpachi         Atlus         AT-C03 D2   038 9341E7010   013 9338EX701
 98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
 98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
 98 Uo Poko            Jaleco        CV02        038 9749WX001   013 9749EX004

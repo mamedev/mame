@@ -34,7 +34,6 @@ public:
 
 	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,
 									const rectangle &, int, int *, rectangle *);
-	UINT8 m_sndnmi_disable;
 	UINT8 m_input_port_4_f0;
 	UINT8 m_kikstart_gears[2];
 	INT8 m_dac_out;
@@ -63,13 +62,21 @@ public:
 	UINT8 m_spacecr_prot_value;
 	UINT8 m_protection_value;
 	UINT32 m_address;
+	bool m_sndnmi_disable; // AKA "CIOB0" on schematic, bit 0 of AY-3-8910 @ IC50 Port B
+	bool m_sound_cmd_written;  // 74ls74 1/2 @ GAME BOARD IC42
+	bool m_sound_semaphore;  // 74ls74 2/2 @ GAME BOARD IC42
 	bitmap_ind16 m_layer_bitmap[3];
 	bitmap_ind16 m_sprite_sprite_collbitmap1;
 	bitmap_ind16 m_sprite_sprite_collbitmap2;
 	bitmap_ind16 m_sprite_layer_collbitmap1;
 	bitmap_ind16 m_sprite_layer_collbitmap2[3];
 	int m_draw_order[32][4];
-	DECLARE_WRITE8_MEMBER(taitosj_soundcommand_w);
+	DECLARE_WRITE8_MEMBER(sound_command_ack_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_READ8_MEMBER(sound_command_r);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(sound_semaphore_w);
+	DECLARE_WRITE8_MEMBER(sound_semaphore_clear_w);
 	DECLARE_WRITE8_MEMBER(taitosj_bankswitch_w);
 	DECLARE_READ8_MEMBER(taitosj_fake_data_r);
 	DECLARE_WRITE8_MEMBER(taitosj_fake_data_w);
