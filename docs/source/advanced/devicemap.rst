@@ -11,7 +11,8 @@ That's where the "mapdevice" configuration setting comes into the picture. This 
 
 Usage of mapdevice
 ------------------
-The "mapdevice" xml element is specified under the input xml element in the configuration. It requires two attributes, "device" and "controller".
+The "mapdevice" xml element is specified under the input xml element in the controller configuration file. It requires two attributes, "device" and "controller".
+NOTE: This setting only take effect when added to the **ctrlr** config file.
 
 The "device" attribute specifies the name of the device to match. It may also be a substring of the name. To see the list of available devices, enable verbose output and available devices will then be listed to the console at startup (more on this below).
 
@@ -47,15 +48,7 @@ Listing Available Devices
 -------------------------
 How did we obtain the device names in the above example? Easy!
 
-We simply set verbose to 1 in mame.ini:
-
-|     #
-|     # CORE DEBUGGING OPTIONS
-|     #
-|     **verbose                   1**
-|
-
-Then, when MAME is started, it will list available devices to the console. For example:
+Run MAME with -v parameter to enable verbose output. It will then list available devices to the console. For example:
 
 |     Input: Adding Gun #0:
 |     Input: Adding Gun #1:

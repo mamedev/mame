@@ -1048,8 +1048,11 @@ void input_class::remap_device_index(int oldindex, int newindex)
 	m_device[oldindex].swap(m_device[newindex]);
 
 	// update device indexes
-	m_device[oldindex]->set_devindex(oldindex);
-	m_device[newindex]->set_devindex(newindex);
+	if (nullptr != m_device[oldindex].get())
+		m_device[oldindex]->set_devindex(oldindex);
+
+	if (nullptr != m_device[newindex].get())
+		m_device[newindex]->set_devindex(newindex);
 
 	// update the maximum index found, since newindex may
 	// exceed current m_maxindex
@@ -2152,7 +2155,7 @@ bool input_manager::map_device_to_controller(const devicemap_table_type *devicem
 			{
 				// remap devindex
 				input_devclass->remap_device_index(device->devindex(), devindex);
-				osd_printf_info("Input: Remapped %s #%d: %s\n", (*devclass_string_table)[input_devclass->devclass()], devindex, device->name());
+				osd_printf_verbose("Input: Remapped %s #%d: %s\n", (*devclass_string_table)[input_devclass->devclass()], devindex, device->name());
 				break;
 			}
 		}
