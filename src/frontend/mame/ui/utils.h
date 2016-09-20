@@ -244,9 +244,8 @@ std::vector<std::string> tokenize(const std::string &text, char sep);
 //-------------------------------------------------
 
 template <typename F>
-bool input_character(std::string &buffer, std::size_t size, unicode_char unichar, F &&filter)
+bool input_character(std::string &buffer, std::string::size_type size, unicode_char unichar, F &&filter)
 {
-	const size_t unbounded_size = ((size_t)0) - 1;
 	bool result = false;
 	auto buflen = buffer.size();
 
@@ -261,11 +260,15 @@ bool input_character(std::string &buffer, std::size_t size, unicode_char unichar
 			result = true;
 		}
 	}
-	else if ((unichar >= ' ') && (size == unbounded_size || buffer.size() < size) && filter(unichar))
+	else if ((unichar >= ' ') && filter(unichar))
 	{
-		// append this character
-		buffer += utf8_from_uchar(unichar);
-		result = true;
+		// append this character - check against the size first
+		std::string utf8_char = utf8_from_uchar(unichar);
+		if ((buffer.size() + utf8_char.size()) <= size)
+		{
+			buffer += utf8_char;
+			result = true;
+		}
 	}
 	return result;
 }
@@ -279,8 +282,8 @@ bool input_character(std::string &buffer, std::size_t size, unicode_char unichar
 template <typename F>
 bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
 {
-	const size_t unbounded_size = ((size_t)0) - 1;
-	return input_character(buffer, unbounded_size, unichar, filter);
+	auto size = std::numeric_limits<std::string::size_type>::max();
+	return input_character(buffer, size, unichar, filter);
 }
 
 
