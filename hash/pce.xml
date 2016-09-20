@@ -3093,7 +3093,7 @@
 		</part>
 	</software>
 
-	<software name="ptennis">
+	<software name="ptennis" supported="partial">
 		<description>Power Tennis</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>

@@ -22,14 +22,14 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
-#define I8048_TAG   "i8048"
+#define I8049_TAG   "i8049"
 
 class digijet_state : public driver_device
 {
 public:
 	digijet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, I8048_TAG)
+		, m_maincpu(*this, I8049_TAG)
 	{
 	}
 
@@ -39,10 +39,6 @@ public:
 	virtual void machine_reset() override { }
 };
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, digijet_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( io_map, AS_IO, 8, digijet_state )
 ADDRESS_MAP_END
 
@@ -51,13 +47,12 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( digijet, digijet_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_11MHz)
-	MCFG_CPU_PROGRAM_MAP(program_map)
+	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_11MHz)
 	MCFG_CPU_IO_MAP(io_map)
 MACHINE_CONFIG_END
 
 ROM_START( digijet )
-	ROM_REGION( 0x800, I8048_TAG, 0 )
+	ROM_REGION( 0x800, I8049_TAG, 0 )
 	ROM_LOAD( "vanagon_85_usa_ca.bin", 0x000, 0x800, CRC(2ed7c4c5) SHA1(ae48d8892b44fe76b48bcefd293c15cd47af3fba) ) // Volkswagen Vanagon, 1985, USA, California
 ROM_END
 

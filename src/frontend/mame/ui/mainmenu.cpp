@@ -129,7 +129,7 @@ void menu_main::populate()
 		item_append(_("Plugin Options"), "", 0, (void *)PLUGINS);
 
 	// add dats menu
-	if (ui().options().enabled_dats() && mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
+	if (mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
 		item_append(_("External DAT View"), "", 0, (void *)EXTERNAL_DATS);
 
 	item_append(menu_item_type::SEPARATOR);

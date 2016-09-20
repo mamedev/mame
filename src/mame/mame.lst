@@ -936,6 +936,9 @@ hr16b                           //
 mmt8                            //
 sr16                            //
 
+@source:alesis_qs.cpp
+alesqs7                         //
+
 @source:alg.cpp
 alg_bios                        //
 aplatoon                        // (c) 199? Nova?
@@ -11015,6 +11018,7 @@ hmcompmx                        // GX858 (c) 1999
 popn1                           // GX803 (c) 1998 (Asia)
 popn2                           // GX831 (c) 1998 (Japan)
 popn3                           // GX980 (c) 1999 (Japan)
+popnstage                       // GQ970 (c) 1999 (Japan)
 
 @source:dkong.cpp
 8ballact                        // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
@@ -14164,8 +14168,10 @@ fxmcr165                        // Gakken
 gjackpot                        // Gakken
 gpoker                          // Gakken
 h2hbaseb                        // Coleco
+h2hboxing                       // Coleco
 h2hfootb                        // Coleco
 lostreas                        // Parker Bros
+matchnum                        // A-One
 mathmagi                        // APF
 mdndclab                        // Mattel
 merlin                          // Parker Bros
@@ -14179,11 +14185,12 @@ ssimon                          // Milton Bradley
 ssports4                        // US Games
 starwbc                         // Kenner
 starwbcp                        // Kenner (patent)
-stopthie                        // Parker Bros
-stopthiep                       // Parker Bros (patent)
+stopthief                       // Parker Bros
+stopthiefp                      // Parker Bros (patent)
 tandy12                         // Tandy Radio Shack
 tbreakup                        // Tomy
 tc4                             // Coleco
+tcfball                         // Tandy Radio Shack
 zodiac                          // Coleco
 
 @source:hh_ucom4.cpp
@@ -20466,6 +20473,7 @@ swtrilgy                        // 1998.11 Star Wars Trilogy Arcade
 swtrilgya                       //
 vf3                             // 1996.09 Virtua Fighter 3
 vf3a                            //
+vf3c                            //
 vf3tb                           // 1997.10 Virtua Fighter 3tb
 von2                            // 1998.03 Dennou Senki Virtual-On Oratorio Tangram
 von254g                         // 1999.05 Dennou Senki Virtual-On Oratorio Tangram ver.5.4
@@ -33549,6 +33557,7 @@ fantasyu                        // (c) 1981 Rock-Ola
 nibbler                         // (c) 1982 Rock-ola (version 9)
 nibbler6                        // (c) 1982 Rock-ola (vresion 6)
 nibbler8                        // (c) 1982 Rock-ola (version 8)
+nibblera                        // (c) 1982 Rock-ola (version ?)
 nibblero                        // (c) 1983 Olympia/Rock-Ola (version 8)
 nibblerp                        // (c) 1982 Rock-ola (pballoon conversion)
 pballoon                        // (c) 1982 SNK
@@ -34872,6 +34881,7 @@ topland                         // B62 (c) 1988 Taito Corporation Japan (World)
 @source:taitogn.cpp
 chaoshea                        // 1998.10 Chaos Heat (V2.09O)
 chaosheaj                       // 1998.10 Chaos Heat (V2.08J)
+coh3002t                        //
 flipmaze                        // 1999.09 Flip Maze (V2.04J)
 gobyrc                          // 1999.?? Go By RC (V2.03O)
 kollon                          // 2003.11 Kollon (V2.04J)
@@ -34892,7 +34902,6 @@ sianniv                         // 2003.10 Space Invaders Anniversary (V2.02J)
 soutenry                        // 2001.02 Soutenryu (V2.07J)
 spuzbobl                        // 1999.?? Super Puzzle Bobble (V2.05O)
 spuzboblj                       // 1999.03 Super Puzzle Bobble (Japan)
-taitogn                         //
 usagi                           // 2001.12 Usagi (V2.02J)
 xiistag                         // 2002.07 XII Stag (V2.01J)
 zokuoten                        // 2000.12 Zoku Otenamihaiken (V2.03J)
@@ -37587,10 +37596,7 @@ zexall                          // zexall z80 test suite with kevtris' preloader
 
 @source:zn.cpp
 1on1gov                         // 1 on 1 Government (JAPAN)
-acpsx                           //
 aerofgts                        // Aero Fighters Special (TAIWAN)
-atluspsx                        //
-atpsx                           //
 bam2                            // Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00)
 beastrzr                        // Beastorizer (USA)
 beastrzrb                       // Beastorizer (USA Bootleg)
@@ -37604,8 +37610,15 @@ brvbladea                       // Brave Blade (ASIA)
 brvbladej                       // Brave Blade (JAPAN)
 brvbladeu                       // Brave Blade (USA)
 cbaj                            // Cool Boaders Arcade Jam
-cpzn1                           //
-cpzn2                           //
+coh1000a                        //
+coh1000c                        //
+coh1000t                        //
+coh1000w                        //
+coh1001l                        //
+coh1002v                        //
+coh1002e                        //
+coh1002m                        //
+coh3002c                        //
 doapp                           // Dead Or Alive ++ (JAPAN)
 flamegun                        // Flame Gunner (USA)
 flamegunj                       // Flame Gunner (JAPAN)
@@ -37632,12 +37645,11 @@ lpadv                           // Logic Pro Adventure (JAPAN)
 mfjump                          // Monster Farm Jump (JAPAN)
 mgcldate                        // Magical Date (JAPAN Ver 2.02J)
 mgcldtex                        // Magical Date EX (JAPAN Ver 2.01J)
-nbajamex                        // NBA Jam Extreme
-nbajamexa						//
+nbajamex                        // NBA Jam Extreme (ver. 1.10I)
+nbajamexa                       // NBA Jam Extreme (ver. 1.04)
 plsmaswd                        // Plasma Sword (USA 980316)
 plsmaswda                       // Plasma Sword (ASIA 980316)
 primrag2                        // Primal Rage 2
-psarc95                         //
 psyforce                        // Psychic Force (Ver 2.4O)
 psyforcej                       // Psychic Force (Ver 2.4J)
 psyforcex                       // Psychic Force EX (Ver 2.0J)
@@ -37676,18 +37688,15 @@ stargladj                       // Star Gladiator (JAPAN 960627)
 stargld2                        // Star Gladiator 2 (JAPAN 980316)
 strider2                        // Strider 2 (USA 991213)
 strider2a                       // Strider 2 (ASIA 991213)
-taitofx1                        //
 tblkkuzu                        // The Block Kuzushi (JAPAN)
 techromn                        // Tech Romancer (EURO 980914)
 techromnu                       // Tech Romancer (USA 980914)
 tecmowcm                        // Tecmo World Cup Millennium (JAPAN)
 tgmj                            // Tetris The Grand Master (JAPAN 980710)
 tondemo                         // Tondemo Crisis (JAPAN)
-tps                             //
 ts2                             // Battle Arena Toshinden 2 (USA 951124)
 ts2a                            // Battle Arena Toshinden 2 (USA 951124)
 ts2j                            // Battle Arena Toshinden 2 (JAPAN 951124)
-vspsx                           //
 
 @source:zodiack.cpp
 bounty                          // (c) 1982 Orca

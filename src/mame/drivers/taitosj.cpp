@@ -175,14 +175,21 @@ TODO:
 
 WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
 {
-	m_sndnmi_disable = data & 0x01;
+	m_sndnmi_disable = (data & 1);
+	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(taitosj_state::sound_command_w)
 {
-	m_sound_cmd_ack = true;
+	m_sound_cmd_written = true;
 	m_soundlatch->write(space,0,data);
-	if (!m_sndnmi_disable) m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -192,9 +199,13 @@ WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
 }
 
 // EPORT2
-WRITE8_MEMBER(taitosj_state::sound_semaphore_assert_w)
+WRITE8_MEMBER(taitosj_state::sound_semaphore_w)
 {
-	m_sound_semaphore = (data & 1) == 1;
+	m_sound_semaphore = (data & 1);
+	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
@@ -233,7 +244,7 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("gfxpointer")
 	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd50c, 0xd50c) AM_MIRROR(0x00f0) AM_WRITE(sound_semaphore_assert_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_MIRROR(0x00f0) AM_WRITE(sound_semaphore_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
@@ -305,7 +316,7 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_SHARE("gfxpointer")
 	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd50c, 0xd50c) AM_WRITE(sound_semaphore_assert_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_WRITE(sound_semaphore_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_SHARE("video_mode")
@@ -316,14 +327,14 @@ ADDRESS_MAP_END
 // RD5000
 READ8_MEMBER(taitosj_state::sound_command_r)
 {
-	m_sound_cmd_ack = false;
+	m_sound_cmd_written = false;
 	return m_soundlatch->read(space,0);
 }
 
 // RD5001
 READ8_MEMBER(taitosj_state::sound_status_r)
 {
-	return (m_sound_cmd_ack == true ? 8 : 0) | (m_sound_semaphore == true ? 4 : 0) | 3;
+	return (m_sound_cmd_written == true ? 8 : 0) | (m_sound_semaphore == true ? 4 : 0) | 3;
 }
 
 // WR5000
@@ -336,6 +347,10 @@ WRITE8_MEMBER(taitosj_state::sound_command_ack_w)
 WRITE8_MEMBER(taitosj_state::sound_semaphore_clear_w)
 {
 	m_sound_semaphore = false;
+	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1749,17 +1764,17 @@ WRITE8_MEMBER(taitosj_state::dac_vol_w)
 static MACHINE_CONFIG_START( nomcu, taitosj_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,8000000/2)      /* 4 MHz */
+	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)      /* 8 MHz / 2, on CPU board */
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitosj_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,6000000/2)    /* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_6MHz/2)    /* 6 MHz / 2, on GAME board */
 	MCFG_CPU_PROGRAM_MAP(taitosj_audio_map)
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
 			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
+	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold,  (double)XTAL_6MHz/(4*16*16*10*16))
 
 
 	/* video hardware */
@@ -1780,21 +1795,30 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 6000000/4)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 6000000/4)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitosj_state, dac_out_w))   /* port Awrite */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, dac_vol_w))    /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 6000000/4)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitosj_state, input_port_4_f0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay4", AY8910, 6000000/4)
+	MCFG_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
+	   collector inverter, to selectively tie none, either or both of two
+	   capacitors between the ay4 audio output signal and ground, or between
+	   audio output signal and high-z (i.e. do nothing).
+	   Bio Attack uses this?
+	*/
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -1810,7 +1834,7 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_CPU_ADD("mcu", M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
+	MCFG_CPU_ADD("mcu", M68705,XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(taitosj_mcu_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -2700,7 +2724,8 @@ ROM_END
 
 void taitosj_state::reset_common()
 {
-	m_sndnmi_disable = 1;
+	m_sndnmi_disable = false; // ay-3-8910 resets all registers to 0 on reset
+	m_sound_semaphore = false;
 	m_input_port_4_f0 = 0;
 	/* start in 1st gear */
 	m_kikstart_gears[0] = 0x02;
@@ -2712,6 +2737,8 @@ void taitosj_state::reset_common()
 void taitosj_state::init_common()
 {
 	save_item(NAME(m_sndnmi_disable));
+	save_item(NAME(m_sound_cmd_written));
+	save_item(NAME(m_sound_semaphore));
 	save_item(NAME(m_input_port_4_f0));
 	save_item(NAME(m_kikstart_gears));
 	save_item(NAME(m_dac_out));

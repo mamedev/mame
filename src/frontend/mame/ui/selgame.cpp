@@ -139,11 +139,15 @@ menu_select_game::~menu_select_game()
 	game_driver const *const driver(isfavorite() ? nullptr : reinterpret_cast<game_driver const *>(get_selection_ref()));
 	ui_software_info *const swinfo(isfavorite() ? reinterpret_cast<ui_software_info *>(get_selection_ref()) : nullptr);
 
-	if ((FPTR)driver > skip_main_items)
+	if (reinterpret_cast<FPTR>(driver) > skip_main_items)
 		last_driver = driver->name;
+	else if (driver && m_prev_selected)
+		last_driver = reinterpret_cast<game_driver const *>(m_prev_selected)->name;
 
-	if ((FPTR)swinfo > skip_main_items)
+	if (reinterpret_cast<FPTR>(swinfo) > skip_main_items)
 		last_driver = swinfo->shortname;
+	else if (swinfo && m_prev_selected)
+		last_driver = reinterpret_cast<ui_software_info *>(m_prev_selected)->shortname;
 
 	std::string filter(main_filters::text[main_filters::actual]);
 	if (main_filters::actual == FILTER_MANUFACTURER)
@@ -168,7 +172,6 @@ void menu_select_game::handle()
 		m_prev_selected = item[0].ref;
 
 	bool check_filter = false;
-	bool enabled_dats = ui().options().enabled_dats();
 
 	// if i have to load datfile, performe an hard reset
 	if (ui_globals::reset)
@@ -339,7 +342,7 @@ void menu_select_game::handle()
 			m_search[0] = '\0';
 			reset(reset_options::SELECT_FIRST);
 		}
-		else if (menu_event->iptkey == IPT_UI_DATS && enabled_dats)
+		else if (menu_event->iptkey == IPT_UI_DATS && mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
 		{
 			// handle UI_DATS
 			if (!isfavorite())
@@ -394,7 +397,7 @@ void menu_select_game::handle()
 				}
 			}
 		}
-		else if (menu_event->iptkey == IPT_UI_EXPORT && !isfavorite())
+		else if (menu_event->iptkey == IPT_UI_EXPORT)
 		{
 			// handle UI_EXPORT
 			inkey_export();
@@ -501,7 +504,7 @@ void menu_select_game::populate()
 	if (!isfavorite())
 	{
 		// if search is not empty, find approximate matches
-		if (m_search[0] != 0 && !isfavorite())
+		if (m_search[0] != 0)
 			populate_search();
 		else
 		{
@@ -1352,8 +1355,23 @@ void menu_select_game::inkey_export()
 	}
 	else
 	{
-		list = m_displaylist;
+		if (isfavorite())
+		{
+			// iterate over favorites
+			for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
+			{
+				if (favmap.second.startempty == 1)
+					list.push_back(favmap.second.driver);
+				else
+					return;
+			}
+		}
+		else
+		{
+			list = m_displaylist;
+		}
 	}
+
 	menu::stack_push<menu_export>(ui(), container(), std::move(list));
 }
 

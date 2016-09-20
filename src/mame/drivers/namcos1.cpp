@@ -2701,7 +2701,8 @@ ROM_START( puzlclub )
 	ROM_LOAD( "pc1-c4.bin",         0x80000, 0x20000, CRC(f1c95296) SHA1(f093c4227b4f6f524a76d0b9409c2c6ce33e560b) )
 	ROM_LOAD( "pc1-c5.bin",         0xa0000, 0x20000, CRC(bc443c27) SHA1(af841b6a2b783b0d9b9bbc33083afbb56e8bff69) )
 	ROM_LOAD( "pc1-c6.bin",         0xc0000, 0x20000, CRC(ec0a3dc5) SHA1(a5148e99f3198196fd635ff4ac0275393e6f7033) )
-
+	ROM_LOAD( "pc1-c7.bin",         0xe0000, 0x20000, NO_DUMP ) // title screen gfxs are here, might not exist.
+	
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites */
 ROM_END

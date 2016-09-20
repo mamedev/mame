@@ -112,6 +112,8 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 		{
 			case CMD_SET_MODE:
 				m_mode = data;
+				m_buf[0] = 0;
+				m_buf_count = 1;
 				break;
 			case CMD_LOCK:
 				m_locked = data & 1 ? true : false;
@@ -167,7 +169,8 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 				m_buf[5] = dec_2_bcd((last >> 16) & 0xff);
 				m_buf[6] = dec_2_bcd((last >> 8) & 0xff);
 				m_buf[7] = dec_2_bcd(last & 0xff);
-				m_buf_count = 8;
+				m_buf[8] = 0;
+				m_buf_count = 9;
 			}
 			else
 			{
@@ -183,8 +186,8 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 				UINT32 start = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk));
 				UINT32 end = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk < tracks ? m_curtoctrk + 1 : 0xaa));
 				m_buf[0] = 1; // track type?
-				m_buf[1] = dec_2_bcd(m_curtoctrk + 1);
-				m_buf[2] = dec_2_bcd(m_curtoctrk + 1);
+				m_buf[1] = 0; // track num except when reading toc
+				m_buf[2] = dec_2_bcd(m_curtoctrk); // index
 				m_buf[3] = dec_2_bcd((start >> 16) & 0xff);
 				m_buf[4] = dec_2_bcd((start >> 8) & 0xff);
 				m_buf[5] = dec_2_bcd(start & 0xff);

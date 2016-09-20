@@ -1266,7 +1266,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_DIPSETTING(    0x40, "80%" )
 	PORT_DIPSETTING(    0x00, "85%" )
 
-	PORT_START("SYSTEM")
+	PORT_START("SYSTEM") /* Port 0 of MCU, might also be readable by z80 at io 0x0418 (nmi ack read port) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1274,8 +1274,13 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )   // doesn't work in bootleg
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, superqix_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	/* The bits 0xc0 above is known to be WRONG from tracing:
+	bit 6 connects to whatever bit 7 is connected to on AY-3-8910 #1 @3P Port A
+	bit 7 connects to whatever bit 7 is connected to on AY-3-8910 #1 @3P Port B
+	however what those ay bits actually each connect to (semaphores? service button?) is currently unknown
+	*/
 
-	PORT_START("P1")
+	PORT_START("P1") /* AY-3-8910 #1 @3P Port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -1285,7 +1290,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")   /* ??? */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("P2")
+	PORT_START("P2") /* AY-3-8910 #1 @3P Port B */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
@@ -1405,12 +1410,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sqix, superqix_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)    /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sqix_port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
-	MCFG_CPU_ADD("mcu", I8751, 12000000/3)  /* ??? */
+	MCFG_CPU_ADD("mcu", I8751, XTAL_12MHz/3)  /* TODO: VERIFY DIVISOR, is this 3mhz or 4mhz? */
 	MCFG_CPU_IO_MAP(sqix_mcu_io_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1435,12 +1440,14 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) // AY-3-8910 @3P, outputs directly tied together
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, in4_mcu_r)) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) // AY-3-8910 @3M, outputs directly tied together
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, sqix_from_mcu_r)) /* port Bread */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(superqix_state,sqix_z80_mcu_w)) /* port Bwrite */
@@ -1483,11 +1490,13 @@ static MACHINE_CONFIG_START( sqix_nomcu, superqix_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, in4_mcu_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, bootleg_in0_r)) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
