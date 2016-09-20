@@ -1368,7 +1368,7 @@ void menu_select_game::inkey_export()
 		}
 		else
 		{
-		list = m_displaylist;
+			list = m_displaylist;
 		}
 	}
 
