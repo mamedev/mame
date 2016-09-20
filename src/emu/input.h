@@ -549,13 +549,14 @@ class input_device
 
 public:
 	// construction/destruction
-	input_device(input_class &_class, int _devindex, const char *_name, void *_internal);
+	input_device(input_class &_class, int _devindex, const char *_name, const char *_id, void *_internal);
 	// getters
 	input_class &device_class() const { return m_class; }
 	input_manager &manager() const;
 	running_machine &machine() const;
 	input_device_class devclass() const;
 	const char *name() const { return m_name.c_str(); }
+	const char *id() const { return m_id.c_str(); }
 	int devindex() const { return m_devindex; }
 	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
 	input_item_id maxitem() const { return m_maxitem; }
@@ -574,12 +575,13 @@ public:
 	// helpers
 	INT32 apply_deadzone_and_saturation(INT32 value) const;
 	void apply_steadykey() const;
-	bool match_device_name(const char * devicename);
+	bool match_device_id(const char * deviceid);
 
 private:
 	// internal state
 	input_class &           m_class;                // reference to our class
 	std::string             m_name;                 // string name of device
+	std::string             m_id;                   // id of device
 	int                     m_devindex;             // device index of this device
 	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
 	input_item_id           m_maxitem;              // maximum item index
@@ -617,8 +619,8 @@ public:
 	void set_multi(bool multi = true) { m_multi = multi; }
 
 	// device management
-	input_device *add_device(const char *name, void *internal = nullptr);
-	input_device *add_device(int devindex, const char *name, void *internal = nullptr);
+	input_device *add_device(const char *name, const char *id, void *internal = nullptr);
+	input_device *add_device(int devindex, const char *name, const char *id, void *internal = nullptr);
 
 	// misc helpers
 	input_item_class standard_item_class(input_item_id itemid);
