@@ -244,13 +244,11 @@ WRITE16_MEMBER(megasys1_tilemap_device::scroll_w)
 		case 0:
 		{
 			COMBINE_DATA(&m_scrollx);
-			m_tmap->set_scrollx(0, m_scrollx);
 			break;
 		}
 		case 1:
 		{
 			COMBINE_DATA(&m_scrolly);
-			m_tmap->set_scrolly(0, m_scrolly);
 			break;
 		}
 		case 2:
@@ -281,6 +279,8 @@ WRITE16_MEMBER(megasys1_tilemap_device::scroll_w)
 
 void megasys1_tilemap_device::draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask)
 {
+	m_tmap->set_scrollx(0, m_scrollx);
+	m_tmap->set_scrolly(0, m_scrolly);
 	m_tmap->draw(screen, dest, cliprect, flags, priority, priority_mask);
 }
 
