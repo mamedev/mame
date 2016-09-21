@@ -559,6 +559,30 @@ ROM_START( phoenix )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
+ROM_START( phoenix2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic45-pg1.1a",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "ic46-pg2.2a",  0x0800, 0x0800, CRC(273a4a82) SHA1(6f3019a074e73ff50ceb92f655fcf15659f34919) )
+	ROM_LOAD( "ic47-pg3.3a",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "ic48-pg4.4a",  0x1800, 0x0800, CRC(cb5d9915) SHA1(49bcf55a5721cfcc02c3b811a4b601e35ea576db) )
+	ROM_LOAD( "ic49-pg5.5a",  0x2000, 0x0800, CRC(73bcd2e1) SHA1(773acb7317531572cb2b81c7375e0fe52127fa0a) )
+	ROM_LOAD( "ic50-pg6.6a",  0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "ic51-pg7.7a",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "ic52-pg8.8a",  0x3800, 0x0800, CRC(aff8e9c5) SHA1(e4164f85ec12d4d9bcbffba27ab1f51b3599f6d0) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "ic23-cg1.3d",  0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24-cg2.4d",  0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "ic39-cg3.3b",  0x0000, 0x0800, CRC(53413e8f) SHA1(d772358505b973b10da840d204afb210c0c746ec) )
+	ROM_LOAD( "ic40-cg4.4b",  0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
+
 ROM_START( phoenixa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1-ic45.1a",    0x0000, 0x0800, CRC(c7a9b499) SHA1(cda61de47956b3603ff6e48556ce528b5f45deab) )
@@ -1383,7 +1407,8 @@ DRIVER_INIT_MEMBER(phoenix_state,vautourza)
 }
 
 /*** Phoenix (& clones) ***/
-GAME( 1980, phoenix,  0,        phoenix,  phoenix, driver_device,  0,        ROT90, "Amstar",                            "Phoenix (Amstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenix,  0,        phoenix,  phoenix, driver_device,  0,        ROT90, "Amstar",                            "Phoenix (Amstar, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenix2, phoenix,  phoenix,  phoenix, driver_device,  0,        ROT90, "Amstar",                            "Phoenix (Amstar, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenixa, phoenix,  phoenix,  phoenixa, driver_device, 0,        ROT90, "Amstar (Centuri license)",          "Phoenix (Centuri, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenixb, phoenix,  phoenix,  phoenixa, driver_device, 0,        ROT90, "Amstar (Centuri license)",          "Phoenix (Centuri, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenixt, phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "Amstar (Taito license)",            "Phoenix (Taito)", MACHINE_SUPPORTS_SAVE )
