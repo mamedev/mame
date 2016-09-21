@@ -15,6 +15,7 @@
 
 #include "ui/filesel.h"
 #include "ui/ui.h"
+#include "ui/utils.h"
 
 #include "imagedev/floppy.h"
 
@@ -432,33 +433,11 @@ void menu_file_selector::handle()
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
-			bool update_selected = false;
-
-			if ((event->unichar == 8) || (event->unichar == 0x7f))
+			// if it's any other key and we're not maxed out, update
+			if (input_character(m_filename, event->unichar, uchar_is_printable))
 			{
-				// if it's a backspace and we can handle it, do so
-				auto const buflen = m_filename.size();
-				if (0 < buflen)
-				{
-					auto buffer_oldend = m_filename.c_str() + buflen;
-					auto buffer_newend = utf8_previous_char(buffer_oldend);
-					m_filename.resize(buffer_newend - m_filename.c_str());
-					update_selected = true;
-
-					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
-				}
-			}
-			else if (event->is_char_printable())
-			{
-				// if it's any other key and we're not maxed out, update
-				m_filename += utf8_from_uchar(event->unichar);
-				update_selected = true;
-
 				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
-			}
 
-			if (update_selected)
-			{
 				file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
 
 				// check for entries which matches our m_filename_buffer:

@@ -23,6 +23,33 @@ bool uchar_isvalid(unicode_char uchar)
 
 
 //-------------------------------------------------
+//  uchar_is_printable - tests to see if a unicode
+//	char is printable
+//-------------------------------------------------
+
+bool uchar_is_printable(unicode_char uchar)
+{
+	return
+		!(0x0001f >= uchar) &&                            // C0 control
+		!((0x0007f <= uchar) && (0x0009f >= uchar)) &&    // DEL and C1 control
+		!((0x0fdd0 <= uchar) && (0x0fddf >= uchar)) && 	  // noncharacters
+		!(0x0fffe == (uchar & 0x0ffff)) &&                // byte-order detection noncharacter
+		!(0x0ffff == (uchar & 0x0ffff));                  // the other noncharacter
+}
+
+
+//-------------------------------------------------
+//  uchar_is_digit - tests to see if a unicode
+//	char is a digit
+//-------------------------------------------------
+
+bool uchar_is_digit(unicode_char uchar)
+{
+	return uchar >= '0' && uchar <= '9';
+}
+
+
+//-------------------------------------------------
 //  uchar_from_utf8 - convert a UTF-8 sequence
 //  into a unicode character
 //-----------------------------------------------
