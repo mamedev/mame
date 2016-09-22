@@ -6,13 +6,6 @@
 
                     driver by   Luca Elia (l.elia@tin.it)
 
-
-    This file contains definitions used across multiple megasys1
-    and non megasys1 Jaleco games:
-
-    * Scrolling layers handling
-    * Code decryption handling
-
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
