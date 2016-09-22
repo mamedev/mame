@@ -21,8 +21,30 @@
 	  as "TEST.DATA".
 	* File type is deduced from host file extension when putting files
 	  into image. File type can be overridden by the "ftype" option.
+	  This table summarizes the file types.
+
+      ftype		Fake		Type of file	BASIC commands
+      switch    extension					for this file type
+      ========================================================
+      U			BKUP		"Database backup"
+											No idea
+	  D			DATA		Generic record-based data file
+											SAVE/GET/PRINT#/READ#
+	  P			PROG		Program file (tokenized BASIC & other data)
+											STORE/LOAD
+	  K			KEYS		KEY file (definition of soft keys)
+											STORE KEY/LOAD KEY
+	  T			BDAT		Binary data file
+											?
+	  A			ALL			Full dump of system state
+											STORE ALL/LOAD ALL
+	  B			BPRG		Binary program file
+											STORE BIN/LOAD BIN
+	  O			OPRM		Option ROM specific file
+											?
+
 	* Files are always stored in units of 256-byte physical records.
-	* An important metadata of files is WPR: Words Per Records. This
+	* An important metadata of files is WPR: Words Per Record. This
 	  is a numeric value that sets the length of each logical record of
 	  the file (in units of 16-bit words). It defaults to 128 (i.e.
 	  logical and physical records are the same thing). It can be
@@ -128,6 +150,17 @@
 #define BPRG_ATTR_STR		"BPRG"
 #define OPRM_FILETYPE		7
 #define OPRM_ATTR_STR		"OPRM"
+
+// Record type identifiers
+#define REC_TYPE_EOR		0x1e	// End-of-record
+#define REC_TYPE_FULLSTR	0x3c	// A whole (un-split) string
+#define REC_TYPE_EOF		0x3e	// End-of-file
+#define REC_TYPE_1STSTR		0x1c	// First part of a string
+#define REC_TYPE_MIDSTR		0x0c	// Middle part(s) of a string
+#define REC_TYPE_ENDSTR		0x2c	// Last part of a string
+
+// End-of-lines
+#define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))
 
 // Words stored on tape
 typedef UINT16 tape_word_t;
@@ -1290,6 +1323,160 @@ void hp9845_tape_get_info(const imgtool_class *imgclass, UINT32 state, union img
 
 	case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:
 		strcpy(info->s = imgtool_temp_str(), HP9845_WRITEFILE_OPTSPEC);
+		break;
+	}
+}
+
+/********************************************************************************
+ * Filter functions
+ ********************************************************************************/
+static unsigned len_to_eor(imgtool_stream *inp)
+{
+	return SECTOR_LEN - (unsigned)(stream_tell(inp) % SECTOR_LEN);
+}
+
+static bool get_record_part(imgtool_stream *inp , void *buf , unsigned len)
+{
+	// Reading must never cross sector boundary
+	if (len > len_to_eor(inp)) {
+		return false;
+	}
+
+	return stream_read(inp , buf , len) == len;
+}
+
+static bool dump_string(imgtool_stream *inp, imgtool_stream *out , unsigned len , bool add_eoln)
+{
+	UINT8 tmp[ SECTOR_LEN ];
+
+	if (!get_record_part(inp , tmp , len)) {
+		return false;
+	}
+
+	stream_write(out , tmp , len);
+	if (add_eoln) {
+		stream_puts(out , EOLN);
+	}
+
+	return true;
+}
+
+static imgtoolerr_t hp9845data_read_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+{
+	imgtool_stream *inp_data;
+	imgtoolerr_t res;
+	UINT8 tmp[ 2 ];
+
+	inp_data = stream_open_mem(NULL , 0);
+	if (inp_data == nullptr) {
+		return IMGTOOLERR_OUTOFMEMORY;
+	}
+
+	res = hp9845_tape_read_file(partition , filename , fork , inp_data);
+	if (res != IMGTOOLERR_SUCCESS) {
+		stream_close(inp_data);
+		return res;
+	}
+
+	stream_seek(inp_data , 0 , SEEK_SET);
+
+	UINT16 rec_type;
+	unsigned rec_len;
+	unsigned tmp_len;
+	unsigned accum_len = 0;
+
+	do {
+		// Get record type
+		if (!get_record_part(inp_data , tmp , 2)) {
+			return IMGTOOLERR_READERROR;
+		}
+		rec_type = (UINT16)pick_integer_be(tmp , 0 , 2);
+		switch (rec_type) {
+		case REC_TYPE_EOR:
+			// End of record: just skip it
+			break;
+
+		case REC_TYPE_FULLSTR:
+			// A string in a single piece
+		case REC_TYPE_1STSTR:
+			// First piece of a split string
+		case REC_TYPE_MIDSTR:
+			// Mid piece(s) of a split string
+		case REC_TYPE_ENDSTR:
+			// Closing piece of a split string
+			if (((rec_type == REC_TYPE_FULLSTR || rec_type == REC_TYPE_1STSTR) && accum_len > 0) ||
+				((rec_type == REC_TYPE_MIDSTR || rec_type == REC_TYPE_ENDSTR) && accum_len == 0)) {
+				fputs("Wrong sequence of string pieces\n" , stderr);
+				return IMGTOOLERR_CORRUPTFILE;
+			}
+
+			if (!get_record_part(inp_data , tmp , 2)) {
+				return IMGTOOLERR_READERROR;
+			}
+			tmp_len = (unsigned)pick_integer_be(tmp , 0 , 2);
+
+			if (rec_type == REC_TYPE_FULLSTR || rec_type == REC_TYPE_1STSTR) {
+				accum_len = tmp_len;
+			} else if (tmp_len != accum_len) {
+				fputs("Wrong length of string piece\n" , stderr);
+				return IMGTOOLERR_CORRUPTFILE;
+			}
+
+			if (rec_type == REC_TYPE_FULLSTR || rec_type == REC_TYPE_ENDSTR) {
+				rec_len = accum_len;
+			} else {
+				rec_len = std::min(accum_len , len_to_eor(inp_data));
+			}
+			if (!dump_string(inp_data , destf , rec_len , rec_type == REC_TYPE_FULLSTR || rec_type == REC_TYPE_ENDSTR)) {
+				return IMGTOOLERR_READERROR;
+			}
+			if (rec_len & 1) {
+				// Keep length of string pieces even
+				get_record_part(inp_data , tmp , 1);
+			}
+			accum_len -= rec_len;
+			break;
+
+		case REC_TYPE_EOF:
+			// End of file
+			break;
+
+		default:
+			fprintf(stderr , "Unknown record type (%04x)\n" , rec_type);
+			return IMGTOOLERR_CORRUPTFILE;
+		}
+	} while (rec_type != REC_TYPE_EOF);
+
+	return IMGTOOLERR_SUCCESS;
+}
+
+static imgtoolerr_t hp9845data_write_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+{
+	// TODO:
+	return IMGTOOLERR_UNIMPLEMENTED;
+}
+
+void filter_hp9845data_getinfo(UINT32 state, union filterinfo *info)
+{
+	switch (state) {
+	case FILTINFO_PTR_READFILE:
+		info->read_file = hp9845data_read_file;
+		break;
+
+	case FILTINFO_PTR_WRITEFILE:
+		info->write_file = hp9845data_write_file;
+		break;
+
+	case FILTINFO_STR_NAME:
+		info->s = "9845data";
+		break;
+
+	case FILTINFO_STR_HUMANNAME:
+		info->s = "HP9845 text-only DATA files";
+		break;
+
+	case FILTINFO_STR_EXTENSION:
+		info->s = "txt";
 		break;
 	}
 }
