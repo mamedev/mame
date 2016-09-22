@@ -34316,9 +34316,10 @@ pbillian                        // (c) 1986 Taito
 perestro                        // (c) 1994 Promat
 perestrof                       // (c) 1993 Promat / Fuuki
 sqix                            // B03 1987
-sqixb1                          // bootleg? but (c) 1987
-sqixb2                          // bootleg? but (c) 1987
+sqixb1                          // bootleg (exact copy of sqixr0 with bootleg MCU) (c) 1987
+sqixb2                          // bootleg with no mcu, but retains the (c) 1987
 sqixr1                          // B03 1987
+sqixr0                          // B03 1987
 sqixu                           // B03 1987
 
 @source:superslave.cpp
@@ -36476,6 +36477,7 @@ wrecking                        // (c) 1984 Nintendo
 
 @source:vt100.cpp
 vt100                           // 1978 Digital Equipment Corporation
+//vt100ac                         // 1979 Digital Equipment Corporation
 vt101                           // 1981 Digital Equipment Corporation
 vt102                           // 1981 Digital Equipment Corporation
 vt105                           // 1978 Digital Equipment Corporation

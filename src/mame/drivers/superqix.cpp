@@ -45,15 +45,35 @@ Super Qix:
   This happens in all sets. There appears to be code that would check part of
   the MCU init sequence ($5973 onwards), but it doesn't seem to be called.
 
-- sqixb1 might be based on an earlier version because there is a bug with coin
-  lockout: it is activated after inserting 10 coins instead of 9.
-  sqix doesn't have that bug and also inverts the coin lockout output compared
-  to the bootleg.
-  The older sqixr1 non-bootleg set does not have the 10 coin lockout bug
-  either, so it is possible that the bootleggers introduced it themselves, or
-  the bootleg is based on some sort of early (location test?) set (older than
-  the sqixr1 set) which we don't have a dump of.
-
+- sqixr0 (World/Japan V1.0) (and sqixb1 which is the exact same ROMs but the
+  8751 MCU replaced with an 8031) has a bug with coin lockout: it is activated
+  after inserting 10 coins instead of 9.
+  This is fixed in World/Japan V1.1, V1.2 and the US set.
+  In addition, the polarity of the coin lockout on V1.0 (and sqixb1) is
+  flat-out reversed, so the pcb will not work in a standard JAMMA harness with
+  coin lockouts without inverting JAMMA pins K and/or 9. The hack below on V1.0
+  pcbs with the two wires connecting to IC 7H may have been a workaround which
+  involved a customized JAMMA connector/harness. How exactly is unclear.
+  
+- All Taito Super Qix PCBS are part M6100237A, and have a wiring hack on top of
+  component 7H (a 74LS86 Quad XOR gate):
+  (reference: 74LS86 pins 4, 5 and 12 are 2A, 2B and 4A respectively, none are
+  outputs)
+  The V1.0 PCBs have two greenwires running on the back of the pcb, connected
+  from 7H pins 4 and 5, to JAMMA pins e (GND) and d (unused) respectively.
+  This implies there was a hack done on the JAMMA harness connector itself
+  (possibly to invert the coin lockout value using one of the XOR gates
+  at 7H (or perhaps 7H controls the coin lockouts themselves?)) but what
+  exactly the hack does is unclear without further tracing.
+  
+  The V1.1, V1.2 and US PCBS have two resistors from VCC to GND forming a
+  voltage divider on top of 7H, the resistor from VCC/Pin 14 to Common is
+  22KOhms, the other resistor is unknown and seems to connect to GND/Pin 7.
+  The center of the two resistors connects to one end of a 0.1uf capacitor,
+  the other end of the capacitor connects to 7H pin 12.
+  This implies some sort of brief/reset pulse generation or filter on pin 12.
+  Again, what exactly this accomplishes is unclear without further tracing.
+  
 - sqixb2 is a bootleg of sqixb1, with the MCU removed.
 
 - Prebillian controls: (from the Japanese flyer):
@@ -68,7 +88,8 @@ TODO:
 
 - I'm not sure about the NMI ack at 0418 in the original sqix, but the game hangs
   at the end of a game without it. Note that the bootleg replaces that call with
-  something else.
+  something else. That something else is actually reading the system/Coin/Start
+  inputs from 0418, which the MCU normally reads from its port 0, hence...
 - Given the behavior of prebillian and hotsmash, I'm guessing 0418 resetting the
   NMI latch (i.e. NMI ACK) is correct. [LN]
 
@@ -363,7 +384,7 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 	machine().bookkeeping().coin_counter_w(1,data & 4);
 
 	// bit 3 = coin lockout
-	machine().bookkeeping().coin_lockout_global_w(~data & 8);
+	machine().bookkeeping().coin_lockout_global_w(((data & 8)>>3) ^ m_invert_coin_lockout);
 
 	// bit 4 = flip screen
 	flip_screen_set(data & 0x10);
@@ -1548,9 +1569,9 @@ ROM_START( hotsmash )
 	ROM_LOAD( "b18-03",  0x14000, 0x04000, CRC(1c82717d) SHA1(6942c8877e24ac51ed71036e771a1655d82f3491) )
 ROM_END
 
-ROM_START( sqix )
+ROM_START( sqix ) // It is unclear what this set fixes vs 1.1 below, but the 'rug pattern' on the bitmap test during POST has the left edge entirely black, unlike v1.0 or v1.1, but like sqixu
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03-01-2.f3",   0x00000, 0x08000, CRC(5ded636b) SHA1(827954001b4617b3bd439be75094d8dca06ea32b) )
+	ROM_LOAD( "b03-01-2.ef3",  0x00000, 0x08000, CRC(5ded636b) SHA1(827954001b4617b3bd439be75094d8dca06ea32b) )
 	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
@@ -1567,9 +1588,28 @@ ROM_START( sqix )
 	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
-ROM_START( sqixr1 )
+ROM_START( sqixr1 ) // This set has the coin lockout polarity inverted, and also fixes the 10 vs 9 lockout bug
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03-01-1.f3",   0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
+	ROM_LOAD( "b03-01-1.ef3",  0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
+	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
+	ROM_LOAD( "b03-03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
+	/* the above file is derived from b03-08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03-03 MCU */
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+ROM_END
+
+ROM_START( sqixr0 ) // This set is older than the above two: it has the coin lockout only trigger after 10 coins (causing the last coin to be lost), and the coin lockout polarity is not inverted
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "b03-01.ef3",    0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
 	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
@@ -1588,7 +1628,7 @@ ROM_END
 
 ROM_START( sqixu )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03-06.f3",    0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
+	ROM_LOAD( "b03-06.ef3",   0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
 	ROM_LOAD( "b03-07.h3",    0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
@@ -1607,10 +1647,11 @@ ROM_END
 /* this is a bootleg with an 8031+external rom in place of the 8751 of the
    original board; The mcu code is extensively hacked to avoid use of port 2,
    which is used as the rom data bus, using a multiplexed latch on one of the
-   other ports instead. This is based on dumped original b03-03.l2 code. */
+   other ports instead. This mcu is based on dumped original b03-03.l2 code.
+   The actual rom set is an exact copy of sqixr0 above, barring the MCU changes */
 ROM_START( sqixb1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
+	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) ) // == b03-01.ef3
 	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I8031 code */
@@ -1620,14 +1661,14 @@ ROM_START( sqixb1 )
 	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* 1st half of sq-iu3.p8, fake label */
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* 2nd half of sq-iu3.p8, fake label */
+	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
+	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
 	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
-ROM_START( sqixb2 )
+ROM_START( sqixb2 ) // this bootleg set has been extensively hacked to avoid using the MCU at all, though a few checks for the semaphore flags were never patched out
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cpu.2",         0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
 	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
@@ -1673,9 +1714,12 @@ ROM_START( perestro )
 	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
+DRIVER_INIT_MEMBER(superqix_state,sqix)
+{
+	m_invert_coin_lockout = 1;
+}
 
-
-DRIVER_INIT_MEMBER(superqix_state,sqixa)
+DRIVER_INIT_MEMBER(superqix_state,sqixr0)
 {
 	m_invert_coin_lockout = 0;
 }
@@ -1746,10 +1790,11 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 
 GAME( 1986, pbillian, 0,        pbillian,   pbillian, driver_device,  0,        ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hotsmash, 0,        hotsmash,   hotsmash, driver_device,  0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix,       superqix, driver_device,  0,        ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix,       superqix, driver_device,  0,        ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqix,       superqix, driver_device,  0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1, 8031 MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
-GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, driver_device,  0,        ROT90, "bootleg", "Super Qix (bootleg set 2, No MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
+GAME( 1987, sqix,     0,        sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr0,   sqix,     sqix,       superqix, superqix_state, sqixr0,   ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, sqixr0,   ROT90, "bootleg", "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
+GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, superqix_state, sqix,     ROT90, "bootleg", "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
 GAME( 1994, perestro, 0,        sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, perestrof,perestro, sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )
