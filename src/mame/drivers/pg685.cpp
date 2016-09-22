@@ -75,7 +75,7 @@ Memory:			27xTMS27C256-15
 
 This machine has the BMG (bit mapped graphics) option, that John Elliott described as a memory mapped
 hercules card. There is a GEM/3 display driver that was indeed derived from the Hercules one.
-The screen buffer starts at E000, he video card is at F9F0:80h, the beeper frequency at F9F0:36h, 
+The screen buffer starts at E000, the video card is at F9F0:80h, the beeper frequency at F9F0:36h, 
 the serial port at F9F0:38h.
 
 Graphics screen, MiniScribe 8425 hard disk drive on a WD2010B-AL controller, Teac FD-55FR 511-U floppy drive
@@ -114,6 +114,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
+
+
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
@@ -124,6 +126,15 @@ static ADDRESS_MAP_START(pg685_mem, AS_PROGRAM, 8, pg685_state)
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
 	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
 	AM_RANGE(0xfb000,0xfb7ff) AM_RAM AM_SHARE ("framebuffer")
+	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(pg685oua12_mem, AS_PROGRAM, 16, pg685_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000,0xdffff) AM_RAM
+	AM_RANGE(0xe0000,0xeffff) AM_RAM AM_SHARE ("framebuffer")
+	AM_RANGE(0xf0000,0xf1fff) AM_RAM
+	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
@@ -191,19 +202,57 @@ static MACHINE_CONFIG_START( pg685, pg685_state )
 	
 	// harddisk
 	
+MACHINE_CONFIG_END	
+
+	
+static MACHINE_CONFIG_START( pg685oua12, pg685_state )
+	// main cpu
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_20MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(pg685oua12_mem)
+
+	// i/o cpu
+	
+	// ram
+
+	// video hardware
+
+	// sound hardware
+
+	// devices
+	
+	// rs232 port
+	
+	// keyboard
+	
+	// printer
+	
+	// floppy
+	
+	// harddisk
+
+MACHINE_CONFIG_END
+
+	
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
-
-MACHINE_CONFIG_END
 
 ROM_START( pg685 )
 	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "pg685_oua11_s79200-g2_a901-03.bin", 0x0000, 0x4000, CRC(db13f2db) SHA1(5f65ab14d9c8acdcc5482b27e727ca43b1a7daf3))
 ROM_END
 
+ROM_START( pg685oua12 )	
+    ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
+	ROM_LOAD( "pg685_oua12_bios.bin", 0x0000, 0x4000, CRC(94b8499b) SHA1(e29086a88f1f9fa17921c3d157cce725d4591328))
+	
+	ROM_REGION( 0x4000, "chargen", 0 )
+	ROM_LOAD( "pg685_oua12_s79200-g39_a901-01.bin", 0x0000, 0x4000, CRC(fa722110) SHA1(b57ee67a77ff45a2544a2ae5203bc2199adfe023))
+ROM_END    
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS          INIT        COMPANY FULLNAME                  FLAGS                */
-COMP( 198?, pg685, 		0,        0,      pg685, 	  pg685, 	  driver_device, 	0,		"Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT     CLASS          INIT        COMPANY FULLNAME                  FLAGS                */
+COMP( 198?, pg685, 		0,        0,      pg685, 	  pg685,	driver_device, 	0,		"Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, pg685oua12, pg685,    0,      pg685oua12, pg685,	driver_device,  0,		"Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
