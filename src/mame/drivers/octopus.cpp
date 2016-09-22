@@ -144,6 +144,7 @@ public:
 		m_floppy1(*this, "fdc:1"),
 		m_kb_uart(*this, "keyboard"),
 		m_pit(*this, "pit"),
+		m_ppi(*this, "ppi"),
 		m_speaker(*this, "speaker"),
 		m_z80_bankdev(*this, "z80_bank"),
 		m_ram(*this, "main_ram"),
@@ -177,6 +178,8 @@ public:
 	DECLARE_READ8_MEMBER(z80_io_r);
 	DECLARE_WRITE8_MEMBER(z80_io_w);
 	IRQ_CALLBACK_MEMBER(x86_irq_cb);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE8_MEMBER(rtc_w);
 
 	DECLARE_WRITE_LINE_MEMBER(spk_w);
 	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
@@ -215,6 +218,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<i8251_device> m_kb_uart;
 	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<address_map_bank_device> m_z80_bankdev;
 	required_device<ram_device> m_ram;
@@ -231,6 +235,9 @@ private:
 	bool m_beep_active;
 	bool m_speaker_level;
 	bool m_z80_active;
+	bool m_rtc_address;
+	bool m_rtc_data;
+	UINT8 m_prev_cntl;
 	
 	emu_timer* m_timer_beep;
 };
@@ -420,7 +427,36 @@ WRITE8_MEMBER(octopus_state::z80_io_w)
 	m_z80_active = false;
 }
 
+// RTC data and I/O - PPI port A
+// bits 0-3 of RTC/FDC control go to control lines of the MC146818
+// The technical manual does not mention what is connected to each bit
+// This is an educated guess, based on the BIOS code
+// bit 0 = ? (Pulsed low after writing to an RTC register)
+// bit 1 = PPI Port A strobe?
+// bit 2 = Data strobe?
+// bit 3 = Address strobe?
+READ8_MEMBER(octopus_state::rtc_r)
+{
+	UINT8 ret = 0xff;
+	
+	if(m_rtc_data)
+		ret = m_rtc->read(space,1);
+	else if(m_rtc_address)
+		ret = m_rtc->read(space,0);
+
+	return ret;
+}
+
+WRITE8_MEMBER(octopus_state::rtc_w)
+{
+	if(m_rtc_data)
+		m_rtc->write(space,1,data);
+	else if(m_rtc_address)
+		m_rtc->write(space,0,data);
+}
+
 // RTC/FDC control - PPI port B
+// bits0-3: RTC control lines
 // bit4-5: write precomp.
 // bit6-7: drive select
 READ8_MEMBER(octopus_state::cntl_r)
@@ -431,6 +467,21 @@ READ8_MEMBER(octopus_state::cntl_r)
 WRITE8_MEMBER(octopus_state::cntl_w)
 {
 	m_cntl = data;
+	
+	if((m_cntl & 0x08) && !(m_prev_cntl & 0x08))
+	{
+		m_rtc_address = true;
+		m_rtc_data = false;
+		logerror("Address strobe!\n");
+	}
+	if((data & 0x04) && !(m_prev_cntl & 0x04))
+	{
+		m_rtc_address = false;
+		m_rtc_data = true;
+		logerror("Data strobe!\n");
+	}
+	m_ppi->pc4_w(data & 0x02);
+	m_prev_cntl = m_cntl;
 	m_current_drive = (data & 0xc0) >> 6;
 	switch(m_current_drive)
 	{
@@ -567,6 +618,8 @@ void octopus_state::machine_reset()
 	m_z80_active = false;
 	m_current_dma = -1;
 	m_current_drive = 0;
+	m_rtc_address = true;
+	m_rtc_data = false;
 	membank("main_ram_bank")->set_base(m_ram->pointer());
 }
 
@@ -651,10 +704,10 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 
 	// RTC (MC146818 via i8255 PPI)  TODO: hook up RTC to PPI
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(NOOP)
+	MCFG_I8255_IN_PORTA_CB(READ8(octopus_state,rtc_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(octopus_state,cntl_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(octopus_state,gpo_r))
-	MCFG_I8255_OUT_PORTA_CB(NOOP)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(octopus_state,rtc_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(octopus_state,cntl_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(octopus_state,gpo_w))
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
