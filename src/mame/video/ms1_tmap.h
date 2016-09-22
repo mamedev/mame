@@ -55,6 +55,7 @@ public:
 
 	// memory handlers
 	DECLARE_WRITE16_MEMBER(write);
+	DECLARE_READ16_MEMBER(scroll_r);
 	DECLARE_WRITE16_MEMBER(scroll_w);
 
 	// drawing and layer control

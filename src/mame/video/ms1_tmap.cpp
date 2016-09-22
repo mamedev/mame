@@ -101,6 +101,7 @@ void megasys1_tilemap_device::device_start()
 	// decode our graphics
 	decode_gfx(gfxinfo);
 	gfx(0)->set_colorbase(m_colorbase);
+	gfx(0)->set_colors(1 << m_bits_per_color_code);
 
 	// create 16x16 tilemaps
 	m_tilemap[0][0] = &machine().tilemap().create(
@@ -237,6 +238,17 @@ TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
 	SET_TILE_INFO_MEMBER(0, (code & 0xfff) * m_16x16_scroll_factor + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
 }
 
+READ16_MEMBER(megasys1_tilemap_device::scroll_r)
+{
+	switch (offset)
+	{
+		case 0: return m_scrollx;
+		case 1: return m_scrolly;
+		case 2: return m_scroll_flag;
+		default: return 0xffff;
+	}
+}
+
 WRITE16_MEMBER(megasys1_tilemap_device::scroll_w)
 {
 	switch (offset)
@@ -256,6 +268,7 @@ WRITE16_MEMBER(megasys1_tilemap_device::scroll_w)
 			if (((m_scroll_flag ^ data) & mem_mask) != 0)
 			{
 				COMBINE_DATA(&m_scroll_flag);
+				logerror("Setting scroll flag: %02X\n", m_scroll_flag);
 				m_tmap = m_tilemap[(m_scroll_flag >> 4) & 1][m_scroll_flag & 3];
 				m_tmap->mark_all_dirty();
 			}
