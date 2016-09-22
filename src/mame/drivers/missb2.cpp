@@ -121,7 +121,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_rgb32 &b
 				x = sx + xc * 8;
 				y = (sy + yc * 8) & 0xff;
 
-				if (flip_screen())
+				if (m_flip_screen)
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -425,6 +425,7 @@ MACHINE_START_MEMBER(missb2_state,missb2)
 	save_item(NAME(m_pending_nmi));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_flip_screen));
 }
 
 MACHINE_RESET_MEMBER(missb2_state,missb2)
@@ -432,6 +433,7 @@ MACHINE_RESET_MEMBER(missb2_state,missb2)
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
 	m_sound_status = 0;
+	m_flip_screen = false;
 }
 
 static MACHINE_CONFIG_START( missb2, missb2_state )

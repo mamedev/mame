@@ -99,12 +99,13 @@ protected:
 	// driver_device overrides
 //  virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-//  virtual void video_start() override;
 private:
 	bool m_master_irq_enable;
 	bool m_slave_irq_enable;
 	UINT8 m_pal_bank;
+	bool m_flip_screen;
 
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -334,7 +335,7 @@ READ8_MEMBER(namcos16_state::dipB_h){ return ioport("DSW2")->read() >> 4; }     
 
 WRITE8_MEMBER(namcos16_state::flip)
 {
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
 }
 
 WRITE8_MEMBER(namcos16_state::pal_bank_w)
@@ -617,6 +618,12 @@ void namcos16_state::machine_reset()
 	m_slave_irq_enable = false;
 	m_slave_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
+}
+
+void namcos16_state::video_start()
+{
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)

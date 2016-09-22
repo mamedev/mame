@@ -35,6 +35,7 @@ public:
 	int m_prot_count;
 	UINT16 m_gfxlist_addr;
 	bitmap_ind16 m_rawbitmap;
+	bool m_flip_screen;
 
 	// common
 	DECLARE_WRITE16_MEMBER(flipscreen_w);

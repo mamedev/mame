@@ -36,6 +36,7 @@ public:
 	UINT8       m_write_layers;
 	UINT8       m_layers;
 	UINT8       m_ninjemak_dispdisable;
+	bool        m_flip_screen;
 
 	UINT8       m_shift_scroll; //youmab
 	UINT32      m_shift_val;

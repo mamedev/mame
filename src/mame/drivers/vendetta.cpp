@@ -469,6 +469,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k052109", k052109_device, mark_all_dirty)
 
 	MCFG_K054000_ADD("k054000")
 

@@ -62,21 +62,6 @@ static inline INT32 normalize_yscroll(const bitmap_t &bitmap, INT32 yscroll)
 
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type GFXDECODE = &device_creator<gfxdecode_device>;
-
-gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
-	device_gfx_interface(mconfig, *this)
-{
-}
-
-
-
-
 /***************************************************************************
     GRAPHICS ELEMENTS
 ***************************************************************************/
@@ -2100,6 +2085,3 @@ void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bi
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
 }
-
-GFXDECODE_START( empty )
-GFXDECODE_END

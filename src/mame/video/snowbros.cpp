@@ -5,6 +5,12 @@
 #include "emu.h"
 #include "includes/snowbros.h"
 
+VIDEO_START_MEMBER(snowbros_state,bootleg_video)
+{
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
+}
+
 UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *spriteram16 = m_bootleg_spriteram16;
@@ -33,7 +39,7 @@ UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind1
 		x = dx;
 		y = dy;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -64,7 +70,7 @@ UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind1
 		x = dx;
 		y = dy;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -119,7 +125,7 @@ UINT32 snowbros_state::screen_update_twinadv(screen_device &screen, bitmap_ind16
 		x = dx;
 		y = dy;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -167,7 +173,7 @@ UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16
 
 		if (wrapr == 8) xpos -= 256;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			xpos = 240 - xpos;
 			ypos = 240 - ypos;
@@ -246,7 +252,7 @@ UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind1
 		if (x > 511) x &= 0x1ff;
 		if (y > 511) y &= 0x1ff;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - x;
 			sy = 240 - y;

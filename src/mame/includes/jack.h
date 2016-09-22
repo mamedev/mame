@@ -40,6 +40,7 @@ public:
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
+	bool m_flip_screen;
 
 	/* misc */
 	int m_timer_rate;

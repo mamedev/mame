@@ -32,8 +32,8 @@ public:
 		dev.m_y_offset = y_offset;
 	}
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip = false );
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip = false );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool flipscreen);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool flipscreen);
 	void set_alt_format(bool alt) { m_alt_format = alt; };
 	void set_pix_mix_mask(UINT16 mask) { m_pixmask = mask; };
 	void set_pix_raw_shift(UINT16 shift) { m_raw_shift = shift; };
@@ -64,7 +64,7 @@ protected:
 
 private:
 	template<class _BitmapClass>
-	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip);
+	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool flipscreen);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

@@ -112,10 +112,10 @@ WRITE8_MEMBER(ladybug_state::ladybug_colorram_w)
 
 WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -144,6 +144,9 @@ VIDEO_START_MEMBER(ladybug_state,ladybug)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void ladybug_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -208,7 +211,7 @@ UINT32 ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 
 		int sx = offs % 4;
 		int sy = offs / 4;
 
-		if (flip_screen())
+		if (m_flip_screen)
 			m_bg_tilemap->set_scrollx(offs, -m_videoram[32 * sx + sy]);
 		else
 			m_bg_tilemap->set_scrollx(offs, m_videoram[32 * sx + sy]);

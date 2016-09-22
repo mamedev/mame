@@ -134,6 +134,11 @@ void zaccaria_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(zaccaria_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_scroll_cols(32);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -170,12 +175,14 @@ WRITE8_MEMBER(zaccaria_state::attributes_w)
 
 WRITE8_MEMBER(zaccaria_state::flip_screen_x_w)
 {
-	flip_screen_x_set(data & 1);
+	m_flip_screen_x = bool(data & 1);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 }
 
 WRITE8_MEMBER(zaccaria_state::flip_screen_y_w)
 {
-	flip_screen_y_set(data & 1);
+	m_flip_screen_y = bool(data & 1);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 }
 
 
@@ -220,12 +227,12 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		if (sx == 1) continue;
 
-		if (flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

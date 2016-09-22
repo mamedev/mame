@@ -2175,6 +2175,7 @@ static MACHINE_CONFIG_START( punkshot, tmnt_state )
 	MCFG_K051960_CB(tmnt_state, punkshot_sprite_callback)
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k052109", k052109_device, mark_all_dirty)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2230,6 +2231,7 @@ static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k052109", k052109_device, mark_all_dirty)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

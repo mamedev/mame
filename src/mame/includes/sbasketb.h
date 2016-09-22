@@ -40,6 +40,7 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	bool m_flip_screen;
 
 	UINT8    m_irq_mask;
 	DECLARE_WRITE8_MEMBER(sbasketb_sh_irqtrigger_w);

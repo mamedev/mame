@@ -273,7 +273,10 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
 	membank("slavebank")->set_entry(data & 0x07);
 
-	flip_screen_set(data & 0x10);
+	bool flip_screen = bool(data & 0x10);
+	m_bg_tilemap->set_flip(flip_screen ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(flip_screen ? TILEMAP_FLIPXY : 0);
+	m_pandora->flip_screen_set(flip_screen);
 
 	// used at the end of levels, after defeating the boss, to leave trails
 	m_pandora->set_clear_bitmap(data & 0x20);

@@ -49,12 +49,12 @@ PALETTE_INIT_MEMBER(mouser_state, mouser)
 
 WRITE8_MEMBER(mouser_state::mouser_flip_screen_x_w)
 {
-	flip_screen_x_set(~data & 1);
+	m_flip_screen_x = (~data & 1);
 }
 
 WRITE8_MEMBER(mouser_state::mouser_flip_screen_y_w)
 {
-	flip_screen_y_set(~data & 1);
+	m_flip_screen_y = (~data & 1);
 }
 
 UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -73,12 +73,12 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		sx = offs % 32;
 		sy = offs / 32;
 
-		if (flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			sx = 31 - sx;
 		}
 
-		if (flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			sy = 31 - sy;
 		}
@@ -95,7 +95,7 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 				m_videoram[offs] | (m_colorram[color_offs] >> 5) * 256 | ((m_colorram[color_offs] >> 4) & 1) * 512,
 				m_colorram[color_offs]%16,
-				flip_screen_x(),flip_screen_y(),
+				m_flip_screen_x, m_flip_screen_y,
 				8*sx,scrolled_y_position);
 	}
 
@@ -110,13 +110,13 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		flipx = BIT(spriteram[offs], 6);
 		flipy = BIT(spriteram[offs], 7);
 
-		if (flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			flipy = !flipy;
 			sy = 238 - sy;
@@ -139,13 +139,13 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		flipx = BIT(spriteram[offs], 6);
 		flipy = BIT(spriteram[offs], 7);
 
-		if (flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			flipy = !flipy;
 			sy = 238 - sy;

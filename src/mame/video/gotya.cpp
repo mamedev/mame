@@ -81,11 +81,8 @@ WRITE8_MEMBER(gotya_state::gotya_video_control_w)
 
 	m_scroll_bit_8 = data & 0x01;
 
-	if (flip_screen() != (data & 0x02))
-	{
-		flip_screen_set(data & 0x02);
-		machine().tilemap().mark_all_dirty();
-	}
+	m_flip_screen = (data & 0x02);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 TILE_GET_INFO_MEMBER(gotya_state::get_bg_tile_info)
@@ -107,13 +104,16 @@ TILEMAP_MAPPER_MEMBER(gotya_state::tilemap_scan_rows_thehand)
 void gotya_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gotya_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(gotya_state::tilemap_scan_rows_thehand),this), 8, 8, 64, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void gotya_state::draw_status_row( bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int col )
 {
 	int row;
 
-	if (flip_screen())
+	if (m_flip_screen)
 	{
 		sx = 35 - sx;
 	}
@@ -122,7 +122,7 @@ void gotya_state::draw_status_row( bitmap_ind16 &bitmap, const rectangle &clipre
 	{
 		int sy;
 
-		if (flip_screen())
+		if (m_flip_screen)
 			sy = row;
 		else
 			sy = 31 - row;
@@ -131,7 +131,8 @@ void gotya_state::draw_status_row( bitmap_ind16 &bitmap, const rectangle &clipre
 		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 									m_videoram2[row * 32 + col],
 									m_videoram2[row * 32 + col + 0x10] & 0x0f,
-									flip_screen_x(), flip_screen_y(),
+									m_flip_screen,
+									m_flip_screen,
 									8 * sx, 8 * sy);
 	}
 }
@@ -148,13 +149,14 @@ void gotya_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		int sx = 256 - spriteram[offs + 0x10] + (spriteram[offs + 0x01] & 0x01) * 256;
 		int sy = spriteram[offs + 0x00];
 
-		if (flip_screen())
+		if (m_flip_screen)
 			sy = 240 - sy;
 
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 										code, color,
-										flip_screen_x(), flip_screen_y(),
+										m_flip_screen,
+										m_flip_screen,
 										sx, sy, 0);
 	}
 }

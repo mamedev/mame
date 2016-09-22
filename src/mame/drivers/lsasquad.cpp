@@ -162,7 +162,7 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
 	/* bit 4 flips screen */
-	flip_screen_set(data & 0x10);
+	m_flip_screen = bool(data & 0x10);
 
 	/* other bits unknown */
 }
@@ -565,6 +565,9 @@ MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 	save_item(NAME(m_pending_nmi));
 	save_item(NAME(m_sound_cmd));
 	save_item(NAME(m_sound_result));
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)

@@ -100,8 +100,7 @@ void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 
 	UINT8 *gfx = memregion("gfx2")->base() + (code << 7);
 
-
-	if (flip_screen())
+	if (m_pc3092_data[1] & 0x01) // flip screen
 		sy += 32;
 
 	/* assume no collision */

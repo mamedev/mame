@@ -63,6 +63,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	bool m_flip_screen;
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
 	virtual void machine_start() override;
@@ -187,6 +188,8 @@ GFXDECODE_END
 
 void go2000_state::video_start()
 {
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -292,7 +295,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 				if (flipx)
 					tile_flipx = !tile_flipx;
 
-				if (flip_screen())
+				if (m_flip_screen)
 				{
 					sx = max_x - sx;
 					sy = max_y - sy;
@@ -326,7 +329,6 @@ void go2000_state::machine_start()
 		membank("bank1")->configure_entry(i, &SOUND[0x00400 + i * 0x10000]);
 
 	membank("bank1")->set_entry(0);
-
 }
 
 static MACHINE_CONFIG_START( go2000, go2000_state )

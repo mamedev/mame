@@ -188,7 +188,9 @@ WRITE8_MEMBER(rmhaihai_state::adpcm_w)
 
 WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 {
-	flip_screen_set(data & 0x01);
+	// (data & 0x01) is flip screen bit
+
+	m_bg_tilemap->set_flip((data & 0x01) ? TILEMAP_FLIPXY : 0);
 
 	// (data & 0x02) is switched on and off in service mode
 

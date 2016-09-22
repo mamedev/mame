@@ -582,7 +582,11 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = m_cps_a_regs[0x22 / 2];
 
-	flip_screen_set(videocontrol & 0x8000);
+	if (BIT(videocontrol, 15) != m_flip_screen)
+	{
+		m_flip_screen = BIT(videocontrol, 15);
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 
 	layercontrol = m_cps_b_regs[m_layer_enable_reg / 2];
 

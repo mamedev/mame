@@ -51,6 +51,7 @@ public:
 	int m_bg_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(cpu1_reset_w);
 	DECLARE_WRITE8_MEMBER(cpu2_reset_w);

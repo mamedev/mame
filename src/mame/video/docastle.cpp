@@ -77,13 +77,15 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 
 READ8_MEMBER(docastle_state::flipscreen_r)
 {
-	flip_screen_set(offset);
+	m_flip_screen = offset;
+	m_do_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	return (offset ? 1 : 0); // is this really needed?
 }
 
 WRITE8_MEMBER(docastle_state::flipscreen_w)
 {
-	flip_screen_set(offset);
+	m_flip_screen = offset;
+	m_do_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
@@ -99,6 +101,9 @@ void docastle_state::video_start_common( UINT32 tile_transmask )
 	m_do_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_do_tilemap->set_scrolldy(-32, -32);
 	m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void docastle_state::video_start()
@@ -174,7 +179,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			flipy = m_spriteram[offs + 2] & 0x80;
 		}
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 176 - sy;

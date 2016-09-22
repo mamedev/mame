@@ -71,6 +71,7 @@ public:
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_bg2_tilemap;
 	tilemap_t *m_bg3_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(starforb_scrolly2);

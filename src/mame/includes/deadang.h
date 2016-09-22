@@ -38,6 +38,7 @@ public:
 	tilemap_t *m_text_layer;
 	int m_tilebank;
 	int m_oldtilebank;
+	bool m_flip_screen;
 
 	DECLARE_WRITE16_MEMBER(foreground_w);
 	DECLARE_WRITE16_MEMBER(text_w);

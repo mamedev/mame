@@ -117,6 +117,9 @@ void finalizr_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(finalizr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(finalizr_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -148,7 +151,7 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (size >= 0x10)
 		{
 			// 32x32
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 256 - sx;
 				sy = 224 - sy;
@@ -163,7 +166,7 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 		else
 		{
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				sx = ((size & 0x08) ? 280: 272) - sx;
 				sy = ((size & 0x04) ? 248: 240) - sy;

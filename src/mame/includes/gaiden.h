@@ -53,6 +53,7 @@ public:
 	INT8        m_bg_offset_y;
 	INT8        m_fg_offset_y;
 	INT8        m_spr_offset_y;
+	bool        m_flip_screen;
 
 	/* misc */
 	int         m_sprite_sizey;

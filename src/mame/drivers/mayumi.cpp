@@ -112,7 +112,8 @@ WRITE8_MEMBER(mayumi_state::bank_sel_w)
 
 	m_int_enable = data & 1;
 
-	flip_screen_set(data & 2);
+	// flip screen
+	m_tilemap->set_flip((data & 2) ? TILEMAP_FLIPXY : 0);
 }
 
 /*************************************

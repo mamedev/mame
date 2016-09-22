@@ -34,6 +34,7 @@ public:
 	UINT8 m_vram_bank;
 	std::unique_ptr<UINT8[]> m_vram;
 	std::unique_ptr<UINT8[]> m_vram_gfx;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_w);

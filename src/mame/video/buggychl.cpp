@@ -20,6 +20,11 @@ void buggychl_state::video_start()
 	save_item(NAME(m_tmp_bitmap2));
 
 	m_gfxdecode->gfx(0)->set_source(m_charram);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -55,8 +60,8 @@ WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
     bit0 = VINV
 */
 
-	flip_screen_y_set(data & 0x01);
-	flip_screen_x_set(data & 0x02);
+	m_flip_screen_y = (data & 0x01);
+	m_flip_screen_x = (data & 0x02);
 
 	m_bg_on = data & 0x04;
 	m_sky_on = data & 0x08;
@@ -88,8 +93,10 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 	/* prevent wraparound */
 	rectangle clip = cliprect;
-	if (flip_screen_x()) clip.min_x += 8*8;
-	else clip.max_x -= 8*8;
+	if (m_flip_screen_x)
+		clip.min_x += 8*8;
+	else
+		clip.max_x -= 8*8;
 
 	for (offs = 0; offs < 0x400; offs++)
 	{
@@ -98,15 +105,16 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		int sx = offs % 32;
 		int sy = offs / 32;
 
-		if (flip_screen_x())
+		if (m_flip_screen_x)
 			sx = 31 - sx;
-		if (flip_screen_y())
+		if (m_flip_screen_y)
 			sy = 31 - sy;
 
 		m_gfxdecode->gfx(0)->opaque(m_tmp_bitmap1,m_tmp_bitmap1.cliprect(),
 				code,
 				2,
-				flip_screen_x(),flip_screen_y(),
+				m_flip_screen_x,
+				m_flip_screen_y,
 				8*sx,8*sy);
 	}
 
@@ -132,20 +140,19 @@ void buggychl_state::draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	{
 		int sx = offs % 32;
 		int sy = offs / 32;
-		int flipx = flip_screen_x();
-		int flipy = flip_screen_y();
 
 		int code = m_videoram[offs];
 
-		if (flipx)
+		if (m_flip_screen_x)
 			sx = 31 - sx;
-		if (flipy)
+		if (m_flip_screen_y)
 			sy = 31 - sy;
 
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				0,
-				flipx,flipy,
+				m_flip_screen_x,
+				m_flip_screen_y,
 				8*sx,8*sy,
 				0);
 	}
@@ -177,7 +184,7 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		for (y = 0; y < 64; y++)
 		{
-			int dy = flip_screen_y() ? (255 - sy - y) : (sy + y);
+			int dy = m_flip_screen_y ? (255 - sy - y) : (sy + y);
 
 			if ((dy & ~0xff) == 0)
 			{
@@ -205,7 +212,7 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 						int col = pendata[x];
 						if (col)
 						{
-							int dx = flip_screen_x() ? (255 - sx - px) : (sx + px);
+							int dx = m_flip_screen_x ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
 								bitmap.pix16(dy, dx) = m_sprite_color_base + col;
 						}

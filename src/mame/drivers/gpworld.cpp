@@ -69,6 +69,7 @@ public:
 	UINT8 m_ldp_read_latch;
 	UINT8 m_ldp_write_latch;
 	UINT8 m_brake_gas;
+	bool m_flip_screen;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<UINT8> m_sprite_ram;
 	required_shared_ptr<UINT8> m_palette_ram;
@@ -142,7 +143,7 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 	const int SPR_SKIP_HI   = 5;
 	const int SPR_GFXOFS_LO = 6;
 	const int SPR_GFXOFS_HI = 7;
-	int flip = flip_screen();
+	int flip = m_flip_screen;
 
 	int i;
 
@@ -255,6 +256,8 @@ UINT32 gpworld_state::screen_update_gpworld(screen_device &screen, bitmap_rgb32 
 
 void gpworld_state::machine_start()
 {
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 

@@ -131,6 +131,9 @@ void firetrap_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg1_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -183,6 +186,12 @@ WRITE8_MEMBER(firetrap_state::firetrap_bg2_scrolly_w)
 	m_bg2_tilemap->set_scrolly(0, -(m_scroll2_y[0] | (m_scroll2_y[1] << 8)));
 }
 
+WRITE8_MEMBER(firetrap_state::flip_screen_w)
+{
+	m_flip_screen = bool(data);
+	m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+}
+
 
 /***************************************************************************
 
@@ -207,7 +216,7 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		color = ((m_spriteram[offs + 1] & 0x08) >> 2) | (m_spriteram[offs + 1] & 0x01);
 		flipx = m_spriteram[offs + 1] & 0x04;
 		flipy = m_spriteram[offs + 1] & 0x02;
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -217,7 +226,7 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		if (m_spriteram[offs + 1] & 0x10)    /* double width */
 		{
-			if (flip_screen()) sy -= 16;
+			if (m_flip_screen) sy -= 16;
 
 			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code & ~1,

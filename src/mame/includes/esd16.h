@@ -48,6 +48,7 @@ public:
 	tilemap_t       *m_tilemap_1;
 	int           m_tilemap0_color;
 	int           m_tilemap1_color;
+	bool m_flip_screen;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

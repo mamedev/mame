@@ -443,7 +443,8 @@ GFXDECODE_END
 WRITE8_MEMBER(popeye_state::popeye_portB_w)
 {
 	/* bit 0 flips screen */
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bits 1-3 select DSW1 bit to read */
 	m_dswbit = (data & 0x0e) >> 1;

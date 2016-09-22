@@ -32,6 +32,7 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	bool       m_flip_screen;
 
 	UINT8      m_yiear_nmi_enable;
 	UINT8      m_yiear_irq_enable;

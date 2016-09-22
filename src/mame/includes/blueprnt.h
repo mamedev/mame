@@ -37,6 +37,7 @@ public:
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
 	int     m_gfx_bank;
+	bool    m_flip_screen;
 
 	/* misc */
 	int     m_dipsw;

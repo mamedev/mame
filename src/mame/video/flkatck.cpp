@@ -97,12 +97,12 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 	{
 		case 0x04:  /* ROM bank select */
 			if (data != m_k007121->ctrlram_r(space, 4))
-				machine().tilemap().mark_all_dirty();
+				m_gfxdecode->mark_all_dirty();
 			break;
 
 		case 0x07:  /* flip screen + IRQ control */
 			m_flipscreen = data & 0x08;
-			machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 			m_irq_enabled = data & 0x02;
 			break;
 	}

@@ -18,6 +18,7 @@ public:
 	UINT8 m_tx_color_mode;
 	UINT8 m_bg_disable;
 	UINT8 m_bg_color_bank;
+	bool m_flip_screen;
 	DECLARE_CUSTOM_INPUT_MEMBER(shifted_port_r);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

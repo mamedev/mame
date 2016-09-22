@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 {
 	int code  = m_videoram[tile_index] | ((m_videoram[tile_index + 0x400] & 0x40) << 2);
 	int color = (m_videoram[tile_index + 0x400] & 0x1f);
-	int flip  = (m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	int flip  = (m_videoram[tile_index + 0x400] & 0x80) ? TILEMAP_FLIPXY : 0;
 
 	SET_TILE_INFO_MEMBER(0, code, color, flip);
 }

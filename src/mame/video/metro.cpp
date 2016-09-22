@@ -282,6 +282,9 @@ VIDEO_START_MEMBER(metro_state,metro_i4100)
 	m_tilemap_scrolldx[2] = 0;
 
 	m_sprite_xoffs_dx = 0;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(metro_state,metro_i4220)

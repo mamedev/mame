@@ -30,6 +30,7 @@ public:
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	int m_tile_bank;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(powerinsa_okibank_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);

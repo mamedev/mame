@@ -139,11 +139,14 @@ void system1_state::video_start_common(int pagecount)
 	/* allocate a temporary bitmap for sprite rendering */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
+	m_flip_screen = false;
+
 	/* register for save stats */
 	save_item(NAME(m_video_mode));
 	save_item(NAME(m_mix_collide_summary));
 	save_item(NAME(m_sprite_collide_summary));
 	save_item(NAME(m_videoram_bank));
+	save_item(NAME(m_flip_screen));
 	save_pointer(NAME(m_videoram.get()), 0x800 * pagecount);
 	save_pointer(NAME(m_mix_collide.get()), 64);
 	save_pointer(NAME(m_sprite_collide.get()), 1024);
@@ -177,7 +180,8 @@ WRITE8_MEMBER(system1_state::system1_videomode_w)
 	m_video_mode = data;
 
 	/* bit 7 is flip screen */
-	flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -357,7 +361,7 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	UINT32 gfxbanks = memregion("sprites")->bytes() / 0x8000;
 	const UINT8 *gfxbase = memregion("sprites")->base();
 	UINT8 *spriteram = m_spriteram;
-	int flipscreen = flip_screen();
+	int flipscreen = m_flip_screen;
 	int spritenum;
 
 	/* up to 32 sprites total */
@@ -567,7 +571,7 @@ UINT32 system1_state::screen_update_system1(screen_device &screen, bitmap_ind16 
 	yscroll = videoram[0xfbd];
 
 	/* adjust for flipping */
-	if (flip_screen())
+	if (m_flip_screen)
 	{
 		xscroll = 640 - (xscroll & 0x1ff);
 		yscroll = 764 - (yscroll & 0x1ff);
@@ -602,7 +606,7 @@ UINT32 system1_state::screen_update_system2(screen_device &screen, bitmap_ind16 
 	bitmap_ind16 &fgpixmap = m_tilemap_page[0]->pixmap();
 
 	/* get scroll offsets */
-	if (!flip_screen())
+	if (!m_flip_screen)
 	{
 		xscroll = ((videoram[0x7c0] | (videoram[0x7c1] << 8)) & 0x1ff) - 512 + 10;
 		yscroll = videoram[0x7ba];
@@ -644,7 +648,7 @@ UINT32 system1_state::screen_update_system2_rowscroll(screen_device &screen, bit
 	bitmap_ind16 &fgpixmap = m_tilemap_page[0]->pixmap();
 
 	/* get scroll offsets */
-	if (!flip_screen())
+	if (!m_flip_screen)
 	{
 		for (y = 0; y < 32; y++)
 			rowscroll[y] = ((videoram[0x7c0 + y * 2] | (videoram[0x7c1 + y * 2] << 8)) & 0x1ff) - 512 + 10;

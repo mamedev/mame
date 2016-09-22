@@ -38,7 +38,11 @@
 
 WRITE8_MEMBER(clshroad_state::flipscreen_w)
 {
-	flip_screen_set(data & 1 );
+	if ((data & 1) != m_flip_screen)
+	{
+		m_flip_screen = data & 1;
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 
@@ -220,6 +224,9 @@ VIDEO_START_MEMBER(clshroad_state,firebatl)
 
 	m_tilemap_0b->set_transparent_pen(0 );
 	m_tilemap_1->configure_groups(*m_gfxdecode->gfx(2), 0x0f);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(clshroad_state,clshroad)
@@ -243,6 +250,9 @@ VIDEO_START_MEMBER(clshroad_state,clshroad)
 
 	m_tilemap_0b->set_transparent_pen(0x0f );
 	m_tilemap_1->set_transparent_pen(0x0f );
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -288,7 +298,7 @@ void clshroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipy   =   0;
 
 		x -= 0x4a/2;
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			y = 240 - y;
 			flipx = !flipx;

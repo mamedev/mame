@@ -289,6 +289,7 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	MCFG_K05324X_CB(asterix_state, sprite_callback)
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k056832", k056832_device, mark_all_dirty)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

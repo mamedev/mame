@@ -45,6 +45,7 @@ public:
 	int            m_tilemap_0_bank;
 	int            m_tilemap_1_bank;
 	int            m_ka302c_banking;
+	bool m_flip_screen;
 
 	/* misc */
 	UINT8          m_soundlatch;
@@ -97,6 +98,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(sngkace);
 	DECLARE_VIDEO_START(psikyo);
+	void flip_screen_set(bool flip);
 	UINT32 screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_psikyo(screen_device &screen, bool state);

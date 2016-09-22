@@ -354,12 +354,6 @@ READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 
 
 
-WRITE8_MEMBER(cosmic_state::flip_screen_w)
-{
-	flip_screen_set(data & 0x80);
-}
-
-
 static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
@@ -959,6 +953,8 @@ MACHINE_START_MEMBER(cosmic_state,cosmic)
 
 	save_item(NAME(m_background_enable));
 	save_item(NAME(m_color_registers));
+
+	save_item(NAME(m_flip_screen));
 }
 
 MACHINE_RESET_MEMBER(cosmic_state,cosmic)
@@ -968,6 +964,7 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmic)
 	m_color_registers[0] = 0;
 	m_color_registers[1] = 0;
 	m_color_registers[2] = 0;
+	m_flip_screen = false;
 }
 
 MACHINE_RESET_MEMBER(cosmic_state,cosmicg)

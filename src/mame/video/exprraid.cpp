@@ -18,10 +18,11 @@ WRITE8_MEMBER(exprraid_state::exprraid_colorram_w)
 
 WRITE8_MEMBER(exprraid_state::exprraid_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -87,6 +88,9 @@ void exprraid_state::video_start()
 
 	m_bg_tilemap->set_scroll_rows(2);
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -103,7 +107,7 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int sx = ((248 - m_spriteram[offs + 2]) & 0xff) - 8;
 		int sy = m_spriteram[offs];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -123,7 +127,7 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code + 1, color,
 				flipx, flipy,
-				sx, sy + (flip_screen() ? -16 : 16), 0);
+				sx, sy + (m_flip_screen ? -16 : 16), 0);
 		}
 	}
 }

@@ -34,6 +34,8 @@ public:
 	UINT8      m_objon;
 	UINT8      m_bgon;
 	UINT8      m_sprite3bank;
+	bool m_flip_screen;
+
 	DECLARE_READ8_MEMBER(gunsmoke_protection_r);
 	DECLARE_WRITE8_MEMBER(gunsmoke_videoram_w);
 	DECLARE_WRITE8_MEMBER(gunsmoke_colorram_w);

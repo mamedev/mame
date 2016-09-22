@@ -28,6 +28,8 @@ public:
 	UINT8 m_scroll_lsb;
 	UINT8 m_scroll_msb;
 	UINT8 m_starfield_enabled;
+	bool m_flip_screen;
+
 	DECLARE_WRITE8_MEMBER(battlex_palette_w);
 	DECLARE_WRITE8_MEMBER(battlex_scroll_x_lsb_w);
 	DECLARE_WRITE8_MEMBER(battlex_scroll_x_msb_w);

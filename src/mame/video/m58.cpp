@@ -179,6 +179,9 @@ void m58_state::video_start()
 
 	m_screen->register_screen_bitmap(m_scroll_panel_bitmap);
 	save_item(NAME(m_scroll_panel_bitmap));
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -192,7 +195,8 @@ void m58_state::video_start()
 WRITE8_MEMBER(m58_state::flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
+	m_flip_screen = bool((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
@@ -233,7 +237,7 @@ void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 			code2 = code1 + 0x40;
 		}
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy2 = 192 - sy1;
@@ -273,16 +277,18 @@ void m58_state::draw_panel( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	{
 		const rectangle clippanel(26*8, 32*8-1, 1*8, 31*8-1);
 		const rectangle clippanelflip(0*8, 6*8-1, 1*8, 31*8-1);
-		rectangle clip = flip_screen() ? clippanelflip : clippanel;
+		rectangle clip = m_flip_screen ? clippanelflip : clippanel;
 		const rectangle &visarea = m_screen->visible_area();
-		int sx = flip_screen() ? cliprect.min_x - 8 : cliprect.max_x + 1 - 14*4;
-		int yoffs = flip_screen() ? -40 : -16;
+		int sx = m_flip_screen ? cliprect.min_x - 8 : cliprect.max_x + 1 - 14*4;
+		int yoffs = m_flip_screen ? -40 : -16;
 
 		clip.min_y += visarea.min_y + yoffs;
 		clip.max_y += visarea.max_y + yoffs;
 		clip &= cliprect;
 
-		copybitmap(bitmap, m_scroll_panel_bitmap, flip_screen(), flip_screen(), sx, visarea.min_y + yoffs, clip);
+		copybitmap(bitmap, m_scroll_panel_bitmap,
+			m_flip_screen, m_flip_screen,
+			sx, visarea.min_y + yoffs, clip);
 	}
 }
 

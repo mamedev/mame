@@ -29,6 +29,13 @@ WRITE16_MEMBER(wwfsstar_state::bg0_videoram_w)
 	m_bg0_tilemap->mark_tile_dirty(offset/2);
 }
 
+WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
+{
+	m_flip_screen = bool(data & 1);
+	m_fg0_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg0_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+}
+
 /*******************************************************************************
  Tilemap Related Functions
 *******************************************************************************/
@@ -153,7 +160,7 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			number &= ~(chain - 1);
 
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				flipy = !flipy;
 				flipx = !flipx;
@@ -163,7 +170,7 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			for (count=0;count<chain;count++)
 			{
-				if (flip_screen())
+				if (m_flip_screen)
 				{
 					if (!flipy)
 					{
@@ -208,11 +215,14 @@ void wwfsstar_state::video_start()
 	m_fg0_tilemap->set_transparent_pen(0);
 
 	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wwfsstar_state::get_bg0_tile_info),this),tilemap_mapper_delegate(FUNC(wwfsstar_state::bg0_scan),this), 16, 16,32,32);
-	m_fg0_tilemap->set_transparent_pen(0);
+	//m_fg0_tilemap->set_transparent_pen(0); // ???
+
+	m_flip_screen = false;
 
 	save_item(NAME(m_vblank));
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
+	save_item(NAME(m_flip_screen));
 }
 
 UINT32 wwfsstar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

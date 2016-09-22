@@ -28,6 +28,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 	UINT8 m_bg_tile_bank;
 	UINT8 m_fg_tile_bank;
 	UINT8 m_tx_tile_bank;

@@ -107,6 +107,9 @@ void yunsun16_state::video_start()
 
 	m_tilemap_0->set_transparent_pen(0xff);
 	m_tilemap_1->set_transparent_pen(0xff);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -167,7 +170,7 @@ void yunsun16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		x += m_sprites_scrolldx;
 		y += m_sprites_scrolldy;
 
-		if (flip_screen())   // not used?
+		if (m_flip_screen)   // not used?
 		{
 			flipx = !flipx;     x = max_x - x - 16;
 			flipy = !flipy;     y = max_y - y - 16;

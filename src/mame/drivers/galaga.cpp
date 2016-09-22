@@ -730,16 +730,6 @@ READ8_MEMBER(galaga_state::bosco_dsw_r)
 	return bit0 | (bit1 << 1);
 }
 
-WRITE8_MEMBER(galaga_state::galaga_flip_screen_w)
-{
-	flip_screen_set(data & 1);
-}
-
-WRITE8_MEMBER(bosco_state::bosco_flip_screen_w)
-{
-	flip_screen_set(~data & 1);
-}
-
 
 WRITE8_MEMBER(galaga_state::bosco_latch_w)
 {

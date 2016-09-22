@@ -284,6 +284,9 @@ VIDEO_START_MEMBER(m92_state,m92)
 		save_item(NAME(layer->control), laynum);
 	}
 
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
+
 	m_paletteram.resize(m_palette->entries());
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 2);
 
@@ -355,7 +358,7 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 				for (row = 0; row < numrows; row++)
 				{
-					if (flip_screen())
+					if (m_flip_screen)
 					{
 						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 								code + s_ptr, color, !flipx, !flipy,
@@ -429,7 +432,7 @@ void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				for (row = 0; row < numrows; row++)
 				{
-					if (flip_screen())
+					if (m_flip_screen)
 					{
 						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 								code + s_ptr, color, !flipx, !flipy,
@@ -546,10 +549,11 @@ UINT32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_sprites(screen, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (ioport("DSW")->read() & 0x100)
-		flip_screen_set(0);
-	else
-		flip_screen_set(1);
+	if (m_flip_screen != bool(~ioport("DSW")->read() & 0x100))
+	{
+		m_flip_screen = bool(~ioport("DSW")->read() & 0x100);
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 	return 0;
 }
 
@@ -563,9 +567,10 @@ UINT32 m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap
 	ppan_draw_sprites(screen, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (ioport("DSW")->read() & 0x100)
-		flip_screen_set(0);
-	else
-		flip_screen_set(1);
+	if (m_flip_screen != bool(~ioport("DSW")->read() & 0x100))
+	{
+		m_flip_screen = bool(~ioport("DSW")->read() & 0x100);
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 	return 0;
 }

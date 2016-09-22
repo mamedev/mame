@@ -64,6 +64,7 @@ public:
 	tilemap_t     *m_text_tilemap;
 	tilemap_t     *m_fore_tilemap;
 	tilemap_t     *m_back_tilemap;
+	bool m_flip_screen;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -122,6 +123,8 @@ void supduck_state::video_start()
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);
 
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 UINT32 supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -131,7 +134,7 @@ UINT32 supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fore_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), m_flip_screen, 1);
 
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

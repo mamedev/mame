@@ -106,7 +106,7 @@ WRITE16_MEMBER(nemesis_state::nemesis_gfx_flipx_word_w)
 		else
 			m_tilemap_flip &= ~TILEMAP_FLIPX;
 
-		machine().tilemap().set_flip_all(m_tilemap_flip);
+		m_gfxdecode->set_flip_all(m_tilemap_flip);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -125,7 +125,7 @@ WRITE16_MEMBER(nemesis_state::nemesis_gfx_flipy_word_w)
 		else
 			m_tilemap_flip &= ~TILEMAP_FLIPY;
 
-		machine().tilemap().set_flip_all(m_tilemap_flip);
+		m_gfxdecode->set_flip_all(m_tilemap_flip);
 	}
 }
 
@@ -151,7 +151,7 @@ WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 			m_tilemap_flip &= ~TILEMAP_FLIPY;
 
 		if (accessing_bits & 0x0c)
-			machine().tilemap().set_flip_all(m_tilemap_flip);
+			m_gfxdecode->set_flip_all(m_tilemap_flip);
 
 		m_irq_port_last = data;
 	}

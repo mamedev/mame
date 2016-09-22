@@ -64,6 +64,7 @@ public:
 	INT32 m_sprite_list;
 	UINT8 m_palette_bank;
 	std::vector<UINT16> m_paletteram;
+	bool m_flip_screen;
 
 	DECLARE_READ16_MEMBER(m92_eeprom_r);
 	DECLARE_WRITE16_MEMBER(m92_eeprom_w);

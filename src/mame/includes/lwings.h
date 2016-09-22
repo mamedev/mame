@@ -36,6 +36,7 @@ public:
 	int      m_spr_avenger_hw;
 	UINT8    m_scroll_x[2];
 	UINT8    m_scroll_y[2];
+	bool     m_flip_screen;
 
 	/* misc */
 	UINT8    m_param[4];
@@ -73,6 +74,7 @@ public:
 	DECLARE_VIDEO_START(trojan);
 	DECLARE_VIDEO_START(avengers);
 	DECLARE_VIDEO_START(avengersb);
+	void flip_screen_set(bool flip);
 	UINT32 screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lwings_interrupt);

@@ -78,7 +78,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_w)
 		if (m_gfxbank[m_banksel] != ((data & 0x0f00) >> 8))
 		{
 			m_gfxbank[m_banksel] = (data & 0x0f00) >> 8;
-			machine().tilemap().mark_all_dirty();
+			m_gfxdecode->mark_all_dirty();
 		}
 	}
 }
@@ -104,6 +104,6 @@ UINT32 gotcha_state::screen_update_gotcha(screen_device &screen, bitmap_ind16 &b
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400, false);
 	return 0;
 }

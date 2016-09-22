@@ -137,10 +137,17 @@ Notes:
 
 void warpwarp_state::machine_start()
 {
+	m_geebee_bgw = 0;
+	m_ball_on = 0;
+	m_ball_h = 0;
+	m_ball_v = 0;
+	m_cocktail_flip = false;
+
 	save_item(NAME(m_geebee_bgw));
 	save_item(NAME(m_ball_on));
 	save_item(NAME(m_ball_h));
 	save_item(NAME(m_ball_v));
+	save_item(NAME(m_cocktail_flip));
 }
 
 /* Interrupt Gen */
@@ -159,7 +166,7 @@ READ8_MEMBER(warpwarp_state::geebee_in_r)
 	res = m_ports[offset].read_safe(0);
 	if (offset == 3)
 	{
-		res = (flip_screen() & 1) ? m_in2->read() : m_in1->read();  // read player 2 input in cocktail mode
+		res = m_cocktail_flip ? m_in2->read() : m_in1->read();  // read player 2 input in cocktail mode
 		if (m_handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
@@ -212,7 +219,7 @@ WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 			break;
 		case 5:
 			if( m_geebee_bgw != (data & 1) )
-				machine().tilemap().mark_all_dirty();
+				m_gfxdecode->mark_all_dirty();
 			m_geebee_bgw = data & 1;
 			break;
 		case 6:
@@ -221,7 +228,8 @@ WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 		case 7:
-			flip_screen_set(data & 1);
+			m_cocktail_flip = data & 1;
+			m_bg_tilemap->set_flip(m_cocktail_flip ? TILEMAP_FLIPXY : 0);
 			break;
 	}
 }
@@ -246,7 +254,7 @@ READ8_MEMBER(warpwarp_state::warpwarp_vol_r)
 {
 	int res;
 
-	res = (flip_screen() & 1) ?  m_volin2->read() : m_volin1->read();
+	res = m_cocktail_flip ? m_volin2->read() : m_volin1->read();
 	if (m_handle_joystick)
 	{
 		if (res & 1) return 0x0f;
@@ -305,7 +313,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out3_w)
 				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 		case 7:
-			flip_screen_set(data & 1);
+			m_cocktail_flip = data & 1;
 			break;
 	}
 }

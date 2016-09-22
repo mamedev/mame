@@ -544,7 +544,7 @@ WRITE16_MEMBER( tc0480scp_device::ctrl_word_w )
 		case 0x0f:   /* control register */
 		{
 			int old_width = (m_pri_reg & 0x80) >> 7;
-			flip = (data & 0x40) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+			flip = (data & 0x40) ? TILEMAP_FLIPXY : 0;
 			m_pri_reg = data;
 
 			m_tilemap[0][0]->set_flip(flip);

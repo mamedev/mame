@@ -77,7 +77,7 @@ void sidepckt_state::video_start()
 	m_bg_tilemap->set_transmask(0,0xff,0x00); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
 
-	machine().tilemap().set_flip_all(TILEMAP_FLIPX);
+	m_gfxdecode->set_flip_all(TILEMAP_FLIPX);
 }
 
 
@@ -103,7 +103,7 @@ WRITE8_MEMBER(sidepckt_state::colorram_w)
 WRITE8_MEMBER(sidepckt_state::flipscreen_w)
 {
 	int flipscreen = data;
-	machine().tilemap().set_flip_all(flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
+	m_gfxdecode->set_flip_all(flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
 }
 
 

@@ -375,12 +375,14 @@ INPUT_PORTS_END
 MACHINE_START_MEMBER(epos_state,epos)
 {
 	save_item(NAME(m_palette));
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_counter));
 }
 
 void epos_state::machine_reset()
 {
 	m_palette = 0;
+	m_flip_screen = false;
 	m_counter = 0;
 }
 

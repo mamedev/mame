@@ -48,6 +48,7 @@ public:
 	UINT8          m_technos_video_hw;
 	UINT8          m_scrollx_hi;
 	UINT8          m_scrolly_hi;
+	bool           m_flip_screen;
 
 	/* misc */
 	UINT8          m_ddragon_sub_port;
@@ -92,6 +93,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_16color_tile_info);
+	void flip_screen_set(bool flip);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	UINT32 screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -71,6 +71,9 @@ void wrally_state::video_start()
 
 	m_pant[0]->set_transmask(0,0xff01,0x00ff); /* this layer is split in two (pens 1..7, pens 8-15) */
 	m_pant[1]->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -123,9 +126,8 @@ void wrally_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 		if (high_priority != priority) continue;
 
-		if (flip_screen()) {
+		if (m_flip_screen)
 			sy = sy + 248;
-		}
 
 		if (!color_effect) {
 			gfx->transpen(bitmap,cliprect,number,
@@ -177,12 +179,15 @@ void wrally_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 UINT32 wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll registers */
-	if (!flip_screen()) {
+	if (!m_flip_screen)
+	{
 		m_pant[0]->set_scrolly(0, m_vregs[0]);
 		m_pant[0]->set_scrollx(0, m_vregs[1]+4);
 		m_pant[1]->set_scrolly(0, m_vregs[2]);
 		m_pant[1]->set_scrollx(0, m_vregs[3]);
-	} else {
+	}
+	else
+	{
 		m_pant[0]->set_scrolly(0, 248 - m_vregs[0]);
 		m_pant[0]->set_scrollx(0, 1024 - m_vregs[1] - 4);
 		m_pant[1]->set_scrolly(0, 248 - m_vregs[2]);

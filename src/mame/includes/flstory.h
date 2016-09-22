@@ -34,6 +34,7 @@ public:
 	UINT8    m_gfxctrl;
 	UINT8    m_char_bank;
 	UINT8    m_palette_bank;
+	bool     m_flip_screen;
 
 	/* sound-related */
 	UINT8    m_snd_data;

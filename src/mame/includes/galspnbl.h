@@ -46,6 +46,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	bool m_flip_screen;
+
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(galspnbl);

@@ -149,7 +149,6 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 	MCFG_GFX_INFO(_info)
 
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -209,6 +208,10 @@ public:
 
 	void set_gfx(UINT8 index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
 
+	// tilemap operations
+	void mark_all_dirty();
+	void set_flip_all(UINT32 attributes);
+
 protected:
 	// interface-level overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
@@ -230,6 +233,39 @@ private:
 
 // iterator
 typedef device_interface_iterator<device_gfx_interface> gfx_interface_iterator;
+
+
+// ======================> gfxdecode_device
+
+// device type definition
+extern const device_type GFXDECODE;
+
+class gfxdecode_device : public device_t, public device_gfx_interface
+{
+public:
+	// construction/destruction
+	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// required override
+	virtual void device_start() override;
+};
+
+
+//**************************************************************************
+//  COMMON GRAPHICS LAYOUTS
+//**************************************************************************
+
+GFXDECODE_EXTERN(empty);
+
+extern const gfx_layout gfx_8x8x1;
+extern const gfx_layout gfx_8x8x2_planar;
+extern const gfx_layout gfx_8x8x3_planar;
+extern const gfx_layout gfx_8x8x4_planar;
+extern const gfx_layout gfx_8x8x5_planar;
+extern const gfx_layout gfx_8x8x6_planar;
+
+extern const gfx_layout gfx_16x16x4_planar;
 
 
 #endif  /* __DIGFX_H__ */

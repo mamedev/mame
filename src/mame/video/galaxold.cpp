@@ -1129,7 +1129,7 @@ void galaxold_state::dambustr_draw_bullets(bitmap_ind16 &bitmap, const rectangle
 {
 	int i, color;
 
-	if (flip_screen_x())  x++;
+	if (m_flipscreen_x)  x++;
 
 	x = x - 6;
 
@@ -1300,7 +1300,7 @@ void galaxold_state::dambustr_draw_background(screen_device &screen, bitmap_ind1
 	int col1 = base + m_dambustr_bg_color_1;
 	int col2 = base + m_dambustr_bg_color_2;
 
-	if (flip_screen_x())
+	if (m_flipscreen_x)
 	{
 		bitmap.plot_box(  0, 0, 256-m_dambustr_bg_split_line, 256, col2);
 		bitmap.plot_box(256-m_dambustr_bg_split_line, 0, m_dambustr_bg_split_line, 256, col1);
@@ -1315,7 +1315,7 @@ void galaxold_state::dambustr_draw_background(screen_device &screen, bitmap_ind1
 
 void galaxold_state::dambustr_draw_upper_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (flip_screen_x())
+	if (m_flipscreen_x)
 	{
 		rectangle clip(254 - m_dambustr_bg_split_line, m_dambustr_bg_split_line, 0, 255);
 		copybitmap(bitmap, *m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);

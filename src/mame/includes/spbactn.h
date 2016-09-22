@@ -45,6 +45,8 @@ public:
 
 	tilemap_t    *m_extra_tilemap;
 
+	bool m_flip_screen;
+
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

@@ -91,7 +91,8 @@ READ8_MEMBER(jackal_state::jackalr_rotary_r)
 WRITE8_MEMBER(jackal_state::jackal_flipscreen_w)
 {
 	m_irq_enable = data & 0x02;
-	flip_screen_set(data & 0x08);
+	m_flip_screen = bool(data & 0x08);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 READ8_MEMBER(jackal_state::jackal_zram_r)

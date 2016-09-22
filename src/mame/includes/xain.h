@@ -57,6 +57,7 @@ public:
 	UINT8 m_scrollyP0[2];
 	UINT8 m_scrollxP1[2];
 	UINT8 m_scrollyP1[2];
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(cpuA_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpuB_bankswitch_w);

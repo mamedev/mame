@@ -32,6 +32,8 @@ public:
 	UINT16 m_scroll_y;
 	UINT8 m_main_irq_mask;
 	UINT8 m_mcu_irq_mask;
+	bool m_flip_screen;
+
 	DECLARE_WRITE8_MEMBER(inputport_select_w);
 	DECLARE_READ8_MEMBER(inputport_r);
 	DECLARE_WRITE8_MEMBER(skykid_led_w);

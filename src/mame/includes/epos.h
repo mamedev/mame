@@ -19,6 +19,7 @@ public:
 
 	/* video-related */
 	UINT8    m_palette;
+	bool     m_flip_screen;
 
 	/* misc */
 	int      m_counter;

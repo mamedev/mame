@@ -86,6 +86,7 @@ public:
 	UINT8 m_scrollx_lo;
 	UINT8 m_gfx_switch;
 	UINT8 m_sound_cmd;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(charram_w);
 	DECLARE_WRITE8_MEMBER(char_vregs_w);
@@ -116,6 +117,7 @@ void progolf_state::video_start()
 {
 	m_scrollx_hi = 0;
 	m_scrollx_lo = 0;
+	m_flip_screen = false;
 
 	m_fg_fb = std::make_unique<UINT8[]>(0x2000*8);
 
@@ -125,6 +127,7 @@ void progolf_state::video_start()
 	save_item(NAME(m_scrollx_hi));
 	save_item(NAME(m_scrollx_lo));
 	save_item(NAME(m_gfx_switch));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -220,7 +223,7 @@ WRITE8_MEMBER(progolf_state::scrollx_hi_w)
 
 WRITE8_MEMBER(progolf_state::flip_screen_w)
 {
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
 	if(data & 0xfe)
 		printf("$9600 with data = %02x used\n",data);
 }

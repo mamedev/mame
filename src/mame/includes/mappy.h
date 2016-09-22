@@ -69,6 +69,7 @@ public:
 
 	UINT8 m_scroll;
 	int m_mux;
+	bool m_flip_screen;
 
 	UINT8 m_main_irq_mask;
 	UINT8 m_sub_irq_mask;

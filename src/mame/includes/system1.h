@@ -58,6 +58,7 @@ public:
 	UINT8 m_videoram_bank;
 	tilemap_t *m_tilemap_page[8];
 	UINT8 m_tilemap_pages;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(videomode_w);
 	DECLARE_READ8_MEMBER(sound_data_r);

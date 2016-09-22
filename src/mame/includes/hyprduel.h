@@ -56,6 +56,7 @@ public:
 	int       m_sprite_yoffs;
 	int       m_sprite_yoffs_sub;
 	std::unique_ptr<UINT8[]>   m_expanded_gfx1;
+	bool m_flip_screen;
 
 	/* misc */
 	emu_timer *m_magerror_irq_timer;

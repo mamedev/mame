@@ -52,10 +52,11 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
 	m_background_priority = data & 0x01;
 
 	/* bit 1 controls horizontal flip screen */
-	flip_screen_x_set(data & 0x02);
+	m_flip_screen_x = (data & 0x02);
 
 	/* bit 2 controls vertical flip screen */
-	flip_screen_y_set(data & 0x04);
+	m_flip_screen_y = (data & 0x04);
+	m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 }
 
 
@@ -148,12 +149,17 @@ void gottlieb_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gottlieb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 
 	/* save some state */
 	save_item(NAME(m_background_priority));
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_transparent0));
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 VIDEO_START_MEMBER(gottlieb_state,screwloo)
@@ -173,12 +179,17 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gottlieb_state::get_screwloo_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 
 	/* save some state */
 	save_item(NAME(m_background_priority));
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_transparent0));
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -207,13 +218,13 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		int sy = (spriteram[offs]) - 13;
 		int code = (255 ^ spriteram[offs + 2]) + 256 * m_spritebank;
 
-		if (flip_screen_x()) sx = 233 - sx;
-		if (flip_screen_y()) sy = 228 - sy;
+		if (m_flip_screen_x) sx = 233 - sx;
+		if (m_flip_screen_y) sy = 228 - sy;
 
 
 			m_gfxdecode->gfx(2)->transpen(bitmap,clip,
 			code, 0,
-			flip_screen_x(), flip_screen_y(),
+			m_flip_screen_x, m_flip_screen_y,
 			sx,sy, 0);
 	}
 }

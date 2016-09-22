@@ -166,10 +166,11 @@ WRITE8_MEMBER(kingofb_state::kingofb_f800_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (flip_screen() != (data & 0x80))
+	if (m_flip_screen != bool(data & 0x80))
 	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
+		m_flip_screen = bool(data & 0x80);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -223,7 +224,7 @@ void kingofb_state::kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 		sx = spriteram[roffs + 1];
 		sy = spriteram[roffs];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -263,6 +264,9 @@ VIDEO_START_MEMBER(kingofb_state,ringking)
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void kingofb_state::ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -280,7 +284,7 @@ void kingofb_state::ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 		int sx = spriteram[offs + 2];
 		int sy = spriteram[offs];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

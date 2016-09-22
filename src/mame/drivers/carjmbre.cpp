@@ -68,6 +68,7 @@ public:
 	bool m_nmi_enabled;
 	UINT8 m_bgcolor;
 	tilemap_t *m_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(bgcolor_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -90,10 +91,12 @@ void carjmbre_state::machine_start()
 	// zerofill
 	m_nmi_enabled = false;
 	m_bgcolor = 0;
+	m_flip_screen = false;
 
 	// register for savestates
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_bgcolor));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -186,7 +189,7 @@ void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = m_spriteram[offs + 3];
 
 		// align to tilemap
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sy += 1;
 			sx = 233 - sx;
@@ -229,7 +232,8 @@ WRITE8_MEMBER(carjmbre_state::nmi_enable_w)
 WRITE8_MEMBER(carjmbre_state::flipscreen_w)
 {
 	// d0: flip screen (cocktail mode)
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carjmbre_state )

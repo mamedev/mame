@@ -135,7 +135,7 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_info4);
 	TILE_GET_INFO_MEMBER(fg_get_info5);
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip_screen);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	void update_DACs();

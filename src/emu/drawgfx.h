@@ -441,25 +441,4 @@ inline UINT32 alpha_blend_r32(UINT32 d, UINT32 s, UINT8 level)
 			((((s & 0xff0000) * level + (d & 0xff0000) * alphad) >> 8) & 0xff0000);
 }
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> gfxdecode_device
-
-// device type definition
-extern const device_type GFXDECODE;
-
-class gfxdecode_device : public device_t, public device_gfx_interface
-{
-public:
-	// construction/destruction
-	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual void device_start() override {};
-};
-
-GFXDECODE_EXTERN(empty);
-
 #endif  // __DRAWGFX_H__

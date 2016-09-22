@@ -196,7 +196,7 @@ UINT32 ashnojoe_state::screen_update_ashnojoe(screen_device &screen, bitmap_ind1
 {
 	//m_tilemap_reg[0] & 0x10 // ?? on coin insertion
 
-	flip_screen_set(m_tilemap_reg[0] & 1);
+	m_gfxdecode->set_flip_all((m_tilemap_reg[0] & 1) ? TILEMAP_FLIPXY : 0);
 
 	if(m_tilemap_reg[0] & 0x02)
 		m_joetilemap7->draw(screen, bitmap, cliprect, 0, 0);

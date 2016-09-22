@@ -260,7 +260,7 @@ WRITE16_MEMBER( pc080sn_device::ctrl_word_w )
 	{
 		case 0x00:
 		{
-			int flip = (data & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+			UINT32 flip = (data & 0x01) ? TILEMAP_FLIPXY : 0;
 
 			m_tilemap[0]->set_flip(flip);
 			m_tilemap[1]->set_flip(flip);
@@ -476,7 +476,7 @@ void pc080sn_device::restore_scroll()
 	m_bgscrolly[0] = -m_ctrl[2];
 	m_bgscrolly[1] = -m_ctrl[3];
 
-	flip = (m_ctrl[4] & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	flip = (m_ctrl[4] & 0x01) ? TILEMAP_FLIPXY : 0;
 	m_tilemap[0]->set_flip(flip);
 	m_tilemap[1]->set_flip(flip);
 }

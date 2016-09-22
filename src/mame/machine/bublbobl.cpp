@@ -32,7 +32,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 	m_video_enable = data & 0x40;
 
 	/* bit 7 flips screen */
-	flip_screen_set(data & 0x80);
+	m_flip_screen = data & 0x80;
 }
 
 WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
@@ -46,7 +46,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
 WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
 {
 	/* bit 7 flips screen */
-	flip_screen_set(data & 0x80);
+	m_flip_screen = data & 0x80;
 
 	/* other bits unknown */
 }

@@ -33,6 +33,7 @@ public:
 	int       m_scroll[4];
 	int       m_lastflip;
 	int       m_lastpixcolor;
+	bool      m_flip_screen;
 
 	/* sound-related */
 	int       m_soundlatch;

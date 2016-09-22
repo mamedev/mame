@@ -1237,12 +1237,15 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(btime_state,btime)
 {
+	m_flip_screen = false;
+
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
 	save_item(NAME(m_bnj_scroll2));
 	save_item(NAME(m_btime_tilemap));
 	save_item(NAME(m_audio_nmi_enabled));
 	save_item(NAME(m_audio_nmi_state));
+	save_item(NAME(m_flip_screen));
 }
 
 MACHINE_START_MEMBER(btime_state,mmonkey)

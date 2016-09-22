@@ -682,7 +682,7 @@ WRITE8_MEMBER(argus_state::butasan_unknown_w)
 
 void argus_state::bg_setting()
 {
-	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPY|TILEMAP_FLIPX : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	if (!m_flipscreen)
 	{

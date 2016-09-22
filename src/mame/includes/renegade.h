@@ -66,6 +66,7 @@ public:
 	INT32 m_scrollx;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(mcu_reset_r);

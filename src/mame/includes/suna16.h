@@ -46,6 +46,7 @@ public:
 	std::unique_ptr<UINT16[]> m_paletteram;
 	int m_color_bank;
 	UINT8 m_prot;
+	bool m_flip_screen;
 
 	// common
 	DECLARE_WRITE16_MEMBER(soundlatch_w);

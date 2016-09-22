@@ -97,8 +97,11 @@ void tecmo_state::video_start()
 	m_bg_tilemap->set_scrolldx(-48,256+48);
 	m_fg_tilemap->set_scrolldx(-48,256+48);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_fgscroll));
 	save_item(NAME(m_bgscroll));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -147,7 +150,10 @@ WRITE8_MEMBER(tecmo_state::bgscroll_w)
 
 WRITE8_MEMBER(tecmo_state::flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -168,7 +174,6 @@ UINT32 tecmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,2);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
 
-	m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode,cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
-
+	m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode,cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, m_flip_screen);
 	return 0;
 }

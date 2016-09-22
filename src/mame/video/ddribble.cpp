@@ -227,8 +227,8 @@ void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 
 UINT32 ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_fg_tilemap->set_flip((m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_bg_tilemap->set_flip((m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_fg_tilemap->set_flip((m_vregs[0][4] & 0x08) ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip((m_vregs[1][4] & 0x08) ? TILEMAP_FLIPXY : 0);
 
 	/* set scroll registers */
 	m_fg_tilemap->set_scrollx(0, m_vregs[0][1] | ((m_vregs[0][2] & 0x01) << 8));

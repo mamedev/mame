@@ -30,6 +30,7 @@ public:
 	tilemap_t *m_fg_tilemap;
 	int     m_scroll_x;
 	int     m_priority;
+	bool m_flip_screen;
 
 	UINT8 m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(scroll_w);

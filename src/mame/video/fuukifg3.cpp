@@ -186,12 +186,13 @@ UINT32 fuuki32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	int tm_middle = pri_table[(m_priority[0] >> 16) & 0x0f][1];
 	int tm_back   = pri_table[(m_priority[0] >> 16) & 0x0f][2];
 
-	flip_screen_set((m_vregs[0x1e / 4] & 0x0000ffff) & 1);
+	bool flip_screen = (m_vregs[0x1e / 4] & 0x0000ffff) & 1;
+	m_gfxdecode->set_flip_all(flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* Layers scrolling */
 
-	scrolly_offs = ((m_vregs[0xc / 4] & 0xffff0000) >> 16) - (flip_screen() ? 0x103 : 0x1f3);
-	scrollx_offs =  (m_vregs[0xc / 4] & 0x0000ffff) - (flip_screen() ? 0x2c7 : 0x3f6);
+	scrolly_offs = ((m_vregs[0xc / 4] & 0xffff0000) >> 16) - (flip_screen ? 0x103 : 0x1f3);
+	scrollx_offs =  (m_vregs[0xc / 4] & 0x0000ffff) - (flip_screen ? 0x2c7 : 0x3f6);
 
 	layer0_scrolly = ((m_vregs[0x0 / 4] & 0xffff0000) >> 16) + scrolly_offs;
 	layer0_scrollx = ((m_vregs[0x0 / 4] & 0x0000ffff)) + scrollx_offs;
@@ -219,7 +220,7 @@ UINT32 fuuki32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
 	draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
 
-	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), m_spr_buffered_tilebank);
+	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen, m_spr_buffered_tilebank);
 	return 0;
 }
 

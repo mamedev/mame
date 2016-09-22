@@ -25,6 +25,7 @@ public:
 	tilemap_t *m_tilemap_0a;
 	tilemap_t *m_tilemap_0b;
 	tilemap_t *m_tilemap_1;
+	bool m_flip_screen;
 
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);

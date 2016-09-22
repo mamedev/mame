@@ -34,6 +34,7 @@ public:
 	bool m_nmi_enable;
 	bool m_display_enable;
 	tilemap_t *m_bg_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_select_w);

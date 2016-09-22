@@ -23,6 +23,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_systemram(*this, "systemram"),
 		m_sprgen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
 	/* devices */
@@ -36,6 +37,7 @@ public:
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_systemram;
 	optional_device<decospr_device> m_sprgen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	std::unique_ptr<UINT16[]> m_spriteram;
 	size_t m_spriteram_size;

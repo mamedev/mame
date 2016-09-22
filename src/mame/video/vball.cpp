@@ -46,6 +46,7 @@ void vball_state::video_start()
 	m_gfxset=0;
 	m_bgprombank=0xff;
 	m_spprombank=0xff;
+	m_flip_screen = false;
 
 	save_item(NAME(m_scrollx_hi));
 	save_item(NAME(m_scrolly_hi));
@@ -54,6 +55,7 @@ void vball_state::video_start()
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_bgprombank));
 	save_item(NAME(m_spprombank));
+	save_item(NAME(m_flip_screen));
 }
 
 WRITE8_MEMBER(vball_state::videoram_w)
@@ -99,6 +101,33 @@ void vball_state::spprombank_w( int bank )
 }
 
 
+/* bit 0 = flip screen
+   bit 1 = scrollx hi
+   bit 2 = bg prom bank
+   bit 3 = bg prom bank
+   bit 4 = bg prom bank
+   bit 5 = sp prom bank
+   bit 6 = sp prom bank
+   bit 7 = sp prom bank
+*/
+WRITE8_MEMBER(vball_state::scrollx_hi_w)
+{
+	m_flip_screen = bool(~data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+
+	m_scrollx_hi = (data & 0x02) << 7;
+	bgprombank_w((data >> 2) & 0x07);
+	spprombank_w((data >> 5) & 0x07);
+	//logerror("%04x: scrollx_hi = %d\n", space.device().safe_pcbase(), m_scrollx_hi);
+}
+
+WRITE8_MEMBER(vball_state::scrollx_lo_w)
+{
+	m_scrollx_lo = data;
+	//logerror("%04x: scrollx_lo =%d\n", space.device().safe_pcbase(), m_scrollx_lo);
+}
+
+
 #define DRAW_SPRITE( order, sx, sy ) gfx->transpen(bitmap,\
 					cliprect, \
 					(which+order),color,flipx,flipy,sx,sy,0);
@@ -124,7 +153,7 @@ void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int flipy = 0;
 		int dy = -16;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

@@ -15,10 +15,10 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_videoram_w)
 
 WRITE8_MEMBER(pokechmp_state::pokechmp_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x80))
+	if (m_flip_screen != bool(data & 0x80))
 	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
+		m_flip_screen = bool(data & 0x80);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -36,6 +36,9 @@ void pokechmp_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(pokechmp_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void pokechmp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -55,7 +58,8 @@ void pokechmp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			flipx = spriteram[offs+1] & 0x04;
 			flipy = spriteram[offs+1] & 0x02;
-			if (flip_screen()) {
+			if (m_flip_screen)
+			{
 				sx=240-sx;
 				sy=240-sy;
 				if (flipx) flipx=0; else flipx=1;

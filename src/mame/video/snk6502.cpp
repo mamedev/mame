@@ -124,16 +124,12 @@ WRITE8_MEMBER(snk6502_state::flipscreen_w)
 	if (m_charbank != bank)
 	{
 		m_charbank = bank;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	/* bit 7 flips screen */
-
-	if (flip_screen() != (data & 0x80))
-	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
-	}
+	m_bg_tilemap->set_flip((data & 0x80) ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip((data & 0x80) ? TILEMAP_FLIPXY : 0);
 }
 
 WRITE8_MEMBER(snk6502_state::scrollx_w)
@@ -252,12 +248,8 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 WRITE8_MEMBER(snk6502_state::satansat_b002_w)
 {
 	/* bit 0 flips screen */
-
-	if (flip_screen() != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
+	m_bg_tilemap->set_flip((data & 0x01) ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip((data & 0x01) ? TILEMAP_FLIPXY : 0);
 
 	/* bit 1 enables interrupts */
 	m_irq_mask = data & 2;

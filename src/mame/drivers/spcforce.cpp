@@ -43,12 +43,15 @@ TODO:
 
 void spcforce_state::machine_start()
 {
+	m_flip_screen = false;
+
 	save_item(NAME(m_sn76496_latch));
 	save_item(NAME(m_sn76496_select));
 	save_item(NAME(m_sn1_ready));
 	save_item(NAME(m_sn2_ready));
 	save_item(NAME(m_sn3_ready));
 	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_flip_screen));
 }
 
 WRITE8_MEMBER(spcforce_state::SN76496_latch_w)

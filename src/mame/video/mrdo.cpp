@@ -219,7 +219,7 @@ WRITE8_MEMBER(mrdo_state::mrdo_flipscreen_w)
 	/* Mr. Do! so we don't emulate them */
 
 	m_flipscreen = data & 0x01;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 }
 
 

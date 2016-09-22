@@ -678,7 +678,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 	switch (offset & 0x0e)
 	{
 		case 0x04:  /* FLIP */
-			flip_screen_set(bit);
+			superpac_flipscreen_w(space, 0, bit);
 			break;
 
 		case 0x08:  /* 4 RESET */

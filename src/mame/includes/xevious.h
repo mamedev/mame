@@ -26,6 +26,7 @@ public:
 	optional_device<samples_device> m_samples;
 
 	INT32 m_xevious_bs[2];
+	bool m_flip_screen;
 	DECLARE_DRIVER_INIT(xevious);
 	DECLARE_DRIVER_INIT(xevios);
 	DECLARE_DRIVER_INIT(battles);

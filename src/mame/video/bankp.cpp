@@ -121,7 +121,12 @@ WRITE8_MEMBER(bankp_state::out_w)
 	m_nmi_mask = (data & 0x10) >> 4;
 
 	/* bit 5 controls screen flip */
-	flip_screen_set(data & 0x20);
+	if (bool(data & 0x20) != m_flip_screen)
+	{
+		m_flip_screen = bool(data & 0x20);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 
 	/* bits 6-7 unknown */
 }
@@ -154,14 +159,17 @@ void bankp_state::video_start()
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0);
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_flip_screen));
 }
 
 UINT32 bankp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (flip_screen())
+	if (m_flip_screen)
 	{
 		m_fg_tilemap->set_scrollx(0, 240-m_scroll_x);
 		m_bg_tilemap->set_scrollx(0, 240);

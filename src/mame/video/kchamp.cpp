@@ -41,7 +41,8 @@ WRITE8_MEMBER(kchamp_state::kchamp_colorram_w)
 
 WRITE8_MEMBER(kchamp_state::kchamp_flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	m_flip_screen = bool(data & 0x01);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 TILE_GET_INFO_MEMBER(kchamp_state::get_bg_tile_info)
@@ -55,6 +56,9 @@ TILE_GET_INFO_MEMBER(kchamp_state::get_bg_tile_info)
 void kchamp_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kchamp_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 /*
@@ -83,7 +87,7 @@ void kchamp_state::kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 		int sx = spriteram[offs + 3] - 8;
 		int sy = 247 - spriteram[offs];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -111,7 +115,7 @@ void kchamp_state::kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 		int sx = spriteram[offs + 3];
 		int sy = 240 - spriteram[offs];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

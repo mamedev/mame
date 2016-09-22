@@ -65,6 +65,7 @@ public:
 	UINT32 m_bg_tile_offset;
 	UINT32 m_tx_tile_offset;
 	int m_is_psychos;
+	bool m_flip_screen;
 
 	UINT8 m_drawmode_table[16];
 	UINT8 m_empty_tile[16*16];

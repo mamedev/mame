@@ -55,4 +55,6 @@ protected:
 	int m_dsw_sel;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_nmi_mask;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 };

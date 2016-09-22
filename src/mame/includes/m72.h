@@ -83,6 +83,7 @@ public:
 	INT32 m_scrollx2;
 	INT32 m_scrolly2;
 	INT32 m_video_off;
+	bool m_flip_screen;
 
 	int m_fg_source;
 	int m_bg_source;

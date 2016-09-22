@@ -45,6 +45,8 @@ public:
 	int         m_sprite_color_base;
 	int         m_bg_scrollx;
 	UINT8       m_sprite_lookup[0x2000];
+	bool        m_flip_screen_x;
+	bool        m_flip_screen_y;
 
 	/* sound-related */
 	int         m_sound_nmi_enable;

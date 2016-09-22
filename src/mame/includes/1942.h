@@ -34,6 +34,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_palette_bank;
 	UINT8 m_scroll[2];
+	bool m_flip_screen;
 	void create_palette();
 	DECLARE_PALETTE_INIT(1942);
 	DECLARE_PALETTE_INIT(1942p);

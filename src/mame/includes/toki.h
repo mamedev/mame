@@ -46,6 +46,7 @@ public:
 	tilemap_t *m_background_layer;
 	tilemap_t *m_foreground_layer;
 	tilemap_t *m_text_layer;
+	bool m_flip_screen;
 
 	DECLARE_WRITE16_MEMBER(tokib_soundcommand_w);
 	DECLARE_READ16_MEMBER(pip_r);

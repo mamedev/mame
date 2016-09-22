@@ -348,6 +348,7 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k052109", k052109_device, mark_all_dirty)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -414,6 +415,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k052109", k052109_device, mark_all_dirty)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

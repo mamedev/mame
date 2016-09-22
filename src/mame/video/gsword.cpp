@@ -100,7 +100,7 @@ WRITE8_MEMBER(gsword_state::charbank_w)
 	if (m_charbank != data)
 	{
 		m_charbank = data;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -116,7 +116,7 @@ WRITE8_MEMBER(gsword_state::videoctrl_w)
 	if (m_charpalbank != ((data & 0x60) >> 5))
 	{
 		m_charpalbank = (data & 0x60) >> 5;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	/* bit 4 is flip screen */
@@ -124,7 +124,7 @@ WRITE8_MEMBER(gsword_state::videoctrl_w)
 	if (m_flipscreen != (data & 0x10))
 	{
 		m_flipscreen = data & 0x10;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	/* bit 0 could be used but unknown */

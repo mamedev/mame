@@ -34,6 +34,16 @@
 #include "includes/thedeep.h"
 
 
+void thedeep_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_tilemap_0->set_flip(flip ? TILEMAP_FLIPXY : 0);
+		m_tilemap_1->set_flip(flip ? TILEMAP_FLIPXY : 0);
+	}
+}
+
 /***************************************************************************
 
                         Callbacks for the TileMap code
@@ -107,6 +117,9 @@ void thedeep_state::video_start()
 	m_tilemap_1->set_transparent_pen(0 );
 
 	m_tilemap_0->set_scroll_cols(0x20); // column scroll for the background
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 /***************************************************************************
@@ -132,7 +145,7 @@ UINT32 thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
-	m_spritegen->draw_sprites(bitmap, cliprect,  reinterpret_cast<UINT16 *>(m_spriteram.target()), 0x00, 0x00, 0x0f);
+	m_spritegen->draw_sprites(bitmap, cliprect,  reinterpret_cast<UINT16 *>(m_spriteram.target()), 0x00, 0x00, 0x0f, m_flip_screen);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

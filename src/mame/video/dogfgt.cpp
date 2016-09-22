@@ -70,6 +70,9 @@ void dogfgt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
+
 	m_bitmapram = std::make_unique<UINT8[]>(BITMAPRAM_SIZE);
 	save_pointer(NAME(m_bitmapram.get()), BITMAPRAM_SIZE);
 
@@ -117,7 +120,7 @@ WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
 		for (i = 0; i < 3; i++)
 			color |= ((m_bitmapram[offset + BITMAPRAM_SIZE / 3 * i] >> subx) & 1) << i;
 
-		if (flip_screen())
+		if (m_flip_screen)
 			m_pixbitmap.pix16(y ^ 0xff, (x + subx) ^ 0xff) = PIXMAP_COLOR_BASE + 8 * m_pixcolor + color;
 		else
 			m_pixbitmap.pix16(y, x + subx) = PIXMAP_COLOR_BASE + 8 * m_pixcolor + color;
@@ -158,7 +161,8 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
 	/* bit 7 is screen flip */
-	flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* other bits unused? */
 	logerror("PC %04x: 1800 = %02x\n", space.device().safe_pc(), data);
@@ -185,7 +189,7 @@ void dogfgt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 			sy = (240 - m_spriteram[offs + 2]) & 0xff;
 			flipx = m_spriteram[offs] & 0x04;
 			flipy = m_spriteram[offs] & 0x02;
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -207,11 +211,11 @@ UINT32 dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &b
 {
 	int offs;
 
-	if (m_lastflip != flip_screen() || m_lastpixcolor != m_pixcolor)
+	if (m_lastflip != m_flip_screen || m_lastpixcolor != m_pixcolor)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
-		m_lastflip = flip_screen();
+		m_lastflip = m_flip_screen;
 		m_lastpixcolor = m_pixcolor;
 
 		for (offs = 0; offs < BITMAPRAM_SIZE; offs++)

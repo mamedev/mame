@@ -170,12 +170,19 @@ VIDEO_START_MEMBER(nova2001_state,nova2001)
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::nova2001_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(0, -7);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(nova2001_state,pkunwar)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::pkunwar_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = nullptr;
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(nova2001_state,ninjakun)
@@ -184,6 +191,9 @@ VIDEO_START_MEMBER(nova2001_state,ninjakun)
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::ninjakun_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(7, 0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(nova2001_state,raiders5)
@@ -192,6 +202,9 @@ VIDEO_START_MEMBER(nova2001_state,raiders5)
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::raiders5_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(7, 0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -250,12 +263,17 @@ WRITE8_MEMBER(nova2001_state::nova2001_scroll_y_w)
 WRITE8_MEMBER(nova2001_state::nova2001_flipscreen_w)
 {
 	// inverted
-	flip_screen_set(~data & 1);
+	m_flip_screen = bool(~data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	if (m_fg_tilemap != nullptr)
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -287,7 +305,7 @@ void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			continue;
 		}
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -324,7 +342,7 @@ void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 			continue;
 		}
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

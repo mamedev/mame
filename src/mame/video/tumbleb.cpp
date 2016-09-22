@@ -220,6 +220,15 @@ void tumbleb_state::tumbleb_tilemap_redraw()
 		m_pf2_alt_tilemap->mark_all_dirty();
 }
 
+void tumbleb_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_gfxdecode->set_flip_all(flip ? TILEMAP_FLIPXY : 0);
+	}
+}
+
 VIDEO_START_MEMBER(tumbleb_state,pangpang)
 {
 	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
@@ -228,6 +237,9 @@ VIDEO_START_MEMBER(tumbleb_state,pangpang)
 
 	m_pf1_tilemap->set_transparent_pen(0);
 	m_pf1_alt_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_state::tumbleb_tilemap_redraw), this));
 }
@@ -242,6 +254,9 @@ VIDEO_START_MEMBER(tumbleb_state,tumblepb)
 	m_pf1_tilemap->set_transparent_pen(0);
 	m_pf1_alt_tilemap->set_transparent_pen(0);
 
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_state::tumbleb_tilemap_redraw), this));
 }
 
@@ -253,6 +268,9 @@ VIDEO_START_MEMBER(tumbleb_state,sdfight)
 
 	m_pf1_tilemap->set_transparent_pen(0);
 	m_pf1_alt_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_state::tumbleb_tilemap_redraw), this));
 }
@@ -266,6 +284,9 @@ VIDEO_START_MEMBER(tumbleb_state,fncywld)
 	m_pf1_tilemap->set_transparent_pen(15);
 	m_pf1_alt_tilemap->set_transparent_pen(15);
 
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_state::tumbleb_tilemap_redraw), this));
 }
 
@@ -277,6 +298,9 @@ VIDEO_START_MEMBER(tumbleb_state,suprtrio)
 	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 
 	m_pf1_alt_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_state::tumbleb_tilemap_redraw), this));
 }
@@ -299,7 +323,7 @@ void tumbleb_state::tumbleb_draw_common(screen_device &screen, bitmap_ind16 &bit
 	else
 		m_pf1_alt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2, m_flip_screen);
 }
 
 UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -308,12 +332,12 @@ UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16
 
 	flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -329,12 +353,12 @@ UINT32 tumbleb_state::screen_update_jumpkids(screen_device &screen, bitmap_ind16
 
 	flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -349,12 +373,12 @@ UINT32 tumbleb_state::screen_update_semicom(screen_device &screen, bitmap_ind16 
 
 	flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -385,13 +409,13 @@ UINT32 tumbleb_state::screen_update_bcstory(screen_device &screen, bitmap_ind16 
 	flip_screen_set(m_control_0[0] & 0x80);
 
 	/* not sure of this */
-	if (flip_screen())
+	if (m_flip_screen)
 		offs = 1;
 	else
 		offs = 8;
 
 	/* not sure of this */
-	if (flip_screen())
+	if (m_flip_screen)
 		offs2 = -3;
 	else
 		offs2 = 8;
@@ -425,7 +449,7 @@ UINT32 tumbleb_state::screen_update_sdfight(screen_device &screen, bitmap_ind16 
 
 	tumbleb_draw_common(screen, bitmap, cliprect, offs2, -16, offs, 0);
 
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2, m_flip_screen);
 	return 0;
 }
 
@@ -435,12 +459,12 @@ UINT32 tumbleb_state::screen_update_fncywld(screen_device &screen, bitmap_ind16 
 
 	flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -456,12 +480,12 @@ UINT32 tumbleb_state::screen_update_pangpang(screen_device &screen, bitmap_ind16
 
 	flip_screen_set(m_control_0[0] & 0x80);
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (flip_screen())
+	if (m_flip_screen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -482,6 +506,6 @@ UINT32 tumbleb_state::screen_update_suprtrio(screen_device &screen, bitmap_ind16
 	m_pf2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_pf1_alt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2, m_flip_screen);
 	return 0;
 }

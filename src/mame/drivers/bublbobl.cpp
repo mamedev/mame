@@ -731,6 +731,7 @@ MACHINE_START_MEMBER(bublbobl_state,common)
 	save_item(NAME(m_pending_nmi));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_flip_screen));
 }
 
 MACHINE_RESET_MEMBER(bublbobl_state,common)
@@ -738,6 +739,7 @@ MACHINE_RESET_MEMBER(bublbobl_state,common)
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
 	m_sound_status = 0;
+	m_flip_screen = false;
 }
 
 

@@ -61,6 +61,8 @@ public:
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	std::unique_ptr<UINT8[]>      m_objram;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -159,6 +161,11 @@ VIDEO_START_MEMBER(wyvernf0_state,wyvernf0)
 
 	m_fg_tilemap->set_scrolldx(0x10, 0xf6);
 	m_fg_tilemap->set_scrolldy(   0,    0);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 void wyvernf0_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground )
@@ -202,12 +209,12 @@ yyyyyyyy fccccccc x???pppp xxxxxxxx
 		int flipx = 0;
 		int flipy = sprram[offs + 1] & 0x80;
 
-		if (flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			flipx = !flipx;
 			sx = 256 - 8 - sx - 3*8;
 		}
-		if (flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			flipy = !flipy;
 			sy = 256 - 8 - sy - 3*8;
@@ -321,8 +328,13 @@ WRITE8_MEMBER(wyvernf0_state::rambank_w)
 	// bit 5 ??? set, except at boot
 	// bit 6 Coin lockout
 	// bit 7 RAM bank
-	flip_screen_x_set(data & 0x01);
-	flip_screen_y_set(data & 0x02);
+	if ((data & 0x03) != ((m_flip_screen_x ? 0x01 : 0x00) | (m_flip_screen_y ? 0x02 : 0x00)))
+	{
+		m_flip_screen_x = (data & 0x01);
+		m_flip_screen_y = (data & 0x02);
+		m_fg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
+	}
 
 	machine().bookkeeping().coin_lockout_w(0, !(data & 0x40));
 	machine().bookkeeping().coin_lockout_w(1, !(data & 0x40));

@@ -27,6 +27,7 @@ public:
 	bitmap_ind8 m_screen_bitmap;
 	int         m_video_ctrl;
 	int         m_cpu_control;  /* CPU interrupt control register */
+	bool        m_flip_screen;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

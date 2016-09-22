@@ -22,6 +22,7 @@ public:
 		m_tilegen2(*this, "tilegen2"),
 		m_tilegen3(*this, "tilegen3"),
 		m_spritegen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
@@ -37,6 +38,7 @@ public:
 	required_device<deco_bac06_device> m_tilegen2;
 	required_device<deco_bac06_device> m_tilegen3;
 	required_device<deco_mxc06_device> m_spritegen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(madmotor_sound_w);

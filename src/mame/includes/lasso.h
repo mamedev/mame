@@ -45,6 +45,8 @@ public:
 	tilemap_t  *m_track_tilemap;
 	UINT8    m_gfxbank;     /* used by lasso, chameleo, wwjgtin and pinbo */
 	UINT8    m_track_enable;    /* used by wwjgtin */
+	bool     m_flip_screen_x;
+	bool     m_flip_screen_y;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

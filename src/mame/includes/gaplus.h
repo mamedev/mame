@@ -65,6 +65,7 @@ public:
 	UINT8 m_main_irq_mask;
 	UINT8 m_sub_irq_mask;
 	UINT8 m_sub2_irq_mask;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);

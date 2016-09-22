@@ -40,6 +40,7 @@ public:
 	int m_latchB;
 	int m_bghide;
 	int m_spritectrl[9];
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(p2a_w);
 	DECLARE_WRITE8_MEMBER(p2b_w);

@@ -103,6 +103,11 @@ VIDEO_START_MEMBER(fastfred_state,fastfred)
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
+
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -195,21 +200,21 @@ WRITE8_MEMBER(fastfred_state::fastfred_colorbank2_w )
 
 WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_x_w )
 {
-	if (flip_screen_x() != (data & 0x01))
+	if (m_flip_screen_x != (data & 0x01))
 	{
-		flip_screen_x_set(data & 0x01);
+		m_flip_screen_x = (data & 0x01);
 
-		m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
 WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_y_w )
 {
-	if (flip_screen_y() != (data & 0x01))
+	if (m_flip_screen_y != (data & 0x01))
 	{
-		flip_screen_y_set(data & 0x01);
+		m_flip_screen_y = (data & 0x01);
 
-		m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((m_flip_screen_x ? TILEMAP_FLIPX : 0) | (m_flip_screen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -265,18 +270,18 @@ void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 
-		if (flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,
+		m_gfxdecode->gfx(1)->transpen(bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea,
 				code,
 				m_colorbank | (m_spriteram[offs + 2] & 0x07),
 				flipx,flipy,

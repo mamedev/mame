@@ -36,6 +36,7 @@ public:
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
 		m_sprgen1(*this, "spritegen1"),
 		m_sprgen2(*this, "spritegen2"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -61,6 +62,7 @@ public:
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
 
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	DECLARE_READ16_MEMBER(rohga_irq_ack_r);

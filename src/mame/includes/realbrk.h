@@ -44,6 +44,8 @@ public:
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 
 	// common
 	DECLARE_WRITE16_MEMBER(vram_0_w);

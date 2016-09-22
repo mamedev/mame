@@ -53,6 +53,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_fg_tile_bank;
 	int m_bg_tile_bank;
+	bool m_flip_screen;
 
 	// common
 	DECLARE_WRITE8_MEMBER(videoram_w);

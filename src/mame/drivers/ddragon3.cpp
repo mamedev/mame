@@ -258,7 +258,7 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
 {
-	flip_screen_set(data&1);
+	flip_screen_set(data & 1);
 }
 
 /*- Palette Reads/Writes - A5 and A6 are not connected */

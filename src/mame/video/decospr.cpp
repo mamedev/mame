@@ -194,7 +194,7 @@ void decospr_device::alloc_sprite_bitmap()
 }
 
 template<class _BitmapClass>
-void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
+void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool flipscreen)
 {
 	//printf("cliprect %04x, %04x\n", cliprect.min_y, cliprect.max_y);
 
@@ -206,11 +206,6 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 
 	int offs, end, incr;
-
-	bool flipscreen = (machine().driver_data()->flip_screen() != 0);
-
-	if (invert_flip)
-		flipscreen = !flipscreen;
 
 
 	if (!m_pri_cb.isnull())
@@ -564,11 +559,11 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 	}
 }
 
-void decospr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
-{ draw_sprites_common(bitmap, cliprect, spriteram, sizewords, invert_flip); }
+void decospr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool flipscreen)
+{ draw_sprites_common(bitmap, cliprect, spriteram, sizewords, flipscreen); }
 
-void decospr_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
-{ draw_sprites_common(bitmap, cliprect, spriteram, sizewords, invert_flip); }
+void decospr_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool flipscreen)
+{ draw_sprites_common(bitmap, cliprect, spriteram, sizewords, flipscreen); }
 
 
 // inefficient, we should be able to mix in a single pass by comparing the existing priority bitmap from the tilemaps

@@ -182,6 +182,9 @@ void gaplus_state::video_start()
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0xff);
 
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
+
 	starfield_init();
 
 	save_item(NAME(m_starfield_control));
@@ -277,7 +280,7 @@ void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 			int duplicate = spriteram_3[offs] & 0x80;
 			int x,y;
 
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -305,7 +308,8 @@ void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 UINT32 gaplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
+	m_flip_screen = bool(m_spriteram[0x1f7f-0x800] & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	bitmap.fill(0, cliprect);
 

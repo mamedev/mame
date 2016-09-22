@@ -25,6 +25,8 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	bool        m_flip_screen;
+
 	DECLARE_READ8_MEMBER(markham_e004_r);
 	DECLARE_WRITE8_MEMBER(markham_videoram_w);
 	DECLARE_WRITE8_MEMBER(markham_flipscreen_w);

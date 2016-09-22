@@ -370,9 +370,12 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 	m_bg_tilemap[1]->set_scrolldx(0, 0);
 	m_bg_tilemap[2]->set_scrolldx(0, 0);
 
+	m_flip_screen = false;
+
 	/* Set up save state */
 	save_item(NAME(m_sprite_xoffs));
 	save_item(NAME(m_sprite_yoffs));
+	save_item(NAME(m_flip_screen));
 	machine().save().register_postload(save_prepost_delegate(FUNC(hyprduel_state::hyprduel_postload), this));
 }
 
@@ -533,7 +536,7 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 			UINT32 gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				flipx = !flipx;     x = max_x - x - width;
 				flipy = !flipy;     y = max_y - y - height;
@@ -702,7 +705,8 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 	    ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)
 		return 0;
-	flip_screen_set(screenctrl & 1);
+	m_flip_screen = bool(screenctrl & 1);
+	m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 #if 0
 if (machine().input().code_pressed(KEYCODE_Z))

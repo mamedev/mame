@@ -102,6 +102,9 @@ VIDEO_START_MEMBER(ddragon_state,ddragon)
 	m_bg_tilemap->set_scrolldx(0, 0);
 	m_fg_tilemap->set_scrolldy(-8, -8);
 	m_bg_tilemap->set_scrolldy(-8, -8);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -121,6 +124,16 @@ WRITE8_MEMBER(ddragon_state::ddragon_fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void ddragon_state::flip_screen_set(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		m_bg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(flip ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 
@@ -171,7 +184,7 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				which = src[i + 3] + ((src[i + 2] & 0x0f) << 8);
 			}
 
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - 16 - sy;

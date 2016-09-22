@@ -36,6 +36,7 @@ public:
 	tilemap_t  *m_fg_tilemap;
 	UINT8 m_scroll_x[2];
 	UINT8 m_scroll_y[2];
+	bool m_flip_screen;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;

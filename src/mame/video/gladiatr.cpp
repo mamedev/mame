@@ -52,11 +52,13 @@ VIDEO_START_MEMBER(gladiatr_state,ppking)
 	m_bg_tilemap->set_scroll_cols(0x10);
 
 	m_sprite_bank = 1;
+	m_flip_screen = false;
 
 	save_item(NAME(m_video_attributes));
 	save_item(NAME(m_fg_scrolly));
 	save_item(NAME(m_sprite_buffer));
 	save_item(NAME(m_fg_tile_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(gladiatr_state,gladiatr)
@@ -70,6 +72,7 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 	m_fg_tilemap->set_scrolldx(-0x30, 0x12f);
 
 	m_sprite_bank = 2;
+	m_flip_screen = false;
 
 	save_item(NAME(m_video_attributes));
 	save_item(NAME(m_fg_scrollx));
@@ -80,6 +83,7 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 	save_item(NAME(m_sprite_buffer));
 	save_item(NAME(m_fg_tile_bank));
 	save_item(NAME(m_bg_tile_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -196,6 +200,16 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_video_registers_w)
 	}
 }
 
+WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
+{
+	if (m_flip_screen != bool(data & 1))
+	{
+		m_flip_screen = bool(data & 1);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
+}
+
 
 
 /***************************************************************************
@@ -227,7 +241,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int color = src[1] & 0x1f;
 		int x,y;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			xflip = !xflip;
 			yflip = !yflip;
@@ -295,9 +309,9 @@ UINT32 gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind1
 		int scroll;
 
 		scroll = m_bg_scrollx + ((m_video_attributes & 0x04) << 6);
-		m_bg_tilemap->set_scrollx(0, scroll ^ (flip_screen() ? 0x0f : 0));
+		m_bg_tilemap->set_scrollx(0, scroll ^ (m_flip_screen ? 0x0f : 0));
 		scroll = m_fg_scrollx + ((m_video_attributes & 0x08) << 5);
-		m_fg_tilemap->set_scrollx(0, scroll ^ (flip_screen() ? 0x0f : 0));
+		m_fg_tilemap->set_scrollx(0, scroll ^ (m_flip_screen ? 0x0f : 0));
 
 		// always 0 anyway
 		m_bg_tilemap->set_scrolly(0, m_bg_scrolly);

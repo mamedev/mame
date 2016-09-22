@@ -29,6 +29,8 @@ public:
 	int m_xscroll[2];
 	int m_yscroll[2];
 	int m_copy_sprites;
+	bool m_flip_screen;
+
 	DECLARE_WRITE8_MEMBER(inputport_select_w);
 	DECLARE_READ8_MEMBER(inputport_r);
 	DECLARE_WRITE8_MEMBER(baraduke_lamps_w);

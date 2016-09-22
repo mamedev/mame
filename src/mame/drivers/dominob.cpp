@@ -88,6 +88,9 @@ public:
 	//UINT8 m_paddle_value;
 	DECLARE_WRITE8_MEMBER(dominob_d008_w);
 	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
+
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 	virtual void video_start() override;
 	UINT32 screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -99,6 +102,12 @@ public:
 void dominob_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_granularity(8);
+
+	// unused?
+	m_flip_screen_x = false;
+	m_flip_screen_y = false;
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 void dominob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -111,20 +120,22 @@ void dominob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		sx = m_spriteram[offs];
 		sy = 248 - m_spriteram[offs + 1];
-		if (flip_screen_x()) sx = 248 - sx;
-		if (flip_screen_y()) sy = 248 - sy;
+		if (m_flip_screen_x) sx = 248 - sx;
+		if (m_flip_screen_y) sy = 248 - sy;
 
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8)  ;
 
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code,
 				((m_spriteram[offs + 2] & 0xf8) >> 3)  ,
-				flip_screen_x(),flip_screen_y(),
-				sx,sy + (flip_screen_y() ? 8 : -8),0);
+				m_flip_screen_x,
+				m_flip_screen_y,
+				sx,sy + (m_flip_screen_y ? 8 : -8),0);
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code + 1,
 				((m_spriteram[offs + 2] & 0xf8) >> 3)  ,
-				flip_screen_x(),flip_screen_y(),
+				m_flip_screen_x,
+				m_flip_screen_y,
 				sx,sy,0);
 	}
 }

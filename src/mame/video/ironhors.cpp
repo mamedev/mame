@@ -95,7 +95,7 @@ WRITE8_MEMBER(ironhors_state::charbank_w)
 	if (m_charbank != (data & 0x03))
 	{
 		m_charbank = data & 0x03;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	m_spriterambank = data & 0x08;
@@ -108,7 +108,7 @@ WRITE8_MEMBER(ironhors_state::palettebank_w)
 	if (m_palettebank != (data & 0x07))
 	{
 		m_palettebank = data & 0x07;
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
@@ -122,10 +122,10 @@ WRITE8_MEMBER(ironhors_state::palettebank_w)
 
 WRITE8_MEMBER(ironhors_state::flipscreen_w)
 {
-	if (flip_screen() != (~data & 0x08))
+	if (m_flip_screen != bool(~data & 0x08))
 	{
-		flip_screen_set(~data & 0x08);
-		machine().tilemap().mark_all_dirty();
+		m_flip_screen = bool(~data & 0x08);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 
 	/* other bits are used too, but unknown */
@@ -147,6 +147,9 @@ void ironhors_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ironhors_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -167,9 +170,9 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int flipy = sr[offs + 4] & 0x40;
 		int code = (sr[offs] << 2) + ((sr[offs + 1] & 0x03) << 10) + ((sr[offs + 1] & 0x0c) >> 2);
 		int color = ((sr[offs + 1] & 0xf0) >> 4) + 16 * m_palettebank;
-	//  int mod = flip_screen() ? -8 : 8;
+	//  int mod = m_flip_screen ? -8 : 8;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -189,7 +192,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 			case 0x04:  /* 16x8 */
 				{
-					if (flip_screen()) sy += 8; // this fixes the train wheels' position
+					if (m_flip_screen) sy += 8; // this fixes the train wheels' position
 
 					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code & ~1,
@@ -259,6 +262,9 @@ VIDEO_START_MEMBER(ironhors_state,farwest)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ironhors_state::farwest_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -276,9 +282,9 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 		int code = (sr[offs] << 2) + ((sr2[offs] & 0x03) << 10) + ((sr2[offs] & 0x0c) >> 2);
 		int color = ((sr2[offs] & 0xf0) >> 4) + 16 * m_palettebank;
 
-	//  int mod = flip_screen() ? -8 : 8;
+	//  int mod = m_flip_screen ? -8 : 8;
 
-//      if (flip_screen())
+//      if (m_flip_screen)
 		{
 		//  sx = 240 - sx;
 			sy = 240 - sy;
@@ -298,7 +304,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 
 			case 0x04:  /* 16x8 */
 				{
-					if (flip_screen()) sy += 8; // this fixes the train wheels' position
+					if (m_flip_screen) sy += 8; // this fixes the train wheels' position
 
 					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code & ~1,

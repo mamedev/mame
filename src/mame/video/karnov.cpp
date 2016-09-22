@@ -70,8 +70,7 @@ PALETTE_INIT_MEMBER(karnov_state, karnov)
 void karnov_state::karnov_flipscreen_w( int data )
 {
 	m_flipscreen = data;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	flip_screen_set(m_flipscreen);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 }
 
 void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -127,7 +126,7 @@ void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 UINT32 karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(bitmap, cliprect);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x800, 0);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x800, 0, m_flipscreen);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

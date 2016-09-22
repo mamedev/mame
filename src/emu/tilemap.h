@@ -342,6 +342,7 @@ const UINT8 TILE_FORCE_LAYER2 = TILEMAP_PIXEL_LAYER2; // force all pixels to be 
 // tilemap global flags, used by tilemap_t::set_flip()
 const UINT32 TILEMAP_FLIPX = TILE_FLIPX;            // draw the tilemap horizontally flipped
 const UINT32 TILEMAP_FLIPY = TILE_FLIPY;            // draw the tilemap vertically flipped
+const UINT32 TILEMAP_FLIPXY = TILEMAP_FLIPX | TILEMAP_FLIPY;
 
 // set this value for a scroll row/column to fully disable it
 const UINT32 TILE_LINE_DISABLED = 0x80000000;
@@ -694,6 +695,7 @@ private:
 class tilemap_manager
 {
 	friend class tilemap_t;
+	friend class device_gfx_interface;
 
 public:
 	// construction/destuction
@@ -710,10 +712,6 @@ public:
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
 	int count() const { return m_tilemap_list.count(); }
-
-	// global operations on all tilemaps
-	void mark_all_dirty();
-	void set_flip_all(UINT32 attributes);
 
 private:
 	// allocate an instance index

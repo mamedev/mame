@@ -33,6 +33,7 @@ public:
 	tilemap_t  *m_bg_tilemap;
 	int m_scroll_x;
 	int m_priority;
+	bool m_flip_screen;
 
 	/* sound-related */
 	UINT32   m_adpcm_data;

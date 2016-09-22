@@ -45,6 +45,7 @@ public:
 	int m_active;
 	UINT16 m_bgscroll;
 	UINT16 m_fgscroll;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(soundcmd_w);

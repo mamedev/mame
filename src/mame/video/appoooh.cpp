@@ -139,8 +139,11 @@ VIDEO_START_MEMBER(appoooh_state,appoooh)
 	m_fg_tilemap->set_scrolldy(8, 8);
 	m_bg_tilemap->set_scrolldy(8, 8);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_priority));
+	save_item(NAME(m_flip_screen));
 }
 
 WRITE8_MEMBER(appoooh_state::scroll_w)
@@ -179,7 +182,9 @@ WRITE8_MEMBER(appoooh_state::out_w)
 	m_nmi_mask = data & 1;
 
 	/* bit 1 flip screen */
-	flip_screen_set(data & 0x02);
+	m_flip_screen = bool(data & 0x02);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* bits 2-3 unknown */
 
@@ -200,7 +205,7 @@ WRITE8_MEMBER(appoooh_state::out_w)
 void appoooh_state::appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite )
 {
 	int offs;
-	int flipy = flip_screen();
+	int flipy = m_flip_screen;
 
 	for (offs = 0x20 - 4; offs >= 0; offs -= 4)
 	{
@@ -231,7 +236,7 @@ void appoooh_state::appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangl
 void appoooh_state::robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite )
 {
 	int offs;
-	int flipy = flip_screen();
+	int flipy = m_flip_screen;
 
 	for (offs = 0x20 - 4; offs >= 0; offs -= 4)
 	{

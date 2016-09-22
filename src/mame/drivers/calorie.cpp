@@ -107,6 +107,7 @@ public:
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	UINT8    m_bg_bank;
+	bool m_flip_screen;
 	DECLARE_WRITE8_MEMBER(fg_ram_w);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);
 	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
@@ -187,7 +188,7 @@ UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 
 		ypos = 0xff - m_sprites[x + 2];
 		xpos = m_sprites[x + 3];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			if (m_sprites[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
@@ -235,7 +236,9 @@ WRITE8_MEMBER(calorie_state::bg_bank_w)
 
 WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 READ8_MEMBER(calorie_state::calorie_soundlatch_r)
@@ -442,11 +445,13 @@ GFXDECODE_END
 void calorie_state::machine_start()
 {
 	save_item(NAME(m_bg_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 void calorie_state::machine_reset()
 {
 	m_bg_bank = 0;
+	m_flip_screen = false;
 }
 
 

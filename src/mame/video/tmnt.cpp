@@ -363,7 +363,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 		if (m_blswhstl_rombank != ((data & 0x80) >> 7))
 		{
 			m_blswhstl_rombank = (data & 0x80) >> 7;
-			machine().tilemap().mark_all_dirty();
+			m_gfxdecode->mark_all_dirty();
 		}
 
 		/* other bits unknown */

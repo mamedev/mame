@@ -56,6 +56,18 @@ WRITE16_MEMBER(shadfrce_state::bg1videoram_w)
 }
 
 
+WRITE16_MEMBER(shadfrce_state::flip_screen)
+{
+	if (m_flip_screen != bool(data & 0x01))
+	{
+		m_flip_screen = bool(data & 0x01);
+		m_bg0tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg1tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fgtilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
+}
+
+
 
 
 void shadfrce_state::video_start()
@@ -70,12 +82,15 @@ void shadfrce_state::video_start()
 
 	m_spvideoram_old = std::make_unique<UINT16[]>(m_spvideoram.bytes()/2);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_irqs_enable));
 	save_item(NAME(m_raster_scanline));
 	save_item(NAME(m_raster_irq_enable));
 	save_item(NAME(m_vblank));
 	save_item(NAME(m_prev_value));
+	save_item(NAME(m_flip_screen));
 }
 
 WRITE16_MEMBER(shadfrce_state::bg0scrollx_w)

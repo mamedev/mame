@@ -144,7 +144,7 @@ WRITE8_MEMBER(espial_state::espial_scrollram_w)
 WRITE8_MEMBER(espial_state::espial_flipscreen_w)
 {
 	m_flipscreen = data;
-	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 }
 
 

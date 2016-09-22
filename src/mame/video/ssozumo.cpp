@@ -107,7 +107,9 @@ WRITE8_MEMBER(ssozumo_state::scroll_w)
 
 WRITE8_MEMBER(ssozumo_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 TILE_GET_INFO_MEMBER(ssozumo_state::get_bg_tile_info)
@@ -136,6 +138,9 @@ void ssozumo_state::video_start()
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void ssozumo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -151,7 +156,7 @@ void ssozumo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int sx = 239 - m_spriteram[offs + 3];
 			int sy = (240 - m_spriteram[offs + 2]) & 0xff;
 
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

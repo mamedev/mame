@@ -36,6 +36,8 @@ public:
 	int m_sb3_music;
 	UINT8 m_semicom_prot_offset;
 
+	bool m_flip_screen;
+
 	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
@@ -64,6 +66,7 @@ public:
 	DECLARE_DRIVER_INIT(hyperpac);
 	DECLARE_MACHINE_RESET(semiprot);
 	DECLARE_MACHINE_RESET(finalttr);
+	DECLARE_VIDEO_START(bootleg_video);
 
 	UINT32 screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -340,7 +340,7 @@ void firetrk_state::check_collision(int which)
 
 UINT32 firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().tilemap().mark_all_dirty();
+	m_gfxdecode->mark_all_dirty();
 	m_tilemap1->set_scrollx(0, *m_scroll_x - 37);
 	m_tilemap2->set_scrollx(0, *m_scroll_x - 37);
 	m_tilemap1->set_scrolly(0, *m_scroll_y);
@@ -374,7 +374,7 @@ UINT32 firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind16 
 
 UINT32 firetrk_state::screen_update_superbug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().tilemap().mark_all_dirty();
+	m_gfxdecode->mark_all_dirty();
 	m_tilemap1->set_scrollx(0, *m_scroll_x - 37);
 	m_tilemap2->set_scrollx(0, *m_scroll_x - 37);
 	m_tilemap1->set_scrolly(0, *m_scroll_y);
@@ -403,7 +403,7 @@ UINT32 firetrk_state::screen_update_superbug(screen_device &screen, bitmap_ind16
 
 UINT32 firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().tilemap().mark_all_dirty();
+	m_gfxdecode->mark_all_dirty();
 	m_tilemap1->set_scrollx(0, *m_scroll_x - 37);
 	m_tilemap2->set_scrollx(0, *m_scroll_x - 37);
 	m_tilemap1->set_scrolly(0, *m_scroll_y);

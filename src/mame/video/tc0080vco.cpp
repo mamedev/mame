@@ -276,9 +276,9 @@ WRITE16_MEMBER( tc0080vco_device::scrollram_w )
 		case 0x00:          /* screen invert control */
 			m_flipscreen = m_scroll_ram[0] & 0x0c00;
 
-			m_tilemap[0]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-			m_tilemap[1]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-			m_tilemap[2]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+			m_tilemap[0]->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+			m_tilemap[1]->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+			m_tilemap[2]->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 			m_bg0_scrollx = m_scroll_ram[1] & 0x03ff;
 			m_bg1_scrollx = m_scroll_ram[2] & 0x03ff;
@@ -692,9 +692,9 @@ void tc0080vco_device::postload()
 {
 	m_flipscreen = m_scroll_ram[0] & 0x0c00;
 
-	m_tilemap[0]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_tilemap[1]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_tilemap[2]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tilemap[0]->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+	m_tilemap[1]->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
+	m_tilemap[2]->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 
 	m_bg0_scrollx = m_scroll_ram[1] & 0x03ff;
 	m_bg1_scrollx = m_scroll_ram[2] & 0x03ff;

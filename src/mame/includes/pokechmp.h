@@ -17,8 +17,11 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	required_shared_ptr<UINT8> m_videoram;
-	tilemap_t *m_bg_tilemap;
 	required_shared_ptr<UINT8> m_spriteram;
+
+	tilemap_t *m_bg_tilemap;
+	bool m_flip_screen;
+
 	DECLARE_WRITE8_MEMBER(pokechmp_bank_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_sound_bank_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_sound_w);
@@ -28,6 +31,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	UINT32 screen_update_pokechmp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

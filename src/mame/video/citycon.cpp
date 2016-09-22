@@ -57,6 +57,9 @@ void citycon_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scroll_rows(32);
+
+	m_cocktail_flip = false;
+	save_item(NAME(m_cocktail_flip));
 }
 
 
@@ -91,7 +94,12 @@ WRITE8_MEMBER(citycon_state::citycon_background_w)
 
 	/* bit 0 flips screen */
 	/* it is also used to multiplex player 1 and player 2 controls */
-	flip_screen_set(data & 0x01);
+	if ((data & 0x01) != m_cocktail_flip)
+	{
+		m_cocktail_flip = data & 0x01;
+		m_fg_tilemap->set_flip(m_cocktail_flip ? TILEMAP_FLIPXY : 0);
+		m_bg_tilemap->set_flip(m_cocktail_flip ? TILEMAP_FLIPXY : 0);
+	}
 
 	/* bits 1-3 are unknown */
 //  if ((data & 0x0e) != 0) logerror("background register = %02x\n", data);
@@ -110,7 +118,7 @@ void citycon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		sx = m_spriteram[offs + 3];
 		sy = 239 - m_spriteram[offs];
 		flipx = ~m_spriteram[offs + 2] & 0x10;
-		if (flip_screen())
+		if (m_cocktail_flip)
 		{
 			sx = 240 - sx;
 			sy = 238 - sy;
@@ -120,7 +128,7 @@ void citycon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		m_gfxdecode->gfx(m_spriteram[offs + 1] & 0x80 ? 2 : 1)->transpen(bitmap,cliprect,
 				m_spriteram[offs + 1] & 0x7f,
 				m_spriteram[offs + 2] & 0x0f,
-				flipx,flip_screen(),
+				flipx, m_cocktail_flip,
 				sx, sy, 0);
 	}
 }

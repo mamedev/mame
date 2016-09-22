@@ -34,6 +34,7 @@ public:
 	int m_irq_enable;
 	int m_charbank;
 	int m_palette_bank;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(soundlatch_w);

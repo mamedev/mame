@@ -105,11 +105,6 @@ WRITE8_MEMBER(senjyo_state::irq_ctrl_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(senjyo_state::flip_screen_w)
-{
-	flip_screen_set(data);
-}
-
 WRITE8_MEMBER(senjyo_state::sound_cmd_w)
 {
 	m_sound_cmd = data;

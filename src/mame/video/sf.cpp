@@ -58,6 +58,9 @@ void sf_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(3);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -100,7 +103,10 @@ WRITE16_MEMBER(sf_state::gfxctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_active = data & 0xff;
-		flip_screen_set(data & 0x04);
+		m_flip_screen = bool(data & 0x04);
+		m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 		m_tx_tilemap->enable(data & 0x08);
 		m_bg_tilemap->enable(data & 0x20);
 		m_fg_tilemap->enable(data & 0x40);
@@ -139,7 +145,7 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 		{
 			int c1, c2, c3, c4, t;
 
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 480 - sx;
 				sy = 224 - sy;
@@ -190,7 +196,7 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 		}
 		else
 		{
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				sx = 496 - sx;
 				sy = 240 - sy;

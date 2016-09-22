@@ -25,6 +25,7 @@ public:
 		m_sprgen2(*this, "spritegen2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
 	optional_device<deco146_device> m_deco146;
@@ -71,5 +72,6 @@ public:
 	inline void sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };

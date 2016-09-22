@@ -45,6 +45,7 @@ public:
 	int m_bgcolor;
 	int m_sound_command1;
 	int m_sound_command2;
+	bool m_flip_screen;
 
 	//m660 specific
 	int m_textbank2;

@@ -37,6 +37,7 @@ public:
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_bg2_tilemap;
 	UINT8 m_nmi_mask;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(hold_cpu2_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);

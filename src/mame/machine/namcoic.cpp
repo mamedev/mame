@@ -141,7 +141,7 @@ SetTilemapControl( int offset, UINT16 newword )
 		if( offset == 0x02/2 )
 		{
 			/* all planes are flipped X+Y from D15 of this word */
-			int attrs = (newword & 0x8000)?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
+			int attrs = (newword & 0x8000) ? TILEMAP_FLIPXY : 0;
 			int i;
 			for( i=0; i<=5; i++ )
 			{

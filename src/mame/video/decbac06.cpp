@@ -280,7 +280,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	doesn't affect any games.
 	*/
 
-	if (machine().driver_data()->flip_screen())
+	if (get_flip_state())
 		src_y = (src_bitmap.height() - 256) - scrolly;
 	else
 		src_y = scrolly;
@@ -291,7 +291,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 		else
 			src_x=scrollx;
 
-		if (machine().driver_data()->flip_screen())
+		if (get_flip_state())
 			src_x=(src_bitmap.width() - 256) - src_x;
 
 		for (x=0; x<=cliprect.max_x; x++) {

@@ -43,6 +43,7 @@ public:
 	tilemap_t   *m_pf2_alt_tilemap;
 	UINT16      m_control_0[8];
 	UINT16      m_tilebank;
+	bool        m_flip_screen;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -121,6 +122,7 @@ public:
 	UINT32 screen_update_sdfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tumbleb2_interrupt);
 	void tumbleb_tilemap_redraw();
+	void flip_screen_set(bool flip);
 	inline void get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base);
 	inline void get_fncywld_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base);
 	inline void pangpang_get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base );

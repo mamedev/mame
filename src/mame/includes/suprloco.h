@@ -29,6 +29,7 @@ public:
 
 	tilemap_t *m_bg_tilemap;
 	int m_control;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(soundport_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);

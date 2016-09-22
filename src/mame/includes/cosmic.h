@@ -39,6 +39,7 @@ public:
 	int            m_color_registers[3];
 	int            m_background_enable;
 	int            m_magspot_pen_mask;
+	bool           m_flip_screen;
 
 	/* sound-related */
 	int            m_sound_enabled;

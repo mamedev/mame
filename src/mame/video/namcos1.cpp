@@ -211,7 +211,7 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip_screen)
 {
 	UINT8 *spriteram = m_spriteram + 0x800;
 	const UINT8 *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
@@ -246,7 +246,7 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		sx += sprite_xoffs;
 		sy -= sprite_yoffs;
 
-		if (flip_screen())
+		if (flip_screen)
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
@@ -288,7 +288,8 @@ UINT32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
-	flip_screen_set(m_spriteram[0x0ff6] & 1);
+	bool flip_screen = m_spriteram[0x0ff6] & 1;
+	m_gfxdecode->set_flip_all(flip_screen ? TILEMAP_FLIPXY : 0);
 
 	/* background color */
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -317,7 +318,7 @@ UINT32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		scrollx = ( m_playfield_control[j+1] + (m_playfield_control[j+0]<<8) );
 		scrolly = ( m_playfield_control[j+3] + (m_playfield_control[j+2]<<8) );
 
-		if (flip_screen())
+		if (flip_screen)
 		{
 			scrollx = -scrollx;
 			scrolly = -scrolly;
@@ -341,7 +342,7 @@ UINT32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 	}
 
-	draw_sprites(screen, bitmap, new_clip);
+	draw_sprites(screen, bitmap, new_clip, flip_screen);
 	return 0;
 }
 

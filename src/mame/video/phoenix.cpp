@@ -248,8 +248,8 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 
 		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
 
-		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->set_flip_all(m_cocktail_mode ? TILEMAP_FLIPXY : 0);
+		m_gfxdecode->mark_all_dirty();
 	}
 
 	/* Phoenix has only one palette select effecting both layers */
@@ -257,7 +257,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 	{
 		m_palette_bank = (data >> 1) & 1;
 
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 	}
 }
 
@@ -271,8 +271,8 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 
 		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
 
-		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->set_flip_all(m_cocktail_mode ? TILEMAP_FLIPXY : 0);
+		m_gfxdecode->mark_all_dirty();
 	}
 
 
@@ -284,7 +284,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 	{
 		m_palette_bank = ((data >> 1) & 3);
 
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 
 		logerror("Palette: %02X\n", (data & 0x06) >> 1);
 	}

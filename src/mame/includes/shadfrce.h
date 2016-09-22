@@ -61,6 +61,7 @@ public:
 	int m_raster_irq_enable;
 	int m_vblank;
 	int m_prev_value;
+	bool m_flip_screen;
 
 	DECLARE_WRITE16_MEMBER(flip_screen);
 	DECLARE_READ16_MEMBER(input_ports_r);

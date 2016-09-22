@@ -31,6 +31,8 @@ public:
 	UINT8 *m_current_bitmap_videoram_displayed;
 	std::unique_ptr<UINT16[]>  m_palette_ram;
 	tilemap_t *m_bg_tilemap;
+	bool m_flip_screen;
+
 	DECLARE_WRITE8_MEMBER(cloak_led_w);
 	DECLARE_WRITE8_MEMBER(cloak_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(cloak_custom_w);

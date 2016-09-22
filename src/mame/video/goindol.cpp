@@ -51,6 +51,9 @@ void goindol_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goindol_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -89,7 +92,7 @@ void goindol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		sx = sprite_ram[offs];
 		sy = 240 - sprite_ram[offs + 1];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -105,14 +108,16 @@ void goindol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 						m_gfxdecode->gfx(gfxbank)->transpen(bitmap,cliprect,
 						tile,
 						palette,
-						flip_screen(),flip_screen(),
+						m_flip_screen,
+						m_flip_screen,
 						sx,sy, 0);
 
 						m_gfxdecode->gfx(gfxbank)->transpen(bitmap,cliprect,
 						tile+1,
 						palette,
-						flip_screen(),flip_screen(),
-						sx,sy + (flip_screen() ? -8 : 8), 0);
+						m_flip_screen,
+						m_flip_screen,
+						sx,sy + (m_flip_screen ? -8 : 8), 0);
 		}
 	}
 }

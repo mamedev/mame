@@ -103,10 +103,10 @@ WRITE8_MEMBER(hyperspt_state::hyperspt_colorram_w)
 
 WRITE8_MEMBER(hyperspt_state::hyperspt_flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (m_flip_screen != bool(data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 	}
 }
 
@@ -123,6 +123,9 @@ void hyperspt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hyperspt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void hyperspt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -139,13 +142,13 @@ void hyperspt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int flipx = ~spriteram[offs] & 0x40;
 		int flipy = spriteram[offs] & 0x80;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		/* Note that this adjustment must be done AFTER handling flip_screen(), thus */
+		/* Note that this adjustment must be done AFTER handling m_flip_screen, thus */
 		/* proving that this is a hardware related "feature" */
 
 		sy += 1;
@@ -175,7 +178,7 @@ UINT32 hyperspt_state::screen_update_hyperspt(screen_device &screen, bitmap_ind1
 	for (row = 0; row < 32; row++)
 	{
 		int scrollx = m_scroll[row * 2] + (m_scroll[(row * 2) + 1] & 0x01) * 256;
-		if (flip_screen()) scrollx = -scrollx;
+		if (m_flip_screen) scrollx = -scrollx;
 		m_bg_tilemap->set_scrollx(row, scrollx);
 	}
 
@@ -198,4 +201,7 @@ VIDEO_START_MEMBER(hyperspt_state,roadf)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hyperspt_state::roadf_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }

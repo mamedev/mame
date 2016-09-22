@@ -140,7 +140,9 @@ WRITE8_MEMBER(tryout_state::vram_bankswitch_w)
 
 WRITE8_MEMBER(tryout_state::flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 TILEMAP_MAPPER_MEMBER(tryout_state::get_fg_memory_offset)
@@ -172,7 +174,10 @@ void tryout_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_vram_bank));
+	save_item(NAME(m_flip_screen));
 	save_pointer(NAME(m_vram.get()), 8 * 0x800);
 	save_pointer(NAME(m_vram_gfx.get()), 0x6000);
 }
@@ -194,7 +199,7 @@ void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		fy = 0;
 		inc = 16;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			x = 240 - x;
 			fx = !fx;
@@ -229,7 +234,7 @@ UINT32 tryout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	int scrollx = 0;
 
-	if (!flip_screen())
+	if (!m_flip_screen)
 		m_fg_tilemap->set_scrollx(0, 16); /* Assumed hard-wired */
 	else
 		m_fg_tilemap->set_scrollx(0, -8); /* Assumed hard-wired */

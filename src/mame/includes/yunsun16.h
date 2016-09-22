@@ -48,6 +48,7 @@ public:
 	tilemap_t     *m_tilemap_1;
 	int         m_sprites_scrolldx;
 	int         m_sprites_scrolldy;
+	bool        m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	DECLARE_WRITE16_MEMBER(magicbub_sound_command_w);

@@ -52,10 +52,10 @@ WRITE16_MEMBER(vaportra_state::vaportra_palette_24bit_b_w)
 UINT32 vaportra_state::screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	const UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	int pri = m_priority[0] & 0x03;
 
-	flip_screen_set(!BIT(flip, 7));
+	m_gfxdecode->set_flip_all(!BIT(flip, 7) ? TILEMAP_FLIPXY : 0);
 	m_deco_tilegen1->pf_update(nullptr, nullptr);
 	m_deco_tilegen2->pf_update(nullptr, nullptr);
 
@@ -66,32 +66,32 @@ UINT32 vaportra_state::screen_update_vaportra(screen_device &screen, bitmap_ind1
 	{
 		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f);
+		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f, !BIT(flip, 7));
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 1)
 	{
 		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f);
+		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f, !BIT(flip, 7));
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 2)
 	{
 		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f);
+		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f, !BIT(flip, 7));
 		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f);
+		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f, !BIT(flip, 7));
 		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 1, m_priority[1], 0x0f);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 1, m_priority[1], 0x0f, !BIT(flip, 7));
 	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

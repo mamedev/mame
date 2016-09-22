@@ -89,6 +89,10 @@ VIDEO_START_MEMBER(lastduel_state,lastduel)
 	m_sprite_flipy_mask = 0x40;
 	m_sprite_pri_mask = 0x00;
 	m_tilemap_priority = 0;
+
+	m_flip_screen = false;
+
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(lastduel_state,madgear)
@@ -118,7 +122,10 @@ WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(data & 0x01);
+		m_flip_screen = bool(data & 0x01);
+		m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+		m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 		machine().bookkeeping().coin_lockout_w(0, ~data & 0x10);
 		machine().bookkeeping().coin_lockout_w(1, ~data & 0x20);
@@ -226,7 +233,7 @@ void lastduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		flipy = attr & m_sprite_flipy_mask;  /* 0x40 for lastduel, 0x80 for madgear */
 		color = attr & 0x0f;
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

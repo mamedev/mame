@@ -165,12 +165,15 @@ void laserbat_state_base::video_start()
 	// start rendering scanlines
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
 UINT32 laserbat_state_base::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool const flip_y = flip_screen_y(), flip_x = flip_screen_x();
+	bool const flip_y = m_flip_screen, flip_x = m_flip_screen;
 	int const offs_y = m_screen->visible_area().max_y + m_screen->visible_area().min_y;
 	int const offs_x = m_screen->visible_area().max_x + m_screen->visible_area().min_x;
 

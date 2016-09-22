@@ -479,6 +479,9 @@ GFXDECODE_END
 
 void lkage_state::machine_start()
 {
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
+
 	save_item(NAME(m_bg_tile_bank));
 	save_item(NAME(m_fg_tile_bank));
 	save_item(NAME(m_tx_tile_bank));
@@ -507,6 +510,7 @@ void lkage_state::machine_start()
 
 void lkage_state::machine_reset()
 {
+	m_flip_screen_x = m_flip_screen_y = false;
 	m_bg_tile_bank = m_fg_tile_bank = m_tx_tile_bank =0;
 
 	m_mcu_ready = 3;

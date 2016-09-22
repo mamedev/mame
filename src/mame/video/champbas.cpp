@@ -162,11 +162,17 @@ TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
 VIDEO_START_MEMBER(champbas_state,champbas)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(champbas_state,exctsccr)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::exctsccr_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -202,7 +208,8 @@ WRITE8_MEMBER(champbas_state::palette_bank_w)
 
 WRITE8_MEMBER(champbas_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	m_flip_screen = bool(~data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 

@@ -65,6 +65,7 @@ public:
 	UINT8 m_tile_bank;
 	UINT8 m_sound_byte;
 	UINT8 m_nmi_enable;
+	bool m_flip_screen;
 
 	tilemap_t * m_bg_tilemap;
 	tilemap_t * m_fg_tilemap;
@@ -141,6 +142,9 @@ void superwng_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scrollx(0, 64);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -148,7 +152,7 @@ UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	rectangle tmp = cliprect;
 
-	if (flip_screen())
+	if (m_flip_screen)
 	{
 		tmp.min_x += 32;
 		m_fg_tilemap->draw(screen, bitmap, tmp, 0, 0);
@@ -295,9 +299,9 @@ WRITE8_MEMBER(superwng_state::superwng_tilebank_w)
 
 WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
 {
-	flip_screen_set(~data & 0x01);
-	m_bg_tilemap->mark_all_dirty();
-	m_fg_tilemap->mark_all_dirty();
+	m_flip_screen = bool(~data & 0x01);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_cointcnt1_w)

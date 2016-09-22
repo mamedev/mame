@@ -22,11 +22,12 @@
 
 UINT32 stadhero_state::screen_update_stadhero(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_gfxdecode->set_flip_all(flip ? TILEMAP_FLIPXY : 0);
 
 	m_tilegen1->set_bppmultmask(0x8, 0x7);
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f, flip);
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

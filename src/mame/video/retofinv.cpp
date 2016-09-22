@@ -106,8 +106,11 @@ void retofinv_state::video_start()
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_fg_bank));
 	save_item(NAME(m_bg_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -135,7 +138,9 @@ WRITE8_MEMBER(retofinv_state::gfx_ctrl_w)
 	switch (offset)
 	{
 		case 0:
-			flip_screen_set(data & 1);
+			m_flip_screen = bool(data & 1);
+			m_fg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+			m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 			break;
 
 		case 1:
@@ -193,7 +198,7 @@ void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			flipx ^= 1;
 			flipy ^= 1;

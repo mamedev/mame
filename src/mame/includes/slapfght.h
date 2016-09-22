@@ -60,6 +60,7 @@ public:
 	UINT8 m_scrolly;
 	bool m_main_irq_enabled;
 	bool m_sound_nmi_enabled;
+	bool m_flip_screen;
 
 	bool m_mcu_sent;
 	bool m_main_sent;

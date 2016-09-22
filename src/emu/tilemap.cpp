@@ -1569,30 +1569,6 @@ tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_in
 }
 
 
-//-------------------------------------------------
-//  set_flip_all - set a global flip for all the
-//  tilemaps
-//-------------------------------------------------
-
-void tilemap_manager::set_flip_all(UINT32 attributes)
-{
-	for (tilemap_t &tmap : m_tilemap_list)
-		tmap.set_flip(attributes);
-}
-
-
-//-------------------------------------------------
-//  mark_all_dirty - mark all the tiles in all the
-//  tilemaps dirty
-//-------------------------------------------------
-
-void tilemap_manager::mark_all_dirty()
-{
-	for (tilemap_t &tmap : m_tilemap_list)
-		tmap.mark_all_dirty();
-}
-
-
 
 //**************************************************************************
 //  TILEMAP DEVICE

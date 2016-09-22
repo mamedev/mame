@@ -30,6 +30,7 @@ public:
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
 	int m_bFlicker;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);

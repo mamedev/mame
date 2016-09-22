@@ -133,12 +133,12 @@ void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 			priority_mask = 0xf0;
 		}
 
-		if (flip_screen_x())
+		if (m_flip_screen_x)
 		{
 			sx = 239 - sx - 24;
 			flipx = !flipx;
 		}
-		if (flip_screen_y())
+		if (m_flip_screen_y)
 		{
 			sy = 254 - 16 * height - sy;
 			flipy = !flipy;
@@ -167,12 +167,16 @@ void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 
 UINT32 lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int bank;
+	bool flipx = ~m_vreg[2] & 0x01;
+	bool flipy = ~m_vreg[2] & 0x02;
+	if (flipx != m_flip_screen_x || flipy != m_flip_screen_y)
+	{
+		m_flip_screen_x = flipx;
+		m_flip_screen_y = flipy;
+		m_gfxdecode->set_flip_all((flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0));
+	}
 
-	flip_screen_x_set(~m_vreg[2] & 0x01);
-	flip_screen_y_set(~m_vreg[2] & 0x02);
-
-	bank = m_vreg[1] & 0x08;
+	UINT8 bank = m_vreg[1] & 0x08;
 
 	if (m_bg_tile_bank != bank)
 	{

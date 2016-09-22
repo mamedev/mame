@@ -597,8 +597,8 @@ WRITE8_MEMBER(majorpkr_state::vidreg_w)
 	{
 		/* upside down screen */
 		m_flip_state = 1;
-		m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
-		m_fg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
+		m_bg_tilemap->set_flip(TILEMAP_FLIPXY);
+		m_fg_tilemap->set_flip(TILEMAP_FLIPXY);
 	}
 
 /*  If bit6 is not active, the screen is drawn normally.

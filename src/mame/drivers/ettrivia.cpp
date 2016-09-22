@@ -86,7 +86,7 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_bg_w)
 
 WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 {
-	machine().tilemap().mark_all_dirty();
+	m_gfxdecode->mark_all_dirty();
 
 	m_palreg  = (data >> 1) & 3;
 	m_gfx_bank = (data >> 2) & 1;
@@ -95,7 +95,8 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 
-	flip_screen_set(data & 1);
+	m_bg_tilemap->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip((data & 1) ? TILEMAP_FLIPXY : 0);
 }
 
 READ8_MEMBER(ettrivia_state::ettrivia_question_r)

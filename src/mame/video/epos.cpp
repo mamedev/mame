@@ -56,7 +56,7 @@ void epos_state::get_pens( pen_t *pens )
 
 WRITE8_MEMBER(epos_state::flip_screen_w)
 {
-	flip_screen_set(BIT(data, 7));
+	m_flip_screen = BIT(data, 7);
 }
 
 WRITE8_MEMBER(epos_state::port_1_w)
@@ -91,7 +91,7 @@ UINT32 epos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		int x = (offs % 136) * 2;
 		int y = (offs / 136);
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			x = 270 - x; // wrong
 			y = 240 - y; // wrong

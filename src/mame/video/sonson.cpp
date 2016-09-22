@@ -116,7 +116,8 @@ WRITE8_MEMBER(sonson_state::sonson_scrollx_w)
 
 WRITE8_MEMBER(sonson_state::sonson_flipscreen_w)
 {
-	flip_screen_set(~data & 0x01);
+	m_flip_screen = bool(~data & 0x01);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 TILE_GET_INFO_MEMBER(sonson_state::get_bg_tile_info)
@@ -132,6 +133,9 @@ void sonson_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sonson_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void sonson_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -148,7 +152,7 @@ void sonson_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int sx = spriteram[offs + 3];
 		int sy = spriteram[offs + 0];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

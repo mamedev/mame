@@ -237,10 +237,13 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(scregg_state,scregg)
 {
+	m_flip_screen = false;
+
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
 	save_item(NAME(m_bnj_scroll2));
 	save_item(NAME(m_btime_tilemap));
+	save_item(NAME(m_flip_screen));
 }
 
 MACHINE_RESET_MEMBER(scregg_state,scregg)

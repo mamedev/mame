@@ -136,7 +136,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_scrolly_w)
 WRITE8_MEMBER(pandoras_state::pandoras_flipscreen_w)
 {
 	m_flipscreen = data;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all(m_flipscreen ? TILEMAP_FLIPXY : 0);
 }
 
 /***************************************************************************

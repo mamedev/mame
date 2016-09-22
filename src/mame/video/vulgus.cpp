@@ -116,7 +116,10 @@ void vulgus_state::video_start()
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 47);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -146,7 +149,8 @@ WRITE8_MEMBER(vulgus_state::c804_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 7 flips screen */
-	flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 
@@ -176,7 +180,7 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int color = m_spriteram[offs + 1] & 0x0f;
 		int sy = m_spriteram[offs + 2];
 		int sx = m_spriteram[offs + 3];
-		bool flip = flip_screen() ? true : false;
+		bool flip = m_flip_screen;
 		int dir = 1;
 
 		if (sy == 0)

@@ -40,6 +40,7 @@ public:
 	int m_sound_command1;
 	int m_sound_command2;
 	int m_last[4];
+	bool m_flip_screen;
 
 	// common
 	DECLARE_WRITE16_MEMBER(flipscreen_w);

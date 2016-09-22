@@ -64,6 +64,7 @@ public:
 	UINT8 m_nsc_latch;
 	UINT8 m_z80_latch;
 	UINT8 m_mux_data;
+	bool m_flip_screen;
 
 	required_shared_ptr<UINT8> m_comms_ram;
 
@@ -142,7 +143,7 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
+	copybitmap(bitmap, *m_tmp_bitmap, m_flip_screen, m_flip_screen, 0, 0, cliprect);
 
 	return 0;
 }
@@ -308,7 +309,7 @@ WRITE8_MEMBER(nightgal_state::output_w)
 	---- ---x out counter
 	*/
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
-	flip_screen_set((data & 0x04) == 0);
+	m_flip_screen = ((data & 0x04) == 0);
 }
 
 /********************************************
@@ -658,6 +659,7 @@ void nightgal_state::machine_start()
 	save_item(NAME(m_nsc_latch));
 	save_item(NAME(m_z80_latch));
 	save_item(NAME(m_mux_data));
+	save_item(NAME(m_flip_screen));
 
 	save_item(NAME(m_blit_raw_data));
 }
@@ -667,6 +669,7 @@ void nightgal_state::machine_reset()
 	m_nsc_latch = 0;
 	m_z80_latch = 0;
 	m_mux_data = 0;
+	m_flip_screen = false;
 
 	memset(m_blit_raw_data, 0, ARRAY_LENGTH(m_blit_raw_data));
 }

@@ -534,6 +534,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
 
 	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_CB("k056832", k056832_device, mark_all_dirty)
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
 

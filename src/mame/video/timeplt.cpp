@@ -126,8 +126,10 @@ void timeplt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_video_enable = 0;
+	m_flip_screen = false;
 
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(timeplt_state,psurge)
@@ -140,8 +142,10 @@ VIDEO_START_MEMBER(timeplt_state,chkun)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_video_enable = 0;
+	m_flip_screen = false;
 
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -168,7 +172,8 @@ WRITE8_MEMBER(timeplt_state::colorram_w)
 
 WRITE8_MEMBER(timeplt_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	m_flip_screen = bool(~data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 WRITE8_MEMBER(timeplt_state::video_enable_w)

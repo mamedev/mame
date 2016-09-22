@@ -198,7 +198,7 @@ WRITE8_MEMBER(pacman_state::pacman_colorram_w)
 WRITE8_MEMBER(pacman_state::pacman_flipscreen_w)
 {
 	m_flipscreen = data & 1;
-	m_bg_tilemap->set_flip(m_flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
+	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPXY : 0);
 }
 
 

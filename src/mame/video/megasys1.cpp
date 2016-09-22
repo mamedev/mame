@@ -1095,7 +1095,7 @@ UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind1
 		active_layers |= 1 << ((pri & 0xf0000) >> 16);  // bottom layer can't be disabled
 	}
 
-	machine().tilemap().set_flip_all((m_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_gfxdecode->set_flip_all((m_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	for (i = 0;i < 3;i++)
 	{

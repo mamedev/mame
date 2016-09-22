@@ -23,6 +23,8 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	int        m_gfx_bank;
+	bool m_flip_screen;
+
 	DECLARE_READ8_MEMBER(funkybee_input_port_0_r);
 	DECLARE_WRITE8_MEMBER(funkybee_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(funkybee_videoram_w);

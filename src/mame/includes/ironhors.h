@@ -45,6 +45,7 @@ public:
 	int        m_palettebank;
 	int        m_charbank;
 	int        m_spriterambank;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);

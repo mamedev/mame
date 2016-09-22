@@ -147,12 +147,6 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "includes/shadfrce.h"
 
 
-WRITE16_MEMBER(shadfrce_state::flip_screen)
-{
-	flip_screen_set(data & 0x01);
-}
-
-
 /* Ports mapping :
 
     $1d0020.w : 0123456789ABCDEF

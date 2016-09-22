@@ -22,6 +22,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_sprgen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
@@ -35,6 +36,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<decospr_device> m_sprgen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ16_MEMBER(supbtime_controls_r);

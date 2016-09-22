@@ -65,6 +65,7 @@ public:
 	UINT8        m_mux_data;
 	UINT8        m_nsc_latch;
 	UINT8        m_z80_latch;
+	bool         m_flip_screen;
 
 	/* devices */
 	required_device<cpu_device> m_cpu_0;
@@ -178,7 +179,7 @@ UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &b
 	}
 	//void copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect)
 
-	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
+	copybitmap(bitmap, *m_tmp_bitmap, m_flip_screen, m_flip_screen, 0, 0, cliprect);
 
 	return 0;
 }
@@ -203,7 +204,7 @@ WRITE8_MEMBER(jangou_state::output_w)
 	*/
 //  printf("%02x\n", data);
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	flip_screen_set(data & 0x04);
+	m_flip_screen = (data & 0x04) != 0;
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 }
 
@@ -788,6 +789,7 @@ INPUT_PORTS_END
 MACHINE_START_MEMBER(jangou_state,common)
 {
 	save_item(NAME(m_mux_data));
+	save_item(NAME(m_flip_screen));
 }
 
 void jangou_state::machine_start()
@@ -815,6 +817,7 @@ MACHINE_START_MEMBER(jangou_state,jngolady)
 MACHINE_RESET_MEMBER(jangou_state,common)
 {
 	m_mux_data = 0;
+	m_flip_screen = false;
 }
 
 void jangou_state::machine_reset()

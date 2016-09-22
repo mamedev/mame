@@ -117,7 +117,8 @@ WRITE8_MEMBER(quizdna_state::screen_ctrl_w)
 
 	m_flipscreen = tmp;
 
-	flip_screen_set(tmp);
+	m_bg_tilemap->set_flip(tmp ? TILEMAP_FLIPXY : 0);
+	m_fg_tilemap->set_flip(tmp ? TILEMAP_FLIPXY : 0);
 	m_fg_tilemap->set_scrolldx(64, -64 +16);
 }
 

@@ -58,7 +58,10 @@ VIDEO_START_MEMBER(tsamurai_state, tsamurai)
 	m_background->set_transparent_pen(0);
 	m_foreground->set_transparent_pen(0);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_bgcolor));
+	save_item(NAME(m_flip_screen));
 	video_start();
 }
 
@@ -135,6 +138,13 @@ WRITE8_MEMBER(tsamurai_state::fg_colorram_w)
 	}
 }
 
+WRITE8_MEMBER(tsamurai_state::flip_screen_w)
+{
+	m_flip_screen = bool(data);
+	m_background->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	m_foreground->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
+}
+
 
 /***************************************************************************
 
@@ -179,7 +189,7 @@ void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		/* So I'm using this specific check. -kal 11 jul 2002 */
 //      if(sprite_type == 1) sy=sy+2;
 
-		if( flip_screen() )
+		if (m_flip_screen)
 		{
 			gfx->transpen(bitmap,cliprect,
 				sprite_number&0x7f,

@@ -321,13 +321,18 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram.get(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
+	// flip screen
+	if ((data & 0x1000) != (m_vreg & 0x1000))
+	{
+		m_bg_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+		m_tx_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+	}
 
 	COMBINE_DATA(&m_vreg);
 
 	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
 	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
-
-	flip_screen_set(m_vreg & 0x1000);
 }
 
 WRITE16_MEMBER(armedf_state::terrafjb_io_w)
@@ -335,12 +340,18 @@ WRITE16_MEMBER(armedf_state::terrafjb_io_w)
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 		m_extra->set_input_line(0, HOLD_LINE);
 
+	// flip screen
+	if ((data & 0x1000) != (m_vreg & 0x1000))
+	{
+		m_bg_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+		m_tx_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+	}
+
 	COMBINE_DATA(&m_vreg);
 
 	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
 	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
-
-	flip_screen_set(m_vreg & 0x1000);
 }
 
 WRITE16_MEMBER(armedf_state::bootleg_io_w)
@@ -350,12 +361,18 @@ WRITE16_MEMBER(armedf_state::bootleg_io_w)
 		// NOP
 	}
 
+	// flip screen
+	if ((data & 0x1000) != (m_vreg & 0x1000))
+	{
+		m_bg_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+		m_fg_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+		m_tx_tilemap->set_flip((data & 0x1000) ? TILEMAP_FLIPXY : 0);
+	}
+
 	COMBINE_DATA(&m_vreg);
 
 	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
 	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
-
-	flip_screen_set(m_vreg & 0x1000);
 }
 
 WRITE16_MEMBER(armedf_state::sound_command_w)

@@ -51,6 +51,8 @@ public:
 	int m_coll_bit6;
 	int m_rougien_gfxbank1;
 	int m_rougien_gfxbank2;
+	bool m_flip_screen_x;
+	bool m_flip_screen_y;
 
 	/* sound-related */
 	UINT32   m_adpcm_pos;

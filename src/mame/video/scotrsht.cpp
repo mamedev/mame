@@ -102,7 +102,7 @@ void scotrsht_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = m_spriteram[i + 2] - ((attr & 0x80) << 1);
 		int sy = m_spriteram[i + 3];
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -122,9 +122,12 @@ void scotrsht_state::video_start()
 
 	m_bg_tilemap->set_scroll_cols(64);
 
+	m_flip_screen = false;
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_flip_screen));
 }
 
 UINT32 scotrsht_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

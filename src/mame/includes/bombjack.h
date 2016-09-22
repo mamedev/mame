@@ -27,6 +27,7 @@ public:
 	tilemap_t   *m_fg_tilemap;
 	tilemap_t   *m_bg_tilemap;
 	UINT8       m_background_image;
+	bool        m_flip_screen;
 
 	/* sound-related */
 	UINT8       m_latch;

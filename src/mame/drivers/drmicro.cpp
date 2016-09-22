@@ -35,7 +35,8 @@ WRITE8_MEMBER(drmicro_state::nmi_enable_w)
 {
 	m_nmi_enable = data & 1;
 	m_flipscreen = (data & 2) ? 1 : 0;
-	flip_screen_set(data & 2);
+	m_bg1->set_flip((data & 2) ? TILEMAP_FLIPXY : 0);
+	m_bg2->set_flip((data & 2) ? TILEMAP_FLIPXY : 0);
 
 	// bit2,3 unknown
 }

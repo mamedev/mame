@@ -77,10 +77,10 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip_screen);
 	void scroll_w(address_space &space, int offset, int data, int layer);
 
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,UINT8 *vram);
-	void set_scroll(int layer);
+	void set_scroll(int layer, bool flip_screen);
 };

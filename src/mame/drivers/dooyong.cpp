@@ -92,11 +92,6 @@ MACHINE_START_MEMBER(dooyong_z80_state, cpu_z80)
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
-WRITE8_MEMBER(dooyong_z80_state::flip_screen_w)
-{
-	flip_screen_set(data);
-}
-
 MACHINE_RESET_MEMBER(dooyong_z80_ym2203_state, sound_ym2203)
 {
 	m_interrupt_line_1 = 0;
@@ -169,7 +164,7 @@ static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSWA")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(flip_screen_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(bluehawk_flip_screen_w)
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")

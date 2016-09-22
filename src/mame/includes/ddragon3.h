@@ -47,6 +47,7 @@ public:
 	UINT16          m_fg_scrollx;
 	UINT16          m_fg_scrolly;
 	UINT16          m_bg_tilebase;
+	bool            m_flip_screen;
 
 	UINT16 m_sprite_xoff;
 	UINT16 m_bg0_dx;
@@ -68,6 +69,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ddragon3_io_w);
 	DECLARE_WRITE16_MEMBER(ddragon3_scroll_w);
 	DECLARE_READ16_MEMBER(ddragon3_scroll_r);
+	void flip_screen_set(bool flip);
 	DECLARE_WRITE16_MEMBER(ddragon3_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(ddragon3_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);

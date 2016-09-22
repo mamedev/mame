@@ -36,6 +36,7 @@ public:
 	int m_palette_bank;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(bgvideoram_w);

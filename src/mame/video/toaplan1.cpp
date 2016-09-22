@@ -366,7 +366,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
 	{
 		logerror("Setting BCU controller flipscreen port to %04x\n",data);
 		m_bcu_flipscreen = data & 0x01;     /* 0x0001 = flip, 0x0000 = no flip */
-		machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+		m_gfxdecode->set_flip_all(data ? TILEMAP_FLIPXY : 0);
 
 		toaplan1_set_scrolls();
 	}

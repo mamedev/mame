@@ -34,6 +34,7 @@ public:
 	int m_scrolly;
 	tilemap_t *m_fg0_tilemap;
 	tilemap_t *m_bg0_tilemap;
+	bool m_flip_screen;
 
 	DECLARE_WRITE16_MEMBER(scroll_w);
 	DECLARE_WRITE16_MEMBER(sound_w);

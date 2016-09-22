@@ -414,9 +414,9 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 	   characters when screen is flipped, we have to flip them back. */
 	int color = m_videoram[tile_index + 0x400] & 0x3f;
 	SET_TILE_INFO_MEMBER(0,
-			(m_videoram[tile_index] & 0x7f) | (flip_screen() ? 0x80 : 0) | (m_galaga_gfxbank << 8),
+			(m_videoram[tile_index] & 0x7f) | (m_flip_screen ? 0x80 : 0) | (m_galaga_gfxbank << 8),
 			color,
-			flip_screen() ? TILE_FLIPX : 0);
+			m_flip_screen ? TILE_FLIPX : 0);
 	tileinfo.group = color;
 }
 
@@ -434,10 +434,12 @@ VIDEO_START_MEMBER(galaga_state,galaga)
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
 
 	m_galaga_gfxbank = 0;
+	m_flip_screen = false;
 
 	save_item(NAME(m_stars_scrollx));
 	save_item(NAME(m_stars_scrolly));
 	save_item(NAME(m_galaga_gfxbank));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -459,6 +461,15 @@ WRITE8_MEMBER(galaga_state::gatsbee_bank_w)
 {
 	m_galaga_gfxbank = data & 0x1;
 	m_fg_tilemap->mark_all_dirty();
+}
+
+WRITE8_MEMBER(galaga_state::galaga_flip_screen_w)
+{
+	if (m_flip_screen != bool(data & 1))
+	{
+		m_flip_screen = bool(data & 1);
+		m_gfxdecode->set_flip_all(m_flip_screen ? TILEMAP_FLIPXY : 0);
+	}
 }
 
 
@@ -497,7 +508,7 @@ void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 		sy -= 16 * sizey;
 		sy = (sy & 0xff) - 32;  // fix wraparound
 
-		if (flip_screen())
+		if (m_flip_screen)
 		{
 			flipx ^= 1;
 			flipy ^= 1;

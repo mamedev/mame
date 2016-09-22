@@ -163,7 +163,8 @@ WRITE8_MEMBER(jack_state::joinem_control_w)
 	// d6: unused?
 
 	// d7: flip screen
-	flip_screen_set(data & 0x80);
+	m_flip_screen = bool(data & 0x80);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 

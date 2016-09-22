@@ -38,6 +38,7 @@ public:
 	tilemap_t   *m_bg_tilemap;
 	tilemap_t   *m_fg_tilemap;
 	UINT16    m_scroll[4];
+	bool      m_flip_screen;
 
 	UINT16    m_inp[3];
 	UINT16    m_soundcommand;

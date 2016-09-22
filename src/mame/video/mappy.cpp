@@ -314,6 +314,9 @@ VIDEO_START_MEMBER(mappy_state,superpac)
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 31);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(mappy_state,phozon)
@@ -321,6 +324,9 @@ VIDEO_START_MEMBER(mappy_state,phozon)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mappy_state::phozon_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 15);
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 VIDEO_START_MEMBER(mappy_state,mappy)
@@ -330,6 +336,8 @@ VIDEO_START_MEMBER(mappy_state,mappy)
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 31);
 	m_bg_tilemap->set_scroll_cols(36);
 
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_scroll));
 }
 
@@ -355,12 +363,13 @@ WRITE8_MEMBER(mappy_state::mappy_videoram_w)
 
 WRITE8_MEMBER(mappy_state::superpac_flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	m_flip_screen = bool(data & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 }
 
 READ8_MEMBER(mappy_state::superpac_flipscreen_r)
 {
-	flip_screen_set(1);
+	superpac_flipscreen_w(space, offset, 1);
 	return 0xff;
 }
 
@@ -410,7 +419,7 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
 
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -487,7 +496,7 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
 
-			if (flip_screen())
+			if (m_flip_screen)
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -541,7 +550,8 @@ UINT32 mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &
 UINT32 mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
+	m_flip_screen = bool(m_spriteram[0x1f7f-0x800] & 1);
+	m_bg_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPXY : 0);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 

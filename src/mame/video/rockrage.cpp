@@ -55,7 +55,7 @@ WRITE8_MEMBER(rockrage_state::rockrage_vreg_w)
 	/* bits 0-1: sprite bank select */
 
 	if ((data & 0x0c) != (m_vreg & 0x0c))
-		machine().tilemap().mark_all_dirty();
+		m_gfxdecode->mark_all_dirty();
 
 	m_vreg = data;
 }
