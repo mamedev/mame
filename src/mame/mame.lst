@@ -14191,6 +14191,7 @@ tandy12                         // Tandy Radio Shack
 tbreakup                        // Tomy
 tc4                             // Coleco
 tcfball                         // Tandy Radio Shack
+tcfballa                        // Tandy Radio Shack
 zodiac                          // Coleco
 
 @source:hh_ucom4.cpp

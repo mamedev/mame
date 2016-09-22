@@ -33,6 +33,7 @@
  @MP1133   TMS1470   1979, Kosmos Astro
  @MP1180   TMS1100   1980, Tomy Power House Pinball
  @MP1181   TMS1100   1979, Conic Football 2
+ @MP1183   TMS1100   1980, E.R.S. Superbowl XV Football/Tandy Championship Football (model 60-2151)
  @MP1193   TMS1100   1980, Tandy Championship Football (model 60-2150)
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
@@ -175,6 +176,7 @@
 #include "tbreakup.lh"
 #include "tc4.lh"
 #include "tcfball.lh"
+#include "tcfballa.lh"
 #include "zodiac.lh"
 
 #include "hh_tms1k_test.lh" // common test-layout - use external artwork
@@ -1639,7 +1641,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - Hong Kong: Electronic Football, Conic
-  - USA(1): Football, ERS(Electronic Readout Systems)
+  - USA(1): Football, E.R.S.(Electronic Readout Systems)
   - USA(2): Football, ELECsonic
   - USA(3): Football, no brand!
 
@@ -5419,12 +5421,13 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Tandy Championship Football (model 60-2150)
+  Tandy Radio Shack Championship Football (model 60-2150)
   * PCB label CYG-316
   * TMS1100NLL MP1193 (die label 1100B, MP1193)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
 
-  Another clone of Mattel Football II. The original manufacturer is unknown.
+  Another clone of Mattel Football II. The original manufacturer is unknown, but
+  suspected to be Conic/E.R.S.(Electronic Readout Systems).
 
 ***************************************************************************/
 
@@ -5436,9 +5439,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
 };
 
 // handlers
@@ -5514,6 +5517,72 @@ static MACHINE_CONFIG_START( tcfball, tcfball_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tcfball)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Tandy Radio Shack Championship Football (model 60-2151)
+  * TMS1100NLL MP1183 (no decap)
+  * 7-digit 7seg LED display + LED grid, 1-bit sound
+  
+  The hardware is almost the same as the MP1193 one, they added an extra row of leds.
+
+  known releases:
+  - World(1): Superbowl XV Football, distributed by E.R.S.(Electronic Readout Systems)
+  - World(2): Super-Pro Football, no brand
+  - USA: Championship Football (model 60-2151), distributed by Tandy
+
+***************************************************************************/
+
+class tcfballa_state : public tcfball_state
+{
+public:
+	tcfballa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tcfball_state(mconfig, type, tag)
+	{ }
+};
+
+// handlers: uses the ones in tcfball_state
+
+
+// config
+
+static INPUT_PORTS_START( tcfballa )
+	PORT_INCLUDE( tcfball )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Display")
+INPUT_PORTS_END
+
+
+// output PLA is not decapped, dumped electronically
+static const UINT16 tcfballa_output_pla[0x20] =
+{
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x46, 0x70, 0x00, 0x00, 0x00,
+	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+static MACHINE_CONFIG_START( tcfballa, tcfballa_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=50pf
+	MCFG_TMS1XXX_OUTPUT_PLA(tcfballa_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(tcfballa_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tcfballa_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tcfballa_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tcfballa)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -7033,6 +7102,16 @@ ROM_START( tcfball )
 	ROM_LOAD( "tms1100_tcfball_output.pla", 0, 365, CRC(26b2996e) SHA1(df0e706c552bf74123aa65e71b0c9b4d33cddb2b) )
 ROM_END
 
+ROM_START( tcfballa )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1183", 0x0000, 0x0800, CRC(2a4db1d5) SHA1(5df15d1115bb425578ad522d607a582dd478f35c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tcfballa_output.pla", 0, 365, NO_DUMP )
+ROM_END
+
 
 ROM_START( tandy12 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -7180,6 +7259,7 @@ CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Par
 CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1980, tcfball,   0,        0, tcfball,   tcfball,   driver_device, 0, "Tandy Radio Shack", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tcfballa,  tcfball,  0, tcfballa,  tcfballa,  driver_device, 0, "Tandy Radio Shack", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
 COMP( 1976, speechp,   0,        0, speechp,   speechp,   driver_device, 0, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
