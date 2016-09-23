@@ -55,6 +55,9 @@
 	  is no single block of free records big enough to hold the file
 	  even though the total amount of free space would be sufficient.
 
+	Notes on commands
+    =================
+
 	**** dir command ****
 	The format of the "attr" part of file listing is as follows:
 	%c		'*' if file has the protection bit set, else ' '
@@ -68,6 +71,7 @@
 	A file can be extracted from an image with or without an explicit
 	extension. If an extension is given, it must match the one corresponding
 	to file type.
+    The "9845data" filter can be used on DATA files (see below).
 
 	**** getall command ****
 	Files are extracted with their "fake" extension.
@@ -79,9 +83,29 @@
 	match any known type, file type is set to "DATA".
 	WPR can be set through the "wpr" option. If it's 0 (the default),
 	WPR is set to 128.
+    The "9845data" filter can be used on DATA files (see below).
 
 	**** del command ****
 	File extension is ignored, if present.
+
+	"9845data" filter
+	=================
+
+	This filter can be applied to DATA files whose content is made
+	of strings only. BASIC programs that are saved with "SAVE" command
+    have this format.
+    This filter translates a DATA file into a standard ASCII text file
+    and viceversa.
+    Keep in mind that this translation is NOT lossless because all
+    non-ASCII & non printable characters are substituted with spaces.
+	This kind of characters must be removed because they may confuse
+	the line-by-line reading of file when translating in the opposite
+	direction.
+	The 9845 system has the capability to insert formatting characters
+	directly in the text strings to be displayed on screen. These
+	characters set things like inverse video or underline.
+	Turning a DATA file into a text file through this filter removes
+	these special characters.
 
 *********************************************************************/
 #include <bitset>
@@ -1353,6 +1377,13 @@ static bool dump_string(imgtool_stream *inp, imgtool_stream *out , unsigned len 
 		return false;
 	}
 
+	// Sanitize string
+	for (unsigned i = 0; i < len; i++) {
+		if (!isascii(tmp[ i ]) || !isprint(tmp[ i ])) {
+			tmp[ i ] = ' ';
+		}
+	}
+
 	stream_write(out , tmp , len);
 	if (add_eoln) {
 		stream_puts(out , EOLN);
@@ -1450,10 +1481,117 @@ static imgtoolerr_t hp9845data_read_file(imgtool_partition *partition, const cha
 	return IMGTOOLERR_SUCCESS;
 }
 
+static bool split_string_n_dump(const char *s , imgtool_stream *dest)
+{
+	unsigned s_len = strlen(s);
+	UINT16 rec_type = REC_TYPE_1STSTR;
+	UINT8 tmp[ 4 ];
+	bool at_least_one = false;
+
+	while (1) {
+		unsigned free_len = len_to_eor(dest);
+		if (free_len <= 4) {
+			// Not enough free space at end of current record: fill with EORs
+			place_integer_be(tmp , 0 , 2 , REC_TYPE_EOR);
+			while (free_len) {
+				if (stream_write(dest , tmp , 2) != 2) {
+					return false;
+				}
+				free_len -= 2;
+			}
+		} else {
+			unsigned s_part_len = std::min(free_len - 4 , s_len);
+			if (s_part_len == s_len) {
+				// Free space to EOR enough for what's left of string
+				break;
+			}
+			place_integer_be(tmp , 0 , 2 , rec_type);
+			place_integer_be(tmp , 2 , 2 , s_len);
+			if (stream_write(dest , tmp , 4) != 4 ||
+				stream_write(dest , s , s_part_len) != s_part_len) {
+				return false;
+			}
+			rec_type = REC_TYPE_MIDSTR;
+			s_len -= s_part_len;
+			s += s_part_len;
+			at_least_one = true;
+		}
+	}
+
+	place_integer_be(tmp , 0 , 2 , at_least_one ? REC_TYPE_ENDSTR : REC_TYPE_FULLSTR);
+	place_integer_be(tmp , 2 , 2 , s_len);
+	if (stream_write(dest , tmp , 4) != 4 ||
+		stream_write(dest , s , s_len) != s_len) {
+		return false;
+	}
+	if (s_len & 1) {
+		tmp[ 0 ] = 0;
+		if (stream_write(dest , tmp , 1) != 1) {
+			return false;
+		}
+	}
+	return true;
+}
+
 static imgtoolerr_t hp9845data_write_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
-	// TODO:
-	return IMGTOOLERR_UNIMPLEMENTED;
+	imgtool_stream *out_data;
+
+	out_data = stream_open_mem(NULL , 0);
+	if (out_data == nullptr) {
+		return IMGTOOLERR_OUTOFMEMORY;
+	}
+
+	while (1) {
+		char line[ 256 ];
+
+		// Read input file one line at time
+		if (stream_core_file(sourcef)->gets(line , sizeof(line)) == nullptr) {
+			// EOF
+			break;
+		}
+		line[ sizeof(line) - 1 ] = '\0';
+
+		// Strip space and non-ASCII characters from the end of the line
+		size_t line_len = strlen(line);
+		char *p = &line[ line_len ];
+		while (p != line) {
+			char c = *(--p);
+			if (isascii(c) && !isspace(c)) {
+				break;
+			}
+			*p = '\0';
+		}
+
+		// Ignore empty lines
+		if (p == line) {
+			continue;
+		}
+
+		if (!split_string_n_dump(line , out_data)) {
+			return IMGTOOLERR_WRITEERROR;
+		}
+	}
+
+	// Fill free space of last record with EOFs
+	unsigned free_len = len_to_eor(out_data);
+	UINT8 tmp[ 2 ];
+	place_integer_be(tmp , 0 , 2 , REC_TYPE_EOF);
+
+	while (free_len) {
+		if (stream_write(out_data , tmp , 2 ) != 2) {
+			return IMGTOOLERR_WRITEERROR;
+		}
+		free_len -= 2;
+	}
+
+	stream_seek(out_data , 0 , SEEK_SET);
+
+	imgtoolerr_t res = hp9845_tape_write_file(partition , filename , fork , out_data , opts);
+
+	stream_close(out_data);
+
+	return res;
 }
 
 void filter_hp9845data_getinfo(UINT32 state, union filterinfo *info)
