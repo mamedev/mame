@@ -24,6 +24,7 @@
 #include "sound/tms5220.h"
 #include "gromport.h"
 #include "bus/ti99_peb/peribox.h"
+#include "machine/ram.h"
 
 extern const device_type MAINBOARD8;
 
@@ -31,9 +32,6 @@ extern const device_type MAINBOARD8;
 #define MOFETTA_TAG "mofetta"
 #define AMIGO_TAG "amigo"
 #define OSO_TAG "oso"
-
-#define SRAM_SIZE 2048
-#define DRAM_SIZE 65536
 
 class mainboard8_device;
 extern const device_type VAQUERRO;
@@ -156,7 +154,7 @@ private:
 	bool m_video_wait;
 
 	// State of the CRUS line
-	line_state m_crus;
+	int m_crus;
 
 	// Are the GROM libraries turned on?
 	bool m_crugl;
@@ -179,16 +177,16 @@ private:
 	int m_gromsel;
 
 	// Outgoing READY
-	line_state m_ggrdy;
+	int m_ggrdy;
 
 	// Outgoing READY latch (common flipflop driving SRY)
 	bool m_sry;
 
 	// Holds the A14 address line state. We need this for the clock_in method.
-	line_state m_a14;
+	int m_a14;
 
 	// Keeps the recent DBIN level
-	line_state m_dbin_level;
+	int m_dbin_level;
 
 	// Wait state logic components
 	grom_waitstate_generator m_sgmws, m_tsgws, m_p8gws, m_p3gws;
@@ -276,7 +274,7 @@ private:
 	int m_gromclock_count;
 
 	// Remember last msast state for edge detection
-	line_state m_msast;
+	int m_msast;
 
 	// Pointer to mainboard
 	mainboard8_device* m_mainboard;
@@ -336,13 +334,13 @@ private:
 	mainboard8_device* m_mainboard;
 
 	// Keep the system ready state
-	line_state m_srdy;
+	int m_srdy;
 
 	// Outgoing READY level
-	line_state m_ready_out;
+	int m_ready_out;
 
 	// Keep the CRUS setting
-	line_state m_crus;
+	int m_crus;
 
 	// State of the address creation
 	int m_amstate;
@@ -488,7 +486,7 @@ private:
 	bool m_pbox_ready;
 
 	// Keeps the recent DBIN level
-	line_state m_dbin_level;
+	int m_dbin_level;
 
 	// Ready line to the CPU
 	devcb_write_line m_ready;
@@ -511,9 +509,11 @@ private:
 	required_device<cd2501ecd_device>       m_speech;
 	required_device<gromport_device>        m_gromport;
 	required_device<peribox_device>         m_peb;
+	required_device<ram_device>             m_sram;
+	required_device<ram_device>             m_dram;
 
 	// Debugging
-	line_state m_last_ready;
+	int m_last_ready;
 
 	// System GROM library
 	tmc0430_device* m_sgrom[3];
@@ -532,10 +532,6 @@ private:
 	bool m_tsgrom_idle;
 	bool m_p8grom_idle;
 	bool m_p3grom_idle;
-
-	// Memory
-	std::unique_ptr<UINT8[]>    m_sram;
-	std::unique_ptr<UINT8[]>    m_dram;
 
 	// ROM area of the system.
 	UINT8*   m_rom0;

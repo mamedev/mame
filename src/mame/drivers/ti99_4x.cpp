@@ -75,8 +75,6 @@ public:
 		m_joyport(*this, JOYPORT_TAG),
 		m_datamux(*this, DATAMUX_TAG),
 		m_video(*this, VDP_TAG),
-		m_scratchpad(*this, PADRAM_TAG),
-		m_ram32k(*this, EXPRAM_TAG),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2")
 		{ }
@@ -162,8 +160,6 @@ private:
 	required_device<joyport_device>     m_joyport;
 	required_device<ti99_datamux_device> m_datamux;
 	optional_device<tms9928a_device>    m_video;
-	required_device<ram_device>             m_scratchpad;
-	required_device<ram_device>             m_ram32k;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 

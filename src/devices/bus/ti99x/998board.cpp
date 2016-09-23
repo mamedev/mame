@@ -103,9 +103,6 @@
 
 ***************************************************************************/
 
-// TODO:
-// - PEB
-
 #include "998board.h"
 
 #define TRACE_CRU 0
@@ -143,6 +140,8 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_speech(*owner, SPEECHSYN_TAG),
 	m_gromport(*owner, GROMPORT_TAG),
 	m_peb(*owner, PERIBOX_TAG),
+	m_sram(*owner, SRAM_TAG),
+	m_dram(*owner, DRAM_TAG),
 	m_sgrom_idle(true),
 	m_tsgrom_idle(true),
 	m_p8grom_idle(true),
@@ -311,7 +310,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 	{
 		if (m_amigo->skdrcs_out()==ASSERT_LINE)
 		{
-			m_dram[m_physical_address & 0xffff] = m_latched_data;
+			m_dram->pointer()[m_physical_address & 0xffff] = m_latched_data;
 			m_pending_write = false;
 			if (TRACE_MEM) logerror("Write %04x (phys %06x, DRAM) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -473,7 +472,7 @@ READ8_MEMBER( mainboard8_device::read )
 
 	if (m_amigo->sramcs_out()==ASSERT_LINE)
 	{
-		value = m_sram[m_logical_address & 0x07ff];
+		value = m_sram->pointer()[m_logical_address & 0x07ff];
 		what = "SRAM";
 		goto readdone;
 	}
@@ -568,7 +567,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// =================================================
 		if (m_amigo->skdrcs_out()==ASSERT_LINE)
 		{
-			value = m_dram[m_physical_address & 0xffff];
+			value = m_dram->pointer()[m_physical_address & 0xffff];
 			what = "DRAM";
 			goto readdonephys;
 		}
@@ -652,7 +651,6 @@ void mainboard8_device::cycle_end()
 WRITE8_MEMBER( mainboard8_device::write )
 {
 	m_latched_data = data;
-	m_space = &space;
 	m_pending_write = true;
 
 	// Some logical space devices can be written immediately
@@ -678,7 +676,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 		if (m_amigo->sramcs_out()==ASSERT_LINE)
 		{
 			if (TRACE_MEM) logerror("Write %04x (SRAM) <- %02x\n", m_logical_address, data);
-			m_sram[m_logical_address & 0x07ff] = data;
+			m_sram->pointer()[m_logical_address & 0x07ff] = data;
 			m_pending_write = false;
 		}
 	}
@@ -787,15 +785,27 @@ void mainboard8_device::device_start()
 		m_p8grom[i] = downcast<tmc0430_device*>(machine().device(glib2[i]));
 	}
 
-	// Configure RAM and AMIGO
-	m_sram = std::make_unique<UINT8[]>(SRAM_SIZE);
-	m_dram = std::make_unique<UINT8[]>(DRAM_SIZE);
-
-	m_amigo->connect_sram(m_sram.get());
-
 	m_rom0  = machine().root_device().memregion(ROM0_REG)->base();
 	m_rom1  = machine().root_device().memregion(ROM1_REG)->base();
 	m_pascalrom  = machine().root_device().memregion(PASCAL_REG)->base();
+
+	// Register state variables
+	save_item(NAME(m_A14_set));
+	save_item(NAME(m_logical_address));
+	save_item(NAME(m_physical_address));
+	save_item(NAME(m_pending_write));
+	save_item(NAME(m_latched_data));
+	save_item(NAME(m_gromclk));
+	save_item(NAME(m_prev_grom));
+	save_item(NAME(m_speech_ready));
+	save_item(NAME(m_sound_ready));
+	save_item(NAME(m_pbox_ready));
+	save_item(NAME(m_dbin_level));
+	save_item(NAME(m_last_ready));
+	save_item(NAME(m_sgrom_idle));
+	save_item(NAME(m_tsgrom_idle));
+	save_item(NAME(m_p8grom_idle));
+	save_item(NAME(m_p3grom_idle));
 }
 
 void mainboard8_device::device_reset()
@@ -808,6 +818,13 @@ void mainboard8_device::device_reset()
 	m_pending_write = false;
 	m_prev_grom = 0;
 	m_A14_set = false;
+	// Configure RAM and AMIGO
+	m_amigo->connect_sram(m_sram->pointer());
+
+	// Get the pointer to the address space; we need it outside of the
+	// usual memory functions.
+	cpu_device* cpu = downcast<cpu_device*>(machine().device("maincpu"));
+	m_space = &cpu->space(AS_PROGRAM);
 }
 
 MACHINE_CONFIG_FRAGMENT( ti998_mainboard )
@@ -1157,6 +1174,24 @@ void vaquerro_device::device_start()
 	m_p8gws.init(P8GSEL);
 	m_p3gws.init(P3GSEL);
 	m_vidws.init(VIDSEL);
+
+	save_item(NAME(m_memen));
+	save_item(NAME(m_video_wait));
+	save_item(NAME(m_crus));
+	save_item(NAME(m_crugl));
+	save_item(NAME(m_lasreq));
+	save_item(NAME(m_grom_or_video));
+	save_item(NAME(m_spwt));
+	save_item(NAME(m_sccs));
+	save_item(NAME(m_sromcs));
+	save_item(NAME(m_sprd));
+	save_item(NAME(m_vdprd));
+	save_item(NAME(m_vdpwt));
+	save_item(NAME(m_gromsel));
+	save_item(NAME(m_ggrdy));
+	save_item(NAME(m_sry));
+	save_item(NAME(m_a14));
+	save_item(NAME(m_dbin_level));
 }
 
 void vaquerro_device::device_reset()
@@ -1513,6 +1548,24 @@ void mofetta_device::device_start()
 {
 	logerror("Starting\n");
 	m_mainboard = downcast<mainboard8_device*>(owner());
+
+	save_item(NAME(m_pmemen));
+	save_item(NAME(m_lasreq));
+	save_item(NAME(m_skdrcs));
+	save_item(NAME(m_gromclk_up));
+	save_item(NAME(m_gotfirstword));
+	save_item(NAME(m_address_latch));
+	save_item(NAME(m_prefix));
+	save_item(NAME(m_alcpg));
+	save_item(NAME(m_txspg));
+	save_item(NAME(m_rom1cs));
+	save_item(NAME(m_rom1am));
+	save_item(NAME(m_rom1al));
+	save_item(NAME(m_alccs));
+	save_item(NAME(m_prcs));
+	save_item(NAME(m_cmas));
+	save_item(NAME(m_gromclock_count));
+	save_item(NAME(m_msast));
 }
 
 void mofetta_device::device_reset()
@@ -1856,6 +1909,23 @@ void amigo_device::device_start()
 {
 	logerror("Starting\n");
 	m_mainboard = downcast<mainboard8_device*>(owner());
+
+	save_item(NAME(m_memen));
+	save_pointer(NAME(m_base_register),16);
+	save_item(NAME(m_logical_space));
+	save_item(NAME(m_physical_address));
+	save_item(NAME(m_srdy));
+	save_item(NAME(m_ready_out));
+	save_item(NAME(m_crus));
+	save_item(NAME(m_amstate));
+	save_item(NAME(m_protflag));
+	save_item(NAME(m_sram_accessed));
+	save_item(NAME(m_dram_accessed));
+	save_item(NAME(m_mapper_accessed));
+	save_item(NAME(m_hold_acknowledged));
+	save_item(NAME(m_sram_address));
+	save_item(NAME(m_basereg));
+	save_item(NAME(m_mapvalue));
 }
 
 void amigo_device::device_reset()
@@ -1996,6 +2066,10 @@ void oso_device::device_start()
 {
 	logerror("Starting\n");
 	m_status = m_xmit = m_control = m_data = 0;
+	save_item(NAME(m_data));
+	save_item(NAME(m_status));
+	save_item(NAME(m_control));
+	save_item(NAME(m_xmit));
 }
 
 const device_type OSO = &device_creator<oso_device>;

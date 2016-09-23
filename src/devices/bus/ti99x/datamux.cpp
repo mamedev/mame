@@ -76,6 +76,12 @@
 */
 ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__),
+	m_video(*owner, VDP_TAG),
+	m_sound(*owner, TISOUNDCHIP_TAG),
+	m_peb(*owner, PERIBOX_TAG),
+	m_gromport(*owner, GROMPORT_TAG),
+	m_ram16b(*owner, EXPRAM_TAG),
+	m_padram(*owner, PADRAM_TAG),
 	m_spacep(nullptr),
 	m_ready(*this),
 	m_addr_buf(0),
@@ -604,15 +610,9 @@ void ti99_datamux_device::device_reset(void)
 
 void ti99_datamux_device::device_config_complete()
 {
-	m_video = downcast<tms9928a_device*>(owner()->subdevice(VDP_TAG));
-	m_sound = downcast<sn76496_base_device*>(owner()->subdevice(TISOUNDCHIP_TAG));
-	m_gromport = downcast<gromport_device*>(owner()->subdevice(GROMPORT_TAG));
-	m_peb = downcast<peribox_device*>(owner()->subdevice(PERIBOX_TAG));
 	m_grom[0] = downcast<tmc0430_device*>(owner()->subdevice(GROM0_TAG));
 	m_grom[1] = downcast<tmc0430_device*>(owner()->subdevice(GROM1_TAG));
 	m_grom[2] = downcast<tmc0430_device*>(owner()->subdevice(GROM2_TAG));
-	m_padram =  downcast<ram_device*>(owner()->subdevice(PADRAM_TAG));
-	m_ram16b =  downcast<ram_device*>(owner()->subdevice(EXPRAM_TAG));
 }
 
 

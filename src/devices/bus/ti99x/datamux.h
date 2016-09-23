@@ -56,25 +56,25 @@ protected:
 
 private:
 	// Link to the video processor
-	tms9928a_device* m_video;
+	optional_device<tms9928a_device> m_video;
 
 	// Link to the sound processor
-	sn76496_base_device* m_sound;
+	optional_device<sn76496_base_device> m_sound;
 
 	// Link to the peripheral expansion box
-	peribox_device* m_peb;
+	required_device<peribox_device> m_peb;
 
 	// Link to the cartridge port (aka GROM port)
-	gromport_device* m_gromport;
+	required_device<gromport_device> m_gromport;
+
+	// Memory expansion (internal, 16 bit)
+	required_device<ram_device> m_ram16b;
+
+	// Console RAM
+	required_device<ram_device> m_padram;
 
 	// Keeps the address space pointer
 	address_space* m_spacep;
-
-	// Memory expansion (internal, 16 bit)
-	ram_device* m_ram16b;
-
-	// Console RAM
-	ram_device* m_padram;
 
 	// Console ROM
 	UINT16* m_consolerom;
