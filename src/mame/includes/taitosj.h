@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
+#include "sound/ay8910.h"
 
 class taitosj_state : public driver_device
 {
@@ -27,6 +28,10 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_dac(*this, "dac"),
+		m_ay1(*this, "ay1"),
+		m_ay2(*this, "ay2"),
+		m_ay3(*this, "ay3"),
+		m_ay4(*this, "ay4"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -139,6 +144,10 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<dac_device> m_dac;
+	required_device<ay8910_device> m_ay1;
+	required_device<ay8910_device> m_ay2;
+	required_device<ay8910_device> m_ay3;
+	required_device<ay8910_device> m_ay4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
