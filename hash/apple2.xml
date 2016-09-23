@@ -4419,13 +4419,14 @@
 	</software>
 
 	<software name="arkanoi2">
-		<description>Arkanoid 2: Revenge of DOH</description>
+		<!-- Arkanoid 2: Revenge of DOH was never released for the Apple II, only a native Apple IIgs version -->
+		<description>Arkanoid 2 (level hack of cracked Arkanoid)</description>
 		<year>1988</year>
-		<publisher>Taito America</publisher>
+		<publisher>Hack</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="arkanoi2.dsk" size="143360" crc="c35c1af5" sha1="b695b594496b74baa65f8c09cca324a2d5ea4a6b" offset="0x0000" />
+				<rom name="arkanoi2 (level hack of arkanoid).dsk" size="143360" crc="c35c1af5" sha1="b695b594496b74baa65f8c09cca324a2d5ea4a6b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
