@@ -12,7 +12,10 @@
  */
 
 /***********************************************************************************************************
-  Barcrest MPU3 highly preliminary driver by J.Wallace, and Anonymous.
+  Barcrest MPU3 highly preliminary driver
+  based on MPU4 driver (see mpu4.cpp for credits)
+
+  Thanks to Chris Wren and MFME for documentation, particularly of meters and characteriser.
 
 --- Board Setup ---
 
