@@ -51,6 +51,7 @@
 #include "sound/tms5220.h"          /* Speech */
 #include "video/saa5050.h"          /* Teletext */
 #include "bbc.lh"
+#include "bbcm.lh"
 
 /* Devices */
 #include "formats/acorn_dsk.h"
@@ -1276,7 +1277,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)
 
-	MCFG_DEFAULT_LAYOUT(layout_bbc)
+	MCFG_DEFAULT_LAYOUT(layout_bbcm)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

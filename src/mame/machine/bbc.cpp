@@ -1809,6 +1809,8 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	/* Set ROM/IO bank to point to rom */
 	m_bank8->set_base(m_region_os->base() + 0x3c00);
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xfc00, 0xfeff, "bank8");
+
+	output().set_value("power_led", 0);
 }
 
 MACHINE_RESET_MEMBER(bbc_state, bbcm)
