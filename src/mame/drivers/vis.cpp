@@ -72,14 +72,14 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		case 0x80: // 8bit mono
 		{
 			UINT8 sample = m_sample[m_sample_byte >> 1] >> ((m_sample_byte & 1) * 8);
-			m_dacl->write_unsigned8(sample);
-			m_dacr->write_unsigned8(sample);
+			m_dacl->write_signed8(sample);
+			m_dacr->write_signed8(sample);
 			m_sample_byte++;
 			break;
 		}
 		case 0x00: // 8bit stereo
-			m_dacl->write_unsigned8(m_sample[m_sample_byte >> 1] & 0xff);
-			m_dacr->write_unsigned8(m_sample[m_sample_byte >> 1] >> 8);
+			m_dacl->write_signed8(m_sample[m_sample_byte >> 1] & 0xff);
+			m_dacr->write_signed8(m_sample[m_sample_byte >> 1] >> 8);
 			m_sample_byte += 2;
 			break;
 		case 0x88: // 16bit mono
@@ -99,7 +99,10 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		m_sample_byte = 0;
 		m_samples = 0;
 		if(m_count)
+		{
+			m_count--;
 			m_isa->drq7_w(ASSERT_LINE);
+		}
 		else
 		{
 			m_dacl->write(0);
@@ -108,7 +111,6 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			m_pcm->adjust(attotime::never);
 			m_isa->irq7_w(ASSERT_LINE);
 		}
-		m_count--;
 	}
 }
 
