@@ -65,7 +65,7 @@ private:
 	devcb_write_line   m_gromready;
 
 	// Clock line level
-	line_state m_current_clock_level;
+	int m_current_clock_level;
 
 	// Currently active GROM ident
 	int m_current_ident;

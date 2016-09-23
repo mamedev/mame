@@ -1400,6 +1400,29 @@ void geneve_mapper_device::device_start()
 
 	m_geneve_mode = false;
 	m_direct_mode = true;
+
+	// State registration
+	save_item(NAME(m_gromwaddr_LSB));
+	save_item(NAME(m_gromraddr_LSB));
+	save_item(NAME(m_grom_address));
+	save_item(NAME(m_video_waitstates));
+	save_item(NAME(m_extra_waitstates));
+	save_item(NAME(m_ready_asserted));
+	save_item(NAME(m_read_mode));
+	save_item(NAME(m_debug_no_ws));
+	save_item(NAME(m_geneve_mode));
+	save_item(NAME(m_direct_mode));
+	save_item(NAME(m_cartridge_size));
+	save_item(NAME(m_cartridge_secondpage));
+	save_item(NAME(m_cartridge6_writable));
+	save_item(NAME(m_cartridge7_writable));
+	save_item(NAME(m_pfm_mode));
+	save_item(NAME(m_pfm_bank));
+	save_item(NAME(m_pfm_output_enable));
+	save_item(NAME(m_sram_mask));
+	save_item(NAME(m_sram_val));
+	save_item(NAME(m_waitcount));
+	save_item(NAME(m_ext_waitcount));
 }
 
 void geneve_mapper_device::device_reset()
@@ -1798,6 +1821,24 @@ void geneve_keyboard_device::device_start()
 {
 	m_timer = timer_alloc(0);
 	m_interrupt.resolve();
+
+	// State registration
+	save_item(NAME(m_key_reset));
+	save_item(NAME(m_key_queue_length));
+	save_item(NAME(m_key_queue_head));
+	save_item(NAME(m_key_in_buffer));
+	save_item(NAME(m_key_numlock_state));
+	save_item(NAME(m_key_ctrl_state));
+	save_item(NAME(m_key_alt_state));
+	save_item(NAME(m_key_real_shift_state));
+	save_item(NAME(m_key_fake_shift_state));
+	save_item(NAME(m_key_fake_unshift_state));
+	save_item(NAME(m_key_autorepeat_key));
+	save_item(NAME(m_key_autorepeat_timer));
+	save_item(NAME(m_keep_keybuf));
+	save_item(NAME(m_keyboard_clock));
+	save_pointer(NAME(m_key_queue),KEYQUEUESIZE);
+	save_pointer(NAME(m_key_state_save),4);
 }
 
 void geneve_keyboard_device::device_reset()
