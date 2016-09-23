@@ -14,7 +14,10 @@
 */
 
 /***********************************************************************************************************
-  Barcrest MPU4 highly preliminary driver by J.Wallace, and Anonymous.
+  Barcrest MPU4 highly preliminary driver.
+  MAME Driver J. Wallace and Haze
+  
+  Thanks to Chris Wren and MFME for documentation.
 
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
