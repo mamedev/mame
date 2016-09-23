@@ -4795,6 +4795,19 @@
 		</part>
 	</software>
 
+	<software name="genesis">
+		<!-- Original disk wouldn't boot on 65C02 or later -->
+		<description>Genesis (clean crack)</description>
+		<year>1983</year>
+		<publisher>Datasoft / Design Labs</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="genesis (1983)(datasoft - design labs)(trex single file crack).dsk" size="143360" crc="c55fd79c" sha1="34940df9dc08c88f38000f9d3311bae429a2f735" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gbust">
 		<description>Ghostbusters</description>
 		<year>1984</year>
@@ -5404,6 +5417,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="paperboy (4am crack).dsk" size="143360" crc="e0914bc0" sha1="37da2f836f9182c53931a8f08827f72826f844ac" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigpen">
+		<description>Pigpen (clean crack)</description>
+		<year>1982</year>
+		<publisher>Datamost / TMQ Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pingpen (1982)(datamost - tmq software)(clean crack).dsk" size="143360" crc="69abf73f" sha1="0811f5331a44df93edebbf3908b036c972733b55" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
