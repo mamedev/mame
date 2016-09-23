@@ -5429,7 +5429,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="pingpen (1982)(datamost - tmq software)(clean crack).dsk" size="143360" crc="69abf73f" sha1="0811f5331a44df93edebbf3908b036c972733b55" offset="0x0000" />
+				<rom name="pigpen (1982)(datamost - tmq software)(clean crack).dsk" size="143360" crc="69abf73f" sha1="0811f5331a44df93edebbf3908b036c972733b55" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
