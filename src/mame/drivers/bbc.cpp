@@ -975,7 +975,9 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 
 	/* expansion ports */
 	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, "acornjoy")
-	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
+	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbcb_1mhzbus_devices, nullptr)
+	MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in3_w))
+	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(bbc_state, bus_nmi_w))
 	MCFG_BBC_TUBE_SLOT_ADD("tube", bbc_tube_ext_devices, nullptr)
 	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
 
@@ -1248,6 +1250,12 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
+
+	/* expansion ports */
+	MCFG_DEVICE_REMOVE("analogue")
+	MCFG_DEVICE_REMOVE("1mhzbus")
+	MCFG_DEVICE_REMOVE("tube")
+	MCFG_DEVICE_REMOVE("userport")
 MACHINE_CONFIG_END
 
 
@@ -1398,7 +1406,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* expansion ports */
 	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, "acornjoy")
-	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
+	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbcm_1mhzbus_devices, nullptr)
 	MCFG_BBC_TUBE_SLOT_ADD("tube_ext", bbc_tube_ext_devices, nullptr)
 	MCFG_BBC_TUBE_SLOT_ADD("tube_int", bbc_tube_int_devices, nullptr)
 	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)

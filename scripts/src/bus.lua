@@ -277,6 +277,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
 	}
 end
 
