@@ -4,7 +4,196 @@
 #include "emu.h"
 #include "cpu/i86/i286.h"
 #include "machine/at.h"
+#include "sound/dac.h"
+#include "sound/262intf.h"
 #include "bus/isa/isa_cards.h"
+
+class vis_audio_device : public device_t,
+						 public device_isa16_card_interface
+{
+public:
+	vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_READ8_MEMBER(pcm_r);
+	DECLARE_WRITE8_MEMBER(pcm_w);
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void dack16_w(int line, UINT16 data) override { m_sample[m_samples++] = data; if(m_samples == 2) m_isa->drq7_w(CLEAR_LINE); }
+	virtual machine_config_constructor device_mconfig_additions() const override;
+private:
+	required_device<dac_device> m_dacr;
+	required_device<dac_device> m_dacl;
+	UINT16 m_count;
+	UINT16 m_sample[2];
+	UINT8 m_index[2]; // unknown indexed registers, volume?
+	UINT8 m_data[2][16];
+	UINT8 m_mode;
+	UINT8 m_stat;
+	int m_sample_byte;
+	int m_samples;
+	emu_timer *m_pcm;
+};
+
+const device_type VIS_AUDIO = &device_creator<vis_audio_device>;
+
+vis_audio_device::vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VIS_AUDIO, "vis_pcm", tag, owner, clock, "vis_pcm", __FILE__),
+	device_isa16_card_interface(mconfig, *this),
+	m_dacr(*this, "dacr"),
+	m_dacl(*this, "dacl")
+{
+}
+
+void vis_audio_device::device_start()
+{
+	set_isa_device();
+	m_isa->set_dma_channel(7, this, FALSE);
+	m_isa->install_device(0x0220, 0x022f, read8_delegate(FUNC(vis_audio_device::pcm_r), this), write8_delegate(FUNC(vis_audio_device::pcm_w), this));
+	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), subdevice<ymf262_device>("ymf262")), write8_delegate(FUNC(ymf262_device::write), subdevice<ymf262_device>("ymf262")));
+	m_pcm = timer_alloc();
+	m_pcm->adjust(attotime::never);
+}
+
+void vis_audio_device::device_reset()
+{
+	m_count = 0;
+	m_sample_byte = 0;
+	m_samples = 0;
+	m_mode = 0;
+	m_index[0] = m_index[1] = 0;
+	m_stat = 0;
+}
+
+void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(m_mode & 0x88)
+	{
+		case 0x80: // 8bit mono
+		{
+			UINT8 sample = m_sample[m_sample_byte >> 1] >> ((m_sample_byte & 1) * 8);
+			m_dacl->write_unsigned8(sample);
+			m_dacr->write_unsigned8(sample);
+			m_sample_byte++;
+			break;
+		}
+		case 0x00: // 8bit stereo
+			m_dacl->write_unsigned8(m_sample[m_sample_byte >> 1] & 0xff);
+			m_dacr->write_unsigned8(m_sample[m_sample_byte >> 1] >> 8);
+			m_sample_byte += 2;
+			break;
+		case 0x88: // 16bit mono
+			m_dacl->write((INT16)m_sample[m_sample_byte >> 1]);
+			m_dacr->write((INT16)m_sample[m_sample_byte >> 1]);
+			m_sample_byte += 2;
+			break;
+		case 0x08: // 16bit stereo
+			m_dacl->write((INT16)m_sample[0]);
+			m_dacr->write((INT16)m_sample[1]);
+			m_sample_byte += 4;
+			break;
+	}
+
+	if(m_sample_byte >= 4)
+	{
+		m_sample_byte = 0;
+		m_samples = 0;
+		if(m_count)
+			m_isa->drq7_w(ASSERT_LINE);
+		else
+		{
+			m_dacl->write(0);
+			m_dacr->write(0);
+			m_stat = 4;
+			m_pcm->adjust(attotime::never);
+			m_isa->irq7_w(ASSERT_LINE);
+		}
+		m_count--;
+	}
+}
+
+static MACHINE_CONFIG_FRAGMENT( vis_pcm_config )
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ymf262", YMF262, XTAL_14_31818MHz)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("dacl", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ADD("dacr", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+MACHINE_CONFIG_END
+
+machine_config_constructor vis_audio_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( vis_pcm_config );
+}
+
+READ8_MEMBER(vis_audio_device::pcm_r)
+{
+	switch(offset)
+	{
+		case 0x00:
+			return m_mode;
+		case 0x02:
+			return m_data[0][m_index[0]];
+		case 0x04:
+			return m_data[1][m_index[1]];
+		case 0x09:
+			m_isa->irq7_w(CLEAR_LINE);
+			return m_stat;
+		case 0x0c:
+			return m_count & 0xff;
+		case 0x0e:
+			return m_count >> 8;
+		default:
+			logerror("unknown pcm read %04x\n", offset);
+			break;
+	}
+	return 0;
+}
+
+WRITE8_MEMBER(vis_audio_device::pcm_w)
+{
+	switch(offset)
+	{
+		case 0x00:
+			m_mode = data;
+			break;
+		case 0x02:
+			m_data[0][m_index[0]] = data;
+			break;
+		case 0x03:
+			m_index[0] = data;
+			break;
+		case 0x04:
+			m_data[1][m_index[1]] = data;
+			break;
+		case 0x05:
+			m_index[1] = data;
+			break;
+		case 0x0c:
+			m_count = (m_count & 0xff00) | data;
+			break;
+		case 0x0e:
+			m_count = (m_count & 0xff) | (data << 8);
+			break;
+		default:
+			logerror("unknown pcm write %04x %02x\n", offset, data);
+			break;
+	}
+	if((m_mode & 0x10) && m_count)
+	{
+		const int rates[] = {44100, 22050, 11025, 5512};
+		m_samples = 0;
+		m_sample_byte = 0;
+		m_stat = 0;
+		m_isa->drq7_w(ASSERT_LINE);
+		attotime rate = attotime::from_hz(rates[(m_mode >> 5) & 3]);
+		m_pcm->adjust(rate, 0, rate);
+	}
+}
 
 class vis_state : public driver_device
 {
@@ -12,12 +201,10 @@ public:
 	vis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_mb(*this, "mb"),
 		m_pic1(*this, "mb:pic8259_slave"),
 		m_vga(*this, "vga")
 		{ }
 	required_device<cpu_device> m_maincpu;
-	required_device<at_mb_device> m_mb;
 	required_device<pic8259_device> m_pic1;
 	required_device<vga_device> m_vga;
 
@@ -167,6 +354,10 @@ static ADDRESS_MAP_START( at16_io, AS_IO, 16, vis_state )
 	AM_RANGE(0x03b0, 0x03df) AM_READWRITE8(vga_r, vga_w, 0xffff)
 ADDRESS_MAP_END
 
+static SLOT_INTERFACE_START(vis_cards)
+	SLOT_INTERFACE("visaudio", VIS_AUDIO)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( vis, vis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz )
@@ -177,7 +368,8 @@ static MACHINE_CONFIG_START( vis, vis_state )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus","mcd", pc_isa16_cards, "mcd", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus", "mcd", pc_isa16_cards, "mcd", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus", "visaudio", vis_cards, "visaudio", true)
 	MCFG_FRAGMENT_ADD(pcvideo_vga)
 MACHINE_CONFIG_END
 
