@@ -4689,7 +4689,7 @@
 		</part>
 		<part name="flop12" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="dungeon master's assistant side a (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="fafa454c" sha1="169ec625b5d72f6c624534e4c031915a0e36c82d" offset="0x0000" />
+				<rom name="dungeon master's assistant side b (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="fafa454c" sha1="169ec625b5d72f6c624534e4c031915a0e36c82d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
