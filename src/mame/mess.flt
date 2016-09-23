@@ -430,6 +430,7 @@ pcd.cpp
 pce.cpp
 pce220.cpp
 pcfx.cpp
+pcipc.cpp
 pcm.cpp
 pcw.cpp
 pcw16.cpp
@@ -443,6 +444,7 @@ pentagon.cpp
 peoplepc.cpp
 pes.cpp
 pet.cpp
+pg685.cpp
 phc25.cpp
 phantom.cpp
 phunsy.cpp
