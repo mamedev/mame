@@ -118,11 +118,11 @@ Address          Dir Data     Name      Description
 01001--------01x R/W xxxxxxxx CS5       AY-3-8910 #2
 01001--------1-x R/W xxxxxxxx CS5       AY-3-8910 #3
 01010---------00 R   xxxxxxxx RD5000    read command from main CPU
-01010---------00   W -------- WR5000    clear bit 7 of command from main CPU (not used?)
-01010---------01 R   ----x--- RD5001    command pending from main CPU (not used?)
-01010---------01 R   -----x-- RD5001    single bit from main CPU (not used?)
+01010---------00   W -------- WR5000    clear bit 7 of command from main CPU
+01010---------01 R   ----x--- RD5001    command pending from main CPU
+01010---------01 R   -----x-- RD5001    secondary semaphore from main CPU
 01010---------01 R   ------11 RD5001    always 1
-01010---------01   W -------- WR5001    clear single bit from main CPU (not used?)
+01010---------01   W -------- WR5001    clear secondary semaphore from main CPU
 01010---------10              n.c.
 01010---------11              n.c.
 111xxxxxxxxxxxxx R   xxxxxxxx           space for diagnostics ROM? not shown in the schematics
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("gfxpointer")
 	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(sound_command_w)
 	AM_RANGE(0xd50c, 0xd50c) AM_MIRROR(0x00f0) AM_WRITE(sound_semaphore_w)
-	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
+	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
 	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_SHARE("video_mode")
@@ -1822,6 +1822,9 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
+
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -1846,8 +1849,6 @@ static MACHINE_CONFIG_DERIVED( kikstart, mcu )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kikstart_main_map)
-
-	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_kikstart)
