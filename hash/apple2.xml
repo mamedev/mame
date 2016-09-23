@@ -611,18 +611,18 @@
 	</software>
 
 	<software name="aliens">
-		<description>Aliens</description>
+		<description>Aliens(clean crack) </description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="aliens (1986)(activision)(disk 1 of 2)[cr digital gang][unk filesys].do" size="143360" crc="35b077e3" sha1="890876f6f65808a1a1a5e0bd60bce15bb564af87" offset="0x0000" />
+				<rom name="aliens (1986)(activision)(disk 1 of 2)(clean crack).dsk" size="143360" crc="bf0f7f72" sha1="d77b4d92ce266c75c4d7f08b85e507529e0afc68" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="aliens (1986)(activision)(disk 2 of 2)[cr digital gang].do" size="143360" crc="9ed3a7e3" sha1="f1dddc3518f66121e097b719f3bfac9e3f880421" offset="0x0000" />
+				<rom name="aliens (1986)(activision)(disk 2 of 2)(clean crack).dsk" size="143360" crc="001325b2" sha1="077d7e3d9fb920b6f7cfc69381eb447f44ce0713" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1645,18 +1645,18 @@
 	</software>
 
 	<software name="batlches">
-		<description>Battle Chess (crack)</description>
+		<description>Battle Chess (clean crack)</description>
 		<year>1990</year>
 		<publisher>Interplay</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="battle chess (1990)(interplay)(side a)[cr la sing].po" size="143360" crc="0f914273" sha1="78e73f3cae2fc438939d41f9d34fa298a9d2ce1c" offset="0x0000" />
+				<rom name="battle chess side a (1990)(interplay)(trex crack).dsk" size="143360" crc="a81e4ae5" sha1="5b0e79fa0d4257a4855864c9324840cc1a41284e" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="battle chess (1990)(interplay)(side b)[cr la sing][unk filesys].po" size="143360" crc="222f0942" sha1="72adf7950a97f52d1be62a5be6f5887a68ffa0e7" offset="0x0000" />
+				<rom name="battle chess side b (1990)(interplay)(trex crack)[unk filesys].dsk" size="143360" crc="54359fd3" sha1="19b3ed795c9827f580df77f559ad02eca55455b9" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2868,36 +2868,19 @@
 		</part>
 	</software>
 
-	<software name="bublbbcr">
-		<description>Bubble Bobble (crack)</description>
-		<year>1988</year>
-		<publisher>Taito / NovaLogic</publisher>
-
-		<part name="flop11" interface="floppy_5_25">
-			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble (1988)(taito - novalogic)(side a)[cr club 96].dsk" size="143360" crc="ec39dae6" sha1="ae9f3498829ff1e164e897bfd1e92ac887c1d99c" offset="0x0000" />
-			</dataarea>
-		</part>
-		<part name="flop12" interface="floppy_5_25">
-			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble (1988)(taito - novalogic)(side b)[cr club 96].dsk" size="143360" crc="ac056c8d" sha1="0f30fb98d37e91f166d0c8c6b328e898cdf37ec1" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1988</year>
-		<publisher>Taito / NovaLogic</publisher>
+		<publisher>Taito America / NovaLogic</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble (1988)(taito - novalogic)(side a).dsk" size="143360" crc="2982842c" sha1="2de1b0a0656f9b2962c957ced9ceb6d5c142f32d" offset="0x0000" />
+				<rom name="bubble bobble disk 1 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="2af0a5d4" sha1="4810c07e9514d6d3a49ee9babee7497103428d43" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble (1988)(taito - novalogic)(side b).dsk" size="143360" crc="5efacf8b" sha1="9db4bf2d403784c9cda4ad992f65f7f2b3ed3dfe" offset="0x0000" />
+				<rom name="bubble bobble disk 2 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="ac056c8d" sha1="0f30fb98d37e91f166d0c8c6b328e898cdf37ec1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4694,6 +4677,23 @@
 		</part>
 	</software>
 
+	<software name="dmaster">
+		<description>Dungeon Master's Assistant (clean crack)</description>
+		<year>1988</year>
+		<publisher>SSI</publisher>
+
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop1" size="143360">
+				<rom name="dungeon master's assistant side a (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="14904b40" sha1="9a8953ed45bb36f340b13db1eb6d75a26e498815" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop1" size="143360">
+				<rom name="dungeon master's assistant side a (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="fafa454c" sha1="169ec625b5d72f6c624534e4c031915a0e36c82d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dvmidmgc">
 		<description>David's Midnight Magic</description>
 		<year>1981</year>
@@ -5397,7 +5397,7 @@
 	</software>
 
 	<software name="paperboy">
-		<description>Paperboy</description>
+		<description>Paperboy (clean crack)</description>
 		<year>1986</year>
 		<publisher>Mindscape / Atari</publisher>
 
@@ -5514,13 +5514,13 @@
 	</software>
 
 	<software name="qix">
-		<description>Qix</description>
+		<description>Qix (clean crack)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="qix.dsk" size="143360" crc="f4612a2c" sha1="2477fce2193e131be825adabaa8d325d84750c4a" offset="0x0000" />
+				<rom name="qix (1981-89)(taito america)(trex crack).dsk" size="143360" crc="7540d5ea" sha1="ed5b36df6f6940730313cd6d7ea9702003629dcc" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5533,6 +5533,24 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="rampage.dsk" size="143360" crc="92baaac9" sha1="199ac85d0950022afe3540442f061d3f92d2e720" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="renegade">
+		<!-- ProDOS 8 based & hard drive compatable -->
+		<description>Renegade (clean crack)</description>
+		<year>1988</year>
+		<publisher>Taito America / NovaLogic</publisher>
+
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop1" size="143360">
+				<rom name="renegade disk 1 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="9d480dec" sha1="bca268ad1859c8cfd214496c3195b88362a31502" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop1" size="143360">
+				<rom name="renegade disk 2 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="c01e6c75" sha1="b4b789285ee0c06315ffb216c413414c09a7756a" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5748,7 +5766,7 @@
 	</software>
 
 	<software name="sneakers">
-		<description>Sneakers</description>
+		<description>Sneakers (clean crack)</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
 
@@ -6618,7 +6636,7 @@
 	</software>
 
 	<software name="xevious">
-		<description>Xevious</description>
+		<description>Xevious (clean crack)</description>
 		<year>1983</year>
 		<publisher>Mindscape</publisher>
 
@@ -6708,7 +6726,7 @@
 <!-- 4am adds, A-E -->
 
 	<software name="123seqme">
-		<description>1-2-3 Sequence Me</description>
+		<description>1-2-3 Sequence Me (clean crack)</description>
 		<year>1991</year>
 		<publisher>Sunburst</publisher>
 
@@ -6720,7 +6738,7 @@
 	</software>
 
 	<software name="acedect">
-		<description>Ace Detective</description>
+		<description>Ace Detective (clean crack)</description>
 		<year>1987</year>
 		<publisher>Mindplay</publisher>
 
@@ -6737,7 +6755,7 @@
 	</software>
 
 	<software name="addsub1">
-		<description>Mathematics Courseware Series: Addition and Subtraction 1</description>
+		<description>Mathematics Courseware Series: Addition and Subtraction 1 (clean crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
 
@@ -6749,7 +6767,7 @@
 	</software>
 
 	<software name="addsub2">
-		<description>Mathematics Courseware Series: Addition and Subtraction 2</description>
+		<description>Mathematics Courseware Series: Addition and Subtraction 2 (clean crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
 
@@ -6761,7 +6779,7 @@
 	</software>
 
 	<software name="afrpiano">
-		<description>Alfred's Basic Piano Theory Software</description>
+		<description>Alfred's Basic Piano Theory Software (clean crack)</description>
 		<year>1986</year>
 		<publisher>Alfred Publishing Company</publisher>
 
@@ -6773,7 +6791,7 @@
 	</software>
 
 	<software name="agentusa">
-		<description>Agent USA</description>
+		<description>Agent USA (clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
 
@@ -6785,7 +6803,7 @@
 	</software>
 
 	<software name="alcircus">
-		<description>Alphabet Circus</description>
+		<description>Alphabet Circus (clean crack)</description>
 		<year>1984</year>
 		<publisher>NeoSoft</publisher>
 
@@ -6797,7 +6815,7 @@
 	</software>
 
 	<software name="alcwndrl">
-		<description>Alice in Wonderland</description>
+		<description>Alice in Wonderland (clean crack)</description>
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
 
@@ -6814,7 +6832,7 @@
 	</software>
 
 	<software name="algebra2">
-		<description>Algebra 2</description>
+		<description>Algebra 2 (clean crack)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware</publisher>
 
@@ -6826,7 +6844,7 @@
 	</software>
 
 	<software name="algeplus">
-		<description>Alge-Blaster Plus!</description>
+		<description>Alge-Blaster Plus! (clean crack)</description>
 		<year>1989</year>
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
@@ -6854,7 +6872,7 @@
 	</software>
 
 	<software name="algernon">
-		<description>Algernon</description>
+		<description>Algernon (clean crack)</description>
 		<year>1987</year>
 		<publisher>Sunburst</publisher>
 
@@ -6866,7 +6884,7 @@
 	</software>
 
 	<software name="algevol1">
-		<description>Algebra, Volume 1</description>
+		<description>Algebra, Volume 1 (clean crack)</description>
 		<year>1984</year>
 		<publisher>Peachtree Software</publisher>
 
@@ -6878,7 +6896,7 @@
 	</software>
 
 	<software name="alienadd">
-		<description>Alien Addition</description>
+		<description>Alien Addition (clean crack)</description>
 		<year>1982</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -6890,7 +6908,7 @@
 	</software>
 
 	<software name="amhisadv">
-		<description>American History Adventure</description>
+		<description>American History Adventure (clean crack)</description>
 		<year>1984</year>
 		<publisher>Queue Inc.</publisher>
 
@@ -6907,7 +6925,7 @@
 	</software>
 
 	<software name="animkngd">
-		<description>Animal Kingdom</description>
+		<description>Animal Kingdom (clean crack)</description>
 		<year>1985</year>
 		<publisher>Unicorn Software</publisher>
 
@@ -6924,7 +6942,7 @@
 	</software>
 
 	<software name="arkanoid">
-		<description>Arkanoid</description>
+		<description>Arkanoid (clean crack)</description>
 		<year>1988</year>
 		<publisher>Taito America</publisher>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
@@ -6937,7 +6955,7 @@
 	</software>
 
 	<software name="ballblzr">
-		<description>BallBlazer</description>
+		<description>BallBlazer (clean crack)</description>
 		<year>1985</year>
 		<publisher>Lucasfilm Games</publisher>
 
@@ -6949,7 +6967,7 @@
 	</software>
 
 	<software name="bandsaw">
-		<description>Band Saw and Shaper Safety</description>
+		<description>Band Saw and Shaper Safety (clean crack)</description>
 		<year>1986</year>
 		<publisher>Abraxas Basic Courseware</publisher>
 
@@ -6961,7 +6979,7 @@
 	</software>
 
 	<software name="basmathf">
-		<description>Basic Math Facts and Games</description>
+		<description>Basic Math Facts and Games (clean crack)</description>
 		<year>1981</year>
 		<publisher>Random House</publisher>
 
@@ -6973,7 +6991,7 @@
 	</software>
 
 	<software name="basvocb">
-		<description>Basic Vocabulary Builder Demo</description>
+		<description>Basic Vocabulary Builder Demo (clean crack)</description>
 		<year>1984</year>
 		<publisher>National Textbook Company</publisher>
 
@@ -6985,7 +7003,7 @@
 	</software>
 
 	<software name="beerrun">
-		<description>Beer Run</description>
+		<description>Beer Run (clean crack)</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
 
@@ -6997,7 +7015,7 @@
 	</software>
 
 	<software name="bigbkmkr">
-		<description>Big Book Maker</description>
+		<description>Big Book Maker (clean crack)</description>
 		<year>1992</year>
 		<publisher>Pelican Software</publisher>
 
@@ -7024,7 +7042,7 @@
 	</software>
 
 	<software name="bingoha">
-		<description>Bingo Bugglebee Presents: Home Alone</description>
+		<description>Bingo Bugglebee Presents: Home Alone (clean crack)</description>
 		<year>1985</year>
 		<publisher>Quest Learning Systems</publisher>
 
@@ -7036,7 +7054,7 @@
 	</software>
 
 	<software name="bingoos">
-		<description>Bingo Bugglebee Presents: Outdoor Safety</description>
+		<description>Bingo Bugglebee Presents: Outdoor Safety (clean crack)</description>
 		<year>1985</year>
 		<publisher>Quest Learning Systems</publisher>
 
@@ -7048,7 +7066,7 @@
 	</software>
 
 	<software name="binomult">
-		<description>Binomial Multiplication</description>
+		<description>Binomial Multiplication (clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
@@ -7060,7 +7078,7 @@
 	</software>
 
 	<software name="blzpdls">
-		<description>Blazing Paddles</description>
+		<description>Blazing Paddles (clean crack)</description>
 		<year>1985</year>
 		<publisher>Baudville</publisher>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
@@ -7072,7 +7090,7 @@
 	</software>
 
 	<software name="bmblgmes">
-		<description>Bumble Games</description>
+		<description>Bumble Games (clean crack)</description>
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 
@@ -7084,7 +7102,7 @@
 	</software>
 
 	<software name="bopgwdc">
-		<description>Boppie's Great Word Chase</description>
+		<description>Boppie's Great Word Chase (clean crack)</description>
 		<year>1985</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -7096,7 +7114,7 @@
 	</software>
 
 	<software name="bounce">
-		<description>Bounce</description>
+		<description>Bounce (clean crack)</description>
 		<year>1988</year>
 		<publisher>Sunburst</publisher>
 
@@ -7108,7 +7126,7 @@
 	</software>
 
 	<software name="bridge40">
-		<description>Bridge 4.0</description>
+		<description>Bridge 4.0 (clean crack)</description>
 		<year>1983</year>
 		<publisher>Artworx</publisher>
 
@@ -7120,7 +7138,7 @@
 	</software>
 
 	<software name="btime">
-		<description>BurgerTime</description>
+		<description>BurgerTime (clean crack)</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 
@@ -7132,7 +7150,7 @@
 	</software>
 
 	<software name="bzone">
-		<description>Battlezone</description>
+		<description>Battlezone (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7144,7 +7162,7 @@
 	</software>
 
 	<software name="calgames">
-		<description>California Games</description>
+		<description>California Games (clean crack)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 
@@ -7161,7 +7179,7 @@
 	</software>
 
 	<software name="calskils">
-		<description>Calendar Skills (version 08.31.86)</description>
+		<description>Calendar Skills (version 08.31.86) (clean crack)</description>
 		<year>1986</year>
 		<publisher>Hartley Courseware, Inc.</publisher>
 
@@ -7173,7 +7191,7 @@
 	</software>
 
 	<software name="casegtr">
-		<description>Case of the Great Train Robbery</description>
+		<description>Case of the Great Train Robbery (clean crack)</description>
 		<year>1986</year>
 		<publisher>Troll Associates</publisher>
 
@@ -7185,7 +7203,7 @@
 	</software>
 
 	<software name="casemisc">
-		<description>Case of the Missing Chick</description>
+		<description>Case of the Missing Chick (clean crack)</description>
 		<year>1986</year>
 		<publisher>Troll Associates</publisher>
 
@@ -7197,7 +7215,7 @@
 	</software>
 
 	<software name="catmouse">
-		<description>Cat 'n Mouse</description>
+		<description>Cat 'n Mouse (clean crack)</description>
 		<year>1986</year>
 		<publisher>Mindplay</publisher>
 
@@ -7209,7 +7227,7 @@
 	</software>
 
 	<software name="centiped">
-		<description>Centipede</description>
+		<description>Centipede (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7221,7 +7239,7 @@
 	</software>
 
 	<software name="cgotrspc">
-		<description>Curious George In Outer Space</description>
+		<description>Curious George In Outer Space (clean crack)</description>
 		<year>1989</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -7238,7 +7256,7 @@
 	</software>
 
 	<software name="cgshopng">
-		<description>Curious George Goes Shopping</description>
+		<description>Curious George Goes Shopping (clean crack)</description>
 		<year>1989</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -7255,7 +7273,7 @@
 	</software>
 
 	<software name="chalmath">
-		<description>Challenge Math</description>
+		<description>Challenge Math (clean crack)</description>
 		<year>1982</year>
 		<publisher>Sunburst</publisher>
 
@@ -7267,7 +7285,7 @@
 	</software>
 
 	<software name="chbr123">
-		<description>Charlie Brown's 1-2-3s</description>
+		<description>Charlie Brown's 1-2-3s (clean crack)</description>
 		<year>1985</year>
 		<publisher>Random House</publisher>
 
@@ -7284,7 +7302,7 @@
 	</software>
 
 	<software name="chbrabc">
-		<description>Charlie Brown's ABCs</description>
+		<description>Charlie Brown's ABCs (clean crack)</description>
 		<year>1984</year>
 		<publisher>Random House</publisher>
 
@@ -7301,7 +7319,7 @@
 	</software>
 
 	<software name="chldrnr">
-		<description>Championship Lode Runner</description>
+		<description>Championship Lode Runner (clean crack)</description>
 		<year>1984</year>
 		<publisher>Broderbund</publisher>
 
@@ -7313,7 +7331,7 @@
 	</software>
 
 	<software name="chwrest">
-		<description>Championship Wrestling</description>
+		<description>Championship Wrestling (clean crack)</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
 
@@ -7330,7 +7348,7 @@
 	</software>
 
 	<software name="clabcalc">
-		<description>Computer Laboratory for Calculus</description>
+		<description>Computer Laboratory for Calculus (clean crack)</description>
 		<year>1985</year>
 		<publisher>The Math Lab</publisher>
 
@@ -7342,7 +7360,7 @@
 	</software>
 
 	<software name="clasanbk">
-		<description>Classifying Animals With Backbones</description>
+		<description>Classifying Animals With Backbones (clean crack)</description>
 		<year>1985</year>
 		<publisher>D.C. Heath and Company</publisher>
 
@@ -7356,7 +7374,7 @@
 	<software name="clasmate">
 		<description>ClassMate</description>
 		<year>1987</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson and Associates (clean crack)</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -7366,7 +7384,7 @@
 	</software>
 
 	<software name="cltrcy">
-		<description>Computer Literacy: Introduction</description>
+		<description>Computer Literacy: Introduction (clean crack)</description>
 		<year>1982</year>
 		<publisher>Control Data Corporation</publisher>
 
@@ -7378,7 +7396,7 @@
 	</software>
 
 	<software name="colorme">
-		<description>Color Me</description>
+		<description>Color Me (clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 
@@ -7410,7 +7428,7 @@
 	</software>
 
 	<software name="commando">
-		<description>Commando</description>
+		<description>Commando (clean crack)</description>
 		<year>1987</year>
 		<publisher>Data East</publisher>
 
@@ -7422,7 +7440,7 @@
 	</software>
 
 	<software name="compread">
-		<description>Compu-Read 3.4</description>
+		<description>Compu-Read 3.4 (clean crack)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware Services Inc.</publisher>
 
@@ -7434,7 +7452,7 @@
 	</software>
 
 	<software name="conan">
-		<description>Conan</description>
+		<description>Conan (clean crack)</description>
 		<year>1984</year>
 		<publisher>DataSoft</publisher>
 
@@ -7451,7 +7469,7 @@
 	</software>
 
 	<software name="cotntale">
-		<description>Cotton Tales</description>
+		<description>Cotton Tales (clean crack)</description>
 		<year>1987</year>
 		<publisher>Mindplay</publisher>
 
@@ -7463,7 +7481,7 @@
 	</software>
 
 	<software name="crcreate">
-		<description>Creature Creator</description>
+		<description>Creature Creator (clean crack)</description>
 		<year>1983</year>
 		<publisher>DesignWare</publisher>
 
@@ -7477,7 +7495,7 @@
 	<software name="creation">
 		<description>Creation</description>
 		<year>1988</year>
-		<publisher>Pelican Software</publisher>
+		<publisher>Pelican Software (clean crack)</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -7492,7 +7510,7 @@
 	</software>
 
 	<software name="crumbetr">
-		<description>Crumb Eater</description>
+		<description>Crumb Eater (clean crack)</description>
 		<year>1983</year>
 		<publisher>Davka Corporation</publisher>
 
@@ -7504,7 +7522,7 @@
 	</software>
 
 	<software name="cryptcbe">
-		<description>Crypto Cube</description>
+		<description>Crypto Cube (clean crack)</description>
 		<year>1983</year>
 		<publisher>DesignWare</publisher>
 
@@ -7516,7 +7534,7 @@
 	</software>
 
 	<software name="cseefft">
-		<description>Cause and Effect: What Makes It Happen?</description>
+		<description>Cause and Effect: What Makes It Happen? (clean crack)</description>
 		<year>1988</year>
 		<publisher>Troll Associates</publisher>
 
@@ -7528,7 +7546,7 @@
 	</software>
 
 	<software name="deathswd">
-		<description>Death Sword</description>
+		<description>Death Sword (clean crack)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 
@@ -7540,7 +7558,7 @@
 	</software>
 
 	<software name="decdisc">
-		<description>Decimal Discovery</description>
+		<description>Decimal Discovery (clean crack)</description>
 		<year>1986</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -7552,7 +7570,7 @@
 	</software>
 
 	<software name="decimals">
-		<description>Decimals (ver 3.0)</description>
+		<description>Decimals (ver 3.0) (clean crack)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware</publisher>
 
@@ -7564,7 +7582,7 @@
 	</software>
 
 	<software name="defender">
-		<description>Defender</description>
+		<description>Defender (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7576,7 +7594,7 @@
 	</software>
 
 	<software name="deltadrw">
-		<description>Delta Drawing</description>
+		<description>Delta Drawing (clean crack)</description>
 		<year>1982</year>
 		<publisher>Spinnaker</publisher>
 
@@ -7588,7 +7606,7 @@
 	</software>
 
 	<software name="digduga">
-		<description>Dig Dug (Atarisoft)</description>
+		<description>Dig Dug (Atarisoft) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7600,7 +7618,7 @@
 	</software>
 
 	<software name="digdug">
-		<description>Dig Dug (Thunder Mountain)</description>
+		<description>Dig Dug (Thunder Mountain) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Thunder Mountain</publisher>
 
@@ -7612,7 +7630,7 @@
 	</software>
 
 	<software name="dinodig">
-		<description>Dino Dig</description>
+		<description>Dino Dig (clean crack)</description>
 		<year>1992</year>
 		<publisher>Troll Associates</publisher>
 
@@ -7624,7 +7642,7 @@
 	</software>
 
 	<software name="dinoeggs">
-		<description>Dino Eggs</description>
+		<description>Dino Eggs (clean crack)</description>
 		<year>1983</year>
 		<publisher>Micro Fun</publisher>
 
@@ -7636,7 +7654,7 @@
 	</software>
 
 	<software name="dinosars">
-		<description>Dinosaurs</description>
+		<description>Dinosaurs (clean crack)</description>
 		<year>1984</year>
 		<publisher>Advanced Ideas, Inc.</publisher>
 
@@ -7648,7 +7666,7 @@
 	</software>
 
 	<software name="divebmbr">
-		<description>Dive Bomber</description>
+		<description>Dive Bomber (clean crack)</description>
 		<year>1988</year>
 		<publisher>Acme Animation, Inc.</publisher>
 
@@ -7660,7 +7678,7 @@
 	</software>
 
 	<software name="dkong">
-		<description>Donkey Kong</description>
+		<description>Donkey Kong (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7672,7 +7690,7 @@
 	</software>
 
 	<software name="dunzhin">
-		<description>Dunzhin</description>
+		<description>Dunzhin (clean crack)</description>
 		<year>1982</year>
 		<publisher>Screenplay</publisher>
 
@@ -7684,7 +7702,7 @@
 	</software>
 
 	<software name="dynoqst">
-		<description>Dyno-Quest</description>
+		<description>Dyno-Quest (clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindplay</publisher>
 
@@ -7696,7 +7714,7 @@
 	</software>
 
 	<software name="dyohachd">
-		<description>Design Your Own Home: Architectural Design</description>
+		<description>Design Your Own Home: Architectural Design (clean crack)</description>
 		<year>1984</year>
 		<publisher>Avant-Garde Publishing Corp.</publisher>
 
@@ -7718,7 +7736,7 @@
 	</software>
 
 	<software name="dyoharch">
-		<description>Design Your Own Home: Architectural</description>
+		<description>Design Your Own Home: Architectural (clean crack)</description>
 		<year>1983</year>
 		<publisher>Avant-Garde Publishing Corp.</publisher>
 
@@ -7730,7 +7748,7 @@
 	</software>
 
 	<software name="dyoh">
-		<description>Design Your Own Home: Interior Design</description>
+		<description>Design Your Own Home: Interior Design (clean crack)</description>
 		<year>1986</year>
 		<publisher>Avant-Garde Publishing Corp.</publisher>
 
@@ -7752,7 +7770,7 @@
 	</software>
 
 	<software name="easyabc">
-		<description>Easy as ABC</description>
+		<description>Easy as ABC (clean crack)</description>
 		<year>1984</year>
 		<publisher>Springboard Software</publisher>
 
@@ -7764,7 +7782,7 @@
 	</software>
 
 	<software name="easyrddm">
-		<description>Easy Reader Demo</description>
+		<description>Easy Reader Demo (clean crack)</description>
 		<year>1983</year>
 		<publisher>American Educational Computer, Inc.</publisher>
 
@@ -7791,7 +7809,7 @@
 	</software>
 
 	<software name="easystr">
-		<description>Easy Street</description>
+		<description>Easy Street (clean crack)</description>
 		<year>1988</year>
 		<publisher>Mindplay</publisher>
 
@@ -7803,7 +7821,7 @@
 	</software>
 
 	<software name="ecryfarm">
-		<description>Electric Crayon Fun On The Farm</description>
+		<description>Electric Crayon Fun On The Farm (clean crack)</description>
 		<year>1986</year>
 		<publisher>Polarware</publisher>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
@@ -7816,7 +7834,7 @@
 	</software>
 
 	<software name="educalc">
-		<description>Edu-Calc</description>
+		<description>Edu-Calc (clean crack)</description>
 		<year>1985</year>
 		<publisher>Grolier</publisher>
 
@@ -7833,7 +7851,7 @@
 	</software>
 
 	<software name="egyc">
-		<description>Early Games For Young Children</description>
+		<description>Early Games For Young Children (clean crack)</description>
 		<year>1982</year>
 		<publisher>Springboard</publisher>
 
@@ -7845,7 +7863,7 @@
 	</software>
 
 	<software name="euronat">
-		<description>European Nations And Locations</description>
+		<description>European Nations And Locations (clean crack)</description>
 		<year>1985</year>
 		<publisher>DesignWare, Inc.</publisher>
 
@@ -7857,7 +7875,7 @@
 	</software>
 
 	<software name="expsctmp">
-		<description>Exploring Science: Temperature</description>
+		<description>Exploring Science: Temperature (clean crack)</description>
 		<year>1988</year>
 		<publisher>Sunburst</publisher>
 
@@ -7871,7 +7889,7 @@
 <!-- end 4am adds, A-E -->
 <!-- 4am adds, F-L -->
 	<software name="1stdegle">
-		<description>First Degree Linear Equations</description>
+		<description>First Degree Linear Equations (clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
@@ -7883,7 +7901,7 @@
 	</software>
 
 	<software name="facemkr">
-		<description>Facemaker</description>
+		<description>Facemaker (clean crack)</description>
 		<year>1982</year>
 		<publisher>Spinnaker</publisher>
 
@@ -7895,7 +7913,7 @@
 	</software>
 
 	<software name="falcons">
-		<description>Falcons</description>
+		<description>Falcons (clean crack)</description>
 		<year>1981</year>
 		<publisher>Piccadilly Software</publisher>
 
@@ -7907,7 +7925,7 @@
 	</software>
 
 	<software name="fantlrd">
-		<description>Professor Davensteev's Fantasy Land (Red Level)</description>
+		<description>Professor Davensteev's Fantasy Land (Red Level) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Learning Well / Methods &amp; Solutions</publisher>
 
@@ -7919,7 +7937,7 @@
 	</software>
 
 	<software name="fctalgex">
-		<description>Factoring Algebraic Expressions</description>
+		<description>Factoring Algebraic Expressions (clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
@@ -7931,7 +7949,7 @@
 	</software>
 
 	<software name="finfacts">
-		<description>Financial Facts</description>
+		<description>Financial Facts (clean crack)</description>
 		<year>1981</year>
 		<publisher>Advanced Operating Systems</publisher>
 
@@ -7943,7 +7961,7 @@
 	</software>
 
 	<software name="flshsphc">
-		<description>Flash Spell Helicopter</description>
+		<description>Flash Spell Helicopter (clean crack)</description>
 		<year>1983</year>
 		<publisher>Microcomputer Workships Courseware</publisher>
 
@@ -7955,7 +7973,7 @@
 	</software>
 
 	<software name="flycolor">
-		<description>Flying Colors</description>
+		<description>Flying Colors (clean crack)</description>
 		<year>1983</year>
 		<publisher>The Computer Colorworks</publisher>
 
@@ -7967,7 +7985,7 @@
 	</software>
 
 	<software name="forcemtn">
-		<description>Force And Motion</description>
+		<description>Force And Motion (clean crack)</description>
 		<year>1990</year>
 		<publisher>Queue, Inc.</publisher>
 
@@ -7984,7 +8002,7 @@
 	</software>
 
 	<software name="fornext">
-		<description>FOR Your NEXT Adventure: FOR-NEXT Loops</description>
+		<description>FOR Your NEXT Adventure: FOR-NEXT Loops (clean crack)</description>
 		<year>1985</year>
 		<publisher>Sunburst</publisher>
 
@@ -7996,7 +8014,7 @@
 	</software>
 
 	<software name="frctnoid">
-		<description>Fraction-oids</description>
+		<description>Fraction-oids (clean crack)</description>
 		<year>1989</year>
 		<publisher>Mindplay</publisher>
 
@@ -8008,7 +8026,7 @@
 	</software>
 
 	<software name="frctns2">
-		<description>Fractions II</description>
+		<description>Fractions II (clean crack)</description>
 		<year>1987</year>
 		<publisher>Silver Burdett Company</publisher>
 
@@ -8020,7 +8038,7 @@
 	</software>
 
 	<software name="frctntut">
-		<description>Fraction Tutorial</description>
+		<description>Fraction Tutorial (clean crack)</description>
 		<year>19??</year>
 		<publisher>Opportunities For Learning</publisher>
 
@@ -8037,7 +8055,7 @@
 	</software>
 
 	<software name="fredpzad">
-		<description>Freddy's Puzzling Adventures</description>
+		<description>Freddy's Puzzling Adventures (clean crack)</description>
 		<year>1984</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -8049,7 +8067,7 @@
 	</software>
 
 	<software name="frenchvb">
-		<description>French Vocabulary Builder</description>
+		<description>French Vocabulary Builder (clean crack)</description>
 		<year>1982</year>
 		<publisher>Control Data Corporation</publisher>
 
@@ -8061,7 +8079,7 @@
 	</software>
 
 	<software name="frogdog">
-		<description>Frogs, Dogs, Kittens, and Kids 1</description>
+		<description>Frogs, Dogs, Kittens, and Kids 1 (clean crack)</description>
 		<year>1988</year>
 		<publisher>Hartley Courseware</publisher>
 
@@ -8083,7 +8101,7 @@
 	</software>
 
 	<software name="frogger2">
-		<description>Frogger II: Threedeep</description>
+		<description>Frogger II: Threedeep (clean crack)</description>
 		<year>1984</year>
 		<publisher>Sega Enterprises Inc.</publisher>
 
@@ -8095,7 +8113,7 @@
 	</software>
 
 	<software name="frogger">
-		<description>Frogger</description>
+		<description>Frogger (clean crack)</description>
 		<year>1981</year>
 		<publisher>Sierra On-Line</publisher>
 
@@ -8107,7 +8125,7 @@
 	</software>
 
 	<software name="frogjon">
-		<description>Frog Jump Ordering Numbers</description>
+		<description>Frog Jump Ordering Numbers (clean crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
 
@@ -8119,7 +8137,7 @@
 	</software>
 
 	<software name="galaxat">
-		<description>Galaxian (Atarisoft)</description>
+		<description>Galaxian (Atarisoft) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -8131,7 +8149,7 @@
 	</software>
 
 	<software name="galaxian">
-		<description>Galaxian (Thunder Mountain)</description>
+		<description>Galaxian (Thunder Mountain) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Thunder Mountain</publisher>
 
@@ -8143,7 +8161,7 @@
 	</software>
 
 	<software name="garfleyw">
-		<description>Garfield Eat Your Words</description>
+		<description>Garfield Eat Your Words (clean crack)</description>
 		<year>1985</year>
 		<publisher>Random House</publisher>
 
@@ -8160,7 +8178,7 @@
 	</software>
 
 	<software name="genemach">
-		<description>Gene Machine (version 2.0)</description>
+		<description>Gene Machine (version 2.0) (clean crack)</description>
 		<year>1983</year>
 		<publisher>HRM Software</publisher>
 
@@ -8172,7 +8190,7 @@
 	</software>
 
 	<software name="gertrude">
-		<description>Gertrude's Secrets (version 1.2)</description>
+		<description>Gertrude's Secrets (version 1.2) (clean crack)</description>
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 
@@ -8184,7 +8202,7 @@
 	</software>
 
 	<software name="gramgrem">
-		<description>Grammar Gremlins</description>
+		<description>Grammar Gremlins (clean crack)</description>
 		<year>1986</year>
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
 
@@ -8201,7 +8219,7 @@
 	</software>
 
 	<software name="grammst2">
-		<description>Grammar Mastery II</description>
+		<description>Grammar Mastery II (clean crack)</description>
 		<year>1987</year>
 		<publisher>American Language Academy</publisher>
 
@@ -8293,7 +8311,7 @@
 	</software>
 
 	<software name="greetcrd">
-		<description>Greeting Card Maker</description>
+		<description>Greeting Card Maker (clean crack)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
 
@@ -8305,7 +8323,7 @@
 	</software>
 
 	<software name="gremlins">
-		<description>Gremlins</description>
+		<description>Gremlins (clean crack)</description>
 		<year>1984</year>
 		<publisher>Atarisoft</publisher>
 
@@ -8317,7 +8335,7 @@
 	</software>
 
 	<software name="grphlnfc">
-		<description>Graphing Linear Functions</description>
+		<description>Graphing Linear Functions (clean crack)</description>
 		<year>1984</year>
 		<publisher>Microcomputer Workshops Courseware</publisher>
 
@@ -8329,7 +8347,7 @@
 	</software>
 
 	<software name="gulfstrk">
-		<description>Gulf Strike</description>
+		<description>Gulf Strike (clean crack)</description>
 		<year>1985</year>
 		<publisher>The Avalon Hill Game Company</publisher>
 
@@ -8341,7 +8359,7 @@
 	</software>
 
 	<software name="heredog">
-		<description>Heredity Dog</description>
+		<description>Heredity Dog (clean crack)</description>
 		<year>1983</year>
 		<publisher>HRM Software</publisher>
 
@@ -8353,7 +8371,7 @@
 	</software>
 
 	<software name="heydidle">
-		<description>Hey Diddle Diddle</description>
+		<description>Hey Diddle Diddle (clean crack)</description>
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
 
@@ -8365,7 +8383,7 @@
 	</software>
 
 	<software name="homehlpr">
-		<description>Homework Helper: Writing</description>
+		<description>Homework Helper: Writing (clean crack)</description>
 		<year>1985</year>
 		<publisher>Spinnaker</publisher>
 
@@ -8402,7 +8420,7 @@
 	</software>
 
 	<software name="homewrtr">
-		<description>Homework Writer</description>
+		<description>Homework Writer (clean crack)</description>
 		<year>1988</year>
 		<publisher>Scholastic, Inc.</publisher>
 
@@ -8419,7 +8437,7 @@
 	</software>
 
 	<software name="housefir">
-		<description>House-A-Fire!</description>
+		<description>House-A-Fire! (clean crack)</description>
 		<year>1988</year>
 		<publisher>Decision Development Co</publisher>
 
@@ -8436,7 +8454,7 @@
 	</software>
 
 	<software name="howwest">
-		<description>How The West Was One + Three x Four</description>
+		<description>How The West Was One + Three x Four (clean crack)</description>
 		<year>1987</year>
 		<publisher>Sunburst</publisher>
 
@@ -8448,7 +8466,7 @@
 	</software>
 
 	<software name="impmiss2">
-		<description>Impossible Mission II</description>
+		<description>Impossible Mission II (clean crack)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 
@@ -8465,7 +8483,7 @@
 	</software>
 
 	<software name="invscmth">
-		<description>Investigating Secondary Mathematics With Computers</description>
+		<description>Investigating Secondary Mathematics With Computers (clean crack)</description>
 		<year>1985</year>
 		<publisher>University of Massachusetts</publisher>
 
@@ -8482,7 +8500,7 @@
 	</software>
 
 	<software name="jackbnst">
-		<description>Jack And The Beanstalk</description>
+		<description>Jack And The Beanstalk (clean crack)</description>
 		<year>1985</year>
 		<publisher>HRM Software</publisher>
 
@@ -8494,7 +8512,7 @@
 	</software>
 
 	<software name="jmpmthfl">
-		<description>Jumping Math Flash</description>
+		<description>Jumping Math Flash (clean crack)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 
@@ -8506,7 +8524,7 @@
 	</software>
 
 	<software name="junghunt">
-		<description>Jungle Hunt</description>
+		<description>Jungle Hunt (clean crack)</description>
 		<year>1984</year>
 		<publisher>Atarisoft</publisher>
 
@@ -8518,7 +8536,7 @@
 	</software>
 
 	<software name="kenuston">
-		<description>Ken Uston's Professional Blackjack (v1.23)</description>
+		<description>Ken Uston's Professional Blackjack (v1.23) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Intelligent Statements, Inc.</publisher>
 
@@ -8530,7 +8548,7 @@
 	</software>
 
 	<software name="kidskeys">
-		<description>Kids On Keys</description>
+		<description>Kids On Keys (clean crack)</description>
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
 
@@ -8542,7 +8560,7 @@
 	</software>
 
 	<software name="kindrcmp">
-		<description>Kindercomp</description>
+		<description>Kindercomp (clean crack)</description>
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
 
@@ -8554,7 +8572,7 @@
 	</software>
 
 	<software name="kittenkf">
-		<description>Kittens, Kids, And A Frog (version 01.11.85)</description>
+		<description>Kittens, Kids, And A Frog (version 01.11.85) (clean crack)</description>
 		<year>1985</year>
 		<publisher>Hartley Courseware, Inc.</publisher>
 
@@ -8571,7 +8589,7 @@
 	</software>
 
 	<software name="kmwldhis">
-		<description>Knowledge Master World History 1</description>
+		<description>Knowledge Master World History 1 (clean crack)</description>
 		<year>1987</year>
 		<publisher>Academic Hallmarks</publisher>
 
@@ -8583,7 +8601,7 @@
 	</software>
 
 	<software name="krelllgo">
-		<description>Krell's Logo</description>
+		<description>Krell's Logo (clean crack)</description>
 		<year>1981</year>
 		<publisher>Krell</publisher>
 
@@ -8595,7 +8613,7 @@
 	</software>
 
 	<software name="viewkill">
-		<description>James Bond 007 In: A View To A Kill</description>
+		<description>James Bond 007 In: A View To A Kill (clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 
