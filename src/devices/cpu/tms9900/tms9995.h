@@ -131,11 +131,9 @@ private:
 	address_space*                  m_prgspace;
 	address_space*                  m_cru;
 
-
 	// Processor states
 	bool    m_idle_state;
 	bool    m_nmi_state;
-//  bool    m_irq_state;
 	bool    m_hold_state;
 	bool    m_hold_requested;
 
@@ -165,9 +163,6 @@ private:
 	// executed as two consecutive byte accesses. CRU accesses are repeated
 	// single-bit accesses.
 	int     m_pass;
-
-	// For parity operations
-	int     m_parity;
 
 	// For Format 1 instruction; determines whether the next operand address
 	// derivation is for the source or address operand
@@ -276,22 +271,22 @@ private:
 
 	// ============== Prefetch support =====================
 
-	struct decoded_instruction
-	{
-		UINT16          IR;
-		UINT16          command;
-		const UINT8*    program;
-		bool            byteop;
-		int             state;
-	};
-
-	int     m_instindex;
-
 	// We implement the prefetch mechanism by two separate datasets for
-	// the decoded commands. When the previous command has completed, the
-	// pointer is just switched to the other one.
-	tms9995_device::decoded_instruction     m_decoded[2];
-	tms9995_device::decoded_instruction*    m_instruction;
+	// the decoded commands. When the next instruction shall be started,
+	// the contents from the pre* members are copied to the main members.
+
+	UINT16  IR;
+	UINT16  m_command;
+	int     m_index;
+	bool    m_byteop;
+
+	UINT16  m_pre_IR;
+	UINT16  m_pre_command;
+	int     m_pre_index;
+	bool    m_pre_byteop;
+
+	// State of the currently executed instruction
+	int     m_inst_state;
 
 	// ================ Microprogram support ========================
 
@@ -316,27 +311,30 @@ private:
 	// Lookup table entry
 	struct lookup_entry
 	{
-		lookup_entry *next_digit;
-		const tms_instruction *entry;
+		std::unique_ptr<lookup_entry[]> next_digit;
+		int index; // pointing to the static instruction list
 	};
 
 	// Pointer to the lookup table; the entry point for searching the command
-	lookup_entry*   m_command_lookup_table;
-
-	// List of allocated tables (used for easy clean-up on exit)
-	lookup_entry*   m_lotables[32];
+	std::unique_ptr<lookup_entry[]>   m_command_lookup_table;
 
 	// List of pointers for micro-operations
 	static const tms9995_device::ophandler s_microoperation[];
 
 	static const tms9995_device::tms_instruction s_command[];
 
+	// Index of the interrupt program
+	int     m_interrupt_mp_index;
+
+	// Index of the operand address derivation subprogram
+	int     m_operand_address_derivation_index;
+
 	// Micro-operation program counter (as opposed to the program counter PC)
 	int     MPC;
 
 	// Calling microprogram (used when data derivation is called)
-	const UINT8*    m_caller;
-	int             m_caller_MPC;
+	int     m_caller_index;
+	int     m_caller_MPC;
 
 	// Table of microprograms
 	static const microprogram mp_table[];
@@ -387,7 +385,6 @@ private:
 	void alu_lst_lwp();
 	void alu_mov();
 	void alu_multiply();
-//  void alu_multiply_signed();
 	void alu_rtwp();
 	void alu_sbo_sbz();
 	void alu_shift();
