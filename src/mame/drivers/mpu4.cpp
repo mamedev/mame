@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:James Wallace
+// thanks-to:Chris Wren, Tony Friery, MFME
 /* MPU4 hardware emulation
   for sets see the various includes prefixed 'mpu4'
 */
