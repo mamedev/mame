@@ -7,14 +7,14 @@
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
+#include "video/ms1_tmap.h"
 
 class cischeat_state : public driver_device
 {
 public:
 	cischeat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_vregs(*this, "vregs"),
-		m_scrollram(*this, "scrollram.%u", 0),
+		m_tmap(*this, "scroll%u", 0),
 		m_ram(*this, "ram"),
 		m_roadram(*this, "roadram.%u", 0),
 		m_f1gpstr2_ioready(*this, "ioready"),
@@ -42,20 +42,13 @@ public:
 			m_captflag_leds = 0;
 		}
 
-	required_shared_ptr<UINT16> m_vregs;
-	optional_shared_ptr_array<UINT16,3> m_scrollram;
+	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	required_shared_ptr<UINT16> m_ram;
 	optional_shared_ptr_array<UINT16,2> m_roadram;
 	optional_shared_ptr<UINT16> m_f1gpstr2_ioready;
 
 	UINT16 *m_objectram;
-	tilemap_t *m_tmap[3];
-	tilemap_t *m_tilemap[3][2][4];
-	int m_scrollx[3];
-	int m_scrolly[3];
-	int m_active_layers;
-	int m_bits_per_color_code;
-	int m_scroll_flag[3];
+	UINT16 m_active_layers;
 
 	int m_prev;
 	int m_armold;
@@ -65,6 +58,10 @@ public:
 	int m_debugsprites;
 	int m_show_unknown;
 	UINT16 *m_spriteram;
+
+	UINT8 m_motor_value;
+	UINT8 m_io_value;
+
 	DECLARE_WRITE16_MEMBER(scudhamm_motor_command_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_leds_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_enable_w);
@@ -75,38 +72,34 @@ public:
 	DECLARE_READ16_MEMBER(armchmp2_buttons_r);
 	DECLARE_WRITE16_MEMBER(armchmp2_leds_w);
 	DECLARE_WRITE16_MEMBER(bigrun_soundbank_w);
-	DECLARE_READ16_MEMBER(f1gpstr2_io_r);
-	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
 	DECLARE_READ16_MEMBER(scudhamm_motor_status_r);
 	DECLARE_READ16_MEMBER(scudhamm_motor_pos_r);
 	DECLARE_READ16_MEMBER(scudhamm_analog_r);
-	DECLARE_WRITE16_MEMBER(cischeat_scrollram_0_w);
-	DECLARE_WRITE16_MEMBER(cischeat_scrollram_1_w);
-	DECLARE_WRITE16_MEMBER(cischeat_scrollram_2_w);
-	DECLARE_READ16_MEMBER(bigrun_vregs_r);
-	DECLARE_WRITE16_MEMBER(bigrun_vregs_w);
-	DECLARE_READ16_MEMBER(cischeat_vregs_r);
-	DECLARE_WRITE16_MEMBER(cischeat_vregs_w);
-	DECLARE_READ16_MEMBER(f1gpstar_vregs_r);
-	DECLARE_READ16_MEMBER(f1gpstr2_vregs_r);
-	DECLARE_READ16_MEMBER(wildplt_vregs_r);
-	DECLARE_WRITE16_MEMBER(f1gpstar_vregs_w);
-	DECLARE_WRITE16_MEMBER(f1gpstr2_vregs_w);
-	DECLARE_WRITE16_MEMBER(scudhamm_vregs_w);
-	void cischeat_set_vreg_flag(int which, int data);
+	DECLARE_READ16_MEMBER(bigrun_ip_select_r);
+	DECLARE_WRITE16_MEMBER(leds_out_w);
+	DECLARE_WRITE16_MEMBER(unknown_out_w);
+	DECLARE_WRITE16_MEMBER(motor_out_w);
+	DECLARE_WRITE16_MEMBER(wheel_out_w);
+	DECLARE_WRITE16_MEMBER(ip_select_w);
+	DECLARE_WRITE16_MEMBER(ip_select_plus1_w);
+	DECLARE_WRITE16_MEMBER(bigrun_comms_w);
+	DECLARE_WRITE16_MEMBER(active_layers_w);
+	DECLARE_READ16_MEMBER(cischeat_ip_select_r);
+	DECLARE_WRITE16_MEMBER(cischeat_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(cischeat_comms_w);
+	DECLARE_READ16_MEMBER(f1gpstar_wheel_r);
+	DECLARE_READ16_MEMBER(f1gpstr2_ioready_r);
+	DECLARE_READ16_MEMBER(wildplt_xy_r);
+	DECLARE_WRITE16_MEMBER(f1gpstar_motor_w);
+	DECLARE_WRITE16_MEMBER(f1gpstar_soundint_w);
+	DECLARE_WRITE16_MEMBER(f1gpstar_comms_w);
+	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_1_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_2_w);
-	DECLARE_DRIVER_INIT(wildplt);
 	DECLARE_DRIVER_INIT(cischeat);
 	DECLARE_DRIVER_INIT(bigrun);
 	DECLARE_DRIVER_INIT(f1gpstar);
-	TILEMAP_MAPPER_MEMBER(cischeat_scan_8x8);
-	TILEMAP_MAPPER_MEMBER(cischeat_scan_16x16);
-	TILE_GET_INFO_MEMBER(cischeat_get_scroll_tile_info_8x8);
-	TILE_GET_INFO_MEMBER(cischeat_get_scroll_tile_info_16x16);
-	DECLARE_VIDEO_START(bigrun);
-	DECLARE_VIDEO_START(f1gpstar);
-	DECLARE_VIDEO_START(cischeat);
+	virtual void video_start() override;
 	UINT32 screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -115,8 +108,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scudhamm_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
 	void prepare_shadows();
-	inline void scrollram_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int which);
-	void create_tilemaps();
 	void cischeat_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency);
 	void f1gpstar_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency);
 	void cischeat_draw_sprites(bitmap_ind16 &bitmap , const rectangle &cliprect, int priority1, int priority2);
