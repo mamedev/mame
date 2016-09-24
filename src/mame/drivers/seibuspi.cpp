@@ -41,7 +41,7 @@
           0x28 China
           0x80 Europe / Germany
           0x82 Austria
-		  0x8c Great Britain
+          0x8c Great Britain
           0x90 Holland
           0x92 Italy
           0x9c Switzerland
