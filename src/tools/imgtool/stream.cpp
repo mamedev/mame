@@ -266,8 +266,7 @@ UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
 				if (s->filesize < s->position + sz)
 				{
 					/* try to expand the buffer */
-					if (s->buffer) free(s->buffer);
-					new_buffer = malloc(s->position + sz);
+					new_buffer = realloc(s->buffer , s->position + sz);
 					if (new_buffer)
 					{
 						s->buffer = (UINT8*)new_buffer;
