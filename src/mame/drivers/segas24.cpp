@@ -552,8 +552,10 @@ UINT8 segas24_state::dcclub_io_r(UINT8 port)
 	case 1:
 		return m_p2->read();
 	case 2:
+	{
 		static const UINT8 pos[16] = { 0, 0, 0, 0, 0, 0,  0, 0, 0, 1, 3, 2 };
 		return(~pos[m_paddle->read()>>4] & 0x03) | 0xfc;
+	}
 	case 3:
 		return 0xff;
 	case 4:
