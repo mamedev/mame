@@ -446,7 +446,7 @@ void menu_file_selector::handle()
 					if (cur_selected != &entry)
 					{
 						int match = 0;
-						for (int i = 0; i < m_filename.size(); i++)
+						for (int i = 0; i < m_filename.size() + 1; i++)
 						{
 							if (core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i) == 0)
 								match = i;
