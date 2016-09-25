@@ -2245,6 +2245,7 @@ ROM_START( mac128k )
 	https://upload.wikimedia.org/wikipedia/commons/3/34/Macintosh-motherboard.jpg
 	https://68kmla.org/forums/uploads/monthly_01_2016/post-2105-0-31195100-1452296677.jpg
 	https://68kmla.org/forums/uploads/monthly_12_2014/post-2597-0-46269000-1419299800.jpg
+	http://cdn.cultofmac.com/wp-content/uploads/2014/01/12A-128k-Motherboard.jpg
 	  */
 ROM_END
 
