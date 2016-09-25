@@ -173,10 +173,10 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	int total_count, total_size, freespace_err;
 	UINT64 freespace;
-	imgtool_image *image = nullptr;
-	imgtool_partition *partition = nullptr;
-	imgtool_directory *imgenum = nullptr;
-	imgtool_dirent ent;
+	imgtool::image *image = nullptr;
+	imgtool::partition *partition = nullptr;
+	imgtool::directory *imgenum = nullptr;
+	imgtool::dirent ent;
 	char buf[512];
 	char last_modified[19];
 	const char *path;
@@ -265,8 +265,8 @@ done:
 static int cmd_get(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
-	imgtool_partition *partition = nullptr;
+	imgtool::image *image = nullptr;
+	imgtool::partition *partition = nullptr;
 	const char *filename;
 	char *new_filename;
 	int unnamedargs = 0;
@@ -312,12 +312,12 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	int i;
-	imgtool_image *image = nullptr;
-	imgtool_partition *partition = nullptr;
+	imgtool::image *image = nullptr;
+	imgtool::partition *partition = nullptr;
 	const char *filename = nullptr;
 	int unnamedargs;
 	filter_getinfoproc filter;
-	const imgtool_module *module;
+	const imgtool::module *module;
 	std::unique_ptr<util::option_resolution> resolution;
 	const char *fork;
 	const char *new_filename;
@@ -398,10 +398,10 @@ done:
 static int cmd_getall(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
-	imgtool_partition *partition = nullptr;
-	imgtool_directory *imgenum = nullptr;
-	imgtool_dirent ent;
+	imgtool::image *image = nullptr;
+	imgtool::partition *partition = nullptr;
+	imgtool::directory *imgenum = nullptr;
+	imgtool::dirent ent;
 	filter_getinfoproc filter;
 	int unnamedargs;
 	const char *path = nullptr;
@@ -458,8 +458,8 @@ done:
 static int cmd_del(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
-	imgtool_partition *partition = nullptr;
+	imgtool::image *image = nullptr;
+	imgtool::partition *partition = nullptr;
 	int partition_index = 0;
 
 	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
@@ -489,8 +489,8 @@ done:
 static int cmd_mkdir(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
-	imgtool_partition *partition = nullptr;
+	imgtool::image *image = nullptr;
+	imgtool::partition *partition = nullptr;
 	int partition_index = 0;
 
 	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
@@ -520,8 +520,8 @@ done:
 static int cmd_rmdir(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
-	imgtool_partition *partition = nullptr;
+	imgtool::image *image = nullptr;
+	imgtool::partition *partition = nullptr;
 	int partition_index = 0;
 
 	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
@@ -550,7 +550,7 @@ done:
 
 static int cmd_identify(const struct command *c, int argc, char *argv[])
 {
-	imgtool_module *modules[128];
+	imgtool::module *modules[128];
 	imgtoolerr_t err;
 	int i;
 
@@ -577,7 +577,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	int unnamedargs;
-	const imgtool_module *module;
+	const imgtool::module *module;
 	std::unique_ptr<util::option_resolution> resolution;
 
 	module = imgtool_find_module(argv[0]);
@@ -618,8 +618,8 @@ error:
 static int cmd_readsector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *img;
-	imgtool_stream *stream = nullptr;
+	imgtool::image *img;
+	imgtool::stream *stream = nullptr;
 	std::vector<UINT8> buffer;
 	UINT32 track, head, sector;
 
@@ -658,8 +658,8 @@ done:
 static int cmd_writesector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *img;
-	imgtool_stream *stream = nullptr;
+	imgtool::image *img;
+	imgtool::stream *stream = nullptr;
 	dynamic_buffer buffer;
 	UINT32 size, track, head, sector;
 
@@ -793,7 +793,7 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 
 static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[])
 {
-	const imgtool_module *mod;
+	const imgtool::module *mod;
 	const util::option_guide *opt_guide;
 	const char *opt_spec;
 

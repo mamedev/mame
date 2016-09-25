@@ -38,7 +38,7 @@ struct psion_file
 
 struct psion_pack
 {
-	imgtool_stream *stream;
+	imgtool::stream *stream;
 
 	UINT16 eop;
 	struct psion_file pack_index[MAXFILES];
@@ -59,7 +59,7 @@ UINT16 head_checksum(UINT8* data)
 	return checksum;
 }
 
-UINT16 get_long_rec_size(imgtool_stream *stream)
+UINT16 get_long_rec_size(imgtool::stream *stream)
 {
 	UINT8 size_h, size_l;
 
@@ -127,7 +127,7 @@ UINT32 update_pack_index(psion_pack *pack)
 	return FALSE;
 }
 
-int seek_next_record(imgtool_stream *stream, UINT8 id)
+int seek_next_record(imgtool::stream *stream, UINT8 id)
 {
 	UINT8 data, rec_id;
 	UINT16 size;
@@ -194,7 +194,7 @@ UINT8 get_free_file_id(psion_pack *pack)
 	return 0xff;
 }
 
-void put_name_record(imgtool_stream *stream, const char* filename, UINT8 record_type, UINT8 record_id)
+void put_name_record(imgtool::stream *stream, const char* filename, UINT8 record_type, UINT8 record_id)
 {
 	char data[0x10];
 	int i = 0;
@@ -214,7 +214,7 @@ void put_name_record(imgtool_stream *stream, const char* filename, UINT8 record_
 	stream_write(stream, data, i);
 }
 
-void update_opk_head(imgtool_stream *stream)
+void update_opk_head(imgtool::stream *stream)
 {
 	UINT16 size = stream_size(stream) - 6;
 
@@ -223,7 +223,7 @@ void update_opk_head(imgtool_stream *stream)
 	stream_putc(stream, size & 0xff);
 }
 
-char *stream_getline(imgtool_stream *source, UINT16 max_len)
+char *stream_getline(imgtool::stream *source, UINT16 max_len)
 {
 	UINT16 pos = 0;
 	char data;
@@ -255,7 +255,7 @@ char *stream_getline(imgtool_stream *source, UINT16 max_len)
 	return NULL;
 }
 
-UINT16 put_odb(imgtool_stream *instream, imgtool_stream *outstream, UINT8 file_id)
+UINT16 put_odb(imgtool::stream *instream, imgtool::stream *outstream, UINT8 file_id)
 {
 	char *line;
 	UINT16 out_size = 0;
@@ -282,7 +282,7 @@ UINT16 put_odb(imgtool_stream *instream, imgtool_stream *outstream, UINT8 file_i
 	return out_size + 4;
 }
 
-UINT16 put_ob3(imgtool_stream *instream, imgtool_stream *outstream)
+UINT16 put_ob3(imgtool::stream *instream, imgtool::stream *outstream)
 {
 	UINT16 size = stream_size(instream) - 6;
 	dynamic_buffer buffer(size);
@@ -298,7 +298,7 @@ UINT16 put_ob3(imgtool_stream *instream, imgtool_stream *outstream)
 	return size;
 }
 
-UINT16 put_opl(imgtool_stream *instream, imgtool_stream *outstream)
+UINT16 put_opl(imgtool::stream *instream, imgtool::stream *outstream)
 {
 	UINT16 out_size = 0;
 	UINT32 rec_start = stream_tell(outstream);
@@ -333,7 +333,7 @@ UINT16 put_opl(imgtool_stream *instream, imgtool_stream *outstream)
 	return out_size + 4;
 }
 
-UINT16 get_odb(imgtool_stream *instream, imgtool_stream *outstream, UINT8 type, UINT8 file_id)
+UINT16 get_odb(imgtool::stream *instream, imgtool::stream *outstream, UINT8 type, UINT8 file_id)
 {
 	UINT8 data, *buffer;
 	UINT16 out_size = 0;
@@ -355,7 +355,7 @@ UINT16 get_odb(imgtool_stream *instream, imgtool_stream *outstream, UINT8 type, 
 	return out_size;
 }
 
-UINT16 get_ob3(imgtool_stream *instream, imgtool_stream *outstream, UINT8 type, UINT8 file_id)
+UINT16 get_ob3(imgtool::stream *instream, imgtool::stream *outstream, UINT8 type, UINT8 file_id)
 {
 	UINT8 data, *buffer = NULL;
 	UINT16 size = 0;
@@ -385,7 +385,7 @@ UINT16 get_ob3(imgtool_stream *instream, imgtool_stream *outstream, UINT8 type, 
 	return size;
 }
 
-static imgtoolerr_t datapack_open( imgtool_image *image, imgtool_stream *stream)
+static imgtoolerr_t datapack_open( imgtool::image *image, imgtool::stream *stream)
 {
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	char opk_magic[4];
@@ -403,7 +403,7 @@ static imgtoolerr_t datapack_open( imgtool_image *image, imgtool_stream *stream)
 		return IMGTOOLERR_CORRUPTIMAGE;
 }
 
-static imgtoolerr_t datapack_create( imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t datapack_create( imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
 {
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	static const UINT8 opk_magic[4] = {'O', 'P', 'K', 0x00};
@@ -440,14 +440,14 @@ static imgtoolerr_t datapack_create( imgtool_image *image, imgtool_stream *strea
 		return IMGTOOLERR_CORRUPTIMAGE;
 }
 
-static void datapack_close( imgtool_image *image)
+static void datapack_close( imgtool::image *image)
 {
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 
 	stream_close( pack->stream );
 }
 
-static imgtoolerr_t datapack_begin_enum(imgtool_directory *enumeration, const char *path)
+static imgtoolerr_t datapack_begin_enum(imgtool::directory *enumeration, const char *path)
 {
 	psion_iter *iter = (psion_iter*)imgtool_directory_extrabytes(enumeration);
 	iter->index = 0;
@@ -455,9 +455,9 @@ static imgtoolerr_t datapack_begin_enum(imgtool_directory *enumeration, const ch
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_next_enum(imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t datapack_next_enum(imgtool::directory *enumeration, imgtool::dirent *ent)
 {
-	imgtool_image *image = imgtool_directory_image(enumeration);
+	imgtool::image *image = imgtool_directory_image(enumeration);
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	psion_iter *iter = (psion_iter*)imgtool_directory_extrabytes(enumeration);
 	UINT8 data = 0;
@@ -492,13 +492,13 @@ static imgtoolerr_t datapack_next_enum(imgtool_directory *enumeration, imgtool_d
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void datapack_close_enum( imgtool_directory *enumeration)
+static void datapack_close_enum( imgtool::directory *enumeration)
 {
 }
 
-static imgtoolerr_t datapack_free_space( imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t datapack_free_space( imgtool::partition *partition, UINT64 *size)
 {
-	imgtool_image *image = imgtool_partition_image( partition);
+	imgtool::image *image = imgtool_partition_image( partition);
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	UINT32 pack_size = 0;
 
@@ -511,9 +511,9 @@ static imgtoolerr_t datapack_free_space( imgtool_partition *partition, UINT64 *s
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_read_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
-	imgtool_image *image = imgtool_partition_image(partition);
+	imgtool::image *image = imgtool_partition_image(partition);
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	int index = seek_file_name(pack, filename);
 
@@ -543,9 +543,9 @@ static imgtoolerr_t datapack_read_file(imgtool_partition *partition, const char 
 		return IMGTOOLERR_FILENOTFOUND;
 }
 
-static imgtoolerr_t datapack_write_file( imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
-	imgtool_image *image = imgtool_partition_image(partition);
+	imgtool::image *image = imgtool_partition_image(partition);
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	static const UINT8 data_head[4] = {0x02, 0x80, 0x00, 0x00};
 	UINT8 head[3];
@@ -605,9 +605,9 @@ static imgtoolerr_t datapack_write_file( imgtool_partition *partition, const cha
 		return IMGTOOLERR_CORRUPTIMAGE;
 }
 
-static imgtoolerr_t datapack_delete_file( imgtool_partition *partition, const char *filename)
+static imgtoolerr_t datapack_delete_file( imgtool::partition *partition, const char *filename)
 {
-	imgtool_image *image = imgtool_partition_image(partition);
+	imgtool::image *image = imgtool_partition_image(partition);
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	int index = seek_file_name(pack, filename);
 

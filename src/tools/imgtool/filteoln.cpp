@@ -16,7 +16,7 @@
 
 
 
-static imgtoolerr_t convert_stream_eolns(imgtool_stream *source, imgtool_stream *dest, const char *eoln)
+static imgtoolerr_t convert_stream_eolns(imgtool::stream *source, imgtool::stream *dest, const char *eoln)
 {
 	size_t len, i, pos;
 	char buffer[2000];
@@ -53,10 +53,10 @@ static imgtoolerr_t convert_stream_eolns(imgtool_stream *source, imgtool_stream 
 
 
 
-static imgtoolerr_t ascii_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t ascii_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
 	imgtoolerr_t err;
-	imgtool_stream *mem_stream;
+	imgtool::stream *mem_stream;
 
 	mem_stream = stream_open_mem(nullptr, 0);
 	if (!mem_stream)
@@ -82,10 +82,10 @@ done:
 
 
 
-static imgtoolerr_t ascii_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t ascii_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
-	imgtool_stream *mem_stream = nullptr;
+	imgtool::stream *mem_stream = nullptr;
 	const char *eoln;
 
 	/* create a stream */

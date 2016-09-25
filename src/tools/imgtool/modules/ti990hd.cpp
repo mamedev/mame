@@ -368,7 +368,7 @@ struct ti990_phys_sec_address
 */
 struct ti990_image
 {
-	imgtool_stream *file_handle;        /* imgtool file handle */
+	imgtool::stream *file_handle;        /* imgtool file handle */
 	ti990_geometry geometry;    /* geometry */
 	ti990_sc0 sec0;             /* cached copy of sector 0 */
 };
@@ -386,19 +386,19 @@ struct ti990_iterator
 };
 
 
-static imgtoolerr_t ti990_image_init(imgtool_image *img, imgtool_stream *f);
-static void ti990_image_exit(imgtool_image *img);
-static void ti990_image_info(imgtool_image *img, char *string, size_t len);
-static imgtoolerr_t ti990_image_beginenum(imgtool_directory *enumeration, const char *path);
-static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent);
-static void ti990_image_closeenum(imgtool_directory *enumeration);
-static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *size);
+static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream *f);
+static void ti990_image_exit(imgtool::image *img);
+static void ti990_image_info(imgtool::image *img, char *string, size_t len);
+static imgtoolerr_t ti990_image_beginenum(imgtool::directory *enumeration, const char *path);
+static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtool::dirent *ent);
+static void ti990_image_closeenum(imgtool::directory *enumeration);
+static imgtoolerr_t ti990_image_freespace(imgtool::partition *partition, UINT64 *size);
 #ifdef UNUSED_FUNCTION
-static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const char *fpath, imgtool_stream *destf);
-static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const char *fpath, imgtool_stream *sourcef, util::option_resolution *writeoptions);
-static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const char *fpath);
+static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const char *fpath, imgtool::stream *destf);
+static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions);
+static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const char *fpath);
 #endif
-static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *createoptions);
+static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream *f, util::option_resolution *createoptions);
 
 enum
 {
@@ -531,7 +531,7 @@ static unsigned phys_address_to_offset(const ti990_phys_sec_address *address, co
     dest: pointer to destination buffer
     len: length of data to read
 */
-static int read_sector_physical_len(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, void *dest, int len)
+static int read_sector_physical_len(imgtool::stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, void *dest, int len)
 {
 	int reply;
 
@@ -559,7 +559,7 @@ static int read_sector_physical_len(imgtool_stream *file_handle, const ti990_phy
     geometry: disk geometry (sectors per track, tracks per side, sides)
     dest: pointer to a destination buffer of geometry->bytes_per_sector bytes
 */
-static int read_sector_physical(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, void *dest)
+static int read_sector_physical(imgtool::stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, void *dest)
 {
 	return read_sector_physical_len(file_handle, address, geometry, dest, geometry->bytes_per_sector);
 }
@@ -574,7 +574,7 @@ static int read_sector_physical(imgtool_stream *file_handle, const ti990_phys_se
     src: pointer to source buffer
     len: length of source buffer
 */
-static int write_sector_physical_len(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, const void *src, int len)
+static int write_sector_physical_len(imgtool::stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, const void *src, int len)
 {
 	int reply;
 
@@ -610,7 +610,7 @@ static int write_sector_physical_len(imgtool_stream *file_handle, const ti990_ph
     geometry: disk geometry (sectors per track, tracks per side, sides)
     dest: pointer to a source buffer of geometry->bytes_per_sector bytes
 */
-static int write_sector_physical(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, const void *src)
+static int write_sector_physical(imgtool::stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, const void *src)
 {
 	return write_sector_physical_len(file_handle, address, geometry, src, geometry->bytes_per_sector);
 }
@@ -636,7 +636,7 @@ static void log_address_to_phys_address(int secnum, const ti990_geometry *geomet
     dest: pointer to destination buffer
     len: length of data to read
 */
-static int read_sector_logical_len(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, void *dest, int len)
+static int read_sector_logical_len(imgtool::stream *file_handle, int secnum, const ti990_geometry *geometry, void *dest, int len)
 {
 	ti990_phys_sec_address address;
 
@@ -655,7 +655,7 @@ static int read_sector_logical_len(imgtool_stream *file_handle, int secnum, cons
     geometry: disk geometry (sectors per track, tracks per side, sides)
     dest: pointer to a destination buffer of geometry->bytes_per_sector bytes
 */
-static int read_sector_logical(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, void *dest)
+static int read_sector_logical(imgtool::stream *file_handle, int secnum, const ti990_geometry *geometry, void *dest)
 {
 	return read_sector_logical_len(file_handle, secnum, geometry, dest, geometry->bytes_per_sector);
 }
@@ -670,7 +670,7 @@ static int read_sector_logical(imgtool_stream *file_handle, int secnum, const ti
     src: pointer to source buffer
     len: length of source buffer
 */
-static int write_sector_logical_len(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, const void *src, int len)
+static int write_sector_logical_len(imgtool::stream *file_handle, int secnum, const ti990_geometry *geometry, const void *src, int len)
 {
 	ti990_phys_sec_address address;
 
@@ -688,7 +688,7 @@ static int write_sector_logical_len(imgtool_stream *file_handle, int secnum, con
     geometry: disk geometry (sectors per track, tracks per side, sides)
     dest: pointer to a source buffer of geometry->bytes_per_sector bytes
 */
-static int write_sector_logical(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, const void *src)
+static int write_sector_logical(imgtool::stream *file_handle, int secnum, const ti990_geometry *geometry, const void *src)
 {
 	return write_sector_logical_len(file_handle, secnum, geometry, src, geometry->bytes_per_sector);
 }
@@ -1106,7 +1106,7 @@ static int qsort_catalog_compare(const void *p1, const void *p2)
 /*
     Open a file as a ti990_image.
 */
-static imgtoolerr_t ti990_image_init(imgtool_image *img, imgtool_stream *f)
+static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream *f)
 {
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(img);
 	disk_image_header header;
@@ -1162,7 +1162,7 @@ static imgtoolerr_t ti990_image_init(imgtool_image *img, imgtool_stream *f)
 /*
     close a ti990_image
 */
-static void ti990_image_exit(imgtool_image *img)
+static void ti990_image_exit(imgtool::image *img)
 {
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(img);
 	stream_close(image->file_handle);
@@ -1173,7 +1173,7 @@ static void ti990_image_exit(imgtool_image *img)
 
     Currently returns the volume name
 */
-static void ti990_image_info(imgtool_image *img, char *string, size_t len)
+static void ti990_image_info(imgtool::image *img, char *string, size_t len)
 {
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(img);
 	char vol_name[9];
@@ -1186,7 +1186,7 @@ static void ti990_image_info(imgtool_image *img, char *string, size_t len)
 /*
     Open the disk catalog for enumeration
 */
-static imgtoolerr_t ti990_image_beginenum(imgtool_directory *enumeration, const char *path)
+static imgtoolerr_t ti990_image_beginenum(imgtool::directory *enumeration, const char *path)
 {
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(imgtool_directory_image(enumeration));
 	ti990_iterator *iter = (ti990_iterator *) imgtool_directory_extrabytes(enumeration);
@@ -1212,7 +1212,7 @@ static imgtoolerr_t ti990_image_beginenum(imgtool_directory *enumeration, const 
 /*
     Enumerate disk catalog next entry
 */
-static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtool::dirent *ent)
 {
 	ti990_iterator *iter = (ti990_iterator *) imgtool_directory_extrabytes(enumeration);
 	int flag;
@@ -1406,16 +1406,16 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 /*
     Free enumerator
 */
-static void ti990_image_closeenum(imgtool_directory *enumeration)
+static void ti990_image_closeenum(imgtool::directory *enumeration)
 {
 }
 
 /*
     Compute free space on disk image (in ADUs)
 */
-static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t ti990_image_freespace(imgtool::partition *partition, UINT64 *size)
 {
-	imgtool_image *img = imgtool_partition_image(partition);
+	imgtool::image *img = imgtool_partition_image(partition);
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(img);
 	int totadus = get_UINT16BE(image->sec0.tna);
 	int adu, record, sub_adu;
@@ -1453,9 +1453,9 @@ static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *
 /*
     Extract a file from a ti990_image.
 */
-static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const char *fpath, imgtool_stream *destf)
+static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const char *fpath, imgtool::stream *destf)
 {
-	imgtool_image *img = imgtool_partition_image(partition);
+	imgtool::image *img = imgtool_partition_image(partition);
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(img);
 	int catalog_index, fdr_secnum, parent_fdr_secnum;
 	imgtoolerr_t reply;
@@ -1550,9 +1550,9 @@ static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const cha
 /*
     Add a file to a ti990_image.
 */
-static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const char *fpath, imgtool_stream *sourcef, util::option_resolution *writeoptions)
+static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions)
 {
-	imgtool_image *img = imgtool_partition_image(partition);
+	imgtool::image *img = imgtool_partition_image(partition);
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(img);
 	int catalog_index, fdr_secnum, parent_fdr_secnum;
 	imgtoolerr_t reply;
@@ -1674,9 +1674,9 @@ static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const ch
 /*
     Delete a file from a ti990_image.
 */
-static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const char *fpath)
+static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const char *fpath)
 {
-	imgtool_image *img = imgtool_partition_image(partition);
+	imgtool::image *img = imgtool_partition_image(partition);
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(img);
 	int catalog_index, fdr_secnum, parent_fdr_secnum;
 	imgtoolerr_t reply;
@@ -1764,7 +1764,7 @@ static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const c
 /*
     Create a blank ti990_image.
 */
-static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *createoptions)
+static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream *f, util::option_resolution *createoptions)
 {
 	//const char *volname;
 	ti990_geometry geometry;

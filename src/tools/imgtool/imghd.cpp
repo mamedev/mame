@@ -46,7 +46,7 @@ static imgtoolerr_t map_chd_error(chd_error chderr)
 
     Create a MAME HD image
 */
-imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
+imgtoolerr_t imghd_create(imgtool::stream *stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	chd_file chd;
@@ -125,7 +125,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 
     Open stream as a MAME HD image
 */
-imgtoolerr_t imghd_open(imgtool_stream *stream, struct mess_hard_disk_file *hard_disk)
+imgtoolerr_t imghd_open(imgtool::stream *stream, struct mess_hard_disk_file *hard_disk)
 {
 	chd_error chderr;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
@@ -215,7 +215,7 @@ const hard_disk_info *imghd_get_header(struct mess_hard_disk_file *disk)
 }
 
 
-static imgtoolerr_t mess_hd_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *createoptions);
+static imgtoolerr_t mess_hd_image_create(imgtool::image *image, imgtool::stream *f, util::option_resolution *createoptions);
 
 enum
 {
@@ -254,7 +254,7 @@ void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo 
 
 
 
-static imgtoolerr_t mess_hd_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *createoptions)
+static imgtoolerr_t mess_hd_image_create(imgtool::image *image, imgtool::stream *f, util::option_resolution *createoptions)
 {
 	UINT32  blocksize, cylinders, heads, sectors, seclen;
 

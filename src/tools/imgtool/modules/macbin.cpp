@@ -63,7 +63,7 @@ static UINT32 pad128(UINT32 length)
 
 
 
-static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
 	static const UINT32 attrs[] =
 	{
@@ -181,11 +181,11 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 
 
 
-static imgtoolerr_t write_fork(imgtool_partition *partition, const char *filename, const char *fork,
-	imgtool_stream *sourcef, UINT64 pos, UINT64 fork_len, util::option_resolution *opts)
+static imgtoolerr_t write_fork(imgtool::partition *partition, const char *filename, const char *fork,
+	imgtool::stream *sourcef, UINT64 pos, UINT64 fork_len, util::option_resolution *opts)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	imgtool_stream *mem_stream = NULL;
+	imgtool::stream *mem_stream = NULL;
 	size_t len;
 
 	if (fork_len > 0)
@@ -216,7 +216,7 @@ done:
 
 
 
-static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
 	static const UINT32 attrs[] =
 	{
@@ -233,7 +233,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 		0
 	};
 	imgtoolerr_t err;
-	imgtool_image *image = imgtool_partition_image(partition);
+	imgtool::image *image = imgtool_partition_image(partition);
 	UINT8 header[128];
 	UINT32 datafork_size;
 	UINT32 resourcefork_size;
@@ -342,7 +342,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 
 
 
-static imgtoolerr_t macbinary_checkstream(imgtool_stream *stream, imgtool_suggestion_viability_t *viability)
+static imgtoolerr_t macbinary_checkstream(imgtool::stream *stream, imgtool_suggestion_viability_t *viability)
 {
 	imgtoolerr_t err;
 
