@@ -33,7 +33,7 @@
   1x 27128 (U37) ROM.   Handwritten sticker:  Char C U37.
   1x 27256 (U42) ROM.   Handwritten sticker:  PK V1.4 U42.
 
-  1x TI SN76489     Digital Complex Sound Generator (DCSG).
+  1x TI SN76489AN   Digital Complex Sound Generator (DCSG).
 
   3x MMI PAL16L8ACN (U47, U48, U50)
   1x MMI PAL16R4 (U49)    <-- couldn't get a consistent read
@@ -125,8 +125,6 @@ public:
 	required_device<pic8259_device> m_pic;
 	required_device<msm5832_device> m_rtc;
 	required_device<mc6845_device> m_crtc;
-	INTERRUPT_GEN_MEMBER(amusco_vblank_irq);
-	INTERRUPT_GEN_MEMBER(amusco_timer_irq);
 	UINT8 m_mc6845_address;
 	UINT16 m_video_update_address;
 };
@@ -279,7 +277,7 @@ static ADDRESS_MAP_START( amusco_io_map, AS_IO, 8, amusco_state )
 	AM_RANGE(0x0020, 0x0023) AM_DEVWRITE("pit8253", pit8253_device, write)
 	AM_RANGE(0x0030, 0x0033) AM_DEVREADWRITE("ppi_outputs", i8255_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("ppi_inputs", i8255_device, read, write)
-	AM_RANGE(0x0060, 0x0060) AM_DEVWRITE("sn", sn76489_device, write)
+	AM_RANGE(0x0060, 0x0060) AM_DEVWRITE("sn", sn76489a_device, write)
 	AM_RANGE(0x0070, 0x0071) AM_WRITE(vram_w)
 	AM_RANGE(0x0280, 0x0283) AM_READWRITE(lpt_r, lpt_w)
 	AM_RANGE(0x0380, 0x0383) AM_READWRITE(rtc_r, rtc_w)
@@ -368,18 +366,6 @@ MC6845_ON_UPDATE_ADDR_CHANGED(amusco_state::crtc_addr)
 //  m_video_update_address = address;
 }
 
-INTERRUPT_GEN_MEMBER(amusco_state::amusco_vblank_irq)
-{
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80/4); // sets 0x665 to 0xff
-}
-
-
-INTERRUPT_GEN_MEMBER(amusco_state::amusco_timer_irq)
-{
-	/* This probably goes inside on mc6845 update change */
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x84/4); // sets 0x918 bit 3
-}
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -390,8 +376,7 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
 	MCFG_CPU_PROGRAM_MAP(amusco_mem_map)
 	MCFG_CPU_IO_MAP(amusco_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amusco_state, amusco_vblank_irq)
-	MCFG_CPU_PERIODIC_INT_DRIVER(amusco_state, amusco_timer_irq,  60*32)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 
@@ -425,10 +410,12 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(amusco_state, crtc_addr)
+	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("pic8259", pic8259_device, ir1_w)) // IRQ1 sets 0x918 bit 3
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("pic8259", pic8259_device, ir0_w)) // IRQ0 sets 0x665 to 0xff
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn", SN76489, SND_CLOCK)
+	MCFG_SOUND_ADD("sn", SN76489A, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
