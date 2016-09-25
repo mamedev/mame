@@ -164,23 +164,6 @@ static imgtoolerr_t markerrorsource(imgtoolerr_t err)
 	return err;
 }
 
-char *imgtool_basename(char *filename)
-{
-	char *c;
-
-	// NULL begets NULL
-	if (!filename)
-		return nullptr;
-
-	// start at the end and return when we hit a slash or colon
-	for (c = filename + strlen(filename) - 1; c >= filename; c--)
-		if (*c == '\\' || *c == '/' || *c == ':')
-			return c + 1;
-
-	// otherwise, return the whole thing
-	return filename;
-}
-
 /*-------------------------------------------------
     internal_error - debug function for raising
     internal errors
@@ -2102,9 +2085,13 @@ imgtoolerr_t imgtool_partition_put_file(imgtool_partition *partition, const char
 	imgtool_stream *f = nullptr;
 	imgtool_charset charset;
 	char *alloc_newfname = nullptr;
+	std::string basename;
 
 	if (!newfname)
-		newfname = (const char *) imgtool_basename((char *) source);
+	{
+		basename = core_filename_extract_base(source);
+		newfname = basename.c_str();
+	}
 
 	charset = (imgtool_charset) (int) imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET);
 	if (charset != IMGTOOL_CHARSET_UTF8)
