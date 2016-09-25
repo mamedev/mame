@@ -346,7 +346,8 @@ static imgtoolerr_t pc_chd_image_readsector(imgtool_image *image, UINT32 track, 
 
 	// get the sector size and resize the buffer
 	UINT32 sector_size = imghd_get_header(&info->hard_disk)->sectorbytes;
-	buffer.resize(sector_size);
+	try { buffer.resize(sector_size); }
+	catch (std::bad_alloc& b) { return IMGTOOLERR_OUTOFMEMORY; }
 
 	// read the data
 	return imghd_read(&info->hard_disk,
