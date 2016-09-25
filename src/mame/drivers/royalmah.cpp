@@ -18,7 +18,7 @@ Year + Game               Board(s)               CPU      Company            Not
 81  Royal Mahjong                                Z80      Nichibutsu
 81? Open Mahjong                                 Z80      Sapporo Mechanic
 82  Royal Mahjong         ? + FRM-03             Z80      Falcon             bootleg
-83  Janyou Part II                               Z80        Cosmo Denshi
+83  Janyou Part II                               Z80      Cosmo Denshi
 84? Jan Oh                FRM-00?                Z80      Toaplan            Incomplete program roms
 86  Ippatsu Gyakuten                             Z80      Public/Paradais
 86  Don Den Mahjong       D039198L-0             Z80      Dyna Electronics
@@ -37,7 +37,7 @@ Year + Game               Board(s)               CPU      Company            Not
 96  Janputer '96          NS503X0727             Z80      Dynax              Larger palette, RTC
 97  Janputer Special      CS166P008 + NS5110207  Z80      Dynax              Larger palette, RTC
 99  Mahjong Cafe Break    NS528-9812             TLCS-90  Nakanihon / Dynax  Undumped internal rom
-99  Mahjong Cafe Paradise ? + Techno Top Limited TLCS-90  Techno-Top?        Undumped internal rom
+99  Mahjong Cafe Paradise ? + TSS001-0001        TLCS-90  Techno-Top         Undumped internal rom
 -----------------------------------------------------------------------------------------------------------------------
 
 TODO:
@@ -4297,7 +4297,7 @@ Mahjong Cafe Paradise
 Royal Mahjong board. No roms on the base board.
 
 Top board looks like typical Dynax with scratched SDIP64.
-It is marked 'Techno Top Limited' and has just 2 eproms and 2 PROMs.
+It is marked 'TSS001-0001 - Techno Top Limited' and has just 2 eproms and 2 PROMs.
 Everything else is scratched but there's a 32.768kHz OSC, RTC and connected battery.
 Also, 4 DIP sw each with 10 switches and an 8MHz OSC next to the SDIP64 chip,
 and a PLCC68 chip (likely FPGA)
