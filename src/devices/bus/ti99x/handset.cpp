@@ -319,6 +319,12 @@ void ti99_handset_device::pulse_clock()
 void ti99_handset_device::device_start(void)
 {
 	m_delay_timer = timer_alloc(DELAY_TIMER);
+	save_item(NAME(m_ack));
+	save_item(NAME(m_clock_high));
+	save_item(NAME(m_buf));
+	save_item(NAME(m_buflen));
+	save_pointer(NAME(previous_joy), MAX_HANDSETS);
+	save_pointer(NAME(previous_key), MAX_HANDSETS);
 }
 
 void ti99_handset_device::device_reset(void)
@@ -496,6 +502,7 @@ ti99_twin_joystick::ti99_twin_joystick(const machine_config &mconfig, const char
 
 void ti99_twin_joystick::device_start(void)
 {
+	save_item(NAME(m_joystick));
 }
 
 /*

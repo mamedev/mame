@@ -854,10 +854,12 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(PADRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Optional RAM expansion
 	MCFG_RAM_ADD(EXPRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
@@ -972,10 +974,12 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(PADRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Optional RAM expansion
 	MCFG_RAM_ADD(EXPRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
@@ -1131,10 +1135,12 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(PADRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Optional RAM expansion
 	MCFG_RAM_ADD(EXPRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// EVPC connector
 	MCFG_ADD_EVPC_CONNECTOR( EVPC_CONN_TAG, WRITELINE( ti99_4x_state, video_interrupt_evpc_in ) )

@@ -367,6 +367,32 @@ void mfm_harddisk_device::device_start()
 
 	// In 5 second periods, check whether the cache has dirty lines
 	m_cache_timer->adjust(attotime::from_msec(5000), 0, attotime::from_msec(5000));
+
+	save_item(NAME(m_max_cylinders));
+	save_item(NAME(m_phys_cylinders));
+	save_item(NAME(m_actual_cylinders));
+	save_item(NAME(m_max_heads));
+	save_item(NAME(m_landing_zone));
+	save_item(NAME(m_precomp_cyl));
+	save_item(NAME(m_redwc_cyl));
+	save_item(NAME(m_maxseek_time));
+	save_item(NAME(m_seeknext_time));
+	save_item(NAME(m_cell_size));
+	save_item(NAME(m_trackimage_size));
+	save_item(NAME(m_spinupms));
+	save_item(NAME(m_rpm));
+	save_item(NAME(m_interleave));
+	save_item(NAME(m_cachelines));
+	save_item(NAME(m_ready));
+	save_item(NAME(m_current_cylinder));
+	save_item(NAME(m_current_head));
+	save_item(NAME(m_track_delta));
+	save_item(NAME(m_step_phase));
+	save_item(NAME(m_seek_complete));
+	save_item(NAME(m_seek_inward));
+	save_item(NAME(m_autotruncation));
+	save_item(NAME(m_recalibrated));
+	save_item(NAME(m_spinup_time));
 }
 
 void mfm_harddisk_device::device_reset()
@@ -1163,6 +1189,12 @@ mfm_harddisk_connector::mfm_harddisk_connector(const machine_config &mconfig, co
 
 mfm_harddisk_connector::~mfm_harddisk_connector()
 {
+}
+
+void mfm_harddisk_connector::device_start()
+{
+	save_item(NAME(m_spinupms));
+	save_item(NAME(m_cachesize));
 }
 
 mfm_harddisk_device* mfm_harddisk_connector::get_device()

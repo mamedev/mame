@@ -37,10 +37,8 @@ protected:
 
 private:
 	bool    access_enabled(offs_t offset);
-
 	required_device<ram_device> m_ram;
-	UINT8   m_dip_switch[8];
-	int     m_genmod;
+	UINT8   m_switches;
 };
 
 #endif
