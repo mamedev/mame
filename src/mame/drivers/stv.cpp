@@ -1595,6 +1595,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+
 /* Micronet layout, routes joystick port to the mux! */
 static INPUT_PORTS_START( myfairld )
 	PORT_INCLUDE( stv )
@@ -1689,6 +1690,86 @@ static INPUT_PORTS_START( myfairld )
 	PORT_CONFNAME( 0x01, 0x01, "I/O Device type" )
 	PORT_CONFSETTING(    0x00, "Mahjong Panel" )
 	PORT_CONFSETTING(    0x01, "Joystick" )
+INPUT_PORTS_END
+
+/* Micronet layout, routes joystick port to the mux! */
+static INPUT_PORTS_START( vmahjong )
+	PORT_INCLUDE( stv )
+
+	PORT_MODIFY("PORTA")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTE")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTF")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P1_KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+
+	PORT_START("P1_KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+
+	PORT_START("P1_KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+
+	PORT_START("P1_KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+
+	PORT_START("P1_KEY4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) /* F/F is there, but these two games are single player so it isn't connected */
+
+	PORT_START("P2_KEY0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 
@@ -3468,7 +3549,7 @@ GAME( 1995, finlarch,  smleague,stv,      stv, stv_state,        finlarch,   ROT
 GAME( 1996, sokyugrt,  stvbios, stv,      stv, stv_state,        sokyugrt,   ROT0,   "Raizing / Eighting",           "Soukyugurentai / Terra Diver (JUET 960821 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, suikoenb,  stvbios, stv,      stv6b, stv_state,      suikoenb,   ROT0,   "Data East",                    "Suiko Enbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, vfkids,    stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, vmahjong,  stvbios, stv,      myfairld, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, vmahjong,  stvbios, stv,      vmahjong, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, winterht,  stvbios, stv,      stv, stv_state,        winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv,      stv, stv_state,        znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
