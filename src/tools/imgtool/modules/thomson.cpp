@@ -812,7 +812,7 @@ static imgtoolerr_t thom_read_sector(imgtool_image* img, UINT32 track,
 
 	// resize the buffer
 	try { buffer.resize(f->sector_size); }
-	catch (std::bad_alloc& b) { return IMGTOOLERR_OUTOFMEMORY; }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
 
 	memcpy( &buffer[0], thom_get_sector( f, head, track, sector ), f->sector_size);
 	return IMGTOOLERR_SUCCESS;

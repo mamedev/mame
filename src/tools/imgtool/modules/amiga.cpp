@@ -1819,7 +1819,7 @@ static imgtoolerr_t amiga_image_read_sector(imgtool_image* img,
 	UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
 {
 	try { buffer.resize(BSIZE); }
-	catch (std::bad_alloc& b) { return IMGTOOLERR_OUTOFMEMORY; }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
 
 	return amiga_image_read_sector(img, track, head, sector, &buffer[0], buffer.size());
 }

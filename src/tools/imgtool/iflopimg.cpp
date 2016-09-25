@@ -209,7 +209,7 @@ static imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 trac
 
 	// resize the buffer accordingly
 	try { buffer.resize(sector_size); }
-	catch (std::bad_alloc& b) { return IMGTOOLERR_OUTOFMEMORY; }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
 
 	// and read the sector
 	ferr = floppy_read_sector(imgtool_floppy(image), head, track, sector, 0, &buffer[0], sector_size);
