@@ -483,7 +483,7 @@ static MACHINE_CONFIG_DERIVED( popeyej, skyskipr )
 	MCFG_PALETTE_INIT_OWNER(popeye_state,popeye)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( popeye, skyskipr )
+static MACHINE_CONFIG_DERIVED( popeye, popeyej )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(popeye_map)
 
