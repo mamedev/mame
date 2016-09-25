@@ -2254,13 +2254,13 @@ ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 ma
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas") // V3 - 4d1f8172
 	ROMX_LOAD( "vlsi__740_sa_1262__23512-1054__342-0341-c__(c)apple_'83-'86__korea_a.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) ) // these also appeared with a different label when made by AMI: "342-0341-C // (C)APPLE 85,86 // (M)AMI 8849MBL // PHILLIPINES"
-	ROMX_LOAD( "vlsi__740_sa_1342__23512-1055__342-0342-b__(c)apple_'83-'86__korea_a.rom-lo.27512.u7d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) ) // these also appeared with a later VLSI label like "<VLSI logo>VLSI // 8905AV 0 AS759 // 23512-1055 // 342-0342-B // (C)APPLE '85-'86"
+	ROMX_LOAD( "vlsi__740_sa_1342__23512-1055__342-0342-b__(c)apple_'83-'86__korea_a.rom-lo.27512.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) ) // these also appeared with a later VLSI label like "<VLSI logo>VLSI // 8905AV 0 AS759 // 23512-1055 // 342-0342-B // (C)APPLE '85-'86"
 	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers") // V2 - 4d1eeae1 - fixes a bug where the system will hang forever on the boot screen if a scsi device is present but does not respond properly
 	ROMX_LOAD( "vti__624_v0_8636__23512-1010__342-0341-b__(c)apple_'85__mexico_r.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "vti__622_v0_b637__23512-1007__342-0342-a__(c)apple_'83-'85__korea_a.rom-lo.27512.u7d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "vti__622_v0_b637__23512-1007__342-0342-a__(c)apple_'83-'85__korea_a.rom-lo.27512.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts") // V1 - 4d1eeee1
 	ROMX_LOAD( "342-0341-a.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) ) // label of these two roms may be slightly different from what is listed here, as they are very rare except in 512ke machines; the first part of this label is likely vti__<datecode/lotcode>__23512-1008__ etc.
-	ROMX_LOAD( "vti__622_v0_b637__23512-1007__342-0342-a__(c)apple_'83-'85__korea_a.rom-lo.27512.u7d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) ) // label of these two rom may be slightly different from what is listed here, as they are very rare except in 512ke machines; this rom is identical to one of the v2 roms.
+	ROMX_LOAD( "vti__622_v0_b637__23512-1007__342-0342-a__(c)apple_'83-'85__korea_a.rom-lo.27512.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) ) // label of these two rom may be slightly different from what is listed here, as they are very rare except in 512ke machines; this rom is identical to one of the v2 roms.
 ROM_END
 
 ROM_START( macplus )
