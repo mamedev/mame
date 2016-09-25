@@ -354,7 +354,7 @@ Notes:
 #define FRC_CLOCK_MODE0     (MASTER_CLOCK/2)/24 // /16 according to Charles
 #define FRC_CLOCK_MODE1     (MASTER_CLOCK/2)/1536 // /1024 according to Charles, but /1536 sounds better
 
-#define FDC_LEGACY_LOG		0
+#define FDC_LEGACY_LOG      0
 #define FDC_LOG(x) do { if (FDC_LEGACY_LOG) logerror x; } while (0)
 
 enum {
@@ -1691,7 +1691,7 @@ static INPUT_PORTS_START( dcclub ) /* In the Japan set missing angle input */
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Start Credit" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "1" )

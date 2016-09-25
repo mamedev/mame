@@ -649,7 +649,7 @@ ROM_START( saurob )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
 	ROM_LOAD( "sauro-8.bin",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) ) // sauro08.9j
-	ROM_LOAD( "sauro-9.bin",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) ) // sauro09.11j 
+	ROM_LOAD( "sauro-9.bin",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) ) // sauro09.11j
 	ROM_LOAD( "sauro-10.bin",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) ) // sauro10.12j
 	ROM_LOAD( "sauro-11.bin",    0x18000, 0x8000, CRC(f47982a8) SHA1(cbaeac272c015d9439f151cfb3449082f11a57a1) ) // sauro11.14j
 
@@ -658,7 +658,7 @@ ROM_START( saurob )
 	ROM_LOAD( "82s137-2.bin",    0x0400, 0x0400, CRC(c3e96d5d) SHA1(3f6f21526a4357e4a9a9d56a6f4ef5911af2d120) )  /* Green component */
 	ROM_LOAD( "82s137-1.bin",    0x0800, 0x0400, CRC(bdfcf00c) SHA1(9faf4d7f8959b64faa535c9945eec59c774a3760) )  /* Blue component */
 
-        ROM_REGION( 0x0200, "user1", 0 ) // Unknown PROM was found near ROMs 6 & 7
+		ROM_REGION( 0x0200, "user1", 0 ) // Unknown PROM was found near ROMs 6 & 7
 	ROM_LOAD( "sauropr4.16h",    0x0000, 0x0200, CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
 ROM_END
 

@@ -389,7 +389,7 @@ WRITE16_MEMBER(namcos10_state::bank_w)
 READ16_MEMBER(namcos10_state::range_r)
 {
 	UINT16 data = ((const UINT16 *)(memregion("maincpu:rom")->base()))[bank_base+offset];
-	
+
 	if (decrypter == nullptr)
 		return data;
 
@@ -670,7 +670,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 {
 	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
-	
+
 	decrypt_bios(machine(), "maincpu:rom", 0, 0x62000, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
 	decrypt_bios(machine(), "maincpu:rom", 0x380000, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
 	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));

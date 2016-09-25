@@ -277,12 +277,12 @@ private:
 
 	int     m_ptm_out0;
 
-	int		m_pia_0_irqa;
-	int		m_pia_0_irqb;
-	int		m_pia_1_irqa;
-	int		m_pia_1_irqb;
-	int		m_ptm_irq;
-	int		m_irq_state;
+	int     m_pia_0_irqa;
+	int     m_pia_0_irqb;
+	int     m_pia_1_irqa;
+	int     m_pia_1_irqb;
+	int     m_ptm_irq;
+	int     m_irq_state;
 };
 
 const device_type CMI01A_CHANNEL_CARD = &device_creator<cmi01a_device>;
@@ -651,9 +651,9 @@ private:
 	UINT8   m_map_ram_latch;
 	int     m_cpu_active_space[2]; // TODO: Make one register
 	int     m_cpu_map_switch[2];
-	UINT8	m_irq_address[2][2];
-	int		m_m6809_bs_hack_cnt;
-	int		m_m6809_bs_hack_cpu;
+	UINT8   m_irq_address[2][2];
+	int     m_m6809_bs_hack_cnt;
+	int     m_m6809_bs_hack_cpu;
 
 	/* Q219 lightpen/graphics card */
 	std::unique_ptr<UINT8[]>    m_video_ram;
@@ -688,7 +688,7 @@ private:
 	int     m_ank_irqb;
 
 	// Master card (CMI-02)
-	int		m_cmi02_ptm_irq;
+	int     m_cmi02_ptm_irq;
 };
 
 /**************************************

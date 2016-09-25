@@ -1378,7 +1378,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pengojpm_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-//	AM_RANGE(0x1000, 0x1fff) // header check for 0x55aa at POST, diagnostic ROM?
+//  AM_RANGE(0x1000, 0x1fff) // header check for 0x55aa at POST, diagnostic ROM?
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
@@ -4702,18 +4702,18 @@ ROM_END
 
 ROM_START( pinguinos )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "pg0_2732.bin", 0x0000, 0x1000, CRC(1a79436c) SHA1(341a0c86784b794c1206842d03da8111487099b0) )
-    ROM_LOAD( "pg4_2732.bin", 0x4000, 0x1000, CRC(6210c06f) SHA1(995f63402720a337a2754eef6207d5c3331a0123) )
-    ROM_LOAD( "pg5_2732.bin", 0x5000, 0x1000, CRC(7c83d678) SHA1(08fec6ba0f75684f1f5eb6d2ce3bf50b5b350a34) )
-    ROM_LOAD( "pg6_2732.bin", 0x6000, 0x1000, CRC(ae646d36) SHA1(ac2621383607fa8eb81d44bba507e9fcf90c53bb) )
-    ROM_LOAD( "pg7_2732.bin", 0x7000, 0x1000, CRC(1628eb6d) SHA1(44bd9d30828bb2440599fcd4a46f20fd798c24d5) )
- 
+	ROM_LOAD( "pg0_2732.bin", 0x0000, 0x1000, CRC(1a79436c) SHA1(341a0c86784b794c1206842d03da8111487099b0) )
+	ROM_LOAD( "pg4_2732.bin", 0x4000, 0x1000, CRC(6210c06f) SHA1(995f63402720a337a2754eef6207d5c3331a0123) )
+	ROM_LOAD( "pg5_2732.bin", 0x5000, 0x1000, CRC(7c83d678) SHA1(08fec6ba0f75684f1f5eb6d2ce3bf50b5b350a34) )
+	ROM_LOAD( "pg6_2732.bin", 0x6000, 0x1000, CRC(ae646d36) SHA1(ac2621383607fa8eb81d44bba507e9fcf90c53bb) )
+	ROM_LOAD( "pg7_2732.bin", 0x7000, 0x1000, CRC(1628eb6d) SHA1(44bd9d30828bb2440599fcd4a46f20fd798c24d5) )
+
 	ROM_REGION( 0x2000, "gfx1", 0 )
-    ROM_LOAD( "pg9_mb8516.e6", 	0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) )
-	ROM_LOAD( "pg11.h6",      	0x0800, 0x0800, CRC(cee7cb9a) SHA1(718aacdb61e8a82e2fd6c753787b39b6e45e60b5) )
-    ROM_LOAD( "pg10_mb8516.f6", 0x1000, 0x0800, CRC(bae319a3) SHA1(88f0562ba2501f16ddfaffb12c4d1c00315f4225) )
-    ROM_LOAD( "pg12_2716.j6", 	0x1800, 0x0800, CRC(5a5190e8) SHA1(caf49a348c649fbf959e97c632832bdb5bc068be) )
-	
+	ROM_LOAD( "pg9_mb8516.e6",  0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) )
+	ROM_LOAD( "pg11.h6",        0x0800, 0x0800, CRC(cee7cb9a) SHA1(718aacdb61e8a82e2fd6c753787b39b6e45e60b5) )
+	ROM_LOAD( "pg10_mb8516.f6", 0x1000, 0x0800, CRC(bae319a3) SHA1(88f0562ba2501f16ddfaffb12c4d1c00315f4225) )
+	ROM_LOAD( "pg12_2716.j6",   0x1800, 0x0800, CRC(5a5190e8) SHA1(caf49a348c649fbf959e97c632832bdb5bc068be) )
+
 	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "pr1633.78",      0x0000, 0x0020, BAD_DUMP CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) /* color palette */
 	ROM_LOAD( "pengopac.4a",    0x0020, 0x0100, BAD_DUMP CRC(ef283be2) SHA1(6d616348c06d08f3ffbe875a40036a2453cb45ad) ) /* color lookup */
@@ -7377,4 +7377,4 @@ GAME( 1999, superabco,superabc, superabc, superabc, pacman_state,  superabc, ROT
 
 GAME( 1981, pengojpm, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 1)", MACHINE_SUPPORTS_SAVE ) // conversion of pacmanjpm board with wire mods
 GAME( 1981, pengopac, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 2)", MACHINE_SUPPORTS_SAVE ) // different conversion?
-GAME( 1982, pinguinos, pengo,    pengojpm, pengojpm, driver_device, 0,       ROT90,  "bootleg (Aincar)", "Pinguinos (Spanish bootleg on Pac-Man hardware)", MACHINE_SUPPORTS_SAVE ) 	
+GAME( 1982, pinguinos, pengo,    pengojpm, pengojpm, driver_device, 0,       ROT90,  "bootleg (Aincar)", "Pinguinos (Spanish bootleg on Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )

@@ -740,7 +740,7 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 	for (auto iter = resolution.entries_begin(); iter != resolution.entries_end(); iter++)
 	{
 		const util::option_resolution::entry &entry = *iter;
-                std::stringstream description_buffer;
+				std::stringstream description_buffer;
 
 		std::string opt_name = string_format("--%s", entry.identifier());
 		const char *opt_desc = entry.display_name();

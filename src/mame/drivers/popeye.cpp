@@ -711,7 +711,7 @@ ROM_START( popeyej )
 
 	ROM_REGION( 0x0200, "sprpal", 0 )
 	ROM_LOAD( "TPP1-T.3A.82S129",   0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "TPP1-T.2A.82S129",   0x0100, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */	
+	ROM_LOAD( "TPP1-T.2A.82S129",   0x0100, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "prot", 0 )
 	ROM_LOAD( "TPP1-T.3J.82S129", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */

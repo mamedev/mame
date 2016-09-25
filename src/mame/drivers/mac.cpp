@@ -2239,7 +2239,7 @@ ROM_START( mac128k )
 	Hitachi:
 	[can't find reference for rom-hi]
 	"<Hitachi 'target' logo> 8413 // 3256 016 JAPAN // (C)APPLE 83 // 342-0221-A"
-	
+
 	References:
 	http://www.vintagecomputer.net/apple/Macintosh/Macintosh_motherboard.jpg
 	https://upload.wikimedia.org/wikipedia/commons/3/34/Macintosh-motherboard.jpg

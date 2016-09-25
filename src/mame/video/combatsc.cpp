@@ -431,15 +431,15 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 			// scrollram [0x20]-[0x3f]: char enable (presumably bit 0 only)
 			if(m_scrollram[0x20 + i] == 0)
 				continue;
-			
+
 			clip.min_y = i * 8;
 			clip.max_y = clip.min_y + 7;
-			
+
 			// bit 3 of reg [1] selects if tiles are opaque or have transparent pen.
 			m_textlayer->draw(screen, bitmap, clip, m_k007121_1->ctrlram_r(space, 1) & 0x08 ? TILEMAP_DRAW_OPAQUE : 0, 0);
 		}
 	}
-	
+
 	/* chop the extreme columns if necessary */
 	if (m_k007121_1->ctrlram_r(space, 3) & 0x40)
 	{

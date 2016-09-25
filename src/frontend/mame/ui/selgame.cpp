@@ -36,7 +36,6 @@
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
-
 bool menu_select_game::first_start = true;
 std::vector<const game_driver *> menu_select_game::m_sortedlist;
 int menu_select_game::m_isabios = 0;

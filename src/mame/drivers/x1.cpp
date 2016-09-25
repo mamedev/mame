@@ -1225,7 +1225,7 @@ void x1_state::set_current_palette()
 
 		m_palette->set_pen_color(addr|8, pal1bit(r), pal1bit(g), pal1bit(b));
 	}
-	
+
 	// TODO: disabled for now, causes issues with Thunder Force. x1fdemo changes palette dynamically during initial logo.
 	//       Likely it needs a video rewrite in order to make this to work correctly.
 	//  machine().first_screen()->update_partial(machine().first_screen()->vpos());

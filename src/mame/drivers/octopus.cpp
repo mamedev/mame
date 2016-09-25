@@ -184,7 +184,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(spk_w);
 	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
 	DECLARE_WRITE_LINE_MEMBER(beep_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(dack0_w) { m_dma1->hack_w(state ? 0 : 1); }  // for all unused DMA channel?
 	DECLARE_WRITE_LINE_MEMBER(dack1_w) { if(!state) m_current_dma = 1; else if(m_current_dma == 1) m_current_dma = -1; }  // HD
 	DECLARE_WRITE_LINE_MEMBER(dack2_w) { if(!state) m_current_dma = 2; else if(m_current_dma == 2) m_current_dma = -1; }  // RAM refresh
@@ -198,10 +198,10 @@ public:
 	{
 		BEEP_TIMER = 100
 	};
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -222,7 +222,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<address_map_bank_device> m_z80_bankdev;
 	required_device<ram_device> m_ram;
-	
+
 	UINT8 m_hd_bank;  // HD bank select
 	UINT8 m_fd_bank;  // Floppy bank select
 	UINT8 m_z80_bank; // Z80 bank / RAM refresh
@@ -238,7 +238,7 @@ private:
 	bool m_rtc_address;
 	bool m_rtc_data;
 	UINT8 m_prev_cntl;
-	
+
 	emu_timer* m_timer_beep;
 };
 
@@ -409,7 +409,7 @@ READ8_MEMBER(octopus_state::system_r)
 	case 0:
 		return 0x1f;  // do bits 0-4 mean anything?  Language DIPs?
 	}
-	
+
 	return 0xff;
 }
 
@@ -438,7 +438,7 @@ WRITE8_MEMBER(octopus_state::z80_io_w)
 READ8_MEMBER(octopus_state::rtc_r)
 {
 	UINT8 ret = 0xff;
-	
+
 	if(m_rtc_data)
 		ret = m_rtc->read(space,1);
 	else if(m_rtc_address)
@@ -467,7 +467,7 @@ READ8_MEMBER(octopus_state::cntl_r)
 WRITE8_MEMBER(octopus_state::cntl_w)
 {
 	m_cntl = data;
-	
+
 	if((m_cntl & 0x08) && !(m_prev_cntl & 0x08))
 	{
 		m_rtc_address = true;
@@ -605,7 +605,7 @@ IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
 void octopus_state::machine_start()
 {
 	m_timer_beep = timer_alloc(BEEP_TIMER);
-	
+
 	// install extra RAM
 	if(m_ram->size() > 0x20000)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"extra_ram_bank");
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(octopus_state,gpo_w))
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir2_w))
-	
+
 	// Keyboard UART
 	MCFG_DEVICE_ADD("keyboard", I8251, 0)
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir4_w))
@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_PIT8253_CLK1(500)  // DART channel B
 	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(octopus_state,spk_freq_w))
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -755,8 +755,8 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_SCREEN_SIZE(720, 360)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",scn2674_device, screen_update)
-//	MCFG_SCREEN_PALETTE("palette")
-//	MCFG_PALETTE_ADD_MONOCHROME("palette")	
+//  MCFG_SCREEN_PALETTE("palette")
+//  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SCN2674_VIDEO_ADD("crtc", 0, DEVWRITELINE("pic_slave",pic8259_device,ir0_w))  // character clock can be selectable, either 16MHz or 17.6MHz
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)

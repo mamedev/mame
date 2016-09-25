@@ -25,8 +25,8 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i82371sb_isa_device)
-//	AM_RANGE(0x0060, 0x0063) AM_READ8      (reset_irq12_1_r,           0x000000ff)
-//	AM_RANGE(0x0060, 0x0063) AM_READWRITE8 (nmi_st_r,        nmi_st_w, 0x0000ff00)
+//  AM_RANGE(0x0060, 0x0063) AM_READ8      (reset_irq12_1_r,           0x000000ff)
+//  AM_RANGE(0x0060, 0x0063) AM_READWRITE8 (nmi_st_r,        nmi_st_w, 0x0000ff00)
 	AM_RANGE(0x0080, 0x0083) AM_WRITE8     (boot_state_w,              0x000000ff) // POST/non-existing, used for delays by the bios/os
 	AM_RANGE(0x00ec, 0x00ef) AM_WRITE8     (nop_w,                     0x0000ff00) // Non-existing, used for delays by the bios/os
 ADDRESS_MAP_END

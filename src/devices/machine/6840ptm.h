@@ -110,21 +110,21 @@ private:
 
 	enum
 	{
-		RESET_TIMERS	= 0x01,
-		CR1_SELECT		= 0x01,
-		T3_PRESCALE_EN 	= 0x01,
-		INTERNAL_CLK_EN	= 0x02,
-		COUNT_MODE_8BIT	= 0x04,
-		INTERRUPT_EN	= 0x40,
-		COUNT_OUT_EN	= 0x80
+		RESET_TIMERS    = 0x01,
+		CR1_SELECT      = 0x01,
+		T3_PRESCALE_EN  = 0x01,
+		INTERNAL_CLK_EN = 0x02,
+		COUNT_MODE_8BIT = 0x04,
+		INTERRUPT_EN    = 0x40,
+		COUNT_OUT_EN    = 0x80
 	};
 
 	enum
 	{
-		TIMER1_IRQ	= 0x01,
-		TIMER2_IRQ	= 0x02,
-		TIMER3_IRQ	= 0x04,
-		ANY_IRQ		= 0x80
+		TIMER1_IRQ  = 0x01,
+		TIMER2_IRQ  = 0x02,
+		TIMER3_IRQ  = 0x04,
+		ANY_IRQ     = 0x80
 	};
 
 	double m_internal_clock;

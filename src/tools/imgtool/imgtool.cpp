@@ -239,7 +239,7 @@ const imgtool_module *imgtool_find_module(const char *modulename)
 
 
 /*-------------------------------------------------
-	imgtool_find_module - looks up a module
+    imgtool_find_module - looks up a module
 -------------------------------------------------*/
 
 const imgtool::library::modulelist &imgtool_get_modules()

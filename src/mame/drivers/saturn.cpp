@@ -651,7 +651,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2, _3));
 	}
-	
+
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));

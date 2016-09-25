@@ -574,7 +574,7 @@ protected:
 
 		// convert name to utf8
 		std::string utf8_name = utf8_from_wstring(name.c_str());
-		
+
 		// set device id to raw input name
 		std::string utf8_id = utf8_from_wstring(tname.get());
 

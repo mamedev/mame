@@ -95,7 +95,7 @@
 		<bezel element="static_black"><bounds x="125" y="56" width="13" height="68" /></bezel>
 		<bezel element="static_black"><bounds x="145" y="56" width="13" height="68" /></bezel>
 		<bezel element="static_black"><bounds x="165" y="56" width="13" height="68" /></bezel>
- 
+
 		<bezel name="9.7" element="seg"><bounds x="7" y="72" width="9" height="2" /></bezel>
 		<bezel name="8.7" element="seg"><bounds x="7" y="89" width="9" height="2" /></bezel>
 		<bezel name="7.7" element="seg"><bounds x="7" y="106" width="9" height="2" /></bezel>

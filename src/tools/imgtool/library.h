@@ -401,8 +401,8 @@ public:
 	const modulelist &modules() { return m_modules; }
 
 private:
-	object_pool *	m_pool;
-	modulelist		m_modules;
+	object_pool *   m_pool;
+	modulelist      m_modules;
 
 	// internal lookup and iteration
 	modulelist::iterator find(const char *module_name);

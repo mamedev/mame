@@ -675,10 +675,10 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 	obvious entry points are 1000, 1016 (which is the first one hit, from f95), 1025, 112e, 1167, 11db, 136e, 1470, 1480, 16a9, 1719, 17e5
 	corresponding functions in vt100 roms are: WRITE ME
 	*/
-	
+
 	ROM_REGION(0x1000, "avo", 0) // all switches on avo are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
 	// are 184 and 185 an older version of the stp avo firmware?
-	//NOTE: for both of these two avo roms, Pin 18 is positive enable CE, Pin 20 is negative enable /CE1, Pin 21 is negative enable /CE2, 
+	//NOTE: for both of these two avo roms, Pin 18 is positive enable CE, Pin 20 is negative enable /CE1, Pin 21 is negative enable /CE2,
 	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592DEC1) SHA1(C4B8FC9FC0514E0CD46AD2DE03ABE72271CE460B)) // Label: "S 8218 // C69063 // 23186E2" @E21
 	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(C6D72A41) SHA1(956F9EB945A250FD05C76100B38C0BA381AB8FDE)) // Label: "S 8228 // C69062 // 23187E2" @E17
 
@@ -695,16 +695,16 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 // expansion board for a vt100 with a processor on it and dma, intended to act as a ram/send buffer for the STP printer board.
 // It can be populated with two banks of two eproms each, each bank either contains 2k or 4k eproms depending on the w2/w3 and w4/w5 jumpers.
 // It also has two proms on the cpu board. I don't know if it is technically necessary to have this board installed if an STP module is installed, but due to the alt stp romset, it probably is.
-	ROM_LOAD( "23-003e3-00.e10", 0x0000, 0x1000, NO_DUMP) // "EPROM 0" bank 0
-	ROM_LOAD( "23-004e3-00.e4", 0x1000, 0x1000, NO_DUMP) // "EPROM 1" bank 0
-	ROM_LOAD( "23-005e3-00.e9", 0x2000, 0x1000, NO_DUMP) // "EPROM 2" bank 1
-	ROM_LOAD( "23-006e3-00.e3", 0x3000, 0x1000, NO_DUMP) // "EPROM 3" bank 1
-	//ROM_REGION(0x0800, "avo",0)
-	//ROM_LOAD( "23-???e2-00.e34", 0x0000, 0x0800, NO_DUMP) // ? second gfx rom?
-	ROM_REGION(0x0400, "proms",0)
-	ROM_LOAD( "23-312a1-07.e26", 0x0000, 0x0200, NO_DUMP) // "PROM A"; handles 8085 i/o? mapping (usart, timer, dma, comm, etc)
-	ROM_LOAD( "23-313a1-07.e15", 0x0200, 0x0200, NO_DUMP) // "PROM B"; handles firmware rom mapping and memory size/page select; bit 0 = ram page, bits 1-3 unused, bits 4-7 select one eprom each
-	*/
+    ROM_LOAD( "23-003e3-00.e10", 0x0000, 0x1000, NO_DUMP) // "EPROM 0" bank 0
+    ROM_LOAD( "23-004e3-00.e4", 0x1000, 0x1000, NO_DUMP) // "EPROM 1" bank 0
+    ROM_LOAD( "23-005e3-00.e9", 0x2000, 0x1000, NO_DUMP) // "EPROM 2" bank 1
+    ROM_LOAD( "23-006e3-00.e3", 0x3000, 0x1000, NO_DUMP) // "EPROM 3" bank 1
+    //ROM_REGION(0x0800, "avo",0)
+    //ROM_LOAD( "23-???e2-00.e34", 0x0000, 0x0800, NO_DUMP) // ? second gfx rom?
+    ROM_REGION(0x0400, "proms",0)
+    ROM_LOAD( "23-312a1-07.e26", 0x0000, 0x0200, NO_DUMP) // "PROM A"; handles 8085 i/o? mapping (usart, timer, dma, comm, etc)
+    ROM_LOAD( "23-313a1-07.e15", 0x0200, 0x0200, NO_DUMP) // "PROM B"; handles firmware rom mapping and memory size/page select; bit 0 = ram page, bits 1-3 unused, bits 4-7 select one eprom each
+    */
 ROM_END
 
 #if 0

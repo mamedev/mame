@@ -85,7 +85,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vcs_control_port_device> m_joy;
-	
+
 	required_ioport m_y1;
 	required_ioport m_y2;
 	required_ioport m_y3;

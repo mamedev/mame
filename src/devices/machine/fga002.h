@@ -10,22 +10,22 @@
 #define LOG(x)
 #endif
 
-#define MCFG_FGA002_ADD(_tag, _clock)	MCFG_DEVICE_ADD(_tag, FGA002, _clock)
+#define MCFG_FGA002_ADD(_tag, _clock)   MCFG_DEVICE_ADD(_tag, FGA002, _clock)
 
 // LOCAL IRQ callbacks
-#define MCFG_FGA002_OUT_INT_CB(_devcb)								\
+#define MCFG_FGA002_OUT_INT_CB(_devcb)                              \
 	devcb = &fga002_device::set_out_int_callback(*device, DEVCB_##_devcb);
 
-#define MCFG_FGA002_OUT_LIACK4_CB(_devcb)								\
+#define MCFG_FGA002_OUT_LIACK4_CB(_devcb)                               \
 	devcb = &fga002_device::set_liack4_callback(*device, DEVCB_##_devcb);
 
-#define MCFG_FGA002_OUT_LIACK5_CB(_devcb)								\
+#define MCFG_FGA002_OUT_LIACK5_CB(_devcb)                               \
 	devcb = &fga002_device::set_liack5_callback(*device, DEVCB_##_devcb);
 
-#define MCFG_FGA002_OUT_LIACK6_CB(_devcb)								\
+#define MCFG_FGA002_OUT_LIACK6_CB(_devcb)                               \
 	devcb = &fga002_device::set_liack6_callback(*device, DEVCB_##_devcb);
 
-#define MCFG_FGA002_OUT_LIACK7_CB(_devcb)								\
+#define MCFG_FGA002_OUT_LIACK7_CB(_devcb)                               \
 	devcb = &fga002_device::set_liack7_callback(*device, DEVCB_##_devcb);
 
 // type for array of mapping of FGA registers that assembles an IRQ source
@@ -42,7 +42,7 @@ typedef struct {
 // ======================> fga002_device
 
 class fga002_device :  public device_t
-//		,public device_z80daisy_interface
+//      ,public device_z80daisy_interface
 {
 	public:
 	// construction/destruction
@@ -72,7 +72,7 @@ class fga002_device :  public device_t
 	template<class _Object> static devcb_base &set_liack6_callback(device_t &device, _Object object) { return downcast<fga002_device &>(device).m_liack6_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_liack7_callback(device_t &device, _Object object) { return downcast<fga002_device &>(device).m_liack7_cb.set_callback(object); }
 
-	// interrupt sources in prio order if on same interrupt level. TODO: Add all sources 
+	// interrupt sources in prio order if on same interrupt level. TODO: Add all sources
 	const static fga_irq_t m_irq_sources[];
 
  protected:
@@ -88,10 +88,10 @@ class fga002_device :  public device_t
 	virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	devcb_write_line    m_out_int_cb;
-	devcb_read8			m_liack4_cb;
-	devcb_read8			m_liack5_cb;
-	devcb_read8    		m_liack6_cb;
-	devcb_read8    		m_liack7_cb;
+	devcb_read8         m_liack4_cb;
+	devcb_read8         m_liack5_cb;
+	devcb_read8         m_liack6_cb;
+	devcb_read8         m_liack7_cb;
 	int m_int_state[0x08]; // interrupt state
 
  private:
@@ -198,14 +198,14 @@ class fga002_device :  public device_t
 	};
 
 	enum{
-		REG_LIACK_LOCAL4_MSK 	= 0x03,
-		REG_LIACK_LOCAL5_MSK 	= 0x0c, // >> 2 to use patterns below
-		REG_LIACK_LOCAL6_MSK 	= 0x30, // >> 4 to use patterns below
-		REG_LIACK_LOCAL7_MSK 	= 0xc0, // >> 6 to use patterns below
-		REG_LIACK_INT_IACK		= 0x00, // Assumes bits to be right adjusted
-		REG_LIACK_EXT_IACK1		= 0x01,
-		REG_LIACK_EXT_IACK2		= 0x02,
-		REG_LIACK_EXT_IACK3		= 0x03,
+		REG_LIACK_LOCAL4_MSK    = 0x03,
+		REG_LIACK_LOCAL5_MSK    = 0x0c, // >> 2 to use patterns below
+		REG_LIACK_LOCAL6_MSK    = 0x30, // >> 4 to use patterns below
+		REG_LIACK_LOCAL7_MSK    = 0xc0, // >> 6 to use patterns below
+		REG_LIACK_INT_IACK      = 0x00, // Assumes bits to be right adjusted
+		REG_LIACK_EXT_IACK1     = 0x01,
+		REG_LIACK_EXT_IACK2     = 0x02,
+		REG_LIACK_EXT_IACK3     = 0x03,
 	};
 
 	enum{
@@ -222,11 +222,11 @@ class fga002_device :  public device_t
 	};
 
 	enum{
-		REG_ICR_LVL_MSK 	= 0x07,
-		REG_ICR_ENABLE  	= 0x08,
-		REG_ICR_AUTOCLR		= 0x10,
-		REG_ICR_ACTIVITY	= 0x20,
-		REG_ICR_EDGE    	= 0x40,
+		REG_ICR_LVL_MSK     = 0x07,
+		REG_ICR_ENABLE      = 0x08,
+		REG_ICR_AUTOCLR     = 0x10,
+		REG_ICR_ACTIVITY    = 0x20,
+		REG_ICR_EDGE        = 0x40,
 	};
 
 	/* Register offsets */
@@ -300,39 +300,39 @@ class fga002_device :  public device_t
 		FGA_FMBAREA     = 0x033c,
 		FGA_AUXSRCSTART = 0x0340,
 		FGA_AUXDSTSTART = 0x0344,
-		FGA_AUXSRCTERM 	= 0x0348,
-		FGA_AUXDSTTERM 	= 0x034c,
-		FGA_CTL13 		= 0x0350,
-		FGA_CTL14 		= 0x0354,
-		FGA_CTL15 		= 0x0358,
-		FGA_CTL16 		= 0x035c,
-		FGA_SPECIALENA 	= 0x0424,
-		FGA_ISLOCAL0	= 0x0480,
-		FGA_ISLOCAL1	= 0x0484,
-		FGA_ISLOCAL2	= 0x0488,
-		FGA_ISLOCAL3	= 0x048C,
-		FGA_ISLOCAL4	= 0x0490,
-		FGA_ISLOCAL5	= 0x0494,
-		FGA_ISLOCAL6	= 0x0498,
-		FGA_ISLOCAL7	= 0x049C,
-		FGA_ISTIM0 		= 0x04a0,
-		FGA_ISDMANORM 	= 0x04b0,
-		FGA_ISDMAERR 	= 0x04b4,
-		FGA_ISFMB0REF 	= 0x04b8,
-		FGA_ISFMB1REF 	= 0x04bc,
-		FGA_ISPARITY 	= 0x04c0,
-		FGA_DMARUNCTL 	= 0x04c4,
-		FGA_ISABORT 	= 0x04c8,
-		FGA_ISACFAIL 	= 0x04cc,
-		FGA_ISFMB0MES 	= 0x04e0,
-		FGA_ISFMB1MES 	= 0x04e4,
-		FGA_ISSYSFAIL 	= 0x04d0,
-		FGA_ABORTPIN 	= 0x04d4,
-		FGA_RSVMECALL 	= 0x04f0,
-		FGA_RSKEYRES 	= 0x04f4,
-		FGA_RSCPUCALL 	= 0x04f8,
-		FGA_RSLOCSW 	= 0x04fc,
-		FGA_TIM0COUNT	= 0x0c00,
+		FGA_AUXSRCTERM  = 0x0348,
+		FGA_AUXDSTTERM  = 0x034c,
+		FGA_CTL13       = 0x0350,
+		FGA_CTL14       = 0x0354,
+		FGA_CTL15       = 0x0358,
+		FGA_CTL16       = 0x035c,
+		FGA_SPECIALENA  = 0x0424,
+		FGA_ISLOCAL0    = 0x0480,
+		FGA_ISLOCAL1    = 0x0484,
+		FGA_ISLOCAL2    = 0x0488,
+		FGA_ISLOCAL3    = 0x048C,
+		FGA_ISLOCAL4    = 0x0490,
+		FGA_ISLOCAL5    = 0x0494,
+		FGA_ISLOCAL6    = 0x0498,
+		FGA_ISLOCAL7    = 0x049C,
+		FGA_ISTIM0      = 0x04a0,
+		FGA_ISDMANORM   = 0x04b0,
+		FGA_ISDMAERR    = 0x04b4,
+		FGA_ISFMB0REF   = 0x04b8,
+		FGA_ISFMB1REF   = 0x04bc,
+		FGA_ISPARITY    = 0x04c0,
+		FGA_DMARUNCTL   = 0x04c4,
+		FGA_ISABORT     = 0x04c8,
+		FGA_ISACFAIL    = 0x04cc,
+		FGA_ISFMB0MES   = 0x04e0,
+		FGA_ISFMB1MES   = 0x04e4,
+		FGA_ISSYSFAIL   = 0x04d0,
+		FGA_ABORTPIN    = 0x04d4,
+		FGA_RSVMECALL   = 0x04f0,
+		FGA_RSKEYRES    = 0x04f4,
+		FGA_RSCPUCALL   = 0x04f8,
+		FGA_RSLOCSW     = 0x04fc,
+		FGA_TIM0COUNT   = 0x0c00,
 	};
 };
 

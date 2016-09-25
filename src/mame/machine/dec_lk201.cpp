@@ -273,19 +273,19 @@ Actual membrane part number (from later 6805-based LK201 keyboard): 54-15172
 
 Matrix Rows to bit translation, from schematic page 20 ( http://bitsavers.trailing-edge.com/pdf/dec/terminal/lk201/MP01395_LK201_Schematic_Oct83.pdf )
 Bit D0 - Column P3-3
-	D1 - Column P3-7
-	D2 - Column P3-8
-	D3 - Column P3-12
-	D4 - Column P2-8
-	D5 - Column P1-2
-	D6 - Column P3-11
-	D7 - Column P1-3
+    D1 - Column P3-7
+    D2 - Column P3-8
+    D3 - Column P3-12
+    D4 - Column P2-8
+    D5 - Column P1-2
+    D6 - Column P3-11
+    D7 - Column P1-3
 
 Keyboard Matrix
 ---------------
 Row select
 |         Columns SwitchID by bit                    Columns Key by bit
-|         D5   D7   D4   D0   D1   D2   D3   D6      D5   D7   D4   D0   D1   D2   D3   D6 
+|         D5   D7   D4   D0   D1   D2   D3   D6      D5   D7   D4   D0   D1   D2   D3   D6
 V         V    V    V    V    V    V    V    V       V    V    V    V    V    V    V    V
 P1-6      ---  E99  E00  B01  C01  D01  E01  D99     ---  N/C  `    Z    A    Q    1    N/C
 P1-7      ---  G99  D00  B00  B02  C02  D02  E02     ---  F1   TAB  <>   X    S    W    2
@@ -295,7 +295,7 @@ P1-11     ---  G02  E04 A0406 B04  C04  D04  G03     ---  F4   4   SPACE V    F 
 P2-2      ---  ---  G05  B05  C05  D05  E05  G04     ---  ---  F6   B    G    T    5    N/C
 P2-3      ---  ---  G06  B06  C06  D06  E06  G07     ---  ---  F7   N    H    Y    6    F8
 P2-4      ---  ---  G09  B07  C07  D07  E07  G08     ---  ---  F10  M    J    U    7    F9
-P2-5      --- B9911 ---  ---  ---  ---  ---  ---     ---  SHFT ---  ---  ---  ---  ---  --- 
+P2-5      --- B9911 ---  ---  ---  ---  ---  ---     ---  SHFT ---  ---  ---  ---  ---  ---
 P2-6      ---  ---  G10  B08  C08  D08  E08  G11     ---  ---  N/C  ,    K    I    8    F11
 P2-9      ---  ---  G13  B09  C09  D09  E09  G12     ---  ---  F13  .    L    O    9    F12
 P2-10     ---  G14  E10  B10  C10  D13  D10  E13     ---  F14  0    /    ;    N/C  P    BKSP(DEL)
@@ -308,7 +308,7 @@ P3-9      ---  ---  G23  A23  C23  D23  E23  G22     ---  ---  F20  kRTN k,   k-
 
 --- = No matrix switch at all
 N/C = switch present, but officially unused?
-	*/
+    */
 
 	PORT_START("KBD0") // Row P2-5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )

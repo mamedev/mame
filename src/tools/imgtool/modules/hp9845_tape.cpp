@@ -2,110 +2,110 @@
 // copyright-holders:F. Ulivi
 /*********************************************************************
 
-	hp9845_tape.cpp
+    hp9845_tape.cpp
 
-	HP-9845 tape format
+    HP-9845 tape format
 
-	This imgtool module manipulates HTI files. These are image files
-	of the DC-100 tape cartridges that are simulated for the HP9845B
-	driver.
-	HP9845 filesystem for tapes has the following features:
-	* File names are 1 to 6 characters long.
-	* Case is significant in file names.
-	* There is no file "extension", file type is encoded separately
-	  in file metadata.
-	* There are 8 file types. File type is encoded in 5 bits.
-	  Only 8 out of the 32 possible values are valid.
-	* This module handles the file type as a fake file extension.
-	  For example, a file named "TEST" having DATA type is get/put/shown
-	  as "TEST.DATA".
-	* File type is deduced from host file extension when putting files
-	  into image. File type can be overridden by the "ftype" option.
-	  This table summarizes the file types.
+    This imgtool module manipulates HTI files. These are image files
+    of the DC-100 tape cartridges that are simulated for the HP9845B
+    driver.
+    HP9845 filesystem for tapes has the following features:
+    * File names are 1 to 6 characters long.
+    * Case is significant in file names.
+    * There is no file "extension", file type is encoded separately
+      in file metadata.
+    * There are 8 file types. File type is encoded in 5 bits.
+      Only 8 out of the 32 possible values are valid.
+    * This module handles the file type as a fake file extension.
+      For example, a file named "TEST" having DATA type is get/put/shown
+      as "TEST.DATA".
+    * File type is deduced from host file extension when putting files
+      into image. File type can be overridden by the "ftype" option.
+      This table summarizes the file types.
 
-      ftype		Fake		Type of file	BASIC commands
-      switch    extension					for this file type
+      ftype     Fake        Type of file    BASIC commands
+      switch    extension                   for this file type
       ========================================================
-      U			BKUP		"Database backup"
-											No idea
-	  D			DATA		Generic record-based data file
-											SAVE/GET/PRINT#/READ#
-	  P			PROG		Program file (tokenized BASIC & other data)
-											STORE/LOAD
-	  K			KEYS		KEY file (definition of soft keys)
-											STORE KEY/LOAD KEY
-	  T			BDAT		Binary data file
-											?
-	  A			ALL			Full dump of system state
-											STORE ALL/LOAD ALL
-	  B			BPRG		Binary program file
-											STORE BIN/LOAD BIN
-	  O			OPRM		Option ROM specific file
-											?
+      U         BKUP        "Database backup"
+                                            No idea
+      D         DATA        Generic record-based data file
+                                            SAVE/GET/PRINT#/READ#
+      P         PROG        Program file (tokenized BASIC & other data)
+                                            STORE/LOAD
+      K         KEYS        KEY file (definition of soft keys)
+                                            STORE KEY/LOAD KEY
+      T         BDAT        Binary data file
+                                            ?
+      A         ALL         Full dump of system state
+                                            STORE ALL/LOAD ALL
+      B         BPRG        Binary program file
+                                            STORE BIN/LOAD BIN
+      O         OPRM        Option ROM specific file
+                                            ?
 
-	* Files are always stored in units of 256-byte physical records.
-	* An important metadata of files is WPR: Words Per Record. This
-	  is a numeric value that sets the length of each logical record of
-	  the file (in units of 16-bit words). It defaults to 128 (i.e.
-	  logical and physical records are the same thing). It can be
-	  set by the "wpr" option when putting files into the image.
-	* There is no fragmentation map in the filesystem: each file
-	  always occupy a contiguous set of physical records. This fact
-	  could prevent the putting of a file into an image when there
-	  is no single block of free records big enough to hold the file
-	  even though the total amount of free space would be sufficient.
+    * Files are always stored in units of 256-byte physical records.
+    * An important metadata of files is WPR: Words Per Record. This
+      is a numeric value that sets the length of each logical record of
+      the file (in units of 16-bit words). It defaults to 128 (i.e.
+      logical and physical records are the same thing). It can be
+      set by the "wpr" option when putting files into the image.
+    * There is no fragmentation map in the filesystem: each file
+      always occupy a contiguous set of physical records. This fact
+      could prevent the putting of a file into an image when there
+      is no single block of free records big enough to hold the file
+      even though the total amount of free space would be sufficient.
 
-	Notes on commands
+    Notes on commands
     =================
 
-	**** dir command ****
-	The format of the "attr" part of file listing is as follows:
-	%c		'*' if file has the protection bit set, else ' '
-	%02x	Hexadecimal value of file type (00-1f)
-	%c      '?' if file type is not valid, else ' '
-	%4u		Number of logical records
-	%4u		WPR * 2 (i.e. bytes per logical record)
-	%3u		First physical record of file
+    **** dir command ****
+    The format of the "attr" part of file listing is as follows:
+    %c      '*' if file has the protection bit set, else ' '
+    %02x    Hexadecimal value of file type (00-1f)
+    %c      '?' if file type is not valid, else ' '
+    %4u     Number of logical records
+    %4u     WPR * 2 (i.e. bytes per logical record)
+    %3u     First physical record of file
 
-	**** get command ****
-	A file can be extracted from an image with or without an explicit
-	extension. If an extension is given, it must match the one corresponding
-	to file type.
+    **** get command ****
+    A file can be extracted from an image with or without an explicit
+    extension. If an extension is given, it must match the one corresponding
+    to file type.
     The "9845data" filter can be used on DATA files (see below).
 
-	**** getall command ****
-	Files are extracted with their "fake" extension.
+    **** getall command ****
+    Files are extracted with their "fake" extension.
 
-	**** put command ****
-	File type can be specified explicitly through the "ftype" option.
-	If this option is "auto" (the default), type is deduced from file
-	extension, if present. When extension is not given or it doesn't
-	match any known type, file type is set to "DATA".
-	WPR can be set through the "wpr" option. If it's 0 (the default),
-	WPR is set to 128.
+    **** put command ****
+    File type can be specified explicitly through the "ftype" option.
+    If this option is "auto" (the default), type is deduced from file
+    extension, if present. When extension is not given or it doesn't
+    match any known type, file type is set to "DATA".
+    WPR can be set through the "wpr" option. If it's 0 (the default),
+    WPR is set to 128.
     The "9845data" filter can be used on DATA files (see below).
 
-	**** del command ****
-	File extension is ignored, if present.
+    **** del command ****
+    File extension is ignored, if present.
 
-	"9845data" filter
-	=================
+    "9845data" filter
+    =================
 
-	This filter can be applied to DATA files whose content is made
-	of strings only. BASIC programs that are saved with "SAVE" command
+    This filter can be applied to DATA files whose content is made
+    of strings only. BASIC programs that are saved with "SAVE" command
     have this format.
     This filter translates a DATA file into a standard ASCII text file
     and viceversa.
     Keep in mind that this translation is NOT lossless because all
     non-ASCII & non printable characters are substituted with spaces.
-	This kind of characters must be removed because they may confuse
-	the line-by-line reading of file when translating in the opposite
-	direction.
-	The 9845 system has the capability to insert formatting characters
-	directly in the text strings to be displayed on screen. These
-	characters set things like inverse video or underline.
-	Turning a DATA file into a text file through this filter removes
-	these special characters.
+    This kind of characters must be removed because they may confuse
+    the line-by-line reading of file when translating in the opposite
+    direction.
+    The 9845 system has the capability to insert formatting characters
+    directly in the text strings to be displayed on screen. These
+    characters set things like inverse video or underline.
+    Turning a DATA file into a text file through this filter removes
+    these special characters.
 
 *********************************************************************/
 #include <bitset>
@@ -114,74 +114,74 @@
 #include "formats/imageutl.h"
 
 // Constants
-#define SECTOR_LEN			256	// Bytes in a sector
-#define WORDS_PER_SECTOR	(SECTOR_LEN / 2)	// 16-bit words in a sector payload
-#define SECTORS_PER_TRACK	426	// Sectors in a track
-#define TRACKS_NO			2	// Number of tracks
-#define TOT_SECTORS			(SECTORS_PER_TRACK * TRACKS_NO)	// Total number of sectors
-#define DIR_WORD_0			0x0500	// First word of directories
-#define DIR_WORD_1			0xffff	// Second word of directories
-#define DIR_LAST_WORD		0xffff	// Last word of directories
-#define FIRST_DIR_SECTOR	1	// First directory sector
-#define SECTORS_PER_DIR		2	// Sectors per copy of directory
-#define MAX_DIR_ENTRIES		42	// And the answer is.... the maximum number of entries in the directory!
-#define DIR_COPIES			2	// Count of directory copies
-#define CHARS_PER_FNAME		6	// Maximum characters in a filename
-#define CHARS_PER_EXT		4	// Characters in file extension. Extension is encoded as file type, it's not actually stored in directory as characters.
-#define CHARS_PER_FNAME_EXT	(CHARS_PER_FNAME + 1 + CHARS_PER_EXT)	// Characters in filename + extension
-#define PAD_WORD			0xffff	// Word value for padding
-#define FIRST_FILE_SECTOR	(FIRST_DIR_SECTOR + SECTORS_PER_DIR * DIR_COPIES)	// First file sector
-#define MAGIC				0x5441434f	// Magic value at start of image file: "TACO"
-#define ONE_INCH_POS		(968 * 1024)	// 1 inch of tape in tape_pos_t units
-#define START_POS			((tape_pos_t)(72.25 * ONE_INCH_POS))	// Start position on each track
-#define DZ_WORDS			350	// Words in deadzone
-#define IRG_SIZE			ONE_INCH_POS	// Size of inter-record-gap: 1"
-#define IFG_SIZE			((tape_pos_t)(2.5 * ONE_INCH_POS))	// Size of inter-file-gap: 2.5"
-#define ZERO_BIT_LEN		619     // Length of "0" bits when encoded on tape
-#define ONE_BIT_LEN			1083    // Length of "1" bits when encoded on tape
-#define HDR_W0_ZERO_MASK	0x4000	// Mask of zero bits in word 0 of header
-#define RES_FREE_FIELD		0x2000	// Mask of "reserved free field" bit
-#define FILE_ID_BIT			0x8000	// Mask of "file identifier" bit
-#define SECTOR_IN_USE		0x1800	// Mask of "empty record indicator" (== !sector in use indicator)
-#define SIF_FILE_NO			1	// SIF file #
-#define SIF_FILE_NO_MASK	0x07ff	// Mask of SIF file #
-#define SIF_FREE_FIELD		0	// SIF free field
-#define SIF_FREE_FIELD_MASK	0xf000	// Mask of SIF free field
-#define BYTES_AVAILABLE		0xff00	// "bytes available" field = 256
-#define BYTES_AVAILABLE_MASK	0xff00	// Mask of "bytes available" field
-#define BYTES_USED			0x00ff	// "bytes used" field = 256
-#define BYTES_USED_MASK		0x00ff	// Mask of "bytes used" field
-#define FORMAT_SECT_SIZE	((tape_pos_t)(2.85 * ONE_INCH_POS))	// Size of sectors including padding: 2.85"
-#define PAD_WORD_LENGTH		(17 * ONE_BIT_LEN)	// Size of PAD_WORD on tape
-#define PREAMBLE_WORD		0	// Value of preamble word
-#define WORDS_PER_SECTOR_W_MARGIN	256	// Maximum number of words in a sector with a lot of margin (there are actually never more than about 160 words)
-#define MIN_IRG_SIZE		((tape_pos_t)(0.066 * ONE_INCH_POS))	// Minimum size of IRG gaps: 0.066"
+#define SECTOR_LEN          256 // Bytes in a sector
+#define WORDS_PER_SECTOR    (SECTOR_LEN / 2)    // 16-bit words in a sector payload
+#define SECTORS_PER_TRACK   426 // Sectors in a track
+#define TRACKS_NO           2   // Number of tracks
+#define TOT_SECTORS         (SECTORS_PER_TRACK * TRACKS_NO) // Total number of sectors
+#define DIR_WORD_0          0x0500  // First word of directories
+#define DIR_WORD_1          0xffff  // Second word of directories
+#define DIR_LAST_WORD       0xffff  // Last word of directories
+#define FIRST_DIR_SECTOR    1   // First directory sector
+#define SECTORS_PER_DIR     2   // Sectors per copy of directory
+#define MAX_DIR_ENTRIES     42  // And the answer is.... the maximum number of entries in the directory!
+#define DIR_COPIES          2   // Count of directory copies
+#define CHARS_PER_FNAME     6   // Maximum characters in a filename
+#define CHARS_PER_EXT       4   // Characters in file extension. Extension is encoded as file type, it's not actually stored in directory as characters.
+#define CHARS_PER_FNAME_EXT (CHARS_PER_FNAME + 1 + CHARS_PER_EXT)   // Characters in filename + extension
+#define PAD_WORD            0xffff  // Word value for padding
+#define FIRST_FILE_SECTOR   (FIRST_DIR_SECTOR + SECTORS_PER_DIR * DIR_COPIES)   // First file sector
+#define MAGIC               0x5441434f  // Magic value at start of image file: "TACO"
+#define ONE_INCH_POS        (968 * 1024)    // 1 inch of tape in tape_pos_t units
+#define START_POS           ((tape_pos_t)(72.25 * ONE_INCH_POS))    // Start position on each track
+#define DZ_WORDS            350 // Words in deadzone
+#define IRG_SIZE            ONE_INCH_POS    // Size of inter-record-gap: 1"
+#define IFG_SIZE            ((tape_pos_t)(2.5 * ONE_INCH_POS))  // Size of inter-file-gap: 2.5"
+#define ZERO_BIT_LEN        619     // Length of "0" bits when encoded on tape
+#define ONE_BIT_LEN         1083    // Length of "1" bits when encoded on tape
+#define HDR_W0_ZERO_MASK    0x4000  // Mask of zero bits in word 0 of header
+#define RES_FREE_FIELD      0x2000  // Mask of "reserved free field" bit
+#define FILE_ID_BIT         0x8000  // Mask of "file identifier" bit
+#define SECTOR_IN_USE       0x1800  // Mask of "empty record indicator" (== !sector in use indicator)
+#define SIF_FILE_NO         1   // SIF file #
+#define SIF_FILE_NO_MASK    0x07ff  // Mask of SIF file #
+#define SIF_FREE_FIELD      0   // SIF free field
+#define SIF_FREE_FIELD_MASK 0xf000  // Mask of SIF free field
+#define BYTES_AVAILABLE     0xff00  // "bytes available" field = 256
+#define BYTES_AVAILABLE_MASK    0xff00  // Mask of "bytes available" field
+#define BYTES_USED          0x00ff  // "bytes used" field = 256
+#define BYTES_USED_MASK     0x00ff  // Mask of "bytes used" field
+#define FORMAT_SECT_SIZE    ((tape_pos_t)(2.85 * ONE_INCH_POS)) // Size of sectors including padding: 2.85"
+#define PAD_WORD_LENGTH     (17 * ONE_BIT_LEN)  // Size of PAD_WORD on tape
+#define PREAMBLE_WORD       0   // Value of preamble word
+#define WORDS_PER_SECTOR_W_MARGIN   256 // Maximum number of words in a sector with a lot of margin (there are actually never more than about 160 words)
+#define MIN_IRG_SIZE        ((tape_pos_t)(0.066 * ONE_INCH_POS))    // Minimum size of IRG gaps: 0.066"
 
 // File types
-#define BKUP_FILETYPE		0
-#define BKUP_ATTR_STR		"BKUP"
-#define DATA_FILETYPE		1
-#define DATA_ATTR_STR		"DATA"
-#define PROG_FILETYPE		2
-#define PROG_ATTR_STR		"PROG"
-#define KEYS_FILETYPE		3
-#define KEYS_ATTR_STR		"KEYS"
-#define BDAT_FILETYPE		4
-#define BDAT_ATTR_STR		"BDAT"
-#define ALL_FILETYPE		5
-#define ALL_ATTR_STR		"ALL"
-#define BPRG_FILETYPE		6
-#define BPRG_ATTR_STR		"BPRG"
-#define OPRM_FILETYPE		7
-#define OPRM_ATTR_STR		"OPRM"
+#define BKUP_FILETYPE       0
+#define BKUP_ATTR_STR       "BKUP"
+#define DATA_FILETYPE       1
+#define DATA_ATTR_STR       "DATA"
+#define PROG_FILETYPE       2
+#define PROG_ATTR_STR       "PROG"
+#define KEYS_FILETYPE       3
+#define KEYS_ATTR_STR       "KEYS"
+#define BDAT_FILETYPE       4
+#define BDAT_ATTR_STR       "BDAT"
+#define ALL_FILETYPE        5
+#define ALL_ATTR_STR        "ALL"
+#define BPRG_FILETYPE       6
+#define BPRG_ATTR_STR       "BPRG"
+#define OPRM_FILETYPE       7
+#define OPRM_ATTR_STR       "OPRM"
 
 // Record type identifiers
-#define REC_TYPE_EOR		0x1e	// End-of-record
-#define REC_TYPE_FULLSTR	0x3c	// A whole (un-split) string
-#define REC_TYPE_EOF		0x3e	// End-of-file
-#define REC_TYPE_1STSTR		0x1c	// First part of a string
-#define REC_TYPE_MIDSTR		0x0c	// Middle part(s) of a string
-#define REC_TYPE_ENDSTR		0x2c	// Last part of a string
+#define REC_TYPE_EOR        0x1e    // End-of-record
+#define REC_TYPE_FULLSTR    0x3c    // A whole (un-split) string
+#define REC_TYPE_EOF        0x3e    // End-of-file
+#define REC_TYPE_1STSTR     0x1c    // First part of a string
+#define REC_TYPE_MIDSTR     0x0c    // Middle part(s) of a string
+#define REC_TYPE_ENDSTR     0x2c    // Last part of a string
 
 // End-of-lines
 #define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))
@@ -196,13 +196,13 @@ typedef INT32 tape_pos_t;
  * Directory entries
  ********************************************************************************/
 typedef struct {
-	UINT8 filename[ CHARS_PER_FNAME ];	// Filename (left justified, 0 padded on the right)
-	bool protection;	// File protection
-	UINT8 filetype;		// File type (00-1f)
-	UINT16 filepos;		// File position (# of 1st sector)
-	UINT16 n_recs;		// Number of records
-	UINT16 wpr;			// Word-per-record
-	unsigned n_sects;	// Count of sectors
+	UINT8 filename[ CHARS_PER_FNAME ];  // Filename (left justified, 0 padded on the right)
+	bool protection;    // File protection
+	UINT8 filetype;     // File type (00-1f)
+	UINT16 filepos;     // File position (# of 1st sector)
+	UINT16 n_recs;      // Number of records
+	UINT16 wpr;         // Word-per-record
+	unsigned n_sects;   // Count of sectors
 } dir_entry_t;
 
 /********************************************************************************
@@ -251,7 +251,7 @@ private:
 
 	static void wipe_sector(tape_word_t *s);
 	void dump_dir_sect(const tape_word_t *dir_sect , unsigned dir_sect_idx);
-	void fill_and_dump_dir_sect(tape_word_t *dir_sect , unsigned& idx , unsigned& dir_sect_idx , tape_word_t w)	;
+	void fill_and_dump_dir_sect(tape_word_t *dir_sect , unsigned& idx , unsigned& dir_sect_idx , tape_word_t w) ;
 	void encode_dir(void);
 	bool read_sector_words(unsigned& sect_no , unsigned& sect_idx , size_t word_no , tape_word_t *out) const;
 	static bool filename_char_check(UINT8 c);
@@ -314,9 +314,9 @@ imgtoolerr_t tape_image_t::load_from_file(imgtool_stream *stream)
 
 	unsigned exp_sector = 0;
 	// Loader state:
-	// 0	Wait for DZ
-	// 1	Wait for sector data
-	// 2	Wait for gap
+	// 0    Wait for DZ
+	// 1    Wait for sector data
+	// 2    Wait for gap
 	unsigned state;
 	tape_pos_t end_pos = 0;
 	for (unsigned track = 0; track < TRACKS_NO; track++) {
@@ -880,14 +880,14 @@ bool tape_image_t::filename_check(const UINT8 *filename)
 }
 
 static const char *const filetype_attrs[] = {
-	BKUP_ATTR_STR,	// 0
-	DATA_ATTR_STR,	// 1
-	PROG_ATTR_STR,	// 2
-	KEYS_ATTR_STR,	// 3
-	BDAT_ATTR_STR,	// 4
-	ALL_ATTR_STR,	// 5
-	BPRG_ATTR_STR,	// 6
-	OPRM_ATTR_STR	// 7
+	BKUP_ATTR_STR,  // 0
+	DATA_ATTR_STR,  // 1
+	PROG_ATTR_STR,  // 2
+	KEYS_ATTR_STR,  // 3
+	BDAT_ATTR_STR,  // 4
+	ALL_ATTR_STR,   // 5
+	BPRG_ATTR_STR,  // 6
+	OPRM_ATTR_STR   // 7
 };
 
 void tape_image_t::get_filename_and_ext(const dir_entry_t& ent , bool inc_ext , char *out , bool& qmark)
@@ -1261,7 +1261,7 @@ static imgtoolerr_t hp9845_tape_delete_file(imgtool_partition *partition, const 
 	return IMGTOOLERR_SUCCESS;
 }
 
-#define HP9845_WRITEFILE_OPTSPEC	"W[0]-65535;T[0]-8"
+#define HP9845_WRITEFILE_OPTSPEC    "W[0]-65535;T[0]-8"
 
 OPTION_GUIDE_START(hp9845_write_optguide)
 	OPTION_INT('W' , "wpr" , "Words per record")

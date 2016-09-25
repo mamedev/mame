@@ -517,7 +517,7 @@ ADDRESS_MAP_END
 
 void seta2_state::staraudi_debug_outputs()
 {
-//	popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
+//  popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
 }
 
 WRITE16_MEMBER(seta2_state::staraudi_lamps1_w)
@@ -528,7 +528,7 @@ WRITE16_MEMBER(seta2_state::staraudi_lamps1_w)
 		output().set_led_value(0, data & 0x0001 );  // Lamp 1 |
 		output().set_led_value(1, data & 0x0002 );  // Lamp 2 |- Camera Lamps
 		output().set_led_value(2, data & 0x0004 );  // Lamp 3 |
-        //                        data & 0x0008 );  // Degauss
+		//                        data & 0x0008 );  // Degauss
 	}
 	staraudi_debug_outputs();
 }
@@ -538,7 +538,7 @@ WRITE16_MEMBER(seta2_state::staraudi_lamps2_w)
 	COMBINE_DATA(&m_lamps2);
 	if (ACCESSING_BITS_0_7)
 	{
-        //                        data & 0x0020 );  // ? Always On
+		//                        data & 0x0020 );  // ? Always On
 		output().set_led_value(3, data & 0x0040 );  // 2P Switch Lamp
 		output().set_led_value(4, data & 0x0080 );  // 1P Switch Lamp
 	}
@@ -550,10 +550,10 @@ WRITE16_MEMBER(seta2_state::staraudi_camera_w)
 	COMBINE_DATA(&m_cam);
 	if (ACCESSING_BITS_0_7)
 	{
-        //                        data & 0x0001 );  // ? Always On
-        //                        data & 0x0002 );  // ? Print Test
-        //                        data & 0x0008 );  // Camera On (Test Mode)
-        //                        data & 0x0020 );  // ?
+		//                        data & 0x0001 );  // ? Always On
+		//                        data & 0x0002 );  // ? Print Test
+		//                        data & 0x0008 );  // Camera On (Test Mode)
+		//                        data & 0x0020 );  // ?
 	}
 	staraudi_debug_outputs();
 }
@@ -582,8 +582,8 @@ static ADDRESS_MAP_START( staraudi_map, AS_PROGRAM, 16, seta2_state )
 
 	AM_RANGE(0x400000, 0x45ffff) AM_READWRITE(staraudi_tileram_r, staraudi_tileram_w) AM_SHARE("tileram") // Tile RAM
 
-//	AM_RANGE(0x500000, 0x53ffff) AM_RAM                             // Camera RAM (r8g8)
-//	AM_RANGE(0x540000, 0x57ffff) AM_RAM                             // Camera RAM (00b8)
+//  AM_RANGE(0x500000, 0x53ffff) AM_RAM                             // Camera RAM (r8g8)
+//  AM_RANGE(0x540000, 0x57ffff) AM_RAM                             // Camera RAM (00b8)
 	AM_RANGE(0x500000, 0x57ffff) AM_RAM AM_SHARE("rgbram")
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(staraudi_camera_w)        // Camera Outputs
@@ -1793,18 +1793,18 @@ static INPUT_PORTS_START( staraudi )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC(0x0004, IP_ACTIVE_LOW, "SW1:3" )
 	PORT_DIPUNKNOWN_DIPLOC(0x0008, IP_ACTIVE_LOW, "SW1:4" )
-	PORT_DIPNAME( 0x0010, 0x0010, "Show Camera Variables" ) PORT_DIPLOCATION("SW1:5")	// camera test in service mode
+	PORT_DIPNAME( 0x0010, 0x0010, "Show Camera Variables" ) PORT_DIPLOCATION("SW1:5")   // camera test in service mode
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, "Parallel/Serial" ) PORT_DIPLOCATION("SW1:6")	// activates parallel / serial reading (ERROR if not active)
+	PORT_DIPNAME( 0x0020, 0x0000, "Parallel/Serial" ) PORT_DIPLOCATION("SW1:6") // activates parallel / serial reading (ERROR if not active)
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC(0x0040, IP_ACTIVE_LOW, "SW1:7" )
-	PORT_SERVICE_DIPLOC(   0x0080, IP_ACTIVE_LOW, "SW1:8" )	// service mode
+	PORT_SERVICE_DIPLOC(   0x0080, IP_ACTIVE_LOW, "SW1:8" ) // service mode
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  // $700302.w
-	PORT_DIPUNKNOWN_DIPLOC(0x0001, IP_ACTIVE_LOW, "SW2:1" )	// ?
+	PORT_DIPUNKNOWN_DIPLOC(0x0001, IP_ACTIVE_LOW, "SW2:1" ) // ?
 	PORT_DIPUNKNOWN_DIPLOC(0x0002, IP_ACTIVE_LOW, "SW2:2" )
 	PORT_DIPUNKNOWN_DIPLOC(0x0004, IP_ACTIVE_LOW, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC(0x0008, IP_ACTIVE_LOW, "SW2:4" )
@@ -1825,7 +1825,7 @@ static INPUT_PORTS_START( staraudi )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Camera Variables? (Cheat)")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Flip Screen / Monitor Sync (Cheat)")	// keep pressed during boot / press together with up
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Flip Screen / Monitor Sync (Cheat)")   // keep pressed during boot / press together with up
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Reset Monitor Sync (Cheat)")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1836,7 +1836,7 @@ static INPUT_PORTS_START( staraudi )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Slow Motion (Cheat)")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Pause (Cheat)")	// something in monitor sync menu too
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Pause (Cheat)")    // something in monitor sync menu too
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) // unused?
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1844,9 +1844,9 @@ static INPUT_PORTS_START( staraudi )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Degauss")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )	PORT_NAME("Reset")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Reset")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE4 ) // unused?
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2   )	// something (flash activity)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2   ) // something (flash activity)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3   ) // unused?
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_START4   ) // unused?
@@ -3521,7 +3521,7 @@ ROM_START( staraudi )
 
 	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "su1_snd.u32", 0x100000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) )	// BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
+	ROM_LOAD( "su1_snd.u32", 0x100000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
 ROM_END
 
 DRIVER_INIT_MEMBER(seta2_state,staraudi)

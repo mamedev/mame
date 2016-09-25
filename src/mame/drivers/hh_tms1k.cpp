@@ -396,7 +396,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
   * PCB label PT-204 "Pair Card"
   * TMS1000NLL MP0163 (die label 1000B, MP0163)
   * 2x2-digit 7seg LED displays + 3 LEDs, 1-bit sound
-  
+
   A-One was a subsidiary of Bandai? The PCB serial PT-xxx is same, and the font
   used on the boxes for "A-One LSI" is same as "Bandai Electronics" from early-80s.
 
@@ -432,10 +432,10 @@ WRITE16_MEMBER(matchnum_state::write_r)
 {
 	// R3-R5,R8-R10: input mux
 	m_inp_mux = (data >> 3 & 7) | (data >> 5 & 0x38);
-	
+
 	// R6,R7: speaker out
 	m_speaker->level_w(data >> 6 & 3);
-	
+
 	// R0-R3: digit/led select
 	m_r = data;
 	prepare_display();
@@ -1369,7 +1369,7 @@ MACHINE_CONFIG_END
   Coleco Head to Head Boxing
   * TMS1100NLL M34018-N2 (die label M34018)
   * 2-digit 7seg LED display, LED grid display, 1-bit sound
-  
+
   This appears to be the last game of Coleco's Head to Head series.
 
 ***************************************************************************/
@@ -4016,7 +4016,7 @@ WRITE16_MEMBER(bship_state::write_o)
 {
 	// O4: explosion light bulb
 	display_matrix(1, 1, data >> 4 & 1, 1);
-	
+
 	// other: sound
 }
 
@@ -5451,7 +5451,7 @@ void tcfball_state::prepare_display()
 	// R8 enables leds, R9 enables digits
 	UINT16 mask = ((m_r >> 9 & 1) * 0x7f) | ((m_r >> 8 & 1) * 0x780);
 	UINT16 sel = ((m_r & 0x7f) | (m_r << 7 & 0x780)) & mask;
-	
+
 	set_display_segmask(0x77, 0x7f);
 	set_display_segmask(0x08, 0xff); // R3 has DP
 	display_matrix(8, 11, m_o, sel);
@@ -5533,7 +5533,7 @@ MACHINE_CONFIG_END
   Tandy Radio Shack Championship Football (model 60-2151)
   * TMS1100NLL MP1183 (no decap)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
-  
+
   The hardware is almost the same as the MP1193 one, they added an extra row of leds.
 
   known releases:

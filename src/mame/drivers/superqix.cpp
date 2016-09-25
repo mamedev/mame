@@ -54,7 +54,7 @@ Super Qix:
   coin lockouts without inverting JAMMA pins K and/or 9. The hack below on V1.0
   pcbs with the two wires connecting to IC 7H may have been a workaround which
   involved a customized JAMMA connector/harness. How exactly is unclear.
-  
+
 - All Taito Super Qix PCBS are part M6100237A, and have a wiring hack on top of
   component 7H (a 74LS86 Quad XOR gate):
   (reference: 74LS86 pins 4, 5 and 12 are 2A, 2B and 4A respectively, none are
@@ -65,7 +65,7 @@ Super Qix:
   (possibly to invert the coin lockout value using one of the XOR gates
   at 7H (or perhaps 7H controls the coin lockouts themselves?)) but what
   exactly the hack does is unclear without further tracing.
-  
+
   The V1.1, V1.2 and US PCBS have two resistors from VCC to GND forming a
   voltage divider on top of 7H, the resistor from VCC/Pin 14 to Common is
   22KOhms, the other resistor is unknown and seems to connect to GND/Pin 7.
@@ -73,7 +73,7 @@ Super Qix:
   the other end of the capacitor connects to 7H pin 12.
   This implies some sort of brief/reset pulse generation or filter on pin 12.
   Again, what exactly this accomplishes is unclear without further tracing.
-  
+
 - sqixb2 is a bootleg of sqixb1, with the MCU removed.
 
 - Prebillian controls: (from the Japanese flyer):
@@ -200,7 +200,7 @@ WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 /**************************************************************************
 
   Timers
-  
+
 **************************************************************************/
 
 void superqix_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -441,20 +441,20 @@ WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
 /***************************************************************************
 
  Hot Smash Z80 <-> 68705 protection interface
- 
+
  High level commands; these commands are parsed by the MCU from the z80->mcu
  register when the MCU's /INT pin is activated, which seems to occur on a
  write to the Z80->MCU register by the Z80.
- 
+
  MCU Commands Legend (hotsmash)
  0x00 - Reset MCU (jumps to reset vector; does not return anything or set mcu->z80 semaphore)
  0x01 - Read Spinner Position Counter for Player 1 (p1, bits 2 and 3 quadrature, counter range is clamped to 00-7f) OR Protection Read
-		Protection reads are reads of a variable length of a rom extending from MCU rom 0x80 to 0xff, and are only every even byte;
-		the strange values returned by the protection functions below are actually the raw rom offset in mcu rom where the reads will come from.
-		The first byte of each read is checked if it is >= or < 0x32, if it is >= it is thrown out and the next byte is ignored. if it is <, it is thrown out,
-		and the next byte is returned instead of reading spinner 1. In the case where the byte of the rom WOULD BE 0xFF, instead based on the LSB of the spinner
-		counter value (effectively a random coin flip) 0x8A or 0x8B is returned. This protection value might actually be the ball speed or AI aggressiveness
-		per level after a certain number of ball hits/points scored, as it always increases, to a limit.
+        Protection reads are reads of a variable length of a rom extending from MCU rom 0x80 to 0xff, and are only every even byte;
+        the strange values returned by the protection functions below are actually the raw rom offset in mcu rom where the reads will come from.
+        The first byte of each read is checked if it is >= or < 0x32, if it is >= it is thrown out and the next byte is ignored. if it is <, it is thrown out,
+        and the next byte is returned instead of reading spinner 1. In the case where the byte of the rom WOULD BE 0xFF, instead based on the LSB of the spinner
+        counter value (effectively a random coin flip) 0x8A or 0x8B is returned. This protection value might actually be the ball speed or AI aggressiveness
+        per level after a certain number of ball hits/points scored, as it always increases, to a limit.
  0x02 - Read Spinner Position Counter for Player 2 (p2, bits 3 and 2 quadrature, counter range is clamped to 00-7f)
  0x04 - Read dipswitch array sw1 and send to z80
  0x08 - Read dipswitch array sw2 and send to z80 and also write them to $3b
@@ -462,229 +462,229 @@ WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
  0x40 - Reset score and start 1P vs CPU game; returns number of points per game win based on sw2:3; clears counters and clears $3a
  0x41 - Reset score and start 2P game; returns number of points per game win based on sw2:3; clears counters and sets $3a bit 0
  0x80 - Increment score for CPU/P2, reset protection read suboffset and set protection read enable flag
-		If in a 2P game, if p2 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xb3
-		If in a 2P game, if p2 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0x9d
-		If in a 2P game, if p2 did not yet score more than sw2.5?4:3 points, return 0x89
-		If in a 1P game, if cpu scored more than sw2.5?4:3 points, return 0xee
-		If in a 1P game, if cpu did not yet score more than sw2.5?4:3 points, return 0xd9
+        If in a 2P game, if p2 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xb3
+        If in a 2P game, if p2 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0x9d
+        If in a 2P game, if p2 did not yet score more than sw2.5?4:3 points, return 0x89
+        If in a 1P game, if cpu scored more than sw2.5?4:3 points, return 0xee
+        If in a 1P game, if cpu did not yet score more than sw2.5?4:3 points, return 0xd9
  0x81 - Increment score for P1, reset protection read suboffset and set protection read enable flag
-		If in a 2P game, if p1 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xa8
-		If in a 2P game, if p1 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0x92
-		If in a 2P game, if p1 did not yet score more than sw2.5?4:3 points, return 0x80
-		If in a 1P game, if p1 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xe2
-		If in a 1P game, if p1 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0xe2
-		If in a 1P game, if p1 did not yet score more than sw2.5?4:3 points, return 0xd0
+        If in a 2P game, if p1 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xa8
+        If in a 2P game, if p1 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0x92
+        If in a 2P game, if p1 did not yet score more than sw2.5?4:3 points, return 0x80
+        If in a 1P game, if p1 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xe2
+        If in a 1P game, if p1 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0xe2
+        If in a 1P game, if p1 did not yet score more than sw2.5?4:3 points, return 0xd0
  0x83 - Increment score for BOTH PLAYERS, reset protection read offset and set protection read enable flag, return 0xbe
  0x84 - Reset protection read suboffset and set protection read enable flag, return 0xc9
  0xF0 - Reset protection read suboffset, return 0xf0 (sent on mcu timeout from z80 side?)
  other - Echo (returns whatever the command byte was back to the z80 immediately)
- 
+
  MCU Commands Detail:
  0x00 - Reset MCU (jumps to reset vector; does not return anything or set mcu->z80 semaphore)
  0x01 - Read Spinner Position Counter for Player 1 (p1, bits 2 and 3 quadrature, counter range is clamped to 00-7f) OR Protection Read
-	if $31 has bit 1 set
-	jump to 239
-		increment $32
-		load a with $34
-		add $33 to a
-		transfer a to x
-		load a with $x
-		if a is 0
-		jump to 247
-			jump to 204, see below
-		if a < 0x32
-		jump to 24a
-			increment $33
-			load a with $34
-			add $33 to a
-			transfer a to x
-			load a with $x
-			if a == 0xFF
-			jump to 25b
-				load x with 0x10
-				load a with [x+1] which is 0x11 (spinner 1 value)
-				store a (value of $11) into $2a
-				if $2a has bit 0 set
-				jump to 269
-					load a with 0x8B
-					store a (value of $34) into $2e
-					store $2e to the mcu->z80 latch
-				otherwise
-					load a with 0x8A
-					store a (value of $34) into $2e
-					store $2e to the mcu->z80 latch
-			otherwise jump to 22a <- I believe this path is the 'protection succeeded' path, as it allows an offset of the first 256 bytes of the mcu rom to be read...
-				store accum into $2e
-				store $2e to the mcu->z80 latch
-		otherwise jump to 204, see below
-	204:
-		load x with 0x10
-		load a with [x+1] which is 0x11 (spinner 1 value)
-		store a (value of $11) into $2e
-		store $2e to the mcu->z80 latch
+    if $31 has bit 1 set
+    jump to 239
+        increment $32
+        load a with $34
+        add $33 to a
+        transfer a to x
+        load a with $x
+        if a is 0
+        jump to 247
+            jump to 204, see below
+        if a < 0x32
+        jump to 24a
+            increment $33
+            load a with $34
+            add $33 to a
+            transfer a to x
+            load a with $x
+            if a == 0xFF
+            jump to 25b
+                load x with 0x10
+                load a with [x+1] which is 0x11 (spinner 1 value)
+                store a (value of $11) into $2a
+                if $2a has bit 0 set
+                jump to 269
+                    load a with 0x8B
+                    store a (value of $34) into $2e
+                    store $2e to the mcu->z80 latch
+                otherwise
+                    load a with 0x8A
+                    store a (value of $34) into $2e
+                    store $2e to the mcu->z80 latch
+            otherwise jump to 22a <- I believe this path is the 'protection succeeded' path, as it allows an offset of the first 256 bytes of the mcu rom to be read...
+                store accum into $2e
+                store $2e to the mcu->z80 latch
+        otherwise jump to 204, see below
+    204:
+        load x with 0x10
+        load a with [x+1] which is 0x11 (spinner 1 value)
+        store a (value of $11) into $2e
+        store $2e to the mcu->z80 latch
  0x02 - Read Spinner Position Counter for Player 2 (p2, bits 3 and 2 quadrature, counter range is clamped to 00-7f)
-	load x with 0x1a
-	load accum with [x+1] which is 0x1b (spinner 2 value)
-	store accum (value of $1b) into $2e
-	store $2e to the mcu->z80 latch
+    load x with 0x1a
+    load accum with [x+1] which is 0x1b (spinner 2 value)
+    store accum (value of $1b) into $2e
+    store $2e to the mcu->z80 latch
  0x04 - Read dipswitch array sw1 and send to z80
  0x08 - Read dipswitch array sw2 and send to z80 and also write them to $3b
-	same as command 0x04, but polls the other port, and also stores the result to $3b
+    same as command 0x04, but polls the other port, and also stores the result to $3b
  0x20 - Reset quadrature counters to 0x38, clears protection read enable flag, return 0x38
-	load a with 0x38
-	load x with 0x10
-	store a to $11
-	load x with 0x1a
-	store a to $1b
-	clear $31
-	store a into $2e
-	store $2e to the mcu->z80 latch
+    load a with 0x38
+    load x with 0x10
+    store a to $11
+    load x with 0x1a
+    store a to $1b
+    clear $31
+    store a into $2e
+    store $2e to the mcu->z80 latch
  0x40 Reset score and start 1P vs CPU game; returns number of points per game win based on sw2:3; clears counters and clears $3a
  0x41 Reset score and start 2P game; returns number of points per game win based on sw2:3; clears counters and sets $3a bit 0
-	clear $32
-	clear $35
-	clear $36
-	clear $37
-	clear $38
-	if $3b has bit 4 clear (number of points per game dipswitch is set to 3)
-	jump to 29c
-		store 0x03 in $39
-		goto in all cases:
-	otherwise (number of points per game dipswitch is set to 4)
-		store 0x04 in $39
-		goto in all cases:
-	in all cases:
+    clear $32
+    clear $35
+    clear $36
+    clear $37
+    clear $38
+    if $3b has bit 4 clear (number of points per game dipswitch is set to 3)
+    jump to 29c
+        store 0x03 in $39
+        goto in all cases:
+    otherwise (number of points per game dipswitch is set to 4)
+        store 0x04 in $39
+        goto in all cases:
+    in all cases:
 ****if command was 0x40: clears $31, $3a,
 ****if command was 0x41: clears $31, sets bit 0x01 of $3a
-	store accum (value of $39) into $2e
-	store $2e to the mcu->z80 latch
+    store accum (value of $39) into $2e
+    store $2e to the mcu->z80 latch
  0x80 - Increment score for CPU/P2, reset protection read suboffset and set protection read enable flag
-	if $3a has bit 0x01 set
-	jump to 2ad
-		set bit 1 of $31
-		clear $33
-		increment $36 
-		check if $36 == $39, if so
-		jump to 2c2
-			clear $36
-			clear $35
-			increment $38
-			check if $38 == 0x02, if so
-			jump to 2d7
-				clear $38
-				clear $37
-				store 0xb3 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-			otherwise
-				store 0x9d into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-		otherwise
-			store 0x89 into $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
-	otherwise jump to 31b <- we're in a 1p game
-		set bit 1 of $31
-		clear $33
-		increment $36
-		check if $36 == $39, if so
-		jump to 330
-			store 0xee into $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
-		otherwise
-			store 0xd9 into $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
+    if $3a has bit 0x01 set
+    jump to 2ad
+        set bit 1 of $31
+        clear $33
+        increment $36
+        check if $36 == $39, if so
+        jump to 2c2
+            clear $36
+            clear $35
+            increment $38
+            check if $38 == 0x02, if so
+            jump to 2d7
+                clear $38
+                clear $37
+                store 0xb3 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+            otherwise
+                store 0x9d into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+        otherwise
+            store 0x89 into $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
+    otherwise jump to 31b <- we're in a 1p game
+        set bit 1 of $31
+        clear $33
+        increment $36
+        check if $36 == $39, if so
+        jump to 330
+            store 0xee into $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
+        otherwise
+            store 0xd9 into $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
  0x81 - Increment score for P1, reset protection read suboffset and set protection read enable flag
-	if $3a has bit 0x01 set
-	jump to 2e4
-		set bit 0x01 of $31
-		clear $33
-		increment $35
-		check if $35 == $39, if so
-		jump to 2f9
-			clear $36
-			clear $35
-			increment $37
-			check if $37 == 0x02, if so
-			jump to 30e
-				clear $38
-				clear $37
-				store 0xA8 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-			otherwise
-				store 0x92 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-		otherwise
-			store 0x80 to $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
-	otherwise jump to 339
-		set bit 0x01 of $31
-		clear $33
-		increment $35
-		check if $35 == $39, if so
-		jump to 34e
-			clear $35
-			clear $36
-			increment $37
-			check if $37 == 0x02
-			if so jump to 363
-				clear $37
-				clear $38
-				store 0xE2 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-			otherwise 
-				store 0xE2 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-		otherwise
-			store 0xd0 to $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
+    if $3a has bit 0x01 set
+    jump to 2e4
+        set bit 0x01 of $31
+        clear $33
+        increment $35
+        check if $35 == $39, if so
+        jump to 2f9
+            clear $36
+            clear $35
+            increment $37
+            check if $37 == 0x02, if so
+            jump to 30e
+                clear $38
+                clear $37
+                store 0xA8 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+            otherwise
+                store 0x92 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+        otherwise
+            store 0x80 to $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
+    otherwise jump to 339
+        set bit 0x01 of $31
+        clear $33
+        increment $35
+        check if $35 == $39, if so
+        jump to 34e
+            clear $35
+            clear $36
+            increment $37
+            check if $37 == 0x02
+            if so jump to 363
+                clear $37
+                clear $38
+                store 0xE2 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+            otherwise
+                store 0xE2 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+        otherwise
+            store 0xd0 to $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
  0x83 - Increment score for BOTH PLAYERS, reset protection read offset and set protection read enable flag, return 0xbe
-	increment $35
-	increment $36
-	store 0xbe to $34
-	clear $32
-	clear $33
-	set bit 1 of $31
-	store a (value of $34) into $2e
-	store $2e to the mcu->z80 latch
+    increment $35
+    increment $36
+    store 0xbe to $34
+    clear $32
+    clear $33
+    set bit 1 of $31
+    store a (value of $34) into $2e
+    store $2e to the mcu->z80 latch
  0x84 - Reset protection read suboffset and set protection read enable flag, return 0xc9
- 	store 0xc9 to $34
-	clear $32
-	clear $33
-	set bit 1 of $31
-	store a (value of $34) into $2e
-	store $2e to the mcu->z80 latch
+    store 0xc9 to $34
+    clear $32
+    clear $33
+    set bit 1 of $31
+    store a (value of $34) into $2e
+    store $2e to the mcu->z80 latch
  0xF0 - Reset protection read suboffset, return 0xf0 (sent on mcu timeout from z80 side?)
-	clear $32
-	clear $33
-	store a (0xF0) into $2e
-	store $2e to the mcu->z80 latch
+    clear $32
+    clear $33
+    store a (0xF0) into $2e
+    store $2e to the mcu->z80 latch
  other - Echo (returns whatever the command byte was back to the z80 immediately)
- 
+
  MCU idle quadrature read loop starts at 165
  MCU reset vector is 120
  The block of code between 100 and 120 is unknown.
- 
+
  MCU memory addresses known:
  10 - cleared by reset, holds the player 1 raw quadrature inputs as last read in bits 2 and 3
  11 - cleared by reset, holds the player 1 spinner position counter, clamped between 0x00 and 0x7f
@@ -711,7 +711,7 @@ WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
  39 - number of points being played for in total (3 or 4, based on sw2:5 dipswitch)
  3a - bit 0: if set: 2P/VS game; if clear: 1P/CPU game
  3b - contents of dipswitch 2; bit 0x10 (switch 5?) affects the value loaded to 39
- 
+
 The Prebillian/Hotsmash hardware seems to be an evolution of the arkanoid hardware in regards to the mcu:
 arkanoid:
 Port A[7:0] <> bidir comms with z80

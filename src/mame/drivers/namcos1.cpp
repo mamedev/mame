@@ -182,7 +182,7 @@ Notes:
 - The ROM/RAM test is NOT performed by default. It is only done if the test mode
   switch is on when the game powers up (setting it and resetting is not enough).
   You can manage to make it work if you press F2 quickly enough after the MAME
-  startup screen, without having to exit MAME and restarting [or just use hard 
+  startup screen, without having to exit MAME and restarting [or just use hard
   reset].
 
 - There are three watchdogs, one per CPU. Handling them separately is necessary
@@ -2702,7 +2702,7 @@ ROM_START( puzlclub )
 	ROM_LOAD( "pc1-c5.bin",         0xa0000, 0x20000, CRC(bc443c27) SHA1(af841b6a2b783b0d9b9bbc33083afbb56e8bff69) )
 	ROM_LOAD( "pc1-c6.bin",         0xc0000, 0x20000, CRC(ec0a3dc5) SHA1(a5148e99f3198196fd635ff4ac0275393e6f7033) )
 	ROM_LOAD( "pc1-c7.bin",         0xe0000, 0x20000, NO_DUMP ) // title screen gfxs are here, might not exist.
-	
+
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites */
 ROM_END

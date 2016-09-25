@@ -192,7 +192,7 @@ void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &
 		if (LOG_LINE)
 			logerror("[%s]: set_line(): %s <= %s\n", machine().describe_context(), line_name, line_value_string(value));
 
-		// engage in a bit of gymnastics for this odious 'Q' value 
+		// engage in a bit of gymnastics for this odious 'Q' value
 		switch(line.value)
 		{
 			case line_value::CLEAR:

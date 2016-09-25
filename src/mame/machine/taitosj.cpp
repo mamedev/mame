@@ -59,9 +59,9 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 
 	/* this is a bit of a hack, but works.
-		Eventually the mixing of the ay1 outs and
-		amplitude-overdrive-mute stuff done by
-		bit 1 here should be done on a netlist.
+	    Eventually the mixing of the ay1 outs and
+	    amplitude-overdrive-mute stuff done by
+	    bit 1 here should be done on a netlist.
 	*/
 	m_ay1->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0); // 3 outputs for Ay1 since it doesn't use tied together outs
 	m_ay1->set_output_gain(1, (data & 0x2) ? 1.0 : 0.0);

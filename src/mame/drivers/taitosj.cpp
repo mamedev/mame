@@ -2485,15 +2485,15 @@ completely differently, at the whim of whoever copied the roms.
 I'm guessing the bootlegs are mostly this set, but it is quite likely we are missing
 dumps of other variations on this bootleg.
 Examples of names:
-position - real name - name1 - name2  
-ic1        "ea_20"   - "9"   - "EAS1" 
-ic2        "ea_21"   - "10"  - "EAS2" 
-ic3        "ea_22"   - "11"  - "EAS3" 
-ic4        "ea_23"   - "12"  - "EAS4" 
-ic5        "ea_24"   - "13"  - "EAS5" 
-ic6        "ea_25"   - "14"  - "EAS6" 
-ic7        "ea_26"   - "15"  - "EAS7" 
-ic8        "ea_27"   - "16"  - "EAS8" 
+position - real name - name1 - name2
+ic1        "ea_20"   - "9"   - "EAS1"
+ic2        "ea_21"   - "10"  - "EAS2"
+ic3        "ea_22"   - "11"  - "EAS3"
+ic4        "ea_23"   - "12"  - "EAS4"
+ic5        "ea_24"   - "13"  - "EAS5"
+ic6        "ea_25"   - "14"  - "EAS6"
+ic7        "ea_26"   - "15"  - "EAS7"
+ic8        "ea_27"   - "16"  - "EAS8"
 
 real name - http://i.ebayimg.com/images/g/75kAAOSwXeJXfVvj/s-l1600.jpg
 name1 - https://s7.postimg.org/lo6dxb09n/IMG_7573.jpg

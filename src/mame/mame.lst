@@ -29305,7 +29305,7 @@ pacuman                         // bootleg
 paintrlr                        // 1981 bootleg
 pengojpm                        // bootleg
 pengopac                        // bootleg
-pinguinos						// bootleg
+pinguinos                       // bootleg
 piranha                         // GL
 piranhah                        // hack
 piranhao                        // GL
@@ -30190,8 +30190,8 @@ sonstwr2                        //
 wolfman                         //
 
 @source:pg685.cpp
-pg685							//
-pg685oua12						//
+pg685                           //
+pg685oua12                      //
 
 
 
@@ -30800,7 +30800,7 @@ popeye                          // (c) 1982
 popeyebl                        // bootleg
 popeyef                         // (c) 1982
 popeyeu                         // (c) 1982
-popeyej							//
+popeyej                         //
 skyskipr                        // (c) 1981
 
 @source:popobear.cpp
@@ -32290,7 +32290,7 @@ fantzn2                         // (c) 1988
 hangonjr                        // (c) 1985
 opaopa                          //
 ridleofp                        // (c) 1986 Sega / Nasco
-slapshtr						// (c) 1986 Sega
+slapshtr                        // (c) 1986 Sega
 tetrisse                        // (c) 1988
 transfrm                        // 834-5803 (c) 1986
 
@@ -35105,7 +35105,7 @@ spcteam                         //
 @source:tecmo.cpp
 backfirt                        // bootleg [(c) 1988 Tecmo]
 gemini                          // (c) 1987 Tecmo
-geminib							// bootleg
+geminib                         // bootleg
 rygar                           // 6002 - (c) 1986 Tecmo
 rygar2                          // 6002 - (c) 1986 Tecmo
 rygar3                          // 6002 - (c) 1986 Tecmo

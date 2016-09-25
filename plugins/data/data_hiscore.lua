@@ -515,7 +515,7 @@ function dat.check(set, softlist)
 								dat[#dat + 1] = check_format(col["format"])
 								dat[#dat + 1] = "val = tempform(val)"
 							end
-							if igncol == col["id"] then 
+							if igncol == col["id"] then
 								dat[#dat + 1] = "checkval = val"
 							end
 							dat[#dat + 1] = "line = line .. val .. '\\t'"
@@ -546,7 +546,7 @@ function dat.check(set, softlist)
 		end
 		return script
 	end
-	
+
 	if #env == 0 then
 		function env.open(file, size)
 			if file == ".hi" then
@@ -765,7 +765,7 @@ function dat.check(set, softlist)
 	local scrfile = emu.file(lfs.env_replace(mame_manager:ui():options().entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
 	local ret = scrfile:open(set .. ".lua")
 	local script
-	if ret then 
+	if ret then
 		local xml = xml_parse()
 		if not xml then
 			return nil
@@ -787,7 +787,7 @@ function dat.check(set, softlist)
 		if not status then
 			emu.print_verbose("error in hi score parse script: " .. output)
 			output = nil
-		end			
+		end
 	end
 	if output then
 		return "High Scores"
