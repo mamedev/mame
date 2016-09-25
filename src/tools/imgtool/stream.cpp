@@ -22,11 +22,12 @@ enum imgtype_t
 	IMG_MEM
 };
 
-struct imgtool_stream
+class imgtool::stream
 {
-	typedef std::unique_ptr<imgtool_stream> ptr;
+public:
+	typedef std::unique_ptr<imgtool::stream> ptr;
 
-	imgtool_stream(bool wp)
+	stream(bool wp)
 		: imgtype(IMG_FILE)
 		, write_protect(wp)
 		, name(nullptr)
@@ -37,7 +38,7 @@ struct imgtool_stream
 	{
 	}
 
-	imgtool_stream(
+	stream(
 			bool wp,
 			util::core_file::ptr &&f)
 		: imgtype(IMG_FILE)
@@ -50,7 +51,7 @@ struct imgtool_stream
 	{
 	}
 
-	imgtool_stream(bool wp, std::size_t size)
+	stream(bool wp, std::size_t size)
 		: imgtype(IMG_MEM)
 		, write_protect(wp)
 		, name(nullptr)
@@ -61,7 +62,7 @@ struct imgtool_stream
 	{
 	}
 
-	imgtool_stream(bool wp, std::size_t size, void *buf)
+	stream(bool wp, std::size_t size, void *buf)
 		: imgtype(IMG_MEM)
 		, write_protect(wp)
 		, name(nullptr)
@@ -72,7 +73,7 @@ struct imgtool_stream
 	{
 	}
 
-	~imgtool_stream()
+	~stream()
 	{
 		free(buffer);
 	}
@@ -89,7 +90,7 @@ struct imgtool_stream
 
 
 
-static imgtool_stream *stream_open_zip(const char *zipname, const char *subname, int read_or_write)
+static imgtool::stream *stream_open_zip(const char *zipname, const char *subname, int read_or_write)
 {
 	if (read_or_write)
 		return nullptr;
@@ -100,7 +101,7 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 		return nullptr;
 	fclose(f);
 
-	imgtool_stream::ptr imgfile(new imgtool_stream(true));
+	imgtool::stream::ptr imgfile(new imgtool::stream(true));
 
 	imgfile->imgtype = IMG_MEM;
 
@@ -128,7 +129,7 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 
 
 
-imgtool_stream *stream_open(const char *fname, int read_or_write)
+imgtool::stream *stream_open(const char *fname, int read_or_write)
 {
 	static const UINT32 write_modes[] =
 	{
@@ -137,7 +138,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 		OPEN_FLAG_READ | OPEN_FLAG_WRITE,
 		OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE
 	};
-	imgtool_stream *s = nullptr;
+	imgtool::stream *s = nullptr;
 	char c;
 
 	/* maybe we are just a ZIP? */
@@ -176,7 +177,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 		return nullptr;
 	}
 
-	imgtool_stream::ptr imgfile(new imgtool_stream(read_or_write ? false : true, std::move(f)));
+	imgtool::stream::ptr imgfile(new imgtool::stream(read_or_write ? false : true, std::move(f)));
 
 	/* Normal file */
 	imgfile->name = fname;
@@ -185,9 +186,9 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 
 
 
-imgtool_stream *stream_open_write_stream(int size)
+imgtool::stream *stream_open_write_stream(int size)
 {
-	imgtool_stream::ptr imgfile(new imgtool_stream(false, size));
+	imgtool::stream::ptr imgfile(new imgtool::stream(false, size));
 	if (!imgfile->buffer)
 		return nullptr;
 
@@ -196,16 +197,16 @@ imgtool_stream *stream_open_write_stream(int size)
 
 
 
-imgtool_stream *stream_open_mem(void *buf, size_t sz)
+imgtool::stream *stream_open_mem(void *buf, size_t sz)
 {
-	imgtool_stream::ptr imgfile(new imgtool_stream(false, sz, buf));
+	imgtool::stream::ptr imgfile(new imgtool::stream(false, sz, buf));
 
 	return imgfile.release();
 }
 
 
 
-void stream_close(imgtool_stream *s)
+void stream_close(imgtool::stream *s)
 {
 	assert(s != nullptr);
 
@@ -214,14 +215,14 @@ void stream_close(imgtool_stream *s)
 
 
 
-util::core_file *stream_core_file(imgtool_stream *stream)
+util::core_file *stream_core_file(imgtool::stream *stream)
 {
 	return (stream->imgtype == IMG_FILE) ? stream->file.get() : nullptr;
 }
 
 
 
-UINT32 stream_read(imgtool_stream *stream, void *buf, UINT32 sz)
+UINT32 stream_read(imgtool::stream *stream, void *buf, UINT32 sz)
 {
 	UINT32 result = 0;
 
@@ -252,7 +253,7 @@ UINT32 stream_read(imgtool_stream *stream, void *buf, UINT32 sz)
 
 
 
-UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
+UINT32 stream_write(imgtool::stream *s, const void *buf, UINT32 sz)
 {
 	void *new_buffer;
 	UINT32 result = 0;
@@ -304,14 +305,14 @@ UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
 
 
 
-UINT64 stream_size(imgtool_stream *s)
+UINT64 stream_size(imgtool::stream *s)
 {
 	return s->filesize;
 }
 
 
 
-void *stream_getptr(imgtool_stream *f)
+void *stream_getptr(imgtool::stream *f)
 {
 	void *ptr;
 
@@ -330,7 +331,7 @@ void *stream_getptr(imgtool_stream *f)
 
 
 
-int stream_seek(imgtool_stream *s, INT64 pos, int where)
+int stream_seek(imgtool::stream *s, INT64 pos, int where)
 {
 	UINT64 size;
 
@@ -359,14 +360,14 @@ int stream_seek(imgtool_stream *s, INT64 pos, int where)
 
 
 
-UINT64 stream_tell(imgtool_stream *s)
+UINT64 stream_tell(imgtool::stream *s)
 {
 	return s->position;
 }
 
 
 
-UINT64 stream_transfer(imgtool_stream *dest, imgtool_stream *source, UINT64 sz)
+UINT64 stream_transfer(imgtool::stream *dest, imgtool::stream *source, UINT64 sz)
 {
 	UINT64 result = 0;
 	UINT64 readsz;
@@ -383,14 +384,14 @@ UINT64 stream_transfer(imgtool_stream *dest, imgtool_stream *source, UINT64 sz)
 
 
 
-UINT64 stream_transfer_all(imgtool_stream *dest, imgtool_stream *source)
+UINT64 stream_transfer_all(imgtool::stream *dest, imgtool::stream *source)
 {
 	return stream_transfer(dest, source, stream_size(source));
 }
 
 
 
-int stream_crc(imgtool_stream *s, unsigned long *result)
+int stream_crc(imgtool::stream *s, unsigned long *result)
 {
 	size_t sz;
 	void *ptr;
@@ -424,7 +425,7 @@ int stream_crc(imgtool_stream *s, unsigned long *result)
 int file_crc(const char *fname,  unsigned long *result)
 {
 	int err;
-	imgtool_stream *f;
+	imgtool::stream *f;
 
 	f = stream_open(fname, OSD_FOPEN_READ);
 	if (!f)
@@ -437,7 +438,7 @@ int file_crc(const char *fname,  unsigned long *result)
 
 
 
-UINT64 stream_fill(imgtool_stream *f, unsigned char b, UINT64 sz)
+UINT64 stream_fill(imgtool::stream *f, unsigned char b, UINT64 sz)
 {
 	UINT64 outsz;
 	char buf[1024];
@@ -455,28 +456,28 @@ UINT64 stream_fill(imgtool_stream *f, unsigned char b, UINT64 sz)
 
 
 
-int stream_isreadonly(imgtool_stream *s)
+int stream_isreadonly(imgtool::stream *s)
 {
 	return s->write_protect;
 }
 
 
 
-UINT32 stream_putc(imgtool_stream *stream, char c)
+UINT32 stream_putc(imgtool::stream *stream, char c)
 {
 	return stream_write(stream, &c, 1);
 }
 
 
 
-UINT32 stream_puts(imgtool_stream *stream, const char *s)
+UINT32 stream_puts(imgtool::stream *stream, const char *s)
 {
 	return stream_write(stream, s, strlen(s));
 }
 
 
 
-UINT32 stream_printf(imgtool_stream *stream, const char *fmt, ...)
+UINT32 stream_printf(imgtool::stream *stream, const char *fmt, ...)
 {
 	va_list va;
 	char buf[256];

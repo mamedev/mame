@@ -216,8 +216,8 @@ public:
 
 	void format_img(void);
 
-	imgtoolerr_t load_from_file(imgtool_stream *stream);
-	imgtoolerr_t save_to_file(imgtool_stream *stream);
+	imgtoolerr_t load_from_file(imgtool::stream *stream);
+	imgtoolerr_t save_to_file(imgtool::stream *stream);
 
 	unsigned free_sectors(void) const;
 
@@ -259,8 +259,8 @@ private:
 	bool decode_dir(void);
 	static tape_pos_t word_length(tape_word_t w);
 	static tape_pos_t block_end_pos(tape_pos_t pos , const tape_word_t *block , unsigned block_len);
-	static bool save_word(imgtool_stream *stream , tape_pos_t& pos , tape_word_t w);
-	static bool save_words(imgtool_stream *stream , tape_pos_t& pos , const tape_word_t *block , unsigned block_len);
+	static bool save_word(imgtool::stream *stream , tape_pos_t& pos , tape_word_t w);
+	static bool save_words(imgtool::stream *stream , tape_pos_t& pos , const tape_word_t *block , unsigned block_len);
 	static tape_word_t checksum(const tape_word_t *block , unsigned block_len);
 };
 
@@ -268,7 +268,7 @@ private:
  * Image state
  ********************************************************************************/
 typedef struct {
-	imgtool_stream *stream;
+	imgtool::stream *stream;
 	tape_image_t *img;
 } tape_state_t;
 
@@ -298,7 +298,7 @@ void tape_image_t::format_img(void)
 	dirty = true;
 }
 
-imgtoolerr_t tape_image_t::load_from_file(imgtool_stream *stream)
+imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 {
 	stream_seek(stream , 0 , SEEK_SET);
 
@@ -432,7 +432,7 @@ tape_pos_t tape_image_t::block_end_pos(tape_pos_t pos , const tape_word_t *block
 	return pos;
 }
 
-bool tape_image_t::save_word(imgtool_stream *stream , tape_pos_t& pos , tape_word_t w)
+bool tape_image_t::save_word(imgtool::stream *stream , tape_pos_t& pos , tape_word_t w)
 {
 	UINT8 tmp[ 2 ];
 
@@ -446,7 +446,7 @@ bool tape_image_t::save_word(imgtool_stream *stream , tape_pos_t& pos , tape_wor
 	return true;
 }
 
-bool tape_image_t::save_words(imgtool_stream *stream , tape_pos_t& pos , const tape_word_t *block , unsigned block_len)
+bool tape_image_t::save_words(imgtool::stream *stream , tape_pos_t& pos , const tape_word_t *block , unsigned block_len)
 {
 	UINT8 tmp[ 4 ];
 
@@ -483,7 +483,7 @@ tape_word_t tape_image_t::checksum(const tape_word_t *block , unsigned block_len
 	return csum & 0xffff;
 }
 
-imgtoolerr_t tape_image_t::save_to_file(imgtool_stream *stream)
+imgtoolerr_t tape_image_t::save_to_file(imgtool::stream *stream)
 {
 	// Encode copies of directory into sectors
 	encode_dir();
@@ -1023,7 +1023,7 @@ bool tape_image_t::decode_dir(void)
 	return true;
 }
 
-static tape_state_t& get_tape_state(imgtool_image *img)
+static tape_state_t& get_tape_state(imgtool::image *img)
 {
 	tape_state_t *ts = (tape_state_t*)imgtool_image_extra_bytes(img);
 
@@ -1042,7 +1042,7 @@ static tape_image_t& get_tape_image(tape_state_t& ts)
 /********************************************************************************
  * Imgtool functions
  ********************************************************************************/
-static imgtoolerr_t hp9845_tape_open(imgtool_image *image, imgtool_stream *stream)
+static imgtoolerr_t hp9845_tape_open(imgtool::image *image, imgtool::stream *stream)
 {
 	tape_state_t& state = get_tape_state(image);
 
@@ -1053,7 +1053,7 @@ static imgtoolerr_t hp9845_tape_open(imgtool_image *image, imgtool_stream *strea
 	return tape_image.load_from_file(stream);
 }
 
-static imgtoolerr_t hp9845_tape_create(imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t hp9845_tape_create(imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
 {
 	tape_state_t& state = get_tape_state(image);
 
@@ -1066,7 +1066,7 @@ static imgtoolerr_t hp9845_tape_create(imgtool_image *image, imgtool_stream *str
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void hp9845_tape_close(imgtool_image *image)
+static void hp9845_tape_close(imgtool::image *image)
 {
 	tape_state_t& state = get_tape_state(image);
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1081,7 +1081,7 @@ static void hp9845_tape_close(imgtool_image *image)
 	global_free(&tape_image);
 }
 
-static imgtoolerr_t hp9845_tape_begin_enum (imgtool_directory *enumeration, const char *path)
+static imgtoolerr_t hp9845_tape_begin_enum (imgtool::directory *enumeration, const char *path)
 {
 	dir_state_t *ds = (dir_state_t*)imgtool_directory_extrabytes(enumeration);
 
@@ -1090,7 +1090,7 @@ static imgtoolerr_t hp9845_tape_begin_enum (imgtool_directory *enumeration, cons
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_next_enum (imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t hp9845_tape_next_enum (imgtool::directory *enumeration, imgtool::dirent *ent)
 {
 	tape_state_t& state = get_tape_state(imgtool_directory_image(enumeration));
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1115,7 +1115,7 @@ static imgtoolerr_t hp9845_tape_next_enum (imgtool_directory *enumeration, imgto
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_free_space(imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t hp9845_tape_free_space(imgtool::partition *partition, UINT64 *size)
 {
 	tape_state_t& state = get_tape_state(imgtool_partition_image(partition));
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1125,7 +1125,7 @@ static imgtoolerr_t hp9845_tape_free_space(imgtool_partition *partition, UINT64 
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_read_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t hp9845_tape_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
 	tape_state_t& state = get_tape_state(imgtool_partition_image(partition));
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1159,7 +1159,7 @@ static imgtoolerr_t hp9845_tape_read_file(imgtool_partition *partition, const ch
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_write_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t hp9845_tape_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
 	tape_state_t& state = get_tape_state(imgtool_partition_image(partition));
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1245,7 +1245,7 @@ static imgtoolerr_t hp9845_tape_write_file(imgtool_partition *partition, const c
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_delete_file(imgtool_partition *partition, const char *filename)
+static imgtoolerr_t hp9845_tape_delete_file(imgtool::partition *partition, const char *filename)
 {
 	tape_state_t& state = get_tape_state(imgtool_partition_image(partition));
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1354,12 +1354,12 @@ void hp9845_tape_get_info(const imgtool_class *imgclass, UINT32 state, union img
 /********************************************************************************
  * Filter functions
  ********************************************************************************/
-static unsigned len_to_eor(imgtool_stream *inp)
+static unsigned len_to_eor(imgtool::stream *inp)
 {
 	return SECTOR_LEN - (unsigned)(stream_tell(inp) % SECTOR_LEN);
 }
 
-static bool get_record_part(imgtool_stream *inp , void *buf , unsigned len)
+static bool get_record_part(imgtool::stream *inp , void *buf , unsigned len)
 {
 	// Reading must never cross sector boundary
 	if (len > len_to_eor(inp)) {
@@ -1369,7 +1369,7 @@ static bool get_record_part(imgtool_stream *inp , void *buf , unsigned len)
 	return stream_read(inp , buf , len) == len;
 }
 
-static bool dump_string(imgtool_stream *inp, imgtool_stream *out , unsigned len , bool add_eoln)
+static bool dump_string(imgtool::stream *inp, imgtool::stream *out , unsigned len , bool add_eoln)
 {
 	UINT8 tmp[ SECTOR_LEN ];
 
@@ -1392,9 +1392,9 @@ static bool dump_string(imgtool_stream *inp, imgtool_stream *out , unsigned len 
 	return true;
 }
 
-static imgtoolerr_t hp9845data_read_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t hp9845data_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
-	imgtool_stream *inp_data;
+	imgtool::stream *inp_data;
 	imgtoolerr_t res;
 	UINT8 tmp[ 2 ];
 
@@ -1481,7 +1481,7 @@ static imgtoolerr_t hp9845data_read_file(imgtool_partition *partition, const cha
 	return IMGTOOLERR_SUCCESS;
 }
 
-static bool split_string_n_dump(const char *s , imgtool_stream *dest)
+static bool split_string_n_dump(const char *s , imgtool::stream *dest)
 {
 	unsigned s_len = strlen(s);
 	UINT16 rec_type = REC_TYPE_1STSTR;
@@ -1533,9 +1533,9 @@ static bool split_string_n_dump(const char *s , imgtool_stream *dest)
 	return true;
 }
 
-static imgtoolerr_t hp9845data_write_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t hp9845data_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
-	imgtool_stream *out_data;
+	imgtool::stream *out_data;
 
 	out_data = stream_open_mem(NULL , 0);
 	if (out_data == nullptr) {

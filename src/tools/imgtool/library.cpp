@@ -50,8 +50,8 @@ void library::add_class(const imgtool_class *imgclass)
 	char *s1, *s2;
 
 	// allocate the module and place it in the chain
-	m_modules.emplace_back(std::make_unique<imgtool_module>());
-	imgtool_module *module = m_modules.back().get();
+	m_modules.emplace_back(std::make_unique<imgtool::module>());
+	imgtool::module *module = m_modules.back().get();
 	memset(module, 0, sizeof(*module));
 
 	// extensions have a weird format
@@ -69,16 +69,16 @@ void library::add_class(const imgtool_class *imgclass)
 	module->tracks_are_called_cylinders = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? 1 : 0;
 	module->writing_untested            = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_WRITING_UNTESTED) ? 1 : 0;
 	module->creation_untested           = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_CREATION_UNTESTED) ? 1 : 0;
-	module->open                        = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
-	module->create                      = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *, util::option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
-	module->close                       = (void (*)(imgtool_image *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CLOSE);
-	module->info                        = (void (*)(imgtool_image *, char *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_INFO);
-	module->read_sector                 = (imgtoolerr_t (*)(imgtool_image *, UINT32, UINT32, UINT32, std::vector<UINT8> &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_SECTOR);
-	module->write_sector                = (imgtoolerr_t (*)(imgtool_image *, UINT32, UINT32, UINT32, const void *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_SECTOR);
-	module->get_geometry                = (imgtoolerr_t (*)(imgtool_image *, UINT32 *, UINT32 *, UINT32 *))imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_GET_GEOMETRY);
-	module->read_block                  = (imgtoolerr_t (*)(imgtool_image *, void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_BLOCK);
-	module->write_block                 = (imgtoolerr_t (*)(imgtool_image *, const void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_BLOCK);
-	module->list_partitions             = (imgtoolerr_t (*)(imgtool_image *, imgtool_partition_info *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
+	module->open                        = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
+	module->create                      = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *, util::option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
+	module->close                       = (void (*)(imgtool::image *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CLOSE);
+	module->info                        = (void (*)(imgtool::image *, char *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_INFO);
+	module->read_sector                 = (imgtoolerr_t (*)(imgtool::image *, UINT32, UINT32, UINT32, std::vector<UINT8> &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_SECTOR);
+	module->write_sector                = (imgtoolerr_t (*)(imgtool::image *, UINT32, UINT32, UINT32, const void *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_SECTOR);
+	module->get_geometry                = (imgtoolerr_t (*)(imgtool::image *, UINT32 *, UINT32 *, UINT32 *))imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_GET_GEOMETRY);
+	module->read_block                  = (imgtoolerr_t (*)(imgtool::image *, void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_BLOCK);
+	module->write_block                 = (imgtoolerr_t (*)(imgtool::image *, const void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_BLOCK);
+	module->list_partitions             = (imgtoolerr_t (*)(imgtool::image *, imgtool_partition_info *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
 	module->block_size                  = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_BLOCK_SIZE);
 	module->createimage_optguide        = (const util::option_guide *) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE);
 	module->createimage_optspec         = imgtool_library_strdup_allow_null((const char*)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
@@ -143,7 +143,7 @@ void library::unlink(const char *module_name)
 //  module_compare
 //-------------------------------------------------
 
-int library::module_compare(const imgtool_module *m1, const imgtool_module *m2, sort_type sort)
+int library::module_compare(const imgtool::module *m1, const imgtool::module *m2, sort_type sort)
 {
 	int rc = 0;
 	switch(sort)
@@ -165,7 +165,7 @@ int library::module_compare(const imgtool_module *m1, const imgtool_module *m2, 
 
 void library::sort(sort_type sort)
 {
-	auto compare = [this, sort](const std::unique_ptr<imgtool_module> &a, const std::unique_ptr<imgtool_module> &b)
+	auto compare = [this, sort](const std::unique_ptr<imgtool::module> &a, const std::unique_ptr<imgtool::module> &b)
 	{
 		return module_compare(a.get(), b.get(), sort) < 0;
 	};
@@ -182,7 +182,7 @@ library::modulelist::iterator library::find(const char *module_name)
 	return std::find_if(
 		m_modules.begin(),
 		m_modules.end(),
-		[this, module_name](std::unique_ptr<imgtool_module> &module) { return !strcmp(module->name, module_name); });
+		[this, module_name](std::unique_ptr<imgtool::module> &module) { return !strcmp(module->name, module_name); });
 }
 
 
@@ -190,7 +190,7 @@ library::modulelist::iterator library::find(const char *module_name)
 //  findmodule
 //-------------------------------------------------
 
-const imgtool_module *library::findmodule(const char *module_name)
+const imgtool::module *library::findmodule(const char *module_name)
 {
 	modulelist::iterator iter = find(module_name);
 	return iter != m_modules.end()

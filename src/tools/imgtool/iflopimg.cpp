@@ -45,29 +45,29 @@ imgtoolerr_t imgtool_floppy_error(floperr_t err)
 
 static void imgtool_floppy_closeproc(void *file)
 {
-	stream_close((imgtool_stream *) file);
+	stream_close((imgtool::stream *) file);
 }
 
 static int imgtool_floppy_seekproc(void *file, INT64 offset, int whence)
 {
-	stream_seek((imgtool_stream *) file, offset, whence);
+	stream_seek((imgtool::stream *) file, offset, whence);
 	return 0;
 }
 
 static size_t imgtool_floppy_readproc(void *file, void *buffer, size_t length)
 {
-	return stream_read((imgtool_stream *) file, buffer, length);
+	return stream_read((imgtool::stream *) file, buffer, length);
 }
 
 static size_t imgtool_floppy_writeproc(void *file, const void *buffer, size_t length)
 {
-	stream_write((imgtool_stream *) file, buffer, length);
+	stream_write((imgtool::stream *) file, buffer, length);
 	return length;
 }
 
 static UINT64 imgtool_floppy_filesizeproc(void *file)
 {
-	return stream_size((imgtool_stream *) file);
+	return stream_size((imgtool::stream *) file);
 }
 
 static const struct io_procs imgtool_ioprocs =
@@ -102,19 +102,19 @@ struct imgtool_floppy_image
 
 
 
-static imgtoolerr_t imgtool_floppy_open_internal(imgtool_image *image, imgtool_stream *f, int noclose)
+static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image *image, imgtool::stream *f, int noclose)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
 	struct imgtool_floppy_image *fimg;
 	const imgtool_class *imgclass;
 	const struct FloppyFormat *format;
-	imgtoolerr_t (*open)(imgtool_image *image, imgtool_stream *f);
+	imgtoolerr_t (*open)(imgtool::image *image, imgtool::stream *f);
 
 	fimg = (struct imgtool_floppy_image *) imgtool_image_extra_bytes(image);
 	imgclass = &imgtool_image_module(image)->imgclass;
 	format = (const struct FloppyFormat *) imgclass->derived_param;
-	open = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_OPEN);
+	open = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_OPEN);
 
 	/* open up the floppy */
 	ferr = floppy_open(f, noclose ? &imgtool_noclose_ioprocs : &imgtool_ioprocs,
@@ -137,28 +137,28 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool_image *image, imgtool_s
 
 
 
-static imgtoolerr_t imgtool_floppy_open(imgtool_image *image, imgtool_stream *f)
+static imgtoolerr_t imgtool_floppy_open(imgtool::image *image, imgtool::stream *f)
 {
 	return imgtool_floppy_open_internal(image, f, FALSE);
 }
 
 
 
-static imgtoolerr_t imgtool_floppy_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *opts)
+static imgtoolerr_t imgtool_floppy_create(imgtool::image *image, imgtool::stream *f, util::option_resolution *opts)
 {
 	floperr_t ferr;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	struct imgtool_floppy_image *fimg;
 	const imgtool_class *imgclass;
 	const struct FloppyFormat *format;
-	imgtoolerr_t (*create)(imgtool_image *, imgtool_stream *, util::option_resolution *);
-	imgtoolerr_t (*open)(imgtool_image *image, imgtool_stream *f);
+	imgtoolerr_t (*create)(imgtool::image *, imgtool::stream *, util::option_resolution *);
+	imgtoolerr_t (*open)(imgtool::image *image, imgtool::stream *f);
 
 	fimg = (struct imgtool_floppy_image *) imgtool_image_extra_bytes(image);
 	imgclass = &imgtool_image_module(image)->imgclass;
 	format = (const struct FloppyFormat *) imgclass->derived_param;
-	create = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *, util::option_resolution *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_CREATE);
-	open = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_OPEN);
+	create = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *, util::option_resolution *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_CREATE);
+	open = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_OPEN);
 
 	/* open up the floppy */
 	ferr = floppy_create(f, &imgtool_ioprocs, format, opts, &fimg->floppy);
@@ -190,14 +190,14 @@ done:
 
 
 
-static void imgtool_floppy_close(imgtool_image *img)
+static void imgtool_floppy_close(imgtool::image *img)
 {
 	floppy_close(imgtool_floppy(img));
 }
 
 
 
-static imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
+static imgtoolerr_t imgtool_floppy_read_sector(imgtool::image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
 {
 	floperr_t ferr;
 	UINT32 sector_size;
@@ -221,7 +221,7 @@ static imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 trac
 
 
 
-static imgtoolerr_t imgtool_floppy_write_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam)
+static imgtoolerr_t imgtool_floppy_write_sector(imgtool::image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam)
 {
 	floperr_t ferr;
 
@@ -296,7 +296,7 @@ int imgtool_floppy_make_class(int index, imgtool_class *imgclass)
 
 
 
-floppy_image_legacy *imgtool_floppy(imgtool_image *img)
+floppy_image_legacy *imgtool_floppy(imgtool::image *img)
 {
 	struct imgtool_floppy_image *fimg;
 	fimg = (struct imgtool_floppy_image *) imgtool_image_extra_bytes(img);
@@ -305,7 +305,7 @@ floppy_image_legacy *imgtool_floppy(imgtool_image *img)
 
 
 
-static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool_image *img, int head, int track, int sector, int offset, size_t length, imgtool_stream *f, int direction)
+static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool::image *img, int head, int track, int sector, int offset, size_t length, imgtool::stream *f, int direction)
 {
 	floperr_t err;
 	floppy_image_legacy *floppy;
@@ -338,21 +338,21 @@ done:
 
 
 
-imgtoolerr_t imgtool_floppy_read_sector_to_stream(imgtool_image *img, int head, int track, int sector, int offset, size_t length, imgtool_stream *f)
+imgtoolerr_t imgtool_floppy_read_sector_to_stream(imgtool::image *img, int head, int track, int sector, int offset, size_t length, imgtool::stream *f)
 {
 	return imgtool_floppy_transfer_sector_tofrom_stream(img, head, track, sector, offset, length, f, 1);
 }
 
 
 
-imgtoolerr_t imgtool_floppy_write_sector_from_stream(imgtool_image *img, int head, int track, int sector, int offset, size_t length, imgtool_stream *f)
+imgtoolerr_t imgtool_floppy_write_sector_from_stream(imgtool::image *img, int head, int track, int sector, int offset, size_t length, imgtool::stream *f)
 {
 	return imgtool_floppy_transfer_sector_tofrom_stream(img, head, track, sector, offset, length, f, 0);
 }
 
 
 
-void *imgtool_floppy_extrabytes(imgtool_image *img)
+void *imgtool_floppy_extrabytes(imgtool::image *img)
 {
 	struct imgtool_floppy_image *fimg;
 	fimg = (struct imgtool_floppy_image *) imgtool_image_extra_bytes(img);

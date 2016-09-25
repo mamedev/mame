@@ -14,7 +14,7 @@
 
 struct cybiko_file_system
 {
-	imgtool_stream *stream;
+	imgtool::stream *stream;
 	UINT32 page_count, page_size, block_count_boot, block_count_file;
 	UINT16 write_count;
 };
@@ -265,7 +265,7 @@ static int cfs_verify( cybiko_file_system *cfs)
 	return TRUE;
 }
 
-static int cfs_init( cybiko_file_system *cfs, imgtool_stream *stream, int flash_type)
+static int cfs_init( cybiko_file_system *cfs, imgtool::stream *stream, int flash_type)
 {
 	cfs->stream = stream;
 	switch (flash_type)
@@ -345,7 +345,7 @@ static int flash_option_to_flash_type( int option)
 	}
 }
 
-static imgtoolerr_t cybiko_image_open( imgtool_image *image, imgtool_stream *stream)
+static imgtoolerr_t cybiko_image_open( imgtool::image *image, imgtool::stream *stream)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	int flash_type;
@@ -358,13 +358,13 @@ static imgtoolerr_t cybiko_image_open( imgtool_image *image, imgtool_stream *str
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void cybiko_image_close( imgtool_image *image)
+static void cybiko_image_close( imgtool::image *image)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	stream_close( cfs->stream);
 }
 
-static imgtoolerr_t cybiko_image_create( imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t cybiko_image_create( imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	int flash_type;
@@ -377,16 +377,16 @@ static imgtoolerr_t cybiko_image_create( imgtool_image *image, imgtool_stream *s
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_begin_enum( imgtool_directory *enumeration, const char *path)
+static imgtoolerr_t cybiko_image_begin_enum( imgtool::directory *enumeration, const char *path)
 {
 	cybiko_iter *iter = (cybiko_iter*)imgtool_directory_extrabytes( enumeration);
 	iter->block = 0;
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_next_enum( imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t cybiko_image_next_enum( imgtool::directory *enumeration, imgtool::dirent *ent)
 {
-	imgtool_image *image = imgtool_directory_image( enumeration);
+	imgtool::image *image = imgtool_directory_image( enumeration);
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	cybiko_iter *iter = (cybiko_iter*)imgtool_directory_extrabytes( enumeration);
 	UINT8 buffer[MAX_PAGE_SIZE];
@@ -418,22 +418,22 @@ static imgtoolerr_t cybiko_image_next_enum( imgtool_directory *enumeration, imgt
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void cybiko_image_close_enum( imgtool_directory *enumeration)
+static void cybiko_image_close_enum( imgtool::directory *enumeration)
 {
 	// nothing
 }
 
-static imgtoolerr_t cybiko_image_free_space( imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t cybiko_image_free_space( imgtool::partition *partition, UINT64 *size)
 {
-	imgtool_image *image = imgtool_partition_image( partition);
+	imgtool::image *image = imgtool_partition_image( partition);
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	if (size) *size = cfs_calc_free_space( cfs, cfs_calc_free_blocks( cfs));
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_read_file( imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t cybiko_image_read_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
-	imgtool_image *image = imgtool_partition_image( partition);
+	imgtool::image *image = imgtool_partition_image( partition);
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	UINT8 buffer[MAX_PAGE_SIZE];
 	UINT16 file_id, part_id = 0, old_part_id;
@@ -458,9 +458,9 @@ static imgtoolerr_t cybiko_image_read_file( imgtool_partition *partition, const 
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_write_file( imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t cybiko_image_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
-	imgtool_image *image = imgtool_partition_image( partition);
+	imgtool::image *image = imgtool_partition_image( partition);
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	UINT8 buffer[MAX_PAGE_SIZE];
 	UINT16 file_id, part_id = 0, free_blocks;
@@ -518,9 +518,9 @@ static imgtoolerr_t cybiko_image_write_file( imgtool_partition *partition, const
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_delete_file( imgtool_partition *partition, const char *filename)
+static imgtoolerr_t cybiko_image_delete_file( imgtool::partition *partition, const char *filename)
 {
-	imgtool_image *image = imgtool_partition_image( partition);
+	imgtool::image *image = imgtool_partition_image( partition);
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	UINT16 file_id;
 	// find file
