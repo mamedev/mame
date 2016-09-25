@@ -2226,12 +2226,34 @@ ROM_END
 
 ROM_START( mac128k )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
+	//ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
+	ROMX_LOAD("vti__416_vh_2605__23256-1020__342-0220-a__(c)apple_83__korea-ae.rom-hi.27256.u6d",  0x00000, 0x08000, CRC(198210ad) SHA1(2590ff4af5ac0361babdf0dc5da18e2eecad454a), ROM_SKIP(1) ) // see below for alternate labels
+	ROMX_LOAD("vti__416_vh_2826__23256-1023__342-0221-a__(c)apple_83__korea-ae.rom-lo.27256.u8d",  0x00001, 0x08000, CRC(fd2665c2) SHA1(8507932a854bd28196a17785c8b1851cb53eaf64), ROM_SKIP(1) ) // see below for alternate labels
+	/* These two roms were manufactured by at least 3 manufacturers:
+	VTi:
+	"<VTi logo along side> // 416 VH 2605 // 23256-1020 // 342-0220-A // (C)APPLE 83 // KOREA-AE"
+	"<VTi logo along side> // 416 VH 2826 // 23256-1023 // 342-0221-A // (C)APPLE 83 // KOREA-AE"
+	Synertek:
+	"<Synertek 'S' logo> 8416 G // C19728 // 342-0220-A // (C)APPLE 83"
+	"<Synertek 'S' logo> 8410 G // C19729 // 342-0221-A // (C)APPLE 83"
+	Hitachi:
+	[can't find reference for rom-hi]
+	"<Hitachi 'target' logo> 8413 // 3256 016 JAPAN // (C)APPLE 83 // 342-0221-A"
+	
+	References:
+	http://www.vintagecomputer.net/apple/Macintosh/Macintosh_motherboard.jpg
+	https://upload.wikimedia.org/wikipedia/commons/3/34/Macintosh-motherboard.jpg
+	https://68kmla.org/forums/uploads/monthly_01_2016/post-2105-0-31195100-1452296677.jpg
+	https://68kmla.org/forums/uploads/monthly_12_2014/post-2597-0-46269000-1419299800.jpg
+	  */
 ROM_END
 
 ROM_START( mac512k )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
+	//ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
+	ROMX_LOAD("vti__512_vh_6434__23256-1104__342-0220-b__(c)_apple_84__korea-a.rom-hi.27256.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
+	ROMX_LOAD("vti__512_vh_6709__23256-1105__342-0221-b__(c)_apple_84__korea-a.rom-lo.27256.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
+	// reference: http://i.ebayimg.com/images/g/Uj8AAOSwvzRXy2tW/s-l1600.jpg
 ROM_END
 
 ROM_START( unitron )
