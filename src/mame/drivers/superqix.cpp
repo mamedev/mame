@@ -27,9 +27,9 @@ Super Qix:
   (bit 3 was stuck high). It was originally recovered by carefully checking
   the disassembly, and this repair was later verified from another dump to be
   correct. The majority of the bootleg 8031 MCU code matches the decapped
-  sqixu b03-03.l2 mcu code, implying the sq07.ic108 8031 MCU code ROM was
-  derived from code dumped from an original Taito b03-03.l2 8751 MCU somehow.
-  The bootleg MCU code is different from the original b03-03.l2 MCU since
+  sqixu b03__03.l2 mcu code, implying the sq07.ic108 8031 MCU code ROM was
+  derived from code dumped from an original Taito b03__03.l2 8751 MCU somehow.
+  The bootleg MCU code is different from the original b03__03.l2 MCU since
   an 8031 when running in external ROM mode cannot use ports 0 or 2, hence
   the code was extensively patched by the bootleggers to avoid use of those
   ports, by adding an additional multiplexer to port 1, and moving various
@@ -1576,7 +1576,7 @@ ROM_START( sqix ) // It is unclear what this set fixes vs 1.1 below, but the 'ru
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
 	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
-	/* the above file is derived from b03-08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03-03 MCU */
+	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1595,7 +1595,7 @@ ROM_START( sqixr1 ) // This set has the coin lockout polarity inverted, and also
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
 	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
-	/* the above file is derived from b03-08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03-03 MCU */
+	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1614,7 +1614,7 @@ ROM_START( sqixr0 ) // This set is older than the above two: it has the coin loc
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
 	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
-	/* the above file is derived from b03-08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03-03 MCU */
+	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1648,41 +1648,41 @@ ROM_END
    original board; The MCU code is extensively hacked to avoid use of ports 0
    and 2, which are used as the rom data and address buses, using a multiplexed
    latch on the other ports instead. This bootleg MCU is based on a dump of the
-   original b03-03.l2 code, obtained by the pirates through unknown means.
+   original b03__03.l2 code, obtained by the pirates through unknown means.
    Barring the bootleg MCU, the actual rom set is an exact copy of sqixr0 above. */
 ROM_START( sqixb1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) ) // == b03-01.ef3
-	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different
+	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) ) // == b03__01.ef3
+	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I8031 code */
-	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
 	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) ) // actual label is something different on the bootleg
 ROM_END
 
 ROM_START( sqixb2 ) // this bootleg set has been extensively hacked to avoid using the MCU at all, though a few checks for the semaphore flags were never patched out
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cpu.2",         0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
-	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* 1st half of sq-iu3.p8 */
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* 2nd half of sq-iu3.p8 */
+	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
+	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) ) // actual label is something different on the bootleg
 ROM_END
 
 ROM_START( perestrof )
