@@ -93,9 +93,8 @@ imgtoolerr_t imgtool_image_create(const imgtool_module *module, const char *fnam
 imgtoolerr_t imgtool_image_create_byname(const char *modulename, const char *fname, util::option_resolution *opts, imgtool_image **image);
 void imgtool_image_close(imgtool_image *image);
 imgtoolerr_t imgtool_image_info(imgtool_image *image, char *string, size_t len);
-imgtoolerr_t imgtool_image_get_sector_size(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *length);
 imgtoolerr_t imgtool_image_get_geometry(imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors);
-imgtoolerr_t imgtool_image_read_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len);
+imgtoolerr_t imgtool_image_read_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
 imgtoolerr_t imgtool_image_write_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len);
 imgtoolerr_t imgtool_image_get_block_size(imgtool_image *image, UINT32 *length);
 imgtoolerr_t imgtool_image_read_block(imgtool_image *image, UINT64 block, void *buffer);

@@ -793,20 +793,6 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 
 /********************** module functions ***********************/
 
-static imgtoolerr_t thom_get_sector_size(imgtool_image* img, UINT32 track,
-						UINT32 head, UINT32 sector,
-						UINT32 *sector_size)
-{
-	thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
-
-	if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks ) {
-	if ( sector_size ) *sector_size = 0;
-	return IMGTOOLERR_SEEKERROR;
-	}
-	if ( sector_size ) *sector_size = f->sector_size;
-	return IMGTOOLERR_SUCCESS;
-}
-
 static imgtoolerr_t thom_get_geometry(imgtool_image* img, UINT32* tracks,
 						UINT32* heads, UINT32* sectors)
 {
@@ -818,14 +804,17 @@ static imgtoolerr_t thom_get_geometry(imgtool_image* img, UINT32* tracks,
 }
 
 static imgtoolerr_t thom_read_sector(imgtool_image* img, UINT32 track,
-						UINT32 head, UINT32 sector, void *buf,
-						size_t len)
+						UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
 {
 	thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
 	if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks )
-	return IMGTOOLERR_SEEKERROR;
-	if ( len > f->sector_size) return IMGTOOLERR_READERROR;
-	memcpy( buf, thom_get_sector( f, head, track, sector ), len );
+		return IMGTOOLERR_SEEKERROR;
+
+	// resize the buffer
+	try { buffer.resize(f->sector_size); }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
+
+	memcpy( &buffer[0], thom_get_sector( f, head, track, sector ), f->sector_size);
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -1590,8 +1579,6 @@ static void thom_basic_get_info(const imgtool_class *clas,
 	info->delete_file = thom_delete_file; break;
 	case IMGTOOLINFO_PTR_FREE_SPACE:
 	info->free_space = thom_free_space; break;
-	case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:
-	info->get_sector_size = thom_get_sector_size; break;
 	case IMGTOOLINFO_PTR_GET_GEOMETRY:
 	info->get_geometry = thom_get_geometry; break;
 	case IMGTOOLINFO_PTR_INFO:

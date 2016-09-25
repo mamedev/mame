@@ -232,6 +232,8 @@ struct amiga_iterator
 
 static imgtoolerr_t amiga_image_read_sector(imgtool_image* img,
 	UINT32 track, UINT32 head, UINT32 sector, void *buf, size_t len);
+static imgtoolerr_t amiga_image_read_sector(imgtool_image* img,
+	UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
 static imgtoolerr_t amiga_image_write_sector(imgtool_image* img,
 	UINT32 track, UINT32 head, UINT32 sector, const void *buf, size_t len, int ddam);
 
@@ -1813,6 +1815,16 @@ static imgtoolerr_t amiga_image_read_sector(imgtool_image* img, UINT32 track, UI
 }
 
 
+static imgtoolerr_t amiga_image_read_sector(imgtool_image* img,
+	UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
+{
+	try { buffer.resize(BSIZE); }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
+
+	return amiga_image_read_sector(img, track, head, sector, &buffer[0], buffer.size());
+}
+
+
 static imgtoolerr_t amiga_image_write_sector(imgtool_image* img, UINT32 track, UINT32 head, UINT32 sector, const void *buf, size_t len, int ddam)
 {
 	amiga_floppy *f = (amiga_floppy *) imgtool_image_extra_bytes(img);
@@ -1829,13 +1841,6 @@ static imgtoolerr_t amiga_image_write_sector(imgtool_image* img, UINT32 track, U
 	/* reset stream */
 	stream_seek(f->stream, 0, 0);
 
-	return IMGTOOLERR_SUCCESS;
-}
-
-
-static imgtoolerr_t amiga_image_get_sector_size(imgtool_image* img, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size)
-{
-	*sector_size = BSIZE;
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -2391,7 +2396,6 @@ void amiga_floppy_get_info(const imgtool_class *imgclass, UINT32 state, union im
 		case IMGTOOLINFO_PTR_CLOSE:                      info->close = amiga_image_exit; break;
 		case IMGTOOLINFO_PTR_READ_SECTOR:                info->read_sector = amiga_image_read_sector; break;
 		case IMGTOOLINFO_PTR_WRITE_SECTOR:               info->write_sector = amiga_image_write_sector; break;
-		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:            info->get_sector_size = amiga_image_get_sector_size; break;
 		case IMGTOOLINFO_PTR_CREATE:                     info->create = amiga_image_create; break;
 		case IMGTOOLINFO_PTR_INFO:                       info->info = amiga_image_info; break;
 		case IMGTOOLINFO_PTR_BEGIN_ENUM:                 info->begin_enum = amiga_image_beginenum; break;

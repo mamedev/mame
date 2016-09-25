@@ -620,8 +620,8 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	imgtool_image *img;
 	imgtool_stream *stream = nullptr;
-	dynamic_buffer buffer;
-	UINT32 size, track, head, sector;
+	std::vector<UINT8> buffer;
+	UINT32 track, head, sector;
 
 	/* attempt to open image */
 	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_READ, &img);
@@ -632,16 +632,9 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	head = atoi(argv[3]);
 	sector = atoi(argv[4]);
 
-	err = imgtool_image_get_sector_size(img, track, head, sector, &size);
+	err = imgtool_image_read_sector(img, track, head, sector, buffer);
 	if (err)
 		goto done;
-
-	buffer.resize(size);
-
-	err = imgtool_image_read_sector(img, track, head, sector, &buffer[0], size);
-	if (err)
-		goto done;
-
 
 	stream = stream_open(argv[5], OSD_FOPEN_WRITE);
 	if (!stream)
@@ -650,7 +643,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 		goto done;
 	}
 
-	stream_write(stream, &buffer[0], size);
+	stream_write(stream, &buffer[0], buffer.size());
 
 done:
 	if (stream)
