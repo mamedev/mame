@@ -311,7 +311,6 @@ m6805evs.cpp
 m79152pc.cpp
 mac.cpp
 macpci.cpp
-marywu.cpp
 mbc200.cpp
 mbc55x.cpp
 mbdtower.cpp
