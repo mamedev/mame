@@ -68,10 +68,13 @@ Super Qix:
 
   The V1.1, V1.2 and US PCBS have two resistors from VCC to GND forming a
   voltage divider on top of 7H, the resistor from VCC/Pin 14 to Common is
-  22KOhms, the other resistor is unknown and seems to connect to GND/Pin 7.
-  The center of the two resistors connects to one end of a 0.1uf capacitor,
-  the other end of the capacitor connects to 7H pin 12.
-  This implies some sort of brief/reset pulse generation or filter on pin 12.
+  22KOhms, the other resistor is also 22KOhms and seems to connect to
+  GND/Pin 7. The center of the two resistors connects to one end of a 0.1uf
+  capacitor and also to 7H pin 4, the other end of the capacitor connects to
+  7H pin 12.
+  This implies some sort of brief/reset pulse generation or filter on pin 12,
+  or more likely some abuse of the TTL input hysteresis of the 74LS86 IC itself
+  such that transitions of pin 12 cause transitions on pin 4 as well, or similar.
   Again, what exactly this accomplishes is unclear without further tracing.
 
 - sqixb2 is a bootleg of sqixb1, with the MCU removed.
