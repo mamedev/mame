@@ -268,6 +268,11 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 
 	   I/O ports:
 
+	    $74 x--- ---- global flip screen
+		    -xx- ---- individual flip screen x/y
+			i.e. Mayjinsen sets 0x80, other ST0016 games 0x60. 
+			TODO: Might also be paired with $70 & $75 (setted up by Mayjinsen).
+	   
 	    $a0 \
 	    $a1 - source address >> 1
 	    $a2 /
