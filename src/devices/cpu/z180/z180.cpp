@@ -2346,6 +2346,7 @@ void z180_device::execute_run()
 	if (m_nmi_pending)
 	{
 		LOG(("Z180 '%s' take NMI\n", tag()));
+		_PPC = -1;            /* there isn't a valid previous program counter */
 		LEAVE_HALT();       /* Check if processor was halted */
 
 		/* disable DMA transfers!! */

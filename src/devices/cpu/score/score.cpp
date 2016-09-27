@@ -94,7 +94,7 @@ void score7_cpu_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%08X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc).formatstr("%8X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", REG_CR).callexport().formatstr("%5s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS",  m_ppc).formatstr("%5s").noshow();
 
 	// save state
 	save_item(NAME(m_pc));
@@ -168,8 +168,9 @@ void score7_cpu_device::execute_run()
 {
 	do
 	{
-		m_ppc = m_pc;
 		debugger_instruction_hook(this, m_pc);
+
+		m_ppc = m_pc;
 
 		check_irq();
 

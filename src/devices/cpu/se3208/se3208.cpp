@@ -1752,10 +1752,10 @@ void se3208_device::execute_run()
 	{
 		UINT16 Opcode=m_direct->read_word(m_PC, WORD_XOR_LE(0));
 
-		m_PPC = m_PC;
 		debugger_instruction_hook(this, m_PC);
 
 		(this->*OpTable[Opcode])(Opcode);
+		m_PPC=m_PC;
 		m_PC+=2;
 		//Check interrupts
 		if(m_NMI==ASSERT_LINE)

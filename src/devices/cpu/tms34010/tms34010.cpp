@@ -742,8 +742,8 @@ void tms340x0_device::execute_run()
 		do
 		{
 			UINT16 op;
-			m_ppc = m_pc;
 			debugger_instruction_hook(this, m_pc);
+			m_ppc = m_pc;
 			op = ROPCODE();
 			(this->*s_opcode_table[op >> 4])(op);
 		} while (m_icount > 0);
