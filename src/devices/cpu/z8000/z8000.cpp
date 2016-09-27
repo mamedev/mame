@@ -584,7 +584,6 @@ void z8002_device::clear_internal_state()
 
 void z8002_device::register_debug_state()
 {
-	state_add( Z8000_PPC,     "prev PC", m_ppc     ).formatstr("%08X");
 	state_add( Z8000_PC,      "PC",      m_pc      ).formatstr("%08X");
 	state_add( Z8000_NSPOFF,  "NSPOFF",  m_nspoff  ).formatstr("%04X");
 	state_add( Z8000_NSPSEG,  "NSPSEG",  m_nspseg  ).formatstr("%04X");
@@ -783,6 +782,7 @@ void z8002_device::execute_run()
 		if (z8k_segm_mode == Z8K_SEGM_MODE_AUTO)
 			z8k_segm = (m_fcw & F_SEG_Z8001()) ? 1 : 0;
 
+		m_ppc = m_pc;
 		debugger_instruction_hook(this, m_pc);
 
 		if (m_irq_req & Z8000_HALT)
@@ -793,7 +793,6 @@ void z8002_device::execute_run()
 		{
 			Z8000_exec *exec;
 
-			m_ppc = m_pc;
 			m_op[0] = RDOP();
 			m_op_valid = 1;
 			exec = &z8000_exec[m_op[0]];

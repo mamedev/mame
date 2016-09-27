@@ -417,10 +417,10 @@ void lc8670_cpu_device::execute_run()
 	{
 		check_irqs();
 
+		m_ppc = m_pc;
 		debugger_instruction_hook(this, m_pc);
 
 		int cycles;
-		m_ppc = m_pc;
 
 		if (REG_PCON & HALT_MODE)
 		{

@@ -606,7 +606,7 @@ void adsp21xx_device::device_reset()
 
 	// reset PC and loops
 	m_pc = (m_chip_type >= CHIP_TYPE_ADSP2101) ? 0 : 4;
-	m_ppc = -1;
+	m_ppc = m_pc;
 	m_loop = 0xffff;
 	m_loop_condition = 0;
 
