@@ -691,7 +691,7 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT    INIT                       COMPANY             FULLNAME                                    FLAGS */
+/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT                     INIT      COMPANY             FULLNAME                                    FLAGS */
 CONS( 1983, sg1000,     0,          0,          sg1000,     sg1000,  driver_device,     0,      "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
 CONS( 1984, sg1000m2,   sg1000,     0,          sc3000,     sc3000,  driver_device,     0,      "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
 COMP( 1983, sc3000,     0,          sg1000,     sc3000,     sc3000,  driver_device,     0,      "Sega",             "SC-3000",                                  MACHINE_SUPPORTS_SAVE )
