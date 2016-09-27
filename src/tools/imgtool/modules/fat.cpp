@@ -294,7 +294,7 @@ static imgtoolerr_t fat_read_sector(imgtool_partition *partition, UINT32 sector_
 	//disk_info = fat_get_partition_info(partition);
 
 	/* sanity check */
-	err = imgtool_partition_get_block_size(partition, &block_size);
+	err = imgtool_partition_get_block_size(partition, block_size);
 	if (err)
 		return err;
 	assert(block_size == sizeof(data));
@@ -330,7 +330,7 @@ static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector
 	//disk_info = fat_get_partition_info(partition);
 
 	/* sanity check */
-	err = imgtool_partition_get_block_size(partition, &block_size);
+	err = imgtool_partition_get_block_size(partition, block_size);
 	if (err)
 		return err;
 	assert(block_size == sizeof(data));
@@ -447,7 +447,7 @@ static imgtoolerr_t fat_partition_open(imgtool_partition *partition, UINT64 firs
 
 
 
-static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_block, UINT64 block_count)
+static imgtoolerr_t fat_partition_create(imgtool::image *image, UINT64 first_block, UINT64 block_count)
 {
 	imgtoolerr_t err;
 	UINT32 heads, tracks, sectors_per_track;
@@ -469,7 +469,7 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 		return IMGTOOLERR_PARAMTOOLARGE;
 
 	/* get the geometry */
-	err = imgtool_image_get_geometry(image, &tracks, &heads, &sectors_per_track);
+	err = image->get_geometry(&tracks, &heads, &sectors_per_track);
 	if (err)
 		return err;
 
@@ -534,7 +534,7 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 	place_integer_le(header, 32, 4, (UINT32) (block_count >> 16));
 	place_integer_le(header, 36, 1, 0xFF);
 	place_integer_le(header, 38, 1, 0x28);
-	place_integer_le(header, 39, 4, imgtool_image_rand(image));
+	place_integer_le(header, 39, 4, imgtool::image::rand());
 	memcpy(&header[43], "           ", 11);
 	memcpy(&header[54], fat_bits_string, 8);
 
@@ -560,14 +560,14 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 		header[2] = (UINT8) ((boot_sector_offset - 2) >> 8); /* (offset) */
 	}
 
-	err = imgtool_image_write_block(image, first_block, header);
+	err = image->write_block(first_block, header);
 	if (err)
 		return err;
 
 	/* clear out file allocation table */
 	for (i = reserved_sectors; i < (reserved_sectors + sectors_per_fat * fat_count + root_dir_sectors); i++)
 	{
-		err = imgtool_image_clear_block(image, first_block + i, 0);
+		err = image->clear_block(first_block + i, 0);
 		if (err)
 			return err;
 	}
@@ -582,7 +582,7 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 
 	for (i = 0; i < fat_count; i++)
 	{
-		err = imgtool_image_write_block(image, first_block + 1 + (i * sectors_per_fat), &first_fat_entries);
+		err = image->write_block(first_block + 1 + (i * sectors_per_fat), &first_fat_entries);
 		if (err)
 			return err;
 	}
