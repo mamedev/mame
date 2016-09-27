@@ -332,8 +332,8 @@ void dsp56k_device::device_start()
 	state_add(DSP56K_ST15,   "ST15", m_dsp56k_core.PCU.ss[15].d).formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_dsp56k_core.PCU.pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_dsp56k_core.ppc).noshow();
 	state_add(STATE_GENSP, "GENSP", m_dsp56k_core.PCU.sp).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_dsp56k_core.ppc).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_dsp56k_core.PCU.sr).formatstr("%14s").noshow();
 
 	m_icountptr = &m_dsp56k_core.icount;

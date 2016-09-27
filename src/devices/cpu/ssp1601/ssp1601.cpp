@@ -540,8 +540,8 @@ void ssp1601_device::device_start()
 	state_add( SSP_PR7,    "R7",     m_r[7]).formatstr("%02X");
 
 	state_add(STATE_GENPC, "GENPC", rPC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", PPC).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", rST).formatstr("%4s").noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
 
 	m_icountptr = &m_g_cycles;
 }

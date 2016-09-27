@@ -640,6 +640,7 @@ void pdp1_device::device_start()
 	state_add( PDP1_IOS,       "IOS", m_ios).mask(1).formatstr("%1X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_pf ).formatstr("%13s").noshow();
 
 	m_icountptr = &m_icount;

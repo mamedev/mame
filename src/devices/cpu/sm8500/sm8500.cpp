@@ -134,7 +134,8 @@ void sm8500_cpu_device::device_start()
 	state_add(SM8500_RR10, "RR10", m_PC ).callimport().callexport().formatstr("%04s");
 	state_add(SM8500_RR12, "RR12", m_PC ).callimport().callexport().formatstr("%04s");
 	state_add(SM8500_RR14, "RR14", m_PC ).callimport().callexport().formatstr("%04s");
-	state_add(STATE_GENPC, "curpc", m_PC).callimport().callexport().formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "GENPC", m_PC).formatstr("%8s").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_PC).formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_PS1).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;

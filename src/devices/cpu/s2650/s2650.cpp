@@ -822,6 +822,7 @@ void s2650_device::device_start()
 	state_add( S2650_FO,   "FO", m_debugger_temp).mask(0x01).callimport().callexport().formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
 	m_icountptr = &m_icount;

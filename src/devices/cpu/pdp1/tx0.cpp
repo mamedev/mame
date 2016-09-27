@@ -209,6 +209,7 @@ void tx0_device::device_start()
 	state_add( TX0_IOS,        "IOS",      m_ios        ).mask(1)             .formatstr("%1X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("0%06O").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("0%06O").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_ir).noshow();
 
 	m_icountptr = &m_icount;

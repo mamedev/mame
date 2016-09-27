@@ -206,7 +206,8 @@ void tms32082_mp_device::device_start()
 	state_add(MP_TCOUNT, "tcount", m_tcount).formatstr("%08X");
 	state_add(MP_TSCALE, "tscale", m_tscale).formatstr("%08X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
@@ -503,7 +504,8 @@ void tms32082_pp_device::device_start()
 	// Register state for debugger
 	state_add(PP_PC, "pc", m_pc).formatstr("%08X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();

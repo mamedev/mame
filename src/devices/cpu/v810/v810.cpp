@@ -1307,9 +1307,9 @@ void v810_device::device_start()
 	state_add( V810_ADTRE, "ADTRE", ADTRE).formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", PC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_PPC).noshow();
 	state_add(STATE_GENSP, "GENSP", SP).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", PSW).formatstr("%8s").noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_PPC).noshow();
 
 	m_icountptr = &m_icount;
 }

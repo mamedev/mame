@@ -305,7 +305,7 @@ void r3000_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE,  "GENPCBASE", m_ppc).noshow();
+	state_add(STATE_GENPCBASE,  "CURPC",     m_ppc).noshow();
 	state_add(STATE_GENSP,      "GENSP",     m_r[31]).noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS",  SR).callimport().callexport().formatstr("%6s").noshow();
 	state_add(R3000_PC,         "PC",       m_pc);

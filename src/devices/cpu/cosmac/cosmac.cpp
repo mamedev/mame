@@ -342,6 +342,7 @@ void cosmac_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",        m_pc).callimport().callexport().noshow();
+	state_add(STATE_GENPCBASE,  "CURPC",        m_pc).callimport().callexport().noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS",     m_flagsio).mask(0x7).callimport().callexport().noshow().formatstr("%3s");
 
 	state_add(COSMAC_P,     "P",    m_p).mask(0xf);
@@ -433,6 +434,7 @@ void cosmac_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			R[P] = m_pc;
 			break;
 
@@ -453,6 +455,7 @@ void cosmac_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			m_pc = R[P];
 			break;
 

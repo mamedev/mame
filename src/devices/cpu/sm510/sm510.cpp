@@ -104,7 +104,8 @@ void sm510_base_device::device_start()
 	state_add(SM510_C,   "C",   m_c).formatstr("%01X");
 	state_add(SM510_W,   "W",   m_w).formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
 
 	m_icountptr = &m_icount;

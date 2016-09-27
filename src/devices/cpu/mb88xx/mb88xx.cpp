@@ -222,6 +222,7 @@ void mb88_cpu_device::device_start()
 	state_add( MB88_SB,  "SB",  m_SB).formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_pc ).callimport().callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_flags ).callimport().callexport().formatstr("%6s").noshow();
 	m_icountptr = &m_icount;
 }
@@ -241,6 +242,7 @@ void mb88_cpu_device::state_import(const device_state_entry &entry)
 			break;
 
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			m_PC = m_debugger_pc & 0x3f;
 			m_PA = ( m_debugger_pc >> 6 ) & 0x1f;
 			break;
@@ -263,6 +265,7 @@ void mb88_cpu_device::state_export(const device_state_entry &entry)
 			break;
 
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			m_debugger_pc = GETPC();
 			break;
 	}

@@ -196,7 +196,7 @@ void vgmplay_device::device_start()
 	save_item(NAME(m_pc));
 
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_pc).noshow();
 }
 
 void vgmplay_device::device_reset()

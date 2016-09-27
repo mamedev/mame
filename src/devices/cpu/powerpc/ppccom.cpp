@@ -877,6 +877,7 @@ void ppc_device::device_start()
 	state_add(PPC_FPSCR, "FPSCR", m_core->fpscr).formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_core->pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 	state_add(STATE_GENSP, "GENSP", m_core->r[31]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow().formatstr("%1s");
 
