@@ -2315,7 +2315,7 @@ ROM_END
 ROM_START( macclasc )
 	ROM_REGION16_BE(0x80000, "bootrom", 0) // a49f9914, second half of chip dump is the 6.0.3 XO rom disk
 	// this dump is big endian
-	ROM_LOAD( "341-0813__(c)1983-90_apple__japan__910d_d.27c4096.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
+	ROM_LOAD( "341-0813__(c)1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
 ROM_END
 
 ROM_START( maclc )
