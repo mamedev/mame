@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
+// thanks-to:Tony Friery
 /***************************************************************************
 
     JPM IMPACT (aka System 6)

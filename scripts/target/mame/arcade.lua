@@ -2017,6 +2017,8 @@ files {
 	MAME_DIR .. "src/mame/machine/jalcrpt.h",
 	MAME_DIR .. "src/mame/video/jalblend.cpp",
 	MAME_DIR .. "src/mame/video/jalblend.h",
+	MAME_DIR .. "src/mame/video/ms1_tmap.cpp",
+	MAME_DIR .. "src/mame/video/ms1_tmap.h",
 }
 
 createMAMEProjects(_target, _subtarget, "jpm")
@@ -4484,6 +4486,7 @@ files {
 	MAME_DIR .. "src/mame/includes/malzak.h",
 	MAME_DIR .. "src/mame/video/malzak.cpp",
 	MAME_DIR .. "src/mame/drivers/manohman.cpp",
+	MAME_DIR .. "src/mame/drivers/marywu.cpp",
 	MAME_DIR .. "src/mame/drivers/mcatadv.cpp",
 	MAME_DIR .. "src/mame/includes/mcatadv.h",
 	MAME_DIR .. "src/mame/video/mcatadv.cpp",

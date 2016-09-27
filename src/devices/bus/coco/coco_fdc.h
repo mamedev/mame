@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-	coco_fdc.h
+    coco_fdc.h
 
-	CoCo/Dragon Floppy Disk Controller
+    CoCo/Dragon Floppy Disk Controller
 
 *********************************************************************/
 
@@ -17,7 +17,7 @@
 
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 // ======================> coco_family_fdc_device_base
@@ -45,7 +45,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// FDC overrides 
+	// FDC overrides
 	virtual void update_lines() = 0;
 	virtual UINT8* get_cart_base() override;
 

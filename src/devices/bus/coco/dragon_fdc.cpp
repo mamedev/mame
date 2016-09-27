@@ -2,66 +2,66 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-	dragon_fdc.cpp
+    dragon_fdc.cpp
 
-	Dragon Floppy Disk Controller
+    Dragon Floppy Disk Controller
 
-	The CoCo and Dragon both use the Western Digital floppy disk controllers.
-	The CoCo uses either the WD1793 or the WD1773, the Dragon uses the WD2797,
-	which mostly uses the same command set with some subtle differences, most
-	notably the 2797 handles disk side select internally. The Dragon Alpha also
-	uses the WD2797, however as this is a built in interface and not an external
-	cartrige, it is dealt with in the main coco.cpp file.
+    The CoCo and Dragon both use the Western Digital floppy disk controllers.
+    The CoCo uses either the WD1793 or the WD1773, the Dragon uses the WD2797,
+    which mostly uses the same command set with some subtle differences, most
+    notably the 2797 handles disk side select internally. The Dragon Alpha also
+    uses the WD2797, however as this is a built in interface and not an external
+    cartrige, it is dealt with in the main coco.cpp file.
 
-	The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
-	on the Dragon.  In addition, there is another register
-	called DSKREG that controls the interface with the wd1793.  DSKREG is
-	detailed below:  But they appear to be
+    The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
+    on the Dragon.  In addition, there is another register
+    called DSKREG that controls the interface with the wd1793.  DSKREG is
+    detailed below:  But they appear to be
 
-	References:
-	CoCo:   Disk Basic Unravelled
-	Dragon: Inferences from the PC-Dragon source code
-	DragonDos Controller, Disk and File Formats by Graham E Kinns
+    References:
+    CoCo:   Disk Basic Unravelled
+    Dragon: Inferences from the PC-Dragon source code
+    DragonDos Controller, Disk and File Formats by Graham E Kinns
 
-	---------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
 
-	DSKREG - the control register
-	Dragon ($FF48)
+    DSKREG - the control register
+    Dragon ($FF48)
 
-	Bit
-	7 not used
-	6 not used
-	5 NMI enable flag
-	4 write precompensation
-	3 single density enable
-	2 drive motor activation
-	1 drive select high bit
-	0 drive select low bit
+    Bit
+    7 not used
+    6 not used
+    5 NMI enable flag
+    4 write precompensation
+    3 single density enable
+    2 drive motor activation
+    1 drive select high bit
+    0 drive select low bit
 
-	---------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
 
-	2007-02-22, P.Harvey-Smith
+    2007-02-22, P.Harvey-Smith
 
-	Began implementing the Dragon Delta Dos controller, this was actually the first
-	Dragon disk controller to market, beating Dragon Data's by a couple of months,
-	it is based around the WD2791 FDC, which is compatible with the WD1793/WD2797 used
-	by the standard CoCo and Dragon disk controllers except that it used an inverted
-	data bus, which is the reason the read/write handlers invert the data. This
-	controller like, the DragonDos WD2797 is mapped at $FF40-$FF43, in the normal
-	register order.
+    Began implementing the Dragon Delta Dos controller, this was actually the first
+    Dragon disk controller to market, beating Dragon Data's by a couple of months,
+    it is based around the WD2791 FDC, which is compatible with the WD1793/WD2797 used
+    by the standard CoCo and Dragon disk controllers except that it used an inverted
+    data bus, which is the reason the read/write handlers invert the data. This
+    controller like, the DragonDos WD2797 is mapped at $FF40-$FF43, in the normal
+    register order.
 
-	The Delta cart also has a register (74LS174 hex flipflop) at $FF44 encoded as
-	follows :-
+    The Delta cart also has a register (74LS174 hex flipflop) at $FF44 encoded as
+    follows :-
 
-	Bit
-	7 not used
-	6 not used
-	5 not used
-	4 Single (0) / Double (1) density select
-	3 5.25"(0) / 8"(1) Clock select
-	2 Side select
-	1 Drive select ms bit
-	0 Drive select ls bit
+    Bit
+    7 not used
+    6 not used
+    5 not used
+    4 Single (0) / Double (1) density select
+    3 5.25"(0) / 8"(1) Clock select
+    2 Side select
+    1 Drive select ms bit
+    0 Drive select ls bit
 
 *********************************************************************/
 
@@ -77,7 +77,7 @@
 
 
 /***************************************************************************
-	PARAMETERS
+    PARAMETERS
 ***************************************************************************/
 
 #define LOG_FDC                 0
@@ -85,7 +85,7 @@
 
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 namespace
@@ -105,8 +105,8 @@ namespace
 
 	private:
 		// device references
-		required_device<wd2797_t>					m_wd2797;
-		required_device_array<floppy_connector, 4>	m_floppies;
+		required_device<wd2797_t>                   m_wd2797;
+		required_device_array<floppy_connector, 4>  m_floppies;
 
 		// methods
 		void dskreg_w(UINT8 data);
@@ -114,7 +114,7 @@ namespace
 };
 
 /***************************************************************************
-	LOCAL VARIABLES
+    LOCAL VARIABLES
 ***************************************************************************/
 
 static SLOT_INTERFACE_START(dragon_fdc_device_base)
@@ -135,7 +135,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	IMPLEMENTATION
+//  IMPLEMENTATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -161,8 +161,8 @@ machine_config_constructor dragon_fdc_device_base::device_mconfig_additions() co
 
 
 //-------------------------------------------------
-//	update_lines - Dragon specific disk
-//	controller lines
+//  update_lines - Dragon specific disk
+//  controller lines
 //-------------------------------------------------
 
 void dragon_fdc_device_base::update_lines()
@@ -176,7 +176,7 @@ void dragon_fdc_device_base::update_lines()
 
 
 //-------------------------------------------------
-//	dskreg_w - function to write to
+//  dskreg_w - function to write to
 //  Dragon dskreg
 //-------------------------------------------------
 
@@ -213,7 +213,7 @@ void dragon_fdc_device_base::dskreg_w(UINT8 data)
 
 
 //-------------------------------------------------
-//	read
+//  read
 //-------------------------------------------------
 
 READ8_MEMBER(dragon_fdc_device_base::read)
@@ -240,7 +240,7 @@ READ8_MEMBER(dragon_fdc_device_base::read)
 
 
 //-------------------------------------------------
-//	write
+//  write
 //-------------------------------------------------
 
 WRITE8_MEMBER(dragon_fdc_device_base::write)

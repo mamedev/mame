@@ -2904,6 +2904,27 @@ void ioport_manager::load_config(config_type cfg_type, xml_data_node *parentnode
 	if (cfg_type == config_type::CONFIG_TYPE_CONTROLLER)
 		load_remap_table(parentnode);
 
+	// load device map table for controller configs only
+	if (cfg_type == config_type::CONFIG_TYPE_CONTROLLER)
+	{
+		std::unique_ptr<devicemap_table_type> devicemap_table = std::make_unique<devicemap_table_type>();
+		for (xml_data_node *mapdevice_node = xml_get_sibling(parentnode->child, "mapdevice"); mapdevice_node != nullptr; mapdevice_node = xml_get_sibling(mapdevice_node->next, "mapdevice"))
+		{
+			const char *devicename = xml_get_attribute_string(mapdevice_node, "device", nullptr);
+			const char *controllername = xml_get_attribute_string(mapdevice_node, "controller", nullptr);
+			if (devicename != nullptr && controllername != nullptr)
+			{
+				devicemap_table->insert(std::make_pair(std::string(devicename), std::string(controllername)));
+			}
+		}
+
+		// map device to controller if we have a device map
+		if (!devicemap_table->empty())
+		{
+			machine().input().map_device_to_controller(devicemap_table.get());
+		}
+	}
+
 	// iterate over all the port nodes
 	for (xml_data_node *portnode = xml_get_sibling(parentnode->child, "port"); portnode; portnode = xml_get_sibling(portnode->next, "port"))
 	{

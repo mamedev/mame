@@ -34,7 +34,7 @@
 			<bounds x="0.15" y="1.05" width="0.7" height="0.85" />
 		</text>
 	</element>
-	
+
 	<element name="counter" defstate="0">
 		<simplecounter digits="3">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -54,7 +54,7 @@
 		<bezel name="lamp1" element="lamp">
 			<bounds x="0.05" y="3.05" width="0.2" height="0.4" />
 		</bezel>
-		
+
 		<bezel name="wheel" element="counter">
 			<bounds x="1.9" y="3.0" width="0.2" height="0.1" />
 		</bezel>

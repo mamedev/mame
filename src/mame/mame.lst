@@ -2178,7 +2178,8 @@ pitfightj                       // Japan
 @source:atarig42.cpp
 guardian                        // 136092           (c) 1992
 roadriot                        // 136089           (c) 1991
-roadrioto                       // 136089           (c) 1991
+roadriota                       // 136089           (c) 1991
+roadriotb                       // 136089           (c) 1991
 
 @source:atarigt.cpp
 primrage                        // 136102           (c) 1994
@@ -2560,6 +2561,7 @@ bbcmc                           // 1986 BBC Master Compact
 bbcmc_ar                        // 1986 BBC Master Compact (Arabic)
 bbcmet                          // 1986 BBC Master ET
 bbcmt                           // 1986 BBC Master Turbo
+discmate                        // 1988 Arbiter Discmate
 ltmpbp                          // 1985 LTM Portable (B+)
 ltmpm                           // 1986 LTM Portable (Master)
 pro128s                         // 1987 Olivetti Prodest PC 128S
@@ -11201,6 +11203,7 @@ cutefght                        // (c) 1998 SemiCom
 dreamwld                        // (c) 2000 SemiCom
 gaialast                        // (c) 1999 SemiCom
 rolcrush                        // (c) 1999 Trust
+rolcrusha                       // (c) 1999 SemiCom
 
 @source:drgnmst.cpp
 drgnmst                         // (c) 1994
@@ -12796,6 +12799,7 @@ thepitm                         // bootleg
 timefgtr                        // (c) Taito (Brazil) - rewrite of Time Pilot
 tst_galx                        // Galaxian Test ROM
 turpin                          // (c) 1981 Sega
+turpins                         // (c) 1981 bootleg
 turtles                         // (c) 1981 Stern
 uniwars                         // (c) Irem
 warofbug                        // (c) 1981 Armenia
@@ -14191,6 +14195,7 @@ tandy12                         // Tandy Radio Shack
 tbreakup                        // Tomy
 tc4                             // Coleco
 tcfball                         // Tandy Radio Shack
+tcfballa                        // Tandy Radio Shack
 zodiac                          // Coleco
 
 @source:hh_ucom4.cpp
@@ -14976,7 +14981,7 @@ jedi                            // 136030           (c) 1984
 leking                          //
 olympic                         //
 
-@source:jeutel.cpp
+@source:joctronic.cpp
 punkywil                        //
 walkyria                        //
 
@@ -16966,9 +16971,6 @@ cupsoca                         // (c) 1992 Seibu
 cupsocb                         // (c) 1992 Seibu
 cupsocs                         // (c) 1992 Seibu
 cupsocs2                        // (c) 1992 Seibu
-cupsocsb                        // bootleg
-cupsocsb2                       // bootleg
-cupsocsb3                       // bootleg
 denjinmk                        // (c) 199? Banpresto
 godzilla                        // (c) 1993 Banpresto
 grainbow                        // (c) 1993 Banpresto
@@ -29304,6 +29306,7 @@ pacuman                         // bootleg
 paintrlr                        // 1981 bootleg
 pengojpm                        // bootleg
 pengopac                        // bootleg
+pinguinos                       // bootleg
 piranha                         // GL
 piranhah                        // hack
 piranhao                        // GL
@@ -30187,6 +30190,12 @@ sonstwar                        //
 sonstwr2                        //
 wolfman                         //
 
+@source:pg685.cpp
+pg685                           //
+pg685oua12                      //
+
+
+
 @source:pgm.cpp
 ddp2                            // (c) 2001 DoDonPachi 2 - Bee Storm
 ddp2100                         //
@@ -30333,13 +30342,15 @@ avefenix                        // bootleg (Video Game)
 avefenixl                       // bootleg (Laguna)
 avefenixrf                      // bootleg (Recreativos Franco)
 capitol                         // bootleg?
-condor                          // bootleg
+condor                          // bootleg (Sidam)
+condorn                         // bootleg (S C Novar)
 falcon                          // bootleg
 falconz                         // bootleg
 fenix                           // bootleg
 griffon                         // bootleg (Videotron)
 nextfase                        // bootleg
 phoenix                         // (c) 1980 Amstar
+phoenix2                        // (c) 1980 Amstar
 phoenix3                        // bootleg
 phoenixa                        // (c) 1980 Amstar + Centuri license
 phoenixass                      // bootleg (Assa)
@@ -30790,6 +30801,7 @@ popeye                          // (c) 1982
 popeyebl                        // bootleg
 popeyef                         // (c) 1982
 popeyeu                         // (c) 1982
+popeyej                         //
 skyskipr                        // (c) 1981
 
 @source:popobear.cpp
@@ -31522,6 +31534,7 @@ spacecho2                       // bootleg
 speakres                        // [Sun Electronics]
 speakresb                       // bootleg
 stratvox                        // [1980 Sun Electronics] Taito
+stratvoxa                       // [1980 Sun Electronics] Taito
 stratvoxb                       // bootleg
 ttmahjng                        // Taito
 
@@ -32061,6 +32074,7 @@ vsaturn                         // JVC V-Saturn
 
 @source:sauro.cpp
 sauro                           // (c) 1987
+saurob                          // (c) 1987 bootleg
 saurop                          // (c) 1987
 saurorr                         // (c) 1987
 trckydoc                        // (c) 1987
@@ -32165,7 +32179,6 @@ newsin7                         // (c) 1983 ATW USA, Inc.
 newsin7a                        // (c) 1982 ATW USA, Inc.
 triplep                         // (c) 1982 KKI / made by Sanritsu?
 triplepa                        // (c) 1982 KKI / made by Sanritsu?
-turpins                         // (c) 1981 bootleg
 
 @source:scregg.cpp
 dommy                           // TA-00?? (c) 1983 (Arcade TV Game List - P.90, Left, 13 from top)
@@ -32278,6 +32291,7 @@ fantzn2                         // (c) 1988
 hangonjr                        // (c) 1985
 opaopa                          //
 ridleofp                        // (c) 1986 Sega / Nasco
+slapshtr                        // (c) 1986 Sega
 tetrisse                        // (c) 1988
 transfrm                        // 834-5803 (c) 1986
 
@@ -32790,6 +32804,7 @@ rdftadi                         // (c) 1996 Seibu Kaihatsu (Dream Island license
 rdftam                          // (c) 1996 Seibu Kaihatsu (Metrotainment license)
 rdftau                          // (c) 1996 Seibu Kaihatsu
 rdftauge                        // (c) 1996 Seibu Kaihatsu (Tuning license and text display, but Australia region code)
+rdftgb                          // (c) 1996 Seibu Kaihatsu
 rdftit                          // (c) 1996 Seibu Kaihatsu
 rdftj                           // (c) 1996 Seibu Kaihatsu
 rdftja                          // (c) 1996 Seibu Kaihatsu
@@ -32824,6 +32839,11 @@ friskytb                        // (c) 1981
 radrad                          // (c) 1982 Nichibutsu USA
 sectrzon                        // (c) 1984 + Alice
 seicross                        // (c) 1984 + Alice
+
+@source:seicupbl.cpp
+cupsocsb                        // bootleg
+cupsocsb2                       // bootleg
+cupsocsb3                       // bootleg
 
 @source:selz80.cpp
 dagz80                          //
@@ -32943,6 +32963,7 @@ wschampb                        // (c) 2001 Sammy USA Corporation
 sf                              // 8/1987 (c) 1987 (US)
 sfan                            // 8/1987 (c) 1987 (World)
 sfj                             // 8/1987 (c) 1987 (Japan)
+sfjan
 sfp                             // 8/1987 (c) 1987
 sfua                            // 8/1987 (c) 1987 (US)
 
@@ -33552,6 +33573,7 @@ fantasyu                        // (c) 1981 Rock-Ola
 nibbler                         // (c) 1982 Rock-ola (version 9)
 nibbler6                        // (c) 1982 Rock-ola (vresion 6)
 nibbler8                        // (c) 1982 Rock-ola (version 8)
+nibblera                        // (c) 1982 Rock-ola (version ?)
 nibblero                        // (c) 1983 Olympia/Rock-Ola (version 8)
 nibblerp                        // (c) 1982 Rock-ola (pballoon conversion)
 pballoon                        // (c) 1982 SNK
@@ -34308,9 +34330,10 @@ pbillian                        // (c) 1986 Taito
 perestro                        // (c) 1994 Promat
 perestrof                       // (c) 1993 Promat / Fuuki
 sqix                            // B03 1987
-sqixb1                          // bootleg? but (c) 1987
-sqixb2                          // bootleg? but (c) 1987
+sqixb1                          // bootleg (exact copy of sqixr0 with bootleg MCU) (c) 1987
+sqixb2                          // bootleg with no mcu, but retains the (c) 1987
 sqixr1                          // B03 1987
+sqixr0                          // B03 1987
 sqixu                           // B03 1987
 
 @source:superslave.cpp
@@ -34925,7 +34948,8 @@ optiger                         // 1998.09 E63 (c) 1998 Taito
 alpine                          // RH  (c) 1982 Taito Corporation
 alpinea                         // RH  (c) 1982 Taito Corporation
 bioatack                        // AA8 (c) 1983 Taito Corporation + Fox Video Games license
-elevator                        // EA  (c) 1983 Taito Corporation
+elevator                        // EA  (c) 1983 Taito Corporation (5 board set, v1.1?)
+elevator4                       // BA3 (c) 1983 Taito Corporation (4 board set, v1.1?)
 elevatorb                       // bootleg
 frontlin                        // FL  (c) 1982 Taito Corporation
 hwrace                          // AC4 (c) 1983 Taito Corporation
@@ -35082,7 +35106,7 @@ spcteam                         //
 @source:tecmo.cpp
 backfirt                        // bootleg [(c) 1988 Tecmo]
 gemini                          // (c) 1987 Tecmo
-geminib							// bootleg
+geminib                         // bootleg
 rygar                           // 6002 - (c) 1986 Tecmo
 rygar2                          // 6002 - (c) 1986 Tecmo
 rygar3                          // 6002 - (c) 1986 Tecmo
@@ -36468,6 +36492,7 @@ wrecking                        // (c) 1984 Nintendo
 
 @source:vt100.cpp
 vt100                           // 1978 Digital Equipment Corporation
+vt100ac                         // 1979 Digital Equipment Corporation
 vt101                           // 1981 Digital Equipment Corporation
 vt102                           // 1981 Digital Equipment Corporation
 vt105                           // 1978 Digital Equipment Corporation

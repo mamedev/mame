@@ -154,7 +154,7 @@ WRITE8_MEMBER(cmmb_state::cmmb_output_w)
 	switch(offset)
 	{
 		case 0x01:
-//			m_irq_mask = data & 0x80;
+//          m_irq_mask = data & 0x80;
 			break;
 		case 0x02:
 			// bit 7 toggled - watchdog/eeprom?
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("IN4")
 	AM_RANGE(0x2011, 0x2011) AM_READ_PORT("IN5")
 	AM_RANGE(0x2480, 0x249f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	//AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) 
+	//AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w)
 	//AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM
@@ -276,15 +276,15 @@ static INPUT_PORTS_START( cmmb )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) // trackball H dir
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -371,8 +371,8 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(cmmb_state::vblank_irq)
 {
-//	if(machine().input().code_pressed_once(KEYCODE_Z))
-//		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+//  if(machine().input().code_pressed_once(KEYCODE_Z))
+//      device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void cmmb_state::machine_reset()
@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmmb_state, vblank_irq)
 
 	MCFG_AT29C020_ADD("at29c020")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/12, 384, 0, 256, 264, 0, 240) // TBD, not real measurements

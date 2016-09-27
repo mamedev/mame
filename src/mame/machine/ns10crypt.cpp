@@ -50,8 +50,8 @@ the end-of-ROM region, in what maybe is an attempt to hinder the
 recognition/reconstruction of the encrypted data.
 
 Most games do a single decryption run, so the process is only initialized once;
-however, at least four of them (mrdrilr2, gamshara, mrdrilrg & panikuru) do 
-reinitialize the internal state of the decryption several times. As of 2016-09-16, 
+however, at least four of them (mrdrilr2, gamshara, mrdrilrg & panikuru) do
+reinitialize the internal state of the decryption several times. As of 2016-09-16,
 only mrdrilr2 (type-1) and gamshara (type-2) show signs
 of doing it by writing to the triggering register; how the others two are triggering the
 reinitializations is still unclear. mrdrilr2 does a reinitialization every time the address
@@ -171,7 +171,7 @@ ns10_type1_decrypter_device::ns10_type1_decrypter_device(device_type type, const
 uint16_t ns10_type1_decrypter_device::decrypt(uint16_t cipherword)
 {
 	uint16_t plainword = _mask ^ bitswap(cipherword,9,13,15,7,14,8,6,10,11,12,3,5,0,1,4,2);
-	
+
 	uint16_t nbs =
 		((BIT(_counter, 4)                         ) << 15) ^
 		((BIT(cipherword, 2) ^ BIT(cipherword, 5)  ) << 14) ^
@@ -187,8 +187,8 @@ uint16_t ns10_type1_decrypter_device::decrypt(uint16_t cipherword)
 		(((BIT(cipherword, 7) & BIT(_counter, 7))  ) <<  2) ^
 		((BIT(_counter, 5)                         ) <<  1) ^
 		(((BIT(cipherword, 7) | BIT(_counter, 1))  ) <<  0);
-	_mask = nbs 
-			^ bitswap(cipherword, 6,11, 3, 1,13, 5,15,10, 2, 9, 8, 4, 0,12, 7,14) 
+	_mask = nbs
+			^ bitswap(cipherword, 6,11, 3, 1,13, 5,15,10, 2, 9, 8, 4, 0,12, 7,14)
 			^ bitswap(plainword , 9, 7, 5, 2,14, 4,13, 8, 0,15,10, 1, 3, 6,12,11)
 			^ 0xecbe;
 	++_counter;

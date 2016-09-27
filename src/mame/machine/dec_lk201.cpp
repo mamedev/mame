@@ -184,7 +184,9 @@ ROM_START( lk201 )
 //  23-001s9-00.bin is for the newer LK201 version (green LEDs, Motorola 6805)
 	ROM_LOAD( "23-001s9-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) )
 
-//  23-004M1 or 23-004M2 are in the older LK201 keyboard with red LEDs (8051)
+//  23-004M1 or 23-004M2 are in the older LK201 keyboard with red LEDs (8051 or 8051H respectively, same code on both?)
+	ROM_REGION( 0x1000, "i8051cpu", 0 )
+	ROM_LOAD( "23-004m2.8051h.e1", 0x0000, 0x1000, CRC(35dd04c6) SHA1(9744c561d76fe85afaccc7a2485ce2865236873a) )
 
 ROM_END
 
@@ -266,22 +268,24 @@ const tiny_rom_entry *lk201_device::device_rom_region() const
 
 INPUT_PORTS_START( lk201 )
 
-	/*
-	Matrix Rows to bit translation, from schematic page 20 ( http://bitsavers.trailing-edge.com/pdf/dec/terminal/lk201/MP01395_LK201_Schematic_Oct83.pdf )
-	Bit D0 - Column P3-3
-		D1 - Column P3-7
-		D2 - Column P3-8
-		D3 - Column P3-12
-		D4 - Column P2-8
-		D5 - Column P1-2
-		D6 - Column P3-11
-		D7 - Column P1-3
-	
+/*
+Actual membrane part number (from later 6805-based LK201 keyboard): 54-15172
+
+Matrix Rows to bit translation, from schematic page 20 ( http://bitsavers.trailing-edge.com/pdf/dec/terminal/lk201/MP01395_LK201_Schematic_Oct83.pdf )
+Bit D0 - Column P3-3
+    D1 - Column P3-7
+    D2 - Column P3-8
+    D3 - Column P3-12
+    D4 - Column P2-8
+    D5 - Column P1-2
+    D6 - Column P3-11
+    D7 - Column P1-3
+
 Keyboard Matrix
 ---------------
 Row select
 |         Columns SwitchID by bit                    Columns Key by bit
-|         D5   D7   D4   D0   D1   D2   D3   D6      D5   D7   D4   D0   D1   D2   D3   D6 
+|         D5   D7   D4   D0   D1   D2   D3   D6      D5   D7   D4   D0   D1   D2   D3   D6
 V         V    V    V    V    V    V    V    V       V    V    V    V    V    V    V    V
 P1-6      ---  E99  E00  B01  C01  D01  E01  D99     ---  N/C  `    Z    A    Q    1    N/C
 P1-7      ---  G99  D00  B00  B02  C02  D02  E02     ---  F1   TAB  <>   X    S    W    2
@@ -290,11 +294,11 @@ P1-10     A99  C99  A10  ---  ---  ---  ---  C00     COMP CTRL N/C  ---  ---  --
 P1-11     ---  G02  E04 A0406 B04  C04  D04  G03     ---  F4   4   SPACE V    F    R    F5
 P2-2      ---  ---  G05  B05  C05  D05  E05  G04     ---  ---  F6   B    G    T    5    N/C
 P2-3      ---  ---  G06  B06  C06  D06  E06  G07     ---  ---  F7   N    H    Y    6    F8
-P2-4      ---  ---  G09  B07  C07  D07  E07  G08     ---  ---  F10  M    J    V    7    F9
-P2-5      --- B9911 ---  ---  ---  ---  ---  ---     ---  SHFT ---  ---  ---  ---  ---  --- 
+P2-4      ---  ---  G09  B07  C07  D07  E07  G08     ---  ---  F10  M    J    U    7    F9
+P2-5      --- B9911 ---  ---  ---  ---  ---  ---     ---  SHFT ---  ---  ---  ---  ---  ---
 P2-6      ---  ---  G10  B08  C08  D08  E08  G11     ---  ---  N/C  ,    K    I    8    F11
 P2-9      ---  ---  G13  B09  C09  D09  E09  G12     ---  ---  F13  .    L    O    9    F12
-P2-10     ---  G14  E10  B10  C10  ***  D10  E13     ---  F14  0    /    ;    ***  P    BKSP(DEL)
+P2-10     ---  G14  E10  B10  C10  D13  D10  E13     ---  F14  0    /    ;    N/C  P    BKSP(DEL)
 P2-11     G15  E16  D16  C12  B16  C13  D12  E12     HELP FIND SLCT \    LEFT RETN ]    =
 P3-2      G16  E17  D17  A17  B13  C11  D11  E11     DO   INST PREV N/C  N/C  '    [    -
 P3-4      E18  E20  C17  A20  B20  C20  D20  D18     RMVE PF1  UP   k0   k1   k4   k7   NEXT
@@ -304,8 +308,7 @@ P3-9      ---  ---  G23  A23  C23  D23  E23  G22     ---  ---  F20  kRTN k,   k-
 
 --- = No matrix switch at all
 N/C = switch present, but officially unused?
-*** = No matrix switch, but registers as a key regardless (registers as RETURN or LF?)
-	*/
+    */
 
 	PORT_START("KBD0") // Row P2-5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -420,7 +423,7 @@ N/C = switch present, but officially unused?
 	PORT_START("KBD11") // Row P2-10
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) // B10
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";") PORT_CODE(KEYCODE_COLON) // C10
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // Interestingly, the mcu responds to return(?or line feed?) on this matrix location, but according to the schematic the membrane has no sensor at this location, would likely be A11 next to the unpopulated A10 key, and may be dedicated line feed. FIXME - duplicate "Return"
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // D13, exists but no key(?) above this position (under the upper half of the 'Return' key), DOES register as return; NOT LISTED on older schematic but definitely appears on the physical membrane of the later 6805 keyboard!
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("P") PORT_CODE(KEYCODE_P) // D10
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0) // E10
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )

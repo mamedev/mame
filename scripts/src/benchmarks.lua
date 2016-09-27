@@ -36,7 +36,7 @@ project "benchmark"
 		MAME_DIR .. "3rdparty/benchmark/src/reporter.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/sleep.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/string_util.cc",
-		MAME_DIR .. "3rdparty/benchmark/src/sysinfo.cc",		
+		MAME_DIR .. "3rdparty/benchmark/src/sysinfo.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/timers.cc",
 		MAME_DIR .. "3rdparty/benchmark/src/re_std.cc",
 	}

@@ -28,15 +28,15 @@
     DSKREG - the control register
     CoCo ($FF40)
 
-    Bit                 
-    7 halt enable flag  
+    Bit
+    7 halt enable flag
     6 drive select #3
     5 density (0=single, 1=double) and NMI enable flag
     4 write precompensation
     3 drive motor activation
-    2 drive select #2       
-    1 drive select #1       
-    0 drive select #0       
+    2 drive select #2
+    1 drive select #1
+    0 drive select #0
 
     Reading from $FF48-$FF4F clears bit 7 of DSKREG ($FF40)
 
@@ -95,9 +95,9 @@ protected:
 	rtc_type real_time_clock();
 
 	// devices
-	required_device<wd1773_t>					m_wd17xx;
-	required_device<ds1315_device>				m_ds1315;
-	required_device_array<floppy_connector, 4>	m_floppies;
+	required_device<wd1773_t>                   m_wd17xx;
+	required_device<ds1315_device>              m_ds1315;
+	required_device_array<floppy_connector, 4>  m_floppies;
 
 	// Disto RTC
 	required_device<msm6242_device> m_disto_msm6242;        // 6242 RTC on Disto interface
@@ -137,7 +137,7 @@ MACHINE_CONFIG_END
 
 
 //***************************************************************************
-//	COCO FAMILY FDCs - base class for CoCo/Dragon
+//  COCO FAMILY FDCs - base class for CoCo/Dragon
 //***************************************************************************
 
 //-------------------------------------------------
@@ -165,7 +165,7 @@ void coco_family_fdc_device_base::device_reset()
 
 
 //-------------------------------------------------
-//	coco_family_fdc_device_base::get_cart_base
+//  coco_family_fdc_device_base::get_cart_base
 //-------------------------------------------------
 
 UINT8* coco_family_fdc_device_base::get_cart_base()
@@ -175,7 +175,7 @@ UINT8* coco_family_fdc_device_base::get_cart_base()
 
 
 //***************************************************************************
-//	COCO FDCs
+//  COCO FDCs
 //***************************************************************************
 
 //-------------------------------------------------
@@ -194,7 +194,7 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 }
 
 //-------------------------------------------------
-//	real_time_clock
+//  real_time_clock
 //-------------------------------------------------
 
 coco_fdc_device_base::rtc_type coco_fdc_device_base::real_time_clock()
@@ -224,7 +224,7 @@ machine_config_constructor coco_fdc_device_base::device_mconfig_additions() cons
 
 
 //-------------------------------------------------
-//	update_lines - CoCo specific disk
+//  update_lines - CoCo specific disk
 //  controller lines
 //-------------------------------------------------
 
@@ -243,7 +243,7 @@ void coco_fdc_device_base::update_lines()
 
 
 //-------------------------------------------------
-//	dskreg_w - function to write to CoCo dskreg
+//  dskreg_w - function to write to CoCo dskreg
 //-------------------------------------------------
 
 void coco_fdc_device_base::dskreg_w(UINT8 data)
@@ -305,7 +305,7 @@ void coco_fdc_device_base::dskreg_w(UINT8 data)
 
 
 //-------------------------------------------------
-//	read
+//  read
 //-------------------------------------------------
 
 READ8_MEMBER(coco_fdc_device_base::read)
@@ -357,7 +357,7 @@ READ8_MEMBER(coco_fdc_device_base::read)
 
 
 //-------------------------------------------------
-//	write
+//  write
 //-------------------------------------------------
 
 WRITE8_MEMBER(coco_fdc_device_base::write)
@@ -400,7 +400,7 @@ WRITE8_MEMBER(coco_fdc_device_base::write)
 
 
 //**************************************************************************
-//	COCO FDC
+//  COCO FDC
 //**************************************************************************
 
 ROM_START(coco_fdc)

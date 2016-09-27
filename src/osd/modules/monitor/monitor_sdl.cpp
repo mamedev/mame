@@ -145,7 +145,7 @@ private:
 		SDL_Rect sdl1, sdl2;
 		osdrect_to_sdlrect(rect1, sdl1);
 		osdrect_to_sdlrect(rect2, sdl2);
-		
+
 		SDL_Rect intersection;
 		if (SDL_IntersectRect(&sdl1, &sdl2, &intersection))
 			return intersection.w + intersection.h;

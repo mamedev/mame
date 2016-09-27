@@ -324,16 +324,6 @@ static imgtoolerr_t pc_chd_image_get_geometry(imgtool_image *image, UINT32 *trac
 
 
 
-static imgtoolerr_t pc_chd_image_getsectorsize(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size)
-{
-	pc_chd_image_info *info;
-	info = pc_chd_get_image_info(image);
-	*sector_size = imghd_get_header(&info->hard_disk)->sectorbytes;
-	return IMGTOOLERR_SUCCESS;
-}
-
-
-
 static UINT32 pc_chd_calc_lbasector(pc_chd_image_info *info, UINT32 track, UINT32 head, UINT32 sector)
 {
 	UINT32 lbasector;
@@ -350,13 +340,19 @@ static UINT32 pc_chd_calc_lbasector(pc_chd_image_info *info, UINT32 track, UINT3
 
 
 
-static imgtoolerr_t pc_chd_image_readsector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len)
+static imgtoolerr_t pc_chd_image_readsector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
 {
-	pc_chd_image_info *info;
-	info = pc_chd_get_image_info(image);
+	pc_chd_image_info *info = pc_chd_get_image_info(image);
+
+	// get the sector size and resize the buffer
+	UINT32 sector_size = imghd_get_header(&info->hard_disk)->sectorbytes;
+	try { buffer.resize(sector_size); }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
+
+	// read the data
 	return imghd_read(&info->hard_disk,
 		pc_chd_calc_lbasector(info, track, head, sector),
-		buffer);
+		&buffer[0]);
 }
 
 
@@ -462,7 +458,6 @@ void pc_chd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtooli
 		case IMGTOOLINFO_PTR_WRITE_SECTOR:                  info->write_sector = pc_chd_image_writesector; break;
 		case IMGTOOLINFO_PTR_READ_BLOCK:                    info->read_block = pc_chd_image_readblock; break;
 		case IMGTOOLINFO_PTR_WRITE_BLOCK:                   info->write_block = pc_chd_image_writeblock; break;
-		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:               info->get_sector_size = pc_chd_image_getsectorsize; break;
 		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = &pc_chd_create_optionguide; break;
 		case IMGTOOLINFO_PTR_GET_GEOMETRY:                  info->get_geometry = pc_chd_image_get_geometry; break;
 		case IMGTOOLINFO_PTR_LIST_PARTITIONS:               info->list_partitions = pc_chd_list_partitions; break;

@@ -2881,12 +2881,12 @@ ROM_START( goldmedla )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "gm3-7.bin", 0x00000, 0x10000, CRC(11a63f4c) SHA1(840a8f1f6d80d0395c65f8ad30cc6bfe5a9693f4) )
 	ROM_LOAD16_BYTE( "gm4-7.bin", 0x00001, 0x10000, CRC(e19966af) SHA1(a2523627fcc9f5e4a82b4ebec937880fc0e0e9f3) )
-	
+
 	ROM_REGION16_BE( 0x40000, "data_bank", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "gm1-7.bin", 0x00000, 0x10000, CRC(6d87b8a6) SHA1(6f47b42d6577691334784e961a991de2ad67f677) )
 	ROM_LOAD16_BYTE( "gm2-7.bin", 0x00001, 0x10000, CRC(8d579505) SHA1(81f225edbba1cac65275e2929336d076afbbd2bf) )
 	ROM_COPY( "data_bank", 0, 0x20000, 0x20000 )
-	
+
 	ROM_REGION( 0x80000, "audiocpu", 0 ) // banking is slightly different from other Alpha68kII games
 	ROM_LOAD( "38.bin",          0x00000,  0x08000, BAD_DUMP CRC(4bf251b8) SHA1(d69a6607e92dbe8081c7c66b6853f02d578ef73f) ) // we use the bootleg set instead
 	ROM_CONTINUE(                0x18000,  0x08000 )

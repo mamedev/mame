@@ -118,7 +118,7 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool_image *image, imgtool_s
 
 	/* open up the floppy */
 	ferr = floppy_open(f, noclose ? &imgtool_noclose_ioprocs : &imgtool_ioprocs,
-		nullptr, format, FLOPPY_FLAGS_READWRITE, &fimg->floppy);
+		"", format, FLOPPY_FLAGS_READWRITE, &fimg->floppy);
 	if (ferr)
 	{
 		err = imgtool_floppy_error(ferr);
@@ -197,24 +197,22 @@ static void imgtool_floppy_close(imgtool_image *img)
 
 
 
-static imgtoolerr_t imgtool_floppy_get_sector_size(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size)
+static imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
 {
 	floperr_t ferr;
+	UINT32 sector_size;
 
-	ferr = floppy_get_sector_length(imgtool_floppy(image), head, track, sector, sector_size);
+	// get the sector length
+	ferr = floppy_get_sector_length(imgtool_floppy(image), head, track, sector, &sector_size);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
-	return IMGTOOLERR_SUCCESS;
-}
+	// resize the buffer accordingly
+	try { buffer.resize(sector_size); }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
 
-
-
-static imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len)
-{
-	floperr_t ferr;
-
-	ferr = floppy_read_sector(imgtool_floppy(image), head, track, sector, 0, buffer, len);
+	// and read the sector
+	ferr = floppy_read_sector(imgtool_floppy(image), head, track, sector, 0, &buffer[0], sector_size);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -270,7 +268,6 @@ static void imgtool_floppy_get_info(const imgtool_class *imgclass, UINT32 state,
 		case IMGTOOLINFO_PTR_CREATE:                info->create = imgtool_floppy_create; break;
 		case IMGTOOLINFO_PTR_CLOSE:                 info->close = imgtool_floppy_close; break;
 		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = format->param_guidelines ? &floppy_option_guide : nullptr; break;
-		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:       info->get_sector_size = imgtool_floppy_get_sector_size; break;
 		case IMGTOOLINFO_PTR_READ_SECTOR:           info->read_sector = imgtool_floppy_read_sector; break;
 		case IMGTOOLINFO_PTR_WRITE_SECTOR:          info->write_sector = imgtool_floppy_write_sector; break;
 

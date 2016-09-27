@@ -26,7 +26,7 @@ private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-	char  m_barcode_buffer[20];
+	std::string m_barcode_buffer;
 };
 
 } // namespace ui

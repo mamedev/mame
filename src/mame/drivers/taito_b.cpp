@@ -1447,7 +1447,7 @@ static INPUT_PORTS_START( silentd ) /* World Version */
 	PORT_DIPNAME( 0x04, 0x04, "Friendly Fire" )   PORT_DIPLOCATION("SW2:3") // "hit of players" or "invincible player mode"
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Power-Up at Stage Clear" )	PORT_DIPLOCATION("SW2:4") // "clear stage power-up"
+	PORT_DIPNAME( 0x08, 0x08, "Power-Up at Stage Clear" )   PORT_DIPLOCATION("SW2:4") // "clear stage power-up"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Regain Power buy-in" )      PORT_DIPLOCATION("SW2:5") // If enabled player can use a credit to refill his HP and get a "rage" mode for few seconds

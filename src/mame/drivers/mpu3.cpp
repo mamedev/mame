@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:James Wallace
+// thanks-to:Chris Wren, Tony Friery, MFME
 /* Notes 17/07/11 DH
  added most other MPU3 sets
 
@@ -12,7 +13,10 @@
  */
 
 /***********************************************************************************************************
-  Barcrest MPU3 highly preliminary driver by J.Wallace, and Anonymous.
+  Barcrest MPU3 highly preliminary driver
+  based on MPU4 driver (see mpu4.cpp for credits)
+
+  Thanks to Chris Wren and MFME for documentation, particularly of meters and characteriser.
 
 --- Board Setup ---
 

@@ -7,7 +7,7 @@
     http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Acorn_Plus3.html
 
     The Acorn Plus 3 was a hardware module that connected independently
-    of the Plus 1 and provided a double-density 3½" disc drive connected
+    of the Plus 1 and provided a double-density 3.5" disc drive connected
     through a WD1770 drive controller and an ADFS ROM. There were two
     versions of the Plus 3 produced: A Single-sided and a Double-sided
     drive version.

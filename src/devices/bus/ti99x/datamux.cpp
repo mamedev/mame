@@ -76,6 +76,12 @@
 */
 ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__),
+	m_video(*owner, VDP_TAG),
+	m_sound(*owner, TISOUNDCHIP_TAG),
+	m_peb(*owner, PERIBOX_TAG),
+	m_gromport(*owner, GROMPORT_TAG),
+	m_ram16b(*owner, EXPRAM_TAG),
+	m_padram(*owner, PADRAM_TAG),
 	m_spacep(nullptr),
 	m_ready(*this),
 	m_addr_buf(0),
@@ -84,7 +90,6 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
 	m_sysready(CLEAR_LINE),
 	m_latch(0),
 	m_waitcount(0),
-	m_ram16b(nullptr),
 	m_use32k(false),
 	m_base32k(0),
 	m_console_groms_present(false),
@@ -226,7 +231,8 @@ UINT16 ti99_datamux_device::debugger_read(address_space& space, UINT16 addr)
 	if ((addrb & 0xe000)==0x0000) value = m_consolerom[(addrb & 0x1fff)>>1];
 	else
 	{
-		if ((addrb & 0xfc00)==0x8000) value = m_padram[(addrb & 0x00ff)>>1];
+		if ((addrb & 0xfc00)==0x8000)
+			value = (m_padram->pointer()[addrb & 0x00ff] << 8) | m_padram->pointer()[(addrb & 0x00ff)+1];
 		else
 		{
 			int base32k = 0;
@@ -236,7 +242,10 @@ UINT16 ti99_datamux_device::debugger_read(address_space& space, UINT16 addr)
 				if (((addrb & 0xe000)==0xa000) || ((addrb & 0xc000)==0xc000)) base32k = 0x8000;
 			}
 
-			if (base32k != 0) value = m_ram16b[(addrb-base32k)>>1];
+			if (base32k != 0)
+			{
+				value = (m_ram16b->pointer()[addrb-base32k] << 8) | m_ram16b->pointer()[addrb-base32k+1];
+			}
 			else
 			{
 				UINT8 lval = 0;
@@ -265,7 +274,11 @@ void ti99_datamux_device::debugger_write(address_space& space, UINT16 addr, UINT
 
 	if ((addrb & 0xe000)==0x0000) return;
 
-	if ((addrb & 0xfc00)==0x8000) m_padram[(addrb & 0x00ff)>>1] = data;
+	if ((addrb & 0xfc00)==0x8000)
+	{
+		m_padram->pointer()[addrb & 0x00ff] = data >> 8;
+		m_padram->pointer()[(addrb & 0x00ff)+1] = data & 0xff;
+	}
 	else
 	{
 		int base32k = 0;
@@ -275,7 +288,11 @@ void ti99_datamux_device::debugger_write(address_space& space, UINT16 addr, UINT
 			if (((addrb & 0xe000)==0xa000) || ((addrb & 0xc000)==0xc000)) base32k = 0x8000;
 		}
 
-		if (base32k != 0) m_ram16b[(addrb-base32k)>>1] = data;
+		if (base32k != 0)
+		{
+			m_ram16b->pointer()[addrb-base32k] = data >> 8;
+			m_ram16b->pointer()[(addrb-base32k)+1] = data & 0xff;
+		}
 		else
 		{
 			if ((addrb & 0xe000)==0x6000)
@@ -320,7 +337,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 		// Addresses from 8300-83ff (mirrors at 8000, 8100, 8200) are console RAM  (no wait states)
 		if ((m_addr_buf & 0xfc00)==0x8000)
 		{
-			value = m_padram[(m_addr_buf & 0x00ff)>>1];
+			value = (m_padram->pointer()[m_addr_buf & 0x00ff] << 8) | m_padram->pointer()[(m_addr_buf & 0x00ff)+1];
 		}
 		else
 		{
@@ -332,7 +349,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 
 			if (m_base32k != 0)
 			{
-				value = m_ram16b[(m_addr_buf-m_base32k)>>1];
+				value = (m_ram16b->pointer()[m_addr_buf-m_base32k] << 8) | m_ram16b->pointer()[(m_addr_buf-m_base32k)+1];
 			}
 			else
 			{
@@ -369,14 +386,16 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 	// Addresses from 8300-83ff (mirrors at 8000, 8100, 8200) are console RAM
 	if ((m_addr_buf & 0xfc00)==0x8000)
 	{
-		m_padram[(m_addr_buf & 0x00ff)>>1] = data;
+		m_padram->pointer()[(m_addr_buf & 0x00ff)] = data >> 8;
+		m_padram->pointer()[(m_addr_buf & 0x00ff)+1] = data & 0xff;
 		return;
 	}
 
 	// Handle the internal 32K expansion
 	if (m_base32k != 0)
 	{
-		m_ram16b[(m_addr_buf-m_base32k)>>1] = data;
+		m_ram16b->pointer()[(m_addr_buf-m_base32k)] = data >> 8;
+		m_ram16b->pointer()[(m_addr_buf-m_base32k)+1] = data & 0xff;
 	}
 	else
 	{
@@ -417,7 +436,6 @@ SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
 	// 2 subsequent wait states (MSB)
 	// clock cycle 6 is the nominal follower of the last wait state
 	m_waitcount = 5;
-	m_spacep = &space;
 
 	m_base32k = 0;
 	if (m_use32k)
@@ -549,14 +567,24 @@ WRITE_LINE_MEMBER( ti99_datamux_device::gromclk_in )
 
 void ti99_datamux_device::device_start(void)
 {
-	m_ram16b = nullptr;
 	m_muxready = ASSERT_LINE;
 	m_ready.resolve();
+
+	// Register persistable state variables
+	save_item(NAME(m_addr_buf));
+	save_item(NAME(m_dbin));
+	save_item(NAME(m_muxready));
+	save_item(NAME(m_sysready));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_waitcount));
+	save_item(NAME(m_use32k));
+	save_item(NAME(m_base32k));
+	save_item(NAME(m_console_groms_present));
+	save_item(NAME(m_grom_idle));
 }
 
 void ti99_datamux_device::device_stop(void)
 {
-	m_ram16b = nullptr;
 }
 
 void ti99_datamux_device::device_reset(void)
@@ -564,12 +592,6 @@ void ti99_datamux_device::device_reset(void)
 	m_consolerom = (UINT16*)owner()->memregion(CONSOLEROM)->base();
 	m_use32k = (ioport("RAM")->read()==1);
 	m_console_groms_present = (ioport("GROMENA")->read()==1);
-
-	// better use a region?
-	if (m_ram16b==nullptr)
-	{
-		m_ram16b = make_unique_clear<UINT16[]>(32768/2);
-	}
 
 	m_sysready = ASSERT_LINE;
 	m_muxready = ASSERT_LINE;
@@ -579,18 +601,18 @@ void ti99_datamux_device::device_reset(void)
 	m_latch = 0;
 
 	m_dbin = CLEAR_LINE;
+
+	// Get the pointer to the address space already here, because we cannot
+	// save that pointer to a savestate, and we need it on restore
+	cpu_device* cpu = downcast<cpu_device*>(machine().device("maincpu"));
+	m_spacep = &cpu->space(AS_PROGRAM);
 }
 
 void ti99_datamux_device::device_config_complete()
 {
-	m_video = downcast<tms9928a_device*>(owner()->subdevice(VDP_TAG));
-	m_sound = downcast<sn76496_base_device*>(owner()->subdevice(TISOUNDCHIP_TAG));
-	m_gromport = downcast<gromport_device*>(owner()->subdevice(GROMPORT_TAG));
-	m_peb = downcast<peribox_device*>(owner()->subdevice(PERIBOX_TAG));
 	m_grom[0] = downcast<tmc0430_device*>(owner()->subdevice(GROM0_TAG));
 	m_grom[1] = downcast<tmc0430_device*>(owner()->subdevice(GROM1_TAG));
 	m_grom[2] = downcast<tmc0430_device*>(owner()->subdevice(GROM2_TAG));
-	m_padram = make_unique_clear<UINT16[]>(256/2);
 }
 
 

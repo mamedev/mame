@@ -87,7 +87,7 @@ public:
 		m_bgvram(*this, "bgvram"),
 		m_fgvram(*this, "fgvram")
 	{ }
-	
+
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<UINT8> m_txvram;
@@ -116,10 +116,10 @@ void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		if(attr & 0x03) // debug
 			attr = machine().rand() & 0xfc;
-		
+
 		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8,y*8,3);
 	}
-	
+
 	for (count=0;count<4*32;count++)
 	{
 		int x = count / 32;
@@ -130,10 +130,10 @@ void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		if(attr & 0x03) // debug
 			attr = machine().rand() & 0xfc;
-		
+
 		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+256,y*8,3);
 	}
-	
+
 }
 
 void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -146,19 +146,19 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
 		int x = count % 16;
 		int y = count / 16;
 		UINT8 tile, attr;
-		
+
 		tile = m_bgvram[count];
 		attr = m_bgvram[count+0x100];
 		if(attr & 0xf) // debug
 			attr = machine().rand() & 0xf0;
-		
+
 		gfx_1->opaque(bitmap,cliprect, tile,  attr >> 4, 0, 0, x*16, y*16);
-		
+
 		tile = m_fgvram[count];
 		attr = m_fgvram[count+0x100];
 		if(attr & 0xf)
 			attr = machine().rand() & 0xf0;
-		
+
 		gfx_1->transpen(bitmap,cliprect, tile, attr >> 4, 0, 0, x*16, y*16, 15);
 	}
 }
@@ -172,8 +172,8 @@ UINT32 flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 
 static ADDRESS_MAP_START( shared_map, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("workram") 
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP 
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("workram")
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("txvram")
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_SHARE("bgvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("fgvram")
@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( flower, flower_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_3_579545MHz*2, 442, 0, 288, 263, 16, 240)  /* generic NTSC video timing at 256x224 */
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flower) 
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flower)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 MACHINE_CONFIG_END
@@ -298,7 +298,7 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_LOAD( "12.16e", 0x4000, 0x2000, CRC(e3779f7f) SHA1(8e12d06b3cdc2fcb7b77cc35f8eca45544cc4873) )
 	ROM_LOAD( "11.14e", 0x6000, 0x2000, CRC(8801b34f) SHA1(256059fcd16b21e076db1c18fd9669128df1d658) )
 
-	
+
 	ROM_REGION( 0x8000, "sound1", 0 )
 	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 

@@ -2226,12 +2226,35 @@ ROM_END
 
 ROM_START( mac128k )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
+	//ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
+	ROMX_LOAD("vti__416_vh_2605__23256-1020__342-0220-a__(c)apple_83__korea-ae.rom-hi.27256.u6d",  0x00000, 0x08000, CRC(198210ad) SHA1(2590ff4af5ac0361babdf0dc5da18e2eecad454a), ROM_SKIP(1) ) // see below for alternate labels
+	ROMX_LOAD("vti__416_vh_2826__23256-1023__342-0221-a__(c)apple_83__korea-ae.rom-lo.27256.u8d",  0x00001, 0x08000, CRC(fd2665c2) SHA1(8507932a854bd28196a17785c8b1851cb53eaf64), ROM_SKIP(1) ) // see below for alternate labels
+	/* These two roms were manufactured by at least 3 manufacturers:
+	VTi:
+	"<VTi logo along side> // 416 VH 2605 // 23256-1020 // 342-0220-A // (C)APPLE 83 // KOREA-AE"
+	"<VTi logo along side> // 416 VH 2826 // 23256-1023 // 342-0221-A // (C)APPLE 83 // KOREA-AE"
+	Synertek:
+	"<Synertek 'S' logo> 8416 G // C19728 // 342-0220-A // (C)APPLE 83"
+	"<Synertek 'S' logo> 8410 G // C19729 // 342-0221-A // (C)APPLE 83"
+	Hitachi:
+	[can't find reference for rom-hi]
+	"<Hitachi 'target' logo> 8413 // 3256 016 JAPAN // (C)APPLE 83 // 342-0221-A"
+
+	References:
+	http://www.vintagecomputer.net/apple/Macintosh/Macintosh_motherboard.jpg
+	https://upload.wikimedia.org/wikipedia/commons/3/34/Macintosh-motherboard.jpg
+	https://68kmla.org/forums/uploads/monthly_01_2016/post-2105-0-31195100-1452296677.jpg
+	https://68kmla.org/forums/uploads/monthly_12_2014/post-2597-0-46269000-1419299800.jpg
+	http://cdn.cultofmac.com/wp-content/uploads/2014/01/12A-128k-Motherboard.jpg
+	  */
 ROM_END
 
 ROM_START( mac512k )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
+	//ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
+	ROMX_LOAD("vti__512_vh_6434__23256-1104__342-0220-b__(c)_apple_84__korea-a.rom-hi.27256.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
+	ROMX_LOAD("vti__512_vh_6709__23256-1105__342-0221-b__(c)_apple_84__korea-a.rom-lo.27256.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
+	// reference: http://i.ebayimg.com/images/g/Uj8AAOSwvzRXy2tW/s-l1600.jpg
 ROM_END
 
 ROM_START( unitron )
@@ -2246,21 +2269,34 @@ ROM_START( utrn1024 )
 	ROM_LOAD16_BYTE( "macplus_mem_l.e7", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7) )
 ROM_END
 
-ROM_START( mac512ke )
-	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f))
-ROM_END
+	//ROMX_LOAD( "4d1f8172 - macplus v3.rom",  0x00000, 0x020000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
+	//ROMX_LOAD( "4d1eeae1 - macplus v2.rom",  0x00000, 0x020000, CRC(7cacd18f) SHA1(73bf2eb215646e108daa0cdd874e6c843c8ce421), ROM_GROUPWORD | ROM_BIOS(2) )
+	//ROMX_LOAD( "4d1eeee1 - macplus v1.rom",  0x00000, 0x020000, CRC(4fa5b399) SHA1(e0da7165b92dee90d8b1522429c033729fa73fd2), ROM_GROUPWORD | ROM_BIOS(3) )
 
+ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 macplus romsets installed, and v1 romsets are more common here than in the plus, since the 512ke lacks scsi, which is the cause of the major bug fixed between v1 and v2, hence 512ke is unaffected and was a good way for apple to use the buggy roms rather than destroying them.
+	ROM_REGION16_BE(0x20000, "bootrom", 0)
+	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas") // V3 - 4d1f8172
+	ROMX_LOAD( "vlsi__740_sa_1262__23512-1054__342-0341-c__(c)apple_'83-'86__korea_a.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) ) // these also appeared with a different label when made by AMI: "342-0341-C // (C)APPLE 85,86 // (M)AMI 8849MBL // PHILLIPINES"
+	ROMX_LOAD( "vlsi__740_sa_1342__23512-1055__342-0342-b__(c)apple_'83-'86__korea_a.rom-lo.27512.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) ) // these also appeared with a later VLSI label like "<VLSI logo>VLSI // 8905AV 0 AS759 // 23512-1055 // 342-0342-B // (C)APPLE '85-'86"
+	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers") // V2 - 4d1eeae1 - fixes a bug where the system will hang forever on the boot screen if a scsi device is present but does not respond properly
+	ROMX_LOAD( "vti__624_v0_8636__23512-1010__342-0341-b__(c)apple_'85__mexico_r.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "vti__622_v0_b637__23512-1007__342-0342-a__(c)apple_'83-'85__korea_a.rom-lo.27512.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts") // V1 - 4d1eeee1
+	ROMX_LOAD( "342-0341-a.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) ) // label of these two roms may be slightly different from what is listed here, as they are very rare except in 512ke machines; the first part of this label is likely vti__<datecode/lotcode>__23512-1008__ etc.
+	ROMX_LOAD( "vti__622_v0_b637__23512-1007__342-0342-a__(c)apple_'83-'85__korea_a.rom-lo.27512.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) ) // label of these two rom may be slightly different from what is listed here, as they are very rare except in 512ke machines; this rom is identical to one of the v2 roms.
+ROM_END
 
 ROM_START( macplus )
 	ROM_REGION16_BE(0x40000, "bootrom", 0)
-	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
-	ROMX_LOAD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
-	ROMX_LOAD( "23512-1007__342-0342-a.rom-lo.u7d", 0x000000, 0x010000, CRC(5aaa4a2f) SHA1(5dfbfbe279ddadfae691c95f552fd9db41e3ed90), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "23512-1010__342-0341-b.rom-hi.u6d", 0x000001, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts")
-	ROMX_LOAD( "4d1eeee1 - macplus v1.rom", 0x000000, 0x020000, CRC(4fa5b399) SHA1(e0da7165b92dee90d8b1522429c033729fa73fd2), ROM_GROUPWORD | ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas") // V3 - 4d1f8172
+	ROMX_LOAD( "vlsi__740_sa_1262__23512-1054__342-0341-c__(c)apple_'83-'86__korea_a.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) ) // these also appeared with a different label when made by AMI: "342-0341-C // (C)APPLE 85,86 // (M)AMI 8849MBL // PHILLIPINES"
+	ROMX_LOAD( "vlsi__740_sa_1342__23512-1055__342-0342-b__(c)apple_'83-'86__korea_a.rom-lo.27512.u7d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) ) // these also appeared with a later VLSI label like "<VLSI logo>VLSI // 8905AV 0 AS759 // 23512-1055 // 342-0342-B // (C)APPLE '85-'86"
+	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers") // V2 - 4d1eeae1 - fixes a bug where the system will hang forever on the boot screen if a scsi device is present but does not respond properly
+	ROMX_LOAD( "vti__624_v0_8636__23512-1010__342-0341-b__(c)apple_'85__mexico_r.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "vti__622_v0_b637__23512-1007__342-0342-a__(c)apple_'83-'85__korea_a.rom-lo.27512.u7d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts") // V1 - 4d1eeee1
+	ROMX_LOAD( "342-0341-a.rom-hi.27512.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) ) // label of these two roms may be slightly different from what is listed here, as they are very rare except in 512ke machines; the first part of this label is likely vti__<datecode/lotcode>__23512-1008__ etc.
+	ROMX_LOAD( "vti__622_v0_b637__23512-1007__342-0342-a__(c)apple_'83-'85__korea_a.rom-lo.27512.u7d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) ) // label of these two rom may be slightly different from what is listed here, as they are very rare except in 512ke machines; this rom is identical to one of the v2 roms.
 	ROM_SYSTEM_BIOS(3, "romdisk", "mac68k.info self-boot (1/1/2015)")
 	ROMX_LOAD( "modplus-harp2.bin", 0x000000, 0x028000, CRC(ba56078d) SHA1(debdf328ac73e1662d274a044d8750224f47edef), ROM_GROUPWORD | ROM_BIOS(4) )
 ROM_END

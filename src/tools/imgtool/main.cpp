@@ -23,9 +23,10 @@
 
 static void writeusage(FILE *f, int write_word_usage, const struct command *c, char *argv[])
 {
+	std::string cmdname = core_filename_extract_base(argv[0]);
 	fprintf(f, "%s %s %s %s\n",
 		(write_word_usage ? "Usage:" : "      "),
-		imgtool_basename(argv[0]),
+		cmdname.c_str(),
 		c->name,
 		c->usage ? c->usage : "");
 }
@@ -619,8 +620,8 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	imgtool_image *img;
 	imgtool_stream *stream = nullptr;
-	dynamic_buffer buffer;
-	UINT32 size, track, head, sector;
+	std::vector<UINT8> buffer;
+	UINT32 track, head, sector;
 
 	/* attempt to open image */
 	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_READ, &img);
@@ -631,16 +632,9 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	head = atoi(argv[3]);
 	sector = atoi(argv[4]);
 
-	err = imgtool_image_get_sector_size(img, track, head, sector, &size);
+	err = imgtool_image_read_sector(img, track, head, sector, buffer);
 	if (err)
 		goto done;
-
-	buffer.resize(size);
-
-	err = imgtool_image_read_sector(img, track, head, sector, &buffer[0], size);
-	if (err)
-		goto done;
-
 
 	stream = stream_open(argv[5], OSD_FOPEN_WRITE);
 	if (!stream)
@@ -649,7 +643,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 		goto done;
 	}
 
-	stream_write(stream, &buffer[0], size);
+	stream_write(stream, &buffer[0], buffer.size());
 
 done:
 	if (stream)
@@ -746,7 +740,7 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 	for (auto iter = resolution.entries_begin(); iter != resolution.entries_end(); iter++)
 	{
 		const util::option_resolution::entry &entry = *iter;
-                std::stringstream description_buffer;
+				std::stringstream description_buffer;
 
 		std::string opt_name = string_format("--%s", entry.identifier());
 		const char *opt_desc = entry.display_name();
@@ -870,6 +864,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	int result;
 	const struct command *c;
 	const char *sample_format = "coco_jvc_rsdos";
+	std::string cmdname = core_filename_extract_base(argv[0]);
 
 #ifdef MAME_DEBUG
 	if (imgtool_validitychecks())
@@ -929,9 +924,9 @@ int CLIB_DECL main(int argc, char *argv[])
 	fprintf(stderr, "<imagename> is the image filename; can specify a ZIP file for image name\n");
 
 	fprintf(stderr, "\nExample usage:\n");
-	fprintf(stderr, "\t%s dir %s myimageinazip.zip\n", imgtool_basename(argv[0]), sample_format);
-	fprintf(stderr, "\t%s get %s myimage.dsk myfile.bin mynewfile.txt\n", imgtool_basename(argv[0]), sample_format);
-	fprintf(stderr, "\t%s getall %s myimage.dsk\n", imgtool_basename(argv[0]), sample_format);
+	fprintf(stderr, "\t%s dir %s myimageinazip.zip\n", cmdname.c_str(), sample_format);
+	fprintf(stderr, "\t%s get %s myimage.dsk myfile.bin mynewfile.txt\n", cmdname.c_str(), sample_format);
+	fprintf(stderr, "\t%s getall %s myimage.dsk\n", cmdname.c_str(), sample_format);
 	result = 0;
 	goto done;
 

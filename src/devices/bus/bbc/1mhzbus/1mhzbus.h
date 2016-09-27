@@ -95,8 +95,16 @@
 	MCFG_DEVICE_ADD(_tag, BBC_1MHZBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#define MCFG_BBC1MHZ_PASSTHRU_1MHZBUS_SLOT_ADD() \
-	MCFG_BBC_1MHZBUS_SLOT_ADD(BBC_1MHZBUS_SLOT_TAG, 0, bbc_1mhzbus_devices, nullptr)
+#define MCFG_BBC_PASSTHRU_1MHZBUS_SLOT_ADD() \
+	MCFG_BBC_1MHZBUS_SLOT_ADD(BBC_1MHZBUS_SLOT_TAG, bbc_1mhzbus_devices, nullptr) \
+	MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_1mhzbus_slot_device, irq_w)) \
+	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_1mhzbus_slot_device, nmi_w))
+
+#define MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(_devcb) \
+	devcb = &bbc_1mhzbus_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(_devcb) \
+	devcb = &bbc_1mhzbus_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -107,14 +115,22 @@
 
 class device_bbc_1mhzbus_interface;
 
-class bbc_1mhzbus_slot_device : public device_t,
-												public device_slot_interface
+class bbc_1mhzbus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
 	bbc_1mhzbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~bbc_1mhzbus_slot_device() {}
+	virtual ~bbc_1mhzbus_slot_device();
 
+	// callbacks
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
+		{ return downcast<bbc_1mhzbus_slot_device &>(device).m_irq_handler.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
+		{ return downcast<bbc_1mhzbus_slot_device &>(device).m_nmi_handler.set_callback(object); }
+
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
 protected:
 	// device-level overrides
@@ -122,6 +138,10 @@ protected:
 	virtual void device_reset() override;
 
 	device_bbc_1mhzbus_interface *m_card;
+
+private:
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_nmi_handler;
 };
 
 
@@ -142,7 +162,8 @@ protected:
 // device type definition
 extern const device_type BBC_1MHZBUS_SLOT;
 
-SLOT_INTERFACE_EXTERN( bbc_1mhzbus_devices );
+SLOT_INTERFACE_EXTERN( bbcb_1mhzbus_devices );
+SLOT_INTERFACE_EXTERN( bbcm_1mhzbus_devices );
 
 
 #endif

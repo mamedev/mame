@@ -21,11 +21,11 @@
 namespace util {
 
 /***************************************************************************
-	option_resolution
+    option_resolution
 ***************************************************************************/
 
 // -------------------------------------------------
-//	ctor
+//  ctor
 // -------------------------------------------------
 
 option_resolution::option_resolution(const option_guide &guide)
@@ -63,7 +63,7 @@ option_resolution::option_resolution(const option_guide &guide)
 
 
 // -------------------------------------------------
-//	dtor
+//  dtor
 // -------------------------------------------------
 
 option_resolution::~option_resolution()
@@ -72,7 +72,7 @@ option_resolution::~option_resolution()
 
 
 // -------------------------------------------------
-//	lookup_in_specification
+//  lookup_in_specification
 // -------------------------------------------------
 
 const char *option_resolution::lookup_in_specification(const char *specification, const option_guide::entry &option)
@@ -84,8 +84,8 @@ const char *option_resolution::lookup_in_specification(const char *specification
 
 
 // -------------------------------------------------
-//	set_specification - sets the option specification
-//	and mutates values accordingly
+//  set_specification - sets the option specification
+//  and mutates values accordingly
 // -------------------------------------------------
 
 void option_resolution::set_specification(const std::string &specification)
@@ -108,7 +108,7 @@ void option_resolution::set_specification(const std::string &specification)
 
 
 // -------------------------------------------------
-//	find
+//  find
 // -------------------------------------------------
 
 option_resolution::entry *option_resolution::find(int parameter)
@@ -125,7 +125,7 @@ option_resolution::entry *option_resolution::find(int parameter)
 
 
 // -------------------------------------------------
-//	find
+//  find
 // -------------------------------------------------
 
 option_resolution::entry *option_resolution::find(const std::string &identifier)
@@ -142,7 +142,7 @@ option_resolution::entry *option_resolution::find(const std::string &identifier)
 
 
 // -------------------------------------------------
-//	lookup_int
+//  lookup_int
 // -------------------------------------------------
 
 int option_resolution::lookup_int(int parameter)
@@ -154,7 +154,7 @@ int option_resolution::lookup_int(int parameter)
 
 
 // -------------------------------------------------
-//	lookup_string
+//  lookup_string
 // -------------------------------------------------
 
 const std::string &option_resolution::lookup_string(int parameter)
@@ -166,7 +166,7 @@ const std::string &option_resolution::lookup_string(int parameter)
 
 
 // -------------------------------------------------
-//	error_string
+//  error_string
 // -------------------------------------------------
 
 option_resolution::error option_resolution::get_default(const char *specification, int option_char, int *val)
@@ -177,29 +177,29 @@ option_resolution::error option_resolution::get_default(const char *specificatio
 
 
 // -------------------------------------------------
-//	error_string
+//  error_string
 // -------------------------------------------------
 
 const char *option_resolution::error_string(option_resolution::error err)
 {
 	switch (err)
 	{
-	case error::SUCCESS:				return "The operation completed successfully";
-	case error::OUTOFMEMORY:			return "Out of memory";
-	case error::PARAMOUTOFRANGE:		return "Parameter out of range";
-	case error::PARAMNOTSPECIFIED:		return "Parameter not specified";
-	case error::PARAMNOTFOUND:			return "Unknown parameter";
-	case error::PARAMALREADYSPECIFIED:	return "Parameter specified multiple times";
-	case error::BADPARAM:				return "Invalid parameter";
-	case error::SYNTAX:					return "Syntax error";
-	case error::INTERNAL:				return "Internal error";
+	case error::SUCCESS:                return "The operation completed successfully";
+	case error::OUTOFMEMORY:            return "Out of memory";
+	case error::PARAMOUTOFRANGE:        return "Parameter out of range";
+	case error::PARAMNOTSPECIFIED:      return "Parameter not specified";
+	case error::PARAMNOTFOUND:          return "Unknown parameter";
+	case error::PARAMALREADYSPECIFIED:  return "Parameter specified multiple times";
+	case error::BADPARAM:               return "Invalid parameter";
+	case error::SYNTAX:                 return "Syntax error";
+	case error::INTERNAL:               return "Internal error";
 	}
 	return nullptr;
 }
 
 
 // -------------------------------------------------
-//	entry::ctor
+//  entry::ctor
 // -------------------------------------------------
 
 option_resolution::entry::entry(const option_guide::entry &guide_entry)
@@ -209,7 +209,7 @@ option_resolution::entry::entry(const option_guide::entry &guide_entry)
 
 
 // -------------------------------------------------
-//	entry::set_enum_value_range
+//  entry::set_enum_value_range
 // -------------------------------------------------
 
 void option_resolution::entry::set_enum_value_range(const option_guide::entry *begin, const option_guide::entry *end)
@@ -220,7 +220,7 @@ void option_resolution::entry::set_enum_value_range(const option_guide::entry *b
 
 
 // -------------------------------------------------
-//	entry::parse_specification
+//  entry::parse_specification
 // -------------------------------------------------
 
 void option_resolution::entry::parse_specification(const char *specification)
@@ -331,7 +331,7 @@ void option_resolution::entry::parse_specification(const char *specification)
 
 
 // -------------------------------------------------
-//	entry::numeric_value
+//  entry::numeric_value
 // -------------------------------------------------
 
 std::string option_resolution::entry::numeric_value(int value)
@@ -341,7 +341,7 @@ std::string option_resolution::entry::numeric_value(int value)
 
 
 // -------------------------------------------------
-//	entry::value
+//  entry::value
 // -------------------------------------------------
 
 const std::string &option_resolution::entry::value() const
@@ -352,7 +352,7 @@ const std::string &option_resolution::entry::value() const
 
 
 // -------------------------------------------------
-//	entry::value_int
+//  entry::value_int
 // -------------------------------------------------
 
 int option_resolution::entry::value_int() const
@@ -362,7 +362,7 @@ int option_resolution::entry::value_int() const
 
 
 // -------------------------------------------------
-//	entry::set_value
+//  entry::set_value
 // -------------------------------------------------
 
 bool option_resolution::entry::set_value(const std::string &value)
@@ -382,7 +382,7 @@ bool option_resolution::entry::set_value(const std::string &value)
 
 
 // -------------------------------------------------
-//	entry::can_bump_lower
+//  entry::can_bump_lower
 // -------------------------------------------------
 
 bool option_resolution::entry::can_bump_lower() const
@@ -393,7 +393,7 @@ bool option_resolution::entry::can_bump_lower() const
 
 
 // -------------------------------------------------
-//	entry::can_bump_higher
+//  entry::can_bump_higher
 // -------------------------------------------------
 
 bool option_resolution::entry::can_bump_higher() const
@@ -404,7 +404,7 @@ bool option_resolution::entry::can_bump_higher() const
 
 
 // -------------------------------------------------
-//	entry::bump_lower
+//  entry::bump_lower
 // -------------------------------------------------
 
 bool option_resolution::entry::bump_lower()
@@ -436,7 +436,7 @@ bool option_resolution::entry::bump_lower()
 
 
 // -------------------------------------------------
-//	entry::bump_higher
+//  entry::bump_higher
 // -------------------------------------------------
 
 bool option_resolution::entry::bump_higher()
@@ -468,7 +468,7 @@ bool option_resolution::entry::bump_higher()
 
 
 // -------------------------------------------------
-//	entry::find_in_ranges
+//  entry::find_in_ranges
 // -------------------------------------------------
 
 option_resolution::entry::rangelist::const_iterator option_resolution::entry::find_in_ranges(int value) const

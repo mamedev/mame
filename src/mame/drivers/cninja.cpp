@@ -1629,7 +1629,7 @@ ROM_START( cninjabl2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "audio-prg.3",  0x00000,  0x8000,  CRC(3eb65b6d) SHA1(e6d94223a7b98d33470ad4e387d6ce399b76ea4a) ) // first half empty
 	ROM_CONTINUE(               0x00000,  0x8000 )
-	
+
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "gl-08.rom",  0x00001,  0x10000,  CRC(33a2b400) SHA1(fdb8de315f33705719c0ac03a61fb56ffbfdf597) )       /* chars */
 	ROM_LOAD16_BYTE( "gl-09.rom",  0x00000,  0x10000,  CRC(5a2d4752) SHA1(617dd10a99b5b55ca64dcdd22a0f133b0d6b770d) )

@@ -63,13 +63,13 @@ private:
 	int     m_address;
 
 	// Holds the status of the DRQ and IRQ lines.
-	line_state  m_DRQ, m_IRQ;
+	int  m_DRQ, m_IRQ;
 
 	// Needed for triggering the motor monoflop
 	UINT8   m_lastval;
 
 	// Signal DVENA. When TRUE, makes some drive turning.
-	line_state  m_DVENA;
+	int  m_DVENA;
 
 	// Set when address is in card area
 	bool    m_inDsrArea;
@@ -88,7 +88,7 @@ private:
 	int         m_DSEL;
 
 	// Signal SIDSEL. 0 or 1, indicates the selected head.
-	line_state        m_SIDSEL;
+	int        m_SIDSEL;
 
 	// count 4.23s from rising edge of motor_on
 	emu_timer*  m_motor_on_timer;
@@ -103,7 +103,7 @@ private:
 	floppy_image_device*    m_floppy[3];
 
 	// Currently selected floppy drive
-	floppy_image_device*    m_current_floppy;
+	int  m_current;
 
 	// Debugging
 	bool m_debug_dataout;

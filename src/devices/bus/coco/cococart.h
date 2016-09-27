@@ -117,10 +117,10 @@ private:
 		emu_timer                   *timer[TIMER_POOL];
 		int                         timer_index;
 		int                         delay;
-		line_value					value;
+		line_value                  value;
 		int                         line;
 		int                         q_count;
-		devcb_write_line *			callback;
+		devcb_write_line *          callback;
 	};
 
 	// configuration

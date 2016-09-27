@@ -47,7 +47,7 @@ private:
 
 	void find_matches(const char *str);
 
-	char                       m_search[40];
+	std::string                m_search;
 	UINT16                     &m_selector;
 	int                        m_category, m_hover;
 	bool                       m_first_pass;

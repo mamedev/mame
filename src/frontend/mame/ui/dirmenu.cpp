@@ -342,19 +342,9 @@ void menu_add_change_folder::handle()
 		}
 		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
-			auto const buflen = std::strlen(m_search);
 			bool update_selected = false;
 
-			if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
-			{
-				// if it's a backspace and we can handle it, do so
-				if (0 < buflen)
-				{
-					*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
-					update_selected = true;
-				}
-			}
-			else if (menu_event->unichar == 0x09)
+			if (menu_event->unichar == 0x09)
 			{
 				// Tab key, save current path
 				std::string error_string;
@@ -391,11 +381,10 @@ void menu_add_change_folder::handle()
 				reset_parent(reset_options::SELECT_FIRST);
 				stack_pop();
 			}
-			else if (menu_event->is_char_printable())
+			else
 			{
 				// if it's any other key and we're not maxed out, update
-				if (menu_event->append_char(m_search, buflen))
-					update_selected = true;
+				update_selected = input_character(m_search, menu_event->unichar, uchar_is_printable);
 			}
 
 			// check for entries which matches our search buffer
@@ -406,12 +395,12 @@ void menu_add_change_folder::handle()
 
 				// from current item to the end
 				for (entry = cur_selected; entry < item.size(); entry++)
-					if (item[entry].ref != nullptr && m_search[0] != 0)
+					if (item[entry].ref != nullptr && !m_search.empty())
 					{
 						int match = 0;
-						for (int i = 0; i < ARRAY_LENGTH(m_search); i++)
+						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item[entry].text.c_str(), m_search, i) == 0)
+							if (core_strnicmp(item[entry].text.c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
@@ -425,12 +414,12 @@ void menu_add_change_folder::handle()
 				// and from the first item to current one
 				for (entry = 0; entry < cur_selected; entry++)
 				{
-					if (item[entry].ref != nullptr && m_search[0] != 0)
+					if (item[entry].ref != nullptr && !m_search.empty())
 					{
 						int match = 0;
-						for (int i = 0; i < ARRAY_LENGTH(m_search); i++)
+						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item[entry].text.c_str(), m_search, i) == 0)
+							if (core_strnicmp(item[entry].text.c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
@@ -447,8 +436,7 @@ void menu_add_change_folder::handle()
 		else if (menu_event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
-			if (m_search[0] != 0)
-				m_search[0] = '\0';
+			m_search.clear();
 		}
 	}
 }

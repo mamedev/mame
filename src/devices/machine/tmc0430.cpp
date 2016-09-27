@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
 	UINT16 baddr = 0;
 
 	// Wait for rising edge
-	line_state oldlevel = m_current_clock_level;
+	line_state oldlevel = (line_state)m_current_clock_level;
 	m_current_clock_level = (line_state)state;
 
 	if ((m_current_clock_level==CLEAR_LINE) || (oldlevel==ASSERT_LINE))
@@ -337,6 +337,15 @@ WRITE8_MEMBER( tmc0430_device::write )
 void tmc0430_device::device_start(void)
 {
 	m_gromready.resolve_safe();
+	save_item(NAME(m_current_clock_level));
+	save_item(NAME(m_current_ident));
+	save_item(NAME(m_phase));
+	save_item(NAME(m_address_mode));
+	save_item(NAME(m_read_mode));
+	save_item(NAME(m_selected));
+	save_item(NAME(m_address_lowbyte));
+	save_item(NAME(m_address));
+	save_item(NAME(m_buffer));
 }
 
 void tmc0430_device::device_reset(void)

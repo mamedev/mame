@@ -49,14 +49,14 @@
 #define V1050_VIDEORAM_SIZE     0x8000
 #define V1050_VIDEORAM_MASK     0x7fff
 
-#define INT_RS_232          0x01
-#define INT_WINCHESTER      0x02
-#define INT_KEYBOARD        0x04
-#define INT_FLOPPY          0x08
-#define INT_VSYNC           0x10
-#define INT_DISPLAY         0x20
-#define INT_EXPANSION_B     0x40
-#define INT_EXPANSION_A     0x80
+#define INT_RS_232          0
+#define INT_WINCHESTER      1
+#define INT_KEYBOARD        2
+#define INT_FLOPPY          3
+#define INT_VSYNC           4
+#define INT_DISPLAY         5
+#define INT_EXPANSION_B     6
+#define INT_EXPANSION_A     7
 
 class v1050_state : public driver_device
 {
@@ -157,7 +157,7 @@ protected:
 private:
 	void bankswitch();
 	void update_fdc();
-	void set_interrupt(UINT8 mask, int state);
+	void set_interrupt(int line, int state);
 	void scan_keyboard();
 	void set_baud_sel(int sel);
 
@@ -192,7 +192,6 @@ public: // HACK for MC6845
 
 	// interrupt state
 	UINT8 m_int_mask;           // interrupt mask
-	UINT8 m_int_state;          // interrupt status
 	int m_f_int_enb;            // floppy interrupt enable
 	bool m_fdc_irq;
 	bool m_fdc_drq;

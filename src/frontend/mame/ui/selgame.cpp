@@ -36,7 +36,6 @@
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
-
 bool menu_select_game::first_start = true;
 std::vector<const game_driver *> menu_select_game::m_sortedlist;
 int menu_select_game::m_isabios = 0;
@@ -397,7 +396,7 @@ void menu_select_game::handle()
 				}
 			}
 		}
-		else if (menu_event->iptkey == IPT_UI_EXPORT && !isfavorite())
+		else if (menu_event->iptkey == IPT_UI_EXPORT)
 		{
 			// handle UI_EXPORT
 			inkey_export();
@@ -970,23 +969,8 @@ void menu_select_game::inkey_special(const event *menu_event)
 {
 	if (!isfavorite())
 	{
-		auto const buflen = std::strlen(m_search);
-
-		if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
-		{
-			// if it's a backspace and we can handle it, do so
-			if (0 < buflen)
-			{
-				*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
-				reset(reset_options::SELECT_FIRST);
-			}
-		}
-		else if (menu_event->is_char_printable())
-		{
-			// if it's any other key and we're not maxed out, update
-			if (menu_event->append_char(m_search, buflen))
-				reset(reset_options::SELECT_FIRST);
-		}
+		if (input_character(m_search, menu_event->unichar, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
 	}
 }
 
@@ -1355,8 +1339,23 @@ void menu_select_game::inkey_export()
 	}
 	else
 	{
-		list = m_displaylist;
+		if (isfavorite())
+		{
+			// iterate over favorites
+			for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
+			{
+				if (favmap.second.startempty == 1)
+					list.push_back(favmap.second.driver);
+				else
+					return;
+			}
+		}
+		else
+		{
+			list = m_displaylist;
+		}
 	}
+
 	menu::stack_push<menu_export>(ui(), container(), std::move(list));
 }
 

@@ -211,6 +211,8 @@ void gromport_device::device_start()
 {
 	m_console_ready.resolve();
 	m_console_reset.resolve();
+
+	save_item(NAME(m_romgq));
 }
 
 void gromport_device::device_reset()
@@ -663,6 +665,10 @@ void multi_conn_device::device_start()
 	{
 		elem = nullptr;
 	}
+	save_item(NAME(m_readrom));
+	save_item(NAME(m_active_slot));
+	save_item(NAME(m_fixed_slot));
+	save_item(NAME(m_next_free_slot));
 }
 
 void multi_conn_device::device_reset(void)
@@ -1087,6 +1093,11 @@ void gkracker_device::device_start()
 	m_grom_ptr = memregion(GKRACKER_ROM_TAG)->base();
 	m_cartridge = nullptr;
 	for (int i=1; i < 6; i++) m_gk_switch[i] = 0;
+	save_pointer(NAME(m_gk_switch),6);
+	save_item(NAME(m_romspace_selected));
+	save_item(NAME(m_ram_page));
+	save_item(NAME(m_grom_address));
+	save_item(NAME(m_waddr_LSB));
 }
 
 void gkracker_device::device_reset()

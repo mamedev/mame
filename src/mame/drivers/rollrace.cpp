@@ -280,8 +280,8 @@ static MACHINE_CONFIG_DERIVED( rollace2, rollrace )
 
 	/* basic machine hardware */
 
-//	MCFG_SCREEN_MODIFY("screen")
-//	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
+//  MCFG_SCREEN_MODIFY("screen")
+//  MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
 MACHINE_CONFIG_END
 
 

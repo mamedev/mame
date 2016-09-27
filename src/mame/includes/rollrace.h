@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cram_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void tilemap_refresh_flip();
-	
+
 	DECLARE_PALETTE_INIT(rollrace);
 	virtual void machine_start() override;
 	virtual void video_start() override;

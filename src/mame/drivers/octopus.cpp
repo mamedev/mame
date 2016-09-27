@@ -144,6 +144,7 @@ public:
 		m_floppy1(*this, "fdc:1"),
 		m_kb_uart(*this, "keyboard"),
 		m_pit(*this, "pit"),
+		m_ppi(*this, "ppi"),
 		m_speaker(*this, "speaker"),
 		m_z80_bankdev(*this, "z80_bank"),
 		m_ram(*this, "main_ram"),
@@ -177,11 +178,13 @@ public:
 	DECLARE_READ8_MEMBER(z80_io_r);
 	DECLARE_WRITE8_MEMBER(z80_io_w);
 	IRQ_CALLBACK_MEMBER(x86_irq_cb);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE8_MEMBER(rtc_w);
 
 	DECLARE_WRITE_LINE_MEMBER(spk_w);
 	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
 	DECLARE_WRITE_LINE_MEMBER(beep_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(dack0_w) { m_dma1->hack_w(state ? 0 : 1); }  // for all unused DMA channel?
 	DECLARE_WRITE_LINE_MEMBER(dack1_w) { if(!state) m_current_dma = 1; else if(m_current_dma == 1) m_current_dma = -1; }  // HD
 	DECLARE_WRITE_LINE_MEMBER(dack2_w) { if(!state) m_current_dma = 2; else if(m_current_dma == 2) m_current_dma = -1; }  // RAM refresh
@@ -195,10 +198,10 @@ public:
 	{
 		BEEP_TIMER = 100
 	};
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -215,10 +218,11 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<i8251_device> m_kb_uart;
 	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<address_map_bank_device> m_z80_bankdev;
 	required_device<ram_device> m_ram;
-	
+
 	UINT8 m_hd_bank;  // HD bank select
 	UINT8 m_fd_bank;  // Floppy bank select
 	UINT8 m_z80_bank; // Z80 bank / RAM refresh
@@ -231,7 +235,10 @@ private:
 	bool m_beep_active;
 	bool m_speaker_level;
 	bool m_z80_active;
-	
+	bool m_rtc_address;
+	bool m_rtc_data;
+	UINT8 m_prev_cntl;
+
 	emu_timer* m_timer_beep;
 };
 
@@ -402,7 +409,7 @@ READ8_MEMBER(octopus_state::system_r)
 	case 0:
 		return 0x1f;  // do bits 0-4 mean anything?  Language DIPs?
 	}
-	
+
 	return 0xff;
 }
 
@@ -420,7 +427,36 @@ WRITE8_MEMBER(octopus_state::z80_io_w)
 	m_z80_active = false;
 }
 
+// RTC data and I/O - PPI port A
+// bits 0-3 of RTC/FDC control go to control lines of the MC146818
+// The technical manual does not mention what is connected to each bit
+// This is an educated guess, based on the BIOS code
+// bit 0 = ? (Pulsed low after writing to an RTC register)
+// bit 1 = PPI Port A strobe?
+// bit 2 = Data strobe?
+// bit 3 = Address strobe?
+READ8_MEMBER(octopus_state::rtc_r)
+{
+	UINT8 ret = 0xff;
+
+	if(m_rtc_data)
+		ret = m_rtc->read(space,1);
+	else if(m_rtc_address)
+		ret = m_rtc->read(space,0);
+
+	return ret;
+}
+
+WRITE8_MEMBER(octopus_state::rtc_w)
+{
+	if(m_rtc_data)
+		m_rtc->write(space,1,data);
+	else if(m_rtc_address)
+		m_rtc->write(space,0,data);
+}
+
 // RTC/FDC control - PPI port B
+// bits0-3: RTC control lines
 // bit4-5: write precomp.
 // bit6-7: drive select
 READ8_MEMBER(octopus_state::cntl_r)
@@ -431,6 +467,21 @@ READ8_MEMBER(octopus_state::cntl_r)
 WRITE8_MEMBER(octopus_state::cntl_w)
 {
 	m_cntl = data;
+
+	if((m_cntl & 0x08) && !(m_prev_cntl & 0x08))
+	{
+		m_rtc_address = true;
+		m_rtc_data = false;
+		logerror("Address strobe!\n");
+	}
+	if((data & 0x04) && !(m_prev_cntl & 0x04))
+	{
+		m_rtc_address = false;
+		m_rtc_data = true;
+		logerror("Data strobe!\n");
+	}
+	m_ppi->pc4_w(data & 0x02);
+	m_prev_cntl = m_cntl;
 	m_current_drive = (data & 0xc0) >> 6;
 	switch(m_current_drive)
 	{
@@ -554,7 +605,7 @@ IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
 void octopus_state::machine_start()
 {
 	m_timer_beep = timer_alloc(BEEP_TIMER);
-	
+
 	// install extra RAM
 	if(m_ram->size() > 0x20000)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"extra_ram_bank");
@@ -567,6 +618,8 @@ void octopus_state::machine_reset()
 	m_z80_active = false;
 	m_current_dma = -1;
 	m_current_drive = 0;
+	m_rtc_address = true;
+	m_rtc_data = false;
 	membank("main_ram_bank")->set_base(m_ram->pointer());
 }
 
@@ -651,15 +704,15 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 
 	// RTC (MC146818 via i8255 PPI)  TODO: hook up RTC to PPI
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(NOOP)
+	MCFG_I8255_IN_PORTA_CB(READ8(octopus_state,rtc_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(octopus_state,cntl_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(octopus_state,gpo_r))
-	MCFG_I8255_OUT_PORTA_CB(NOOP)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(octopus_state,rtc_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(octopus_state,cntl_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(octopus_state,gpo_w))
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir2_w))
-	
+
 	// Keyboard UART
 	MCFG_DEVICE_ADD("keyboard", I8251, 0)
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir4_w))
@@ -684,7 +737,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_PIT8253_CLK1(500)  // DART channel B
 	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(octopus_state,spk_freq_w))
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -702,8 +755,8 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_SCREEN_SIZE(720, 360)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",scn2674_device, screen_update)
-//	MCFG_SCREEN_PALETTE("palette")
-//	MCFG_PALETTE_ADD_MONOCHROME("palette")	
+//  MCFG_SCREEN_PALETTE("palette")
+//  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SCN2674_VIDEO_ADD("crtc", 0, DEVWRITELINE("pic_slave",pic8259_device,ir0_w))  // character clock can be selectable, either 16MHz or 17.6MHz
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)

@@ -164,23 +164,6 @@ static imgtoolerr_t markerrorsource(imgtoolerr_t err)
 	return err;
 }
 
-char *imgtool_basename(char *filename)
-{
-	char *c;
-
-	// NULL begets NULL
-	if (!filename)
-		return nullptr;
-
-	// start at the end and return when we hit a slash or colon
-	for (c = filename + strlen(filename) - 1; c >= filename; c--)
-		if (*c == '\\' || *c == '/' || *c == ':')
-			return c + 1;
-
-	// otherwise, return the whole thing
-	return filename;
-}
-
 /*-------------------------------------------------
     internal_error - debug function for raising
     internal errors
@@ -256,7 +239,7 @@ const imgtool_module *imgtool_find_module(const char *modulename)
 
 
 /*-------------------------------------------------
-	imgtool_find_module - looks up a module
+    imgtool_find_module - looks up a module
 -------------------------------------------------*/
 
 const imgtool::library::modulelist &imgtool_get_modules()
@@ -462,23 +445,6 @@ done:
 
 
 /*-------------------------------------------------
-    imgtool_image_get_sector_size - gets the size
-    of a particular sector on an image
--------------------------------------------------*/
-
-imgtoolerr_t imgtool_image_get_sector_size(imgtool_image *image, UINT32 track, UINT32 head,
-	UINT32 sector, UINT32 *length)
-{
-	/* implemented? */
-	if (!image->module->get_sector_size)
-		return (imgtoolerr_t )(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
-
-	return image->module->get_sector_size(image, track, head, sector, length);
-}
-
-
-
-/*-------------------------------------------------
     imgtool_image_get_geometry - gets the geometry
     of an image; note that this may disagree with
     particular sectors; this is a common copy
@@ -514,13 +480,13 @@ imgtoolerr_t imgtool_image_get_geometry(imgtool_image *image, UINT32 *tracks, UI
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_read_sector(imgtool_image *image, UINT32 track, UINT32 head,
-	UINT32 sector, void *buffer, size_t len)
+	UINT32 sector, std::vector<UINT8> &buffer)
 {
 	/* implemented? */
 	if (!image->module->read_sector)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return image->module->read_sector(image, track, head, sector, buffer, len);
+	return image->module->read_sector(image, track, head, sector, buffer);
 }
 
 
@@ -990,18 +956,6 @@ int imgtool_validitychecks(void)
 			}
 		}
 #endif
-
-		/* sanity checks on sector operations */
-		if (module->read_sector && !module->get_sector_size)
-		{
-			printf("imgtool module %s implements read_sector without supporting get_sector_size\n", module->name);
-			error = 1;
-		}
-		if (module->write_sector && !module->get_sector_size)
-		{
-			printf("imgtool module %s implements write_sector without supporting get_sector_size\n", module->name);
-			error = 1;
-		}
 
 		/* sanity checks on creation options */
 		if (module->createimage_optguide || module->createimage_optspec)
@@ -2102,9 +2056,13 @@ imgtoolerr_t imgtool_partition_put_file(imgtool_partition *partition, const char
 	imgtool_stream *f = nullptr;
 	imgtool_charset charset;
 	char *alloc_newfname = nullptr;
+	std::string basename;
 
 	if (!newfname)
-		newfname = (const char *) imgtool_basename((char *) source);
+	{
+		basename = core_filename_extract_base(source);
+		newfname = basename.c_str();
+	}
 
 	charset = (imgtool_charset) (int) imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET);
 	if (charset != IMGTOOL_CHARSET_UTF8)

@@ -458,7 +458,7 @@ UINT8 duscc_device::modify_vector(UINT8 vec, int index, UINT8 src)
 	{
 		// Modify vector according to "Vector Include Status" bit (REG_ICR_V2V4_MOD)
 		if ((m_icr & REG_ICR_V2V4_MOD) != 0)
-	    {                 // Affect V2-V4
+		{                 // Affect V2-V4
 			LOGINT((" - Affect V2-V4 with status"));
 			vec &= 0x07 << 3;
 			vec |= src  << 3;
@@ -501,7 +501,7 @@ void duscc_device::trigger_interrupt(int index, int state)
 	LOGINT(("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, state));
 
 	/* The Interrup Controll Register (ICR) bits, must be set for the correspondning channel */
-    // ICR Check is probably by the caller but we check again to be sure
+	// ICR Check is probably by the caller but we check again to be sure
 	if ((m_icr & (index == CHANNEL_A ? REG_ICR_CHA : REG_ICR_CHB)) == 0)
 	{
 		LOGINT(("The Interrupt Control Register [%02x] bit for this channel is not set, blocking attempt to interrupt\n", m_icr));
@@ -2165,14 +2165,14 @@ void duscc_channel::do_dusccreg_gsr_w(UINT8 data)
 void duscc_channel::do_dusccreg_ier_w(UINT8 data)
 {
 	LOGINT(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
-	if (REG_IER_DCD_CTS	& (data ^ m_ier)) LOGINT(("- DCD/CTS interrups %s\n", (data & REG_IER_DCD_CTS) ? "enabled" : "disabled" ));
-	if (REG_IER_TXRDY	& (data ^ m_ier)) LOGINT(("- TXRDY interrupts %s\n", (data & REG_IER_TXRDY) ? "enabled" : "disabled" ));
-	if (REG_IER_TRSR73	& (data ^ m_ier)) LOGINT(("- TRSR73 interrupts %s\n", (data & REG_IER_TRSR73) ? "enabled" : "disabled" ));
-	if (REG_IER_RXRDY 	& (data ^ m_ier)) LOGINT(("- RXRDY interrupts %s\n", (data & REG_IER_RXRDY) ? "enabled" : "disabled" ));
-	if (REG_IER_RSR76 	& (data ^ m_ier)) LOGINT(("- RSR76 interrupts %s\n", (data & REG_IER_RSR76) ? "enabled" : "disabled" ));
-	if (REG_IER_RSR54 	& (data ^ m_ier)) LOGINT(("- RSR54 interrupts %s\n", (data & REG_IER_RSR54) ? "enabled" : "disabled" ));
-	if (REG_IER_RSR32 	& (data ^ m_ier)) LOGINT(("- RSR32 interrupts %s\n", (data & REG_IER_RSR32) ? "enabled" : "disabled" ));
-	if (REG_IER_RSR10 	& (data ^ m_ier)) LOGINT(("- RSR10 interrupts %s\n", (data & REG_IER_RSR10) ? "enabled" : "disabled" ));
+	if (REG_IER_DCD_CTS & (data ^ m_ier)) LOGINT(("- DCD/CTS interrups %s\n", (data & REG_IER_DCD_CTS) ? "enabled" : "disabled" ));
+	if (REG_IER_TXRDY   & (data ^ m_ier)) LOGINT(("- TXRDY interrupts %s\n", (data & REG_IER_TXRDY) ? "enabled" : "disabled" ));
+	if (REG_IER_TRSR73  & (data ^ m_ier)) LOGINT(("- TRSR73 interrupts %s\n", (data & REG_IER_TRSR73) ? "enabled" : "disabled" ));
+	if (REG_IER_RXRDY   & (data ^ m_ier)) LOGINT(("- RXRDY interrupts %s\n", (data & REG_IER_RXRDY) ? "enabled" : "disabled" ));
+	if (REG_IER_RSR76   & (data ^ m_ier)) LOGINT(("- RSR76 interrupts %s\n", (data & REG_IER_RSR76) ? "enabled" : "disabled" ));
+	if (REG_IER_RSR54   & (data ^ m_ier)) LOGINT(("- RSR54 interrupts %s\n", (data & REG_IER_RSR54) ? "enabled" : "disabled" ));
+	if (REG_IER_RSR32   & (data ^ m_ier)) LOGINT(("- RSR32 interrupts %s\n", (data & REG_IER_RSR32) ? "enabled" : "disabled" ));
+	if (REG_IER_RSR10   & (data ^ m_ier)) LOGINT(("- RSR10 interrupts %s\n", (data & REG_IER_RSR10) ? "enabled" : "disabled" ));
 	m_ier = data;
 	m_uart->check_interrupts();
 	return;
@@ -2189,8 +2189,8 @@ void duscc_channel::do_dusccreg_icr_w(UINT8 data)
 {
 	m_uart->m_icr = data;
 	LOG(("%s(%02x)\n", FUNCNAME, data));
-	if (duscc_device::REG_ICR_CHB 	   & (data ^ m_uart->m_icr)) LOG(("- Channel B interrupts %s\n", (data & duscc_device::REG_ICR_CHB) ? "enabled" : "disabled" ));
-	if (duscc_device::REG_ICR_CHA 	   & (data ^ m_uart->m_icr)) LOG(("- Channel A interrupts %s\n", (data & duscc_device::REG_ICR_CHA) ? "enabled" : "disabled" ));
+	if (duscc_device::REG_ICR_CHB      & (data ^ m_uart->m_icr)) LOG(("- Channel B interrupts %s\n", (data & duscc_device::REG_ICR_CHB) ? "enabled" : "disabled" ));
+	if (duscc_device::REG_ICR_CHA      & (data ^ m_uart->m_icr)) LOG(("- Channel A interrupts %s\n", (data & duscc_device::REG_ICR_CHA) ? "enabled" : "disabled" ));
 	if (duscc_device::REG_ICR_VEC_MOD  & (data ^ m_uart->m_icr)) LOG(("- Vector is %s\n", (data & duscc_device::REG_ICR_VEC_MOD) ? "modified" : "unmodified" ));
 	if (duscc_device::REG_ICR_V2V4_MOD & (data ^ m_uart->m_icr)) LOG(("- Vector bits %s modified\n", (data & duscc_device::REG_ICR_V2V4_MOD) ? "4:2" : "2:0" ));
 	// TODO: LOG the other bits as well
@@ -2399,7 +2399,7 @@ void duscc_channel::receive_data(UINT8 data)
 			if (m_ier & REG_IER_RXRDY)
 			{
 				if (m_omr & REG_OMR_RXRDY_ACTIVATED) // interrupt on FIFO full and...
-			    {
+				{
 					if (m_rx_fifo_rp == m_rx_fifo_wp) // FIFO full?
 						m_uart->trigger_interrupt(m_index, INT_RXREADY);
 				}

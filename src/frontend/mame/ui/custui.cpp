@@ -945,7 +945,7 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 
 		if (!m_key_active)
 		{
-			int val = atoi(m_search);
+			int val = atoi(m_search.data());
 			val = m_color->clamp(val);
 
 			switch ((FPTR)menu_event->itemref)
@@ -967,7 +967,7 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 				break;
 			}
 
-			m_search[0] = 0;
+			m_search.erase();
 			m_lock_ref = 0;
 			return;
 		}
@@ -975,26 +975,11 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 
 	if (!m_key_active)
 	{
-		m_search[0] = 0;
+		m_search.erase();
 		return;
 	}
 
-	auto const buflen = std::strlen(m_search);
-	if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
-	{
-		// if it's a backspace and we can handle it, do so
-		if (0 < buflen)
-			*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
-	}
-	else if (buflen >= 3)
-	{
-		return;
-	}
-	else if ((menu_event->unichar >= '0' && menu_event->unichar <= '9'))
-	{
-		// if it's any other key and we're not maxed out, update
-		menu_event->append_char(m_search, buflen);
-	}
+	input_character(m_search, 3, menu_event->unichar, uchar_is_digit);
 }
 
 std::pair<const char *, const char *> const menu_palette_sel::s_palette[] = {

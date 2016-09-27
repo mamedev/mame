@@ -38,6 +38,18 @@
 		</part>
 	</software>
 
+	<software name="amxsartm">
+		<description>AMX Super Art (Master)</description>
+		<year>1986</year>
+		<publisher>Advanced Memory Systems</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="amx_superart_master.ssd" size="102400" crc="3dff4b7f" sha1="d67cb13474f2cf836ea0655f800c39ace6a1d0b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fsdd">
 		<description>FileStore Dealer Test Disc</description>
 		<year>1986</year>

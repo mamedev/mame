@@ -4296,4 +4296,1244 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="nesbfu11">
+		<description>NES-e - Balloon Fight-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 1) (strip 1).raw" size="2912" crc="374ad684" sha1="6dc50b1c42ff296bbb28a418654364bfb163f90c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbfu12">
+		<description>NES-e - Balloon Fight-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 1) (strip 2).raw" size="2912" crc="566f7a57" sha1="bd3866a437c4bf40bfd5f0b16a89321340e711d7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbfu21">
+		<description>NES-e - Balloon Fight-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 2) (strip 1).raw" size="2912" crc="4b7fa2fb" sha1="24ff460007a6ce6e9b285fb7a73d34b022167965"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbfu22">
+		<description>NES-e - Balloon Fight-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 2) (strip 2).raw" size="2912" crc="a3816d78" sha1="907af0bc4d78b771d7b3ee5e2b97f10e2703b910"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbfu31">
+		<description>NES-e - Balloon Fight-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 3) (strip 1).raw" size="2912" crc="0920c274" sha1="9cc8ab9232e62a24ddef2b084205ff6982c53c24"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbfu32">
+		<description>NES-e - Balloon Fight-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 3) (strip 2).raw" size="2912" crc="737ce8da" sha1="42e3d04d98d7024cbfc0833c191f01aaa6965116"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbfu41">
+		<description>NES-e - Balloon Fight-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 4) (strip 1).raw" size="2912" crc="53ddde04" sha1="2d0f885143c2e8bc3ef03633e00d8aedafb0fd38"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbfu42">
+		<description>NES-e - Balloon Fight-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 4) (strip 2).raw" size="2912" crc="54aec2a5" sha1="d01f1ef98190785bd966854c21bf160f296cdbd0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbfu5">
+		<description>NES-e - Balloon Fight-e (USA) (Card 5)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - balloon fight-e (usa) (card 5).raw" size="2912" crc="99da9303" sha1="2c39b1d82cc6e5e1182b4e6bf74c97f31218501e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu11">
+		<description>NES-e - Baseball-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 1) (strip 1).raw" size="2912" crc="eef0e6e4" sha1="3baa00f8a4d3d344a892980bd5e52a8c85c8df7f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu12">
+		<description>NES-e - Baseball-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 1) (strip 2).raw" size="2912" crc="d52cd49c" sha1="4a588f89208a07271f749ee88a8e0337673fead0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu21">
+		<description>NES-e - Baseball-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 2) (strip 1).raw" size="2912" crc="9c93b218" sha1="063ec436d431c76e57d4df2a750683f3cd0339ea"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu22">
+		<description>NES-e - Baseball-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 2) (strip 2).raw" size="2912" crc="8acafcfa" sha1="9ede8eac4157de477da0ad17daa7ed29ed6211c9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu31">
+		<description>NES-e - Baseball-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 3) (strip 1).raw" size="2912" crc="f5487653" sha1="2a9e4e3ff09fe79d2236ee5897bb7e14d6a0e1c1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu32">
+		<description>NES-e - Baseball-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 3) (strip 2).raw" size="2912" crc="4087e056" sha1="aea5bc1ab1de29b7aa917b81d3cd8408ad777621"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu41">
+		<description>NES-e - Baseball-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 4) (strip 1).raw" size="2912" crc="65052fb1" sha1="acfd5754052eca01462f203fcfc62c597682f36b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu42">
+		<description>NES-e - Baseball-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 4) (strip 2).raw" size="2912" crc="fd5abff9" sha1="4a686ba467d1f87d048acb52bbaf0852c8b63595"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu51">
+		<description>NES-e - Baseball-e (USA) (Card 5) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 5) (strip 1).raw" size="2912" crc="25fa8045" sha1="904a6f87fb62dfbf80730a64f298255ed9048fab"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesbsu52">
+		<description>NES-e - Baseball-e (USA) (Card 5) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - baseball-e (usa) (card 5) (strip 2).raw" size="2912" crc="e5d8d7d3" sha1="cf4384a61b3dfbccbe3470874b6ce1da64a95760"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu11">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 1) (strip 1).raw" size="2912" crc="28ffdbb6" sha1="aecdde7989dec36c9e9db6c20d2ac067865fbee3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu12">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 1) (strip 2).raw" size="2912" crc="e5800b82" sha1="fc167abfa75716ed74573f25d90fc389cdabc33c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu21">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 2) (strip 1).raw" size="2912" crc="d50082b3" sha1="75d6fb3b3db17388c4ac93eae3faa0c8654b2610"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu22">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 2) (strip 2).raw" size="2912" crc="e75ac200" sha1="aa25faa39ccaeaf559eba45c07dba96ccd48043d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu31">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 3) (strip 1).raw" size="2912" crc="09433c72" sha1="bce3351428f71984ee61653a30e03e13b47b3b0f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu32">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 3) (strip 2).raw" size="2912" crc="fe02561e" sha1="1fb2751691458b2466c40a35310883dd58faf522"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu41">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 4) (strip 1).raw" size="2912" crc="6a6b8771" sha1="c6f8d785f884746d6281579558dbb0732f4dd16e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu42">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 4) (strip 2).raw" size="2912" crc="bf06065f" sha1="10e9fa3467e26386c80cbc4fb57615b7ccbe05b5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesccu5">
+		<description>NES-e - Clu Clu Land-e (USA) (Card 5)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - clu clu land-e (usa) (card 5).raw" size="2912" crc="def05249" sha1="9aa4e52b7022546b623cec4d4a90c21a2260b6f0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u11">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 1) (strip 1).raw" size="2912" crc="87c48248" sha1="9923084251da6f40f6a63ecccf6093c2dfc12a27"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u12">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 1) (strip 2).raw" size="2912" crc="a03b9fc9" sha1="a524f8003f5ee68f9508d921cf013a068a3519d9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u21">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 2) (strip 1).raw" size="2912" crc="8c8f793f" sha1="d410de3063c11d51eda249311a85a4ceac85ca27"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u22">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 2) (strip 2).raw" size="2912" crc="047f8f47" sha1="1d45b7cba960e0c9f3a28aae3e6af13c6b31f885"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u31">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 3) (strip 1).raw" size="2912" crc="28684f3b" sha1="3543f8f8d489466934284f1d6b6df9259bfd445f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u32">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 3) (strip 2).raw" size="2912" crc="014dfdc2" sha1="e66863d4e28c85c3cb2112e58bc209738c342acc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u41">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 4) (strip 1).raw" size="2912" crc="a74b31e6" sha1="25cbe7160f42779f4cbb4c922b0db12fe6f874e8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u42">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 4) (strip 2).raw" size="2912" crc="3ed9d402" sha1="ce30189ec75c1ed598dda045387c8a99a9830667"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u51">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 5) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 5) (strip 1).raw" size="2912" crc="fadf1a4e" sha1="9aa112c9e93b1835d3232b90c49faa897e925356"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesd3u52">
+		<description>NES-e - Donkey Kong 3-e (USA) (Card 5) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong 3-e (usa) (card 5) (strip 2).raw" size="2912" crc="41e47864" sha1="d6373ec361cf509d2993702a3fc10f9c1cf79295"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju11">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 1) (strip 1).raw" size="2912" crc="40a3ace9" sha1="44e23caa4ffa651893172366a638efe505f96d82"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju12">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 1) (strip 2).raw" size="2912" crc="85e96bed" sha1="5c87d5ae512449a9af5400c04b83d6b133d0ee79"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju21">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 2) (strip 1).raw" size="2912" crc="34d32c0b" sha1="3df96ae3f2cc1f3a0ab1a2460d3cb4a06f5fafc8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju22">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 2) (strip 2).raw" size="2912" crc="8875c48a" sha1="2d76fb3bf8f40f793c4f934577d172e9684e703d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju31">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 3) (strip 1).raw" size="2912" crc="a06582a7" sha1="118f86daa7d108d454274bf8085886af99ca82be"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju32">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 3) (strip 2).raw" size="2912" crc="09a9c3d1" sha1="8a98407936b7ae50e9c95a284c1db199f61796e0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju41">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 4) (strip 1).raw" size="2912" crc="1ed69ca6" sha1="208beaf18559d6ba9fa40b99f12b1379e067a6b0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju42">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 4) (strip 2).raw" size="2912" crc="05449d1d" sha1="1d4087a76e52fbe5d64326fcb6cdc247aea215fc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju51">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 5) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 5) (strip 1).raw" size="2912" crc="2e65df50" sha1="d656f9f3af61320b2915e9eb7e533cccd14eef62"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdju52">
+		<description>NES-e - Donkey Kong Jr.-e (USA) (Card 5) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong jr.-e (usa) (card 5) (strip 2).raw" size="2912" crc="aaaa17c1" sha1="67c8b2827f0aa67017595b45bdba244e9fcdb329"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku11">
+		<description>NES-e - Donkey Kong-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 1) (strip 1).raw" size="2912" crc="a1d0370a" sha1="96a37f407ccb6d2f1a0567c7e84ca2a0c33c0c95"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku12">
+		<description>NES-e - Donkey Kong-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 1) (strip 2).raw" size="2912" crc="2e2336af" sha1="d3478e438aa54d8d5898749aea15cbbb813e9c79"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku21">
+		<description>NES-e - Donkey Kong-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 2) (strip 1).raw" size="2912" crc="70520c37" sha1="bd8a27d80618162150794c0fd79556fe2595f785"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku22">
+		<description>NES-e - Donkey Kong-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 2) (strip 2).raw" size="2912" crc="5f476663" sha1="4eb8d9d99395ed99e219f0fb36f013e8267c723f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku31">
+		<description>NES-e - Donkey Kong-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 3) (strip 1).raw" size="2912" crc="5a6d412a" sha1="8a1c65f022d2f65a92732aad1edd107bfe8ae2cd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku32">
+		<description>NES-e - Donkey Kong-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 3) (strip 2).raw" size="2912" crc="70b98e50" sha1="332cf75cc93033585e282cbb2f7c520354ae1ed2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku41">
+		<description>NES-e - Donkey Kong-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 4) (strip 1).raw" size="2912" crc="269db790" sha1="97fee17d343e3c8cead3ee9cfda43e435a70739b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku42">
+		<description>NES-e - Donkey Kong-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 4) (strip 2).raw" size="2912" crc="c6a539c4" sha1="a50ee40d795d5bd94b12c1a718ffb8daa3f64b29"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesdku5">
+		<description>NES-e - Donkey Kong-e (USA) (Card 5)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - donkey kong-e (usa) (card 5).raw" size="2912" crc="5e3644f3" sha1="81952d993a41b53e0ba8e3bdd2e0b94281c86208"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu11">
+		<description>NES-e - Excitebike-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 1) (strip 1).raw" size="2912" crc="0e9d948a" sha1="353a874c5554b4efe8a4cb8f1a42366807b60589"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu12">
+		<description>NES-e - Excitebike-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 1) (strip 2).raw" size="2912" crc="92c850b6" sha1="56ef82e99bf7626305187084be69aafd23592970"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu21">
+		<description>NES-e - Excitebike-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 2) (strip 1).raw" size="2912" crc="7775b2e9" sha1="e271728f3655f2ab4d0957bfe8d67bfaa72fe4f4"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu22">
+		<description>NES-e - Excitebike-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 2) (strip 2).raw" size="2912" crc="691f6eae" sha1="91695413c347502c5ac0a83a25820d2942e1a3c0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu31">
+		<description>NES-e - Excitebike-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 3) (strip 1).raw" size="2912" crc="071e02d7" sha1="14245e2fe3c98e3d72e2f19742b052ad9dda1788"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu32">
+		<description>NES-e - Excitebike-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 3) (strip 2).raw" size="2912" crc="86ca75ab" sha1="e2ff0170589d47b1a64e26dc1fa4b30409b5fc91"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu41">
+		<description>NES-e - Excitebike-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 4) (strip 1).raw" size="2912" crc="9f6473ed" sha1="b02af178395960db5e29fc9f9cda38e8af93337b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu42">
+		<description>NES-e - Excitebike-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 4) (strip 2).raw" size="2912" crc="14322d51" sha1="b396b5da915d3d7657dbf8e87f2fb0dafef6c778"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu51">
+		<description>NES-e - Excitebike-e (USA) (Card 5) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 5) (strip 1).raw" size="2912" crc="c0cc86e5" sha1="b7c43e9da1f4c8cee16451d692be81da6ec5e76a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesebu52">
+		<description>NES-e - Excitebike-e (USA) (Card 5) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - excitebike-e (usa) (card 5) (strip 2).raw" size="2912" crc="f7b3ef67" sha1="aec9c4a692c8a3871efc032824688f7266f39634"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu11">
+		<description>NES-e - Golf-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 1) (strip 1).raw" size="2912" crc="a540e0ee" sha1="a3ad36a6f823050fd464ec25df3089c105635f4f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu12">
+		<description>NES-e - Golf-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 1) (strip 2).raw" size="2912" crc="ca33352b" sha1="044bd98e5a42f67135fe3a81b0586fde650f1d2c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu21">
+		<description>NES-e - Golf-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 2) (strip 1).raw" size="2912" crc="caf0e032" sha1="96b34b415c080692cbe3fb93f8109409136e2c99"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu22">
+		<description>NES-e - Golf-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 2) (strip 2).raw" size="2912" crc="60fb7900" sha1="82e65050c8c259ae199c80515f5ed2e9eabee681"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu31">
+		<description>NES-e - Golf-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 3) (strip 1).raw" size="2912" crc="c0e91964" sha1="5939850dc84f7379589c44ac1879a904e0e0030a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu32">
+		<description>NES-e - Golf-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 3) (strip 2).raw" size="2912" crc="9fbf4994" sha1="fd22115c20b396dc8ed2d8caf67af10c97b16333"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu41">
+		<description>NES-e - Golf-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 4) (strip 1).raw" size="2912" crc="79511b94" sha1="8acf3dae7d4a60246db4516dd472e3396c1191eb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu42">
+		<description>NES-e - Golf-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 4) (strip 2).raw" size="2912" crc="f88355e7" sha1="aeb1cd5032120de5b03fc8cccb95e045732a6fd3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesgfu51">
+		<description>NES-e - Golf-e (USA) (Card 5) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - golf-e (usa) (card 5) (strip 1).raw" size="2912" crc="602a17e9" sha1="40e9daf015c0ef2b580f8f08755c1deb9eca5054"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu11">
+		<description>NES-e - Ice Climber-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 1) (strip 1).raw" size="2912" crc="27b5892c" sha1="4019ed4f5f4099f34353b0cc249e84eb481c529e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu12">
+		<description>NES-e - Ice Climber-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 1) (strip 2).raw" size="2912" crc="b88fe5b9" sha1="ce741950071ff8546b6cbc38d171c9b48192631f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu21">
+		<description>NES-e - Ice Climber-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 2) (strip 1).raw" size="2912" crc="a1fe5bb5" sha1="14b536e38edf2b080f45fff39ec5ce3c64c2c84b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu22">
+		<description>NES-e - Ice Climber-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 2) (strip 2).raw" size="2912" crc="e73722d2" sha1="9ccf1e3dd55d31deee950985d13bd28acf4f896a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu31">
+		<description>NES-e - Ice Climber-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 3) (strip 1).raw" size="2912" crc="943390a6" sha1="d878c67e3cfb3e7d897a0fd3a9fdd5bea59e6a8f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu32">
+		<description>NES-e - Ice Climber-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 3) (strip 2).raw" size="2912" crc="8eaef76b" sha1="f6ee9025ceb5d3c852f74bbc08ff31f9ee315eff"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu41">
+		<description>NES-e - Ice Climber-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 4) (strip 1).raw" size="2912" crc="33ba6386" sha1="8d9b7d96ea755a040cee633e55f0960bb360d1a2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu42">
+		<description>NES-e - Ice Climber-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 4) (strip 2).raw" size="2912" crc="e4e7fa0e" sha1="e6b65b5efddf7cfba727f6b702250cbbdccd4d25"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu51">
+		<description>NES-e - Ice Climber-e (USA) (Card 5) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 5) (strip 1).raw" size="2912" crc="53712f9a" sha1="6ce001e8b1e82a98464199bcf959fefe6df99a63"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesicu52">
+		<description>NES-e - Ice Climber-e (USA) (Card 5) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - ice climber-e (usa) (card 5) (strip 2).raw" size="2912" crc="da49e5e1" sha1="1e1b6a670e0a1cc3b980107e83411abb3261562d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu11">
+		<description>NES-e - Mario Bros.-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 1) (strip 1).raw" size="2912" crc="6db40ec8" sha1="e370f558e21c926c9ce2bf35542d85843a7ad5ed"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu12">
+		<description>NES-e - Mario Bros.-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 1) (strip 2).raw" size="2912" crc="200c0a17" sha1="9661c4e2dd53130f9307d2c06e1dddcf19fe4c38"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu21">
+		<description>NES-e - Mario Bros.-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 2) (strip 1).raw" size="2912" crc="1135dbb6" sha1="1bc9779064ea06bf9e6e21d9acd4526199cf8184"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu22">
+		<description>NES-e - Mario Bros.-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 2) (strip 2).raw" size="2912" crc="9084687a" sha1="ff1bd56cec64d93b94d309213638075f2c2c5031"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu31">
+		<description>NES-e - Mario Bros.-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 3) (strip 1).raw" size="2912" crc="4be7750a" sha1="6efe8a8e8512d782f469c1c344f598ca4290f653"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu32">
+		<description>NES-e - Mario Bros.-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 3) (strip 2).raw" size="2912" crc="0062a1bb" sha1="4ba1c2f40ea60597727fdc91a5627439bfacec4f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu41">
+		<description>NES-e - Mario Bros.-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 4) (strip 1).raw" size="2912" crc="a772cbae" sha1="305de418b4c75f9e14d1376e6dd93787a6a555c5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu42">
+		<description>NES-e - Mario Bros.-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 4) (strip 2).raw" size="2912" crc="585c2074" sha1="b8b9f0263d90b90fca834d976a398912c5f5ae51"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu51">
+		<description>NES-e - Mario Bros.-e (USA) (Card 5) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 5) (strip 1).raw" size="2912" crc="149ef5f5" sha1="efbc2c33be9cc3795a1fdc8f7eef9568c31aed9b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesmbu52">
+		<description>NES-e - Mario Bros.-e (USA) (Card 5) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - mario bros.-e (usa) (card 5) (strip 2).raw" size="2912" crc="5602dd06" sha1="4b5c9361fa5ed18e090e0ff5fc6200ef598deb3c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu11">
+		<description>NES-e - Pinball-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 1) (strip 1).raw" size="2912" crc="84160bc0" sha1="4d795e9941a9ae1d4b721ec7c8c29ae9a24bd728"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu12">
+		<description>NES-e - Pinball-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 1) (strip 2).raw" size="2912" crc="d9342e4d" sha1="cdea8c1e1effcdf9dbec7798caf213714b9af830"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu21">
+		<description>NES-e - Pinball-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 2) (strip 1).raw" size="2912" crc="b4d29843" sha1="e7e5025684398d468468b08067952100fcb8b0bc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu22">
+		<description>NES-e - Pinball-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 2) (strip 2).raw" size="2912" crc="e73d2d1b" sha1="37afebfa698d813ecbcb72b6b2cdfbb69942584c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu31">
+		<description>NES-e - Pinball-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 3) (strip 1).raw" size="2912" crc="ac47eb59" sha1="343277110ee8c35c235d70e86dbfee6c2355b832"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu32">
+		<description>NES-e - Pinball-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 3) (strip 2).raw" size="2912" crc="d268a22d" sha1="65606182a101817fc635d365ff28e78c1d6c74f9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu41">
+		<description>NES-e - Pinball-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 4) (strip 1).raw" size="2912" crc="37e13036" sha1="ba058690c485b708010dbd2d2a7262d5cd2556e2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu42">
+		<description>NES-e - Pinball-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 4) (strip 2).raw" size="2912" crc="d4d23138" sha1="85ea8cef79bce6c7b275849503c39c69d89546ee"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nespbu5">
+		<description>NES-e - Pinball-e (USA) (Card 5)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - pinball-e (usa) (card 5).raw" size="2912" crc="31abcf36" sha1="3e0fa4cca0cb155137c076b12c4e13cd34fec08b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu11">
+		<description>NES-e - Tennis-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 1) (strip 1).raw" size="2912" crc="a93158d5" sha1="b7fd19f25f326f34c29d0d7012e8ab9c56617960"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu12">
+		<description>NES-e - Tennis-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 1) (strip 2).raw" size="2912" crc="823cbb7e" sha1="0c21c97ae02110d0f81ee8c6ef750255f646fdcb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu21">
+		<description>NES-e - Tennis-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 2) (strip 1).raw" size="2912" crc="d6702c95" sha1="db35e214f7d6b8aabeb37634361d5e7a2a3dca27"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu22">
+		<description>NES-e - Tennis-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 2) (strip 2).raw" size="2912" crc="f65f134d" sha1="3fe242d9e65dae4589289f9139426d237f03c733"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu31">
+		<description>NES-e - Tennis-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 3) (strip 1).raw" size="2912" crc="431ac224" sha1="396f025228fb357a6f65c86403c4f62260b9c27e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu32">
+		<description>NES-e - Tennis-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 3) (strip 2).raw" size="2912" crc="e9d30113" sha1="026db617d5b7852720b3fbff85b659543f08c661"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu41">
+		<description>NES-e - Tennis-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 4) (strip 1).raw" size="2912" crc="426fbcc5" sha1="96d4476b270df9e2a8b2a04df952713e9065d5db"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu42">
+		<description>NES-e - Tennis-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 4) (strip 2).raw" size="2912" crc="8644752e" sha1="ad55611e30aae7ab70a23069e2db1f8e04e56536"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu51">
+		<description>NES-e - Tennis-e (USA) (Card 5) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 5) (strip 1).raw" size="2912" crc="b067f8b8" sha1="ba9487afa6eef663911df5ef8f9c7617d6afacd9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nestnu52">
+		<description>NES-e - Tennis-e (USA) (Card 5) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - tennis-e (usa) (card 5) (strip 2).raw" size="2912" crc="0a1e9db6" sha1="66815215cd96b8f349e2a90b87f3dd2128753f5c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu11">
+		<description>NES-e - Urban Champion-e (USA) (Card 1) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 1) (strip 1).raw" size="2912" crc="629cb81f" sha1="d2e873fb1379b2feb899804a1a0ca64979e60053"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu12">
+		<description>NES-e - Urban Champion-e (USA) (Card 1) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 1) (strip 2).raw" size="2912" crc="5cb34532" sha1="2a996369c4ae0ae894e1701d0f32052f702f2ccc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu21">
+		<description>NES-e - Urban Champion-e (USA) (Card 2) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 2) (strip 1).raw" size="2912" crc="657f9d26" sha1="acf33f77a7f80b8c7ad272901c561271200f6b98"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu22">
+		<description>NES-e - Urban Champion-e (USA) (Card 2) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 2) (strip 2).raw" size="2912" crc="4bfdab66" sha1="a9dabbe15bd2992f49018d9e8e80a1326ce6f879"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu31">
+		<description>NES-e - Urban Champion-e (USA) (Card 3) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 3) (strip 1).raw" size="2912" crc="2ce42eef" sha1="7071679e7738aae9123123268794741494291615"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu32">
+		<description>NES-e - Urban Champion-e (USA) (Card 3) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 3) (strip 2).raw" size="2912" crc="3cad3b08" sha1="83423fbcc64193f928515e7e34fae4c7fb572154"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu41">
+		<description>NES-e - Urban Champion-e (USA) (Card 4) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 4) (strip 1).raw" size="2912" crc="02c73b83" sha1="ce0a286a27bbaf275bd795316314e3bfae3b056c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu42">
+		<description>NES-e - Urban Champion-e (USA) (Card 4) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 4) (strip 2).raw" size="2912" crc="599c653b" sha1="319dc968f09c74e14ab45907fe56718aa2ce9198"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="nesucu5">
+		<description>NES-e - Urban Champion-e (USA) (Card 5)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="nes-e - urban champion-e (usa) (card 5).raw" size="2912" crc="69f42450" sha1="93880cca449283dbeaba27ce153bca63398bbf07"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

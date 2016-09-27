@@ -106,6 +106,8 @@
 
 #include "tms9900.h"
 
+#define NOPRG -1
+
 /* tms9900 ST register bits. */
 enum
 {
@@ -182,7 +184,9 @@ tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, 
 		m_iaq_line(*this),
 		m_get_intlevel(*this),
 		m_dbin_line(*this),
-		m_external_operation(*this)
+		m_external_operation(*this),
+		m_program_index(NOPRG),
+		m_caller_index(NOPRG)
 {
 }
 
@@ -234,14 +238,53 @@ void tms99xx_device::device_start()
 
 	build_command_lookup_table();
 
-	m_program = nullptr;
+	// Register persistable state variables
+	save_item(NAME(m_icount));
+	save_item(NAME(WP));
+	save_item(NAME(PC));
+	save_item(NAME(ST));
+	save_item(NAME(IR));
+	save_item(NAME(m_address));
+	save_item(NAME(m_current_value));
+	save_item(NAME(m_command));
+	save_item(NAME(m_byteop));
+	save_item(NAME(m_pass));
+	save_item(NAME(m_check_ready));
+	save_item(NAME(m_mem_phase));
+	save_item(NAME(m_load_state));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_reset));
+	save_item(NAME(m_irq_level));
+	// save_item(NAME(m_first_cycle)); // only for log output
+	save_item(NAME(m_idle_state));
+	save_item(NAME(m_ready_bufd));
+	save_item(NAME(m_ready));
+	save_item(NAME(m_wait_state));
+	save_item(NAME(m_hold_state));
+	// save_item(NAME(m_state_any)); // only for debugger output
+	save_item(NAME(MPC));
+	save_item(NAME(m_program_index));
+	save_item(NAME(m_caller_index));
+	save_item(NAME(m_caller_MPC));
+	save_item(NAME(m_state));
+	save_item(NAME(m_hold_acknowledged));
+	save_item(NAME(m_source_even));
+	save_item(NAME(m_destination_even));
+	save_item(NAME(m_source_address));
+	save_item(NAME(m_source_value));
+	save_item(NAME(m_address_saved));
+	save_item(NAME(m_address_copy));
+	save_item(NAME(m_register_contents));
+	save_item(NAME(m_regnumber));
+	save_item(NAME(m_cru_address));
+	save_item(NAME(m_count));
+	save_item(NAME(m_value_copy));
+	save_item(NAME(m_value));
+	save_item(NAME(m_get_destination));
 }
 
 void tms99xx_device::device_stop()
 {
-	int k = 0;
-	if (TRACE_SETUP) logerror("Deleting lookup tables\n");
-	while (m_lotables[k]!=nullptr) delete[] m_lotables[k++];
 }
 
 /*
@@ -998,7 +1041,8 @@ const tms99xx_device::tms_instruction tms99xx_device::s_command[] =
 	{ 0xc000, MOV, 1, f1_mp },
 	{ 0xd000, MOVB, 1, f1_mp },
 	{ 0xe000, SOC, 1, f1_mp },
-	{ 0xf000, SOCB, 1, f1_mp }
+	{ 0xf000, SOCB, 1, f1_mp },
+	{ 0x0000, INTR, 1, int_mp}      // special entry for the interrupt microprogram, not in lookup table
 };
 
 /*
@@ -1043,24 +1087,20 @@ void tms99xx_device::build_command_lookup_table()
 	int bitcount;
 	const tms_instruction *inst;
 	UINT16 opcode;
-	int k = 0;
 
-	m_command_lookup_table = new lookup_entry[16];
-	// We use lotables as a list of allocated tables - to be able to delete them
-	// at the end.
-	m_lotables[k++] = m_command_lookup_table;
+	m_command_lookup_table = std::make_unique<lookup_entry[]>(16);
 
-	lookup_entry* table = m_command_lookup_table;
+	lookup_entry* table = m_command_lookup_table.get();
 	for (int j=0; j < 16; j++)
 	{
-		table[j].entry = nullptr;
 		table[j].next_digit = nullptr;
+		table[j].index = NOPRG;
 	}
 
 	do
 	{
 		inst = &s_command[i];
-		table = m_command_lookup_table;
+		table = m_command_lookup_table.get();
 		if (TRACE_SETUP) logerror("=== opcode=%04x, len=%d\n", inst->opcode, format_mask_len[inst->format]);
 		bitcount = 4;
 		opcode = inst->opcode;
@@ -1072,12 +1112,11 @@ void tms99xx_device::build_command_lookup_table()
 			if (table[cmdindex].next_digit == nullptr)
 			{
 				if (TRACE_SETUP) logerror("create new table at bitcount=%d for index=%d\n", bitcount, cmdindex);
-				table[cmdindex].next_digit = new lookup_entry[16];
-				m_lotables[k++] = table[cmdindex].next_digit;
+				table[cmdindex].next_digit = std::make_unique<lookup_entry[]>(16);
 				for (int j=0; j < 16; j++)
 				{
 					table[cmdindex].next_digit[j].next_digit = nullptr;
-					table[cmdindex].next_digit[j].entry = nullptr;
+					table[cmdindex].next_digit[j].index = NOPRG;
 				}
 			}
 			else
@@ -1085,7 +1124,7 @@ void tms99xx_device::build_command_lookup_table()
 				if (TRACE_SETUP) logerror("found a table at bitcount=%d\n", bitcount);
 			}
 
-			table = table[cmdindex].next_digit;
+			table = table[cmdindex].next_digit.get();
 
 			bitcount = bitcount+4;
 			opcode <<= 4;
@@ -1101,14 +1140,12 @@ void tms99xx_device::build_command_lookup_table()
 		for (int j=0; j < (1<<(bitcount-format_mask_len[inst->format])); j++)
 		{
 			if (TRACE_SETUP) logerror("opcode=%04x at position %d\n", inst->opcode, cmdindex+j);
-			table[cmdindex+j].entry = inst;
+			table[cmdindex+j].index = i;
 		}
-
 		i++;
 	} while (inst->opcode != 0xf000);
 
-	m_lotables[k++] = nullptr;
-	if (TRACE_SETUP) logerror("Allocated %d tables\n", k);
+	m_interrupt_mp_index = i;
 }
 
 /*
@@ -1155,7 +1192,7 @@ void tms99xx_device::execute_run()
 	do
 	{
 		// Only when last instruction has completed
-		if (m_program == nullptr)
+		if (m_program_index == NOPRG)
 		{
 			if (m_load_state)
 			{
@@ -1175,7 +1212,7 @@ void tms99xx_device::execute_run()
 			}
 		}
 
-		if (m_program == nullptr && m_idle_state)
+		if (m_program_index == NOPRG && m_idle_state)
 		{
 			if (TRACE_WAIT) logerror("idle state\n");
 			pulse_clock(1);
@@ -1187,14 +1224,19 @@ void tms99xx_device::execute_run()
 		}
 		else
 		{
+			const UINT8* program = nullptr;
+			// When we are in the data derivation sequence, the caller_index is set
+			if (m_program_index != NOPRG)
+				program = (m_caller_index == NOPRG)? (UINT8*)s_command[m_program_index].prog : data_derivation;
+
 			// Handle HOLD
 			// A HOLD request is signalled through the input line HOLD.
 			// The hold state will be entered with the next non-memory access cycle.
 			if (m_hold_state &&
-				(m_program==nullptr ||
-				(m_program[MPC] != IAQ &&
-				m_program[MPC] != MEMORY_READ && m_program[MPC] != MEMORY_WRITE &&
-				m_program[MPC] != REG_READ && m_program[MPC] != REG_WRITE)))
+				(m_program_index == NOPRG ||
+				(program[MPC] != IAQ &&
+				program[MPC] != MEMORY_READ && program[MPC] != MEMORY_WRITE &&
+				program[MPC] != REG_READ && program[MPC] != REG_WRITE)))
 			{
 				if (TRACE_WAIT) logerror("hold\n");
 				if (!m_hold_acknowledged) acknowledge_hold();
@@ -1216,15 +1258,12 @@ void tms99xx_device::execute_run()
 				{
 					set_wait_state(false);
 					m_check_ready = false;
+					// If we don't have a microprogram, acquire the next instruction
+					UINT8 op = (m_program_index==NOPRG)? IAQ : program[MPC];
 
-					if (m_program==nullptr) m_op = IAQ;
-					else
-					{
-						m_op = m_program[MPC];
-					}
-					if (TRACE_MICRO) logerror("MPC = %d, m_op = %d\n", MPC, m_op);
+					if (TRACE_MICRO) logerror("MPC = %d, op = %d\n", MPC, op);
 					// Call the operation of the microprogram
-					(this->*s_microoperation[m_op])();
+					(this->*s_microoperation[op])();
 					// If we have multiple passes (as in the TMS9980)
 					m_pass--;
 					if (m_pass<=0)
@@ -1287,7 +1326,8 @@ int tms99xx_device::get_intlevel(int state)
 
 void tms99xx_device::service_interrupt()
 {
-	m_program = int_mp;
+	m_program_index = m_interrupt_mp_index;
+
 	m_command = INTR;
 	m_idle_state = false;
 	if (!m_external_operation.isnull()) m_external_operation(IDLE_OP, 0, 0xff);
@@ -1402,11 +1442,10 @@ inline void tms99xx_device::set_wait_state(bool state)
 */
 void tms99xx_device::decode(UINT16 inst)
 {
-	int index = 0;
-	lookup_entry* table = m_command_lookup_table;
+	int ix = 0;
+	lookup_entry* table = m_command_lookup_table.get();
 	UINT16 opcode = inst;
 	bool complete = false;
-	const tms_instruction *decoded;
 
 	m_state = 0;
 	IR = inst;
@@ -1415,35 +1454,34 @@ void tms99xx_device::decode(UINT16 inst)
 
 	while (!complete)
 	{
-		index = (opcode >> 12) & 0x000f;
-		if (TRACE_MICRO) logerror("Check next hex digit of instruction %x\n", index);
-		if (table[index].next_digit != nullptr)
+		ix = (opcode >> 12) & 0x000f;
+		if (TRACE_MICRO) logerror("Check next hex digit of instruction %x\n", ix);
+		if (table[ix].next_digit != nullptr)
 		{
-			table = table[index].next_digit;
+			table = table[ix].next_digit.get();
 			opcode = opcode << 4;
 		}
 		else complete = true;
 	}
-	decoded = table[index].entry;
-	if (decoded == nullptr)
+	m_program_index = table[ix].index;
+	if (m_program_index == NOPRG)
 	{
 		// not found
 		logerror("Address %04x: Illegal opcode %04x\n", PC, inst);
 		IR = 0;
 		// This will cause another instruction acquisition in the next machine cycle
 		// with an asserted IAQ line (can be used to indicate this illegal opcode detection).
-		m_program = nullptr;
 	}
 	else
 	{
-		m_program = decoded->prog;
+		const tms_instruction decoded = s_command[m_program_index];
 		MPC = -1;
-		m_command = decoded->id;
-		if (TRACE_MICRO) logerror("Command decoded as id %d, %s, base opcode %04x\n", m_command, opname[m_command], decoded->opcode);
+		m_command = decoded.id;
+		if (TRACE_MICRO) logerror("Command decoded as id %d, %s, base opcode %04x\n", m_command, opname[m_command], decoded.opcode);
 		// Byte operations are either format 1 with the byte flag set
 		// or format 4 (CRU multi bit operations) with 1-8 bits to transfer.
-		m_byteop = ((decoded->format==1 && ((IR & 0x1000)!=0))
-				|| (decoded->format==4 && (((IR >> 6)&0x000f) > 0) && (((IR >> 6)&0x000f) > 9)));
+		m_byteop = ((decoded.format==1 && ((IR & 0x1000)!=0))
+				|| (decoded.format==4 && (((IR >> 6)&0x000f) > 0) && (((IR >> 6)&0x000f) > 9)));
 	}
 	m_pass = 1;
 }
@@ -1646,7 +1684,8 @@ void tms99xx_device::return_from_subprogram()
 	// Return from data derivation
 	// The result should be in m_current_value
 	// and the address in m_address
-	m_program = m_caller;
+	m_program_index = m_caller_index;
+	m_caller_index = NOPRG;
 	MPC = m_caller_MPC; // will be increased on return
 }
 
@@ -1661,7 +1700,7 @@ void tms99xx_device::command_completed()
 		if (cycles > 0 && cycles < 10000) logerror(" %d cycles", cycles);
 		logerror("\n");
 	}
-	m_program = nullptr;
+	m_program_index = NOPRG;
 }
 
 /*
@@ -1674,7 +1713,7 @@ void tms99xx_device::data_derivation_subprogram()
 	UINT16 ircopy = IR;
 
 	// Save the return program and position
-	m_caller = m_program;
+	m_caller_index = m_program_index;
 	m_caller_MPC = MPC;
 
 	// Source or destination argument?
@@ -1682,7 +1721,6 @@ void tms99xx_device::data_derivation_subprogram()
 
 	m_regnumber = ircopy & 0x000f;
 
-	m_program = (UINT8*)data_derivation;
 	MPC = ircopy & 0x0030;
 
 	if (((MPC == 0x0020) && (m_regnumber != 0))         // indexed

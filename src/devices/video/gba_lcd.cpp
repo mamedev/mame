@@ -296,7 +296,7 @@ void gba_lcd_device::draw_scanline(int y)
 	{
 		for (auto x = 0; x < 240; x++)
 		{
-			m_scanline[l][x] = TRANSPARENT_PIXEL;		
+			m_scanline[l][x] = TRANSPARENT_PIXEL;
 		}
 	}
 
@@ -333,7 +333,7 @@ void gba_lcd_device::draw_scanline(int y)
 	if (submode == 2)
 	{
 		draw_oam_window(m_scanline[5], y);
-		update_mask(mask, y);	
+		update_mask(mask, y);
 	}
 	else
 	{
