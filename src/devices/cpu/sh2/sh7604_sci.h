@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:<author_name>
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for skeleton device
+  SH7604 SCI Controller
 
 ***************************************************************************/
 
@@ -10,6 +10,17 @@ Template for skeleton device
 
 #ifndef __SH7604_SCIDEV_H__
 #define __SH7604_SCIDEV_H__
+
+enum {
+	STATUS_MPBT = 1 << 0,
+	STATUS_MPB =  1 << 1,
+	STATUS_TEND = 1 << 2,
+	STATUS_PER =  1 << 3,
+	STATUS_FER =  1 << 4,
+	STATUS_ORER = 1 << 5,
+	STATUS_RDRF = 1 << 6,
+	STATUS_TDRE = 1 << 7
+};
 
 
 
@@ -36,6 +47,19 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
+	
+	DECLARE_READ8_MEMBER( serial_mode_r );
+	DECLARE_WRITE8_MEMBER( serial_mode_w );
+	DECLARE_READ8_MEMBER( bitrate_r );
+	DECLARE_WRITE8_MEMBER( bitrate_w );
+	DECLARE_READ8_MEMBER( serial_control_r );
+	DECLARE_WRITE8_MEMBER( serial_control_w );
+
+	DECLARE_READ8_MEMBER( transmit_data_r );
+	DECLARE_WRITE8_MEMBER( transmit_data_w );
+	DECLARE_READ8_MEMBER( serial_status_r );
+	DECLARE_WRITE8_MEMBER( serial_ack_w );
+	DECLARE_READ8_MEMBER( receive_data_r );
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 protected:
@@ -45,6 +69,10 @@ protected:
 	virtual void device_reset() override;
 private:
 	const address_space_config      m_space_config;
+	UINT8 m_smr;
+	UINT8 m_scr;
+	UINT8 m_ssr;
+	UINT8 m_brr;
 };
 
 

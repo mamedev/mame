@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:<author_name>
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for skeleton device
+  SH7604 BUS Controller
 
 ***************************************************************************/
 
