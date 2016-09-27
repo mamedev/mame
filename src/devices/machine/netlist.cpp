@@ -499,7 +499,8 @@ void netlist_mame_cpu_device_t::device_start()
 
 	// State support
 
-	state_add(STATE_GENPC, "curpc", m_genPC).noshow();
+	state_add(STATE_GENPC, "GENPC", m_genPC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_genPC).noshow();
 
 	for (int i=0; i < netlist().m_nets.size(); i++)
 	{

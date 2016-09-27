@@ -1066,6 +1066,7 @@ void m37710_cpu_device::device_start()
 	state_add( M37710_IRQ_STATE, "IRQ", m_line_irq).formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_pc ).callimport().callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_p ).formatstr("%8s").noshow();
 
 	m_icountptr = &m_ICount;
@@ -1098,6 +1099,7 @@ void m37710_cpu_device::state_import(const device_state_entry &entry)
 			break;
 
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			REG_PB = m_debugger_pc & 0xff0000;
 			m37710_set_pc(m_debugger_pc & 0xffff);
 			break;
@@ -1130,6 +1132,7 @@ void m37710_cpu_device::state_export(const device_state_entry &entry)
 			break;
 
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			m_debugger_pc = (REG_PB | REG_PC);
 			break;
 	}

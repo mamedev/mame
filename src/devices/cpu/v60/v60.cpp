@@ -498,7 +498,7 @@ void v60_device::device_start()
 	state_add( V60_ADTMR1, "ADTMR1", ADTMR1).formatstr("%08X");
 
 	state_add( STATE_GENPC, "GENPC", PC).noshow();
-	state_add( STATE_GENPCBASE, "GENPCBASE", m_PPC ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_PPC ).noshow();
 	state_add( STATE_GENSP, "GENSP", SP ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow();
 

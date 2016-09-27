@@ -506,6 +506,7 @@ void arm7_cpu_device::device_start()
 
 	state_add( ARM7_PC,    "PC", m_pc).callexport().formatstr("%08X");
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().noshow();
 	/* registers shared by all operating modes */
 	state_add( ARM7_R0,    "R0",   m_r[ 0]).formatstr("%08X");
 	state_add( ARM7_R1,    "R1",   m_r[ 1]).formatstr("%08X");
@@ -558,6 +559,7 @@ void arm7_cpu_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			m_pc = GET_PC;
 			break;
 	}

@@ -267,7 +267,8 @@ void hmcs40_cpu_device::device_start()
 	state_add(HMCS40_Y,   "Y",   m_y).formatstr("%01X");
 	state_add(HMCS40_SPY, "SPY", m_spy).formatstr("%01X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_s).formatstr("%2s").noshow();
 
 	m_icountptr = &m_icount;

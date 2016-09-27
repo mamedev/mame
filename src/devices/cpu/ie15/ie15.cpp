@@ -61,6 +61,7 @@ void ie15_device::device_start()
 	// register our state for the debugger
 	state_add(IE15_PC,       "PC",       m_PC.w.l).mask(0x0fff);
 	state_add(STATE_GENPC,   "GENPC",    m_PC.w.l).mask(0x0fff).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",  m_PC.w.l).mask(0x0fff).noshow();
 	state_add(STATE_GENFLAGS,"GENFLAGS", m_flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
 	state_add(IE15_A,        "A",        m_A);
 

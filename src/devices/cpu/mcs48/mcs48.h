@@ -43,11 +43,7 @@ enum
 	MCS48_EA,
 	MCS48_STS,  /* UPI-41 systems only */
 	MCS48_DBBO, /* UPI-41 systems only */
-	MCS48_DBBI, /* UPI-41 systems only */
-
-	MCS48_GENPC = STATE_GENPC,
-	MCS48_GENSP = STATE_GENSP,
-	MCS48_GENPCBASE = STATE_GENPCBASE
+	MCS48_DBBI  /* UPI-41 systems only */
 };
 
 

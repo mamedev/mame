@@ -247,6 +247,7 @@ void mb86901_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",    m_pc).noshow();
+	state_add(STATE_GENPCBASE,  "CURPC",    m_pc).noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS", m_psr).callimport().callexport().formatstr("%6s").noshow();
 	state_add(SPARC_PC,         "PC",       m_pc).formatstr("%08X");
 	state_add(SPARC_NPC,        "nPC",      m_npc).formatstr("%08X");
