@@ -1801,9 +1801,9 @@ void se3208_device::device_start()
 	state_add( SE3208_PPC, "PPC", m_PPC).formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_PC).noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_PPC).noshow();
 	state_add(STATE_GENSP, "GENSP", m_SP).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();	
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_PPC).noshow();
 
 	m_icountptr = &m_icount;
 }

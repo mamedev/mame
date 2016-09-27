@@ -499,7 +499,7 @@ void adsp21xx_device::device_start()
 	// register state with the debugger
 	state_add(ADSP2100_PC,      "PC",        m_pc);
 	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE,  "CURPC",     m_ppc).noshow();
+	state_add(STATE_GENPCBASE,  "GENPCBASE", m_ppc).noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS",  m_astat).mask(0xff).noshow().formatstr("%8s");
 
 	state_add(ADSP2100_AX0,     "AX0",       m_core.ax0.u);

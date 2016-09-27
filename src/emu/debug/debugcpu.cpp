@@ -1939,7 +1939,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 	// handle step out/over on the instruction we are about to execute
 	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT)) != 0 && m_stepaddr == ~0)
-		prepare_for_step_overout(m_device.safe_pcbase());
+		prepare_for_step_overout(m_device.safe_pc());
 
 	// no longer in debugger code
 	debugcpu.set_within_instruction(false);
@@ -2955,7 +2955,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 				{
 					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 				};
-				offs_t pc = space.device().safe_pcbase();
+				offs_t pc = space.device().safe_pc();
 				std::string buffer;
 
 				if (type & WATCHPOINT_WRITE)
@@ -2985,7 +2985,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 
 void device_debug::hotspot_check(address_space &space, offs_t address)
 {
-	offs_t curpc = m_device.safe_pcbase();
+	offs_t curpc = m_device.safe_pc();
 
 	// see if we have a match in our list
 	unsigned int hotindex;

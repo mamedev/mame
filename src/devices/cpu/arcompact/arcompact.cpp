@@ -95,7 +95,6 @@ void arcompact_device::device_start()
 	state_add( 0x12,  "LP_END", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 
 	for (int i = 0x100; i < 0x140; i++)
 	{
@@ -112,8 +111,6 @@ void arcompact_device::state_export(const device_state_entry &entry)
 
 	switch (index)
 	{
-		case STATE_GENPC:
-		case STATE_GENPCBASE:
 		case 0:
 			m_debugger_temp = m_pc;
 			break;
@@ -126,6 +123,10 @@ void arcompact_device::state_export(const device_state_entry &entry)
 			break;
 		case 0x12:
 			m_debugger_temp = m_LP_END;
+			break;
+
+		case STATE_GENPC:
+			m_debugger_temp = m_pc;
 			break;
 
 		default:

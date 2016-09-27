@@ -1689,7 +1689,7 @@ void m68000_base_device::define_state(void)
 
 	state_add(M68K_PC,         "PC",        pc).mask(addrmask);
 	state_add(STATE_GENPC,     "GENPC",     pc).mask(addrmask).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",     ppc).mask(addrmask).noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", ppc).mask(addrmask).noshow();
 	state_add(M68K_SP,         "SP",        dar[15]);
 	state_add(STATE_GENSP,     "GENSP",     dar[15]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  iotemp).noshow().callimport().callexport().formatstr("%16s");

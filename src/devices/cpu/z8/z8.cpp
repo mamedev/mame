@@ -670,7 +670,6 @@ void z8_device::device_start()
 	{
 		state_add(Z8_PC,         "PC",        m_pc);
 		state_add(STATE_GENPC,   "GENPC",     m_pc).noshow();
-		state_add(STATE_GENPCBASE, "CURPC",   m_pc).noshow();
 		state_add(Z8_SP,         "SP",        m_fake_sp).callimport().callexport();
 		state_add(STATE_GENSP,   "GENSP",     m_fake_sp).callimport().callexport().noshow();
 		state_add(Z8_RP,         "RP",        m_r[Z8_REGISTER_RP]);
@@ -774,7 +773,7 @@ void z8_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case Z8_SP:
-		case STATE_GENSP:
+		case Z8_GENSP:
 			m_r[Z8_REGISTER_SPH] = m_fake_sp >> 8;
 			m_r[Z8_REGISTER_SPL] = m_fake_sp & 0xff;
 			break;
@@ -793,7 +792,7 @@ void z8_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case Z8_SP:
-		case STATE_GENSP:
+		case Z8_GENSP:
 			m_fake_sp = (m_r[Z8_REGISTER_SPH] << 8) | m_r[Z8_REGISTER_SPL];
 			break;
 

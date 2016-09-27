@@ -173,8 +173,7 @@ void lr35902_cpu_device::device_start()
 	state_add( LR35902_IE, "IE", m_IE ).callimport().callexport().formatstr("%02X");
 	state_add( LR35902_IF, "IF", m_IF ).callimport().callexport().formatstr("%02X");
 
-	state_add(STATE_GENPC, "GENPC", m_PC).formatstr("%8s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_PC).formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "curpc", m_PC).callimport().callexport().formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_F).mask(0xf0).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;

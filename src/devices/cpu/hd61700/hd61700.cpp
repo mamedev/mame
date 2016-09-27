@@ -186,8 +186,8 @@ void hd61700_cpu_device::device_start()
 		state_add(HD61700_MAINREG + ireg, string_format("R%d", ireg).c_str(), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
 	}
 
-	state_add(STATE_GENPC, "GENPC", m_curpc).formatstr("%8s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_ppc).formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "curpc", m_curpc).callimport().callexport().formatstr("%8s").noshow();
+	state_add(STATE_GENPCBASE, "curpcbase", m_ppc).callimport().callexport().formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_flags).mask(0xff).formatstr("%8s").noshow();
 
 	// set our instruction counter

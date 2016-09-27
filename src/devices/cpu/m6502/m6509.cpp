@@ -32,7 +32,6 @@ void m6509_device::device_start()
 	init();
 
 	state_add(STATE_GENPC, "GENPC", XPC).callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", XPC).callexport().noshow();
 	state_add(M6509_BI, "BI", bank_i);
 	state_add(M6509_BY, "BY", bank_y);
 }
@@ -48,7 +47,6 @@ void m6509_device::state_export(const device_state_entry &entry)
 {
 	switch(entry.index()) {
 	case STATE_GENPC:
-	case STATE_GENPCBASE:
 		XPC = adr_in_bank_i(NPC);
 		break;
 	}

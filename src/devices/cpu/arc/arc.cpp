@@ -65,7 +65,6 @@ void arc_device::device_start()
 
 	state_add( 0,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -79,7 +78,6 @@ void arc_device::state_export(const device_state_entry &entry)
 			break;
 
 		case STATE_GENPC:
-		case STATE_GENPCBASE:
 			m_debugger_temp = m_pc << 2;
 			break;
 	}
