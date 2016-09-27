@@ -3064,7 +3064,7 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 UINT64 device_debug::get_current_pc(symbol_table &table, void *ref)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->safe_pcbase();
+	return device->safe_pc();
 }
 
 
