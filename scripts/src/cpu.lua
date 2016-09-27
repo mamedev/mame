@@ -646,6 +646,8 @@ if (CPUS["SH2"]~=null) then
 		MAME_DIR .. "src/devices/cpu/sh2/sh2.cpp",
 		MAME_DIR .. "src/devices/cpu/sh2/sh2.h",
 		MAME_DIR .. "src/devices/cpu/sh2/sh2fe.cpp",
+		MAME_DIR .. "src/devices/cpu/sh2/sh7604_bus.cpp",
+		MAME_DIR .. "src/devices/cpu/sh2/sh7604_bus.h",
 		--MAME_DIR .. "src/devices/cpu/sh2/sh2comn.cpp",
 		--MAME_DIR .. "src/devices/cpu/sh2/sh2comn.h",
 		--MAME_DIR .. "src/devices/cpu/sh2/sh2drc.cpp",
