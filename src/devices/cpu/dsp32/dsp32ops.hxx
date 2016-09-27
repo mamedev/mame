@@ -125,6 +125,7 @@ inline void dsp32c_device::execute_one()
 	UINT32 op;
 
 	PROCESS_DEFERRED_MEMORY();
+	m_ppc = PC;
 	debugger_instruction_hook(this, PC);
 	op = ROPCODE(PC);
 	m_icount -= 4;  // 4 clocks per cycle
