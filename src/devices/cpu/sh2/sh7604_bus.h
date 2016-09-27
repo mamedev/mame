@@ -61,8 +61,6 @@ protected:
 private:
 	bool m_is_slave;
 	const address_space_config      m_space_config;
-	void writeword(offs_t address, UINT16 data);
-	UINT16 readword(offs_t address);
 	
 	UINT16 m_bcr1;
 	UINT16 m_bcr2;

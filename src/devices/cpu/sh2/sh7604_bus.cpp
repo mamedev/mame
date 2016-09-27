@@ -150,20 +150,10 @@ void sh7604_bus_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-inline void sh7604_bus_device::writeword(offs_t address, UINT16 data)
-{
-	space().write_word(address, data);
-}
-
-inline UINT16 sh7604_bus_device::readword(offs_t address)
-{
-	return space().read_word(address);
-}
-
 READ32_MEMBER( sh7604_bus_device::read )
 {
 	// 16 bit access only, TODO
-	return readword(offset);
+	return space.read_word(offset) & 0xffff;
 }
 
 WRITE32_MEMBER( sh7604_bus_device::write )
@@ -177,5 +167,5 @@ WRITE32_MEMBER( sh7604_bus_device::write )
 			throw emu_fatalerror("%s: making bus write with ID signature = %04x!\n", tag(),data >> 16);
 	}
 	
-	writeword(offset,data & 0xffff);
+	space.write_word(offset,data & 0xffff);
 }
