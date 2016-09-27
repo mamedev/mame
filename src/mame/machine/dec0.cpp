@@ -238,8 +238,8 @@ void dec0_state::birdtry_i8751_write(int data)
 		/*"Sprite control"*/
 		case 0x22a: m_i8751_return = 0x200;    break;
 
-		/* Gives an O.B. otherwise (it must be > 0xb0 )*/
-		case 0x3c7: m_i8751_return = 0x7ff;    break;
+		/* velocity of the ball, controlled by power and height formula? */
+		case 0x3c7: m_i8751_return = 0x2fff;    break;
 
 		/*Enables shot checks*/
 		case 0x33c: m_i8751_return = 0x200;     break;
@@ -264,7 +264,7 @@ void dec0_state::birdtry_i8751_write(int data)
 		case 0x10b: pwr = 0x5c;             break; /*PW*/
 		case 0x10c: pwr = 0x60;             break; /*SW*/
 		case 0x10d: pwr = 0x80;             break; /*PT*/
-		case 0x481: m_i8751_return = pwr;     break; /*Power meter*/
+		case 0x481: m_i8751_return = pwr*9;     break; /*Power meter*/
 
 /*  0x200-0x20f values are for shot height(STRONG=0x200<<-->>WEAK=0x20f).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x534.     *
