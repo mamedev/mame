@@ -19,10 +19,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, I8080_TAG),
 		m_ppi0(*this, "ppi0"),
-		m_ppi1(*this, "ppi1")
+		m_ppi1(*this, "ppi1"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_tileram(*this, "tileram")
 	{
 	}
 
+	DECLARE_PALETTE_INIT(istrebiteli);
+	DECLARE_VIDEO_START(istrebiteli);
 	DECLARE_READ8_MEMBER(ppi0_r);
 	DECLARE_WRITE8_MEMBER(ppi0_w);
 	DECLARE_READ8_MEMBER(ppi1_r);
@@ -35,16 +39,49 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<UINT8> m_tileram;
 
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
 
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	tilemap_t *m_tilemap;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	UINT8 m_spr0_ctrl;
 	UINT8 m_spr1_ctrl;
 	UINT8 m_spr_xy[8];
 };
+
+static const rgb_t istreb_palette[4] = {
+	rgb_t(0x00, 0x00, 0xff),
+	rgb_t(0x00, 0x00, 0x00),
+	rgb_t(0xff, 0xff, 0xff),
+	rgb_t(0xff, 0x00, 0x00)
+};
+
+PALETTE_INIT_MEMBER(istrebiteli_state,istrebiteli)
+{
+	palette.set_pen_colors(0, istreb_palette, ARRAY_LENGTH(istreb_palette));
+}
+
+TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
+{
+	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+}
+
+VIDEO_START_MEMBER(istrebiteli_state, istrebiteli)
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(istrebiteli_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
+		16, 8, 1, 16);
+}
+
+UINT32 istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	//m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
 
 READ8_MEMBER(istrebiteli_state::ppi0_r)
 {
@@ -83,11 +120,6 @@ WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
 	m_spr_xy[offset] = data;
 }
 
-UINT32 istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, istrebiteli_state)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
@@ -96,7 +128,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, istrebiteli_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xb0, 0xbf) AM_NOP //AM_WRITE(charram_w)
+	AM_RANGE(0xb0, 0xbf) AM_RAM AM_SHARE("tileram")
 	AM_RANGE(0xc0, 0xc3) AM_READWRITE(ppi0_r, ppi0_w)
 	AM_RANGE(0xc4, 0xc7) AM_READWRITE(ppi1_r, ppi1_w)
 	AM_RANGE(0xc8, 0xcf) AM_WRITE(spr_xy_w)
@@ -131,6 +163,21 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
+static const gfx_layout char_layout =
+{
+	16,8,
+	32,
+	1,
+	{ 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8 , 11*8, 12*8 , 13*8, 14*8, 15*8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	16 * 8
+};
+
+static GFXDECODE_START( istrebiteli )
+	GFXDECODE_ENTRY( "chars", 0x0000, char_layout, 0, 2 )
+GFXDECODE_END
+
 static MACHINE_CONFIG_START( istreb, istrebiteli_state)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8080_TAG, I8080, 8000000 / 4)		// KR580VM80A
@@ -153,23 +200,26 @@ static MACHINE_CONFIG_START( istreb, istrebiteli_state)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istrebiteli)
 	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(istrebiteli_state, istrebiteli)
 MACHINE_CONFIG_END
 
 ROM_START( istreb )
 	ROM_REGION( 0x1000, I8080_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "main.bin", 0x000, 0xa00, CRC(ae67c41c) SHA1(1f7807d486cd4d161ee49be991b81db7dc9b0f3b) )
+	ROM_LOAD( "main.bin", 0x000, 0xa00, CRC(ae67c41c) SHA1(1f7807d486cd4d161ee49be991b81db7dc9b0f3b) )	// actually 5x 512B ROMs, TODO split
 
-	ROM_REGION(0x400, "chars", 0 )
+	ROM_REGION(0x1000, "chars", ROMREGION_ERASEFF)
 	ROM_LOAD("003-g8.bin", 0x000, 0x200, CRC(5cd7ad47) SHA1(2142711c8a3640b7aa258a2059cfb0f14297a5ac) )
-	ROM_LOAD("003-w3.bin", 0x200, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 
 	ROM_REGION(0x1000, "sprite", 0)
 	ROM_LOAD("001-a11.bin", 0x000, 0x100, CRC(4e05b7dd) SHA1(335e975ae9e8f775c1ac07f60420680ad878c3ae) )
 	ROM_LOAD("001-b11.bin", 0x100, 0x100, CRC(4e05b7dd) SHA1(335e975ae9e8f775c1ac07f60420680ad878c3ae) )
 	ROM_LOAD("001-g4.bin",  0x200, 0x200, CRC(ca3c531b) SHA1(8295167895d51e626b6d5946b565d5e8b8466ac0) )
 	ROM_LOAD("001-g9.bin",  0x400, 0x200, CRC(ca3c531b) SHA1(8295167895d51e626b6d5946b565d5e8b8466ac0) )
+
+	ROM_REGION(0x200, "soundrom", 0)
+	ROM_LOAD("003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT               COMPANY       FULLNAME            FLAGS */
-CONS( 198?, istreb,  0,        0,        istreb,  istreb,  driver_device,  0, "<unknown>", "Istrebiteli", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 198?, istreb,  0,        istreb,  istreb,  driver_device,  0, ROT90, "Terminal", "Istrebiteli", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
