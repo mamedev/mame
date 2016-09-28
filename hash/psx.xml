@@ -2,536 +2,20 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
 
-<!-- WORK IN PROGRESS: redump.org EU/AUS PS1 discs (26 of 3029), based on 'Sony - PlayStation (20160911 11-56-15).dat'
-
-These CHDs have been converted from redump.org disc images.
-
-For an overview of PAL PS1 discs that have not been dumped and added to redump's database yet, please see http://wiki.redump.org/index.php?title=Sony_Playstation_PAL_Missing_Games .
-
--->
-
-	<software name="007rcng">
-		<!-- Original images (Redump)
-		<rom name="007 Racing (Europe).cue" size="85" crc="74722fc6" sha1="db19e66b47df3b885c8a43d177524eb72cbbb9e8"/>
-		<rom name="007 Racing (Europe).bin" size="565672464" crc="2693623a" sha1="2b6802f8a7dcc28840d4e5e1369a5bd2e90fb5ae"/>
-		-->
-		<description>007 Racing (Europe)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03355, SLES-03355-P"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 racing (europe)" sha1="678763314b18dc12db09aba79378115c75c9dc6d"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007rcngf" cloneof="007rcng">
-		<!-- Original images (Redump)
-		<rom name="007 Racing (France).cue" size="85" crc="527a9ec3" sha1="6566b324e064957a31c7aacaeda10dc13957a626"/>
-		<rom name="007 Racing (France).bin" size="547510320" crc="f8500248" sha1="ca37e0995412d40cecec47c16db5bebf5e6e1b14"/>
-		-->
-		<description>007 Racing (France)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03356, SLES-03356-P"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 racing (france)" sha1="db537414d66d3afba09da185061b272516b6f23b"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007rcngg" cloneof="007rcng">
-		<!-- Original images (Redump)
-		<rom name="007 Racing (Germany).cue" size="86" crc="66c0c70d" sha1="b8f87935e390d87227779bac72443d20eb2fe5ed"/>
-		<rom name="007 Racing (Germany).bin" size="552463632" crc="bbe6471e" sha1="f440f37ab90c78b022cdb3d8e73575b6f720ce69"/>
-		-->
-		<description>007 Racing (Germany)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03357"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 racing (germany)" sha1="630e031f941012b302a3fac22f83ea31b427edb6"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007tnd">
-		<!-- Original images (Redump)
-		<rom name="007 - Tomorrow Never Dies (Europe).cue" size="100" crc="765606dd" sha1="fd5f043ce416db55a16a72ea4cd7b408aef20f2f"/>
-		<rom name="007 - Tomorrow Never Dies (Europe).bin" size="572408592" crc="763e4df9" sha1="c7022a564fa7d839f6a84c09c2ec47c96778b7c8"/>
-		-->
-		<description>007 - Tomorrow Never Dies (Europe)</description>
-		<year>1999</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-01324, SLES-01324-T, SLES-01324/P"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 - tomorrow never dies (europe)" sha1="e5c4c5b58390d00b15ce85400bd37a0ddb016189"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007tndf" cloneof="007tnd">
-		<!-- Original images (Redump)
-		<rom name="007 - Demain ne Meurt Jamais (France).cue" size="103" crc="804de764" sha1="079196f7c1bce6e74a32db7185aa889cd40f634f"/>
-		<rom name="007 - Demain ne Meurt Jamais (France).bin" size="570611664" crc="20d12f7b" sha1="077bddb3f832e3f2ec660634cd37b50f0d927eb9"/>
-		-->
-		<description>007 - Demain ne Meurt Jamais (France)</description>
-		<year>1999</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-02375"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 - demain ne meurt jamais (france)" sha1="6bc06878f0a00569d67498da4c4bf9b75a75b34d"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007tndg" cloneof="007tnd">
-		<!-- Original images (Redump)
-		<rom name="007 - Der Morgen stirbt nie (Germany).cue" size="103" crc="90963845" sha1="d32bbab1617536af3a1dfdd95c9f82a88dce62ae"/>
-		<rom name="007 - Der Morgen stirbt nie (Germany).bin" size="569706144" crc="7bd3b19f" sha1="205a36c19e0319760297ed039de8dae14d0dd968"/>
-		-->
-		<description>007 - Der Morgen stirbt nie (Germany)</description>
-		<year>1999</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-02376, SLES-02376-T"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 - der morgen stirbt nie (germany)" sha1="b400eb45e1e2977f9b00ce297c4f15426b1c0673"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007twine">
-		<!-- Original images (Redump)
-		<rom name="007 - The World Is Not Enough (Europe).cue" size="104" crc="7d9fe2b7" sha1="b46ef39f671f819d7077d38b401d251ebbb208fd"/>
-		<rom name="007 - The World Is Not Enough (Europe).bin" size="727292496" crc="8df63204" sha1="9062140eb4952b3addd0197cb6202723032117f7"/>
-		-->
-		<description>007 - The World Is Not Enough (Europe)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03134, SLES-03134-T"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 - the world is not enough (europe)" sha1="9e1720ee29d453a47f279a7553f0262231b52162"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007twinef" cloneof="007twine">
-		<!-- Original images (Redump)
-		<rom name="007 - Le Monde ne Suffit Pas (France).cue" size="103" crc="b7873d96" sha1="ff26ea5b4c4a840afbdc90123686a3012494b9d8"/>
-		<rom name="007 - Le Monde ne Suffit Pas (France).bin" size="727325424" crc="c2d1c87a" sha1="183815d71895adf29c7111ea9ac57ebdc4df7333"/>
-		-->
-		<description>007 - Le Monde ne Suffit Pas (France)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03135"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 - le monde ne suffit pas (france)" sha1="a9c485ebffa6dda4be53cf1f4534e3d80e898154"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007twineg" cloneof="007twine">
-		<!-- Original images (Redump)
-		<rom name="007 - Die Welt ist nicht genug (Germany).cue" size="106" crc="653d8aa1" sha1="89ea3aff72a3153331aee6b1cfe514ec8f9556e1"/>
-		<rom name="007 - Die Welt ist nicht genug (Germany).bin" size="724728816" crc="40fb0330" sha1="109bb1cb7e7fc9c9305d85a42d19c17bf467060d"/>
-		-->
-		<description>007 - Die Welt ist nicht genug (Germany)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03136, SLES-03136-P, SLES-03136-T"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 - die welt ist nicht genug (germany)" sha1="3a4b1689fd139119064d19f43d7bdaead5359dbb"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="007twines" cloneof="007twine">
-		<!-- Original images (Redump)
-		<rom name="007 - El mundo nunca es suficiente (Spain).cue" size="108" crc="927003b7" sha1="e5b33eef809eb421313a0dab202de48968278c38"/>
-		<rom name="007 - El mundo nunca es suficiente (Spain).bin" size="725182752" crc="f2614069" sha1="d058f1ae8891e5dcbb05fd872e2b4cf263be1a00"/>
-		-->
-		<description>007 - El mundo nunca es suficiente (Spain)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03137-T"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 - el mundo nunca es suficiente (spain)" sha1="a37918ee786a0a7017366ffdc682d265b26d11a2"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="100star">
-		<!-- Original images (Redump)
-		<rom name="100% Star (Europe).cue" size="206" crc="5541f00a" sha1="b76a303f7a6e733fa9c08a2c3bea19002a5daffc"/>
-		<rom name="100% Star (Europe) (Track 1).bin" size="36293712" crc="7d4773a4" sha1="92c5ef0e3c12f101c732cd3292d7f4bf78cc3418"/>
-		<rom name="100% Star (Europe) (Track 2).bin" size="33508944" crc="82ccd767" sha1="26cd8247c03111249119495f64923196f85bc74e"/>
-		-->
-		<description>100% Star (Europe)</description>
-		<year>2001</year>
-		<publisher>Eidos Interactive</publisher>
-		<info name="serial" value="SLES-03784"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="100% star (europe)" sha1="cc3bf7b6bce35ae6a69c5ecf426466bab89305a7"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="100starf" cloneof="100star">
-		<!-- Original images (Redump)
-		<rom name="100% Star (France).cue" size="206" crc="dd7e7f04" sha1="7464ad47591e106b3bc47b9329943e1ae98a1da4"/>
-		<rom name="100% Star (France) (Track 1).bin" size="36764112" crc="35c61af7" sha1="ed37acb420798878fd9ec47305d53b043cbc893e"/>
-		<rom name="100% Star (France) (Track 2).bin" size="33508944" crc="82ccd767" sha1="26cd8247c03111249119495f64923196f85bc74e"/>
-		-->
-		<description>100% Star (France)</description>
-		<year>2001</year>
-		<publisher>Eidos Interactive</publisher>
-		<info name="serial" value="SLES-03658"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="100% star (france)" sha1="5f2c7873f5d82d5ecb543915869d13337bd5dfef"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="2xtreme">
-		<!-- Original images (Redump)
-		<rom name="2Xtreme (Europe).cue" size="862" crc="4211e6e3" sha1="35b196dfe7cc8b15f22db1474382f9ed43b535b9"/>
-		<rom name="2Xtreme (Europe) (Track 1).bin" size="45511200" crc="f0cfee6d" sha1="cca776ddb1b0142846befd9d5565a43af0ab2197"/>
-		<rom name="2Xtreme (Europe) (Track 2).bin" size="59239824" crc="62b16b5d" sha1="c615beaa8e4aab515aa2473b2d1e4a6482a6ca62"/>
-		<rom name="2Xtreme (Europe) (Track 3).bin" size="80473680" crc="129b5977" sha1="ee55f9f8d332805d1a42bfb97ec9e7e4f3c102d1"/>
-		<rom name="2Xtreme (Europe) (Track 4).bin" size="76818672" crc="1ba44c84" sha1="19adda1a8e2021dfc4a0b94d714016989348ea08"/>
-		<rom name="2Xtreme (Europe) (Track 5).bin" size="65345616" crc="5490ecbc" sha1="8a449968494f1dd88399256e08d0bc8001f435c1"/>
-		<rom name="2Xtreme (Europe) (Track 6).bin" size="61152000" crc="2a432ca6" sha1="bab1fc47b782be10e76eb49ba5689a19e2cebca4"/>
-		<rom name="2Xtreme (Europe) (Track 7).bin" size="76776336" crc="73d57534" sha1="5257a96d6b864d1ff11a3a26cafab6f6827ee78b"/>
-		<rom name="2Xtreme (Europe) (Track 8).bin" size="76776336" crc="73d57534" sha1="5257a96d6b864d1ff11a3a26cafab6f6827ee78b"/>
-		-->
-		<description>2Xtreme (Europe)</description>
-		<year>1997</year>
-		<publisher>Sony Computer Entertainment Europe</publisher>
-		<info name="serial" value="SCES-00400"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="2xtreme (europe)" sha1="89615d848b0c30b16afc6c6ca857d7de25e8222d"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="321smurf">
-		<!-- Original images (Redump)
-		<rom name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).cue" size="131" crc="f564283d" sha1="45b800c86b31bcf7904138f457d4432ae68c74e5"/>
-		<rom name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).bin" size="250916064" crc="f17c2a33" sha1="50ea49e56a815f42899d5cebed38483e822244d4"/>
-		-->
-		<description>3, 2, 1, Smurf! My First Racing Game (Europe)</description>
-		<year>2001</year>
-		<publisher>Infogrames</publisher>
-		<info name="serial" value="SLES-03120"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="3, 2, 1, smurf! my first racing game (europe) (en,fr,de,es,it,nl)" sha1="09eab3fcbad55f2f359634655d318f1ecbc28fef"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="360">
-		<!-- Original images (Redump)
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv).cue" size="1650" crc="22776432" sha1="d5600354087e3450e4f34a17e1d4bdef48d651d4"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 01).bin" size="134614368" crc="6a9fe576" sha1="d51c0770843bff52b19f72b380dc3f6ac0dd9fef"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 02).bin" size="60220608" crc="fc58373a" sha1="e036c959a5a9a453343121957047045e3a4add21"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 03).bin" size="28859040" crc="6b4fc4cf" sha1="ee24277895159c9a9a0091819c6845d1c1c3eee5"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 04).bin" size="33398400" crc="422bbc45" sha1="54e3ee734e041c2a498f3e34e1265ff45288f59e"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 05).bin" size="37319184" crc="18515beb" sha1="348e3ed2215e60a5f3d447854971c8c85a8ef169"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 06).bin" size="32695152" crc="54ee6993" sha1="2d0c2d597cb8e04b37e16645bc6d6b4d08ea1e8a"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 07).bin" size="33059712" crc="3ced198e" sha1="251ada5ae538eea0ab26cd502162fee9a2c15a7e"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 08).bin" size="37368576" crc="c8704f19" sha1="199de59e4bea1912241907d8434ade5a0f320fb4"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 09).bin" size="26128368" crc="6d5b596c" sha1="99e665561941d3fcce56968d88b4759b783b850a"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 10).bin" size="41945568" crc="049a1f91" sha1="458e5425a034033e1caefdfcf9ff33ccd536b2ea"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 11).bin" size="52774176" crc="51409a8a" sha1="f3cf963760795be3e66b6dbbf1fea5ae9a43df08"/>
-		<rom name="360 Three Sixty (Europe) (En,Fr,De,Es,It,Sv) (Track 12).bin" size="32335296" crc="14770d2e" sha1="8a29ee4590fe2e4dfadf0fcba7f48afa38e2b101"/>
-		-->
-		<description>360 Three Sixty (Europe)</description>
-		<year>1999</year>
-		<publisher>Cryo Interactive Entertainment</publisher>
-		<info name="serial" value="SLES-02089"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="360 three sixty (europe) (en,fr,de,es,it,sv)" sha1="5ab4cee4221d27309a09efe9557aa098d3717f92"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="3dlemmin">
-		<!-- Original images (Redump)
-		<rom name="3D Lemmings (Europe).cue" size="2742" crc="51c41b34" sha1="28327fb2e596ffeff96db17948b5e3463bf7bf08"/>
-		<rom name="3D Lemmings (Europe) (Track 01).bin" size="191979648" crc="d01f4b54" sha1="4b650f874c19a5526700c8fcfb254947adca0b7a"/>
-		<rom name="3D Lemmings (Europe) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
-		<rom name="3D Lemmings (Europe) (Track 03).bin" size="15593760" crc="a998222f" sha1="387e15b378a75acaa16a126273e95c112e7d58c5"/>
-		<rom name="3D Lemmings (Europe) (Track 04).bin" size="16626288" crc="a6d9c21b" sha1="d8c681ea04e29f43f7a24a67d07ab12d384ffb60"/>
-		<rom name="3D Lemmings (Europe) (Track 05).bin" size="15798384" crc="9b0692b7" sha1="dcf195fd7b364a2a2c4e2023ae2159c938f970ee"/>
-		<rom name="3D Lemmings (Europe) (Track 06).bin" size="15311520" crc="5376fed3" sha1="288d1aaa5e2af517178feda3adcf4179e0b7d978"/>
-		<rom name="3D Lemmings (Europe) (Track 07).bin" size="14669424" crc="817c1e4b" sha1="2d81f0fa59c47fdae024249cbe7e1764d6a00e36"/>
-		<rom name="3D Lemmings (Europe) (Track 08).bin" size="14982240" crc="29a46a79" sha1="a75aa456140bf1572b9344822a81368fd97bf879"/>
-		<rom name="3D Lemmings (Europe) (Track 09).bin" size="15327984" crc="ed9b1ae8" sha1="0e1087c49fb61d2d1bca61667e81dbeb871cfbf4"/>
-		<rom name="3D Lemmings (Europe) (Track 10).bin" size="15960672" crc="ee48037e" sha1="235b6e2090135866cb30dc3bbf209089be3556cb"/>
-		<rom name="3D Lemmings (Europe) (Track 11).bin" size="18794832" crc="a31147db" sha1="8281f5a9429e73288c3e8dfbc2b35348bd5ed6bc"/>
-		<rom name="3D Lemmings (Europe) (Track 12).bin" size="18366768" crc="adb10891" sha1="fe1571f0a692baa43edf2f4bb39d214951922685"/>
-		<rom name="3D Lemmings (Europe) (Track 13).bin" size="14596512" crc="d920f2ed" sha1="80862a1597da82c7590e2d1f9652c576202f0369"/>
-		<rom name="3D Lemmings (Europe) (Track 14).bin" size="14787024" crc="d33bef1b" sha1="fd3ee97ff11b21fe020255b2640f393fc1ee8b43"/>
-		<rom name="3D Lemmings (Europe) (Track 15).bin" size="17148432" crc="8ce16106" sha1="ce0d0d81334156cdd6cf7fa7b7469e1c7e04aea2"/>
-		<rom name="3D Lemmings (Europe) (Track 16).bin" size="15840720" crc="9dbb8470" sha1="93b23c4a4199d81a9098bcb975949ab2c23b8496"/>
-		<rom name="3D Lemmings (Europe) (Track 17).bin" size="15492624" crc="a0b90757" sha1="bddbaea5766784cb8e7b23d6ee005a525ad70e5d"/>
-		<rom name="3D Lemmings (Europe) (Track 18).bin" size="15036336" crc="d2f88b4f" sha1="53f18dd471d5ad59f66aba4c039edfcb2d971f25"/>
-		<rom name="3D Lemmings (Europe) (Track 19).bin" size="15647856" crc="ef63cef4" sha1="65b78e3fd2ff621afa78b9b23d0da86a5ad18796"/>
-		<rom name="3D Lemmings (Europe) (Track 20).bin" size="15069264" crc="9db75cf2" sha1="f9b62c22012413bc3ff9c4ed91e103a48c820948"/>
-		<rom name="3D Lemmings (Europe) (Track 21).bin" size="15375024" crc="ae7ef886" sha1="5ebc5d291c8fdba624e9f973cf9e2abd75114ef9"/>
-		<rom name="3D Lemmings (Europe) (Track 22).bin" size="12792528" crc="266c2120" sha1="c4b153fcacca362886c3f503f539cc8204f03ee8"/>
-		<rom name="3D Lemmings (Europe) (Track 23).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
-		<rom name="3D Lemmings (Europe) (Track 24).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
-		-->
-		<description>3D Lemmings (Europe)</description>
-		<year>1995</year>
-		<publisher>Psygnosis</publisher>
-		<info name="serial" value="SCES-00009"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="3d lemmings (europe)" sha1="500d209610d41542dfce8fe7b0b78caf2f068320"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="40winks">
-		<!-- Original images (Redump)
-		<rom name="40 Winks (Europe).cue" size="83" crc="29f57347" sha1="4cd2841e565a42c73d4fc00b736c1d2cc8ebd7a6"/>
-		<rom name="40 Winks (Europe).bin" size="551478144" crc="fdcde564" sha1="43fa48364b0693a4b6144b11b010cc80cc5af2c4"/>
-		-->
-		<description>40 Winks (Europe)</description>
-		<year>1999</year>
-		<publisher>GT Interactive Software</publisher>
-		<info name="serial" value="SLES-01937"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="40 winks (europe)" sha1="752d79a628d34f75856bd86ec26f0df488ada429"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="40winksi" cloneof="40winks">
-		<!-- Original images (Redump)
-		<rom name="40 Winks (Italy).cue" size="82" crc="8d5e56a7" sha1="23978daf31ac2a0dd20e57f18d8d80e14ee281bb"/>
-		<rom name="40 Winks (Italy).bin" size="551344080" crc="677b7ea9" sha1="70380215dd02ae68cdff88ee29738771f57d0207"/>
-		-->
-		<description>40 Winks (Italy)</description>
-		<year>1999</year>
-		<publisher>GT Interactive Software</publisher>
-		<info name="serial" value="SLES-01940"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="40 winks (italy)" sha1="7c12712269431997e9f8a3750924bc0eeb7b9e17"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="40winkss" cloneof="40winks">
-		<!-- Original images (Redump)
-		<rom name="40 Winks (Spain).cue" size="82" crc="d01aa77f" sha1="b11bb31d90d22571e311edc270b4d3044540abe4"/>
-		<rom name="40 Winks (Spain).bin" size="551268816" crc="815a014f" sha1="eac587a040ea4db03772bade7ad4a85ab81fd039"/>
-		-->
-		<description>40 Winks (Spain)</description>
-		<year>1999</year>
-		<publisher>GT Interactive Software</publisher>
-		<info name="serial" value="SLES-01941"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="40 winks (spain)" sha1="38fb713bfbcf73afc47ccdd545b84976201fd7ee"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="442socc">
-		<!-- Original images (Redump)
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es).cue" size="1802" crc="66d6bc0d" sha1="aee918fb7a54ca358f4021b817637d2c2348ac2b"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 01).bin" size="18846576" crc="f80f364c" sha1="c51ecc78eb1bc377ea20d16ecff5aa7542a016d8"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 02).bin" size="30164400" crc="5d496b28" sha1="2a618624fa812be29120fe22c5e2c72abde9cf74"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 03).bin" size="10464048" crc="f71c03c5" sha1="82dc9c7a5262b138d1ea6233231d7585cb15df9e"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 04).bin" size="22685040" crc="fe680473" sha1="0923efa57897402ee94c7535f569b08f796f9b40"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 05).bin" size="21436128" crc="c654b4c8" sha1="7fb67ab5d2f060d4b3ac20f65ba2d7da2e6edc76"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 06).bin" size="24907680" crc="0858e3b7" sha1="2bdc7f209db5f9295f96c727a54be0b7fc3b84cd"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 07).bin" size="15709008" crc="bd38bdef" sha1="afe7852732811e0e1c1ba78f1c365f23ab316c66"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 08).bin" size="5063856" crc="0451acba" sha1="f434bcf8ddebc27f8da334826a3bf9dc22357543"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 09).bin" size="11792928" crc="7795b29c" sha1="77b511fab22e701d096f6ceec3a6b188d57404cc"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 10).bin" size="4631088" crc="8908ea9d" sha1="f497522fdf182991b7cb2bf5231d5f1ee0dfadeb"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 11).bin" size="33219648" crc="55c88f25" sha1="47b3e9893e45e7928ce3834cabb700036e8548e1"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 12).bin" size="5882352" crc="d01bf7b5" sha1="bce99580a35140e5e5ac2c5b29b14934f87edf48"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 13).bin" size="5169696" crc="16c4eda7" sha1="e8a5d9c00e1edfc221ba12aaf33c337b4425d41d"/>
-		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 14).bin" size="33219648" crc="55c88f25" sha1="47b3e9893e45e7928ce3834cabb700036e8548e1"/>
-		-->
-		<description>4-4-2 Soccer (Europe)</description>
-		<year>1997</year>
-		<publisher>Virgin Interactive Entertainment</publisher>
-		<info name="serial" value="SLES-00095"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="4-4-2 soccer (europe) (en,fr,de,es)" sha1="9feb8a26a46e7b0452ee9753fd6131f2c3b82dfd"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="4x4wt">
-		<!-- Original images (Redump)
-		<rom name="4x4 World Trophy (Europe) (En,Fr,De,Es,It).cue" size="108" crc="d4043ac7" sha1="048fc3081e5757fdf60320395fb4df919431361c"/>
-		<rom name="4x4 World Trophy (Europe) (En,Fr,De,Es,It).bin" size="510800304" crc="334d7890" sha1="439745a0b026a516b07b69bf83d45dbbe17749ae"/>
-		-->
-		<description>4x4 World Trophy (Europe)</description>
-		<year>2000</year>
-		<publisher>Infogrames</publisher>
-		<info name="serial" value="SLES-02017"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="4x4 world trophy (europe) (en,fr,de,es,it)" sha1="c3c6e2f9244ed376ea05b50a4e350891e17354a4"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="5starrac">
-		<!-- Original images (Redump)
-		<rom name="5 Star Racing (Europe).cue" size="1386" crc="08e2ba3b" sha1="a940812792e5309b0b3963f0bb557bb41eba00e7"/>
-		<rom name="5 Star Racing (Europe) (Track 01).bin" size="64992816" crc="0ddbd17d" sha1="b953daa8a381579e8593be9f9dd5d80acf8fb78b"/>
-		<rom name="5 Star Racing (Europe) (Track 02).bin" size="24369072" crc="764b74e4" sha1="46b8f9c3d4586ec59ca32423e3f682676b8bd591"/>
-		<rom name="5 Star Racing (Europe) (Track 03).bin" size="42662928" crc="86fbb553" sha1="a6ace580782e81a79e483ecb60223144a02524bf"/>
-		<rom name="5 Star Racing (Europe) (Track 04).bin" size="38003616" crc="74247e2f" sha1="b84a5b7e022ce209509cd39a2bdfa2b36278640c"/>
-		<rom name="5 Star Racing (Europe) (Track 05).bin" size="33003264" crc="583401f4" sha1="a692150277fbbbb5cd07323bbaa9af44ad5e539c"/>
-		<rom name="5 Star Racing (Europe) (Track 06).bin" size="38448144" crc="0c3f299c" sha1="77c74919b2585de3ccca5159762b735f5143b3ca"/>
-		<rom name="5 Star Racing (Europe) (Track 07).bin" size="47096448" crc="be09e41c" sha1="02a08fc18cf54748f947eac352625bf84b33a208"/>
-		<rom name="5 Star Racing (Europe) (Track 08).bin" size="44297568" crc="7b20b4b8" sha1="cd98268f928a56caa8931cb108cac91c8b71e5d4"/>
-		<rom name="5 Star Racing (Europe) (Track 09).bin" size="48808704" crc="4e61c2f3" sha1="35a0b60b4b386fffef78b27d40e8b3cdd9304325"/>
-		<rom name="5 Star Racing (Europe) (Track 10).bin" size="29202432" crc="8a552e5f" sha1="717898340b026ef3549ac2b77eddba40af7dbddc"/>
-		<rom name="5 Star Racing (Europe) (Track 11).bin" size="85024800" crc="e5eb9507" sha1="b1399d076856470846830c6b9e85a68f53049d9a"/>
-		<rom name="5 Star Racing (Europe) (Track 12).bin" size="32302368" crc="e6ce5ea3" sha1="461cd8a7f61a6b36745fd827ffe8696dd75ad742"/>
-		-->
-		<description>5 Star Racing (Europe)</description>
-		<year>2003</year>
-		<publisher>Phoenix Games</publisher>
-		<info name="serial" value="SLES-04064"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="5 star racing (europe)" sha1="7fe3d9b911667209e31c79c846f80d86b2cc8c8b"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="fifa2k2w">
-		<!-- Original images (Redump)
-		<rom name="2002 FIFA World Cup Korea Japan (Europe) (En,Sv).cue" size="114" crc="4f67e187" sha1="db00d389e8cf9980a783dcba62155edc2098ff76"/>
-		<rom name="2002 FIFA World Cup Korea Japan (Europe) (En,Sv).bin" size="514107216" crc="8034c7ff" sha1="845aa8143ba57a60e61ac91d456d1b22668905d9"/>
-		-->
-		<description>2002 FIFA World Cup Korea Japan (Europe)</description>
-		<year>2002</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03830"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="2002 fifa world cup korea japan (europe) (en,sv)" sha1="8776c95cbdee464380dddb270d91036b9c9f07d6"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="fifa2k2wg" cloneof="fifa2k2w">
-		<!-- Original images (Redump)
-		<rom name="2002 FIFA World Cup Korea Japan (Germany).cue" size="107" crc="83c53965" sha1="28ca15019fb5d1e2df801dbf5adf185638003746"/>
-		<rom name="2002 FIFA World Cup Korea Japan (Germany).bin" size="618284352" crc="2b2c62ab" sha1="4c218395a8d58401a25ba361f9148da939361f32"/>
-		-->
-		<description>2002 FIFA World Cup Korea Japan (Germany)</description>
-		<year>2002</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03832"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="2002 fifa world cup korea japan (germany)" sha1="da1176b39cbc2c623b881f12d3668b107b01a29a"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="fifa2k2wi" cloneof="fifa2k2w">
-		<!-- Original images (Redump)
-		<rom name="2002 FIFA World Cup Korea Japan (Italy).cue" size="105" crc="426aefb8" sha1="d8ab97823ca692b2dad47bde2c827ea15803877f"/>
-		<rom name="2002 FIFA World Cup Korea Japan (Italy).bin" size="532488096" crc="6e470a92" sha1="cb559e708f26d3e17f1463ca84d0b21ef2cc803d"/>
-		-->
-		<description>2002 FIFA World Cup Korea Japan (Italy)</description>
-		<year>2002</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03833"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="2002 fifa world cup korea japan (italy)" sha1="7dc42b843b0fdbff231f62edb370f02c10d6cfbc"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="fifa2k2ws" cloneof="fifa2k2w">
-		<!-- Original images (Redump)
-		<rom name="2002 FIFA World Cup Korea Japan (Spain).cue" size="105" crc="1f2e1e60" sha1="f4c95f65ffe7ecab494b8c4b3075f21441ae3786"/>
-		<rom name="2002 FIFA World Cup Korea Japan (Spain).bin" size="561695232" crc="43b5dcb3" sha1="2bc8097d8306b35e69c293f604dc088f44508c3a"/>
-		-->
-		<description>2002 FIFA World Cup Korea Japan (Spain)</description>
-		<year>2002</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-03834"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="2002 fifa world cup korea japan (spain)" sha1="4ca4b2e9cb4d0c5aa2ad2b482ade7fe09cbda20f"/>
-			</diskarea>
-		</part>
-	</software>
-
 <!-- redump.org US PS1 discs (1719 of 1719), based on 'Sony - PlayStation (20160515 00-54-32).dat'
 
 These CHDs have been converted from redump.org disc images.
 
-The following images have not been added to the softlist and are not included in the official redump.org datfiles as they are marked with "Possible bad dump" status:
-	* Madden NFL 96 (USA) (Beta)
-	* Twisted Metal 2 (USA) (Beta)
+    (Madden NFL 96 (USA) (Beta))*
+    (Twisted Metal 2 (USA) (Beta))*
 
-For an overview of US PS1 discs that have not been dumped and added to redump's database yet, please see http://wiki.redump.org/index.php?title=Sony_Playstation_USA_Missing_Games .
+    *) These dumps are not included in the official redump.org datfiles as they are marked with "Possible bad dump" status
+
+Furthermore, for an overview of US PS1 discs that have not been dumped and added to redump's database yet, please see http://wiki.redump.org/index.php?title=Sony_Playstation_USA_Missing_Games .
 
 -->
 
-	<software name="007rcngu" cloneof="007rcng">
+	<software name="007rcng">
 		<!-- Original images (Redump)
 		<rom name="007 Racing (USA).cue" size="82" crc="5c58d484" sha1="f74c52098f149c91f066b17e9000d5a059ec4405"/>
 		<rom name="007 Racing (USA).bin" size="565011552" crc="5a39ae64" sha1="91c0c4b5c888f074a777f891be5432064678070e"/>
@@ -548,7 +32,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="007tndu" cloneof="007tnd">
+	<software name="007tnd">
 		<!-- Original images (Redump)
 		<rom name="007 - Tomorrow Never Dies (USA).cue" size="97" crc="dc22c9e3" sha1="55b145bd5563c4b62cf3fadeda704340824c7b55"/>
 		<rom name="007 - Tomorrow Never Dies (USA).bin" size="573594000" crc="02f976df" sha1="5c635e990dc77c481eb177dc86deb7a198f17cf8"/>
@@ -565,7 +49,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="007twineu" cloneof="007twine">
+	<software name="007twine">
 		<!-- Original images (Redump)
 		<rom name="007 - The World Is Not Enough (USA).cue" size="101" crc="adc163bd" sha1="1e4a0731b245ab3419a5e0f23cb1001e1f1e7613"/>
 		<rom name="007 - The World Is Not Enough (USA).bin" size="726429312" crc="6e91b75f" sha1="0d6f886485318959b9a86209a91228840b61fbad"/>
@@ -735,7 +219,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="2xtremeu" cloneof="2xtreme">
+	<software name="2xtreme">
 		<!-- Original images (Redump)
 		<rom name="2Xtreme (USA).cue" size="700" crc="7e95393e" sha1="ed526fe2905f428530cc001038dd72c413bbe291"/>
 		<rom name="2Xtreme (USA) (Track 1).bin" size="45715824" crc="aad124a6" sha1="3f25e5d1366e60e70a416109711e109d48c9f19b"/>
@@ -776,7 +260,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="3dlemminu" cloneof="3dlemmin">
+	<software name="3dlemmin">
 		<!-- Original images (Redump)
 		<rom name="3D Lemmings (USA).cue" size="2670" crc="b394a6d2" sha1="b2b3cbba19838d9883c5042f5119a2e531e93484"/>
 		<rom name="3D Lemmings (USA) (Track 01).bin" size="192184272" crc="b7dbfea7" sha1="f713cdcb5d0e3d875031dbdc438dbbab0cdd3340"/>
@@ -862,7 +346,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="40winksu" cloneof="40winks">
+	<software name="40winks">
 		<!-- Original images (Redump)
 		<rom name="40 Winks (USA).cue" size="80" crc="1d060c48" sha1="327eb468983d8aeebc67998a7e8a017d5c41bdd3"/>
 		<rom name="40 Winks (USA).bin" size="540854160" crc="5b53f0a5" sha1="68b0e80f3f59cb673fc5ae7c4ebb8eba4a7b6a50"/>
@@ -9596,7 +9080,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="fifa2k2wu" cloneof="fifa2k2w">
+	<software name="fifa2k2w">
 		<!-- Original images (Redump)
 		<rom name="2002 FIFA World Cup (USA) (En,Es).cue" size="99" crc="ce349b32" sha1="57df3eb3cfcd44be5f422c13ad181b53460dfe90"/>
 		<rom name="2002 FIFA World Cup (USA) (En,Es).bin" size="514612896" crc="472333bc" sha1="720c8613669d684be002e1f454acc532a98eb241"/>
@@ -24077,7 +23561,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="smurfrac" cloneof="321smurf">
+	<software name="smurfrac">
 		<!-- Original images (Redump)
 		<rom name="Smurf Racer! (USA) (En,Fr,Es).cue" size="95" crc="cb1eef81" sha1="71192eb409ecf87c41c64795a8943ddd2d00052d"/>
 		<rom name="Smurf Racer! (USA) (En,Fr,Es).bin" size="250480944" crc="42fcf35f" sha1="37a12b2791b2b433fa867f65197c056c5bfb48e1"/>
@@ -26167,7 +25651,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="tdoffr3" cloneof="4x4wt">
+	<software name="tdoffr3">
 		<!-- Original images (Redump)
 		<rom name="Test Drive Off-Road 3 (USA).cue" size="93" crc="2072af36" sha1="c02dbe2024208320f6d82a16da2efdfab3e8336d"/>
 		<rom name="Test Drive Off-Road 3 (USA).bin" size="505957536" crc="9cc878f9" sha1="fe04c5f84119a3952e5f34381877b4c143297539"/>
