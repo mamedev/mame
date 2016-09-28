@@ -14711,6 +14711,9 @@ iskr1031                        //
 @source:istellar.cpp
 istellar                        // (c) 1983 Funai / Gakken
 
+@source:istrebiteli.cpp
+istreb                          //
+
 @source:iteagle.cpp
 bbh2sp                          //
 bbhcotw                         //

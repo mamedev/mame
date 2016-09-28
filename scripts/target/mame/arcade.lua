@@ -4443,6 +4443,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/imolagp.cpp",
 	MAME_DIR .. "src/mame/drivers/intrscti.cpp",
 	MAME_DIR .. "src/mame/drivers/istellar.cpp",
+	MAME_DIR .. "src/mame/drivers/istrebiteli.cpp",
 	MAME_DIR .. "src/mame/drivers/itgambl2.cpp",
 	MAME_DIR .. "src/mame/drivers/itgambl3.cpp",
 	MAME_DIR .. "src/mame/drivers/itgamble.cpp",
