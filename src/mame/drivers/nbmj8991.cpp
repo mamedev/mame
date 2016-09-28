@@ -1740,6 +1740,30 @@ ROM_START( mjlstory )
 	ROM_LOAD( "mjls_16.bin", 0x180000, 0x10000, CRC(53366690) SHA1(9155897a886d0a1ce3ab5bb5389dd8852a014244) )
 ROM_END
 
+ROM_START( ladymakr )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "1.e4", 0x00000,  0x10000, CRC(c5b5c37d) SHA1(a7a1d504c3045f9c3767ed3b76ce284a3feb9b28) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sub program */
+	ROM_LOAD( "3.t4", 0x00000,  0x10000, CRC(15e54af0) SHA1(2553cf77e0be996ddf9bce901bbabe8dec4c7884) )
+	ROM_LOAD( "2.s4", 0x10000,  0x10000, CRC(da976e4f) SHA1(da8a256ed6376f059fe3d4b9a3550e0c338c5a1c) )
+
+	ROM_REGION( 0x190000, "gfx1", 0 ) /* gfx */
+	ROM_LOAD( "4.a8",  0x000000, 0x20000, CRC(79ff2c90) SHA1(4cffb9116090ec7b59367225330f98e7cc62d5f5) )
+	ROM_LOAD( "5.b8",  0x020000, 0x20000, CRC(a275025d) SHA1(becaa9d79b53eddc2f9be8248ae13907d3ca126d) )
+	ROM_LOAD( "6.c8",  0x040000, 0x20000, CRC(8a191142) SHA1(911909518b1b911ec20e664d93eeda2941f5d6d7) )
+	ROM_LOAD( "7.e8",  0x060000, 0x20000, CRC(384b9c40) SHA1(11761954083653450db194f488aeb9302fb1cc69) )
+	ROM_LOAD( "8.f8",  0x080000, 0x20000, CRC(072ac9b6) SHA1(8a82b8bcc108a0fcffeea1ed123f87f683db50bc) )
+	ROM_LOAD( "9.j8",  0x0a0000, 0x20000, CRC(f4dc5e77) SHA1(9624dcd303af56385d3fb1a57ecfef367c0984aa) )
+	ROM_LOAD( "10.k8", 0x0c0000, 0x20000, CRC(aa5a165a) SHA1(4b801fce2254e10c695ea6281bcb30619f1d92f9) )
+	ROM_LOAD( "11.l8", 0x0e0000, 0x20000, CRC(25a44a56) SHA1(40695d4b6b31fdaa52761ff8b4c60eaf3497c994) )
+	ROM_LOAD( "12.m8", 0x100000, 0x20000, CRC(2e19183c) SHA1(14f436ce4b6966cd94e6b0d4ab40fcdf753402bd) )
+	ROM_LOAD( "13.p8", 0x120000, 0x20000, CRC(cc08652c) SHA1(7b8b7f6035f64702c8e96d5c4598d1374d76f8fe) )
+	ROM_LOAD( "14.a7", 0x140000, 0x20000, CRC(f469f3a5) SHA1(331f6aacd73a62c7756d88690e29b150ece917f2) )
+	ROM_LOAD( "15.b7", 0x160000, 0x20000, CRC(a85b22df) SHA1(7af2d90ab45720fa0f744a26cf7e572f40772ea9) )
+	ROM_LOAD( "16.c7", 0x180000, 0x10000, CRC(c25889d1) SHA1(5cb526c56ebe6a34c537144574489625325955b7) )
+ROM_END
+
 ROM_START( vanilla )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "vanilla.01", 0x00000,  0x10000, CRC(2a3341a8) SHA1(d434adf3e2dd0c95b614a0208e874bdd6bc2ede7) )
@@ -2103,6 +2127,7 @@ GAME( 1990, pstadium, 0,        pstadium, pstadium, driver_device,  0,        RO
 GAME( 1990, triplew2, 0,        triplew2, triplew1, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Triple Wars 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ntopstar, 0,        ntopstar, ntopstar, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Nerae! Top Star (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjlstory, 0,        mjlstory, mjlstory, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Jikken Love Story (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ladymakr, mjlstory, mjlstory, mjlstory, driver_device,  0,        ROT180, "Nichibutsu", "Lady Maker [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vanilla,  0,        vanilla,  vanilla,  driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Vanilla Syndrome (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, finalbny, vanilla,  finalbny, finalbny, nbmj8991_state, finalbny, ROT180, "Nichibutsu", "Mahjong Final Bunny [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, qmhayaku, 0,        qmhayaku, qmhayaku, driver_device,  0,        ROT180, "Nichibutsu", "Quiz-Mahjong Hayaku Yatteyo! (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -787,7 +787,9 @@ int shaders::create_resources()
 	{
 		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
+		effects[i]->add_uniform("TargetScale", uniform::UT_FLOAT, uniform::CU_TARGET_SCALE);
 		effects[i]->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+		effects[i]->add_uniform("ScreenCount", uniform::UT_INT, uniform::CU_SCREEN_COUNT);
 		effects[i]->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
 		effects[i]->add_uniform("SwapXY", uniform::UT_BOOL, uniform::CU_SWAP_XY);
 		effects[i]->add_uniform("VectorScreen", uniform::UT_BOOL, uniform::CU_VECTOR_SCREEN);
@@ -1018,9 +1020,9 @@ rgb_t shaders::apply_color_convolution(rgb_t color)
 {
 	// this function uses the same algorithm as the color convolution shader pass
 
-	float r = static_cast<float>(color.r()) / 255.0f;
-	float g = static_cast<float>(color.g()) / 255.0f;
-	float b = static_cast<float>(color.b()) / 255.0f;
+	float r = float(color.r()) / 255.0f;
+	float g = float(color.g()) / 255.0f;
+	float b = float(color.b()) / 255.0f;
 
 	float *rRatio = options->red_ratio;
 	float *gRatio = options->grn_ratio;
@@ -1049,9 +1051,9 @@ rgb_t shaders::apply_color_convolution(rgb_t color)
 	b = chroma[2] * saturation + luma;
 
 	return rgb_t(
-		std::max(0, std::min(255, static_cast<int>(r * 255.0f))),
-		std::max(0, std::min(255, static_cast<int>(g * 255.0f))),
-		std::max(0, std::min(255, static_cast<int>(b * 255.0f))));
+		std::max(0, std::min(255, int(r * 255.0f))),
+		std::max(0, std::min(255, int(g * 255.0f))),
+		std::max(0, std::min(255, int(b * 255.0f))));
 }
 
 int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
@@ -1161,6 +1163,8 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 {
 	int next_index = source_index;
 
+	auto win = d3d->assert_window();
+
 	screen_device_iterator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
@@ -1177,9 +1181,9 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 		: rgb_t(0, 0, 0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
 	float back_color[3] = {
-		static_cast<float>(back_color_rgb.r()) / 255.0f,
-		static_cast<float>(back_color_rgb.g()) / 255.0f,
-		static_cast<float>(back_color_rgb.b()) / 255.0f };
+		float(back_color_rgb.r()) / 255.0f,
+		float(back_color_rgb.g()) / 255.0f,
+		float(back_color_rgb.b()) / 255.0f };
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
@@ -1582,8 +1586,8 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 
 	auto win = d3d->assert_window();
 
-	int target_width = int(prim->get_quad_width() + 0.5f);
-	int target_height = int(prim->get_quad_height() + 0.5f);
+	int target_width = int(prim->get_full_quad_width() + 0.5f);
+	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
@@ -1618,11 +1622,10 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 
 	auto win = d3d->assert_window();
 
-	// source and target size are the same for vector targets
 	int source_width = int(prim->get_quad_width() + 0.5f);
 	int source_height = int(prim->get_quad_height() + 0.5f);
-	int target_width = source_width;
-	int target_height = source_height;
+	int target_width = int(prim->get_full_quad_width() + 0.5f);
+	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
@@ -1658,11 +1661,10 @@ bool shaders::create_vector_target(render_primitive *prim)
 
 	auto win = d3d->assert_window();
 
-	// source and target size are the same for vector targets
 	int source_width = int(prim->get_quad_width() + 0.5f);
 	int source_height = int(prim->get_quad_height() + 0.5f);
-	int target_width = source_width;
-	int target_height = source_height;
+	int target_width = int(prim->get_full_quad_width() + 0.5f);
+	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
@@ -1748,8 +1750,8 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 
 	int source_width = texture->get_width();
 	int source_height = texture->get_height();
-	int target_width = int(prim->get_quad_width() + 0.5f);
-	int target_height = int(prim->get_quad_height() + 0.5f);
+	int target_width = int(prim->get_full_quad_width() + 0.5f);
+	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
@@ -2339,6 +2341,12 @@ void uniform::update()
 			m_shader->set_vector("ScreenDims", 2, &screendims.c.x);
 			break;
 		}
+		case CU_SCREEN_COUNT:
+		{
+			int screen_count = win->target()->current_view()->screens().count();
+			m_shader->set_int("ScreenCount", screen_count);
+			break;
+		}
 		case CU_SOURCE_DIMS:
 		{
 			if (vector_screen)
@@ -2347,8 +2355,8 @@ void uniform::update()
 				{
 					// vector screen has no source texture, so take the source dimensions of the render target
 					float sourcedims[2] = {
-						static_cast<float>(shadersys->curr_render_target->width),
-						static_cast<float>(shadersys->curr_render_target->height) };
+						float(shadersys->curr_render_target->width),
+						float(shadersys->curr_render_target->height) };
 					m_shader->set_vector("SourceDims", 2, sourcedims);
 				}
 			}
@@ -2367,9 +2375,20 @@ void uniform::update()
 			if (shadersys->curr_render_target)
 			{
 				float targetdims[2] = {
-					static_cast<float>(shadersys->curr_render_target->target_width),
-					static_cast<float>(shadersys->curr_render_target->target_height) };
+					float(shadersys->curr_render_target->target_width),
+					float(shadersys->curr_render_target->target_height) };
 				m_shader->set_vector("TargetDims", 2, targetdims);
+			}
+			break;
+		}
+		case CU_TARGET_SCALE:
+		{
+			if (shadersys->curr_render_target)
+			{
+				float targetscale[2] = {
+					shadersys->oversampling_enable ? 2.0f : 1.0f,
+					shadersys->oversampling_enable ? 2.0f : 1.0f };
+				m_shader->set_vector("TargetScale", 2, targetscale);
 			}
 			break;
 		}
@@ -2378,9 +2397,8 @@ void uniform::update()
 			if (shadersys->curr_poly)
 			{
 				float quaddims[2] = {
-					// round
-					static_cast<float>(static_cast<int>(shadersys->curr_poly->prim_width() + 0.5f)),
-					static_cast<float>(static_cast<int>(shadersys->curr_poly->prim_height() + 0.5f)) };
+					floorf(shadersys->curr_poly->prim_width() + 0.5f),
+					floorf(shadersys->curr_poly->prim_height() + 0.5f) };
 				m_shader->set_vector("QuadDims", 2, quaddims);
 			}
 			break;
@@ -2497,7 +2515,7 @@ void uniform::update()
 			break;
 		case CU_POST_SHADOW_COUNT:
 		{
-			float shadowcount[2] = { static_cast<float>(options->shadow_mask_count_x), static_cast<float>(options->shadow_mask_count_y) };
+			float shadowcount[2] = { float(options->shadow_mask_count_x), float(options->shadow_mask_count_y) };
 			m_shader->set_vector("ShadowCount", 2, shadowcount);
 			break;
 		}

@@ -13834,6 +13834,7 @@ stargatp1                       //
 stargatp2                       //
 stargatp3                       //
 stargatp4                       //
+stargatp5                       //
 teedoffp                        //
 teedoffp1                       //
 teedoffp3                       //
@@ -14710,6 +14711,9 @@ iskr1031                        //
 
 @source:istellar.cpp
 istellar                        // (c) 1983 Funai / Gakken
+
+@source:istrebiteli.cpp
+istreb                          //
 
 @source:iteagle.cpp
 bbh2sp                          //
@@ -28451,6 +28455,7 @@ finalbny                        // (c) 1991
 galkaika                        // (c) 1989 Nichibutsu/T.R.TEC
 galkoku                         // (c) 1989 Nichibutsu/T.R.TEC
 hyouban                         // (c) 1989 Nichibutsu/T.R.TEC
+ladymakr                        // (c) 1991
 mcontest                        // (c) 1989
 mjgottub                        // (c) 1991
 mjlstory                        // (c) 1991
@@ -30418,6 +30423,7 @@ pingpong                        // GX555 (c) 1985
 janshi                          //
 pinkiri8                        //
 ronjan                          //
+ronjans                         //
 
 @source:pipbug.cpp
 pipbug                          //
@@ -34025,6 +34031,7 @@ starwarso                       // 136021           (c) 1983
 tomcatsw                        // (proto)          (c) 1983
 
 @source:statriv2.cpp
+bigcsino                        // (c) 1984 Status Games
 cstripxi                        // (c) 1981 Status Games
 funcsino                        // (c) 1981 Status Games
 hangman                         // (c) 1984 Status Games
