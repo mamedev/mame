@@ -963,7 +963,7 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_idle));
 
 	state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_prevpc).mask(0xfff).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
 	state_add(STATE_GENSP,     "GENSP",     m_n).mask(0x3).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).mask(0x3).callimport().callexport().noshow().formatstr("%3s");
 

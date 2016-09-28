@@ -273,7 +273,8 @@ void i80286_cpu_device::device_start()
 	state_add( I286_MSW, "MSW", m_msw ).callimport().callexport().formatstr("%04X");
 	state_add( I286_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).callimport().callexport().formatstr("%06X");
+	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%06X");
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%06X");
 	m_out_shutdown_func.resolve_safe();
 }
 
@@ -282,6 +283,7 @@ void i80286_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			str = string_format("%08X", m_base[CS] + m_ip);
 			break;
 

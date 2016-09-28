@@ -119,7 +119,8 @@ void e0c6200_cpu_device::device_start()
 	state_add(E0C6200_YL, "YL", m_yl).formatstr("%01X");
 	state_add(E0C6200_SP, "SP", m_sp).formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%4s").noshow();
 
 	m_icountptr = &m_icount;

@@ -155,6 +155,7 @@ void mb86233_cpu_device::device_start()
 	state_add( MB86233_R15,   "R15", m_gpr[15]).formatstr("%08X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%2s").noshow();
 
 	m_icountptr = &m_icount;

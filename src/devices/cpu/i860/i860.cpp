@@ -127,7 +127,8 @@ void i860_cpu_device::device_start()
 	state_add( I860_F30, "F30", m_freg[30]).callimport().callexport().formatstr("%08X");
 	state_add( I860_F31, "F31", m_freg[31]).callimport().callexport().formatstr("%08X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_icountptr = &m_icount;
 }
