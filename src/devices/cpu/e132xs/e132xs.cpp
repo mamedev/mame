@@ -1563,6 +1563,7 @@ void hyperstone_device::init(int scale_mask)
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,    "GENPC",     m_global_regs[0]).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",    m_global_regs[0]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_global_regs[1]).callimport().callexport().formatstr("%40s").noshow();
 	state_add(E132XS_PC,      "PC", m_global_regs[0]).mask(0xffffffff);
 	state_add(E132XS_SR,      "SR", m_global_regs[1]).mask(0xffffffff);

@@ -178,7 +178,8 @@ void v30mz_cpu_device::device_start()
 	state_add( NEC_DS, "DS", m_sregs[DS] ).callimport().callexport().formatstr("%04X");
 	state_add( NEC_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).callimport().callexport().formatstr("%05X");
+	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%05X");
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%05X");
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).callimport().callexport().formatstr("%16s").noshow();
 
 	m_icountptr = &m_icount;
@@ -190,6 +191,7 @@ void v30mz_cpu_device::state_string_export(const device_state_entry &entry, std:
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			str = string_format("%08X", ( m_sregs[CS] << 4 ) + m_ip);
 			break;
 

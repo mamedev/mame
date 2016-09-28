@@ -1235,10 +1235,10 @@ void spc700_device::device_start()
 	state_add( SPC700_X,  "X",  m_x             ).formatstr("%02X");
 	state_add( SPC700_Y,  "Y",  m_y             ).formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_ppc).formatstr("%04X").noshow();
 	state_add(STATE_GENSP, "GENSP", m_debugger_temp).mask(0x1ff).callexport().formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_debugger_temp).formatstr("%8s").noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).formatstr("%04X").noshow();
 
 	m_icountptr = &m_ICount;
 }

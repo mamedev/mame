@@ -83,6 +83,7 @@ void i8008_device::device_start()
 	// register our state for the debugger
 	state_add(I8008_PC,       "PC",       m_PC.w.l).mask(0x3fff);
 	state_add(STATE_GENPC,    "GENPC",    m_PC.w.l).mask(0x3fff).noshow();
+	state_add(STATE_GENPCBASE,"CURPC",    m_PC.w.l).mask(0x3fff).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
 	state_add(I8008_A,        "A",        m_A);
 	state_add(I8008_B,        "B",        m_B);

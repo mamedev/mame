@@ -397,7 +397,8 @@ void am29000_cpu_device::device_start()
 	state_add( AM29000_R254, "R254", m_r[254] ).formatstr("%08X");
 	state_add( AM29000_R255, "R255", m_r[255] ).formatstr("%08X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%08X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%08X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%08X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_alu).formatstr("%13s").noshow();
 
 	m_icountptr = &m_icount;

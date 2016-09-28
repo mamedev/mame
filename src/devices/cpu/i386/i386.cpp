@@ -3413,6 +3413,7 @@ void i386_device::register_state_i386()
 	state_add( I386_CPL,        "CPL", m_CPL).formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 	state_add( STATE_GENSP, "GENSP", REG32(ESP)).noshow();
 }

@@ -694,6 +694,8 @@ void superfx_device::device_start()
 	state_add( SUPERFX_RAMAR,   "RAMAR",   m_ramar).formatstr("%04X");
 	state_add( SUPERFX_RAMDR,   "RAMDR",   m_ramdr).formatstr("%02X");
 	state_add( SUPERFX_RAMADDR, "RAMADDR", m_ramaddr).formatstr("%04X");
+	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().formatstr("%06X");
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().formatstr("%06X");
 
 	m_icountptr = &m_icount;
 }
@@ -715,6 +717,7 @@ void superfx_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 		case SUPERFX_PC:
 			m_debugger_temp = ( (m_pbr << 16) | m_r[15] ) - 1;
 			break;

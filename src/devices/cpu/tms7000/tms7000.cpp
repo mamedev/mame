@@ -241,6 +241,7 @@ void tms7000_device::device_start()
 	state_add(TMS7000_ST, "ST", m_sr).formatstr("%02X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%02X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%02X").noshow();
 	state_add(STATE_GENSP, "GENSP", m_sp).formatstr("%02X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 }

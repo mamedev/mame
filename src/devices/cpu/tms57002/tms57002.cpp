@@ -815,6 +815,7 @@ void tms57002_device::device_start()
 	data    = &space(AS_DATA);
 
 	state_add(STATE_GENPC,    "GENPC",  pc).noshow();
+	state_add(STATE_GENPCBASE,"CURPC",  pc).noshow();
 	state_add(TMS57002_PC,    "PC",     pc);
 	state_add(TMS57002_ST0,   "ST0",    st0);
 	state_add(TMS57002_ST1,   "ST1",    st1);

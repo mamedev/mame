@@ -3126,9 +3126,6 @@ OP(op,ff) { rst(0x38);                                                          
 
 void z80_device::take_nmi()
 {
-	/* there isn't a valid previous program counter */
-	PRVPC = -1;
-
 	/* Check if processor was halted */
 	leave_halt();
 
@@ -3148,9 +3145,6 @@ void z80_device::take_nmi()
 void z80_device::take_interrupt()
 {
 	int irq_vector;
-
-	/* there isn't a valid previous program counter */
-	PRVPC = -1;
 
 	/* Check if processor was halted */
 	leave_halt();
@@ -3236,9 +3230,6 @@ void z80_device::take_interrupt()
 
 void nsc800_device::take_interrupt_nsc800()
 {
-	/* there isn't a valid previous program counter */
-	PRVPC = -1;
-
 	/* Check if processor was halted */
 	leave_halt();
 
@@ -3426,7 +3417,7 @@ void z80_device::device_start()
 	/* set up the state table */
 	state_add(Z80_PC,          "PC",        m_pc.w.l);
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_prvpc.w.l).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w.l).noshow();
 	state_add(Z80_SP,          "SP",        SP);
 	state_add(STATE_GENSP,     "GENSP",     SP).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  F).noshow().formatstr("%8s");
