@@ -1082,7 +1082,7 @@ ROM_END
  vsync is 59.629Hz
  hsync pulse is 5.3uS
  vsync pulse is 8 raster lines
- 
+
 The non matching EPROM is a modified version of gw04-5s.rom with the following changes:
 - offset 0x0A4A contains 0x6F instead of 0x1F
 - offset 0x0A4E contains 0xAA instead of 0xFA
@@ -1090,7 +1090,7 @@ The non matching EPROM is a modified version of gw04-5s.rom with the following c
 
 ROM_START( geminib )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "G-2.6d",  0x00000, 0x10000, 		CRC(cd79c5b3) SHA1(355aae2346d49d14a801fad05d49376581d329c6) )  /* c000-ffff is not used */
+	ROM_LOAD( "G-2.6d",  0x00000, 0x10000,      CRC(cd79c5b3) SHA1(355aae2346d49d14a801fad05d49376581d329c6) )  /* c000-ffff is not used */
 	ROM_LOAD( "gw05-6s.rom",  0x10000, 0x10000, CRC(5a6947a9) SHA1(18b7aeb0f0e2c396bc759118dd7c45fd6070b804) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )

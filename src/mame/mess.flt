@@ -311,7 +311,6 @@ m6805evs.cpp
 m79152pc.cpp
 mac.cpp
 macpci.cpp
-marywu.cpp
 mbc200.cpp
 mbc55x.cpp
 mbdtower.cpp
@@ -430,6 +429,7 @@ pcd.cpp
 pce.cpp
 pce220.cpp
 pcfx.cpp
+pcipc.cpp
 pcm.cpp
 pcw.cpp
 pcw16.cpp
@@ -443,6 +443,7 @@ pentagon.cpp
 peoplepc.cpp
 pes.cpp
 pet.cpp
+pg685.cpp
 phc25.cpp
 phantom.cpp
 phunsy.cpp

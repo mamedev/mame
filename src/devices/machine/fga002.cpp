@@ -37,10 +37,10 @@
 #define LOG(x)
 #define LOGR(x)
 #define LOGSETUP(x)
-#define LOGINT(x)   LOGPRINT(x) 
-#define LOGVEC(x) 
-#define LOGLVL(x) 
-#define LOGIACK(x) LOGPRINT(x) 
+#define LOGINT(x)   LOGPRINT(x)
+#define LOGVEC(x)
+#define LOGLVL(x)
+#define LOGIACK(x) LOGPRINT(x)
 #if VERBOSE == 2
 #define logerror printf
 #endif
@@ -135,14 +135,14 @@ void fga002_device::device_reset()
 	m_fga002[FGA_ISSYSFAIL]     = 0x80;
 	m_fga002[FGA_ISFMB0MES]     = 0x80;
 	m_fga002[FGA_ISFMB1MES]     = 0x80;
-	m_fga002[FGA_ISLOCAL0]		= 0x80;
-	m_fga002[FGA_ISLOCAL1]		= 0x80;
-	m_fga002[FGA_ISLOCAL2]		= 0x80;
-	m_fga002[FGA_ISLOCAL3]		= 0x80;
-	m_fga002[FGA_ISLOCAL4]		= 0x80;
-	m_fga002[FGA_ISLOCAL5]		= 0x80;
-	m_fga002[FGA_ISLOCAL6]		= 0x80;
-	m_fga002[FGA_ISLOCAL7]		= 0x80;
+	m_fga002[FGA_ISLOCAL0]      = 0x80;
+	m_fga002[FGA_ISLOCAL1]      = 0x80;
+	m_fga002[FGA_ISLOCAL2]      = 0x80;
+	m_fga002[FGA_ISLOCAL3]      = 0x80;
+	m_fga002[FGA_ISLOCAL4]      = 0x80;
+	m_fga002[FGA_ISLOCAL5]      = 0x80;
+	m_fga002[FGA_ISLOCAL6]      = 0x80;
+	m_fga002[FGA_ISLOCAL7]      = 0x80;
 }
 
 //-------------------------------------------------
@@ -176,43 +176,43 @@ void fga002_device::device_timer (emu_timer &timer, device_timer_id id, INT32 pa
 
 /* The FGA002 Interrupts
 
-	The FGA-002 Gate Array provides high end support for interrupt functionality. It manages interrupt sources 
-	within the gate array as well as external sources connected to the gate array. The FGA-002 Gate Array is an 
-	efficient interface for various interrupt sources to the local CPU, and supports up to 18 external interrupters.
+    The FGA-002 Gate Array provides high end support for interrupt functionality. It manages interrupt sources
+    within the gate array as well as external sources connected to the gate array. The FGA-002 Gate Array is an
+    efficient interface for various interrupt sources to the local CPU, and supports up to 18 external interrupters.
 
-	Interrupt inputs provided for external interrupt sources (exclusive of the VMEbus interrupt inputs) offer 
-	maximum flexibility as they may be configured to be level/edge sensitive or low/high active. The control of 
-	these features is performed by two bits contained in the extended interrupt control registers. The Interrupt 
-	Auto Clear bit in the extended interrupt control register determines, whether the interrupt of an edge sensitive 
-	input is cleared automatically during the interrupt acknowledge cycle or has to be cleared by the interrupt 
-	service routine. Each interrupt source is bound to an individual interrupt channel which has its own assigned 
-	vector number. The interrupt channels are configured by the Interrupt Control Registers where a 3 bit code for 
-	the level and a bit for enable/disable control are stored. Each interrupt channel may be programmed to interrupt 
-	the processor at any level.
-	
-	The vector table of the gate array is a group of 64 vectors. The two most significant bits of the 8 bit vector 
-	are programmable via register bits. The rest of the bits are assigned by gate array hardware. Not all of the 
-	64 vectors are used in the present gate array, and those not used are reserved for future extensions.
+    Interrupt inputs provided for external interrupt sources (exclusive of the VMEbus interrupt inputs) offer
+    maximum flexibility as they may be configured to be level/edge sensitive or low/high active. The control of
+    these features is performed by two bits contained in the extended interrupt control registers. The Interrupt
+    Auto Clear bit in the extended interrupt control register determines, whether the interrupt of an edge sensitive
+    input is cleared automatically during the interrupt acknowledge cycle or has to be cleared by the interrupt
+    service routine. Each interrupt source is bound to an individual interrupt channel which has its own assigned
+    vector number. The interrupt channels are configured by the Interrupt Control Registers where a 3 bit code for
+    the level and a bit for enable/disable control are stored. Each interrupt channel may be programmed to interrupt
+    the processor at any level.
 
-	The following groups of interrupt sources are supported:
-	1. Internal Interrupt Sources
-	- DMA CONTROLLER
-	- TIMER
-	- FORCE MESSAGE BROADCAST -FMB-
-	- PARITY ERROR
-	- 8 MAILBOXES
-	2. External Interrupt Sources
-	Onboard interrupts:
-	- LOCAL 0-7 inputs
-	- ABORT Key input
-	- ACFAIL input
-	- SYSFAIL input
-	VMEbus interrupts:
-	- 7 VMEbus interrupt inputs
+    The vector table of the gate array is a group of 64 vectors. The two most significant bits of the 8 bit vector
+    are programmable via register bits. The rest of the bits are assigned by gate array hardware. Not all of the
+    64 vectors are used in the present gate array, and those not used are reserved for future extensions.
+
+    The following groups of interrupt sources are supported:
+    1. Internal Interrupt Sources
+    - DMA CONTROLLER
+    - TIMER
+    - FORCE MESSAGE BROADCAST -FMB-
+    - PARITY ERROR
+    - 8 MAILBOXES
+    2. External Interrupt Sources
+    Onboard interrupts:
+    - LOCAL 0-7 inputs
+    - ABORT Key input
+    - ACFAIL input
+    - SYSFAIL input
+    VMEbus interrupts:
+    - 7 VMEbus interrupt inputs
 */
 
 // TODO: Add more intrrupts sources in priority order, 18 in total.
-const fga_irq_t fga002_device::m_irq_sources[] = { 
+const fga_irq_t fga002_device::m_irq_sources[] = {
 		{INT_LOCAL0, FGA_ISLOCAL0, FGA_ICRLOCAL0 },
 		{INT_LOCAL1, FGA_ISLOCAL1, FGA_ICRLOCAL1 },
 		{INT_LOCAL2, FGA_ISLOCAL2, FGA_ICRLOCAL2 },
@@ -220,7 +220,7 @@ const fga_irq_t fga002_device::m_irq_sources[] = {
 		{INT_LOCAL4, FGA_ISLOCAL4, FGA_ICRLOCAL4 },
 		{INT_LOCAL5, FGA_ISLOCAL5, FGA_ICRLOCAL5 },
 		{INT_LOCAL6, FGA_ISLOCAL6, FGA_ICRLOCAL6 },
-		{INT_LOCAL7, FGA_ISLOCAL7, FGA_ICRLOCAL7 } 
+		{INT_LOCAL7, FGA_ISLOCAL7, FGA_ICRLOCAL7 }
 };
 
 
@@ -270,9 +270,9 @@ IRQ_CALLBACK_MEMBER(fga002_device::iack)
 		LOGLVL(("Vec Status[val] Control[val]\n"));
 		for (auto & elem : m_irq_sources)
 		{
-			LOGLVL((" %02x    %02x[%02x]      %02x[%02x]\n", 
+			LOGLVL((" %02x    %02x[%02x]      %02x[%02x]\n",
 					elem.vector,
-					elem.status, m_fga002[elem.status],  
+					elem.status, m_fga002[elem.status],
 					elem.control, m_fga002[elem.control]));
 			// Right level?
 			LOGLVL(("Level %02x == ICR %02x is %s\n", level, m_fga002[elem.control] & REG_ICR_LVL_MSK, ((m_fga002[elem.control] & REG_ICR_LVL_MSK) == level) ? "true!" : "false.."));
@@ -288,8 +288,8 @@ IRQ_CALLBACK_MEMBER(fga002_device::iack)
 						LOGVEC((" - org vec:%02x ", vec));
 						switch (vec)
 						{
-							// Assuming that the attached device is returning -1 (INT_ACK_AUTOVECTOR) if no vector is provided, then we keep internal vector  
-							// TODO: Add device specific parameter that maps devices no-vector response to INT_ACK_AUTOVECTOR (and preferably INT_ACK_NOVECTOR) 
+							// Assuming that the attached device is returning -1 (INT_ACK_AUTOVECTOR) if no vector is provided, then we keep internal vector
+							// TODO: Add device specific parameter that maps devices no-vector response to INT_ACK_AUTOVECTOR (and preferably INT_ACK_NOVECTOR)
 						case INT_LOCAL4:  if (( (m_fga002[FGA_LOCALIACK] & REG_LIACK_LOCAL4_MSK) >> 0) != REG_LIACK_INT_IACK ) vec = m_liack4_cb(); break;
 						case INT_LOCAL5:  if (( (m_fga002[FGA_LOCALIACK] & REG_LIACK_LOCAL5_MSK) >> 2) != REG_LIACK_INT_IACK ) vec = m_liack5_cb(); break;
 						case INT_LOCAL6:  if (( (m_fga002[FGA_LOCALIACK] & REG_LIACK_LOCAL6_MSK) >> 4) != REG_LIACK_INT_IACK ) vec = m_liack6_cb(); break;
@@ -301,13 +301,13 @@ IRQ_CALLBACK_MEMBER(fga002_device::iack)
 						if (vec == INT_ACK_AUTOVECTOR) vec = INT_EMPTY;
 						LOGVEC(("avec:%02x ", vec));
 
-						// Add vector page bits and return vector 
-						vec = (vec & 0x3f) | ((m_fga002[FGA_CTL3] & REG_CTL3_VECTORBITS7_6) << 4); 
+						// Add vector page bits and return vector
+						vec = (vec & 0x3f) | ((m_fga002[FGA_CTL3] & REG_CTL3_VECTORBITS7_6) << 4);
 						LOGVEC(("pvec:%02x\n", vec));
 
 						LOGVEC((" - Interrupt Acknowledge Vector %02x\n", vec));
-						/* TODO: 
-						   - Support auto clear of interrupt source and level triggered 
+						/* TODO:
+						   - Support auto clear of interrupt source and level triggered
 						*/
 						vec_found = 1;
 					}
@@ -323,13 +323,13 @@ IRQ_CALLBACK_MEMBER(fga002_device::iack)
 	}
 	LOGIACK((" - Interrupt Acknowledge Vector %02x, next interrupt is off %02x\n", vec, m_irq_level));
 	m_out_int_cb(CLEAR_LINE);
-	return vec; 
+	return vec;
 }
 
 int fga002_device::get_irq_level()
 {
 	LOGINT(("%s %s() - %02x\n", tag(), FUNCNAME, m_irq_level));
-	return m_irq_level; 
+	return m_irq_level;
 }
 
 /*  The FGA002 Timer
@@ -541,14 +541,14 @@ void fga002_device::do_fga002reg_ctl3_w(UINT8 data)
 }
 
 // Local Interrupt control register methods
-UINT8 fga002_device::do_fga002reg_icrlocal0_r(){	UINT8 ret = m_fga002[FGA_ICRLOCAL0]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal1_r(){	UINT8 ret = m_fga002[FGA_ICRLOCAL1]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal2_r(){	UINT8 ret = m_fga002[FGA_ICRLOCAL2]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal3_r(){	UINT8 ret = m_fga002[FGA_ICRLOCAL3]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal4_r(){	UINT8 ret = m_fga002[FGA_ICRLOCAL4]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal5_r(){	UINT8 ret = m_fga002[FGA_ICRLOCAL5]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal6_r(){	UINT8 ret = m_fga002[FGA_ICRLOCAL6]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal7_r(){	UINT8 ret = m_fga002[FGA_ICRLOCAL7]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_icrlocal0_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL0]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_icrlocal1_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL1]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_icrlocal2_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL2]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_icrlocal3_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL3]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_icrlocal4_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL4]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_icrlocal5_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL5]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_icrlocal6_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL6]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_icrlocal7_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL7]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
 
 void  fga002_device::do_fga002reg_icrlocal0_w(UINT8 data){ m_fga002[FGA_ICRLOCAL0] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
 void  fga002_device::do_fga002reg_icrlocal1_w(UINT8 data){ m_fga002[FGA_ICRLOCAL1] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
@@ -560,14 +560,14 @@ void  fga002_device::do_fga002reg_icrlocal6_w(UINT8 data){ m_fga002[FGA_ICRLOCAL
 void  fga002_device::do_fga002reg_icrlocal7_w(UINT8 data){ m_fga002[FGA_ICRLOCAL7] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
 
 // Local Interrupt Status Register methods
-UINT8 fga002_device::do_fga002reg_islocal0_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL0]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal1_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL1]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal2_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL2]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal3_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL3]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal4_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL4]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal5_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL5]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal6_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL6]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal7_r(){	UINT8 ret = m_fga002[FGA_ISLOCAL7]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_islocal0_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL0]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_islocal1_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL1]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_islocal2_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL2]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_islocal3_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL3]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_islocal4_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL4]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_islocal5_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL5]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_islocal6_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL6]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+UINT8 fga002_device::do_fga002reg_islocal7_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL7]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
 
 void fga002_device::islocal_w(int status, int vector, int control, int data)
 {
@@ -660,14 +660,14 @@ WRITE8_MEMBER (fga002_device::write){
 	case FGA_ICRABORT       : LOG(("FGA_ICRABORT - not implemented\n")); m_fga002[FGA_ICRABORT] = data; break;
 	case FGA_ICRACFAIL      : LOG(("FGA_ICRACFAIL - not implemented\n")); m_fga002[FGA_ICRACFAIL] = data; break;
 	case FGA_ICRSYSFAIL     : LOG(("FGA_ICRSYSFAIL - not implemented\n")); m_fga002[FGA_ICRSYSFAIL] = data; break;
-	case FGA_ICRLOCAL0		: do_fga002reg_icrlocal0_w(data); break;
-	case FGA_ICRLOCAL1		: do_fga002reg_icrlocal1_w(data); break;
-	case FGA_ICRLOCAL2		: do_fga002reg_icrlocal2_w(data); break;
-	case FGA_ICRLOCAL3		: do_fga002reg_icrlocal3_w(data); break;
-	case FGA_ICRLOCAL4		: do_fga002reg_icrlocal4_w(data); break;
-	case FGA_ICRLOCAL5		: do_fga002reg_icrlocal5_w(data); break;
-	case FGA_ICRLOCAL6		: do_fga002reg_icrlocal6_w(data); break;
-	case FGA_ICRLOCAL7		: do_fga002reg_icrlocal7_w(data); break;
+	case FGA_ICRLOCAL0      : do_fga002reg_icrlocal0_w(data); break;
+	case FGA_ICRLOCAL1      : do_fga002reg_icrlocal1_w(data); break;
+	case FGA_ICRLOCAL2      : do_fga002reg_icrlocal2_w(data); break;
+	case FGA_ICRLOCAL3      : do_fga002reg_icrlocal3_w(data); break;
+	case FGA_ICRLOCAL4      : do_fga002reg_icrlocal4_w(data); break;
+	case FGA_ICRLOCAL5      : do_fga002reg_icrlocal5_w(data); break;
+	case FGA_ICRLOCAL6      : do_fga002reg_icrlocal6_w(data); break;
+	case FGA_ICRLOCAL7      : do_fga002reg_icrlocal7_w(data); break;
 	case FGA_ENAMCODE       : LOG(("FGA_ENAMCODE - not implemented\n")); m_fga002[FGA_ENAMCODE] = data; break;
 	case FGA_CTL10          : LOG(("FGA_CTL10 - not implemented\n")); m_fga002[FGA_CTL10] = data; break;
 	case FGA_CTL11          : LOG(("FGA_CTL11 - not implemented\n")); m_fga002[FGA_CTL11] = data; break;
@@ -696,15 +696,15 @@ WRITE8_MEMBER (fga002_device::write){
 	case FGA_CTL14          : LOG(("FGA_CTL14 - not implemented\n")); m_fga002[FGA_CTL14] = data; break;
 	case FGA_CTL15          : LOG(("FGA_CTL15 - not implemented\n")); m_fga002[FGA_CTL15] = data; break;
 	case FGA_CTL16          : LOG(("FGA_CTL16 - not implemented\n")); m_fga002[FGA_CTL16] = data; break;
-	case FGA_ISTIM0			: do_fga002reg_istim0_w(data); break;
-	case FGA_ISLOCAL0		: do_fga002reg_islocal0_w(data); break;
-	case FGA_ISLOCAL1		: do_fga002reg_islocal1_w(data); break;
-	case FGA_ISLOCAL2		: do_fga002reg_islocal2_w(data); break;
-	case FGA_ISLOCAL3		: do_fga002reg_islocal3_w(data); break;
-	case FGA_ISLOCAL4		: do_fga002reg_islocal4_w(data); break;
-	case FGA_ISLOCAL5		: do_fga002reg_islocal5_w(data); break;
-	case FGA_ISLOCAL6		: do_fga002reg_islocal6_w(data); break;
-	case FGA_ISLOCAL7		: do_fga002reg_islocal7_w(data); break;
+	case FGA_ISTIM0         : do_fga002reg_istim0_w(data); break;
+	case FGA_ISLOCAL0       : do_fga002reg_islocal0_w(data); break;
+	case FGA_ISLOCAL1       : do_fga002reg_islocal1_w(data); break;
+	case FGA_ISLOCAL2       : do_fga002reg_islocal2_w(data); break;
+	case FGA_ISLOCAL3       : do_fga002reg_islocal3_w(data); break;
+	case FGA_ISLOCAL4       : do_fga002reg_islocal4_w(data); break;
+	case FGA_ISLOCAL5       : do_fga002reg_islocal5_w(data); break;
+	case FGA_ISLOCAL6       : do_fga002reg_islocal6_w(data); break;
+	case FGA_ISLOCAL7       : do_fga002reg_islocal7_w(data); break;
 	case FGA_ISDMANORM      : LOG(("FGA_ISDMANORM - not implemented\n")); m_fga002[FGA_ISDMANORM] = data; break;
 	case FGA_ISDMAERR       : LOG(("FGA_ISDMAERR - not implemented\n")); m_fga002[FGA_ISDMAERR] = data; break;
 	case FGA_ISFMB0REF      : LOG(("FGA_ISFMB0REF - not implemented\n")); m_fga002[FGA_ISFMB0REF] = data; break;
@@ -771,14 +771,14 @@ READ8_MEMBER (fga002_device::read){
 	case FGA_ICRABORT       : ret = m_fga002[FGA_ICRABORT]; LOG(("FGA_ICRABORT returns %02x - not implemented\n", ret)); break;
 	case FGA_ICRACFAIL      : ret = m_fga002[FGA_ICRACFAIL]; LOG(("FGA_ICRACFAIL returns %02x - not implemented\n", ret)); break;
 	case FGA_ICRSYSFAIL     : ret = m_fga002[FGA_ICRSYSFAIL]; LOG(("FGA_ICRSYSFAIL returns %02x - not implemented\n", ret)); break;
-	case FGA_ICRLOCAL0		: ret = do_fga002reg_icrlocal0_r(); break;
-	case FGA_ICRLOCAL1		: ret = do_fga002reg_icrlocal1_r(); break;
-	case FGA_ICRLOCAL2		: ret = do_fga002reg_icrlocal2_r(); break;
-	case FGA_ICRLOCAL3		: ret = do_fga002reg_icrlocal3_r(); break;
-	case FGA_ICRLOCAL4		: ret = do_fga002reg_icrlocal4_r(); break;
-	case FGA_ICRLOCAL5		: ret = do_fga002reg_icrlocal5_r(); break;
-	case FGA_ICRLOCAL6		: ret = do_fga002reg_icrlocal6_r(); break;
-	case FGA_ICRLOCAL7		: ret = do_fga002reg_icrlocal7_r(); break;
+	case FGA_ICRLOCAL0      : ret = do_fga002reg_icrlocal0_r(); break;
+	case FGA_ICRLOCAL1      : ret = do_fga002reg_icrlocal1_r(); break;
+	case FGA_ICRLOCAL2      : ret = do_fga002reg_icrlocal2_r(); break;
+	case FGA_ICRLOCAL3      : ret = do_fga002reg_icrlocal3_r(); break;
+	case FGA_ICRLOCAL4      : ret = do_fga002reg_icrlocal4_r(); break;
+	case FGA_ICRLOCAL5      : ret = do_fga002reg_icrlocal5_r(); break;
+	case FGA_ICRLOCAL6      : ret = do_fga002reg_icrlocal6_r(); break;
+	case FGA_ICRLOCAL7      : ret = do_fga002reg_icrlocal7_r(); break;
 	case FGA_ENAMCODE       : ret = m_fga002[FGA_ENAMCODE]; LOG(("FGA_ENAMCODE returns %02x - not implemented\n", ret)); break;
 	case FGA_CTL10          : ret = m_fga002[FGA_CTL10]; LOG(("FGA_CTL10 returns %02x - not implemented\n", ret)); break;
 	case FGA_CTL11          : ret = m_fga002[FGA_CTL11]; LOG(("FGA_CTL11 returns %02x - not implemented\n", ret)); break;
@@ -807,15 +807,15 @@ READ8_MEMBER (fga002_device::read){
 	case FGA_CTL14          : ret = m_fga002[FGA_CTL14]; LOG(("FGA_CTL14 returns %02x - not implemented\n", ret)); break;
 	case FGA_CTL15          : ret = m_fga002[FGA_CTL15]; LOG(("FGA_CTL15 returns %02x - not implemented\n", ret)); break;
 	case FGA_CTL16          : ret = m_fga002[FGA_CTL16]; LOG(("FGA_CTL16 returns %02x - not implemented\n", ret)); break;
-	case FGA_ISTIM0			: ret = do_fga002reg_istim0_r(); break;
-	case FGA_ISLOCAL0		: ret = do_fga002reg_islocal0_r(); break;
-	case FGA_ISLOCAL1		: ret = do_fga002reg_islocal1_r(); break;
-	case FGA_ISLOCAL2		: ret = do_fga002reg_islocal2_r(); break;
-	case FGA_ISLOCAL3		: ret = do_fga002reg_islocal3_r(); break;
-	case FGA_ISLOCAL4		: ret = do_fga002reg_islocal4_r(); break;
-	case FGA_ISLOCAL5		: ret = do_fga002reg_islocal5_r(); break;
-	case FGA_ISLOCAL6		: ret = do_fga002reg_islocal6_r(); break;
-	case FGA_ISLOCAL7		: ret = do_fga002reg_islocal7_r(); break;
+	case FGA_ISTIM0         : ret = do_fga002reg_istim0_r(); break;
+	case FGA_ISLOCAL0       : ret = do_fga002reg_islocal0_r(); break;
+	case FGA_ISLOCAL1       : ret = do_fga002reg_islocal1_r(); break;
+	case FGA_ISLOCAL2       : ret = do_fga002reg_islocal2_r(); break;
+	case FGA_ISLOCAL3       : ret = do_fga002reg_islocal3_r(); break;
+	case FGA_ISLOCAL4       : ret = do_fga002reg_islocal4_r(); break;
+	case FGA_ISLOCAL5       : ret = do_fga002reg_islocal5_r(); break;
+	case FGA_ISLOCAL6       : ret = do_fga002reg_islocal6_r(); break;
+	case FGA_ISLOCAL7       : ret = do_fga002reg_islocal7_r(); break;
 	case FGA_ISDMANORM      : ret = m_fga002[FGA_ISDMANORM]; LOG(("FGA_ISDMANORM returns %02x - not implemented\n", ret)); break;
 	case FGA_ISDMAERR       : ret = m_fga002[FGA_ISDMAERR]; LOG(("FGA_ISDMAERR returns %02x - not implemented\n", ret)); break;
 	case FGA_ISFMB0REF      : ret = m_fga002[FGA_ISFMB0REF]; LOG(("FGA_ISFMB0REF returns %02x - not implemented\n", ret)); break;

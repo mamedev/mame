@@ -29,7 +29,7 @@ public:
 
 	std::shared_ptr<osd_monitor_info> pick_monitor(osd_options& options, int index) override;
 	std::shared_ptr<osd_monitor_info> monitor_from_handle(std::uint64_t handle) override;
-	
+
 	int init(const osd_options& options) override;
 	void exit() override;
 

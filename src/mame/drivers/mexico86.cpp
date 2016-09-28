@@ -414,7 +414,7 @@ void mexico86_state::machine_start()
 	save_item(NAME(m_mcu_initialised));
 	save_item(NAME(m_coin_last));
 	save_item(NAME(m_coin_fract));
-	
+
 	save_item(NAME(m_charbank));
 }
 

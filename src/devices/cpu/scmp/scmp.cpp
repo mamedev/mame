@@ -493,6 +493,7 @@ void scmp_device::device_start()
 	{
 		state_add(SCMP_PC,     "PC",    m_PC.w.l);
 		state_add(STATE_GENPC, "GENPC", m_PC.w.l).noshow();
+		state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).noshow().formatstr("%8s");
 		state_add(SCMP_P1,     "P1",    m_P1.w.l);
 		state_add(SCMP_P2,     "P2",    m_P2.w.l);

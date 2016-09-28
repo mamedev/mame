@@ -193,7 +193,6 @@ enum
 	IMGTOOLINFO_PTR_GET_ICON_INFO,
 	IMGTOOLINFO_PTR_SUGGEST_TRANSFER,
 	IMGTOOLINFO_PTR_GET_CHAIN,
-	IMGTOOLINFO_PTR_GET_SECTOR_SIZE,
 	IMGTOOLINFO_PTR_GET_GEOMETRY,
 	IMGTOOLINFO_PTR_READ_SECTOR,
 	IMGTOOLINFO_PTR_WRITE_SECTOR,
@@ -276,9 +275,8 @@ union imgtoolinfo
 	imgtoolerr_t    (*get_iconinfo)     (imgtool_partition *partition, const char *path, imgtool_iconinfo *iconinfo);
 	imgtoolerr_t    (*suggest_transfer) (imgtool_partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length);
 	imgtoolerr_t    (*get_chain)        (imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size);
-	imgtoolerr_t    (*get_sector_size)  (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size);
 	imgtoolerr_t    (*get_geometry)     (imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors);
-	imgtoolerr_t    (*read_sector)      (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len);
+	imgtoolerr_t    (*read_sector)      (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
 	imgtoolerr_t    (*write_sector)     (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam);
 	imgtoolerr_t    (*read_block)       (imgtool_image *image, void *buffer, UINT64 block);
 	imgtoolerr_t    (*write_block)      (imgtool_image *image, const void *buffer, UINT64 block);
@@ -351,9 +349,8 @@ struct imgtool_module
 	void            (*close)        (imgtool_image *image);
 	void            (*info)         (imgtool_image *image, char *string, size_t len);
 	imgtoolerr_t    (*create)       (imgtool_image *image, imgtool_stream *f, util::option_resolution *opts);
-	imgtoolerr_t    (*get_sector_size)(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size);
 	imgtoolerr_t    (*get_geometry) (imgtool_image *image, UINT32 *track, UINT32 *heads, UINT32 *sectors);
-	imgtoolerr_t    (*read_sector)  (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len);
+	imgtoolerr_t    (*read_sector)  (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
 	imgtoolerr_t    (*write_sector) (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len);
 	imgtoolerr_t    (*read_block)   (imgtool_image *image, void *buffer, UINT64 block);
 	imgtoolerr_t    (*write_block)  (imgtool_image *image, const void *buffer, UINT64 block);
@@ -404,8 +401,8 @@ public:
 	const modulelist &modules() { return m_modules; }
 
 private:
-	object_pool *	m_pool;
-	modulelist		m_modules;
+	object_pool *   m_pool;
+	modulelist      m_modules;
 
 	// internal lookup and iteration
 	modulelist::iterator find(const char *module_name);

@@ -219,7 +219,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	// Sprites list
 
 	// When debugging, use m_spriteram here, and run mame -update_in_pause, i.e.:
-//	UINT16 *buffered_spriteram16 = m_spriteram;
+//  UINT16 *buffered_spriteram16 = m_spriteram;
 	UINT16 *buffered_spriteram16 = m_buffered_spriteram.get();
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
 	UINT16 *end = &buffered_spriteram16[m_spriteram.bytes()/2];
@@ -272,7 +272,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				shadow_depth = 3;   // reelquak
 				gfx = m_gfxdecode->gfx(0);
 				break;
-//          case 0x0300:			// ??? (staraudi question bubble: pen %00011000 with shadow on!)
+//          case 0x0300:            // ??? (staraudi question bubble: pen %00011000 with shadow on!)
 //              unknown
 			case 0x0200:            // 3bpp tiles?  (-----210) (myangel "Graduate Tests")
 				shadow_depth = 3;   // ?
@@ -511,7 +511,7 @@ void seta2_state::draw_rgbram(bitmap_ind16 &bitmap)
 UINT32 seta2_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update(screen, bitmap, cliprect);
-//	draw_rgbram(bitmap);
+//  draw_rgbram(bitmap);
 
 	return 0;
 }

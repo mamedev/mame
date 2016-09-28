@@ -146,7 +146,7 @@ WRITE8_MEMBER(superqix_state::superqix_0410_w)
 	 ------10  tile bank
 	 -----2--  bitmap page select
 	 ----3---  nmi enable/disable
-	 --54----  rom bank 
+	 --54----  rom bank
 	*/
 	if (data&0xc0) logerror("%04x: superqix_0410_w with invalid high bits: %02x\n",space.device().safe_pc(),data);
 	/* bits 0-1 select the tile bank */

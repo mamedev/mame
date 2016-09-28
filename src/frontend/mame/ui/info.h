@@ -16,7 +16,6 @@
 #include "ui/menu.h"
 
 namespace ui {
-
 class machine_info
 {
 public:

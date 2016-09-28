@@ -133,9 +133,6 @@ protected:
 	// single-bit accesses. (Needed for TMS9980)
 	int     m_pass;
 
-	// Data bus width. Needed for TMS9980.
-	int     m_databus_width;
-
 	// Check the READY line?
 	bool    m_check_ready;
 
@@ -254,15 +251,12 @@ private:
 	// Lookup table entry
 	struct lookup_entry
 	{
-		lookup_entry *next_digit;
-		const tms_instruction *entry;
+		std::unique_ptr<lookup_entry[]> next_digit;
+		int index; // pointing to the static instruction list
 	};
 
 	// Pointer to the lookup table
-	lookup_entry*   m_command_lookup_table;
-
-	// List of allocated tables (used for easy clean-up on exit)
-	lookup_entry*   m_lotables[32];
+	std::unique_ptr<lookup_entry[]>   m_command_lookup_table;
 
 	// List of pointers for micro-operations
 	static const tms99xx_device::ophandler s_microoperation[];
@@ -321,18 +315,18 @@ private:
 
 	void    abort_operation(void);
 
-	// Micro-operation
-	UINT8   m_op;
-
 	// Micro-operation program counter (as opposed to the program counter PC)
 	int     MPC;
 
 	// Current microprogram
-	const UINT8*    m_program;
+	int     m_program_index;
 
 	// Calling microprogram (used when data derivation is called)
-	const UINT8*    m_caller;
-	int             m_caller_MPC;
+	int     m_caller_index;
+	int     m_caller_MPC;
+
+	// Index of the interrupt program
+	int     m_interrupt_mp_index;
 
 	// State of the micro-operation. Needed for repeated ALU calls.
 	int     m_state;

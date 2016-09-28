@@ -1225,6 +1225,10 @@ void x1_state::set_current_palette()
 
 		m_palette->set_pen_color(addr|8, pal1bit(r), pal1bit(g), pal1bit(b));
 	}
+
+	// TODO: disabled for now, causes issues with Thunder Force. x1fdemo changes palette dynamically during initial logo.
+	//       Likely it needs a video rewrite in order to make this to work correctly.
+	//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
 }
 
 WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
@@ -1256,11 +1260,6 @@ WRITE8_MEMBER( x1_state::x1_pal_r_w )
 	{
 		m_x_r = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().first_screen()->vpos())
-		//{
-		//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
-		//  m_old_vpos = machine().first_screen()->vpos();
-		//}
 	}
 }
 
@@ -1275,11 +1274,6 @@ WRITE8_MEMBER( x1_state::x1_pal_g_w )
 	{
 		m_x_g = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().first_screen()->vpos())
-		//{
-			machine().first_screen()->update_partial(machine().first_screen()->vpos());
-		//  m_old_vpos = machine().first_screen()->vpos();
-		//}
 	}
 }
 
@@ -1294,11 +1288,6 @@ WRITE8_MEMBER( x1_state::x1_pal_b_w )
 	{
 		m_x_b = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().first_screen()->vpos())
-		//{
-		//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
-		//  m_old_vpos = machine().first_screen()->vpos();
-		//}
 	}
 }
 

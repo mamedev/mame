@@ -47,7 +47,7 @@ public:
 
 		// fetch the latest info about the monitor
 		m_name = utf8_from_wstring(desc.DeviceName);
-		
+
 		m_pos_size = RECT_to_osd_rect(desc.DesktopCoordinates);
 		m_usuable_pos_size = RECT_to_osd_rect(desc.DesktopCoordinates);
 		m_is_primary = desc.AttachedToDesktop;

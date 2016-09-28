@@ -298,9 +298,6 @@ int z180_device::take_interrupt(int irq)
 	int irq_vector;
 	int cycles = 0;
 
-	/* there isn't a valid previous program counter */
-	_PPC = -1;
-
 	/* Check if processor was halted */
 	LEAVE_HALT();
 

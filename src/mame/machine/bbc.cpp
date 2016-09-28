@@ -1084,7 +1084,12 @@ collector output only. It usually acts as the printer strobe line.
 /* USER VIA 6522 port B is connected to the BBC user port */
 READ8_MEMBER(bbc_state::bbcb_via_user_read_portb)
 {
-	return 0xff;
+	// D0 of portb is joystick FIRE (Compact)
+	// D1 of portb is joystick LEFT (Compact)
+	// D2 of portb is joystick DOWN (Compact)
+	// D3 of portb is joystick UP (Compact)
+	// D4 of portb is joystick RIGHT (Compact)
+	return ((m_joyport ? m_joyport->pb_r() : 0x1f) | 0xe0);
 }
 
 WRITE8_MEMBER(bbc_state::bbcb_via_user_write_portb)
@@ -1099,7 +1104,10 @@ BBC Joystick Support
 
 UPD7002_GET_ANALOGUE(bbc_state::BBC_get_analogue_input)
 {
-	return ((0xff - m_analog->ch_r(channel_number)) << 8);
+	if (m_analog)
+		return ((0xff - m_analog->ch_r(channel_number)) << 8);
+	else
+		return 0xff;
 }
 
 UPD7002_EOC(bbc_state::BBC_uPD7002_EOC)
@@ -1374,8 +1382,21 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 		m_acia->write_rxc(state);
 }
 
+
 /**************************************
-i8271 disc control function
+   1MHz Bus interrupts
+***************************************/
+
+
+WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
+{
+	m_bus_nmi = state;
+	bbc_update_nmi();
+}
+
+
+/**************************************
+   i8271 disc control function
 ***************************************/
 
 
@@ -1424,7 +1445,7 @@ WRITE_LINE_MEMBER(bbc_state::side_w)
 
 void bbc_state::bbc_update_nmi()
 {
-	if (m_fdc_irq || m_fdc_drq || m_adlc_irq)
+	if (m_fdc_irq || m_fdc_drq || m_adlc_irq || m_bus_nmi)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -1804,6 +1825,8 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	/* Set ROM/IO bank to point to rom */
 	m_bank8->set_base(m_region_os->base() + 0x3c00);
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xfc00, 0xfeff, "bank8");
+
+	output().set_value("power_led", 0);
 }
 
 MACHINE_RESET_MEMBER(bbc_state, bbcm)

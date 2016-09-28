@@ -338,8 +338,8 @@ class x11_input_device : public event_based_device<XEvent>
 public:
 	x11_api_state x11_state;
 
-	x11_input_device(running_machine &machine, const char* name, input_device_class devclass, input_module &module)
-		: event_based_device(machine, name, devclass, module),
+	x11_input_device(running_machine &machine, const char *name, const char *id, input_device_class devclass, input_module &module)
+		: event_based_device(machine, name, id, devclass, module),
 			x11_state({0})
 	{
 	}
@@ -354,8 +354,8 @@ class x11_lightgun_device : public x11_input_device
 public:
 	lightgun_state lightgun;
 
-	x11_lightgun_device(running_machine &machine, const char* name, input_module &module)
-		: x11_input_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
+	x11_lightgun_device(running_machine &machine, const char *name, const char *id, input_module &module)
+		: x11_input_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module),
 			lightgun({0})
 	{
 	}
@@ -533,13 +533,13 @@ private:
 			if (m_lightgun_map.initialized)
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
-				devicelist()->create_device<x11_lightgun_device>(machine, tempname, *this);
+				devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
 			}
 
 			return nullptr;
 		}
 
-		return devicelist()->create_device<x11_lightgun_device>(machine, m_lightgun_map.map[index].name.c_str(), *this);
+		return devicelist()->create_device<x11_lightgun_device>(machine, m_lightgun_map.map[index].name.c_str(), m_lightgun_map.map[index].name.c_str(), *this);
 	}
 
 	void add_lightgun_buttons(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device *devinfo) const

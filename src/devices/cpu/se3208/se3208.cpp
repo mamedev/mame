@@ -1752,10 +1752,10 @@ void se3208_device::execute_run()
 	{
 		UINT16 Opcode=m_direct->read_word(m_PC, WORD_XOR_LE(0));
 
+		m_PPC = m_PC;
 		debugger_instruction_hook(this, m_PC);
 
 		(this->*OpTable[Opcode])(Opcode);
-		m_PPC=m_PC;
 		m_PC+=2;
 		//Check interrupts
 		if(m_NMI==ASSERT_LINE)
@@ -1801,9 +1801,9 @@ void se3208_device::device_start()
 	state_add( SE3208_PPC, "PPC", m_PPC).formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_PC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_PPC).noshow();
 	state_add(STATE_GENSP, "GENSP", m_SP).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_PPC).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();	
 
 	m_icountptr = &m_icount;
 }

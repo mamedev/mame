@@ -53,6 +53,9 @@ public:
 
 	int debug_get_address();
 
+	// Allow for checking the state of the GROM so we can turn off the clock
+	bool idle() { return m_phase == 0; }
+
 protected:
 	void device_start(void) override;
 	void device_reset(void) override;
@@ -62,7 +65,7 @@ private:
 	devcb_write_line   m_gromready;
 
 	// Clock line level
-	line_state m_current_clock_level;
+	int m_current_clock_level;
 
 	// Currently active GROM ident
 	int m_current_ident;

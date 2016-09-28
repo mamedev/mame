@@ -90,13 +90,28 @@ const device_type CAT702 = &device_creator<cat702_device>;
 
 cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CAT702, "CAT702", tag, owner, clock, "cat702", __FILE__),
-	m_transform(nullptr),
+	m_region(*this, DEVICE_SELF),
 	m_dataout_handler(*this)
 {
 }
 
 void cat702_device::device_start()
 {
+	memset(m_transform, 0xff, sizeof(m_transform));
+
+	if (!m_region.found())
+	{
+		logerror("cat702(%s):region not found\n", tag());
+	}
+	else if (m_region->bytes() != sizeof(m_transform))
+	{
+		logerror("cat702(%s):region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), sizeof(m_transform));
+	}
+	else
+	{
+		memcpy(m_transform, m_region->base(), sizeof(m_transform));
+	}
+
 	m_dataout_handler.resolve_safe();
 
 	save_item(NAME(m_select));
@@ -160,11 +175,6 @@ void cat702_device::apply_sbox(const UINT8 *sbox)
 	m_state = r;
 }
 
-void cat702_device::static_set_transform_table(device_t &device, const UINT8 *transform)
-{
-	downcast<cat702_device &>(device).m_transform = transform;
-}
-
 WRITE_LINE_MEMBER(cat702_device::write_select)
 {
 	if (m_select != state)
@@ -214,10 +224,4 @@ WRITE_LINE_MEMBER(cat702_device::write_clock)
 WRITE_LINE_MEMBER(cat702_device::write_datain)
 {
 	m_datain = state;
-}
-
-void cat702_device::device_validity_check(validity_checker &valid) const
-{
-	if (m_transform == nullptr)
-		osd_printf_error("No transform table provided\n");
 }

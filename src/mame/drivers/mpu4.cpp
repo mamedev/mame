@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:James Wallace
+// thanks-to:Chris Wren, Tony Friery, MFME
 /* MPU4 hardware emulation
   for sets see the various includes prefixed 'mpu4'
 */
@@ -14,7 +15,10 @@
 */
 
 /***********************************************************************************************************
-  Barcrest MPU4 highly preliminary driver by J.Wallace, and Anonymous.
+  Barcrest MPU4 highly preliminary driver.
+  MAME Driver J. Wallace and Haze
+
+  Thanks to Chris Wren and MFME for documentation.
 
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.

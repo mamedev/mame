@@ -203,7 +203,7 @@ struct render_color
 // render_texuv - floating point set of UV texture coordinates
 struct render_texuv
 {
-	float               u;                  // U coodinate (0.0-1.0)
+	float               u;                  // U coordinate (0.0-1.0)
 	float               v;                  // V coordinate (0.0-1.0)
 };
 
@@ -345,8 +345,10 @@ public:
 	// getters
 	render_primitive *next() const { return m_next; }
 	bool packable(const INT32 pack_size) const { return (flags & PRIMFLAG_PACKABLE) && texture.base != nullptr && texture.width <= pack_size && texture.height <= pack_size; }
-	float get_quad_width() const { return bounds.x1 - bounds.x0; }
-	float get_quad_height() const { return bounds.y1 - bounds.y0; }
+	float get_quad_width() const { return fabsf(bounds.x1 - bounds.x0); }
+	float get_quad_height() const { return fabsf(bounds.y1 - bounds.y0); }
+	float get_full_quad_width() const { return fabsf(full_bounds.x1 - full_bounds.x0); }
+	float get_full_quad_height() const { return fabsf(full_bounds.y1 - full_bounds.y0); }
 
 	// reset to prepare for re-use
 	void reset();
@@ -354,6 +356,7 @@ public:
 	// public state
 	primitive_type      type;               // type of primitive
 	render_bounds       bounds;             // bounds or positions
+	render_bounds       full_bounds;        // bounds or positions (unclipped)
 	render_color        color;              // RGBA values
 	UINT32              flags;              // flags
 	float               width;              // width (for line primitives)
@@ -602,8 +605,8 @@ private:
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
-	std::unique_ptr<palette_client> m_palclient;       // client to the screen palette
-	std::vector<rgb_t>           m_bcglookup;            // copy of screen palette with bcg adjustment
+	std::unique_ptr<palette_client> m_palclient;    // client to the screen palette
+	std::vector<rgb_t>      m_bcglookup;            // copy of screen palette with bcg adjustment
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 };
 

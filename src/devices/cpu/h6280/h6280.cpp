@@ -209,6 +209,7 @@ void h6280_device::device_start()
 {
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",        m_pc.w.l).noshow();
+	state_add(STATE_GENPCBASE,  "CURPC",        m_pc.w.l).noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS",     m_p).callimport().callexport().formatstr("%8s").noshow();
 	state_add(H6280_PC,         "PC",           m_pc.d).mask(0xffff);
 	state_add(H6280_S,          "S",            m_sp.b.l).mask(0xff);

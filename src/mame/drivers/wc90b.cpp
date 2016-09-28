@@ -124,6 +124,17 @@ WRITE8_MEMBER(wc90b_state::adpcm_data_w)
 	m_msm5205next = data;
 }
 
+READ8_MEMBER(wc90b_state::master_irq_ack_r)
+{
+	m_maincpu->set_input_line(0,CLEAR_LINE);
+	return 0xff;
+}
+
+WRITE8_MEMBER(wc90b_state::slave_irq_ack_w)
+{
+	m_subcpu->set_input_line(0,CLEAR_LINE);
+}
+
 
 static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -144,6 +155,7 @@ static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0xfd02, 0xfd02) AM_READ_PORT("P2")
 	AM_RANGE(0xfd06, 0xfd06) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfd08, 0xfd08) AM_READ_PORT("DSW2")
+	AM_RANGE(0xfd0c, 0xfd0c) AM_READ(master_irq_ack_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8, wc90b_state )
@@ -156,6 +168,7 @@ static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
+	AM_RANGE(0xfd0c, 0xfd0c) AM_WRITE(slave_irq_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, wc90b_state )
@@ -163,7 +176,8 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd1", ym2203_device, read, write)
+	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd2", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
@@ -337,11 +351,11 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wc90b_map1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wc90b_map2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
@@ -366,13 +380,16 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, YM2203_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("ymsnd1", YM2203, YM2203_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_SOUND_ADD("ymsnd2", YM2203, YM2203_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(wc90b_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 4KHz 4-bit */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 ROM_START( wc90b1 )
@@ -513,6 +530,6 @@ ROM_START( wc90ba )
 ROM_END
 
 
-GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

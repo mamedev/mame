@@ -157,37 +157,37 @@
 #define MAPSEL_P1_A_DMA3        0x0e
 #define MAPSEL_P1_A_DMA4        0x0f
 
-#define IRQ_ACINT_LEVEL         (7 - 0)
-#define IRQ_MIDINT_LEVEL        (7 - 0)
-#define IRQ_TIMINT_LEVEL        (7 - 1)
-#define IRQ_INTP1_LEVEL         (7 - 2)
-#define IRQ_IPI1_LEVEL          (7 - 3)
-#define IRQ_SMIDINT_LEVEL       (7 - 3)
-#define IRQ_AIC_LEVEL           (7 - 4)
+#define IRQ_ACINT_LEVEL         (0 ^ 7)
+#define IRQ_MIDINT_LEVEL        (0 ^ 7)
+#define IRQ_TIMINT_LEVEL        (1 ^ 7)
+#define IRQ_INTP1_LEVEL         (2 ^ 7)
+#define IRQ_IPI1_LEVEL          (3 ^ 7)
+#define IRQ_SMIDINT_LEVEL       (3 ^ 7)
+#define IRQ_AIC_LEVEL           (4 ^ 7)
 
-#define IRQ_CHINT2_LEVEL        (8)
-#define IRQ_CHINT4_LEVEL        (9)
-#define IRQ_CHINT6_LEVEL        (10)
-#define IRQ_CHINT8_LEVEL        (11)
-#define IRQ_CHINT1_LEVEL        (12)
-#define IRQ_CHINT3_LEVEL        (13)
-#define IRQ_CHINT5_LEVEL        (14)
-#define IRQ_CHINT7_LEVEL        (15)
+#define IRQ_CHINT8_LEVEL        (15 ^ 7)
+#define IRQ_CHINT7_LEVEL        (14 ^ 7)
+#define IRQ_CHINT6_LEVEL        (13 ^ 7)
+#define IRQ_CHINT5_LEVEL        (12 ^ 7)
+#define IRQ_CHINT4_LEVEL        (11 ^ 7)
+#define IRQ_CHINT3_LEVEL        (10 ^ 7)
+#define IRQ_CHINT2_LEVEL        (9 ^ 7)
+#define IRQ_CHINT1_LEVEL        (8 ^ 7)
 
 static const int ch_int_levels[8] =
 {
-	IRQ_CHINT8_LEVEL, IRQ_CHINT7_LEVEL, IRQ_CHINT6_LEVEL, IRQ_CHINT5_LEVEL, IRQ_CHINT4_LEVEL, IRQ_CHINT3_LEVEL, IRQ_CHINT2_LEVEL, IRQ_CHINT1_LEVEL
+	12, 8, 13, 9, 14, 10, 15, 11 //IRQ_CHINT8_LEVEL, IRQ_CHINT7_LEVEL, IRQ_CHINT6_LEVEL, IRQ_CHINT5_LEVEL, IRQ_CHINT4_LEVEL, IRQ_CHINT3_LEVEL, IRQ_CHINT2_LEVEL, IRQ_CHINT1_LEVEL
 };
 
-#define IRQ_PERRINT_LEVEL       (7 - 0)
-#define IRQ_RTCINT_LEVEL        (7 - 0)
-#define IRQ_RINT_LEVEL          (7 - 1)
-#define IRQ_INTP2_LEVEL         (7 - 2)
-#define IRQ_IPI2_LEVEL          (7 - 3)
-#define IRQ_TOUCHINT_LEVEL      (7 - 4)
-#define IRQ_PENINT_LEVEL        (7 - 5)
-#define IRQ_ADINT_LEVEL         (7 - 6)
-#define IRQ_DISKINT_LEVEL       (7 - 7)
+#define IRQ_PERRINT_LEVEL       (0 ^ 7)
+#define IRQ_RTCINT_LEVEL        (0 ^ 7)
+#define IRQ_RINT_LEVEL          (1 ^ 7)
+#define IRQ_INTP2_LEVEL         (2 ^ 7)
+#define IRQ_IPI2_LEVEL          (3 ^ 7)
+#define IRQ_TOUCHINT_LEVEL      (4 ^ 7)
+#define IRQ_PENINT_LEVEL        (5 ^ 7)
+#define IRQ_ADINT_LEVEL         (6 ^ 7)
+#define IRQ_DISKINT_LEVEL       (7 ^ 7)
 
 #define FDC_CONTROL_INTEN       (1 << 2)
 
@@ -215,20 +215,25 @@ public:
 
 	static void set_channel_number(device_t &device, int channel) { dynamic_cast<cmi01a_device&>(device).m_channel = channel; }
 
-	DECLARE_WRITE8_MEMBER( cmi01a_ptm_c0 );
+	DECLARE_WRITE8_MEMBER( ptm_out0 );
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
-	DECLARE_WRITE_LINE_MEMBER( cmi01a_1_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( ch_int );
-	DECLARE_WRITE_LINE_MEMBER( cmi01a_1_cb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_irqa );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_irqb );
+
+	DECLARE_WRITE8_MEMBER( pia_1_a_w );
+	DECLARE_WRITE8_MEMBER( pia_1_b_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_1_irqa );
+	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
+
+	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 
 	DECLARE_READ_LINE_MEMBER( eosi_r );
 	DECLARE_READ_LINE_MEMBER( zx_r );
-
-	DECLARE_WRITE8_MEMBER( cmi01a_2_a_w );
-	DECLARE_WRITE8_MEMBER( cmi01a_2_b_w );
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
@@ -253,6 +258,7 @@ private:
 	void zx_timer_cb();
 	void run_voice();
 	void update_wave_addr(int inc);
+	void update_interrupts();
 
 	emu_timer * m_zx_timer;
 	UINT8       m_zx_flag;
@@ -269,7 +275,14 @@ private:
 	double  m_freq;
 	bool    m_active;
 
-	int     m_ptm_output;
+	int     m_ptm_out0;
+
+	int     m_pia_0_irqa;
+	int     m_pia_0_irqb;
+	int     m_pia_1_irqa;
+	int     m_pia_1_irqb;
+	int     m_ptm_irq;
+	int     m_irq_state;
 };
 
 const device_type CMI01A_CHANNEL_CARD = &device_creator<cmi01a_device>;
@@ -288,24 +301,24 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 
 MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
-	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi01a_device, cmi01a_1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi01a_device, cmi01a_1_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, ch_int))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, ch_int))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi01a_device, pia_0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi01a_device, pia_0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, pia_0_irqa))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, pia_0_irqb))
 
 	MCFG_DEVICE_ADD("cmi01a_pia_1", PIA6821, 0) // pia_cmi01a_2_config
 	MCFG_PIA_READCA1_HANDLER(READLINE(cmi01a_device, zx_r))
 	MCFG_PIA_READCA2_HANDLER(READLINE(cmi01a_device, eosi_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, cmi01a_2_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi01a_device, cmi01a_2_b_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, ch_int))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, ch_int))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, pia_1_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi01a_device, pia_1_b_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, pia_1_irqa))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, pia_1_irqb))
 
 	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 0) // ptm_cmi01a_config
 	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_OUT0_CB(WRITE8(cmi01a_device, cmi01a_ptm_c0))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ch_int))
+	MCFG_PTM6840_OUT0_CB(WRITE8(cmi01a_device, ptm_out0))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ptm_irq))
 MACHINE_CONFIG_END
 
 machine_config_constructor cmi01a_device::device_mconfig_additions() const
@@ -351,6 +364,24 @@ void cmi01a_device::device_reset()
 	m_ptm->set_g1(1);
 	m_ptm->set_g2(1);
 	m_ptm->set_g3(1);
+
+	m_pia_0_irqa = 0;
+	m_pia_0_irqb = 0;
+	m_pia_1_irqa = 0;
+	m_pia_1_irqb = 0;
+	m_ptm_irq = 0;
+	m_irq_state = 0;
+
+	m_segment_cnt = 0;
+	m_new_addr = 0;
+	m_env_dir_ctrl = 0;
+	m_vol_latch = 0;
+	m_flt_latch = 0;
+
+	m_freq = 0.0;
+	m_active = false;
+
+	m_ptm_out0 = 0;
 }
 
 class cmi_state : public driver_device
@@ -467,6 +498,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cpufunc_w );
 	DECLARE_READ8_MEMBER( parity_r );
 	DECLARE_WRITE8_MEMBER( mapsel_w );
+	DECLARE_READ8_MEMBER( irq_ram_r );
+	DECLARE_WRITE8_MEMBER( irq_ram_w );
 
 	// MIDI/SMPTE
 	DECLARE_WRITE16_MEMBER( midi_dma_w );
@@ -578,9 +611,6 @@ protected:
 	address_space *m_cpu1space;
 	address_space *m_cpu2space;
 
-	UINT8 *m_q133_rom;
-	UINT8 m_q133_acia_irq;
-
 private:
 
 	emu_timer *m_map_switch_timer;
@@ -606,7 +636,10 @@ private:
 	void write_fdc_ctrl(UINT8 data);
 	void fdc_dma_transfer();
 
-	int     m_int_state[2];
+	// Q133 CPU Card
+	UINT8 *m_q133_rom;
+	UINT8 m_q133_acia_irq;
+
 	UINT8   m_hp_int;
 	std::unique_ptr<UINT8[]>    m_shared_ram;
 	std::unique_ptr<UINT8[]>    m_scratch_ram[2];
@@ -618,6 +651,9 @@ private:
 	UINT8   m_map_ram_latch;
 	int     m_cpu_active_space[2]; // TODO: Make one register
 	int     m_cpu_map_switch[2];
+	UINT8   m_irq_address[2][2];
+	int     m_m6809_bs_hack_cnt;
+	int     m_m6809_bs_hack_cpu;
 
 	/* Q219 lightpen/graphics card */
 	std::unique_ptr<UINT8[]>    m_video_ram;
@@ -652,7 +688,7 @@ private:
 	int     m_ank_irqb;
 
 	// Master card (CMI-02)
-	int		m_cmi02_ptm_irq;
+	int     m_cmi02_ptm_irq;
 };
 
 /**************************************
@@ -711,7 +747,7 @@ void cmi_state::hblank()
 			else
 				m_q219_b_touch = 1 << 5;
 
-			m_q219_pia->ca1_w(!_touch);
+			m_q219_pia->ca1_w(!_touch ? 1 : 0);
 
 			if (!_touch || !_tfh)
 			{
@@ -886,6 +922,23 @@ WRITE8_MEMBER( cmi_state::map_w )
 	m_map_switch_timer->adjust(attotime::from_ticks(data & 0xf, M6809_CLOCK), cpunum);
 }
 
+READ8_MEMBER( cmi_state::irq_ram_r )
+{
+	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
+	if (m_m6809_bs_hack_cnt > 0 && m_m6809_bs_hack_cpu == cpunum)
+	{
+		m_m6809_bs_hack_cnt--;
+		return m_irq_address[cpunum][offset];
+	}
+	return m_scratch_ram[cpunum][0xf8 + offset];
+}
+
+WRITE8_MEMBER( cmi_state::irq_ram_w )
+{
+	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
+	m_scratch_ram[cpunum][0xf8 + offset] = data;
+}
+
 void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -916,7 +969,6 @@ void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 			m_cmi10_pia_u20->ca1_w(m_scnd);
 			m_scnd ^= 1;
 			m_cmi10_pia_u21->ca1_w(m_scnd);
-			m_map_switch_timer->adjust(attotime::never);
 			break;
 	}
 }
@@ -1635,7 +1687,7 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
 */
 
 
-WRITE_LINE_MEMBER( cmi01a_device::cmi01a_1_ca2_w )
+WRITE_LINE_MEMBER( cmi01a_device::pia_0_ca2_w )
 {
 	// upate_stream()
 	if (!state)
@@ -1646,10 +1698,62 @@ WRITE_LINE_MEMBER( cmi01a_device::cmi01a_1_ca2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( cmi01a_device::ch_int )
+WRITE_LINE_MEMBER( cmi01a_device::pia_0_irqa )
 {
-	//printf("CH%d INT: %x\n", m_channel, state);
-	dynamic_cast<cmi_state*>(owner())->set_interrupt(CPU_1, ch_int_levels[m_channel], state ? ASSERT_LINE : CLEAR_LINE);
+	m_pia_0_irqa = state;
+	//printf("CH%d pia0 irqa int: %x\n", m_channel, state);
+	update_interrupts();
+}
+
+WRITE_LINE_MEMBER( cmi01a_device::pia_0_irqb )
+{
+	m_pia_0_irqb = state;
+	//printf("CH%d pia0 irqb int: %x\n", m_channel, state);
+	update_interrupts();
+}
+
+WRITE8_MEMBER( cmi_state::master_tune_w )
+{
+//  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
+}
+
+WRITE8_MEMBER( cmi01a_device::pia_1_a_w )
+{
+// top two
+}
+
+WRITE8_MEMBER( cmi01a_device::pia_1_b_w )
+{
+}
+
+WRITE_LINE_MEMBER( cmi01a_device::pia_1_irqa )
+{
+	m_pia_1_irqa = state;
+	//printf("CH%d pia1 irqa int: %x\n", m_channel, state);
+	update_interrupts();
+}
+
+WRITE_LINE_MEMBER( cmi01a_device::pia_1_irqb )
+{
+	m_pia_1_irqb = state;
+	//printf("CH%d pia1 irqb int: %x\n", m_channel, state);
+	update_interrupts();
+}
+
+void cmi01a_device::update_interrupts()
+{
+	int old_state = m_irq_state;
+	m_irq_state = m_pia_0_irqa || m_pia_0_irqb || m_pia_1_irqa || m_pia_1_irqb || m_ptm_irq;
+
+	if (m_irq_state != old_state)
+		dynamic_cast<cmi_state*>(owner())->set_interrupt(CPU_1, ch_int_levels[m_channel], m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( cmi01a_device::ptm_irq )
+{
+	m_ptm_irq = state;
+	//printf("CH%d ptm irq int: %x\n", m_channel, state);
+	update_interrupts();
 }
 
 void cmi01a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1675,7 +1779,7 @@ void cmi01a_device::zx_timer_cb()
 	if (m_zx_flag == 0)
 	{
 		/* Low to high transition - clock flip flop */
-		int op = m_ptm_output;
+		int op = m_ptm_out0;
 
 		/* Set /ZCINT */
 		if (op != m_zx_ff)
@@ -1717,7 +1821,7 @@ void cmi01a_device::run_voice()
 	}
 }
 
-WRITE_LINE_MEMBER( cmi01a_device::cmi01a_1_cb2_w )
+WRITE_LINE_MEMBER( cmi01a_device::pia_0_cb2_w )
 {
 	//streams_update();
 
@@ -1764,6 +1868,7 @@ WRITE_LINE_MEMBER( cmi01a_device::cmi01a_1_cb2_w )
 void cmi01a_device::update_wave_addr(int inc)
 {
 	int old_cnt = m_segment_cnt;
+	//printf("update_wave_addr, m_segment_cnt %04x\n", m_segment_cnt);
 
 	if (inc)
 		++m_segment_cnt;
@@ -1772,7 +1877,7 @@ void cmi01a_device::update_wave_addr(int inc)
 	m_pia_1->cb1_w((m_segment_cnt & 0x4000) >> 14);
 
 	/* TODO Update zero crossing flag */
-	m_pia_1->ca1_w((m_segment_cnt & 0x40));
+	m_pia_1->ca1_w((m_segment_cnt & 0x40) >> 6);
 
 	/* Clock a latch on a transition */
 	if ((old_cnt & 0x40) && !(m_segment_cnt & 0x40))
@@ -1825,7 +1930,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 		{
 			/* PTM addressing is a little funky */
 			int a0 = offset & 1;
-			int a1 = (m_ptm_output && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
+			int a1 = (m_ptm_out0 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
 			//printf("CH%d PTM: [%x] %x, %d %d %d, %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data, a2, a1, a0, offset);
@@ -1870,7 +1975,7 @@ READ8_MEMBER( cmi01a_device::read )
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		{
 			int a0 = offset & 1;
-			int a1 = (m_ptm_output && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
+			int a1 = (m_ptm_out0 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
 			data = m_ptm->read(space, (a2 << 2) | (a1 << 1) | a0);
@@ -1881,16 +1986,16 @@ READ8_MEMBER( cmi01a_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( cmi01a_device::cmi01a_ptm_c0 )
+WRITE8_MEMBER( cmi01a_device::ptm_out0 )
 {
-	m_ptm_output = data;
+	m_ptm_out0 = data;
 }
 
 WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
 {
+	//printf("cmi02_ptm_irq: %d\n", state);
 	m_cmi02_ptm_irq = state;
 	set_interrupt(CPU_1, IRQ_TIMINT_LEVEL, m_cmi02_ptm_irq ? ASSERT_LINE : CLEAR_LINE);
-	//printf("CMI-02 PTM IRQ: %d\n", state);
 }
 
 READ8_MEMBER( cmi_state::cmi02_r )
@@ -1966,8 +2071,8 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 			case 0x30:
 				m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 				data ^= 0xff;
-				m_i8214_2->b_w(data & 0x7);
 				m_i8214_2->sgs_w((data >> 3) & 1);
+				m_i8214_2->b_w(data & 0x7);
 				break;
 
 			case 0x31: case 0x32:
@@ -2000,8 +2105,8 @@ WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 	//printf("i8214_cpu1_w: %02x\n", data);
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	data ^= 0xff;
-	m_i8214_0->b_w(data & 0x7);
 	m_i8214_0->sgs_w((data >> 3) & 1);
+	m_i8214_0->b_w(data & 0x7);
 }
 
 
@@ -2009,8 +2114,8 @@ WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 {
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	data ^= 0xff;
-	m_i8214_1->b_w(data & 0x7);
 	m_i8214_1->sgs_w((data >> 3) & 1);
+	m_i8214_1->b_w(data & 0x7);
 }
 
 // TODO: replace with AM_SHARE
@@ -2097,8 +2202,10 @@ void cmi_state::install_peripherals(int cpunum)
 
 	space->install_readwrite_handler(0xfd00, 0xfeff, read8_delegate(FUNC(cmi_state::shared_ram_r),this), write8_delegate(FUNC(cmi_state::shared_ram_w),this));
 
-	space->install_ram(0xff00, 0xfffd, &m_scratch_ram[cpunum][0]);
+	space->install_ram(0xff00, 0xfff7, &m_scratch_ram[cpunum][0]);
+	space->install_ram(0xfffa, 0xfffd, &m_scratch_ram[cpunum][0xfa]);
 
+	space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(FUNC(cmi_state::irq_ram_r),this), write8_delegate(FUNC(cmi_state::irq_ram_w),this));
 	space->install_read_handler(0xfffe, 0xffff, read8_delegate(FUNC(cmi_state::vector_r),this));
 }
 
@@ -2117,91 +2224,76 @@ WRITE_LINE_MEMBER( cmi_state::ptm_q219_irq )
 IRQ_CALLBACK_MEMBER( cmi_state::cpu1_interrupt_callback )
 {
 	/* Switch to mapping A */
-	m_cpu_active_space[0] = MAPPING_A;
-	update_address_space(0, m_map_sel[MAPSEL_P1_A]);
+	m_cpu_active_space[CPU_1] = MAPPING_A;
+	update_address_space(CPU_1, m_map_sel[MAPSEL_P1_A]);
 
 	if (irqline == INPUT_LINE_IRQ0)
 	{
-		UINT16 address;
-		address_space &cmi_space = m_maincpu1->space(AS_PROGRAM);
+		int vector = (m_hp_int ? 0xffe0 : 0xffd0);
+		int level = (m_hp_int ? m_i8214_2->a_r() : m_i8214_0->a_r()) ^ 7;
+		m_irq_address[CPU_1][0] = m_cpu1space->read_byte(vector + level*2);
+		m_irq_address[CPU_1][1] = m_cpu1space->read_byte(vector + level*2 + 1);
 
-		if (m_hp_int)
-		{
-			int level = m_i8214_2->a_r() ^ 0x7;
-			address = (cmi_space.read_byte(0xffe0 + level*2) << 8) | cmi_space.read_byte(0xffe0 + level*2 + 1);
-			//m_hp_int = 0;
-		}
-		else
-		{
-			int level = m_i8214_0->a_r() ^ 0x7;
-			address = (cmi_space.read_byte(0xffd0 + level*2) << 8) | cmi_space.read_byte(0xffd0 + level*2 + 1);
-		}
-		m_maincpu1->set_pc(address);
+		m_m6809_bs_hack_cnt = 2;
+		m_m6809_bs_hack_cpu = CPU_1;
+
+		//printf("cpu1 interrupt, will be pushing address %02x%02x\n", m_irq_address[CPU_1][0], m_irq_address[CPU_1][1]);
 	}
+
 	return 0;
 }
 
 IRQ_CALLBACK_MEMBER( cmi_state::cpu2_interrupt_callback )
 {
 	/* Switch to mapping A */
-	m_cpu_active_space[1] = MAPPING_A;
-	update_address_space(1, m_map_sel[MAPSEL_P2_A]);
+	m_cpu_active_space[CPU_2] = MAPPING_A;
+	update_address_space(CPU_2, m_map_sel[MAPSEL_P2_A]);
 
-	/* */
 	if (irqline == INPUT_LINE_IRQ0)
 	{
 		int level = m_i8214_1->a_r() ^ 0x7;
+		m_irq_address[CPU_2][0] = m_cpu2space->read_byte(0xffe0 + level*2);
+		m_irq_address[CPU_2][1] = m_cpu2space->read_byte(0xffe0 + level*2 + 1);
 
-		address_space &cmi_space = m_maincpu2->space(AS_PROGRAM);
-		UINT16 address = (cmi_space.read_byte(0xffe0 + level*2) << 8) | cmi_space.read_byte(0xffe0 + level*2 + 1);
+		m_m6809_bs_hack_cnt = 2;
+		m_m6809_bs_hack_cpu = CPU_2;
 
-		m_maincpu2->set_pc(address);
+		//printf("cpu1 interrupt, will be pushing address %02x%02x\n", m_irq_address[CPU_2][0], m_irq_address[CPU_2][1]);
 	}
 	return 0;
 }
 
 void cmi_state::set_interrupt(int cpunum, int level, int state)
 {
-	//printf("CPU%d Int: %x State: %x (Cur: %x)\n", cpunum, level, state, m_int_state[cpunum]);
+	//printf("CPU%d Int: %x State: %x\n", cpunum + 1, level, state);
 
-	if (state == ASSERT_LINE)
-		m_int_state[cpunum] |= (1 << level);
-	else
-		m_int_state[cpunum] &= ~(1 << level);
-
-	//printf("New int state: %02x\n", m_int_state[cpunum]);
-
-	if (cpunum == CPU_1)
-	{
-		if (level < 8)
-			m_i8214_2->r_w(~m_int_state[cpunum]);
-		else
-			m_i8214_0->r_w(~(m_int_state[cpunum] >> 8));
-	}
-	else
-	{
-		m_i8214_1->r_w(~m_int_state[cpunum]);
-	}
+	i8214_device *i8214 = ((cpunum == CPU_2) ? m_i8214_1 : (level < 8 ? m_i8214_2 : m_i8214_0));
+	i8214->r_w(level & 7, state ? 0 : 1);
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_1_int_w )
 {
 	//printf("i8214_1_int_w: %d\n", state);
-	m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state)
+	{
+		//machine().debug_break();
+		m_maincpu1->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_2_int_w )
 {
 	//printf("i8214_2_int_w: %d\n", state);
-	m_maincpu2->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state)
+		m_maincpu2->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_3_int_w )
 {
 	//printf("i8214_3_int_w: %d\n", state);
-	//if (state)
-		m_hp_int = state;
-	m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_hp_int = state;
+	if (state)
+		m_maincpu1->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -2261,21 +2353,6 @@ WRITE8_MEMBER( cmi_state::q133_1_portb_w )
 	m_msm5832->write_w(BIT(data, 2));
 	m_msm5832->cs_w(1);
 }
-
-WRITE8_MEMBER( cmi_state::master_tune_w )
-{
-//  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
-}
-
-WRITE8_MEMBER( cmi01a_device::cmi01a_2_a_w )
-{
-// top two
-}
-
-WRITE8_MEMBER( cmi01a_device::cmi01a_2_b_w )
-{
-}
-
 
 /*
     PA0-7 = BKA0-7 (display)
@@ -2512,21 +2589,21 @@ void cmi_state::machine_reset()
 
 	for (int cpunum = 0; cpunum < 2; ++cpunum)
 	{
-		address_space &space = (cpunum == CPU_1 ? m_maincpu1->space(AS_PROGRAM) : m_maincpu2->space(AS_PROGRAM));
+		address_space *space = (cpunum == CPU_1 ? m_cpu1space : m_cpu2space);
 
-		space.unmap_readwrite(0x0000, 0xffff);
+		space->unmap_readwrite(0x0000, 0xffff);
 
 		/* Select A (system) spaces */
 		m_cpu_active_space[cpunum] = MAPPING_A;
 
 		install_peripherals(cpunum);
+
+		m_irq_address[cpunum][0] = space->read_byte(0xfff8);
+		m_irq_address[cpunum][1] = space->read_byte(0xfff9);
 	}
 
 	// TODO - we need to detect empty disk drive!!
 	m_fdc_status |= FDC_STATUS_READY;
-
-	m_int_state[0] = 0;
-	m_int_state[1] = 0;
 
 	/* CMI-07 */
 	m_cmi07_ctrl = 0;
@@ -2539,6 +2616,8 @@ void cmi_state::machine_reset()
 	m_ank_irqb = 0;
 	m_q133_acia_irq = 0;
 	m_cmi02_ptm_irq = 0;
+	m_m6809_bs_hack_cnt = 0;
+	m_m6809_bs_hack_cpu = 0;
 }
 
 void cmi_state::machine_start()
@@ -2595,10 +2674,12 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_CPU_PROGRAM_MAP(maincpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmi_state, cmi_iix_vblank)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
+	MCFG_QUANTUM_PERFECT_CPU("maincpu1")
 
 	MCFG_CPU_ADD("maincpu2", M6809E, Q209_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(maincpu2_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
+	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
 
 	MCFG_CPU_ADD("muskeys", M6802, 3840000)
 	MCFG_CPU_PROGRAM_MAP(muskeys_map)

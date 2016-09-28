@@ -68,6 +68,7 @@
 		<description>Hopper (40/80t)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Neil Raine" />
 		<info name="release" value="SNG23" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101175">
@@ -315,6 +316,7 @@
 		<description>Carousel</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="David Shepherd" />
 		<info name="release" value="SNG24" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101177">
@@ -423,6 +425,7 @@
 		<description>Sphinx Adventure</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Paul Fellows" />
 		<info name="release" value="SNG07" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55284">
@@ -459,6 +462,7 @@
 		<description>Super Invaders</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Geoffrey J Crammond" />
 		<info name="release" value="SNG16" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55282">
@@ -471,6 +475,7 @@
 		<description>Super Invaders (40t)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Geoffrey J Crammond" />
 		<info name="release" value="SNG16" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="24716">
@@ -555,6 +560,7 @@
 		<description>Elite (Demo)</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Ian Bell and David Braben" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104376">
 				<rom name="202 elite demo.fsd" size="104376" crc="cd84ea0a" sha1="d7452ab1a7d6d619cf44f64b5743b8fa22a75367" offset="0" />
@@ -825,7 +831,7 @@
 	</software>
 
 	<software name="colos4ch">
-		<description>Colossus Chess 4</description>
+		<description>Colossus Chess 4.0</description>
 		<year>1986</year>
 		<publisher>CDS</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2937,7 +2943,7 @@
 	</software>
 
 	<software name="strykrun">
-		<description>Stryker's Run</description>
+		<description>Stryker's Run (32K &amp; 128K versions)</description>
 		<year>1986</year>
 		<publisher>Superior Software</publisher>
 		<part name="flop1" interface="floppy_5_25">

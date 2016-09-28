@@ -176,20 +176,20 @@ Possible Undumped protos: -
 	</software>
 
 <!--  Barroom Baseball.  This prototype is for an standup arcade environment involving coins/timer and is based on Real Sports
-		Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge.  Therefore, it is commented. -->
+        Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge.  Therefore, it is commented. -->
 
 <!--
-	<software name="barbball">
-		<description>Barroom Baseball (Prototype)</description>
-		<year>1983</year>
-		<publisher>Atari</publisher>
-		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
-			<dataarea name="rom" size="32768">
-				<rom name="barbball.bin" size="32768" crc="21d19c8f" sha1="510ccb20df2ecdbe7f8373de6a9fc11493e8c3f2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="barbball">
+        <description>Barroom Baseball (Prototype)</description>
+        <year>1983</year>
+        <publisher>Atari</publisher>
+        <part name="cart" interface="a8bit_cart">
+            <feature name="slot" value="a5200" />
+            <dataarea name="rom" size="32768">
+                <rom name="barbball.bin" size="32768" crc="21d19c8f" sha1="510ccb20df2ecdbe7f8373de6a9fc11493e8c3f2" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="bzone">

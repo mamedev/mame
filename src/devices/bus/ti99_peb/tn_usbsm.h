@@ -3,7 +3,7 @@
 /****************************************************************************
 
     Nouspikel USB / SmartMedia interface card
-    See tn_usmsm.c for documentation
+    See tn_usbsm.c for documentation
 
     Michael Zapf
 
@@ -18,6 +18,7 @@
 #include "peribox.h"
 #include "machine/smartmed.h"
 #include "machine/strata.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_USBSM;
 
@@ -51,8 +52,9 @@ private:
 
 	UINT16      m_input_latch;
 	UINT16      m_output_latch;
-	std::vector<UINT16> m_ram;
 
+	required_device<ram_device> m_ram_lb;
+	required_device<ram_device> m_ram_hb;
 	required_device<smartmedia_image_device> m_smartmedia;
 	required_device<strataflash_device> m_flash;
 };

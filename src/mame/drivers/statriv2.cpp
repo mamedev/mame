@@ -711,6 +711,22 @@ ROM_START( funcsino )
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
+ROM_START( bigcsino )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bc1k.u7", 0x0000, 0x1000, CRC(51f35f51) SHA1(3c1b9b613402e178d0d8752bf025e5d7fc9f1081) )
+	ROM_LOAD( "bc2k.u8", 0x1000, 0x1000, CRC(8102d1eb) SHA1(e2ffa04d705b82b19e978429851690426cb4b474) )
+	ROM_LOAD( "bc3k.u9", 0x2000, 0x1000, CRC(fdfb304e) SHA1(b000d7533c1613fb253b9f48143cc4add73aa23c) )
+	ROM_LOAD( "bc4k.u10", 0x3000, 0x1000, CRC(521347c3) SHA1(539ce6e93bf6db2ca2a8fa22d0aef9933f8cd825) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "bc0k.u36", 0x0000, 0x1000, CRC(baf66e19) SHA1(4b78571e9370453e96e64c08d69b92b4d64e1a41) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "82s123.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
+	ROM_LOAD( "82s123.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) /* Soldered in (Color?) */
+	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+ROM_END
+
 ROM_START( hangman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "main_hang_1b_2732.u7", 0x0000, 0x1000, CRC(0d71b2ad) SHA1(636e5e0e356c9c7de174a0b6a5663fedcb1e697f) )
@@ -1125,9 +1141,10 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
  *
  *************************************/
 
-GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,          ROT0, "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,          ROT0, "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,          ROT0, "Status Games", "Tripple Draw (V3.1 s)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, bigcsino, 0,        funcsino,  funcsino, driver_device, 0,          ROT0, "Status Games", "Big Casino", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) //needs correct inputs
 GAME( 1984, hangman,  0,        statriv2,  hangman, statriv2_state,  addr_lmh,  ROT0, "Status Games", "Hangman", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, trivquiz, 0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Triv Quiz", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, statriv2, 0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0, "Status Games", "Triv Two", MACHINE_SUPPORTS_SAVE )

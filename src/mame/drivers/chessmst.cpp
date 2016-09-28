@@ -250,14 +250,14 @@ void chessmst_state::update_display()
 	{
 		if (BIT(m_digit_matrix, i))
 			output().set_indexed_value("digit", i, BITSWAP16(m_digit, 3,5,12,10,14,1,2,13,8,6,11,15,7,9,4,0) | (m_digit_dot << 16));
-	}	
+	}
 }
 
 WRITE8_MEMBER( chessmst_state::digits_w )
 {
 	m_digit = (m_digit << 4) | (data & 0x0f);
 	m_digit_matrix = (data >> 4) & 0x0f;
-	
+
 	update_display();
 }
 

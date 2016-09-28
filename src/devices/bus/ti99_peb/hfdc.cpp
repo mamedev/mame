@@ -876,6 +876,38 @@ void myarc_hfdc_device::device_start()
 	// The HFDC does not use READY; it has on-board RAM for DMA
 	m_current_floppy = nullptr;
 	m_current_harddisk = nullptr;
+
+	// Parent class members
+	save_item(NAME(m_senila));
+	save_item(NAME(m_senilb));
+	save_item(NAME(m_selected));
+	save_item(NAME(m_genmod));
+	save_item(NAME(m_cru_base));
+	save_item(NAME(m_select_mask));
+	save_item(NAME(m_select_value));
+
+	// Own members
+	save_item(NAME(m_see_switches));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_dip));
+	save_item(NAME(m_motor_running));
+	save_item(NAME(m_inDsrArea));
+	save_item(NAME(m_HDCsel));
+	save_item(NAME(m_RTCsel));
+	save_item(NAME(m_tapesel));
+	save_item(NAME(m_RAMsel));
+	save_item(NAME(m_ROMsel));
+	save_item(NAME(m_address));
+	save_item(NAME(m_wait_for_hd1));
+	save_item(NAME(m_rom_page));
+	save_pointer(NAME(m_ram_page),4);
+	save_item(NAME(m_status_latch));
+	save_item(NAME(m_dma_address));
+	save_item(NAME(m_output1_latch));
+	save_item(NAME(m_output2_latch));
+	save_item(NAME(m_lastval));
+	save_item(NAME(m_MOTOR_ON));
+	save_item(NAME(m_readyflags));
 }
 
 void myarc_hfdc_device::device_reset()

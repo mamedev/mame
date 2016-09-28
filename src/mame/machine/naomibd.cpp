@@ -36,8 +36,8 @@
     per block it will repeatedly read only the first 16-bit word.
 
     * bit 30 (mode bit 2)
-	DMA_OFFSET: 0 = enable DMA (all cart types), enabled during trasfer only because there can be other devices which uses G1 bus DMA (comm.board, multiboard, etc)
-	ROM_OFFSET:
+    DMA_OFFSET: 0 = enable DMA (all cart types), enabled during trasfer only because there can be other devices which uses G1 bus DMA (comm.board, multiboard, etc)
+    ROM_OFFSET:
       "M2" type carts: 1 = select decryption/decompression device registers or its RAM space
       "M1" type carts: ???
       "M4" type carts: 1 = enable data decryption, for both PIO and DMA.
@@ -52,7 +52,7 @@
     "M1" type carts: DMA_OFFSET 0 = enable decryptyon/decompression during DMA transfer, ROM_OFFSET - ROM size/mapping select similar to M2 cart type
     "M4" type carts: no effect, ROM_OFFSET bit 29 always return 1 then read, used by BIOS to determine this cart is encrypted and require bit 30 set then read ROM header
 
-	* bit 0 can be set for "M4" type carts, function unknown
+    * bit 0 can be set for "M4" type carts, function unknown
 
     Normal address starts with 0xa0000000 to enable auto-advance and 8MB ROM addressing mode.
 */

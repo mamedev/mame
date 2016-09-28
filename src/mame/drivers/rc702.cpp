@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( rc702, rc702_state )
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//	MCFG_Z80PIO_OUT_PB_CB(WRITE8(rc702_state, portxx_w)) // parallel port
+//  MCFG_Z80PIO_OUT_PB_CB(WRITE8(rc702_state, portxx_w)) // parallel port
 
 	MCFG_DEVICE_ADD("dma", AM9517A, XTAL_8MHz / 2)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(rc702_state, busreq_w))

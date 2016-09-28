@@ -378,6 +378,7 @@ void tlcs900h_device::device_start()
 	state_add( TLCS900_DMAM3, "DMAM3", m_dmam[3].b.l ).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.d ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc.d ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr.w.l ).formatstr("%12s").noshow();
 
 	m_icountptr = &m_icount;

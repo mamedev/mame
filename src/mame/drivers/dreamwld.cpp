@@ -1085,6 +1085,42 @@ ROM_START( rolcrush )
 	ROM_LOAD( "mx27c512.9.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
+
+ROM_START( rolcrusha )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "4", 0x000000, 0x040000, CRC(b6afbc05) SHA1(543bd3d48d03df3500f2fa2c8ef8d9e98a8ebe1f) )
+	ROM_LOAD32_BYTE( "3", 0x000001, 0x040000, CRC(ecb2f9da) SHA1(6892601bd279f7968d46798db9cbbe575f63bff2) )
+	ROM_LOAD32_BYTE( "2", 0x000002, 0x040000, CRC(7b291ba9) SHA1(9629c71b00317c68394b836395c3a81bdd32273a) )
+	ROM_LOAD32_BYTE( "1", 0x000003, 0x040000, CRC(ef23ccf3) SHA1(14dcf8bfca991f6aa9b20236c879ae715a009ca2) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) /* Protection data  */
+	ROM_LOAD( "protdata.bin", 0x000, 0x745, CRC(06b8a880) SHA1(b7d4bf26d34cb544825270c2c474bbd4c81a6c9e) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip*/
+	ROM_LOAD( "5", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
+
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
+	/* not populared */
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "8", 0x000000, 0x200000, CRC(01446191) SHA1(b106ed6c085fad617552972db78866a3346e4553) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "10",0x000000, 0x200000, CRC(8cb75392) SHA1(8b274cd13876e65fffc157d8459331032c3c16db) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "7", 0x000000, 0x020000, CRC(23d641e4) SHA1(1df8afb5c0118e8588d301db64f6adeb9ae40a79) )
+	ROM_LOAD16_BYTE( "6", 0x000001, 0x020000, CRC(5934dac9) SHA1(2adc63746b9a921a15b8f8461af451ad82add721) )
+
+	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
+	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
+
+
 /*
 
 Dream World
@@ -1247,9 +1283,10 @@ ROM_START( gaialast )
 	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
-GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                  "Cute Fighter", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom",          "Rolling Crush (version 1.07.E - 1999/02/11)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, gaialast, 0,      baryon,   gaialast, driver_device, 0, ROT0,   "SemiCom / XESS",           "Gaia - The Last Choice of Earth", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                  "Dream World", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryon,   0,        baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryona,  baryon,   baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, cutefght, 0,        dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                        "Cute Fighter", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrush, 0,        baryon,   rolcrush, driver_device, 0, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, driver_device, 0, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, gaialast, 0,        baryon,   gaialast, driver_device, 0, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                        "Dream World", MACHINE_SUPPORTS_SAVE )

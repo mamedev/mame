@@ -1526,6 +1526,32 @@ ROM_START( nibbler6 ) /* revision 6 */
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
 
+ROM_START( nibblera ) /* revision ??? */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732.ic12", 0x3000, 0x1000, CRC(e569937b) SHA1(6ee9aa528cc3f0685153b3170f41b9a665d358e0) )
+	ROM_LOAD( "2732.ic07", 0x4000, 0x1000, CRC(7f9d715c) SHA1(59fbdbb55dceaa86235911589395fa5243e44afe) )
+	ROM_LOAD( "2732.ic08", 0x5000, 0x1000, CRC(e46eb1c9) SHA1(b70a14085985096eb6650f3d06343a20d75e61b5) )
+	ROM_LOAD( "2732.ic09", 0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) )
+	ROM_LOAD( "2732.ic10", 0x7000, 0x1000, BAD_DUMP CRC(746e94cd) SHA1(284696722857900760d35f1f8ef53290deddac20) )  // FIXED BITS (xxx1xxxx)
+	ROM_LOAD( "2732.ic14", 0x8000, 0x1000, CRC(48ec4af0) SHA1(9b4b80c288d5ade998c0bbcfc3868c9dcd438707) )
+	ROM_RELOAD(                 0xf000, 0x1000 )    /* for the reset and interrupt vectors */
+	ROM_LOAD( "2732.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
+	ROM_LOAD( "2732.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
+	ROM_LOAD( "2732.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "2732.ic50", 0x0000, 0x1000, CRC(01d4d0c2) SHA1(5a8026210a872351ce4e39e27f6479d3ca0689e2) )
+	ROM_LOAD( "2732.ic51", 0x1000, 0x1000, CRC(feff7faf) SHA1(50005502578a4ea9b9c8f36998670b787d2d0b20) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
+	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
+
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )  /* sound ROMs */
+	ROM_LOAD( "2732.ic52", 0x0800, 0x0800, CRC(cabe6c34) SHA1(664ab47555d4c05189d797836f34045f00ac119e) )
+	ROM_LOAD( "2732.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) ) // missing in set
+ROM_END
+
 ROM_START( nibblerp ) /* revision 6 + extra soundrom */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic12",           0x3000, 0x1000, CRC(ac6a802b) SHA1(ac1072e30994f13097663dc24d9d1dc35a95d874) )
@@ -1602,5 +1628,6 @@ GAME( 1982, pballoonr,pballoon, pballoon, pballoon, driver_device, 0, ROT90, "SN
 GAME( 1982, nibbler,  0,        nibbler,  nibbler, driver_device,  0, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler8, nibbler,  nibbler,  nibbler8, driver_device, 0, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler6, nibbler,  nibbler,  nibbler6, driver_device, 0, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblera, nibbler,  nibbler,  nibbler, driver_device,  0, ROT90, "Rock-Ola", "Nibbler (rev ?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibblerp, nibbler,  nibbler,  nibbler6, driver_device, 0, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, nibblero, nibbler,  nibbler,  nibbler8, driver_device, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )

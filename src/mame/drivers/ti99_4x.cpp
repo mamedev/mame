@@ -53,6 +53,7 @@
 
 #include "bus/ti99_peb/peribox.h"
 #include "softlist.h"
+#include "machine/ram.h"
 
 // Debugging
 #define TRACE_READY 0
@@ -147,9 +148,9 @@ private:
 	int     m_model;
 
 	// Latch for 9901 INT1, INT2, and INT12 lines
-	line_state  m_int1;
-	line_state  m_int2;
-	line_state  m_int12;
+	int  m_int1;
+	int  m_int2;
+	int  m_int12;
 
 	// Connected devices
 	required_device<tms9900_device>     m_cpu;
@@ -164,6 +165,9 @@ private:
 
 	// Timer for EVPC (provided by the TMS9929A, but EVPC replaces that VDP)
 	emu_timer   *m_gromclk_timer;
+
+	// Registering save state
+	void    register_save_state();
 };
 
 /*
@@ -778,36 +782,17 @@ WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 	if (TRACE_INTERRUPTS) logerror("ti99_4x: Setting a not connected line ... ignored\n");
 }
 
-#if 0
-/*
-    External clock connector. This is actually a separate cable lead going from
-    the EPVC in the PEB to a pin inside the console. This cable sends the
-    video interrupt from the v9938 on the EVPC into the console.
-    This workaround must be done on the real system because the peripheral
-    box and its connector were not designed to deliver a video interrupt signal.
-    This was fixed with the EVPC2 which uses the external interrupt EXTINT
-    with a special firmware (DSR).
-
-    Emulation detail: We are using a separate device class in order to avoid
-    exposing the console class to the external class.
-*/
-evpc_clock_connector::evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, EVPC_CONN, "EVPC clock connector", tag, owner, clock, "ti99_evpc_clock", __FILE__)
+void ti99_4x_state::register_save_state()
 {
+	save_item(NAME(m_keyboard_column));
+	save_item(NAME(m_check_alphalock));
+	save_item(NAME(m_nready_combined));
+	save_item(NAME(m_nready_prev));
+	save_item(NAME(m_model));
+	save_item(NAME(m_int1));
+	save_item(NAME(m_int2));
+	save_item(NAME(m_int12));
 }
-
-void evpc_clock_connector::device_start()
-{
-	m_console = downcast<ti99_4x_state*>(owner());
-}
-
-WRITE_LINE_MEMBER( evpc_clock_connector::vclock_line )
-{
-	m_console->video_interrupt_in(state);
-};
-
-const device_type EVPC_CONN = &device_creator<evpc_clock_connector>;
-#endif
 
 /******************************************************************************
     Machine definitions
@@ -819,6 +804,7 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 	m_peribox->senilb(CLEAR_LINE);
 	m_nready_combined = 0;
 	m_model = MODEL_4;
+	register_save_state();
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
@@ -845,7 +831,7 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4 )
 
-	/* Main board */
+	// Main board
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( ti99_4x_state, handset_ack) )
@@ -865,10 +851,20 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
-	/* Software list */
+	// Scratch pad RAM 256 bytes
+	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Optional RAM expansion
+	MCFG_RAM_ADD(EXPRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
-	/* Peripheral expansion box */
+	// Peripheral expansion box
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
@@ -880,7 +876,7 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_sound) )
 
-	/* Cassette drives */
+	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )
@@ -932,6 +928,7 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 	m_peribox->senilb(CLEAR_LINE);
 	m_nready_combined = 0;
 	m_model = MODEL_4A;
+	register_save_state();
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
@@ -944,7 +941,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
 }
 
 static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
-	/* CPU */
+	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4x_state, interrupt_level) )
@@ -954,7 +951,7 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4a )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4a )
 
-	/* Main board */
+	// Main board
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4x_state, keyC0) )
@@ -974,10 +971,20 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
-	/* Software list */
+	// Scratch pad RAM 256 bytes
+	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Optional RAM expansion
+	MCFG_RAM_ADD(EXPRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
-	/* Peripheral expansion box */
+	// Peripheral expansion box
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
@@ -989,7 +996,7 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_sound) )
 
-	/* Cassette drives */
+	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )
@@ -1045,6 +1052,7 @@ MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
 	m_peribox->senilb(CLEAR_LINE);
 	m_model = MODEL_4QI;
 	m_nready_combined = 0;
+	register_save_state();
 }
 
 static MACHINE_CONFIG_DERIVED( ti99_4qi, ti99_4a )
@@ -1081,6 +1089,7 @@ MACHINE_START_MEMBER(ti99_4x_state, ti99_4ev)
 	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
 	// In the real hardware this is a circuit (REPL99x) that fits into the VDP socket
 	m_gromclk_timer = timer_alloc(0);
+	register_save_state();
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
@@ -1094,7 +1103,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 }
 
 static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
-	/* CPU */
+	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4x_state, interrupt_level) )
@@ -1104,7 +1113,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4ev )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4ev )
 
-	/* Main board */
+	// Main board
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4x_state, keyC0) )
@@ -1123,19 +1132,29 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
+	// Scratch pad RAM 256 bytes
+	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Optional RAM expansion
+	MCFG_RAM_ADD(EXPRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
 	// EVPC connector
 	MCFG_ADD_EVPC_CONNECTOR( EVPC_CONN_TAG, WRITELINE( ti99_4x_state, video_interrupt_evpc_in ) )
 
-	/* Software list */
+	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
-	/* Peripheral expansion box */
+	// Peripheral expansion box
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_EV, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
 	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
 
-	/* Cassette drives */
+	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )

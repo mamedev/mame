@@ -2038,7 +2038,8 @@ void f8_cpu_device::device_start()
 	state_add( F8_R62, "R62", m_r[62]).formatstr("%02X");
 	state_add( F8_R63, "R63", m_r[63]).formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
 
 	m_icountptr = &m_icount;

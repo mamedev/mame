@@ -118,7 +118,11 @@ Its BIOS performs POST and halts as there's no keyboard.
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "imagedev/floppy.h"
+#include "machine/pit8253.h"
+#include "sound/speaker.h"
 #include "machine/octo_kbd.h"
+#include "machine/bankdev.h"
+#include "machine/ram.h"
 
 class octopus_state : public driver_device
 {
@@ -139,10 +143,19 @@ public:
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
 		m_kb_uart(*this, "keyboard"),
-		m_current_dma(-1)
+		m_pit(*this, "pit"),
+		m_ppi(*this, "ppi"),
+		m_speaker(*this, "speaker"),
+		m_z80_bankdev(*this, "z80_bank"),
+		m_ram(*this, "main_ram"),
+		m_current_dma(-1),
+		m_speaker_active(false),
+		m_beep_active(false),
+		m_z80_active(false)
 		{ }
 
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_READ8_MEMBER(vram_r);
@@ -162,7 +175,16 @@ public:
 	DECLARE_WRITE8_MEMBER(gpo_w);
 	DECLARE_READ8_MEMBER(vidcontrol_r);
 	DECLARE_WRITE8_MEMBER(vidcontrol_w);
-	
+	DECLARE_READ8_MEMBER(z80_io_r);
+	DECLARE_WRITE8_MEMBER(z80_io_w);
+	IRQ_CALLBACK_MEMBER(x86_irq_cb);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE8_MEMBER(rtc_w);
+
+	DECLARE_WRITE_LINE_MEMBER(spk_w);
+	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
+	DECLARE_WRITE_LINE_MEMBER(beep_w);
+
 	DECLARE_WRITE_LINE_MEMBER(dack0_w) { m_dma1->hack_w(state ? 0 : 1); }  // for all unused DMA channel?
 	DECLARE_WRITE_LINE_MEMBER(dack1_w) { if(!state) m_current_dma = 1; else if(m_current_dma == 1) m_current_dma = -1; }  // HD
 	DECLARE_WRITE_LINE_MEMBER(dack2_w) { if(!state) m_current_dma = 2; else if(m_current_dma == 2) m_current_dma = -1; }  // RAM refresh
@@ -171,6 +193,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dack5_w) { if(!state) m_current_dma = 5; else if(m_current_dma == 5) m_current_dma = -1; }  // Floppy
 	DECLARE_WRITE_LINE_MEMBER(dack6_w) { m_dma1->hack_w(state ? 0 : 1); }
 	DECLARE_WRITE_LINE_MEMBER(dack7_w) { m_dma1->hack_w(state ? 0 : 1); }
+
+	enum
+	{
+		BEEP_TIMER = 100
+	};
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -186,7 +217,12 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<i8251_device> m_kb_uart;
-	
+	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<address_map_bank_device> m_z80_bankdev;
+	required_device<ram_device> m_ram;
+
 	UINT8 m_hd_bank;  // HD bank select
 	UINT8 m_fd_bank;  // Floppy bank select
 	UINT8 m_z80_bank; // Z80 bank / RAM refresh
@@ -195,21 +231,28 @@ private:
 	UINT8 m_cntl;  // RTC / FDC control (PPI port B)
 	UINT8 m_gpo;  // General purpose outputs (PPI port C)
 	UINT8 m_vidctrl;
+	bool m_speaker_active;
+	bool m_beep_active;
+	bool m_speaker_level;
+	bool m_z80_active;
+	bool m_rtc_address;
+	bool m_rtc_data;
+	UINT8 m_prev_cntl;
+
+	emu_timer* m_timer_beep;
 };
 
 
 static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+	AM_RANGE(0x00000, 0x1ffff) AM_RAMBANK("main_ram_bank")
 	// second 128kB for 256kB system
 	// expansion RAM, up to 512kB extra
 	AM_RANGE(0x20000, 0xcffff) AM_NOP
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xe0000, 0xe3fff) AM_NOP
 	AM_RANGE(0xe4000, 0xe5fff) AM_RAM AM_SHARE("fram")
-	AM_RANGE(0xe6000, 0xf3fff) AM_NOP
-	AM_RANGE(0xf4000, 0xf5fff) AM_ROM AM_REGION("chargen",0)
-	AM_RANGE(0xf6000, 0xfbfff) AM_NOP
+	AM_RANGE(0xe6000, 0xe7fff) AM_ROM AM_REGION("chargen",0)
+	AM_RANGE(0xe8000, 0xfbfff) AM_NOP
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -223,7 +266,7 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("keyboard", i8251_device, data_r, data_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("keyboard", i8251_device, status_r, control_w)
 	// 0x70-73: HD controller
-	// 0x80-83: serial timers (i8253)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	// 0xa0-a3: serial interface (Z80 SIO/2)
 	AM_RANGE(0xb0, 0xb1) AM_DEVREADWRITE("pic_master", pic8259_device, read, write)
 	AM_RANGE(0xb4, 0xb5) AM_DEVREADWRITE("pic_slave", pic8259_device, read, write)
@@ -241,11 +284,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( octopus_sub_mem, AS_PROGRAM, 8, octopus_state )
-	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("z80_bank", address_map_bank_device, read8, write8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( octopus_sub_io, AS_IO, 8, octopus_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( octopus_vram, AS_0, 8, octopus_state )
@@ -280,6 +324,15 @@ static INPUT_PORTS_START( octopus )
 	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case BEEP_TIMER:  // switch off speaker
+		m_beep_active = false;
+		break;
+	}
+}
 
 WRITE8_MEMBER(octopus_state::vram_w)
 {
@@ -324,6 +377,7 @@ WRITE8_MEMBER(octopus_state::bank_sel_w)
 		break;
 	case 2:
 		m_z80_bank = data;
+		m_z80_bankdev->set_bank(m_z80_bank & 0x0f);
 		logerror("Z80/RAM bank = %i\n",data);
 		break;
 	}
@@ -337,7 +391,15 @@ WRITE8_MEMBER(octopus_state::bank_sel_w)
 // 0x28: write: Z80 enable
 WRITE8_MEMBER(octopus_state::system_w)
 {
-	logerror("SYS: System control offset %i data %02x\n",offset,data);
+	logerror("SYS: System control offset %i data %02x\n",offset+1,data);
+	switch(offset)
+	{
+	case 7:  // enable Z80, halt 8088
+		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_z80_active = true;
+		break;
+	}
 }
 
 READ8_MEMBER(octopus_state::system_r)
@@ -347,11 +409,54 @@ READ8_MEMBER(octopus_state::system_r)
 	case 0:
 		return 0x1f;  // do bits 0-4 mean anything?  Language DIPs?
 	}
-	
+
 	return 0xff;
 }
 
+// Any I/O cycle relinquishes control of the bus
+READ8_MEMBER(octopus_state::z80_io_r)
+{
+	z80_io_w(space,offset,0);
+	return 0x00;
+}
+
+WRITE8_MEMBER(octopus_state::z80_io_w)
+{
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_z80_active = false;
+}
+
+// RTC data and I/O - PPI port A
+// bits 0-3 of RTC/FDC control go to control lines of the MC146818
+// The technical manual does not mention what is connected to each bit
+// This is an educated guess, based on the BIOS code
+// bit 0 = ? (Pulsed low after writing to an RTC register)
+// bit 1 = PPI Port A strobe?
+// bit 2 = Data strobe?
+// bit 3 = Address strobe?
+READ8_MEMBER(octopus_state::rtc_r)
+{
+	UINT8 ret = 0xff;
+
+	if(m_rtc_data)
+		ret = m_rtc->read(space,1);
+	else if(m_rtc_address)
+		ret = m_rtc->read(space,0);
+
+	return ret;
+}
+
+WRITE8_MEMBER(octopus_state::rtc_w)
+{
+	if(m_rtc_data)
+		m_rtc->write(space,1,data);
+	else if(m_rtc_address)
+		m_rtc->write(space,0,data);
+}
+
 // RTC/FDC control - PPI port B
+// bits0-3: RTC control lines
 // bit4-5: write precomp.
 // bit6-7: drive select
 READ8_MEMBER(octopus_state::cntl_r)
@@ -362,6 +467,21 @@ READ8_MEMBER(octopus_state::cntl_r)
 WRITE8_MEMBER(octopus_state::cntl_w)
 {
 	m_cntl = data;
+
+	if((m_cntl & 0x08) && !(m_prev_cntl & 0x08))
+	{
+		m_rtc_address = true;
+		m_rtc_data = false;
+		logerror("Address strobe!\n");
+	}
+	if((data & 0x04) && !(m_prev_cntl & 0x04))
+	{
+		m_rtc_address = false;
+		m_rtc_data = true;
+		logerror("Data strobe!\n");
+	}
+	m_ppi->pc4_w(data & 0x02);
+	m_prev_cntl = m_cntl;
 	m_current_drive = (data & 0xc0) >> 6;
 	switch(m_current_drive)
 	{
@@ -421,6 +541,32 @@ WRITE8_MEMBER(octopus_state::vidcontrol_w)
 	m_fdc->set_unscaled_clock((data & 0x08) ? XTAL_16MHz / 16 : XTAL_16MHz / 8);
 }
 
+// Sound hardware
+// Sound level provided by i8253 timer 2
+// Enabled by /DTR signal from i8251
+// 100ms beep triggered by pulsing /CTS signal low on i8251
+WRITE_LINE_MEMBER(octopus_state::spk_w)
+{
+	m_speaker_active = !state;
+	m_speaker->level_w(((m_speaker_active || m_beep_active) && m_speaker_level) ? 1 : 0);
+}
+
+WRITE_LINE_MEMBER(octopus_state::spk_freq_w)
+{
+	m_speaker_level = state;
+	m_speaker->level_w(((m_speaker_active || m_beep_active) && m_speaker_level) ? 1 : 0);
+}
+
+WRITE_LINE_MEMBER(octopus_state::beep_w)
+{
+	if(!state)  // active low
+	{
+		m_beep_active = true;
+		m_speaker->level_w(((m_speaker_active || m_beep_active) && m_speaker_level) ? 1 : 0);
+		m_timer_beep->adjust(attotime::from_msec(100));
+	}
+}
+
 READ8_MEMBER(octopus_state::dma_read)
 {
 	UINT8 byte;
@@ -447,11 +593,34 @@ WRITE_LINE_MEMBER( octopus_state::dma_hrq_changed )
 	m_dma2->hack_w(state);
 }
 
+// Any interrupt will also give bus control back to the 8088
+IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
+{
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_z80_active = false;
+	return m_pic1->inta_cb(device,irqline);
+}
+
+void octopus_state::machine_start()
+{
+	m_timer_beep = timer_alloc(BEEP_TIMER);
+
+	// install extra RAM
+	if(m_ram->size() > 0x20000)
+		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"extra_ram_bank");
+}
+
 void octopus_state::machine_reset()
 {
-	m_subcpu->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);  // halt Z80 to start with
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);  // halt Z80 to start with
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_z80_active = false;
 	m_current_dma = -1;
 	m_current_drive = 0;
+	m_rtc_address = true;
+	m_rtc_data = false;
+	membank("main_ram_bank")->set_base(m_ram->pointer());
 }
 
 void octopus_state::video_start()
@@ -491,7 +660,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24MHz / 3)  // 8MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_mem)
 	MCFG_CPU_IO_MAP(octopus_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_master", pic8259_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(octopus_state, x86_irq_cb)
 
 	MCFG_CPU_ADD("subcpu",Z80, XTAL_24MHz / 4) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_sub_mem)
@@ -535,18 +704,20 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 
 	// RTC (MC146818 via i8255 PPI)  TODO: hook up RTC to PPI
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(NOOP)
+	MCFG_I8255_IN_PORTA_CB(READ8(octopus_state,rtc_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(octopus_state,cntl_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(octopus_state,gpo_r))
-	MCFG_I8255_OUT_PORTA_CB(NOOP)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(octopus_state,rtc_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(octopus_state,cntl_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(octopus_state,gpo_w))
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir2_w))
-	
+
 	// Keyboard UART
 	MCFG_DEVICE_ADD("keyboard", I8251, 0)
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir4_w))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(octopus_state,spk_w))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(octopus_state,beep_w))
 	MCFG_RS232_PORT_ADD("keyboard_port", keyboard, "octopus")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("keyboard", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("keyboard", i8251_device, write_dsr))
@@ -561,6 +732,16 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(500)  // DART channel A
+	MCFG_PIT8253_CLK1(500)  // DART channel B
+	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(octopus_state,spk_freq_w))
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
 	// TODO: add components
 	// i8253 PIT timer (speaker output, serial timing, other stuff too?)
 	// Centronics parallel interface
@@ -574,14 +755,24 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_SCREEN_SIZE(720, 360)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",scn2674_device, screen_update)
-//	MCFG_SCREEN_PALETTE("palette")
-//	MCFG_PALETTE_ADD_MONOCHROME("palette")	
+//  MCFG_SCREEN_PALETTE("palette")
+//  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SCN2674_VIDEO_ADD("crtc", 0, DEVWRITELINE("pic_slave",pic8259_device,ir0_w))  // character clock can be selectable, either 16MHz or 17.6MHz
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, octopus_vram)
+
+	MCFG_DEVICE_ADD("z80_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(octopus_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+
+	MCFG_RAM_ADD("main_ram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("256K")
 
 MACHINE_CONFIG_END
 

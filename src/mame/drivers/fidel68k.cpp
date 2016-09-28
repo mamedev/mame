@@ -9,6 +9,8 @@
     - how does dual-CPU work?
     - IRQ level/timing is unknown
     - USART is not emulated
+    - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
+      way around, culprit is unemulated cache?
     - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
       at twice the frequency due to lack of superscalar.
     - V11 beeper is too high pitched, obviously related to wrong CPU type too
