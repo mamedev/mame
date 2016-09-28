@@ -2225,8 +2225,8 @@ ROM_END
 */
 
 ROM_START( mac128k )
-	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	//ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
+	ROM_REGION16_BE(0x20000, "bootrom", 0) // 28ba61ce
+	//ROM_LOAD16_WORD( "28ba61ce - Macintosh-128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
 	ROMX_LOAD("vti__416_vh_2605__23256-1020__342-0220-a__(c)apple_83__korea-ae.rom-hi.27256.u6d",  0x00000, 0x08000, CRC(198210ad) SHA1(2590ff4af5ac0361babdf0dc5da18e2eecad454a), ROM_SKIP(1) ) // see below for alternate labels
 	ROMX_LOAD("vti__416_vh_2826__23256-1023__342-0221-a__(c)apple_83__korea-ae.rom-lo.27256.u8d",  0x00001, 0x08000, CRC(fd2665c2) SHA1(8507932a854bd28196a17785c8b1851cb53eaf64), ROM_SKIP(1) ) // see below for alternate labels
 	/* These two roms were manufactured by at least 3 manufacturers:
@@ -2250,8 +2250,8 @@ ROM_START( mac128k )
 ROM_END
 
 ROM_START( mac512k )
-	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	//ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
+	ROM_REGION16_BE(0x20000, "bootrom", 0) //
+	//ROM_LOAD16_WORD( "28ba4e50 - Macintosh-512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
 	ROMX_LOAD("vti__512_vh_6434__23256-1104__342-0220-b__(c)_apple_84__korea-a.rom-hi.27256.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
 	ROMX_LOAD("vti__512_vh_6709__23256-1105__342-0221-b__(c)_apple_84__korea-a.rom-lo.27256.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
 	// reference: http://i.ebayimg.com/images/g/Uj8AAOSwvzRXy2tW/s-l1600.jpg
@@ -2264,14 +2264,14 @@ ROM_END
 
 ROM_START( utrn1024 )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	// CRCs match the original "Lonely Hearts" version 1 Mac Plus ROM
+	// CRCs match the original "Lonely Hearts" version 1 Mac Plus ROM: 4d1eeee1
 	ROM_LOAD16_BYTE( "macplus_mem_h.e6", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b) )
 	ROM_LOAD16_BYTE( "macplus_mem_l.e7", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7) )
 ROM_END
 
-	//ROMX_LOAD( "4d1f8172 - macplus v3.rom",  0x00000, 0x020000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
-	//ROMX_LOAD( "4d1eeae1 - macplus v2.rom",  0x00000, 0x020000, CRC(7cacd18f) SHA1(73bf2eb215646e108daa0cdd874e6c843c8ce421), ROM_GROUPWORD | ROM_BIOS(2) )
-	//ROMX_LOAD( "4d1eeee1 - macplus v1.rom",  0x00000, 0x020000, CRC(4fa5b399) SHA1(e0da7165b92dee90d8b1522429c033729fa73fd2), ROM_GROUPWORD | ROM_BIOS(3) )
+	//ROMX_LOAD( "4d1f8172 - MacPlus v3.rom",  0x00000, 0x020000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
+	//ROMX_LOAD( "4d1eeae1 - MacPlus v2.rom",  0x00000, 0x020000, CRC(7cacd18f) SHA1(73bf2eb215646e108daa0cdd874e6c843c8ce421), ROM_GROUPWORD | ROM_BIOS(2) )
+	//ROMX_LOAD( "4d1eeee1 - MacPlus v1.rom",  0x00000, 0x020000, CRC(4fa5b399) SHA1(e0da7165b92dee90d8b1522429c033729fa73fd2), ROM_GROUPWORD | ROM_BIOS(3) )
 
 ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 macplus romsets installed, and v1 romsets are more common here than in the plus, since the 512ke lacks scsi, which is the cause of the major bug fixed between v1 and v2, hence 512ke is unaffected and was a good way for apple to use the buggy roms rather than destroying them.
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
@@ -2313,8 +2313,9 @@ ROM_START( macsefd )
 ROM_END
 
 ROM_START( macclasc )
-	ROM_REGION16_BE(0x80000, "bootrom", 0)
-	ROM_LOAD( "a49f9914.rom", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
+	ROM_REGION16_BE(0x80000, "bootrom", 0) // a49f9914, second half of chip dump is the 6.0.3 XO rom disk
+	// this dump is big endian
+	ROM_LOAD( "341-0813__(c)1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
 ROM_END
 
 ROM_START( maclc )
@@ -2393,8 +2394,12 @@ ROM_START( maciivi )
 ROM_END
 
 ROM_START( macclas2 )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
+	ROM_REGION32_BE(0x100000, "bootrom", 0) // 3193670e
+	//ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
+	ROM_LOAD32_BYTE( "341-0867__ba16__(c)apple_91.romhh.27c010.u25", 0x000000, 0x020000, CRC(88230887) SHA1(8f45f6d7eb6a8ec9242a46db4773af1d154409c6) )
+	ROM_LOAD32_BYTE( "341-0866__5be9__(c)apple_91.rommh.27c010.u24", 0x000001, 0x020000, CRC(eae68c36) SHA1(e6ce79647dfe7e66590a012836d0b6e985ff672b) )
+	ROM_LOAD32_BYTE( "341-0865__821e__(c)apple_91.romml.27c010.u23", 0x000002, 0x020000, CRC(cb306c01) SHA1(4d6e409995fd9a4aa9afda0fd790a5b09b1c2aca) )
+	ROM_LOAD32_BYTE( "341-0864__6fc6__(c)apple_91.romll.27c010.u22", 0x000003, 0x020000, CRC(21a51e72) SHA1(bb513c1a5b8a41c7534d66aeacaeea47f58dae92) )
 ROM_END
 
 ROM_START( maclc2 )

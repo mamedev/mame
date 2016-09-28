@@ -1874,7 +1874,7 @@ int main(int argc, char *argv[])
 		try
 		{
 			// instantiate appropriate cleaner implementation
-			char const *const ext(std::strrchr(argv[1], '.'));
+			char const *const ext(std::strrchr(argv[i], '.'));
 			bool const is_c_file(ext && is_c_source_extension(ext));
 			bool const is_lua_file(ext && is_lua_source_extension(ext));
 			bool const is_xml_file(ext && is_xml_extension(ext));
@@ -1922,31 +1922,31 @@ int main(int argc, char *argv[])
 				if (!dry_run)
 				{
 					using namespace std::string_literals;
-					std::string const backup(argv[1] + ".orig"s);
+					std::string const backup(argv[i] + ".orig"s);
 					std::remove(backup.c_str());
-					if (std::rename(argv[1], backup.c_str()))
+					if (std::rename(argv[i], backup.c_str()))
 					{
-						util::stream_format(std::cerr, "Error moving %1$s to backup location\n", argv[1]);
+						util::stream_format(std::cerr, "Error moving %1$s to backup location\n", argv[i]);
 						++failures;
 					}
 					else
 					{
-						std::ofstream outfile(argv[1], std::ios_base::binary | std::ios_base::out | std::ios_base::trunc);
+						std::ofstream outfile(argv[i], std::ios_base::binary | std::ios_base::out | std::ios_base::trunc);
 						outfile.write(&output[0], output.size());
 						outfile.flush();
 						if (!outfile)
 						{
-							util::stream_format(std::cerr, "Error writing output to %1$s\n", argv[1]);
+							util::stream_format(std::cerr, "Error writing output to %1$s\n", argv[i]);
 							++failures;
 							outfile.close();
-							if (std::rename(backup.c_str(), argv[1]))
-								util::stream_format(std::cerr, "Error restoring backup of %1$s\n", argv[1]);
+							if (std::rename(backup.c_str(), argv[i]))
+								util::stream_format(std::cerr, "Error restoring backup of %1$s\n", argv[i]);
 						}
 						else if (!keep_backup)
 						{
 							if (std::remove(backup.c_str()))
 							{
-								util::stream_format(std::cerr, "Error removing backup of %1$s\n", argv[1]);
+								util::stream_format(std::cerr, "Error removing backup of %1$s\n", argv[i]);
 								++failures;
 							}
 						}

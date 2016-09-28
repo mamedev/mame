@@ -136,10 +136,10 @@ GENIEOS := linux
 PLATFORM := unknown
 ifneq ($(filter x86_64,$(UNAME_P)),)
 PLATFORM := x86
-endif 
+endif
 ifneq ($(filter %86,$(UNAME_P)),)
 PLATFORM := x86
-endif 
+endif
 ifneq ($(filter alpha,$(UNAME_M)),)
 PLATFORM := alpha
 endif
@@ -148,19 +148,19 @@ PLATFORM := alpha
 endif
 ifneq ($(filter arm%,$(UNAME_M)),)
 PLATFORM := arm
-endif 
+endif
 ifneq ($(filter arm%,$(UNAME_P)),)
 PLATFORM := arm
-endif 
+endif
 ifneq ($(filter aarch64%,$(UNAME_M)),)
 PLATFORM := arm64
-endif 
+endif
 ifneq ($(filter aarch64%,$(UNAME_P)),)
 PLATFORM := arm64
-endif 
+endif
 ifneq ($(filter powerpc,$(UNAME_P)),)
 PLATFORM := powerpc
-endif 
+endif
 ifneq ($(filter mips64%,$(UNAME_M)),)
 ifeq ($(shell getconf LONG_BIT),64)
 PLATFORM := mips64
@@ -958,7 +958,7 @@ ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES) 
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw32-gcc
@@ -1335,7 +1335,7 @@ endif
 ifndef MARVELL_ROOTFS
 	$(error MARVELL_ROOTFS is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  $(MAKETYPE)  
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  $(MAKETYPE)
 
 .PHONY: steamlink
 steamlink: generate $(PROJECTDIR)/$(MAKETYPE)-steamlink/Makefile
@@ -1359,7 +1359,7 @@ endif
 ifndef RASPBERRY_SYSROOT
 	$(error RASPBERRY_SYSROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=rpi --gcc_version=4.9.2 --osd=sdl --targetos=rpi --targetos=rpi --NO_USE_MIDI=1 --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  $(MAKETYPE)  
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=rpi --gcc_version=4.9.2 --osd=sdl --targetos=rpi --targetos=rpi --NO_USE_MIDI=1 --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  $(MAKETYPE)
 
 .PHONY: rpi
 rpi: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-rpi/Makefile
@@ -1383,7 +1383,7 @@ endif
 ifndef CI20_SYSROOT
 	$(error CI20_SYSROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=ci20 --gcc_version=4.9.2 --osd=sdl --targetos=ci20 --targetos=ci20 --NO_USE_MIDI=1  --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  $(MAKETYPE)  
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=ci20 --gcc_version=4.9.2 --osd=sdl --targetos=ci20 --targetos=ci20 --NO_USE_MIDI=1  --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  $(MAKETYPE)
 
 .PHONY: ci20
 ci20: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20/Makefile
@@ -1474,14 +1474,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.177"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.178"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.177" > $@
+	@echo #define BARE_BUILD_VERSION "0.178" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1608,7 +1608,7 @@ cppcheck:
 #-------------------------------------------------
 # BGFX shaders
 #
-# to build all just use : make shaders 
+# to build all just use : make shaders
 #
 # to build specific chain use for example : make shaders CHAIN=eagle
 # data for chain is taken from src/osd/modules/render/bgfx/shaders/chains/
@@ -1627,9 +1627,9 @@ shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx9)
 	-$(call MKDIR,build/shaders/gles)
 	-$(call MKDIR,build/shaders/glsl)
-	-$(call MKDIR,build/shaders/metal)	
+	-$(call MKDIR,build/shaders/metal)
 	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)"
-	
+
 #-------------------------------------------------
 # Translation
 #-------------------------------------------------
@@ -1639,6 +1639,6 @@ shaders: bgfx-tools
 translation:
 	$(SILENT) echo Generating mame.pot
 	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -k__ -o mame.pot
-	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgmerge -U -N %% mame.pot 
+	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgmerge -U -N %% mame.pot
 	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%
 

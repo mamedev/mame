@@ -12,7 +12,7 @@
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="ost72">
 		<description>MicroDOS v3.1M BIOS T-72</description>
 		<year>19??</year>
@@ -39,19 +39,19 @@
 		<description>CD-Pacman</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
-    <!--- title music plays too fast because of unemulated RAM access latency -->
+	<!--- title music plays too fast because of unemulated RAM access latency -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
 				<rom name="cdpacman.fdd" size="839680" crc="c429fa01" sha1="4513907202e22e795eb6c6af7eb9a4795795275e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="game15">
 		<description>Game 15 Part 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-    <!--- hold Ctrl while booting -->
+	<!--- hold Ctrl while booting -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
 				<rom name="game-15.fdd" size="839680" crc="259fcb8e" sha1="4cec8e06d147b74a43784c7389ed86ba02bdf952" offset="0" />
