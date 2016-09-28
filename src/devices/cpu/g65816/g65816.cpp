@@ -868,6 +868,7 @@ void g65816_device::device_start()
 	state_add( G65816_IRQ_STATE, "IRQ", m_line_irq).mask(0x01).callimport().formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 
@@ -879,6 +880,7 @@ void g65816_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			g65816_set_pc(m_debugger_temp);
 			break;
 		case STATE_GENSP:
@@ -924,6 +926,7 @@ void g65816_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 		case G65816_PC:
 			m_debugger_temp = g65816_get_pc();
 			break;

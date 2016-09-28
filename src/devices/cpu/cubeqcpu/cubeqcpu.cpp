@@ -229,7 +229,8 @@ void cquestsnd_cpu_device::device_start()
 	state_add( CQUESTSND_RAME,     "RAM[E]", m_ram[0xe]).formatstr("%04X");
 	state_add( CQUESTSND_RAMF,     "RAM[F]", m_ram[0xf]).formatstr("%04X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%02X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%02X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%02X").noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -331,7 +332,8 @@ void cquestrot_cpu_device::device_start()
 	state_add( CQUESTROT_LDADDR,    "LDADDR",    m_lineaddr).formatstr("%04X");
 	state_add( CQUESTROT_LDDATA,    "LDDATA",    m_linedata).formatstr("%04X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%02X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%02X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%02X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%3s").noshow();
 
 	m_icountptr = &m_icount;
@@ -457,7 +459,8 @@ void cquestlin_cpu_device::device_start()
 	state_add( CQUESTLIN_CLATCH,   "CLATCH", m_clatch).formatstr("%04X");
 	state_add( CQUESTLIN_ZLATCH,   "ZLATCH", m_zlatch).formatstr("%04X");
 
-	state_add(STATE_GENPC, "curpc", m_curpc).callimport().callexport().formatstr("%02X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_curpc).formatstr("%02X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_curpc).formatstr("%02X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%6s").noshow();
 
 	m_icountptr = &m_icount;

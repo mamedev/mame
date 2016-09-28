@@ -106,11 +106,7 @@ enum
 	M68K_D0, M68K_D1, M68K_D2, M68K_D3, M68K_D4, M68K_D5, M68K_D6, M68K_D7,
 	M68K_A0, M68K_A1, M68K_A2, M68K_A3, M68K_A4, M68K_A5, M68K_A6, M68K_A7,
 	M68K_FP0, M68K_FP1, M68K_FP2, M68K_FP3, M68K_FP4, M68K_FP5, M68K_FP6, M68K_FP7,
-	M68K_FPSR, M68K_FPCR,
-
-	M68K_GENPC = STATE_GENPC,
-	M68K_GENSP = STATE_GENSP,
-	M68K_GENPCBASE = STATE_GENPCBASE
+	M68K_FPSR, M68K_FPCR
 };
 
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);

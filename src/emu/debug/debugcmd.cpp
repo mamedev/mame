@@ -2628,7 +2628,7 @@ void debugger_commands::execute_trackpc(int ref, int params, const char *param[]
 		// Insert current pc
 		if (m_cpu.get_visible_cpu() == cpu)
 		{
-			const offs_t pc = cpu->safe_pc();
+			const offs_t pc = cpu->safe_pcbase();
 			cpu->debug()->set_track_pc_visited(pc);
 		}
 		m_console.printf("PC tracking enabled\n");

@@ -101,6 +101,7 @@ void ssem_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_halt).callimport().callexport().formatstr("%1s").noshow();
 	state_add(SSEM_PC,         "PC",        m_shifted_pc).mask(0xffff);
 	state_add(SSEM_A,          "A",         m_a).mask(0xffffffff);

@@ -752,6 +752,7 @@ void avr8_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_shifted_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_shifted_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_r[AVR8_REGIDX_SREG]).callimport().callexport().formatstr("%8s").noshow();
 	state_add(AVR8_SREG,       "STATUS",    m_r[AVR8_REGIDX_SREG]).mask(0xff);
 	state_add(AVR8_PC,         "PC",        m_shifted_pc).mask(m_addr_mask);

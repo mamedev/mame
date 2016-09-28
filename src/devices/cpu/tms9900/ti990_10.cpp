@@ -62,7 +62,8 @@ void ti990_10_device::device_start()
 	// set our instruction counter
 	m_icountptr = &m_icount;
 
-	state_add(STATE_GENPC, "curpc", PC).formatstr("%4s").noshow();
+	state_add(STATE_GENPC, "GENPC", PC).formatstr("%4s").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", PC).formatstr("%4s").noshow();
 	state_add(STATE_GENFLAGS, "status", m_state_any).callimport().callexport().formatstr("%16s").noshow();
 }
 

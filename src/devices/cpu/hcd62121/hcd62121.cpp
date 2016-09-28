@@ -314,7 +314,8 @@ void hcd62121_cpu_device::device_start()
 	save_item( NAME(m_temp2) );
 
 	// Register state for debugger
-	state_add( STATE_GENPC,    "curpc",    m_ip ).callimport().callexport().formatstr("%8s");
+	state_add( STATE_GENPC,    "GENPC",    m_ip ).callexport().formatstr("%8s");
+	state_add( STATE_GENPCBASE,"CURPC",    m_ip ).callexport().formatstr("%8s");
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_f  ).callimport().callexport().formatstr("%12s").noshow();
 
 	state_add( HCD62121_IP,    "IP",    m_ip    ).callimport().callexport().formatstr("%04X");
@@ -368,6 +369,7 @@ void hcd62121_cpu_device::state_string_export(const device_state_entry &entry, s
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			str = string_format("%06X", (m_cseg << 16) | m_ip);
 			break;
 

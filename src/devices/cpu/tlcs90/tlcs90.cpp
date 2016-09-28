@@ -2764,9 +2764,9 @@ void tlcs90_device::device_start()
 	state_add( T90_IY, "IY", m_iy.w.l).formatstr("%04X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc.w.l).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_prvpc.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENSP, "GENSP", m_sp.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", F ).formatstr("%8s").noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_prvpc.w.l).formatstr("%04X").noshow();
 
 	m_icountptr = &m_icount;
 }

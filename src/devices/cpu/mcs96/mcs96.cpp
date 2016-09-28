@@ -26,7 +26,7 @@ void mcs96_device::device_start()
 	m_icountptr = &icount;
 
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
 	state_add(STATE_GENSP,     "GENSP",     R[0]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  PSW).formatstr("%16s").noshow();
 	state_add(MCS96_PC,        "PC",        PC);

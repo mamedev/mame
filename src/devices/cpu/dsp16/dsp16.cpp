@@ -90,7 +90,7 @@ void dsp16_device::device_start()
 {
 	// register state with the debugger
 	state_add(STATE_GENPC,    "GENPC",     m_pc).noshow();
-	//state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",    m_ppc).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_psw).callimport().callexport().formatstr("%10s").noshow();
 	state_add(DSP16_PC,       "PC",        m_pc);
 	state_add(DSP16_I,        "I",         m_i);

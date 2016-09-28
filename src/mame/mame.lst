@@ -12194,6 +12194,7 @@ fgoal                           // TF  (c) 1979 Taito Corporation
 fgoala                          // MF  (c) 1979 Taito Corporation
 
 @source:fidel6502.cpp
+chesster                        //
 csc                             // CSC: Champion Sensory Chess Challenger (English)
 cscfr                           // * French
 cscg                            // * German

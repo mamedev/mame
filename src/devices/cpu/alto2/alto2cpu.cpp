@@ -989,7 +989,8 @@ void alto2_cpu_device::device_start()
 	state_add( A2_OKTORUN, "OKTORUN", m_dsk.ok_to_run).formatstr("%1u");
 	state_add( A2_READY,   "READY",   m_dsk.kstat).formatstr("%1u");
 
-	state_add(STATE_GENPC, "curpc", m_mpc).formatstr("%03X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_mpc).formatstr("%03X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_mpc).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_aluc0).formatstr("%5s").noshow();
 
 	m_icountptr = &m_icount;

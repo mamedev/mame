@@ -244,6 +244,7 @@ void tms32051_device::device_start()
 	state_add( TMS32051_PSC,      "PSC", m_timer.psc).formatstr("%04X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 
 	m_icountptr = &m_icount;
 }

@@ -180,6 +180,7 @@ void hp_hybrid_cpu_device::device_start()
 								state_add(HPHYBRID_D,  "D", m_reg_D);
 								state_add(HPHYBRID_P,  "P", m_reg_P);
 								state_add(STATE_GENPC, "GENPC", m_genpc).noshow();
+								state_add(STATE_GENPCBASE, "CURPC", m_genpc).noshow();
 								state_add(HPHYBRID_R,  "R", m_reg_R);
 								state_add(STATE_GENSP, "GENSP", m_reg_R).noshow();
 								state_add(HPHYBRID_IV, "IV", m_reg_IV);

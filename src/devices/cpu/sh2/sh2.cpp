@@ -2459,8 +2459,8 @@ void sh2_device::device_start()
 	state_add( SH2_EA,   "EA",   m_sh2_state->ea).formatstr("%08X");
 
 	state_add( STATE_GENPC, "GENPC", m_sh2_state->pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->ppc ).noshow();
 	state_add( STATE_GENSP, "GENSP", m_sh2_state->r[15] ).noshow();
-	state_add( STATE_GENPCBASE, "GENPCBASE", m_sh2_state->ppc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr ).formatstr("%6s").noshow();
 
 	m_icountptr = &m_sh2_state->icount;
