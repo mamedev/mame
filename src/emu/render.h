@@ -345,10 +345,10 @@ public:
 	// getters
 	render_primitive *next() const { return m_next; }
 	bool packable(const INT32 pack_size) const { return (flags & PRIMFLAG_PACKABLE) && texture.base != nullptr && texture.width <= pack_size && texture.height <= pack_size; }
-	float get_quad_width() const { return abs(bounds.x1 - bounds.x0); }
-	float get_quad_height() const { return abs(bounds.y1 - bounds.y0); }
-	float get_full_quad_width() const { return abs(full_bounds.x1 - full_bounds.x0); }
-	float get_full_quad_height() const { return abs(full_bounds.y1 - full_bounds.y0); }
+	float get_quad_width() const { return fabsf(bounds.x1 - bounds.x0); }
+	float get_quad_height() const { return fabsf(bounds.y1 - bounds.y0); }
+	float get_full_quad_width() const { return fabsf(full_bounds.x1 - full_bounds.x0); }
+	float get_full_quad_height() const { return fabsf(full_bounds.y1 - full_bounds.y0); }
 
 	// reset to prepare for re-use
 	void reset();
