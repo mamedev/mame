@@ -145,7 +145,6 @@ private:
 	// Data that needs to be stored close to the generated DRC code
 	struct internal_sh2_state
 	{
-		UINT32  ppc;
 		UINT32  pc;
 		UINT32  pr;
 		UINT32  sr;
