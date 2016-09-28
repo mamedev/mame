@@ -4075,5 +4075,225 @@
 				<rom name="domo-kun card-e - b-030 (japan) (strip 2).raw" size="2912" crc="c2a1b026" sha1="169e6510c951509e0c76957927040a4cb696bb0f"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
+	<software name="mpebbu1">
+		<description>Mario Party-e - Big Boo (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - big boo (usa) (strip 1).raw" size="2912" crc="61a12664" sha1="03add9397085bec4d87366266b754f537b9a1a90"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpebbu2">
+		<description>Mario Party-e - Big Boo (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - big boo (usa) (strip 2).raw" size="2912" crc="d7ff0550" sha1="05af90553361c8966614cb0fe7d918fa4b67d828"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpebsu1">
+		<description>Mario Party-e - Bowser (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - bowser (usa) (strip 1).raw" size="2912" crc="86cc476e" sha1="06cf1d3e9cec6e054b3c4fc1b2efda07a961c59a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpebsu2">
+		<description>Mario Party-e - Bowser (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - bowser (usa) (strip 2).raw" size="2912" crc="e0f361b9" sha1="e15a91933c3b27c968271bc3c4db855b716309ad"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpedsu1">
+		<description>Mario Party-e - Daisy (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - daisy (usa) (strip 1).raw" size="2912" crc="387625dc" sha1="ce95a865bb06560f3cf490ef39aa1e84a2e24e5d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpedsu2">
+		<description>Mario Party-e - Daisy (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - daisy (usa) (strip 2).raw" size="2912" crc="945bfa43" sha1="9e86abf3785574aa1fdbcdf1d6f5ef1edc20728e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpegpu1">
+		<description>Mario Party-e - Graceful Princess Peach (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - graceful princess peach (usa) (strip 1).raw" size="2912" crc="65b5b655" sha1="86e19c5f2b0cdc802c513db5d24aeab39799f6f2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpegpu2">
+		<description>Mario Party-e - Graceful Princess Peach (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - graceful princess peach (usa) (strip 2).raw" size="2912" crc="1ec7515f" sha1="fd36fc576e57b4ff08b8ffaee25ec51a7ea1eef2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpelku1">
+		<description>Mario Party-e - Lakitu (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - lakitu (usa) (strip 1).raw" size="2912" crc="441445b1" sha1="f84de62fbf1503cd983d7dcac7efc36755c92773"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpelku2">
+		<description>Mario Party-e - Lakitu (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - lakitu (usa) (strip 2).raw" size="2912" crc="78155c32" sha1="bd56cff29a387a484184b279ecb414f0ec431ff9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpeppu1">
+		<description>Mario Party-e - Princess Peach (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - princess peach (usa) (strip 1).raw" size="2912" crc="85071563" sha1="80f34ec1fb1d1a1359b0a871dea0c38932a4eda4"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpeppu2">
+		<description>Mario Party-e - Princess Peach (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - princess peach (usa) (strip 2).raw" size="2912" crc="77a26fa4" sha1="d3418507974cf4a5e6cbfafa6c9f0715e5050778"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpeslu1">
+		<description>Mario Party-e - Super Waluigi (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - super waluigi (usa) (strip 1).raw" size="2912" crc="1d84220f" sha1="875ee908d6860cb7df24c406711286f0ea57e52d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpeslu2">
+		<description>Mario Party-e - Super Waluigi (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - super waluigi (usa) (strip 2).raw" size="2912" crc="ed011685" sha1="cd4b60b670839986ee93aafd6c5cb3ef3939ceda"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpeswu1">
+		<description>Mario Party-e - Super Wario (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - super wario (usa) (strip 1).raw" size="2912" crc="1fcb520a" sha1="f5dfac00401d3ff3d7bdc4374ff314e9ecca2712"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpeswu2">
+		<description>Mario Party-e - Super Wario (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - super wario (usa) (strip 2).raw" size="2912" crc="d36a5317" sha1="0fe068db27d24ea7da4af2e0023d4e372de63efd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpewlu1">
+		<description>Mario Party-e - Waluigi (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - waluigi (usa) (strip 1).raw" size="2912" crc="1276e9e9" sha1="b11ea3bc9498b6a382a6ee3e0c4c6cd8f7821129"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpewlu2">
+		<description>Mario Party-e - Waluigi (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - waluigi (usa) (strip 2).raw" size="2912" crc="52858a3c" sha1="72251862b2306b1b8a93c40d36d37b75335397ae"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpewru1">
+		<description>Mario Party-e - Wario (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - wario (usa) (strip 1).raw" size="2912" crc="92c8d691" sha1="b31edff7613a6a3ff7622bb21953ab9dbd01803f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpewru2">
+		<description>Mario Party-e - Wario (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - wario (usa) (strip 2).raw" size="2912" crc="f6b909aa" sha1="3170ad31deab34f10098507e7fe57fb20dfeb68c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpeysu1">
+		<description>Mario Party-e - Yoshi (USA) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - yoshi (usa) (strip 1).raw" size="2912" crc="40ddedb4" sha1="72fa65a855a6c35027375936a8260b37564077f3"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpeysu2">
+		<description>Mario Party-e - Yoshi (USA) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="mario party-e - yoshi (usa) (strip 2).raw" size="2912" crc="bbe400ac" sha1="73974834985a112d8b92b81d0421e5eb7fe67f5b"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

@@ -767,7 +767,7 @@ DRIVER_INIT_MEMBER(cps_state,cps2crypt)
  		// decoded[4] == watchdog instruction third word
 		// decoded[5] == watchdog instruction second word
 		// decoded[6] == watchdog instruction first word
-		// decoded[7] == 0x4000
+		// decoded[7] == 0x4000 (bits 8 to 23 of CPS2 object output address)
 		// decoded[8] == 0x0900
 
 		if (decoded[9] == 0xffff)

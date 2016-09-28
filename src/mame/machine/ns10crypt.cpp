@@ -118,14 +118,14 @@ really exist.
 #include "emu.h"
 #include "ns10crypt.h"
 
-constexpr device_type CHOCOVDR_DECRYPTER = &device_creator<chocovdr_decrypter_device>;
-constexpr device_type GAMSHARA_DECRYPTER = &device_creator<gamshara_decrypter_device>;
-constexpr device_type  GJSPACE_DECRYPTER = &device_creator<gjspace_decrypter_device>;
-constexpr device_type KNPUZZLE_DECRYPTER = &device_creator<knpuzzle_decrypter_device>;
-constexpr device_type KONOTAKO_DECRYPTER = &device_creator<konotako_decrypter_device>;
-constexpr device_type MRDRILR2_DECRYPTER = &device_creator<mrdrilr2_decrypter_device>;
-constexpr device_type NFLCLSFB_DECRYPTER = &device_creator<nflclsfb_decrypter_device>;
-constexpr device_type STARTRGN_DECRYPTER = &device_creator<startrgn_decrypter_device>;
+const device_type CHOCOVDR_DECRYPTER = &device_creator<chocovdr_decrypter_device>;
+const device_type GAMSHARA_DECRYPTER = &device_creator<gamshara_decrypter_device>;
+const device_type  GJSPACE_DECRYPTER = &device_creator<gjspace_decrypter_device>;
+const device_type KNPUZZLE_DECRYPTER = &device_creator<knpuzzle_decrypter_device>;
+const device_type KONOTAKO_DECRYPTER = &device_creator<konotako_decrypter_device>;
+const device_type MRDRILR2_DECRYPTER = &device_creator<mrdrilr2_decrypter_device>;
+const device_type NFLCLSFB_DECRYPTER = &device_creator<nflclsfb_decrypter_device>;
+const device_type STARTRGN_DECRYPTER = &device_creator<startrgn_decrypter_device>;
 
 // base class
 
@@ -161,7 +161,7 @@ ns10_decrypter_device::~ns10_decrypter_device()
 constexpr int UNKNOWN {16};
 constexpr int U {UNKNOWN};
 // this could perfectly be part of the per-game logic but, with only one known type-1 game, we cannot say anything definitive
-constexpr int ns10_type1_decrypter_device::initSbox[16] {U,U,U,0,4,9,U,U,U,8,U,1,U,9,U,5};
+const int ns10_type1_decrypter_device::initSbox[16] {U,U,U,0,4,9,U,U,U,8,U,1,U,9,U,5};
 
 ns10_type1_decrypter_device::ns10_type1_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_decrypter_device(type, mconfig, tag, owner, clock)
@@ -211,7 +211,7 @@ void ns10_type1_decrypter_device::device_start()
 // type-2 decrypter
 
 // this could perfectly be part of the per-game logic; by now, only gamshara seems to use it, so we keep it global
-constexpr int ns10_type2_decrypter_device::initSbox[16] {0,12,13,6,2,4,9,8,11,1,7,15,10,5,14,3};
+const int ns10_type2_decrypter_device::initSbox[16] {0,12,13,6,2,4,9,8,11,1,7,15,10,5,14,3};
 
 ns10_type2_decrypter_device::ns10_type2_decrypter_device(device_type type, const ns10_crypto_logic &logic, const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_decrypter_device(type, mconfig, tag, owner, clock)
