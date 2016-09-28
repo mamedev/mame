@@ -37,7 +37,7 @@ public:
 	bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair*> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output);
 	~bgfx_chain_entry();
 
-	void submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen);
+	void submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen);
 
 	// Getters
 	std::string name() const { return m_name; }
@@ -45,12 +45,14 @@ public:
 	bool skip();
 
 private:
-	void setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen);
+	void setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen);
 	void setup_screensize_uniforms(texture_manager& textures, uint16_t screen_width, uint16_t screen_height, int32_t screen);
 	void setup_screenscale_uniforms(float screen_scale_x, float screen_scale_y);
 	void setup_screenoffset_uniforms(float screen_offset_x, float screen_offset_y);
+	void setup_screencount_uniforms(uint16_t screen_count);
 	void setup_sourcesize_uniform(render_primitive* prim) const;
 	void setup_targetsize_uniform(int32_t screen) const;
+	void setup_targetscale_uniform(int32_t screen) const;
 	void setup_rotationtype_uniform(uint32_t rotation_type) const;
 	void setup_swapxy_uniform(bool swap_xy) const;
 	void setup_quaddims_uniform(render_primitive* prim) const;
