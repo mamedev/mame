@@ -804,7 +804,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM // 0x2000-0x2*** maybe shared with other boards?
 	AM_RANGE(0x4000, 0x47ff) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
 ADDRESS_MAP_END
 
@@ -1229,7 +1229,7 @@ static INPUT_PORTS_START( pdriftl )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) 	// Affects banking between 
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) 	// Affects how the z80 access memory at 0x2000-0x2*** 
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
