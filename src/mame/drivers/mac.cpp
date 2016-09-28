@@ -2250,7 +2250,7 @@ ROM_START( mac128k )
 ROM_END
 
 ROM_START( mac512k )
-	ROM_REGION16_BE(0x20000, "bootrom", 0) // 
+	ROM_REGION16_BE(0x20000, "bootrom", 0) //
 	//ROM_LOAD16_WORD( "28ba4e50 - Macintosh-512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
 	ROMX_LOAD("vti__512_vh_6434__23256-1104__342-0220-b__(c)_apple_84__korea-a.rom-hi.27256.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
 	ROMX_LOAD("vti__512_vh_6709__23256-1105__342-0221-b__(c)_apple_84__korea-a.rom-lo.27256.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"

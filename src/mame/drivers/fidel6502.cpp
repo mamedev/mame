@@ -419,7 +419,7 @@ public:
 	DECLARE_READ8_MEMBER(fexcelv_speech_r);
 	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
 	DECLARE_READ8_MEMBER(fexcel_ttl_r);
-	
+
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_DRIVER_INIT(chesster);
