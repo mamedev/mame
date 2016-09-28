@@ -78,8 +78,8 @@ void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_m
 	screen_device* screen_device = screen_iterator.byindex(screen);
 
 	uint16_t screen_count(window.target()->current_view()->screens().count());
-	uint16_t screen_width(floor(prim->get_quad_width() + 0.5f));
-	uint16_t screen_height(floor(prim->get_quad_height() + 0.5f));
+	uint16_t screen_width(floorf(prim->get_quad_width() + 0.5f));
+	uint16_t screen_height(floorf(prim->get_quad_height() + 0.5f));
 	uint32_t rotation_type =
 		(window.target()->orientation() & ROT90)  == ROT90  ? 1 :
 		(window.target()->orientation() & ROT180) == ROT180 ? 2 :

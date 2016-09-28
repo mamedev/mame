@@ -2397,8 +2397,8 @@ void uniform::update()
 			if (shadersys->curr_poly)
 			{
 				float quaddims[2] = {
-					floor(shadersys->curr_poly->prim_width() + 0.5f),
-					floor(shadersys->curr_poly->prim_height() + 0.5f) };
+					floorf(shadersys->curr_poly->prim_width() + 0.5f),
+					floorf(shadersys->curr_poly->prim_height() + 0.5f) };
 				m_shader->set_vector("QuadDims", 2, quaddims);
 			}
 			break;
