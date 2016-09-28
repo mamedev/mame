@@ -214,6 +214,10 @@ static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_WRITE(cischeat_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
+	/* It's actually 0x840000-0x847ff, divided in four banks and shared with other boards.
+		Each board expects reads from the other boards and writes to own bank.
+		Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
+		so it's likely to be the only thing needed. */
 	AM_RANGE(0x084000, 0x087fff) AM_RAM                                                 // Linking with other units
 	AM_RANGE(0x088000, 0x08bfff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x08c000, 0x08ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
