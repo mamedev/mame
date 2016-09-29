@@ -65,9 +65,9 @@ f000 ? ( initialize only )
 
 I/O read/write
 00   z80pio-A data     ( from sound command )
-01   z80pio-A controll ( mode 1 input )
+01   z80pio-A control  ( mode 1 input )
 02   z80pio-B data     ( no use )
-03   z80pio-B controll ( mode 3 bit i/o )
+03   z80pio-B control  ( mode 3 bit i/o )
 08   z80ctc-ch1        ( timer mode cysclk/16, bas clock 15.625KHz )
 09   z80ctc-ch2        ( cascade from ctc-1  , tempo interrupt 88.778Hz )
 0a   z80ctc-ch3        ( timer mode , single sound freq. )
