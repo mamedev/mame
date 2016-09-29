@@ -10,7 +10,7 @@
   -> intel 430hx, aka 82439hx northbridge (pci, no agp)
   -> intel piix3, aka 82371sb southbridge (pci-isa bridge, ide, ioapic, timer, irq, dma, usb)
   -> smsc fdc37c93x superio (isa-connected, keyboard, rtc, fdc, rs232, ide)
-  - A Matrox Millenium PCI video card
+  - A Matrox Millennium PCI video card
 
   We'll see about sound, networking, etc later
 

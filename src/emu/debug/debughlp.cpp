@@ -226,7 +226,7 @@ static const help_item static_help_list[] =
 		"  comadd[//] <address>,<comment> -- adds a comment to the disassembled code at given address\n"
 		"  comdelete <address> -- removes a comment from the given address\n"
 		"  comsave -- save the current comments to a file\n"
-		"  comlist -- print currently avaliable comments from file\n"
+		"  comlist -- print currently available comments from file\n"
 		"  commit[/*] <address>,<comment> -- gives a bulk comadd then comsave command\n"
 		"\n"
 	},
