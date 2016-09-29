@@ -232,20 +232,13 @@ float2 GetTextureCoords(float2 coord, float distortionAmount, float cubicDistort
 	return coord;
 }
 
-float2 GetQuadCoords(float2 coord, float distortionAmount, float cubicDistortionAmount)
+float2 GetQuadCoords(float2 coord, float2 scale, float distortionAmount, float cubicDistortionAmount)
 {
 	// center coordinates
 	coord -= 0.5f;
 
-	// keep coords inside of the quad bounds of a single screen
-	if (ScreenCount == 1)
-	{
-		// base-target dimensions (without oversampling)
-		float2 BaseTargetDims = TargetDims / TargetScale;
-
-		// apply base-target/quad difference
-		coord *= BaseTargetDims / (SwapXY ? QuadDims.yx : QuadDims.xy);
-	}
+	// apply scale
+	coord *= scale;
 
 	// distort coordinates
 	coord = GetDistortedCoords(coord, distortionAmount, cubicDistortionAmount);
@@ -271,12 +264,20 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	// base-target dimensions (without oversampling)
 	float2 BaseTargetDims = TargetDims / TargetScale;
+	BaseTargetDims = SwapXY
+		? BaseTargetDims.yx
+		: BaseTargetDims.xy;
+
+	// base-target/quad difference scale
+	float2 BaseTargetQuadScale = ScreenCount == 1
+		? BaseTargetDims / QuadDims // keeps the coords inside of the quad bounds of a single screen
+		: 1.0f;
 
 	// Screen Texture Curvature
 	float2 BaseCoord = GetTextureCoords(Input.TexCoord, distortionAmount, cubicDistortionAmount);
 
 	// Screen Quad Curvature
-	float2 QuadCoord = GetQuadCoords(Input.TexCoord, distortCornerAmount, 0.0f);
+	float2 QuadCoord = GetQuadCoords(Input.TexCoord, BaseTargetQuadScale, distortCornerAmount, 0.0f);
 
 	// clip border
 	clip(BaseCoord < 0.0f - TexelDims || BaseCoord > 1.0f + TexelDims ? -1 : 1);

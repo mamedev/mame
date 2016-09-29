@@ -157,20 +157,13 @@ vec2 GetTextureCoords(vec2 coord, float distortionAmount, float cubicDistortionA
 	return coord;
 }
 
-vec2 GetQuadCoords(vec2 coord, float distortionAmount, float cubicDistortionAmount)
+vec2 GetQuadCoords(vec2 coord, vec2 scale, float distortionAmount, float cubicDistortionAmount)
 {
 	// center coordinates
 	coord -= 0.5;
 
-	// keep coords inside of the quad bounds of a single screen
-	if (u_screen_count.x > 0.0 && u_screen_count.x < 2.0)
-	{
-		// base-target dimensions (without oversampling)
-		vec2 BaseTargetDims = u_target_dims.xy / u_target_scale.xy;
-
-		// apply base-target/quad difference
-		coord *= BaseTargetDims / ((u_swap_xy.x > 0.0) ? u_quad_dims.yx : u_quad_dims.xy);
-	}
+	// apply scale
+	coord *= scale;
 
 	// distort coordinates
 	coord = GetDistortedCoords(coord, distortionAmount, cubicDistortionAmount);
@@ -197,12 +190,20 @@ void main()
 
 	// base-target dimensions (without oversampling)
 	vec2 BaseTargetDims = u_target_dims.xy / u_target_scale.xy;
+	BaseTargetDims = (u_swap_xy.x > 0.0)
+		? BaseTargetDims.yx
+		: BaseTargetDims.xy;
+
+	// base-target/quad difference scale
+	vec2 BaseTargetQuadScale = (u_screen_count.x > 0.0 && u_screen_count.x < 2.0)
+		? BaseTargetDims / u_quad_dims.xy // keeps the coords inside of the quad bounds of a single screen
+		: vec2(1.0, 1.0);
 
 	// Screen Texture Curvature
 	vec2 BaseCoord = GetTextureCoords(v_texcoord0, distortionAmount, cubicDistortionAmount);
 
 	// Screen Quad Curvature
-	vec2 QuadCoord = GetQuadCoords(v_texcoord0, distortCornerAmount, 0.0);
+	vec2 QuadCoord = GetQuadCoords(v_texcoord0, BaseTargetQuadScale, distortCornerAmount, 0.0);
 
 	// Color
 	vec4 BaseColor = texture2D(s_tex, BaseCoord);
