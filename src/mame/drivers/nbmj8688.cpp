@@ -4059,7 +4059,7 @@ GAME( 1988, vipclub,  orangec,  vipclub,         vipclub,  driver_device,  0,   
 /* pure 12-bit palette */
 GAME( 1988, kaguya,   0,        kaguya,          kaguya,   driver_device,   0,        ROT0, "Miki Syouji", "Mahjong Kaguyahime [BET] (Japan 880521)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, kaguya2,  0,        kaguya2,         kaguya2,  nbmj8688_state,  kaguya2,  ROT0, "Miki Syouji", "Mahjong Kaguyahime Sono2 [BET] (Japan 890829)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, kaguya2f, kaguya2,  kaguya2,         kaguya2,  nbmj8688_state,  kaguya2,  ROT0, "Miki Syouji", "Mahjong Kaguyahime Sono2 Fukkokuban [BET] (Japan 010808)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, kaguya2f, kaguya2,  kaguya2,         kaguya2,  nbmj8688_state,  kaguya2,  ROT0, "Miki Syouji", "Mahjong Kaguyahime Sono2 Fukkokuban [BET] (Japan 010808)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kanatuen, 0,        kanatuen,        kanatuen, nbmj8688_state, kanatuen, ROT0, "Panac", "Kanatsuen no Onna [BET] (Japan 880905)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kyuhito,  kanatuen, kyuhito,         kyuhito,  nbmj8688_state,  kyuhito,  ROT0, "Roller Tron", "Kyukyoku no Hito [BET] (Japan 880824)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, idhimitu, 0,        idhimitu,        idhimitu, nbmj8688_state, idhimitu, ROT0, "Digital Soft", "Idol no Himitsu [BET] (Japan 890304)", MACHINE_SUPPORTS_SAVE )
