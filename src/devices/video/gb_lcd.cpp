@@ -14,19 +14,152 @@
   Timing is not accurate enough:
   - Mode 3 takes 172 cycles (measuered with logic analyzer by costis)
 
+The following timing of the first frame when the LCD is turned on, is with
+no sprites being displayed. If sprites are displayed then the timing of mode
+3 and mode 0 will change.
+
+* LCD turn on for a DMG (on a CGB the timing is a little bit different)
+our state                                     LY   Mode  #Cycles 
+(GB_LCD_STATE_LY00_M2)                        0    0     80 (?)   The unit is actually in mode 0 here and the OAM area is unlocked
+GB_LCD_STATE_LYXX_M3                          0    3     169-172  Draw line 0 during this period
+  - Lock OAM area
+  - Lock VRAM area
+GB_LCD_STATE_LYXX_M0                          0    0     1
+  - Unlock OAM area
+  - Unlock VRAM area
+GB_LCD_STATE_LYXX_M0_2                        0    0     199-202
+  - Check for mode 0 interrupt
+GB_LCD_STATE_LYXX_M0_INC                      1    0     4
+  - clear mode 0 interrupt
+  - check mode 2 interrupt
+  - clear LY=LYC incidence flag
+  - check LY=LYC interrupt
+GB_LCD_STATE_LYXX_M2                          1    2     8
+  - clear mode 0 interrupt
+  - set LY=LYC incidence flag
+  - Lock OAM area
+  - latch WNDPOSY
+GB_LCD_STATE_LYXX_M2_WND                      1    2     72
+  - check whether window could trigger this line
+GB_LCD_STATE_LYXX_M3                          1    3     169-172
+etc, until                                    *    *     *
+GB_LCD_STATE_LYXX_M0_2                        143  0     199-202
+GB_LCD_STATE_LYXX_M0_INC                      144  0     4
+  - check mode 2 interrupt
+  - clear LY=LYC incidence flag
+  - check LY=LYC interrupt
+GB_LCD_STATE_LY9X_M1                          144  1     452
+  - clear mode 0 interrupt
+  - clear mode 2 interrupt
+  - trigger VBlank interrupt
+  - check mode 1 interrupt
+  - set LY=LYC incidence flag
+  - check LY=LYC interrupt
+GB_LCD_STATE_LY9X_M1_INC                      145  1     4
+  - clear LY=LYC incidence flag
+GB_LCD_STATE_LY9X_M1                          145  1     452
+  - set LY=LYC incidence flag
+  - check LY=LYC interrupt
+etc, until                                    *    1     *
+GB_LCD_STATE_LY9X_M1_INC                      153  1     4
+  - clear LY=LYC incidence flag
+GB_LCD_STATE_LY00_M1                          0    1     4
+  - set LY=LYC incidence flag (for line 153)
+  - check LY=LYC interrupt (for line 153)
+GB_LCD_STATE_LY00_M1_1                        0    1     4
+  - clear LY=LYC incidence flag
+GB_LCD_STATE_LY00_M1_2                        0    1     444
+  - check LY=LYC interrupt (for line 0)
+  - set LY=LYC incidence flag (for line 0)
+GB_LCD_STATE_LY00_M0                          0    0     4
+GB_LCD_STATE_LY00_M2                          0    2     8
+  - clear mode 1 interrupt
+  - check mode 2 interrupt
+  - lock OAM area
+  - latch WNDPOSY
+GB_LCD_STATE_LY00_M2_WND                      0    2     72
+  - check whether window could trigger this line
+GB_LCD_STATE_LYXX_M3                          0    3     169-172
+
+
+
+
+From kevtris' gameboy documentation:
+
+Accessing VRAM while drawing a regular line (window is off):
+- B01  - 6 cycles     ($9800, thrown away)
+- B01s - 20x8 cycles  ($9800, $9801, $9802, $9803, etc)
+- B01s - 7.5 cycles
+total: 6 + 167.5 + xscroll & 7
+
+
+Window is on; 0 < xwindow < $a6
+- B01  - 6 cycles                                   ($9800, thrown away)
+- B01s - 1-172 cycles (xscroll & 7 + xwindow + 1)   ($9800, $9801, $9802, etc)
+- W01  - 6 cycles                                   ($9c00)
+- W01s - 1.5-166.5 cycles (166.5 - xwindow)         ($9c01, $9c02, $9c03, etc)
+Total: 6  + 6 + 167.5 + xscroll & 7
+
+
+Window is on; xwindow = 0, xscroll & 7 = 0 - 6
+- B01B - 7 cycles             ($9800, thrown away)
+- W01  - 6 cycles             ($9c00)
+- W01s - 167.5 + xscroll & 7  ($9c01, $9c02, $9c03, $9c04, etc)
+Total: 7 + 6 + 167.5 + xscroll & 7
+
+
+Window is on; xwindow = 0; xscroll & 7 = 7
+- B01B - 7 cycles                                                         ($9800, thrown away)
+- W01  - 6 cycles                                                         ($9c00)
+- W01s - 167.5 + xscroll & 7 + 1 cycle delay during first sprite window   ($9c01, $9c02, $9c03, etc)
+Total: 7 + 6 + 167.5 + xscroll & 7 + 1
+
+
+Window is on; xwindow = $a6
+- First scanline displays first scanline of the window
+- ywindow values:
+  00 : window line 0, window line 1, window line 2, window line 3
+  01 : window line 0, background line 1, window line 2, window line 3
+  02 : window line 0, background line 1, background line 2, window line 2, window line 3
+  03 : window line 0, background line 1, background line 2, background line 3, window line 2, window line 3
+- W01  - 6 cycles     ($9c00, thrown away)
+- W01s - 20x8 cycles  ($9c01, $9c02, $9c03, $9c04, etc)
+- W01s - 7.5 cycles
+total: 6 + 167.5 + xscroll & 7
+
+
+From gambatte scx_m3_extend test a precisely triggered write can extend the m3
+period with the xscroll & 7 delay getting applied twice!
+The write to the xscroll register occurs during the first B01s sequence for
+this to happen or when it is almost/just done applying the xscroll & 7 cycles;
+it is still unclear exactly when the xscroll delay cycles are applied:
+B01 apply-scx B01sB01sB01s...
+or
+B01 B01 apply-scx sB01sB01s...
+
+The first option seems the most logical setup since the xscroll & 7 delay is
+applied in all cases including when xwindow is low, like 0, 1, or 2. In those
+cases the B01 from the first B01s sequence is not completed yet. Unless it is
+applied but only in the form of wait cycles before the window is started.
+
+
+TODO:
+- Add sprite support to new rendering engine.
+- Replace memory map during OAM operation.
+- Fix more test cases.
+- Convert CGB code to new rendering engine.
+- Simplify code. The code was built up adding more and more support for
+  several cases, so it has become a bit more complex than is necessary. Once
+  we have a baseline for passing testcases code simplifications can be
+  more easily tested.
+
 ***************************************************************************/
 
 #include "emu.h"
-//#include "cpu/lr35902/lr35902.h"
 #include "video/gb_lcd.h"
 
-/* Interrupts (copied from includes/gb.h)... */
-#define VBL_INT               0       /* V-Blank    */
-#define LCD_INT               1       /* LCD Status */
-#define TIM_INT               2       /* Timer      */
-#define SIO_INT               3       /* Serial I/O */
-#define EXT_INT               4       /* Joypad     */
-
+#define ENABLE_LOGGING 0
+#define LOG(x) do { if (ENABLE_LOGGING) logerror x; } while(0)
 
 
 #define LCDCONT     m_vid_regs[0x00]  /* LCD control register                       */
@@ -65,14 +198,17 @@ enum {
 
 enum {
 	GB_LCD_STATE_LYXX_M3=1,
+	GB_LCD_STATE_LYXX_M3_2,
 	GB_LCD_STATE_LYXX_PRE_M0,
 	GB_LCD_STATE_LYXX_M0,
-	GB_LCD_STATE_LYXX_M0_SCX3,
+	GB_LCD_STATE_LYXX_M0_2,
 	GB_LCD_STATE_LYXX_M0_GBC_PAL,
 	GB_LCD_STATE_LYXX_M0_PRE_INC,
 	GB_LCD_STATE_LYXX_M0_INC,
 	GB_LCD_STATE_LY00_M2,
+	GB_LCD_STATE_LY00_M2_WND,
 	GB_LCD_STATE_LYXX_M2,
+	GB_LCD_STATE_LYXX_M2_WND,
 	GB_LCD_STATE_LY9X_M1,
 	GB_LCD_STATE_LY9X_M1_INC,
 	GB_LCD_STATE_LY00_M1,
@@ -152,7 +288,7 @@ static const UINT8 cgb_oam_fingerprint[0x100] = {
 /*
  For an AGS in CGB mode this data is: */
 #if 0
-static const UINT8 abs_oam_fingerprint[0x100] = {
+static const UINT8 ags_oam_fingerprint[0x100] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -173,40 +309,51 @@ static const UINT8 abs_oam_fingerprint[0x100] = {
 #endif
 
 
-const device_type GB_LCD_DMG = &device_creator<gb_lcd_device>;
-const device_type GB_LCD_MGB = &device_creator<mgb_lcd_device>;
-const device_type GB_LCD_SGB = &device_creator<sgb_lcd_device>;
-const device_type GB_LCD_CGB = &device_creator<cgb_lcd_device>;
+const device_type DMG_PPU = &device_creator<dmg_ppu_device>;
+const device_type MGB_PPU = &device_creator<mgb_ppu_device>;
+const device_type SGB_PPU = &device_creator<sgb_ppu_device>;
+const device_type CGB_PPU = &device_creator<cgb_ppu_device>;
 
 
 
-gb_lcd_device::gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-					device_video_interface(mconfig, *this),
-					m_sgb_border_hack(0)
+dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT32 vram_size)
+				: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+				, device_video_interface(mconfig, *this)
+				, m_lr35902(*this, finder_base::DUMMY_TAG)
+				, m_sgb_border_hack(0)
+				, m_enable_experimental_engine(false)
+				, m_oam_size(0x100)
+				, m_vram_size(vram_size)
 {
 }
 
-gb_lcd_device::gb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, GB_LCD_DMG, "DMG LCD", tag, owner, clock, "dmg_lcd", __FILE__),
-					device_video_interface(mconfig, *this),
-					m_sgb_border_hack(0)
+dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+				: device_t(mconfig, DMG_PPU, "DMG PPU", tag, owner, clock, "dmg_ppu", __FILE__)
+				, device_video_interface(mconfig, *this)
+				, m_lr35902(*this, finder_base::DUMMY_TAG)
+				, m_sgb_border_hack(0)
+				, m_oam_size(0x100)
+				, m_vram_size(0x2000)
 {
+	m_enable_experimental_engine = true;
 }
 
-mgb_lcd_device::mgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: gb_lcd_device(mconfig, GB_LCD_MGB, "MGB LCD", tag, owner, clock, "mgb_lcd", __FILE__)
+mgb_ppu_device::mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+				: dmg_ppu_device(mconfig, MGB_PPU, "MGB PPU", tag, owner, clock, "mgb_ppu", __FILE__, 0x2000)
 {
+	m_enable_experimental_engine = true;
 }
 
-sgb_lcd_device::sgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: gb_lcd_device(mconfig, GB_LCD_SGB, "SGB LCD", tag, owner, clock, "sgb_lcd", __FILE__)
+sgb_ppu_device::sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+				: dmg_ppu_device(mconfig, SGB_PPU, "SGB PPU", tag, owner, clock, "sgb_ppu", __FILE__, 0x2000)
 {
+	m_enable_experimental_engine = false;
 }
 
-cgb_lcd_device::cgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: gb_lcd_device(mconfig, GB_LCD_CGB, "CGB LCD", tag, owner, clock, "cgb_lcd", __FILE__)
+cgb_ppu_device::cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+				: dmg_ppu_device(mconfig, CGB_PPU, "CGB PPU", tag, owner, clock, "cgb_ppu", __FILE__, 0x4000)
 {
+	m_enable_experimental_engine = false;
 }
 
 
@@ -214,17 +361,20 @@ cgb_lcd_device::cgb_lcd_device(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void gb_lcd_device::common_start()
+void dmg_ppu_device::common_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 	save_item(NAME(m_bitmap));
-	m_oam = make_unique_clear<UINT8[]>(0x100);
+	m_oam = make_unique_clear<UINT8[]>(m_oam_size);
+	m_vram = make_unique_clear<UINT8[]>(m_vram_size);
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(gb_lcd_device::videoptr_restore), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(dmg_ppu_device::videoptr_restore), this));
+	m_lcd_timer = timer_alloc();
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_program_space = &m_lr35902->space(AS_PROGRAM);
 
-	save_pointer(NAME(m_oam.get()), 0x100);
+	save_pointer(NAME(m_oam.get()), m_oam_size);
+	save_pointer(NAME(m_vram.get()), m_vram_size);
 	save_item(NAME(m_window_lines_drawn));
 	save_item(NAME(m_vid_regs));
 	save_item(NAME(m_bg_zbuf));
@@ -245,46 +395,93 @@ void gb_lcd_device::common_start()
 	save_item(NAME(m_end_x));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_state));
-	save_item(NAME(m_lcd_irq_line));
-	save_item(NAME(m_triggering_line_irq));
-	save_item(NAME(m_line_irq));
-	save_item(NAME(m_triggering_mode_irq));
-	save_item(NAME(m_mode_irq));
-	save_item(NAME(m_delayed_line_irq));
 	save_item(NAME(m_sprite_cycles));
+	save_item(NAME(m_window_cycles));
 	save_item(NAME(m_scrollx_adjust));
 	save_item(NAME(m_oam_locked));
+	save_item(NAME(m_oam_locked_reading));
 	save_item(NAME(m_vram_locked));
 	save_item(NAME(m_pal_locked));
 	save_item(NAME(m_hdma_enabled));
 	save_item(NAME(m_hdma_possible));
+	save_item(NAME(m_hdma_cycles_to_start));
+	save_item(NAME(m_hdma_length));
+	save_item(NAME(m_oam_dma_start_cycles));
+	save_item(NAME(m_oam_dma_cycles_left));
+	save_item(NAME(m_oam_dma_source_address));
 	save_item(NAME(m_gbc_mode));
+	save_item(NAME(m_window_x));
+	save_item(NAME(m_window_y));
+	save_item(NAME(m_stat_mode0_int));
+	save_item(NAME(m_stat_mode1_int));
+	save_item(NAME(m_stat_mode2_int));
+	save_item(NAME(m_stat_lyc_int));
+	save_item(NAME(m_stat_lyc_int_prev));
+	save_item(NAME(m_stat_write_int));
+	save_item(NAME(m_stat_int));
 	save_item(NAME(m_gb_tile_no_mod));
-	save_item(NAME(m_vram_bank));
-
+	save_item(NAME(m_oam_dma_processing));
 	save_item(NAME(m_gb_chrgen_offs));
 	save_item(NAME(m_gb_bgdtab_offs));
 	save_item(NAME(m_gb_wndtab_offs));
 	save_item(NAME(m_gbc_chrgen_offs));
 	save_item(NAME(m_gbc_bgdtab_offs));
 	save_item(NAME(m_gbc_wndtab_offs));
+	save_item(NAME(m_vram_bank));
+	save_item(NAME(m_last_updated));
+	save_item(NAME(m_cycles_left));
+	save_item(NAME(m_next_state));
+	save_item(NAME(m_old_curline));
 
-	save_item(NAME(m_layer[0].enabled));
-	save_item(NAME(m_layer[0].xindex));
-	save_item(NAME(m_layer[0].xshift));
-	save_item(NAME(m_layer[0].xstart));
-	save_item(NAME(m_layer[0].xend));
-	save_item(NAME(m_layer[0].bgline));
-	save_item(NAME(m_layer[1].enabled));
-	save_item(NAME(m_layer[1].xindex));
-	save_item(NAME(m_layer[1].xshift));
-	save_item(NAME(m_layer[1].xstart));
-	save_item(NAME(m_layer[1].xend));
-	save_item(NAME(m_layer[1].bgline));
+	for (int i = 0; i < ARRAY_LENGTH(m_layer); i++) {
+		save_item(NAME(m_layer[i].enabled), i);
+		save_item(NAME(m_layer[i].xindex), i);
+		save_item(NAME(m_layer[i].xshift), i);
+		save_item(NAME(m_layer[i].xstart), i);
+		save_item(NAME(m_layer[i].xend), i);
+		save_item(NAME(m_layer[i].bgline), i);
+	}
+
+	save_item(NAME(m_line.tile_cycle));
+	save_item(NAME(m_line.tile_count));
+	save_item(NAME(m_line.y));
+	save_item(NAME(m_line.pattern_address));
+	save_item(NAME(m_line.pattern));
+	save_item(NAME(m_line.tile_address));
+	save_item(NAME(m_line.plane0));
+	save_item(NAME(m_line.plane1));
+	save_item(NAME(m_line.shift_register));
+	save_item(NAME(m_line.sprite_delay_cycles));
+	save_item(NAME(m_line.starting));
+	save_item(NAME(m_line.sequence_counter));
+	save_item(NAME(m_line.drawing));
+	save_item(NAME(m_line.start_drawing));
+	save_item(NAME(m_line.scrollx_delay));
+	save_item(NAME(m_line.scrollx_to_apply));
+	save_item(NAME(m_line.pixels_drawn));
+	save_item(NAME(m_line.window_compare_position));
+	save_item(NAME(m_line.window_active));
+	save_item(NAME(m_line.scrollx));
+	save_item(NAME(m_line.window_start_y));
+	save_item(NAME(m_line.window_start_x));
+	save_item(NAME(m_line.window_start_y_index));
+	save_item(NAME(m_line.window_enable));
+	save_item(NAME(m_line.window_enable_index));
+	save_item(NAME(m_line.window_should_trigger));
+	for (int i = 0; i < ARRAY_LENGTH(m_line.sprite); i++) {
+		save_item(NAME(m_line.sprite[i].enabled), i);
+		save_item(NAME(m_line.sprite[i].x), i);
+		save_item(NAME(m_line.sprite[i].y), i);
+		save_item(NAME(m_line.sprite[i].pattern), i);
+		save_item(NAME(m_line.sprite[i].flags), i);
+		save_item(NAME(m_line.sprite[i].tile_plane_0), i);
+		save_item(NAME(m_line.sprite[i].tile_plane_1), i);
+	}
+	save_item(NAME(m_frame_window_active));
 }
 
 
-void gb_lcd_device::videoptr_restore()
+void dmg_ppu_device::videoptr_restore()
 {
 	m_layer[0].bg_map = m_vram.get() + m_gb_bgdtab_offs;
 	m_layer[0].bg_tiles = m_vram.get() + m_gb_chrgen_offs;
@@ -292,7 +489,7 @@ void gb_lcd_device::videoptr_restore()
 	m_layer[1].bg_tiles = m_vram.get() + m_gb_chrgen_offs;
 }
 
-void cgb_lcd_device::videoptr_restore()
+void cgb_ppu_device::videoptr_restore()
 {
 	m_layer[0].bg_map = m_vram.get() + m_gb_bgdtab_offs;
 	m_layer[0].gbc_map = m_vram.get() + m_gbc_bgdtab_offs;
@@ -301,35 +498,23 @@ void cgb_lcd_device::videoptr_restore()
 }
 
 
-void gb_lcd_device::device_start()
+void dmg_ppu_device::device_start()
 {
 	common_start();
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_lcd_device::lcd_timer_proc),this));
-
-	m_vram = make_unique_clear<UINT8[]>(0x2000);
-	save_pointer(NAME(m_vram.get()), 0x2000);
 
 	memcpy(m_oam.get(), dmg_oam_fingerprint, 0x100);
 }
 
-void mgb_lcd_device::device_start()
+void mgb_ppu_device::device_start()
 {
 	common_start();
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mgb_lcd_device::lcd_timer_proc),this));
-
-	m_vram = make_unique_clear<UINT8[]>(0x2000);
-	save_pointer(NAME(m_vram.get()), 0x2000);
 
 	memcpy(m_oam.get(), mgb_oam_fingerprint, 0x100);
 }
 
-void sgb_lcd_device::device_start()
+void sgb_ppu_device::device_start()
 {
 	common_start();
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sgb_lcd_device::lcd_timer_proc),this));
-
-	m_vram = make_unique_clear<UINT8[]>(0x2000);
-	save_pointer(NAME(m_vram.get()), 0x2000);
 
 	m_sgb_tile_data = make_unique_clear<UINT8[]>(0x2000);
 	save_pointer(NAME(m_sgb_tile_data.get()), 0x2000);
@@ -354,22 +539,22 @@ void sgb_lcd_device::device_start()
 	save_item(NAME(m_sgb_window_mask));
 }
 
-void cgb_lcd_device::device_start()
+void cgb_ppu_device::device_start()
 {
 	common_start();
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cgb_lcd_device::lcd_timer_proc),this));
-
-	m_vram = make_unique_clear<UINT8[]>(0x4000);
-	save_pointer(NAME(m_vram.get()), 0x4000);
 
 	memcpy(m_oam.get(), cgb_oam_fingerprint, 0x100);
 
 	/* Background is initialised as white */
 	for (int i = 0; i < 32; i++)
+	{
 		m_cgb_bpal[i] = 32767;
+	}
 	/* Sprites are supposed to be uninitialized, but we'll make them black */
 	for (int i = 0; i < 32; i++)
+	{
 		m_cgb_spal[i] = 0;
+	}
 }
 
 
@@ -377,7 +562,7 @@ void cgb_lcd_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void gb_lcd_device::common_reset()
+void dmg_ppu_device::common_reset()
 {
 	m_window_lines_drawn = 0;
 
@@ -389,20 +574,28 @@ void gb_lcd_device::common_reset()
 	m_end_x = 0;
 	m_mode = 0;
 	m_state = 0;
-	m_lcd_irq_line = 0;
-	m_triggering_line_irq = 0;
-	m_line_irq = 0;
-	m_triggering_mode_irq = 0;
-	m_mode_irq = 0;
-	m_delayed_line_irq = 0;
 	m_sprite_cycles = 0;
+	m_window_cycles = 0;
 	m_scrollx_adjust = 0;
 	m_oam_locked = 0;
+	m_oam_locked_reading = 0;
 	m_vram_locked = 0;
 	m_pal_locked = 0;
 	m_gbc_mode = 0;
 	m_gb_tile_no_mod = 0;
 	m_vram_bank = 0;
+	m_oam_dma_processing = false;
+	m_oam_dma_start_cycles = 0;
+	m_oam_dma_cycles_left = 0;
+	m_updating_state = false;
+	m_stat_mode0_int = false;
+	m_stat_mode1_int = false;
+	m_stat_mode2_int = false;
+	m_stat_lyc_int = false;
+	m_stat_lyc_int_prev = false;
+	m_stat_write_int = false;
+	m_stat_int = false;
+	m_hdma_cycles_to_start = 0;
 
 	m_gb_chrgen_offs = 0;
 	m_gb_bgdtab_offs = 0x1c00;
@@ -420,7 +613,9 @@ void gb_lcd_device::common_reset()
 	m_vid_regs[0x06] = 0xff;
 
 	for (int i = 0x0c; i < NR_GB_VID_REGS; i++)
+	{
 		m_vid_regs[i] = 0xff;
+	}
 
 	LCDSTAT = 0x80;
 	LCDCONT = 0x00;     /* Video hardware is turned off at boot time */
@@ -431,19 +626,23 @@ void gb_lcd_device::common_reset()
 
 	// Initialize palette arrays
 	for (int i = 0; i < 4; i++)
+	{
 		m_gb_bpal[i] = m_gb_spal0[i] = m_gb_spal1[i] = i;
+	}
 
+	m_last_updated = machine().time();
 }
 
 
-void gb_lcd_device::device_reset()
+void dmg_ppu_device::device_reset()
 {
 	common_reset();
 
-	m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(456));
+	m_cycles_left = 456;
+	m_lcd_timer->adjust(m_lr35902->cycles_to_attotime(456));
 }
 
-void sgb_lcd_device::device_reset()
+void sgb_ppu_device::device_reset()
 {
 	common_reset();
 
@@ -455,7 +654,7 @@ void sgb_lcd_device::device_reset()
 	memset(m_sgb_atf_data, 0, sizeof(m_sgb_atf_data));
 }
 
-void cgb_lcd_device::device_reset()
+void cgb_ppu_device::device_reset()
 {
 	common_reset();
 
@@ -472,58 +671,384 @@ void cgb_lcd_device::device_reset()
 
 
 
-inline void gb_lcd_device::plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void dmg_ppu_device::plot_pixel(int x, int y, UINT16 color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	m_bitmap.pix16(y, x) = color;
 }
 
-/*
-  Select which sprites should be drawn for the current scanline and return the
-  number of sprites selected.
- */
-void gb_lcd_device::select_sprites()
+
+void dmg_ppu_device::calculate_window_cycles()
 {
-	int /*yindex,*/ line, height;
-	UINT8 *oam = m_oam.get() + 39 * 4;
+	m_window_cycles = 0;
 
-	m_sprCount = 0;
+	LOG(("m_window_x = %d, m_window_y = %d\n", m_window_x, m_window_y));
 
-	/* If video hardware is enabled and sprites are enabled */
-	if ((LCDCONT & 0x80) && (LCDCONT & 0x02))
+	if ((LCDCONT & WINDOW_ENABLED) && m_window_x < 167 && m_window_y < 144)
 	{
-		/* Check for stretched sprites */
-		if (LCDCONT & 0x04)
-			height = 16;
-		else
-			height = 8;
-
-		//yindex = m_current_line;
-		line = m_current_line + 16;
-
-		for (int i = 39; i >= 0; i--)
+		// This is not good enough yet
+		m_window_cycles = 4;
+		if (m_window_x == 0x0f)
 		{
-			if (line >= oam[0] && line < (oam[0] + height) && oam[1] && oam[1] < 168)
-			{
-				/* We limit the sprite count to max 10 here;
-				   proper games should not exceed this... */
-				if (m_sprCount < 10)
-				{
-					m_sprite[m_sprCount] = i;
-					m_sprCount++;
-				}
-			}
-			oam -= 4;
+			m_window_cycles = 12;
 		}
 	}
 }
 
-void gb_lcd_device::update_sprites()
+
+void dmg_ppu_device::clear_line_state()
 {
-	bitmap_ind16 &bitmap = m_bitmap;
-	UINT8 height, tilemask, line, *oam, *vram;
+	for (int i = 0; i < 10; i++)
+	{
+		m_line.sprite[i].enabled = false;
+	}
+	m_line.sprite_delay_cycles = 0;
+	m_line.starting = true;
+	m_line.sequence_counter = 0;
+	m_line.start_drawing = false;
+	m_line.drawing = false;
+	m_line.scrollx_delay = 0;
+	m_line.scrollx_to_apply = 0;
+	m_line.pixels_drawn = 0;
+	m_line.tile_count = SCROLLX >> 3;
+	m_line.tile_cycle = 0;
+	m_line.window_compare_position = 0x100;
+	m_line.window_active = false;
+	m_line.window_should_trigger = false;
+
+	if (m_enable_experimental_engine)
+	{
+		m_scrollx_adjust = 0;
+	}
+}
+
+
+/*
+  Select which sprites should be drawn for the current scanline.
+ */
+void dmg_ppu_device::select_sprites()
+{
+	m_sprCount = 0;
+	m_sprite_cycles = 0;
+
+	/* If video hardware is enabled and sprites are enabled */
+	if ((LCDCONT & ENABLED) && (LCDCONT & SPRITES_ENABLED))
+	{
+		UINT8 sprite_occurs[32];
+
+		memset(sprite_occurs, 0, sizeof(sprite_occurs));
+
+		/* Check for stretched sprites */
+		int height = (LCDCONT & 0x04) ? 16 : 8;
+		int line = m_current_line + 16;
+
+		for (int i = 0; i < 160; i+= 4)
+		{
+			if (line >= m_oam[i] && line < (m_oam[i] + height))
+			{
+				if (m_sprCount < 10)
+				{
+					m_sprite[m_sprCount] = i / 4;
+
+					if (m_oam[i + 1] < 168)
+					{
+						m_line.sprite[m_sprCount].enabled = true;
+						m_line.sprite[m_sprCount].y = m_oam[i];
+						m_line.sprite[m_sprCount].x = m_oam[i + 1];
+						m_line.sprite[m_sprCount].pattern = m_oam[i + 2];
+						m_line.sprite[m_sprCount].flags = m_oam[i + 3];
+
+						// X=0 is special
+						int spr_x = m_oam[i + 1] ? m_oam[i + 1] + (SCROLLX & 0x07) : 0;
+
+						if (sprite_occurs[spr_x >> 3])
+						{
+							m_sprite_cycles += 3;
+						}
+						m_sprite_cycles += 3;
+
+						sprite_occurs[spr_x >> 3] |= (1 << (spr_x & 0x07));
+					}
+
+					m_sprCount++;
+				}
+			}
+		}
+
+		if (m_sprCount > 0)
+		{
+			for (int i = 0; i < 22; i++)
+			{
+				if (sprite_occurs[i])
+				{
+					LOG(("sprite_occurs[%d] = %02x\n", i, sprite_occurs[i]));
+				}
+
+				if (sprite_occurs[i])
+				{
+					static int cycles[32] =
+					{
+						3, 8, 7, 8, 6, 8, 7, 8, 5, 8, 7, 8, 6, 8, 7, 8,
+						4, 8, 7, 8, 6, 8, 7, 8, 5, 8, 7, 8, 6, 8, 7, 8
+					};
+					m_sprite_cycles += cycles[sprite_occurs[i] & 0x1f];
+				}
+			}
+
+			LOG(("m_sprite_cycles = %d\n", m_sprite_cycles));
+		}
+	}
+}
+
+
+void dmg_ppu_device::update_line_state(UINT64 cycles)
+{
+	// Can the bg tilemap select bit be changed while drawing the screen? => yes
+	// Can scroll-y be changed while drawing the screen? => yes
+	// Can bits 3-8 of scroll-x be changed while drawing the screen? => yes
+
+	while (cycles > 0 && m_line.pixels_drawn < 160)
+	{
+		// Not sure if delaying during the first B01s sequence is the right time
+		if (m_line.scrollx_delay > 0)
+		{
+			m_line.scrollx_delay -= 1;
+			m_line.scrollx_to_apply++;
+		}
+
+//LOG(("tile_cycle = %u, starting = %s, drawing = %s\n", m_line.tile_cycle, m_line.starting ? "true" : "false", m_line.drawing ? "true" : "false"));
+		// output next pixel
+		if (m_line.drawing)
+		{
+			if (m_line.scrollx_to_apply > 0)
+			{
+				// TODO: Determine when the scrollx shifts are applied when window-x is <= 0x07
+//logerror("scrollx_to_apply: %u\n", m_line.scrollx_to_apply);
+				if (!m_line.window_active)
+				{
+					m_line.shift_register <<= 2;
+				}
+				m_line.window_compare_position--;
+				m_line.scrollx_to_apply--;
+				m_cycles_left++;
+				m_scrollx_adjust++;
+			}
+			else
+			{
+				if (!m_line.starting && m_line.tile_cycle < 8)
+				{
+					if (m_line.pixels_drawn < 8)
+					{
+						LOG(("draw pixel %u\n", m_line.pixels_drawn));
+					}
+					plot_pixel(m_line.pixels_drawn, m_current_line, m_gb_bpal[m_line.shift_register >> 14]);
+					m_bg_zbuf[m_line.pixels_drawn] = m_line.shift_register >> 14;
+					m_line.shift_register <<= 2;
+					m_line.pixels_drawn++;
+
+					if (m_line.pixels_drawn == 160 && (LCDCONT & SPRITES_ENABLED))
+					{
+						update_sprites();
+					}
+				}
+			}
+		}
+
+		UINT8 next_tile_cycle = m_line.tile_cycle + 1;
+
+		switch (m_line.tile_cycle)
+		{
+		case 0:  // Set pattern address, latch data into shift register(s)
+			if (!m_line.window_active && !(LCDCONT & BACKGROUND_ENABLED))
+			{
+				m_line.shift_register = 0;
+			}
+			else
+			{
+				// Interleave bits from plane0 and plane1
+				m_line.shift_register = (((((m_line.plane0 * U64(0x0101010101010101)) & U64(0x8040201008040201)) * U64(0x0102040810204081)) >> 49) & 0x5555)
+				                      | (((((m_line.plane1 * U64(0x0101010101010101)) & U64(0x8040201008040201)) * U64(0x0102040810204081)) >> 48) & 0xAAAA);
+			}
+			if (m_line.pixels_drawn < 8)
+			{
+				LOG(("m_current_line: %u, tile_count: %02x, plane0 = %02x, plane1 = %02x, shift_register = %04x\n", m_current_line, m_line.tile_count, m_line.plane0, m_line.plane1, m_line.shift_register));
+			}
+			if (m_line.sequence_counter >= 2)
+			{
+				if (!m_line.starting)
+				{
+					m_line.drawing = true;
+				}
+			}
+			else if (m_line.sequence_counter == 1)
+			{
+				// start counting for start of window
+				m_line.window_compare_position = 0;
+			}
+			m_line.sequence_counter++;
+			if (m_line.window_active)
+			{
+				m_line.y = m_window_lines_drawn;
+				m_line.pattern_address = m_gb_wndtab_offs | ((m_line.y & 0xF8) << 2) | (m_line.tile_count & 0x1f);
+			}
+			else
+			{
+				m_line.y = SCROLLY + m_current_line;
+				m_line.pattern_address = m_gb_bgdtab_offs | ((m_line.y & 0xF8) << 2) | (((SCROLLX >> 3) + m_line.tile_count) & 0x1f);
+			}
+
+			m_line.tile_count++;
+			break;
+
+		case 1:  // Read pattern data
+			m_line.pattern = m_vram.get()[m_line.pattern_address] ^ m_gb_tile_no_mod;
+			if (m_line.tile_count < 8)
+			{
+				LOG(("tile_count = %u, y = %u, pattern = %02x, pattern_address = %04x\n", m_line.tile_count, m_current_line, m_line.pattern, m_line.pattern_address));
+			}
+			break;
+
+		case 2:  // Set plane 0 address
+			m_line.tile_address = m_gb_chrgen_offs + ((m_line.pattern << 4) | ((m_line.y & 0x07) << 1));
+			if (m_line.tile_count < 8)
+			{
+				LOG(("tile_count = %u, tile_address = %04x, pattern = %02x, y = %u, m_gb_chrgen_offs = %04x\n", m_line.tile_count, m_line.tile_address, m_line.pattern, m_line.y & 7, m_gb_chrgen_offs));
+			}
+			break;
+
+		case 3:  // Read plane 0 data
+			m_line.plane0 = m_vram.get()[m_line.tile_address];
+			if (m_line.starting && !m_line.window_active)
+			{
+				m_line.scrollx = SCROLLX;
+			}
+			break;
+
+		case 4:  // Set plane 1 address
+			m_line.tile_address = m_line.tile_address + 1;
+			break;
+
+		case 5:  // Read plane 1 data
+			m_line.plane1 = m_vram.get()[m_line.tile_address];
+			if (m_line.starting)
+			{
+				// TODO: (review) Do not reset tile_count and scroll when restarting for window
+				// TODO: Check for window at pos 0
+				if (m_line.window_active)
+				{
+					// Force line_drawing to true
+					m_line.sequence_counter = 2;
+					if (m_line.scrollx_delay > 0)
+					{
+					}
+				}
+				else
+				{
+					m_line.tile_count = 0;
+					m_line.scrollx_delay = m_line.scrollx & 0x07;
+				}
+
+				m_line.starting = false;
+				next_tile_cycle = 0;
+			}
+			break;
+
+		case 6:  // sprite stuff
+			break;
+
+		case 7:  // more sprite stuff
+			if (m_line.sprite_delay_cycles == 0)
+			{
+				next_tile_cycle &= 7;
+			}
+			break;
+
+		case 8:   // even more sprite stuff/delay
+			m_line.sprite_delay_cycles--;
+			m_cycles_left++;
+			m_sprite_cycles++;
+			next_tile_cycle = m_line.sprite_delay_cycles == 0 ? 0 : 8;
+			break;
+
+		default:
+			next_tile_cycle &= 7;
+			break;
+		}
+		m_line.tile_cycle = next_tile_cycle;
+		cycles--;
+
+		check_start_of_window();
+	}
+
+	if (m_line.pixels_drawn == 160 && m_line.window_active)
+	{
+		m_window_lines_drawn++;
+		m_line.pixels_drawn++;
+		m_line.window_active = false;
+	}
+}
+
+
+void dmg_ppu_device::check_start_of_window()
+{
+//
+// WY=1
+// ly = 2
+// late_enable_afterVblank_3_dmg08_cgb04c_out3.gbc - 4 cycles into M2 -> gb+cgb: triggering in both line 2 and 3 still returns STAT mode 0
+// late_enable_afterVblank_4_dmg08_out3_cgb04c_out0.gbc - start of M2 -> gb: should not trigger, cgb: should trigger
+// late_enable_afterVblank_5_dmg08_cgb04c_out0.gbc - enable 4 cycles before M2 ->  gb+cgb: should trigger on line 2 and 3
+//
+// Mid frame enable:
+// - at start of frame window disabled
+// - enabling at line of WY triggers when window is enabled before M2 of WY + 1
+
+	// Check for start of window
+	if (m_line.window_compare_position < 16)
+	{
+		LOG(("check window this line, m_current_line = %u, WNDPOSY = %u, WNDPOSX = %u, m_line.window_compare_position = %u, tile_cycle = %u, window_start_y = %u, pixels_drawn = %u\n", m_current_line, WNDPOSY, WNDPOSX, m_line.window_compare_position, m_line.tile_cycle, m_line.window_start_y[m_line.window_start_y_index], m_line.pixels_drawn));
+	}
+
+	if (/*LCDCONT*/(m_line.window_enable[m_line.window_enable_index] & WINDOW_ENABLED) && !m_line.window_active && (m_frame_window_active || /*m_current_line >= m_window_y*/ m_line.window_should_trigger || m_current_line == m_line.window_start_y[m_line.window_start_y_index]) && m_line.window_compare_position == /*WNDPOSX*/ m_line.window_start_x[m_line.window_start_y_index] && m_line.window_compare_position < 0xA6)
+	{
+LOG(("enable window, m_current_line = %u, WNDPOSY = %u, WNDPOSX = %u, m_line.window_compare_position = %u, pixels_drawn = %u\n", m_current_line, WNDPOSY, WNDPOSX, m_line.window_compare_position, m_line.pixels_drawn));
+		m_line.starting = true;
+		m_line.window_active = true;
+		m_frame_window_active = true;
+		m_line.tile_cycle = 0;
+		m_line.tile_count = 0;
+		m_window_cycles = 6;
+		m_cycles_left += 6;
+
+		if (m_line.window_start_x[m_line.window_start_y_index] == 0)
+		{
+			// TODO: WX=00 should trigger a 1 cycle delay during the first sprite frame
+			// Does not fix failing late_scx_late_wy_FFto4_ly4_wx00_2_dmg08_out3_cgb04c_out0.gbc yet
+			m_line.sprite_delay_cycles += 1;
+		}
+	}
+
+	// 4 makes most tests pass
+	m_line.window_start_y[(m_line.window_start_y_index + 4) % ARRAY_LENGTH(m_line.window_start_y)] = WNDPOSY;
+	// 2-4 makes most tests pass
+	m_line.window_start_x[(m_line.window_start_y_index + 4) % ARRAY_LENGTH(m_line.window_start_x)] = WNDPOSX;
+	m_line.window_start_y_index = (m_line.window_start_y_index + 1) % ARRAY_LENGTH(m_line.window_start_y);
+
+	// 3 makes most tests pass
+	m_line.window_enable[(m_line.window_enable_index + 3) % ARRAY_LENGTH(m_line.window_enable)] = LCDCONT;
+	m_line.window_enable_index = (m_line.window_enable_index + 1) % ARRAY_LENGTH(m_line.window_enable);
+
+	if (!m_line.starting && m_line.tile_cycle < 8)
+	{
+		m_line.window_compare_position++;
+	}
+}
+
+
+void dmg_ppu_device::update_sprites()
+{
+	UINT8 height, tilemask, line, *vram;
 	int yindex;
 
-	if (LCDCONT & 0x04)
+	if (LCDCONT & LARGE_SPRITES)
 	{
 		height = 16;
 		tilemask = 0xFE;
@@ -537,95 +1062,95 @@ void gb_lcd_device::update_sprites()
 	yindex = m_current_line;
 	line = m_current_line + 16;
 
-	oam = m_oam.get() + 39 * 4;
 	vram = m_vram.get();
-	for (int i = 39; i >= 0; i--)
+	for (int i = m_sprCount - 1; i >= 0; i--)
 	{
-		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
-		if (line >= oam[0] && line < (oam[0] + height) && oam[1] && oam[1] < 168)
+		int oam_address = m_sprite[i] * 4;
+		UINT16 *spal = (m_oam[oam_address + 3] & 0x10) ? m_gb_spal1 : m_gb_spal0;
+		int xindex = m_oam[oam_address + 1] - 8;
+		int adr = (m_oam[oam_address + 2] & tilemask) * 16;
+
+		if (xindex < -7 || xindex > 160)
 		{
-			UINT16 data;
-			UINT8 bit, *spal;
-			int xindex, adr;
-
-			spal = (oam[3] & 0x10) ? m_gb_spal1 : m_gb_spal0;
-			xindex = oam[1] - 8;
-			if (oam[3] & 0x40)         /* flip y ? */
-			{
-				adr = (oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2;
-			}
-			else
-			{
-				adr = (oam[2] & tilemask) * 16 + (line - oam[0]) * 2;
-			}
-			data = (vram[adr + 1] << 8) | vram[adr];
-
-			switch (oam[3] & 0xA0)
-			{
-			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
-				{
-					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
-						plot_pixel(bitmap, xindex, yindex, spal[colour]);
-					data >>= 1;
-				}
-				break;
-			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
-				{
-					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if (colour && xindex >= 0 && xindex < 160)
-						plot_pixel(bitmap, xindex, yindex, spal[colour]);
-					data >>= 1;
-				}
-				break;
-			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
-				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
-				{
-					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
-						plot_pixel(bitmap, xindex, yindex, spal[colour]);
-					data <<= 1;
-				}
-				break;
-			case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
-				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
-				{
-					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if (colour && xindex >= 0 && xindex < 160)
-						plot_pixel(bitmap, xindex, yindex, spal[colour]);
-					data <<= 1;
-				}
-				break;
-			}
+			continue;
 		}
-		oam -= 4;
+
+		if (m_oam[oam_address + 3] & 0x40)         /* flip y ? */
+		{
+			adr += (height - 1 - line + m_oam[oam_address]) * 2;
+		}
+		else
+		{
+			adr += (line - m_oam[oam_address]) * 2;
+		}
+		UINT16 data = (vram[adr + 1] << 8) | vram[adr];
+
+		switch (m_oam[oam_address + 3] & 0xA0)
+		{
+		case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+				if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					plot_pixel(xindex, yindex, spal[colour]);
+				data >>= 1;
+			}
+			break;
+		case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+				if (colour && xindex >= 0 && xindex < 160)
+					plot_pixel(xindex, yindex, spal[colour]);
+				data >>= 1;
+			}
+			break;
+		case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
+			for (int bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
+			{
+				int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+				if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					plot_pixel(xindex, yindex, spal[colour]);
+				data <<= 1;
+			}
+			break;
+		case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
+			for (int bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
+			{
+				int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+				if (colour && xindex >= 0 && xindex < 160)
+					plot_pixel(xindex, yindex, spal[colour]);
+				data <<= 1;
+			}
+			break;
+		}
 	}
 }
 
-void gb_lcd_device::update_scanline()
+
+void dmg_ppu_device::update_scanline(UINT32 cycles_to_go)
 {
-	bitmap_ind16 &bitmap = m_bitmap;
+	if (m_enable_experimental_engine)
+	{
+		return;
+	}
 
 	g_profiler.start(PROFILER_VIDEO);
 
 	/* Make sure we're in mode 3 */
 	if ((LCDSTAT & 0x03) == 0x03)
 	{
-		/* Calculate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = m_maincpu->attotime_to_cycles(m_lcd_timer->remaining());
 		int l = 0;
 
 		if (m_start_x < 0)
 		{
 			/* Window is enabled if the hardware says so AND the current scanline is
 			 * within the window AND the window X coordinate is <=166 */
-			m_layer[1].enabled = ((LCDCONT & 0x20) && (m_current_line >= WNDPOSY) && (WNDPOSX <= 166)) ? 1 : 0;
+			m_layer[1].enabled = ((LCDCONT & WINDOW_ENABLED) && (m_current_line >= m_window_y) && (m_window_x <= 166)) ? 1 : 0;
 
 			/* BG is enabled if the hardware says so AND (window_off OR (window_on
 			* AND window's X position is >=7)) */
-			m_layer[0].enabled = ((LCDCONT & 0x01) && ((!m_layer[1].enabled) || (m_layer[1].enabled && (WNDPOSX >= 7)))) ? 1 : 0;
+			m_layer[0].enabled = ((LCDCONT & BACKGROUND_ENABLED) && ((!m_layer[1].enabled) || (m_layer[1].enabled && (m_window_x >= 7)))) ? 1 : 0;
 
 			if (m_layer[0].enabled)
 			{
@@ -640,7 +1165,7 @@ void gb_lcd_device::update_scanline()
 
 			if (m_layer[1].enabled)
 			{
-				int xpos = WNDPOSX - 7;             /* Window is offset by 7 pixels */
+				int xpos = m_window_x - 7;             /* Window is offset by 7 pixels */
 				if (xpos < 0)
 					xpos = 0;
 
@@ -660,10 +1185,10 @@ void gb_lcd_device::update_scanline()
 		{
 			m_end_x = std::min(int(160 - cycles_to_go), 160);
 			/* Draw empty pixels when the background is disabled */
-			if (!(LCDCONT & 0x01))
+			if (!(LCDCONT & BACKGROUND_ENABLED))
 			{
 				rectangle r(m_start_x, m_end_x - 1, m_current_line, m_current_line);
-				bitmap.fill(m_gb_bpal[0], r);
+				m_bitmap.fill(m_gb_bpal[0], r);
 			}
 			while (l < 2)
 			{
@@ -695,7 +1220,7 @@ void gb_lcd_device::update_scanline()
 					while ((m_layer[l].xshift < 8) && i)
 					{
 						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-						plot_pixel(bitmap, xindex, m_current_line, m_gb_bpal[colour]);
+						plot_pixel(xindex, m_current_line, m_gb_bpal[colour]);
 						m_bg_zbuf[xindex] = colour;
 						xindex++;
 						data <<= 1;
@@ -720,7 +1245,7 @@ void gb_lcd_device::update_scanline()
 				}
 				l++;
 			}
-			if (m_end_x == 160 && LCDCONT & 0x02)
+			if (m_end_x == 160 && LCDCONT & SPRITES_ENABLED)
 			{
 				update_sprites();
 			}
@@ -729,7 +1254,7 @@ void gb_lcd_device::update_scanline()
 	}
 	else
 	{
-		if (!(LCDCONT & 0x80))
+		if (!(LCDCONT & ENABLED))
 		{
 			/* Draw an empty line when LCD is disabled */
 			if (m_previous_line != m_current_line)
@@ -738,7 +1263,7 @@ void gb_lcd_device::update_scanline()
 				{
 					const rectangle &r = m_screen->visible_area();
 					rectangle r1(r.min_x, r.max_x, m_current_line, m_current_line);
-					bitmap.fill(0, r1);
+					m_bitmap.fill(0, r1);
 				}
 				m_previous_line = m_current_line;
 			}
@@ -750,13 +1275,12 @@ void gb_lcd_device::update_scanline()
 
 /* --- Super Game Boy Specific --- */
 
-void sgb_lcd_device::update_sprites()
+void sgb_ppu_device::update_sprites()
 {
-	bitmap_ind16 &bitmap = m_bitmap;
-	UINT8 height, tilemask, line, *oam, *vram, pal;
+	UINT8 height, tilemask, line, *vram;
 	INT16 yindex;
 
-	if (LCDCONT & 0x04)
+	if (LCDCONT & LARGE_SPRITES)
 	{
 		height = 16;
 		tilemask = 0xFE;
@@ -771,83 +1295,76 @@ void sgb_lcd_device::update_sprites()
 	yindex = m_current_line + SGB_YOFFSET;
 	line = m_current_line + 16;
 
-	oam = m_oam.get() + 39 * 4;
 	vram = m_vram.get();
-	for (int i = 39; i >= 0; i--)
+
+	for (int i = m_sprCount - 1; i >= 0; i--)
 	{
-		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
-		if (line >= oam[0] && line < (oam[0] + height) && oam[1] && oam[1] < 168)
+		int oam_address = m_sprite[i] * 4;
+		int adr = (m_oam[oam_address + 2] & tilemask) * 16;
+		UINT16 *spal = (m_oam[oam_address + 3] & 0x10) ? m_gb_spal1 : m_gb_spal0;
+		UINT16 xindex = m_oam[oam_address + 1] - 8;
+
+		if (m_oam[oam_address + 3] & 0x40)         /* flip y ? */
 		{
-			UINT16 data;
-			UINT8 bit, *spal;
-			INT16 xindex;
-			int adr;
-
-			spal = (oam[3] & 0x10) ? m_gb_spal1 : m_gb_spal0;
-			xindex = oam[1] - 8;
-			if (oam[3] & 0x40)         /* flip y ? */
-			{
-				adr = (oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2;
-			}
-			else
-			{
-				adr = (oam[2] & tilemask) * 16 + (line - oam[0]) * 2;
-			}
-			data = (vram[adr + 1] << 8) | vram[adr];
-
-			/* Find the palette to use */
-			// If sprite started before the start of the line we may need to pick a different pal_map entry?
-			pal = m_sgb_pal_map[(xindex < 0) ? 0 : (xindex >> 3)][((yindex - SGB_YOFFSET) >> 3)] << 2;
-
-			/* Offset to center of screen */
-			xindex += SGB_XOFFSET;
-
-			switch (oam[3] & 0xA0)
-			{
-			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
-				{
-					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !m_bg_zbuf[xindex - SGB_XOFFSET])
-						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
-					data >>= 1;
-				}
-				break;
-			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
-				{
-					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
-						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
-					data >>= 1;
-				}
-				break;
-			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
-				{
-					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !m_bg_zbuf[xindex - SGB_XOFFSET])
-						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
-					data <<= 1;
-				}
-				break;
-			case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
-				{
-					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
-						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
-					data <<= 1;
-				}
-				break;
-			}
+			adr += (height - 1 - line + m_oam[oam_address]) * 2;
 		}
-		oam -= 4;
+		else
+		{
+			adr += (line - m_oam[oam_address]) * 2;
+		}
+		UINT16 data = (vram[adr + 1] << 8) | vram[adr];
+
+		/* Find the palette to use */
+		// If sprite started before the start of the line we may need to pick a different pal_map entry?
+		UINT8 pal = m_sgb_pal_map[(xindex < 0) ? 0 : (xindex >> 3)][((yindex - SGB_YOFFSET) >> 3)] << 2;
+
+		/* Offset to center of screen */
+		xindex += SGB_XOFFSET;
+
+		switch (m_oam[oam_address + 3] & 0xA0)
+		{
+		case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+				if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !m_bg_zbuf[xindex - SGB_XOFFSET])
+					plot_pixel(xindex, yindex, m_sgb_pal[pal + spal[colour]]);
+				data >>= 1;
+			}
+			break;
+		case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+				if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
+					plot_pixel(xindex, yindex, m_sgb_pal[pal + spal[colour]]);
+				data >>= 1;
+			}
+			break;
+		case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+				if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !m_bg_zbuf[xindex - SGB_XOFFSET])
+					plot_pixel(xindex, yindex, m_sgb_pal[pal + spal[colour]]);
+				data <<= 1;
+			}
+			break;
+		case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+				if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
+					plot_pixel(xindex, yindex, m_sgb_pal[pal + spal[colour]]);
+				data <<= 1;
+			}
+			break;
+		}
 	}
 }
 
 
-void sgb_lcd_device::refresh_border()
+void sgb_ppu_device::refresh_border()
 {
 	UINT16 data, data2;
 	UINT8 *tiles, *tiles2;
@@ -908,7 +1425,7 @@ void sgb_lcd_device::refresh_border()
 				if (!((yidx >= SGB_YOFFSET && yidx < SGB_YOFFSET + 144) &&
 					(xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160)))
 				{
-					plot_pixel(m_bitmap, xindex, yidx, m_sgb_pal[pal + colour]);
+					plot_pixel(xindex, yidx, m_sgb_pal[pal + colour]);
 				}
 				xindex++;
 			}
@@ -916,27 +1433,23 @@ void sgb_lcd_device::refresh_border()
 	}
 }
 
-void sgb_lcd_device::update_scanline()
+void sgb_ppu_device::update_scanline(UINT32 cycles_to_go)
 {
-	bitmap_ind16 &bitmap = m_bitmap;
-
 	g_profiler.start(PROFILER_VIDEO);
 
 	if ((LCDSTAT & 0x03) == 0x03)
 	{
-		/* Calcuate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = m_maincpu->attotime_to_cycles(m_lcd_timer->remaining());
 		int l = 0;
 
 		if (m_start_x < 0)
 		{
 			/* Window is enabled if the hardware says so AND the current scanline is
 			 * within the window AND the window X coordinate is <=166 */
-			m_layer[1].enabled = ((LCDCONT & 0x20) && m_current_line >= WNDPOSY && WNDPOSX <= 166) ? 1 : 0;
+			m_layer[1].enabled = ((LCDCONT & WINDOW_ENABLED) && m_current_line >= m_window_y && m_window_x <= 166) ? 1 : 0;
 
 			/* BG is enabled if the hardware says so AND (window_off OR (window_on
 			 * AND window's X position is >=7 )) */
-			m_layer[0].enabled = ((LCDCONT & 0x01) && ((!m_layer[1].enabled) || (m_layer[1].enabled && WNDPOSX >= 7))) ? 1 : 0;
+			m_layer[0].enabled = ((LCDCONT & BACKGROUND_ENABLED) && ((!m_layer[1].enabled) || (m_layer[1].enabled && m_window_x >= 7))) ? 1 : 0;
 
 			if (m_layer[0].enabled)
 			{
@@ -954,7 +1467,7 @@ void sgb_lcd_device::update_scanline()
 				int xpos;
 
 				/* Window X position is offset by 7 so we'll need to adjust */
-				xpos = WNDPOSX - 7;
+				xpos = m_window_x - 7;
 				if (xpos < 0)
 					xpos = 0;
 
@@ -981,13 +1494,13 @@ void sgb_lcd_device::update_scanline()
 			case 2: /* Blank screen (black) */
 				{
 					rectangle r(SGB_XOFFSET, SGB_XOFFSET + 160-1, SGB_YOFFSET, SGB_YOFFSET + 144 - 1);
-					bitmap.fill(0, r);
+					m_bitmap.fill(0, r);
 				}
 				return;
 			case 3: /* Blank screen (white - or should it be color 0?) */
 				{
 					rectangle r(SGB_XOFFSET, SGB_XOFFSET + 160 - 1, SGB_YOFFSET, SGB_YOFFSET + 144 - 1);
-					bitmap.fill(32767, r);
+					m_bitmap.fill(32767, r);
 				}
 				return;
 			}
@@ -1003,10 +1516,10 @@ void sgb_lcd_device::update_scanline()
 			m_end_x = std::min(int(160 - cycles_to_go),160);
 
 			/* if background or screen disabled clear line */
-			if (!(LCDCONT & 0x01))
+			if (!(LCDCONT & BACKGROUND_ENABLED))
 			{
 				rectangle r(SGB_XOFFSET, SGB_XOFFSET + 160 - 1, m_current_line + SGB_YOFFSET, m_current_line + SGB_YOFFSET);
-				bitmap.fill(0, r);
+				m_bitmap.fill(0, r);
 			}
 			while (l < 2)
 			{
@@ -1042,7 +1555,7 @@ void sgb_lcd_device::update_scanline()
 					while ((m_layer[l].xshift < 8) && i)
 					{
 						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-						plot_pixel(bitmap, xindex + SGB_XOFFSET, m_current_line + SGB_YOFFSET, m_sgb_pal[sgb_palette + m_gb_bpal[colour]]);
+						plot_pixel(xindex + SGB_XOFFSET, m_current_line + SGB_YOFFSET, m_sgb_pal[sgb_palette + m_gb_bpal[colour]]);
 						m_bg_zbuf[xindex] = colour;
 						xindex++;
 						data <<= 1;
@@ -1067,7 +1580,7 @@ void sgb_lcd_device::update_scanline()
 				}
 				l++;
 			}
-			if ((m_end_x == 160) && (LCDCONT & 0x02))
+			if ((m_end_x == 160) && (LCDCONT & SPRITES_ENABLED))
 			{
 				update_sprites();
 			}
@@ -1076,7 +1589,7 @@ void sgb_lcd_device::update_scanline()
 	}
 	else
 	{
-		if (!(LCDCONT * 0x80))
+		if (!(LCDCONT & ENABLED))
 		{
 			/* if screen disabled clear line */
 			if (m_previous_line != m_current_line)
@@ -1085,7 +1598,7 @@ void sgb_lcd_device::update_scanline()
 				if (m_current_line < 144)
 				{
 					rectangle r(SGB_XOFFSET, SGB_XOFFSET + 160 - 1, m_current_line + SGB_YOFFSET, m_current_line + SGB_YOFFSET);
-					bitmap.fill(0, r);
+					m_bitmap.fill(0, r);
 				}
 				m_previous_line = m_current_line;
 			}
@@ -1097,13 +1610,12 @@ void sgb_lcd_device::update_scanline()
 
 /* --- Game Boy Color Specific --- */
 
-void cgb_lcd_device::update_sprites()
+void cgb_ppu_device::update_sprites()
 {
-	bitmap_ind16 &bitmap = m_bitmap;
-	UINT8 height, tilemask, line, *oam;
-	int xindex, yindex;
+	UINT8 height, tilemask, line;
+	int yindex;
 
-	if (LCDCONT & 0x04)
+	if (LCDCONT & LARGE_SPRITES)
 	{
 		height = 16;
 		tilemask = 0xFE;
@@ -1117,121 +1629,117 @@ void cgb_lcd_device::update_sprites()
 	yindex = m_current_line;
 	line = m_current_line + 16;
 
-	oam = m_oam.get() + 39 * 4;
-	for (int i = 39; i >= 0; i--)
+	for (int i = m_sprCount - 1; i >= 0; i--)
 	{
-		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
-		if (line >= oam[0] && line < (oam[0] + height) && oam[1] && oam[1] < 168)
+		const UINT16 oam_address = m_sprite[i] * 4;
+		UINT8 pal;
+		int xindex = m_oam[oam_address + 1] - 8;
+		UINT16 adr = ((m_oam[oam_address + 3] & 0x08) << 10) + (m_oam[oam_address + 2] & tilemask) * 16;
+
+		if (xindex < -7 || xindex > 160)
 		{
-			UINT16 data;
-			UINT8 bit, pal;
+			continue;
+		}
 
-			/* Handle mono mode for GB games */
-			if (!m_gbc_mode)
-				pal = (oam[3] & 0x10) ? 4 : 0;
-			else
-				pal = ((oam[3] & 0x7) * 4);
+		/* Handle mono mode for GB games */
+		if (!m_gbc_mode)
+			pal = (m_oam[oam_address + 3] & 0x10) ? 4 : 0;
+		else
+			pal = ((m_oam[oam_address + 3] & 0x7) * 4);
 
-			xindex = oam[1] - 8;
-			if (oam[3] & 0x40)         /* flip y ? */
+		if (m_oam[oam_address + 3] & 0x40)         /* flip y ? */
+		{
+			adr += (height - 1 - line + m_oam[oam_address]) * 2;
+		}
+		else
+		{
+			adr += (line - m_oam[oam_address]) * 2;
+		}
+
+		UINT16 data = (m_vram[adr + 1] << 8) | m_vram[adr];
+
+		switch (m_oam[oam_address + 3] & 0xA0)
+		{
+		case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
 			{
-				data = *((UINT16 *) &m_vram[((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2]);
-			}
-			else
-			{
-				data = *((UINT16 *) &m_vram[((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (line - oam[0]) * 2]);
-			}
-
-			data = little_endianize_int16(data);
-
-			switch (oam[3] & 0xA0)
-			{
-			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
+				int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+				if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 				{
-					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
-					{
-						if (!m_gbc_mode)
-							colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
-						plot_pixel(bitmap, xindex, yindex, m_cgb_spal[pal + colour]);
-					}
-					data >>= 1;
+					if (!m_gbc_mode)
+						colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
+					plot_pixel(xindex, yindex, m_cgb_spal[pal + colour]);
 				}
-				break;
-			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
+				data >>= 1;
+			}
+			break;
+		case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+				if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & BACKGROUND_ENABLED))
+					colour = 0;
+				if (colour && xindex >= 0 && xindex < 160)
 				{
-					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
-						colour = 0;
-					if (colour && xindex >= 0 && xindex < 160)
-					{
-						if (!m_gbc_mode)
-							colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
-						plot_pixel(bitmap, xindex, yindex, m_cgb_spal[pal + colour]);
-					}
-					data >>= 1;
+					if (!m_gbc_mode)
+						colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
+					plot_pixel(xindex, yindex, m_cgb_spal[pal + colour]);
 				}
-				break;
-			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
+				data >>= 1;
+			}
+			break;
+		case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+				if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+				{
+					if (!m_gbc_mode)
+						colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
+					plot_pixel(xindex, yindex, m_cgb_spal[pal + colour]);
+				}
+				data <<= 1;
+			}
+			break;
+		case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
+			for (int bit = 0; bit < 8; bit++, xindex++)
+			{
+				if (xindex >= 0 && xindex < 160)
 				{
 					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & BACKGROUND_ENABLED))
+						colour = 0;
+					if (colour)
 					{
 						if (!m_gbc_mode)
 							colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
-						plot_pixel(bitmap, xindex, yindex, m_cgb_spal[pal + colour]);
+						plot_pixel(xindex, yindex, m_cgb_spal[pal + colour]);
 					}
-					data <<= 1;
 				}
-				break;
-			case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
-				{
-					if (xindex >= 0 && xindex < 160)
-					{
-						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-						if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
-							colour = 0;
-						if (colour)
-						{
-							if (!m_gbc_mode)
-								colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
-							plot_pixel(bitmap, xindex, yindex, m_cgb_spal[pal + colour]);
-						}
-					}
-					data <<= 1;
-				}
-				break;
+				data <<= 1;
 			}
+			break;
 		}
-		oam -= 4;
 	}
 }
 
-void cgb_lcd_device::update_scanline()
+void cgb_ppu_device::update_scanline(UINT32 cycles_to_go)
 {
-	bitmap_ind16 &bitmap = m_bitmap;
-
 	g_profiler.start(PROFILER_VIDEO);
 
 	if ((LCDSTAT & 0x03) == 0x03)
 	{
-		/* Calcuate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = m_maincpu->attotime_to_cycles(m_lcd_timer->remaining());
 		int l = 0;
 
 		if (m_start_x < 0)
 		{
 			/* Window is enabled if the hardware says so AND the current scanline is
 			 * within the window AND the window X coordinate is <=166 */
-			m_layer[1].enabled = ((LCDCONT & 0x20) && (m_current_line >= WNDPOSY) && (WNDPOSX <= 166)) ? 1 : 0;
+			m_layer[1].enabled = ((LCDCONT & WINDOW_ENABLED) && (m_current_line >= m_window_y) && (m_window_x <= 166)) ? 1 : 0;
 
 			/* BG is enabled if the hardware says so AND (window_off OR (window_on
 			 * AND window's X position is >=7 )) */
-			m_layer[0].enabled = ((LCDCONT & 0x01) && ((!m_layer[1].enabled) || (m_layer[1].enabled && (WNDPOSX >= 7)))) ? 1 : 0;
+			m_layer[0].enabled = ((LCDCONT & BACKGROUND_ENABLED) && ((!m_layer[1].enabled) || (m_layer[1].enabled && (m_window_x >= 7)))) ? 1 : 0;
 
 			if (m_layer[0].enabled)
 			{
@@ -1249,7 +1757,7 @@ void cgb_lcd_device::update_scanline()
 				int xpos;
 
 				/* Window X position is offset by 7 so we'll need to adust */
-				xpos = WNDPOSX - 7;
+				xpos = m_window_x - 7;
 				if (xpos < 0)
 					xpos = 0;
 
@@ -1269,10 +1777,10 @@ void cgb_lcd_device::update_scanline()
 		{
 			m_end_x = std::min(int(160 - cycles_to_go), 160);
 			/* Draw empty line when the background is disabled */
-			if (!(LCDCONT & 0x01))
+			if (!(LCDCONT & BACKGROUND_ENABLED))
 			{
 				rectangle r(m_start_x, m_end_x - 1, m_current_line, m_current_line);
-				bitmap.fill((!m_gbc_mode) ? 0 : 32767, r);
+				m_bitmap.fill((!m_gbc_mode) ? 0 : 32767, r);
 			}
 			while (l < 2)
 			{
@@ -1334,7 +1842,7 @@ void cgb_lcd_device::update_scanline()
 							colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 							data <<= 1;
 						}
-						plot_pixel(bitmap, xindex, m_current_line, m_cgb_bpal[(!m_gbc_mode) ? m_gb_bpal[colour] : (((gbcmap[m_layer[l].xindex] & 0x07) * 4) + colour)]);
+						plot_pixel(xindex, m_current_line, m_cgb_bpal[(!m_gbc_mode) ? m_gb_bpal[colour] : (((gbcmap[m_layer[l].xindex] & 0x07) * 4) + colour)]);
 						m_bg_zbuf[xindex] = colour + (gbcmap[m_layer[l].xindex] & 0x80);
 						xindex++;
 						m_layer[l].xshift++;
@@ -1369,7 +1877,7 @@ void cgb_lcd_device::update_scanline()
 				}
 				l++;
 			}
-			if (m_end_x == 160 && (LCDCONT & 0x02))
+			if (m_end_x == 160 && (LCDCONT & SPRITES_ENABLED))
 			{
 				update_sprites();
 			}
@@ -1378,7 +1886,7 @@ void cgb_lcd_device::update_scanline()
 	}
 	else
 	{
-		if (!(LCDCONT & 0x80))
+		if (!(LCDCONT & ENABLED))
 		{
 			/* Draw an empty line when LCD is disabled */
 			if (m_previous_line != m_current_line)
@@ -1387,7 +1895,7 @@ void cgb_lcd_device::update_scanline()
 				{
 					const rectangle &r1 = m_screen->visible_area();
 					rectangle r(r1.min_x, r1.max_x, m_current_line, m_current_line);
-					bitmap.fill((!m_gbc_mode) ? 0 : 32767 , r);
+					m_bitmap.fill((!m_gbc_mode) ? 0 : 32767 , r);
 				}
 				m_previous_line = m_current_line;
 			}
@@ -1398,22 +1906,17 @@ void cgb_lcd_device::update_scanline()
 }
 
 
-TIMER_CALLBACK_MEMBER(gb_lcd_device::video_init_vbl)
-{
-	m_maincpu->set_input_line(VBL_INT, ASSERT_LINE);
-}
-
-UINT32 gb_lcd_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 dmg_ppu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
 
-void gb_lcd_device::increment_scanline()
+void dmg_ppu_device::increment_scanline()
 {
 	m_current_line = (m_current_line + 1) % 154;
-	if (LCDCONT & 0x80)
+	if (LCDCONT & ENABLED)
 	{
 		CURLINE = m_current_line;
 	}
@@ -1423,265 +1926,450 @@ void gb_lcd_device::increment_scanline()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gb_lcd_device::lcd_timer_proc)
+
+void dmg_ppu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	static const int gb_sprite_cycles[] = { 0, 8, 20, 32, 44, 52, 64, 76, 88, 96, 108 };
+	update_state();
+}
 
-	m_state = param;
 
-	if (LCDCONT & 0x80)
+void dmg_ppu_device::update_oam_dma_state(UINT64 cycles)
+{
+	if (m_oam_dma_cycles_left > 0)
 	{
-		switch (m_state)
+		if (cycles >= m_oam_dma_cycles_left)
 		{
-		case GB_LCD_STATE_LYXX_PRE_M0:  /* Just before switching to mode 0 */
-			m_mode = 0;
-			if (LCDSTAT & 0x08)
+			m_oam_dma_cycles_left = 0;
+			m_oam_dma_processing = false;
+			// TODO: reenable real program map...
+		}
+		else
+		{
+			m_oam_dma_cycles_left -= cycles;
+		}
+	}
+
+	if (m_oam_dma_start_cycles > 0)
+	{   
+		if (cycles >= m_oam_dma_start_cycles)
+		{
+			for (int i = 0; i < 0xA0; i++)
 			{
-				if (!m_mode_irq)
+				m_oam[i] = m_program_space->read_byte(m_oam_dma_source_address + i); 
+			}
+
+			m_oam_dma_start_cycles = 0;
+			m_oam_dma_cycles_left = 160 * 4;
+			m_oam_dma_processing = true;
+			// TODO: all reads should start to return 0xFF? from here
+		}
+		else
+		{
+			m_oam_dma_start_cycles -= cycles;
+		}
+	}
+}
+
+
+static const char* state_to_string(int state)
+{
+	switch (state)
+	{
+	case GB_LCD_STATE_LYXX_M3:
+		return "GB_LCD_STATE_LYXX_M3";
+	case GB_LCD_STATE_LYXX_M3_2:
+		return "GB_LCD_STATE_LYXX_M3_2";
+	case GB_LCD_STATE_LYXX_PRE_M0:
+		return "GB_LCD_STATE_LYXX_PRE_M0";
+	case GB_LCD_STATE_LYXX_M0:
+		return "GB_LCD_STATE_LYXX_M0";
+	case GB_LCD_STATE_LYXX_M0_2:
+		return "GB_LCD_STATE_LYXX_M0_2";
+	case GB_LCD_STATE_LYXX_M0_GBC_PAL:
+		return "GB_LCD_STATE_LYXX_M0_GBC_PAL";
+	case GB_LCD_STATE_LYXX_M0_PRE_INC:
+		return "GB_LCD_STATE_LYXX_M0_PRE_INC";
+	case GB_LCD_STATE_LYXX_M0_INC:
+		return "GB_LCD_STATE_LYXX_M0_INC";
+	case GB_LCD_STATE_LY00_M2:
+		return "GB_LCD_STATE_LY00_M2";
+	case GB_LCD_STATE_LY00_M2_WND:
+		return "GB_LCD_STATE_LY00_M2_WND";
+	case GB_LCD_STATE_LYXX_M2_WND:
+		return "GB_LCD_STATE_LYXX_M2_WND";
+	case GB_LCD_STATE_LYXX_M2:
+		return "GB_LCD_STATE_LYXX_M2";
+	case GB_LCD_STATE_LY9X_M1:
+		return "GB_LCD_STATE_LY9X_M1";
+	case GB_LCD_STATE_LY9X_M1_INC:
+		return "GB_LCD_STATE_LY9X_M1_INC";
+	case GB_LCD_STATE_LY00_M1:
+		return "GB_LCD_STATE_LY00_M1";
+	case GB_LCD_STATE_LY00_M1_1:
+		return "GB_LCD_STATE_LY00_M1_1";
+	case GB_LCD_STATE_LY00_M1_2:
+		return "GB_LCD_STATE_LY00_M1_2";
+	case GB_LCD_STATE_LY00_M0:
+		return "GB_LCD_STATE_LY00_M0";
+	default:
+		return "unknown state";
+	}
+}
+
+
+void dmg_ppu_device::update_state()
+{
+	if (m_updating_state)
+	{
+		return;
+	}
+
+	m_updating_state = true;
+
+	attotime now = machine().time();
+
+	assert(now >= m_last_updated);
+
+	UINT64 cycles = m_lr35902->attotime_to_cycles(now - m_last_updated);
+
+	update_oam_dma_state(cycles);
+
+	if (LCDCONT & ENABLED)
+	{
+		LOG(("m_cycles_left = %u, cycles = %u, CURLINE = %u, m_next_state = %s\n", m_cycles_left, cycles, CURLINE, state_to_string(m_next_state)));
+
+		if (m_cycles_left > 0)
+		{
+			if (m_state == GB_LCD_STATE_LYXX_M3 || m_state == GB_LCD_STATE_LYXX_M3_2 || m_state == GB_LCD_STATE_LYXX_M0 || m_state == GB_LCD_STATE_LYXX_M0_2)
+			{
+				// Execute <cycles> M3 cycles
+				if (m_enable_experimental_engine)
 				{
-					if (!m_line_irq && !m_delayed_line_irq)
+					update_line_state(cycles);
+				}
+			}
+
+			if (cycles >= m_cycles_left) {
+				cycles -= m_cycles_left;
+				m_cycles_left = 0;
+			}
+			else
+			{
+				m_cycles_left -= cycles;
+				cycles = 0;
+			}
+		}
+
+		while (m_cycles_left == 0)
+		{
+			UINT16 state_cycles = 0;
+
+			m_state = m_next_state;
+
+			switch (m_state)
+			{
+			case GB_LCD_STATE_LYXX_PRE_M0:  /* Just before switching to mode 0 */
+				m_next_state = GB_LCD_STATE_LYXX_M0;
+				state_cycles = 4;
+				break;
+
+			case GB_LCD_STATE_LYXX_M0:      /* Switch to mode 0 */
+				/* update current scanline */
+				update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
+				/* Increment the number of window lines drawn if enabled */
+				if (m_layer[1].enabled)
+				{
+					if (!m_enable_experimental_engine)
 					{
-						m_mode_irq = 1;
-						m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
+						m_window_lines_drawn++;
 					}
+				}
+				m_previous_line = m_current_line;
+				/* Set Mode 0 lcdstate */
+				LCDSTAT &= 0xFC;
+				m_oam_locked = UNLOCKED;
+				m_oam_locked_reading = UNLOCKED;
+				m_vram_locked = UNLOCKED;
+				m_next_state = GB_LCD_STATE_LYXX_M0_2;
+				state_cycles = 1;
+				break;
+
+			case GB_LCD_STATE_LYXX_M0_2:
+				m_stat_mode0_int = (LCDSTAT & MODE_0_INT_ENABLED) ? true : false;
+				check_stat_irq();
+				m_mode = 0;
+				m_next_state = GB_LCD_STATE_LYXX_M0_INC;
+				state_cycles = 200 - 1 + 3 - m_scrollx_adjust - m_sprite_cycles - m_window_cycles;
+				break;
+
+			case GB_LCD_STATE_LYXX_M0_INC:  /* Increment LY, stay in M0 for 4 more cycles */
+				increment_scanline();
+				m_window_y = WNDPOSY;
+				m_stat_lyc_int_prev = m_stat_lyc_int;
+				m_stat_lyc_int = false;
+				if (CURLINE < 144)
+				{
+					m_stat_mode0_int = false;
+				}
+				m_stat_mode2_int = (LCDSTAT & MODE_2_INT_ENABLED) ? true : false;
+				check_stat_irq();
+
+				m_stat_lyc_int = ((CMPLINE == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
+				LOG(("GB_LCD_STATE_LYXX_M0_INC: CMPLINE = %02x, CURLINE = %02x, LCDSTAT = %02x, m_stat_lyc_int = %s\n", CMPLINE, CURLINE, LCDSTAT, m_stat_lyc_int ? "true":"false"));
+				/* Reset LY==LYC STAT bit */
+				LCDSTAT &= ~LY_LYC_FLAG;
+				/* Check if we're going into VBlank next */
+				if (CURLINE == 144)
+				{
+					m_next_state = GB_LCD_STATE_LY9X_M1;
+					state_cycles = 4;
 				}
 				else
 				{
-					m_mode_irq = 0;
+					m_next_state = GB_LCD_STATE_LYXX_M2;
+					m_oam_locked_reading = LOCKED;
+					state_cycles = 4;
 				}
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
-			break;
-		case GB_LCD_STATE_LYXX_M0:      /* Switch to mode 0 */
-			/* update current scanline */
-			update_scanline();
-			/* Increment the number of window lines drawn if enabled */
-			if (m_layer[1].enabled)
-			{
-				m_window_lines_drawn++;
-			}
-			m_previous_line = m_current_line;
-			/* Set Mode 0 lcdstate */
-			m_mode = 0;
-			LCDSTAT &= 0xFC;
-			m_oam_locked = UNLOCKED;
-			m_vram_locked = UNLOCKED;
-			/*
-			    There seems to a kind of feature in the Game Boy hardware when the lowest bits of the
-			    SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
-			    than usual.
-			    The SGB probably has the same bug.
-			*/
-			if ((SCROLLX & 0x03) == 0x03)
-			{
-				m_scrollx_adjust += 4;
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
+				break;
+
+			case GB_LCD_STATE_LY00_M2:      /* Switch to mode 2 on line #0 */
+				/* Set Mode 2 lcdstate */
+				m_mode = 2;
+				LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
+				m_oam_locked = LOCKED;
+				/* Generate lcd interrupt if requested */
+				m_stat_mode1_int = false;
+				m_stat_mode2_int = (LCDSTAT & MODE_2_INT_ENABLED) ? true : false;
+				check_stat_irq();
+				/* Check for regular compensation of x-scroll register */
+				if (!m_enable_experimental_engine)
+				{
+					m_scrollx_adjust = SCROLLX & 0x07;
+				}
+				/* Mode 2 lasts approximately 80 clock cycles */
+				m_next_state = GB_LCD_STATE_LYXX_M3;
+				clear_line_state();
+				select_sprites();
+//				if (!m_enable_experimental_engine)
+				{
+					m_window_y = WNDPOSY;
+				}
+				state_cycles = 80;
+				state_cycles = 8;
+				m_next_state = GB_LCD_STATE_LY00_M2_WND;
+				break;
+
+			case GB_LCD_STATE_LY00_M2_WND:
+				// Check window active for current/previous line
+				if ((LCDCONT & WINDOW_ENABLED) && m_current_line == m_window_y)
+				{
+					m_line.window_should_trigger = true;
+				}
+LOG(("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_line.window_should_trigger ? "true" : "false", m_current_line, m_window_y));
+
+				state_cycles = 80 - 8;
+				m_next_state = GB_LCD_STATE_LYXX_M3;
+				break;
+
+			case GB_LCD_STATE_LYXX_M2:      /* Switch to mode 2 */
+				m_stat_mode0_int = false;
+				check_stat_irq();
+				/* Update STAT register to the correct state */
+				m_mode = 2;
+				LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
+				m_oam_locked = LOCKED;
+				/* Check if LY==LYC STAT bit should be set */
+				if (CURLINE == CMPLINE)
+				{
+					LCDSTAT |= LY_LYC_FLAG;
+				}
+				/* Check for regular compensation of x-scroll register */
+				if (!m_enable_experimental_engine)
+				{
+					m_scrollx_adjust = SCROLLX & 0x07;
+				}
+				/* Mode 2 last for approximately 80 clock cycles */
+				m_next_state = GB_LCD_STATE_LYXX_M3;
+				clear_line_state();
+				select_sprites();
+				if (!m_enable_experimental_engine)
+				{
+					m_window_y = WNDPOSY;
+				}
+				state_cycles = 80;
+				m_next_state = GB_LCD_STATE_LYXX_M2_WND;
+				state_cycles = 8;
+				break;
+
+			case GB_LCD_STATE_LYXX_M2_WND:
+				// Check window active for current/previous line
+				if ((LCDCONT & WINDOW_ENABLED) && m_current_line == m_window_y + 1)
+				{
+					m_line.window_should_trigger = true;
+				}
+LOG(("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_line.window_should_trigger ? "true" : "false", m_current_line, m_window_y));
+				m_next_state = GB_LCD_STATE_LYXX_M3;
+				state_cycles = 80 - 8;
+				break;
+
+			case GB_LCD_STATE_LYXX_M3:      /* Switch to mode 3 */
+				for (int i = 0; i < ARRAY_LENGTH(m_line.window_start_y); i++)
+				{
+					m_line.window_start_y[i] = WNDPOSY;
+					m_line.window_start_x[i] = WNDPOSX;
+				}
+				m_line.window_start_y_index = 0;
+				for (int i = 0; i < ARRAY_LENGTH(m_line.window_enable); i++)
+				{
+					m_line.window_enable[i] = LCDCONT;
+				}
+				m_line.window_enable_index = 0;
+				m_stat_mode2_int = false;
+				check_stat_irq();
+				/* Set Mode 3 lcdstate */
+				m_mode = 3;
+				LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
+				// Normally OAM is already locked by mode 2, except when the lcd unit is just switched on.
+				m_oam_locked = LOCKED;
+				m_vram_locked = LOCKED;
+				/* Check for compensations of x-scroll register */
+				/* Mode 3 lasts for approximately 172+cycles needed to handle sprites */
+				if (m_enable_experimental_engine)
+				{
+					m_next_state = GB_LCD_STATE_LYXX_M0;
+					state_cycles = 4 - 3 + 168 + m_sprite_cycles;
+				}
+				else
+				{
+					// old
+					m_next_state = GB_LCD_STATE_LYXX_PRE_M0;
+					state_cycles = 168 + m_scrollx_adjust + m_sprite_cycles;
+					// new
+// WX write at 164 cycles left still taken into account
+// WX write at 160 cycles left not taken into account
+					m_next_state = GB_LCD_STATE_LYXX_M3_2;
+					state_cycles = 12;
+					m_start_x = -1;
+				}
+				break;
+
+			case GB_LCD_STATE_LYXX_M3_2:
+				m_window_x = WNDPOSX;
+				if (!m_enable_experimental_engine)
+				{
+					calculate_window_cycles();
+				}
+				m_next_state = GB_LCD_STATE_LYXX_M0;
+				state_cycles = 4 - 3 + 168 - 12 + m_scrollx_adjust + m_sprite_cycles + m_window_cycles;
+				break;
+
+			case GB_LCD_STATE_LY9X_M1:      /* Switch to or stay in mode 1 */
+				m_stat_lyc_int = ((CMPLINE == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
+				m_stat_mode2_int = false;
+				m_stat_mode0_int = false;
+				if (CURLINE == 144)
+				{
+					/* Trigger VBlank interrupt */
+					m_lr35902->set_input_line(lr35902_cpu_device::VBL_INT, ASSERT_LINE);
+					// Make sure the state is updated during the current timeslice in case it is read.
+					m_lr35902->execute_set_input(lr35902_cpu_device::VBL_INT, ASSERT_LINE);
+					/* Set VBlank lcdstate */
+					m_mode = 1;
+					LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
+					/* Trigger LCD interrupt if requested */
+					m_stat_mode1_int = (LCDSTAT & MODE_1_INT_ENABLED) ? true : false;
+				}
+				check_stat_irq();
+				/* Check if LY==LYC STAT bit should be set */
+				if (CURLINE == CMPLINE)
+				{
+					LCDSTAT |= LY_LYC_FLAG;
+				}
+				m_next_state = GB_LCD_STATE_LY9X_M1_INC;
+				state_cycles = 452;
+				break;
+
+			case GB_LCD_STATE_LY9X_M1_INC:      /* Increment scanline counter */
+				increment_scanline();
+				LOG(("GB_LCD_STATE_LY9X_M1_INC: m_stat_lyc_int = %s\n", m_stat_lyc_int ? "true" : "false"));
+				/* Reset LY==LYC STAT bit */
+				LCDSTAT &= ~LY_LYC_FLAG;
+				if (m_current_line == 153)
+				{
+					m_next_state = GB_LCD_STATE_LY00_M1;
+					state_cycles = 4;
+				}
+				else
+				{
+					m_next_state = GB_LCD_STATE_LY9X_M1;
+					state_cycles = 4;
+				}
+				break;
+
+			case GB_LCD_STATE_LY00_M1:      /* we stay in VBlank but current line counter should already be incremented */
+				/* Check LY=LYC for line #153 */
+				if (CURLINE == CMPLINE)
+				{
+					LCDSTAT |= LY_LYC_FLAG;
+				}
+				else
+				{
+					LCDSTAT &= ~LY_LYC_FLAG;
+				}
+				m_stat_lyc_int = ((CMPLINE == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
+				check_stat_irq();
+
+				increment_scanline();
+				m_next_state = GB_LCD_STATE_LY00_M1_1;
+				state_cycles = 4;
+				break;
+
+			case GB_LCD_STATE_LY00_M1_1:
+				LCDSTAT &= ~LY_LYC_FLAG;
+				m_next_state = GB_LCD_STATE_LY00_M1_2;
+				state_cycles = 4;
+				break;
+
+			case GB_LCD_STATE_LY00_M1_2:    /* Rest of line #0 during VBlank */
+				m_frame_window_active = false;
+				m_stat_lyc_int = ((CMPLINE == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
+				check_stat_irq();
+				if (CURLINE == CMPLINE)
+				{
+					LCDSTAT |= LY_LYC_FLAG;
+				}
+				m_next_state = GB_LCD_STATE_LY00_M0;
+				state_cycles = 444;
+				break;
+
+			case GB_LCD_STATE_LY00_M0:      /* The STAT register seems to go to 0 for about 4 cycles */
+				m_window_y = WNDPOSY;
+				/* Set Mode 0 lcdstat */
+				LCDSTAT = (LCDSTAT & 0xFC);
+				m_next_state = GB_LCD_STATE_LY00_M2;
+				state_cycles = 4;
 				break;
 			}
-		case GB_LCD_STATE_LYXX_M0_SCX3:
-			/* Generate lcd interrupt if requested */
-			if (!m_mode_irq && (LCDSTAT & 0x08) &&
-					((!m_line_irq && m_delayed_line_irq) || !(LCDSTAT & 0x40)))
+			assert(state_cycles > 0);
+
+			if (m_state == GB_LCD_STATE_LYXX_M3 || m_state == GB_LCD_STATE_LYXX_M3_2 || m_state == GB_LCD_STATE_LYXX_M0 || m_state == GB_LCD_STATE_LYXX_M0)
 			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(196 - m_scrollx_adjust - m_sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
-			break;
-		case GB_LCD_STATE_LYXX_M0_PRE_INC:  /* Just before incrementing the line counter go to mode 2 internally */
-			if (CURLINE < 143)
-			{
-				m_mode = 2;
-				m_triggering_mode_irq = (LCDSTAT & 0x20) ? 1 : 0;
-				if (m_triggering_mode_irq)
+				// Execute <cycles> M3 cycles
+				if (m_enable_experimental_engine)
 				{
-					if (!m_mode_irq)
-					{
-						if (!m_line_irq && !m_delayed_line_irq)
-						{
-							m_mode_irq = 1;
-							m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-						}
-					}
-					else
-					{
-						m_mode_irq = 0;
-					}
+					update_line_state(cycles);
 				}
 			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
-			break;
-		case GB_LCD_STATE_LYXX_M0_INC:  /* Increment LY, stay in M0 for 4 more cycles */
-			increment_scanline();
-			m_delayed_line_irq = m_line_irq;
-			m_triggering_line_irq = ((CMPLINE == CURLINE) && (LCDSTAT & 0x40)) ? 1 : 0;
-			m_line_irq = 0;
-			if (!m_mode_irq && !m_delayed_line_irq && m_triggering_line_irq && !m_triggering_mode_irq)
+
+			if (cycles >= state_cycles)
 			{
-				m_line_irq = m_triggering_line_irq;
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			/* Reset LY==LYC STAT bit */
-			LCDSTAT &= 0xFB;
-			/* Check if we're going into VBlank next */
-			if (CURLINE == 144)
-			{
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				cycles -= state_cycles;
+				m_cycles_left = 0;
 			}
 			else
 			{
-				/* Internally switch to mode 2 */
-				m_mode = 2;
-				/* Generate lcd interrupt if requested */
-				if (!m_mode_irq && m_triggering_mode_irq &&
-						((!m_triggering_line_irq && !m_delayed_line_irq) || !(LCDSTAT & 0x40)))
-				{
-					m_mode_irq = 1;
-					m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-				}
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
+				m_cycles_left = state_cycles - cycles;
 			}
-			break;
-		case GB_LCD_STATE_LY00_M2:      /* Switch to mode 2 on line #0 */
-			/* Set Mode 2 lcdstate */
-			m_mode = 2;
-			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
-			m_oam_locked = LOCKED;
-			/* Generate lcd interrupt if requested */
-			if ((LCDSTAT & 0x20) && !m_line_irq)
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			/* Check for regular compensation of x-scroll register */
-			m_scrollx_adjust = (SCROLLX & 0x04) ? 4 : 0;
-			/* Mode 2 lasts approximately 80 clock cycles */
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
-			break;
-		case GB_LCD_STATE_LYXX_M2:      /* Switch to mode 2 */
-			/* Update STAT register to the correct state */
-			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
-			m_oam_locked = LOCKED;
-			/* Generate lcd interrupt if requested */
-			if ((m_delayed_line_irq && m_triggering_line_irq && !(LCDSTAT & 0x20)) ||
-					(!m_mode_irq && !m_line_irq && !m_delayed_line_irq && m_triggering_mode_irq))
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			m_line_irq = m_triggering_line_irq;
-			m_triggering_mode_irq = 0;
-			/* Check if LY==LYC STAT bit should be set */
-			if (CURLINE == CMPLINE)
-			{
-				LCDSTAT |= 0x04;
-			}
-			/* Check for regular compensation of x-scroll register */
-			m_scrollx_adjust = (SCROLLX & 0x04) ? 4 : 0;
-			/* Mode 2 last for approximately 80 clock cycles */
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
-			break;
-		case GB_LCD_STATE_LYXX_M3:      /* Switch to mode 3 */
-			select_sprites();
-			m_sprite_cycles = gb_sprite_cycles[m_sprCount];
-			/* Set Mode 3 lcdstate */
-			m_mode = 3;
-			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
-			m_vram_locked = LOCKED;
-			/* Check for compensations of x-scroll register */
-			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(168 + m_scrollx_adjust + m_sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
-			m_start_x = -1;
-			break;
-		case GB_LCD_STATE_LY9X_M1:      /* Switch to or stay in mode 1 */
-			if (CURLINE == 144)
-			{
-				/* Trigger VBlank interrupt */
-				m_maincpu->set_input_line(VBL_INT, ASSERT_LINE);
-				/* Set VBlank lcdstate */
-				m_mode = 1;
-				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
-				/* Trigger LCD interrupt if requested */
-				if (LCDSTAT & 0x10)
-				{
-					m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-				}
-			}
-			/* Check if LY==LYC STAT bit should be set */
-			if (CURLINE == CMPLINE)
-			{
-				LCDSTAT |= 0x04;
-			}
-			if (m_delayed_line_irq && m_triggering_line_irq)
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
-			break;
-		case GB_LCD_STATE_LY9X_M1_INC:      /* Increment scanline counter */
-			increment_scanline();
-			m_delayed_line_irq = m_line_irq;
-			m_triggering_line_irq = ((CMPLINE == CURLINE) && (LCDSTAT & 0x40)) ? 1 : 0;
-			m_line_irq = 0;
-			if (!m_delayed_line_irq && m_triggering_line_irq)
-			{
-				m_line_irq = m_triggering_line_irq;
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			/* Reset LY==LYC STAT bit */
-			LCDSTAT &= 0xFB;
-			if (m_current_line == 153)
-			{
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
-			}
-			else
-			{
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
-			}
-			break;
-		case GB_LCD_STATE_LY00_M1:      /* we stay in VBlank but current line counter should already be incremented */
-			/* Check LY=LYC for line #153 */
-			if (m_delayed_line_irq)
-			{
-				if (m_triggering_line_irq)
-				{
-					m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-				}
-			}
-			m_delayed_line_irq = m_delayed_line_irq | m_line_irq;
-			if (CURLINE == CMPLINE)
-			{
-				LCDSTAT |= 0x04;
-			}
-			increment_scanline();
-			m_triggering_line_irq = ((CMPLINE == CURLINE) && (LCDSTAT & 0x40)) ? 1 : 0;
-			m_line_irq = 0;
-			LCDSTAT &= 0xFB;
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4/*8*/), GB_LCD_STATE_LY00_M1_1);
-			break;
-		case GB_LCD_STATE_LY00_M1_1:
-			if (!m_delayed_line_irq && m_triggering_line_irq)
-			{
-				m_line_irq = m_triggering_line_irq;
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
-			break;
-		case GB_LCD_STATE_LY00_M1_2:    /* Rest of line #0 during VBlank */
-			if (m_delayed_line_irq && m_triggering_line_irq)
-			{
-				m_line_irq = m_triggering_line_irq;
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			if (CURLINE == CMPLINE)
-			{
-				LCDSTAT |= 0x04;
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
-			break;
-		case GB_LCD_STATE_LY00_M0:      /* The STAT register seems to go to 0 for about 4 cycles */
-			/* Set Mode 0 lcdstat */
-			m_mode = 0;
-			LCDSTAT = (LCDSTAT & 0xFC);
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
-			break;
 		}
 	}
 	else
@@ -1689,332 +2377,411 @@ TIMER_CALLBACK_MEMBER(gb_lcd_device::lcd_timer_proc)
 		increment_scanline();
 		if (m_current_line < 144)
 		{
-			update_scanline();
+			// Force draw of an empty line
+			update_scanline(0);
 		}
-		m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(456));
+		m_cycles_left = 456;
 	}
+	assert(m_cycles_left > 0);
+
+	m_last_updated = machine().time();
+
+	int next_cycles = m_cycles_left;
+
+	if (m_oam_dma_start_cycles > 0 && m_oam_dma_start_cycles < next_cycles)
+	{
+		next_cycles = m_oam_dma_start_cycles;
+	}
+
+	if (m_oam_dma_cycles_left > 0 && m_oam_dma_cycles_left < next_cycles)
+	{
+		next_cycles = m_oam_dma_cycles_left;
+	}
+
+	m_lcd_timer->adjust(m_lr35902->cycles_to_attotime(next_cycles));
+
+	m_updating_state = false;
 }
 
 
 // CGB specific code
 
-void cgb_lcd_device::hdma_trans(UINT16 length)
+void cgb_ppu_device::update_hdma_state(UINT64 cycles)
 {
-	UINT16 src, dst;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	if (m_hdma_cycles_to_start > 0)
+	{
+		if (cycles >= m_hdma_cycles_to_start)
+		{
+			m_hdma_cycles_to_start = 0;
+			hdma_trans_execute();
+		}
+		else
+		{
+			m_hdma_cycles_to_start -= cycles;
+		}
+	}
+}
 
-	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
-	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);
-	dst |= 0x8000;
+
+void cgb_ppu_device::hdma_trans(UINT16 length)
+{
+	LOG(("hdma_trans\n"));
+	m_hdma_length = length;
+	m_hdma_cycles_to_start = 4;
+	update_state();
+}
+
+
+void cgb_ppu_device::hdma_trans_execute()
+{
+	LOG(("hdma_trans_execute\n"));
+	UINT16 length = m_hdma_length;
+	UINT16 src, dst;
+
+	src = (HDMA1 << 8) | (HDMA2 & 0xF0);
+	// 102 Dalmatians uses destination 0000 and expects data to be DMAed.
+	dst = 0x8000 | (HDMA3 << 8) | (HDMA4 & 0xF0);
+
+	//LOG(("length = %04x, src = %04x, dst = %04x\n", length, src, dst));
 	while (length > 0)
 	{
-		space.write_byte(dst++, space.read_byte(src++));
+		if (dst & 0x8000)
+		{
+			UINT16 src_high = src & 0xF000;
+			UINT8 source = 0xFF;
+			if (src_high < 0x8000 || (src_high >= 0xA000 && src_high < 0xE000))
+			{
+				source = m_program_space->read_byte(src);
+			}
+			m_program_space->write_byte(dst & 0x9FFF, source);
+		}
+		src++;
+		dst++;
+
 		length--;
 	}
 	HDMA1 = src >> 8;
-	HDMA2 = src & 0xF0;
-	HDMA3 = 0x1f & (dst >> 8);
-	HDMA4 = dst & 0xF0;
+	HDMA2 = src & 0xFF;
+	HDMA3 = dst >> 8;
+	HDMA4 = dst & 0xFF;
 	HDMA5--;
 	if ((HDMA5 & 0x7f) == 0x7f)
 	{
 		HDMA5 = 0xff;
 		m_hdma_enabled = 0;
 	}
+
+	m_lr35902->dma_cycles_to_burn(4 + m_hdma_length * 2);
 }
 
 
-TIMER_CALLBACK_MEMBER(cgb_lcd_device::lcd_timer_proc)
+void cgb_ppu_device::update_state()
 {
-	static const int cgb_sprite_cycles[] = { 0, 8, 20, 32, 44, 52, 64, 76, 88, 96, 108 };
-
-	m_state = param;
-
-	if (LCDCONT & 0x80)
+	if (m_updating_state)
 	{
-		switch (m_state)
+		return;
+	}
+
+	m_updating_state = true;
+
+	attotime now = machine().time();
+
+	UINT64 cycles = m_lr35902->attotime_to_cycles(now - m_last_updated);
+
+	update_oam_dma_state(cycles);
+	update_hdma_state(cycles);
+
+	if (LCDCONT & ENABLED)
+	{
+		LOG(("m_cycles_left = %d, cycles = %d, m_next_state = %s\n", m_cycles_left, cycles, state_to_string(m_next_state)));
+
+		if (m_cycles_left > 0)
+		{   
+			if (cycles >= m_cycles_left) {
+				cycles -= m_cycles_left;
+				m_cycles_left = 0;
+			}   
+			else
+			{   
+				m_cycles_left -= cycles;
+				cycles = 0;
+			}   
+		}   
+
+		while (m_cycles_left == 0)
 		{
-		case GB_LCD_STATE_LYXX_PRE_M0:  /* Just before switching to mode 0 */
-			m_mode = 0;
-			if (LCDSTAT & 0x08)
+			UINT16 state_cycles = 0;
+
+			m_state = m_next_state;
+
+			switch (m_state)
 			{
-				if (!m_mode_irq)
+			case GB_LCD_STATE_LYXX_PRE_M0:  /* Just before switching to mode 0 */
+				m_next_state = GB_LCD_STATE_LYXX_M0;
+				state_cycles = 4;
+				break;
+
+			case GB_LCD_STATE_LYXX_M0:      /* Switch to mode 0 */
+				m_stat_mode0_int = (LCDSTAT & MODE_0_INT_ENABLED) ? true : false;
+				/* update current scanline */
+				update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
+				/* Increment the number of window lines drawn if enabled */
+				if (m_layer[1].enabled)
 				{
-					if (!m_line_irq && !m_delayed_line_irq)
-					{
-						m_mode_irq = 1;
-						m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-					}
+					m_window_lines_drawn++;
+				}
+				m_previous_line = m_current_line;
+				/* Set Mode 0 lcdstate */
+				m_mode = 0;
+				LCDSTAT &= 0xFC;
+				m_oam_locked = UNLOCKED;
+				m_oam_locked_reading = UNLOCKED;
+				m_vram_locked = UNLOCKED;
+				//m_pal_locked = UNLOCKED;
+				m_next_state = GB_LCD_STATE_LYXX_M0_GBC_PAL;
+				state_cycles = 4;
+				m_next_state = GB_LCD_STATE_LYXX_M0_2;
+				state_cycles = 1;
+				break;
+
+			case GB_LCD_STATE_LYXX_M0_2:
+				check_stat_irq();
+				m_next_state = GB_LCD_STATE_LYXX_M0_GBC_PAL;
+				state_cycles = 3;
+				break;
+
+			case GB_LCD_STATE_LYXX_M0_GBC_PAL:
+				m_pal_locked = UNLOCKED;
+				/* Check for HBLANK DMA */
+				if (m_hdma_enabled)
+				{
+					hdma_trans(0x10);
 				}
 				else
 				{
-					m_mode_irq = 0;
+					m_hdma_possible = 1;
 				}
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
-			break;
-		case GB_LCD_STATE_LYXX_M0:      /* Switch to mode 0 */
-			/* update current scanline */
-			update_scanline();
-			/* Increment the number of window lines drawn if enabled */
-			if (m_layer[1].enabled)
-			{
-				m_window_lines_drawn++;
-			}
-			m_previous_line = m_current_line;
-			/* Set Mode 0 lcdstate */
-			m_mode = 0;
-			LCDSTAT &= 0xFC;
-			m_oam_locked = UNLOCKED;
-			m_vram_locked = UNLOCKED;
-			/*
-			    There seems to a kind of feature in the Game Boy hardware when the lowest bits of the
-			    SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
-			    than usual.
-			    The SGB probably has the same bug.
-			*/
-			m_triggering_mode_irq = (LCDSTAT & 0x08) ? 1 : 0;
-			if ((SCROLLX & 0x03) == 0x03)
-			{
-				m_scrollx_adjust += 4;
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
+				m_next_state = GB_LCD_STATE_LYXX_M0_PRE_INC;
+				state_cycles = 192 + 3 - m_scrollx_adjust - m_sprite_cycles - m_window_cycles;
+				break;
+
+			case GB_LCD_STATE_LYXX_M0_PRE_INC:  /* Just before incrementing the line counter */
+				m_cmp_line = CMPLINE;
+				m_next_state = GB_LCD_STATE_LYXX_M0_INC;
+				state_cycles = 4;
+				break;
+
+			case GB_LCD_STATE_LYXX_M0_INC:  /* Increment LY, stay in M0 for 4 more cycles */
+				increment_scanline();
+				m_stat_lyc_int = false;
+				if (CURLINE < 144)
+				{
+					m_stat_mode0_int = false;
+				}
+				m_stat_mode2_int = (LCDSTAT & MODE_2_INT_ENABLED) ? true : false;
+				check_stat_irq();
+				m_stat_lyc_int = ((m_cmp_line == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
+				LOG(("GB_LCD_STATE_LYXX_M0_INC: m_cmp_line = %u, CURLINE = %u, LCDSTAT = %02x, m_stat_lyc_int = %s\n", m_cmp_line, CURLINE, LCDSTAT, m_stat_lyc_int ? "true" : "false"));
+				m_hdma_possible = 0;
+				/* Check if we're going into VBlank next */
+				if (CURLINE == 144)
+				{
+					m_next_state = GB_LCD_STATE_LY9X_M1;
+					state_cycles = 4;
+				}
+				else
+				{
+					/* Internally switch to mode 2 */
+					m_next_state = GB_LCD_STATE_LYXX_M2;
+					m_oam_locked_reading = LOCKED;
+					state_cycles = 4;
+				}
+				break;
+
+			case GB_LCD_STATE_LY00_M2:      /* Switch to mode 2 on line #0 */
+				/* Set Mode 2 lcdstate */
+				m_mode = 2;
+				LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
+				m_oam_locked = LOCKED;
+				/* Generate lcd interrupt if requested */
+				m_stat_mode1_int = false;
+				m_stat_mode2_int = (LCDSTAT & MODE_2_INT_ENABLED) ? true : false;
+				check_stat_irq();
+				/* Mode 2 lasts approximately 80 clock cycles */
+				m_next_state = GB_LCD_STATE_LYXX_M3;
+				clear_line_state();
+				/* Check for regular compensation of x-scroll register */
+				m_scrollx_adjust = SCROLLX & 0x07;
+				select_sprites();
+				m_window_y = WNDPOSY;
+				state_cycles = 80;
+				break;
+
+			case GB_LCD_STATE_LYXX_M2:      /* Switch to mode 2 */
+				m_stat_mode0_int = false;
+				check_stat_irq();
+				/* Update STAT register to the correct state */
+				m_mode = 2;
+				LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
+				m_oam_locked = LOCKED;
+				/* Check if LY==LYC STAT bit should be set */
+				if (CURLINE == CMPLINE)
+				{
+					LCDSTAT |= LY_LYC_FLAG;
+				}
+				else
+				{
+					LCDSTAT &= ~LY_LYC_FLAG;
+				}
+				/* Mode 2 last for approximately 80 clock cycles */
+				m_next_state = GB_LCD_STATE_LYXX_M3;
+				clear_line_state();
+				/* Check for regular compensation of x-scroll register */
+				m_scrollx_adjust = SCROLLX & 0x07;
+				select_sprites();
+				m_window_y = WNDPOSY;
+				state_cycles = 80;
+				break;
+
+			case GB_LCD_STATE_LYXX_M3:      /* Switch to mode 3 */
+				for (int i = 0; i < ARRAY_LENGTH(m_line.window_start_y); i++)
+				{
+					m_line.window_start_y[i] = WNDPOSY;
+					m_line.window_start_x[i] = WNDPOSX;
+				}
+				m_line.window_start_y_index = 0;
+				for (int i = 0; i < ARRAY_LENGTH(m_line.window_enable); i++)
+				{
+					m_line.window_enable[i] = LCDCONT;
+				}
+				m_line.window_enable_index = 0;
+				m_stat_mode2_int = false;
+				check_stat_irq();
+				/* Set Mode 3 lcdstate */
+				m_mode = 3;
+				LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
+				m_oam_locked = LOCKED;
+				m_vram_locked = LOCKED;
+				m_pal_locked = LOCKED;
+				/* Check for compensations of x-scroll register */
+				/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
+				m_next_state = GB_LCD_STATE_LYXX_PRE_M0;
+				state_cycles = 168 + m_scrollx_adjust + m_sprite_cycles;
+
+				// This magic 12 needs to be improved as it fixes just one test. We have
+				// to also support mid-scanline WX write at other times.
+				m_next_state = GB_LCD_STATE_LYXX_M3_2;
+				state_cycles = 12;
+				m_start_x = -1;
+				break;
+
+			case GB_LCD_STATE_LYXX_M3_2:
+				m_window_x = WNDPOSX;
+				calculate_window_cycles();
+				m_next_state = GB_LCD_STATE_LYXX_PRE_M0;
+				state_cycles = 168 - 12 + m_scrollx_adjust + m_sprite_cycles + m_window_cycles;
+				m_next_state = GB_LCD_STATE_LYXX_M0;
+				state_cycles = 4 - /*2*/3 + 168 - 12 + m_scrollx_adjust + m_sprite_cycles + m_window_cycles;
+				break;
+
+			case GB_LCD_STATE_LY9X_M1:      /* Switch to or stay in mode 1 */
+				m_stat_mode0_int = false;
+				m_stat_mode2_int = false;
+				if (CURLINE == 144)
+				{
+					/* Trigger VBlank interrupt */
+					m_lr35902->set_input_line(lr35902_cpu_device::VBL_INT, ASSERT_LINE);
+					m_lr35902->execute_set_input(lr35902_cpu_device::VBL_INT, ASSERT_LINE);
+					/* Set VBlank lcdstate */
+					m_mode = 1;
+					LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
+					/* Trigger LCD interrupt if requested */
+					m_stat_mode1_int = (LCDSTAT & MODE_1_INT_ENABLED) ? true : false;
+				}
+				check_stat_irq();
+				/* Check if LY==LYC STAT bit should be set */
+				if (CURLINE == CMPLINE)
+				{
+					LCDSTAT |= LY_LYC_FLAG;
+				}
+				else
+				{
+					LCDSTAT &= ~LY_LYC_FLAG;
+				}
+				m_next_state = GB_LCD_STATE_LY9X_M1_INC;
+				state_cycles = 452;
+				break;
+
+			case GB_LCD_STATE_LY9X_M1_INC:      /* Increment scanline counter */
+				increment_scanline();
+				m_stat_lyc_int = ((CMPLINE == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
+				if (m_current_line == 153)
+				{
+					m_next_state = GB_LCD_STATE_LY00_M1;
+					state_cycles = 4;
+				}
+				else
+				{
+					m_next_state = GB_LCD_STATE_LY9X_M1;
+					state_cycles = 4;
+				}
+				break;
+
+			case GB_LCD_STATE_LY00_M1:      /* we stay in VBlank but current line counter should already be incremented */
+				LOG(("GB_LCD_STATE_LY00_M1, CURLINE=%u, CMPLINE=%u, m_stat_lyc_int=%s\n", CURLINE, CMPLINE, m_stat_lyc_int ? "true" : "false"));
+				/* Check LY=LYC for line #153 */
+				if (CURLINE == CMPLINE)
+				{
+					LCDSTAT |= LY_LYC_FLAG;
+				}
+				else
+				{
+					LCDSTAT &= ~LY_LYC_FLAG;
+				}
+				check_stat_irq();
+				m_next_state = GB_LCD_STATE_LY00_M1_1;
+				state_cycles = 4;
+				break;
+
+			case GB_LCD_STATE_LY00_M1_1:
+				increment_scanline();
+				m_stat_lyc_int = ((CMPLINE == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
+				LOG(("GB_LCD_STATE_LY00_M1_1, m_stat_lyc_int = %s\n", m_stat_lyc_int ? "true" : "false"));
+				m_next_state = GB_LCD_STATE_LY00_M1_2;
+				state_cycles = 4;
+				break;
+
+			case GB_LCD_STATE_LY00_M1_2:    /* Rest of line #0 during VBlank */
+				check_stat_irq();
+				if (CURLINE == CMPLINE)
+				{
+					LCDSTAT |= LY_LYC_FLAG;
+				}
+				else
+				{
+					LCDSTAT &= ~LY_LYC_FLAG;
+				}
+				m_next_state = GB_LCD_STATE_LY00_M0;
+				state_cycles = 444;
+				break;
+
+			case GB_LCD_STATE_LY00_M0:      /* Just before going to mode 2 for LY 0 */
+				m_mode = 2;
+				m_next_state = GB_LCD_STATE_LY00_M2;
+				state_cycles = 4;
 				break;
 			}
-		case GB_LCD_STATE_LYXX_M0_SCX3:
-			/* Generate lcd interrupt if requested */
-			if (!m_mode_irq && m_triggering_mode_irq &&
-					((!m_line_irq && m_delayed_line_irq) || !(LCDSTAT & 0x40)))
+			assert(state_cycles > 0);
+
+			if (cycles >= state_cycles)
 			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-				m_triggering_mode_irq = 0;
-			}
-			if ((SCROLLX & 0x03) == 0x03)
-			{
-				m_pal_locked = UNLOCKED;
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_GBC_PAL);
-			break;
-		case GB_LCD_STATE_LYXX_M0_GBC_PAL:
-			m_pal_locked = UNLOCKED;
-			/* Check for HBLANK DMA */
-			if (m_hdma_enabled)
-			{
-				hdma_trans(0x10);
-//              cpunum_set_reg(0, LR35902_DMA_CYCLES, 36);
+				cycles -= state_cycles;
+				m_cycles_left = 0;
 			}
 			else
 			{
-				m_hdma_possible = 1;
+				m_cycles_left = state_cycles - cycles;
 			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(192 - m_scrollx_adjust - m_sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
-			break;
-		case GB_LCD_STATE_LYXX_M0_PRE_INC:  /* Just before incrementing the line counter go to mode 2 internally */
-			m_cmp_line = CMPLINE;
-			if (CURLINE < 143)
-			{
-				m_mode = 2;
-				if (LCDSTAT & 0x20)
-				{
-					if (!m_mode_irq)
-					{
-						if (!m_line_irq && !m_delayed_line_irq)
-						{
-							m_mode_irq = 1;
-							m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-						}
-					}
-					else
-					{
-						m_mode_irq = 0;
-					}
-				}
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
-			break;
-		case GB_LCD_STATE_LYXX_M0_INC:  /* Increment LY, stay in M0 for 4 more cycles */
-			increment_scanline();
-			m_delayed_line_irq = m_line_irq;
-			m_triggering_line_irq = ((m_cmp_line == CURLINE) && (LCDSTAT & 0x40)) ? 1 : 0;
-			m_line_irq = 0;
-			if (!m_mode_irq && !m_delayed_line_irq && m_triggering_line_irq && !(LCDSTAT & 0x20))
-			{
-				m_line_irq = m_triggering_line_irq;
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			m_hdma_possible = 0;
-			/* Check if we're going into VBlank next */
-			if (CURLINE == 144)
-			{
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
-			}
-			else
-			{
-				/* Internally switch to mode 2 */
-				m_mode = 2;
-				/* Generate lcd interrupt if requested */
-				if (!m_mode_irq && (LCDSTAT & 0x20) &&
-						((!m_triggering_line_irq && !m_delayed_line_irq) || !(LCDSTAT & 0x40)))
-				{
-					m_mode_irq = 1;
-					m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-				}
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
-			}
-			break;
-		case GB_LCD_STATE_LY00_M2:      /* Switch to mode 2 on line #0 */
-			/* Set Mode 2 lcdstate */
-			m_mode = 2;
-			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
-			m_oam_locked = LOCKED;
-			/* Generate lcd interrupt if requested */
-			if ((LCDSTAT & 0x20) && !m_line_irq)
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			/* Check for regular compensation of x-scroll register */
-			m_scrollx_adjust = (SCROLLX & 0x04) ? 4 : 0;
-			/* Mode 2 lasts approximately 80 clock cycles */
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
-			break;
-		case GB_LCD_STATE_LYXX_M2:      /* Switch to mode 2 */
-			/* Update STAT register to the correct state */
-			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
-			m_oam_locked = LOCKED;
-			/* Generate lcd interrupt if requested */
-			if ((m_delayed_line_irq && m_triggering_line_irq && !(LCDSTAT & 0x20)) ||
-					(!m_mode_irq && !m_line_irq && !m_delayed_line_irq && (LCDSTAT & 0x20)))
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			m_line_irq = m_triggering_line_irq;
-			/* Check if LY==LYC STAT bit should be set */
-			if (CURLINE == CMPLINE)
-			{
-				LCDSTAT |= 0x04;
-			}
-			else
-			{
-				LCDSTAT &= ~0x04;
-			}
-			/* Check for regular compensation of x-scroll register */
-			m_scrollx_adjust = (SCROLLX & 0x04) ? 4 : 0;
-			/* Mode 2 last for approximately 80 clock cycles */
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
-			break;
-		case GB_LCD_STATE_LYXX_M3:      /* Switch to mode 3 */
-			select_sprites();
-			m_sprite_cycles = cgb_sprite_cycles[m_sprCount];
-			/* Set Mode 3 lcdstate */
-			m_mode = 3;
-			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
-			m_vram_locked = LOCKED;
-			m_pal_locked = LOCKED;
-			/* Check for compensations of x-scroll register */
-			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(168 + m_scrollx_adjust + m_sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
-			m_start_x = -1;
-			break;
-		case GB_LCD_STATE_LY9X_M1:      /* Switch to or stay in mode 1 */
-			if (CURLINE == 144)
-			{
-				/* Trigger VBlank interrupt */
-				m_maincpu->set_input_line(VBL_INT, ASSERT_LINE);
-				/* Set VBlank lcdstate */
-				m_mode = 1;
-				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
-				/* Trigger LCD interrupt if requested */
-				if (LCDSTAT & 0x10)
-				{
-					m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-				}
-			}
-			/* Check if LY==LYC STAT bit should be set */
-			if (CURLINE == CMPLINE)
-			{
-				LCDSTAT |= 0x04;
-			}
-			else
-			{
-				LCDSTAT &= ~0x04;
-			}
-			if (m_delayed_line_irq && m_triggering_line_irq)
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
-			break;
-		case GB_LCD_STATE_LY9X_M1_INC:      /* Increment scanline counter */
-			increment_scanline();
-			m_delayed_line_irq = m_line_irq;
-			m_triggering_line_irq = ((CMPLINE == CURLINE) && (LCDSTAT & 0x40)) ? 1 : 0;
-			m_line_irq = 0;
-			if (!m_delayed_line_irq && m_triggering_line_irq)
-			{
-				m_line_irq = m_triggering_line_irq;
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			if (m_current_line == 153)
-			{
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
-			}
-			else
-			{
-				m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
-			}
-			break;
-		case GB_LCD_STATE_LY00_M1:      /* we stay in VBlank but current line counter should already be incremented */
-			/* Check LY=LYC for line #153 */
-			if (m_delayed_line_irq)
-			{
-				if (m_triggering_line_irq)
-				{
-					m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-				}
-			}
-			m_delayed_line_irq = m_delayed_line_irq | m_line_irq;
-			if (CURLINE == CMPLINE)
-			{
-				LCDSTAT |= 0x04;
-			}
-			else
-			{
-				LCDSTAT &= ~0x04;
-			}
-			increment_scanline();
-			m_triggering_line_irq = ((CMPLINE == CURLINE) && (LCDSTAT & 0x40)) ? 1 : 0;
-			m_line_irq = 0;
-			LCDSTAT &= 0xFB;
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_1);
-			break;
-		case GB_LCD_STATE_LY00_M1_1:
-			if (!m_delayed_line_irq && m_triggering_line_irq)
-			{
-				m_line_irq = m_triggering_line_irq;
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
-			break;
-		case GB_LCD_STATE_LY00_M1_2:    /* Rest of line #0 during VBlank */
-			if (m_delayed_line_irq && m_triggering_line_irq)
-			{
-				m_line_irq = m_triggering_line_irq;
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			if (CURLINE == CMPLINE)
-			{
-				LCDSTAT |= 0x04;
-			}
-			else
-			{
-				LCDSTAT &= ~0x04;
-			}
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
-			break;
-		case GB_LCD_STATE_LY00_M0:      /* The STAT register seems to go to 0 for about 4 cycles */
-			/* Set Mode 0 lcdstat */
-			m_mode = 0;
-			m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
-			break;
 		}
 	}
 	else
@@ -2022,60 +2789,125 @@ TIMER_CALLBACK_MEMBER(cgb_lcd_device::lcd_timer_proc)
 		increment_scanline();
 		if (m_current_line < 144)
 		{
-			update_scanline();
+			// Force draw of empty line
+			update_scanline(0);
 		}
-		m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(456));
+		m_cycles_left = 456;
 	}
+	assert(m_cycles_left > 0);
+
+	m_last_updated = now;
+
+	int next_cycles = m_cycles_left;
+
+	if (m_oam_dma_start_cycles > 0 && m_oam_dma_start_cycles < next_cycles)
+	{
+		next_cycles = m_oam_dma_start_cycles;
+	}
+
+	if (m_oam_dma_cycles_left > 0 && m_oam_dma_cycles_left < next_cycles)
+	{
+		next_cycles = m_oam_dma_cycles_left;
+	}
+
+	if (m_hdma_cycles_to_start > 0 && m_hdma_cycles_to_start < next_cycles)
+	{
+		next_cycles = m_hdma_cycles_to_start;
+	}
+
+	m_lcd_timer->adjust(m_lr35902->cycles_to_attotime(next_cycles));
+
+	m_updating_state = false;
 }
 
 
-void gb_lcd_device::lcd_switch_on()
+void dmg_ppu_device::lcd_switch_on(UINT8 new_data)
 {
 	m_current_line = 0;
 	m_previous_line = 153;
 	m_window_lines_drawn = 0;
-	m_line_irq = 0;
-	m_delayed_line_irq = 0;
-	m_mode = 0;
-	m_oam_locked = LOCKED;   /* TODO: Investigate whether this OAM locking is correct. */
-	/* Check for LY=LYC coincidence */
-	if (CURLINE == CMPLINE)
+	m_window_cycles = 0;
+	m_mode = 4;   // Starting up
+	m_sprCount = 0;
+	m_sprite_cycles = 0;
+	m_oam_locked = UNLOCKED;
+	m_oam_locked_reading = UNLOCKED;
+	m_window_y = 0xFF;
+	m_stat_mode0_int = false;
+	m_stat_mode1_int = false;
+	m_stat_mode2_int = false;
+	m_stat_lyc_int = false;
+	m_stat_lyc_int_prev = false;
+	m_stat_write_int = false;
+	m_stat_int = false;
+	m_hdma_cycles_to_start = 0;
+	m_frame_window_active = false;
+	// Check for LY=LYC coincidence
+	if (CURLINE == CMPLINE && CURLINE != m_old_curline)
 	{
-		LCDSTAT |= 0x04;
-		/* Generate lcd interrupt if requested */
-		if (LCDSTAT & 0x40)
+		LCDSTAT |= LY_LYC_FLAG;
+		// Generate lcd interrupt if requested
+		if (LCDSTAT & LY_LYC_INT_ENABLED)
 		{
-			m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
+			m_stat_lyc_int = true;
+			check_stat_irq();
 		}
 	}
+	else
+	{
+		LCDSTAT &= ~LY_LYC_FLAG;
+	}
+	clear_line_state();
+	m_window_y = WNDPOSY;
+	if ((new_data & WINDOW_ENABLED) && m_current_line == m_window_y)
+	{
+		m_line.window_should_trigger = true;
+	}
 	m_state = GB_LCD_STATE_LY00_M2;
-	m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+	m_next_state = GB_LCD_STATE_LYXX_M3;
+	m_cycles_left = 80;
+	m_lcd_timer->adjust(m_lr35902->cycles_to_attotime(m_cycles_left));
 }
 
 
-
-
-READ8_MEMBER(gb_lcd_device::vram_r)
+READ8_MEMBER(dmg_ppu_device::vram_r)
 {
+	if (!space.debugger_access())
+	{
+		update_state();
+		LOG(("vram_r: offset=0x%04x\n", offset));
+	}
+
 	return (m_vram_locked == LOCKED) ? 0xff : m_vram[offset + (m_vram_bank * 0x2000)];
 }
 
-WRITE8_MEMBER(gb_lcd_device::vram_w)
+
+WRITE8_MEMBER(dmg_ppu_device::vram_w)
 {
+	update_state();
 	if (m_vram_locked == LOCKED)
 		return;
 
 	m_vram[offset + (m_vram_bank * 0x2000)] = data;
 }
 
-READ8_MEMBER(gb_lcd_device::oam_r)
+
+READ8_MEMBER(dmg_ppu_device::oam_r)
 {
-	return (m_oam_locked == LOCKED) ? 0xff : m_oam[offset];
+	if (!space.debugger_access())
+	{
+		update_state();
+		LOG(("oam_r: offset=0x%02x\n", offset));
+	}
+
+	return (m_oam_locked == LOCKED || m_oam_locked_reading == LOCKED || m_oam_dma_processing) ? 0xff : m_oam[offset];
 }
 
-WRITE8_MEMBER(gb_lcd_device::oam_w)
+
+WRITE8_MEMBER(dmg_ppu_device::oam_w)
 {
-	if (m_oam_locked == LOCKED || offset >= 0xa0)
+	update_state();
+	if (m_oam_locked == LOCKED || offset >= 0xa0 || m_oam_dma_processing)
 		return;
 
 	m_oam[offset] = data;
@@ -2083,13 +2915,148 @@ WRITE8_MEMBER(gb_lcd_device::oam_w)
 
 
 
-READ8_MEMBER(gb_lcd_device::video_r)
+READ8_MEMBER(dmg_ppu_device::video_r)
 {
+	if (!space.debugger_access())
+	{
+		update_state();
+		if (offset == 1) LOG(("STAT read\n"));
+		if (offset == 0x28) LOG(("BCPS read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
+		if (offset == 0x29) LOG(("BCPD read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
+	}
+
 	return m_vid_regs[offset];
 }
 
-WRITE8_MEMBER(gb_lcd_device::video_w)
+
+bool dmg_ppu_device::stat_write(UINT8 new_data)
 {
+	LOG(("stat_write: old_data = %02x, new_data = %02x\n", LCDSTAT & 0x78, new_data & 0x78));
+
+	bool new_lyc_int = m_stat_lyc_int;
+
+	/* Check if line irqs are being enabled */
+	if (new_data & 0x40)
+	{
+		if ((LCDSTAT & (LY_LYC_INT_ENABLED | LY_LYC_FLAG)) == LY_LYC_FLAG)
+		{
+			new_lyc_int = true;
+		}
+	}
+	else
+	{
+		new_lyc_int = false;
+	}
+
+	switch (m_mode)
+	{
+	case 0:
+		m_stat_mode0_int = (new_data & MODE_0_INT_ENABLED) ? true : false;
+		if (!m_stat_int)
+		{
+			if (!(LCDSTAT & MODE_0_INT_ENABLED))
+			{
+				m_stat_write_int = true;
+			}
+		}
+		else
+		{
+			if (!(LCDSTAT & MODE_0_INT_ENABLED))
+			{
+				if (!m_stat_lyc_int && !new_lyc_int)
+				{
+					// Force an irq
+					m_stat_int = false;
+					m_stat_write_int = true;
+				}
+			}
+		}
+		break;
+	case 1:
+		m_stat_mode1_int = (new_data & MODE_1_INT_ENABLED) ? true : false;
+		if (!m_stat_int)
+		{
+			m_stat_write_int = true;
+		}
+		else
+		{
+			if (!(LCDSTAT & MODE_1_INT_ENABLED))
+			{
+				if (!m_stat_lyc_int && !new_lyc_int)
+				{
+					// Force an irq
+					m_stat_int = false;
+					m_stat_write_int = true;
+				}
+			}
+		}
+		break;
+	case 2:
+		// 0x20 -> 0x40  with LYC -> trigger
+		// 0x20 -> 0x60  with LYC -> trigger
+		//m_stat_mode2_int = (new_data & MODE_2_INT_ENABLED) ? true : false;
+		if (LCDSTAT & MODE_2_INT_ENABLED)
+		{
+			if (!m_stat_lyc_int && new_lyc_int)
+			{
+				// Force an irq
+				m_stat_int = false;
+			}
+		}
+		// Weird trigger for stat irqs
+		if ((LCDSTAT & (LY_LYC_INT_ENABLED | LY_LYC_FLAG)) == LY_LYC_FLAG)
+		{
+			m_stat_write_int = true;
+			// Force an irq
+			m_stat_int = false;
+		}
+		break;
+	default:
+		break;
+	}
+
+	m_stat_lyc_int = new_lyc_int;
+	check_stat_irq();
+
+	return false;
+}
+
+
+void dmg_ppu_device::check_stat_irq()
+{
+	bool new_stat_int = m_stat_mode0_int || m_stat_mode1_int || m_stat_mode2_int || m_stat_lyc_int || m_stat_write_int;
+
+	LOG(("m_mode = %d, m_stat_mode0_int = %s, m_stat_mode1_int = %s, m_stat_mode2_int = %s, m_stat_lyc_int = %s\n",
+		m_mode,
+		m_stat_mode0_int ? "true" : "false",
+		m_stat_mode1_int ? "true" : "false",
+		m_stat_mode2_int ? "true" : "false",
+		m_stat_lyc_int ? "true" : "false"
+	));
+
+	if (new_stat_int && !m_stat_int)
+	{
+		LOG(("--m_stat_mode0_int = %s, m_stat_mode1_int = %s, m_stat_mode2_int = %s, m_stat_lyc_int = %s\n",
+			m_stat_mode0_int ? "true" : "false",
+			m_stat_mode1_int ? "true" : "false",
+			m_stat_mode2_int ? "true" : "false",
+			m_stat_lyc_int ? "true" : "false"
+		));
+
+		m_lr35902->set_input_line(lr35902_cpu_device::LCD_INT, ASSERT_LINE);
+		m_lr35902->execute_set_input(lr35902_cpu_device::LCD_INT, ASSERT_LINE);
+	}
+
+	m_stat_int = new_stat_int;
+	m_stat_write_int = false;
+}
+
+
+WRITE8_MEMBER(dmg_ppu_device::video_w)
+{
+	update_state();
+	LOG(("video_w: offset = %02x, data = %02x\n", offset, data));
+
 	switch (offset)
 	{
 	case 0x00:                      /* LCDC - LCD Control */
@@ -2098,17 +3065,29 @@ WRITE8_MEMBER(gb_lcd_device::video_w)
 		m_gb_bgdtab_offs = (data & 0x08) ? 0x1c00 : 0x1800;
 		m_gb_wndtab_offs = (data & 0x40) ? 0x1c00 : 0x1800;
 		/* if LCD controller is switched off, set STAT and LY to 00 */
-		if (!(data & 0x80))
+		if (!(data & ENABLED))
 		{
 			LCDSTAT &= ~0x03;
+			m_old_curline = CURLINE;
 			CURLINE = 0;
 			m_oam_locked = UNLOCKED;
 			m_vram_locked = UNLOCKED;
 		}
-		/* If LCD is being switched on */
-		if (!(LCDCONT & 0x80) && (data & 0x80))
+		else
 		{
-			lcd_switch_on();
+			/* If LCD is being switched on */
+			if (!(LCDCONT & ENABLED))
+			{
+				lcd_switch_on(data);
+			}
+			else
+			{
+				if (m_line.window_active && !(data & WINDOW_ENABLED))
+				{
+					m_window_lines_drawn++;
+					m_line.window_active = false;
+				}
+			}
 		}
 		break;
 	case 0x01:                      /* STAT - LCD Status */
@@ -2118,41 +3097,9 @@ WRITE8_MEMBER(gb_lcd_device::video_w)
 		   Writing to STAT when the LCD controller is active causes a STAT
 		   interrupt to be triggered.
 		 */
-		if (LCDCONT & 0x80)
+		if (LCDCONT & ENABLED)
 		{
-			/* Triggers seen so far:
-			   - 0x40 -> 0x00 - trigger
-			   - 0x00 -> 0x08 - trigger
-			   - 0x08 -> 0x00 - don't trigger
-			   - 0x00 -> 0x20 (mode 3) - trigger
-			   - 0x00 -> 0x60 (mode 2) - don't trigger
-			   - 0x20 -> 0x60 (mode 3) - trigger
-			   - 0x20 -> 0x40 (mode 3) - trigger
-			   - 0x40 -> 0x20 (mode 2) - don't trigger
-			   - 0x40 -> 0x08 (mode 0) - don't trigger
-			   - 0x00 -> 0x40 - trigger only if LY==LYC
-			   - 0x20 -> 0x00/0x08/0x10/0x20/0x40 (mode 2, after m2int) - don't trigger
-			   - 0x20 -> 0x00/0x08/0x10/0x20/0x40 (mode 3, after m2int) - don't trigger
-			*/
-			if (!m_mode_irq && ((m_mode == 1) ||
-				((LCDSTAT & 0x40) && !(data & 0x68)) ||
-				(!(LCDSTAT & 0x40) && (data & 0x40) && (LCDSTAT & 0x04)) ||
-				(!(LCDSTAT & 0x48) && (data & 0x08)) ||
-				((LCDSTAT & 0x60) == 0x00 && (data & 0x60) == 0x20) ||
-				((LCDSTAT & 0x60) == 0x20 && (data & 0x40))
-				))
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			/*
-			   - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
-			   - 0x20 -> 0x00/0x10/0x20/0x40 (mode 0, after m2int) - trigger (stat bug)
-			   - 0x00 -> 0xXX (mode 0) - trigger stat bug
-			*/
-			if (m_mode_irq && m_mode == 0)
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
+			stat_write(data);
 		}
 		break;
 	case 0x04:                      /* LY - LCD Y-coordinate */
@@ -2160,60 +3107,79 @@ WRITE8_MEMBER(gb_lcd_device::video_w)
 	case 0x05:                      /* LYC */
 		if (CMPLINE != data)
 		{
-			if (CURLINE == data)
+			if (CURLINE == data || (m_state == GB_LCD_STATE_LY00_M1 && CURLINE == 0 && data == 153))
 			{
-				if (m_state != GB_LCD_STATE_LYXX_M0_INC && m_state != GB_LCD_STATE_LY9X_M1_INC)
+				LOG(("write LYC, if\n"));
+				LCDSTAT |= LY_LYC_FLAG;
+				/* Generate lcd interrupt if requested */
+				if (LCDSTAT & LY_LYC_INT_ENABLED)
 				{
-					LCDSTAT |= 0x04;
-					/* Generate lcd interrupt if requested */
-					if (LCDSTAT & 0x40)
+					if (m_state != GB_LCD_STATE_LYXX_M0_INC || !m_stat_lyc_int_prev)
 					{
-						m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
+						m_stat_lyc_int = true;
+						// Force an irq?
+						if (m_stat_mode2_int)
+						{
+							m_stat_int = false;
+						}
+						check_stat_irq();
 					}
 				}
 			}
 			else
 			{
-				LCDSTAT &= 0xFB;
-				m_triggering_line_irq = 0;
+				LOG(("write LYC, else\n"));
+				LCDSTAT &= ~LY_LYC_FLAG;
+				m_stat_lyc_int = false;
+				check_stat_irq();
 			}
 		}
 		break;
 	case 0x06:                      /* DMA - DMA Transfer and Start Address */
-		{
-			UINT8 *P = m_oam.get();
-			offset = (UINT16) data << 8;
-			for (data = 0; data < 0xA0; data++)
-				*P++ = space.read_byte(offset++);
-		}
+		m_oam_dma_source_address = data << 8;
+		m_oam_dma_start_cycles = 8;
+		update_state();
 		return;
 	case 0x07:                      /* BGP - Background Palette */
-		update_scanline();
+		update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
 		m_gb_bpal[0] = data & 0x3;
 		m_gb_bpal[1] = (data & 0xC) >> 2;
 		m_gb_bpal[2] = (data & 0x30) >> 4;
 		m_gb_bpal[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x08:                      /* OBP0 - Object Palette 0 */
-//      update_scanline();
+//      update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
 		m_gb_spal0[0] = data & 0x3;
 		m_gb_spal0[1] = (data & 0xC) >> 2;
 		m_gb_spal0[2] = (data & 0x30) >> 4;
 		m_gb_spal0[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x09:                      /* OBP1 - Object Palette 1 */
-//      update_scanline();
+//      update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
 		m_gb_spal1[0] = data & 0x3;
 		m_gb_spal1[1] = (data & 0xC) >> 2;
 		m_gb_spal1[2] = (data & 0x30) >> 4;
 		m_gb_spal1[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x02:                      /* SCY - Scroll Y */
+		update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
+		break;
 	case 0x03:                      /* SCX - Scroll X */
-		update_scanline();
+		update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
+		LOG(("SCX: scrollx_delay = %d, m_cycles_left = %d\n", m_line.scrollx_delay, m_cycles_left));
+		if (m_line.scrollx_delay > 0)
+		{
+			// Additional delay cycles; not sure if this is correct.
+			int adjust = (data & 0x07);
+
+			m_line.scrollx_delay += adjust;
+		}
 		break;
 	case 0x0A:                      /* WY - Window Y position */
+		LOG(("WY write, m_cycles_left = %d\n", m_cycles_left));
+		break;
 	case 0x0B:                      /* WX - Window X position */
+		LOG(("WX write, m_cycles_left = %d\n", m_cycles_left));
 		break;
 	default:                        /* Unknown register, no change */
 		return;
@@ -2221,8 +3187,16 @@ WRITE8_MEMBER(gb_lcd_device::video_w)
 	m_vid_regs[offset] = data;
 }
 
-READ8_MEMBER(cgb_lcd_device::video_r)
+READ8_MEMBER(cgb_ppu_device::video_r)
 {
+	if (!space.debugger_access())
+	{
+		update_state();
+		if (offset == 1) LOG(("STAT read\n"));
+		if (offset == 0x28) LOG(("BCPS read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
+		if (offset == 0x29) LOG(("BCPD read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
+	}
+
 	switch (offset)
 	{
 	case 0x11:  /* FF51 */
@@ -2241,8 +3215,71 @@ READ8_MEMBER(cgb_lcd_device::video_r)
 	return m_vid_regs[offset];
 }
 
-WRITE8_MEMBER(cgb_lcd_device::video_w)
+
+bool cgb_ppu_device::stat_write(UINT8 new_data)
 {
+	LOG(("stat_write: old_data = %02x, new_data = %02x\n", LCDSTAT & 0x78, new_data & 0x78));
+
+	bool new_lyc_int = m_stat_lyc_int;
+
+	/* Check if line irqs are being enabled */
+	if (m_state != GB_LCD_STATE_LYXX_M0_INC && m_state != GB_LCD_STATE_LY00_M1_1)
+	{
+		if (new_data & LY_LYC_INT_ENABLED)
+		{
+			if ((LCDSTAT & (LY_LYC_INT_ENABLED | LY_LYC_FLAG)) == LY_LYC_FLAG)
+			{
+				new_lyc_int = true;
+			}
+		}
+		else
+		{
+			new_lyc_int = false;
+		}
+	}
+
+	switch (m_mode)
+	{
+	case 0:
+		m_stat_mode0_int = (new_data & MODE_0_INT_ENABLED) ? true : false;
+		break;
+	case 1:
+		// 0x40 -> 0x50, during incrementing line counter and LY=LYC check getting de-asserted
+		if (m_state == GB_LCD_STATE_LY9X_M1_INC)
+		{
+			check_stat_irq();
+		}
+		m_stat_mode1_int = (new_data & MODE_1_INT_ENABLED) ? true : false;
+		break;
+    case 2:
+		// 0x20 -> 0x40  with LYC -> trigger
+		//m_stat_mode2_int = (new_data & MODE_2_INT_ENABLED) ? true : false;
+		if (LCDSTAT & MODE_2_INT_ENABLED)
+		{
+			if (!m_stat_lyc_int && new_lyc_int)
+			{
+				// Force an irq
+				m_stat_int = false;
+			}
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	m_stat_lyc_int = new_lyc_int;
+	check_stat_irq();
+
+	return false;
+}
+
+
+WRITE8_MEMBER(cgb_ppu_device::video_w)
+{
+	update_state();
+	LOG(("video_w\n"));
+
 	switch (offset)
 	{
 	case 0x00:      /* LCDC - LCD Control */
@@ -2257,67 +3294,65 @@ WRITE8_MEMBER(cgb_lcd_device::video_w)
 		if (!(data & 0x80))
 		{
 			LCDSTAT &= ~0x03;
+			m_old_curline = CURLINE;
 			CURLINE = 0;
 			m_oam_locked = UNLOCKED;
 			m_vram_locked = UNLOCKED;
 			m_pal_locked = UNLOCKED;
 		}
-		/* If LCD is being switched on */
-		if (!(LCDCONT & 0x80) && (data & 0x80))
+		else
 		{
-			lcd_switch_on();
+			/* If LCD is being switched on */
+			if (!(LCDCONT & ENABLED))
+			{
+				lcd_switch_on(data);
+			}
+			else
+			{
+				if (m_line.window_active && !(data & WINDOW_ENABLED))
+				{
+					m_window_lines_drawn++;
+					m_line.window_active = false;
+				}
+			}
 		}
 		break;
 	case 0x01:      /* STAT - LCD Status */
 		data = 0x80 | (data & 0x78) | (LCDSTAT & 0x07);
-		if (LCDCONT & 0x80)
+		if (LCDCONT & ENABLED)
 		{
-			/*
-			   - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
-			*/
-			if (m_mode_irq && m_mode == 0 && (LCDSTAT & 0x28) == 0x20 && (data & 0x08))
-			{
-				m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-			}
-			/* Check if line irqs are being disabled */
-			if (!(data & 0x40))
-			{
-				m_delayed_line_irq = 0;
-			}
-			/* Check if line irqs are being enabled */
-			if (!(LCDSTAT & 0x40) && (data & 0x40))
-			{
-				if (CMPLINE == CURLINE)
-				{
-					m_line_irq = 1;
-					m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
-				}
-			}
+			stat_write(data);
 		}
 		break;
 	case 0x05:                      /* LYC */
 		if (CMPLINE != data)
 		{
-			if ((m_state != GB_LCD_STATE_LYXX_M0_PRE_INC && CURLINE == data) ||
-					(m_state == GB_LCD_STATE_LYXX_M0_INC && m_triggering_line_irq))
+			if (CURLINE == data && m_state != GB_LCD_STATE_LY00_M1 && m_state != GB_LCD_STATE_LYXX_M0_PRE_INC)
 			{
-				LCDSTAT |= 0x04;
+				LOG(("write LYC, if, CURLINE=%u\n", CURLINE));
+
+				LCDSTAT |= LY_LYC_FLAG;
 				/* Generate lcd interrupt if requested */
-				if (LCDSTAT & 0x40)
+				if (LCDSTAT & LY_LYC_INT_ENABLED)
 				{
-					m_maincpu->set_input_line(LCD_INT, ASSERT_LINE);
+					m_stat_lyc_int = true;
+					check_stat_irq();
 				}
 			}
 			else
 			{
-				LCDSTAT &= 0xFB;
-				m_triggering_line_irq = 0;
+				LOG(("write LYC, else, CURLINE=%u\n", CURLINE));
+
+				LCDSTAT &= ~LY_LYC_FLAG;
+				check_stat_irq();
 				m_cmp_line = data;
+				m_stat_lyc_int = false;
+				check_stat_irq();
 			}
 		}
 		break;
 	case 0x07:      /* BGP - GB background palette */
-		update_scanline();
+		update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
 		m_gb_bpal[0] = data & 0x3;
 		m_gb_bpal[1] = (data & 0xC) >> 2;
 		m_gb_bpal[2] = (data & 0x30) >> 4;
@@ -2345,13 +3380,10 @@ WRITE8_MEMBER(cgb_lcd_device::video_w)
 	case 0x11:      /* HDMA1 - HBL General DMA - Source High */
 		break;
 	case 0x12:      /* HDMA2 - HBL General DMA - Source Low */
-		data &= 0xF0;
 		break;
 	case 0x13:      /* HDMA3 - HBL General DMA - Destination High */
-		data &= 0x1F;
 		break;
 	case 0x14:      /* HDMA4 - HBL General DMA - Destination Low */
-		data &= 0xF0;
 		break;
 	case 0x15:      /* HDMA5 - HBL General DMA - Mode, Length */
 		if (!(data & 0x80))
@@ -2365,7 +3397,6 @@ WRITE8_MEMBER(cgb_lcd_device::video_w)
 			{
 				/* General DMA */
 				hdma_trans(((data & 0x7F) + 1) * 0x10);
-//              cpunum_set_reg(0, LR35902_DMA_CYCLES, 4 + (((data & 0x7F) + 1) * 32));
 				data = 0xff;
 			}
 		}
@@ -2379,12 +3410,13 @@ WRITE8_MEMBER(cgb_lcd_device::video_w)
 			if (m_hdma_possible)
 			{
 				hdma_trans(0x10);
-//              cpunum_set_reg(0, LR35902_DMA_CYCLES, 36);
 				m_hdma_possible = 0;
 			}
 		}
 		break;
 	case 0x28:      /* BCPS - Background palette specification */
+		LOG(("BCPS write %02x\n", data));
+
 		GBCBCPS = data;
 		if (data & 0x01)
 			GBCBCPD = m_cgb_bpal[(data >> 1) & 0x1F] >> 8;
@@ -2392,6 +3424,8 @@ WRITE8_MEMBER(cgb_lcd_device::video_w)
 			GBCBCPD = m_cgb_bpal[(data >> 1) & 0x1F] & 0xFF;
 		break;
 	case 0x29:      /* BCPD - background palette data */
+		LOG(("BCPD write %02x, palette is %s\n", data, m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
+
 		if (m_pal_locked == LOCKED)
 		{
 			return;
@@ -2457,7 +3491,7 @@ WRITE8_MEMBER(cgb_lcd_device::video_w)
 		return;
 	default:
 		/* we didn't handle the write, so pass it to the GB handler */
-		gb_lcd_device::video_w(space, offset, data);
+		dmg_ppu_device::video_w(space, offset, data);
 		return;
 	}
 
@@ -2466,7 +3500,7 @@ WRITE8_MEMBER(cgb_lcd_device::video_w)
 
 // Super Game Boy
 
-void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
+void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
 {
 	switch (offs)
 	{
