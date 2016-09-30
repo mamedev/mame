@@ -5437,7 +5437,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="pac-man (datasoft)(4am crack).dsk" size="143360" crc="82379bed" sha1="9b3e1b9e78dcfb1f8f55925c9bf2f6161423004d" offset="0x0000" />
+				<rom name="pac-man (thunder mountain)(4am crack).dsk" size="143360" crc="82379bed" sha1="9b3e1b9e78dcfb1f8f55925c9bf2f6161423004d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
