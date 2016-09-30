@@ -293,7 +293,7 @@ void menu_select_game::handle()
 				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < ui_globals::curdats_total)
+					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
 					{
 						ui_globals::curdats_view++;
 						m_topline_datsview = 0;
@@ -302,12 +302,12 @@ void menu_select_game::handle()
 				else
 				{
 					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
-					if (drv->startempty == 1 && ui_globals::curdats_view < ui_globals::curdats_total)
+					if (drv->startempty == 1 && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
 					{
 						ui_globals::curdats_view++;
 						m_topline_datsview = 0;
 					}
-					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view < ui_globals::cur_sw_dats_total)
+					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 					{
 						ui_globals::cur_sw_dats_view++;
 						m_topline_datsview = 0;
