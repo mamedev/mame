@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER(spr0_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spr1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spr_xy_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
@@ -42,7 +44,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	virtual void machine_start() override { }
-	virtual void machine_reset() override { }
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -52,7 +54,15 @@ public:
 	UINT8 m_spr0_ctrl;
 	UINT8 m_spr1_ctrl;
 	UINT8 m_spr_xy[8];
+	UINT8 coin_count;
 };
+
+void istrebiteli_state::machine_reset()
+{
+	m_spr0_ctrl = m_spr1_ctrl = 0;
+	coin_count = 0;
+	memset(m_spr_xy, 0, sizeof(m_spr_xy));
+}
 
 static const rgb_t istreb_palette[4] = {
 	rgb_t(0x00, 0x00, 0x00),
@@ -98,27 +108,15 @@ UINT32 istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	myrect.set_size(16, 16*8);
 	m_tilemap->draw(screen, bitmap, myrect, 0, 0);
 
-	int sx, sy, spritecode;
+	int spritecode;
 
-	sx = m_spr_xy[6];
-	sy = m_spr_xy[7] ^ 0xff;
 	spritecode = (m_spr0_ctrl & 0x1f) + ((m_spr0_ctrl & 0x80) >> 2);
-
-	m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-		spritecode,
-		0,
-		0, 0,
-		sx, sy, 1);
-
-	sx = m_spr_xy[4];
-	sy = m_spr_xy[5] ^ 0xff;
+	m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[6], m_spr_xy[7] ^ 0xff, 1);
 	spritecode = (m_spr1_ctrl & 0x1f) + ((m_spr1_ctrl & 0x80) >> 2);
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,	spritecode, 0, 0, 0, m_spr_xy[4], m_spr_xy[5] ^ 0xff, 1);
 
-	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-		spritecode,
-		0,
-		0, 0,
-		sx, sy, 1);
+	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr0_ctrl & 0x40) ? 5:7, 0, 0, 0, m_spr_xy[2], m_spr_xy[3] ^ 0xff, 1);
+	m_gfxdecode->gfx(4)->transpen(bitmap, cliprect, (m_spr1_ctrl & 0x40) ? 5:7, 0, 0, 0, m_spr_xy[0], m_spr_xy[1] ^ 0xff, 1);
 
 	return 0;
 }
@@ -142,7 +140,9 @@ WRITE8_MEMBER(istrebiteli_state::ppi1_w)
 
 WRITE8_MEMBER(istrebiteli_state::sound_w)
 {
-	// TODO
+	if (data & 1)
+		coin_count = 0;
+	// bits 1-7 sound control, TODO
 }
 
 WRITE8_MEMBER(istrebiteli_state::spr0_ctrl_w)
@@ -174,34 +174,47 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, istrebiteli_state)
 	AM_RANGE(0xc8, 0xcf) AM_WRITE(spr_xy_w)
 ADDRESS_MAP_END
 
+CUSTOM_INPUT_MEMBER(istrebiteli_state::coin_r)
+{
+	return coin_count;
+}
+
+INPUT_CHANGED_MEMBER(istrebiteli_state::coin_inc)
+{
+	if (oldval == 0 && newval == 1)
+		++coin_count;
+}
+
 static INPUT_PORTS_START( istreb )
 	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_UNUSED) // sprite collision flag
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // sprite collision flag
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_UNUSED) // sprite collision flag
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // sprite collision flag
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_COIN1)
-	PORT_BIT(0x38, IP_ACTIVE_HIGH, IPT_UNKNOWN)  // TODO read coin counter
+	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, coin_r, nullptr)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, istrebiteli_state,coin_inc, nullptr)
 INPUT_PORTS_END
 
 static const gfx_layout char_layout =
@@ -226,10 +239,23 @@ static const gfx_layout sprite_layout =
 	8*8
 };
 
+static const gfx_layout projectile_layout =
+{
+	16,16,
+	8,
+	1,
+	{ 0 },
+	{ 15*8,14*8,13*8,12*8,11*8,10*8,9*8,8*8,7*8,6*8,5*8,4*8,3*8,2*8,1*8,0*8 },
+	{ 15*128,14*128,13*128,12*128,11*128,10*128,9*128,8*128,7*128,6*128,5*128,4*128,3*128,2*128,1*128,0*128 },
+	1
+};
+
 static GFXDECODE_START( istrebiteli )
 	GFXDECODE_ENTRY( "chars", 0x0000, char_layout, 0, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 2, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 0, 2 )
+	GFXDECODE_ENTRY( "sprite", 0x0200, projectile_layout, 2, 2 )
+	GFXDECODE_ENTRY( "sprite", 0x0200, projectile_layout, 0, 2 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( istreb, istrebiteli_state)
@@ -239,8 +265,8 @@ static MACHINE_CONFIG_START( istreb, istrebiteli_state)
 	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(istrebiteli_state, sound_w))
 
 	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
