@@ -8449,7 +8449,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="gumball (4am & san inc crack).dsk" size="143360" crc="56e68a48" sha1="6d0e3652cce177637f332a6df34d7fb133cad2c7" offset="0x0000" />
+				<rom name="gumball (4am &amp; san inc crack).dsk" size="143360" crc="56e68a48" sha1="6d0e3652cce177637f332a6df34d7fb133cad2c7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
