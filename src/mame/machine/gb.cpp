@@ -404,11 +404,13 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 				{
 					if (m_sgb_bytecount == 16 && m_sgb_packets == -1)
 					{
+#ifdef MAME_DEBUG
 						LOG(("SGB: %s (%02X) pkts: %d data: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
 								sgbcmds[sgb_data[0] >> 3],sgb_data[0] >> 3, sgb_data[0] & 0x07, sgb_data[1], sgb_data[2], sgb_data[3],
 								sgb_data[4], sgb_data[5], sgb_data[6], sgb_data[7],
 								sgb_data[8], sgb_data[9], sgb_data[10], sgb_data[11],
 								sgb_data[12], sgb_data[13], sgb_data[14], sgb_data[15]));
+#endif
 						m_sgb_packets = sgb_data[0] & 0x07;
 						m_sgb_start = 0;
 					}
