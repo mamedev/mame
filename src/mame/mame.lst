@@ -12200,7 +12200,13 @@ cscfr                           // * French
 cscg                            // * German
 cscsp                           // * Spanish
 feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
+feasbufr                        // * French
+feasbug                         // * German
+feasbusp                        // * Spanish
 feasgla                         // EAS: Elite A/S Challenger (Glasgow program, English)
+feasglafr                       // * French
+feasglag                        // * German
+feasglasp                       // * Spanish
 fexcel                          //
 fexcelv                         //
 fscc9                           //
