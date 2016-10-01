@@ -557,7 +557,7 @@ static ADDRESS_MAP_START( finalttr_map, AS_PROGRAM, 16, snowbros_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nunal_map, AS_PROGRAM, 16, snowbros_state )
+static ADDRESS_MAP_START( yutnori_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	// 0x100000  clr.w on startup
@@ -570,7 +570,7 @@ static ADDRESS_MAP_START( nunal_map, AS_PROGRAM, 16, snowbros_state )
 
 	// could be one of the OKIs? but gets value to write from RAM, always seems to be 0?
 	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP
-	AM_RANGE(0x30000e, 0x30000f) AM_READNOP //AM_READ( nunal_unk_r ) // ??
+	AM_RANGE(0x30000e, 0x30000f) AM_READNOP //AM_READ( yutnori_unk_r ) // ??
 
 //	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // maybe?
 	AM_RANGE(0x400000, 0x400001) AM_NOP
@@ -1570,7 +1570,7 @@ INPUT_PORTS_END
 
 
 
-static INPUT_PORTS_START( nunal )
+static INPUT_PORTS_START( yutnori )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -2010,11 +2010,11 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( nunal, snowbros_state )
+static MACHINE_CONFIG_START( yutnori, snowbros_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)
-	MCFG_CPU_PROGRAM_MAP(nunal_map)
+	MCFG_CPU_PROGRAM_MAP(yutnori_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
 //	MCFG_WATCHDOG_ADD("watchdog") // maybe
@@ -2753,13 +2753,13 @@ ROM_START( suhosong )
 ROM_END
 
 
-ROM_START( nunal )
+ROM_START( yutnori )
 	ROM_REGION( 0x80000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "SYS_D0-D7",    0x000001, 0x20000, CRC(d5c853da) SHA1(578f29c3a307f82fcaa23a7fe2931c0a673e777e) )
 	ROM_LOAD16_BYTE( "SYS_D8-D15",   0x000000, 0x20000, CRC(bf108119) SHA1(e64f64ddb577d6750cbc3a6c9d8d2ec4482cafe0) )
 
 	ROM_REGION( 0x4010, "mcu", 0 )    /* PIC code */
-	ROM_LOAD( "pic16c64a-04-p",    0x000000, 0x4010, CRC(46fd3671) SHA1(54cf7a38f7743cdad73a2741183b2720ee42e6c8) ) // dump seems to be 99% empty, protected, only configuration bytes dumped?
+	ROM_LOAD( "pic16c64a-04-p",    0x000000, 0x4010, BAD_DUMP CRC(46fd3671) SHA1(54cf7a38f7743cdad73a2741183b2720ee42e6c8) ) // dump seems to be 99% empty, protected, only configuration bytes dumped?
 		
 	ROM_REGION( 0x120000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "GRAPHICS_ROM_1",    0x000000, 0x80000, CRC(d4881b49) SHA1(e169b7eca48a0bd66ad55fe21197a4bb491198bb) )
@@ -2898,7 +2898,7 @@ DRIVER_INIT_MEMBER(snowbros_state, hyperpac)
 }
 
 
-DRIVER_INIT_MEMBER(snowbros_state, nunal)
+DRIVER_INIT_MEMBER(snowbros_state, yutnori)
 {
 	// presumably related to the PIC protection
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
@@ -2953,4 +2953,4 @@ GAME( 1996, multi96,  twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Bar
 GAME( 2002, snowbro3, 0,        snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
 GAME( 2003, ballboy,  snowbro3, snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "bootleg", "Ball Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, nunal,    0,        nunal, nunal, snowbros_state, nunal, ROT0, "Nunal",                        "Puzzle 'unknown' XXX", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.
+GAME( 1999, yutnori,    0,        yutnori, yutnori, snowbros_state, yutnori, ROT0, "Nunal",                        "Puzzle Yutnori (Korea)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer
