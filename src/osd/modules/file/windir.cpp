@@ -112,7 +112,7 @@ bool win_directory::open_impl(std::string const &dirname)
 	std::string dirfilter = string_format("%s\\*.*", dirname);
 
 	// convert the path to TCHARs
-	auto t_dirfilter = tstring_from_utf8(dirfilter.c_str());
+	tstring t_dirfilter = tstring_from_utf8(dirfilter);
 
 	// attempt to find the first file
 	m_find = FindFirstFileEx(t_dirfilter.c_str(), FindExInfoStandard, &m_data, FindExSearchNameMatch, nullptr, 0);

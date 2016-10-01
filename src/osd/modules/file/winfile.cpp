@@ -173,7 +173,7 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 		return win_open_ptty(path, openflags, file, filesize);
 
 	// convert path to TCHAR
-	auto t_path = tstring_from_utf8(path.c_str());
+	tstring t_path = tstring_from_utf8(path);
 
 	// convert the path into something Windows compatible (the actual interesting part appears
 	// to have been commented out???)
@@ -274,7 +274,7 @@ osd_file::error osd_file::openpty(ptr &file, std::string &name)
 
 osd_file::error osd_file::remove(std::string const &filename)
 {
-	auto tempstr = tstring_from_utf8(filename.c_str());
+	tstring tempstr = tstring_from_utf8(filename);
 
 	error filerr = error::NONE;
 	if (!DeleteFile(tempstr.c_str()))
@@ -338,7 +338,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 {
 	// convert the path to TCHARs
-	auto t_path = tstring_from_utf8(path.c_str());
+	tstring t_path = tstring_from_utf8(path);
 
 	// is this path a root directory (e.g. - C:)?
 	WIN32_FIND_DATA find_data;
@@ -382,7 +382,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 {
 	// convert the path to TCHARs
-	auto t_path = tstring_from_utf8(path.c_str());
+	tstring t_path = tstring_from_utf8(path);
 
 	// cannonicalize the path
 	TCHAR buffer[MAX_PATH];
@@ -402,7 +402,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 
 bool osd_is_absolute_path(std::string const &path)
 {
-	auto t_path = tstring_from_utf8(path.c_str());
+	tstring t_path = tstring_from_utf8(path);
 	return !PathIsRelative(t_path.c_str());
 }
 

@@ -43,7 +43,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			m_devices_menu = CreatePopupMenu();
 			for (device_image_interface &img : iter)
 			{
-				auto tc_buf = tstring_from_utf8(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]").c_str());
+				tstring tc_buf = tstring_from_utf8(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]"));
 				AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
 			}
 			AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_devices_menu, TEXT("Images"));
@@ -189,7 +189,7 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			auto tc_buf = tstring_from_utf8(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]").c_str());
+			tstring tc_buf = tstring_from_utf8(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]"));
 			ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf.c_str());
 
 			cnt++;
@@ -214,7 +214,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					std::string filter;
 					build_generic_filter(img, false, filter);
 					{
-						auto t_filter = tstring_from_utf8(filter.c_str());
+						tstring t_filter = tstring_from_utf8(filter);
 
 						// convert a pipe-char delimited string into a NUL delimited string
 						for (int i = 0; t_filter[i] != '\0'; i++)
@@ -252,7 +252,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					std::string filter;
 					build_generic_filter(img, true, filter);
 					{
-						auto t_filter = tstring_from_utf8(filter.c_str());
+						tstring t_filter = tstring_from_utf8(filter);
 						// convert a pipe-char delimited string into a NUL delimited string
 						for (int i = 0; t_filter[i] != '\0'; i++)
 						{

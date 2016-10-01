@@ -367,7 +367,7 @@ protected:
 
 		for (auto const &library : m_libraries)
 		{
-			auto tempstr = tstring_from_utf8(library.c_str());
+			tstring tempstr = tstring_from_utf8(library);
 			HMODULE module = load_library(tempstr.c_str());
 
 			if (module != nullptr)

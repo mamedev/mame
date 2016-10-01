@@ -85,7 +85,7 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	logfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
 	// copy in the face name
-	std::basic_string<TCHAR> face = tstring_from_utf8(name.c_str());
+	tstring face = tstring_from_utf8(name);
 	_tcsncpy(logfont.lfFaceName, face.c_str(), ARRAY_LENGTH(logfont.lfFaceName));
 	logfont.lfFaceName[sizeof(logfont.lfFaceName) / sizeof(TCHAR)-1] = 0;
 
