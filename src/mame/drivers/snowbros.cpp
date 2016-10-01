@@ -2906,7 +2906,7 @@ DRIVER_INIT_MEMBER(snowbros_state, nunal)
 	rom[0xd820 / 2] = 0x4e71;
 	rom[0xc3b6 / 2] = 0x4e71;
 
-	m_pandora->set_bg_pen(0x00);
+	m_pandora->set_bg_pen(0xf0);
 }
 
 GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
