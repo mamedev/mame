@@ -1492,6 +1492,66 @@ ROM_START( wingwarj )
 	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
 ROM_END
 
+// Dumper's note: As per other R360 games wingwar is just a slightly modified version with 4 roms different on the rom board.
+
+ROM_START( wingwar360 )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_LOAD16_BYTE( "epr-16729.14", 0x200000, 0x80000, CRC(7edec2cc) SHA1(3e423a868ca7c8475fbb5bc1a10526e69d94d865) )
+	ROM_LOAD16_BYTE( "epr-16730.15", 0x200001, 0x80000, CRC(bab24dee) SHA1(26c95139c1aa7f34b6a5cce39e5bd1dd2ef0dd49) )
+
+	ROM_LOAD( "ic4_17052.bin", 0xfc0000, 0x20000, CRC(0f4743e7) SHA1(cc47fd1d25808728ed05d95d510733b8bd011b41) )
+	ROM_RELOAD(          0x000000, 0x20000 )
+	ROM_LOAD( "ic5_17053.bin", 0xfe0000, 0x20000, CRC(83af2415) SHA1(46dfee9db95171a3942cd32c851ec75c3d9e03da) )
+	ROM_RELOAD(          0x020000, 0x20000 )
+
+	ROM_LOAD16_BYTE( "ic6_17056.bin",  0x1000000, 0x80000, CRC(5216de4d) SHA1(1463311d3f96ca7c46b8f676ee3963caddeec9e2) )
+	ROM_LOAD16_BYTE( "ic7_17057.bin",  0x1000001, 0x80000, CRC(b21aa2db) SHA1(861e637b5ae9b2d7fe6d09a7e788a6a3ff09af6e) )
+	ROM_LOAD16_BYTE( "mpr-16736.8",  0x1100000, 0x80000, CRC(10b6a025) SHA1(7a4f624ceb7c0b92044a5db8ff55440562ef836b) )
+	ROM_LOAD16_BYTE( "mpr-16735.9",  0x1100001, 0x80000, CRC(c82fd198) SHA1(d9e53ae1e14dfc8e84a14c0026ef0b904863bb1b) )
+	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
+	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
+
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
+	ROM_LOAD16_WORD_SWAP("epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
+	ROM_LOAD16_WORD_SWAP("epr-16752.8", 0x020000, 0x20000, CRC(6541c48f) SHA1(9341eff160e31a8574b9545fafc1c4059323fa0c) )
+	ROM_RELOAD(0x80000, 0x20000)
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
+	ROM_LOAD("mpr-16753.32", 0x000000, 0x200000, CRC(324a8333) SHA1(960342e08db637c6f72615d49cffd9fb0889620b) )
+	ROM_LOAD("mpr-16754.33", 0x200000, 0x200000, CRC(144f3cf5) SHA1(d2f8cc9086affbbc5ef2195272200230f724e5d1) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
+	ROM_LOAD("mpr-16755.4", 0x000000, 0x200000, CRC(4baaf878) SHA1(661d4ea9be6a4952852d0ef94becee7ed42bf4a1) )
+	ROM_LOAD("mpr-16756.5", 0x200000, 0x200000, CRC(d9c40672) SHA1(83e6f1156b30888d3a00103f079dc74f4fca8446) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 ) /* TGP model roms */
+	ROM_LOAD32_WORD( "mpr-16743.26", 0x000000, 0x200000, CRC(a710d33c) SHA1(1d0184545b34789ed511caaa25d57db3cd9a8e2f) )
+	ROM_LOAD32_WORD( "mpr-16744.27", 0x000002, 0x200000, CRC(de796e1f) SHA1(397efb86a21b178770f29d2464bacf5f893619a0) )
+	ROM_LOAD32_WORD( "mpr-16745.28", 0x400000, 0x200000, CRC(905b689c) SHA1(685dec2a65d5b3a386bda0af1bb5ae7e2b73a01a) )
+	ROM_LOAD32_WORD( "mpr-16746.29", 0x400002, 0x200000, CRC(163b312e) SHA1(6b45007d6a9d17c8a0b46d81ec84ce9bfefb1695) )
+	ROM_LOAD32_WORD( "mpr-16747.30", 0x800000, 0x200000, CRC(7353bb12) SHA1(608c5d561e909b8ba31d53db18e6e199855eaaec) )
+	ROM_LOAD32_WORD( "mpr-16748.31", 0x800002, 0x200000, CRC(8ce98d3a) SHA1(1978776a0e2ea817508e30ba232d5f8d9c158f70) )
+	ROM_LOAD32_WORD( "mpr-16749.32", 0xc00000, 0x200000, CRC(0e36dc1a) SHA1(4939177a6ac51ca57d0acd118ff14af4f4e438bb) )
+	ROM_LOAD32_WORD( "mpr-16750.33", 0xc00002, 0x200000, CRC(e4f0b98d) SHA1(e69de2e5ccea2834fb8326bdd61fc6b517bc60b7) )
+
+	ROM_REGION32_LE( 0x200000, "user2", 0 ) /* TGP data roms */
+	ROM_LOAD32_BYTE( "mpr-16741.39", 0x000000, 0x80000, CRC(84b2ffd8) SHA1(0eba3855d20b88567c6fa08046e12429664d87cb) )
+	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
+	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
+	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
+
+	ROM_REGION( 0x10000, "ioboard", 0 )
+	ROM_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0) )
+
+	ROM_REGION( 0x20000, "commboard", 0 )
+	ROM_LOAD("epr-15112.17", 0x00000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
+
+	// Dumper's note: Video & Drive is the control board in the attendants' tower, same hardware as G-Loc R360 with the two program roms being the only difference.
+	ROM_REGION( 0x400000, "controlboard", 0 )
+	ROM_LOAD("ic22_18851.bin", 0x00000, 0x20000, CRC(85f75bd7) SHA1(43cc8f8c81631d71b661e55e15f3fe8803a8a7e9) )
+	ROM_LOAD("ic67_18850.bin", 0x20000, 0x08000, CRC(45a3e9fc) SHA1(bf2d1a7acc35b72a62551bfbb55e5058d6fd6d5c) )
+ROM_END
+
 ROM_START( netmerc )
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
@@ -1606,11 +1666,12 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
 
-GAME( 1993, vf,       0,       model1,    vf, driver_device,       0, ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,       0,       model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
-GAME( 1993, vformula, vr,      model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,      0,       swa,       swa, driver_device,      0, ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,  0,       model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,  0,       model1,    vf, driver_device,       0, ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
+GAME( 1993, vf,         0,       model1,    vf, driver_device,       0, ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAME( 1993, vformula,   vr,      model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,       swa, driver_device,      0, ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War R360 (World)", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       model1,    vf, driver_device,       0, ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
