@@ -12803,6 +12803,7 @@ turpin                          // (c) 1981 Sega
 turpins                         // (c) 1981 bootleg
 turtles                         // (c) 1981 Stern
 uniwars                         // (c) Irem
+uniwarsa                        // (c) Karateco
 warofbug                        // (c) 1981 Armenia
 warofbugg                       // German Version
 warofbugu                       // (c) 1981 Armenia
@@ -14842,8 +14843,10 @@ wfortunea                       // (c) 1989 GameTek
 
 @source:itgambl2.cpp
 cmagica                         // (c) 200? unknown
+granfrat                        // (c) 200? unknown
 mcard_h8                        // (c) 200? unknown
 elvis                           // (c) 200? unknown
+eurodsr                         // (c) 200? unknown
 europass                        // (c) 200? unknown
 laser2k1                        // (c) 2001 unknown
 mclass                          // (c) 200? unknown
@@ -14859,7 +14862,6 @@ thedrink                        // (c) 200? unknown
 trstar2k                        // (c) 1999 A.M.
 unkh8gam                        // (c) 200? unknown
 wizard                          // (c) 1999 A.A.
-eurodsr                         // (c) 200? unknown
 
 @source:itgambl3.cpp
 ejollyx5                        // (c) 200? Solar Games
@@ -20376,6 +20378,7 @@ vf                              // 1993.12 Virtua Fighter
 vformula                        // 1993.?? Virtua Formula
 vr                              // 1992.08 Virtua Racing
 wingwar                         // 1994.06 Wing War
+wingwar360                      // 1994.09 Wing War R360
 wingwarj                        // 1994.06 Wing War (Japan)
 wingwaru                        // 1994.09 Wing War (US)
 
@@ -28381,7 +28384,7 @@ iemoto                          // (c) 1987
 iemotom                         // (c) 1987
 kaguya                          // (c) 1988 MIKI SYOUJI
 kaguya2                         // (c) 1989 MIKI SYOUJI
-kaguya2f                        // (c) 1989 MIKI SYOUJI
+kaguya2f                        // (c) 2001 MIKI SYOUJI
 kanatuen                        // (c) 1988 Panac
 korinai                         // (c) 1988
 korinaim                        // (c) 1988

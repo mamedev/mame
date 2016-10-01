@@ -1408,7 +1408,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(gba_state, dma_vblank_callback))
 
 	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
-	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
+	MCFG_SOUND_ADD("custom", CGB04_APU, XTAL_16_777216MHz/4)
 	MCFG_SOUND_ROUTE(0, "spkleft", 0.50)
 	MCFG_SOUND_ROUTE(1, "spkright", 0.50)
 	MCFG_SOUND_ADD("direct_a_left", DAC, 0)         // GBA direct sound A left

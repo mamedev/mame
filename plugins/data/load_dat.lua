@@ -84,7 +84,7 @@ function datfile.open(file, vertag)
 		end
 		fh:seek("set", data[tag1][tag2][set])
 		for line in fh:lines() do
-			if line == "$end" then
+			if line:sub(1, 4) == "$end" then
 				return table.concat(output, "\n")
 			end
 			output[#output + 1] = line

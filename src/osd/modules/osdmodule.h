@@ -62,7 +62,7 @@ class osd_module_manager
 {
 public:
 
-	static const int MAX_MODULES = 32;
+	static const int MAX_MODULES = 64;
 
 	osd_module_manager();
 	~osd_module_manager();
