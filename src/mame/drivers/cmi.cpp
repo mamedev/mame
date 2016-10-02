@@ -104,6 +104,7 @@
 #include "cpu/m68000/m68000.h"
 
 #include "machine/clock.h"
+#include "machine/7474.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
@@ -220,20 +221,22 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
+	DECLARE_WRITE8_MEMBER( rp_w );
+	DECLARE_WRITE8_MEMBER( ws_dir_w );
+	DECLARE_READ_LINE_MEMBER( tri_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_0_irqa );
 	DECLARE_WRITE_LINE_MEMBER( pia_0_irqb );
 
+	DECLARE_READ_LINE_MEMBER( eosi_r );
+	DECLARE_READ_LINE_MEMBER( zx_r );
 	DECLARE_WRITE8_MEMBER( pia_1_a_w );
 	DECLARE_WRITE8_MEMBER( pia_1_b_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_1_irqa );
 	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
-
-	DECLARE_READ_LINE_MEMBER( eosi_r );
-	DECLARE_READ_LINE_MEMBER( zx_r );
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
@@ -271,6 +274,9 @@ private:
 	UINT8   m_env_dir_ctrl;
 	UINT8   m_vol_latch;
 	UINT8   m_flt_latch;
+	UINT8	m_rp;
+	UINT8	m_ws;
+	int		m_dir;
 
 	double  m_freq;
 	bool    m_active;
@@ -301,6 +307,9 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 
 MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
+	MCFG_PIA_READCB1_HANDLER(READLINE(cmi01a_device, tri_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, ws_dir_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi01a_device, rp_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi01a_device, pia_0_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi01a_device, pia_0_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, pia_0_irqa))
@@ -377,6 +386,9 @@ void cmi01a_device::device_reset()
 	m_env_dir_ctrl = 0;
 	m_vol_latch = 0;
 	m_flt_latch = 0;
+	m_rp = 0;
+	m_ws = 0;
+	m_dir = 0;
 
 	m_freq = 0.0;
 	m_active = false;
@@ -817,6 +829,9 @@ void cmi_state::video_write(int offset)
 
 READ8_MEMBER( cmi_state::video_r )
 {
+	if (space.debugger_access())
+		return m_video_data;
+
 	m_video_data = m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
 
 	video_write(offset);
@@ -860,6 +875,9 @@ WRITE8_MEMBER( cmi_state::vram_w )
 
 READ8_MEMBER( cmi_state::vram_r )
 {
+	if (space.debugger_access())
+		return m_video_ram[offset];
+
 	/* Latch the current video position */
 	m_y_pos = (offset >> 6) & 0xff;
 	m_x_pos = (offset & 0x3f) << 3;
@@ -925,6 +943,10 @@ WRITE8_MEMBER( cmi_state::map_w )
 READ8_MEMBER( cmi_state::irq_ram_r )
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
+
+	if (space.debugger_access())
+		return m_scratch_ram[cpunum][0xf8 + offset];
+
 	if (m_m6809_bs_hack_cnt > 0 && m_m6809_bs_hack_cpu == cpunum)
 	{
 		m_m6809_bs_hack_cnt--;
@@ -945,8 +967,6 @@ void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	{
 		case TIMER_MAP_SWITCH:
 		{
-			//printf("Timer 0 expired\n");
-			//printf("Map switch timer: CPU %d\n", param);
 			m_cpu_active_space[param] = m_cpu_map_switch[param];
 			UINT8 map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
 							 m_map_sel[param ? MAPSEL_P2_A : MAPSEL_P1_A] :
@@ -1560,6 +1580,9 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 
 READ8_MEMBER( cmi_state::fdc_r )
 {
+	if (space.debugger_access())
+		return 0;
+
 	if (offset == 0)
 	{
 		switch (m_fdc_addr)
@@ -1686,6 +1709,10 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
 28 - 2B = PIA
 */
 
+WRITE8_MEMBER( cmi_state::master_tune_w )
+{
+//  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
+}
 
 WRITE_LINE_MEMBER( cmi01a_device::pia_0_ca2_w )
 {
@@ -1712,11 +1739,6 @@ WRITE_LINE_MEMBER( cmi01a_device::pia_0_irqb )
 	update_interrupts();
 }
 
-WRITE8_MEMBER( cmi_state::master_tune_w )
-{
-//  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
-}
-
 WRITE8_MEMBER( cmi01a_device::pia_1_a_w )
 {
 // top two
@@ -1724,6 +1746,24 @@ WRITE8_MEMBER( cmi01a_device::pia_1_a_w )
 
 WRITE8_MEMBER( cmi01a_device::pia_1_b_w )
 {
+}
+
+WRITE8_MEMBER( cmi01a_device::rp_w )
+{
+	m_rp = data;
+}
+
+WRITE8_MEMBER( cmi01a_device::ws_dir_w )
+{
+	m_ws = data & 0x7f;
+	m_dir = (data >> 7) & 1;
+}
+
+READ_LINE_MEMBER( cmi01a_device::tri_r )
+{
+	bool top_terminal_count = (m_dir == ENV_DIR_UP && m_rp == 0);
+	bool bottom_terminal_count = (m_dir == ENV_DIR_DOWN && m_rp == 0xff);
+	return (top_terminal_count || bottom_terminal_count) ? 1 : 0;
 }
 
 WRITE_LINE_MEMBER( cmi01a_device::pia_1_irqa )
@@ -1868,7 +1908,6 @@ WRITE_LINE_MEMBER( cmi01a_device::pia_0_cb2_w )
 void cmi01a_device::update_wave_addr(int inc)
 {
 	int old_cnt = m_segment_cnt;
-	//printf("update_wave_addr, m_segment_cnt %04x\n", m_segment_cnt);
 
 	if (inc)
 		++m_segment_cnt;
@@ -1890,8 +1929,24 @@ void cmi01a_device::update_wave_addr(int inc)
 	/* Zero crossing interrupt is a pulse */
 }
 
+WRITE8_MEMBER( cmi01a_device::ptm_out0 )
+{
+	m_ptm_out0 = data;
+}
+
+READ_LINE_MEMBER( cmi01a_device::eosi_r )
+{
+	return (m_segment_cnt & 0x4000) >> 14;
+}
+
+READ_LINE_MEMBER( cmi01a_device::zx_r )
+{
+	return m_segment_cnt & 0x40;
+}
+
 WRITE8_MEMBER( cmi01a_device::write )
 {
+	//printf("C%d W: %02x = %02x\n", m_channel, offset, data);
 	switch (offset)
 	{
 		case 0x0:
@@ -1933,15 +1988,22 @@ WRITE8_MEMBER( cmi01a_device::write )
 			int a1 = (m_ptm_out0 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
-			//printf("CH%d PTM: [%x] %x, %d %d %d, %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data, a2, a1, a0, offset);
+			//printf("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
 			m_ptm->write(space, (a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
+
+		default:
+			printf("Unknown channel card %d write to E0%02X = %02X\n", m_channel, offset, data);
+			break;
 	}
 }
 
 READ8_MEMBER( cmi01a_device::read )
 {
+	if (space.debugger_access())
+		return 0;
+
 	UINT8 data = 0;
 
 	switch (offset)
@@ -1964,6 +2026,10 @@ READ8_MEMBER( cmi01a_device::read )
 			m_env_dir_ctrl = ENV_DIR_UP;
 			break;
 
+		case 0x5:
+			data = 0xff;
+			break;
+
 		case 0x8: case 0x9: case 0xa: case 0xb:
 			data = m_pia_0->read(space, offset & 3);
 			break;
@@ -1979,16 +2045,19 @@ READ8_MEMBER( cmi01a_device::read )
 			int a2 = BIT(offset, 1);
 
 			data = m_ptm->read(space, (a2 << 2) | (a1 << 1) | a0);
+
+			//printf("CH%d PTM R: [%x] %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
+
+		default:
+			printf("Unknown channel card %d read from E0%02X\n", m_channel, offset);
+			break;
 	}
 
-	return data;
-}
+	//printf("C%d R: %02x = %02x\n", m_channel, offset, data);
 
-WRITE8_MEMBER( cmi01a_device::ptm_out0 )
-{
-	m_ptm_out0 = data;
+	return data;
 }
 
 WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
@@ -2000,6 +2069,9 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
 
 READ8_MEMBER( cmi_state::cmi02_r )
 {
+	if (space.debugger_access())
+		return 0;
+
 	if (offset <= 0x1f)
 	{
 		int ch_mask = m_cmi02_pia_0->a_output();
@@ -2153,16 +2225,6 @@ READ_LINE_MEMBER( cmi_state::ank_rts_r )
 {
 //  printf("ANK RTS?\n");
 	return 0;
-}
-
-READ_LINE_MEMBER( cmi01a_device::eosi_r )
-{
-	return (m_segment_cnt & 0x4000) >> 14;
-}
-
-READ_LINE_MEMBER( cmi01a_device::zx_r )
-{
-	return m_segment_cnt & 0x40;
 }
 
 void cmi_state::install_peripherals(int cpunum)
