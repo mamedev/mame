@@ -3839,8 +3839,9 @@ static imgtoolerr_t BT_node_get_record(mac_BTref *BTref, void *node_buf, unsigne
 	if (recnum >= node_numRecords)
 		return IMGTOOLERR_UNEXPECTED;
 
-	offset = get_UINT16BE(((UINT16BE *)((UINT8 *) node_buf + BTref->nodeSize))[-recnum-1]);
-	next_offset = get_UINT16BE(((UINT16BE *)((UINT8 *) node_buf + BTref->nodeSize))[-recnum-2]);
+	int recnum_s = (int)recnum;
+	offset = get_UINT16BE(((UINT16BE *)((UINT8 *) node_buf + BTref->nodeSize))[-recnum_s - 1]);
+	next_offset = get_UINT16BE(((UINT16BE *)((UINT8 *) node_buf + BTref->nodeSize))[-recnum_s - 2]);
 
 	if ((offset < sizeof(BTNodeHeader)) || (offset > BTref->nodeSize-2*node_numRecords)
 			|| (next_offset < sizeof(BTNodeHeader)) || (next_offset > BTref->nodeSize-2*node_numRecords)
