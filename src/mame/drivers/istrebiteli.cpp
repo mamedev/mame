@@ -2,7 +2,12 @@
 // copyright-holders:MetalliC
 /*************************************************************************
 
-    Istrebiteli preliminary driver by MetalliC
+    Istrebiteli driver by MetalliC
+
+    TODO:
+      sound emulation
+      check sprite priorities
+      accurate sprite collision
 
 **************************************************************************/
 
@@ -20,7 +25,6 @@ public:
 		, m_maincpu(*this, I8080_TAG)
 		, m_ppi0(*this, "ppi0")
 		, m_ppi1(*this, "ppi1")
-		, m_tileram(*this, "tileram")
 		, m_gfxdecode(*this, "gfxdecode")
 	{
 	}
@@ -34,13 +38,14 @@ public:
 	DECLARE_WRITE8_MEMBER(spr0_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spr1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spr_xy_w);
+	DECLARE_WRITE8_MEMBER(tileram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
-	required_shared_ptr<UINT8> m_tileram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	virtual void machine_start() override { }
@@ -55,6 +60,7 @@ public:
 	UINT8 m_spr1_ctrl;
 	UINT8 m_spr_xy[8];
 	UINT8 coin_count;
+	UINT8 m_tileram[16];
 };
 
 void istrebiteli_state::machine_reset()
@@ -62,6 +68,7 @@ void istrebiteli_state::machine_reset()
 	m_spr0_ctrl = m_spr1_ctrl = 0;
 	coin_count = 0;
 	memset(m_spr_xy, 0, sizeof(m_spr_xy));
+	memset(m_tileram, 0, sizeof(m_tileram));
 }
 
 static const rgb_t istreb_palette[4] = {
@@ -78,7 +85,7 @@ PALETTE_INIT_MEMBER(istrebiteli_state,istrebiteli)
 
 TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index] & 0x1f, 0, 0);
 }
 
 void istrebiteli_state::video_start()
@@ -95,30 +102,37 @@ void istrebiteli_state::video_start()
 		memcpy(&gfx[offs], &temp[0], 64);
 	}
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(istrebiteli_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
-		16, 8, 1, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(istrebiteli_state::get_tile_info), this), TILEMAP_SCAN_ROWS_FLIP_X,
+		8, 16, 16, 1);
+	m_tilemap->set_scrolldx(96, 96);
 }
 
 UINT32 istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(1);
 
-	m_tilemap->mark_all_dirty();
-	rectangle myrect;
-	myrect.set_size(16, 16*8);
-	m_tilemap->draw(screen, bitmap, myrect, 0, 0);
+	rectangle rect = cliprect;
+	rect.offset(32, 64);
+	rect.set_size(16*8, 16);
+	m_tilemap->draw(screen, bitmap, rect, 0, 0);
 
 	int spritecode;
 
 	spritecode = (m_spr0_ctrl & 0x1f) + ((m_spr0_ctrl & 0x80) >> 2);
-	m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[6], m_spr_xy[7] ^ 0xff, 1);
+	m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[7], m_spr_xy[6], 1);
 	spritecode = (m_spr1_ctrl & 0x1f) + ((m_spr1_ctrl & 0x80) >> 2);
-	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,	spritecode, 0, 0, 0, m_spr_xy[4], m_spr_xy[5] ^ 0xff, 1);
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,	spritecode, 0, 0, 0, m_spr_xy[5], m_spr_xy[4], 1);
 
-	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr0_ctrl & 0x40) ? 5:7, 0, 0, 0, m_spr_xy[2], m_spr_xy[3] ^ 0xff, 1);
-	m_gfxdecode->gfx(4)->transpen(bitmap, cliprect, (m_spr1_ctrl & 0x40) ? 5:7, 0, 0, 0, m_spr_xy[0], m_spr_xy[1] ^ 0xff, 1);
+	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr0_ctrl & 0x40) ? 5:7, 0, 0, 0, m_spr_xy[3], m_spr_xy[2], 1);
+	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr1_ctrl & 0x40) ? 4:6, 0, 0, 0, m_spr_xy[1], m_spr_xy[0], 1);
 
 	return 0;
+}
+
+WRITE8_MEMBER(istrebiteli_state::tileram_w)
+{
+	m_tileram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 READ8_MEMBER(istrebiteli_state::ppi0_r)
@@ -168,11 +182,28 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, istrebiteli_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xb0, 0xbf) AM_RAM AM_SHARE("tileram")
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(tileram_w)
 	AM_RANGE(0xc0, 0xc3) AM_READWRITE(ppi0_r, ppi0_w)
 	AM_RANGE(0xc4, 0xc7) AM_READWRITE(ppi1_r, ppi1_w)
 	AM_RANGE(0xc8, 0xcf) AM_WRITE(spr_xy_w)
 ADDRESS_MAP_END
+
+CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
+{
+	// piece of HACK
+	// real hardware does per-pixel sprite collision detection
+	int id = *(int*)&param * 2;
+
+	int sx = m_spr_xy[4 + id];
+	int sy = m_spr_xy[5 + id];
+	int px = m_spr_xy[2 - id] + 3;
+	int py = m_spr_xy[3 - id] + 3;
+
+	if (px >= sx && px < (sx + 8) && py >= sy && py < (sy + 8))
+		return 1;
+
+	return 0;
+}
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::coin_r)
 {
@@ -192,7 +223,7 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // sprite collision flag
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -202,7 +233,7 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // sprite collision flag
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -219,13 +250,13 @@ INPUT_PORTS_END
 
 static const gfx_layout char_layout =
 {
-	16,8,
+	8,16,
 	32,
 	1,
 	{ 0 },
+	{ 7,6,5,4,3,2,1,0 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-	{ 0,1,2,3,4,5,6,7 },
-	16*8
+	8*16
 };
 
 static const gfx_layout sprite_layout =
@@ -234,8 +265,8 @@ static const gfx_layout sprite_layout =
 	64,
 	1,
 	{ 0 },
-	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-	{ 7,6,5,4,3,2,1,0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 7*8,6*8,5*8,4*8,3*8,2*8,1*8,0*8 },
 	8*8
 };
 
@@ -254,7 +285,6 @@ static GFXDECODE_START( istrebiteli )
 	GFXDECODE_ENTRY( "chars", 0x0000, char_layout, 0, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 2, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 0, 2 )
-	GFXDECODE_ENTRY( "sprite", 0x0200, projectile_layout, 2, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0200, projectile_layout, 0, 2 )
 GFXDECODE_END
 
@@ -276,7 +306,7 @@ static MACHINE_CONFIG_START( istreb, istrebiteli_state)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 312, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 64, 256, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -289,17 +319,17 @@ ROM_START( istreb )
 	ROM_REGION( 0x1000, I8080_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "main.bin", 0x000, 0xa00, CRC(ae67c41c) SHA1(1f7807d486cd4d161ee49be991b81db7dc9b0f3b) )	// actually 5x 512B ROMs, TODO split
 
-	ROM_REGION(0x1000, "chars", ROMREGION_ERASEFF)
-	ROM_LOAD("003-g8.bin", 0x000, 0x200, CRC(5cd7ad47) SHA1(2142711c8a3640b7aa258a2059cfb0f14297a5ac) )
+	ROM_REGION( 0x200, "chars", 0 )
+	ROM_LOAD( "003-g8.bin", 0x000, 0x200, CRC(5cd7ad47) SHA1(2142711c8a3640b7aa258a2059cfb0f14297a5ac) )
 
-	ROM_REGION(0x1000, "sprite", 0)
-	ROM_LOAD("001-g4.bin",  0x000, 0x200, CRC(ca3c531b) SHA1(8295167895d51e626b6d5946b565d5e8b8466ac0) )
-	ROM_LOAD("001-g9.bin",  0x000, 0x200, CRC(ca3c531b) SHA1(8295167895d51e626b6d5946b565d5e8b8466ac0) )
-	ROM_LOAD("001-a11.bin", 0x200, 0x100, CRC(4e05b7dd) SHA1(335e975ae9e8f775c1ac07f60420680ad878c3ae) )
-	ROM_LOAD("001-b11.bin", 0x200, 0x100, CRC(4e05b7dd) SHA1(335e975ae9e8f775c1ac07f60420680ad878c3ae) )
+	ROM_REGION( 0x1000, "sprite", 0 )
+	ROM_LOAD( "001-g4.bin",  0x000, 0x200, CRC(ca3c531b) SHA1(8295167895d51e626b6d5946b565d5e8b8466ac0) )
+	ROM_LOAD( "001-g9.bin",  0x000, 0x200, CRC(ca3c531b) SHA1(8295167895d51e626b6d5946b565d5e8b8466ac0) )
+	ROM_LOAD( "001-a11.bin", 0x200, 0x100, CRC(4e05b7dd) SHA1(335e975ae9e8f775c1ac07f60420680ad878c3ae) )
+	ROM_LOAD( "001-b11.bin", 0x200, 0x100, CRC(4e05b7dd) SHA1(335e975ae9e8f775c1ac07f60420680ad878c3ae) )
 
 	ROM_REGION(0x200, "soundrom", 0)
-	ROM_LOAD("003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
+	ROM_LOAD( "003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 ROM_END
 
-GAME( 198?, istreb,  0,        istreb,  istreb,  driver_device,  0, ROT90, "Terminal", "Istrebiteli", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 198?, istreb,  0,        istreb,  istreb,  driver_device,  0, ROT0, "Terminal", "Istrebiteli", MACHINE_NO_SOUND)
