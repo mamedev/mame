@@ -9,6 +9,13 @@
       check sprite priorities
       accurate sprite collision
 
+	how to play:
+      insert one or more coins, each coin gives 2 minutes of play time, then press 1 or 2 player game start
+	  hit enemy 15 or more times to get bonus game
+	
+	test mode:
+	  insert 12 or more coins then press 2 player start
+
 **************************************************************************/
 
 #include "emu.h"
