@@ -366,7 +366,7 @@
 
 	<software name="unidos33P">
 		<description>UniDOS 3.3 Plus v2.0.1</description>
-		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive 2 = D2 and D4 -->
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
 		<year>1986</year>
 		<publisher>Microsparc, Inc.</publisher>
 
@@ -379,7 +379,7 @@
 
 	<software name="unidosplus">
 		<description>UniDOS Plus v2.1</description>
-		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive 2 = D2 and D4 -->
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
 		<year>1986</year>
 		<publisher>Microsparc, Inc.</publisher>
 
@@ -6555,7 +6555,7 @@
 		</part>
 	</software>
 
-	<software name="wheretime">
+	<software name="wheretime35">
 		<description>Where in Time is Carmen Sandiego v1.0 800K 3.5 disc (clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund</publisher>
