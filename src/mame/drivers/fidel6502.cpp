@@ -6,8 +6,7 @@
     Fidelity Electronics 6502 based board driver
 
     TODO:
-    - EAS doesn't work, there's some activity if you boot/reset with 1-key held down.
-      Also need to verify if the program rom addresses are right, especially for feasgla
+    - x
 
 ******************************************************************************
 
@@ -291,9 +290,9 @@ Memory map:
 
 control (W):
 ------------
-Z80 A0-A2 to 3*74259, Z80 Dx to D (_C unused)
+CPU A0-A2 to 3*74259, CPU Dx to D (_C unused)
 
-Z80 D0:
+CPU D0:
 - Q4,Q5: led commons
 - Q6,Q7,Q2,Q1: 7seg panel digit select
 - Q0-Q3: 7442 A0-A3
@@ -301,10 +300,10 @@ Z80 D0:
   + 0-8: keypad mux
   + 9: buzzer out
 
-Z80 D1: (model 6093)
+CPU D1: (model 6093)
 - Q0-Q7: 7seg data
 
-Z80 D2: (model 6092)
+CPU D2: (model 6092)
 - Q0-Q5: TSI C0-C5
 - Q6: TSI START pin
 - Q7: TSI ROM A11
@@ -315,12 +314,12 @@ Sound comes from the Audio out pin, digital out pins are N/C.
 
 control (R):
 ------------
-Z80 A0-A2 to 2*74251, Z80 Dx to output
+CPU A0-A2 to 2*74251, CPU Dx to output
 
-Z80 D7 to Y:
+CPU D7 to Y:
 - D0-D7: keypad row data
 
-Z80 D6 to W: (model 6092, tied to VCC otherwise)
+CPU D6 to W: (model 6092, tied to VCC otherwise)
 - D0,D1: language switches
 - D2-D6: VCC
 - D7: TSI BUSY
@@ -357,7 +356,8 @@ I/O is via TTL, see source code for more info
 #include "fidel_chesster.lh" // clickable
 #include "fidel_csc.lh" // clickable
 #include "fidel_eas.lh" // clickable
-#include "fidel_fev.lh" // clickable
+#include "fidel_ex.lh" // clickable
+#include "fidel_exd.lh" // clickable
 #include "fidel_rsc_v2.lh" // clickable
 #include "fidel_sc9.lh" // clickable
 #include "fidel_sc12.lh" // clickable
@@ -920,6 +920,13 @@ ADDRESS_MAP_END
 // Excellence
 
 static ADDRESS_MAP_START( fexcel_map, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
+	//AM_RANGE(0x8000, 0x8000) AM_READNOP // checks for opening module, but hw doesn't have a module slot
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fexcelb_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1605,7 +1612,7 @@ static MACHINE_CONFIG_START( fexcel, fidel6502_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(780))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_fev)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_ex)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1613,12 +1620,25 @@ static MACHINE_CONFIG_START( fexcel, fidel6502_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fexcelv, fexcel )
+static MACHINE_CONFIG_DERIVED( fexcelb, fexcel )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(fexcelb_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, fexcelv_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( fexceld, fexcelb )
+
+	/* basic machine hardware */
+	MCFG_DEFAULT_LAYOUT(layout_fidel_exd)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( chesster, fidel6502_state )
@@ -1899,7 +1919,7 @@ ROM_END
 
 ROM_START( fexcel )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same as fexcelv
+	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) )
 ROM_END
 
 ROM_START( fexcelv )
@@ -1909,6 +1929,13 @@ ROM_START( fexcelv )
 	ROM_REGION( 0x8000, "speech", 0 )
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) ) // PCB2, M27256
 ROM_END
+
+ROM_START( fexcelb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same as fexcelv
+ROM_END
+
+#define rom_fexceld rom_fexcelb
 
 
 ROM_START( chesster )
@@ -1951,7 +1978,9 @@ CONS( 1982, fscc9,      0,        0,      sc9,      sc12,     driver_device, 0, 
 CONS( 1982, fscc9b,     fscc9,    0,      sc9b,     sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1984, fscc12,     0,        0,      sc12,     sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, fexcel,     0,        0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "Excellence (model 6080/6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,  fexcelv,  driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcel,     0,        0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexcelb,    fexcel,   0,      fexcelb,  fexcel,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,  fexcelv,  driver_device, 0, "Fidelity Electronics", "Voice Excellence (model 6092)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexceld,    fexcel,   0,      fexceld,  fexcel,   driver_device, 0, "Fidelity Electronics", "Excel Display (model 6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1990, chesster,   0,        0,      chesster, chesster, fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
