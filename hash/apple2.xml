@@ -350,6 +350,46 @@
 		</part>
 	</software>
 
+	<software name="prodos241">
+		<description>ProDOS (v2.4.1)</description>
+		<!-- Copyright by Apple, but rewritten by John Brooks in 2016 - Compatible with 6502 & some Apple II clone machines -->
+		<!-- Copyright date 16-Aug-16 (IE: 16-8-16 ;-) -->
+		<year>2016</year>
+		<publisher>Apple Computer, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="prodos 2.4.1.dsk" size="143360" crc="066cfa27" sha1="88d0d66867e607d6ee1117f61b83f8fe37d29f69" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unidos33P">
+		<description>UniDOS 3.3 Plus v2.0.1</description>
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive 2 = D2 and D4 -->
+		<year>1986</year>
+		<publisher>Microsparc, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="unidos 3.3 plus v2.0.1 (1986)(microsparc).2mg" size="819264" crc="f9fab5b6" sha1="a9f178545af6cd48b9c16d1db248a33b9ad7f6e9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unidosplus">
+		<description>UniDOS Plus v2.1</description>
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive 2 = D2 and D4 -->
+		<year>1986</year>
+		<publisher>Microsparc, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="unidos plus v2.1 (1986)(microsparc).2mg" size="819264" crc="9328f3cb" sha1="90219aafc3ccba331b8d8d7c4682aecc8c85559b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="221baker">
 		<description>221B Baker Street</description>
 		<year>1986</year>
@@ -972,7 +1012,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="aztec (4am crack)" size="143360" crc="f4c40d91" sha1="71d639bb9b55369abc2ef534bab6b74a731b7e65" offset="0x0000" />
+				<rom name="aztec (4am crack).dsk " size="143360" crc="f4c40d91" sha1="71d639bb9b55369abc2ef534bab6b74a731b7e65" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6484,6 +6524,45 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="wavynavy.dsk" size="143360" crc="6393e6bd" sha1="5917520e44ed4dac3b7b8bce37bd901d4ad3a122" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wheretime">
+		<description>Where in Time is Carmen Sandiego v1.0 (clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Where in Time is Carmen Sandiego side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Where in Time is Carmen Sandiego side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Where in Time is Carmen Sandiego side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Where in Time is Carmen Sandiego side d(1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wheretime">
+		<description>Where in Time is Carmen Sandiego v1.0 800K 3.5 disc (clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="Where in Time is Carmen Sandiego 800k 3.5 disk (1989)(broderbund)(trex crack).2mg" size="819264" crc="36d3ff6d" sha1="21051ecf94f598da648355e75e46641351ed3230" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
