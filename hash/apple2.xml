@@ -364,7 +364,7 @@
 		</part>
 	</software>
 
-	<software name="unidos33P">
+	<software name="unidos33p">
 		<description>UniDOS 3.3 Plus v2.0.1</description>
 		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
 		<year>1986</year>
@@ -6550,7 +6550,7 @@
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="Where in Time is Carmen Sandiego side d(1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
+				<rom name="Where in Time is Carmen Sandiego side d (1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

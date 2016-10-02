@@ -6661,7 +6661,7 @@
 		</part>
 	</software>
 
-	<software name="unidos33P">
+	<software name="unidos33p">
 		<description>UniDOS 3.3 Plus v2.0.1</description>
 		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
 		<year>1986</year>
