@@ -17,6 +17,7 @@
 #include "express.h"
 #include "debughlp.h"
 #include "debugvw.h"
+#include "natkeyboard.h"
 #include "render.h"
 #include <ctype.h>
 

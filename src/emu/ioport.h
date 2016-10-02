@@ -653,10 +653,6 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// opaque types pointing to live state
-struct input_port_state;
-struct input_field_state;
-
 // forward declarations
 class ioport_list;
 class ioport_port;
@@ -664,7 +660,7 @@ struct ioport_port_live;
 class ioport_field;
 struct ioport_field_live;
 class ioport_manager;
-class emu_timer;
+class natural_keyboard;
 struct xml_data_node;
 class analog_field;
 
@@ -675,11 +671,6 @@ typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::s
 typedef device_delegate<ioport_value (ioport_field &, void *)> ioport_field_read_delegate;
 typedef device_delegate<void (ioport_field &, void *, ioport_value, ioport_value)> ioport_field_write_delegate;
 typedef device_delegate<float (ioport_field &, float)> ioport_field_crossmap_delegate;
-
-// keyboard helper function delegates
-typedef delegate<int (const unicode_char *, size_t)> ioport_queue_chars_delegate;
-typedef delegate<bool (unicode_char)> ioport_accept_char_delegate;
-typedef delegate<bool ()> ioport_charqueue_empty_delegate;
 
 
 // ======================> inp_header
@@ -897,75 +888,6 @@ private:
 DECLARE_ENUM_OPERATORS(digital_joystick::direction_t)
 
 
-// ======================> natural_keyboard
-
-// buffer to handle copy/paste/insert of keys
-class natural_keyboard
-{
-	DISABLE_COPYING(natural_keyboard);
-
-public:
-	// construction/destruction
-	natural_keyboard(running_machine &machine);
-
-	void initialize();
-
-	// getters and queries
-	running_machine &machine() const { return m_machine; }
-	bool empty() const { return (m_bufbegin == m_bufend); }
-	bool full() const { return ((m_bufend + 1) % m_buffer.size()) == m_bufbegin; }
-	bool can_post() const { return (!m_queue_chars.isnull() || !m_keycode_map.empty()); }
-	bool is_posting() const { return (!empty() || (!m_charqueue_empty.isnull() && !m_charqueue_empty())); }
-
-	// configuration
-	void configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
-
-	// posting
-	void post(unicode_char ch);
-	void post(const unicode_char *text, size_t length = 0, const attotime &rate = attotime::zero);
-	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
-	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
-
-	void frame_update(ioport_port &port, ioport_value &digital);
-	std::string key_name(unicode_char ch) const;
-
-	// debugging
-	std::string dump();
-
-private:
-	// internal keyboard code information
-	struct keycode_map_entry
-	{
-		unicode_char    ch;
-		ioport_field *  field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
-	};
-
-	// internal helpers
-	void build_codes(ioport_manager &manager);
-	bool can_post_directly(unicode_char ch);
-	bool can_post_alternate(unicode_char ch);
-	attotime choose_delay(unicode_char ch);
-	void internal_post(unicode_char ch);
-	void timer(void *ptr, int param);
-	std::string unicode_to_string(unicode_char ch);
-	const keycode_map_entry *find_code(unicode_char ch) const;
-
-	// internal state
-	running_machine &       m_machine;              // reference to our machine
-	UINT32                  m_bufbegin;             // index of starting character
-	UINT32                  m_bufend;               // index of ending character
-	std::vector<unicode_char> m_buffer;           // actual buffer
-	bool                    m_status_keydown;       // current keydown status
-	bool                    m_last_cr;              // was the last char a CR?
-	emu_timer *             m_timer;                // timer for posting characters
-	attotime                m_current_rate;         // current rate for posting
-	ioport_queue_chars_delegate m_queue_chars;      // queue characters callback
-	ioport_accept_char_delegate m_accept_char;      // accept character callback
-	ioport_charqueue_empty_delegate m_charqueue_empty; // character queue empty callback
-	std::vector<keycode_map_entry> m_keycode_map; // keycode map
-};
-
-
 // ======================> ioport_condition
 
 // encapsulates a condition on a port field or setting
@@ -1152,6 +1074,7 @@ public:
 
 	UINT8 way() const { return m_way; }
 	unicode_char keyboard_code(int which) const;
+	std::string key_name(int which) const;
 	ioport_field_live &live() const { assert(m_live != nullptr); return *m_live; }
 
 	// setters
@@ -1467,12 +1390,13 @@ public:
 	// construction/destruction
 	ioport_manager(running_machine &machine);
 	time_t initialize();
+	~ioport_manager();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
 	const ioport_list &ports() const { return m_portlist; }
 	bool safe_to_read() const { return m_safe_to_read; }
-	natural_keyboard &natkeyboard() { return m_natkeyboard; }
+	natural_keyboard &natkeyboard() { assert(m_natkeyboard != nullptr); return *m_natkeyboard; }
 
 	// type helpers
 	const simple_list<input_type_entry> &types() const { return m_typelist; }
@@ -1510,6 +1434,7 @@ private:
 	ioport_port *port(const char *tag) const { if (tag) { auto search = m_portlist.find(tag); if (search != m_portlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	void exit();
 	input_seq_type token_to_seq_type(const char *string);
+	static const char *const seqtypestrings[];
 
 	void load_config(config_type cfg_type, xml_data_node *parentnode);
 	void load_remap_table(xml_data_node *parentnode);
@@ -1549,7 +1474,7 @@ private:
 
 	// specific special global input states
 	simple_list<digital_joystick> m_joystick_list;  // list of digital joysticks
-	natural_keyboard        m_natkeyboard;          // natural keyboard support
+	std::unique_ptr<natural_keyboard> m_natkeyboard; // natural keyboard support
 
 	// frame time tracking
 	attotime                m_last_frame_time;      // time of the last frame callback

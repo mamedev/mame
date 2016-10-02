@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "emuopts.h"
+#include "natkeyboard.h"
 #include "mame.h"
 #include "luaengine.h"
 #include "ui/menu.h"

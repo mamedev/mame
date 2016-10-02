@@ -20,6 +20,7 @@
 #include "emuopts.h"
 #include "ui/ui.h"
 #include "luaengine.h"
+#include "natkeyboard.h"
 #include "uiinput.h"
 #include <mutex>
 
