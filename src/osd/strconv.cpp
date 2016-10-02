@@ -12,20 +12,82 @@
 #undef min
 #undef max
 #include <algorithm>
+#include <assert.h>
 // MAMEOS headers
 #include "strconv.h"
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+
+namespace
+{
+	// abstract base class designed to provide inputs to WideCharToMultiByte() and MultiByteToWideChar()
+	template<typename T>
+	class string_source
+	{
+	public:
+		virtual const T *string() const = 0;	// returns pointer to actual characters
+		virtual int char_count() const = 0;		// returns the character count (including NUL terminater), or -1 if NUL terminated
+	};
+
+	// implementation of string_source for NUL-terminated strings
+	template<typename T>
+	class null_terminated_string_source : public string_source<T>
+	{
+	public:
+		null_terminated_string_source(const T *str) : m_str(str)
+		{
+			assert(str != nullptr);
+		}
+
+		virtual const T *string() const override { return m_str; }
+		virtual int char_count() const override { return -1; }
+
+	private:
+		const T *m_str;
+	};
+
+	// implementation of string_source for std::[w]string
+	template<typename T>
+	class basic_string_source : public string_source<T>
+	{
+	public:
+		basic_string_source(const std::basic_string<T> &str) : m_str(str)
+		{
+		}
+
+		virtual const T *string() const override { return m_str.c_str(); }
+		virtual int char_count() const override { return (int) m_str.size() + 1; }
+
+	private:
+		const std::basic_string<T> &m_str;
+	};
+};
+
 //============================================================
-//  astring_from_wstring
+//  mbstring_from_wstring
 //============================================================
 
-static std::string &astring_from_wstring(std::string &dst, const std::wstring &wstring)
+static std::string &mbstring_from_wstring(std::string &dst, UINT code_page, const string_source<wchar_t> &src)
+{	
+	// convert UTF-16 to the specified code page
+	int dst_char_count = WideCharToMultiByte(code_page, 0, src.string(), src.char_count(), nullptr, 0, nullptr, nullptr);
+	dst.resize(dst_char_count - 1);
+	WideCharToMultiByte(code_page, 0, src.string(), src.char_count(), &dst[0], dst_char_count, nullptr, nullptr);
+
+	return dst;
+}
+
+
+//============================================================
+//  wstring_from_mbstring
+//============================================================
+
+static std::wstring &wstring_from_mbstring(std::wstring &dst, const string_source<char> &src, UINT code_page)
 {
-	// convert UTF-16 to "ANSI code page" string
-	int char_count = WideCharToMultiByte(CP_ACP, 0, wstring.c_str(), wstring.size() + 1, nullptr, 0, nullptr, nullptr);
-	dst.resize(char_count - 1);
-	WideCharToMultiByte(CP_ACP, 0, wstring.c_str(), wstring.size(), &dst[0], char_count, nullptr, nullptr);
+	// convert multibyte string (in specified code page) to UTF-16
+	int dst_char_count = MultiByteToWideChar(code_page, 0, src.string(), src.char_count(), nullptr, 0);
+	dst.resize(dst_char_count - 1);
+	MultiByteToWideChar(CP_UTF8, 0, src.string(), src.char_count(), &dst[0], dst_char_count - 1);
 
 	return dst;
 }
@@ -41,7 +103,7 @@ std::string &astring_from_utf8(std::string &dst, const std::string &s)
 	std::wstring wstring = wstring_from_utf8(s);
 
 	// convert UTF-16 to "ANSI code page" string
-	return astring_from_wstring(dst, wstring);
+	return mbstring_from_wstring(dst, CP_ACP, basic_string_source<wchar_t>(wstring));
 }
 
 
@@ -56,7 +118,7 @@ std::string &astring_from_utf8(std::string &dst, const char *s)
 	std::wstring wstring = wstring_from_utf8(s);
 
 	// convert UTF-16 to "ANSI code page" string
-	return astring_from_wstring(dst, wstring);
+	return mbstring_from_wstring(dst, CP_ACP, basic_string_source<wchar_t>(wstring));
 }
 
 
@@ -91,9 +153,8 @@ std::string astring_from_utf8(const char *s)
 std::string &utf8_from_astring(std::string &dst, const std::string &s)
 {
 	// convert "ANSI code page" string to UTF-16
-	int char_count = MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size() + 1, nullptr, 0);
-	std::wstring wstring(char_count - 1, 0);
-	MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size() + 1, &wstring[0], char_count - 1);
+	std::wstring wstring;
+	wstring_from_mbstring(wstring, basic_string_source<char>(s), CP_ACP);
 
 	// convert UTF-16 to MAME string (UTF-8)
 	return utf8_from_wstring(dst, wstring);
@@ -107,9 +168,8 @@ std::string &utf8_from_astring(std::string &dst, const std::string &s)
 std::string &utf8_from_astring(std::string &dst, const CHAR *s)
 {
 	// convert "ANSI code page" string to UTF-16
-	int char_count = MultiByteToWideChar(CP_ACP, 0, s, -1, nullptr, 0);
-	std::wstring wstring(char_count - 1, 0);
-	MultiByteToWideChar(CP_ACP, 0, s, -1, &wstring[0], char_count - 1);
+	std::wstring wstring;
+	wstring_from_mbstring(wstring, null_terminated_string_source<char>(s), CP_ACP);
 
 	// convert UTF-16 to MAME string (UTF-8)
 	return utf8_from_wstring(dst, wstring);
@@ -147,11 +207,7 @@ std::string utf8_from_astring(const CHAR *s)
 std::wstring &wstring_from_utf8(std::wstring &dst, const std::string &s)
 {
 	// convert MAME string (UTF-8) to UTF-16
-	int char_count = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size() + 1, nullptr, 0);
-	dst.resize(char_count - 1);
-	MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size() + 1, &dst[0], char_count - 1);
-
-	return dst;
+	return wstring_from_mbstring(dst, basic_string_source<char>(s), CP_UTF8);
 }
 
 
@@ -162,11 +218,7 @@ std::wstring &wstring_from_utf8(std::wstring &dst, const std::string &s)
 std::wstring &wstring_from_utf8(std::wstring &dst, const char *s)
 {
 	// convert MAME string (UTF-8) to UTF-16
-	int char_count = MultiByteToWideChar(CP_UTF8, 0, s, -1, nullptr, 0);
-	dst.resize(char_count - 1);
-	MultiByteToWideChar(CP_UTF8, 0, s, -1, &dst[0], char_count - 1);
-
-	return dst;
+	return wstring_from_mbstring(dst, null_terminated_string_source<char>(s), CP_UTF8);
 }
 
 
@@ -201,11 +253,7 @@ std::wstring wstring_from_utf8(const char *s)
 std::string &utf8_from_wstring(std::string &dst, const std::wstring &s)
 {
 	// convert UTF-16 to MAME string (UTF-8)
-	int char_count = WideCharToMultiByte(CP_UTF8, 0, s.c_str(), s.size() + 1, nullptr, 0, nullptr, nullptr);
-	dst.resize(char_count - 1);
-	WideCharToMultiByte(CP_UTF8, 0, s.c_str(), -1, &dst[0], char_count - 1, nullptr, nullptr);
-
-	return dst;
+	return mbstring_from_wstring(dst, CP_UTF8, basic_string_source<wchar_t>(s));
 }
 
 
@@ -216,11 +264,7 @@ std::string &utf8_from_wstring(std::string &dst, const std::wstring &s)
 std::string &utf8_from_wstring(std::string &dst, const WCHAR *s)
 {
 	// convert UTF-16 to MAME string (UTF-8)
-	int char_count = WideCharToMultiByte(CP_UTF8, 0, s, -1, nullptr, 0, nullptr, nullptr);
-	dst.resize(char_count - 1);
-	WideCharToMultiByte(CP_UTF8, 0, s, -1, &dst[0], char_count - 1, nullptr, nullptr);
-
-	return dst;
+	return mbstring_from_wstring(dst, CP_UTF8, null_terminated_string_source<wchar_t>(s));
 }
 
 
