@@ -24,6 +24,99 @@
 
 #define I8080_TAG   "maincpu"
 
+/////////////////////////////////////////////////////////////
+
+class istrebiteli_sound_device : public device_t,
+	public device_sound_interface
+{
+public:
+	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	void sound_w(UINT8 data);
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+private:
+	// internal state
+	sound_stream *m_channel;
+	UINT8 *m_rom;
+	int m_rom_cnt;
+	int m_rom_incr;
+	int m_sample_num;
+	int m_temp_vol;
+	bool m_cnt_reset;
+	bool m_rom_out_en;
+	UINT8 m_prev_data;
+};
+
+extern const device_type ISTREBITELI_SOUND;
+
+//////////////////////////////////////////////////////////////
+
+const device_type ISTREBITELI_SOUND = &device_creator<istrebiteli_sound_device>;
+
+istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ISTREBITELI_SOUND, "Istrebiteli Sound", tag, owner, clock, "istrebiteli_sound", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_channel(nullptr),
+		m_rom(nullptr),
+		m_rom_cnt(0),
+		m_rom_incr(0),
+		m_sample_num(0),
+		m_temp_vol(0),
+		m_cnt_reset(true),
+		m_rom_out_en(false),
+		m_prev_data(0)
+{
+}
+
+void istrebiteli_sound_device::device_start()
+{
+	m_channel = stream_alloc(0, 1, clock() / 2);
+	m_rom = machine().root_device().memregion("soundrom")->base();
+}
+
+void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	stream_sample_t *sample = outputs[0];
+
+	while (samples-- > 0)
+	{
+		int smpl = 0;
+		if (m_rom_out_en)
+			smpl = ((m_rom[m_rom_cnt] >> m_sample_num) & 1) * 4000;
+		*sample++ = smpl;
+		m_rom_cnt = (m_rom_cnt + m_rom_incr) & 0x1ff;
+	}
+}
+
+void istrebiteli_sound_device::sound_w(UINT8 data)
+{
+//	if (m_prev_data != data)
+//		printf("sound %02X rescnt %d sample %d outen %d vol %d\n", data, (data >> 1) & 1, (data >> 2) & 7, (data >> 5) & 1, (data >> 6) & 3);
+
+	m_cnt_reset = ((data >> 1) & 1) ? true : false;
+	m_sample_num = (data >> 2) & 7;
+	m_rom_out_en = ((data >> 5) & 1) ? false : true;
+
+	if (m_cnt_reset) {
+		m_rom_cnt = 0;
+		m_rom_incr = 0;
+		m_temp_vol = 0;
+	} else
+		m_rom_incr = 1;
+
+	if (((data >> 6) & 1) && ((m_prev_data >> 6) & 1) == 0)
+		m_temp_vol = (m_temp_vol + 1) & 3;
+
+	m_prev_data = data;
+}
+
+//////////////////////////////////////////////////////////////
+
 class istrebiteli_state : public driver_device
 {
 public:
@@ -33,6 +126,7 @@ public:
 		, m_ppi0(*this, "ppi0")
 		, m_ppi1(*this, "ppi1")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_sound_dev(*this, "custom")
 	{
 	}
 
@@ -54,8 +148,9 @@ public:
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<istrebiteli_sound_device> m_sound_dev;
 
-	virtual void machine_start() override { }
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -65,10 +160,19 @@ public:
 
 	UINT8 m_spr0_ctrl;
 	UINT8 m_spr1_ctrl;
-	UINT8 m_spr_xy[8];
 	UINT8 coin_count;
+	UINT8 m_spr_xy[8];
 	UINT8 m_tileram[16];
 };
+
+void istrebiteli_state::machine_start()
+{
+	save_item(NAME(m_spr0_ctrl));
+	save_item(NAME(m_spr1_ctrl));
+	save_item(NAME(coin_count));
+	save_item(NAME(m_spr_xy));
+	save_item(NAME(m_tileram));
+}
 
 void istrebiteli_state::machine_reset()
 {
@@ -161,9 +265,10 @@ WRITE8_MEMBER(istrebiteli_state::ppi1_w)
 
 WRITE8_MEMBER(istrebiteli_state::sound_w)
 {
+	machine().bookkeeping().coin_lockout_w(0, data & 1);
 	if (data & 1)
 		coin_count = 0;
-	// bits 1-7 sound control, TODO
+	m_sound_dev->sound_w(data);
 }
 
 WRITE8_MEMBER(istrebiteli_state::spr0_ctrl_w)
@@ -297,7 +402,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( istreb, istrebiteli_state)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8080_TAG, I8080, 8000000 / 4)		// KR580VM80A
+	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_8MHz / 4)		// KR580VM80A
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -313,13 +418,18 @@ static MACHINE_CONFIG_START( istreb, istrebiteli_state)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 64, 256, 312, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz / 2, 256, 64, 256, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istrebiteli)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(istrebiteli_state, istrebiteli)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("custom", ISTREBITELI_SOUND, XTAL_8MHz / 2 / 256)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 ROM_START( istreb )
@@ -339,4 +449,4 @@ ROM_START( istreb )
 	ROM_LOAD( "003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 ROM_END
 
-GAME( 198?, istreb,  0,        istreb,  istreb,  driver_device,  0, ROT0, "Terminal", "Istrebiteli", MACHINE_NO_SOUND)
+GAME( 198?, istreb,  0,        istreb,  istreb,  driver_device,  0, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
