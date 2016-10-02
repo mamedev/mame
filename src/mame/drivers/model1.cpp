@@ -756,7 +756,7 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
-	tgp_reset(!strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj"));
+	tgp_reset(!strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj")  || !strcmp(machine().system().name, "wingwar360"));
 	if (!strcmp(machine().system().name, "swa"))
 	{
 		m_sound_irq = 0;
@@ -1673,5 +1673,5 @@ GAME( 1993, swa,        0,       swa,       swa, driver_device,      0, ROT0, "S
 GAME( 1994, wingwar,    0,       model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
 GAME( 1994, wingwaru,   wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
 GAME( 1994, wingwarj,   wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwar360, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War R360 (World)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
 GAME( 1993, netmerc,    0,       model1,    vf, driver_device,       0, ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
