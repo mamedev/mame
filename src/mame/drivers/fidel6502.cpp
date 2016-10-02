@@ -418,6 +418,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
 	DECLARE_READ8_MEMBER(fexcelv_speech_r);
 	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
+	DECLARE_READ8_MEMBER(fexcelb_ttl_r);
 	DECLARE_READ8_MEMBER(fexcel_ttl_r);
 
 	// Chesster
@@ -786,13 +787,25 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	}
 }
 
-READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
+READ8_MEMBER(fidel6502_state::fexcelb_ttl_r)
 {
 	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
 	UINT8 d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
-	
+
 	// a0-a2,d7: multiplexed inputs (active low)
 	return d6 | ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
+}
+
+READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
+{
+	UINT8 d7 = 0x80;
+
+	// 74259(1) Q7 + 74251 I0: battery status
+	if (m_inp_mux == 1 && ~m_led_select & 0x80)
+		d7 = m_inp_matrix[9]->read() & 0x80;
+
+	// a0-a2,d7: multiplexed inputs (active low)
+	return d7 & ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
 }
 
 
@@ -926,9 +939,15 @@ static ADDRESS_MAP_START( fexcel_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fexcelb_map, AS_PROGRAM, 8, fidel6502_state )
+static ADDRESS_MAP_START( fexcelp_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fexcelb_map, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
+	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcelb_ttl_r, fexcel_ttl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1041,7 +1060,7 @@ static INPUT_PORTS_START( sc12 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( fexcel )
+static INPUT_PORTS_START( fexcelb )
 	PORT_INCLUDE( sc12 )
 
 	PORT_MODIFY("IN.8")
@@ -1056,7 +1075,7 @@ static INPUT_PORTS_START( fexcel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fexcelv )
-	PORT_INCLUDE( fexcel )
+	PORT_INCLUDE( fexcelb )
 
 	PORT_START("IN.9")
 	PORT_CONFNAME( 0x03, 0x00, "Language" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, fexcelv_bankswitch, 0)
@@ -1066,6 +1085,15 @@ static INPUT_PORTS_START( fexcelv )
 	PORT_CONFSETTING(    0x03, "Spanish" )
 	PORT_BIT(0x7c, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("speech", s14001a_device, busy_r)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( fexcel )
+	PORT_INCLUDE( fexcelb )
+
+	PORT_START("IN.9")
+	PORT_CONFNAME( 0x80, 0x00, "Battery Status" )
+	PORT_CONFSETTING(    0x80, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 
@@ -1631,7 +1659,7 @@ static MACHINE_CONFIG_DERIVED( fexcelp, fexcel )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz)
-	MCFG_CPU_PROGRAM_MAP(fexcelb_map)
+	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
@@ -1926,7 +1954,7 @@ ROM_END
 
 ROM_START( fexcel )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) )
+	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) ) // RCA
 ROM_END
 
 ROM_START( fexcela )
@@ -1997,9 +2025,9 @@ CONS( 1984, fscc12,     0,        0,      sc12,     sc12,     driver_device, 0, 
 
 CONS( 1985, fexcel,     0,        0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, fexcela,    fexcel,   0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexcelb,    fexcel,   0,      fexcelb,  fexcel,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,  fexcel,   driver_device, 0, "Fidelity Electronics", "The Par Excellence (model 6083)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexcelb,    fexcel,   0,      fexcelb,  fexcelb,  driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,  fexcelv,  driver_device, 0, "Fidelity Electronics", "Voice Excellence (model 6092)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexceld,    fexcel,   0,      fexceld,  fexcel,   driver_device, 0, "Fidelity Electronics", "Excel Display (model 6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexceld,    fexcel,   0,      fexceld,  fexcelb,  driver_device, 0, "Fidelity Electronics", "Excel Display (model 6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1990, chesster,   0,        0,      chesster, chesster, fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
