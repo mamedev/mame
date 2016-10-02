@@ -686,10 +686,11 @@ READ16_MEMBER(model1_state::fifoin_status_r)
 
 WRITE16_MEMBER(model1_state::bank_w)
 {
+
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0x7)); // netmerc has bit 0x80 set when banking, probably not a bank bit.
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -756,8 +757,8 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
-	tgp_reset(!strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj")  || !strcmp(machine().system().name, "wingwar360"));
-	if (!strcmp(machine().system().name, "swa"))
+	tgp_reset(!strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj")  || !strcmp(machine().system().name, "wingwar360")   || !strcmp(machine().system().name, "netmerc"));
+	if (!strcmp(machine().system().name, "swa") )
 	{
 		m_sound_irq = 0;
 	}
@@ -931,7 +932,7 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
 	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
 
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_io, AS_IO, 16, model1_state )
@@ -1556,6 +1557,7 @@ ROM_START( netmerc )
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD( "epr-18120.ic5", 0xf80000, 0x80000, CRC(de489762) SHA1(4e935f11e844489c5b5dc06439dc7902c4fddc9f) ) /* Rom board with Sega ID# ??? */
+	ROM_RELOAD(          0x000000, 0x80000 )
 
 	ROM_LOAD16_BYTE( "epr-18122.ic6",  0x1000000, 0x80000, CRC(10581ab3) SHA1(e3f5ec4ce14a1e1a1134c8b516c371b7655f3544) )
 	ROM_LOAD16_BYTE( "epr-18123.ic7",  0x1000001, 0x80000, CRC(27e0d848) SHA1(117f99efd0643ba92b3340171d8952b6a1a568d4) )
