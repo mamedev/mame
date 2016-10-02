@@ -17,17 +17,17 @@
 enum { FRAC_SHIFT = 16 };
 enum { MOIRE = 0x01000000 };
 
-UINT32 model1_state::readi(const UINT16 *adr) const
+UINT32 model1_state::readi(int adr) const
 {
-	return adr[0]|(adr[1] << 16);
+	return m_display_list_current[(adr + 0)&0x7fff] | (m_display_list_current[(adr + 1)&0x7fff] << 16);
 }
 
-INT16 model1_state::readi16(const UINT16 *adr) const
+INT16 model1_state::readi16(int adr) const
 {
-	return adr[0];
+	return m_display_list_current[(adr + 0)&0x7fff];
 }
 
-float model1_state::readf(const UINT16 *adr) const
+float model1_state::readf(int adr) const
 {
 	return u2f(readi(adr));
 }
@@ -985,20 +985,21 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
 	}
 }
 
-UINT16 *model1_state::push_direct(UINT16 *list) {
-	UINT32 tex_adr = readi(list);
-	//  v1      = readi(list+2);
-	//  v2      = readi(list+10);
+
+int model1_state::push_direct(int list_offset) {
+	UINT32 tex_adr = readi(list_offset + 2);
+	//  v1      = readi(list_offset+2+2);
+	//  v2      = readi(list_offset+2+10);
 
 	point_t *old_p0 = m_pointpt++;
 	point_t *old_p1 = m_pointpt++;
 
-	old_p0->x = readf(list + 4);
-	old_p0->y = readf(list + 6);
-	old_p0->z = readf(list + 8);
-	old_p1->x = readf(list + 12);
-	old_p1->y = readf(list + 14);
-	old_p1->z = readf(list + 16);
+	old_p0->x = readf(list_offset + 2 + 4);
+	old_p0->y = readf(list_offset + 2 + 6);
+	old_p0->z = readf(list_offset + 2 + 8);
+	old_p1->x = readf(list_offset + 2 + 12);
+	old_p1->y = readf(list_offset + 2 + 14);
+	old_p1->z = readf(list_offset + 2 + 16);
 
 	LOG_TGP(("VIDEOD start direct\n"));
 	LOG_TGP(("VIDEOD (%f, %f, %f) (%f, %f, %f)\n",
@@ -1025,10 +1026,10 @@ UINT16 *model1_state::push_direct(UINT16 *list) {
 		old_p1->s.x = old_p1->s.y = 0;
 	}
 
-	list += 18;
+	list_offset += 18;
 
 	for (;;) {
-		UINT32 flags = readi(list);
+		UINT32 flags = readi(list_offset + 2);
 
 		int type = flags & 3;
 		if (!type)
@@ -1037,43 +1038,43 @@ UINT16 *model1_state::push_direct(UINT16 *list) {
 		if (flags & 0x00001000)
 			tex_adr++;
 
-		// list+2 is luminosity
-		// list+4 is 0?
-		// list+12 is z?
+		// list+2+2 is luminosity
+		// list+2+4 is 0?
+		// list+2+12 is z?
 
 		point_t *p0 = m_pointpt++;
 		point_t *p1 = m_pointpt++;
 
-		UINT32 lum = readi(list + 2);
-		//      v1    = readi(list+4);
+		UINT32 lum = readi(list_offset + 2 + 2);
+		//      v1    = readi(list_offset+2+4);
 
 		float z = 0;
 		if (type == 2)
 		{
-			p0->x = readf(list + 6);
-			p0->y = readf(list + 8);
-			p0->z = readf(list + 10);
+			p0->x = readf(list_offset + 2 + 6);
+			p0->y = readf(list_offset + 2 + 8);
+			p0->z = readf(list_offset + 2 + 10);
 			z = p0->z;
 			LOG_TGP(("VIDEOD %08x %08x (%f, %f, %f)\n",
 				flags, lum,
 				p0->x, p0->y, p0->z));
 			*p1 = *p0;
-			list += 12;
+			list_offset += 12;
 		}
 		else
 		{
-			p0->x = readf(list + 6);
-			p0->y = readf(list + 8);
-			p0->z = readf(list + 10);
-			p1->x = readf(list + 14);
-			p1->y = readf(list + 16);
-			p1->z = readf(list + 18);
-			z = readf(list + 12);
+			p0->x = readf(list_offset + 2 + 6);
+			p0->y = readf(list_offset + 2 + 8);
+			p0->z = readf(list_offset + 2 + 10);
+			p1->x = readf(list_offset + 2 + 14);
+			p1->y = readf(list_offset + 2 + 16);
+			p1->z = readf(list_offset + 2 + 18);
+			z = readf(list_offset + 2 + 12);
 			LOG_TGP(("VIDEOD %08x %08x (%f, %f, %f) (%f, %f, %f)\n",
 				flags, lum,
 				p0->x, p0->y, p0->z,
 				p1->x, p1->y, p1->z));
-			list += 20;
+			list_offset += 20;
 		}
 
 		int link = (flags >> 8) & 3;
@@ -1121,8 +1122,8 @@ UINT16 *model1_state::push_direct(UINT16 *list) {
 			int g = (color >> 0x5) & 0x1f;
 			int b = (color >> 0xA) & 0x1f;
 			lumval >>= 2; //there must be a luma translation table somewhere
-			if (lumval>0x3f) lumval = 0x3f;
-			else if (lumval<0) lumval = 0;
+			if (lumval > 0x3f) lumval = 0x3f;
+			else if (lumval < 0) lumval = 0;
 			r = (m_color_xlat[(r << 8) | lumval | 0x0] >> 3) & 0x1f;
 			g = (m_color_xlat[(g << 8) | lumval | 0x2000] >> 3) & 0x1f;
 			b = (m_color_xlat[(b << 8) | lumval | 0x4000] >> 3) & 0x1f;
@@ -1136,39 +1137,41 @@ UINT16 *model1_state::push_direct(UINT16 *list) {
 
 	next:
 		switch (link) {
-			case 0:
-			case 2:
-				old_p0 = p0;
-				old_p1 = p1;
-				break;
-			case 1:
-				old_p1 = p0;
-				break;
-			case 3:
-				old_p0 = p1;
-				break;
+		case 0:
+		case 2:
+			old_p0 = p0;
+			old_p1 = p1;
+			break;
+		case 1:
+			old_p1 = p0;
+			break;
+		case 3:
+			old_p0 = p1;
+			break;
 		}
 	}
-	return list + 2;
+	list_offset += 4;
+	return list_offset;
 }
 
-UINT16* model1_state::skip_direct(UINT16 *list) const
+int model1_state::skip_direct(int list_offset) const
 {
-	list += 18;
+	list_offset += 18;
 
 	while (true) {
-		UINT32 flags = readi(list);
+		UINT32 flags = readi(list_offset + 2);
 
 		int type = flags & 3;
 		if (!type)
 			break;
 
 		if (type == 2)
-			list += 12;
+			list_offset += 12;
 		else
-			list += 20;
+			list_offset += 20;
 	}
-	return list + 2;
+	list_offset += 4;
+	return list_offset;
 }
 
 void model1_state::draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1184,25 +1187,30 @@ void model1_state::draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	m_pointpt = m_pointdb;
 }
 
-UINT16 *model1_state::draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 *list)
+
+int model1_state::draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, int list_offset)
 {
-	LOG_TGP(("VIDEO:   draw direct %x\n", readi(list)));
+	LOG_TGP(("VIDEO:   draw direct %x\n", readi(list_offset + 2)));
 
 	draw_objects(bitmap, cliprect);
-	UINT16 *res = push_direct(list);
+
+	list_offset = push_direct(list_offset);
+
 	unsort_quads();
 	draw_quads(bitmap, cliprect);
 
 	m_quadpt = m_quaddb;
 	m_pointpt = m_pointdb;
-	return res;
+
+	return list_offset;
 }
 
-UINT16 *model1_state::get_list()
+
+void model1_state::set_current_render_list()
 {
 	if(!(m_listctl[0] & 4))
 		m_listctl[0] = (m_listctl[0] & ~0x40) | (m_listctl[0] & 8 ? 0x40 : 0);
-	return m_listctl[0] & 0x40 ? m_display_list1 : m_display_list0;
+	m_display_list_current = m_listctl[0] & 0x40 ? m_display_list1 : m_display_list0;
 }
 
 int model1_state::get_list_number()
@@ -1289,154 +1297,160 @@ void model1_state::view_t::set_view_translation(float x, float y)
 	recompute_frustum();
 }
 
+
+
 void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_render_done = 1;
 	if ((m_listctl[1] & 0x1f) == 0x1f)
 	{
-		UINT16 *list = get_list();
+		set_current_render_list();
 		int zz = 0;
 		LOG_TGP(("VIDEO: render list %d\n", get_list_number()));
 
 		m_view->init_translation_matrix();
 
+		int list_offset = 0;
 		for (;;) {
-			int type = (list[1] << 16) | list[0];
-			m_glist = list;
+			int type = readi(list_offset + 0);
+
 			switch (type)
 			{
-				case 0:
-					list += 2;
-					break;
-				case 1:
-				case 0x41:
-					// 1 = plane 1
-					// 2 = ??  draw object (413d3, 17c4c, e)
-					// 3 = plane 2
-					// 4 = ??  draw object (408a8, a479, 9)
-					// 5 = decor
-					// 6 = ??  draw object (57bd4, 387460, 2ad)
+			case 0:
+				list_offset += 2;
+				break;
+			case 1:
+			case 0x41:
+				// 1 = plane 1
+				// 2 = ??  draw object (413d3, 17c4c, e)
+				// 3 = plane 2
+				// 4 = ??  draw object (408a8, a479, 9)
+				// 5 = decor
+				// 6 = ??  draw object (57bd4, 387460, 2ad)
 
-					if (true || zz >= 666)
-						push_object(readi(list + 2), readi(list + 4), readi(list + 6));
-					list += 8;
-					break;
-				case 2:
-					list = draw_direct(bitmap, cliprect, list + 2);
-					break;
-				case 3:
-				{
-					LOG_TGP(("VIDEO:   viewport (%d, %d, %d, %d, %d, %d, %d)\n",
-						readi(list + 2),
-						readi16(list + 4), readi16(list + 6), readi16(list + 8),
-						readi16(list + 10), readi16(list + 12), readi16(list + 14)));
+				if (true || zz >= 666)
+					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
+				list_offset += 8;
+				break;
+			case 2:
+			{
+				list_offset = draw_direct(bitmap, cliprect, list_offset);
+				break;
+			}				
+			case 3:
+			{
+				LOG_TGP(("VIDEO:   viewport (%d, %d, %d, %d, %d, %d, %d)\n",
+					readi(list_offset + 2),
+					readi16(list_offset + 4), readi16(list_offset + 6), readi16(list_offset + 8),
+					readi16(list_offset + 10), readi16(list_offset + 12), readi16(list_offset + 14)));
 
-					draw_objects(bitmap, cliprect);
+				draw_objects(bitmap, cliprect);
 
-					float xc = readi16(list + 4);
-					float yc = 383 - (readi16(list + 6) - 39);
-					float x1 = readi16(list + 8);
-					float y2 = 383 - (readi16(list + 10) - 39);
-					float x2 = readi16(list + 12);
-					float y1 = 383 - (readi16(list + 14) - 39);
+				float xc = readi16(list_offset + 4);
+				float yc = 383 - (readi16(list_offset + 6) - 39);
+				float x1 = readi16(list_offset + 8);
+				float y2 = 383 - (readi16(list_offset + 10) - 39);
+				float x2 = readi16(list_offset + 12);
+				float y1 = 383 - (readi16(list_offset + 14) - 39);
 
-					m_view->set_viewport(xc, yc, x1, x2, y1, y2);
+				m_view->set_viewport(xc, yc, x1, x2, y1, y2);
 
-					list += 16;
-					break;
-				}
-				case 4:
+				list_offset += 16;
+				break;
+			}
+			case 4:
+			{
+				int adr = readi(list_offset + 2);
+				int len = readi(list_offset + 4) + 1;
+				LOG_TGP(("ZVIDEO:   color write, adr=%x, len=%x\n", adr, len));
+				for (int i = 0; i < len; i++)
 				{
-					int adr = readi(list + 2);
-					int len = readi(list + 4) + 1;
-					LOG_TGP(("ZVIDEO:   color write, adr=%x, len=%x\n", adr, len));
-					for (int i = 0; i < len; i++)
-					{
-						m_tgp_ram[adr - 0x40000 + i] = list[6 + 2 * i];
-					}
-					list += 6 + len * 2;
-					break;
+					m_tgp_ram[adr - 0x40000 + i] = readi16(list_offset + 6 + 2 * i);
 				}
-				case 5:
+				list_offset += 6 + len * 2;
+				break;
+			}
+			case 5:
+			{
+				int adr = readi(list_offset + 2);
+				int len = readi(list_offset + 4);
+				for (int i = 0; i < len; i++)
 				{
-					int adr = readi(list + 2);
-					int len = readi(list + 4);
-					for (int i = 0; i < len; i++)
-					{
-						m_poly_ram[adr - 0x800000 + i] = readi(list + 2 * i + 6);
-					}
-					list += 6 + len * 2;
-					break;
+					m_poly_ram[adr - 0x800000 + i] = readi(list_offset + 2 * i + 6);
 				}
-				case 6:
+				list_offset += 6 + len * 2;
+				break;
+			}
+			case 6:
+			{
+				int adr = readi(list_offset + 2);
+				int len = readi(list_offset + 4);
+				LOG_TGP(("VIDEO:   upload data, adr=%x, len=%x\n", adr, len));
+				for (int i = 0; i < len; i++)
 				{
-					int adr = readi(list + 2);
-					int len = readi(list + 4);
-					LOG_TGP(("VIDEO:   upload data, adr=%x, len=%x\n", adr, len));
-					for (int i = 0; i < len; i++)
-					{
-						int v = readi(list + 6 + i * 2);
-						float diffuse = (float(v & 0xff)) / 255.0f;
-						float ambient = (float((v >> 8) & 0xff)) / 255.0f;
-						float specular = (float((v >> 16) & 0xff)) / 255.0f;
-						int power = (v >> 24) & 0xff;
-						m_view->set_lightparam(i + adr, diffuse, ambient, specular, power);
-					}
-					list += 6 + len * 2;
-					break;
+					int v = readi(list_offset + 6 + i * 2);
+					float diffuse = (float(v & 0xff)) / 255.0f;
+					float ambient = (float((v >> 8) & 0xff)) / 255.0f;
+					float specular = (float((v >> 16) & 0xff)) / 255.0f;
+					int power = (v >> 24) & 0xff;
+					m_view->set_lightparam(i + adr, diffuse, ambient, specular, power);
 				}
-				case 7:
-					LOG_TGP(("VIDEO:   code 7 (%d)\n", readi(list + 2)));
-					zz++;
-					list += 4;
-					break;
-				case 8:
-					LOG_TGP(("VIDEO:   select mode %08x\n", readi(list + 2)));
-					list += 4;
-					break;
-				case 9:
-					LOG_TGP(("VIDEO:   zoom (%f, %f)\n", readf(list + 2), readf(list + 4)));
-					m_view->set_zoom(readf(list + 2) * 4, readf(list + 4) * 4);
-					list += 6;
-					break;
-				case 0xa:
-					LOG_TGP(("VIDEO:   light vector (%f, %f, %f)\n", readf(list + 2), readf(list + 4), readf(list + 6)));
-					m_view->set_light_direction(readf(list + 2), readf(list + 4), readf(list + 6));
-					list += 8;
-					break;
-				case 0xb:
+				list_offset += 6 + len * 2;
+				break;
+			}
+			case 7:
+				LOG_TGP(("VIDEO:   code 7 (%d)\n", readi(list_offset + 2)));
+				zz++;
+				list_offset += 4;
+				break;
+			case 8:
+				LOG_TGP(("VIDEO:   select mode %08x\n", readi(list_offset + 2)));
+				list_offset += 4;
+				break;
+			case 9:
+				LOG_TGP(("VIDEO:   zoom (%f, %f)\n", readf(list_offset + 2), readf(list_offset + 4)));
+				m_view->set_zoom(readf(list_offset + 2) * 4, readf(list_offset + 4) * 4);
+				list_offset += 6;
+				break;
+			case 0xa:
+				LOG_TGP(("VIDEO:   light vector (%f, %f, %f)\n", readf(list_offset + 2), readf(list_offset + 4), readf(list_offset + 6)));
+				m_view->set_light_direction(readf(list_offset + 2), readf(list_offset + 4), readf(list_offset + 6));
+				list_offset += 8;
+				break;
+			case 0xb:
+			{
+				LOG_TGP(("VIDEO:   matrix (%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)\n",
+					readf(list_offset + 2), readf(list_offset + 4), readf(list_offset + 6),
+					readf(list_offset + 8), readf(list_offset + 10), readf(list_offset + 12),
+					readf(list_offset + 14), readf(list_offset + 16), readf(list_offset + 18),
+					readf(list_offset + 20), readf(list_offset + 22), readf(list_offset + 24)));
+				float mat[12];
+				for (int i = 0; i < 12; i++)
 				{
-					LOG_TGP(("VIDEO:   matrix (%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)\n",
-						readf(list + 2), readf(list + 4), readf(list + 6),
-						readf(list + 8), readf(list + 10), readf(list + 12),
-						readf(list + 14), readf(list + 16), readf(list + 18),
-						readf(list + 20), readf(list + 22), readf(list + 24)));
-					float mat[12];
-					for (int i = 0; i < 12; i++)
-					{
-						mat[i] = readf(list + 2 + 2 * i);
-					}
-					m_view->set_translation_matrix(mat);
-					list += 26;
-					break;
+					mat[i] = readf(list_offset + 2 + 2 * i);
 				}
-				case 0xc:
-					LOG_TGP(("VIDEO:   trans (%f, %f)\n", readf(list + 2), readf(list + 4)));
-					m_view->set_view_translation(readf(list + 2), readf(list + 4));
-					list += 6;
-					break;
-				case 0xf:
-					//case -1:
-					goto end;
-				default:
-					LOG_TGP(("VIDEO:   unknown type %d\n", type));
-					goto end;
+				m_view->set_translation_matrix(mat);
+				list_offset += 26;
+				break;
+			}
+			case 0xc:
+				LOG_TGP(("VIDEO:   trans (%f, %f)\n", readf(list_offset + 2), readf(list_offset + 4)));
+				m_view->set_view_translation(readf(list_offset + 2), readf(list_offset + 4));
+				list_offset += 6;
+				break;
+			case 0xf:
+				//case -1:
+				goto end;
+			default:
+				LOG_TGP(("VIDEO:   unknown type %d\n", type));
+				goto end;
 			}
 		}
 	end:
 		draw_objects(bitmap, cliprect);
 	}
 }
+
 
 void model1_state::tgp_scan()
 {
@@ -1453,83 +1467,86 @@ void model1_state::tgp_scan()
 #endif
 	if (!m_render_done && (m_listctl[1] & 0x1f) == 0x1f)
 	{
-		UINT16 *list = get_list();
+		set_current_render_list();
 		// Skip everything but the data uploads
 		LOG_TGP(("VIDEO: scan list %d\n", get_list_number()));
+
+		int list_offset = 0;
 		for (;;)
 		{
-			int type = (list[1] << 16) | list[0];
+			int type = readi(list_offset + 0);
 			switch (type) {
 				case 0:
-					list += 2;
+					list_offset += 2;
 					break;
 				case 1:
 				case 0x41:
-					list += 8;
+					list_offset += 8;
 					break;
 				case 2:
-					list = skip_direct(list + 2);
+					list_offset = skip_direct(list_offset);
+
 					break;
 				case 3:
-					list += 16;
+					list_offset += 16;
 					break;
 				case 4:
 				{
-					int adr = readi(list + 2);
-					int len = readi(list + 4) + 1;
+					int adr = readi(list_offset + 2);
+					int len = readi(list_offset + 4) + 1;
 					LOG_TGP(("ZVIDEO:   scan color write, adr=%x, len=%x\n", adr, len));
 					for (int i = 0; i<len; i++)
 					{
-						m_tgp_ram[adr - 0x40000 + i] = list[6 + 2 * i];
+						m_tgp_ram[adr - 0x40000 + i] = readi16(list_offset + 6 + 2 * i);
 					}
-					list += 6 + len * 2;
+					list_offset += 6 + len * 2;
 					break;
 				}
 				case 5:
 				{
-					int adr = readi(list + 2);
-					int len = readi(list + 4);
+					int adr = readi(list_offset + 2);
+					int len = readi(list_offset + 4);
 					for (int i = 0; i < len; i++)
 					{
-						m_poly_ram[adr - 0x800000 + i] = readi(list + 2 * i + 6);
+						m_poly_ram[adr - 0x800000 + i] = readi(list_offset + 2 * i + 6);
 					}
-					list += 6 + len * 2;
+					list_offset += 6 + len * 2;
 					break;
 				}
 				case 6:
 				{
-					int adr = readi(list + 2);
-					int len = readi(list + 4);
+					int adr = readi(list_offset + 2);
+					int len = readi(list_offset + 4);
 					//LOG_TGP(("VIDEO:   upload data, adr=%x, len=%x\n", adr, len));
 					for (int i = 0; i<len; i++)
 					{
-						int v = readi(list + 6 + i * 2);
+						int v = readi(list_offset + 6 + i * 2);
 						m_view->lightparams[i + adr].d = (float(v & 0xff)) / 255.0f;
 						m_view->lightparams[i + adr].a = (float((v >> 8) & 0xff)) / 255.0f;
 						m_view->lightparams[i + adr].s = (float((v >> 16) & 0xff)) / 255.0f;
 						m_view->lightparams[i + adr].p = (v >> 24) & 0xff;
 						//LOG_TGP(("         %02X\n",v));
 					}
-					list += 6 + len * 2;
+					list_offset += 6 + len * 2;
 					break;
 				}
 				case 7:
-					list += 4;
+					list_offset += 4;
 					break;
 				case 8:
-					list += 4;
+					list_offset += 4;
 					break;
 				case 9:
-					list += 6;
+					list_offset += 6;
 					break;
 				case 0xa:
-					list += 8;
+					list_offset += 8;
 					break;
 				case 0xb:
-					list += 26;
+					list_offset += 26;
 					break;
 				case 0xc:
-					list += 6;
+					list_offset += 6;
 					break;
 				case 0xf:
 				case -1:
