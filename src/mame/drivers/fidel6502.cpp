@@ -790,7 +790,7 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 {
 	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
 	UINT8 d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
-
+	
 	// a0-a2,d7: multiplexed inputs (active low)
 	return d6 | ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
 }
@@ -1627,6 +1627,13 @@ static MACHINE_CONFIG_DERIVED( fexcelb, fexcel )
 	MCFG_CPU_PROGRAM_MAP(fexcelb_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( fexcelp, fexcel )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(fexcelb_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
 
 	/* sound hardware */
@@ -1922,6 +1929,16 @@ ROM_START( fexcel )
 	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) )
 ROM_END
 
+ROM_START( fexcela )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ep12_d.ic5", 0xc000, 0x4000, CRC(212b006d) SHA1(242ff851b0841cbec66bbada6a730da021010e2c) )
+ROM_END
+
+ROM_START( fexcelp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) )
+ROM_END
+
 ROM_START( fexcelv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // PCB1, M27256
@@ -1979,7 +1996,9 @@ CONS( 1982, fscc9b,     fscc9,    0,      sc9b,     sc12,     driver_device, 0, 
 CONS( 1984, fscc12,     0,        0,      sc12,     sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1985, fexcel,     0,        0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcela,    fexcel,   0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelb,    fexcel,   0,      fexcelb,  fexcel,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,  fexcel,   driver_device, 0, "Fidelity Electronics", "The Par Excellence (model 6083)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,  fexcelv,  driver_device, 0, "Fidelity Electronics", "Voice Excellence (model 6092)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexceld,    fexcel,   0,      fexceld,  fexcel,   driver_device, 0, "Fidelity Electronics", "Excel Display (model 6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
