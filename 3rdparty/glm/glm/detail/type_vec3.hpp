@@ -1,45 +1,16 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
 /// @ref core
 /// @file glm/detail/type_vec3.hpp
-/// @date 2008-08-22 / 2011-06-15
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 #include "type_vec.hpp"
-#ifdef GLM_SWIZZLE
+#if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
 #	if GLM_HAS_UNRESTRICTED_UNIONS
 #		include "_swizzle.hpp"
 #	else
 #		include "_swizzle_func.hpp"
 #	endif
-#endif //GLM_SWIZZLE
+#endif //GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
 #include <cstddef>
 
 namespace glm
@@ -49,37 +20,54 @@ namespace glm
 	{
 		// -- Implementation detail --
 
+		typedef T value_type;
 		typedef tvec3<T, P> type;
 		typedef tvec3<bool, P> bool_type;
-		typedef T value_type;
 
 		// -- Data --
 
-#		if GLM_HAS_UNRESTRICTED_UNIONS
+#		if GLM_HAS_ALIGNED_TYPE
+#			if GLM_COMPILER & GLM_COMPILER_GCC
+#				pragma GCC diagnostic push
+#				pragma GCC diagnostic ignored "-Wpedantic"
+#			endif
+#			if GLM_COMPILER & GLM_COMPILER_CLANG
+#				pragma clang diagnostic push
+#				pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
+#				pragma clang diagnostic ignored "-Wnested-anon-types"
+#			endif
+
 			union
 			{
 				struct{ T x, y, z; };
 				struct{ T r, g, b; };
 				struct{ T s, t, p; };
 
-#				ifdef GLM_SWIZZLE
-					_GLM_SWIZZLE3_2_MEMBERS(T, P, tvec2, x, y, z)
-					_GLM_SWIZZLE3_2_MEMBERS(T, P, tvec2, r, g, b)
-					_GLM_SWIZZLE3_2_MEMBERS(T, P, tvec2, s, t, p)
-					_GLM_SWIZZLE3_3_MEMBERS(T, P, tvec3, x, y, z)
-					_GLM_SWIZZLE3_3_MEMBERS(T, P, tvec3, r, g, b)
-					_GLM_SWIZZLE3_3_MEMBERS(T, P, tvec3, s, t, p)
-					_GLM_SWIZZLE3_4_MEMBERS(T, P, tvec4, x, y, z)
-					_GLM_SWIZZLE3_4_MEMBERS(T, P, tvec4, r, g, b)
-					_GLM_SWIZZLE3_4_MEMBERS(T, P, tvec4, s, t, p)
+#				if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
+					_GLM_SWIZZLE3_2_MEMBERS(T, P, glm::tvec2, x, y, z)
+					_GLM_SWIZZLE3_2_MEMBERS(T, P, glm::tvec2, r, g, b)
+					_GLM_SWIZZLE3_2_MEMBERS(T, P, glm::tvec2, s, t, p)
+					_GLM_SWIZZLE3_3_MEMBERS(T, P, glm::tvec3, x, y, z)
+					_GLM_SWIZZLE3_3_MEMBERS(T, P, glm::tvec3, r, g, b)
+					_GLM_SWIZZLE3_3_MEMBERS(T, P, glm::tvec3, s, t, p)
+					_GLM_SWIZZLE3_4_MEMBERS(T, P, glm::tvec4, x, y, z)
+					_GLM_SWIZZLE3_4_MEMBERS(T, P, glm::tvec4, r, g, b)
+					_GLM_SWIZZLE3_4_MEMBERS(T, P, glm::tvec4, s, t, p)
 #				endif//GLM_SWIZZLE
 			};
+		
+#			if GLM_COMPILER & GLM_COMPILER_CLANG
+#				pragma clang diagnostic pop
+#			endif
+#			if GLM_COMPILER & GLM_COMPILER_GCC
+#				pragma GCC diagnostic pop
+#			endif
 #		else
 			union { T x, r, s; };
 			union { T y, g, t; };
 			union { T z, b, p; };
 
-#			ifdef GLM_SWIZZLE
+#			if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
 				GLM_SWIZZLE_GEN_VEC_FROM_VEC3(T, P, tvec3, tvec2, tvec3, tvec4)
 #			endif//GLM_SWIZZLE
 #		endif//GLM_LANG
@@ -103,7 +91,7 @@ namespace glm
 		// -- Explicit basic constructors --
 
 		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR explicit tvec3(ctor);
-		GLM_FUNC_DECL GLM_CONSTEXPR_GCC explicit tvec3(T scalar);
+		GLM_FUNC_DECL GLM_CONSTEXPR explicit tvec3(T scalar);
 		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(T a, T b, T c);
 
 		// -- Conversion scalar constructors --
@@ -137,26 +125,25 @@ namespace glm
 		GLM_FUNC_DECL GLM_CONSTEXPR GLM_EXPLICIT tvec3(tvec3<U, Q> const & v);
 
 		// -- Swizzle constructors --
-
-#		if GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE)
+#		if GLM_HAS_UNRESTRICTED_UNIONS && (GLM_SWIZZLE == GLM_SWIZZLE_ENABLED)
 			template <int E0, int E1, int E2>
-			GLM_FUNC_DECL tvec3(detail::_swizzle<3, T, P, tvec3<T, P>, E0, E1, E2, -1> const & that)
+			GLM_FUNC_DECL tvec3(detail::_swizzle<3, T, P, glm::tvec3, E0, E1, E2, -1> const & that)
 			{
 				*this = that();
 			}
 
 			template <int E0, int E1>
-			GLM_FUNC_DECL tvec3(detail::_swizzle<2, T, P, tvec2<T, P>, E0, E1, -1, -2> const & v, T const & scalar)
+			GLM_FUNC_DECL tvec3(detail::_swizzle<2, T, P, glm::tvec2, E0, E1, -1, -2> const & v, T const & scalar)
 			{
 				*this = tvec3<T, P>(v(), scalar);
 			}
 
 			template <int E0, int E1>
-			GLM_FUNC_DECL tvec3(T const & scalar, detail::_swizzle<2, T, P, tvec2<T, P>, E0, E1, -1, -2> const & v)
+			GLM_FUNC_DECL tvec3(T const & scalar, detail::_swizzle<2, T, P, glm::tvec2, E0, E1, -1, -2> const & v)
 			{
 				*this = tvec3<T, P>(scalar, v());
 			}
-#		endif// GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE)
+#		endif// GLM_HAS_UNRESTRICTED_UNIONS && (GLM_SWIZZLE == GLM_SWIZZLE_ENABLED)
 
 		// -- Unary arithmetic operators --
 

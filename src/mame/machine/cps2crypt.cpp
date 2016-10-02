@@ -704,17 +704,18 @@ static void cps2_decrypt(running_machine &machine, UINT16 *rom, UINT16 *dec, int
 
 
 		// decrypt the opcodes
-		for (a = i; a < length/2 && a < upper_limit/2; a += 0x10000)
+		for (a = i; a < length/2; a += 0x10000)
 		{
-			dec[a] = feistel(rom[a], fn2_groupA, fn2_groupB,
-				&sboxes2[0*4], &sboxes2[1*4], &sboxes2[2*4], &sboxes2[3*4],
-				key2[0], key2[1], key2[2], key2[3]);
-		}
-		// copy the unencrypted part
-		while (a < length/2)
-		{
-			dec[a] = rom[a];
-			a += 0x10000;
+			if (a >= lower_limit && a <= upper_limit)
+			{
+				dec[a] = feistel(rom[a], fn2_groupA, fn2_groupB,
+					&sboxes2[0 * 4], &sboxes2[1 * 4], &sboxes2[2 * 4], &sboxes2[3 * 4],
+					key2[0], key2[1], key2[2], key2[3]);
+			}
+			else
+			{
+				dec[a] = rom[a];
+			}
 		}
 	}
 }
@@ -742,23 +743,50 @@ struct game_keys
 
 DRIVER_INIT_MEMBER(cps_state,cps2crypt)
 {
-	UINT32 key[2];
-	UINT32 lower;
-	UINT32 upper;
+	if (m_region_key)
+	{
+		UINT32 key[2];
+		UINT32 lower;
+		UINT32 upper;
 
-	std::string skey1 = parameter("cryptkey1");;
-	key[0] = strtoll(skey1.c_str(), nullptr, 16);
+		int b;
 
-	std::string skey2 = parameter("cryptkey2");
-	key[1] = strtoll(skey2.c_str(), nullptr, 16);
+		unsigned short decoded[10];
+		memset(decoded, 0, sizeof(decoded));
 
-	std::string slower = parameter("cryptlower");
-	lower = strtoll(slower.c_str(), nullptr, 16);
+		for (b = 0; b < 10 * 16; b++)
+		{
+			int bit = (317 - b) % 160;
+			if ((m_region_key->base()[bit / 8] >> ((bit ^ 7) % 8)) & 1)
+			{
+				decoded[b / 16] |= (0x8000 >> (b % 16));
+			}
+		}
 
-	std::string supper = parameter("cryptupper");
-	upper = strtoll(supper.c_str(), nullptr, 16);
+		key[0] = (decoded[0] << 16) | decoded[1];
+		key[1] = (decoded[2] << 16) | decoded[3];
+ 		// decoded[4] == watchdog instruction third word
+		// decoded[5] == watchdog instruction second word
+		// decoded[6] == watchdog instruction first word
+		// decoded[7] == 0x4000 (bits 8 to 23 of CPS2 object output address)
+		// decoded[8] == 0x0900
 
-	// we have a proper key so use it to decrypt
-	if (lower!=0xff0000) // don't run the decrypt on 'dead key' games for now
-		cps2_decrypt(machine(), (UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, memregion("maincpu")->bytes(), key, lower,upper);
+		if (decoded[9] == 0xffff)
+		{
+			// On a dead board, the only encrypted range is actually FF0000-FFFFFF.
+			// It doesn't start from 0, and it's the upper half of a 128kB bank.
+			upper = 0xffffff;
+			lower = 0xff0000;
+		}
+		else
+		{
+			upper = (((~decoded[9] & 0x3ff) << 14) | 0x3fff) + 1;
+			lower = 0;
+		}
+
+		logerror("cps2 decrypt 0x%08x,0x%08x,0x%08x,0x%08x\n", key[0], key[1], lower, upper);
+
+		// we have a proper key so use it to decrypt
+		cps2_decrypt(machine(), (UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, memregion("maincpu")->bytes(), key, lower / 2, upper / 2);
+	}
 }

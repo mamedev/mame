@@ -1056,7 +1056,7 @@ UINT64 debugger_cpu::expression_read_memory(void *param, const char *name, expre
 				device = expression_get_device(name);
 			if (device == nullptr || !device->interface(memory))
 			{
-				device = m_machine.debugger().cpu().get_visible_cpu();
+				device = get_visible_cpu();
 				memory = &device->memory();
 			}
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
@@ -1079,7 +1079,7 @@ UINT64 debugger_cpu::expression_read_memory(void *param, const char *name, expre
 				device = expression_get_device(name);
 			if (device == nullptr || !device->interface(memory))
 			{
-				device = m_machine.debugger().cpu().get_visible_cpu();
+				device = get_visible_cpu();
 				memory = &device->memory();
 			}
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
@@ -1100,7 +1100,7 @@ UINT64 debugger_cpu::expression_read_memory(void *param, const char *name, expre
 				device = expression_get_device(name);
 			if (device == nullptr || !device->interface(memory))
 			{
-				device = m_machine.debugger().cpu().get_visible_cpu();
+				device = get_visible_cpu();
 				memory = &device->memory();
 			}
 			return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
@@ -1242,7 +1242,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = expression_get_device(name);
 			if (device == nullptr || !device->interface(memory))
 			{
-				device = m_machine.debugger().cpu().get_visible_cpu();
+				device = get_visible_cpu();
 				memory = &device->memory();
 			}
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
@@ -1260,7 +1260,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = expression_get_device(name);
 			if (device == nullptr || !device->interface(memory))
 			{
-				device = m_machine.debugger().cpu().get_visible_cpu();
+				device = get_visible_cpu();
 				memory = &device->memory();
 			}
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
@@ -1276,7 +1276,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = expression_get_device(name);
 			if (device == nullptr || !device->interface(memory))
 			{
-				device = m_machine.debugger().cpu().get_visible_cpu();
+				device = get_visible_cpu();
 				memory = &device->memory();
 			}
 			expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
@@ -1433,7 +1433,7 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 				return expression_error::INVALID_MEMORY_NAME;
 		}
 		if (!device)
-			device = m_machine.debugger().cpu().get_visible_cpu();
+			device = get_visible_cpu();
 		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
 		break;
@@ -1449,7 +1449,7 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 				return expression_error::INVALID_MEMORY_NAME;
 		}
 		if (!device)
-			device = m_machine.debugger().cpu().get_visible_cpu();
+			device = get_visible_cpu();
 		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
 		break;
@@ -1463,7 +1463,7 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 				return expression_error::INVALID_MEMORY_NAME;
 		}
 		if (!device)
-			device = m_machine.debugger().cpu().get_visible_cpu();
+			device = get_visible_cpu();
 		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
 		break;
@@ -1939,7 +1939,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 	// handle step out/over on the instruction we are about to execute
 	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT)) != 0 && m_stepaddr == ~0)
-		prepare_for_step_overout(m_device.safe_pc());
+		prepare_for_step_overout(m_device.safe_pcbase());
 
 	// no longer in debugger code
 	debugcpu.set_within_instruction(false);
@@ -2955,7 +2955,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 				{
 					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 				};
-				offs_t pc = space.device().safe_pc();
+				offs_t pc = space.device().safe_pcbase();
 				std::string buffer;
 
 				if (type & WATCHPOINT_WRITE)
@@ -2985,7 +2985,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 
 void device_debug::hotspot_check(address_space &space, offs_t address)
 {
-	offs_t curpc = m_device.safe_pc();
+	offs_t curpc = m_device.safe_pcbase();
 
 	// see if we have a match in our list
 	unsigned int hotindex;
@@ -3064,7 +3064,7 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 UINT64 device_debug::get_current_pc(symbol_table &table, void *ref)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->safe_pc();
+	return device->safe_pcbase();
 }
 
 

@@ -125,7 +125,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 	   mystery yet */
 
 	/* INT 1 is on 32V */
-	scanline_int_gen(m_maincpu);
+	scanline_int_gen(*m_maincpu);
 
 	/* advance to the next interrupt */
 	scanline += 64;

@@ -612,7 +612,7 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 	{
 		layer_t *l = &m_layers[i];
 
-		l->tmap = &machine().tilemap().create(m_gfxdecode, i ?
+		l->tmap = &machine().tilemap().create(*m_gfxdecode, i ?
 												tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_1),this) :
 												tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_0),this),
 												TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);
@@ -841,13 +841,13 @@ READ8_MEMBER(subsino2_state::vblank_bit6_r)
 WRITE8_MEMBER(subsino2_state::oki_bank_bit0_w)
 {
 	// it writes 0x32 or 0x33
-	m_oki->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_rom_bank(data & 1);
 }
 
 WRITE8_MEMBER(subsino2_state::oki_bank_bit4_w)
 {
 	// it writes 0x23 or 0x33
-	m_oki->set_bank_base(((data >> 4) & 1) * 0x40000);
+	m_oki->set_rom_bank((data >> 4) & 1);
 }
 
 INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)

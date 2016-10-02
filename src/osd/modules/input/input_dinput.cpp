@@ -25,13 +25,10 @@
 #undef min
 #undef max
 
-#include <utility>
 #include <mutex>
-#include <thread>
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 #include "strconv.h"
 
 // MAMEOS headers
@@ -71,8 +68,8 @@ static HRESULT dinput_set_dword_property(ComPtr<IDirectInputDevice> device, REFG
 //  dinput_device - base directinput device
 //============================================================
 
-dinput_device::dinput_device(running_machine &machine, const char *name, input_device_class deviceclass, input_module &module)
-	: device_info(machine, name, deviceclass, module),
+dinput_device::dinput_device(running_machine &machine, const char *name, const char *id, input_device_class deviceclass, input_module &module)
+	: device_info(machine, name, id, deviceclass, module),
 		dinput({nullptr})
 {
 }
@@ -113,8 +110,8 @@ HRESULT dinput_device::poll_dinput(LPVOID pState) const
 //  dinput_keyboard_device - directinput keyboard device
 //============================================================
 
-dinput_keyboard_device::dinput_keyboard_device(running_machine &machine, const char *name, input_module &module)
-	: dinput_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
+dinput_keyboard_device::dinput_keyboard_device(running_machine &machine, const char *name, const char *id, input_module &module)
+	: dinput_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
 		keyboard({{0}})
 {
 }
@@ -139,7 +136,8 @@ void dinput_keyboard_device::reset()
 
 dinput_api_helper::dinput_api_helper(int version)
 	: m_dinput(nullptr),
-		m_dinput_version(version)
+	  m_dinput_version(version),
+	  m_dinput_create_prt(nullptr)
 {
 }
 
@@ -330,8 +328,8 @@ public:
 };
 
 
-dinput_mouse_device::dinput_mouse_device(running_machine &machine, const char *name, input_module &module)
-	: dinput_device(machine, name, DEVICE_CLASS_MOUSE, module),
+dinput_mouse_device::dinput_mouse_device(running_machine &machine, const char *name, const char *id, input_module &module)
+	: dinput_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
 		mouse({0})
 {
 }
@@ -385,7 +383,7 @@ public:
 		result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_REL);
 		if (result != DI_OK && result != DI_PROPNOEFFECT)
 		{
-			osd_printf_error("DirectInput: Unable to set relative mode for mouse %d (%s)\n", devicelist()->size(), devinfo->name());
+			osd_printf_error("DirectInput: Unable to set relative mode for mouse %u (%s)\n", static_cast<unsigned int>(devicelist()->size()), devinfo->name());
 			goto error;
 		}
 
@@ -429,8 +427,8 @@ public:
 	}
 };
 
-dinput_joystick_device::dinput_joystick_device(running_machine &machine, const char *name, input_module &module)
-	: dinput_device(machine, name, DEVICE_CLASS_JOYSTICK, module),
+dinput_joystick_device::dinput_joystick_device(running_machine &machine, const char *name, const char *id, input_module &module)
+	: dinput_device(machine, name, id, DEVICE_CLASS_JOYSTICK, module),
 		joystick({{0}})
 {
 }

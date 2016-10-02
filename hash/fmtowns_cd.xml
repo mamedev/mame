@@ -3931,9 +3931,9 @@ User/save disks that can be created from the game itself are not included.
 		<description>Hiouden II</description>
 		<year>1994</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
-		<!-- 
+		<!--
 		Note from the dumper:
-		
+
 		When I dumped the system disk it was considerably damaged, with a lot of bad sectors
 		on side 1. Thankfully this doesn't affect the executable files and doesn't prevent the
 		game from running, but there are saved games by the original owner that probably won't work.

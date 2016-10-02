@@ -55,6 +55,17 @@ void segapcm_device::device_start()
 }
 
 
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void segapcm_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------

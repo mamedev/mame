@@ -126,9 +126,10 @@ class oz750_state : public rex6000_state
 {
 public:
 	oz750_state(const machine_config &mconfig, device_type type, const char *tag)
-		: rex6000_state(mconfig, type, tag),
-			m_keyboard(*this, "COL")
-		{ }
+		: rex6000_state(mconfig, type, tag)
+		, m_keyboard(*this, "COL.%u", 0)
+	{
+	}
 
 	optional_ioport_array<10> m_keyboard;
 

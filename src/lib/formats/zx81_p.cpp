@@ -206,12 +206,12 @@ static const struct CassetteLegacyWaveFiller zx81_legacy_fill_wave =
 	0                       /* trailer_samples */
 };
 
-static casserr_t zx81_p_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error zx81_p_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &zx81_legacy_fill_wave);
 }
 
-static casserr_t zx81_p_load(cassette_image *cassette)
+static cassette_image::error zx81_p_load(cassette_image *cassette)
 {
 	/* The filename of the file is used to create the wave stream for the emulated machine. Why is this information not
 	   part of the image file itself?
@@ -274,12 +274,12 @@ static const struct CassetteLegacyWaveFiller zx80_legacy_fill_wave =
 	0                                           /* trailer_samples */
 };
 
-static casserr_t zx80_o_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error zx80_o_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &zx80_legacy_fill_wave);
 }
 
-static casserr_t zx80_o_load(cassette_image *cassette)
+static cassette_image::error zx80_o_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &zx80_legacy_fill_wave);
 }

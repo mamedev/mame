@@ -16,6 +16,7 @@
 #include "winutf8.h"
 
 #include "winutil.h"
+#include "modules/lib/osdobj_common.h"
 
 
 bool debugwin_info::s_window_class_registered = false;

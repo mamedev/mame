@@ -345,7 +345,7 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 
 WRITE8_MEMBER(nmg5_state::oki_banking_w)
 {
-	m_oki->set_bank_base((data & 1) ? 0x40000 : 0);
+	m_oki->set_rom_bank(data & 1);
 }
 
 /*******************************************************************
@@ -832,8 +832,8 @@ TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg
 
 void nmg5_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 

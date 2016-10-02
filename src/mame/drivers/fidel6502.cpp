@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
-// thanks-to:Berger
+// thanks-to:Berger,yovan
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
 
     TODO:
-    - EAS doesn't work, there's some activity if you boot/reset with 1-key held down
+    - EAS doesn't work, there's some activity if you boot/reset with 1-key held down.
+      Also need to verify if the program rom addresses are right, especially for feasgla
 
 ******************************************************************************
 
@@ -85,7 +86,7 @@ CA2 - selector bit 3
 CB1 - button row 8
 CB2 - selector bit 2
 
-Selector: (attached to PIA 1, outputs 1 of 10 pins low.  7442)
+Selector: (attached to PIA 1, outputs 1 of 10 pins low. 7442)
 ---------
 output # (selected turns this column on, and all others off)
 0 - LED column A, button column A, 7seg digit 1
@@ -324,6 +325,21 @@ Z80 D6 to W: (model 6092, tied to VCC otherwise)
 - D2-D6: VCC
 - D7: TSI BUSY
 
+
+******************************************************************************
+
+Chesster (model 6120)
+There is also a German version titled Kishon Chesster
+----------------
+
+8*(8+1) buttons, 8+8+1 LEDs
+8KB RAM(UM6264-12), 32KB ROM(M27C256B)
+Ricoh RP65C02G CPU, 5MHz XTAL
+8-bit DAC speech timed via IRQ, 128KB ROM(AMI custom label)
+PCB label 510-1141C01
+
+I/O is via TTL, see source code for more info
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -333,10 +349,12 @@ Z80 D6 to W: (model 6092, tied to VCC otherwise)
 #include "machine/6821pia.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
 
 #include "includes/fidelz80.h"
 
 // internal artwork
+#include "fidel_chesster.lh" // clickable
 #include "fidel_csc.lh" // clickable
 #include "fidel_eas.lh" // clickable
 #include "fidel_fev.lh" // clickable
@@ -396,11 +414,15 @@ public:
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	DECLARE_READ8_MEMBER(sc12_cart_r);
 
-	// 6080/6092/6093 (Excellence)
+	// Excellence
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
 	DECLARE_READ8_MEMBER(fexcelv_speech_r);
 	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
 	DECLARE_READ8_MEMBER(fexcel_ttl_r);
+
+	// Chesster
+	DECLARE_WRITE8_MEMBER(chesster_control_w);
+	DECLARE_DRIVER_INIT(chesster);
 };
 
 
@@ -560,8 +582,8 @@ WRITE8_MEMBER(fidel6502_state::eas_led_w)
 
 READ8_MEMBER(fidel6502_state::eas_input_r)
 {
-	// multiplexed inputs
-	return read_inputs(9);
+	// multiplexed inputs (active low)
+	return read_inputs(9) ^ 0xff;
 }
 
 
@@ -569,7 +591,12 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
-	// speech chip?
+	// d0-d5: TSI C0-C5
+	// d6: TSI START line
+	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->start_w(data >> 6 & 1);
+
+	// d7: printer? (black wire to LED pcb)
 }
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
@@ -578,13 +605,32 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 	m_led_select = data & 0xf;
 	csc_prepare_display();
 
-	// other: ?
+	// d4: speech ROM A12
+	m_speech->force_update(); // update stream to now
+	m_speech_bank = data >> 4 & 1;
+
+	// d5: lower TSI volume
+	m_speech->set_output_gain(0, (data & 0x20) ? 0.5 : 1.0);
+
+	// d6,d7: N/C?
 }
 
 READ8_MEMBER(fidel6502_state::eas_ppi_portb_r)
 {
-	// ?
-	return 0;
+	// d0: printer? white wire from LED pcb
+	UINT8 data = 1;
+
+	// d1: TSI BUSY line
+	data |= (m_speech->busy_r()) ? 2 : 0;
+
+	// d2,d3: language switches
+	data |= ~m_inp_matrix[9]->read() << 2 & 0x0c;
+
+	// d5: multiplexed inputs highest bit
+	data |= (read_inputs(9) & 0x100) ? 0 : 0x20;
+
+	// other: ?
+	return data | 0xd0;
 }
 
 
@@ -671,7 +717,7 @@ READ8_MEMBER(fidel6502_state::sc12_cart_r)
 
 
 /******************************************************************************
-    6080/6092/6093 (Excellence)
+    Excellence
 ******************************************************************************/
 
 // misc handlers
@@ -747,6 +793,39 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 
 	// a0-a2,d7: multiplexed inputs (active low)
 	return d6 | ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
+}
+
+
+
+/******************************************************************************
+    Chesster
+******************************************************************************/
+
+// TTL/generic
+
+WRITE8_MEMBER(fidel6502_state::chesster_control_w)
+{
+	// a0-a2,d7: 74259(1)
+	UINT8 mask = 1 << offset;
+	m_led_select = (m_led_select & ~mask) | ((data & 0x80) ? mask : 0);
+
+	// 74259 Q4-Q7: 7442 a0-a3
+	// 7442 0-8: led data, input mux
+	UINT16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
+	m_inp_mux = sel & 0x1ff;
+
+	// 74259 Q0,Q1: led select (active low)
+	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3);
+
+	// 74259 Q2,Q3: speechrom A14,A15
+	// a0-a2,d0: 74259(2) where Q3 is speechrom A16, other outputs unconnected
+	m_speech_bank = (m_speech_bank & ~mask) | ((data & 1) ? mask : 0);
+	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
+}
+
+DRIVER_INIT_MEMBER(fidel6502_state, chesster)
+{
+	membank("bank1")->configure_entries(0, 8, memregion("speech")->base(), 0x4000);
 }
 
 
@@ -838,11 +917,22 @@ static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 
-// 6080/6092/6093 (Excellence)
+// Excellence
 
 static ADDRESS_MAP_START( fexcel_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+// Chesster
+
+static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(sc12_input_r, chesster_control_w)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1144,6 +1234,7 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square a3")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square a2")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square a1")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square b8")
@@ -1154,6 +1245,7 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square b3")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square b2")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square b1")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square c8")
@@ -1164,6 +1256,7 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square c3")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square c2")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square c1")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square d8")
@@ -1216,14 +1309,124 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Square h1")
 
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Control")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("PB / King")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("PV / Queen")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("TM / Rook")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("ST / Bishop")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("TB / Knight")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("LV / Pawn")
+
+	PORT_START("IN.9") // hardwired
+	PORT_CONFNAME( 0x01, 0x00, "Language" )
+	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFSETTING(    0x01, "Other" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( easg )
+	PORT_INCLUDE( eas )
+
+	PORT_MODIFY("IN.9")
+	PORT_CONFNAME( 0x01, 0x01, "Language" )
+	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFSETTING(    0x01, "Other" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( chesster )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h8")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g8")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f8")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e8")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d8")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c8")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b8")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a8")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h7")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g7")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f7")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e7")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d7")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c7")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b7")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a7")
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h6")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g6")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f6")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e6")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d6")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c6")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b6")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a6")
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h5")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g5")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f5")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e5")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d5")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c5")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b5")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a5")
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g4")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f4")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e4")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d4")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c4")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b4")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a4")
+
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h3")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g3")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d3")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c3")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b3")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a3")
+
+	PORT_START("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e2")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d2")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c2")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b2")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a2")
+
+	PORT_START("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h1")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f1")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e1")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d1")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c1")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b1")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a1")
+
+	PORT_START("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / No")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Yes")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Take Back / Repeat")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Level / New")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Option / Replay")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Verify / Problem")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
 INPUT_PORTS_END
 
 
@@ -1418,6 +1621,22 @@ static MACHINE_CONFIG_DERIVED( fexcelv, fexcel )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( chesster, fidel6502_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", R65C02, XTAL_5MHz) // RP65C02G
+	MCFG_CPU_PROGRAM_MAP(chesster_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 9500) // R/C circuit, approximation
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_chesster)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_DAC_ADD("dac")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
 
 
 /******************************************************************************
@@ -1482,33 +1701,132 @@ ROM_END
 
 ROM_START( feasbu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("eli_bu3.bin", 0x8000, 0x2000, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
-	ROM_LOAD("eli_bu1.bin", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) )
-	ROM_LOAD("eli_bu2.bin", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) )
+	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A, unknown label
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("101-1052a02.4", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) ) // Mostek MK36C63N-5
+	ROM_LOAD("101-1052a01.5", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) ) // Mostek MK36C63N-5
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-english.bin", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
-	ROM_RELOAD(                 0x1000, 0x1000)
+	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // NEC D2332C
+	ROM_RELOAD(               0x1000, 0x1000)
+ROM_END
+
+ROM_START( feasbusp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("101-1052a02.4", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) )
+	ROM_LOAD("101-1052a01.5", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
+ROM_END
+
+ROM_START( feasbug )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("101-1052a02.4", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) )
+	ROM_LOAD("101-1052a01.5", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( feasbufr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("101-1052a02.4", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) )
+	ROM_LOAD("101-1052a01.5", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
 ROM_END
 
 ROM_START( feasgla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("eli_gla3.bin", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
+	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
 	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("eli_gla1.bin", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
+	ROM_LOAD("eli_gla.4", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
 	ROM_CONTINUE( 0xd000, 0x0800 )
 	ROM_CONTINUE( 0xc800, 0x0800 )
 	ROM_CONTINUE( 0xd800, 0x0800 )
-	ROM_LOAD("eli_gla2.bin", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
+	ROM_LOAD("eli_gla.5", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
 	ROM_CONTINUE( 0xf000, 0x0800 )
 	ROM_CONTINUE( 0xe800, 0x0800 )
 	ROM_CONTINUE( 0xf800, 0x0800 )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-english.bin", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
-	ROM_RELOAD(                 0x1000, 0x1000)
+	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // NEC D2332C
+	ROM_RELOAD(               0x1000, 0x1000)
+ROM_END
+
+ROM_START( feasglasp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("eli_gla.4", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("eli_gla.5", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
+ROM_END
+
+ROM_START( feasglag )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("eli_gla.4", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("eli_gla.5", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( feasglafr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("eli_gla.4", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("eli_gla.5", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
 ROM_END
 
 
@@ -1593,6 +1911,15 @@ ROM_START( fexcelv )
 ROM_END
 
 
+ROM_START( chesster )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("chesster.ic9", 0x8000, 0x8000, CRC(29f9a698) SHA1(4c83ca46fd5fc9c40302e9c7f16b4ae2c18b06e6) ) // M27C256B, sticker but no label
+
+	ROM_REGION( 0x20000, "speech", 0 )
+	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
+ROM_END
+
+
 
 /******************************************************************************
     Drivers
@@ -1606,8 +1933,14 @@ CONS( 1981, cscsp,      csc,      0,      csc,      cscg,     driver_device, 0, 
 CONS( 1981, cscg,       csc,      0,      csc,      cscg,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, cscfr,      csc,      0,      csc,      cscg,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, feasbu,     0,        0,      eas,      eas,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, feasgla,    feasbu,   0,      eas,      eas,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, English)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, feasbu,     0,        0,      eas,      eas,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, feasbusp,   feasbu,   0,      eas,      easg,     driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, feasbug,    feasbu,   0,      eas,      easg,     driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, feasbufr,   feasbu,   0,      eas,      easg,     driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, feasgla,    feasbu,   0,      eas,      eas,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, feasglasp,  feasbu,   0,      eas,      easg,     driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, feasglag,   feasbu,   0,      eas,      easg,     driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, feasglafr,  feasbu,   0,      eas,      easg,     driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, super9cc,   0,        0,      su9,      su9,      driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, super9ccsp, super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -1620,3 +1953,5 @@ CONS( 1984, fscc12,     0,        0,      sc12,     sc12,     driver_device, 0, 
 
 CONS( 1987, fexcel,     0,        0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "Excellence (model 6080/6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,  fexcelv,  driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1990, chesster,   0,        0,      chesster, chesster, fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

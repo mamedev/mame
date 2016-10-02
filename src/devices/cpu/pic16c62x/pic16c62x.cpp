@@ -937,8 +937,8 @@ void pic16c62x_device::device_start()
 	state_add( PIC16C62x_PSCL, "PSCL", m_debugger_temp).callimport().formatstr("%3s");
 
 	state_add( STATE_GENPC, "GENPC", m_PC).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_PREVPC).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_OPTION).formatstr("%13s").noshow();
-	state_add( STATE_GENPCBASE, "PREVPC", m_PREVPC).noshow();
 
 	m_icountptr = &m_icount;
 }

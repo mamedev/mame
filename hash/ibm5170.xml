@@ -3611,6 +3611,54 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="wp60">
+		<description>WordPerfect 6.0 for DOS</description>
+		<year>1993</year>
+		<publisher>WordPerfect Corporation</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install 1"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Perfect 6.0 DOS - Disk 1.img" size="1474560" crc="18ea85ae" sha1="a22d6f1b8a266960b35cdb56201ca2448296da5a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install 2"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Perfect 6.0 DOS - Disk 2.img" size="1474560" crc="c5045bb4" sha1="337c138c7ab4c9c9bb19150d652f949ce5ce3cd5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install 3"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Perfect 6.0 DOS - Disk 3.img" size="1474560" crc="bd22e80b" sha1="e274a5fe47ead680d070804faa79c0dae2bf0a59" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Install 4"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Perfect 6.0 DOS - Disk 4.img" size="1474560" crc="5261f673" sha1="4c1462b853f884c835d979c5fa3c7b12f5ce4a5f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Program 1"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Perfect 6.0 DOS - Disk 5.img" size="1474560" crc="316c1cf7" sha1="0d4c0a7edb79f36cd5460ca7fabe6ea212127b92" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Program 2"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Perfect 6.0 DOS - Disk 6.img" size="1474560" crc="76dfdce7" sha1="a1cae91a0a32557e1c97dec62bd86c1722afb217" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Program 3"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Perfect 6.0 DOS - Disk 7.img" size="1474560" crc="50b4d482" sha1="02894c316a1900bce1d07bc8c0458bdb88e35699" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mbhh95">
 		<description>MikroBITTI Huvi- ja hyötylevyke 1995 (Fin)</description>
 		<year>1995</year>
@@ -4088,6 +4136,32 @@ Missing files come here
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="3e6fc1d5" sha1="45ee9c088ebee47ebc6be7e7d4337962c42a5887" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jazz">
+		<description>Jazz Jackrabbit</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="jazz16-1.img" size="1474560" crc="7d5e0539" sha1="c373b19efe307b5c92ccbc004a8b65b94a3cba16" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="jazz16-2.img" size="1474560" crc="9dfa9d71" sha1="0ebe3dfa15f151d0f923334c2a7f44b521edd639" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="jazz16-3.img" size="1474560" crc="b647de5f" sha1="12b97ee5c2eb060cc5c69cf76e63f303f9522d19" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="jazz16-4.img" size="1474560" crc="c0f0bffe" sha1="f4ca79c4ff3ce3a3142e0bd522cb071a4f7f2547" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

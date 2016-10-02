@@ -19,7 +19,7 @@
 
     For more info, please check chapter 6 "Monitor software" in the book
     and/or the assembly listings of the ZAP monitor software
-    avaliable at appendix D.
+    available at appendix D.
 
     Currently missing features in this driver:
       * hookup RS232 support

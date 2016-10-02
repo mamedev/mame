@@ -77,9 +77,9 @@ void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_m
 	screen_device_iterator screen_iterator(window.machine().root_device());
 	screen_device* screen_device = screen_iterator.byindex(screen);
 
-	int current_view = view;
-	uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
-	uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
+	uint16_t screen_count(window.target()->current_view()->screens().count());
+	uint16_t screen_width(floorf(prim->get_quad_width() + 0.5f));
+	uint16_t screen_height(floorf(prim->get_quad_height() + 0.5f));
 	uint32_t rotation_type =
 		(window.target()->orientation() & ROT90)  == ROT90  ? 1 :
 		(window.target()->orientation() & ROT180) == ROT180 ? 2 :
@@ -101,11 +101,12 @@ void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_m
 		screen_offset_y = -screen_container.yoffset();
 	}
 
+	int current_view = view;
 	for (bgfx_chain_entry* entry : m_entries)
 	{
 		if (!entry->skip())
 		{
-			entry->submit(current_view, prim, textures, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, blend, screen);
+			entry->submit(current_view, prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, blend, screen);
 			current_view++;
 		}
 	}

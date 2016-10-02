@@ -678,14 +678,14 @@ ROM_START(tstrk_l1)
 ROM_END
 
 
-GAME( 1979, flash_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-2)", MACHINE_MECHANICAL )
-GAME( 1979, flash_l1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", MACHINE_MECHANICAL )
-GAME( 1979, flash_t1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", MACHINE_MECHANICAL )
-GAME( 1978, trizn_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (L-1)", MACHINE_MECHANICAL )
-GAME( 1978, trizn_t1, trizn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (T-1)", MACHINE_MECHANICAL )
-GAME( 1979, tmwrp_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (L-2)", MACHINE_MECHANICAL )
-GAME( 1979, tmwrp_t2, tmwrp_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (T-2)", MACHINE_MECHANICAL )
-GAME( 1979, stlwr_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Stellar Wars (L-2)", MACHINE_MECHANICAL )
+GAME( 1979, flash_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_l1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_t1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, trizn_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, trizn_t1, trizn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (T-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_t2, tmwrp_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (T-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, stlwr_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Stellar Wars (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 GAME( 1978, pomp_l1,  0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Pompeii (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1978, arist_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

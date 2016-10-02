@@ -23,12 +23,14 @@ class pc1500_state : public driver_device
 {
 public:
 	pc1500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_rtc(*this, "upd1990a"),
-			m_lcd_data(*this, "lcd_data"),
-			m_keyboard(*this, "KEY"),
-			m_io_on(*this, "ON") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "upd1990a")
+		, m_lcd_data(*this, "lcd_data")
+		, m_keyboard(*this, "KEY.%u", 0)
+		, m_io_on(*this, "ON")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;

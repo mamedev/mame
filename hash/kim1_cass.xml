@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="kim1_cass" description="KIM-1 cassettes">
+
+<!-- Instruction Manual for use and loading of Microchess is available at viewing and download at -->
+<!-- http://archive.computerhistory.org/projects/chess/related_materials/text/4-1.MicroChess_%20Manual_for_6502.Micro-Ware/MicroChessManual.PETER_JENNINGS.062303071.sm.pdf -->
+	<software name="mchess">
+		<description>Microchess</description>
+		<year>1976</year>
+		<publisher>Micro-ware Ltd</publisher>
+
+		<!-- Typed in from book -->
+		<part name="cass" interface="kim1_cass">
+			<dataarea name="cass" size="22961384">
+				<rom name="microchess (1976)(micro-ware ltd).wav" size="22961384" crc="e4eb54e3" sha1="44037ea1e736e9ea9336093cc8abc7dc23cc567a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

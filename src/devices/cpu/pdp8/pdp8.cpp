@@ -73,6 +73,7 @@ void pdp8_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
+	state_add(STATE_CURPC,     "CURPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_l).callimport().callexport().formatstr("%1s").noshow();
 	state_add(PDP8_PC,         "PC",        m_pc).mask(0xfff);
 	state_add(PDP8_AC,         "AC",        m_ac).mask(0xfff);

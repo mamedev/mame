@@ -130,8 +130,6 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/custmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/custui.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/custui.h",
-	MAME_DIR .. "src/frontend/mame/ui/datfile.cpp",
-	MAME_DIR .. "src/frontend/mame/ui/datfile.h",
 	MAME_DIR .. "src/frontend/mame/ui/datmenu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/datmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/defimg.ipp",

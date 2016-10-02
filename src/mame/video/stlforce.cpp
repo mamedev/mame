@@ -174,10 +174,10 @@ UINT32 stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_ind1
 
 void stlforce_state::video_start()
 {
-	m_bg_tilemap    = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_bg_tile_info),this),   TILEMAP_SCAN_COLS,      16,16,64,16);
-	m_mlow_tilemap  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mlow_tile_info),this), TILEMAP_SCAN_COLS, 16,16,64,16);
-	m_mhigh_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mhigh_tile_info),this),TILEMAP_SCAN_COLS, 16,16,64,16);
-	m_tx_tilemap    = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_tx_tile_info),this),   TILEMAP_SCAN_ROWS,  8, 8,64,32);
+	m_bg_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_bg_tile_info),this),   TILEMAP_SCAN_COLS,      16,16,64,16);
+	m_mlow_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mlow_tile_info),this), TILEMAP_SCAN_COLS, 16,16,64,16);
+	m_mhigh_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mhigh_tile_info),this),TILEMAP_SCAN_COLS, 16,16,64,16);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_tx_tile_info),this),   TILEMAP_SCAN_ROWS,  8, 8,64,32);
 
 	m_mlow_tilemap->set_transparent_pen(0);
 	m_mhigh_tilemap->set_transparent_pen(0);

@@ -88,13 +88,14 @@ const tiny_rom_entry *coco_pak_device::device_rom_region() const
 
 void coco_pak_device::device_reset()
 {
-	if (m_cart->exists()) {
-		cococart_line_value cart_line = m_autostart.read_safe(0x01)
-			? COCOCART_LINE_VALUE_Q
-			: COCOCART_LINE_VALUE_CLEAR;
+	if (m_cart->exists())
+	{
+		auto cart_line = m_autostart.read_safe(0x01)
+			? cococart_slot_device::line_value::Q
+			: cococart_slot_device::line_value::CLEAR;
 
-		/* normal CoCo PAKs tie their CART line to Q - the system clock */
-		m_owner->cart_set_line(COCOCART_LINE_CART,cart_line);
+		// normal CoCo PAKs tie their CART line to Q - the system clock
+		m_owner->cart_set_line(cococart_slot_device::line::CART, cart_line);
 	}
 }
 

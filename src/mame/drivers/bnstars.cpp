@@ -108,14 +108,14 @@ public:
 			m_ms32_bg1_ram(*this, "bg1_ram"),
 			m_ms32_roz0_ram(*this, "roz0_ram"),
 			m_ms32_roz1_ram(*this, "roz1_ram"),
-			m_ms32_roz_ctrl(*this, "roz_ctrl"),
+			m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0),
 			m_ms32_spram(*this, "spram"),
 			m_ms32_tx0_scroll(*this, "tx0_scroll"),
 			m_ms32_bg0_scroll(*this, "bg0_scroll"),
 			m_ms32_tx1_scroll(*this, "tx1_scroll"),
 			m_ms32_bg1_scroll(*this, "bg1_scroll"),
-			m_p1_keys(*this, "P1KEY"),
-			m_p2_keys(*this, "P2KEY") { }
+			m_p1_keys(*this, "P1KEY.%u", 0),
+			m_p2_keys(*this, "P2KEY.%u", 0) { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
@@ -477,18 +477,18 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void bnstars_state::video_start()
 {
-	m_ms32_tx_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
-	m_ms32_tx_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	m_ms32_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	m_ms32_tx_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
 	m_ms32_tx_tilemap[0]->set_transparent_pen(0);
 	m_ms32_tx_tilemap[1]->set_transparent_pen(0);
 
-	m_ms32_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
-	m_ms32_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_ms32_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_ms32_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
 	m_ms32_bg_tilemap[0]->set_transparent_pen(0);
 	m_ms32_bg_tilemap[1]->set_transparent_pen(0);
 
-	m_ms32_roz_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
-	m_ms32_roz_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_ms32_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_ms32_roz_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
 	m_ms32_roz_tilemap[0]->set_transparent_pen(0);
 	m_ms32_roz_tilemap[1]->set_transparent_pen(0);
 
@@ -848,6 +848,8 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymf1", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

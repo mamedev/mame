@@ -31,7 +31,7 @@ protected:
 
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	char                m_search[40];
+	std::string         m_search;
 	const game_driver   *m_driver;
 	bool                m_has_empty_start;
 	s_filter            m_filter;
@@ -61,11 +61,11 @@ private:
 	void find_matches(const char *str, int count);
 	void load_sw_custom_filters();
 
-	virtual void infos_render(float x1, float y1, float x2, float y2) override;
-
 	// handlers
 	void inkey_select(const event *menu_event);
 	void inkey_special(const event *menu_event);
+
+	virtual void general_info(const game_driver *driver, std::string &buffer) override {}
 };
 
 class software_parts : public menu

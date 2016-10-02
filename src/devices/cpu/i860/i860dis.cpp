@@ -301,7 +301,7 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	int size;
 	int auto_inc = (insn & 1);
 	const char *const auto_suff[2] = { "", "++" };
-	int piped = (insn & 0x40000000) >> 29;
+	int piped = (insn & 0x40000000) >> 30;
 	const char *const piped_suff[2] = { "", "p" };
 	int upper_6bits = (insn >> 26) & 0x3f;
 	int is_load = (upper_6bits == 8 || upper_6bits == 9 || upper_6bits == 24

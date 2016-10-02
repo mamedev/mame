@@ -31,7 +31,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_testport(*this, "TEST")
 		, m_coinport(*this, "COIN")
-		, m_switch(*this, "SWITCH")
+		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port00_w);
@@ -228,4 +228,4 @@ ROM_START(flicker)
 ROM_END
 
 //   YEAR    GAME     PARENT  MACHINE   INPUT    CLASS           INIT      ORIENTATION   COMPANY                            DESCRIPTION           FLAGS
-GAME(1974,  flicker,  0,      flicker,  flicker, driver_device,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL )
+GAME(1974,  flicker,  0,      flicker,  flicker, driver_device,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

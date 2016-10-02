@@ -99,11 +99,9 @@ void consolewin_info::set_cpu(device_t &device)
 	m_views[1]->set_source_for_device(device);
 
 	// then update the caption
-	char curtitle[256];
-
 	std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
-	win_get_window_text_utf8(window(), curtitle, ARRAY_LENGTH(curtitle));
-	if (title.compare(curtitle) != 0)
+	std::string curtitle = win_get_window_text_utf8(window());
+	if (title != curtitle)
 		win_set_window_text_utf8(window(), title.c_str());
 
 	// and recompute the children

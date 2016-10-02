@@ -73,7 +73,7 @@ public:
 		, m_subcpu(*this, "sub")
 		, m_crtc(*this, "crtc")
 		, m_p_videoram(*this, "videoram")
-		, m_keyboard(*this, "KEY")
+		, m_keyboard(*this, "KEY.%u", 0)
 		, m_beep(*this, "beeper")
 		, m_centronics(*this, "centronics")
 		, m_cass(*this, "cassette")

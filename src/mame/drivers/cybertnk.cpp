@@ -287,13 +287,13 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
 
 void cybertnk_state::video_start()
 {
-	m_tilemap0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
 	m_tilemap0_tilemap->set_transparent_pen(0);
 
-	m_tilemap1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
 	m_tilemap1_tilemap->set_transparent_pen(0);
 
-	m_tilemap2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
 	m_tilemap2_tilemap->set_transparent_pen(0);
 }
 

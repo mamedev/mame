@@ -15,7 +15,7 @@ public:
 		m_palette(*this, "palette"),
 		m_adpcmrom(*this, "adpcm"),
 		m_videoram(*this, "videoram"),
-		m_row(*this, "ROW") { }
+		m_row(*this, "ROW.%u", 0) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;

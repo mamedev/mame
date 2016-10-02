@@ -31,7 +31,7 @@ public:
 		, m_pio(*this, "z80pio")
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
-		, m_keyboard(*this, "KEY")
+		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(pasopia_ctrl_w);

@@ -28,6 +28,7 @@
 		<description>Hopper</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Neil Raine" />
 		<info name="release" value="SCG23" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">

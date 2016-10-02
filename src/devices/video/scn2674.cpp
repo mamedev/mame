@@ -461,6 +461,7 @@ void scn2674_device::write_command(UINT8 data)
 			break;
 
 		case 0xab:
+		case 0xaf:  // LSI Octopus sends command 0xAF
 			/* write at cursor address + increment */
 			space().write_byte(m_cursor_l | (m_cursor_h << 8), m_buffer);
 			if(!(++m_cursor_l))
@@ -481,6 +482,16 @@ void scn2674_device::write_command(UINT8 data)
 		case 0xbd:
 			/* read from cursor address to pointer address */
 			LOG2674(("DELAYED read from cursor address to pointer address %02x\n",data));
+			break;
+
+		case 0xbf:
+			/* write from cursor address to pointer address TODO: transfer only during blank*/
+			for(i = m_cursor_l | (m_cursor_h << 8); i != (m_IR10_display_pointer_address_lower | (m_IR11_display_pointer_address_upper << 8)); i = ((i + 1) & 0xffff))
+				space().write_byte(i, m_buffer);
+			space().write_byte(i, m_buffer); // get the last
+			m_cursor_l = m_IR10_display_pointer_address_lower;
+			m_cursor_h = m_IR11_display_pointer_address_upper;
+			LOG2674(("DELAYED write from cursor address to pointer address %02x\n",data));
 			break;
 	}
 }

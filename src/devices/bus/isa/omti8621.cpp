@@ -672,7 +672,7 @@ void omti8621_device::format_track(const UINT8 * cdb)
 }
 
 /***************************************************************************
- set_esdi_defect_list - setup the (emty) ESDI defect list
+ set_esdi_defect_list - setup the (empty) ESDI defect list
  ***************************************************************************/
 
 void omti8621_device::set_esdi_defect_list(UINT8 lun, UINT8 head)

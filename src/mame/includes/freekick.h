@@ -30,6 +30,7 @@ public:
 	int        m_spinner;
 	int        m_nmi_en;
 	int        m_ff_data;
+	DECLARE_WRITE8_MEMBER(flipscreen_xy_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(spinner_select_w);

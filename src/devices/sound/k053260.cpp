@@ -114,6 +114,16 @@ void k053260_device::device_reset()
 }
 
 
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void k053260_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
 READ8_MEMBER( k053260_device::main_read )
 {
 	// sub-to-main ports

@@ -90,12 +90,14 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "includes/segaipt.h"
 #include "includes/system16.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 #include "sound/2203intf.h"
+#include "sound/okim6295.h"
 
 #define SHADOW_COLORS_MULTIPLIER 3
 
@@ -1300,11 +1302,6 @@ static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-READ16_MEMBER(segas1x_bootleg_state::ddcrew_c41006_r)
-{
-	return 0xffff;//rand();
-}
-
 WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
 {
 //  printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
@@ -1332,38 +1329,35 @@ static ADDRESS_MAP_START(ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state)
 
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") // ok
 
-	AM_RANGE(0xC00000, 0xC00001) AM_WRITENOP // vdp leftovers maybe?
-	AM_RANGE(0xC00004, 0xC00005) AM_WRITENOP
-	AM_RANGE(0xC00006, 0xC00007) AM_WRITENOP
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP // vdp leftovers maybe?
+	AM_RANGE(0xc00004, 0xc00005) AM_WRITENOP
+	AM_RANGE(0xc00006, 0xc00007) AM_WRITENOP
 
+	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("P1")
+	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("COINAGE")
+	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P3")
 
-	AM_RANGE(0xC40000, 0xC40001) AM_READ(ddcrew_c41006_r)
-	AM_RANGE(0xC40002, 0xC40003) AM_READ(ddcrew_c41006_r)
-	AM_RANGE(0xC41000, 0xC41001) AM_READ(ddcrew_c41006_r)
-	AM_RANGE(0xC41002, 0xC41003) AM_READ(ddcrew_c41006_r)
-	AM_RANGE(0xC41004, 0xC41005) AM_READ(ddcrew_c41006_r)
-	AM_RANGE(0xC41006, 0xC41007) AM_READ(ddcrew_c41006_r)
-
-
-
-	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
+	AM_RANGE(0xc44000, 0xc44001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
 
-	AM_RANGE(0xC46038, 0xC4603f) AM_WRITE(ddcrewbl_spritebank_w) // ok
+	AM_RANGE(0xc46038, 0xc4603f) AM_WRITE(ddcrewbl_spritebank_w) // ok
 
-	AM_RANGE(0xC46000, 0xC46001) AM_WRITENOP
-	AM_RANGE(0xC46010, 0xC46011) AM_WRITENOP
-	AM_RANGE(0xC46020, 0xC46021) AM_WRITENOP
+	AM_RANGE(0xc46000, 0xc46001) AM_WRITENOP
+	AM_RANGE(0xc46010, 0xc46011) AM_WRITENOP
+	AM_RANGE(0xc46020, 0xc46021) AM_WRITENOP
 
-	AM_RANGE(0xC46040, 0xC46041) AM_WRITENOP
-	AM_RANGE(0xC46050, 0xC46051) AM_WRITENOP
+	AM_RANGE(0xc46040, 0xc46041) AM_WRITENOP
+	AM_RANGE(0xc46050, 0xc46051) AM_WRITENOP
 
-	AM_RANGE(0xC46060, 0xC46061) AM_WRITENOP
-	AM_RANGE(0xC46062, 0xC46063) AM_WRITENOP
-	AM_RANGE(0xC46064, 0xC46065) AM_WRITENOP
+	AM_RANGE(0xc46060, 0xc46061) AM_WRITENOP
+	AM_RANGE(0xc46062, 0xc46063) AM_WRITENOP
+	AM_RANGE(0xc46064, 0xc46065) AM_WRITENOP
 
-	AM_RANGE(0xC46070, 0xC46071) AM_WRITENOP
+	AM_RANGE(0xc46070, 0xc46071) AM_WRITENOP
 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // ok
 ADDRESS_MAP_END
@@ -1834,10 +1828,54 @@ static INPUT_PORTS_START( astormbl )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ddcrewbl )
+	PORT_INCLUDE( astormbl )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("COINAGE")
+	SEGA_COINAGE_LOC(SW1)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x02, 0x02, "Switch to Start" ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, "Start" )
+	PORT_DIPSETTING(    0x00, "Attack" )
+	PORT_DIPNAME( 0x04, 0x00, "Coin Chute" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "Common" )
+	PORT_DIPSETTING(    0x00, "Individual" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Player Start/Continue" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "3/3" )
+	PORT_DIPSETTING(    0x20, "2/3" )
+	PORT_DIPSETTING(    0x10, "2/2" )
+	PORT_DIPSETTING(    0x00, "3/4" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( mwalkbl )
 	PORT_INCLUDE( astormbl )
 
-		PORT_MODIFY("P3")
+	PORT_MODIFY("P3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_MODIFY("SERVICE")
@@ -2427,6 +2465,10 @@ static MACHINE_CONFIG_START( ddcrewbl, segas1x_bootleg_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", 10000000/10, OKIM6295_PIN7_HIGH) // clock and pin not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -3493,7 +3535,7 @@ ROM_START( ddcrewbl )
 	ROM_LOAD16_BYTE( "fac-04.bin", 0x600001, 0x80000, CRC(846c4265) SHA1(58d0c213d085fb4dee18b7aefb05087d9d522950) )
 	ROM_LOAD16_BYTE( "fac-05.bin", 0x600000, 0x80000, CRC(0e76c797) SHA1(9a44dc948e84e5acac36e80105c2349ee78e6cfa) )
 
-	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "fac-12.bin", 0x00000, 0x80000, CRC(2e7dade2) SHA1(4133138990ed10f56e299399f034f86ffd9cbd47) )
 
 	ROM_REGION( 0x100000, "proms", 0 )
@@ -3826,4 +3868,4 @@ GAME( 1990, astormb2,    astorm,    astormbl,    astormbl, segas1x_bootleg_state
 GAME( 1990, mwalkbl,     mwalk,     mwalkbl,     mwalkbl, segas1x_bootleg_state,   mwalkbl,    ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbl,    shdancer,  shdancbl,    shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbla,   shdancer,  shdancbla,   shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,    astormbl, segas1x_bootleg_state,  ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,    ddcrewbl, segas1x_bootleg_state,  ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

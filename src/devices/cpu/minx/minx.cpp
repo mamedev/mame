@@ -114,7 +114,8 @@ void minx_cpu_device::device_start()
 	state_add( MINX_XI, "XI", m_XI ).formatstr("%02X");
 	state_add( MINX_YI, "YI", m_YI ).formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_curpc).formatstr("%06X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_curpc).formatstr("%06X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_curpc).formatstr("%06X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%14s").noshow();
 
 	m_icountptr = &m_icount;

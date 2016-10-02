@@ -24,7 +24,7 @@
 // ======================> portfolio_ram_card_t
 
 class portfolio_ram_card_t :  public device_t,
-				  			  public device_portfolio_memory_card_slot_interface,
+							  public device_portfolio_memory_card_slot_interface,
 							  public device_nvram_interface
 {
 public:

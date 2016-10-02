@@ -434,25 +434,25 @@ void supracan_state::video_start()
 	m_gfxdecode->gfx(4)->set_source(&m_vram_addr_swapped[0]);
 	m_gfxdecode->gfx(4)->set_xormask(0);
 
-	m_tilemap_sizes[0][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap_sizes[0][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap_sizes[0][2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	m_tilemap_sizes[0][3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap_sizes[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap_sizes[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap_sizes[0][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	m_tilemap_sizes[1][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap_sizes[1][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap_sizes[1][2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	m_tilemap_sizes[1][3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap_sizes[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap_sizes[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap_sizes[1][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	m_tilemap_sizes[2][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap_sizes[2][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap_sizes[2][2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	m_tilemap_sizes[2][3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[2][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap_sizes[2][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap_sizes[2][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap_sizes[2][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	m_tilemap_sizes[3][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap_sizes[3][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap_sizes[3][2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	m_tilemap_sizes[3][3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[3][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap_sizes[3][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap_sizes[3][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap_sizes[3][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
 int supracan_state::get_tilemap_dimensions(int &xsize, int &ysize, int layer)

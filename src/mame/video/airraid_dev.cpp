@@ -3,7 +3,7 @@
 
 /* There are 2 versions of the Air Raid / Cross Shooter hardware, one has everything integrated on a single PCB
    the other is a Air Raid specific video PCB used with the Street Fight motherboard, there could be differences.
-  
+
    This is very similar to Dark Mist */
 
 #include "emu.h"
@@ -80,19 +80,22 @@ machine_config_constructor airraid_video_device::device_mconfig_additions() cons
 
 void airraid_video_device::device_start()
 {
+	if (!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	save_item(NAME(m_hw));
 
 	// there might actually be 4 banks of 2048 x 16 tilemaps in here as the upper scroll bits are with the rom banking.
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(airraid_video_device::bg_scan),this),16,16,2048, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(airraid_video_device::bg_scan),this),16,16,2048, 64);
 
 	// which could in turn mean this is actually 256 x 128, not 256 x 512
-//  m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(airraid_video_device::fg_scan),this),16,16,256, 512);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(airraid_video_device::fg_scan),this),16,16,256, 128);
+//  m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(airraid_video_device::fg_scan),this),16,16,256, 512);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(airraid_video_device::fg_scan),this),16,16,256, 128);
 
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_cstx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airraid_video_device::get_cstx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 
-//	m_fg_tilemap->set_transparent_pen(0);
-//	m_tx_tilemap->set_transparent_pen(0);
+//  m_fg_tilemap->set_transparent_pen(0);
+//  m_tx_tilemap->set_transparent_pen(0);
 
 	// we do manual mixing using a temp bitmap
 	m_screen->register_screen_bitmap(m_temp_bitmap);
@@ -208,7 +211,7 @@ UINT32 airraid_video_device::screen_update_airraid(screen_device &screen, bitmap
 	// draw screen
 	bitmap.fill(0x80, cliprect); // temp
 
-//	m_temp_bitmap.fill(0x00, cliprect);
+//  m_temp_bitmap.fill(0x00, cliprect);
 
 	if ((m_hw & DISPLAY_BG) == 0x00)
 	{

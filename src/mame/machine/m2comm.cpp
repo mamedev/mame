@@ -446,7 +446,7 @@ void m2comm_device::comm_tick()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						osd_printf_verbose("M2COMM: droped a message...\n");
+						osd_printf_verbose("M2COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -527,7 +527,7 @@ void m2comm_device::comm_tick()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					osd_printf_verbose("M2COMM: droped a message...\n");
+					osd_printf_verbose("M2COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}

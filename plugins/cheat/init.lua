@@ -11,7 +11,7 @@
 --     "item" [{
 --       "value": "itemval(index*stepval+minval)",
 --       "text": "text"
---     }, 
+--     },
 --     ... ]
 --   },
 --   "space": {
@@ -171,17 +171,17 @@ function cheat.startplugin()
 
 	local function parse_cheat(cheat)
 		cheat.cheat_env = { draw_text = draw_text,
-				    draw_line = draw_line,
-				    draw_box = draw_box,
-				    tobcd = tobcd,
-				    frombcd = frombcd,
-				    pairs = pairs,
-				    ipairs = ipairs,
-				    outputs = manager:machine():outputs(),
-				    time = time,
-			    	    table = 
-				    { insert = table.insert,
-			    	      remove = table.remove } }
+					draw_line = draw_line,
+					draw_box = draw_box,
+					tobcd = tobcd,
+					frombcd = frombcd,
+					pairs = pairs,
+					ipairs = ipairs,
+					outputs = manager:machine():outputs(),
+					time = time,
+						table =
+					{ insert = table.insert,
+						  remove = table.remove } }
 		cheat.enabled = false
 		-- verify scripts are valid first
 		if not cheat.script then
@@ -351,7 +351,7 @@ function cheat.startplugin()
 					end
 				end
 			elseif index == 3 then
-				for num, cheat in pairs(cheats) do 
+				for num, cheat in pairs(cheats) do
 					if cheat.enabled and cheat.script.off then
 						cheat.script.off()
 					end

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 /***************************************************************************
 
-	Sony LDP-1450 laserdisc emulation.
+    Sony LDP-1450 laserdisc emulation.
 
 ***************************************************************************/
 
@@ -45,7 +45,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	
+
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
@@ -75,7 +75,7 @@ protected:
 		player_stop,
 		player_repeat
 	};
-	
+
 private:
 	UINT8 m_command;
 	UINT8 m_status;
@@ -87,7 +87,7 @@ private:
 	void exec_enter_cmd();
 	UINT8 m_internal_bcd[0x10];
 	UINT8 m_index_state;
-	
+
 };
 
 

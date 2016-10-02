@@ -38,15 +38,10 @@ private:
 	};
 
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	char m_search[40];
+	std::string m_search;
 	static bool first_start;
 	static int m_isabios;
 	int highlight;
-
-	std::string             m_info_buffer;
-	game_driver const       *m_info_driver;
-	ui_software_info const  *m_info_software;
-	int                     m_info_view;
 
 	static std::vector<const game_driver *> m_sortedlist;
 	std::vector<const game_driver *> m_availsortedlist;
@@ -88,9 +83,7 @@ private:
 	}
 
 	// General info
-	void general_info(const game_driver *driver, std::string &buffer);
-
-	virtual void infos_render(float x1, float y1, float x2, float y2) override;
+	virtual void general_info(const game_driver *driver, std::string &buffer) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);

@@ -106,7 +106,7 @@ WRITE16_MEMBER(pirates_state::out_w)
 		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
-		m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
+		m_oki->set_rom_bank((data >> 6) & 1);
 
 		/* bit 7 used (function unknown) */
 	}

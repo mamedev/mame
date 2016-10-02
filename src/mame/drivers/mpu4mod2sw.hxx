@@ -1928,7 +1928,7 @@ GAME(199?, m4tupen      ,0          ,mod2       ,mpu4               , mpu4_state
 
 GAME(199?, m421         ,0          ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4)",GAME_FLAGS ) // reel issues
 
-GAMEL(199?, m4alpha      ,0          ,mod2       ,mpu4               , mpu4_state,m4alpha	        ,ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",GAME_FLAGS, layout_m4alpha )
+GAMEL(199?, m4alpha      ,0          ,mod2       ,mpu4               , mpu4_state,m4alpha           ,ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",GAME_FLAGS, layout_m4alpha )
 
 GAME(199?, m4bnknot     ,0          ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Bank A Note (Barcrest) [BN 1.0] (MPU4)",GAME_FLAGS )
 

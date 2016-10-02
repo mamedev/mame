@@ -66,7 +66,7 @@ public:
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
 {
-	generic_pulse_irq_line(m_maincpu, 0, 1);
+	generic_pulse_irq_line(*m_maincpu, 0, 1);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_off)
@@ -82,7 +82,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_on)
 		m_maincpu->set_unscaled_clock(XTAL_4MHz * 0.75);
 		m_scanline_off_timer->adjust(m_screen->time_until_pos(param, 128));
 	}
-	
+
 	// vblank interrupt
 	if (param == 191)
 		m_interrupt_timer->adjust(m_screen->time_until_pos(param, 128+64));
@@ -120,7 +120,7 @@ UINT32 dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			// vram fetch
 			if ((x & 7) == 0)
 				m_vram_latch = m_vram[x >> 3 | y >> 1 << 4];
-			
+
 			bitmap.pix16(y, x) = (m_vram_latch >> (~x & 7) & 1) ? m_color & 7 : m_color >> 3;
 		}
 	}

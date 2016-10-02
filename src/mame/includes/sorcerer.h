@@ -67,7 +67,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_vs(*this, "VS")
-		, m_iop_x(*this, "X")
+		, m_iop_x(*this, "X.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(sorcerer_fc_r);

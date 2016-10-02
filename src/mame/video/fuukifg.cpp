@@ -9,9 +9,9 @@
 const device_type FUUKI_VIDEO = &device_creator<fuukivid_device>;
 
 fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, FUUKI_VIDEO, "Fuuki Video", tag, owner, clock, "fuukivid", __FILE__),
-		device_video_interface(mconfig, *this),
-		m_gfxdecode(*this)
+	: device_t(mconfig, FUUKI_VIDEO, "Fuuki Video", tag, owner, clock, "fuukivid", __FILE__)
+	, device_video_interface(mconfig, *this)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 

@@ -56,7 +56,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
 		, m_crtc(*this, "crtc")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_dma(*this, "dma")
 		, m_u12(*this, "u12")
 		, m_centronics(*this, "centronics")

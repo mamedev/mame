@@ -19,13 +19,15 @@ class p2000t_state : public driver_device
 {
 public:
 	p2000t_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_speaker(*this, "speaker"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_videoram(*this, "videoram"),
-			m_keyboard(*this, "KEY")    { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_videoram(*this, "videoram")
+		, m_keyboard(*this, "KEY.%u", 0)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;

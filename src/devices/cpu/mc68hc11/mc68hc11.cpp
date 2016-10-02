@@ -442,6 +442,7 @@ void mc68hc11_cpu_device::device_start()
 	state_add( HC11_IY, "IY", m_iy).formatstr("%04X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;

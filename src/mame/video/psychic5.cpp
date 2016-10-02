@@ -191,8 +191,8 @@ VIDEO_START_MEMBER(psychic5_state,psychic5)
 {
 	video_start();
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_title_screen));
@@ -203,8 +203,8 @@ VIDEO_START_MEMBER(psychic5_state,bombsa)
 {
 	video_start();
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
 	m_fg_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_bombsa_unknown));
@@ -226,7 +226,7 @@ VIDEO_RESET_MEMBER(psychic5_state,psychic5)
 
 #define DRAW_SPRITE(code, sx, sy) \
 	if (m_blend) \
-		m_blend->drawgfx(m_palette, bitmap, cliprect, m_gfxdecode->gfx(0), code, color, flipx, flipy, sx, sy, 15); \
+		m_blend->drawgfx(*m_palette, bitmap, cliprect, m_gfxdecode->gfx(0), code, color, flipx, flipy, sx, sy, 15); \
 	else \
 		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 15);
 

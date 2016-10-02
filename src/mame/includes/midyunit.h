@@ -44,19 +44,22 @@ public:
 	};
 
 	midyunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_oki(*this, "oki"),
-			m_palette(*this, "palette"),
-			m_narc_sound(*this, "narcsnd"),
-			m_cvsd_sound(*this, "cvsd"),
-			m_adpcm_sound(*this, "adpcm"),
-			m_soundlatch(*this, "soundlatch"),
-			m_generic_paletteram_16(*this, "paletteram"),
-			m_gfx_rom(*this, "gfx_rom", 16),
-			m_mainram(*this, "mainram"),
-			m_ports(*this, ports) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki")
+		, m_palette(*this, "palette")
+		, m_narc_sound(*this, "narcsnd")
+		, m_cvsd_sound(*this, "cvsd")
+		, m_adpcm_sound(*this, "adpcm")
+		, m_soundlatch(*this, "soundlatch")
+		, m_generic_paletteram_16(*this, "paletteram")
+		, m_gfx_rom(*this, "gfx_rom", 16)
+		, m_mainram(*this, "mainram")
+		, m_ports(*this, { { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" } })
+	{
+	}
+
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -71,8 +74,6 @@ public:
 	optional_shared_ptr<UINT8> m_gfx_rom;
 	required_shared_ptr<UINT16> m_mainram;
 	optional_ioport_array<6> m_ports;
-
-	DECLARE_IOPORT_ARRAY(ports);
 
 	std::unique_ptr<UINT16[]> m_cmos_ram;
 	UINT32 m_cmos_page;

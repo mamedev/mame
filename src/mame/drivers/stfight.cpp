@@ -6,8 +6,8 @@
 
 
  Notes:  Lower Board - CPU board        S-0086-002-B0  (both games)
-		 Top Board   - GFX board        S-0086-002A-A0 (Street Fight)
-		 Top Board   - GFX board        S-0087-807     (Cross Shooter)
+         Top Board   - GFX board        S-0086-002A-A0 (Street Fight)
+         Top Board   - GFX board        S-0087-807     (Cross Shooter)
 
  for the single PCB version of Air Raid / Cross Shooter on the S-0087-011A-0 PCB,
  see airraid.cpp
@@ -263,7 +263,7 @@ TODO:
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                  /* sf02.bin */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")                  /* sf02.bin */
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc100, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")
@@ -1070,4 +1070,4 @@ GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,  
 GAME( 1986, stfightgb,empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* Cross Shooter uses the same base board, but different video board */
-GAME( 1987, cshootert,  airraid,      cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cshootert,  airraid,      cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

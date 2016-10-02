@@ -38,6 +38,8 @@ public:
 	UINT16 m_picr;
 	UINT16 m_pitr;
 
+	UINT16 get_cs(offs_t address);
+
 	READ32_MEMBER( m68340_internal_base_r );
 	WRITE32_MEMBER( m68340_internal_base_w );
 	READ32_MEMBER( m68340_internal_dma_r );
@@ -65,8 +67,6 @@ protected:
 };
 
 static const device_type M68340 = &device_creator<m68340cpu_device>;
-
-extern UINT16 m68340_get_cs(m68340cpu_device *device, offs_t address);
 
 
 

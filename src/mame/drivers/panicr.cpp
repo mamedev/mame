@@ -237,10 +237,10 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 
 void panicr_state::video_start()
 {
-	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
-	m_infotilemap_2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info_2),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
+	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
+	m_infotilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info_2),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
 
-	m_txttilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_txttilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_txttilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
 
 	save_item(NAME(m_scrollx));
@@ -353,7 +353,7 @@ READ8_MEMBER(panicr_state::collision_r)
 	// there is a 3rd additional bit that is used as priority, we're not concerned about that here
 
 	m_infotilemap_2->set_scrollx(0, m_scrollx & 0xffff);
-	m_infotilemap_2->draw(m_screen, *m_tempbitmap_1, m_tempbitmap_clip, 0,0);
+	m_infotilemap_2->draw(*m_screen, *m_tempbitmap_1, m_tempbitmap_clip, 0,0);
 
 
 	int actual_column = offset&0x3f;

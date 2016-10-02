@@ -167,7 +167,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 
 	m_reel0->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel1", m_reel0);
+	awp_draw_reel(machine(),"reel1", *m_reel0);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
@@ -179,7 +179,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 
 	m_reel1->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel2", m_reel1);
+	awp_draw_reel(machine(),"reel2", *m_reel1);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
@@ -191,7 +191,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 
 	m_reel2->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel3", m_reel2);
+	awp_draw_reel(machine(),"reel3", *m_reel2);
 }
 
 

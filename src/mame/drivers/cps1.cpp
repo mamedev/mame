@@ -377,10 +377,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
 
 READ16_MEMBER(cps_state::qsound_rom_r)
 {
-	UINT8 *rom = memregion("user1")->base();
-
-	if (rom)
+	if (memregion("user1") != nullptr)
+	{
+		UINT8 *rom = memregion("user1")->base();
 		return rom[offset] | 0xff00;
+	}
 	else
 	{
 		popmessage("%06x: read sound ROM byte %04x", space.device().safe_pc(), offset);
@@ -778,6 +779,21 @@ static INPUT_PORTS_START( cps1_2b )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // no button 3
 INPUT_PORTS_END
 
+/* CPS1 games with 2 players, 4-way joysticks and 2 buttons each */
+static INPUT_PORTS_START( cps1_2b_4way )
+	PORT_INCLUDE( cps1_2b )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+INPUT_PORTS_END
+
 /* CPS1 games with 2 players and 1 button each */
 static INPUT_PORTS_START( cps1_1b )
 	PORT_INCLUDE( cps1_2b )
@@ -901,7 +917,7 @@ static INPUT_PORTS_START( forgottn )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ghouls )
-	PORT_INCLUDE( cps1_2b )
+	PORT_INCLUDE( cps1_2b_4way )
 	/* Service1 doesn't give any credit */
 
 	PORT_START("DSWC")
@@ -1756,7 +1772,7 @@ static INPUT_PORTS_START( nemo )
 	PORT_START("DSWB")
 	CPS1_DIFFICULTY_1( "SW(B)" )
 	PORT_DIPNAME( 0x18, 0x18, "Life Bar" )                          PORT_DIPLOCATION("SW(B):4,5")
-	PORT_DIPSETTING(    0x00, "Minimun" )
+	PORT_DIPSETTING(    0x00, "Minimum" )
 	PORT_DIPSETTING(    0x18, DEF_STR( Medium ) )
 //  PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x08, "Maximum" )
@@ -2780,10 +2796,18 @@ INPUT_PORTS_END
 
 /* Needs further checking */
 static INPUT_PORTS_START( pang3 )
-	PORT_INCLUDE( cps1_3b )
+	// Though service mode shows diagonal inputs, the flyer and manual both specify 4-way joysticks
+	PORT_INCLUDE( cps1_2b_4way )
 
 	PORT_MODIFY("IN0")
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+
+	// As manual states, "Push 2 is not used," and is not even shown in service mode
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shot")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Shot")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWA")      /* (not used, EEPROM) */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )

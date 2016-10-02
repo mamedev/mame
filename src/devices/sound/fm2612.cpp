@@ -2395,6 +2395,14 @@ void * ym2612_init(void *param, device_t *device, int clock, int rate,
 	return F2612;
 }
 
+void ym2612_clock_changed(void *chip, int clock, int rate)
+{
+	YM2612 *F2612 = (YM2612 *)chip;
+
+	F2612->OPN.ST.clock = clock;
+	F2612->OPN.ST.rate = rate;
+}
+
 /* shut down emulator */
 void ym2612_shutdown(void *chip)
 {

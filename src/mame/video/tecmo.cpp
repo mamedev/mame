@@ -80,15 +80,15 @@ void tecmo_state::video_start()
 {
 	if (m_video_type == 2)  /* gemini */
 	{
-		m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
-		m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
 	}
 	else    /* rygar, silkworm */
 	{
-		m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
-		m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
 	}
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -133,6 +133,7 @@ WRITE8_MEMBER(tecmo_state::fgscroll_w)
 
 	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] + 256 * m_fgscroll[1]);
 	m_fg_tilemap->set_scrolly(0, m_fgscroll[2]);
+	m_screen->update_partial(m_screen->vpos());
 }
 
 WRITE8_MEMBER(tecmo_state::bgscroll_w)
@@ -141,6 +142,7 @@ WRITE8_MEMBER(tecmo_state::bgscroll_w)
 
 	m_bg_tilemap->set_scrollx(0, m_bgscroll[0] + 256 * m_bgscroll[1]);
 	m_bg_tilemap->set_scrolly(0, m_bgscroll[2]);
+	m_screen->update_partial(m_screen->vpos());
 }
 
 WRITE8_MEMBER(tecmo_state::flipscreen_w)
@@ -167,5 +169,6 @@ UINT32 tecmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
 
 	m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode,cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
+
 	return 0;
 }

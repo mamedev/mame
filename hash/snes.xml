@@ -25823,7 +25823,7 @@ more investigation needed...
 			<feature name="led2" value="LED2" /> <!-- green, connected to CN2? -->
 			<feature name="cart_model" value="SHVC-042" />
 			<feature name="cart_back_label" value="SHVC-SGB2-JPN" />
-			<feature name="slot" value="lorom_sgb" />
+			<feature name="slot" value="lorom_sgb2" />
 			<dataarea name="rom" size="524288">
 				<rom name="sys-sgb2-10.u4" size="524288" crc="cb176e45" sha1="e5b2922ca137051059e4269b236d07a22c07bc84" offset="0x000000" />
 			</dataarea>

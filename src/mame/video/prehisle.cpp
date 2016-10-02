@@ -105,7 +105,7 @@ void prehisle_state::video_start()
 {
 	// ROM-based background layer
 	m_bg_tilemap = &machine().tilemap().create(
-			m_gfxdecode,
+			*m_gfxdecode,
 			tilemap_get_info_delegate(FUNC(prehisle_state::get_bg_tile_info), this),
 			TILEMAP_SCAN_COLS,      // scan order
 			16, 16,                 // tile size
@@ -113,7 +113,7 @@ void prehisle_state::video_start()
 
 	// RAM-based foreground layer (overlays most sprites)
 	m_fg_tilemap = &machine().tilemap().create(
-			m_gfxdecode,
+			*m_gfxdecode,
 			tilemap_get_info_delegate(FUNC(prehisle_state::get_fg_tile_info), this),
 			TILEMAP_SCAN_COLS,      // scan order
 			16, 16,                 // tile size
@@ -122,7 +122,7 @@ void prehisle_state::video_start()
 
 	// text layer
 	m_tx_tilemap = &machine().tilemap().create(
-			m_gfxdecode,
+			*m_gfxdecode,
 			tilemap_get_info_delegate(FUNC(prehisle_state::get_tx_tile_info), this),
 			TILEMAP_SCAN_ROWS,      // scan order
 			8, 8,                   // tile size

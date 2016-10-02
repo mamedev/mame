@@ -222,7 +222,7 @@ void hpc104_t::nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom,
 		{
 			if (offset >= 0x1f000 && offset < 0x5f000)
 			{
-				m_nvram[offset - 0x1f000] = data;	
+				m_nvram[offset - 0x1f000] = data;
 			}
 		}
 	}

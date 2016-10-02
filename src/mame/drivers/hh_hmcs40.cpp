@@ -106,7 +106,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_inp_matrix(*this, "IN"),
+		m_inp_matrix(*this, "IN.%u", 0),
 		m_speaker(*this, "speaker"),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -2521,10 +2521,10 @@ MACHINE_CONFIG_END
   Entex Select-A-Game (HMCS40 MCU cartridges)
   * see gamelist for cartridge info
   * cyan/red VFD display Futaba DM-16Z + cyan VFD 9-digit panel Futaba 9-ST-11A 1F
-  
+
   The console is the peripheral, the heart of the system is the cartridge.
   Cartridges with a HMCS40 MCU are implemented in this driver.
-  
+
   MAME external artwork is recommended, needed for per-game VFD overlays.
 
 ***************************************************************************/
@@ -2549,7 +2549,7 @@ void sag_state::prepare_display()
 	// grid 0-7 are the 'pixels'
 	for (int y = 0; y < 8; y++)
 		m_display_state[y] = (m_grid >> y & 1) ? m_plate : 0;
-	
+
 	// grid 8-11 are 7segs
 	set_display_segmask(0xf00, 0x7f);
 	UINT8 seg = BITSWAP8(m_plate,3,4,5,6,7,8,9,10);

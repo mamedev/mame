@@ -47,7 +47,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_via6522_0(*this, "via6522_0")
 		, m_configuration(*this, "Configuration")
-		, m_matrix(*this, "matrix")
+		, m_matrix(*this, "matrix.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(ssystem3);

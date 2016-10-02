@@ -185,6 +185,9 @@ Notes:
 #define TOWNS_CD_IRQ_MPU 1
 #define TOWNS_CD_IRQ_DMA 2
 
+#define LOG_SYS 0
+#define LOG_CD 0
+
 enum
 {
 	MOUSE_START,
@@ -292,10 +295,10 @@ READ8_MEMBER(towns_state::towns_system_r)
 	switch(offset)
 	{
 		case 0x00:
-			logerror("SYS: port 0x20 read\n");
+			if(LOG_SYS) logerror("SYS: port 0x20 read\n");
 			return 0x00;
 		case 0x05:
-			logerror("SYS: port 0x25 read\n");
+			if(LOG_SYS) logerror("SYS: port 0x25 read\n");
 			return 0x00;
 /*      case 0x06:
             count = (m_towns_freerun_counter->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
@@ -304,28 +307,28 @@ READ8_MEMBER(towns_state::towns_system_r)
             count = (m_towns_freerun_counter->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
             return (count >> 8) & 0xff;
 */      case 0x06:
-			//logerror("SYS: (0x26) timer read\n");
+			//if(LOG_SYS) logerror("SYS: (0x26) timer read\n");
 			return m_freerun_timer;
 		case 0x07:
 			return m_freerun_timer >> 8;
 		case 0x08:
-			//logerror("SYS: (0x28) NMI mask read\n");
+			//if(LOG_SYS) logerror("SYS: (0x28) NMI mask read\n");
 			return m_nmi_mask & 0x01;
 		case 0x10:
-			logerror("SYS: (0x30) Machine ID read\n");
+			if(LOG_SYS) logerror("SYS: (0x30) Machine ID read\n");
 			return (m_towns_machine_id >> 8) & 0xff;
 		case 0x11:
-			logerror("SYS: (0x31) Machine ID read\n");
+			if(LOG_SYS) logerror("SYS: (0x31) Machine ID read\n");
 			return m_towns_machine_id & 0xff;
 		case 0x12:
 			/* Bit 0 = data, bit 6 = CLK, bit 7 = RESET, bit 5 is always 1? */
 			ret = (m_towns_serial_rom[m_towns_srom_position/8] & (1 << (m_towns_srom_position%8))) ? 1 : 0;
 			ret |= m_towns_srom_clk;
 			ret |= m_towns_srom_reset;
-			//logerror("SYS: (0x32) Serial ROM read [0x%02x, pos=%i]\n",ret,towns_srom_position);
+			//if(LOG_SYS) logerror("SYS: (0x32) Serial ROM read [0x%02x, pos=%i]\n",ret,towns_srom_position);
 			return ret;
 		default:
-			//logerror("SYS: Unknown system port read (0x%02x)\n",offset+0x20);
+			//if(LOG_SYS) logerror("SYS: Unknown system port read (0x%02x)\n",offset+0x20);
 			return 0x00;
 	}
 }
@@ -336,17 +339,17 @@ WRITE8_MEMBER(towns_state::towns_system_w)
 	{
 		case 0x00:  // bit 7 = NMI vector protect, bit 6 = power off, bit 0 = software reset, bit 3 = A20 line?
 //          space.m_maincpu->set_input_line(INPUT_LINE_A20,(data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-			logerror("SYS: port 0x20 write %02x\n",data);
+			if(LOG_SYS) logerror("SYS: port 0x20 write %02x\n",data);
 			break;
 		case 0x02:
-			logerror("SYS: (0x22) power port write %02x\n",data);
+			if(LOG_SYS) logerror("SYS: (0x22) power port write %02x\n",data);
 			break;
 		case 0x08:
-			//logerror("SYS: (0x28) NMI mask write %02x\n",data);
+			//if(LOG_SYS) logerror("SYS: (0x28) NMI mask write %02x\n",data);
 			m_nmi_mask = data & 0x01;
 			break;
 		case 0x12:
-			//logerror("SYS: (0x32) Serial ROM write %02x\n",data);
+			//if(LOG_SYS) logerror("SYS: (0x32) Serial ROM write %02x\n",data);
 			// clocks on low-to-high transition
 			if((data & 0x40) && m_towns_srom_clk == 0) // CLK
 			{  // advance to next bit
@@ -360,7 +363,7 @@ WRITE8_MEMBER(towns_state::towns_system_w)
 			m_towns_srom_reset = data & 0x80;
 			break;
 		default:
-			logerror("SYS: Unknown system port write 0x%02x (0x%02x)\n",data,offset);
+			if(LOG_SYS) logerror("SYS: Unknown system port write 0x%02x (0x%02x)\n",data,offset);
 	}
 }
 
@@ -450,7 +453,7 @@ void towns_state::wait_end()
 
 READ8_MEMBER(towns_state::towns_sys6c_r)
 {
-	logerror("SYS: (0x6c) Timer? read\n");
+	if(LOG_SYS) logerror("SYS: (0x6c) Timer? read\n");
 	return 0x00;
 }
 
@@ -821,10 +824,10 @@ READ8_MEMBER(towns_state::towns_sys5e8_r)
 	switch(offset)
 	{
 		case 0x00:
-			logerror("SYS: read RAM size port (%i)\n",m_ram->size());
+			if(LOG_SYS) logerror("SYS: read RAM size port (%i)\n",m_ram->size());
 			return m_ram->size()/1048576;
 		case 0x02:
-			logerror("SYS: read port 5ec\n");
+			if(LOG_SYS) logerror("SYS: read port 5ec\n");
 			return m_compat_mode & 0x01;
 	}
 	return 0x00;
@@ -835,10 +838,10 @@ WRITE8_MEMBER(towns_state::towns_sys5e8_w)
 	switch(offset)
 	{
 		case 0x00:
-			logerror("SYS: wrote 0x%02x to port 5e8\n",data);
+			if(LOG_SYS) logerror("SYS: wrote 0x%02x to port 5e8\n",data);
 			break;
 		case 0x02:
-			logerror("SYS: wrote 0x%02x to port 5ec\n",data);
+			if(LOG_SYS) logerror("SYS: wrote 0x%02x to port 5ec\n",data);
 			m_compat_mode = data & 0x01;
 			break;
 	}
@@ -1427,7 +1430,7 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 		{  // end of transfer
 			m_towns_cd.status &= ~0x10;  // no longer transferring by DMA
 			m_towns_cd.status &= ~0x20;  // no longer transferring by software
-			logerror("DMA1: end of transfer (LBA=%08x)\n",m_towns_cd.lba_current);
+			if(LOG_CD) logerror("DMA1: end of transfer (LBA=%08x)\n",m_towns_cd.lba_current);
 			if(m_towns_cd.lba_current >= m_towns_cd.lba_last)
 			{
 				m_towns_cd.extra_status = 0;
@@ -1461,7 +1464,7 @@ UINT8 towns_state::towns_cdrom_read_byte_software()
 	{  // end of transfer
 		m_towns_cd.status &= ~0x10;  // no longer transferring by DMA
 		m_towns_cd.status &= ~0x20;  // no longer transferring by software
-		logerror("CD: end of software transfer (LBA=%08x)\n",m_towns_cd.lba_current);
+		if(LOG_CD) logerror("CD: end of software transfer (LBA=%08x)\n",m_towns_cd.lba_current);
 		if(m_towns_cd.lba_current >= m_towns_cd.lba_last)
 		{
 			m_towns_cd.extra_status = 0;
@@ -1516,7 +1519,7 @@ void towns_state::towns_cdrom_read(cdrom_image_device* device)
 	if(m_towns_cd.parameter[1] != 0)
 		m_towns_cd.lba_last += m_towns_cd.parameter[1];
 
-	logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",m_towns_cd.lba_current,m_towns_cd.lba_last,track);
+	if(LOG_CD) logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",m_towns_cd.lba_current,m_towns_cd.lba_last,track);
 
 	if(m_towns_cd.lba_current > m_towns_cd.lba_last)
 	{
@@ -1574,7 +1577,7 @@ void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 
 	m_cdda->set_cdrom(device->get_cdrom_file());
 	m_cdda->start_audio(m_towns_cd.cdda_current,m_towns_cd.cdda_length);
-	logerror("CD: CD-DA start from LBA:%i length:%i\n",m_towns_cd.cdda_current,m_towns_cd.cdda_length);
+	if(LOG_CD) logerror("CD: CD-DA start from LBA:%i length:%i\n",m_towns_cd.cdda_current,m_towns_cd.cdda_length);
 	if(m_towns_cd.command & 0x20)
 	{
 		m_towns_cd.extra_status = 1;
@@ -1608,7 +1611,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					m_towns_cd.extra_status = 1;
 					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
-				logerror("CD: Command 0x00: SEEK\n");
+				if(LOG_CD) logerror("CD: Command 0x00: SEEK\n");
 				break;
 			case 0x01:  // unknown
 				if(m_towns_cd.command & 0x20)
@@ -1616,29 +1619,29 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					m_towns_cd.extra_status = 0;
 					towns_cd_set_status(0x00,0xff,0xff,0xff);
 				}
-				logerror("CD: Command 0x01: unknown\n");
+				if(LOG_CD) logerror("CD: Command 0x01: unknown\n");
 				break;
 			case 0x02:  // Read (MODE1)
-				logerror("CD: Command 0x02: READ MODE1\n");
+				if(LOG_CD) logerror("CD: Command 0x02: READ MODE1\n");
 				towns_cdrom_read(device);
 				break;
 			case 0x04:  // Play Audio Track
-				logerror("CD: Command 0x04: PLAY CD-DA\n");
+				if(LOG_CD) logerror("CD: Command 0x04: PLAY CD-DA\n");
 				m_towns_cdda_timer->set_ptr(device);
 				m_towns_cdda_timer->adjust(attotime::from_msec(1),0,attotime::never);
 				break;
 			case 0x05:  // Read TOC
-				logerror("CD: Command 0x05: READ TOC\n");
+				if(LOG_CD) logerror("CD: Command 0x05: READ TOC\n");
 				m_towns_cd.extra_status = 1;
 				towns_cd_set_status(0x00,0x00,0x00,0x00);
 				break;
 			case 0x06:  // Read CD-DA state?
-				logerror("CD: Command 0x06: READ CD-DA STATE\n");
+				if(LOG_CD) logerror("CD: Command 0x06: READ CD-DA STATE\n");
 				m_towns_cd.extra_status = 1;
 				towns_cd_set_status(0x00,0x00,0x00,0x00);
 				break;
 			case 0x80:  // set state
-				logerror("CD: Command 0x80: set state\n");
+				if(LOG_CD) logerror("CD: Command 0x80: set state\n");
 				if(m_towns_cd.command & 0x20)
 				{
 					m_towns_cd.extra_status = 0;
@@ -1655,7 +1658,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					m_towns_cd.extra_status = 0;
 					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
-				logerror("CD: Command 0x81: set state (CDDASET)\n");
+				if(LOG_CD) logerror("CD: Command 0x81: set state (CDDASET)\n");
 				break;
 			case 0x84:   // Stop CD audio track  -- generates no status output?
 				if(m_towns_cd.command & 0x20)
@@ -1664,7 +1667,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
 				m_cdda->pause_audio(1);
-				logerror("CD: Command 0x84: STOP CD-DA\n");
+				if(LOG_CD) logerror("CD: Command 0x84: STOP CD-DA\n");
 				break;
 			case 0x85:   // Stop CD audio track (difference from 0x84?)
 				if(m_towns_cd.command & 0x20)
@@ -1673,7 +1676,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
 				m_cdda->pause_audio(1);
-				logerror("CD: Command 0x85: STOP CD-DA\n");
+				if(LOG_CD) logerror("CD: Command 0x85: STOP CD-DA\n");
 				break;
 			case 0x87:  // Resume CD-DA playback
 				if(m_towns_cd.command & 0x20)
@@ -1682,7 +1685,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					towns_cd_set_status(0x00,0x03,0x00,0x00);
 				}
 				m_cdda->pause_audio(0);
-				logerror("CD: Command 0x87: RESUME CD-DA\n");
+				if(LOG_CD) logerror("CD: Command 0x87: RESUME CD-DA\n");
 				break;
 			default:
 				m_towns_cd.extra_status = 0;
@@ -1709,7 +1712,7 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 	switch(offset)
 	{
 		case 0x00:  // status
-			//logerror("CD: status read, returning %02x\n",towns_cd.status);
+			//if(LOG_CD) logerror("CD: status read, returning %02x\n",towns_cd.status);
 			return m_towns_cd.status;
 		case 0x01:  // command status
 			if(m_towns_cd.cmd_status_ptr >= 3)
@@ -1831,7 +1834,7 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 					}
 				}
 			}
-			logerror("CD: reading command status port (%i), returning %02x\n",m_towns_cd.cmd_status_ptr,ret);
+			if(LOG_CD) logerror("CD: reading command status port (%i), returning %02x\n",m_towns_cd.cmd_status_ptr,ret);
 			m_towns_cd.cmd_status_ptr++;
 			if(m_towns_cd.cmd_status_ptr > 3)
 			{
@@ -1867,13 +1870,13 @@ WRITE8_MEMBER(towns_state::towns_cdrom_w)
 				logerror("CD: sub MPU reset\n");
 			m_towns_cd.mpu_irq_enable = data & 0x02;
 			m_towns_cd.dma_irq_enable = data & 0x01;
-			logerror("CD: status write %02x\n",data);
+			if(LOG_CD) logerror("CD: status write %02x\n",data);
 			break;
 		case 0x01: // command
 			m_towns_cd.command = data;
 			towns_cdrom_execute_command(m_cdrom);
-			logerror("CD: command %02x sent\n",data);
-			logerror("CD: parameters: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+			if(LOG_CD) logerror("CD: command %02x sent\n",data);
+			if(LOG_CD) logerror("CD: parameters: %02x %02x %02x %02x %02x %02x %02x %02x\n",
 				m_towns_cd.parameter[7],m_towns_cd.parameter[6],m_towns_cd.parameter[5],
 				m_towns_cd.parameter[4],m_towns_cd.parameter[3],m_towns_cd.parameter[2],
 				m_towns_cd.parameter[1],m_towns_cd.parameter[0]);
@@ -1882,7 +1885,7 @@ WRITE8_MEMBER(towns_state::towns_cdrom_w)
 			for(x=7;x>0;x--)
 				m_towns_cd.parameter[x] = m_towns_cd.parameter[x-1];
 			m_towns_cd.parameter[0] = data;
-			logerror("CD: parameter %02x added\n",data);
+			if(LOG_CD) logerror("CD: parameter %02x added\n",data);
 			break;
 		case 0x03:
 			if(data & 0x08)  // software transfer
@@ -1903,10 +1906,10 @@ WRITE8_MEMBER(towns_state::towns_cdrom_w)
 					m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 				}
 			}
-			logerror("CD: transfer mode write %02x\n",data);
+			if(LOG_CD) logerror("CD: transfer mode write %02x\n",data);
 			break;
 		default:
-			logerror("CD: write %02x to port %02x\n",data,offset*2);
+			if(LOG_CD) logerror("CD: write %02x to port %02x\n",data,offset*2);
 	}
 }
 

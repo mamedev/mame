@@ -73,11 +73,11 @@
   1x Dallas DS1236-10 (micro manager).
   1x Push button.
 
-  1x Unknown 24-pin IC labeled K-666 9330.
-  1x Unknown 8-pin IC labeled K-664 9432 (looks like a DAC).
-  1x LM358P (8-pin).
-  1x MC14538BCL (Dual precision monostable multivibrator).
-  1x TDA2003 Audio Amp.
+  1x Custom DIP24 IC labeled K-666 9330 (equivalent to YM3812).
+  1x Custom DIP8 IC labeled K-664 (equivalent to YM3014).
+  1x LM358P (DIP8, dual operational amplifier).
+  1x MC14538BCL (dual precision monostable multivibrator).
+  1x TDA2003 (10W. audio amplifier).
   1x Pot.
 
   1x KM6264BL-7 (RAM).
@@ -202,9 +202,9 @@
 
   1x Yamaha YM3812.
   1x Yamaha Y3014B (DAC).
-  1x LM358M (8-pin).
-  1x MC14538 (Dual precision monostable multivibrator).
-  1x TDA2003 (Audio Amp, Heatsinked).
+  1x LM358M (DIP8, dual operational amplifier).
+  1x MC14538 (dual precision monostable multivibrator).
+  1x TDA2003 (10W. audio amplifier) heatsinked.
   1x Pot.
 
   1x HY6264A (RAM).
@@ -929,6 +929,32 @@ ROM_START( am_mg24 )
 	ROM_LOAD( "n82s147a_2.bin", 0x0200, 0x0200, NO_DUMP )
 ROM_END
 
+/*
+  1x 40-pin custom CPU labeled:
+
+     Amatic Trading GMBH
+     Lfnd. Nr. 0940
+     Type:     801 L
+     Datum:    11.12.95
+
+  The program needs proper decryption.
+*/
+ROM_START( am_mg24a )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_LOAD( "multi_stm_27_cl_8202.bin", 0x00000, 0x40000, CRC(e3625367) SHA1(cea3ae4042522c720119ea94c8f05f74cbcdcab0) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "multi_2.4_zg1.bin", 0x100000, 0x80000, CRC(29c3a45b) SHA1(97157a4d436a3dc8b81ffd7eb51f96f3bd969f4b) )  // this one doesn't match the parent.
+	ROM_LOAD( "multi_2.4_zg2.bin", 0x080000, 0x80000, CRC(b504e1b8) SHA1(ffa17a2c212eb2fffb89b131868e69430cb41203) )  // identical to the parent.
+	ROM_LOAD( "multi_2.4_zg3.bin", 0x000000, 0x80000, CRC(9b66bb4d) SHA1(64035d2028a9b68164c87475a1ec9754453ad572) )  // identical to the parent.
+
+	ROM_REGION( 0x20000/*0x0400*/, "proms", 0 )
+	ROM_LOAD( "n82s147n_1.bin", 0x0000, 0x0200, CRC(08e304e3) SHA1(e6f7cda9a626bb4b123889446dac9807983fa8c1) )
+	ROM_LOAD( "n82s147n_2.bin", 0x0200, 0x0200, BAD_DUMP CRC(c962a66d) SHA1(d93aa03a9aa5cd93131e830c1221da5366662474) )
+ROM_END
+
 ROM_START( am_mg3 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
@@ -1081,9 +1107,10 @@ DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
 *           Game Drivers            *
 ************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                        LAYOUT */
-GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND,                                                                                        layout_suprstar )
+/*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                                       LAYOUT */
+GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND,                                                                                                    layout_suprstar )
 GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg24a, 0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (unknown V2.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )  // needs proper decryption.
 GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg3a,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.64)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg35i, 0,        amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.5)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

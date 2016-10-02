@@ -91,6 +91,7 @@
 #include "m1cluedo4.lh"
 #include "m1cluessf.lh"
 #include "m1coro21n.lh"
+#include "m1cororrk.lh"
 #include "m1dkong91n.lh"
 #include "m1dxmono51o.lh"
 #include "m1eastndl.lh"
@@ -100,6 +101,7 @@
 #include "m1frexplc.lh"
 #include "m1gladg.lh"
 #include "m1grescb.lh"
+#include "m1guvnor.lh"
 #include "m1hotpoth.lh"
 #include "m1htclb.lh"
 #include "m1imclb.lh"
@@ -119,11 +121,13 @@
 #include "m1nudbnke.lh"
 #include "m1omega.lh"
 #include "m1onbusa.lh"
+#include "m1pinkpc.lh"
 #include "m1przeeb.lh"
 #include "m1retpp.lh"
 #include "m1search.lh"
 #include "m1sptlgtc.lh"
 #include "m1startr.lh"
+#include "m1sudnima.lh"
 #include "m1taknot.lh"
 #include "m1thatlfc.lh"
 #include "m1topstr.lh"
@@ -350,8 +354,8 @@ WRITE8_MEMBER(maygay1b_state::reel12_w)
 	m_reel0->update( data     & 0x0F);
 	m_reel1->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel1", m_reel0);
-	awp_draw_reel(machine(),"reel2", m_reel1);
+	awp_draw_reel(machine(),"reel1", *m_reel0);
+	awp_draw_reel(machine(),"reel2", *m_reel1);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel34_w)
@@ -359,8 +363,8 @@ WRITE8_MEMBER(maygay1b_state::reel34_w)
 	m_reel2->update( data     & 0x0F);
 	m_reel3->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel3", m_reel2);
-	awp_draw_reel(machine(),"reel4", m_reel3);
+	awp_draw_reel(machine(),"reel3", *m_reel2);
+	awp_draw_reel(machine(),"reel4", *m_reel3);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel56_w)
@@ -368,8 +372,8 @@ WRITE8_MEMBER(maygay1b_state::reel56_w)
 	m_reel4->update( data     & 0x0F);
 	m_reel5->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel5", m_reel4);
-	awp_draw_reel(machine(),"reel6", m_reel5);
+	awp_draw_reel(machine(),"reel5", *m_reel4);
+	awp_draw_reel(machine(),"reel6", *m_reel5);
 }
 
 READ8_MEMBER(maygay1b_state::m1_duart_r)
@@ -635,7 +639,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 
 READ8_MEMBER( maygay1b_state::kbd_r )
 {
-	return (m_kbd_ports[m_lamp_strobe&0x07])->read();
+	return (m_kbd_ports[(m_lamp_strobe&0x07)^4])->read();
 }
 
 WRITE8_MEMBER( maygay1b_state::scanlines_2_w )
@@ -692,10 +696,10 @@ WRITE8_MEMBER(maygay1b_state::mcu_port0_w)
 {
 #ifdef USE_MCU
 // only during startup
-//	logerror("%s: mcu_port0_w %02x\n",machine().describe_context(),data);
+//  logerror("%s: mcu_port0_w %02x\n",machine().describe_context(),data);
 #endif
 }
-	
+
 WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
 {
 #ifdef USE_MCU
@@ -714,7 +718,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
 	}
 #endif
 }
-	
+
 WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
 {
 #ifdef USE_MCU
@@ -722,7 +726,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
 	logerror("%s: mcu_port2_w %02x\n",machine().describe_context(),data);
 #endif
 }
-	
+
 WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
 {
 #ifdef USE_MCU
@@ -738,12 +742,12 @@ READ8_MEMBER(maygay1b_state::mcu_port0_r)
 	// the MCU code checks to see if the input from this port is stable in
 	// the main loop
 	// it looks like it needs to read the strobe
-//	logerror("%s: mcu_port0_r returning %02x\n", machine().describe_context(), ret);
+//  logerror("%s: mcu_port0_r returning %02x\n", machine().describe_context(), ret);
 #endif
 	return ret;
 
 }
-	
+
 
 READ8_MEMBER(maygay1b_state::mcu_port2_r)
 {
@@ -756,10 +760,6 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 #endif
 	return ret;
 }
-
-static ADDRESS_MAP_START( maygay_mcu_map, AS_PROGRAM, 8, maygay1b_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maygay_mcu_io, AS_IO, 8, maygay1b_state )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE( mcu_port0_r, mcu_port0_w )
@@ -777,7 +777,6 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
 	MCFG_CPU_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
-	MCFG_CPU_PROGRAM_MAP(maygay_mcu_map)
 	MCFG_CPU_IO_MAP(maygay_mcu_io)
 
 
@@ -806,12 +805,12 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
-	
+
 	MCFG_DEVICE_ADD("i8279", I8279, M1_MASTER_CLOCK/4)    // unknown clock
 	MCFG_I8279_OUT_SL_CB(WRITE8(maygay1b_state, scanlines_w))   // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_w))     // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(maygay1b_state, kbd_r))           // kbd RL lines
-	
+
 #ifndef USE_MCU
 	// on M1B there is a 2nd i8279, on M1 / M1A a 8051 handles this task!
 	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)        // unknown clock

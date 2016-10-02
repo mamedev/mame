@@ -610,8 +610,8 @@ ROM_START(columbia)
 ROM_END
 
 // system 3
-GAME(1981, atla_ltd, 0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",     MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME(1981, bhol_ltd, 0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",   MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME(1981, atla_ltd, 0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, bhol_ltd, 0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(1981, zephy,    0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",              MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 4

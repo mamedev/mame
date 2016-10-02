@@ -2208,6 +2208,8 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 //  LAYOUT VIEW
 //**************************************************************************
 
+const simple_list<layout_view::item> layout_view::s_null_list;
+
 //-------------------------------------------------
 //  layout_view - constructor
 //-------------------------------------------------
@@ -2270,8 +2272,6 @@ layout_view::~layout_view()
 
 const simple_list<layout_view::item> &layout_view::items(item_layer layer) const
 {
-	static simple_list<item> s_null_list;
-
 	switch (layer)
 	{
 		case ITEM_LAYER_BACKDROP:   return m_backdrop_list;

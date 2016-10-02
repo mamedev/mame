@@ -283,8 +283,8 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	// Video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
-             A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
-             A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)
+			 A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
+			 A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)
 	// Two interlaced fields at 60Hz => 30Hz frame rate
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
@@ -313,7 +313,7 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 	cpu->set_speaker(m_speaker);
 	// Create a timer which fires twice per frame, once for each field
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
-	m_vblank_timer->adjust(attotime::from_hz(30),0,attotime::from_hz(30*2));
+	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
 }
 
 void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

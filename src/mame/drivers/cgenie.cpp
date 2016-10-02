@@ -42,7 +42,7 @@ public:
 		m_char_rom(*this, "gfx1"),
 		m_color_ram(*this, "colorram"),
 		m_font_ram(*this, "fontram"),
-		m_keyboard(*this, "KEY"),
+		m_keyboard(*this, "KEY.%u", 0),
 		m_palette(nullptr),
 		m_control(0xff),
 		m_rs232_rx(1),

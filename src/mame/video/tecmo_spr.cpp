@@ -366,8 +366,6 @@ void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &
 	}
 }
 
-#undef WC90_DRAW_SPRITE
-
 
 
 void tecmo_spr_device::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, gfxdecode_device *gfxdecode, int xscroll, UINT8* spriteram)

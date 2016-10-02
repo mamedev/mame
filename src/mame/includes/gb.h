@@ -15,33 +15,6 @@
 #include "machine/ram.h"
 #include "video/gb_lcd.h"
 
-/* Interrupts */
-#define VBL_INT               0       /* V-Blank    */
-#define LCD_INT               1       /* LCD Status */
-#define TIM_INT               2       /* Timer      */
-#define SIO_INT               3       /* Serial I/O */
-#define EXT_INT               4       /* Joypad     */
-
-#ifdef TIMER
-#undef TIMER
-#endif
-
-/* Cartridge types */
-#define CART_RAM    0x01    /* Cartridge has RAM                             */
-#define BATTERY     0x02    /* Cartridge has a battery to save RAM           */
-#define TIMER       0x04    /* Cartridge has a real-time-clock (MBC3 only)   */
-#define RUMBLE      0x08    /* Cartridge has a rumble motor (MBC5 only)      */
-#define SRAM        0x10    /* Cartridge has SRAM                            */
-#define UNKNOWN     0x80    /* Cartridge is of an unknown type               */
-
-#define DMG_FRAMES_PER_SECOND   59.732155
-#define SGB_FRAMES_PER_SECOND   61.17
-
-
-#define MAX_ROMBANK 512
-#define MAX_RAMBANK 256
-
-
 
 class gb_state : public driver_device
 {
@@ -50,13 +23,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cartslot(*this, "gbslot"),
 		m_maincpu(*this, "maincpu"),
-		m_custom(*this, "custom"),
+		m_apu(*this, "apu"),
 		m_region_maincpu(*this, "maincpu"),
 		m_rambank(*this, "cgb_ram"),
 		m_inputs(*this, "INPUTS"),
 		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ram(*this, RAM_TAG),
-		m_lcd(*this, "lcd") { }
+		m_ppu(*this, "ppu") { }
 
 	//gb_state driver_data;
 	UINT8       m_gb_io[0x10];
@@ -69,8 +42,9 @@ public:
 	UINT8       m_reloading;
 
 	/* Serial I/O related */
+	UINT16      m_internal_serial_clock;
+	UINT16      m_internal_serial_frequency;
 	UINT32      m_sio_count;             /* Serial I/O counter */
-	emu_timer   *m_gb_serial_timer;
 
 	/* SGB variables */
 	INT8 m_sgb_packets;
@@ -86,7 +60,7 @@ public:
 	UINT8       *m_gbc_rammap[8];           /* (CGB) Addresses of internal RAM banks */
 	UINT8       m_gbc_rambank;          /* (CGB) Current CGB RAM bank */
 
-	int m_bios_disable;
+	bool m_bios_disable;
 
 	DECLARE_WRITE8_MEMBER(gb_io_w);
 	DECLARE_WRITE8_MEMBER(gb_io2_w);
@@ -94,6 +68,7 @@ public:
 	DECLARE_READ8_MEMBER(gb_ie_r);
 	DECLARE_WRITE8_MEMBER(gb_ie_w);
 	DECLARE_READ8_MEMBER(gb_io_r);
+	DECLARE_WRITE8_MEMBER(gbc_io_w);
 	DECLARE_WRITE8_MEMBER(gbc_io2_w);
 	DECLARE_READ8_MEMBER(gbc_io2_r);
 	DECLARE_PALETTE_INIT(gb);
@@ -104,7 +79,6 @@ public:
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
 	DECLARE_PALETTE_INIT(gbc);
-	TIMER_CALLBACK_MEMBER(gb_serial_timer_proc);
 	DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
 	DECLARE_READ8_MEMBER(gb_cart_r);
@@ -118,18 +92,19 @@ public:
 
 protected:
 	required_device<lr35902_cpu_device> m_maincpu;
-	required_device<gameboy_sound_device> m_custom;
+	required_device<gameboy_sound_device> m_apu;
 	required_memory_region m_region_maincpu;
 	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;
 	required_ioport m_bios_hack;
 	optional_device<ram_device> m_ram;
-	required_device<gb_lcd_device> m_lcd;
+	required_device<dmg_ppu_device> m_ppu;
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();
 	void gb_init();
 	void gb_init_regs();
+	void gb_serial_timer_tick();
 
 	void save_gb_base();
 	void save_gbc_only();

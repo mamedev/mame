@@ -80,7 +80,7 @@ static UINT8 cassette_image_read_uint8(cassette_image *cassette, UINT64 offset)
     atom_tap_identify - identify cassette
 -------------------------------------------------*/
 
-static casserr_t atom_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error atom_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_modulation_identify( cassette, &atom_tap_modulation, opts);
 }
@@ -92,15 +92,15 @@ static casserr_t atom_tap_identify(cassette_image *cassette, struct CassetteOpti
 #define MODULATE(_value) \
 	for (int i = 0; i < (_value ? 8 : 4); i++) { \
 		err = cassette_put_modulated_data_bit(cassette, 0, time_index, _value, &atom_tap_modulation, &time_displacement);\
-		if (err) return err;\
+		if (err != cassette_image::error::SUCCESS) return err;\
 		time_index += time_displacement;\
 	}
 
 #define BIT(x,n) (((x)>>(n))&1)
 
-static casserr_t atom_tap_load(cassette_image *cassette)
+static cassette_image::error atom_tap_load(cassette_image *cassette)
 {
-	casserr_t err;
+	cassette_image::error err;
 	UINT64 image_size = cassette_image_size(cassette);
 	UINT64 image_pos = 0;
 	double time_index = 0.0;
@@ -126,7 +126,7 @@ static casserr_t atom_tap_load(cassette_image *cassette)
 		image_pos++;
 	}
 
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 /*-------------------------------------------------

@@ -111,7 +111,7 @@ class device_t : public delegate_late_bind
 		friend class device_t;
 		friend class machine_config;
 
-public:
+	public:
 		// construction/destruction
 		subdevice_list() { }
 
@@ -125,7 +125,7 @@ public:
 		auto_iterator begin() const { return m_list.begin(); }
 		auto_iterator end() const { return m_list.end(); }
 
-private:
+	private:
 		// private helpers
 		device_t *find(const std::string &name) const
 		{
@@ -149,19 +149,28 @@ private:
 		friend class device_state_interface;
 		friend class device_execute_interface;
 
-public:
+	public:
 		class auto_iterator
 		{
-public:
+		public:
+			typedef std::ptrdiff_t difference_type;
+			typedef device_interface value_type;
+			typedef device_interface *pointer;
+			typedef device_interface &reference;
+			typedef std::forward_iterator_tag iterator_category;
+
 			// construction/destruction
 			auto_iterator(device_interface *intf) : m_current(intf) { }
 
-			// required operator overrides
+			// required operator overloads
+			bool operator==(const auto_iterator &iter) const { return m_current == iter.m_current; }
 			bool operator!=(const auto_iterator &iter) const { return m_current != iter.m_current; }
 			device_interface &operator*() const { return *m_current; }
-			const auto_iterator &operator++();
+			device_interface *operator->() const { return m_current; }
+			auto_iterator &operator++();
+			auto_iterator operator++(int);
 
-private:
+		private:
 			// private state
 			device_interface *m_current;
 		};
@@ -176,8 +185,8 @@ private:
 		auto_iterator begin() const { return auto_iterator(m_head); }
 		auto_iterator end() const { return auto_iterator(nullptr); }
 
-private:
-		device_interface *      m_head;         // head of interface list
+	private:
+		device_interface *m_head;               // head of interface list
 		device_execute_interface *m_execute;    // pre-cached pointer to execute interface
 		device_memory_interface *m_memory;      // pre-cached pointer to memory interface
 		device_state_interface *m_state;        // pre-cached pointer to state interface
@@ -362,7 +371,7 @@ private:
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find
-	mutable std::vector<rom_entry>	m_rom_entries;
+	mutable std::vector<rom_entry>  m_rom_entries;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;
@@ -768,11 +777,18 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 }
 
 
-// this operator requires device_interface to be a complete type
-inline const device_t::interface_list::auto_iterator &device_t::interface_list::auto_iterator::operator++()
+// these operators requires device_interface to be a complete type
+inline device_t::interface_list::auto_iterator &device_t::interface_list::auto_iterator::operator++()
 {
 	m_current = m_current->interface_next();
 	return *this;
+}
+
+inline device_t::interface_list::auto_iterator device_t::interface_list::auto_iterator::operator++(int)
+{
+	auto_iterator result(*this);
+	m_current = m_current->interface_next();
+	return result;
 }
 
 

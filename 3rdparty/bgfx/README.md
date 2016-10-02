@@ -59,6 +59,7 @@ Languages:
  * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
  * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
  * [Lua language API bindings](https://github.com/excessive/lua-bgfx)
+ * [Nim language API bindings](https://github.com/Halsys/nim-bgfx)
  * [Python language API bindings](https://github.com/jnadro/pybgfx#pybgf)
  * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
  * [Swift language API bindings](https://github.com/stuartcarnie/SwiftBGFX)
@@ -158,6 +159,14 @@ base on a far island.
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=CgMr1g12yXw
 " target="_blank"><img src="http://img.youtube.com/vi/CgMr1g12yXw/0.jpg" 
 alt="Dead Venture - Gameplay Teaser (iOS / Android)"
+width="640" height="480" border="0" /></a>
+
+https://github.com/degenerated1123/REGoth - Open source reimplementation of the
+zEngine, used by the game "Gothic" and "Gothic II".
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=8bLAGttYYpY
+" target="_blank"><img src="http://img.youtube.com/vi/8bLAGttYYpY/0.jpg" 
+alt="REGoth Engine"
 width="640" height="480" border="0" /></a>
 
 [License (BSD 2-clause)](https://bkaradzic.github.io/bgfx/license.html)

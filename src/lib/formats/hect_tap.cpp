@@ -263,24 +263,24 @@ static const struct CassetteLegacyWaveFiller hector_forth_legacy_fill_wave =
 };
 
 
-static casserr_t hector_k7_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error hector_k7_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &hector_legacy_fill_wave);
 }
 
 
-static casserr_t hector_k7_load(cassette_image *cassette)
+static cassette_image::error hector_k7_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &hector_legacy_fill_wave);
 }
 
-static casserr_t hector_k7forth_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error hector_k7forth_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &hector_forth_legacy_fill_wave);
 }
 
 
-static casserr_t hector_k7forth_load(cassette_image *cassette)
+static cassette_image::error hector_k7forth_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &hector_forth_legacy_fill_wave);
 }

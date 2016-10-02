@@ -177,13 +177,13 @@ WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_yscroll_w)
 
 void ashnojoe_state::video_start()
 {
-	m_joetilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info),this),  TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_joetilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_joetilemap3 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_joetilemap4 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_4),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_joetilemap5 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_5),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_joetilemap6 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_6),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_joetilemap7 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_7),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_joetilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info),this),  TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_joetilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_joetilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_joetilemap4 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_4),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_joetilemap5 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_5),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_joetilemap6 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_6),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_joetilemap7 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_7),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_joetilemap->set_transparent_pen(15);
 	m_joetilemap2->set_transparent_pen(15);

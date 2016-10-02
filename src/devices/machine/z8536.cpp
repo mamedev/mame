@@ -1003,19 +1003,19 @@ READ8_MEMBER( z8536_device::read )
 	{
 		switch (offset & 0x03)
 		{
-		case PORT_C:
+		case 0:
 			data = read_register(PORT_C_DATA);
 			break;
 
-		case PORT_B:
+		case 1:
 			data = read_register(PORT_B_DATA);
 			break;
 
-		case PORT_A:
+		case 2:
 			data = read_register(PORT_A_DATA);
 			break;
 
-		case CONTROL:
+		case 3:
 			switch (m_state)
 			{
 			case STATE_1:

@@ -2390,7 +2390,7 @@ ROM_END
 
 // AS-2888 sound
 GAME( 1979, sst,        0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Supersonic", MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL(1978, playboy,    0,        as2888, playboy, by35_state, playboy, ROT0, "Bally", "Playboy", MACHINE_MECHANICAL, layout_by35_playboy)
+GAMEL(1978, playboy,    0,        as2888, playboy, by35_state, playboy, ROT0, "Bally", "Playboy", MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
 GAME( 1978, lostwrlp,   0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Lost World", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1978, smman,      0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Six Million Dollar Man", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1978, voltan,     0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Voltan Escapes Cosmic Doom", MACHINE_IS_SKELETON_MECHANICAL)

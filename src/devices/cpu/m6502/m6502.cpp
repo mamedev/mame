@@ -55,7 +55,7 @@ void m6502_device::init()
 	sync_w.resolve_safe();
 
 	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
 	state_add(STATE_GENSP,     "GENSP",     SP).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  P).callimport().formatstr("%6s").noshow();
 	state_add(M6502_PC,        "PC",        NPC).callimport();

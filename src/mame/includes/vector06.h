@@ -12,8 +12,11 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/speaker.h"
 #include "sound/wave.h"
+#include "sound/ay8910.h"
 #include "machine/i8255.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
@@ -28,6 +31,7 @@ public:
 	vector06_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
 		m_fdc(*this, "wd1793"),
@@ -35,14 +39,15 @@ public:
 		m_floppy1(*this, "wd1793:1"),
 		m_ppi(*this, "ppi8255"),
 		m_ppi2(*this, "ppi8255_2"),
+		m_pit8253(*this, "pit8253"),
+		m_ay(*this, "aysnd"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
-		m_bank4(*this, "bank4"),
 		m_region_maincpu(*this, "maincpu"),
-		m_line(*this, "LINE"),
+		m_line(*this, "LINE.%u", 0),
 		m_reset(*this, "RESET")
 	{ }
 
@@ -54,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vector06_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(vector06_color_set);
 	DECLARE_READ8_MEMBER(vector06_romdisk_portb_r);
+	DECLARE_WRITE8_MEMBER(vector06_romdisk_portb_w);
 	DECLARE_WRITE8_MEMBER(vector06_romdisk_porta_w);
 	DECLARE_WRITE8_MEMBER(vector06_romdisk_portc_w);
 	DECLARE_READ8_MEMBER(vector06_8255_1_r);
@@ -61,6 +67,11 @@ public:
 	DECLARE_READ8_MEMBER(vector06_8255_2_r);
 	DECLARE_WRITE8_MEMBER(vector06_8255_2_w);
 	DECLARE_WRITE8_MEMBER(vector06_disc_w);
+	DECLARE_WRITE8_MEMBER(vector06_status_callback);
+	DECLARE_WRITE8_MEMBER(vector06_ramdisk_w);
+	DECLARE_WRITE8_MEMBER(pit8253_w);
+	DECLARE_READ8_MEMBER(pit8253_r);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	void vector06_set_video_mode(int width);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -73,19 +84,21 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
-	required_device<fd1793_t> m_fdc;
+	required_device<kr1818vg93_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<i8255_device> m_ppi;
 	required_device<i8255_device> m_ppi2;
+	required_device<pit8253_device> m_pit8253;
+	required_device<ay8910_device> m_ay;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
 	required_memory_region m_region_maincpu;
 	required_ioport_array<9> m_line;
 	required_ioport m_reset;
@@ -96,7 +109,12 @@ private:
 	UINT8 m_romdisk_msb;
 	UINT8 m_romdisk_lsb;
 	UINT8 m_vblank_state;
+	UINT8 m_rambank;
+	UINT8 m_aylatch;
+	bool m_stack_state;
+	bool m_romen;
 
+	void update_mem();
 };
 
 #endif /* VECTOR06_H_ */

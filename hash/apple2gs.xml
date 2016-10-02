@@ -6661,6 +6661,32 @@
 		</part>
 	</software>
 
+	<software name="unidos33p">
+		<description>UniDOS 3.3 Plus v2.0.1</description>
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
+		<year>1986</year>
+		<publisher>Microsparc, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="unidos 3.3 plus v2.0.1 (1986)(microsparc).2mg" size="819264" crc="f9fab5b6" sha1="a9f178545af6cd48b9c16d1db248a33b9ad7f6e9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unidosplus">
+		<description>UniDOS Plus v2.1</description>
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
+		<year>1986</year>
+		<publisher>Microsparc, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="unidos plus v2.1 (1986)(microsparc).2mg" size="819264" crc="9328f3cb" sha1="90219aafc3ccba331b8d8d7c4682aecc8c85559b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="uninvite">
 		<description>Uninvited [cr The Torcher Chamber]</description>
 		<year>1988</year>

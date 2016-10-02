@@ -112,8 +112,6 @@ READ16_MEMBER(midyunit_state::midyunit_protection_r)
  *
  *************************************/
 
-IOPORT_ARRAY_MEMBER(midyunit_state::ports) { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
-
 READ16_MEMBER(midyunit_state::midyunit_input_r)
 {
 	return m_ports[offset]->read();

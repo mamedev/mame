@@ -49,9 +49,7 @@ newoption {
 	allowed = {
 		{ "intel-14",      "Intel C++ Compiler XE 14.0" },
 		{ "intel-15",      "Intel C++ Compiler XE 15.0" },
-		{ "vs2013-clang",  "Clang 3.6"         },
 		{ "vs2015-clang",  "Clang 3.6"         },
-		{ "vs2013-xp",     "Visual Studio 2013 targeting XP" },
 		{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
 		{ "winphone8",     "Windows Phone 8.0" },
 		{ "winphone81",    "Windows Phone 8.1" },
@@ -333,7 +331,7 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ci20")
 		end
 
-	elseif _ACTION == "vs2013" or _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
+	elseif _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
@@ -382,11 +380,6 @@ function toolchain(_buildDir, _subDir)
 		if "intel-15" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "Intel C++ Compiler XE 15.0"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
-		end
-
-		if ("vs2013-xp") == _OPTIONS["vs"] then
-			premake.vstudio.toolset = ("v120_xp")
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
 		end
 
 		if ("vs2015-xp") == _OPTIONS["vs"] then
@@ -1047,30 +1040,30 @@ function strip()
 		return true
 	end
 
-	configuration { "osx-*", "Release" }
+	configuration { "osx-*" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix) .. "strip \"$(TARGET)\"",
 		}
 
-	configuration { "android-*", "Release" }
+	configuration { "android-*" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. toolchainPrefix .. "strip -s \"$(TARGET)\""
 		}
 
-	configuration { "linux-* or rpi", "Release" }
+	configuration { "linux-* or rpi" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) strip -s \"$(TARGET)\""
 		}
 
-	configuration { "mingw*", "x64", "Release" }
+	configuration { "mingw*", "x64" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW64)/bin/") .. "strip -s \"$(TARGET)\"",
 		}
-	configuration { "mingw*", "x32", "Release" }
+	configuration { "mingw*", "x32" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW32)/bin/") .. "strip -s \"$(TARGET)\"",

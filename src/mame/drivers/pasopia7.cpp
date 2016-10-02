@@ -49,7 +49,7 @@ public:
 		, m_sn1(*this, "sn1")
 		, m_sn2(*this, "sn2")
 		, m_palette(*this, "palette")
-		, m_keyboard(*this, "KEY")
+		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(vram_r);

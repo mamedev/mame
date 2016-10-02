@@ -1254,6 +1254,17 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<software name="aqualesd" cloneof="aquales">
+		<description>Aquales (Demo)</description>
+		<year>1991</year>
+		<publisher>エグザクト (Exact)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aquales (demo) (1991)(exact).dim" size="1261824" crc="84B506D7" sha1="101B51D194135CD74F678F27FBBB22ED9E00AF4D" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arcshu">
 		<description>Arcshu - Kagerou no Jidai o Koete</description>
 		<year>1990</year>
@@ -5634,6 +5645,17 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
+	<software name="genocid2da" cloneof="genocid2">
+		<description>Genocide 2 (Demo, Alt)</description>
+		<year>1991</year>
+		<publisher>Zoom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide 2 (demo, alt) (1991)(zoom).dim" size="1261824" crc="D5669357" sha1="812197A1608C1460A9912659D44ADB830C0B2CDE" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="genpei">
 		<description>Genpei Toumaden</description>
 		<year>1988</year>
@@ -5883,6 +5905,17 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="gradius ii gofer no yabou (1992)(konami)(disk 2 of 2)(disk b).dim" size="1261824" crc="c195b747" sha1="10125ddef46517c55fe9c8ac55c522c137a555e4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gradius2d" cloneof="gradius2">
+		<description>Gradius II - Gofer no Yabou (Demo)</description>
+		<year>1992</year>
+		<publisher>コナミ (Konami)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gradius ii gofer no yabou (demo) (1992)(konami).dim" size="1261824" crc="B983C29E" sha1="72A4D7571409CACE19BF469D565EE172AC8761ED" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7849,6 +7882,36 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
+	<software name="lagoond" cloneof="lagoon">
+		<description>Lagoon (Demo)</description>
+		<year>1990</year>
+		<publisher>Zoom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261824">
+				<rom name="lagoon (demo) (1990)(zoom).dim" size="1261824" crc="03A62EE9" sha1="3E1BD9DB352158381A5A310DA87FCE27CB9AB055" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lagoondo" cloneof="lagoon">
+		<description>Lagoon (Demo, Older)</description>
+		<year>1990</year>
+		<publisher>Zoom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1261824">
+				<rom name="lagoon (demo, older) (1990)(zoom)(disk 1 of 2).dim" size="1261824" crc="EECF706D" sha1="5F286E4D5840E4C77FD7C0D9B6D3034835D69822" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1261824">
+				<rom name="lagoon (demo, older) (1990)(zoom)(disk 2 of 2).dim" size="1261824" crc="74AA8BC7" sha1="1473631AE34A478CB617CE5EFBC6CE6FE8033FBD" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lammal">
 		<description>Lam-Mal</description>
 		<year>1992</year>
@@ -8029,6 +8092,18 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="lemmings (1991)(imagineer).dim" size="1261824" crc="d13a979d" sha1="a157d8112bb13f44bf34e84d83d656065e239c5d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemmingsd" cloneof="lemmings">
+		<description>Lemmings (Demo)</description>
+		<year>1992</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<info name="alt_title" value="レミングス" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="lemmings (demo) (1991)(imagineer).dim" size="1261824" crc="D93C6810" sha1="C1044C3E67709EEDA49FEE2AA4DF45A6158C7596" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10407,6 +10482,18 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
+	<software name="phalanxd" cloneof="phalanx">
+		<description>Phalanx (Demo)</description>
+		<year>1991</year>
+		<publisher>Zoom</publisher>
+		<info name="alt_title" value="ファランクス" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="phalanx (demo) (1991)(zoom).dim" size="1261824" crc="5E4B01D7" sha1="52C735985A64F73947AAC3C79DA7F393B6C328FC" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="phantas3">
 		<description>Phantasie III - The Wrath of Nikademus</description>
 		<year>1989</year>
@@ -12728,6 +12815,17 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="star wars attack on the death star (1991)(mnm software)(disk 2 of 2)(disk b).dim" size="1261824" crc="ddf14f4c" sha1="5c89ec7140eff057a6d52b03619a5113b649c7e0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwarsd" cloneof="starwars">
+		<description>Star Wars - Attack on the Death Star (Demo)</description>
+		<year>1991</year>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="star wars attack on the death star (demo) (1991)(mnm software).dim" size="1261824" crc="F960D9E4" sha1="FE6095A1C92D184B51A5EE8F06CB7BC990898C80" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

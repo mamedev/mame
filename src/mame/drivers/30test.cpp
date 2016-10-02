@@ -130,7 +130,7 @@ READ8_MEMBER(namco_30test_state::hc11_okibank_r)
 WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
 {
 	m_oki_bank = data;
-	m_oki->set_bank_base((data & 1) ? 0x40000 : 0);
+	m_oki->set_rom_bank(data & 1);
 }
 
 

@@ -431,11 +431,11 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 						// if current endpoint descriptor is not 0 use it, otherwise ...
 						if (ohcist.hc_regs[HcControlCurrentED] == 0) {
 							// ... check the filled bit ...
-							if (ohcist.hc_regs[HcCommandStatus] & (1 << 1)) {
+							if (ohcist.hc_regs[HcCommandStatus] & CLF) {
 								// ... if 1 start processing from the head of the list
 								ohcist.hc_regs[HcControlCurrentED] = ohcist.hc_regs[HcControlHeadED];
 								// clear CLF (ControlListFilled)
-								ohcist.hc_regs[HcCommandStatus] &= ~(1 << 1);
+								ohcist.hc_regs[HcCommandStatus] &= ~CLF;
 								// but if the list is empty, go to the next list
 								if (ohcist.hc_regs[HcControlCurrentED] == 0)
 									cont = false;
@@ -457,7 +457,7 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 							if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
 								UINT32 a, b;
 								// set CLF (ControlListFilled)
-								ohcist.hc_regs[HcCommandStatus] |= (1 << 1);
+								ohcist.hc_regs[HcCommandStatus] |= CLF;
 								// service transfer descriptor
 								usb_ohci_read_transfer_descriptor(ohcist.endpoint_descriptor.headp);
 								// get pid
@@ -568,11 +568,11 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 					// if current endpoint descriptor is not 0 use it, otherwise ...
 					if (ohcist.hc_regs[HcBulkCurrentED] == 0) {
 						// ... check the filled bit ...
-						if (ohcist.hc_regs[HcCommandStatus] & (1 << 2)) {
+						if (ohcist.hc_regs[HcCommandStatus] & BLF) {
 							// ... if 1 start processing from the head of the list
 							ohcist.hc_regs[HcBulkCurrentED] = ohcist.hc_regs[HcBulkHeadED];
 							// clear BLF (BulkListFilled)
-							ohcist.hc_regs[HcCommandStatus] &= ~(1 << 2);
+							ohcist.hc_regs[HcCommandStatus] &= ~BLF;
 							// but if the list is empty, go to the next list
 							if (ohcist.hc_regs[HcBulkCurrentED] == 0)
 								cont = false;
@@ -593,7 +593,7 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 							if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
 								UINT32 a, b;
 								// set BLF (BulkListFilled)
-								ohcist.hc_regs[HcCommandStatus] |= (1 << 2);
+								ohcist.hc_regs[HcCommandStatus] |= BLF;
 								// service transfer descriptor
 								usb_ohci_read_transfer_descriptor(ohcist.endpoint_descriptor.headp);
 								// get pid
@@ -682,9 +682,9 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 						}
 					}
 					// go to the next list
-					if ((ohcist.hc_regs[HcCommandStatus] & (1 << 1)) && (ohcist.hc_regs[HcControl] & CLE))
+					if ((ohcist.hc_regs[HcCommandStatus] & CLF) && (ohcist.hc_regs[HcControl] & CLE))
 						list = 1; // go to control list if enabled and filled
-					else if ((ohcist.hc_regs[HcCommandStatus] & (1 << 2)) && (ohcist.hc_regs[HcControl] & BLE))
+					else if ((ohcist.hc_regs[HcCommandStatus] & BLF) && (ohcist.hc_regs[HcControl] & BLE))
 						list = 2; // otherwise stay in bulk list if enabled and filled
 					else
 						list = 0; // if no control or bulk lists, go to periodic list

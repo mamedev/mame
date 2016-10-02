@@ -257,7 +257,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_videoram_w)
 
 VIDEO_START_MEMBER(ojankohs_state,ojankohs)
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ojankohs_state::ojankohs_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ojankohs_state::ojankohs_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  m_videoram = std::make_unique<UINT8[]>(0x1000);
 //  m_colorram = std::make_unique<UINT8[]>(0x1000);
 //  m_paletteram = std::make_unique<UINT8[]>(0x800);
@@ -265,7 +265,7 @@ VIDEO_START_MEMBER(ojankohs_state,ojankohs)
 
 VIDEO_START_MEMBER(ojankohs_state,ojankoy)
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ojankohs_state::ojankoy_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ojankohs_state::ojankoy_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  m_videoram = std::make_unique<UINT8[]>(0x2000);
 //  m_colorram = std::make_unique<UINT8[]>(0x1000);
 }

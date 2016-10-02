@@ -56,7 +56,7 @@ public:
 		m_cassette(*this, "cassette"),
 		m_cart_rom(*this, "cartslot"),
 		m_expander(*this, "exp"),
-		m_keyboard(*this, "KEY"),
+		m_keyboard(*this, "KEY.%u", 0),
 		m_buttons(*this, "BUTTONS"),
 		m_intvdp(0), m_intexp(0),
 		m_romdis(1), m_ramdis(1),

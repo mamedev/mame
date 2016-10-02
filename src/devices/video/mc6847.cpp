@@ -642,6 +642,11 @@ UINT8 mc6847_base_device::input(UINT16 address)
 template<int sample_count, int yres>
 void mc6847_base_device::record_scanline_res(int scanline, INT32 start_pos, INT32 end_pos)
 {
+	// determine the "sample_modulo" (e.g. - for 32 samples per row, query the video RAM every
+	// position, for 16 samples per row, query every other position)
+	const int sample_modulo = 32 / sample_count;
+	static_assert((32 / sample_modulo) == sample_count, "Expected 32 to be divisible by sample_count");
+
 	UINT8 current_sample_count = (start_pos > 0) ? m_data[scanline].m_sample_count : 0;
 
 	// main loop
@@ -651,7 +656,8 @@ void mc6847_base_device::record_scanline_res(int scanline, INT32 start_pos, INT3
 		if (pos == 0)
 			m_video_address = scanline / (192 / yres) * sample_count;
 
-		if ((sample_count == 32) || ((pos % 1) == 0))
+		// are we sampling this position?
+		if ((pos % sample_modulo) == 0)
 		{
 			// input data
 			UINT8 data = input(m_video_address++);

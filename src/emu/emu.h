@@ -100,8 +100,8 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // video-related
 #include "drawgfx.h"
-#include "tilemap.h"
 #include "emupal.h"
+#include "tilemap.h"
 #include "screen.h"
 #include "video.h"
 

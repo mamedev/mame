@@ -124,14 +124,14 @@ static const struct CassetteLegacyWaveFiller lviv_legacy_fill_wave =
 
 
 
-static casserr_t lviv_lvt_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error lviv_lvt_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &lviv_legacy_fill_wave);
 }
 
 
 
-static casserr_t lviv_lvt_load(cassette_image *cassette)
+static cassette_image::error lviv_lvt_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &lviv_legacy_fill_wave);
 }

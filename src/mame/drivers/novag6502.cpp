@@ -33,7 +33,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
-		m_inp_matrix(*this, "IN"),
+		m_inp_matrix(*this, "IN.%u", 0),
 		m_display_wait(33),
 		m_display_maxy(1),
 		m_display_maxx(0)

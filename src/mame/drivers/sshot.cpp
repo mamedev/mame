@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 
 void supershot_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supershot_state::get_supershot_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supershot_state::get_supershot_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 UINT32 supershot_state::screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -292,10 +292,10 @@ static INPUT_PORTS_START( supershot )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("IN0")
-	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED( 0x01, 0x00 )

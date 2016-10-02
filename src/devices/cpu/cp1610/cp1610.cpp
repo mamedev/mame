@@ -3359,7 +3359,8 @@ void cp1610_cpu_device::device_start()
 	state_add( CP1610_R5, "R5", m_r[5] ).formatstr("%04X");
 	state_add( CP1610_R6, "R6", m_r[6] ).formatstr("%04X");
 	state_add( CP1610_R7, "R7", m_r[7] ).formatstr("%04X");
-	state_add( STATE_GENPC, "curpc", m_r[7] ).noshow();
+	state_add( STATE_GENPC, "GENPC", m_r[7] ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_r[7]).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
 
 	m_icountptr = &m_icount;

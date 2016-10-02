@@ -64,8 +64,8 @@ public:
 		m_palette(*this, "palette"),
 		m_f3_ram(*this,"f3_ram"),
 		m_paletteram32(*this, "paletteram"),
-		m_input(*this, "IN"),
-		m_dial(*this, "DIAL"),
+		m_input(*this, "IN.%u", 0),
+		m_dial(*this, "DIAL.%u", 0),
 		m_eepromin(*this, "EEPROMIN")
 
 	{ }

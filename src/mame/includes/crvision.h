@@ -40,10 +40,10 @@ public:
 		m_cart(*this, "cartslot"),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_ram(*this, RAM_TAG),
-		m_inp_pa0(*this, "PA0"),
-		m_inp_pa1(*this, "PA1"),
-		m_inp_pa2(*this, "PA2"),
-		m_inp_pa3(*this, "PA3")
+		m_inp_pa0(*this, "PA0.%u", 0),
+		m_inp_pa1(*this, "PA1.%u", 0),
+		m_inp_pa2(*this, "PA2.%u", 0),
+		m_inp_pa3(*this, "PA3.%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -82,10 +82,10 @@ class laser2001_state : public crvision_state
 {
 public:
 	laser2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: crvision_state(mconfig, type, tag),
-		m_centronics(*this, CENTRONICS_TAG),
-		m_inp_y(*this, "Y"),
-		m_inp_joy(*this, "JOY")
+		: crvision_state(mconfig, type, tag)
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_inp_y(*this, "Y.%u", 0)
+		, m_inp_joy(*this, "JOY.%u", 0)
 	{ }
 
 	required_device<centronics_device> m_centronics;

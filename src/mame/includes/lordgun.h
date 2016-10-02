@@ -33,9 +33,9 @@ public:
 		m_priority_ram(*this, "priority_ram"),
 		m_scrollram(*this, "scrollram"),
 		m_spriteram(*this, "spriteram"),
-		m_vram(*this, "vram"),
-		m_scroll_x(*this, "scroll_x"),
-		m_scroll_y(*this, "scroll_y") { }
+		m_vram(*this, "vram.%u", 0),
+		m_scroll_x(*this, "scroll_x.%u", 0),
+		m_scroll_y(*this, "scroll_y.%u", 0) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;

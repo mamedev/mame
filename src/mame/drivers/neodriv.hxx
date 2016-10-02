@@ -5039,11 +5039,9 @@ ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) ) /* TC531001 */
 	ROM_RELOAD( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "cslot1:ymsnd", 0 )
+	ROM_REGION( 0x300000, "cslot1:ymsnd", 0 )
 	ROM_LOAD( "236-v1.v1", 0x000000, 0x200000, CRC(5f89c3b4) SHA1(dc8fd561cf8dfdd41696dcf14ea8d2d0ac4eec4b) ) /* TC5316200 */
-
-	ROM_REGION( 0x100000, "cslot1:ymsnd.deltat", 0 )
-	ROM_LOAD( "236-v2.v2", 0x000000, 0x100000, CRC(1e843567) SHA1(30d63887b4900571025b3077b9e41099a59c3ad9) ) /* TC538200 */
+	ROM_LOAD( "236-v2.v2", 0x200000, 0x100000, CRC(72e3add7) SHA1(dc49f05274693255416d2e41ecc088027b798eb9) ) /* TC538200 */
 
 	ROM_REGION( 0x0800000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "236-c1.c1", 0x000000, 0x400000, CRC(c1d47902) SHA1(727001c34f979226fc8f581113ce2aaac4fc0d42) ) /* Plane 0,1 */ /* TC5332205 */
@@ -8186,7 +8184,7 @@ ROM_START( diggerma ) /* Unlicensed Prototype, no official game ID # */
 	ROM_REGION( 0x200000, "cslot1:ymsnd", 0 )
 	ROM_LOAD( "dig-v1.bin", 0x000000, 0x080000, CRC(ee15bda4) SHA1(fe2206728e6efd02d6302869a98b196eb19a17df) )
 
-	ROM_REGION( 0x400000, "cslot1:sprites", 0 )
+	ROM_REGION( 0x100000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "dig-c1.bin", 0x000000, 0x080000, CRC(3db0a4ed) SHA1(6214faa883d97ea05809b6af7e0c85a236a18a28) ) /* Plane 0,1 */
 	ROM_LOAD16_BYTE( "dig-c2.bin", 0x000001, 0x080000, CRC(3e632161) SHA1(83711c4286fb1d9f3f91414ac6e5fed36618033e) ) /* Plane 2,3 */
 ROM_END
@@ -8669,7 +8667,7 @@ GAME( 1997, kof97,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1997, kof97h,     kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (NGH-2320)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97k,     kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (Korean release)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97pls,   kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, kof97oro,   kof97,    kof97oro,  neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Oroshi Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, kof97oro,   kof97,    kof97oro,  neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Chongchu Jianghu Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kog,        kof97,    kog,       neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protected bootleg
 GAME( 1997, lastblad,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", MACHINE_SUPPORTS_SAVE )

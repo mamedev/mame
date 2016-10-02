@@ -1,0 +1,74 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
+// Intel i82439hx northbridge (440hx)
+
+#ifndef I82439HX_H
+#define I82439HX_H
+
+#include "pci.h"
+
+#define MCFG_I82439HX_ADD(_tag, _cpu_tag, _ram_size)    \
+	MCFG_PCI_HOST_ADD(_tag, I82439HX, 0x80861250, 0x03, 0x00000000) \
+	downcast<i82439hx_host_device *>(device)->set_cpu_tag(_cpu_tag); \
+	downcast<i82439hx_host_device *>(device)->set_ram_size(_ram_size);
+
+class i82439hx_host_device : public pci_host_device {
+public:
+	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	void set_cpu_tag(const char *tag);
+	void set_ram_size(int ram_size);
+
+	DECLARE_READ8_MEMBER (pcon_r);
+	DECLARE_WRITE8_MEMBER(pcon_w);
+	DECLARE_READ8_MEMBER (cc_r);
+	DECLARE_WRITE8_MEMBER(cc_w);
+	DECLARE_READ8_MEMBER (dramec_r);
+	DECLARE_WRITE8_MEMBER(dramec_w);
+	DECLARE_READ8_MEMBER (dramc_r);
+	DECLARE_WRITE8_MEMBER(dramc_w);
+	DECLARE_READ8_MEMBER (dramt_r);
+	DECLARE_WRITE8_MEMBER(dramt_w);
+	DECLARE_READ8_MEMBER (pam0_r);
+	DECLARE_WRITE8_MEMBER(pam0_w);
+	DECLARE_READ8_MEMBER (pam3_r);
+	DECLARE_WRITE8_MEMBER(pam3_w);
+	DECLARE_READ8_MEMBER (drb_r);
+	DECLARE_WRITE8_MEMBER(drb_w);
+	DECLARE_READ8_MEMBER (drt_r);
+	DECLARE_WRITE8_MEMBER(drt_w);
+	DECLARE_READ8_MEMBER (drat_r);
+	DECLARE_WRITE8_MEMBER(drat_w);
+	DECLARE_READ8_MEMBER (smram_r);
+	DECLARE_WRITE8_MEMBER(smram_w);
+	DECLARE_READ8_MEMBER (errcmd_r);
+	DECLARE_WRITE8_MEMBER(errcmd_w);
+	DECLARE_READ8_MEMBER (errsts_r);
+	DECLARE_WRITE8_MEMBER(errsts_w);
+	DECLARE_READ8_MEMBER (errsyn_r);
+
+	virtual void reset_all_mappings() override;
+
+	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+
+	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	const char *cpu_tag;
+	int ram_size;
+	cpu_device *cpu;
+	std::vector<UINT32> ram;
+
+	UINT8 pcon, cc, dramec, dramc, dramt;
+	UINT8 pam[7], drb[8];
+	UINT8 drt, drat, smram, errcmd, errsts, errsyn;
+};
+
+extern const device_type I82439HX;
+
+#endif

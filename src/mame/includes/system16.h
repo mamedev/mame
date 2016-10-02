@@ -132,7 +132,6 @@ public:
 	DECLARE_READ16_MEMBER(passht4b_io1_r);
 	DECLARE_READ16_MEMBER(passht4b_io2_r);
 	DECLARE_READ16_MEMBER(passht4b_io3_r);
-	DECLARE_READ16_MEMBER(ddcrew_c41006_r);
 	DECLARE_WRITE16_MEMBER(sys16_tilebank_w);
 	DECLARE_WRITE16_MEMBER(ddcrewbl_spritebank_w);
 	DECLARE_WRITE8_MEMBER(tturfbl_msm5205_data_w);

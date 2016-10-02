@@ -2643,11 +2643,36 @@ ROM_END
 ROM_START( megast )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
-	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
+	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" ) // came in both 6 rom and 2 rom formats; 6 roms are 27512, and 2 roms are non-jedec RP231024 (TC531000 equivalent) 28-pin roms with A16 instead of /OE on pin 22
 	ROMX_LOAD( "tos102.bin", 0x00000, 0x30000, BAD_DUMP CRC(d3c32283) SHA1(735793fdba07fe8d5295caa03484f6ef3de931f5), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
+	//For a C100167-001 revision B Mega ST motherboard, jumpered for 2 roms:
+	//ROMX_LOAD( "c101629-001__(c)atari_1987__38__rp231024e__0564__8807_z07.rp231024.u9", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) ) // in u9 HI-0 socket
+	//ROMX_LOAD( "c101630-002__(c)atari_1987__38__rp231024e__0563__8809_z10.rp231024.u10", 0x00001, 0x20000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) ) // in u10 LO-0 socket
+	//For a C100167-001 revision B Mega ST motherboard, jumpered for 6 roms:
+	//ROMX_LOAD( "unknownmarkings_hi-0.27512.u9", 0x00000, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_lo-0.27512.u10", 0x00001, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_hi-1.27512.u6", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_lo-1.27512.u7", 0x10001, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_hi-2.27512.u3", 0x20000, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_lo-2.27512.u4", 0x20001, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )  // came in both 6 rom and 2 rom formats; 6 roms are 27512, and 2 roms are non-jedec RP231024 (TC531000 equivalent) 28-pin roms with A16 instead of /OE on pin 22
 	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(90f4fbff) SHA1(2487f330b0895e5d88d580d4ecb24061125e88ad), ROM_BIOS(2) )
-
+	/*For a C100167-001 revision B Mega ST motherboard, jumpered for 2 roms:
+	These came in an upgrade kit pouch with label:
+	RAINBOW (TOS 1.4)
+	CA400407 2CHIPSET
+	(C) ATARI CORP.
+	and an end-user pamphlet explaining the changes in 1.04 and a sheet giving installation instructions (jumper strapping to convert between 2/6 chip)
+	*/
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300683-002_h0__(c)atari_corp.rp231024e.u9", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300684-002_l0__(c)atari_corp.rp231024e.u10", 0x00001, 0x20000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//For a C100167-001 revision B Mega ST motherboard, jumpered for 6 roms:
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300789-002_h0__(c)atari_corp.27512.u9", 0x00000, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300792-002_l0__(c)atari_corp.27512.u10", 0x00001, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300788-002_h1__(c)atari_corp.27512.u6", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300791-002_l1__(c)atari_corp.27512.u7", 0x10001, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300787-002_h2__(c)atari_corp.27512.u3", 0x20000, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300790-002_l2__(c)atari_corp.27512.u4", 0x20001, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END

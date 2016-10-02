@@ -124,31 +124,31 @@ const device_type ATARI_MOTION_OBJECTS = &device_creator<atari_motion_objects_de
 //-------------------------------------------------
 
 atari_motion_objects_device::atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, "Atari Motion Objects", tag, owner, "atarimo", __FILE__),
-		device_video_interface(mconfig, *this),
-		m_tilewidth(0),
-		m_tileheight(0),
-		m_tilexshift(0),
-		m_tileyshift(0),
-		m_bitmapwidth(0),
-		m_bitmapheight(0),
-		m_bitmapxmask(0),
-		m_bitmapymask(0),
-		m_entrycount(0),
-		m_entrybits(0),
-		m_spriterammask(0),
-		m_spriteramsize(0),
-		m_slipshift(0),
-		m_sliprammask(0),
-		m_slipramsize(0),
-		m_bank(0),
-		m_xscroll(0),
-		m_yscroll(0),
-		m_slipram(*this, "slip"),
-		m_activelast(nullptr),
-		m_last_xpos(0),
-		m_next_xpos(0),
-		m_gfxdecode(*this)
+	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, "Atari Motion Objects", tag, owner, "atarimo", __FILE__)
+	, device_video_interface(mconfig, *this)
+	, m_tilewidth(0)
+	, m_tileheight(0)
+	, m_tilexshift(0)
+	, m_tileyshift(0)
+	, m_bitmapwidth(0)
+	, m_bitmapheight(0)
+	, m_bitmapxmask(0)
+	, m_bitmapymask(0)
+	, m_entrycount(0)
+	, m_entrybits(0)
+	, m_spriterammask(0)
+	, m_spriteramsize(0)
+	, m_slipshift(0)
+	, m_sliprammask(0)
+	, m_slipramsize(0)
+	, m_bank(0)
+	, m_xscroll(0)
+	, m_yscroll(0)
+	, m_slipram(*this, "slip")
+	, m_activelast(nullptr)
+	, m_last_xpos(0)
+	, m_next_xpos(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 

@@ -29,7 +29,7 @@ WRITE8_MEMBER(sbugger_state::videoram_attr_w)
 
 void sbugger_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbugger_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbugger_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
 }
 
 UINT32 sbugger_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

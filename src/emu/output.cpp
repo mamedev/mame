@@ -38,10 +38,9 @@ output_manager::output_manager(running_machine &machine)
 
 output_manager::output_item* output_manager::find_item(const char *string)
 {
-	/* use the hash as a starting point and find an entry */
-	for (auto &item : m_itemtable)
-		if (strcmp(string, item.second.name.c_str()) == 0)
-			return &item.second;
+	auto item = m_itemtable.find(std::string(string));
+	if (item != m_itemtable.end())
+		return &item->second;
 
 	return nullptr;
 }

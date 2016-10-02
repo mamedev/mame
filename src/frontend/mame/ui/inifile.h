@@ -83,8 +83,17 @@ public:
 	// construction/destruction
 	favorite_manager(running_machine &machine, ui_options &moptions);
 
+	// favorites comparator
+	struct ci_less
+	{
+		bool operator() (const std::string &s1, const std::string &s2) const
+		{
+			return (core_stricmp(s1.c_str(), s2.c_str()) < 0);
+		}
+	};
+
 	// favorite indices
-	std::vector<ui_software_info> m_list;
+	std::multimap<std::string, ui_software_info, ci_less> m_list;
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -110,7 +119,7 @@ private:
 	const char *favorite_filename = "favorites.ini";
 
 	// current
-	int m_current;
+	std::multimap<std::string, ui_software_info>::iterator m_current;
 
 	// parse file ui_favorite
 	void parse_favorite();

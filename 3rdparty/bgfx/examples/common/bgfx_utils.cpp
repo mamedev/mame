@@ -240,6 +240,8 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 						break;
 
 					case LCT_PALETTE:
+						format = bgfx::TextureFormat::R8;
+						bpp    = 8;
 						break;
 					}
 					break;
@@ -304,7 +306,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 
 		if (NULL != out)
 		{
-			handle = bgfx::createTexture2D(uint16_t(width), uint16_t(height), 1
+			handle = bgfx::createTexture2D(uint16_t(width), uint16_t(height), false, 1
 											, format
 											, _flags
 											, bgfx::copy(out, width*height*bpp/8)
@@ -317,6 +319,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 					, uint16_t(width)
 					, uint16_t(height)
 					, 0
+					, false
 					, false
 					, 1
 					, format

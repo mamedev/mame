@@ -1,34 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @file test/core/func_matrix.cpp
-/// @date 2007-01-25 / 2011-06-07
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <glm/matrix.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/ulp.hpp>
@@ -219,24 +188,24 @@ int test_inverse()
 
 int test_inverse_simd()
 {
-	int Failed(0);
+	int Error = 0;
 
-	glm::tmat4x4<float, glm::simd> const Identity(1);
+	glm::mat4x4 const Identity(1);
 
-	glm::tmat4x4<float, glm::simd> const A4x4(
-		glm::tvec4<float, glm::simd>(1, 0, 1, 0),
-		glm::tvec4<float, glm::simd>(0, 1, 0, 0),
-		glm::tvec4<float, glm::simd>(0, 0, 1, 0),
-		glm::tvec4<float, glm::simd>(0, 0, 0, 1));
-	glm::tmat4x4<float, glm::simd> const B4x4 = glm::inverse(A4x4);
-	glm::tmat4x4<float, glm::simd> const I4x4 = A4x4 * B4x4;
+	glm::mat4x4 const A4x4(
+		glm::vec4(1, 0, 1, 0),
+		glm::vec4(0, 1, 0, 0),
+		glm::vec4(0, 0, 1, 0),
+		glm::vec4(0, 0, 0, 1));
+	glm::mat4x4 const B4x4 = glm::inverse(A4x4);
+	glm::mat4x4 const I4x4 = A4x4 * B4x4;
 
-	Failed += glm::all(glm::epsilonEqual(I4x4[0], Identity[0], 0.001f)) ? 0 : 1;
-	Failed += glm::all(glm::epsilonEqual(I4x4[1], Identity[1], 0.001f)) ? 0 : 1;
-	Failed += glm::all(glm::epsilonEqual(I4x4[2], Identity[2], 0.001f)) ? 0 : 1;
-	Failed += glm::all(glm::epsilonEqual(I4x4[3], Identity[3], 0.001f)) ? 0 : 1;
+	Error += glm::all(glm::epsilonEqual(I4x4[0], Identity[0], 0.001f)) ? 0 : 1;
+	Error += glm::all(glm::epsilonEqual(I4x4[1], Identity[1], 0.001f)) ? 0 : 1;
+	Error += glm::all(glm::epsilonEqual(I4x4[2], Identity[2], 0.001f)) ? 0 : 1;
+	Error += glm::all(glm::epsilonEqual(I4x4[3], Identity[3], 0.001f)) ? 0 : 1;
 
-	return Failed;
+	return Error;
 }
 
 template <typename VEC3, typename MAT4>

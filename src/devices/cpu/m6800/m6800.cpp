@@ -1135,6 +1135,7 @@ void m6800_cpu_device::device_start()
 	state_add( M6800_WAI_STATE, "WAI", m_wai_state).formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.w.l).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc.w.l).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_cc).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;

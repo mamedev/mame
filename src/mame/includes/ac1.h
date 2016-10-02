@@ -16,12 +16,12 @@ class ac1_state : public driver_device
 {
 public:
 	ac1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cassette(*this, "cassette"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_io_line(*this, "LINE")
+		: driver_device(mconfig, type, tag)
+		, m_cassette(*this, "cassette")
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_io_line(*this, "LINE.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(ac1);

@@ -35,7 +35,7 @@ void h8_device::device_start()
 	io      = &space(AS_IO);
 
 	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
 	if(has_exr)
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  CCR).formatstr("%11s").noshow();
 	else

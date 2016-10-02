@@ -213,6 +213,16 @@ machine_config_constructor qs1000_device::device_mconfig_additions() const
 
 
 //-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void qs1000_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 void qs1000_device::device_start()

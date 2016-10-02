@@ -793,20 +793,6 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 
 /********************** module functions ***********************/
 
-static imgtoolerr_t thom_get_sector_size(imgtool_image* img, UINT32 track,
-						UINT32 head, UINT32 sector,
-						UINT32 *sector_size)
-{
-	thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
-
-	if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks ) {
-	if ( sector_size ) *sector_size = 0;
-	return IMGTOOLERR_SEEKERROR;
-	}
-	if ( sector_size ) *sector_size = f->sector_size;
-	return IMGTOOLERR_SUCCESS;
-}
-
 static imgtoolerr_t thom_get_geometry(imgtool_image* img, UINT32* tracks,
 						UINT32* heads, UINT32* sectors)
 {
@@ -818,14 +804,17 @@ static imgtoolerr_t thom_get_geometry(imgtool_image* img, UINT32* tracks,
 }
 
 static imgtoolerr_t thom_read_sector(imgtool_image* img, UINT32 track,
-						UINT32 head, UINT32 sector, void *buf,
-						size_t len)
+						UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
 {
 	thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
 	if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks )
-	return IMGTOOLERR_SEEKERROR;
-	if ( len > f->sector_size) return IMGTOOLERR_READERROR;
-	memcpy( buf, thom_get_sector( f, head, track, sector ), len );
+		return IMGTOOLERR_SEEKERROR;
+
+	// resize the buffer
+	try { buffer.resize(f->sector_size); }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
+
+	memcpy( &buffer[0], thom_get_sector( f, head, track, sector ), f->sector_size);
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -1065,7 +1054,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 	}
 
 	/* comment */
-	char const *const comment = opts->lookup_string('C');
+	char const *const comment = opts->lookup_string('C').c_str();
 	if (comment && *comment)
 		strncpy(d.comment, comment, 8);
 
@@ -1132,7 +1121,7 @@ static imgtoolerr_t thom_create(imgtool_image* img,
 	/* get parameters */
 	f->heads = opts->lookup_int('H');
 	f->tracks = opts->lookup_int('T');
-	name = opts->lookup_string('N');
+	name = opts->lookup_string('N').c_str();
 	switch ( opts->lookup_int('D') ) {
 	case 0: f->sector_size = 128; f->sectuse_size = 128; break;
 	case 1: f->sector_size = 256; f->sectuse_size = 255; break;
@@ -1519,7 +1508,7 @@ FILTER( thombas128,
 
 /************************* driver ***************************/
 
-static OPTION_GUIDE_START( thom_createimage_optguide )
+OPTION_GUIDE_START( thom_createimage_optguide )
 	OPTION_INT( 'H', "heads", "Heads" )
 	OPTION_INT( 'T', "tracks", "Tracks" )
 	OPTION_ENUM_START( 'D', "density", "Density" )
@@ -1529,7 +1518,7 @@ static OPTION_GUIDE_START( thom_createimage_optguide )
 	OPTION_STRING( 'N', "name", "Floppy name" )
 OPTION_GUIDE_END
 
-static OPTION_GUIDE_START( thom_writefile_optguide )
+OPTION_GUIDE_START( thom_writefile_optguide )
 	OPTION_ENUM_START( 'T', "ftype", "File type" )
 	OPTION_ENUM( 0, "auto", "Automatic (by extension)" )
 	OPTION_ENUM( 1, "B", "Program" )
@@ -1571,7 +1560,7 @@ static void thom_basic_get_info(const imgtool_class *clas,
 	case IMGTOOLINFO_PTR_CREATE:
 	info->create = thom_create; break;
 	case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:
-	info->createimage_optguide = thom_createimage_optguide; break;
+	info->createimage_optguide = &thom_createimage_optguide; break;
 	case IMGTOOLINFO_PTR_BEGIN_ENUM:
 	info->begin_enum = thom_begin_enum; break;
 	case IMGTOOLINFO_PTR_NEXT_ENUM:
@@ -1581,7 +1570,7 @@ static void thom_basic_get_info(const imgtool_class *clas,
 	case IMGTOOLINFO_PTR_WRITE_FILE:
 	info->write_file = thom_write_file; break;
 	case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:
-	info->writefile_optguide = thom_writefile_optguide; break;
+	info->writefile_optguide = &thom_writefile_optguide; break;
 	case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:
 	strcpy( info->s = imgtool_temp_str(), "T[0]-4;F[0]-2;C" ); break;
 	case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:
@@ -1590,8 +1579,6 @@ static void thom_basic_get_info(const imgtool_class *clas,
 	info->delete_file = thom_delete_file; break;
 	case IMGTOOLINFO_PTR_FREE_SPACE:
 	info->free_space = thom_free_space; break;
-	case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:
-	info->get_sector_size = thom_get_sector_size; break;
 	case IMGTOOLINFO_PTR_GET_GEOMETRY:
 	info->get_geometry = thom_get_geometry; break;
 	case IMGTOOLINFO_PTR_INFO:

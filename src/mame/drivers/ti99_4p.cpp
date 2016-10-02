@@ -123,9 +123,11 @@
 #include "imagedev/cassette.h"
 #include "bus/ti99x/joyport.h"
 #include "bus/ti99_peb/peribox.h"
+#include "machine/ram.h"
 
 #define TMS9901_TAG "tms9901"
 #define SGCPU_TAG "sgcpu"
+#define AMSRAM_TAG "amsram1meg"
 
 #define TRACE_ILLWRITE 0
 #define TRACE_READY 0
@@ -143,7 +145,10 @@ public:
 		m_tms9901(*this, TMS9901_TAG),
 		m_cassette(*this, "cassette"),
 		m_peribox(*this, PERIBOX_TAG),
-		m_joyport(*this, JOYPORT_TAG)   { }
+		m_joyport(*this, JOYPORT_TAG),
+		m_scratchpad(*this, PADRAM_TAG),
+		m_amsram(*this, AMSRAM_TAG)
+		{ }
 
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
@@ -162,8 +167,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
-	void    datamux_clock_in(int clock);
-
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER( cruread );
 	DECLARE_WRITE8_MEMBER( cruwrite );
@@ -181,33 +184,29 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
+private:
+	void    datamux_clock_in(int clock);
+
+	// Devices
 	required_device<tms9900_device>        m_cpu;
 	required_device<tms9901_device>        m_tms9901;
 	required_device<cassette_image_device> m_cassette;
 	required_device<peribox_device>        m_peribox;
 	required_device<joyport_device>        m_joyport;
-
-	// Pointer to ROM0
-	UINT16  *m_rom0;
-
-	// AMS RAM (1 Mib)
-	std::vector<UINT16> m_ram;
-
-	// Scratch pad ram (1 KiB)
-	std::vector<UINT16> m_scratchpad;
-
-	// First joystick. 6 for TI-99/4A
-	int     m_firstjoy;
-
-private:
+	required_device<ram_device> m_scratchpad;
+	required_device<ram_device> m_amsram;
 
 	int decode_address(int address);
 	DECLARE_READ16_MEMBER( debugger_read );
 	DECLARE_WRITE16_MEMBER( debugger_write );
-
 	void ready_join();
-
 	void    set_keyboard_column(int number, int data);
+
+	// Pointer to EPROM
+	UINT16 *m_rom;
+
+	// First joystick. 6 for TI-99/4A
+	int     m_firstjoy;
 
 	int     m_keyboard_column;
 	int     m_check_alphalock;
@@ -240,7 +239,7 @@ private:
 	bool m_muxready;
 
 	// Incoming Ready level
-	line_state m_sysready;
+	int m_sysready;
 
 	// Saves a pointer to the address space
 	address_space* m_spacep;
@@ -258,7 +257,7 @@ private:
 	bool m_rom6_upper;
 
 	// State of the DBIN line
-	line_state m_dbin;
+	int m_dbin;
 
 	UINT8   m_lowbyte;
 	UINT8   m_highbyte;
@@ -267,15 +266,11 @@ private:
 	// Mapper registers
 	UINT8 m_mapper[16];
 
-	// Pointer to EPROM
-	UINT16 *m_rom;
-
 	// Latch for 9901 INT2, INT1 lines
 	int     m_9901_int;
 	void    set_9901_int(int line, line_state state);
 
 	int     m_ready_prev;       // for debugging purposes only
-
 };
 
 enum
@@ -481,7 +476,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 		else // transparent mode
 			address = m_addr_buf;
 
-		value = m_ram[address>>1];
+		value = ((m_amsram->pointer()[address] & 0xff) << 8) | (m_amsram->pointer()[address+1] & 0xff);
 		break;
 
 	case SGCPU_INTDSR:
@@ -498,7 +493,8 @@ READ16_MEMBER( ti99_4p_state::memread )
 	case SGCPU_PADRAM:
 		// Scratch pad RAM (16 bit)
 		// 8000 ... 83ff (1K, 4 times the size of the internal RAM of the TI-99/4A)
-		value = m_scratchpad[(m_addr_buf & 0x03ff)>>1];
+		value = ((m_scratchpad->pointer()[m_addr_buf & 0x03ff] & 0xff)<<8)
+				| (m_scratchpad->pointer()[(m_addr_buf & 0x03ff)+1] & 0xff);
 		break;
 
 	case SGCPU_PEB:
@@ -539,7 +535,8 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		else // transparent mode
 			address = m_addr_buf;
 
-		m_ram[address>>1] = data;
+		m_amsram->pointer()[address] = (data >> 8) & 0xff;
+		m_amsram->pointer()[address+1] = data & 0xff;
 		break;
 
 	case SGCPU_INTDSR:
@@ -558,7 +555,8 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	case SGCPU_PADRAM:
 		// Scratch pad RAM (16 bit)
 		// 8000 ... 83ff (1K, 4 times the size of the internal RAM of the TI-99/4A)
-		m_scratchpad[(m_addr_buf & 0x03ff)>>1] = data;
+		m_scratchpad->pointer()[m_addr_buf & 0x03ff] = (data >> 8) & 0xff;
+		m_scratchpad->pointer()[(m_addr_buf & 0x03ff)+1] = data & 0xff;
 		break;
 
 	case SGCPU_PEB:
@@ -932,9 +930,6 @@ WRITE8_MEMBER( ti99_4p_state::external_operation )
 
 void ti99_4p_state::machine_start()
 {
-	m_ram.resize(0x80000/2);
-	m_scratchpad.resize(0x400/2);
-
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 
@@ -944,6 +939,30 @@ void ti99_4p_state::machine_start()
 	m_muxready = true;
 
 	m_rom = (UINT16*)(memregion("maincpu")->base());
+
+	save_item(NAME(m_firstjoy));
+	save_item(NAME(m_keyboard_column));
+	save_item(NAME(m_check_alphalock));
+	save_item(NAME(m_internal_dsr));
+	save_item(NAME(m_internal_rom6));
+	save_item(NAME(m_rom6_bank));
+	save_item(NAME(m_waitcount));
+	save_item(NAME(m_map_mode));
+	save_item(NAME(m_access_mapper));
+	save_item(NAME(m_addr_buf));
+	save_item(NAME(m_decode));
+	save_item(NAME(m_muxready));
+	save_item(NAME(m_sysready));
+	save_item(NAME(m_internal_dsr_active));
+	save_item(NAME(m_mapper_active));
+	save_item(NAME(m_rom6_active));
+	save_item(NAME(m_rom6_upper));
+	save_item(NAME(m_dbin));
+	save_item(NAME(m_lowbyte));
+	save_item(NAME(m_highbyte));
+	save_item(NAME(m_latch));
+	save_pointer(NAME(m_mapper),16);
+	save_item(NAME(m_9901_int));
 }
 
 /*
@@ -999,6 +1018,16 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 
 	// The SGCPU actually makes use of this pin which was unused before
 	MCFG_PERIBOX_LCP_HANDLER( WRITELINE(ti99_4p_state, video_interrupt_in) )
+
+	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
+	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("1k")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// AMS RAM 1 MiB
+	MCFG_RAM_ADD(AMSRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("1M")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")

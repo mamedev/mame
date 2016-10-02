@@ -1547,6 +1547,7 @@ void pps4_device::device_start()
 	state_add( PPS4_I2, "I2",  m_I2 ).formatstr("%02X").noshow();
 	state_add( PPS4_Ip, "Ip",  m_Ip ).formatstr("%02X").noshow();
 	state_add( STATE_GENPC,    "GENPC", m_P ).noshow();
+	state_add( STATE_GENPCBASE,"CURPC", m_P ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_C).formatstr("%3s").noshow();
 
 	m_icountptr = &m_icount;

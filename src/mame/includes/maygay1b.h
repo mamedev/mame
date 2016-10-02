@@ -41,7 +41,7 @@ public:
 		m_duart68681(*this, "duart68681"),
 		m_sw1_port(*this, "SW1"),
 		m_sw2_port(*this, "SW2"),
-		m_kbd_ports(*this, {"SW1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", "SW2"}),
+		m_kbd_ports(*this, { "SW1", "SW2", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", }),
 		m_bank1(*this, "bank1"),
 		m_reel0(*this, "reel0"),
 		m_reel1(*this, "reel1"),

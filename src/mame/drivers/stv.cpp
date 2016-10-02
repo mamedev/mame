@@ -1595,6 +1595,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+
 /* Micronet layout, routes joystick port to the mux! */
 static INPUT_PORTS_START( myfairld )
 	PORT_INCLUDE( stv )
@@ -1689,6 +1690,86 @@ static INPUT_PORTS_START( myfairld )
 	PORT_CONFNAME( 0x01, 0x01, "I/O Device type" )
 	PORT_CONFSETTING(    0x00, "Mahjong Panel" )
 	PORT_CONFSETTING(    0x01, "Joystick" )
+INPUT_PORTS_END
+
+/* Micronet layout, routes joystick port to the mux! */
+static INPUT_PORTS_START( vmahjong )
+	PORT_INCLUDE( stv )
+
+	PORT_MODIFY("PORTA")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTE")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTF")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P1_KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+
+	PORT_START("P1_KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+
+	PORT_START("P1_KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+
+	PORT_START("P1_KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+
+	PORT_START("P1_KEY4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) /* F/F is there, but these two games are single player so it isn't connected */
+
+	PORT_START("P2_KEY0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 
@@ -2504,13 +2585,29 @@ ROM_START( twcup98 )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
-	ROM_LOAD16_BYTE( "epr20819.13",    0x0000001, 0x0100000, CRC(d930dfc8) SHA1(f66cc955181720661a0334fe67fa5750ddf9758b) )
+	ROM_LOAD16_BYTE( "epr20819.24",    0x0000001, 0x0100000, CRC(d930dfc8) SHA1(f66cc955181720661a0334fe67fa5750ddf9758b) ) // tested as IC13
 	ROM_RELOAD_PLAIN( 0x0200000, 0x0100000)
 	ROM_RELOAD_PLAIN( 0x0300000, 0x0100000)
-	ROM_LOAD16_WORD_SWAP( "mpr20821.2",    0x0400000, 0x0400000, CRC(2d930d23) SHA1(5fcaf4257f3639cb3aa407d2936f616499a09d97) ) // ic2 good (was .12)
-	ROM_LOAD16_WORD_SWAP( "mpr20822.3",    0x0800000, 0x0400000, CRC(8b33a5e2) SHA1(d5689ac8aad63509febe9aa4077351be09b2d8d4) ) // ic3 good (was .13)
-	ROM_LOAD16_WORD_SWAP( "mpr20823.4",    0x0c00000, 0x0400000, CRC(6e6d4e95) SHA1(c387d03ba27580c62ac0bf780915fdf41552df6f) ) // ic4 good (was .14)
-	ROM_LOAD16_WORD_SWAP( "mpr20824.5",    0x1000000, 0x0400000, CRC(4cf18a25) SHA1(310961a5f114fea8938a3f514dffd5231e910a5a) ) // ic5 good (was .15)
+	ROM_LOAD16_WORD_SWAP( "mpr20821.12",    0x0400000, 0x0400000, CRC(2d930d23) SHA1(5fcaf4257f3639cb3aa407d2936f616499a09d97) ) // tested as IC2
+	ROM_LOAD16_WORD_SWAP( "mpr20822.13",    0x0800000, 0x0400000, CRC(8b33a5e2) SHA1(d5689ac8aad63509febe9aa4077351be09b2d8d4) ) // tested as IC3
+	ROM_LOAD16_WORD_SWAP( "mpr20823.14",    0x0c00000, 0x0400000, CRC(6e6d4e95) SHA1(c387d03ba27580c62ac0bf780915fdf41552df6f) ) // tested as IC4
+	ROM_LOAD16_WORD_SWAP( "mpr20824.15",    0x1000000, 0x0400000, CRC(4cf18a25) SHA1(310961a5f114fea8938a3f514dffd5231e910a5a) ) // tested as IC5
+
+	// 25209801    1998     317-5039-COM   ST-V
+	ROM_PARAMETER( ":315_5881:key", "05200913" )
+ROM_END
+
+ROM_START( twsoc98 )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_BYTE( "epr-20820.ic24",    0x0000001, 0x0100000, CRC(b10451f9) SHA1(180b5071eaa5d6e9903da3fe4845ee2b6a93ef22) ) // tested as IC13
+	ROM_RELOAD_PLAIN( 0x0200000, 0x0100000)
+	ROM_RELOAD_PLAIN( 0x0300000, 0x0100000)
+	ROM_LOAD16_WORD_SWAP( "mpr20821.12",    0x0400000, 0x0400000, CRC(2d930d23) SHA1(5fcaf4257f3639cb3aa407d2936f616499a09d97) ) // tested as IC2
+	ROM_LOAD16_WORD_SWAP( "mpr20822.13",    0x0800000, 0x0400000, CRC(8b33a5e2) SHA1(d5689ac8aad63509febe9aa4077351be09b2d8d4) ) // tested as IC3
+	ROM_LOAD16_WORD_SWAP( "mpr20823.14",    0x0c00000, 0x0400000, CRC(6e6d4e95) SHA1(c387d03ba27580c62ac0bf780915fdf41552df6f) ) // tested as IC4
+	ROM_LOAD16_WORD_SWAP( "mpr20824.15",    0x1000000, 0x0400000, CRC(4cf18a25) SHA1(310961a5f114fea8938a3f514dffd5231e910a5a) ) // tested as IC5
 
 	// 25209801    1998     317-5039-COM   ST-V
 	ROM_PARAMETER( ":315_5881:key", "05200913" )
@@ -3452,7 +3549,7 @@ GAME( 1995, finlarch,  smleague,stv,      stv, stv_state,        finlarch,   ROT
 GAME( 1996, sokyugrt,  stvbios, stv,      stv, stv_state,        sokyugrt,   ROT0,   "Raizing / Eighting",           "Soukyugurentai / Terra Diver (JUET 960821 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, suikoenb,  stvbios, stv,      stv6b, stv_state,      suikoenb,   ROT0,   "Data East",                    "Suiko Enbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, vfkids,    stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, vmahjong,  stvbios, stv,      myfairld, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, vmahjong,  stvbios, stv,      vmahjong, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, winterht,  stvbios, stv,      stv, stv_state,        winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv,      stv, stv_state,        znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -3510,6 +3607,7 @@ GAME( 1995, vfremix,   stvbios, stv,      stv, stv_state,        vfremix,    ROT
 GAME( 1996, decathlt,  stvbios, stv_5838, stv, stv_state,        decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960709 V1.001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1996, decathlto, decathlt,stv_5838, stv, stv_state,        decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998, twcup98,   stvbios, stv_5881, stv, stv_state,        twcup98,    ROT0,   "Tecmo",                        "Tecmo World Cup '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some situations with the GK result in the game stalling, maybe CPU core bug??
+GAME( 1998, twsoc98,   twcup98, stv_5881, stv, stv_state,        twcup98,    ROT0,   "Tecmo",                        "Tecmo World Soccer '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^^ (check)
 /* Gives I/O errors */
 GAME( 1996, magzun,    stvbios, stv,      stv, stv_state,        magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, techbowl,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Technical Bowling (J 971212 V1.000)", MACHINE_NOT_WORKING )

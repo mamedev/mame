@@ -74,29 +74,24 @@ const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
 
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-device_video_interface(mconfig, *this),
-m_read_ram(*this),
-m_write_clear_video_interrupt(*this),
-m_char_rom(*this),
-m_palette(*this, "palette")
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_video_interface(mconfig, *this)
+	, m_read_ram(*this)
+	, m_write_clear_video_interrupt(*this)
+	, m_char_rom(*this, finder_base::DUMMY_TAG)
+	, m_palette(*this, "palette")
 {
 }
 
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__),
-device_video_interface(mconfig, *this),
-m_read_ram(*this),
-m_write_clear_video_interrupt(*this),
-m_char_rom(*this),
-m_palette(*this, "palette")
+	: vt100_video_device(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__)
 {
 }
 
 
 rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: vt100_video_device(mconfig, RAINBOW_VIDEO, "Rainbow Video", tag, owner, clock, "rainbow_video", __FILE__)
+	: vt100_video_device(mconfig, RAINBOW_VIDEO, "Rainbow Video", tag, owner, clock, "rainbow_video", __FILE__)
 {
 }
 

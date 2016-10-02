@@ -533,7 +533,8 @@ void v25_common_device::device_start()
 	state_add( V25_SS,    "SS", m_debugger_temp).callimport().callexport().formatstr("%04X");
 	state_add( V25_DS,    "DS0", m_debugger_temp).callimport().callexport().formatstr("%04X");
 
-	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
+	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
@@ -643,6 +644,7 @@ void v25_common_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 		case V25_PC:
 			m_debugger_temp = (Sreg(PS)<<4) + m_ip;
 			break;

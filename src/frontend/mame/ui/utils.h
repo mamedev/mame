@@ -84,20 +84,6 @@ enum
 	HIDE_BOTH
 };
 
-enum
-{
-	UI_FIRST_LOAD = 0,
-	UI_GENERAL_LOAD = UI_FIRST_LOAD,
-	UI_HISTORY_LOAD,
-	UI_MAMEINFO_LOAD,
-	UI_SYSINFO_LOAD,
-	UI_MESSINFO_LOAD,
-	UI_COMMAND_LOAD,
-	UI_GINIT_LOAD,
-	UI_STORY_LOAD,
-	UI_LAST_LOAD = UI_STORY_LOAD
-};
-
 enum : UINT16
 {
 	UI_SW_FIRST = 0,
@@ -202,7 +188,7 @@ struct c_year
 // GLOBAL CLASS
 struct ui_globals
 {
-	static UINT8        curimage_view, curdats_view, cur_sw_dats_view, rpanel;
+	static UINT8        curimage_view, curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
 	static bool         switch_image, redraw_icon, default_image, reset;
 	static int          visible_main_lines, visible_sw_lines;
 	static UINT16       panels_status;
@@ -258,7 +244,7 @@ std::vector<std::string> tokenize(const std::string &text, char sep);
 //-------------------------------------------------
 
 template <typename F>
-bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
+bool input_character(std::string &buffer, std::string::size_type size, unicode_char unichar, F &&filter)
 {
 	bool result = false;
 	auto buflen = buffer.size();
@@ -276,11 +262,28 @@ bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
 	}
 	else if ((unichar >= ' ') && filter(unichar))
 	{
-		// append this character
-		buffer += utf8_from_uchar(unichar);
-		result = true;
+		// append this character - check against the size first
+		std::string utf8_char = utf8_from_uchar(unichar);
+		if ((buffer.size() + utf8_char.size()) <= size)
+		{
+			buffer += utf8_char;
+			result = true;
+		}
 	}
 	return result;
+}
+
+
+//-------------------------------------------------
+//  input_character - inputs a typed character
+//  into a buffer
+//-------------------------------------------------
+
+template <typename F>
+bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
+{
+	auto size = std::numeric_limits<std::string::size_type>::max();
+	return input_character(buffer, size, unichar, filter);
 }
 
 

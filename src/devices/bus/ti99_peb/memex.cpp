@@ -14,7 +14,7 @@
 
 #include "memex.h"
 
-#define RAMREGION "ram2M"
+#define RAMREGION "ram2meg"
 #define TRACE_CONFIG 0
 
 enum
@@ -31,8 +31,7 @@ enum
 
 geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_MEMEX, "Geneve memory expansion card", tag, owner, clock, "ti99_memex", __FILE__),
-	m_ram(*this, RAMREGION),
-	m_genmod(0)
+	m_ram(*this, RAMREGION)
 {
 }
 
@@ -45,33 +44,27 @@ bool geneve_memex_device::access_enabled(offs_t offset)
 	// Some traditional cards will not decode the AMx lines, so
 	// we may have to lock out those areas
 	int page = (offset >> 13)&0xff;
-	int index;
 
-	// SW2: "off" locks
-	//      10xxx010
-	//      10111010   also locked when "on"
+	// SW2: 10xxx010   locked when SW2=off
+	//      10111010   locked when SW2=on
 	if (page == 0xba) return false;
-	if ((page & 0xc7)==0x82 && m_dip_switch[1]==false)
+	if ((page & 0xc7)==0x82 && ((m_switches & MDIP2)==0))
 	{
-		if (TRACE_CONFIG) logerror("memex blocks page %02x; dip1=%d\n", page,  m_dip_switch[1]);
+		if (TRACE_CONFIG) logerror("memex blocks page %02x; dip2=%d\n", page,  (m_switches & MDIP2)!=0);
 		return false;
 	}
 
-	// SW3: 111010xx    0=enabled 1=locked out
-	// SW4: 111011xx
-	// SW5: 111100xx
-	// SW6: 111101xx
-	// SW7: 111110xx
-	// SW8: 111111xx
+	// Switch  page
+	// SW3:    111010xx    enabled for SWx=0,blocked for SWx=1
+	// SW4:    111011xx
+	// SW5:    111100xx
+	// SW6:    111101xx
+	// SW7:    111110xx
+	// SW8:    111111xx
 
-	index = ((page >> 2)&0x3f);
-	if (index >= 0x3a && index <= 0x3f)
+	if (page >= 0xe8 && page <= 0xff)
 	{
-		if (m_dip_switch[index - 0x38]==0) return true;
-		else
-		{
-			return false;
-		}
+		return ((m_switches & (4<< (((page>>2) & 0x0f)-10))) == 0);
 	}
 	return true;
 }
@@ -91,9 +84,7 @@ READ8Z_MEMBER( geneve_memex_device::readz )
 
 	// The card is accessed for all addresses in the address space
 	if (access_enabled(offset))
-	{
 		*value = m_ram->pointer()[offset];
-	}
 }
 
 /*
@@ -106,26 +97,20 @@ WRITE8_MEMBER( geneve_memex_device::write )
 
 	// The card is accessed for all addresses in the address space
 	if (access_enabled(offset))
-	{
 		m_ram->pointer()[offset] = data;
-	}
 }
 
 /**************************************************************************/
 
 void geneve_memex_device::device_start()
 {
+	save_item(NAME(m_switches));
 }
 
 void geneve_memex_device::device_reset()
 {
-	UINT8 dips = ioport("MEMEXDIPS")->read();
-	if (TRACE_CONFIG) logerror("memex dips = %02x\n", dips);
-	for (auto & elem : m_dip_switch)
-	{
-		elem = ((dips & 0x01)!=0x00);
-		dips = dips >> 1;
-	}
+	m_switches = ioport("MEMEXDIPS")->read();
+	if (TRACE_CONFIG) logerror("memex dips = %02x\n", m_switches);
 }
 
 INPUT_PORTS_START( memex )

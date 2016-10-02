@@ -330,16 +330,16 @@ void tecmosys_state::video_start()
 	m_tmp_tilemap_renderbitmap.fill(0x0000);
 
 
-	m_txt_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
 	m_txt_tilemap->set_transparent_pen(0);
 
-	m_bg0tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg0tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg0tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg0tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_bg0tilemap->set_transparent_pen(0);
 
-	m_bg1tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg1tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg1tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg1tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_bg1tilemap->set_transparent_pen(0);
 
-	m_bg2tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg2tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg2tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg2tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_bg2tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_spritelist));

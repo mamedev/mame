@@ -45,13 +45,30 @@ public:
 	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_has_halt_bug = true; }
 
 	UINT8 get_speed();
-	void set_speed( UINT8 speed_request );
+	void set_speed(UINT8 speed_request);
 
-	UINT8 get_ie() { return m_IE; }
-	void set_ie( UINT8 data ) { m_IE = data; }
+	inline UINT8 get_ie() { return m_IE; }
+	inline void set_ie(UINT8 data) { m_IE = data; }
 
-	UINT8 get_if() { return m_IF; }
-	void set_if( UINT8 data ) { m_IF = data; }
+	inline UINT8 get_if() { return m_IF; }
+	inline void set_if(UINT8 data) { m_IF = data; }
+
+	inline void dma_cycles_to_burn(UINT16 cycles_to_burn) { m_dma_cycles_to_burn += cycles_to_burn; }
+
+	// Needed for some gameboy operation which needs to read the results
+	// of setting an input during the currently running timeslice.
+	// Can become protected again once this core becomes cycle accurate.
+	virtual void execute_set_input(int inputnum, int state) override;
+
+	enum
+	{
+		/* Interrupts */
+		VBL_INT = 0,    /* V-Blank    */
+		LCD_INT = 1,    /* LCD Status */
+		TIM_INT = 2,    /* Timer      */
+		SIO_INT = 3,    /* Serial I/O */
+		EXT_INT = 4     /* Joypad     */
+	};
 
 protected:
 
@@ -64,7 +81,6 @@ protected:
 	virtual UINT32 execute_max_cycles() const override { return 16; }
 	virtual UINT32 execute_input_lines() const override { return 5; }
 	virtual void execute_run() override;
-	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
@@ -115,8 +131,9 @@ protected:
 	int m_gb_speed;
 	int m_gb_speed_change_pending;
 	int m_enable;
-	bool m_handle_halt_bug;
 	bool m_has_halt_bug;
+	UINT32 m_dma_cycles_to_burn;
+	bool m_entering_halt;
 
 	/* Callbacks */
 	devcb_write8 m_timer_func;

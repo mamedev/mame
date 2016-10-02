@@ -60,7 +60,7 @@ private:
 	void set_drive();
 
 	// Holds the status of the DRQ and IRQ lines.
-	line_state      m_DRQ, m_IRQ;
+	int      m_DRQ, m_IRQ;
 
 	// DIP switch state
 	int m_dip1, m_dip2, m_dip34;
@@ -95,7 +95,7 @@ private:
 	bool m_rtc_enabled;
 
 	// Signal motor_on. When TRUE, makes all drives turning.
-	line_state m_MOTOR_ON;
+	int m_MOTOR_ON;
 
 	// Needed for triggering the motor monoflop
 	UINT8 m_lastval;
@@ -111,7 +111,7 @@ private:
 	int m_DSEL;
 
 	// Signal SIDSEL. 0 or 1, indicates the selected head.
-	line_state m_SIDSEL;
+	int m_SIDSEL;
 
 	// count 4.23s from rising edge of motor_on
 	emu_timer*      m_motor_on_timer;
@@ -133,8 +133,5 @@ private:
 
 	// Link to the real-time clock on the board.
 	required_device<mm58274c_device> m_clock;
-
-	// Debugging
-	bool m_debug_dataout;
 };
 #endif

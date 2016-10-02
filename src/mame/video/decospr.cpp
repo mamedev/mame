@@ -157,7 +157,7 @@ decospr_device::decospr_device(const machine_config &mconfig, const char *tag, d
 		m_y_offset(0),
 		m_flipallx(0),
 		m_transpen(0),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	// default color callback
 	m_col_cb =  decospr_col_cb_delegate(FUNC(decospr_device::default_col_cb), this);

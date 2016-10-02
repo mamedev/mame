@@ -60,7 +60,7 @@ void archimedes_state::archimedes_request_irq_b(int mask)
 
 	if (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B])
 	{
-		generic_pulse_irq_line(m_maincpu, ARM_IRQ_LINE, 1);
+		generic_pulse_irq_line(*m_maincpu, ARM_IRQ_LINE, 1);
 		//m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 		//m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
 	}
@@ -74,7 +74,7 @@ void archimedes_state::archimedes_request_fiq(int mask)
 
 	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
 	{
-		generic_pulse_irq_line(m_maincpu, ARM_FIRQ_LINE, 1);
+		generic_pulse_irq_line(*m_maincpu, ARM_FIRQ_LINE, 1);
 
 		//m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
 		//m_maincpu->set_input_line(ARM_FIRQ_LINE, ASSERT_LINE);

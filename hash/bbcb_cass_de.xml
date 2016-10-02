@@ -20,6 +20,7 @@
 		<description>Hopper (Ger)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Neil Raine" />
 		<info name="release" value="SBG23" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8112">
@@ -92,6 +93,7 @@
 		<description>Super Invaders (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Geoffrey J Crammond" />
 		<info name="release" value="SBG16" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7812">

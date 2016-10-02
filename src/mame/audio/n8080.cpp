@@ -128,7 +128,7 @@ void n8080_state::spacefev_sound_pins_changed()
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(m_audiocpu, 0, 2);
+		generic_pulse_irq_line(*m_audiocpu, 0, 2);
 	}
 }
 
@@ -151,7 +151,7 @@ void n8080_state::sheriff_sound_pins_changed()
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(m_audiocpu, 0, 2);
+		generic_pulse_irq_line(*m_audiocpu, 0, 2);
 	}
 }
 
@@ -166,7 +166,7 @@ void n8080_state::helifire_sound_pins_changed()
 
 	if (changes & (1 << 6))
 	{
-		generic_pulse_irq_line(m_audiocpu, 0, 2);
+		generic_pulse_irq_line(*m_audiocpu, 0, 2);
 	}
 }
 

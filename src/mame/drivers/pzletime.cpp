@@ -97,8 +97,8 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
 
 void pzletime_state::video_start()
 {
-	m_mid_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pzletime_state::get_mid_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_txt_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pzletime_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pzletime_state::get_mid_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pzletime_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	m_mid_tilemap->set_transparent_pen(0);
 	m_txt_tilemap->set_transparent_pen(0);
@@ -220,7 +220,7 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 
 WRITE16_MEMBER(pzletime_state::oki_bank_w)
 {
-	m_oki->set_bank_base(0x40000 * (data & 0x3));
+	m_oki->set_rom_bank(data & 0x3);
 }
 
 CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)

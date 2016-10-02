@@ -382,6 +382,14 @@ void snug_enhanced_video_device::device_start()
 	m_dsrrom = memregion(DSRROM)->base();
 	m_novram = std::make_unique<UINT8[]>(NOVRAM_SIZE);
 	m_console_conn = downcast<evpc_clock_connector*>(machine().device(EVPC_CONN_TAG));
+	save_item(NAME(m_address));
+	save_item(NAME(m_dsr_page));
+	save_item(NAME(m_inDsrArea));
+	save_item(NAME(m_novram_accessed));
+	save_item(NAME(m_palette_accessed));
+	save_item(NAME(m_RAMEN));
+	save_item(NAME(m_sound_accessed));
+	save_item(NAME(m_video_accessed));
 }
 
 void snug_enhanced_video_device::device_reset()

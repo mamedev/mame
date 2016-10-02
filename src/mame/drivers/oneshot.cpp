@@ -96,7 +96,7 @@ WRITE16_MEMBER(oneshot_state::soundbank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki->set_bank_base(0x40000 * ((data & 0x03) ^ 0x03));
+		m_oki->set_rom_bank((data & 0x03) ^ 0x03);
 	}
 }
 

@@ -133,7 +133,8 @@ void ccpu_cpu_device::device_start()
 	state_add( CCPU_X,  "X",  m_X).mask(0xfff).formatstr("%03X");
 	state_add( CCPU_Y,  "Y",  m_Y).mask(0xfff).formatstr("%03X");
 	state_add( CCPU_T,  "T",  m_T).mask(0xfff).formatstr("%03X");
-	state_add(STATE_GENPC, "curpc", m_PC).noshow();
+	state_add(STATE_GENPC, "GENPC", m_PC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_PC).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%6s").noshow();
 
 	m_icountptr = &m_icount;

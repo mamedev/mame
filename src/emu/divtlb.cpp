@@ -36,7 +36,8 @@ device_vtlb_interface::device_vtlb_interface(const machine_config &mconfig, devi
 		m_fixed(0),
 		m_dynindex(0),
 		m_pageshift(0),
-		m_addrwidth(0)
+		m_addrwidth(0),
+		m_table_base(nullptr)
 {
 }
 
@@ -92,6 +93,8 @@ void device_vtlb_interface::interface_pre_start()
 	// allocate the lookup table
 	m_table.resize((size_t) 1 << (m_addrwidth - m_pageshift));
 	memset(&m_table[0], 0, m_table.size()*sizeof(m_table[0]));
+	// pointer to first element for quick access
+	m_table_base = &m_table[0];
 
 	// allocate the fixed page count array
 	if (m_fixed > 0)
@@ -336,5 +339,5 @@ void device_vtlb_interface::vtlb_flush_address(offs_t address)
 
 const vtlb_entry *device_vtlb_interface::vtlb_table() const
 {
-	return &m_table[0];
+	return m_table_base;
 }

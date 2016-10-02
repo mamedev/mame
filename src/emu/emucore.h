@@ -346,6 +346,25 @@ inline Dest downcast(Source &src)
 	return static_cast<Dest>(src);
 }
 
+// template function which takes a strongly typed enumerator and returns its value as a compile-time constant
+template <typename E>
+using enable_enum_t = typename std::enable_if_t<std::is_enum<E>::value, typename std::underlying_type_t<E>>;
+
+template <typename E>
+constexpr inline enable_enum_t<E>
+underlying_value(E e) noexcept
+{
+	return static_cast< typename std::underlying_type<E>::type >( e );
+}
+
+// template function which takes an integral value and returns its representation as enumerator (even strongly typed)
+template <typename E , typename T>
+constexpr inline typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T>::value, E>
+enum_value(T value) noexcept
+{
+	return static_cast<E>(value);
+}
+
 
 
 //**************************************************************************

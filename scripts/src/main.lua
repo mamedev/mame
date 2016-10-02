@@ -223,7 +223,7 @@ end
 		ext_lib("jpeg"),
 		"7z",
 	}
-if (STANDALONE~=true) then		
+if (STANDALONE~=true) then
 	links {
 		ext_lib("lua"),
 		"lualibs",
@@ -267,11 +267,11 @@ end
 		ext_includedir("flac"),
 	}
 
-	
+
 if (STANDALONE==true) then
 	standalone();
 end
-		
+
 if (STANDALONE~=true) then
 	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
 		linkoptions {
@@ -378,6 +378,6 @@ end
 		debugargs (_OPTIONS["DEBUG_ARGS"])
 	else
 		debugargs ("-window")
-	end	
-	
+	end
+
 end

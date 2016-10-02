@@ -16,7 +16,9 @@ public:
 		m_bg_scrolly(*this, "bg_scrolly"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_ports(*this, ports) { }
+		m_ports(*this, { { "SYSTEM", "P1", "P2", "DSW0", "DSW1" } })
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -29,7 +31,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 
-	DECLARE_IOPORT_ARRAY(ports);
 	optional_ioport_array<5> m_ports;
 
 	int m_gameid;
