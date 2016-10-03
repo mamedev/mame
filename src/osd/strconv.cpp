@@ -25,8 +25,18 @@ namespace
 	class string_source
 	{
 	public:
-		virtual const T *string() const = 0;	// returns pointer to actual characters
-		virtual int char_count() const = 0;		// returns the character count (including NUL terminater), or -1 if NUL terminated
+		const T *string() const { return m_str;	};	// returns pointer to actual characters
+		virtual int char_count() const { return m_char_count; }		// returns the character count (including NUL terminater), or -1 if NUL terminated
+
+	protected:
+		string_source(const T *str, int char_count) : m_str(str), m_char_count(char_count)
+		{
+			assert(str != nullptr);
+		}
+
+	private:
+		const T *m_str;
+		int m_char_count;
 	};
 
 	// implementation of string_source for NUL-terminated strings
@@ -34,16 +44,9 @@ namespace
 	class null_terminated_string_source : public string_source<T>
 	{
 	public:
-		null_terminated_string_source(const T *str) : m_str(str)
+		null_terminated_string_source(const T *str) : string_source<T>(str, -1)
 		{
-			assert(str != nullptr);
 		}
-
-		virtual const T *string() const override { return m_str; }
-		virtual int char_count() const override { return -1; }
-
-	private:
-		const T *m_str;
 	};
 
 	// implementation of string_source for std::[w]string
@@ -51,15 +54,9 @@ namespace
 	class basic_string_source : public string_source<T>
 	{
 	public:
-		basic_string_source(const std::basic_string<T> &str) : m_str(str)
+		basic_string_source(const std::basic_string<T> &str) : string_source<T>(str.c_str(), (int)str.size() + 1)
 		{
 		}
-
-		virtual const T *string() const override { return m_str.c_str(); }
-		virtual int char_count() const override { return (int) m_str.size() + 1; }
-
-	private:
-		const std::basic_string<T> &m_str;
 	};
 };
 
