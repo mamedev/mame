@@ -27,7 +27,7 @@
 
 std::string astring_from_utf8(const std::string &s);
 std::string astring_from_utf8(const char *s);
-std::string &astring_from_utf8(std::string &dst, std::string &s);
+std::string &astring_from_utf8(std::string &dst, const std::string &s);
 std::string &astring_from_utf8(std::string &dst, const char *s);
 std::string utf8_from_astring(const std::string &s);
 std::string utf8_from_astring(const CHAR *s);
@@ -36,7 +36,7 @@ std::string &utf8_from_astring(std::string &dst, const CHAR *s);
 
 std::wstring wstring_from_utf8(const std::string &s);
 std::wstring wstring_from_utf8(const char *s);
-std::wstring &wstring_from_utf8(std::wstring &dst, std::string &s);
+std::wstring &wstring_from_utf8(std::wstring &dst, const std::string &s);
 std::wstring &wstring_from_utf8(std::wstring &dst, const char *s);
 std::string utf8_from_wstring(const std::wstring &s);
 std::string utf8_from_wstring(const WCHAR *s);
