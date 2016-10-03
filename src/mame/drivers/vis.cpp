@@ -19,7 +19,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void dack16_w(int line, UINT16 data) override { m_sample[m_samples++] = data; if(m_samples == 2) m_isa->drq7_w(CLEAR_LINE); }
+	virtual void dack16_w(int line, UINT16 data) override { if(m_samples < 2) m_sample[m_samples++] = data; else m_isa->drq7_w(CLEAR_LINE); }
 	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
 	required_device<dac_device> m_dacr;
@@ -30,8 +30,8 @@ private:
 	UINT8 m_data[2][16];
 	UINT8 m_mode;
 	UINT8 m_stat;
-	int m_sample_byte;
-	int m_samples;
+	unsigned int m_sample_byte;
+	unsigned int m_samples;
 	emu_timer *m_pcm;
 };
 
@@ -164,13 +164,13 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 			m_mode = data;
 			break;
 		case 0x02:
-			m_data[0][m_index[0]] = data;
+			m_data[0][m_index[0] & 0xf] = data;
 			break;
 		case 0x03:
 			m_index[0] = data;
 			break;
 		case 0x04:
-			m_data[1][m_index[1]] = data;
+			m_data[1][m_index[1] & 0xf] = data;
 			break;
 		case 0x05:
 			m_index[1] = data;

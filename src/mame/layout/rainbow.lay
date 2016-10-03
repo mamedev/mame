@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <mamelayout version="2">
 	<element name="driveled" defstate="0">
 		<disk state="1">
@@ -115,7 +114,7 @@
 
 	<view name="Default Layout">
 		<screen index="0">
-			<bounds x="30" y="0" width="640" height="480" />
+			<bounds x="30" y="0" width="~scr0width~" height="~scr0height~" />
 		</screen>
 
 		<bezel name="driveled0" element="driveled">
@@ -221,10 +220,33 @@
 		</bezel>
 	</view>
 
-	<view name="Screen Only">
+	<view name="Text Only">
 		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
+			<bounds x="30" y="0" width="~scr0width~" height="~scr0height~" />
 		</screen>
 	</view>
 
+	<view name="Graphics Only">
+		<screen index="1">
+			<bounds x="0" y="0" width="~scr1width~" height="~scr1height~" />
+		</screen>
+	</view>
+
+	<view name="Dual Side-by-Side">
+		<screen index="0">
+			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
+		</screen>
+		<screen index="1">
+			<bounds x="~scr0width~" y="0" width="~scr1width~" height="~scr1height~" />
+		</screen>
+	</view>
+
+	<view name="Dual Over-Under">
+		<screen index="0">
+			<bounds x="30" y="0" width="~scr0width~" height="~scr0height~" />
+		</screen>
+		<screen index="1">
+			<bounds x="30" y="~scr0height~" width="~scr1width~" height="~scr1height~" />
+		</screen>
+	</view>
 </mamelayout>

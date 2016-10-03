@@ -49,6 +49,7 @@ void mcd_isa_device::device_start()
 {
 	cdrom_image_device::device_start();
 	set_isa_device();
+	m_isa->set_dma_channel(5, this, FALSE);
 	m_isa->install_device(0x0310, 0x0311, *this, &mcd_isa_device::map, 16);
 }
 
@@ -58,41 +59,91 @@ void mcd_isa_device::device_start()
 
 void mcd_isa_device::device_reset()
 {
-	m_data = false;
-	m_stat = m_cdrom_handle ? STAT_READY : 0;
-	m_flag = FLAG_STAT;
-	m_rd_count = 0;
+	m_stat = m_cdrom_handle ? STAT_READY | STAT_CHANGE : 0;
+	m_cmdrd_count = 0;
+	m_cmdbuf_count = 0;
 	m_buf_count = 0;
 	m_curtoctrk = 1;
 	m_dma = 0;
 	m_irq = 0;
+	m_conf = 0;
+	m_dmalen = 2048;
 	m_locked = false;
+	m_change = true;
+	m_newstat = true;
+	m_data = false;
+}
+
+bool mcd_isa_device::read_sector()
+{
+	if(!m_readcount)
+	{
+		m_isa->drq5_w(CLEAR_LINE);
+		if(m_irq & IRQ_DATACOMP)
+			m_isa->irq5_w(ASSERT_LINE);
+		m_data = false;
+		m_cmdbuf[0] = STAT_SPIN | STAT_READY;
+		m_cmdbuf_count = 1;
+		return false;
+	}
+	UINT32 lba = msf_to_lba(m_readmsf);
+	cdrom_read_data(m_cdrom_handle, lba - 150, m_buf, m_mode & 0x40 ? CD_TRACK_MODE1_RAW : CD_TRACK_MODE1);
+	m_readmsf = lba_to_msf(lba + 1);
+	m_buf_count = m_dmalen + 1;
+	m_buf_idx = 0;
+	m_data = true;
+	m_readcount--;
+	if(m_dma)
+		m_isa->drq5_w(ASSERT_LINE);
+	if(m_irq & IRQ_DATAREADY)
+		m_isa->irq5_w(ASSERT_LINE);
+	return true;
 }
 
 READ8_MEMBER(mcd_isa_device::flag_r)
 {
-	UINT8 ret = m_flag;
-	m_flag = 0;
+	UINT8 ret = 0;
+	if(!m_buf_count || !m_data)
+		ret |= FLAG_NODATA;
+	if(m_buf_count == m_dmalen + 1)
+		ret |= FLAG_DATAREADY;
+	if(!m_cmdbuf_count || !m_newstat)
+		ret |= FLAG_NOSTAT; // all command results are status
 	return ret;
 }
 
 READ8_MEMBER(mcd_isa_device::data_r)
 {
-	if(!m_data)
+	m_isa->irq5_w(CLEAR_LINE);
+	if(m_cmdbuf_count)
 	{
-		if(m_buf_count)
-		{
-			m_flag = FLAG_DATA;
-			m_data = true;
-		}
-		return m_stat;
+		m_cmdbuf_count--;
+		return m_cmdbuf[m_cmdbuf_idx++];
 	}
 	else if(m_buf_count)
 	{
-		UINT8 ret = m_buf[m_buf_idx++];
+		UINT8 ret = m_buf_idx < 2352 ? m_buf[m_buf_idx++] : 0;
 		m_buf_count--;
-		if(m_buf_count)
-			m_flag = FLAG_DATA;
+		if(!m_buf_count)
+			read_sector();
+		return ret;
+	}
+	return m_stat;
+}
+
+UINT16 mcd_isa_device::dack16_r(int line)
+{
+	if(m_buf_count & ~1)
+	{
+		UINT16 ret = 0;
+		if(m_buf_idx < 2351)
+		{
+			ret = m_buf[m_buf_idx++];
+			ret |= (m_buf[m_buf_idx++] << 8);
+		}
+		m_buf_count -= 2;
+		if(!m_buf_count)
+			read_sector();
 		return ret;
 	}
 	return 0;
@@ -105,27 +156,34 @@ WRITE8_MEMBER(mcd_isa_device::reset_w)
 
 WRITE8_MEMBER(mcd_isa_device::cmd_w)
 {
-	if(m_rd_count)
+	if(m_cmdrd_count)
 	{
-		m_rd_count--;
+		m_cmdrd_count--;
 		switch(m_cmd)
 		{
 			case CMD_SET_MODE:
 				m_mode = data;
-				m_buf[0] = 0;
-				m_buf_count = 1;
+				m_cmdbuf[1] = 0;
+				m_cmdbuf_count = 2;
 				break;
 			case CMD_LOCK:
 				m_locked = data & 1 ? true : false;
-				m_buf[0] = 0;
-				m_buf[1] = 0;
-				m_buf_count = 2;
+				m_cmdbuf[1] = 0;
+				m_cmdbuf[2] = 0;
+				m_cmdbuf_count = 3;
 				break;
 			case CMD_CONFIG:
-				switch(m_rd_count)
+				switch(m_cmdrd_count)
 				{
 					case 1:
+						if(m_conf == 1)
+						{
+							m_dmalen = data << 8;
+							break;
+						}
 						m_conf = data;
+						if(m_conf == 1)
+							m_cmdrd_count++;
 						break;
 					case 0:
 						switch(m_conf)
@@ -133,50 +191,69 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 							case 0x10:
 								m_irq = data;
 								break;
+							case 0x01:
+								m_dmalen |= data;
+								break;
 							case 0x02:
 								m_dma = data;
 								break;
 						}
-						m_buf[0] = 0;
-						m_buf_count = 1;
+						m_cmdbuf[1] = 0;
+						m_cmdbuf_count = 2;
+						m_conf = 0;
 						break;
 				}
+				break;
+			case CMD_READ1X:
+			case CMD_READ2X:
+				switch(m_cmdrd_count)
+				{
+					case 5:
+						m_readmsf = 0;
+					case 4:
+					case 3:
+						m_readmsf |= bcd_2_dec(data) << ((m_cmdrd_count - 3) * 8);
+						break;
+					case 0:
+						m_readcount = data + 1;
+						read_sector();
+						m_cmdbuf_count = 1;
+						m_cmdbuf[0] = STAT_SPIN | STAT_READY;
+						break;
+				}
+				break;
 		}
-		if(!m_rd_count)
-		{
-			m_data = false;
-			m_flag = FLAG_STAT;
-			m_stat = m_cdrom_handle ? STAT_READY : 0;
-		}
+		if(!m_cmdrd_count)
+			m_stat = m_cdrom_handle ? (STAT_READY | (m_change ? STAT_CHANGE : 0)) : 0;
 		return;
 	}
 	m_cmd = data;
-	m_buf_idx = 0;
-	m_rd_count = 0;
-	m_buf_count = 0;
-	m_stat = m_cdrom_handle ? STAT_READY : 0;
+	m_cmdbuf_idx = 0;
+	m_cmdrd_count = 0;
+	m_cmdbuf_count = 1;
+	m_cmdbuf[0] = m_cdrom_handle ? (STAT_READY | (m_change ? STAT_CHANGE : 0)) : 0;
+	m_data = false;
 	switch(data)
 	{
 		case CMD_GET_INFO:
 			if(m_cdrom_handle)
 			{
 				UINT32 first = lba_to_msf(150), last = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, 0xaa));
-				m_buf[0] = 1;
-				m_buf[1] = dec_2_bcd(cdrom_get_last_track(m_cdrom_handle));
-				m_buf[2] = dec_2_bcd((first >> 16) & 0xff);
-				m_buf[3] = dec_2_bcd((first >> 8) & 0xff);
-				m_buf[4] = dec_2_bcd(first & 0xff);
-				m_buf[5] = dec_2_bcd((last >> 16) & 0xff);
-				m_buf[6] = dec_2_bcd((last >> 8) & 0xff);
-				m_buf[7] = dec_2_bcd(last & 0xff);
-				m_buf[8] = 0;
-				m_buf_count = 9;
+				m_cmdbuf[1] = 1;
+				m_cmdbuf[2] = dec_2_bcd(cdrom_get_last_track(m_cdrom_handle));
+				m_cmdbuf[3] = dec_2_bcd((last >> 16) & 0xff);
+				m_cmdbuf[4] = dec_2_bcd((last >> 8) & 0xff);
+				m_cmdbuf[5] = dec_2_bcd(last & 0xff);
+				m_cmdbuf[6] = dec_2_bcd((first >> 16) & 0xff);
+				m_cmdbuf[7] = dec_2_bcd((first >> 8) & 0xff);
+				m_cmdbuf[8] = dec_2_bcd(first & 0xff);
+				m_cmdbuf[9] = 0;
+				m_cmdbuf_count = 10;
 			}
 			else
 			{
-				m_buf_count = 1;
-				m_buf[0] = 0;
-				m_stat = STAT_CMD_CHECK;
+				m_cmdbuf_count = 1;
+				m_cmdbuf[0] = STAT_CMD_CHECK;
 			}
 			break;
 		case CMD_GET_Q:
@@ -185,29 +262,31 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 				int tracks = cdrom_get_last_track(m_cdrom_handle);
 				UINT32 start = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk));
 				UINT32 end = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk < tracks ? m_curtoctrk + 1 : 0xaa));
-				m_buf[0] = 1; // track type?
-				m_buf[1] = 0; // track num except when reading toc
-				m_buf[2] = dec_2_bcd(m_curtoctrk); // index
-				m_buf[3] = dec_2_bcd((start >> 16) & 0xff);
-				m_buf[4] = dec_2_bcd((start >> 8) & 0xff);
-				m_buf[5] = dec_2_bcd(start & 0xff);
-				m_buf[6] = 0;
-				m_buf[7] = dec_2_bcd((end >> 16) & 0xff);
-				m_buf[8] = dec_2_bcd((end >> 8) & 0xff);
-				m_buf[9] = dec_2_bcd(end & 0xff);
+				m_cmdbuf[1] = (cdrom_get_adr_control(m_cdrom_handle, m_curtoctrk) << 4) & 0xf0;
+				m_cmdbuf[2] = 0; // track num except when reading toc
+				m_cmdbuf[3] = dec_2_bcd(m_curtoctrk); // index
+				m_cmdbuf[4] = dec_2_bcd((start >> 16) & 0xff);
+				m_cmdbuf[5] = dec_2_bcd((start >> 8) & 0xff);
+				m_cmdbuf[6] = dec_2_bcd(start & 0xff);
+				m_cmdbuf[7] = 0;
+				m_cmdbuf[8] = dec_2_bcd((end >> 16) & 0xff);
+				m_cmdbuf[9] = dec_2_bcd((end >> 8) & 0xff);
+				m_cmdbuf[10] = dec_2_bcd(end & 0xff);
 				if(m_curtoctrk >= tracks)
 					m_curtoctrk = 1;
-				m_buf_count = 10;
+				m_cmdbuf_count = 11;
 			}
 			else
-				m_stat = STAT_CMD_CHECK;
+			{
+				m_cmdbuf_count = 1;
+				m_cmdbuf[0] = STAT_CMD_CHECK;
+			}
 			break;
 		case CMD_GET_STAT:
-			m_buf[0] = m_stat;
-			m_buf_count = 1;
+			m_change = false;
 			break;
 		case CMD_SET_MODE:
-			m_rd_count = 1;
+			m_cmdrd_count = 1;
 			break;
 		case CMD_STOPCDDA:
 		case CMD_STOP:
@@ -215,32 +294,34 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 			m_curtoctrk = 1;
 			break;
 		case CMD_CONFIG:
-			m_rd_count = 2;
+			m_cmdrd_count = 2;
 			break;
-		case CMD_READ:
-			m_drvmode = DRV_MODE_READ;
-			break;
-		case CMD_READCDDA:
-			m_drvmode = DRV_MODE_CDDA;
+		case CMD_READ1X:
+		case CMD_READ2X:
+			if(m_cdrom_handle)
+			{
+				m_drvmode = DRV_MODE_READ;
+				m_cmdrd_count = 6;
+			}
+			else
+			{
+				m_cmdbuf_count = 1;
+				m_cmdbuf[0] = STAT_CMD_CHECK;
+			}
 			break;
 		case CMD_GET_VER:
-			m_buf[0] = 1; // ?
-			m_buf[1] = 'D';
-			m_buf[2] = 0;
-			m_buf_count = 3;
+			m_cmdbuf[1] = 1; // ?
+			m_cmdbuf[2] = 'D';
+			m_cmdbuf[3] = 0;
+			m_cmdbuf_count = 4;
 			break;
 		case CMD_EJECT:
 			break;
 		case CMD_LOCK:
-			m_rd_count = 1;
+			m_cmdrd_count = 1;
 			break;
 		default:
-			m_stat |= STAT_CMD_CHECK;
+			m_cmdbuf[0] = m_stat | STAT_CMD_CHECK;
 			break;
-	}
-	if(!m_rd_count)
-	{
-		m_data = false;
-		m_flag = FLAG_STAT;
 	}
 }
