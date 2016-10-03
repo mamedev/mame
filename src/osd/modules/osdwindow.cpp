@@ -21,6 +21,11 @@
 #include "render/drawsdl.h"
 #endif
 
+float osd_window::pixel_aspect() const
+{
+	return monitor()->pixel_aspect();
+}
+
 std::unique_ptr<osd_renderer> osd_renderer::make_for_type(int mode, std::shared_ptr<osd_window> window, int extra_flags)
 {
 	switch(mode)

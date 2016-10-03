@@ -62,7 +62,7 @@ ef9364_device::ef9364_device(const machine_config &mconfig, const char *tag, dev
 	device_video_interface(mconfig, *this),
 	m_space_config("textram", ENDIANNESS_LITTLE, 8, 12, 0, nullptr, *ADDRESS_MAP_NAME(ef9364)),
 	m_charset(*this, DEVICE_SELF),
-	m_palette(*this)
+	m_palette(*this, finder_base::DUMMY_TAG)
 {
 	clock_freq = clock;
 }

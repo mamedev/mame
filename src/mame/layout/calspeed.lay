@@ -90,7 +90,7 @@
 		<bezel name="lamp3" element="view3" inputtag="IN1" inputmask="0x40">
 			<bounds x="0.025" y="3.325" width="0.472" height="0.125" />
 		</bezel>
-		
+
 		<bezel name="lamp4" element="lamp">
 			<bounds x="1.785" y="3.2" width="0.1" height="0.1" />
 		</bezel>

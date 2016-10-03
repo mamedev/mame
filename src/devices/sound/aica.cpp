@@ -353,7 +353,7 @@ signed short aica_device::DecodeADPCM(int *PrevSignal, unsigned char Delta, int 
 {
 	int x = (*PrevQuant * quant_mul[Delta & 7]) / 8;
 	if (x > 0x7FFF) x = 0x7FFF;
-	if (Delta & 8)	x = -x;
+	if (Delta & 8)  x = -x;
 	x += *PrevSignal;
 #if 0 // older implementation
 	int x = *PrevQuant * quant_mul [Delta & 15];

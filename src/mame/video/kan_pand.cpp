@@ -55,12 +55,12 @@
 const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
 
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__),
-		device_video_interface(mconfig, *this),
-		m_gfx_region(0),
-		m_xoffset(0),
-		m_yoffset(0),
-		m_gfxdecode(*this)
+	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__)
+	, device_video_interface(mconfig, *this)
+	, m_gfx_region(0)
+	, m_xoffset(0)
+	, m_yoffset(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 

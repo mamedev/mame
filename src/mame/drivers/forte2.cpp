@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Mariusz Wojcieszek
 /* Brazilian bootleg board from 1989. Forte II Games, Industria Brasileira.
-MAME driver by Mariusz Wojcieszek & hap, based on information from Alexandre.
+MAME driver by Mariusz Wojcieszek & hap, based on
+information from Alexandre Souza (a.k.a. "Tabajara").
 
 Hardware is based on MSX1, excluding i8255 PPI:
  64KB RAM, largely unused
@@ -12,12 +13,25 @@ Hardware is based on MSX1, excluding i8255 PPI:
  (no dipswitches)
 
 Games:
-Pesadelo (means Nightmare in Portuguese), 1989 bootleg of Knightmare (Majou
+Pesadelo (means 'nightmare' in Portuguese), 1989 bootleg of Knightmare (Majou
 Densetsu in Japan) (C) 1986 Konami, originally released exclusively on MSX.
 This arcade conversion has been made a bit harder, eg. bonus power-ups deplete
 three times quicker, and the game starts at a later, more difficult level.
-A rough translation of the text after inserting a coin: Coins won't accumulate,
-insert a new coin after the game is over if you want another play.
+A precise translation of the Brazilian Portuguese text displayed
+upon inserting a coin is:
+
+  NIGHTMARE DIFFICULTY-LEVEL 2 DOES NOT ACCUMULATE
+  CREDITS , ONLY INSERT A NEW
+  COIN AFTER THE END OF THE GAME
+  IN ORDER TO START THE GAME PRESS
+  THE FIRE BUTTON.
+
+               GOOD LUCK!
+
+If the coin detector is activated for a few seconds, an error message
+meaning STUCK COIN shows up blinking and beeping:
+
+               FICHA PRESA
 
 According to Alexandre, there are more games for this board, but not
 found/dumped yet. */

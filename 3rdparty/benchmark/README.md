@@ -9,6 +9,8 @@ Discussion group: https://groups.google.com/d/forum/benchmark-discuss
 
 IRC channel: https://freenode.net #googlebenchmark
 
+[Known issues and common problems](#known-issues)
+
 ## Example usage
 ### Basic usage
 Define a function that executes the code to be measured.
@@ -40,13 +42,13 @@ measuring the speed of `memcpy()` calls of different lengths:
 
 ```c++
 static void BM_memcpy(benchmark::State& state) {
-  char* src = new char[state.range_x()];
-  char* dst = new char[state.range_x()];
-  memset(src, 'x', state.range_x());
+  char* src = new char[state.range(0)];
+  char* dst = new char[state.range(0)];
+  memset(src, 'x', state.range(0));
   while (state.KeepRunning())
-    memcpy(dst, src, state.range_x());
+    memcpy(dst, src, state.range(0));
   state.SetBytesProcessed(int64_t(state.iterations()) *
-                          int64_t(state.range_x()));
+                          int64_t(state.range(0)));
   delete[] src;
   delete[] dst;
 }
@@ -61,7 +63,16 @@ the specified range and will generate a benchmark for each such argument.
 BENCHMARK(BM_memcpy)->Range(8, 8<<10);
 ```
 
-You might have a benchmark that depends on two inputs. For example, the
+By default the arguments in the range are generated in multiples of eight and
+the command above selects [ 8, 64, 512, 4k, 8k ]. In the following code the
+range multiplier is changed to multiples of two.
+
+```c++
+BENCHMARK(BM_memcpy)->RangeMultiplier(2)->Range(8, 8<<10);
+```
+Now arguments generated are [ 8, 16, 32, 64, 128, 256, 512, 1024, 2k, 4k, 8k ].
+
+You might have a benchmark that depends on two or more inputs. For example, the
 following code defines a family of benchmarks for measuring the speed of set
 insertion.
 
@@ -69,21 +80,21 @@ insertion.
 static void BM_SetInsert(benchmark::State& state) {
   while (state.KeepRunning()) {
     state.PauseTiming();
-    std::set<int> data = ConstructRandomSet(state.range_x());
+    std::set<int> data = ConstructRandomSet(state.range(0));
     state.ResumeTiming();
-    for (int j = 0; j < state.range_y(); ++j)
+    for (int j = 0; j < state.range(1); ++j)
       data.insert(RandomNumber());
   }
 }
 BENCHMARK(BM_SetInsert)
-    ->ArgPair(1<<10, 1)
-    ->ArgPair(1<<10, 8)
-    ->ArgPair(1<<10, 64)
-    ->ArgPair(1<<10, 512)
-    ->ArgPair(8<<10, 1)
-    ->ArgPair(8<<10, 8)
-    ->ArgPair(8<<10, 64)
-    ->ArgPair(8<<10, 512);
+    ->Args({1<<10, 1})
+    ->Args({1<<10, 8})
+    ->Args({1<<10, 64})
+    ->Args({1<<10, 512})
+    ->Args({8<<10, 1})
+    ->Args({8<<10, 8})
+    ->Args({8<<10, 64})
+    ->Args({8<<10, 512});
 ```
 
 The preceding code is quite repetitive, and can be replaced with the following
@@ -92,7 +103,7 @@ product of the two specified ranges and will generate a benchmark for each such
 pair.
 
 ```c++
-BENCHMARK(BM_SetInsert)->RangePair(1<<10, 8<<10, 1, 512);
+BENCHMARK(BM_SetInsert)->Ranges({{1<<10, 8<<10}, {1, 512}});
 ```
 
 For more complex patterns of inputs, passing a custom function to `Apply` allows
@@ -104,9 +115,43 @@ and a sparse range on the second.
 static void CustomArguments(benchmark::internal::Benchmark* b) {
   for (int i = 0; i <= 10; ++i)
     for (int j = 32; j <= 1024*1024; j *= 8)
-      b->ArgPair(i, j);
+      b->Args({i, j});
 }
 BENCHMARK(BM_SetInsert)->Apply(CustomArguments);
+```
+
+### Calculate asymptotic complexity (Big O)
+Asymptotic complexity might be calculated for a family of benchmarks. The
+following code will calculate the coefficient for the high-order term in the
+running time and the normalized root-mean square error of string comparison.
+
+```c++
+static void BM_StringCompare(benchmark::State& state) {
+  std::string s1(state.range(0), '-');
+  std::string s2(state.range(0), '-');
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(s1.compare(s2));
+  }
+  state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_StringCompare)
+    ->RangeMultiplier(2)->Range(1<<10, 1<<18)->Complexity(benchmark::oN);
+```
+
+As shown in the following invocation, asymptotic complexity might also be
+calculated automatically.
+
+```c++
+BENCHMARK(BM_StringCompare)
+    ->RangeMultiplier(2)->Range(1<<10, 1<<18)->Complexity();
+```
+
+The following code will specify asymptotic complexity with a lambda function,
+that might be used to customize high-order term calculation.
+
+```c++
+BENCHMARK(BM_StringCompare)->RangeMultiplier(2)
+    ->Range(1<<10, 1<<18)->Complexity([](int n)->double{return n; });
 ```
 
 ### Templated benchmarks
@@ -119,14 +164,14 @@ template <class Q> int BM_Sequential(benchmark::State& state) {
   Q q;
   typename Q::value_type v;
   while (state.KeepRunning()) {
-    for (int i = state.range_x(); i--; )
+    for (int i = state.range(0); i--; )
       q.push(v);
-    for (int e = state.range_x(); e--; )
+    for (int e = state.range(0); e--; )
       q.Wait(&v);
   }
   // actually messages, not bytes:
   state.SetBytesProcessed(
-      static_cast<int64_t>(state.iterations())*state.range_x());
+      static_cast<int64_t>(state.iterations())*state.range(0));
 }
 BENCHMARK_TEMPLATE(BM_Sequential, WaitQueue<int>)->Range(1<<0, 1<<10);
 ```
@@ -141,6 +186,54 @@ Three macros are provided for adding benchmark templates.
 #endif
 #define BENCHMARK_TEMPLATE1(func, arg1)
 #define BENCHMARK_TEMPLATE2(func, arg1, arg2)
+```
+
+## Passing arbitrary arguments to a benchmark
+In C++11 it is possible to define a benchmark that takes an arbitrary number
+of extra arguments. The `BENCHMARK_CAPTURE(func, test_case_name, ...args)`
+macro creates a benchmark that invokes `func`  with the `benchmark::State` as
+the first argument followed by the specified `args...`.
+The `test_case_name` is appended to the name of the benchmark and
+should describe the values passed.
+
+```c++
+template <class ...ExtraArgs>`
+void BM_takes_args(benchmark::State& state, ExtraArgs&&... extra_args) {
+  [...]
+}
+// Registers a benchmark named "BM_takes_args/int_string_test` that passes
+// the specified values to `extra_args`.
+BENCHMARK_CAPTURE(BM_takes_args, int_string_test, 42, std::string("abc"));
+```
+Note that elements of `...args` may refer to global variables. Users should
+avoid modifying global state inside of a benchmark.
+
+## Using RegisterBenchmark(name, fn, args...)
+
+The `RegisterBenchmark(name, func, args...)` function provides an alternative
+way to create and register benchmarks.
+`RegisterBenchmark(name, func, args...)` creates, registers, and returns a
+pointer to a new benchmark with the specified `name` that invokes
+`func(st, args...)` where `st` is a `benchmark::State` object.
+
+Unlike the `BENCHMARK` registration macros, which can only be used at the global
+scope, the `RegisterBenchmark` can be called anywhere. This allows for
+benchmark tests to be registered programmatically.
+
+Additionally `RegisterBenchmark` allows any callable object to be registered
+as a benchmark. Including capturing lambdas and function objects. This
+allows the creation
+
+For Example:
+```c++
+auto BM_test = [](benchmark::State& st, auto Inputs) { /* ... */ };
+
+int main(int argc, char** argv) {
+  for (auto& test_input : { /* ... */ })
+      benchmark::RegisterBenchmark(test_input.name(), BM_test, test_input);
+  benchmark::Initialize(&argc, argv);
+  benchmark::RunSpecifiedBenchmarks();
+}
 ```
 
 ### Multithreaded benchmarks
@@ -193,7 +286,7 @@ can be reported back with `SetIterationTime`.
 
 ```c++
 static void BM_ManualTiming(benchmark::State& state) {
-  int microseconds = state.range_x();
+  int microseconds = state.range(0);
   std::chrono::duration<double, std::micro> sleep_duration {
     static_cast<double>(microseconds)
   };
@@ -216,7 +309,8 @@ BENCHMARK(BM_ManualTiming)->Range(1, 1<<17)->UseManualTime();
 
 ### Preventing optimisation
 To prevent a value or expression from being optimized away by the compiler
-the `benchmark::DoNotOptimize(...)` function can be used.
+the `benchmark::DoNotOptimize(...)` and `benchmark::ClobberMemory()`
+functions can be used.
 
 ```c++
 static void BM_test(benchmark::State& state) {
@@ -228,6 +322,48 @@ static void BM_test(benchmark::State& state) {
   }
 }
 ```
+
+`DoNotOptimize(<expr>)` forces the  *result* of `<expr>` to be stored in either
+memory or a register. For GNU based compilers it acts as read/write barrier
+for global memory. More specifically it forces the compiler to flush pending
+writes to memory and reload any other values as necessary.
+
+Note that `DoNotOptimize(<expr>)` does not prevent optimizations on `<expr>`
+in any way. `<expr>` may even be removed entirely when the result is already
+known. For example:
+
+```c++
+  /* Example 1: `<expr>` is removed entirely. */
+  int foo(int x) { return x + 42; }
+  while (...) DoNotOptimize(foo(0)); // Optimized to DoNotOptimize(42);
+
+  /*  Example 2: Result of '<expr>' is only reused */
+  int bar(int) __attribute__((const));
+  while (...) DoNotOptimize(bar(0)); // Optimized to:
+  // int __result__ = bar(0);
+  // while (...) DoNotOptimize(__result__);
+```
+
+The second tool for preventing optimizations is `ClobberMemory()`. In essence
+`ClobberMemory()` forces the compiler to perform all pending writes to global
+memory. Memory managed by block scope objects must be "escaped" using
+`DoNotOptimize(...)` before it can be clobbered. In the below example
+`ClobberMemory()` prevents the call to `v.push_back(42)` from being optimized
+away.
+
+```c++
+static void BM_vector_push_back(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    std::vector<int> v;
+    v.reserve(1);
+    benchmark::DoNotOptimize(v.data()); // Allow v.data() to be clobbered.
+    v.push_back(42);
+    benchmark::ClobberMemory(); // Force 42 to be written to memory.
+  }
+}
+```
+
+Note that `ClobberMemory()` is only available for GNU based compilers.
 
 ### Set time unit manually
 If a benchmark runs a few milliseconds it may be hard to visually compare the
@@ -245,6 +381,24 @@ iterations is at least one, not more than 1e9, until CPU time is greater than
 the minimum time, or the wallclock time is 5x minimum time. The minimum time is
 set as a flag `--benchmark_min_time` or per benchmark by calling `MinTime` on
 the registered benchmark object.
+
+## Reporting the mean and standard devation by repeated benchmarks
+By default each benchmark is run once and that single result is reported.
+However benchmarks are often noisy and a single result may not be representative
+of the overall behavior. For this reason it's possible to repeatedly rerun the
+benchmark.
+
+The number of runs of each benchmark is specified globally by the
+`--benchmark_repetitions` flag or on a per benchmark basis by calling
+`Repetitions` on the registered benchmark object. When a benchmark is run
+more than once the mean and standard deviation of the runs will be reported.
+
+Additionally the `--benchmark_report_aggregates_only={true|false}` flag or
+`ReportAggregatesOnly(bool)` function can be used to change how repeated tests
+are reported. By default the result of each repeated run is reported. When this
+option is 'true' only the mean and standard deviation of the runs is reported.
+Calling `ReportAggregatesOnly(bool)` on a registered benchmark object overrides
+the value of the flag for that benchmark.
 
 ## Fixtures
 Fixture tests are created by
@@ -276,12 +430,44 @@ BENCHMARK_REGISTER_F(MyFixture, BarTest)->Threads(2);
 /* BarTest is now registered */
 ```
 
+## Exiting Benchmarks in Error
+
+When errors caused by external influences, such as file I/O and network
+communication, occur within a benchmark the
+`State::SkipWithError(const char* msg)` function can be used to skip that run
+of benchmark and report the error. Note that only future iterations of the
+`KeepRunning()` are skipped. Users may explicitly return to exit the
+benchmark immediately.
+
+The `SkipWithError(...)` function may be used at any point within the benchmark,
+including before and after the `KeepRunning()` loop.
+
+For example:
+
+```c++
+static void BM_test(benchmark::State& state) {
+  auto resource = GetResource();
+  if (!resource.good()) {
+      state.SkipWithError("Resource is not good!");
+      // KeepRunning() loop will not be entered.
+  }
+  while (state.KeepRunning()) {
+      auto data = resource.read_data();
+      if (!resource.good()) {
+        state.SkipWithError("Failed to read data!");
+        break; // Needed to skip the rest of the iteration.
+     }
+     do_stuff(data);
+  }
+}
+```
+
 ## Output Formats
 The library supports multiple output formats. Use the
-`--benchmark_format=<tabular|json>` flag to set the format type. `tabular` is
-the default format.
+`--benchmark_format=<console|json|csv>` flag to set the format type. `console`
+is the default format.
 
-The Tabular format is intended to be a human readable format. By default
+The Console format is intended to be a human readable format. By default
 the format generates color output. Context is output on stderr and the 
 tabular data on stdout. Example tabular output looks like:
 ```
@@ -344,6 +530,12 @@ name,iterations,real_time,cpu_time,bytes_per_second,items_per_second,label
 "BM_SetInsert/1024/10",106365,17238.4,8421.53,4.74973e+06,1.18743e+06,
 ```
 
+## Output Files
+The library supports writing the output of the benchmark to a file specified
+by `--benchmark_out=<filename>`. The format of the output can be specified
+using `--benchmark_out_format={json|console|csv}`. Specifying
+`--benchmark_out` does not suppress the console output.
+
 ## Debug vs Release
 By default, benchmark builds as a debug library. You will see a warning in the output when this is the case. To build it as a release library instead, use:
 
@@ -358,4 +550,29 @@ cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_LTO=true
 ```
 
 ## Linking against the library
-When using gcc, it is necessary to link against pthread to avoid runtime exceptions. This is due to how gcc implements std::thread. See [issue #67](https://github.com/google/benchmark/issues/67) for more details.
+When using gcc, it is necessary to link against pthread to avoid runtime exceptions.
+This is due to how gcc implements std::thread.
+See [issue #67](https://github.com/google/benchmark/issues/67) for more details.
+
+## Compiler Support
+
+Google Benchmark uses C++11 when building the library. As such we require
+a modern C++ toolchain, both compiler and standard library.
+
+The following minimum versions are strongly recommended build the library:
+
+* GCC 4.8
+* Clang 3.4
+* Visual Studio 2013
+
+Anything older *may* work.
+
+Note: Using the library and its headers in C++03 is supported. C++11 is only
+required to build the library.
+
+# Known Issues
+
+### Windows
+
+* Users must manually link `shlwapi.lib`. Failure to do so may result
+in resolved symbols.

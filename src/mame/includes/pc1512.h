@@ -6,15 +6,17 @@
 #define __PC1512__
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
+#include "bus/isa/pc1640_iga.h"
+#include "bus/pc1512/mouse.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/pc_dsk.h"
 #include "machine/am9517a.h"
 #include "machine/buffer.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/ins8250.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/isa_cards.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -23,7 +25,6 @@
 #include "machine/ram.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
-#include "bus/isa/pc1640_iga.h"
 
 #define I8086_TAG       "ic120"
 #define I8087_TAG       "ic119"
@@ -44,45 +45,45 @@
 class pc1512_state : public driver_device
 {
 public:
-	pc1512_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8086_TAG),
-			m_dmac(*this, I8237A5_TAG),
-			m_pic(*this, I8259A2_TAG),
-			m_pit(*this, I8253_TAG),
-			m_rtc(*this, MC146818_TAG),
-			m_fdc(*this, PC_FDC_XT_TAG),
-			m_uart(*this, INS8250_TAG),
-			m_vdu(*this, AMS40041_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_cent_data_out(*this, "cent_data_out"),
-			m_speaker(*this, SPEAKER_TAG),
-			m_kb(*this, PC1512_KEYBOARD_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),
-			m_floppy1(*this, PC_FDC_XT_TAG ":1:525dd" ),
-			m_bus(*this, ISA_BUS_TAG),
-			m_char_rom(*this, AMS40041_TAG),
-			m_video_ram(*this, "video_ram"),
-			m_lk(*this, "LK"),
-			m_pit1(0),
-			m_pit2(0),
-			m_status1(0),
-			m_status2(0),
-			m_port61(0),
-			m_nmi_enable(0),
-			m_kb_bits(0),
-			m_kbclk(1),
-			m_kbdata(1),
-			m_dreq0(0),
-			m_nden(1),
-			m_dint(0),
-			m_ddrq(0),
-			m_fdc_dsr(0),
-			m_neop(0),
-			m_ack_int_enable(1),
-			m_centronics_ack(0),
-			m_speaker_drive(0)
+	pc1512_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8086_TAG),
+		m_dmac(*this, I8237A5_TAG),
+		m_pic(*this, I8259A2_TAG),
+		m_pit(*this, I8253_TAG),
+		m_rtc(*this, MC146818_TAG),
+		m_fdc(*this, PC_FDC_XT_TAG),
+		m_uart(*this, INS8250_TAG),
+		m_vdu(*this, AMS40041_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_cent_data_out(*this, "cent_data_out"),
+		m_speaker(*this, SPEAKER_TAG),
+		m_kb(*this, PC1512_KEYBOARD_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),
+		m_floppy1(*this, PC_FDC_XT_TAG ":1:525dd" ),
+		m_bus(*this, ISA_BUS_TAG),
+		m_char_rom(*this, AMS40041_TAG),
+		m_video_ram(*this, "video_ram"),
+		m_lk(*this, "LK"),
+		m_pit1(0),
+		m_pit2(0),
+		m_status1(0),
+		m_status2(0),
+		m_port61(0),
+		m_nmi_enable(0),
+		m_kb_bits(0),
+		m_kbclk(1),
+		m_kbdata(1),
+		m_dreq0(0),
+		m_nden(1),
+		m_dint(0),
+		m_ddrq(0),
+		m_fdc_dsr(0),
+		m_neop(0),
+		m_ack_int_enable(1),
+		m_centronics_ack(0),
+		m_speaker_drive(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -96,7 +97,7 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<pc1512_keyboard_device> m_kb;
+	required_device<pc1512_keyboard_t> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;
@@ -155,10 +156,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_1_changed );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_2_changed );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
@@ -167,6 +164,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE8_MEMBER( mouse_x_w );
+	DECLARE_WRITE8_MEMBER( mouse_y_w );
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	// system status register
@@ -186,6 +185,8 @@ public:
 	int m_kbdata;
 
 	// mouse state
+	UINT8 m_mouse_x_old;
+	UINT8 m_mouse_y_old;
 	UINT8 m_mouse_x;
 	UINT8 m_mouse_y;
 
@@ -230,10 +231,10 @@ public:
 class pc1640_state : public pc1512_state
 {
 public:
-	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc1512_state(mconfig, type, tag),
-			m_sw(*this, "SW"),
-			m_opt(0)
+	pc1640_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc1512_state(mconfig, type, tag),
+		m_sw(*this, "SW"),
+		m_opt(0)
 	{ }
 
 	virtual void machine_start() override;

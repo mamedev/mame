@@ -167,13 +167,13 @@ static const struct CassetteLegacyWaveFiller ace_legacy_fill_wave =
 };
 
 
-static casserr_t ace_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error ace_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &ace_legacy_fill_wave);
 }
 
 
-static casserr_t ace_tap_load(cassette_image *cassette)
+static cassette_image::error ace_tap_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &ace_legacy_fill_wave);
 }

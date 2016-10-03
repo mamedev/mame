@@ -41,25 +41,25 @@ public:
 	UINT8    m_palettebank;
 
 	/* input-related */
-	UINT8    m_paddle_select;
+	UINT8    m_paddle_select;   // selected by d008 bit 2
 
 	/* bootleg related */
 	int      m_bootleg_id;
 	UINT8    m_bootleg_cmd;
 
 	/* mcu interface related */
-	bool     m_z80HasWritten;   // z80 has written to latch flag
-	UINT8    m_fromz80;         // byte latch for z80->68705 comms
-	bool     m_68705HasWritten; // 68705 has written to latch flag
-	UINT8    m_toz80;           // byte latch for 68705->z80 comms
+	bool     m_Z80HasWritten;   // z80 has written to latch flag
+	UINT8    m_fromZ80;         // byte latch for z80->68705 comms
+	bool     m_MCUHasWritten;   // 68705 has written to latch flag
+	UINT8    m_fromMCU;         // byte latch for 68705->z80 comms
 
 	/* mcu internal related */
-	UINT8    m_port_a_in;
-	UINT8    m_port_a_out;
-	UINT8    m_ddr_a;
-	UINT8    m_port_c_internal;
-	UINT8    m_port_c_out;
-	UINT8    m_ddr_c;
+	UINT8    m_portA_in;
+	UINT8    m_portA_out;
+	UINT8    m_ddrA;
+	UINT8    m_portC_internal;
+	UINT8    m_portC_out;
+	UINT8    m_ddrC;
 	UINT8    m_tdr;
 	UINT8    m_tcr;
 	emu_timer *m_68705_timer;
@@ -99,7 +99,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hexaa_f000_w);
 	DECLARE_WRITE8_MEMBER(hexaa_sub_80_w);
 	DECLARE_READ8_MEMBER(hexaa_sub_90_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_68705_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
 	DECLARE_DRIVER_INIT(block2);
 	DECLARE_DRIVER_INIT(arkblock);

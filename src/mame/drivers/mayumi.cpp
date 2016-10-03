@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(mayumi_state::get_tile_info)
 
 void mayumi_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mayumi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mayumi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)
@@ -282,7 +282,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) // analyzer
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) // memory reset
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) // memory reset
 INPUT_PORTS_END
 
 WRITE8_MEMBER(mayumi_state::input_sel_w)

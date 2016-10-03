@@ -10,6 +10,7 @@ public:
 	wc90b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -26,6 +27,7 @@ public:
 		m_spriteram(*this, "spriteram") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -57,6 +59,8 @@ public:
 	DECLARE_WRITE8_MEMBER(txvideoram_w);
 	DECLARE_WRITE8_MEMBER(adpcm_control_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	DECLARE_READ8_MEMBER(master_irq_ack_r);
+	DECLARE_WRITE8_MEMBER(slave_irq_ack_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

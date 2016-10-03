@@ -52,8 +52,8 @@ public:
 	g627_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_switch(*this, "SWITCH")
-		, m_testipt(*this, "TEST")
+		, m_switch(*this, "SWITCH.%u", 0)
+		, m_testipt(*this, "TEST.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(v115);
@@ -330,6 +330,6 @@ ROM_START(rota_101)
 	ROM_LOAD("v101-c.bin", 0x1000, 0x0800, CRC(c7e85638) SHA1(b59805d8b558ab8f5ea5b4b9261e862afca4b9d3))
 ROM_END
 
-GAME(1978,  rotation,  0,         g627,  g627, g627_state, v117,  ROT0,  "Midway", "Rotation VIII (v. 1.17)", MACHINE_MECHANICAL )
-GAME(1978,  rota_115,  rotation,  g627,  g627, g627_state, v115,  ROT0,  "Midway", "Rotation VIII (v. 1.15)", MACHINE_MECHANICAL )
-GAME(1978,  rota_101,  rotation,  g627,  g627, g627_state, v115,  ROT0,  "Midway", "Rotation VIII (v. 1.01)", MACHINE_MECHANICAL )
+GAME(1978,  rotation,  0,         g627,  g627, g627_state, v117,  ROT0,  "Midway", "Rotation VIII (v. 1.17)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  rota_115,  rotation,  g627,  g627, g627_state, v115,  ROT0,  "Midway", "Rotation VIII (v. 1.15)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  rota_101,  rotation,  g627,  g627, g627_state, v115,  ROT0,  "Midway", "Rotation VIII (v. 1.01)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

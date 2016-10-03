@@ -150,7 +150,7 @@ void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		m_soundcomm->sound_irq_gen(m_audiocpu);
+		m_soundcomm->sound_irq_gen(*m_audiocpu);
 	else
 		m_soundcomm->sound_irq_ack_r(space, 0);
 }

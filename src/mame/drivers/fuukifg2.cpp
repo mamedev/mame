@@ -126,7 +126,7 @@ WRITE8_MEMBER(fuuki16_state::oki_banking_w)
 	    data & 0x10 is always set
 	*/
 
-	m_oki->set_bank_base(((data & 6) >> 1) * 0x40000);
+	m_oki->set_rom_bank((data & 6) >> 1);
 }
 
 static ADDRESS_MAP_START( fuuki16_sound_map, AS_PROGRAM, 8, fuuki16_state )

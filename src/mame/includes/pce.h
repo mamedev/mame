@@ -41,8 +41,8 @@ public:
 		m_huc6260(*this, "huc6260"),
 		m_cartslot(*this, "cartslot"),
 		m_cd(*this, "pce_cd"),
-		m_joy(*this, "JOY_P"),
-		m_joy6b(*this, "JOY6B_P"),
+		m_joy(*this, "JOY_P.%u", 0),
+		m_joy6b(*this, "JOY6B_P.%u", 0),
 		m_joy_type(*this, "JOY_TYPE"),
 		m_a_card(*this, "A_CARD")
 	{ }

@@ -1513,4 +1513,3 @@ std::vector<rom_entry> rom_build_entries(const tiny_rom_entry *tinyentries)
 	}
 	return result;
 }
-

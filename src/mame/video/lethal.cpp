@@ -55,10 +55,10 @@ void lethal_state::video_start()
 	// the US and Japanese cabinets apparently use different mirror setups
 	if (!strcmp(machine().system().name, "lethalenj"))
 	{
-		m_k056832->set_layer_offs(0, -195, 0);
-		m_k056832->set_layer_offs(1, -193, 0);
-		m_k056832->set_layer_offs(2, -191, 0);
-		m_k056832->set_layer_offs(3, -189, 0);
+		m_k056832->set_layer_offs(0, 29, 0);
+		m_k056832->set_layer_offs(1, 31, 0);
+		m_k056832->set_layer_offs(2, 33, 0);
+		m_k056832->set_layer_offs(3, 35, 0);
 	}
 	else
 	{

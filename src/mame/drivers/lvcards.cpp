@@ -68,7 +68,6 @@ I/O Ports:
 TODO:
 
 - What do the control ports do? Payout?
-- CPU speed/ YM2149 frequencies
 - Input ports need to be cleaned up
 - NVRAM does not work for lvcards?
 
@@ -451,14 +450,12 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( lvcards, lvcards_state )
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu",Z80, 18432000/6) // 3.072 MHz ?
-
+	MCFG_CPU_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
 	MCFG_CPU_PROGRAM_MAP(lvcards_map)
 	MCFG_CPU_IO_MAP(lvcards_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
 
 	// video hardware
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -474,7 +471,7 @@ static MACHINE_CONFIG_START( lvcards, lvcards_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
+	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12) // unknown frequency, assume same as tehkanwc.cpp
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

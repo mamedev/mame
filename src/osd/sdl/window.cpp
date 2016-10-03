@@ -38,6 +38,7 @@
 #include "modules/render/drawbgfx.h"
 #include "modules/render/drawsdl.h"
 #include "modules/render/draw13.h"
+#include "modules/monitor/monitor_common.h"
 #if (USE_OPENGL)
 #include "modules/render/drawogl.h"
 #endif
@@ -63,6 +64,8 @@
 #define WMSZ_TOPRIGHT       (6)
 #define WMSZ_RIGHT          (7)
 #endif
+
+#define SDL_VERSION_EQUALS(v1, vnum2) (SDL_VERSIONNUM(v1.major, v1.minor, v1.patch) == vnum2)
 
 class SDL_DM_Wrapper
 {
@@ -500,7 +503,7 @@ osd_dim sdl_window_info::pick_best_mode()
 	}
 
 	// FIXME: this should be provided by monitor !
-	num = SDL_GetNumDisplayModes(*((UINT64 *)m_monitor->oshandle()));
+	num = SDL_GetNumDisplayModes(m_monitor->oshandle());
 
 	if (num == 0)
 	{
@@ -512,7 +515,7 @@ osd_dim sdl_window_info::pick_best_mode()
 		for (i = 0; i < num; ++i)
 		{
 			SDL_DisplayMode mode;
-			SDL_GetDisplayMode(*((UINT64 *)m_monitor->oshandle()), i, &mode);
+			SDL_GetDisplayMode(m_monitor->oshandle(), i, &mode);
 
 			// compute initial score based on difference between target and current
 			size_score = 1.0f / (1.0f + abs((INT32)mode.w - target_width) + abs((INT32)mode.h - target_height));
@@ -712,6 +715,24 @@ int sdl_window_info::complete_create()
 	 *        It however creates issues with white borders, i.e. the screen clear
 	 *        does not work. This happens both with opengl and accel.
 	 */
+#endif
+
+	// We need to workaround an issue in SDL 2.0.4 for OS X where setting the
+	// relative mode on the mouse in fullscreen mode makes mouse events stop
+	// It is fixed in the latest revisions so we'll assume it'll be fixed
+	// in the next public SDL release as well
+#if defined(SDLMAME_MACOSX) && SDL_VERSION_ATLEAST(2, 0, 2) // SDL_HINT_MOUSE_RELATIVE_MODE_WARP is introduced in 2.0.2
+	SDL_version linked;
+	SDL_GetVersion(&linked);
+	int revision = SDL_GetRevisionNumber();
+
+	// If we're running the exact version of SDL 2.0.4 (revision 10001) from the
+	// SDL web site, we need to work around this issue and send the warp mode hint
+	if (SDL_VERSION_EQUALS(linked, SDL_VERSIONNUM(2, 0, 4)) && revision == 10001)
+	{
+		osd_printf_verbose("Using warp mode for relative mouse in OS X SDL 2.0.4\n");
+		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
+	}
 #endif
 
 	// create the SDL window

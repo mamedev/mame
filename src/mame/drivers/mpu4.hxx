@@ -2637,7 +2637,7 @@ GAME(199?, m4sctagt ,0          ,mod4oki    ,mpu4               , mpu4_state,m4d
 /* Others */
 
 
-GAMEL(199?, m4aao,     0,        mod4oki, mpu4, mpu4_state, m4aao	, ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
+GAMEL(199?, m4aao,     0,        mod4oki, mpu4, mpu4_state, m4aao   , ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
 GAME(199?, m4bandgd,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
 
 GAME(199?, m4bigben,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",GAME_FLAGS )

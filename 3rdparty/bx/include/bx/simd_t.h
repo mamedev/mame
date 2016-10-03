@@ -136,7 +136,13 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 	BX_SIMD_FORCE_INLINE Ty simd_ld(float _x, float _y, float _z, float _w);
 
 	template<typename Ty>
+	BX_SIMD_FORCE_INLINE Ty simd_ld(float _x, float _y, float _z, float _w, float _a, float _b, float _c, float _d);
+
+	template<typename Ty>
 	BX_SIMD_FORCE_INLINE Ty simd_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w);
+
+	template<typename Ty>
+	BX_SIMD_FORCE_INLINE Ty simd_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w, uint32_t _a, uint32_t _b, uint32_t _c, uint32_t _d);
 
 	template<typename Ty>
 	BX_SIMD_FORCE_INLINE Ty simd_splat(const void* _ptr);
@@ -352,14 +358,6 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 	typedef __m128 simd128_sse_t;
 #endif // BX_SIMD_SSE
 
-	union simd128_ref_t
-	{
-		float    fxyzw[4];
-		int32_t  ixyzw[4];
-		uint32_t uxyzw[4];
-
-	};
-
 } // namespace bx
 
 #if BX_SIMD_AVX
@@ -378,27 +376,51 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 #	include "simd128_sse.inl"
 #endif // BX_SIMD_SSE
 
-#include "simd128_ref.inl"
-#include "simd256_ref.inl"
-
 namespace bx
 {
-#if !( BX_SIMD_AVX \
-	|| BX_SIMD_LANGEXT \
+	union simd128_ref_t
+	{
+		float    fxyzw[4];
+		int32_t  ixyzw[4];
+		uint32_t uxyzw[4];
+	};
+
+#ifndef BX_SIMD_WARN_REFERENCE_IMPL
+#	define BX_SIMD_WARN_REFERENCE_IMPL 0
+#endif // BX_SIMD_WARN_REFERENCE_IMPL
+
+#if !( BX_SIMD_LANGEXT \
 	|| BX_SIMD_NEON \
 	|| BX_SIMD_SSE \
 	 )
-#	ifndef BX_SIMD_WARN_REFERENCE_IMPL
-#		define BX_SIMD_WARN_REFERENCE_IMPL 0
-#	endif // BX_SIMD_WARN_REFERENCE_IMPL
-
 #	if BX_SIMD_WARN_REFERENCE_IMPL
-#		pragma message("************************************\nUsing SIMD reference implementation!\n************************************")
+#		pragma message("*** Using SIMD128 reference implementation! ***")
 #	endif // BX_SIMD_WARN_REFERENCE_IMPL
 
 	typedef simd128_ref_t simd128_t;
 #endif //
 
+	struct simd256_ref_t
+	{
+		simd128_t simd128_0;
+		simd128_t simd128_1;
+	};
+
+#if !BX_SIMD_AVX
+#	if BX_SIMD_WARN_REFERENCE_IMPL
+#		pragma message("*** Using SIMD256 reference implementation! ***")
+#	endif // BX_SIMD_WARN_REFERENCE_IMPL
+
+	typedef simd256_ref_t simd256_t;
+#endif // !BX_SIMD_AVX
+
+} // namespace bx
+
+#include "simd128_ref.inl"
+#include "simd256_ref.inl"
+
+namespace bx
+{
 	BX_SIMD_FORCE_INLINE simd128_t simd_zero()
 	{
 		return simd_zero<simd128_t>();

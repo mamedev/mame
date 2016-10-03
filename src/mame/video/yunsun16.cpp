@@ -92,10 +92,12 @@ WRITE16_MEMBER(yunsun16_state::vram_1_w)
 
 void yunsun16_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
-								16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
-								16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
+	m_tilemap_0 = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
+			16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
+	m_tilemap_1 = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
+			16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	m_tilemap_0->set_scrolldx(-0x34, 0);
 	m_tilemap_1->set_scrolldx(-0x38, 0);

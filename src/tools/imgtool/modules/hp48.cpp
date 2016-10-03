@@ -136,7 +136,7 @@ static const char* hp48_prefix = "HPHP48-R";
 
 
 
-static OPTION_GUIDE_START( hp48_create_optionguide )
+OPTION_GUIDE_START( hp48_create_optionguide )
 	OPTION_INT('S', "size", "Size in KB" )
 OPTION_GUIDE_END
 
@@ -726,7 +726,7 @@ void hp48_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinf
 		case IMGTOOLINFO_STR_FILE_EXTENSIONS:               strcpy(info->s = imgtool_temp_str(), "crd"); break;
 		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:           strcpy(info->s = imgtool_temp_str(), hp48_create_optionspec); break;
 
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = hp48_create_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = &hp48_create_optionguide; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case IMGTOOLINFO_PTR_OPEN:                          info->open        = hp48_open; break;

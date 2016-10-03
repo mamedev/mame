@@ -725,7 +725,7 @@ READ32_MEMBER( sh2_device::sh7604_r )
 		return (m_m[0x38] & 0x7fffffff) | (m_nmi_line_state == ASSERT_LINE ? 0 : 0x80000000);
 
 	case 0x78: // BCR1
-		return m_is_slave ? 0x00008000 : 0;
+		return (m_is_slave ? 0x00008000 : 0) | (m_m[0x78] & 0x7fff);
 
 	case 0x41: // dvdntl mirrors
 	case 0x47:

@@ -1,6 +1,6 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Carl
--- Layout scripts should return a table and a string.  The table can have two optional keys reset and frame 
+-- Layout scripts should return a table and a string.  The table can have two optional keys reset and frame
 -- which have functions for values called on reset and frame draw respectively and the string is a unique name.
 local exports = {}
 exports.name = "layout"
@@ -15,7 +15,7 @@ function layout.startplugin()
 	local scripts = {}
 	local function prepare_layout(script)
 		local env = { machine = manager:machine(), pairs = pairs, ipairs = ipairs,
-			      table = { insert = table.insert, remove = table.remove } }
+				  table = { insert = table.insert, remove = table.remove } }
 		local script, err = load(script, script, "t", env)
 		if not script then
 			emu.print_verbose("error loading layout script " .. err)

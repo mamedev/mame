@@ -23,6 +23,7 @@ namespace bgfx
 	static const char* s_ARB_shader_texture_lod[] =
 	{
 		"texture2DLod",
+		"texture2DArrayLod", // BK - interacts with ARB_texture_array.
 		"texture2DProjLod",
 		"texture3DLod",
 		"texture3DProjLod",
@@ -86,6 +87,14 @@ namespace bgfx
 		"uint4",
 		"isampler3D",
 		"usampler3D",
+		NULL
+	};
+
+	static const char* s_textureArray[] =
+	{
+		"texture2DArray",
+		"texture2DArrayLod",
+		"shadow2DArray",
 		NULL
 	};
 
@@ -1760,11 +1769,12 @@ namespace bgfx
 							{
 								std::string code;
 
-								const bool usesTextureLod = !!bx::findIdentifierMatch(input, s_ARB_shader_texture_lod /*EXT_shader_texture_lod*/);
-								const bool usesGpuShader5 = !!bx::findIdentifierMatch(input, s_ARB_gpu_shader5);
-								const bool usesPacking    = !!bx::findIdentifierMatch(input, s_ARB_shading_language_packing);
-								const bool usesTextureMS  = !!bx::findIdentifierMatch(input, s_ARB_texture_multisample);
-								const bool usesTexelFetch = !!bx::findIdentifierMatch(input, s_texelFetch);
+								const bool usesGpuShader5   = !!bx::findIdentifierMatch(input, s_ARB_gpu_shader5);
+								const bool usesTexelFetch   = !!bx::findIdentifierMatch(input, s_texelFetch);
+								const bool usesTextureLod   = !!bx::findIdentifierMatch(input, s_ARB_shader_texture_lod /*EXT_shader_texture_lod*/);
+								const bool usesTextureMS    = !!bx::findIdentifierMatch(input, s_ARB_texture_multisample);
+								const bool usesTextureArray = !!bx::findIdentifierMatch(input, s_textureArray);
+								const bool usesPacking      = !!bx::findIdentifierMatch(input, s_ARB_shading_language_packing);
 
 								if (0 == essl)
 								{
@@ -1782,15 +1792,6 @@ namespace bgfx
 										bx::stringPrintf(code, "#version %s\n", need130 ? "130" : profile);
 									}
 
-									if (130 > glsl)
-									{
-										bx::stringPrintf(code,
-												"#define ivec2 vec2\n"
-												"#define ivec3 vec3\n"
-												"#define ivec4 vec4\n"
-												);
-									}
-
 									if (usesGpuShader5)
 									{
 										bx::stringPrintf(code
@@ -1804,11 +1805,6 @@ namespace bgfx
 											, "#extension GL_ARB_shading_language_packing : enable\n"
 											);
 									}
-
-									bx::stringPrintf(code
-										, "#define bgfxShadow2D shadow2D\n"
-										  "#define bgfxShadow2DProj shadow2DProj\n"
-										);
 
 									if (usesTextureLod
 									&&  130 > glsl)
@@ -1824,15 +1820,30 @@ namespace bgfx
 											, "#extension GL_ARB_texture_multisample : enable\n"
 											);
 									}
+
+									if (usesTextureArray)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_EXT_texture_array : enable\n"
+											);
+									}
+
+									if (130 > glsl)
+									{
+										bx::stringPrintf(code,
+												"#define ivec2 vec2\n"
+												"#define ivec3 vec3\n"
+												"#define ivec4 vec4\n"
+												);
+									}
+
+									bx::stringPrintf(code
+										, "#define bgfxShadow2D shadow2D\n"
+										  "#define bgfxShadow2DProj shadow2DProj\n"
+										);
 								}
 								else
 								{
-									bx::stringPrintf(code,
-											"#define ivec2 vec2\n"
-											"#define ivec3 vec3\n"
-											"#define ivec4 vec4\n"
-											);
-
 									// Pretend that all extensions are available.
 									// This will be stripped later.
 									if (usesTextureLod)
@@ -1888,6 +1899,19 @@ namespace bgfx
 											  "#define gl_FragDepth gl_FragDepthEXT\n"
 											);
 									}
+
+									if (usesTextureArray)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_EXT_texture_array : enable\n"
+											);
+									}
+
+									bx::stringPrintf(code,
+											"#define ivec2 vec2\n"
+											"#define ivec3 vec3\n"
+											"#define ivec4 vec4\n"
+											);
 								}
 
 								code += preprocessor.m_preprocessed;

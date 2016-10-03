@@ -797,15 +797,15 @@ inline void m68000_base_device::cpu_execute(void)
 			/* Set tracing accodring to T1. (T0 is done inside instruction) */
 			m68ki_trace_t1(this); /* auto-disable (see m68kcpu.h) */
 
+			/* Record previous program counter */
+			REG_PPC(this) = REG_PC(this);
+
 			/* Call external hook to peek at CPU */
 			debugger_instruction_hook(this, REG_PC(this));
 
 			/* call external instruction hook (independent of debug mode) */
 			if (!instruction_hook.isnull())
 				instruction_hook(*program, REG_PC(this), 0xffffffff);
-
-			/* Record previous program counter */
-			REG_PPC(this) = REG_PC(this);
 
 			try
 			{
@@ -1689,7 +1689,7 @@ void m68000_base_device::define_state(void)
 
 	state_add(M68K_PC,         "PC",        pc).mask(addrmask);
 	state_add(STATE_GENPC,     "GENPC",     pc).mask(addrmask).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", ppc).mask(addrmask).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     ppc).mask(addrmask).noshow();
 	state_add(M68K_SP,         "SP",        dar[15]);
 	state_add(STATE_GENSP,     "GENSP",     dar[15]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  iotemp).noshow().callimport().callexport().formatstr("%16s");

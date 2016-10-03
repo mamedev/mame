@@ -19,6 +19,7 @@
 #include "window.h"
 #include "drawd3d.h"
 #include "modules/render/d3d/d3dhlsl.h"
+#include "modules/monitor/monitor_module.h"
 #undef min
 #undef max
 #include <utility>
@@ -1227,7 +1228,7 @@ int renderer_d3d9::config_adapter_mode()
 		// make sure it's a pixel format we can get behind
 		if (m_pixformat != D3DFMT_X1R5G5B5 && m_pixformat != D3DFMT_R5G6B5 && m_pixformat != D3DFMT_X8R8G8B8)
 		{
-			osd_printf_error("Device %s currently in an unsupported mode\n", win->monitor()->devicename());
+			osd_printf_error("Device %s currently in an unsupported mode\n", win->monitor()->devicename().c_str());
 			return 1;
 		}
 	}
@@ -1250,7 +1251,7 @@ int renderer_d3d9::config_adapter_mode()
 	result = d3dintf->d3dobj->CheckDeviceType(m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_pixformat, !win->fullscreen());
 	if (FAILED(result))
 	{
-		osd_printf_error("Proposed video mode not supported on device %s\n", win->monitor()->devicename());
+		osd_printf_error("Proposed video mode not supported on device %s\n", win->monitor()->devicename().c_str());
 		return 1;
 	}
 	return 0;
@@ -1274,7 +1275,7 @@ int renderer_d3d9::get_adapter_for_monitor()
 		HMONITOR curmonitor = d3dintf->d3dobj->GetAdapterMonitor(adapternum);
 
 		// if we match the proposed monitor, this is it
-		if (curmonitor == *((HMONITOR *)win->monitor()->oshandle()))
+		if (curmonitor == reinterpret_cast<HMONITOR>(win->monitor()->oshandle()))
 		{
 			return adapternum;
 		}
@@ -1422,6 +1423,8 @@ void renderer_d3d9::batch_vectors(int vector_count)
 
 	float quad_width = 0.0f;
 	float quad_height = 0.0f;
+	float target_width = 0.0f;
+	float target_height = 0.0f;
 
 	int vertex_count = vector_count * 6;
 	int triangle_count = vector_count * 2;
@@ -1444,8 +1447,10 @@ void renderer_d3d9::batch_vectors(int vector_count)
 			case render_primitive::QUAD:
 				if (PRIMFLAG_GET_VECTORBUF(prim.flags))
 				{
-					quad_width = prim.bounds.x1 - prim.bounds.x0;
-					quad_height = prim.bounds.y1 - prim.bounds.y0;
+					quad_width = prim.get_quad_width();
+					quad_height = prim.get_quad_height();
+					target_width = prim.get_full_quad_width();
+					target_height = prim.get_full_quad_height();
 				}
 				break;
 
@@ -1475,18 +1480,18 @@ void renderer_d3d9::batch_vectors(int vector_count)
 			((rotation_0 || rotation_90) && orientation_swap_xy) ||
 			((rotation_180 || rotation_90) && !orientation_swap_xy);
 
-		float screen_width = static_cast<float>(this->get_width());
-		float screen_height = static_cast<float>(this->get_height());
+		float screen_width = float(this->get_width());
+		float screen_height = float(this->get_height());
 		float half_screen_width = screen_width * 0.5f;
 		float half_screen_height = screen_height * 0.5f;
 		float screen_swap_x_factor = 1.0f / screen_width * screen_height;
 		float screen_swap_y_factor = 1.0f / screen_height * screen_width;
-		float screen_quad_ratio_x = screen_width / quad_width;
-		float screen_quad_ratio_y = screen_height / quad_height;
+		float screen_target_ratio_x = screen_width / target_width;
+		float screen_target_ratio_y = screen_height / target_height;
 
 		if (swap_xy)
 		{
-			std::swap(screen_quad_ratio_x, screen_quad_ratio_y);
+			std::swap(screen_target_ratio_x, screen_target_ratio_y);
 		}
 
 		for (int batchindex = 0; batchindex < m_batchindex; batchindex++)
@@ -1512,9 +1517,9 @@ void renderer_d3d9::batch_vectors(int vector_count)
 			m_vectorbatch[batchindex].x -= half_screen_width;
 			m_vectorbatch[batchindex].y -= half_screen_height;
 
-			// correct screen/quad ratio (vectors are created in screen coordinates and have to be adjusted for texture corrdinates of the quad)
-			m_vectorbatch[batchindex].x *= screen_quad_ratio_x;
-			m_vectorbatch[batchindex].y *= screen_quad_ratio_y;
+			// correct screen/target ratio (vectors are created in screen coordinates and have to be adjusted for texture corrdinates of the target)
+			m_vectorbatch[batchindex].x *= screen_target_ratio_x;
+			m_vectorbatch[batchindex].y *= screen_target_ratio_y;
 
 			// un-center
 			m_vectorbatch[batchindex].x += half_screen_width;
@@ -1667,10 +1672,10 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 
 	vertex[0].u0 = start.c.x;
 	vertex[0].v0 = start.c.y;
-	vertex[2].u0 = stop.c.x;
-	vertex[2].v0 = start.c.y;
 	vertex[1].u0 = start.c.x;
 	vertex[1].v0 = stop.c.y;
+	vertex[2].u0 = stop.c.x;
+	vertex[2].v0 = start.c.y;
 	vertex[3].u0 = stop.c.x;
 	vertex[3].v0 = stop.c.y;
 
@@ -1702,7 +1707,6 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 void renderer_d3d9::draw_quad(const render_primitive &prim)
 {
 	texture_info *texture = m_texture_manager->find_texinfo(&prim.texture, prim.flags);
-
 	if (texture == nullptr)
 	{
 		texture = get_default_texture();
@@ -1711,7 +1715,9 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	// get a pointer to the vertex buffer
 	vertex *vertex = mesh_alloc(4);
 	if (vertex == nullptr)
+	{
 		return;
+	}
 
 	// fill in the vertexes clockwise
 	vertex[0].x = prim.bounds.x0;
@@ -1722,8 +1728,8 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	vertex[2].y = prim.bounds.y1;
 	vertex[3].x = prim.bounds.x1;
 	vertex[3].y = prim.bounds.y1;
-	float width = prim.bounds.x1 - prim.bounds.x0;
-	float height = prim.bounds.y1 - prim.bounds.y0;
+	float quad_width = prim.get_quad_width();
+	float quad_height = prim.get_quad_height();
 
 	// set the texture coordinates
 	if (texture != nullptr)
@@ -1760,7 +1766,7 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, D3DTOP_MODULATE, width, height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, D3DTOP_MODULATE, quad_width, quad_height);
 	m_numpolys++;
 }
 

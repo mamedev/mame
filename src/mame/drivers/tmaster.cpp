@@ -206,7 +206,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank0)
 	else
 		m_okibank &= ~1;
 
-	m_oki->set_bank_base(m_okibank * 0x40000);
+	m_oki->set_rom_bank(m_okibank);
 }
 
 WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
@@ -216,7 +216,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
 	else
 		m_okibank &= ~2;
 
-	m_oki->set_bank_base(m_okibank * 0x40000);
+	m_oki->set_rom_bank(m_okibank);
 }
 
 /***************************************************************************

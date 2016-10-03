@@ -56,8 +56,8 @@ public:
 		m_p2_knob(*this, "P2_KNOB"),
 		m_p3_knob(*this, "P3_KNOB"),
 		m_p4_knob(*this, "P4_KNOB"),
-		m_trackball(*this, trackball_inputs),
-		m_joystick(*this, joystick_inputs),
+		m_trackball(*this, { { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" } }),
+		m_joystick(*this, { { "MOVEX", "MOVEY" } }),
 		m_interrupt_scanline(0xff)
 	{ }
 
@@ -84,9 +84,7 @@ public:
 	optional_ioport m_p2_knob;
 	optional_ioport m_p3_knob;
 	optional_ioport m_p4_knob;
-	DECLARE_IOPORT_ARRAY(trackball_inputs);
 	optional_ioport_array<4> m_trackball;
-	DECLARE_IOPORT_ARRAY(joystick_inputs);
 	optional_ioport_array<2> m_joystick;
 
 	UINT8 m_video_config;

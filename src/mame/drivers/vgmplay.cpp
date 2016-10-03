@@ -26,11 +26,17 @@
 #include "sound/multipcm.h"
 #include "sound/gb.h"
 #include "sound/pokey.h"
+#include "sound/c352.h"
+#include "sound/okim6295.h"
+
+#define AS_IO16             AS_1
+#define MCFG_CPU_IO16_MAP   MCFG_CPU_DATA_MAP
 
 class vgmplay_device : public cpu_device
 {
 public:
-	enum {
+	enum io8_t
+	{
 		REG_SIZE     = 0x00000000,
 		A_YM2612     = 0x00000010,
 		A_YM2151     = 0x00000020,
@@ -44,14 +50,20 @@ public:
 		A_SN76496    = 0x000000a0,
 		A_K053260    = 0x000000b0,
 		A_C6280      = 0x000000e0,
+		A_OKIM6295   = 0x000000f0,
 		A_SEGAPCM    = 0x00001000,
-		A_GAMEBOY	 = 0x00002000,
+		A_GAMEBOY    = 0x00002000,
 		A_NESAPU     = 0x00002030,
 		A_NESRAM     = 0x00003000,
 		A_MULTIPCMA  = 0x00013000,
 		A_MULTIPCMB  = 0x00013010,
 		A_POKEYA     = 0x00013020,
-		A_POKEYB     = 0x00013030
+		A_POKEYB     = 0x00013030,
+	};
+
+	enum io16_t
+	{
+		A_C352       = 0x00000000
 	};
 
 	vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -79,6 +91,8 @@ public:
 	READ8_MEMBER(multipcma_rom_r);
 	READ8_MEMBER(multipcmb_rom_r);
 	READ8_MEMBER(k053260_rom_r);
+	READ8_MEMBER(okim6295_rom_r);
+	READ8_MEMBER(c352_rom_r);
 
 private:
 	struct rom_block {
@@ -92,8 +106,8 @@ private:
 
 	enum { RESET, RUN, DONE };
 
-	address_space_config m_file_config, m_io_config;
-	address_space *m_file, *m_io;
+	address_space_config m_file_config, m_io_config, m_io16_config;
+	address_space *m_file, *m_io, *m_io16;
 
 	int m_icount, m_state;
 
@@ -152,6 +166,8 @@ private:
 	required_device<h6280_device> m_h6280;
 	required_device<pokey_device> m_pokeya;
 	required_device<pokey_device> m_pokeyb;
+	required_device<c352_device> m_c352;
+	required_device<okim6295_device> m_okim6295;
 
 	UINT32 m_multipcma_bank_l;
 	UINT32 m_multipcma_bank_r;
@@ -165,7 +181,8 @@ private:
 vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cpu_device(mconfig, VGMPLAY, "VGM Player engine", tag, owner, clock, "vgmplay_core", __FILE__),
 	m_file_config("file", ENDIANNESS_LITTLE, 8, 32),
-	m_io_config("io", ENDIANNESS_LITTLE, 8, 32)
+	m_io_config("io", ENDIANNESS_LITTLE, 8, 32),
+	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 32)
 {
 }
 
@@ -174,11 +191,12 @@ void vgmplay_device::device_start()
 	m_icountptr = &m_icount;
 	m_file = &space(AS_PROGRAM);
 	m_io   = &space(AS_IO);
+	m_io16  = &space(AS_IO16);
 
 	save_item(NAME(m_pc));
 
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_pc).noshow();
 }
 
 void vgmplay_device::device_reset()
@@ -382,6 +400,7 @@ void vgmplay_device::execute_run()
 
 					m_io->write_byte(A_YM2612+0, 0x2a);
 					m_io->write_byte(A_YM2612+1, m_data_streams[0][m_ym2612_stream_offset]);
+					m_ym2612_stream_offset++;
 				}
 				m_pc += 1;
 				m_icount -= code & 0xf;
@@ -430,6 +449,11 @@ void vgmplay_device::execute_run()
 				break;
 			}
 
+			case 0xb8:
+				m_io->write_byte(A_OKIM6295 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+
 			case 0xb9:
 				m_io->write_byte(A_C6280 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
@@ -473,6 +497,15 @@ void vgmplay_device::execute_run()
 				m_pc += 5;
 				break;
 
+			case 0xe1:
+			{
+				UINT32 addr = (m_file->read_byte(m_pc+1) << 8) | m_file->read_byte(m_pc+2);
+				UINT16 data = (m_file->read_byte(m_pc+3) << 8) | m_file->read_byte(m_pc+4);
+				m_io16->write_word(A_C352 + (addr << 1), data);
+				m_pc += 5;
+				break;
+			}
+
 			default:
 				logerror("unhandled code %02x (%02x %02x %02x %02x)\n", code, m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2), m_file->read_byte(m_pc+3), m_file->read_byte(m_pc+4));
 				m_state = DONE;
@@ -505,6 +538,7 @@ const address_space_config *vgmplay_device::memory_space_config(address_spacenum
 	switch(spacenum) {
 	case AS_PROGRAM: return &m_file_config;
 	case AS_IO:      return &m_io_config;
+	case AS_IO16:    return &m_io16_config;
 	default:         return nullptr;
 	}
 }
@@ -809,6 +843,13 @@ offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 		return 5 | DASMFLAG_SUPPORTED;
 	}
 
+	case 0xe1: {
+		UINT16 addr = (oprom[1] << 8) | oprom[2];
+		UINT16 data = (oprom[3] << 8) | oprom[4];
+		sprintf(buffer, "c352 r%04x = %04x", addr, data);
+		return 5 | DASMFLAG_SUPPORTED;
+	}
+
 	default:
 		sprintf(buffer, "?? %02x", oprom[0]);
 		return 1 | DASMFLAG_SUPPORTED;
@@ -842,9 +883,19 @@ READ8_MEMBER(vgmplay_device::multipcmb_rom_r)
 	return rom_r(1, 0x89, offset);
 }
 
+READ8_MEMBER(vgmplay_device::okim6295_rom_r)
+{
+	return rom_r(0, 0x8b, offset);
+}
+
 READ8_MEMBER(vgmplay_device::k053260_rom_r)
 {
 	return rom_r(0, 0x8e, offset);
+}
+
+READ8_MEMBER(vgmplay_device::c352_rom_r)
+{
+	return rom_r(0, 0x92, offset);
 }
 
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -871,6 +922,8 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_h6280(*this, "h6280")
 	, m_pokeya(*this, "pokeya")
 	, m_pokeyb(*this, "pokeyb")
+	, m_c352(*this, "c352")
+	, m_okim6295(*this, "okim6295")
 {
 }
 
@@ -941,109 +994,165 @@ void vgmplay_state::machine_start()
 
 		UINT32 version = r32(8);
 		logerror("File version %x.%02x\n", version >> 8, version & 0xff);
+
+		UINT32 header_size = 0;
+		if(version < 0x151)
+			header_size = 0x40;
+		else if(version < 0x161)
+			header_size = 0x80;
+		else if(version < 0x171)
+			header_size = 0xc0;
+		else
+			header_size = 0x100;
+		logerror("Header size according to version is %x, header size according to header is %x\n", header_size, r32(0x34) + 0x34);
+
+		UINT32 data_start = header_size;
+		if (version >= 0x150 && r32(0x34))
+			data_start = r32(0x34) + 0x34;
+
+		// Parse clocks
 		if(r32(0x0c))
 			m_sn76496->set_unscaled_clock(r32(0x0c));
 		if(r32(0x10))
 			m_ym2413->set_unscaled_clock(r32(0x10));
-		if(version <= 0x101 && r32(0x0c)) {
-			m_ym2612->set_unscaled_clock(r32(0x0c));
-			m_ym2151->set_unscaled_clock(r32(0x0c));
-		}
 		if(version >= 0x110 && r32(0x2c))
 			m_ym2612->set_unscaled_clock(r32(0x2c));
 		if(version >= 0x110 && r32(0x30))
 			m_ym2151->set_unscaled_clock(r32(0x30));
+
 		if(version >= 0x151 && r32(0x38))
 			m_segapcm->set_unscaled_clock(r32(0x38));
-		if(version >= 0x151 && r32(0x40))
-			logerror("Warning: file requests an unsupported RF5C68\n");
-		if(version >= 0x151 && r32(0x44)) {
-			UINT32 clock = r32(0x44);
-			if (clock & 0x40000000)
-				clock &= ~0x40000000;
-			m_ym2203a->set_unscaled_clock(clock);
-			m_ym2203b->set_unscaled_clock(clock);
-		}
-		if(version >= 0x151 && r32(0x48))
-			logerror("Warning: file requests an unsupported YM2608\n");
-		if(version >= 0x151 && r32(0x4c))
-			logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
-		if(version >= 0x151 && r32(0x50)) {
-			m_ym3812->set_unscaled_clock(r32(0x50));
-		}
-		if(version >= 0x151 && r32(0x54)) {
-			m_ym3526->set_unscaled_clock(r32(0x54));
-		}
-		if(version >= 0x151 && r32(0x58))
-			logerror("Warning: file requests an unsupported Y8950\n");
-		if(version >= 0x151 && r32(0x5c))
-			logerror("Warning: file requests an unsupported YMF262\n");
-		if(version >= 0x151 && r32(0x60))
-			logerror("Warning: file requests an unsupported YMF278B\n");
-		if(version >= 0x151 && r32(0x64))
-			logerror("Warning: file requests an unsupported YMF271\n");
-		if(version >= 0x151 && r32(0x68))
-			logerror("Warning: file requests an unsupported YMZ280B\n");
-		if(version >= 0x151 && r32(0x6c))
-			logerror("Warning: file requests an unsupported RF5C164\n");
-		if(version >= 0x151 && r32(0x70))
-			logerror("Warning: file requests an unsupported PWM\n");
-		if(version >= 0x151 && r32(0x74)) {
-			m_ay8910a->set_unscaled_clock(r32(0x74) & ~0x40000000);
-			m_ay8910b->set_unscaled_clock(r32(0x74) & ~0x40000000);
-		}
-		if(version >= 0x151 && r8(0x78)) {
-			UINT8 type = r8(0x78);
-			if (type & 0x10)
-			{
-				ay8910_device::set_psg_type(*m_ay8910a, ay8910_device::PSG_TYPE_YM);
-				ay8910_device::set_psg_type(*m_ay8910b, ay8910_device::PSG_TYPE_YM);
+
+		if (data_start > 0x40)
+		{
+			if(version >= 0x151 && r32(0x40))
+				logerror("Warning: file requests an unsupported RF5C68\n");
+			if(version >= 0x151 && r32(0x44)) {
+				UINT32 clock = r32(0x44);
+				m_ym2203a->set_unscaled_clock(clock & ~0x40000000);
+				if (clock & 0x40000000)
+				{
+					clock &= ~0x40000000;
+					m_ym2203b->set_unscaled_clock(clock);
+				}
+			}
+			if(version >= 0x151 && r32(0x48))
+				logerror("Warning: file requests an unsupported YM2608\n");
+			if(version >= 0x151 && r32(0x4c))
+				logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
+			if(version >= 0x151 && r32(0x50)) {
+				m_ym3812->set_unscaled_clock(r32(0x50));
+			}
+			if(version >= 0x151 && r32(0x54)) {
+				m_ym3526->set_unscaled_clock(r32(0x54));
+			}
+			if(version >= 0x151 && r32(0x58))
+				logerror("Warning: file requests an unsupported Y8950\n");
+			if(version >= 0x151 && r32(0x5c))
+				logerror("Warning: file requests an unsupported YMF262\n");
+			if(version >= 0x151 && r32(0x60))
+				logerror("Warning: file requests an unsupported YMF278B\n");
+			if(version >= 0x151 && r32(0x64))
+				logerror("Warning: file requests an unsupported YMF271\n");
+			if(version >= 0x151 && r32(0x68))
+				logerror("Warning: file requests an unsupported YMZ280B\n");
+			if(version >= 0x151 && r32(0x6c))
+				logerror("Warning: file requests an unsupported RF5C164\n");
+			if(version >= 0x151 && r32(0x70))
+				logerror("Warning: file requests an unsupported PWM\n");
+			if(version >= 0x151 && r32(0x74)) {
+				UINT32 clock = r32(0x74);
+				m_ay8910a->set_unscaled_clock(clock & ~0x40000000);
+				if (clock & 0x40000000) {
+					clock &= ~0x40000000;
+					m_ay8910b->set_unscaled_clock(clock);
+				}
+			}
+			if(version >= 0x151 && r8(0x78)) {
+				UINT8 type = r8(0x78);
+				if (type & 0x10)
+				{
+					ay8910_device::set_psg_type(*m_ay8910a, ay8910_device::PSG_TYPE_YM);
+					ay8910_device::set_psg_type(*m_ay8910b, ay8910_device::PSG_TYPE_YM);
+				}
+			}
+			if(version >= 0x151 && r8(0x79)) {
+				UINT8 flags = r8(0x79);
+				UINT8 to_set = 0;
+				if (flags & 1)
+					to_set |= AY8910_LEGACY_OUTPUT;
+				if (flags & 2)
+					to_set |= AY8910_SINGLE_OUTPUT;
+				if (flags & 4)
+					to_set |= AY8910_DISCRETE_OUTPUT;
+				ay8910_device::set_flags(*m_ay8910a, to_set);
+				ay8910_device::set_flags(*m_ay8910b, to_set);
+			}
+			if(version >= 0x151 && r8(0x7a)) {
+				UINT8 flags = r8(0x7a);
+				UINT8 to_set = 0;
+				if (flags & 1)
+					to_set |= AY8910_LEGACY_OUTPUT;
+				if (flags & 2)
+					to_set |= AY8910_SINGLE_OUTPUT;
+				if (flags & 4)
+					to_set |= AY8910_DISCRETE_OUTPUT;
+				ay8910_device::set_flags(*m_ym2203a, to_set);
+				ay8910_device::set_flags(*m_ym2203b, to_set);
 			}
 		}
-		if(version >= 0x151 && r8(0x79)) {
-			UINT8 flags = r8(0x79);
-			UINT8 to_set = 0;
-			if (flags & 1)
-				to_set |= AY8910_LEGACY_OUTPUT;
-			if (flags & 2)
-				to_set |= AY8910_SINGLE_OUTPUT;
-			if (flags & 4)
-				to_set |= AY8910_DISCRETE_OUTPUT;
-			ay8910_device::set_flags(*m_ay8910a, to_set);
-			ay8910_device::set_flags(*m_ay8910b, to_set);
+
+		if (data_start > 0x80)
+		{
+			if(version >= 0x161 && r32(0x80)) {
+				m_dmg->set_unscaled_clock(r32(0x80));
+			}
+			if(version >= 0x161 && r32(0x84)) {
+				m_nescpu->set_unscaled_clock(r32(0x84));
+				m_nescpu->m_apu->set_unscaled_clock(r32(0x84));
+			}
+			if(version >= 0x161 && r32(0x88)) {
+				UINT32 clock = r32(0x88);
+				m_multipcma->set_unscaled_clock(clock & ~0x40000000);
+				if (clock & 0x40000000) {
+					clock &= ~0x40000000;
+					m_multipcmb->set_unscaled_clock(clock);
+				}
+			}
+			if(version >= 0x161 && r32(0x98)) {
+				UINT32 clock = r32(0x98);
+				UINT32 pin7 = 0;
+				if (clock & 0x80000000) {
+					clock &= ~0x80000000;
+					pin7 = 1;
+				}
+				okim6295_device::static_set_pin7(*m_okim6295, pin7);
+				m_okim6295->set_unscaled_clock(clock);
+			}
+			if(version >= 0x161 && r32(0xac)) {
+				m_k053260->set_unscaled_clock(r32(0xac));
+			}
+			if(version >= 0x161 && r32(0xa4)) {
+				m_c6280->set_unscaled_clock(r32(0xa4));
+			}
+			if(version >= 0x161 && r32(0xb0)) {
+				UINT32 clock = r32(0xb0);
+				m_pokeya->set_unscaled_clock(clock);
+				if (clock & 0x40000000) {
+					clock &= ~0x40000000;
+					m_pokeyb->set_unscaled_clock(clock);
+				}
+			}
 		}
-		if(version >= 0x151 && r8(0x7a)) {
-			UINT8 flags = r8(0x7a);
-			UINT8 to_set = 0;
-			if (flags & 1)
-				to_set |= AY8910_LEGACY_OUTPUT;
-			if (flags & 2)
-				to_set |= AY8910_SINGLE_OUTPUT;
-			if (flags & 4)
-				to_set |= AY8910_DISCRETE_OUTPUT;
-			ay8910_device::set_flags(*m_ym2203a, to_set);
-			ay8910_device::set_flags(*m_ym2203b, to_set);
-		}
-		if(version >= 0x161 && r32(0x80)) {
-			m_dmg->set_unscaled_clock(r32(0x80));
-		}
-		if(version >= 0x161 && r32(0x84)) {
-			m_nescpu->set_unscaled_clock(r32(0x84));
-			m_nescpu->m_apu->set_unscaled_clock(r32(0x84));
-		}
-		if(version >= 0x161 && r32(0x88)) {
-			m_multipcma->set_unscaled_clock(r32(0x88) & ~0x40000000);
-			m_multipcmb->set_unscaled_clock(r32(0x88) & ~0x40000000);
-		}
-		if(version >= 0x161 && r32(0xac)) {
-			m_k053260->set_unscaled_clock(r32(0xac));
-		}
-		if(version >= 0x161 && r32(0xa4)) {
-			m_c6280->set_unscaled_clock(r32(0xa4));
-		}
-		if(version >= 0x161 && r32(0xb0)) {
-			m_pokeya->set_unscaled_clock(r32(0xb0) & ~0x40000000);
-			m_pokeyb->set_unscaled_clock(r32(0xb0) & ~0x40000000);
+
+		if (data_start > 0xc0)
+		{
+			if(version >= 0x171 && r8(0xd6)) {
+				c352_device::static_set_divider(*m_c352, r8(0xd6) * 4);
+			}
+			if(version >= 0x171 && r32(0xdc)) {
+				m_c352->set_unscaled_clock(r32(0xdc));
+			}
 		}
 	}
 }
@@ -1104,6 +1213,10 @@ static ADDRESS_MAP_START( file_map, AS_PROGRAM, 8, vgmplay_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READ(file_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( soundchips16_map, AS_IO16, 16, vgmplay_state )
+	AM_RANGE(vgmplay_device::A_C352,         vgmplay_device::A_C352+0x7fff)   AM_DEVWRITE    ("c352",          c352_device, write)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::REG_SIZE,       vgmplay_device::REG_SIZE+3)      AM_READ(file_size_r)
 	AM_RANGE(vgmplay_device::A_YM2612,       vgmplay_device::A_YM2612+3)      AM_DEVWRITE    ("ym2612",        ym2612_device, write)
@@ -1117,10 +1230,11 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_AY8910A+1,    vgmplay_device::A_AY8910A+1)     AM_DEVWRITE    ("ay8910a",       ay8910_device, address_w)
 	AM_RANGE(vgmplay_device::A_AY8910B,      vgmplay_device::A_AY8910B)       AM_DEVWRITE    ("ay8910b",       ay8910_device, data_w)
 	AM_RANGE(vgmplay_device::A_AY8910B+1,    vgmplay_device::A_AY8910B+1)     AM_DEVWRITE    ("ay8910b",       ay8910_device, address_w)
-//	AM_RANGE(vgmplay_device::A_SN76496+0,    vgmplay_device::A_SN76496+0)     AM_DEVWRITE    ("sn76496",       sn76496_device, stereo_w)
+//  AM_RANGE(vgmplay_device::A_SN76496+0,    vgmplay_device::A_SN76496+0)     AM_DEVWRITE    ("sn76496",       sn76496_device, stereo_w)
 	AM_RANGE(vgmplay_device::A_SN76496+1,    vgmplay_device::A_SN76496+1)     AM_DEVWRITE    ("sn76496",       sn76496_device, write)
 	AM_RANGE(vgmplay_device::A_K053260,      vgmplay_device::A_K053260+0x2f)  AM_DEVWRITE    ("k053260",       k053260_device, write)
 	AM_RANGE(vgmplay_device::A_C6280,        vgmplay_device::A_C6280+0xf)     AM_DEVWRITE    ("c6280",         c6280_device, c6280_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295,     vgmplay_device::A_OKIM6295)      AM_DEVWRITE    ("okim6295",      okim6295_device, write)
 	AM_RANGE(vgmplay_device::A_SEGAPCM,      vgmplay_device::A_SEGAPCM+0x7ff) AM_DEVWRITE    ("segapcm",       segapcm_device, sega_pcm_w)
 	AM_RANGE(vgmplay_device::A_GAMEBOY,      vgmplay_device::A_GAMEBOY+0x16)  AM_DEVWRITE    ("dmg",           gameboy_sound_device, sound_w)
 	AM_RANGE(vgmplay_device::A_GAMEBOY+0x20, vgmplay_device::A_GAMEBOY+0x2f)  AM_DEVWRITE    ("dmg",           gameboy_sound_device, wave_w)
@@ -1152,6 +1266,14 @@ static ADDRESS_MAP_START( k053260_map, AS_0, 8, vgmplay_state )
 	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, k053260_rom_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( okim6295_map, AS_0, 8, vgmplay_state )
+	AM_RANGE(0, 0x3ffff) AM_DEVREAD("vgmplay", vgmplay_device, okim6295_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( c352_map, AS_0, 8, vgmplay_state )
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, c352_rom_r)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( nescpu_map, AS_PROGRAM, 8, vgmplay_state )
 	AM_RANGE(0, 0xffff) AM_RAM AM_SHARE("nesapu_ram")
 ADDRESS_MAP_END
@@ -1168,6 +1290,7 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_CPU_ADD("vgmplay", VGMPLAY, 44100)
 	MCFG_CPU_PROGRAM_MAP( file_map )
 	MCFG_CPU_IO_MAP( soundchips_map )
+	MCFG_CPU_IO16_MAP( soundchips16_map )
 
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
 
@@ -1205,7 +1328,7 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("dmg", GAMEBOY, 0)
+	MCFG_SOUND_ADD("dmg", DMG_APU, XTAL_4_194304Mhz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -1264,6 +1387,16 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ADD("pokeyb", POKEY, 1789772)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+
+	MCFG_C352_ADD("c352", 1000000, 288)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, c352_map)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
+	MCFG_OKIM6295_ADD("okim6295", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, okim6295_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )

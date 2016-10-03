@@ -196,7 +196,7 @@ WRITE8_MEMBER( mc6852_device::write )
 			/* control 2 */
 			if (LOG) logerror("MC6852 '%s' Control 2 %02x\n", tag(), data);
 			m_cr[1] = data;
-			
+
 			int data_bit_count = 0;
 			parity_t parity = PARITY_NONE;
 			stop_bits_t stop_bits = STOP_BITS_1;
@@ -242,7 +242,7 @@ WRITE8_MEMBER( mc6852_device::write )
 	else
 	{
 		if (LOG) logerror("MC6852 '%s' Control 1 %02x\n", tag(), data);
-		
+
 		/* receiver reset */
 		if (data & C1_RX_RS)
 		{
@@ -273,7 +273,7 @@ WRITE8_MEMBER( mc6852_device::write )
 			if (LOG) logerror("MC6852 '%s' Transmitter Reset\n", tag());
 
 			m_status &= ~(S_TUF | S_CTS | S_TDRA);
-	
+
 			transmit_register_reset();
 		}
 

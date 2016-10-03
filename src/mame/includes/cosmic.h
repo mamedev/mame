@@ -20,7 +20,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_in_ports(*this, {"IN0", "IN1", "IN2"}),
+		m_in_ports(*this, "IN%u", 0),
 		m_dsw(*this, "DSW"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),

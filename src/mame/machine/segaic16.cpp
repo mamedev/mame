@@ -199,12 +199,12 @@ WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
 //-------------------------------------------------
 
 sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock, "sega_315_5195", __FILE__),
-		m_cpu(*this),
-		m_cpuregion(*this),
-		m_space(nullptr),
-		m_decrypted_space(nullptr),
-		m_curregion(0)
+	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock, "sega_315_5195", __FILE__)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_cpuregion(*this, finder_base::DUMMY_TAG)
+	, m_space(nullptr)
+	, m_decrypted_space(nullptr)
+	, m_curregion(0)
 {
 }
 

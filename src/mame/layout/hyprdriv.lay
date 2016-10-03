@@ -101,7 +101,7 @@
 		<bezel name="lamp3" element="view3" inputtag="IN1" inputmask="0x40">
 			<bounds x="0.025" y="3.325" width="0.125" height="0.125" />
 		</bezel>
-		
+
 		<bezel name="lamp4" element="lamp">
 			<bounds x="1.785" y="3.2" width="0.1" height="0.1" />
 		</bezel>
@@ -130,7 +130,7 @@
 		<bezel name="led0" element="led">
 			<bounds x="3.55" y="3.025" width="0.025" height="0.025" />
 		</bezel>
-		
+
 		<bezel name="led9" element="led">
 			<bounds x="3.43" y="3.055" width="0.025" height="0.025" />
 		</bezel>
@@ -146,11 +146,11 @@
 		<bezel name="led5" element="led">
 			<bounds x="3.55" y="3.055" width="0.025" height="0.025" />
 		</bezel>
-		
+
 		<bezel name="led10" element="led">
 			<bounds x="3.325" y="3.085" width="0.025" height="0.025" />
 		</bezel>
-		
+
 		<bezel name="led11" element="led">
 			<bounds x="3.295" y="3.115" width="0.025" height="0.025" />
 		</bezel>
@@ -160,7 +160,7 @@
 		<bezel name="led13" element="led">
 			<bounds x="3.355" y="3.115" width="0.025" height="0.025" />
 		</bezel>
-		
+
 		<bezel name="led14" element="led">
 			<bounds x="3.295" y="3.145" width="0.025" height="0.025" />
 		</bezel>
@@ -170,7 +170,7 @@
 		<bezel name="led16" element="led">
 			<bounds x="3.355" y="3.145" width="0.025" height="0.025" />
 		</bezel>
-		
+
 		<bezel name="led17" element="led">
 			<bounds x="3.295" y="3.175" width="0.025" height="0.025" />
 		</bezel>

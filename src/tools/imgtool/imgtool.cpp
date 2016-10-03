@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    imgtool.c
+    imgtool.cpp
 
     Core code for Imgtool
 
@@ -66,7 +66,7 @@ struct imgtool_partition
 	imgtoolerr_t    (*suggest_transfer)(imgtool_partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length);
 	imgtoolerr_t    (*get_chain)    (imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size);
 
-	const option_guide *writefile_optguide;
+	const util::option_guide *writefile_optguide;
 	const char *writefile_optspec;
 };
 
@@ -81,7 +81,7 @@ struct imgtool_directory
     GLOBALS
 ***************************************************************************/
 
-static imgtool_library *global_imgtool_library;
+static std::unique_ptr<imgtool::library> global_imgtool_library;
 
 static int global_omit_untested;
 static void (*global_warn)(const char *message);
@@ -164,23 +164,6 @@ static imgtoolerr_t markerrorsource(imgtoolerr_t err)
 	return err;
 }
 
-char *imgtool_basename(char *filename)
-{
-	char *c;
-
-	// NULL begets NULL
-	if (!filename)
-		return nullptr;
-
-	// start at the end and return when we hit a slash or colon
-	for (c = filename + strlen(filename) - 1; c >= filename; c--)
-		if (*c == '\\' || *c == '/' || *c == ':')
-			return c + 1;
-
-	// otherwise, return the whole thing
-	return filename;
-}
-
 /*-------------------------------------------------
     internal_error - debug function for raising
     internal errors
@@ -216,14 +199,14 @@ static char *normalize_filename(imgtool_partition *partition, const char *src)
     imgtool_init - initializes the imgtool core
 -------------------------------------------------*/
 
-void imgtool_init(int omit_untested, void (*warn)(const char *message))
+void imgtool_init(bool omit_untested, void (*warn)(const char *message))
 {
 	imgtoolerr_t err;
-	err = imgtool_create_cannonical_library(omit_untested, &global_imgtool_library);
+	err = imgtool_create_cannonical_library(omit_untested, global_imgtool_library);
 	assert(err == IMGTOOLERR_SUCCESS);
 	if (err == IMGTOOLERR_SUCCESS)
 	{
-		imgtool_library_sort(global_imgtool_library, ITLS_DESCRIPTION);
+		global_imgtool_library->sort(imgtool::library::sort_type::DESCRIPTION);
 	}
 	global_omit_untested = omit_untested;
 	global_warn = warn;
@@ -238,10 +221,8 @@ void imgtool_init(int omit_untested, void (*warn)(const char *message))
 void imgtool_exit(void)
 {
 	if (global_imgtool_library)
-	{
-		imgtool_library_close(global_imgtool_library);
-		global_imgtool_library = nullptr;
-	}
+		global_imgtool_library.reset();
+
 	global_warn = nullptr;
 }
 
@@ -253,9 +234,18 @@ void imgtool_exit(void)
 
 const imgtool_module *imgtool_find_module(const char *modulename)
 {
-	return imgtool_library_findmodule(global_imgtool_library, modulename);
+	return global_imgtool_library->findmodule(modulename);
 }
 
+
+/*-------------------------------------------------
+    imgtool_find_module - looks up a module
+-------------------------------------------------*/
+
+const imgtool::library::modulelist &imgtool_get_modules()
+{
+	return global_imgtool_library->modules();
+}
 
 
 /*-------------------------------------------------
@@ -386,8 +376,7 @@ imgtool_image *imgtool_partition_image(imgtool_partition *partition)
 imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, size_t count)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	imgtool_library *library = global_imgtool_library;
-	imgtool_module *module = nullptr;
+	imgtool::library &library = *global_imgtool_library.get();
 	imgtool_module *insert_module;
 	imgtool_module *temp_module;
 	size_t i = 0;
@@ -420,15 +409,15 @@ imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, 
 		extension++;
 
 	/* iterate through all modules */
-	while((module = imgtool_library_iterate(library, module)) != nullptr)
+	for (const auto &module : library.modules())
 	{
 		if (!extension || image_find_extension(module->extensions, extension))
 		{
-			err = evaluate_module(fname, module, &val);
+			err = evaluate_module(fname, module.get(), &val);
 			if (err)
 				goto done;
 
-			insert_module = module;
+			insert_module = module.get();
 			for (i = 0; (val > 0.0f) && (i < count); i++)
 			{
 				if (val > values[i])
@@ -451,23 +440,6 @@ done:
 	if (values)
 		free(values);
 	return err;
-}
-
-
-
-/*-------------------------------------------------
-    imgtool_image_get_sector_size - gets the size
-    of a particular sector on an image
--------------------------------------------------*/
-
-imgtoolerr_t imgtool_image_get_sector_size(imgtool_image *image, UINT32 track, UINT32 head,
-	UINT32 sector, UINT32 *length)
-{
-	/* implemented? */
-	if (!image->module->get_sector_size)
-		return (imgtoolerr_t )(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
-
-	return image->module->get_sector_size(image, track, head, sector, length);
 }
 
 
@@ -508,13 +480,13 @@ imgtoolerr_t imgtool_image_get_geometry(imgtool_image *image, UINT32 *tracks, UI
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_read_sector(imgtool_image *image, UINT32 track, UINT32 head,
-	UINT32 sector, void *buffer, size_t len)
+	UINT32 sector, std::vector<UINT8> &buffer)
 {
 	/* implemented? */
 	if (!image->module->read_sector)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return image->module->read_sector(image, track, head, sector, buffer, len);
+	return image->module->read_sector(image, track, head, sector, buffer);
 }
 
 
@@ -800,7 +772,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	p->get_iconinfo                 = (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_iconinfo *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ICON_INFO);
 	p->suggest_transfer             = (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
 	p->get_chain                    = (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
-	p->writefile_optguide           = (const option_guide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
+	p->writefile_optguide           = (const util::option_guide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	p->writefile_optspec            = pool_strdup_allow_null(p->pool, (char*)imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC));
 
 	/* mask out if writing is untested */
@@ -928,10 +900,7 @@ void imgtool_partition_get_attribute_name(imgtool_partition *partition, UINT32 a
 int imgtool_validitychecks(void)
 {
 	int error = 0;
-	int val;
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
-	const imgtool_module *module = nullptr;
-	const option_guide *guide_entry;
 	imgtool_module_features features;
 	int created_library = FALSE;
 
@@ -941,9 +910,9 @@ int imgtool_validitychecks(void)
 		created_library = TRUE;
 	}
 
-	while((module = imgtool_library_iterate(global_imgtool_library, module)) != nullptr)
+	for (const auto &module : global_imgtool_library->modules())
 	{
-		features = imgtool_get_module_features(module);
+		features = imgtool_get_module_features(module.get());
 
 		if (!module->name)
 		{
@@ -988,18 +957,6 @@ int imgtool_validitychecks(void)
 		}
 #endif
 
-		/* sanity checks on sector operations */
-		if (module->read_sector && !module->get_sector_size)
-		{
-			printf("imgtool module %s implements read_sector without supporting get_sector_size\n", module->name);
-			error = 1;
-		}
-		if (module->write_sector && !module->get_sector_size)
-		{
-			printf("imgtool module %s implements write_sector without supporting get_sector_size\n", module->name);
-			error = 1;
-		}
-
 		/* sanity checks on creation options */
 		if (module->createimage_optguide || module->createimage_optspec)
 		{
@@ -1017,44 +974,12 @@ int imgtool_validitychecks(void)
 
 			if (module->createimage_optguide && module->createimage_optspec)
 			{
-				guide_entry = module->createimage_optguide;
-				while (guide_entry->option_type != OPTIONTYPE_END)
-				{
-					if (util::option_resolution::contains(module->createimage_optspec, guide_entry->parameter))
-					{
-						switch (guide_entry->option_type)
-						{
-							case OPTIONTYPE_INT:
-							case OPTIONTYPE_ENUM_BEGIN:
-								err = (imgtoolerr_t)util::option_resolution::get_default(module->createimage_optspec,
-									guide_entry->parameter, &val);
-								if (err)
-									goto done;
-								break;
-
-							default:
-								break;
-						}
-						if (!guide_entry->identifier)
-						{
-							printf("imgtool module %s creation option %d has null identifier\n",
-								module->name, (int) (guide_entry - module->createimage_optguide));
-							error = 1;
-						}
-						if (!guide_entry->display_name)
-						{
-							printf("imgtool module %s creation option %d has null display_name\n",
-								module->name, (int) (guide_entry - module->createimage_optguide));
-							error = 1;
-						}
-					}
-					guide_entry++;
-				}
+				auto resolution = std::make_unique<util::option_resolution>(*module->createimage_optguide);
+				resolution->set_specification(module->createimage_optspec);
 			}
 		}
 	}
 
-done:
 	if (created_library)
 		imgtool_exit();
 	if (err)
@@ -1218,12 +1143,14 @@ imgtoolerr_t imgtool_image_create(const imgtool_module *module, const char *fnam
 	/* allocate dummy options if necessary */
 	if (!opts && module->createimage_optguide)
 	{
-		try { alloc_resolution.reset(new util::option_resolution(module->createimage_optguide, module->createimage_optspec)); }
+		try { alloc_resolution.reset(new util::option_resolution(*module->createimage_optguide)); }
 		catch (...) { return (imgtoolerr_t)IMGTOOLERR_OUTOFMEMORY; }
+
+		if (module->createimage_optspec)
+			alloc_resolution->set_specification(module->createimage_optspec);
+
 		opts = alloc_resolution.get();
 	}
-	if (opts)
-		opts->finish();
 
 	return internal_open(module, fname, OSD_FOPEN_RW_CREATE, opts, image);
 }
@@ -2000,16 +1927,16 @@ imgtoolerr_t imgtool_partition_write_file(imgtool_partition *partition, const ch
 		/* allocate dummy options if necessary */
 		if (!opts && partition->writefile_optguide)
 		{
-			try { alloc_resolution.reset(new util::option_resolution(partition->writefile_optguide, partition->writefile_optspec)); }
+			try { alloc_resolution.reset(new util::option_resolution(*partition->writefile_optguide)); }
 			catch (...)
 			{
 				err = IMGTOOLERR_OUTOFMEMORY;
 				goto done;
 			}
+			if (partition->writefile_optspec)
+				alloc_resolution->set_specification(partition->writefile_optspec);
 			opts = alloc_resolution.get();
 		}
-		if (opts)
-			opts->finish();
 
 		/* if free_space is implemented; do a quick check to see if space is available */
 		if (partition->free_space)
@@ -2129,9 +2056,13 @@ imgtoolerr_t imgtool_partition_put_file(imgtool_partition *partition, const char
 	imgtool_stream *f = nullptr;
 	imgtool_charset charset;
 	char *alloc_newfname = nullptr;
+	std::string basename;
 
 	if (!newfname)
-		newfname = (const char *) imgtool_basename((char *) source);
+	{
+		basename = core_filename_extract_base(source);
+		newfname = basename.c_str();
+	}
 
 	charset = (imgtool_charset) (int) imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET);
 	if (charset != IMGTOOL_CHARSET_UTF8)

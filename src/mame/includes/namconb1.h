@@ -116,7 +116,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
-	
+
 	int NB1objcode2tile(int code);
 	int NB2objcode2tile(int code);
 };

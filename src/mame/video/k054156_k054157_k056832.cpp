@@ -188,7 +188,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	//*m_pixmap[K056832_PAGE_COUNT],
 	//m_regs[0x20],
 	//m_regsb[4],
-	m_rombase(*this),
+	m_rombase(*this, finder_base::DUMMY_TAG),
 	m_num_gfx_banks(0),
 	m_cur_gfx_banks(0),
 	m_gfx_num(0),

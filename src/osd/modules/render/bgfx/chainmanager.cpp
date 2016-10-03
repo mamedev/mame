@@ -435,8 +435,8 @@ uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *st
 			continue;
 		}
 
-		uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
-		uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
+		uint16_t screen_width(floorf(prim->get_full_quad_width() + 0.5f));
+		uint16_t screen_height(floorf(prim->get_full_quad_height() + 0.5f));
 		if (window.swap_xy())
 		{
 			std::swap(screen_width, screen_height);

@@ -6,40 +6,40 @@
 
 **********************************************************************
 
-	Pin 	COMMON	RAM 	OPTROM 				Mask ROM
-							32k	64k	128k
-	1		A16
-	2		A15
-	3				VBB		VPP	NC	VPP 		NC
-	4		A12
-	5		A7
-	6		A6
-	7		A5
-	8		A4
-	9		A3
-	10		A2
-	11		A1
-	12		A0
-	13		D0
-	14		D1
-	15		D2
-	16		GND
-	17		D3
-	18		D4
-	19		D5
-	20		D6
-	21		D7
-	22		CE
-	23		A10
-	24				OE 		OE 	OE/VPP			OE 		OE
-	25		A11	
-	26		A9
-	27		A8
-	28		A13
-	29		A14
-	30				WE 		NC	NC				PGM 	NC
-	31		VCC
-	32		CDET
+    Pin     COMMON  RAM     OPTROM              Mask ROM
+                            32k 64k 128k
+    1       A16
+    2       A15
+    3               VBB     VPP NC  VPP         NC
+    4       A12
+    5       A7
+    6       A6
+    7       A5
+    8       A4
+    9       A3
+    10      A2
+    11      A1
+    12      A0
+    13      D0
+    14      D1
+    15      D2
+    16      GND
+    17      D3
+    18      D4
+    19      D5
+    20      D6
+    21      D7
+    22      CE
+    23      A10
+    24              OE      OE  OE/VPP          OE      OE
+    25      A11
+    26      A9
+    27      A8
+    28      A13
+    29      A14
+    30              WE      NC  NC              PGM     NC
+    31      VCC
+    32      CDET
 
 **********************************************************************/
 
@@ -106,7 +106,7 @@ protected:
 
 class portfolio_memory_card_slot_t : public device_t,
 									 public device_slot_interface,
-								     public device_image_interface
+									 public device_image_interface
 {
 public:
 	// construction/destruction

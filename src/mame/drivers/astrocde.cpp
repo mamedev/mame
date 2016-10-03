@@ -234,8 +234,6 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
  *
  *************************************/
 
-IOPORT_ARRAY_MEMBER(astrocde_state::trackball_inputs) { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-
 CUSTOM_INPUT_MEMBER(astrocde_state::ebases_trackball_r)
 {
 	return m_trackball[m_input_select]->read();
@@ -440,8 +438,6 @@ READ8_MEMBER(astrocde_state::demndrgn_io_r)
 	return 0xff;
 }
 
-
-IOPORT_ARRAY_MEMBER(astrocde_state::joystick_inputs) { "MOVEX", "MOVEY" };
 
 
 CUSTOM_INPUT_MEMBER(astrocde_state::demndragn_joystick_r)

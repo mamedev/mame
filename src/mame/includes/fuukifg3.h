@@ -28,7 +28,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_fuukivid(*this, "fuukivid"),
-		m_vram(*this, "vram"),
+		m_vram(*this, "vram.%u", 0),
 		m_vregs(*this, "vregs"),
 		m_priority(*this, "priority"),
 		m_tilebank(*this, "tilebank")

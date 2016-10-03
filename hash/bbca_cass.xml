@@ -62,6 +62,17 @@
 		</part>
 	</software>
 
+	<software name="atomsmas">
+		<description>Atom Smasher</description>
+		<year>1983</year>
+		<publisher>Romik</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="4572">
+				<rom name="atomsmasher(1983)(romik).uef" size="4572" crc="80f9484c" sha1="6be2cffc1aa05f9396618efcb8525725f3f1f1be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beebtrek">
 		<description>Beebtrek</description>
 		<year>1982</year>
@@ -132,6 +143,7 @@
 		<description>Draughts And Reversi</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="author" value="Nick Reeves" />
 		<info name="release" value="SBG20" />
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Draughts"/>

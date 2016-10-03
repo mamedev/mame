@@ -110,6 +110,22 @@ int output_win32::init(const osd_options &options)
 	assert(result == 0);
 	(void)result; // to silence gcc 4.6
 
+	// allocate message ids before creating the window 
+	// since the window proc gets called during creation
+	om_mame_start = RegisterWindowMessage(OM_MAME_START);
+	assert(om_mame_start != 0);
+	om_mame_stop = RegisterWindowMessage(OM_MAME_STOP);
+	assert(om_mame_stop != 0);
+	om_mame_update_state = RegisterWindowMessage(OM_MAME_UPDATE_STATE);
+	assert(om_mame_update_state != 0);
+
+	om_mame_register_client = RegisterWindowMessage(OM_MAME_REGISTER_CLIENT);
+	assert(om_mame_register_client != 0);
+	om_mame_unregister_client = RegisterWindowMessage(OM_MAME_UNREGISTER_CLIENT);
+	assert(om_mame_unregister_client != 0);
+	om_mame_get_id_string = RegisterWindowMessage(OM_MAME_GET_ID_STRING);
+	assert(om_mame_get_id_string != 0);
+
 	// create a window
 	m_output_hwnd = CreateWindowEx(
 						WINDOW_STYLE_EX,
@@ -126,21 +142,6 @@ int output_win32::init(const osd_options &options)
 
 	// set a pointer to the running machine
 	SetWindowLongPtr(m_output_hwnd, GWLP_USERDATA, (LONG_PTR)this);
-
-	// allocate message ids
-	om_mame_start = RegisterWindowMessage(OM_MAME_START);
-	assert(om_mame_start != 0);
-	om_mame_stop = RegisterWindowMessage(OM_MAME_STOP);
-	assert(om_mame_stop != 0);
-	om_mame_update_state = RegisterWindowMessage(OM_MAME_UPDATE_STATE);
-	assert(om_mame_update_state != 0);
-
-	om_mame_register_client = RegisterWindowMessage(OM_MAME_REGISTER_CLIENT);
-	assert(om_mame_register_client != 0);
-	om_mame_unregister_client = RegisterWindowMessage(OM_MAME_UNREGISTER_CLIENT);
-	assert(om_mame_unregister_client != 0);
-	om_mame_get_id_string = RegisterWindowMessage(OM_MAME_GET_ID_STRING);
-	assert(om_mame_get_id_string != 0);
 
 	// broadcast a startup message
 	PostMessage(HWND_BROADCAST, om_mame_start, (WPARAM)m_output_hwnd, 0);

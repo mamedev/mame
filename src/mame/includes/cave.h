@@ -33,24 +33,24 @@ class cave_state : public driver_device
 {
 public:
 	cave_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_videoregs(*this, "videoregs"),
-			m_vram(*this, "vram"),
-			m_vctrl(*this, "vctrl"),
-			m_spriteram(*this, "spriteram"),
-			m_spriteram_2(*this, "spriteram_2"),
-			m_paletteram(*this, "paletteram"),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_oki(*this, "oki"),
-			m_int_timer(*this, "int_timer"),
-			m_int_timer_left(*this, "int_timer_left"),
-			m_int_timer_right(*this, "int_timer_right"),
-			m_eeprom(*this, "eeprom"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_soundlatch(*this, "soundlatch") { }
+		: driver_device(mconfig, type, tag)
+		, m_videoregs(*this, "videoregs.%u", 0)
+		, m_vram(*this, "vram.%u", 0)
+		, m_vctrl(*this, "vctrl.%u", 0)
+		, m_spriteram(*this, "spriteram.%u", 0)
+		, m_spriteram_2(*this, "spriteram_2.%u", 0)
+		, m_paletteram(*this, "paletteram.%u", 0)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki")
+		, m_int_timer(*this, "int_timer")
+		, m_int_timer_left(*this, "int_timer_left")
+		, m_int_timer_right(*this, "int_timer_right")
+		, m_eeprom(*this, "eeprom")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	optional_shared_ptr_array<UINT16, 4> m_videoregs;

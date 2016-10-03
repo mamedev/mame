@@ -399,19 +399,19 @@ WRITE16_MEMBER(tickee_state::sound_bank_w)
 	switch (data & 0xff)
 	{
 		case 0x2c:
-			m_oki->set_bank_base(0x00000);
+			m_oki->set_rom_bank(0);
 			break;
 
 		case 0x2d:
-			m_oki->set_bank_base(0x40000);
+			m_oki->set_rom_bank(1);
 			break;
 
 		case 0x1c:
-			m_oki->set_bank_base(0x80000);
+			m_oki->set_rom_bank(2);
 			break;
 
 		case 0x1d:
-			m_oki->set_bank_base(0xc0000);
+			m_oki->set_rom_bank(3);
 			break;
 
 		default:

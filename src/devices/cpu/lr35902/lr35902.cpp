@@ -80,6 +80,7 @@ lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char
 	, m_IF(0)
 	, m_enable(0)
 	, m_has_halt_bug(false)
+	, m_entering_halt(false)
 	, m_timer_func(*this)
 	, m_incdec16_func(*this)
 {
@@ -156,7 +157,7 @@ void lr35902_cpu_device::device_start()
 	save_item(NAME(m_gb_speed));
 	save_item(NAME(m_gb_speed_change_pending));
 	save_item(NAME(m_enable));
-	save_item(NAME(m_handle_halt_bug));
+	save_item(NAME(m_entering_halt));
 
 	// Register state for debugger
 	state_add( LR35902_PC, "PC", m_PC ).callimport().callexport().formatstr("%04X");
@@ -173,7 +174,8 @@ void lr35902_cpu_device::device_start()
 	state_add( LR35902_IE, "IE", m_IE ).callimport().callexport().formatstr("%02X");
 	state_add( LR35902_IF, "IF", m_IF ).callimport().callexport().formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_PC).callimport().callexport().formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "GENPC", m_PC).formatstr("%8s").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_PC).formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_F).mask(0xf0).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;
@@ -217,10 +219,10 @@ void lr35902_cpu_device::device_reset()
 	m_IF = 0;
 
 	m_execution_state = 0;
-	m_handle_halt_bug = false;
 	m_handle_ei_delay = false;
 	m_gb_speed_change_pending = 0;
 	m_gb_speed = 1;
+	m_entering_halt = false;
 }
 
 
@@ -253,6 +255,7 @@ void lr35902_cpu_device::check_interrupts()
 		   logerror("LR35902 Interrupt IRQ $%02X\n", irq);
 		*/
 
+		bool was_halted = (m_enable & HALTED);
 		for( ; irqline < 5; irqline++ )
 		{
 			if( irq & (1<<irqline) )
@@ -261,17 +264,42 @@ void lr35902_cpu_device::check_interrupts()
 				{
 					m_enable &= ~HALTED;
 					m_PC++;
+					// In general there seems to be a 4 cycle delay to leave the halt state; except when the
+					// trigger is caused by the VBlank interrupt (on DMG/MGB/SGB?/SGB2?).
+					//
+					// On CGB/AGB/AGS this delay to leave the halt seems to always be 4 cycles.
+					//
 					if ( m_has_halt_bug ) {
 						if ( ! ( m_enable & IME ) ) {
 							/* Old cpu core (dmg/mgb/sgb) */
-							m_handle_halt_bug = true;
+							m_PC--;
+						}
+						// TODO: Properly detect when the delay should be skipped. Cases seen so far:
+						// - Vblank irq
+						// - STAT mode 1 irq (triggered at same time as vblank)
+						// - STAT mode 2 irq (8 cycles?, breaks gambatte halt/m2irq_ly tests when always applied but fix other gambatte halt/m2irq and halt/m2int cases)
+						// No delay:
+						// - LY=LYC irq
+						// STAT and not vblank just triggered (this on dmg/mgb/sgb only)? or Timer IRQ
+						//
+						// This is a bit hacky, more testing is needed to determine exact
+						// hardware behavior.
+						if ((irqline == 1 && !(m_IF & 0x01)) || irqline == 2)
+						{
+							// Cycles needed for leaving the halt state
+							cycles_passed(4);
+							if (irqline == 2)
+							{
+								cycles_passed(2);
+							}
 						}
 					} else {
 						/* New cpu core (cgb/agb/ags) */
-						/* Adjust for internal syncing with video core */
-						/* This feature needs more investigation */
-						if ( irqline < 2 ) {
-							cycles_passed( 4 );
+						// Leaving halt state seems to take 4 cycles.
+						cycles_passed(4);
+						if (!(m_enable & IME) && !m_entering_halt)
+						{
+							cycles_passed(4);
 						}
 					}
 				}
@@ -283,6 +311,9 @@ void lr35902_cpu_device::check_interrupts()
 					mem_write_word( m_SP, m_PC );
 					m_PC = 0x40 + irqline * 8;
 					/*logerror("LR35902 Interrupt PC $%04X\n", m_PC );*/
+					if (was_halted) {
+						m_op = mem_read_byte( m_PC );
+					}
 					return;
 				}
 			}
@@ -298,32 +329,50 @@ void lr35902_cpu_device::execute_run()
 {
 	do
 	{
-		if ( m_execution_state ) {
-			UINT8   x;
-			/* Execute instruction */
-			switch( m_op ) {
-#include "opc_main.hxx"
-				default:
-					// actually this should lock up the cpu!
-					logerror("LR35902: Illegal opcode $%02X @ %04X\n", m_op, m_PC);
-					break;
+		if (m_dma_cycles_to_burn > 0)
+		{
+			if (m_dma_cycles_to_burn < 4)
+			{
+				cycles_passed(m_dma_cycles_to_burn);
+				m_dma_cycles_to_burn = 0;
 			}
-		} else {
-			/* Fetch and count cycles */
-			check_interrupts();
-			debugger_instruction_hook(this, m_PC);
-			if ( m_enable & HALTED ) {
-				cycles_passed( 4 );
-				m_execution_state = 1;
-			} else {
-				m_op = mem_read_byte( m_PC++ );
-				if ( m_handle_halt_bug ) {
-					m_PC--;
-					m_handle_halt_bug = false;
-				}
+			else
+			{
+				cycles_passed(4);
+				m_dma_cycles_to_burn -= 4;
 			}
 		}
-		m_execution_state ^= 1;
+		else
+		{
+			if ( m_execution_state ) {
+				UINT8   x;
+				/* Execute instruction */
+				switch( m_op ) {
+#include "opc_main.hxx"
+					default:
+						// actually this should lock up the cpu!
+						logerror("LR35902: Illegal opcode $%02X @ %04X\n", m_op, m_PC);
+						break;
+				}
+			} else {
+				/* Fetch and count cycles */
+				bool was_halted = (m_enable & HALTED);
+				check_interrupts();
+				debugger_instruction_hook(this, m_PC);
+				if ( m_enable & HALTED ) {
+					cycles_passed(m_has_halt_bug ? 2 : 4);
+					m_execution_state = 1;
+					m_entering_halt = false;
+				} else {
+					if (was_halted) {
+						m_PC++;
+					} else {
+						m_op = mem_read_byte( m_PC++ );
+					}
+				}
+			}
+			m_execution_state ^= 1;
+		}
 	} while (m_icount > 0);
 }
 

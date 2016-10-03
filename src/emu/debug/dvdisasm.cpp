@@ -167,7 +167,7 @@ void debug_view_disasm::view_char(int chval)
 		case DCH_HOME:              // set the active column to the PC
 		{
 			const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-			offs_t pc = source.m_space.address_to_byte(source.device()->safe_pc()) & source.m_space.logbytemask();
+			offs_t pc = source.m_space.address_to_byte(source.device()->safe_pcbase()) & source.m_space.logbytemask();
 
 			// figure out which row the pc is on
 			for (unsigned int curline = 0; curline < m_byteaddress.size(); curline++)
@@ -458,7 +458,7 @@ void debug_view_disasm::view_update()
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 
-	offs_t pc = source.device()->safe_pc();
+	offs_t pc = source.device()->safe_pcbase();
 	offs_t pcbyte = source.m_space.address_to_byte(pc) & source.m_space.logbytemask();
 
 	// update our context; if the expression is dirty, recompute

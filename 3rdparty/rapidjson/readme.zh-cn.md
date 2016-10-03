@@ -1,6 +1,6 @@
 ![](doc/logo/rapidjson.png)
 
-![](https://img.shields.io/badge/release-v1.0.2-blue.png)
+![](https://img.shields.io/badge/release-v1.1.0-blue.png)
 
 ## 高效的 C++ JSON 解析／生成器，提供 SAX 及 DOM 风格 API
 
@@ -37,16 +37,26 @@ RapidJSON 是一个 C++ 的 JSON 解析器及生成器。它的灵感来自 [Rap
 
 * RapidJSON 独立。它不依赖于 BOOST 等外部库。它甚至不依赖于 STL。
 
-* RapidJSON 对内存友好。在大部分 32/64 位机器上，每个 JSON 值只占 16 或 20 字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。
+* RapidJSON 对内存友好。在大部分 32/64 位机器上，每个 JSON 值只占 16 字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。
 
 * RapidJSON 对 Unicode 友好。它支持 UTF-8、UTF-16、UTF-32 (大端序／小端序)，并内部支持这些编码的检测、校验及转码。例如，RapidJSON 可以在分析一个 UTF-8 文件至 DOM 时，把当中的 JSON 字符串转码至 UTF-16。它也支持代理对（surrogate pair）及 `"\u0000"`（空字符）。
 
-在 [这里](doc/features.md) 可读取更多特点。
+在 [这里](doc/features.zh-cn.md) 可读取更多特点。
 
-JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404。 关于 JSON 的更多信息可参考：
+JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404，并支持可选的放宽语法。 关于 JSON 的更多信息可参考：
 * [Introducing JSON](http://json.org/)
 * [RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format](http://www.ietf.org/rfc/rfc7159.txt)
 * [Standard ECMA-404: The JSON Data Interchange Format](http://www.ecma-international.org/publications/standards/Ecma-404.htm)
+
+## v1.1 中的亮点 (2016-8-25)
+
+* 加入 [JSON Pointer](doc/pointer.zh-cn.md) 功能，可更简单地访问及更改 DOM。
+* 加入 [JSON Schema](doc/schema.zh-cn.md) 功能，可在解析或生成 JSON 时进行校验。
+* 加入 [放宽的 JSON 语法](doc/dom.zh-cn.md) （注释、尾随逗号、NaN/Infinity）
+* 使用 [C++11 范围 for 循环](doc/tutorial.zh-cn.md) 去遍历 array 和 object。
+* 在 x86-64 架构下，缩减每个 `Value` 的内存开销从 24 字节至 16 字节。
+
+其他改动请参考 [change log](CHANGELOG.md).
 
 ## 兼容性
 
@@ -70,13 +80,13 @@ RapidJSON 依赖于以下软件：
 生成测试及例子的步骤：
 
 1. 执行 `git submodule update --init` 去获取 thirdparty submodules (google test)。
-2. 在 rapidjson 目渌下，建立一个 `build` 目录。
+2. 在 rapidjson 目录下，建立一个 `build` 目录。
 3. 在 `build` 目录下执行 `cmake ..` 命令以设置生成。Windows 用户可使用 cmake-gui 应用程序。
 4. 在 Windows 下，编译生成在 build 目录中的 solution。在 Linux 下，于 build 目录运行 `make`。
 
 成功生成后，你会在 `bin` 的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于 build 下的 `doc/html` 目录。要执行测试，请在 build 下执行 `make test` 或 `ctest`。使用 `ctest -V` 命令可获取详细的输出。
 
-我们也可以把程序库安装至全系统中，只要在具管理權限下从 build 目录执行 `make install` 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 `CMakeLists.txt` 加入一句 `find_package(RapidJSON)`。
+我们也可以把程序库安装至全系统中，只要在具管理权限下从 build 目录执行 `make install` 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 `CMakeLists.txt` 加入一句 `find_package(RapidJSON)`。
 
 ## 用法一览
 

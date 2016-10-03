@@ -24,26 +24,26 @@ const device_type I8214 = &device_creator<i8214_device>;
 
 
 //**************************************************************************
-//  INLINE HELPERS
+//  HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  trigger_interrupt -
 //-------------------------------------------------
 
-inline void i8214_device::trigger_interrupt(int level)
+void i8214_device::trigger_interrupt(int level)
 {
 	if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", tag(), level);
 
 	m_a = level;
 
-	// disable interrupts
+	// disable more interrupts from being latched
 	m_int_dis = 1;
 
 	// disable next level group
 	m_write_enlg(0);
 
-	// toggle interrupt line
+	// set interrupt line
 	m_write_irq(ASSERT_LINE);
 	m_write_irq(CLEAR_LINE);
 }
@@ -53,19 +53,17 @@ inline void i8214_device::trigger_interrupt(int level)
 //  check_interrupt -
 //-------------------------------------------------
 
-inline void i8214_device::check_interrupt()
+void i8214_device::check_interrupt()
 {
-	int level;
+	if (m_int_dis || !m_etlg || !m_inte) return;
 
-	if (m_int_dis || !m_etlg) return;
-
-	for (level = 7; level >= 0; level--)
+	for (int level = 7; level >= 0; level--)
 	{
 		if (!BIT(m_r, 7 - level))
 		{
 			if (m_sgs)
 			{
-				if (level > m_b)
+				if (level > m_current_status)
 				{
 					trigger_interrupt(level);
 				}
@@ -88,10 +86,17 @@ inline void i8214_device::check_interrupt()
 //  i8214_device - constructor
 //-------------------------------------------------
 
-i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, I8214, "I8214", tag, owner, clock, "i8214", __FILE__),
-	m_write_irq(*this),
-	m_write_enlg(*this)
+i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, I8214, "I8214", tag, owner, clock, "i8214", __FILE__)
+	, m_write_irq(*this)
+	, m_write_enlg(*this)
+	, m_inte(0)
+	, m_int_dis(0)
+	, m_a(0)
+	, m_current_status(0)
+	, m_r(0xff)
+	, m_sgs(0)
+	, m_etlg(1)
 {
 }
 
@@ -107,12 +112,13 @@ void i8214_device::device_start()
 	m_write_enlg.resolve_safe();
 
 	m_int_dis = 0;
+	m_etlg = 1;
 
 	// register for state saving
 	save_item(NAME(m_inte));
 	save_item(NAME(m_int_dis));
 	save_item(NAME(m_a));
-	save_item(NAME(m_b));
+	save_item(NAME(m_current_status));
 	save_item(NAME(m_r));
 	save_item(NAME(m_sgs));
 	save_item(NAME(m_etlg));
@@ -139,9 +145,9 @@ UINT8 i8214_device::a_r()
 
 void i8214_device::b_w(UINT8 data)
 {
-	m_b = data & 0x07;
+	m_current_status = data & 0x07;
 
-	if (LOG) logerror("I8214 '%s' B: %01x\n", tag(), m_b);
+	if (LOG) logerror("I8214 '%s' B: %01x\n", tag(), m_current_status);
 
 	// enable interrupts
 	m_int_dis = 0;
@@ -154,14 +160,16 @@ void i8214_device::b_w(UINT8 data)
 
 
 //-------------------------------------------------
-//  r_w -
+//  r_w - update the interrupt request
+//  state for a given line
 //-------------------------------------------------
 
-void i8214_device::r_w(UINT8 data)
+void i8214_device::r_w(int line, int state)
 {
-	if (LOG) logerror("I8214 '%s' R: %02x\n", tag(), data);
+	if (LOG) logerror("I8214 '%s' R%d: %d\n", tag(), line, state);
 
-	m_r = data;
+	m_r &= ~(1 << line);
+	m_r |= (state << line);
 
 	check_interrupt();
 }

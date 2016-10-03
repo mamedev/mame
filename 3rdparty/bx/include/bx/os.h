@@ -34,14 +34,10 @@
 #		include <pthread.h> // mach_port_t
 #	endif // BX_PLATFORM_*
 
-#	if BX_PLATFORM_NACL
-#		include <sys/nacl_syscalls.h> // nanosleep
-#	else
-#		include <time.h> // nanosleep
-#		if !BX_PLATFORM_PS4
-#			include <dlfcn.h> // dlopen, dlclose, dlsym
-#		endif // !BX_PLATFORM_PS4
-#	endif // BX_PLATFORM_NACL
+#	include <time.h> // nanosleep
+#	if !BX_PLATFORM_PS4 && !BX_PLATFORM_NACL
+#		include <dlfcn.h> // dlopen, dlclose, dlsym
+#	endif // !BX_PLATFORM_PS4 && !BX_PLATFORM_NACL
 
 #	if BX_PLATFORM_ANDROID
 #		include <malloc.h> // mallinfo

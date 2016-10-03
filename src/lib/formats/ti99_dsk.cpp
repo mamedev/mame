@@ -99,7 +99,8 @@ bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *
 	int cell_size = 0;
 	int sector_count = 0;
 	int heads = 0;
-	determine_sizes(io, cell_size, sector_count, heads);
+	int log_track_count = 0;
+	determine_sizes(io, cell_size, sector_count, heads, log_track_count);
 
 	if (cell_size == 0) return false;
 
@@ -111,28 +112,49 @@ bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *
 
 	int file_size = io_generic_size(io);
 	int track_size = get_track_size(cell_size, sector_count);
-	int track_count = file_size / (track_size*heads);
 
-	if (TRACE) osd_printf_info("ti99_dsk: track count = %d\n", track_count);
+	// Problem: If the disk is improperly formatted, the track count will be
+	// wrong. For instance, a disk could be reformatted to single-side.
+	// We assume there is no disk with single side format beyond 40 tracks.
+	if ((heads==1) && (file_size > track_size*40))
+		heads = 2;
 
-	if (track_count > maxtrack)
+	int phys_track_count = file_size / (track_size*heads);
+
+	// Some disks are known to have an incomplete header.
+	// PASCAL disks have a track count of 0.
+	if (log_track_count==0) log_track_count = phys_track_count;
+
+	if (TRACE) osd_printf_info("ti99_dsk: logical tracks = %d, physical tracks = %d\n", log_track_count, phys_track_count);
+
+	if (phys_track_count > maxtrack)
 	{
 		osd_printf_error("ti99_dsk: Floppy disk has too many tracks for this drive.\n");
 		return false;
 	}
 
-	bool doubletracks = (track_count * 2 <= maxtrack);
+	// Is this the first time that this disk is read in an 80-track drive?
+	bool double_step = ((log_track_count * 2) <= maxtrack);
+	bool first_time_double = ((phys_track_count * 2) <= maxtrack);
 
-	if (doubletracks) osd_printf_warning("ti99_dsk: 40-track image in an 80-track drive. On save, image size will double.\n");
+	if (first_time_double)
+	{
+		osd_printf_warning("ti99_dsk: 40-track image in an 80-track drive. On save, image size will double.\n");
+	}
+
+	int acttrack;
 
 	// Read the image
-	for(int head=0; head < heads; head++)
+	for (int head=0; head < heads; head++)
 	{
-		for(int track=0; track < track_count; track++)
+		for (int track=0; track < phys_track_count; track++)
 		{
-			load_track(io, trackdata, head, track, sector_count, track_count, cell_size);
+			if (double_step && !first_time_double) acttrack = track/2;
+			else acttrack = track;
 
-			if (doubletracks)
+			load_track(io, trackdata, head, track, acttrack, sector_count, phys_track_count, cell_size);
+
+			if (first_time_double)
 			{
 				// Create two tracks from each medium track. This reflects the
 				// fact that the drive head will find the same data after
@@ -158,6 +180,7 @@ bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -316,7 +339,7 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 		if (((i-start-6)%334==0) && (i < start + 9*334))
 		{
 			// IDAM
-			raw_w(buffer, 16, 0xf57e);
+			raw_w(buffer, 16, 0xf57e, cell_size);
 		}
 		else
 		{
@@ -324,7 +347,7 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 			{
 				// DAM
 				// FB (1111010101101111) = normal data, F8 (1111010101101010)= deleted data
-				raw_w(buffer, 16, (trackdata[i]==0xf8)? 0xf56a : 0xf56f);
+				raw_w(buffer, 16, (trackdata[i]==0xf8)? 0xf56a : 0xf56f, cell_size);
 			}
 			else
 			{
@@ -368,7 +391,7 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 						}
 					}
 				}
-				fm_w(buffer, 8, trackdata[i]);
+				fm_w(buffer, 8, trackdata[i], cell_size);
 			}
 		}
 	}
@@ -410,7 +433,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 		{
 			// IDAM
 			for (int j=0; j < 3; j++)
-				raw_w(buffer, 16, 0x4489);  // 3 times A1
+				raw_w(buffer, 16, 0x4489, cell_size);  // 3 times A1
 			i += 2;
 		}
 		else
@@ -419,7 +442,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 			{
 				// DAM
 				for (int j=0; j < 3; j++)
-					raw_w(buffer, 16, 0x4489);  // 3 times A1
+					raw_w(buffer, 16, 0x4489, cell_size);  // 3 times A1
 				i += 2;
 			}
 			else
@@ -464,7 +487,7 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 						}
 					}
 				}
-				mfm_w(buffer, 8, trackdata[i]);
+				mfm_w(buffer, 8, trackdata[i], cell_size);
 			}
 		}
 	}
@@ -785,7 +808,7 @@ int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
 	return vote;
 }
 
-void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads)
+void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
 	UINT64 file_size = io_generic_size(io);
 	ti99vib vib;
@@ -819,10 +842,11 @@ void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 		}
 		if (TRACE) osd_printf_info("ti99_dsk: VIB says that this disk is %s density with %d sectors per track, %d tracks, and %d heads\n", (cell_size==4000)? "single": ((cell_size==2000)? "double" : "high"), sector_count, vib.tracksperside, heads);
 		have_vib = true;
+		tracks = vib.tracksperside;
 	}
 
 	// Do we have a broken VIB? The Pascal disks are known to have such incomplete VIBs
-	if (heads == 0 || sector_count == 0) have_vib = false;
+	if (tracks == 0 || heads == 0 || sector_count == 0) have_vib = false;
 
 	// We're also checking the size of the image
 	int cell_size1 = 0;
@@ -882,8 +906,11 @@ int ti99_sdf_format::get_track_size(int cell_size, int sector_count)
     Load a SDF image track. Essentially, we want to end up in the same
     kind of track image as with the TDF, so the easiest thing is to produce
     a TDF image track from the sectors and process them as if it came from TDF.
+
+    acttrack is the actual track when double stepping is used and changes
+    every two physical tracks.
 */
-void ti99_sdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize)
+void ti99_sdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int track, int acttrack, int sectorcount, int trackcount, int cellsize)
 {
 	bool fm = (cellsize==4000);
 	int tracksize = sectorcount * SECTOR_SIZE;
@@ -903,7 +930,7 @@ void ti99_sdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int
 	memset(trackdata, 0x00, 9216);
 
 	int secno = 0;
-	secno = (track * skew) % sectorcount;
+	secno = (acttrack * skew) % sectorcount;
 
 	// Gap 1
 	int gap1 = fm? 16 : 40;
@@ -925,7 +952,7 @@ void ti99_sdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int
 		trackdata[position++] = 0xfe;   // IDAM / ident
 
 		// Header
-		trackdata[position++] = track;
+		trackdata[position++] = acttrack;
 		trackdata[position++] = head;
 		trackdata[position++] = i;
 		trackdata[position++] = 1;
@@ -1095,7 +1122,7 @@ int ti99_tdf_format::identify(io_generic *io, UINT32 form_factor)
     Find the proper format for a given image file. We determine the cell size,
     but we do not care about the sector size (only needed by the SDF converter).
 */
-void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads)
+void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
 	UINT64 file_size = io_generic_size(io);
 	heads = 2;  // TDF only supports two-sided recordings
@@ -1109,8 +1136,9 @@ void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 
 /*
     For TDF this just amounts to loading the track from the image file.
+    acttrack is not used here, since the file contains the track data.
 */
-void ti99_tdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize)
+void ti99_tdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int track, int acttrack, int sectorcount, int trackcount, int cellsize)
 {
 	int offset = ((trackcount * head) + track) * get_track_size(cellsize, 0);
 	io_generic_read(io, trackdata, offset, get_track_size(cellsize, 0));

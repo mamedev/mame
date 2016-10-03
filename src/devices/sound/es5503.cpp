@@ -82,6 +82,15 @@ void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 	m_stream->update();
 }
 
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void es5503_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
 // halt_osc: handle halting an oscillator
 // chip = chip ptr
 // onum = oscillator #

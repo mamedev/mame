@@ -41,7 +41,8 @@ public:
 	/* kikikai mcu simulation */
 	int      m_mcu_running;
 	int      m_mcu_initialised;
-	int      m_coin_last;
+	bool     m_coin_last[2];
+	UINT8    m_coin_fract;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -73,4 +74,5 @@ public:
 	INTERRUPT_GEN_MEMBER(kikikai_interrupt);
 	INTERRUPT_GEN_MEMBER(mexico86_m68705_interrupt);
 	void mcu_simulate(  );
+	bool mcu_coin_counter_w(bool condition);
 };

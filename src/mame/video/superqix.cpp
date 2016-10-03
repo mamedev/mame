@@ -51,20 +51,18 @@ TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
 
 VIDEO_START_MEMBER(superqix_state,pbillian)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::pb_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::pb_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8,32,32);
 }
 
 VIDEO_START_MEMBER(superqix_state,superqix)
 {
 	m_fg_bitmap[0] = std::make_unique<bitmap_ind16>(256, 256);
 	m_fg_bitmap[1] = std::make_unique<bitmap_ind16>(256, 256);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::sqix_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::sqix_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
 
-	save_item(NAME(m_gfxbank));
-	save_item(NAME(m_show_bitmap));
 	save_item(NAME(*m_fg_bitmap[0]));
 	save_item(NAME(*m_fg_bitmap[1]));
 }
@@ -131,17 +129,26 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 	 --5-----  flip screen
 	*/
 
-	machine().bookkeeping().coin_counter_w(0,data & 0x02);
-	machine().bookkeeping().coin_counter_w(1,data & 0x04);
+	if (data&0xc1) logerror("%04x: pbillian_0410_w with invalid bits: %02x\n",space.device().safe_pc(),data);
+	machine().bookkeeping().coin_counter_w(0,BIT(data,1));
+	machine().bookkeeping().coin_counter_w(1,BIT(data,2));
 
-	membank("bank1")->set_entry((data & 0x08) >> 3);
+	membank("bank1")->set_entry(BIT(data,3));
 
-	m_nmi_mask = data & 0x10;
-	flip_screen_set(data & 0x20);
+	m_nmi_mask = BIT(data,4);
+	if (!(m_nmi_mask)) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	flip_screen_set(BIT(data,5));
 }
 
 WRITE8_MEMBER(superqix_state::superqix_0410_w)
 {
+	/*
+	 ------10  tile bank
+	 -----2--  bitmap page select
+	 ----3---  nmi enable/disable
+	 --54----  rom bank
+	*/
+	if (data&0xc0) logerror("%04x: superqix_0410_w with invalid high bits: %02x\n",space.device().safe_pc(),data);
 	/* bits 0-1 select the tile bank */
 	if (m_gfxbank != (data & 0x03))
 	{
@@ -150,10 +157,11 @@ WRITE8_MEMBER(superqix_state::superqix_0410_w)
 	}
 
 	/* bit 2 selects which of the two bitmaps to display (for 2 players game) */
-	m_show_bitmap = (data & 0x04) >> 2;
+	m_show_bitmap = BIT(data,2);
 
 	/* bit 3 enables NMI */
-	m_nmi_mask = data & 0x08;
+	m_nmi_mask = BIT(data,3);
+	//if (!(m_nmi_mask)) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // test for later, could this explain the need for 4 NMIs per frame instead of one? Is the game manually retriggering NMI using the mask register, several times during the vblank period?
 
 	/* bits 4-5 control ROM bank */
 	membank("bank1")->set_entry((data & 0x30) >> 4);

@@ -176,7 +176,7 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, nullptr, *ADDRESS_MAP_NAME(ef9365)),
 	m_charset(*this, "ef9365"),
-	m_palette(*this),
+	m_palette(*this, finder_base::DUMMY_TAG),
 	m_irq_handler(*this)
 {
 	clock_freq = clock;

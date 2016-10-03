@@ -876,6 +876,38 @@ void myarc_hfdc_device::device_start()
 	// The HFDC does not use READY; it has on-board RAM for DMA
 	m_current_floppy = nullptr;
 	m_current_harddisk = nullptr;
+
+	// Parent class members
+	save_item(NAME(m_senila));
+	save_item(NAME(m_senilb));
+	save_item(NAME(m_selected));
+	save_item(NAME(m_genmod));
+	save_item(NAME(m_cru_base));
+	save_item(NAME(m_select_mask));
+	save_item(NAME(m_select_value));
+
+	// Own members
+	save_item(NAME(m_see_switches));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_dip));
+	save_item(NAME(m_motor_running));
+	save_item(NAME(m_inDsrArea));
+	save_item(NAME(m_HDCsel));
+	save_item(NAME(m_RTCsel));
+	save_item(NAME(m_tapesel));
+	save_item(NAME(m_RAMsel));
+	save_item(NAME(m_ROMsel));
+	save_item(NAME(m_address));
+	save_item(NAME(m_wait_for_hd1));
+	save_item(NAME(m_rom_page));
+	save_pointer(NAME(m_ram_page),4);
+	save_item(NAME(m_status_latch));
+	save_item(NAME(m_dma_address));
+	save_item(NAME(m_output1_latch));
+	save_item(NAME(m_output2_latch));
+	save_item(NAME(m_lastval));
+	save_item(NAME(m_MOTOR_ON));
+	save_item(NAME(m_readyflags));
 }
 
 void myarc_hfdc_device::device_reset()
@@ -987,22 +1019,22 @@ INPUT_PORTS_START( ti99_hfdc )
 		PORT_DIPSETTING( 0x1f00, "1F00" )
 
 	PORT_START( "HFDCDIP" )
-	PORT_DIPNAME( 0x0c, 0x00, "HFDC drive 1 config" )
+	PORT_DIPNAME( 0x0c, 0x08, "HFDC drive 1 config" )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
 		PORT_DIPSETTING( 0x08, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x04, "80 track, 2 ms")
 		PORT_DIPSETTING( 0x0c, "80 track HD, 2 ms")
-	PORT_DIPNAME( 0x03, 0x00, "HFDC drive 2 config" )
+	PORT_DIPNAME( 0x03, 0x02, "HFDC drive 2 config" )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
 		PORT_DIPSETTING( 0x02, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x01, "80 track, 2 ms")
 		PORT_DIPSETTING( 0x03, "80 track HD, 2 ms")
-	PORT_DIPNAME( 0xc0, 0x00, "HFDC drive 3 config" )
+	PORT_DIPNAME( 0xc0, 0x80, "HFDC drive 3 config" )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
 		PORT_DIPSETTING( 0x80, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x40, "80 track, 2 ms")
 		PORT_DIPSETTING( 0xc0, "80 track HD, 2 ms")
-	PORT_DIPNAME( 0x30, 0x00, "HFDC drive 4 config" )
+	PORT_DIPNAME( 0x30, 0x20, "HFDC drive 4 config" )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
 		PORT_DIPSETTING( 0x20, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x10, "80 track, 2 ms")

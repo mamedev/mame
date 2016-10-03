@@ -46,7 +46,7 @@ public:
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_soundlatch(*this, "soundlatch"),
-		m_key(*this, "KEY"),
+		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_audiocpu(*this, "audiocpu"),
 		m_bank1(*this, "bank1")

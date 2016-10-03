@@ -61,22 +61,7 @@ private:
 	required_device<beep_device> m_speaker;
 	required_device<i8243_device> m_i8243;
 
-	required_ioport m_kbd0;
-	required_ioport m_kbd1;
-	required_ioport m_kbd2;
-	required_ioport m_kbd3;
-	required_ioport m_kbd4;
-	required_ioport m_kbd5;
-	required_ioport m_kbd6;
-	required_ioport m_kbd7;
-	required_ioport m_kbd8;
-	required_ioport m_kbd9;
-	required_ioport m_kbd10;
-	required_ioport m_kbd11;
-	required_ioport m_kbd12;
-	required_ioport m_kbd13;
-	required_ioport m_kbd14;
-	required_ioport m_kbd15;
+	required_ioport_array<16> m_kbd;
 
 	int m_keylatch;                 // keyboard row latch
 	UINT8 m_p1;

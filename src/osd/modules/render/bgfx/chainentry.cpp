@@ -55,7 +55,7 @@ bgfx_chain_entry::~bgfx_chain_entry()
 	delete m_clear;
 }
 
-void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
+void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
 {
 	bgfx::setViewSeq(view, true);
 
@@ -73,7 +73,7 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 	put_screen_buffer(prim, &buffer);
 	bgfx::setVertexBuffer(&buffer);
 
-	setup_auto_uniforms(prim, textures, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, screen);
+	setup_auto_uniforms(prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, screen);
 
 	for (bgfx_entry_uniform* uniform : m_uniforms)
 	{
@@ -137,6 +137,16 @@ void bgfx_chain_entry::setup_screenoffset_uniforms(float screen_offset_x, float 
 	}
 }
 
+void bgfx_chain_entry::setup_screencount_uniforms(uint16_t screen_count)
+{
+	bgfx_uniform* u_screen_count = m_effect->uniform("u_screen_count");
+	if (u_screen_count != nullptr)
+	{
+		float values[1] = { float(screen_count) };
+		u_screen_count->set(values, sizeof(float));
+	}
+}
+
 void bgfx_chain_entry::setup_sourcesize_uniform(render_primitive* prim) const
 {
 	bgfx_uniform* source_dims = m_effect->uniform("u_source_dims");
@@ -157,6 +167,20 @@ void bgfx_chain_entry::setup_targetsize_uniform(int32_t screen) const
 		{
 			float values[2] = { float(output->width()), float(output->height()) };
 			target_dims->set(values, sizeof(float) * 2);
+		}
+	}
+}
+
+void bgfx_chain_entry::setup_targetscale_uniform(int32_t screen) const
+{
+	bgfx_uniform* target_scale = m_effect->uniform("u_target_scale");
+	if (target_scale != nullptr)
+	{
+		bgfx_target* output = m_targets.target(screen, m_output);
+		if (output != nullptr)
+		{
+			float values[2] = { float(output->scale()), float(output->scale()) };
+			target_scale->set(values, sizeof(float) * 2);
 		}
 	}
 }
@@ -201,13 +225,15 @@ void bgfx_chain_entry::setup_screenindex_uniform(int32_t screen) const
 	}
 }
 
-void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
+void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
 {
 	setup_screensize_uniforms(textures, screen_width, screen_height, screen);
 	setup_screenscale_uniforms(screen_scale_x, screen_scale_y);
 	setup_screenoffset_uniforms(screen_offset_x, screen_offset_y);
+	setup_screencount_uniforms(screen_count);
 	setup_sourcesize_uniform(prim);
 	setup_targetsize_uniform(screen);
+	setup_targetscale_uniform(screen);
 	setup_rotationtype_uniform(rotation_type);
 	setup_swapxy_uniform(swap_xy);
 	setup_quaddims_uniform(prim);

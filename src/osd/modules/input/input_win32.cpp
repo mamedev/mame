@@ -20,7 +20,6 @@
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -39,8 +38,8 @@ class win32_keyboard_device : public event_based_device<KeyPressEventArgs>
 public:
 	keyboard_state keyboard;
 
-	win32_keyboard_device(running_machine& machine, const char *name, input_module &module)
-		: event_based_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
+	win32_keyboard_device(running_machine& machine, const char *name, const char *id, input_module &module)
+		: event_based_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
 			keyboard({{0}})
 	{
 	}
@@ -74,7 +73,7 @@ public:
 	virtual void input_init(running_machine &machine) override
 	{
 		// Add a single win32 keyboard device that we'll monitor using Win32
-		win32_keyboard_device *devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", *this);
+		win32_keyboard_device *devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", "Win32 Keyboard 1", *this);
 
 		keyboard_trans_table &table = keyboard_trans_table::instance();
 
@@ -104,8 +103,12 @@ public:
 			case INPUT_EVENT_KEYDOWN:
 			case INPUT_EVENT_KEYUP:
 				args = static_cast<KeyPressEventArgs*>(eventdata);
-				for (int i = 0; i < devicelist()->size(); i++)
-					downcast<win32_keyboard_device*>(devicelist()->at(i))->queue_events(args, 1);
+				devicelist()->for_each_device([args](auto device)
+				{
+					auto keyboard = dynamic_cast<win32_keyboard_device*>(device);
+					if (keyboard != nullptr)
+						keyboard->queue_events(args, 1);
+				});
 
 				return true;
 
@@ -130,8 +133,8 @@ public:
 	mouse_state         mouse;
 	win32_mouse_state   win32_mouse;
 
-	win32_mouse_device(running_machine& machine, const char *name, input_module &module)
-		: event_based_device(machine, name, DEVICE_CLASS_MOUSE, module),
+	win32_mouse_device(running_machine& machine, const char *name, const char *id, input_module &module)
+		: event_based_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
 			mouse({0}),
 			win32_mouse({{0}})
 	{
@@ -203,7 +206,7 @@ public:
 			return;
 
 		// allocate a device
-		devinfo = devicelist()->create_device<win32_mouse_device>(machine, "Win32 Mouse 1", *this);
+		devinfo = devicelist()->create_device<win32_mouse_device>(machine, "Win32 Mouse 1", "Win32 Mouse 1", *this);
 		if (devinfo == nullptr)
 			return;
 
@@ -234,8 +237,12 @@ public:
 			return false;
 
 		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
-		for (int i = 0; i < devicelist()->size(); i++)
-			downcast<win32_mouse_device*>(devicelist()->at(i))->queue_events(args, 1);
+		devicelist()->for_each_device([args](auto device)
+		{
+			auto mouse = dynamic_cast<win32_mouse_device*>(device);
+			if (mouse != nullptr)
+				mouse->queue_events(args, 1);
+		});
 
 		return true;
 	}
@@ -254,8 +261,8 @@ private:
 public:
 	mouse_state     mouse;
 
-	win32_lightgun_device(running_machine& machine, const char *name, input_module &module)
-		: event_based_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
+	win32_lightgun_device(running_machine& machine, const char *name, const char *id, input_module &module)
+		: event_based_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module),
 			m_lightgun_shared_axis_mode(FALSE),
 			m_gun_index(0),
 			mouse({0})
@@ -386,7 +393,7 @@ public:
 			int axisnum, butnum;
 
 			// allocate a device
-			devinfo = devicelist()->create_device<win32_lightgun_device>(machine, gun_names[gunnum], *this);
+			devinfo = devicelist()->create_device<win32_lightgun_device>(machine, gun_names[gunnum], gun_names[gunnum], *this);
 			if (devinfo == nullptr)
 				break;
 
@@ -417,8 +424,13 @@ public:
 		if (!input_enabled() || !lightgun_enabled() || eventid != INPUT_EVENT_MOUSE_BUTTON)
 			return false;
 
-		for (int i = 0; i < devicelist()->size(); i++)
-			downcast<win32_lightgun_device*>(devicelist()->at(i))->queue_events(static_cast<MouseButtonEventArgs*>(eventdata), 1);
+		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
+		devicelist()->for_each_device([args](auto device)
+		{
+			auto lightgun = dynamic_cast<win32_lightgun_device*>(device);
+			if (lightgun != nullptr)
+				lightgun->queue_events(args, 1);
+		});
 
 		return true;
 	}

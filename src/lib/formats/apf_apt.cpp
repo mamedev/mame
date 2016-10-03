@@ -195,12 +195,12 @@ static const struct CassetteLegacyWaveFiller apf_cpf_fill_intf =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t apf_cpf_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error apf_cpf_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &apf_cpf_fill_intf);
 }
 
-static casserr_t apf_cpf_load(cassette_image *cassette)
+static cassette_image::error apf_cpf_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &apf_cpf_fill_intf);
 }
@@ -226,12 +226,12 @@ static const struct CassetteLegacyWaveFiller apf_apt_fill_intf =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t apf_apt_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error apf_apt_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &apf_apt_fill_intf);
 }
 
-static casserr_t apf_apt_load(cassette_image *cassette)
+static cassette_image::error apf_apt_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &apf_apt_fill_intf);
 }

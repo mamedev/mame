@@ -135,7 +135,7 @@ WRITE32_MEMBER(simpl156_state::simpl156_eeprom_w)
 
 	//okibank = data & 0x07;
 
-	m_okimusic->set_bank_base(0x40000 * (data & 0x7));
+	m_okimusic->set_rom_bank(data & 0x7);
 
 	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(BIT(data, 4));

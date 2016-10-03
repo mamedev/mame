@@ -20,7 +20,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_gfxrombank(*this, "gfxrombank"),
 		m_fixram(*this, "fixram"),
-		m_videoram(*this, "videoram"),
+		m_videoram(*this, "videoram.%u", 0),
 		m_zipram(*this, "zipram"),
 		m_sprite_gfx_ram(*this, "sprite_gfx_ram"),
 		m_gfxrom(*this, "gfxrom") { }

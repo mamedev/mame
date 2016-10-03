@@ -263,11 +263,11 @@ private:
 	int     m_keyboard_column;
 
 	// READY handling
-	line_state m_ready_old;
+	int m_ready_old;
 
 	// Latch for 9901 INT2, INT1 lines
-	line_state  m_int1;
-	line_state  m_int2;
+	int  m_int1;
+	int  m_int2;
 
 	// Connected devices
 	required_device<tms9995_device>     m_cpu;
@@ -689,6 +689,11 @@ MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 	// Need to configure the speech ROM for inverse bit order
 	speechrom_device* mem = subdevice<speechrom_device>(SPEECHROM_REG);
 	mem->set_reverse_bit_order(true);
+
+	save_item(NAME(m_keyboard_column));
+	save_item(NAME(m_ready_old));
+	save_item(NAME(m_int1));
+	save_item(NAME(m_int2));
 }
 
 MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
@@ -742,6 +747,14 @@ static MACHINE_CONFIG_START( ti99_8, ti99_8_state )
 	MCFG_GROMPORT8_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, system_grom_ready) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_8_state, console_reset) )
+
+	// RAM
+	MCFG_RAM_ADD(SRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+	MCFG_RAM_ADD(DRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")

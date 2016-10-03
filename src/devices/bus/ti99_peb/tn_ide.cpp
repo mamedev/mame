@@ -306,6 +306,16 @@ void nouspikel_ide_interface_device::device_start()
 {
 	m_rtc = subdevice<rtc65271_device>("ide_rtc");
 	m_sram_enable_dip = false; // TODO: what is this?
+
+	save_item(NAME(m_ata_irq));
+	save_item(NAME(m_cru_register));
+	save_item(NAME(m_clk_irq));
+	save_item(NAME(m_sram_enable));
+	save_item(NAME(m_sram_enable_dip));
+	save_item(NAME(m_cur_page));
+	save_item(NAME(m_tms9995_mode));
+	save_item(NAME(m_input_latch));
+	save_item(NAME(m_output_latch));
 }
 
 void nouspikel_ide_interface_device::device_reset()

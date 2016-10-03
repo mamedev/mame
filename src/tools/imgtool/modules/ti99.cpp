@@ -3877,7 +3877,7 @@ enum
 	dsk_createopts_density = 'F'
 };
 
-static OPTION_GUIDE_START( dsk_create_optionguide )
+OPTION_GUIDE_START( dsk_create_optionguide )
 	OPTION_STRING(dsk_createopts_volname, "label",  "Volume name" )
 	OPTION_INT(dsk_createopts_sides, "sides", "Sides" )
 	OPTION_INT(dsk_createopts_tracks, "tracks", "Tracks" )
@@ -3929,7 +3929,7 @@ void ti99_old_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoo
 		case IMGTOOLINFO_STR_DESCRIPTION:           strcpy(info->s = imgtool_temp_str(), "TI99 Diskette (old MESS format)"); break;
 		case IMGTOOLINFO_PTR_OPEN:                  info->open = dsk_image_init_mess; break;
 		case IMGTOOLINFO_PTR_CREATE:                info->create = dsk_image_create_mess; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = dsk_create_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = &dsk_create_optionguide; break;
 		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:   strcpy(info->s = imgtool_temp_str(), dsk_create_optionspecs); break;
 		default:                                    ti99_dsk_getinfo(imgclass, state, info); break;
 	}
@@ -3943,7 +3943,7 @@ void ti99_v9t9_get_info(const imgtool_class *imgclass, UINT32 state, union imgto
 		case IMGTOOLINFO_STR_DESCRIPTION:           strcpy(info->s = imgtool_temp_str(), "TI99 Diskette (V9T9 format)"); break;
 		case IMGTOOLINFO_PTR_OPEN:                  info->open = dsk_image_init_v9t9; break;
 		case IMGTOOLINFO_PTR_CREATE:                info->create = dsk_image_create_v9t9; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = dsk_create_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = &dsk_create_optionguide; break;
 		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:   strcpy(info->s = imgtool_temp_str(), dsk_create_optionspecs); break;
 		default:                                    ti99_dsk_getinfo(imgclass, state, info); break;
 	}
@@ -5244,7 +5244,7 @@ static imgtoolerr_t dsk_image_create(imgtool_image *image, imgtool_stream *f, ut
 	l1_img.file_handle = f;
 
 	/* read options */
-	volname = createoptions->lookup_string(dsk_createopts_volname);
+	volname = createoptions->lookup_string(dsk_createopts_volname).c_str();
 	l1_img.geometry.heads = createoptions->lookup_int(dsk_createopts_sides);
 	l1_img.geometry.cylinders = createoptions->lookup_int(dsk_createopts_tracks);
 	l1_img.geometry.secspertrack = createoptions->lookup_int(dsk_createopts_sectors);

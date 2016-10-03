@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:James Wallace
+// thanks-to:Chris Wren, Tony Friery, MFME
 /* MPU4 hardware emulation
   for sets see the various includes prefixed 'mpu4'
 */
@@ -14,7 +15,10 @@
 */
 
 /***********************************************************************************************************
-  Barcrest MPU4 highly preliminary driver by J.Wallace, and Anonymous.
+  Barcrest MPU4 highly preliminary driver.
+  MAME Driver J. Wallace and Haze
+
+  Thanks to Chris Wren and MFME for documentation.
 
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
@@ -252,8 +256,8 @@ TODO: - Distinguish door switches using manual
       start modelling the individual hysteresis curves of filament lamps.
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
       - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
-	  
-	  - Per game inputs not currently supported, may need to do something about DIPs, inverted lines etc.
+
+      - Per game inputs not currently supported, may need to do something about DIPs, inverted lines etc.
 ***********************************************************************************************************/
 #include "emu.h"
 
@@ -381,39 +385,39 @@ void mpu4_state::update_meters()
 	case FIVE_REEL_5TO8:
 		m_reel4->update(((data >> 4) & 0x0f));
 		data = (data & 0x0F); //Strip reel data from meter drives, leaving active elements
-		awp_draw_reel(machine(),"reel5", m_reel4);
+		awp_draw_reel(machine(),"reel5", *m_reel4);
 		break;
 
 	case FIVE_REEL_8TO5:
 		m_reel4->update((((data & 0x01) + ((data & 0x08) >> 2) + ((data & 0x20) >> 3) + ((data & 0x80) >> 4)) & 0x0f)) ;
 		data = 0x00; //Strip all reel data from meter drives, nothing is connected
-		awp_draw_reel(machine(),"reel5", m_reel4);
+		awp_draw_reel(machine(),"reel5", *m_reel4);
 		break;
 
 	case FIVE_REEL_3TO6:
 		m_reel4->update(((data >> 2) & 0x0f));
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel(machine(),"reel5", m_reel4);
+		awp_draw_reel(machine(),"reel5", *m_reel4);
 		break;
 
 	case SIX_REEL_1TO8:
 		m_reel4->update( data       & 0x0f);
 		m_reel5->update((data >> 4) & 0x0f);
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel(machine(),"reel5", m_reel4);
-		awp_draw_reel(machine(),"reel6", m_reel5);
+		awp_draw_reel(machine(),"reel5", *m_reel4);
+		awp_draw_reel(machine(),"reel6", *m_reel5);
 		break;
 
 	case SIX_REEL_5TO8:
 		m_reel4->update(((data >> 4) & 0x0f));
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel(machine(),"reel5", m_reel4);
+		awp_draw_reel(machine(),"reel5", *m_reel4);
 		break;
 
 	case SEVEN_REEL:
 		m_reel0->update((((data & 0x01) + ((data & 0x08) >> 2) + ((data & 0x20) >> 3) + ((data & 0x80) >> 4)) & 0x0f)) ;
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel(machine(),"reel1", m_reel0);
+		awp_draw_reel(machine(),"reel1", *m_reel0);
 		break;
 
 	case FLUTTERBOX: //The backbox fan assembly fits in a reel unit sized box, wired to the remote meter pin, so we can handle it here
@@ -912,16 +916,16 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 	{
 		m_reel4->update( data      &0x0F);
 		m_reel5->update((data >> 4)&0x0F);
-		awp_draw_reel(machine(),"reel5", m_reel4);
-		awp_draw_reel(machine(),"reel6", m_reel5);
+		awp_draw_reel(machine(),"reel5", *m_reel4);
+		awp_draw_reel(machine(),"reel6", *m_reel5);
 	}
 	else
 	if (m_reel_mux == SEVEN_REEL)
 	{
 		m_reel1->update( data      &0x0F);
 		m_reel2->update((data >> 4)&0x0F);
-		awp_draw_reel(machine(),"reel2", m_reel1);
-		awp_draw_reel(machine(),"reel3", m_reel2);
+		awp_draw_reel(machine(),"reel2", *m_reel1);
+		awp_draw_reel(machine(),"reel3", *m_reel2);
 	}
 
 	if (core_stricmp(machine().system().name, "m4gambal") == 0)
@@ -1145,15 +1149,15 @@ WRITE8_MEMBER(mpu4_state::pia_ic6_portb_w)
 	{
 		m_reel3->update( data      &0x0F);
 		m_reel4->update((data >> 4)&0x0F);
-		awp_draw_reel(machine(),"reel4", m_reel3);
-		awp_draw_reel(machine(),"reel5", m_reel4);
+		awp_draw_reel(machine(),"reel4", *m_reel3);
+		awp_draw_reel(machine(),"reel5", *m_reel4);
 	}
 	else if (m_reels)
 	{
 		m_reel0->update( data      &0x0F);
 		m_reel1->update((data >> 4)&0x0F);
-		awp_draw_reel(machine(),"reel1", m_reel0);
-		awp_draw_reel(machine(),"reel2", m_reel1);
+		awp_draw_reel(machine(),"reel1", *m_reel0);
+		awp_draw_reel(machine(),"reel2", *m_reel1);
 	}
 }
 
@@ -1201,15 +1205,15 @@ WRITE8_MEMBER(mpu4_state::pia_ic7_porta_w)
 	{
 		m_reel5->update( data      &0x0F);
 		m_reel6->update((data >> 4)&0x0F);
-		awp_draw_reel(machine(),"reel6", m_reel5);
-		awp_draw_reel(machine(),"reel7", m_reel7);
+		awp_draw_reel(machine(),"reel6", *m_reel5);
+		awp_draw_reel(machine(),"reel7", *m_reel7);
 	}
 	else if (m_reels)
 	{
 		m_reel2->update( data      &0x0F);
 		m_reel3->update((data >> 4)&0x0F);
-		awp_draw_reel(machine(),"reel3", m_reel2);
-		awp_draw_reel(machine(),"reel4", m_reel3);
+		awp_draw_reel(machine(),"reel3", *m_reel2);
+		awp_draw_reel(machine(),"reel4", *m_reel3);
 	}
 }
 
@@ -2648,7 +2652,7 @@ ADDRESS_MAP_END
 	MCFG_STEPPER_END_INDEX(2)\
 	MCFG_STEPPER_INDEX_PATTERN(0x00)\
 	MCFG_STEPPER_INIT_PHASE(2)
-	
+
 #define MCFG_MPU4_BWB_REEL_ADD(_tag)\
 	MCFG_STEPPER_ADD(_tag)\
 	MCFG_STEPPER_REEL_TYPE(BARCREST_48STEP_REEL)\

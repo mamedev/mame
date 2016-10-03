@@ -1,26 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, Robbbert
-/***************************************************************************
+/******************************************************************************************************
 
-        Protec Pro-80
+Protec Pro-80
 
-        06/12/2009 Skeleton driver.
+2009-12-09 Skeleton driver.
 
-        TODO:
-        - Cassette load/save
-        - Use messram for optional ram
-        - Fix Step command (don't works due of missing interrupt emulation)
+TODO:
+- Cassette load
+- Use messram for optional ram
+- Fix Step command (don't works due of missing interrupt emulation)
 
-The unit has a PIO, ports 40-43, but it was for expansion only.
+The cassette uses 2 bits for input, plus a D flipflop and a 74LS221 oneshot, with the pulse width set
+  by 0.02uf and 24k (= 336 usec). The pulse is started by a H->L transistion of the input. At the end
+  of the pulse, the current input is passed through the flipflop.
 
-The cassette used 2 bits for input, plus a D flipflop and a 74LS221 oneshot.
-
-
-****************************************************************************/
+******************************************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "pro80.lh"
@@ -29,22 +29,41 @@ class pro80_state : public driver_device
 {
 public:
 	pro80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass(*this, "cassette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_WRITE8_MEMBER(segment_w);
+	DECLARE_READ8_MEMBER(kp_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+
+private:
+	UINT8 m_digit_sel;
+	UINT8 m_cass_in;
+	UINT16 m_cass_data[4];
+	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	void machine_reset() override;
-
-	DECLARE_WRITE8_MEMBER( digit_w );
-	DECLARE_WRITE8_MEMBER( segment_w );
-	DECLARE_READ8_MEMBER( kp_r );
-
-	UINT8 m_digit_sel;
 };
 
+// This can read the first few bytes correctly, but after that bit slippage occurs.
+// Needs to be reworked
+TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::timer_p )
+{
+	m_cass_data[1]++;
+	UINT8 cass_ws = ((m_cass)->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cass_in = ((m_cass_data[1] < 0x0d) ? 0x10 : 0); // data bit
+		m_cass_data[1] = 0;
+	}
+	if (m_cass_data[1] < 5)
+		m_cass_in |= 0x20; // sync bit
+}
 
 WRITE8_MEMBER( pro80_state::digit_w )
 {
@@ -52,6 +71,7 @@ WRITE8_MEMBER( pro80_state::digit_w )
 	// -x-- ---- cassette out
 	// x--- ---- ???
 	m_digit_sel = data & 0x3f;
+	m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
 }
 
 WRITE8_MEMBER( pro80_state::segment_w )
@@ -64,7 +84,6 @@ WRITE8_MEMBER( pro80_state::segment_w )
 		if (!BIT(m_digit_sel, 3)) output().set_digit_value(3, data);
 		if (!BIT(m_digit_sel, 4)) output().set_digit_value(4, data);
 		if (!BIT(m_digit_sel, 5)) output().set_digit_value(5, data);
-		m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
 
 		m_digit_sel = 0;
 	}
@@ -81,8 +100,7 @@ READ8_MEMBER( pro80_state::kp_r )
 	if (!BIT(m_digit_sel, 4)) data &= ioport("LINE4")->read();
 	if (!BIT(m_digit_sel, 5)) data &= ioport("LINE5")->read();
 
-	// cassette-in bits go here - bit 4 = sync bit, bit 5 = data bit
-	return data;
+	return data | m_cass_in | 0xc0;
 }
 
 static ADDRESS_MAP_START( pro80_mem, AS_PROGRAM, 8, pro80_state )
@@ -95,7 +113,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pro80_io, AS_IO, 8, pro80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x40, 0x43) Z80PIO
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pio", z80pio_device, read, write)
 	AM_RANGE(0x44, 0x47) AM_READ(kp_r)
 	AM_RANGE(0x48, 0x4b) AM_WRITE(digit_w)
 	AM_RANGE(0x4c, 0x4f) AM_WRITE(segment_w)
@@ -138,11 +156,12 @@ INPUT_PORTS_END
 void pro80_state::machine_reset()
 {
 	m_digit_sel = 0;
+	m_cass_in = 0;
 }
 
 static MACHINE_CONFIG_START( pro80, pro80_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pro80_mem)
 	MCFG_CPU_IO_MAP(pro80_io)
 
@@ -152,10 +171,12 @@ static MACHINE_CONFIG_START( pro80, pro80_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz / 2)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", pro80_state, timer_p, attotime::from_hz(40000)) // cass read
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -167,5 +188,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1981, pro80,  0,      0,       pro80,     pro80, driver_device,   0,      "Protec",   "Pro-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT    COMPANY     FULLNAME       FLAGS */
+COMP( 1981, pro80,  0,      0,       pro80,     pro80, driver_device,   0,   "Protec",   "Pro-80", MACHINE_NOT_WORKING )

@@ -17,18 +17,18 @@ bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, u
 	, m_height(height)
 {
 	bgfx::TextureInfo info;
-	bgfx::calcTextureSize(info, width, height, 1, false, 1, format);
+	bgfx::calcTextureSize(info, width, height, 1, false, false, 1, format);
 	if (data != nullptr)
 	{
-		m_texture = bgfx::createTexture2D(width, height, 1, format, flags, bgfx::copy(data, info.storageSize));
+		m_texture = bgfx::createTexture2D(width, height, false, 1, format, flags, bgfx::copy(data, info.storageSize));
 	}
 	else
 	{
-		m_texture = bgfx::createTexture2D(width, height, 1, format, flags);
+		m_texture = bgfx::createTexture2D(width, height, false, 1, format, flags);
 
 		const bgfx::Memory* memory = bgfx::alloc(info.storageSize);
 		memset(memory->data, 0, info.storageSize);
-		bgfx::updateTexture2D(m_texture, 0, 0, 0, width, height, memory, info.storageSize / height);
+		bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, width, height, memory, info.storageSize / height);
 	}
 }
 
@@ -39,8 +39,8 @@ bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, u
 	, m_height(height)
 {
 	bgfx::TextureInfo info;
-	bgfx::calcTextureSize(info, width, height, 1, false, 1, format);
-	m_texture = bgfx::createTexture2D(width, height, 1, format, flags, data);
+	bgfx::calcTextureSize(info, width, height, 1, false, false, 1, format);
+	m_texture = bgfx::createTexture2D(width, height, false, 1, format, flags, data);
 }
 
 bgfx_texture::~bgfx_texture()

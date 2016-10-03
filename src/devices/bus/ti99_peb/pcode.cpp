@@ -273,6 +273,16 @@ void ti_pcode_card_device::device_start()
 	m_grom[6] = downcast<tmc0430_device*>(subdevice(PGROM6_TAG));
 	m_grom[7] = downcast<tmc0430_device*>(subdevice(PGROM7_TAG));
 	m_rom = memregion(PCODE_ROM_TAG)->base();
+
+	save_item(NAME(m_bank_select));
+	save_item(NAME(m_active));
+	save_item(NAME(m_clock_count));
+	save_item(NAME(m_clockhigh));
+	save_item(NAME(m_inDsrArea));
+	save_item(NAME(m_isrom0));
+	save_item(NAME(m_isrom12));
+	save_item(NAME(m_isgrom));
+	save_item(NAME(m_address));
 }
 
 void ti_pcode_card_device::device_reset()

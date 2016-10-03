@@ -153,18 +153,9 @@ Notes:
 #include "bus/rs232/rs232.h"
 #include "softlist.h"
 
-void v1050_state::set_interrupt(UINT8 mask, int state)
+void v1050_state::set_interrupt(int line, int state)
 {
-	if (state)
-	{
-		m_int_state |= mask;
-	}
-	else
-	{
-		m_int_state &= ~mask;
-	}
-
-	m_pic->r_w(~(m_int_state & m_int_mask));
+	m_pic->r_w(line, (m_int_mask & (1 << state)) ? 0 : 1);
 }
 
 void v1050_state::bankswitch()
@@ -989,7 +980,6 @@ void v1050_state::machine_start()
 
 	// register for state saving
 	save_item(NAME(m_int_mask));
-	save_item(NAME(m_int_state));
 	save_item(NAME(m_f_int_enb));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));

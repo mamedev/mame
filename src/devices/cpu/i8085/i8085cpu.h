@@ -124,24 +124,24 @@
 
 /* i/o */
 #define M_IN \
-	m_STATUS = 0x42; \
+	set_status(0x42); \
 	m_WZ.d=ARG(); \
 	m_AF.b.h=m_io->read_byte(m_WZ.d);
 
 #define M_OUT \
-	m_STATUS = 0x10; \
+	set_status(0x10); \
 	m_WZ.d=ARG(); \
 	m_io->write_byte(m_WZ.d,m_AF.b.h)
 
 /* stack */
 #define M_PUSH(R) { \
-	m_STATUS = 0x04; \
+	set_status(0x04); \
 	m_program->write_byte(--m_SP.w.l, m_##R.b.h); \
 	m_program->write_byte(--m_SP.w.l, m_##R.b.l); \
 }
 
 #define M_POP(R) { \
-	m_STATUS = 0x86; \
+	set_status(0x86); \
 	m_##R.b.l = m_program->read_byte(m_SP.w.l++); \
 	m_##R.b.h = m_program->read_byte(m_SP.w.l++); \
 }

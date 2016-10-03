@@ -19,7 +19,7 @@ by Roberto Ierusalimschy, Luiz Henrique de Figueiredo, Waldemar Celes
 
 <P>
 <SMALL>
-Copyright &copy; 2015 Lua.org, PUC-Rio.
+Copyright &copy; 2015&ndash;2016 Lua.org, PUC-Rio.
 Freely available under the terms of the
 <a href="http://www.lua.org/license.html">Lua license</a>.
 </SMALL>
@@ -35,7 +35,7 @@ Freely available under the terms of the
 <!-- ====================================================================== -->
 <p>
 
-<!-- $Id: manual.of,v 1.153 2015/11/25 16:57:42 roberto Exp $ -->
+<!-- $Id: manual.of,v 1.162 2016/05/30 15:57:03 roberto Exp $ -->
 
 
 
@@ -43,30 +43,47 @@ Freely available under the terms of the
 <h1>1 &ndash; <a name="1">Introduction</a></h1>
 
 <p>
-Lua is an extension programming language designed to support
-general procedural programming with data description
-facilities.
-Lua also offers good support for object-oriented programming,
-functional programming, and data-driven programming.
-Lua is intended to be used as a powerful, lightweight,
-embeddable scripting language for any program that needs one.
+Lua is a powerful, efficient, lightweight, embeddable scripting language.
+It supports procedural programming,
+object-oriented programming, functional programming,
+data-driven programming, and data description.
+
+
+<p>
+Lua combines simple procedural syntax with powerful data description
+constructs based on associative arrays and extensible semantics.
+Lua is dynamically typed,
+runs by interpreting bytecode with a register-based
+virtual machine,
+and has automatic memory management with
+incremental garbage collection,
+making it ideal for configuration, scripting,
+and rapid prototyping.
+
+
+<p>
 Lua is implemented as a library, written in <em>clean C</em>,
 the common subset of Standard&nbsp;C and C++.
+The Lua distribution includes a host program called <code>lua</code>,
+which uses the Lua library to offer a complete,
+standalone Lua interpreter,
+for interactive or batch use.
+Lua is intended to be used both as a powerful, lightweight,
+embeddable scripting language for any program that needs one,
+and as a powerful but lightweight and efficient stand-alone language.
 
 
 <p>
 As an extension language, Lua has no notion of a "main" program:
-it only works <em>embedded</em> in a host client,
+it works <em>embedded</em> in a host client,
 called the <em>embedding program</em> or simply the <em>host</em>.
+(Frequently, this host is the stand-alone <code>lua</code> program.)
 The host program can invoke functions to execute a piece of Lua code,
 can write and read Lua variables,
 and can register C&nbsp;functions to be called by Lua code.
 Through the use of C&nbsp;functions, Lua can be augmented to cope with
 a wide range of different domains,
 thus creating customized programming languages sharing a syntactical framework.
-The Lua distribution includes a sample host program called <code>lua</code>,
-which uses the Lua library to offer a complete, standalone Lua interpreter,
-for interactive or batch use.
 
 
 <p>
@@ -351,8 +368,8 @@ It is up to the Lua program or its host to handle such error objects.
 When you use <a href="#pdf-xpcall"><code>xpcall</code></a> or <a href="#lua_pcall"><code>lua_pcall</code></a>,
 you may give a <em>message handler</em>
 to be called in case of errors.
-This function is called with the original error message
-and returns a new error message.
+This function is called with the original error object
+and returns a new error object.
 It is called before the error unwinds the stack,
 so that it can gather more information about the error,
 for instance by inspecting the stack and creating a stack traceback.
@@ -382,16 +399,23 @@ Lua calls this function to perform the addition.
 
 
 <p>
-The keys in a metatable are derived from the <em>event</em> names;
+The key for each event in a metatable is a string
+with the event name prefixed by two underscores;
 the corresponding values are called <em>metamethods</em>.
-In the previous example, the event is <code>"add"</code>
+In the previous example, the key is "<code>__add</code>"
 and the metamethod is the function that performs the addition.
 
 
 <p>
 You can query the metatable of any value
 using the <a href="#pdf-getmetatable"><code>getmetatable</code></a> function.
+Lua queries metamethods in metatables using a raw access (see <a href="#pdf-rawget"><code>rawget</code></a>).
+So, to retrieve the metamethod for event <code>ev</code> in object <code>o</code>,
+Lua does the equivalent to the following code:
 
+<pre>
+     rawget(getmetatable(<em>o</em>) or {}, "__<em>ev</em>")
+</pre>
 
 <p>
 You can replace the metatable of tables
@@ -420,18 +444,7 @@ when a userdata or a table is garbage collected (<a href="#2.5">&sect;2.5</a>).
 
 
 <p>
-A detailed list of events controlled by metatables is given next.
-Each operation is identified by its corresponding event name.
-The key for each event is a string with its name prefixed by
-two underscores, '<code>__</code>';
-for instance, the key for operation "add" is the
-string "<code>__add</code>".
-Note that queries for metamethods are always raw;
-the access to a metamethod does not invoke other metamethods.
-
-
-<p>
-For the unary operators (negation, length, and bitwise not),
+For the unary operators (negation, length, and bitwise NOT),
 the metamethod is computed and called with a dummy second operand,
 equal to the first one.
 This extra operand is only to simplify Lua's internals
@@ -440,17 +453,21 @@ and may be removed in future versions.
 (For most uses this extra operand is irrelevant.)
 
 
+<p>
+A detailed list of events controlled by metatables is given next.
+Each operation is identified by its corresponding key.
+
+
 
 <ul>
 
-<li><b>"add": </b>
-the <code>+</code> operation.
-
+<li><b><code>__add</code>: </b>
+the addition (<code>+</code>) operation.
 If any operand for an addition is not a number
 (nor a string coercible to a number),
 Lua will try to call a metamethod.
 First, Lua will check the first operand (even if it is valid).
-If that operand does not define a metamethod for the "<code>__add</code>" event,
+If that operand does not define a metamethod for <code>__add</code>,
 then Lua will check the second operand.
 If Lua can find a metamethod,
 it calls the metamethod with the two operands as arguments,
@@ -461,99 +478,84 @@ Otherwise,
 it raises an error.
 </li>
 
-<li><b>"sub": </b>
-the <code>-</code> operation.
-
-Behavior similar to the "add" operation.
+<li><b><code>__sub</code>: </b>
+the subtraction (<code>-</code>) operation.
+Behavior similar to the addition operation.
 </li>
 
-<li><b>"mul": </b>
-the <code>*</code> operation.
-
-Behavior similar to the "add" operation.
+<li><b><code>__mul</code>: </b>
+the multiplication (<code>*</code>) operation.
+Behavior similar to the addition operation.
 </li>
 
-<li><b>"div": </b>
-the <code>/</code> operation.
-
-Behavior similar to the "add" operation.
+<li><b><code>__div</code>: </b>
+the division (<code>/</code>) operation.
+Behavior similar to the addition operation.
 </li>
 
-<li><b>"mod": </b>
-the <code>%</code> operation.
-
-Behavior similar to the "add" operation.
+<li><b><code>__mod</code>: </b>
+the modulo (<code>%</code>) operation.
+Behavior similar to the addition operation.
 </li>
 
-<li><b>"pow": </b>
-the <code>^</code> (exponentiation) operation.
-
-Behavior similar to the "add" operation.
+<li><b><code>__pow</code>: </b>
+the exponentiation (<code>^</code>) operation.
+Behavior similar to the addition operation.
 </li>
 
-<li><b>"unm": </b>
-the <code>-</code> (unary minus) operation.
-
-Behavior similar to the "add" operation.
+<li><b><code>__unm</code>: </b>
+the negation (unary <code>-</code>) operation.
+Behavior similar to the addition operation.
 </li>
 
-<li><b>"idiv": </b>
-the <code>//</code> (floor division) operation.
-
-Behavior similar to the "add" operation.
+<li><b><code>__idiv</code>: </b>
+the floor division (<code>//</code>) operation.
+Behavior similar to the addition operation.
 </li>
 
-<li><b>"band": </b>
-the <code>&amp;</code> (bitwise and) operation.
-
-Behavior similar to the "add" operation,
+<li><b><code>__band</code>: </b>
+the bitwise AND (<code>&amp;</code>) operation.
+Behavior similar to the addition operation,
 except that Lua will try a metamethod
 if any operand is neither an integer
 nor a value coercible to an integer (see <a href="#3.4.3">&sect;3.4.3</a>).
 </li>
 
-<li><b>"bor": </b>
-the <code>|</code> (bitwise or) operation.
-
-Behavior similar to the "band" operation.
+<li><b><code>__bor</code>: </b>
+the bitwise OR (<code>|</code>) operation.
+Behavior similar to the bitwise AND operation.
 </li>
 
-<li><b>"bxor": </b>
-the <code>~</code> (bitwise exclusive or) operation.
-
-Behavior similar to the "band" operation.
+<li><b><code>__bxor</code>: </b>
+the bitwise exclusive OR (binary <code>~</code>) operation.
+Behavior similar to the bitwise AND operation.
 </li>
 
-<li><b>"bnot": </b>
-the <code>~</code> (bitwise unary not) operation.
-
-Behavior similar to the "band" operation.
+<li><b><code>__bnot</code>: </b>
+the bitwise NOT (unary <code>~</code>) operation.
+Behavior similar to the bitwise AND operation.
 </li>
 
-<li><b>"shl": </b>
-the <code>&lt;&lt;</code> (bitwise left shift) operation.
-
-Behavior similar to the "band" operation.
+<li><b><code>__shl</code>: </b>
+the bitwise left shift (<code>&lt;&lt;</code>) operation.
+Behavior similar to the bitwise AND operation.
 </li>
 
-<li><b>"shr": </b>
-the <code>&gt;&gt;</code> (bitwise right shift) operation.
-
-Behavior similar to the "band" operation.
+<li><b><code>__shr</code>: </b>
+the bitwise right shift (<code>&gt;&gt;</code>) operation.
+Behavior similar to the bitwise AND operation.
 </li>
 
-<li><b>"concat": </b>
-the <code>..</code> (concatenation) operation.
-
-Behavior similar to the "add" operation,
+<li><b><code>__concat</code>: </b>
+the concatenation (<code>..</code>) operation.
+Behavior similar to the addition operation,
 except that Lua will try a metamethod
 if any operand is neither a string nor a number
 (which is always coercible to a string).
 </li>
 
-<li><b>"len": </b>
-the <code>#</code> (length) operation.
-
+<li><b><code>__len</code>: </b>
+the length (<code>#</code>) operation.
 If the object is not a string,
 Lua will try its metamethod.
 If there is a metamethod,
@@ -566,44 +568,40 @@ then Lua uses the table length operation (see <a href="#3.4.7">&sect;3.4.7</a>).
 Otherwise, Lua raises an error.
 </li>
 
-<li><b>"eq": </b>
-the <code>==</code> (equal) operation.
-
-Behavior similar to the "add" operation,
+<li><b><code>__eq</code>: </b>
+the equal (<code>==</code>) operation.
+Behavior similar to the addition operation,
 except that Lua will try a metamethod only when the values
 being compared are either both tables or both full userdata
 and they are not primitively equal.
 The result of the call is always converted to a boolean.
 </li>
 
-<li><b>"lt": </b>
-the <code>&lt;</code> (less than) operation.
-
-Behavior similar to the "add" operation,
+<li><b><code>__lt</code>: </b>
+the less than (<code>&lt;</code>) operation.
+Behavior similar to the addition operation,
 except that Lua will try a metamethod only when the values
 being compared are neither both numbers nor both strings.
 The result of the call is always converted to a boolean.
 </li>
 
-<li><b>"le": </b>
-the <code>&lt;=</code> (less equal) operation.
-
+<li><b><code>__le</code>: </b>
+the less equal (<code>&lt;=</code>) operation.
 Unlike other operations,
 the less-equal operation can use two different events.
-First, Lua looks for the "<code>__le</code>" metamethod in both operands,
-like in the "lt" operation.
+First, Lua looks for the <code>__le</code> metamethod in both operands,
+like in the less than operation.
 If it cannot find such a metamethod,
-then it will try the "<code>__lt</code>" event,
+then it will try the <code>__lt</code> metamethod,
 assuming that <code>a &lt;= b</code> is equivalent to <code>not (b &lt; a)</code>.
 As with the other comparison operators,
 the result is always a boolean.
-(This use of the "<code>__lt</code>" event can be removed in future versions;
-it is also slower than a real "<code>__le</code>" metamethod.)
+(This use of the <code>__lt</code> event can be removed in future versions;
+it is also slower than a real <code>__le</code> metamethod.)
 </li>
 
-<li><b>"index": </b>
+<li><b><code>__index</code>: </b>
 The indexing access <code>table[key]</code>.
-
 This event happens when <code>table</code> is not a table or
 when <code>key</code> is not present in <code>table</code>.
 The metamethod is looked up in <code>table</code>.
@@ -613,16 +611,18 @@ The metamethod is looked up in <code>table</code>.
 Despite the name,
 the metamethod for this event can be either a function or a table.
 If it is a function,
-it is called with <code>table</code> and <code>key</code> as arguments.
+it is called with <code>table</code> and <code>key</code> as arguments,
+and the result of the call
+(adjusted to one value)
+is the result of the operation.
 If it is a table,
 the final result is the result of indexing this table with <code>key</code>.
 (This indexing is regular, not raw,
 and therefore can trigger another metamethod.)
 </li>
 
-<li><b>"newindex": </b>
+<li><b><code>__newindex</code>: </b>
 The indexing assignment <code>table[key] = value</code>.
-
 Like the index event,
 this event happens when <code>table</code> is not a table or
 when <code>key</code> is not present in <code>table</code>.
@@ -641,22 +641,24 @@ and therefore can trigger another metamethod.)
 
 
 <p>
-Whenever there is a "newindex" metamethod,
+Whenever there is a <code>__newindex</code> metamethod,
 Lua does not perform the primitive assignment.
 (If necessary,
 the metamethod itself can call <a href="#pdf-rawset"><code>rawset</code></a>
 to do the assignment.)
 </li>
 
-<li><b>"call": </b>
+<li><b><code>__call</code>: </b>
 The call operation <code>func(args)</code>.
-
 This event happens when Lua tries to call a non-function value
 (that is, <code>func</code> is not a function).
 The metamethod is looked up in <code>func</code>.
 If present,
 the metamethod is called with <code>func</code> as its first argument,
 followed by the arguments of the original call (<code>args</code>).
+All results of the call
+are the result of the operation.
+(This is the only metamethod that allows multiple results.)
 </li>
 
 </ul>
@@ -664,8 +666,17 @@ followed by the arguments of the original call (<code>args</code>).
 <p>
 It is a good practice to add all needed metamethods to a table
 before setting it as a metatable of some object.
-In particular, the "<code>__gc</code>" metamethod works only when this order
+In particular, the <code>__gc</code> metamethod works only when this order
 is followed (see <a href="#2.5.1">&sect;2.5.1</a>).
+
+
+<p>
+Because metatables are regular tables,
+they can contain arbitrary fields,
+not only the event names defined above.
+Some functions in the standard library
+(e.g., <a href="#pdf-tostring"><code>tostring</code></a>)
+use other fields in metatables for their own purposes.
 
 
 
@@ -935,7 +946,7 @@ In case of normal termination,
 <a href="#pdf-coroutine.resume"><code>coroutine.resume</code></a> returns <b>true</b>,
 plus any values returned by the coroutine main function.
 In case of errors, <a href="#pdf-coroutine.resume"><code>coroutine.resume</code></a> returns <b>false</b>
-plus an error message.
+plus an error object.
 
 
 <p>
@@ -1168,7 +1179,7 @@ and the system file functions may have problems with
 some control characters.
 So, it is safer to represent
 non-text data as a quoted literal with
-explicit escape sequences for non-text characters.
+explicit escape sequences for the non-text characters.
 
 
 <p>
@@ -1201,9 +1212,11 @@ which start with <code>0x</code> or <code>0X</code>.
 Hexadecimal constants also accept an optional fractional part
 plus an optional binary exponent,
 marked by a letter '<code>p</code>' or '<code>P</code>'.
-A numeric constant with a fractional dot or an exponent 
+A numeric constant with a radix point or an exponent 
 denotes a float;
-otherwise it denotes an integer.
+otherwise,
+if its value fits in an integer,
+it denotes an integer.
 Examples of valid integer constants are
 
 <pre>
@@ -1794,7 +1807,7 @@ bitwise operators (see <a href="#3.4.2">&sect;3.4.2</a>),
 relational operators (see <a href="#3.4.4">&sect;3.4.4</a>), logical operators (see <a href="#3.4.5">&sect;3.4.5</a>),
 and the concatenation operator (see <a href="#3.4.6">&sect;3.4.6</a>).
 Unary operators comprise the unary minus (see <a href="#3.4.1">&sect;3.4.1</a>),
-the unary bitwise not (see <a href="#3.4.2">&sect;3.4.2</a>),
+the unary bitwise NOT (see <a href="#3.4.2">&sect;3.4.2</a>),
 the unary logical <b>not</b> (see <a href="#3.4.5">&sect;3.4.5</a>),
 and the unary <em>length operator</em> (see <a href="#3.4.7">&sect;3.4.7</a>).
 
@@ -1908,12 +1921,12 @@ that is equal modulo <em>2<sup>64</sup></em> to the mathematical result.)
 Lua supports the following bitwise operators:
 
 <ul>
-<li><b><code>&amp;</code>: </b>bitwise and</li>
-<li><b><code>&#124;</code>: </b>bitwise or</li>
-<li><b><code>~</code>: </b>bitwise exclusive or</li>
+<li><b><code>&amp;</code>: </b>bitwise AND</li>
+<li><b><code>&#124;</code>: </b>bitwise OR</li>
+<li><b><code>~</code>: </b>bitwise exclusive OR</li>
 <li><b><code>&gt;&gt;</code>: </b>right shift</li>
 <li><b><code>&lt;&lt;</code>: </b>left shift</li>
-<li><b><code>~</code>: </b>unary bitwise not</li>
+<li><b><code>~</code>: </b>unary bitwise NOT</li>
 </ul>
 
 <p>
@@ -1981,6 +1994,13 @@ following its syntax and the rules of the Lua lexer.
 Then, the resulting number (float or integer)
 is converted to the type (float or integer) required by the context
 (e.g., the operation that forced the conversion).
+
+
+<p>
+All conversions from strings to numbers 
+accept both a dot and the current locale mark
+as the radix character.
+(The Lua lexer, however, accepts only a dot.)
 
 
 <p>
@@ -2792,7 +2812,7 @@ never returning
 
 <p>
 The panic function runs as if it were a message handler (see <a href="#2.3">&sect;2.3</a>);
-in particular, the error message is at the top of the stack.
+in particular, the error object is at the top of the stack.
 However, there is no guarantee about stack space.
 To push anything on the stack,
 the panic function must first check the available space (see <a href="#4.2">&sect;4.2</a>).
@@ -2974,8 +2994,11 @@ by looking only at its arguments
 The third field, <code>x</code>,
 tells whether the function may raise errors:
 '<code>-</code>' means the function never raises any error;
-'<code>m</code>' means the function may raise memory errors;
-'<code>e</code>' means the function may raise errors;
+'<code>m</code>' means the function may raise out-of-memory errors
+and errors running a <code>__gc</code> metamethod;
+'<code>e</code>' means the function may raise any errors
+(it can run arbitrary Lua code,
+either directly or through metamethods);
 '<code>v</code>' means the function may raise an error on purpose.
 
 
@@ -3102,10 +3125,10 @@ The value of <code>op</code> must be one of the following constants:
 <li><b><a name="pdf-LUA_OPMOD"><code>LUA_OPMOD</code></a>: </b> performs modulo (<code>%</code>)</li>
 <li><b><a name="pdf-LUA_OPPOW"><code>LUA_OPPOW</code></a>: </b> performs exponentiation (<code>^</code>)</li>
 <li><b><a name="pdf-LUA_OPUNM"><code>LUA_OPUNM</code></a>: </b> performs mathematical negation (unary <code>-</code>)</li>
-<li><b><a name="pdf-LUA_OPBNOT"><code>LUA_OPBNOT</code></a>: </b> performs bitwise negation (<code>~</code>)</li>
-<li><b><a name="pdf-LUA_OPBAND"><code>LUA_OPBAND</code></a>: </b> performs bitwise and (<code>&amp;</code>)</li>
-<li><b><a name="pdf-LUA_OPBOR"><code>LUA_OPBOR</code></a>: </b> performs bitwise or (<code>|</code>)</li>
-<li><b><a name="pdf-LUA_OPBXOR"><code>LUA_OPBXOR</code></a>: </b> performs bitwise exclusive or (<code>~</code>)</li>
+<li><b><a name="pdf-LUA_OPBNOT"><code>LUA_OPBNOT</code></a>: </b> performs bitwise NOT (<code>~</code>)</li>
+<li><b><a name="pdf-LUA_OPBAND"><code>LUA_OPBAND</code></a>: </b> performs bitwise AND (<code>&amp;</code>)</li>
+<li><b><a name="pdf-LUA_OPBOR"><code>LUA_OPBOR</code></a>: </b> performs bitwise OR (<code>|</code>)</li>
+<li><b><a name="pdf-LUA_OPBXOR"><code>LUA_OPBXOR</code></a>: </b> performs bitwise exclusive OR (<code>~</code>)</li>
 <li><b><a name="pdf-LUA_OPSHL"><code>LUA_OPSHL</code></a>: </b> performs left shift (<code>&lt;&lt;</code>)</li>
 <li><b><a name="pdf-LUA_OPSHR"><code>LUA_OPSHR</code></a>: </b> performs right shift (<code>&gt;&gt;</code>)</li>
 
@@ -3424,7 +3447,7 @@ and therefore never returns
 
 
 <hr><h3><a name="lua_gc"><code>lua_gc</code></a></h3><p>
-<span class="apii">[-0, +0, <em>e</em>]</span>
+<span class="apii">[-0, +0, <em>m</em>]</span>
 <pre>int lua_gc (lua_State *L, int what, int data);</pre>
 
 <p>
@@ -3919,7 +3942,7 @@ The return values of <code>lua_load</code> are:
 syntax error during precompilation;</li>
 
 <li><b><a href="#pdf-LUA_ERRMEM"><code>LUA_ERRMEM</code></a>: </b>
-memory allocation error;</li>
+memory allocation (out-of-memory) error;</li>
 
 <li><b><a href="#pdf-LUA_ERRGCMM"><code>LUA_ERRGCMM</code></a>: </b>
 error while running a <code>__gc</code> metamethod.
@@ -4128,7 +4151,7 @@ If there are no errors during the call,
 <a href="#lua_pcall"><code>lua_pcall</code></a> behaves exactly like <a href="#lua_call"><code>lua_call</code></a>.
 However, if there is any error,
 <a href="#lua_pcall"><code>lua_pcall</code></a> catches it,
-pushes a single value on the stack (the error message),
+pushes a single value on the stack (the error object),
 and returns an error code.
 Like <a href="#lua_call"><code>lua_call</code></a>,
 <a href="#lua_pcall"><code>lua_pcall</code></a> always removes the function
@@ -4137,20 +4160,20 @@ and its arguments from the stack.
 
 <p>
 If <code>msgh</code> is 0,
-then the error message returned on the stack
-is exactly the original error message.
+then the error object returned on the stack
+is exactly the original error object.
 Otherwise, <code>msgh</code> is the stack index of a
 <em>message handler</em>.
 (This index cannot be a pseudo-index.)
 In case of runtime errors,
-this function will be called with the error message
-and its return value will be the message
+this function will be called with the error object
+and its return value will be the object
 returned on the stack by <a href="#lua_pcall"><code>lua_pcall</code></a>.
 
 
 <p>
 Typically, the message handler is used to add more debug
-information to the error message, such as a stack traceback.
+information to the error object, such as a stack traceback.
 Such information cannot be gathered after the return of <a href="#lua_pcall"><code>lua_pcall</code></a>,
 since by then the stack has unwound.
 
@@ -4284,7 +4307,7 @@ and return its results (see <a href="#lua_CFunction"><code>lua_CFunction</code><
 
 
 <hr><h3><a name="lua_pushfstring"><code>lua_pushfstring</code></a></h3><p>
-<span class="apii">[-0, +1, <em>m</em>]</span>
+<span class="apii">[-0, +1, <em>e</em>]</span>
 <pre>const char *lua_pushfstring (lua_State *L, const char *fmt, ...);</pre>
 
 <p>
@@ -4316,6 +4339,12 @@ The conversion specifiers can only be
 </li>
 
 </ul>
+
+<p>
+Unlike other push functions,
+this function checks for the stack space it needs,
+including the slot for its result.
+
 
 
 
@@ -4486,7 +4515,7 @@ instead of a variable number of arguments.
 <p>
 Returns 1 if the two values in indices <code>index1</code> and
 <code>index2</code> are primitively equal
-(that is, without calling metamethods).
+(that is, without calling the <code>__eq</code> metamethod).
 Otherwise returns&nbsp;0.
 Also returns&nbsp;0 if any of the indices are not valid.
 
@@ -4513,8 +4542,8 @@ Similar to <a href="#lua_gettable"><code>lua_gettable</code></a>, but does a raw
 <p>
 Pushes onto the stack the value <code>t[n]</code>,
 where <code>t</code> is the table at the given index.
-The access is raw;
-that is, it does not invoke metamethods.
+The access is raw,
+that is, it does not invoke the <code>__index</code> metamethod.
 
 
 <p>
@@ -4533,7 +4562,7 @@ Pushes onto the stack the value <code>t[k]</code>,
 where <code>t</code> is the table at the given index and
 <code>k</code> is the pointer <code>p</code> represented as a light userdata.
 The access is raw;
-that is, it does not invoke metamethods.
+that is, it does not invoke the <code>__index</code> metamethod.
 
 
 <p>
@@ -4584,8 +4613,8 @@ and <code>v</code> is the value at the top of the stack.
 
 <p>
 This function pops the value from the stack.
-The assignment is raw;
-that is, it does not invoke metamethods.
+The assignment is raw,
+that is, it does not invoke the <code>__newindex</code> metamethod.
 
 
 
@@ -4604,8 +4633,8 @@ and <code>v</code> is the value at the top of the stack.
 
 <p>
 This function pops the value from the stack.
-The assignment is raw;
-that is, it does not invoke metamethods.
+The assignment is raw,
+that is, it does not invoke <code>__newindex</code> metamethod.
 
 
 
@@ -4704,7 +4733,7 @@ or an error code in case of errors (see <a href="#lua_pcall"><code>lua_pcall</co
 In case of errors,
 the stack is not unwound,
 so you can use the debug API over it.
-The error message is on the top of the stack.
+The error object is on the top of the stack.
 
 
 <p>
@@ -5179,11 +5208,13 @@ the running function (see <a href="#4.4">&sect;4.4</a>).
 
 
 <hr><h3><a name="lua_version"><code>lua_version</code></a></h3><p>
-<span class="apii">[-0, +0, <em>v</em>]</span>
+<span class="apii">[-0, +0, &ndash;]</span>
 <pre>const lua_Number *lua_version (lua_State *L);</pre>
 
 <p>
-Returns the address of the version number stored in the Lua core.
+Returns the address of the version number
+(a C static variable)
+stored in the Lua core.
 When called with a valid <a href="#lua_State"><code>lua_State</code></a>,
 returns the address of the version used to create that state.
 When called with <code>NULL</code>,
@@ -5287,9 +5318,9 @@ when the coroutine eventually resumes,
 it continues executing the continuation function.
 However, there is one special case,
 which is when this function is called
-from inside a line hook (see <a href="#4.9">&sect;4.9</a>).
+from inside a line or a count hook (see <a href="#4.9">&sect;4.9</a>).
 In that case, <code>lua_yieldk</code> should be called with no continuation
-(probably in the form of <a href="#lua_yield"><code>lua_yield</code></a>),
+(probably in the form of <a href="#lua_yield"><code>lua_yield</code></a>) and no results,
 and the hook should return immediately after the call.
 Lua will yield and,
 when the coroutine resumes again,
@@ -5704,7 +5735,7 @@ Sets the debugging hook function.
 <p>
 Argument <code>f</code> is the hook function.
 <code>mask</code> specifies on which events the hook will be called:
-it is formed by a bitwise or of the constants
+it is formed by a bitwise OR of the constants
 <a name="pdf-LUA_MASKCALL"><code>LUA_MASKCALL</code></a>,
 <a name="pdf-LUA_MASKRET"><code>LUA_MASKRET</code></a>,
 <a name="pdf-LUA_MASKLINE"><code>LUA_MASKLINE</code></a>,
@@ -6256,7 +6287,7 @@ returns the userdata address (see <a href="#lua_touserdata"><code>lua_touserdata
 
 
 <hr><h3><a name="luaL_checkversion"><code>luaL_checkversion</code></a></h3><p>
-<span class="apii">[-0, +0, &ndash;]</span>
+<span class="apii">[-0, +0, <em>v</em>]</span>
 <pre>void luaL_checkversion (lua_State *L);</pre>
 
 <p>
@@ -6472,7 +6503,7 @@ The string <code>mode</code> works as in function <a href="#lua_load"><code>lua_
 
 
 <hr><h3><a name="luaL_loadfile"><code>luaL_loadfile</code></a></h3><p>
-<span class="apii">[-0, +1, <em>e</em>]</span>
+<span class="apii">[-0, +1, <em>m</em>]</span>
 <pre>int luaL_loadfile (lua_State *L, const char *filename);</pre>
 
 <p>
@@ -6483,7 +6514,7 @@ Equivalent to <a href="#luaL_loadfilex"><code>luaL_loadfilex</code></a> with <co
 
 
 <hr><h3><a name="luaL_loadfilex"><code>luaL_loadfilex</code></a></h3><p>
-<span class="apii">[-0, +1, <em>e</em>]</span>
+<span class="apii">[-0, +1, <em>m</em>]</span>
 <pre>int luaL_loadfilex (lua_State *L, const char *filename,
                                             const char *mode);</pre>
 
@@ -6629,6 +6660,27 @@ or <code>NULL</code> if there is a memory allocation error.
 
 <p>
 Opens all standard Lua libraries into the given state.
+
+
+
+
+
+<hr><h3><a name="luaL_opt"><code>luaL_opt</code></a></h3><p>
+<span class="apii">[-0, +0, <em>e</em>]</span>
+<pre>T luaL_opt (L, func, arg, dflt);</pre>
+
+<p>
+This macro is defined as follows:
+
+<pre>
+     (lua_isnoneornil(L,(arg)) ? (dflt) : func(L,(arg)))
+</pre><p>
+In words, if the argument <code>arg</code> is nil or absent,
+the macro results in the default <code>dflt</code>.
+Otherwise, it results in the result of calling <code>func</code>
+with the state <code>L</code> and the argument index <code>arg</code> as
+parameters.
+Note that it evaluates the expression <code>dflt</code> only if needed.
 
 
 
@@ -6931,7 +6983,7 @@ the function also sets <code>*len</code> with the string length.
 
 
 <p>
-If the value has a metatable with a <code>"__tostring"</code> field,
+If the value has a metatable with a <code>__tostring</code> field,
 then <code>luaL_tolstring</code> calls the corresponding metamethod
 with the value as argument,
 and uses the result of the call as its result.
@@ -7220,7 +7272,7 @@ nor vice versa.
 <p>
 If <code>object</code> does not have a metatable, returns <b>nil</b>.
 Otherwise,
-if the object's metatable has a <code>"__metatable"</code> field,
+if the object's metatable has a <code>__metatable</code> field,
 returns the associated value.
 Otherwise, returns the metatable of the given object.
 
@@ -7424,7 +7476,7 @@ use <a href="#pdf-string.format"><code>string.format</code></a> and <a href="#pd
 <p>
 <hr><h3><a name="pdf-rawequal"><code>rawequal (v1, v2)</code></a></h3>
 Checks whether <code>v1</code> is equal to <code>v2</code>,
-without invoking any metamethod.
+without invoking the <code>__eq</code> metamethod.
 Returns a boolean.
 
 
@@ -7433,7 +7485,7 @@ Returns a boolean.
 <p>
 <hr><h3><a name="pdf-rawget"><code>rawget (table, index)</code></a></h3>
 Gets the real value of <code>table[index]</code>,
-without invoking any metamethod.
+without invoking the <code>__index</code> metamethod.
 <code>table</code> must be a table;
 <code>index</code> may be any value.
 
@@ -7444,7 +7496,7 @@ without invoking any metamethod.
 <hr><h3><a name="pdf-rawlen"><code>rawlen (v)</code></a></h3>
 Returns the length of the object <code>v</code>,
 which must be a table or a string,
-without invoking any metamethod.
+without invoking the <code>__len</code> metamethod.
 Returns an integer.
 
 
@@ -7453,7 +7505,7 @@ Returns an integer.
 <p>
 <hr><h3><a name="pdf-rawset"><code>rawset (table, index, value)</code></a></h3>
 Sets the real value of <code>table[index]</code> to <code>value</code>,
-without invoking any metamethod.
+without invoking the <code>__newindex</code> metamethod.
 <code>table</code> must be a table,
 <code>index</code> any value different from <b>nil</b> and NaN,
 and <code>value</code> any Lua value.
@@ -7489,7 +7541,7 @@ Sets the metatable for the given table.
 you must use the debug library (<a href="#6.10">&sect;6.10</a>).)
 If <code>metatable</code> is <b>nil</b>,
 removes the metatable of the given table.
-If the original metatable has a <code>"__metatable"</code> field,
+If the original metatable has a <code>__metatable</code> field,
 raises an error.
 
 
@@ -7541,7 +7593,7 @@ use <a href="#pdf-string.format"><code>string.format</code></a>.)
 
 
 <p>
-If the metatable of <code>v</code> has a <code>"__tostring"</code> field,
+If the metatable of <code>v</code> has a <code>__tostring</code> field,
 then <code>tostring</code> calls the corresponding value
 with <code>v</code> as argument,
 and uses the result of the call as its result.
@@ -8184,6 +8236,9 @@ The only differences are that the options/modifiers
 <code>*</code>, <code>h</code>, <code>L</code>, <code>l</code>, <code>n</code>,
 and <code>p</code> are not supported
 and that there is an extra option, <code>q</code>.
+
+
+<p>
 The <code>q</code> option formats a string between double quotes,
 using escape sequences when necessary to ensure that
 it can safely be read back by the Lua interpreter.
@@ -8206,18 +8261,17 @@ Options
 Options <code>c</code>, <code>d</code>,
 <code>i</code>, <code>o</code>, <code>u</code>, <code>X</code>, and <code>x</code>
 expect an integer.
-Option <code>q</code> expects a string.
+When Lua is compiled with a C89 compiler,
+options <code>A</code> and <code>a</code> (hexadecimal floats)
+do not support any modifier (flags, width, length).
+
+
+<p>
 Option <code>s</code> expects a string;
 if its argument is not a string,
 it is converted to one following the same rules of <a href="#pdf-tostring"><code>tostring</code></a>.
 If the option has any modifier (flags, width, length),
 the string argument should not contain embedded zeros.
-
-
-<p>
-When Lua is compiled with a non-C99 compiler,
-options <code>A</code> and <code>a</code> (hexadecimal floats)
-do not support any modifier (flags, width, length).
 
 
 
@@ -8545,6 +8599,14 @@ represents all alphanumeric characters plus the underscore,
 <code>[0-7]</code> represents the octal digits,
 and <code>[0-7%l%-]</code> represents the octal digits plus
 the lowercase letters plus the '<code>-</code>' character.
+
+
+<p>
+You can put a closing square bracket in a set
+by positioning it as the first character in the set.
+You can put an hyphen in a set
+by positioning it as the first or the last character in the set.
+(You can also use an escape for both cases.)
 
 
 <p>
@@ -8925,13 +8987,17 @@ of list <code>t</code>.
 
 
 <p>
-Moves elements from table <code>a1</code> to table <code>a2</code>.
-This function performs the equivalent to the following
+Moves elements from table <code>a1</code> to table <code>a2</code>,
+performing the equivalent to the following
 multiple assignment:
 <code>a2[t],&middot;&middot;&middot; = a1[f],&middot;&middot;&middot;,a1[e]</code>.
 The default for <code>a2</code> is <code>a1</code>.
 The destination range can overlap with the source range.
 The number of elements to be moved must fit in a Lua integer.
+
+
+<p>
+Returns the destination table <code>a2</code>.
 
 
 
@@ -9457,8 +9523,8 @@ instead of returning an error code.
 <p>
 This function opens a file,
 in the mode specified in the string <code>mode</code>.
-It returns a new file handle,
-or, in case of errors, <b>nil</b> plus an error message.
+In case of success,
+it returns a new file handle.
 
 
 <p>
@@ -9523,7 +9589,8 @@ Equivalent to <code>io.input():read(&middot;&middot;&middot;)</code>.
 
 
 <p>
-Returns a handle for a temporary file.
+In case of success,
+returns a handle for a temporary file.
 This file is opened in update mode
 and it is automatically removed when the program ends.
 
@@ -9801,8 +9868,8 @@ if <code>format</code> is the string "<code>*t</code>",
 then <code>date</code> returns a table with the following fields:
 <code>year</code>, <code>month</code> (1&ndash;12), <code>day</code> (1&ndash;31),
 <code>hour</code> (0&ndash;23), <code>min</code> (0&ndash;59), <code>sec</code> (0&ndash;61),
-<code>wday</code> (weekday, Sunday is&nbsp;1),
-<code>yday</code> (day of the year),
+<code>wday</code> (weekday, 1&ndash;7, Sunday is&nbsp;1),
+<code>yday</code> (day of the year, 1&ndash;366),
 and <code>isdst</code> (daylight saving flag, a boolean).
 This last field may be absent
 if the information is not available.
@@ -10505,6 +10572,14 @@ by issuing a different prompt.
 
 
 <p>
+If the global variable <a name="pdf-_PROMPT"><code>_PROMPT</code></a> contains a string,
+then its value is used as the prompt.
+Similarly, if the global variable <a name="pdf-_PROMPT2"><code>_PROMPT2</code></a> contains a string,
+its value is used as the secondary prompt
+(issued during incomplete statements).
+
+
+<p>
 In case of unprotected errors in the script,
 the interpreter reports the error to the standard error stream.
 If the error object is not a string but 
@@ -10825,10 +10900,10 @@ and LiteralString, see <a href="#3.1">&sect;3.1</a>.)
 
 <P CLASS="footer">
 Last update:
-Wed Nov 25 15:19:10 BRST 2015
+Mon May 30 13:11:08 BRT 2016
 </P>
 <!--
-Last change: revised for Lua 5.3.2
+Last change: revised for Lua 5.3.3
 -->
 
 </body></html>

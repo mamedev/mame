@@ -32,11 +32,11 @@ int m68340_calc_cs(m68340cpu_device *m68k, offs_t address)
 
 
 
-UINT16 m68340_get_cs(m68340cpu_device *device, offs_t address)
+UINT16 m68340cpu_device::get_cs(offs_t address)
 {
-	device->m68340_currentcs = m68340_calc_cs(device, address);
+	m68340_currentcs = m68340_calc_cs(this, address);
 
-	return device->m68340_currentcs;
+	return m68340_currentcs;
 }
 
 

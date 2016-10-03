@@ -320,10 +320,11 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_io_w)
 	switch (offset & 0xff)
 	{
 		case 0x40:
+		case 0x7f: // hourouki mirror
 			m_dac->write_signed8(data);
 			break;
 		default:
-			logerror("%04x: I/O write to port %04x\n", space.device().safe_pc(), offset);
+			logerror("%04x: I/O write to port %04x %02x\n", space.device().safe_pc(), offset,data);
 			break;
 	}
 }
@@ -557,8 +558,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrokumei_sound_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	// TODO: might be that the entire area is sound_bank_w
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP    /* stack writes happen here, but there's no RAM */
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
+	AM_RANGE(0xffbf, 0xffbf) AM_WRITE(mrokumei_sound_bank_w) // hourouki mirror
 ADDRESS_MAP_END
 
 

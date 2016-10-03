@@ -42,13 +42,14 @@ device_ep64_expansion_bus_card_interface::device_ep64_expansion_bus_card_interfa
 //  ep64_expansion_bus_slot_device - constructor
 //-------------------------------------------------
 
-ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, EP64_EXPANSION_BUS_SLOT, "Enterprise Sixty Four expansion bus slot", tag, owner, clock, "ep64_expansion_bus_slot", __FILE__),
-	device_slot_interface(mconfig, *this),
-	m_write_irq(*this),
-	m_write_nmi(*this),
-	m_write_wait(*this),
-	m_dave(*this), m_card(nullptr)
+ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, EP64_EXPANSION_BUS_SLOT, "Enterprise Sixty Four expansion bus slot", tag, owner, clock, "ep64_expansion_bus_slot", __FILE__)
+	, device_slot_interface(mconfig, *this)
+	, m_write_irq(*this)
+	, m_write_nmi(*this)
+	, m_write_wait(*this)
+	, m_dave(*this, finder_base::DUMMY_TAG)
+	, m_card(nullptr)
 {
 }
 

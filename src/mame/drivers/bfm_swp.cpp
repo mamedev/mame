@@ -136,7 +136,7 @@ protected:
 READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -158,7 +158,7 @@ READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)
 WRITE32_MEMBER(bfm_swp_state::bfm_swp_mem_w)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{

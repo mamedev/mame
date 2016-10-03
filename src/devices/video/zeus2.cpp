@@ -89,10 +89,10 @@ void zeus2_device::device_start()
 	/* save states */
 	save_pointer(NAME(waveram[0]), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
 	//save_pointer(NAME(waveram[1]), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12 / sizeof(waveram[1][0]));
-	save_pointer(m_frameColor.get(), "m_frameColor", sizeof(m_frameColor[0]) * WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	save_pointer(m_frameDepth.get(), "m_frameDepth", sizeof(m_frameDepth[0]) * WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	save_pointer(NAME(m_zeusbase), sizeof(m_zeusbase[0]) * 0x80);
-	save_pointer(NAME(m_renderRegs), sizeof(m_renderRegs[0]) * 0x40);
+	save_pointer(NAME(m_frameColor.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	save_pointer(NAME(m_frameDepth.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	save_item(NAME(m_zeusbase));
+	save_item(NAME(m_renderRegs));
 	save_item(NAME(zeus_fifo));
 	save_item(NAME(zeus_fifo_words));
 	save_item(NAME(zeus_cliprect.min_x));
@@ -101,10 +101,14 @@ void zeus2_device::device_start()
 	save_item(NAME(zeus_cliprect.max_y));
 	save_item(NAME(zeus_matrix));
 	save_item(NAME(zeus_point));
+	save_item(NAME(zeus_point2));
 	save_item(NAME(zeus_texbase));
+	save_item(NAME(m_renderMode));
+	save_item(NAME(zeus_quad_size));
 	save_item(NAME(m_fill_color));
 	save_item(NAME(m_fill_depth));
 	save_item(NAME(m_renderPtr));
+	save_item(NAME(m_yScale));
 }
 
 void zeus2_device::device_reset()

@@ -230,6 +230,7 @@ void mn10200_device::device_start()
 	state_add( MN10200_IAGR,  "IAGR",  m_iagr).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_psw).formatstr("%26s").noshow();
 
 	m_icountptr = &m_cycles;

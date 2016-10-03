@@ -151,11 +151,11 @@ static const struct CassetteLegacyWaveFiller rk20_legacy_fill_wave = {
 	0                   /* trailer_samples */
 };
 
-static casserr_t rk20_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error rk20_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	return cassette_legacy_identify( cassette, opts, &rk20_legacy_fill_wave );
 }
 
-static casserr_t rk20_cassette_load( cassette_image *cassette ) {
+static cassette_image::error rk20_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &rk20_legacy_fill_wave );
 }
 
@@ -169,11 +169,11 @@ static const struct CassetteLegacyWaveFiller rk22_legacy_fill_wave = {
 	0                   /* trailer_samples */
 };
 
-static casserr_t rk22_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error rk22_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	return cassette_legacy_identify( cassette, opts, &rk22_legacy_fill_wave );
 }
 
-static casserr_t rk22_cassette_load( cassette_image *cassette ) {
+static cassette_image::error rk22_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &rk22_legacy_fill_wave );
 }
 
@@ -187,11 +187,11 @@ static const struct CassetteLegacyWaveFiller gam_legacy_fill_wave = {
 	0                   /* trailer_samples */
 };
 
-static casserr_t gam_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error gam_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	return cassette_legacy_identify( cassette, opts, &gam_legacy_fill_wave );
 }
 
-static casserr_t gam_cassette_load( cassette_image *cassette ) {
+static cassette_image::error gam_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &gam_legacy_fill_wave );
 }
 
@@ -205,11 +205,11 @@ static const struct CassetteLegacyWaveFiller rk60_legacy_fill_wave = {
 	0                   /* trailer_samples */
 };
 
-static casserr_t rk60_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error rk60_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	return cassette_legacy_identify( cassette, opts, &rk60_legacy_fill_wave );
 }
 
-static casserr_t rk60_cassette_load( cassette_image *cassette ) {
+static cassette_image::error rk60_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &rk60_legacy_fill_wave );
 }
 

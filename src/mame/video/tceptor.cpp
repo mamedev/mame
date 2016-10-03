@@ -252,13 +252,13 @@ void tceptor_state::decode_bg(const char * region)
 	memcpy(src, &buffer[0], len);
 
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, bg_layout, memregion(region)->base(), 0, 64, 0x0a00));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(*m_palette, bg_layout, memregion(region)->base(), 0, 64, 0x0a00));
 }
 
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, *layout, (const UINT8 *)data, 0, 64, 1024));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(*m_palette, *layout, (const UINT8 *)data, 0, 64, 1024));
 }
 
 // fix sprite order
@@ -379,14 +379,14 @@ void tceptor_state::video_start()
 
 	m_c45_road->set_transparent_color(m_palette->pen_indirect(0xfff));
 
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8, 8, 34, 28);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8, 8, 34, 28);
 
 	m_tx_tilemap->set_scrollx(0, -2*8);
 	m_tx_tilemap->set_scrolly(0, 0);
 	m_tx_tilemap->configure_groups(*m_gfxdecode->gfx(0), 7);
 
-	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	save_pointer(NAME(m_sprite_ram_buffered.get()), 0x200 / 2);
 	save_item(NAME(m_bg1_scroll_x));

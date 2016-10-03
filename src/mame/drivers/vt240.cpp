@@ -103,6 +103,10 @@ public:
 	DECLARE_DRIVER_INIT(vt240);
 	virtual void machine_reset() override;
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_draw);
+	void irq_encoder(int irq, int state);
+	DECLARE_WRITE_LINE_MEMBER(irq7_w);
+	DECLARE_WRITE_LINE_MEMBER(irq9_w);
+	DECLARE_WRITE_LINE_MEMBER(irq13_w);
 
 	UINT8 m_i8085_out, m_t11_out, m_i8085_rdy, m_t11;
 	UINT8 m_mem_map[16];
@@ -111,9 +115,44 @@ public:
 	UINT8 m_char_idx, m_mask, m_reg0, m_reg1, m_lu;
 	UINT8 m_vom[16];
 	UINT8 m_vpat, m_patmult, m_patcnt, m_patidx;
+	UINT16 m_irqs;
 	bool m_lb;
 	UINT16 m_scrl;
 };
+
+void vt240_state::irq_encoder(int irq, int state)
+{
+	if(state == ASSERT_LINE)
+		m_irqs |= (1 << irq);
+	else
+		m_irqs &= ~(1 << irq);
+
+	int i;
+	for(i = 15; i > 0; i--)
+	{
+		if(m_irqs & (1 << i))
+			break;
+	}
+	m_maincpu->set_input_line(3, (i & 8) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, (i & 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(1, (i & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, (i & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(vt240_state::irq7_w)
+{
+	irq_encoder(7, state);
+}
+
+WRITE_LINE_MEMBER(vt240_state::irq9_w)
+{
+	irq_encoder(9, state);
+}
+
+WRITE_LINE_MEMBER(vt240_state::irq13_w)
+{
+	irq_encoder(13, state);
+}
 
 WRITE_LINE_MEMBER(vt240_state::write_keyboard_clock)
 {
@@ -147,7 +186,7 @@ WRITE_LINE_MEMBER(vt240_state::tx_w)
 
 WRITE_LINE_MEMBER(vt240_state::i8085_rdy_w)
 {
-	m_maincpu->set_input_line(3, state ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(3, state ? CLEAR_LINE : ASSERT_LINE);
 	m_i8085_rdy = state;
 }
 
@@ -241,10 +280,10 @@ WRITE8_MEMBER(vt240_state::duartout_w)
 {
 	m_host->write_rts(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 	m_host->write_dtr(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(15, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
-	m_maincpu->set_input_line(14, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
-	m_maincpu->set_input_line(11, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
-	m_maincpu->set_input_line(10, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(15, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(14, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(11, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(10, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ8_MEMBER(vt240_state::mem_map_cs_r)
@@ -570,6 +609,7 @@ void vt240_state::machine_reset()
 	m_patcnt = 0;
 	m_patidx = 0;
 	m_reg0 = 0x80;
+	m_irqs = 0;
 }
 
 static const gfx_layout vt240_chars_8x10 =
@@ -629,7 +669,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_MC68681_ADD("duart", XTAL_3_6864MHz) /* 2681 duart (not 68681!) */
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 13))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(vt240_state, irq13_w))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("host", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("printer", rs232_port_device, write_txd))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(vt240_state, duartout_w))
@@ -637,8 +677,8 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(vt240_state, tx_w))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(vt240_state, lben_w))
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", 9))
-	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", 7))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vt240_state, irq9_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vt240_state, irq7_w))
 
 	MCFG_DEVICE_ADD("lk201", LK201, 0)
 	MCFG_LK201_TX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))

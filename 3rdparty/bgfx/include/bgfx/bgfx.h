@@ -615,6 +615,7 @@ namespace bgfx
 		uint16_t width;             //!< Texture width.
 		uint16_t height;            //!< Texture height.
 		uint16_t depth;             //!< Texture depth.
+		uint16_t numLayers;         //!< Number of layers in texture array.
 		uint8_t numMips;            //!< Number of MIP maps.
 		uint8_t bitsPerPixel;       //!< Format bits per pixel.
 		bool    cubeMap;            //!< Texture is cubemap.
@@ -841,7 +842,7 @@ namespace bgfx
 	/// @param[in] _dstSize Destination index buffer in bytes. It must be
 	///    large enough to contain output indices. If destination size is
 	///    insufficient index buffer will be truncated.
-	/// @param[in]_indices Source indices.
+	/// @param[in] _indices Source indices.
 	/// @param[in] _numIndices Number of input indices.
 	/// @param[in] _index32 Set to `true` if input indices are 32-bit.
 	///
@@ -1102,20 +1103,35 @@ namespace bgfx
 	///
 	void dbgTextClear(uint8_t _attr = 0, bool _small = false);
 
-	/// Print into internal debug text buffer.
+	/// Print into internal debug text character-buffer (VGA-compatible text mode).
+	///
+	/// @param[in] _x, _y 2D position from top-left.
+	/// @param[in] _attr Color palette. Where top 4-bits represent index of background, and bottom
+	///   4-bits represent foreground color from standard VGA text palette.
+	/// @param[in] _format `printf` style format.
 	///
 	/// @attention C99 equivalent is `bgfx_dbg_text_printf`.
 	///
 	void dbgTextPrintf(uint16_t _x, uint16_t _y, uint8_t _attr, const char* _format, ...);
 
+	/// Print into internal debug text character-buffer (VGA-compatible text mode).
+	///
+	/// @param[in] _x, _y 2D position from top-left.
+	/// @param[in] _attr Color palette. Where top 4-bits represent index of background, and bottom
+	///   4-bits represent foreground color from standard VGA text palette.
+	/// @param[in] _format `printf` style format.
+	/// @param[in] _argList additional arguments for format string
+	///
+	/// @attention C99 equivalent is `bgfx_dbg_text_vprintf`.
+	///
+	void dbgTextPrintfVargs(uint16_t _x, uint16_t _y, uint8_t _attr, const char* _format, va_list _argList);
+
 	/// Draw image into internal debug text buffer.
 	///
-	/// @param[in] _x      X position from top-left.
-	/// @param[in] _y      Y position from top-left.
-	/// @param[in] _width  Image width.
-	/// @param[in] _height Image height.
-	/// @param[in] _data   Raw image data (character/attribute raw encoding).
-	/// @param[in] _pitch  Image pitch in bytes.
+	/// @param[in] _x, _y 2D position from top-left.
+	/// @param[in] _width, _height  Image width and height.
+	/// @param[in] _data  Raw image data (character/attribute raw encoding).
+	/// @param[in] _pitch Image pitch in bytes.
 	///
 	/// @attention C99 equivalent is `bgfx_dbg_text_image`.
 	///
@@ -1510,6 +1526,15 @@ namespace bgfx
 
 	/// Calculate amount of memory required for texture.
 	///
+	/// @param[out] _info Resulting texture info structure.
+	/// @param[in] _width Width.
+	/// @param[in] _height Height.
+	/// @param[in] _depth Depth.
+	/// @param[in] _cubeMap Indicates that texture contains cubemap.
+	/// @param[in] _hasMips Indicates that texture contains full mip-map chain.
+	/// @param[in] _numLayers Number of layers in texture array.
+	/// @param[in] _format Texture format. See: `TextureFormat::Enum`.
+	///
 	/// @attention C99 equivalent is `bgfx_calc_texture_size`.
 	///
 	void calcTextureSize(
@@ -1518,7 +1543,8 @@ namespace bgfx
 		, uint16_t _height
 		, uint16_t _depth
 		, bool _cubeMap
-		, uint8_t _numMips
+		, bool _hasMips
+		, uint16_t _numLayers
 		, TextureFormat::Enum _format
 		);
 
@@ -1549,7 +1575,9 @@ namespace bgfx
 	///
 	/// @param[in] _width Width.
 	/// @param[in] _height Height.
-	/// @param[in] _numMips Number of mip-maps.
+	/// @param[in] _hasMips Indicates that texture contains full mip-map chain.
+	/// @param[in] _numLayers Number of layers in texture array. Must be 1 if caps
+	///   `BGFX_CAPS_TEXTURE_2D_ARRAY` flag is not set.
 	/// @param[in] _format Texture format. See: `TextureFormat::Enum`.
 	/// @param[in] _flags Default texture sampling mode is linear, and wrap mode
 	///   is repeat.
@@ -1559,13 +1587,16 @@ namespace bgfx
 	///     sampling.
 	///
 	/// @param[in] _mem Texture data. If `_mem` is non-NULL, created texture will be immutable.
+	///   When `_numLayers` is more than 1, expected memory layout is texture and all mips together
+	///   for each array element.
 	///
 	/// @attention C99 equivalent is `bgfx_create_texture_2d`.
 	///
 	TextureHandle createTexture2D(
 		  uint16_t _width
 		, uint16_t _height
-		, uint8_t _numMips
+		, bool     _hasMips
+		, uint16_t _numLayers
 		, TextureFormat::Enum _format
 		, uint32_t _flags = BGFX_TEXTURE_NONE
 		, const Memory* _mem = NULL
@@ -1576,7 +1607,9 @@ namespace bgfx
 	///
 	/// @param[in] _ratio Frame buffer size in respect to back-buffer size. See:
 	///   `BackbufferRatio::Enum`.
-	/// @param[in] _numMips Number of mip-maps.
+	/// @param[in] _hasMips Indicates that texture contains full mip-map chain.
+	/// @param[in] _numLayers Number of layers in texture array. Must be 1 if caps
+	///   `BGFX_CAPS_TEXTURE_2D_ARRAY` flag is not set.
 	/// @param[in] _format Texture format. See: `TextureFormat::Enum`.
 	/// @param[in] _flags Default texture sampling mode is linear, and wrap mode
 	///   is repeat.
@@ -1589,7 +1622,8 @@ namespace bgfx
 	///
 	TextureHandle createTexture2D(
 		  BackbufferRatio::Enum _ratio
-		, uint8_t _numMips
+		, bool _hasMips
+		, uint16_t _numLayers
 		, TextureFormat::Enum _format
 		, uint32_t _flags = BGFX_TEXTURE_NONE
 		);
@@ -1599,7 +1633,7 @@ namespace bgfx
 	/// @param[in] _width Width.
 	/// @param[in] _height Height.
 	/// @param[in] _depth Depth.
-	/// @param[in] _numMips Number of mip-maps.
+	/// @param[in] _hasMips Indicates that texture contains full mip-map chain.
 	/// @param[in] _format Texture format. See: `TextureFormat::Enum`.
 	/// @param[in] _flags Default texture sampling mode is linear, and wrap mode
 	///   is repeat.
@@ -1616,7 +1650,7 @@ namespace bgfx
 		  uint16_t _width
 		, uint16_t _height
 		, uint16_t _depth
-		, uint8_t _numMips
+		, bool _hasMips
 		, TextureFormat::Enum _format
 		, uint32_t _flags = BGFX_TEXTURE_NONE
 		, const Memory* _mem = NULL
@@ -1625,7 +1659,9 @@ namespace bgfx
 	/// Create Cube texture.
 	///
 	/// @param[in] _size Cube side size.
-	/// @param[in] _numMips Number of mip-maps.
+	/// @param[in] _hasMips Indicates that texture contains full mip-map chain.
+	/// @param[in] _numLayers Number of layers in texture array. Must be 1 if caps
+	///   `BGFX_CAPS_TEXTURE_CUBE_ARRAY` flag is not set.
 	/// @param[in] _format Texture format. See: `TextureFormat::Enum`.
 	/// @param[in] _flags Default texture sampling mode is linear, and wrap mode
 	///   is repeat.
@@ -1635,12 +1671,15 @@ namespace bgfx
 	///     sampling.
 	///
 	/// @param[in] _mem Texture data. If `_mem` is non-NULL, created texture will be immutable.
+	///   When `_numLayers` is more than 1, expected memory layout is cubemap texture and all mips
+	///   together for each array element.
 	///
 	/// @attention C99 equivalent is `bgfx_create_texture_cube`.
 	///
 	TextureHandle createTextureCube(
 		  uint16_t _size
-		, uint8_t _numMips
+		, bool _hasMips
+		, uint16_t _numLayers
 		, TextureFormat::Enum _format
 		, uint32_t _flags = BGFX_TEXTURE_NONE
 		, const Memory* _mem = NULL
@@ -1649,6 +1688,7 @@ namespace bgfx
 	/// Update 2D texture.
 	///
 	/// @param[in] _handle Texture handle.
+	/// @param[in] _layer Layers in texture array.
 	/// @param[in] _mip Mip level.
 	/// @param[in] _x X offset in texture.
 	/// @param[in] _y Y offset in texture.
@@ -1662,6 +1702,7 @@ namespace bgfx
 	///
 	void updateTexture2D(
 		  TextureHandle _handle
+		, uint16_t _layer
 		, uint8_t _mip
 		, uint16_t _x
 		, uint16_t _y
@@ -1700,6 +1741,7 @@ namespace bgfx
 	/// Update Cube texture.
 	///
 	/// @param[in] _handle Texture handle.
+	/// @param[in] _layer Layers in texture array.
 	/// @param[in] _side Cubemap side `BGFX_CUBE_MAP_<POSITIVE or NEGATIVE>_<X, Y or Z>`,
 	///   where 0 is +X, 1 is -X, 2 is +Y, 3 is -Y, 4 is +Z, and 5 is -Z.
 	///
@@ -1733,6 +1775,7 @@ namespace bgfx
 	///
 	void updateTextureCube(
 		  TextureHandle _handle
+		, uint16_t _layer
 		, uint8_t _side
 		, uint8_t _mip
 		, uint16_t _x
@@ -1850,7 +1893,7 @@ namespace bgfx
 	///
 	/// @returns Handle to frame buffer object.
 	///
-	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_handles`.
+	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_attachment`.
 	///
 	FrameBufferHandle createFrameBuffer(
 		  uint8_t _num

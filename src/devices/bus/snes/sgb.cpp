@@ -19,15 +19,17 @@
 //  sns_rom_sgb_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SUPERGB = &device_creator<sns_rom_sgb_device>;
+const device_type SNS_LOROM_SUPERGB = &device_creator<sns_rom_sgb1_device>;
+const device_type SNS_LOROM_SUPERGB2 = &device_creator<sns_rom_sgb2_device>;
 
 
-sns_rom_sgb_device::sns_rom_sgb_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
-	sns_rom_device(mconfig, SNS_LOROM_SUPERGB, "SNES Super Game Boy Cart", tag, owner, clock, "sns_rom_sgb", __FILE__),
-	m_gb_cpu(*this, "sgb_cpu"),
-	m_gb_snd(*this, "sgb_snd"),
-	m_gb_lcd(*this, "sgb_lcd"),
+sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_sgb_cpu(*this, "sgb_cpu"),
+	m_sgb_apu(*this, "sgb_apu"),
+	m_sgb_ppu(*this, "sgb_ppu"),
 	m_cartslot(*this, "gb_slot"),
+	m_region_bios(*this, "sgb_cpu"),
 	m_sgb_ly(0),
 	m_sgb_row(0),
 	m_vram(0),
@@ -39,7 +41,20 @@ sns_rom_sgb_device::sns_rom_sgb_device(const machine_config& mconfig, const char
 	m_vram_offs(0),
 	m_mlt_req(0),
 	m_lcd_row(0),
-	m_packetsize(0)
+	m_packetsize(0),
+	m_bios_disabled(false)
+{
+}
+
+
+sns_rom_sgb1_device::sns_rom_sgb1_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB, "SNES Super Game Boy Cart", tag, owner, clock, "sns_rom_sgb", __FILE__)
+{
+}
+
+
+sns_rom_sgb2_device::sns_rom_sgb2_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB2, "SNES Super Game Boy 2 Cart", tag, owner, clock, "sns_rom_sgb2", __FILE__)
 {
 }
 
@@ -62,6 +77,10 @@ void sns_rom_sgb_device::device_reset()
 
 READ8_MEMBER(sns_rom_sgb_device::gb_cart_r)
 {
+	if (offset < 0x100 && !m_bios_disabled)
+	{
+		return m_region_bios->base()[offset];
+	}
 	return m_cartslot->read_rom(space, offset);
 }
 
@@ -101,12 +120,12 @@ WRITE8_MEMBER(sns_rom_sgb_device::gb_io_w)
 
 READ8_MEMBER(sns_rom_sgb_device::gb_ie_r)
 {
-	return m_gb_cpu->get_ie();
+	return m_sgb_cpu->get_ie();
 }
 
 WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
 {
-	m_gb_cpu->set_ie(data & 0x1f);
+	m_sgb_cpu->set_ie(data);
 }
 
 
@@ -114,16 +133,16 @@ WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
 static ADDRESS_MAP_START(supergb_map, AS_PROGRAM, 8, sns_rom_sgb_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("sgb_lcd", sgb_lcd_device, vram_r, vram_w)  /* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("sgb_ppu", sgb_ppu_device, vram_r, vram_w)  /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM                               /* 8k low RAM */
-	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)  /* echo RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM                              /* 8k low RAM */
+	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("sgb_ppu", sgb_ppu_device, oam_r, oam_w)    /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)      /* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("sgb_snd", gameboy_sound_device, sound_r, sound_w)      /* sound registers */
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("sgb_lcd", sgb_lcd_device, oam_r, oam_w)    /* OAM RAM */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("sgb_apu", gameboy_sound_device, sound_r, sound_w)      /* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("sgb_snd", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("sgb_lcd", sgb_lcd_device, video_r, video_w) /* also disable bios?? */        /* Video controller & BIOS flip-flop */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("sgb_apu", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("sgb_ppu", sgb_ppu_device, video_r, video_w) /* also disable bios?? */        /* Video controller & BIOS flip-flop */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
 ADDRESS_MAP_END
@@ -140,23 +159,68 @@ static SLOT_INTERFACE_START(supergb_cart)
 	SLOT_INTERFACE_INTERNAL("rom_mbc1",  GB_ROM_MBC1)
 SLOT_INTERFACE_END
 
+
 static MACHINE_CONFIG_FRAGMENT( supergb )
 	MCFG_CPU_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_GB_LCD_SGB_ADD("sgb_lcd")
+	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
 
-	MCFG_SOUND_ADD("sgb_snd", GAMEBOY, 0)
+	MCFG_SOUND_ADD("sgb_apu", DMG_APU, 4295454)
 
 	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
 MACHINE_CONFIG_END
 
 
-machine_config_constructor sns_rom_sgb_device::device_mconfig_additions() const
+machine_config_constructor sns_rom_sgb1_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( supergb );
+}
+
+
+ROM_START( supergb )
+	ROM_REGION(0x100, "sgb_cpu", 0)
+	ROM_LOAD("sgb_boot.bin", 0x0000, 0x0100, CRC(ec8a83b9) SHA1(aa2f50a77dfb4823da96ba99309085a3c6278515))
+ROM_END
+
+
+const tiny_rom_entry *sns_rom_sgb1_device::device_rom_region() const
+{
+	return ROM_NAME( supergb );
+}
+
+
+static MACHINE_CONFIG_FRAGMENT( supergb2 )
+	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL_4_194304Mhz)   /* 4.194MHz derived from clock on sgb2 pcb */
+	MCFG_CPU_PROGRAM_MAP(supergb_map)
+	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
+	MCFG_LR35902_HALT_BUG
+
+	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+
+	MCFG_SOUND_ADD("sgb_apu", DMG_APU, XTAL_4_194304Mhz)
+
+	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
+MACHINE_CONFIG_END
+
+
+machine_config_constructor sns_rom_sgb2_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( supergb2 );
+}
+
+
+ROM_START( supergb2 )
+	ROM_REGION(0x100, "sgb_cpu", 0)
+	ROM_LOAD("sgb2_boot.bin", 0x0000, 0x0100, CRC(53d0dd63) SHA1(93407ea10d2f30ab96a314d8eca44fe160aea734))
+ROM_END
+
+
+const tiny_rom_entry *sns_rom_sgb2_device::device_rom_region() const
+{
+	return ROM_NAME( supergb2 );
 }
 
 

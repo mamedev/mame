@@ -86,7 +86,9 @@ float roundBox(float2 p, float2 b, float r)
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims; // size of the window or fullscreen
+uniform int ScreenCount;
 uniform float2 TargetDims; // size of the target surface
+uniform float2 TargetScale;
 uniform float2 QuadDims; // size of the screen quad
 
 VS_OUTPUT vs_main(VS_INPUT Input)
@@ -170,7 +172,7 @@ float GetSpotAddend(float2 coord, float amount)
 	return saturate(SigmoidSpot);
 }
 
-float GetRoundCornerFactor(float2 coord, float2 bounds, float radiusAmount, float smoothAmount)
+float GetBoundsFactor(float2 coord, float2 bounds, float radiusAmount, float smoothAmount)
 {
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
@@ -216,7 +218,7 @@ float2 GetDistortedCoords(float2 centerCoord, float amount, float amountCube)
 	return centerCoord;
 }
 
-float2 GetCoords(float2 coord, float distortionAmount, float cubicDistortionAmount)
+float2 GetTextureCoords(float2 coord, float distortionAmount, float cubicDistortionAmount)
 {
 	// center coordinates
 	coord -= 0.5f;
@@ -230,35 +232,62 @@ float2 GetCoords(float2 coord, float distortionAmount, float cubicDistortionAmou
 	return coord;
 }
 
+float2 GetQuadCoords(float2 coord, float2 scale, float distortionAmount, float cubicDistortionAmount)
+{
+	// center coordinates
+	coord -= 0.5f;
+
+	// apply scale
+	coord *= scale;
+
+	// distort coordinates
+	coord = GetDistortedCoords(coord, distortionAmount, cubicDistortionAmount);
+
+	return coord;
+}
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
+	// image distortion
 	float distortionAmount = DistortionAmount;
 	float cubicDistortionAmount = CubicDistortionAmount > 0.0f
 		? CubicDistortionAmount * 1.1f  // cubic distortion need to be a little higher to compensate the quartic distortion
 		: CubicDistortionAmount * 1.2f; // negativ values even more
 
+	// corner distortion at least by the amount of the image distorition
+	float distortCornerAmount = max(DistortCornerAmount, DistortionAmount + CubicDistortionAmount);
+
+	float roundCornerAmount = RoundCornerAmount * 0.5f;
+	float smoothBorderAmount = SmoothBorderAmount * 0.5f;
+
 	float2 TexelDims = 1.0f / TargetDims;
 
-	// Screen Curvature
-	float2 TexCoord = GetCoords(Input.TexCoord, distortionAmount, cubicDistortionAmount);
+	// base-target dimensions (without oversampling)
+	float2 BaseTargetDims = TargetDims / TargetScale;
+	BaseTargetDims = SwapXY
+		? BaseTargetDims.yx
+		: BaseTargetDims.xy;
 
-	// Corner Curvature
-	float2 CornerCoord = GetCoords(Input.TexCoord, DistortCornerAmount, 0.0f);
+	// base-target/quad difference scale
+	float2 BaseTargetQuadScale = ScreenCount == 1
+		? BaseTargetDims / QuadDims // keeps the coords inside of the quad bounds of a single screen
+		: 1.0f;
+
+	// Screen Texture Curvature
+	float2 BaseCoord = GetTextureCoords(Input.TexCoord, distortionAmount, cubicDistortionAmount);
+
+	// Screen Quad Curvature
+	float2 QuadCoord = GetQuadCoords(Input.TexCoord, BaseTargetQuadScale, distortCornerAmount, 0.0f);
 
 	// clip border
-	clip(TexCoord < 0.0f - TexelDims || TexCoord > 1.0f + TexelDims ? -1 : 1);
-
-	float2 TexCoordCentered = TexCoord;
-	TexCoordCentered -= 0.5f;
-	float2 CornerCoordCentered = CornerCoord;
-	CornerCoordCentered -= 0.5f;
+	clip(BaseCoord < 0.0f - TexelDims || BaseCoord > 1.0f + TexelDims ? -1 : 1);
 
 	// Color
-	float4 BaseColor = tex2D(DiffuseSampler, TexCoord);
+	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
 	BaseColor.a = 1.0f;
 
 	// Vignetting Simulation
-	float2 VignetteCoord = CornerCoordCentered;
+	float2 VignetteCoord = QuadCoord;
 
 	float VignetteFactor = GetVignetteFactor(VignetteCoord, VignettingAmount);
 	BaseColor.rgb *= VignetteFactor;
@@ -266,20 +295,23 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Light Reflection Simulation
 	float3 LightColor = float3(1.0f, 0.90f, 0.80f); // color temperature 5.000 Kelvin
 
-	float2 SpotCoord = CornerCoordCentered;
-	float2 NoiseCoord = CornerCoordCentered;
+	float2 SpotCoord = QuadCoord;
+	float2 NoiseCoord = QuadCoord;
 
 	float SpotAddend = GetSpotAddend(SpotCoord, ReflectionAmount);
 	float NoiseFactor = GetNoiseFactor(SpotAddend, random(NoiseCoord));
 	BaseColor.rgb += SpotAddend * NoiseFactor * LightColor;
 
 	// Round Corners Simulation
-	float2 RoundCornerCoord = CornerCoordCentered;
-	float2 RoundCornerBounds = SwapXY
-		? QuadDims.yx
-		: QuadDims.xy;
+	float2 RoundCornerCoord = QuadCoord;
+	float2 RoundCornerBounds = ScreenCount == 1
+		? QuadDims // align corners to quad bounds of a single screen
+		: BaseTargetDims; // align corners to target bounds of multiple screens
+	RoundCornerBounds = SwapXY
+		? RoundCornerBounds.yx
+		: RoundCornerBounds.xy;
 
-	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerBounds, RoundCornerAmount * 0.5f, SmoothBorderAmount * 0.5f);
+	float roundCornerFactor = GetBoundsFactor(RoundCornerCoord, RoundCornerBounds, roundCornerAmount, smoothBorderAmount);
 	BaseColor.rgb *= roundCornerFactor;
 
 	return BaseColor;

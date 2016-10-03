@@ -27,12 +27,9 @@ static void (*const modules[])(const imgtool_class *imgclass, UINT32 state, unio
 };
 
 /* step 3: declare imgtool_create_cannonical_library() */
-imgtoolerr_t imgtool_create_cannonical_library(int omit_untested, imgtool_library **library)
+imgtoolerr_t imgtool_create_cannonical_library(bool omit_untested, std::unique_ptr<imgtool::library> &library)
 {
-	imgtoolerr_t err;
 	size_t i;
-	imgtool_library *lib;
-	imgtool_module *module;
 
 	/* list of modules that we drop */
 	static const char *const irrelevant_modules[] =
@@ -40,28 +37,24 @@ imgtoolerr_t imgtool_create_cannonical_library(int omit_untested, imgtool_librar
 		"coco_os9_rsdos"
 	};
 
-	lib = imgtool_library_create();
-	if (!lib)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto error;
-	}
+	library.reset(new imgtool::library());
+	if (!library)
+		return IMGTOOLERR_OUTOFMEMORY;
 
-	/* create all modules */
+	// create all modules
 	for (i = 0; i < ARRAY_LENGTH(modules); i++)
-		imgtool_library_add(lib, modules[i]);
+		library->add(modules[i]);
 
-	/* remove irrelevant modules */
+	// remove irrelevant modules
 	for (i = 0; i < ARRAY_LENGTH(irrelevant_modules); i++)
 	{
-		imgtool_library_unlink(lib, irrelevant_modules[i]);
+		library->unlink(irrelevant_modules[i]);
 	}
 
-	/* if we are omitting untested, go through and block out the functionality in question */
+	// if we are omitting untested, go through and block out the functionality in question
 	if (omit_untested)
 	{
-		module = nullptr;
-		while((module = imgtool_library_iterate(lib, module)) != nullptr)
+		for (auto &module : library->modules())
 		{
 			if (module->writing_untested)
 			{
@@ -76,14 +69,7 @@ imgtoolerr_t imgtool_create_cannonical_library(int omit_untested, imgtool_librar
 		}
 	}
 
-	*library = lib;
 	return IMGTOOLERR_SUCCESS;
-
-error:
-	if (lib)
-		imgtool_library_close(lib);
-	return err;
-
 }
 
 
@@ -115,5 +101,6 @@ MODULE(cybikoxt)
 MODULE(psion)
 MODULE(bml3)
 MODULE(hp48)
+MODULE(hp9845_tape)
 
 #endif /* MODULES_RECURSIVE */

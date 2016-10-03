@@ -235,8 +235,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 
 	m_console.register_command("dasm",      CMDFLAG_NONE, 0, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1, _2, _3));
 
-	m_console.register_command("trace",     CMDFLAG_NONE, 0, 1, 3, std::bind(&debugger_commands::execute_trace, this, _1, _2, _3));
-	m_console.register_command("traceover", CMDFLAG_NONE, 0, 1, 3, std::bind(&debugger_commands::execute_traceover, this, _1, _2, _3));
+	m_console.register_command("trace",     CMDFLAG_NONE, 0, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1, _2, _3));
+	m_console.register_command("traceover", CMDFLAG_NONE, 0, 1, 4, std::bind(&debugger_commands::execute_traceover, this, _1, _2, _3));
 	m_console.register_command("traceflush",CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_traceflush, this, _1, _2, _3));
 
 	m_console.register_command("history",   CMDFLAG_NONE, 0, 0, 2, std::bind(&debugger_commands::execute_history, this, _1, _2, _3));
@@ -387,15 +387,18 @@ bool debugger_commands::validate_number_parameter(const char *param, UINT64 *res
 bool debugger_commands::validate_boolean_parameter(const char *param, bool *result)
 {
 	/* nullptr parameter does nothing and returns no error */
-	if (param == nullptr)
+	if (param == nullptr || strlen(param) == 0)
 		return true;
 
 	/* evaluate the expression; success if no error */
-	bool is_true = (strcmp(param, "true") == 0 || strcmp(param, "TRUE") == 0 || strcmp(param, "1") == 0);
-	bool is_false = (strcmp(param, "false") == 0 || strcmp(param, "FALSE") == 0 || strcmp(param, "0") == 0);
+	bool is_true = (core_stricmp(param, "true") == 0 || strcmp(param, "1") == 0);
+	bool is_false = (core_stricmp(param, "false") == 0 || strcmp(param, "0") == 0);
 
 	if (!is_true && !is_false)
+	{
+		m_console.printf("Invalid boolean '%s'\n", param);
 		return false;
+	}
 
 	*result = is_true;
 
@@ -2482,7 +2485,7 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 		return;
 	if (!validate_boolean_parameter((params > 2) ? param[2] : nullptr, &detect_loops))
 		return;
-	if (!debug_command_parameter_command(action = param[3]))
+	if (!debug_command_parameter_command(action = (params > 3) ? param[3] : nullptr))
 		return;
 
 	/* open the file */
@@ -2625,7 +2628,7 @@ void debugger_commands::execute_trackpc(int ref, int params, const char *param[]
 		// Insert current pc
 		if (m_cpu.get_visible_cpu() == cpu)
 		{
-			const offs_t pc = cpu->safe_pc();
+			const offs_t pc = cpu->safe_pcbase();
 			cpu->debug()->set_track_pc_visited(pc);
 		}
 		m_console.printf("PC tracking enabled\n");

@@ -188,7 +188,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_atram_w)
 
 void egghunt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(egghunt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(egghunt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	save_item(NAME(m_bgram));
 	save_item(NAME(m_spram));
@@ -229,7 +229,7 @@ READ8_MEMBER(egghunt_state::egghunt_okibanking_r)
 WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
 {
 	m_okibanking = data;
-	m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
+	m_oki->set_rom_bank((data >> 4) & 1);
 }
 
 static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )

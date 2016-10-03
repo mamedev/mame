@@ -430,7 +430,8 @@ void nec_common_device::device_start()
 	state_add( NEC_SS,    "SS", Sreg(SS)).formatstr("%04X");
 	state_add( NEC_DS,    "DS0", Sreg(DS0)).formatstr("%04X");
 
-	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
+	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
@@ -493,6 +494,7 @@ void nec_common_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 		case NEC_PC:
 			m_debugger_temp = (Sreg(PS)<<4) + m_ip;
 			break;

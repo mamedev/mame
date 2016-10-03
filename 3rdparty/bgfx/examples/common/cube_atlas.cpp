@@ -273,6 +273,7 @@ Atlas::Atlas(uint16_t _textureSize, uint16_t _maxRegionsCount)
 	memset(m_textureBuffer, 0, _textureSize * _textureSize * 6 * 4);
 
 	m_textureHandle = bgfx::createTextureCube(_textureSize
+		, false
 		, 1
 		, bgfx::TextureFormat::BGRA8
 		);
@@ -296,6 +297,7 @@ Atlas::Atlas(uint16_t _textureSize, const uint8_t* _textureBuffer, uint16_t _reg
 	memcpy(m_textureBuffer, _textureBuffer, getTextureBufferSize() );
 
 	m_textureHandle = bgfx::createTextureCube(_textureSize
+		, false
 		, 1
 		, bgfx::TextureFormat::BGRA8
 		, BGFX_TEXTURE_NONE
@@ -441,7 +443,7 @@ void Atlas::updateRegion(const AtlasRegion& _region, const uint8_t* _bitmapBuffe
 			}
 		}
 
-		bgfx::updateTextureCube(m_textureHandle, (uint8_t)_region.getFaceIndex(), 0, _region.x, _region.y, _region.width, _region.height, mem);
+		bgfx::updateTextureCube(m_textureHandle, 0, (uint8_t)_region.getFaceIndex(), 0, _region.x, _region.y, _region.width, _region.height, mem);
 	}
 }
 

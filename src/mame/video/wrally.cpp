@@ -66,8 +66,8 @@ TILE_GET_INFO_MEMBER(wrally_state::get_tile_info_screen1)
 
 void wrally_state::video_start()
 {
-	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	m_pant[0]->set_transmask(0,0xff01,0x00ff); /* this layer is split in two (pens 1..7, pens 8-15) */
 	m_pant[1]->set_transparent_pen(0);

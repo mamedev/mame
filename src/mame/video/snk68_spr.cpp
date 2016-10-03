@@ -8,12 +8,12 @@
 const device_type SNK68_SPR = &device_creator<snk68_spr_device>;
 
 snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SNK68_SPR, "SNK68 Sprites", tag, owner, clock, "snk68_spr", __FILE__),
-		m_gfxdecode(*this),
-		m_spriteram(*this, "^spriteram"),
-		m_screen(*this, "^screen"),
-		m_flipscreen(0),
-		m_partialupdates(1)
+	: device_t(mconfig, SNK68_SPR, "SNK68 Sprites", tag, owner, clock, "snk68_spr", __FILE__)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, m_spriteram(*this, "^spriteram")
+	, m_screen(*this, "^screen")
+	, m_flipscreen(0)
+	, m_partialupdates(1)
 {
 	m_newtilecb =  snk68_tile_indirection_delegate(FUNC(snk68_spr_device::tile_callback_noindirect), this);
 }

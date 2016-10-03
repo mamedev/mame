@@ -148,7 +148,7 @@ vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_
 			: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock, "vic3", __FILE__),
 				device_video_interface(mconfig, *this),
 				m_type(VIC4567_NTSC),
-				m_cpu(*this),
+				m_cpu(*this, finder_base::DUMMY_TAG),
 				m_dma_read_cb(*this),
 				m_dma_read_color_cb(*this),
 				m_interrupt_cb(*this),

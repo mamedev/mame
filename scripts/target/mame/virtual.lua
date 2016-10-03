@@ -14,17 +14,29 @@
 --------------------------------------------------
 
 CPUS["M6502"] = true
+CPUS["H6280"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
 -- only for MAME and so aren't included
 --------------------------------------------------
 
-SOUNDS["GB_SOUND"] = true
-SOUNDS["AY8910"] = true
-SOUNDS["YM2203"] = true
-SOUNDS["YM3526"] = true
 SOUNDS["NES_APU"] = true
+SOUNDS["YM2612"] = true
+SOUNDS["YM2151"] = true
+SOUNDS["YM2413"] = true
+SOUNDS["YM2203"] = true
+SOUNDS["AY8910"] = true
+SOUNDS["YM3526"] = true
+SOUNDS["YM3812"] = true
+SOUNDS["C6280"] = true
+SOUNDS["SN76496"] = true
+SOUNDS["K053260"] = true
+SOUNDS["SEGAPCM"] = true
+SOUNDS["MULTIPCM"] = true
+SOUNDS["GB_SOUND"] = true
+SOUNDS["POKEY"] = true
+SOUNDS["C352"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -69,11 +81,15 @@ function createVirtualProjects(_target, _subtarget, _name)
 		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "3rdparty",
 	}
+
+	includedirs {
+		ext_includedir("zlib"),
+	}
 end
 
 function createProjects_mame_virtual(_target, _subtarget)
-createVirtualProjects(_target, _subtarget, "virtual")
-files {
-	MAME_DIR .. "src/mame/drivers/vgmplay.cpp",
-}
+	createVirtualProjects(_target, _subtarget, "virtual")
+	files {
+		MAME_DIR .. "src/mame/drivers/vgmplay.cpp",
+	}
 end

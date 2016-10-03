@@ -1162,7 +1162,7 @@ WRITE8_MEMBER( sp0256_device::ald_w )
 	/* ---------------------------------------------------------------- */
 	if (!m_lrq)
 	{
-		LOG(("sp0256: Droped ALD write\n"));
+		LOG(("sp0256: Dropped ALD write\n"));
 		return;
 	}
 

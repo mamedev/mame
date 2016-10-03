@@ -279,10 +279,10 @@ ioport_constructor intvecs_keybd_device::device_input_ports() const
 	return INPUT_PORTS_NAME( intvecs_keybd );
 }
 
-intvecs_keybd_device::intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ECS_KEYBD, "Mattel Intellivision ECS Keyboard", tag, owner, clock, "intvecs_keybd", __FILE__),
-	device_intvecs_control_port_interface(mconfig, *this),
-	m_keybd(*this, "ROW")
+intvecs_keybd_device::intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ECS_KEYBD, "Mattel Intellivision ECS Keyboard", tag, owner, clock, "intvecs_keybd", __FILE__)
+	, device_intvecs_control_port_interface(mconfig, *this)
+	, m_keybd(*this, "ROW.%u", 0)
 {
 }
 
@@ -415,7 +415,7 @@ ioport_constructor intvecs_synth_device::device_input_ports() const
 intvecs_synth_device::intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ECS_SYNTH, "Mattel Intellivision ECS Synthetizer", tag, owner, clock, "intvecs_synth", __FILE__),
 	device_intvecs_control_port_interface(mconfig, *this),
-	m_synth(*this, "SYNTH")
+	m_synth(*this, "SYNTH.%u", 0)
 {
 }
 

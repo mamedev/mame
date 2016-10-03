@@ -97,6 +97,13 @@ undoukai:
 
 ;@s:8080bw.cpp
 
+;updated when start a game
+escmars:
+@:maincpu,program,20db,1,0a,0a
+@:maincpu,program,20cf,a,1b,1b
+@:maincpu,program,20f4,2,00,05
+
+
 darthvdr:
 @:maincpu,program,1c08,2,00,00
 
@@ -1922,6 +1929,16 @@ carjmbre:
 
 ;@s:cave.cpp
 
+agalleta:
+agalletah:
+agalletaj:
+agalletak:
+agalletat:
+agalletau:
+@:maincpu,program,100292,5a,00,00
+@:maincpu,program,100200,2,02,1a
+
+
 ;(mazinger z)
 mazinger:
 mazingerj:
@@ -3286,8 +3303,9 @@ ssf2tad:
 ssf2tu:
 ssf2tur1:
 ssf2xj:
-ssf2xjd:
-ssf2xjr:
+ssf2xjr1:
+ssf2xjr1d:
+ssf2xjr1r:
 @:maincpu,program,ffd6a2,30,00,20
 @:maincpu,program,ffd71a,4,00,00
 
@@ -4575,6 +4593,11 @@ dominob:
 
 
 ;@s:dooyong.cpp
+
+gulfstrmk:
+@:maincpu,program,c580,80,00,2e
+@:maincpu,program,c618,4,00,00
+
 
 ;******Pop Bingo
 ;** you cant tenter any names into hiscore table yet, driver problem ??? **
@@ -6634,6 +6657,13 @@ reikaids:
 ;battlcry:[Special thanks to Cananas for making this entry work]
 battlcry:
 @:maincpu,program,4449,2a,48,00
+
+
+;@s:hornet.cpp
+
+gradius4:
+@:maincpu,program,2878,50,00,84
+@:maincpu,program,48fc,04,00,d4
 
 
 ;@s:hvyunit.cpp
@@ -8922,6 +8952,7 @@ mtlchampu1:
 ;metamrphu:******Metamorphic Force (ver uaa)
 metamrph:
 metamrpha:
+metamrphe:
 metamrphj:
 metamrphu:
 @:maincpu,program,203240,35,00,5a
@@ -10986,6 +11017,7 @@ r2dx_v33:
 
 
 nzeroteam:
+nzeroteama:
 @:maincpu,program,925c,4b,40,55
 
 
@@ -11833,6 +11865,12 @@ elim4:
 
 
 ;@s:segahang.cpp
+
+shangonho:
+@:maincpu,program,20d400,1b2,01,00
+@:maincpu,program,20d5ad,1,20,20
+@:maincpu,program,20d678,70,99,99
+
 
 ;enduror1:******Enduro Racer (YM2203, FD1089B 317-0013A)
 enduror:
@@ -15488,6 +15526,10 @@ timepltc:
 
 ;@s:tmnt.cpp
 
+tmntub:
+@:maincpu,program,63500,f3,03,41
+
+
 tmht22pe:
 tmnt2:
 tmnt22pu:
@@ -15574,6 +15616,10 @@ glfgreat:
 
 ;@s:tnzs.cpp
 
+tnzsuo:
+@:maincpu,program,e68d,23,00,55
+
+
 ;jpopnics:******Jumping Pop (Nics, Korean bootleg of Plump Pop)
 jpopnics:
 @:maincpu,program,c625,27,00,4b
@@ -15646,16 +15692,7 @@ tnzsjo:
 
 ;@s:toaplan1.cpp
 
-rallybik:
-@:maincpu,program,801ac,324,00,40
-@:maincpu,program,8053d,1,17,17
-@:maincpu,program,80555,1,04,04
-@:maincpu,program,8056d,1,00,00
-@:maincpu,program,80585,1,00,00
-@:maincpu,program,8059d,1,00,00
-@:maincpu,program,805b5,1,00,00
-
-
+;***** truxton fixed (delete old truxton entry and replace).
 truxton:
 @:maincpu,program,0819de,16c,00,0b
 @:maincpu,program,81c53,1,2d,2d
@@ -15666,7 +15703,16 @@ truxton:
 @:maincpu,program,81c67,1,00,00
 @:maincpu,program,81c6b,1,00,00
 @:maincpu,program,81c6f,1,00,00
-@:maincpu,program,81c73,1,00,00
+
+
+rallybik:
+@:maincpu,program,801ac,324,00,40
+@:maincpu,program,8053d,1,17,17
+@:maincpu,program,80555,1,04,04
+@:maincpu,program,8056d,1,00,00
+@:maincpu,program,80585,1,00,00
+@:maincpu,program,8059d,1,00,00
+@:maincpu,program,805b5,1,00,00
 
 
 samesame2:

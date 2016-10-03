@@ -48,9 +48,9 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_tx_tile_info)
 
 void wc90b_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90b_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,64,32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90b_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90b_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90b_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90b_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90b_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
@@ -131,9 +131,10 @@ UINT32 wc90b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_fg_tilemap->set_scrolly(0,m_scroll1y[0] + 1 + ((m_scroll1x[0] & 0x80) ? 256 : 0));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect, 1 );
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	// TODO: if scoring on same Y as GOAL message, ball will be above it. Might be a btanb.
 	draw_sprites(bitmap,cliprect, 0 );
 	return 0;
 }

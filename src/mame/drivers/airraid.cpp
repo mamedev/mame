@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina, Angelo Salese, hap
 /* Air Raid (aka Cross Shooter) (c) 1987 Seibu
-  
+
   this driver is for the single board version on the S-0087-011A-0 PCB
   for the version using a S-0086-002-B0 base PCB and separate video board see stfight.cpp
 
@@ -39,7 +39,7 @@
 
 Haze's notes
  - video system is very similar to darkmist.cpp
- 
+
 
 Stephh's notes (based on the game Z80 code and some tests) :
 
@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( airraid, airraid_state )
 	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)      /* verified on pcb */
 	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")	
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)

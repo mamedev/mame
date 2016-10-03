@@ -18,18 +18,19 @@
 #define LIBRARY_H
 
 #include <time.h>
+#include <list>
 
 #include "corestr.h"
 #include "opresolv.h"
 #include "stream.h"
 #include "unicode.h"
 #include "charconv.h"
+#include "pool.h"
 
 
 struct imgtool_image;
 struct imgtool_partition;
 struct imgtool_directory;
-struct imgtool_library;
 
 enum imgtool_suggestion_viability_t
 {
@@ -51,12 +52,6 @@ union filterinfo
 };
 
 typedef void (*filter_getinfoproc)(UINT32 state, union filterinfo *info);
-
-enum imgtool_libsort_t
-{
-	ITLS_NAME,
-	ITLS_DESCRIPTION
-};
 
 struct imgtool_dirent
 {
@@ -198,7 +193,6 @@ enum
 	IMGTOOLINFO_PTR_GET_ICON_INFO,
 	IMGTOOLINFO_PTR_SUGGEST_TRANSFER,
 	IMGTOOLINFO_PTR_GET_CHAIN,
-	IMGTOOLINFO_PTR_GET_SECTOR_SIZE,
 	IMGTOOLINFO_PTR_GET_GEOMETRY,
 	IMGTOOLINFO_PTR_READ_SECTOR,
 	IMGTOOLINFO_PTR_WRITE_SECTOR,
@@ -281,9 +275,8 @@ union imgtoolinfo
 	imgtoolerr_t    (*get_iconinfo)     (imgtool_partition *partition, const char *path, imgtool_iconinfo *iconinfo);
 	imgtoolerr_t    (*suggest_transfer) (imgtool_partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length);
 	imgtoolerr_t    (*get_chain)        (imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size);
-	imgtoolerr_t    (*get_sector_size)  (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size);
 	imgtoolerr_t    (*get_geometry)     (imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors);
-	imgtoolerr_t    (*read_sector)      (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len);
+	imgtoolerr_t    (*read_sector)      (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
 	imgtoolerr_t    (*write_sector)     (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam);
 	imgtoolerr_t    (*read_block)       (imgtool_image *image, void *buffer, UINT64 block);
 	imgtoolerr_t    (*write_block)      (imgtool_image *image, const void *buffer, UINT64 block);
@@ -291,8 +284,8 @@ union imgtoolinfo
 	int             (*approve_filename_char)(unicode_char ch);
 	int             (*make_class)(int index, imgtool_class *imgclass);
 
-	const option_guide *createimage_optguide;
-	const option_guide *writefile_optguide;
+	const util::option_guide *createimage_optguide;
+	const util::option_guide *writefile_optguide;
 };
 
 
@@ -336,9 +329,6 @@ char *imgtool_temp_str(void);
 
 struct imgtool_module
 {
-	imgtool_module *previous;
-	imgtool_module *next;
-
 	imgtool_class imgclass;
 
 	const char *name;
@@ -359,9 +349,8 @@ struct imgtool_module
 	void            (*close)        (imgtool_image *image);
 	void            (*info)         (imgtool_image *image, char *string, size_t len);
 	imgtoolerr_t    (*create)       (imgtool_image *image, imgtool_stream *f, util::option_resolution *opts);
-	imgtoolerr_t    (*get_sector_size)(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size);
 	imgtoolerr_t    (*get_geometry) (imgtool_image *image, UINT32 *track, UINT32 *heads, UINT32 *sectors);
-	imgtoolerr_t    (*read_sector)  (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len);
+	imgtoolerr_t    (*read_sector)  (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
 	imgtoolerr_t    (*write_sector) (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len);
 	imgtoolerr_t    (*read_block)   (imgtool_image *image, void *buffer, UINT64 block);
 	imgtoolerr_t    (*write_block)  (imgtool_image *image, const void *buffer, UINT64 block);
@@ -369,40 +358,65 @@ struct imgtool_module
 
 	UINT32 block_size;
 
-	const option_guide *createimage_optguide;
+	const util::option_guide *createimage_optguide;
 	const char *createimage_optspec;
 
 	const void *extra;
 };
 
-/* creates an imgtool library */
-imgtool_library *imgtool_library_create(void);
+namespace imgtool {
 
-/* closes an imgtool library */
-void imgtool_library_close(imgtool_library *library);
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/* adds a module to an imgtool library */
-void imgtool_library_add(imgtool_library *library, imgtool_get_info get_info);
+// imgtool "library" - equivalent to the MAME driver list
+class library
+{
+public:
+	typedef std::list<std::unique_ptr<imgtool_module> > modulelist;
 
-/* seeks out and removes a module from an imgtool library */
-const imgtool_module *imgtool_library_unlink(imgtool_library *library,
-	const char *module);
+	enum class sort_type
+	{
+		NAME,
+		DESCRIPTION
+	};
 
-/* sorts an imgtool library */
-void imgtool_library_sort(imgtool_library *library, imgtool_libsort_t sort);
+	library();
+	~library();
 
-/* finds a module */
-const imgtool_module *imgtool_library_findmodule(
-	imgtool_library *library, const char *module_name);
+	// adds a module to an imgtool library
+	void add(imgtool_get_info get_info);
 
-/* memory allocators for pooled library memory */
-void *imgtool_library_malloc(imgtool_library *library, size_t mem);
-char *imgtool_library_strdup(imgtool_library *library, const char *s);
-char *imgtool_library_strdup_allow_null(imgtool_library *library, const char *s);
+	// seeks out and removes a module from an imgtool library
+	void unlink(const char *module_name);
 
-imgtool_module *imgtool_library_iterate(
-	imgtool_library *library, const imgtool_module *module);
-imgtool_module *imgtool_library_index(
-	imgtool_library *library, int i);
+	// sorts an imgtool library
+	void sort(sort_type sort);
 
-#endif /* LIBRARY_H */
+	// finds a module
+	const imgtool_module *findmodule(const char *module_name);
+
+	// module iteration
+	const modulelist &modules() { return m_modules; }
+
+private:
+	object_pool *   m_pool;
+	modulelist      m_modules;
+
+	// internal lookup and iteration
+	modulelist::iterator find(const char *module_name);
+
+	// helpers
+	void add_class(const imgtool_class *imgclass);
+	int module_compare(const imgtool_module *m1, const imgtool_module *m2, sort_type sort);
+
+	// memory allocators for pooled library memory (these should go away in further C++-ification)
+	void *imgtool_library_malloc(size_t mem);
+	char *imgtool_library_strdup(const char *s);
+	char *imgtool_library_strdup_allow_null(const char *s);
+};
+
+} // namespace imgtool
+
+#endif // LIBRARY_H

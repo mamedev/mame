@@ -375,12 +375,12 @@ const device_type SEGAIC16VID = &device_creator<segaic16_video_device>;
 
 segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__),
-		device_video_interface(mconfig, *this),
-		m_display_enable(0),
-		m_tileram(*this, "^tileram"),
-		m_textram(*this, "^textram"),
-		m_rotateram(*this, "^rotateram"),
-		m_gfxdecode(*this)
+		device_video_interface(mconfig, *this)
+	, m_display_enable(0)
+	, m_tileram(*this, "^tileram")
+	, m_textram(*this, "^textram")
+	, m_rotateram(*this, "^rotateram")
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	memset(m_rotate, 0, sizeof(m_rotate));
 	memset(m_bg_tilemap, 0, sizeof(m_bg_tilemap));
@@ -1136,7 +1136,7 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 	}
 
 	/* create the tilemap for the text layer */
-	info->textmap = &machine().tilemap().create(m_gfxdecode, get_text_info, TILEMAP_SCAN_ROWS,  8,8, 64,28);
+	info->textmap = &machine().tilemap().create(*m_gfxdecode, get_text_info, TILEMAP_SCAN_ROWS, 8,8, 64,28);
 
 	/* configure it */
 	info->textmap_info.rambase = info->textram;
@@ -1152,7 +1152,7 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 	for (pagenum = 0; pagenum < info->numpages; pagenum++)
 	{
 		/* each page is 64x32 */
-		info->tilemaps[pagenum] = &machine().tilemap().create(m_gfxdecode, get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
+		info->tilemaps[pagenum] = &machine().tilemap().create(*m_gfxdecode, get_tile_info, TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 		/* configure the tilemap */
 		info->tmap_info[pagenum].rambase = info->tileram + pagenum * 64*32;

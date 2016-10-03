@@ -264,7 +264,7 @@ DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 	m_p_chargen = memregion("chargen")->base();
 	m_video_timer = timer_alloc(TIMER_VIDEO);
 	m_tilemap = &machine().tilemap().create(
-			m_gfxdecode,
+			*m_gfxdecode,
 			tilemap_get_info_delegate(FUNC(osborne1_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
 			8, 10, 128, 32);
 

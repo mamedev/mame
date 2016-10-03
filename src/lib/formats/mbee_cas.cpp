@@ -238,12 +238,12 @@ static const struct CassetteLegacyWaveFiller mbee_tap_config =
 	0                                       /* trailer_samples */
 };
 
-static casserr_t mbee_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error mbee_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &mbee_tap_config);
 }
 
-static casserr_t mbee_tap_load(cassette_image *cassette)
+static cassette_image::error mbee_tap_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &mbee_tap_config);
 }

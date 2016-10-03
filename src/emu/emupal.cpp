@@ -133,7 +133,7 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 //  set_pen_indirect - set an indirect pen index
 //-------------------------------------------------
 
-void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
+void palette_device::set_pen_indirect(pen_t pen, indirect_pen_t index)
 {
 	// make sure we are in range
 	assert(pen < m_entries && index < m_indirect_entries);
@@ -150,7 +150,7 @@ void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 //  transcolor
 //-------------------------------------------------
 
-UINT32 palette_device::transpen_mask(gfx_element &gfx, int color, int transcolor)
+UINT32 palette_device::transpen_mask(gfx_element &gfx, UINT32 color, indirect_pen_t transcolor)
 {
 	UINT32 entry = gfx.colorbase() + (color % gfx.colors()) * gfx.granularity();
 
@@ -301,14 +301,10 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 	offs_t base = byte_offset / bpe;
 	for (int index = 0; index < count; index++)
 	{
-		UINT32 data = m_paletteram.read(base + index);
-		if (m_paletteram_ext.base() != nullptr)
-			data |= m_paletteram_ext.read(base + index) << (8 * bpe);
-
 		if (indirect)
-			set_indirect_color(base + index, m_raw_to_rgb(data));
+			set_indirect_color(base + index, m_raw_to_rgb(read_entry(base + index)));
 		else
-			m_palette->entry_set_color(base + index, m_raw_to_rgb(data));
+			m_palette->entry_set_color(base + index, m_raw_to_rgb(read_entry(base + index)));
 	}
 }
 

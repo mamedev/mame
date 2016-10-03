@@ -80,6 +80,7 @@ enum
 // device type definition
 const device_type INTEL_28F016S5 = &device_creator<intel_28f016s5_device>;
 const device_type SHARP_LH28F016S = &device_creator<sharp_lh28f016s_device>;
+const device_type SHARP_LH28F016S_16BIT = &device_creator<sharp_lh28f016s_16bit_device>;
 const device_type ATMEL_29C010 = &device_creator<atmel_29c010_device>;
 const device_type AMD_29F010 = &device_creator<amd_29f010_device>;
 const device_type AMD_29F040 = &device_creator<amd_29f040_device>;
@@ -144,6 +145,12 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	case FLASH_INTEL_28F016S5:
 	case FLASH_SHARP_LH28F016S:
 		m_bits = 8;
+		m_size = 0x200000;
+		m_maker_id = MFG_INTEL;
+		m_device_id = 0xaa;
+		break;
+	case FLASH_SHARP_LH28F016S_16BIT:
+		m_bits = 16;
 		m_size = 0x200000;
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0xaa;
@@ -346,6 +353,9 @@ fujitsu_29dl16x_device::fujitsu_29dl16x_device(const machine_config &mconfig, co
 
 sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SHARP_LH28F016S, "Sharp LH28F016S Flash", tag, owner, clock, FLASH_SHARP_LH28F016S, "sharp_lh28f016s", __FILE__) { }
+
+sharp_lh28f016s_16bit_device::sharp_lh28f016s_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh16_device(mconfig, SHARP_LH28F016S_16BIT, "Sharp LH28F016S Flash (16-bit)", tag, owner, clock, FLASH_SHARP_LH28F016S_16BIT, "sharp_lh28f016s_16bit", __FILE__) { }
 
 atmel_29c010_device::atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, ATMEL_29C010, "Atmel 29C010 Flash", tag, owner, clock, FLASH_ATMEL_29C010, "atmel_29c010", __FILE__) { }

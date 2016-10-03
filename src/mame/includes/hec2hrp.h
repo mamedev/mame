@@ -83,7 +83,7 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this,"videoram"),
 		m_hector_videoram(*this,"hector_videoram") ,
-		m_keyboard(*this, "KEY"),
+		m_keyboard(*this, "KEY.%u", 0),
 		m_minidisc_fdc(*this, "wd179x"),
 		m_floppy0(*this, "wd179x:0")
 	{}

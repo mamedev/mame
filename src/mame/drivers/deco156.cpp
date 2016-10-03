@@ -104,14 +104,14 @@ WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base(0x40000 * (data & 0x7));
+		m_oki2->set_rom_bank(data & 0x7);
 		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 }
 
 WRITE32_MEMBER(deco156_state::hvysmsh_oki_0_bank_w)
 {
-	m_oki1->set_bank_base((data & 1) * 0x40000);
+	m_oki1->set_rom_bank(data & 1);
 }
 
 WRITE32_MEMBER(deco156_state::wcvol95_nonbuffered_palette_w)

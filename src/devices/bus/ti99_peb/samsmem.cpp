@@ -119,6 +119,9 @@ machine_config_constructor sams_memory_expansion_device::device_mconfig_addition
 
 void sams_memory_expansion_device::device_start()
 {
+	save_pointer(NAME(m_mapper),16);
+	save_item(NAME(m_map_mode));
+	save_item(NAME(m_mapper));
 }
 
 void sams_memory_expansion_device::device_reset()

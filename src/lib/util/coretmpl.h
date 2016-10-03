@@ -16,18 +16,10 @@
 #include "osdcore.h"
 #include "corealloc.h"
 
+#include <iterator>
+#include <stdexcept>
+#include <utility>
 #include <vector>
-
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-#include <yvals.h>
-#define noexcept _NOEXCEPT
-#endif
-
-// TEMPORARY helper to catch is_pod assertions in the debugger
-#if 0
-#undef assert
-#define assert(x) do { if (!(x)) { fprintf(stderr, "Assert: %s\n", #x); osd_break_into_debugger("Assertion failed"); } } while (0)
-#endif
 
 
 typedef std::vector<UINT8> dynamic_buffer;
@@ -43,32 +35,53 @@ class simple_list final
 public:
 	class auto_iterator
 	{
-public:
+	public:
+		typedef int difference_type;
+		typedef _ElementType value_type;
+		typedef _ElementType *pointer;
+		typedef _ElementType &reference;
+		typedef std::forward_iterator_tag iterator_category;
+
 		// construction/destruction
+		auto_iterator() noexcept : m_current(nullptr) { }
 		auto_iterator(_ElementType *ptr) noexcept : m_current(ptr) { }
 
-		// required operator overrides
+		// required operator overloads
+		bool operator==(const auto_iterator &iter) const noexcept { return m_current == iter.m_current; }
 		bool operator!=(const auto_iterator &iter) const noexcept { return m_current != iter.m_current; }
 		_ElementType &operator*() const noexcept { return *m_current; }
+		_ElementType *operator->() const noexcept { return m_current; }
 		// note that _ElementType::next() must not return a const ptr
-		const auto_iterator &operator++() noexcept { m_current = m_current->next(); return *this; }
+		auto_iterator &operator++() noexcept { m_current = m_current->next(); return *this; }
+		auto_iterator operator++(int) noexcept { auto_iterator result(*this); m_current = m_current->next(); return result; }
 
-private:
+	private:
 		// private state
 		_ElementType *m_current;
 	};
+
+	// construction/destruction
+	simple_list() noexcept
+		: m_head(nullptr)
+		, m_tail(nullptr)
+		, m_count(0)
+	{
+	}
+	~simple_list() noexcept { reset(); }
 
 	// we don't support deep copying
 	simple_list(const simple_list &) = delete;
 	simple_list &operator=(const simple_list &) = delete;
 
-	// construction/destruction
-	simple_list() noexcept
-		: m_head(nullptr),
-			m_tail(nullptr),
-			m_count(0) { }
-
-	~simple_list() noexcept { reset(); }
+	// but we do support cheap swap/move
+	simple_list(simple_list &&list) : simple_list() { operator=(std::move(list)); }
+	simple_list &operator=(simple_list &&list)
+	{
+		using std::swap;
+		swap(m_head, list.m_head);
+		swap(m_tail, list.m_tail);
+		swap(m_count, list.m_count);
+	}
 
 	// simple getters
 	_ElementType *first() const noexcept { return m_head; }
@@ -338,5 +351,77 @@ private:
 	simple_list<_ItemType>  m_freelist;     // list of free objects
 };
 
+
+// ======================> contiguous_sequence_wrapper
+
+namespace util {
+
+// wraps an existing sequence of values
+template<typename T>
+class contiguous_sequence_wrapper
+{
+public:
+	typedef std::ptrdiff_t difference_type;
+	typedef std::size_t size_type;
+	typedef T value_type;
+	typedef T &reference;
+	typedef const T &const_reference;
+	typedef T *pointer;
+	typedef T *iterator;
+	typedef const T *const_iterator;
+	typedef std::reverse_iterator<iterator> reverse_iterator;
+	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
+	contiguous_sequence_wrapper(T *ptr, std::size_t size)
+		: m_begin(ptr)
+		, m_end(ptr + size)
+	{
+	}
+
+	contiguous_sequence_wrapper(const contiguous_sequence_wrapper &that) = default;
+
+	// iteration
+	iterator begin() { return m_begin; }
+	const_iterator begin() const { return m_begin; }
+	const_iterator cbegin() const { return m_begin; }
+	iterator end() { return m_end; }
+	const_iterator end() const { return m_end; }
+	const_iterator cend() const { return m_end; }
+
+	// reverse iteration
+	reverse_iterator rbegin() { return std::reverse_iterator<iterator>(end()); }
+	const_reverse_iterator rbegin() const { return std::reverse_iterator<const_iterator>(end()); }
+	const_reverse_iterator crbegin() const { return std::reverse_iterator<const_iterator>(cend()); }
+	reverse_iterator rend() { return std::reverse_iterator<iterator>(begin()); }
+	const_reverse_iterator rend() const { return std::reverse_iterator<iterator>(begin()); }
+	const_reverse_iterator crend() const { return std::reverse_iterator<iterator>(begin()); }
+
+	// capacity
+	size_type size() const { return m_end - m_begin; }
+	size_type max_size() const { return size(); }
+	bool empty() const { return size() == 0; }
+
+	// element access
+	reference front() { return operator[](0); }
+	const_reference front() const { return operator[](0); }
+	reference back() { return operator[](size() - 1); }
+	const_reference back() const { return operator[](size() - 1); }
+	reference operator[] (size_type n) { return m_begin[n]; }
+	const_reference operator[] (size_type n) const { return m_begin[n]; }
+	reference at(size_type n) { check_in_bounds(n); return operator[](n); }
+	const_reference at(size_type n) const { check_in_bounds(n); return operator[](n); }
+
+private:
+	iterator m_begin;
+	iterator m_end;
+
+	void check_in_bounds(size_type n)
+	{
+		if (n < 0 || n >= size())
+			throw std::out_of_range("invalid contiguous_sequence_wrapper<T> subscript");
+	}
+};
+
+}; // namespace util
 
 #endif

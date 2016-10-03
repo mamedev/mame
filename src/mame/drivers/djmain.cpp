@@ -22,7 +22,7 @@
  *  Gx831 Pop'n Music 2 (1999.04)
  *  Gx980 Pop'n Music 3 (1999.09)
  *
- *  ????? Pop'n Stage (1999.11)
+ *  GQ970 Pop'n Stage (1999.11)
  *  Gx970 Pop'n Stage EX (2000.03)
  *
  *  Chips:
@@ -1195,7 +1195,6 @@ INPUT_PORTS_END
 
 //--------- Pop'n Stage
 
-#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( popnstage )
 	PORT_START("BTN1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1288,7 +1287,6 @@ static INPUT_PORTS_START( popnstage )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:6" )
 INPUT_PORTS_END
-#endif
 
 #ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( popnstex )
@@ -1884,6 +1882,28 @@ ROM_START( popn3 )
 	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
+ROM_START( popnstage )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "970jba01.6a", 0x000000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba02.8a", 0x000001, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
+	ROM_LOAD16_BYTE( "970jba03.19a", 0x000000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba04.20a", 0x000001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba05.22a", 0x100000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba06.24a", 0x100001, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )       /* TILEMAP */
+	ROM_LOAD16_BYTE( "970jba07.22d", 0x000000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba08.23d", 0x000001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba09.25d", 0x100000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba10.27d", 0x100001, 0x80000, NO_DUMP )
+
+	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_IMAGE( "970jba11", 0, SHA1(72e92b73b22a8f35e9faca93211e5acf781e66bb) )  /* GQ970  pop'n stage 1.5 ver1.00  1999/10/15 (C) KONAMI */
+
+	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
+ROM_END
 
 #if 0
 // for reference, these sets have not been verified
@@ -2194,6 +2214,7 @@ GAME( 2002, bmfinal,  0,        djmainj,   bm6thmix, djmain_state, bmfinal,   RO
 GAME( 1998, popn1,    0,        djmaina,   popn1,    djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A)", 0 )
 GAME( 1998, popn2,    0,        djmainj,   popn2,    djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
 GAME( 1998, popn3,    0,        djmainj,   popn2,    djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
+GAME( 1999, popnstage,0,        djmainj,   popnstage,djmain_state, beatmania, ROT0, "Konami", "Pop'n Stage (ver JB-A)", MACHINE_NOT_WORKING )
 
 // for reference, these sets have not been verified
 //GAME( 1998, bm3rdmxb, bm3rdmix, djmainj,   bm3rdmix, djmain_state, beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )

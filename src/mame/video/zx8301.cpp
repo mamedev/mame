@@ -105,18 +105,18 @@ inline void zx8301_device::writebyte(offs_t address, UINT8 data)
 //-------------------------------------------------
 
 zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock, "zx8301", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(zx8301)),
-		m_cpu(*this),
-		m_write_vsync(*this),
-		m_dispoff(1),
-		m_mode8(0),
-		m_base(0),
-		m_flash(1),
-		m_vsync(1),
-		m_vda(0)
+	: device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock, "zx8301", __FILE__)
+	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(zx8301))
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_write_vsync(*this)
+	, m_dispoff(1)
+	, m_mode8(0)
+	, m_base(0)
+	, m_flash(1)
+	, m_vsync(1)
+	, m_vda(0)
 {
 }
 

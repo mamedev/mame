@@ -139,7 +139,7 @@ public:
 		m_palette(*this, "palette"),
 		m_crt(*this, "crt"),
 		m_csw(*this, "CSW"),
-		m_twr(*this, "TWR")
+		m_twr(*this, "TWR.%u", 0)
 	{ }
 
 	tx0_tape_reader_t m_tape_reader;

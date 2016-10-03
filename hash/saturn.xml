@@ -15036,7 +15036,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Area 51 (T-18613G)... -->
-	<software name="area51j" cloneof="area51" supported="no">
+	<software name="area51j" cloneof="area51e" supported="no">
 		<description>Area 51 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Soft Bank</publisher>
@@ -30166,7 +30166,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying area51... -->
-	<software name="area51" supported="no">
+	<software name="area51e" supported="no">
 		<description>Area 51 (Euro)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
@@ -30174,7 +30174,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="area51" sha1="fd0fcee3aec2a9a0b723568290f8fd38fb5ac53c" />
+				<disk name="area51e" sha1="fd0fcee3aec2a9a0b723568290f8fd38fb5ac53c" />
 			</diskarea>
 		</part>
 	</software>
@@ -34643,7 +34643,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying dw-sat-0721-Area_51-usa... -->
-	<software name="area51u" cloneof="area51" supported="no">
+	<software name="area51u" cloneof="area51e" supported="no">
 		<description>Area 51 (USA)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>

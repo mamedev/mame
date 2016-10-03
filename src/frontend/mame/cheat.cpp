@@ -80,6 +80,7 @@
 #include "ui/menu.h"
 #include "cheat.h"
 #include "debug/debugcpu.h"
+#include "debugger.h"
 
 #include <ctype.h>
 
@@ -1081,9 +1082,12 @@ cheat_manager::cheat_manager(running_machine &machine)
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
 		m_cpu = std::make_unique<debugger_cpu>(machine);
-
-		// configure for memory access (shared with debugger)
 		m_cpu->configure_memory(m_symtable);
+	}
+	else
+	{
+		// configure for memory access (shared with debugger)
+		machine.debugger().cpu().configure_memory(m_symtable);
 	}
 
 	// load the cheats

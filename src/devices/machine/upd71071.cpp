@@ -109,7 +109,7 @@ upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag,
 				m_out_dack_1_cb(*this),
 				m_out_dack_2_cb(*this),
 				m_out_dack_3_cb(*this),
-				m_cpu(*this)
+				m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 

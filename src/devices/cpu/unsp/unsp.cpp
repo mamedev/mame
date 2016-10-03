@@ -145,6 +145,7 @@ void unsp_device::device_start()
 	state_add( UNSP_SB,  "SB", m_sb).formatstr("%1u");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -153,11 +154,9 @@ void unsp_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case UNSP_PC:
-			m_debugger_temp = UNSP_LPC;
-			break;
-
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
+		case UNSP_PC:
 			m_debugger_temp = UNSP_LPC;
 			break;
 	}

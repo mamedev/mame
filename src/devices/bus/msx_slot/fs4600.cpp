@@ -15,7 +15,7 @@ msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, co
 	: device_t(mconfig, MSX_SLOT_FS4600, "MSX Internal FS4600 Firmware", tag, owner, clock, "msx_slot_fs4600", __FILE__)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
-	, m_rom_region(*this)
+	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_region_offset(0)
 	, m_rom(nullptr)
 	, m_sram_address(0)
