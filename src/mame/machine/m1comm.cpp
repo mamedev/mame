@@ -88,7 +88,7 @@ MACHINE_CONFIG_END
 
 ROM_START( m1comm )
 	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950E771) )
+	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
 ROM_END
 
 //**************************************************************************
