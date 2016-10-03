@@ -144,7 +144,7 @@ B0000x-xxxxxx: see V7, -800000
 #include "includes/fidelz80.h"
 
 // internal artwork
-#include "fidel_eag.lh" // clickable
+#include "fidel_eag_68k.lh" // clickable
 
 
 class fidel68k_state : public fidelz80base_state
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
