@@ -306,10 +306,13 @@ CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
 	// real hardware does per-pixel sprite collision detection
 	int id = *(int*)&param * 2;
 
-	int sx = m_spr_xy[4 + id];
-	int sy = m_spr_xy[5 + id];
-	int px = m_spr_xy[2 - id] + 3;
-	int py = m_spr_xy[3 - id] + 3;
+	int sx = m_spr_xy[5 + id];
+	int sy = m_spr_xy[4 + id];
+	int px = m_spr_xy[3 - id] + 3;
+	int py = m_spr_xy[2 - id] + 3;
+
+	if (sx < 56)
+		return 0;
 
 	if (px >= sx && px < (sx + 8) && py >= sy && py < (sy + 8))
 		return 1;
