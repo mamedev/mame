@@ -132,6 +132,8 @@ files {
 	MAME_DIR .. "src/emu/mconfig.h",
 	MAME_DIR .. "src/emu/memarray.cpp",
 	MAME_DIR .. "src/emu/memarray.h",
+	MAME_DIR .. "src/emu/natkeyboard.cpp",
+	MAME_DIR .. "src/emu/natkeyboard.h",
 	MAME_DIR .. "src/emu/network.cpp",
 	MAME_DIR .. "src/emu/network.h",
 	MAME_DIR .. "src/emu/parameters.cpp",

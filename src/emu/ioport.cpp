@@ -96,6 +96,7 @@
 #include "xmlfile.h"
 #include "profiler.h"
 #include "ui/uimain.h"
+#include "natkeyboard.h"
 
 #include "osdepend.h"
 
@@ -111,36 +112,11 @@ namespace {
 
 
 //**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-#define LOG_NATURAL_KEYBOARD    0
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
 const int SPACE_COUNT = 3;
-const int KEY_BUFFER_SIZE = 4096;
-const unicode_char INVALID_CHAR = '?';
 
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// character information
-struct char_info
-{
-	unicode_char ch;
-	const char *name;
-	const char *alternate;  // alternative string, in UTF-8
-
-	static const char_info *find(unicode_char target);
-};
 
 
 //**************************************************************************
@@ -178,315 +154,6 @@ inline INT32 apply_scale(INT32 value, INT64 scale)
 {
 	return (INT64(value) * scale) >> 24;
 }
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// XML attributes for the different types
-const char *const seqtypestrings[] = { "standard", "increment", "decrement" };
-
-// master character info table
-const char_info charinfo[] =
-{
-	{ 0x0008,                   "Backspace",    nullptr },     // Backspace
-	{ 0x0009,                   "Tab",          "    " },   // Tab
-	{ 0x000c,                   "Clear",        nullptr },     // Clear
-	{ 0x000d,                   "Enter",        nullptr },     // Enter
-	{ 0x001a,                   "Esc",          nullptr },     // Esc
-	{ 0x0020,                   "Space",        " " },      // Space
-	{ 0x0061,                   nullptr,           "A" },      // a
-	{ 0x0062,                   nullptr,           "B" },      // b
-	{ 0x0063,                   nullptr,           "C" },      // c
-	{ 0x0064,                   nullptr,           "D" },      // d
-	{ 0x0065,                   nullptr,           "E" },      // e
-	{ 0x0066,                   nullptr,           "F" },      // f
-	{ 0x0067,                   nullptr,           "G" },      // g
-	{ 0x0068,                   nullptr,           "H" },      // h
-	{ 0x0069,                   nullptr,           "I" },      // i
-	{ 0x006a,                   nullptr,           "J" },      // j
-	{ 0x006b,                   nullptr,           "K" },      // k
-	{ 0x006c,                   nullptr,           "L" },      // l
-	{ 0x006d,                   nullptr,           "M" },      // m
-	{ 0x006e,                   nullptr,           "N" },      // n
-	{ 0x006f,                   nullptr,           "O" },      // o
-	{ 0x0070,                   nullptr,           "P" },      // p
-	{ 0x0071,                   nullptr,           "Q" },      // q
-	{ 0x0072,                   nullptr,           "R" },      // r
-	{ 0x0073,                   nullptr,           "S" },      // s
-	{ 0x0074,                   nullptr,           "T" },      // t
-	{ 0x0075,                   nullptr,           "U" },      // u
-	{ 0x0076,                   nullptr,           "V" },      // v
-	{ 0x0077,                   nullptr,           "W" },      // w
-	{ 0x0078,                   nullptr,           "X" },      // x
-	{ 0x0079,                   nullptr,           "Y" },      // y
-	{ 0x007a,                   nullptr,           "Z" },      // z
-	{ 0x00a0,                   nullptr,           " " },      // non breaking space
-	{ 0x00a1,                   nullptr,           "!" },      // inverted exclaimation mark
-	{ 0x00a6,                   nullptr,           "|" },      // broken bar
-	{ 0x00a9,                   nullptr,           "(c)" },    // copyright sign
-	{ 0x00ab,                   nullptr,           "<<" },     // left pointing double angle
-	{ 0x00ae,                   nullptr,           "(r)" },    // registered sign
-	{ 0x00bb,                   nullptr,           ">>" },     // right pointing double angle
-	{ 0x00bc,                   nullptr,           "1/4" },    // vulgar fraction one quarter
-	{ 0x00bd,                   nullptr,           "1/2" },    // vulgar fraction one half
-	{ 0x00be,                   nullptr,           "3/4" },    // vulgar fraction three quarters
-	{ 0x00bf,                   nullptr,           "?" },      // inverted question mark
-	{ 0x00c0,                   nullptr,           "A" },      // 'A' grave
-	{ 0x00c1,                   nullptr,           "A" },      // 'A' acute
-	{ 0x00c2,                   nullptr,           "A" },      // 'A' circumflex
-	{ 0x00c3,                   nullptr,           "A" },      // 'A' tilde
-	{ 0x00c4,                   nullptr,           "A" },      // 'A' diaeresis
-	{ 0x00c5,                   nullptr,           "A" },      // 'A' ring above
-	{ 0x00c6,                   nullptr,           "AE" },     // 'AE' ligature
-	{ 0x00c7,                   nullptr,           "C" },      // 'C' cedilla
-	{ 0x00c8,                   nullptr,           "E" },      // 'E' grave
-	{ 0x00c9,                   nullptr,           "E" },      // 'E' acute
-	{ 0x00ca,                   nullptr,           "E" },      // 'E' circumflex
-	{ 0x00cb,                   nullptr,           "E" },      // 'E' diaeresis
-	{ 0x00cc,                   nullptr,           "I" },      // 'I' grave
-	{ 0x00cd,                   nullptr,           "I" },      // 'I' acute
-	{ 0x00ce,                   nullptr,           "I" },      // 'I' circumflex
-	{ 0x00cf,                   nullptr,           "I" },      // 'I' diaeresis
-	{ 0x00d0,                   nullptr,           "D" },      // 'ETH'
-	{ 0x00d1,                   nullptr,           "N" },      // 'N' tilde
-	{ 0x00d2,                   nullptr,           "O" },      // 'O' grave
-	{ 0x00d3,                   nullptr,           "O" },      // 'O' acute
-	{ 0x00d4,                   nullptr,           "O" },      // 'O' circumflex
-	{ 0x00d5,                   nullptr,           "O" },      // 'O' tilde
-	{ 0x00d6,                   nullptr,           "O" },      // 'O' diaeresis
-	{ 0x00d7,                   nullptr,           "X" },      // multiplication sign
-	{ 0x00d8,                   nullptr,           "O" },      // 'O' stroke
-	{ 0x00d9,                   nullptr,           "U" },      // 'U' grave
-	{ 0x00da,                   nullptr,           "U" },      // 'U' acute
-	{ 0x00db,                   nullptr,           "U" },      // 'U' circumflex
-	{ 0x00dc,                   nullptr,           "U" },      // 'U' diaeresis
-	{ 0x00dd,                   nullptr,           "Y" },      // 'Y' acute
-	{ 0x00df,                   nullptr,           "SS" },     // sharp S
-	{ 0x00e0,                   nullptr,           "a" },      // 'a' grave
-	{ 0x00e1,                   nullptr,           "a" },      // 'a' acute
-	{ 0x00e2,                   nullptr,           "a" },      // 'a' circumflex
-	{ 0x00e3,                   nullptr,           "a" },      // 'a' tilde
-	{ 0x00e4,                   nullptr,           "a" },      // 'a' diaeresis
-	{ 0x00e5,                   nullptr,           "a" },      // 'a' ring above
-	{ 0x00e6,                   nullptr,           "ae" },     // 'ae' ligature
-	{ 0x00e7,                   nullptr,           "c" },      // 'c' cedilla
-	{ 0x00e8,                   nullptr,           "e" },      // 'e' grave
-	{ 0x00e9,                   nullptr,           "e" },      // 'e' acute
-	{ 0x00ea,                   nullptr,           "e" },      // 'e' circumflex
-	{ 0x00eb,                   nullptr,           "e" },      // 'e' diaeresis
-	{ 0x00ec,                   nullptr,           "i" },      // 'i' grave
-	{ 0x00ed,                   nullptr,           "i" },      // 'i' acute
-	{ 0x00ee,                   nullptr,           "i" },      // 'i' circumflex
-	{ 0x00ef,                   nullptr,           "i" },      // 'i' diaeresis
-	{ 0x00f0,                   nullptr,           "d" },      // 'eth'
-	{ 0x00f1,                   nullptr,           "n" },      // 'n' tilde
-	{ 0x00f2,                   nullptr,           "o" },      // 'o' grave
-	{ 0x00f3,                   nullptr,           "o" },      // 'o' acute
-	{ 0x00f4,                   nullptr,           "o" },      // 'o' circumflex
-	{ 0x00f5,                   nullptr,           "o" },      // 'o' tilde
-	{ 0x00f6,                   nullptr,           "o" },      // 'o' diaeresis
-	{ 0x00f8,                   nullptr,           "o" },      // 'o' stroke
-	{ 0x00f9,                   nullptr,           "u" },      // 'u' grave
-	{ 0x00fa,                   nullptr,           "u" },      // 'u' acute
-	{ 0x00fb,                   nullptr,           "u" },      // 'u' circumflex
-	{ 0x00fc,                   nullptr,           "u" },      // 'u' diaeresis
-	{ 0x00fd,                   nullptr,           "y" },      // 'y' acute
-	{ 0x00ff,                   nullptr,           "y" },      // 'y' diaeresis
-	{ 0x2010,                   nullptr,           "-" },      // hyphen
-	{ 0x2011,                   nullptr,           "-" },      // non-breaking hyphen
-	{ 0x2012,                   nullptr,           "-" },      // figure dash
-	{ 0x2013,                   nullptr,           "-" },      // en dash
-	{ 0x2014,                   nullptr,           "-" },      // em dash
-	{ 0x2015,                   nullptr,           "-" },      // horizontal dash
-	{ 0x2018,                   nullptr,           "\'" },     // left single quotation mark
-	{ 0x2019,                   nullptr,           "\'" },     // right single quotation mark
-	{ 0x201a,                   nullptr,           "\'" },     // single low quotation mark
-	{ 0x201b,                   nullptr,           "\'" },     // single high reversed quotation mark
-	{ 0x201c,                   nullptr,           "\"" },     // left double quotation mark
-	{ 0x201d,                   nullptr,           "\"" },     // right double quotation mark
-	{ 0x201e,                   nullptr,           "\"" },     // double low quotation mark
-	{ 0x201f,                   nullptr,           "\"" },     // double high reversed quotation mark
-	{ 0x2024,                   nullptr,           "." },      // one dot leader
-	{ 0x2025,                   nullptr,           ".." },     // two dot leader
-	{ 0x2026,                   nullptr,           "..." },    // horizontal ellipsis
-	{ 0x2047,                   nullptr,           "??" },     // double question mark
-	{ 0x2048,                   nullptr,           "?!" },     // question exclamation mark
-	{ 0x2049,                   nullptr,           "!?" },     // exclamation question mark
-	{ 0xff01,                   nullptr,           "!" },      // fullwidth exclamation point
-	{ 0xff02,                   nullptr,           "\"" },     // fullwidth quotation mark
-	{ 0xff03,                   nullptr,           "#" },      // fullwidth number sign
-	{ 0xff04,                   nullptr,           "$" },      // fullwidth dollar sign
-	{ 0xff05,                   nullptr,           "%" },      // fullwidth percent sign
-	{ 0xff06,                   nullptr,           "&" },      // fullwidth ampersand
-	{ 0xff07,                   nullptr,           "\'" },     // fullwidth apostrophe
-	{ 0xff08,                   nullptr,           "(" },      // fullwidth left parenthesis
-	{ 0xff09,                   nullptr,           ")" },      // fullwidth right parenthesis
-	{ 0xff0a,                   nullptr,           "*" },      // fullwidth asterisk
-	{ 0xff0b,                   nullptr,           "+" },      // fullwidth plus
-	{ 0xff0c,                   nullptr,           "," },      // fullwidth comma
-	{ 0xff0d,                   nullptr,           "-" },      // fullwidth minus
-	{ 0xff0e,                   nullptr,           "." },      // fullwidth period
-	{ 0xff0f,                   nullptr,           "/" },      // fullwidth slash
-	{ 0xff10,                   nullptr,           "0" },      // fullwidth zero
-	{ 0xff11,                   nullptr,           "1" },      // fullwidth one
-	{ 0xff12,                   nullptr,           "2" },      // fullwidth two
-	{ 0xff13,                   nullptr,           "3" },      // fullwidth three
-	{ 0xff14,                   nullptr,           "4" },      // fullwidth four
-	{ 0xff15,                   nullptr,           "5" },      // fullwidth five
-	{ 0xff16,                   nullptr,           "6" },      // fullwidth six
-	{ 0xff17,                   nullptr,           "7" },      // fullwidth seven
-	{ 0xff18,                   nullptr,           "8" },      // fullwidth eight
-	{ 0xff19,                   nullptr,           "9" },      // fullwidth nine
-	{ 0xff1a,                   nullptr,           ":" },      // fullwidth colon
-	{ 0xff1b,                   nullptr,           ";" },      // fullwidth semicolon
-	{ 0xff1c,                   nullptr,           "<" },      // fullwidth less than sign
-	{ 0xff1d,                   nullptr,           "=" },      // fullwidth equals sign
-	{ 0xff1e,                   nullptr,           ">" },      // fullwidth greater than sign
-	{ 0xff1f,                   nullptr,           "?" },      // fullwidth question mark
-	{ 0xff20,                   nullptr,           "@" },      // fullwidth at sign
-	{ 0xff21,                   nullptr,           "A" },      // fullwidth 'A'
-	{ 0xff22,                   nullptr,           "B" },      // fullwidth 'B'
-	{ 0xff23,                   nullptr,           "C" },      // fullwidth 'C'
-	{ 0xff24,                   nullptr,           "D" },      // fullwidth 'D'
-	{ 0xff25,                   nullptr,           "E" },      // fullwidth 'E'
-	{ 0xff26,                   nullptr,           "F" },      // fullwidth 'F'
-	{ 0xff27,                   nullptr,           "G" },      // fullwidth 'G'
-	{ 0xff28,                   nullptr,           "H" },      // fullwidth 'H'
-	{ 0xff29,                   nullptr,           "I" },      // fullwidth 'I'
-	{ 0xff2a,                   nullptr,           "J" },      // fullwidth 'J'
-	{ 0xff2b,                   nullptr,           "K" },      // fullwidth 'K'
-	{ 0xff2c,                   nullptr,           "L" },      // fullwidth 'L'
-	{ 0xff2d,                   nullptr,           "M" },      // fullwidth 'M'
-	{ 0xff2e,                   nullptr,           "N" },      // fullwidth 'N'
-	{ 0xff2f,                   nullptr,           "O" },      // fullwidth 'O'
-	{ 0xff30,                   nullptr,           "P" },      // fullwidth 'P'
-	{ 0xff31,                   nullptr,           "Q" },      // fullwidth 'Q'
-	{ 0xff32,                   nullptr,           "R" },      // fullwidth 'R'
-	{ 0xff33,                   nullptr,           "S" },      // fullwidth 'S'
-	{ 0xff34,                   nullptr,           "T" },      // fullwidth 'T'
-	{ 0xff35,                   nullptr,           "U" },      // fullwidth 'U'
-	{ 0xff36,                   nullptr,           "V" },      // fullwidth 'V'
-	{ 0xff37,                   nullptr,           "W" },      // fullwidth 'W'
-	{ 0xff38,                   nullptr,           "X" },      // fullwidth 'X'
-	{ 0xff39,                   nullptr,           "Y" },      // fullwidth 'Y'
-	{ 0xff3a,                   nullptr,           "Z" },      // fullwidth 'Z'
-	{ 0xff3b,                   nullptr,           "[" },      // fullwidth left bracket
-	{ 0xff3c,                   nullptr,           "\\" },     // fullwidth backslash
-	{ 0xff3d,                   nullptr,           "]" },      // fullwidth right bracket
-	{ 0xff3e,                   nullptr,           "^" },      // fullwidth caret
-	{ 0xff3f,                   nullptr,           "_" },      // fullwidth underscore
-	{ 0xff40,                   nullptr,           "`" },      // fullwidth backquote
-	{ 0xff41,                   nullptr,           "a" },      // fullwidth 'a'
-	{ 0xff42,                   nullptr,           "b" },      // fullwidth 'b'
-	{ 0xff43,                   nullptr,           "c" },      // fullwidth 'c'
-	{ 0xff44,                   nullptr,           "d" },      // fullwidth 'd'
-	{ 0xff45,                   nullptr,           "e" },      // fullwidth 'e'
-	{ 0xff46,                   nullptr,           "f" },      // fullwidth 'f'
-	{ 0xff47,                   nullptr,           "g" },      // fullwidth 'g'
-	{ 0xff48,                   nullptr,           "h" },      // fullwidth 'h'
-	{ 0xff49,                   nullptr,           "i" },      // fullwidth 'i'
-	{ 0xff4a,                   nullptr,           "j" },      // fullwidth 'j'
-	{ 0xff4b,                   nullptr,           "k" },      // fullwidth 'k'
-	{ 0xff4c,                   nullptr,           "l" },      // fullwidth 'l'
-	{ 0xff4d,                   nullptr,           "m" },      // fullwidth 'm'
-	{ 0xff4e,                   nullptr,           "n" },      // fullwidth 'n'
-	{ 0xff4f,                   nullptr,           "o" },      // fullwidth 'o'
-	{ 0xff50,                   nullptr,           "p" },      // fullwidth 'p'
-	{ 0xff51,                   nullptr,           "q" },      // fullwidth 'q'
-	{ 0xff52,                   nullptr,           "r" },      // fullwidth 'r'
-	{ 0xff53,                   nullptr,           "s" },      // fullwidth 's'
-	{ 0xff54,                   nullptr,           "t" },      // fullwidth 't'
-	{ 0xff55,                   nullptr,           "u" },      // fullwidth 'u'
-	{ 0xff56,                   nullptr,           "v" },      // fullwidth 'v'
-	{ 0xff57,                   nullptr,           "w" },      // fullwidth 'w'
-	{ 0xff58,                   nullptr,           "x" },      // fullwidth 'x'
-	{ 0xff59,                   nullptr,           "y" },      // fullwidth 'y'
-	{ 0xff5a,                   nullptr,           "z" },      // fullwidth 'z'
-	{ 0xff5b,                   nullptr,           "{" },      // fullwidth left brace
-	{ 0xff5c,                   nullptr,           "|" },      // fullwidth vertical bar
-	{ 0xff5d,                   nullptr,           "}" },      // fullwidth right brace
-	{ 0xff5e,                   nullptr,           "~" },      // fullwidth tilde
-	{ 0xff5f,                   nullptr,           "((" },     // fullwidth double left parenthesis
-	{ 0xff60,                   nullptr,           "))" },     // fullwidth double right parenthesis
-	{ 0xffe0,                   nullptr,           "\xC2\xA2" },       // fullwidth cent sign
-	{ 0xffe1,                   nullptr,           "\xC2\xA3" },       // fullwidth pound sign
-	{ 0xffe4,                   nullptr,           "\xC2\xA4" },       // fullwidth broken bar
-	{ 0xffe5,                   nullptr,           "\xC2\xA5" },       // fullwidth yen sign
-	{ 0xffe6,                   nullptr,           "\xE2\x82\xA9" },   // fullwidth won sign
-	{ 0xffe9,                   nullptr,           "\xE2\x86\x90" },   // fullwidth left arrow
-	{ 0xffea,                   nullptr,           "\xE2\x86\x91" },   // fullwidth up arrow
-	{ 0xffeb,                   nullptr,           "\xE2\x86\x92" },   // fullwidth right arrow
-	{ 0xffec,                   nullptr,           "\xE2\x86\x93" },   // fullwidth down arrow
-	{ 0xffed,                   nullptr,           "\xE2\x96\xAA" },   // fullwidth solid box
-	{ 0xffee,                   nullptr,           "\xE2\x97\xA6" },   // fullwidth open circle
-	{ UCHAR_SHIFT_1,            "Shift",        nullptr },     // Shift key
-	{ UCHAR_SHIFT_2,            "Ctrl",         nullptr },     // Ctrl key
-	{ UCHAR_MAMEKEY(F1),        "F1",           nullptr },     // F1 function key
-	{ UCHAR_MAMEKEY(F2),        "F2",           nullptr },     // F2 function key
-	{ UCHAR_MAMEKEY(F3),        "F3",           nullptr },     // F3 function key
-	{ UCHAR_MAMEKEY(F4),        "F4",           nullptr },     // F4 function key
-	{ UCHAR_MAMEKEY(F5),        "F5",           nullptr },     // F5 function key
-	{ UCHAR_MAMEKEY(F6),        "F6",           nullptr },     // F6 function key
-	{ UCHAR_MAMEKEY(F7),        "F7",           nullptr },     // F7 function key
-	{ UCHAR_MAMEKEY(F8),        "F8",           nullptr },     // F8 function key
-	{ UCHAR_MAMEKEY(F9),        "F9",           nullptr },     // F9 function key
-	{ UCHAR_MAMEKEY(F10),       "F10",          nullptr },     // F10 function key
-	{ UCHAR_MAMEKEY(F11),       "F11",          nullptr },     // F11 function key
-	{ UCHAR_MAMEKEY(F12),       "F12",          nullptr },     // F12 function key
-	{ UCHAR_MAMEKEY(F13),       "F13",          nullptr },     // F13 function key
-	{ UCHAR_MAMEKEY(F14),       "F14",          nullptr },     // F14 function key
-	{ UCHAR_MAMEKEY(F15),       "F15",          nullptr },     // F15 function key
-	{ UCHAR_MAMEKEY(F16),       "F16",          nullptr },     // F16 function key
-	{ UCHAR_MAMEKEY(F17),       "F17",          nullptr },     // F17 function key
-	{ UCHAR_MAMEKEY(F18),       "F18",          nullptr },     // F18 function key
-	{ UCHAR_MAMEKEY(F19),       "F19",          nullptr },     // F19 function key
-	{ UCHAR_MAMEKEY(F20),       "F20",          nullptr },     // F20 function key
-	{ UCHAR_MAMEKEY(ESC),       "Esc",          "\033" },   // Esc key
-	{ UCHAR_MAMEKEY(INSERT),    "Insert",       nullptr },     // Insert key
-	{ UCHAR_MAMEKEY(DEL),       "Delete",       "\010" },   // Delete key
-	{ UCHAR_MAMEKEY(HOME),      "Home",         "\014" },   // Home key
-	{ UCHAR_MAMEKEY(END),       "End",          nullptr },     // End key
-	{ UCHAR_MAMEKEY(PGUP),      "Page Up",      nullptr },     // Page Up key
-	{ UCHAR_MAMEKEY(PGDN),      "Page Down",    nullptr },     // Page Down key
-	{ UCHAR_MAMEKEY(LEFT),      "Cursor Left",  nullptr },     // Cursor Left
-	{ UCHAR_MAMEKEY(RIGHT),     "Cursor Right", nullptr },     // Cursor Right
-	{ UCHAR_MAMEKEY(UP),        "Cursor Up",    nullptr },     // Cursor Up
-	{ UCHAR_MAMEKEY(DOWN),      "Cursor Down",  nullptr },     // Cursor Down
-	{ UCHAR_MAMEKEY(0_PAD),     "Keypad 0",     nullptr },     // 0 on the numeric keypad
-	{ UCHAR_MAMEKEY(1_PAD),     "Keypad 1",     nullptr },     // 1 on the numeric keypad
-	{ UCHAR_MAMEKEY(2_PAD),     "Keypad 2",     nullptr },     // 2 on the numeric keypad
-	{ UCHAR_MAMEKEY(3_PAD),     "Keypad 3",     nullptr },     // 3 on the numeric keypad
-	{ UCHAR_MAMEKEY(4_PAD),     "Keypad 4",     nullptr },     // 4 on the numeric keypad
-	{ UCHAR_MAMEKEY(5_PAD),     "Keypad 5",     nullptr },     // 5 on the numeric keypad
-	{ UCHAR_MAMEKEY(6_PAD),     "Keypad 6",     nullptr },     // 6 on the numeric keypad
-	{ UCHAR_MAMEKEY(7_PAD),     "Keypad 7",     nullptr },     // 7 on the numeric keypad
-	{ UCHAR_MAMEKEY(8_PAD),     "Keypad 8",     nullptr },     // 8 on the numeric keypad
-	{ UCHAR_MAMEKEY(9_PAD),     "Keypad 9",     nullptr },     // 9 on the numeric keypad
-	{ UCHAR_MAMEKEY(SLASH_PAD), "Keypad /",     nullptr },     // / on the numeric keypad
-	{ UCHAR_MAMEKEY(ASTERISK),  "Keypad *",     nullptr },     // * on the numeric keypad
-	{ UCHAR_MAMEKEY(MINUS_PAD), "Keypad -",     nullptr },     // - on the numeric Keypad
-	{ UCHAR_MAMEKEY(PLUS_PAD),  "Keypad +",     nullptr },     // + on the numeric Keypad
-	{ UCHAR_MAMEKEY(DEL_PAD),   "Keypad .",     nullptr },     // . on the numeric keypad
-	{ UCHAR_MAMEKEY(ENTER_PAD), "Keypad Enter", nullptr },     // Enter on the numeric keypad
-	{ UCHAR_MAMEKEY(PRTSCR),    "Print Screen", nullptr },     // Print Screen key
-	{ UCHAR_MAMEKEY(PAUSE),     "Pause",        nullptr },     // Pause key
-	{ UCHAR_MAMEKEY(LSHIFT),    "Left Shift",   nullptr },     // Left Shift key
-	{ UCHAR_MAMEKEY(RSHIFT),    "Right Shift",  nullptr },     // Right Shift key
-	{ UCHAR_MAMEKEY(LCONTROL),  "Left Ctrl",    nullptr },     // Left Control key
-	{ UCHAR_MAMEKEY(RCONTROL),  "Right Ctrl",   nullptr },     // Right Control key
-	{ UCHAR_MAMEKEY(LALT),      "Left Alt",     nullptr },     // Left Alt key
-	{ UCHAR_MAMEKEY(RALT),      "Right Alt",    nullptr },     // Right Alt key
-	{ UCHAR_MAMEKEY(SCRLOCK),   "Scroll Lock",  nullptr },     // Scroll Lock key
-	{ UCHAR_MAMEKEY(NUMLOCK),   "Num Lock",     nullptr },     // Num Lock key
-	{ UCHAR_MAMEKEY(CAPSLOCK),  "Caps Lock",    nullptr },     // Caps Lock key
-	{ UCHAR_MAMEKEY(LWIN),      "Left Win",     nullptr },     // Left Win key
-	{ UCHAR_MAMEKEY(RWIN),      "Right Win",    nullptr },     // Right Win key
-	{ UCHAR_MAMEKEY(MENU),      "Menu",         nullptr },     // Menu key
-	{ UCHAR_MAMEKEY(CANCEL),    "Break",        nullptr }      // Break/Pause key
-};
 
 
 
@@ -622,6 +289,10 @@ const struct
 };
 
 } // TODO: anonymous namespace
+
+
+// XML attributes for the different types
+const char *const ioport_manager::seqtypestrings[] = { "standard", "increment", "decrement" };
 
 
 std::uint8_t const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
@@ -831,544 +502,6 @@ void digital_joystick::frame_update()
 	}
 }
 
-
-
-//**************************************************************************
-//  NATURAL KEYBOARD
-//**************************************************************************
-
-//-------------------------------------------------
-//  natural_keyboard - constructor
-//-------------------------------------------------
-
-natural_keyboard::natural_keyboard(running_machine &machine)
-	: m_machine(machine),
-		m_bufbegin(0),
-		m_bufend(0),
-		m_status_keydown(false),
-		m_last_cr(false),
-		m_timer(nullptr),
-		m_current_rate(attotime::zero)
-{
-	m_queue_chars = ioport_queue_chars_delegate();
-	m_accept_char = ioport_accept_char_delegate();
-	m_charqueue_empty = ioport_charqueue_empty_delegate();
-}
-
-//-------------------------------------------------
-//  initialize - initialize natural keyboard
-//  support
-//-------------------------------------------------
-
-void natural_keyboard::initialize()
-{
-	// posting keys directly only makes sense for a computer
-	if (machine().ioport().has_keyboard())
-	{
-		m_buffer.resize(KEY_BUFFER_SIZE);
-		m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
-		build_codes(machine().ioport());
-	}
-}
-//-------------------------------------------------
-//  configure - configure callbacks for full-
-//  featured keyboard support
-//-------------------------------------------------
-
-void natural_keyboard::configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty)
-{
-	// set the callbacks
-	m_queue_chars = queue_chars;
-	m_accept_char = accept_char;
-	m_charqueue_empty = charqueue_empty;
-}
-
-
-//-------------------------------------------------
-//  post - post a single character
-//-------------------------------------------------
-
-void natural_keyboard::post(unicode_char ch)
-{
-	// ignore any \n that are preceded by \r
-	if (m_last_cr && ch == '\n')
-	{
-		m_last_cr = false;
-		return;
-	}
-
-	// change all eolns to '\r'
-	if (ch == '\n')
-		ch = '\r';
-	else
-		m_last_cr = (ch == '\r');
-
-	// logging
-	if (LOG_NATURAL_KEYBOARD)
-	{
-		const keycode_map_entry *code = find_code(ch);
-		machine().logerror("natural_keyboard::post(): code=%i (%s) field.name='%s'\n", int(ch), unicode_to_string(ch).c_str(), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
-	}
-
-	// can we post this key in the queue directly?
-	if (can_post_directly(ch))
-		internal_post(ch);
-
-	// can we post this key with an alternate representation?
-	else if (can_post_alternate(ch))
-	{
-		const char_info *info = char_info::find(ch);
-		assert(info != nullptr && info->alternate != nullptr);
-		const char *altstring = info->alternate;
-		while (*altstring != 0)
-		{
-			altstring += uchar_from_utf8(&ch, altstring, strlen(altstring));
-			internal_post(ch);
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  post - post a unicode encoded string
-//-------------------------------------------------
-
-void natural_keyboard::post(const unicode_char *text, size_t length, const attotime &rate)
-{
-	// set the fixed rate
-	m_current_rate = rate;
-
-	// 0 length means strlen
-	if (length == 0)
-		for (const unicode_char *scan = text; *scan != 0; scan++)
-			length++;
-
-	// iterate over characters or until the buffer is full up
-	while (length > 0 && !full())
-	{
-		// fetch next character
-		post(*text++);
-		length--;
-	}
-}
-
-
-//-------------------------------------------------
-//  post_utf8 - post a UTF-8 encoded string
-//-------------------------------------------------
-
-void natural_keyboard::post_utf8(const char *text, size_t length, const attotime &rate)
-{
-	// set the fixed rate
-	m_current_rate = rate;
-
-	// 0-length means strlen
-	if (length == 0)
-		length = strlen(text);
-
-	// iterate until out of characters
-	while (length > 0)
-	{
-		// decode the next character
-		unicode_char uc;
-		int count = uchar_from_utf8(&uc, text, length);
-		if (count < 0)
-		{
-			count = 1;
-			uc = INVALID_CHAR;
-		}
-
-		// append to the buffer
-		post(uc);
-		text += count;
-		length -= count;
-	}
-}
-
-
-//-------------------------------------------------
-//  post_coded - post a coded string
-//-------------------------------------------------
-
-void natural_keyboard::post_coded(const char *text, size_t length, const attotime &rate)
-{
-	static const struct
-	{
-		const char *key;
-		unicode_char code;
-	} codes[] =
-	{
-		{ "BACKSPACE",  8 },
-		{ "BS",         8 },
-		{ "BKSP",       8 },
-		{ "DEL",        UCHAR_MAMEKEY(DEL) },
-		{ "DELETE",     UCHAR_MAMEKEY(DEL) },
-		{ "END",        UCHAR_MAMEKEY(END) },
-		{ "ENTER",      13 },
-		{ "ESC",        '\033' },
-		{ "HOME",       UCHAR_MAMEKEY(HOME) },
-		{ "INS",        UCHAR_MAMEKEY(INSERT) },
-		{ "INSERT",     UCHAR_MAMEKEY(INSERT) },
-		{ "PGDN",       UCHAR_MAMEKEY(PGDN) },
-		{ "PGUP",       UCHAR_MAMEKEY(PGUP) },
-		{ "SPACE",      32 },
-		{ "TAB",        9 },
-		{ "F1",         UCHAR_MAMEKEY(F1) },
-		{ "F2",         UCHAR_MAMEKEY(F2) },
-		{ "F3",         UCHAR_MAMEKEY(F3) },
-		{ "F4",         UCHAR_MAMEKEY(F4) },
-		{ "F5",         UCHAR_MAMEKEY(F5) },
-		{ "F6",         UCHAR_MAMEKEY(F6) },
-		{ "F7",         UCHAR_MAMEKEY(F7) },
-		{ "F8",         UCHAR_MAMEKEY(F8) },
-		{ "F9",         UCHAR_MAMEKEY(F9) },
-		{ "F10",        UCHAR_MAMEKEY(F10) },
-		{ "F11",        UCHAR_MAMEKEY(F11) },
-		{ "F12",        UCHAR_MAMEKEY(F12) },
-		{ "QUOTE",      '\"' }
-	};
-
-	// set the fixed rate
-	m_current_rate = rate;
-
-	// 0-length means strlen
-	if (length == 0)
-		length = strlen(text);
-
-	// iterate through the source string
-	size_t curpos = 0;
-	while (curpos < length)
-	{
-		// extract next character
-		unicode_char ch = text[curpos];
-		size_t increment = 1;
-
-		// look for escape characters
-		if (ch == '{')
-			for (auto & code : codes)
-			{
-				size_t keylen = strlen(code.key);
-				if (curpos + keylen + 2 <= length)
-					if (core_strnicmp(code.key, &text[curpos + 1], keylen) == 0 && text[curpos + keylen + 1] == '}')
-					{
-						ch = code.code;
-						increment = keylen + 2;
-					}
-			}
-
-		// if we got a code, post it
-		if (ch != 0)
-			post(ch);
-		curpos += increment;
-	}
-}
-
-
-//-------------------------------------------------
-//  build_codes - given an input port table, create
-//  an input code table useful for mapping unicode
-//  chars
-//-------------------------------------------------
-
-void natural_keyboard::build_codes(ioport_manager &manager)
-{
-	// iterate over shift keys
-	ioport_field *shift[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN] = { nullptr };
-	for (int curshift = 0; curshift <= ARRAY_LENGTH(shift); curshift++)
-		if (curshift == 0 || shift[curshift - 1] != nullptr)
-
-			// iterate over ports and fields
-			for (auto &port : manager.ports())
-				for (ioport_field &field : port.second->fields())
-					if (field.type() == IPT_KEYBOARD)
-					{
-						// fetch the code, ignoring 0
-						unicode_char code = field.keyboard_code(curshift);
-						if (code == 0)
-							continue;
-
-						// is this a shifter key?
-						if (code >= UCHAR_SHIFT_BEGIN && code <= UCHAR_SHIFT_END)
-							shift[code - UCHAR_SHIFT_BEGIN] = &field;
-
-						// not a shifter key; record normally
-						else
-						{
-							keycode_map_entry newcode;
-							if (curshift == 0)
-							{
-								newcode.field[0] = &field;
-								newcode.field[1] = nullptr;
-							}
-							else
-							{
-								newcode.field[0] = shift[curshift - 1];
-								newcode.field[1] = &field;
-							}
-							newcode.ch = code;
-							m_keycode_map.push_back(newcode);
-
-							if (LOG_NATURAL_KEYBOARD)
-							{
-								machine().logerror("natural_keyboard: code=%i (%s) port=%p field.name='%s'\n", int(code), unicode_to_string(code).c_str(), (void *)&port, field.name());
-							}
-						}
-					}
-}
-
-
-//-------------------------------------------------
-//  can_post_directly - determine if the given
-//  unicode character can be directly posted
-//-------------------------------------------------
-
-bool natural_keyboard::can_post_directly(unicode_char ch)
-{
-	// if we have a queueing callback, then it depends on whether we can accept the character
-	if (!m_queue_chars.isnull())
-		return m_accept_char.isnull() ? true : m_accept_char(ch);
-
-	// otherwise, it depends on the input codes
-	const keycode_map_entry *code = find_code(ch);
-	return (code != nullptr && code->field[0] != nullptr);
-}
-
-
-//-------------------------------------------------
-//  can_post_alternate - determine if the given
-//  unicode character can be posted via translation
-//-------------------------------------------------
-
-bool natural_keyboard::can_post_alternate(unicode_char ch)
-{
-	const char_info *info = char_info::find(ch);
-	if (info == nullptr)
-		return false;
-
-	const char *altstring = info->alternate;
-	if (altstring == nullptr)
-		return false;
-
-	while (*altstring != 0)
-	{
-		unicode_char uchar;
-		int count = uchar_from_utf8(&uchar, altstring, strlen(altstring));
-		if (count <= 0)
-			return false;
-		if (!can_post_directly(uchar))
-			return false;
-		altstring += count;
-	}
-	return true;
-}
-
-
-//-------------------------------------------------
-//  choose_delay - determine the delay between
-//  posting keyboard events
-//-------------------------------------------------
-
-attotime natural_keyboard::choose_delay(unicode_char ch)
-{
-	// if we have a live rate, just use that
-	if (m_current_rate != attotime::zero)
-		return m_current_rate;
-
-	// systems with queue_chars can afford a much smaller delay
-	if (!m_queue_chars.isnull())
-		return attotime::from_msec(10);
-
-	// otherwise, default to constant delay with a longer delay on CR
-	return attotime::from_msec((ch == '\r') ? 200 : 50);
-}
-
-
-//-------------------------------------------------
-//  internal_post - post a keyboard event
-//-------------------------------------------------
-
-void natural_keyboard::internal_post(unicode_char ch)
-{
-	// need to start up the timer?
-	if (empty())
-	{
-		m_timer->adjust(choose_delay(ch));
-		m_status_keydown = 0;
-	}
-
-	// add to the buffer, resizing if necessary
-	m_buffer[m_bufend++] = ch;
-	if ((m_bufend + 1) % m_buffer.size() == m_bufbegin)
-		m_buffer.resize(m_buffer.size() + KEY_BUFFER_SIZE);
-	m_bufend %= m_buffer.size();
-}
-
-
-//-------------------------------------------------
-//  timer - timer callback to keep things flowing
-//  when posting a string of characters
-//-------------------------------------------------
-
-void natural_keyboard::timer(void *ptr, int param)
-{
-	// the driver has a queue_chars handler
-	if (!m_queue_chars.isnull())
-	{
-		while (!empty() && m_queue_chars(&m_buffer[m_bufbegin], 1))
-		{
-			m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
-			if (m_current_rate != attotime::zero)
-				break;
-		}
-	}
-
-	// the driver does not have a queue_chars handler
-	else
-	{
-		if (m_status_keydown)
-			m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
-		m_status_keydown = !m_status_keydown;
-	}
-
-	// need to make sure timerproc is called again if buffer not empty
-	if (!empty())
-		m_timer->adjust(choose_delay(m_buffer[m_bufbegin]));
-}
-
-
-//-------------------------------------------------
-//  unicode_to_string - obtain a string
-//  representation of a given code; used for
-//  logging and debugging
-//-------------------------------------------------
-
-std::string natural_keyboard::unicode_to_string(unicode_char ch)
-{
-	std::string buffer;
-	switch (ch)
-	{
-		// check some magic values
-		case '\0':  buffer.assign("\\0");      break;
-		case '\r':  buffer.assign("\\r");      break;
-		case '\n':  buffer.assign("\\n");      break;
-		case '\t':  buffer.assign("\\t");      break;
-
-		default:
-			// seven bit ASCII is easy
-			if (ch >= 32 && ch < 128)
-			{
-				char temp[2] = { char(ch), 0 };
-				buffer.assign(temp);
-			}
-			else if (ch >= UCHAR_MAMEKEY_BEGIN)
-			{
-				// try to obtain a codename with code_name(); this can result in an empty string
-				input_code code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(ch - UCHAR_MAMEKEY_BEGIN));
-				buffer = machine().input().code_name(code);
-			}
-
-			// did we fail to resolve? if so, we have a last resort
-			if (buffer.empty())
-				buffer = string_format("U+%04X", unsigned(ch));
-			break;
-	}
-	return buffer;
-}
-
-
-//-------------------------------------------------
-//  find_code - find a code in our lookup table
-//-------------------------------------------------
-
-const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(unicode_char ch) const
-{
-	for (auto & elem : m_keycode_map)
-	{
-		if (elem.ch == ch)
-			return &elem;
-	}
-	return nullptr;
-}
-
-
-//-------------------------------------------------
-//  frame_update - once per frame update of the
-//  natural keyboard state
-//-------------------------------------------------
-
-void natural_keyboard::frame_update(ioport_port &port, ioport_value &digital)
-{
-	// is there currently a key down?
-	if (m_status_keydown && !empty())
-	{
-		// loop through this character's component codes
-		const keycode_map_entry *code = find_code(m_buffer[m_bufbegin]);
-		if (code != nullptr)
-			for (int fieldnum = 0; fieldnum < ARRAY_LENGTH(code->field) && code->field[fieldnum] != nullptr; fieldnum++)
-				if (&code->field[fieldnum]->port() == &port)
-					digital |= code->field[fieldnum]->mask();
-	}
-}
-
-
-//-------------------------------------------------
-//  key_name - returns the name of a specific key
-//-------------------------------------------------
-
-std::string natural_keyboard::key_name(unicode_char ch) const
-{
-	std::string str;
-
-	// attempt to get the string from the character info table
-	const char_info *ci = char_info::find(ch);
-	const char *result = (ci != nullptr) ? ci->name : nullptr;
-	if (result != nullptr)
-		str.assign(result);
-
-	// if that doesn't work, convert to UTF-8
-	else if (ch > 0x7F || isprint(ch))
-	{
-		char buf[10];
-		int count = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
-		buf[count] = 0;
-		str.assign(buf);
-	}
-
-	// otherwise, opt for question marks
-	else
-		str.assign("???");
-	return str;
-}
-
-
-//-------------------------------------------------
-//  dump - dumps info to string
-//-------------------------------------------------
-
-std::string natural_keyboard::dump()
-{
-	std::ostringstream buffer;
-	const size_t left_column_width = 24;
-
-	// loop through all codes
-	for (auto & code : m_keycode_map)
-	{
-		// describe the character code
-		std::string description = string_format("%08X (%s) ", code.ch, unicode_to_string(code.ch).c_str());
-
-		// pad with spaces
-		util::stream_format(buffer, "%-*s", left_column_width, description);
-
-		// identify the keys used
-		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != nullptr; field++)
-			util::stream_format(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
-
-		// carriage return
-		buffer << '\n';
-	}
-
-	return buffer.str();
-}
 
 
 //**************************************************************************
@@ -1627,6 +760,82 @@ unicode_char ioport_field::keyboard_code(int which) const
 
 
 //-------------------------------------------------
+//  key_name - returns the name of a specific key
+//-------------------------------------------------
+
+std::string ioport_field::key_name(int which) const
+{
+	unicode_char ch = keyboard_code(which);
+
+	// attempt to get the string from the character info table
+	switch (ch)
+	{
+		case 8: return "Backspace";
+		case 9: return "Tab";
+		case 12: return "Clear";
+		case 13: return "Enter";
+		case 27: return "Esc";
+		case 32: return "Space";
+		case UCHAR_SHIFT_1: return "Shift";
+		case UCHAR_SHIFT_2: return "Ctrl";
+		case UCHAR_MAMEKEY(ESC): return "Esc";
+		case UCHAR_MAMEKEY(INSERT): return "Insert";
+		case UCHAR_MAMEKEY(DEL): return "Delete";
+		case UCHAR_MAMEKEY(HOME): return "Home";
+		case UCHAR_MAMEKEY(END): return "End";
+		case UCHAR_MAMEKEY(PGUP): return "Page Up";
+		case UCHAR_MAMEKEY(PGDN): return "Page Down";
+		case UCHAR_MAMEKEY(LEFT): return "Cursor Left";
+		case UCHAR_MAMEKEY(RIGHT): return "Cursor Right";
+		case UCHAR_MAMEKEY(UP): return "Cursor Up";
+		case UCHAR_MAMEKEY(DOWN): return "Cursor Down";
+		case UCHAR_MAMEKEY(SLASH_PAD): return "Keypad /";
+		case UCHAR_MAMEKEY(ASTERISK): return "Keypad *";
+		case UCHAR_MAMEKEY(MINUS_PAD): return "Keypad -";
+		case UCHAR_MAMEKEY(PLUS_PAD): return "Keypad +";
+		case UCHAR_MAMEKEY(DEL_PAD): return "Keypad .";
+		case UCHAR_MAMEKEY(ENTER_PAD): return "Keypad Enter";
+		case UCHAR_MAMEKEY(PRTSCR): return "Print Screen";
+		case UCHAR_MAMEKEY(PAUSE): return "Pause";
+		case UCHAR_MAMEKEY(LSHIFT): return "Left Shift";
+		case UCHAR_MAMEKEY(RSHIFT): return "Right Shift";
+		case UCHAR_MAMEKEY(LCONTROL): return "Left Ctrl";
+		case UCHAR_MAMEKEY(RCONTROL): return "Right Ctrl";
+		case UCHAR_MAMEKEY(LALT): return "Left Alt";
+		case UCHAR_MAMEKEY(RALT): return "Right Alt";
+		case UCHAR_MAMEKEY(SCRLOCK): return "Scroll Lock";
+		case UCHAR_MAMEKEY(NUMLOCK): return "Num Lock";
+		case UCHAR_MAMEKEY(CAPSLOCK): return "Caps Lock";
+		case UCHAR_MAMEKEY(LWIN): return "Left Win";
+		case UCHAR_MAMEKEY(RWIN): return "Right Win";
+		case UCHAR_MAMEKEY(MENU): return "Menu";
+		case UCHAR_MAMEKEY(CANCEL): return "Break";
+		default: break;
+	}
+
+	// handle function keys
+	if (ch >= UCHAR_MAMEKEY(F1) && ch <= UCHAR_MAMEKEY(F20))
+		return util::string_format("F%d", ch - UCHAR_MAMEKEY(F1) + 1);
+
+	// handle 0-9 on numeric keypad
+	if (ch >= UCHAR_MAMEKEY(0_PAD) && ch <= UCHAR_MAMEKEY(9_PAD))
+		return util::string_format("Keypad %d", ch - UCHAR_MAMEKEY(0_PAD));
+
+	// if that doesn't work, convert to UTF-8
+	if (ch > 0x7F || isprint(ch))
+	{
+		char buf[10];
+		int count = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
+		buf[count] = 0;
+		return std::string(buf);
+	}
+
+	// otherwise, opt for question marks
+	return "???";
+}
+
+
+//-------------------------------------------------
 //  get_user_settings - return the current
 //  settings for the given input field
 //-------------------------------------------------
@@ -1862,6 +1071,15 @@ void ioport_field::frame_update(ioport_value &result)
 	if (machine().ui().is_menu_active())
 		return;
 
+	// if we're a keyboard type and using natural keyboard, bail
+	if (m_type == IPT_KEYBOARD && machine().ui().use_natural_keyboard())
+	{
+		// use just the digital value
+		if (m_digital_value)
+			result |= m_mask;
+		return;
+	}
+
 	// if the state changed, look for switch down/switch up
 	bool curstate = m_digital_value || machine().input().seq_pressed(seq());
 	if (m_live->autofire && !machine().ioport().get_autofire_toggle())
@@ -1883,10 +1101,6 @@ void ioport_field::frame_update(ioport_value &result)
 		m_live->last = curstate;
 		changed = true;
 	}
-
-	// if we're a keyboard type and using natural keyboard, bail
-	if (m_type == IPT_KEYBOARD && machine().ui().use_natural_keyboard())
-		return;
 
 	// coin impulse option
 	int effective_impulse = m_impulse;
@@ -2153,7 +1367,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 			unicode_char ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
-			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch)));
+			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.key_name(which)));
 		}
 
 		// trim extra spaces
@@ -2283,9 +1497,6 @@ void ioport_port::frame_update()
 	// now loop back and modify based on the inputs
 	for (ioport_field &field : fields())
 		field.frame_update(m_live->digital);
-
-	// hook for MESS's natural keyboard support
-	manager().natkeyboard().frame_update(*this, m_live->digital);
 }
 
 
@@ -2440,7 +1651,6 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 ioport_manager::ioport_manager(running_machine &machine)
 	: m_machine(machine),
 		m_safe_to_read(false),
-		m_natkeyboard(machine),
 		m_last_frame_time(attotime::zero),
 		m_last_delta_nsec(0),
 		m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
@@ -2526,7 +1736,9 @@ time_t ioport_manager::initialize()
 					break;
 				}
 
-	m_natkeyboard.initialize();
+	// initialize natural keyboard
+	m_natkeyboard = std::make_unique<natural_keyboard>(machine());
+
 	// register callbacks for when we load configurations
 	machine().configuration().config_register("input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
 
@@ -2628,6 +1840,15 @@ void ioport_manager::exit()
 	playback_end();
 	record_end();
 	timecode_end();
+}
+
+
+//-------------------------------------------------
+//  ~ioport_manager - destructor
+//-------------------------------------------------
+
+ioport_manager::~ioport_manager()
+{
 }
 
 
@@ -3938,31 +3159,6 @@ void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, iopor
 ***************************************************************************/
 
 //-------------------------------------------------
-//  find - look up information about a particular
-//  character
-//-------------------------------------------------
-
-const char_info *char_info::find(unicode_char target)
-{
-	// perform a simple binary search to find the proper alternate
-	int low = 0;
-	int high = ARRAY_LENGTH(charinfo);
-	while (high > low)
-	{
-		int middle = (high + low) / 2;
-		unicode_char ch = charinfo[middle].ch;
-		if (ch < target)
-			low = middle + 1;
-		else if (ch > target)
-			high = middle;
-		else
-			return &charinfo[middle];
-	}
-	return nullptr;
-}
-
-
-//-------------------------------------------------
 //  dynamic_field - constructor
 //-------------------------------------------------
 
@@ -4538,43 +3734,3 @@ input_seq_type ioport_manager::token_to_seq_type(const char *string)
 			return input_seq_type(seqindex);
 	return SEQ_TYPE_INVALID;
 }
-
-
-
-//-------------------------------------------------
-//  validate_natural_keyboard_statics -
-//  validates natural keyboard static data
-//-------------------------------------------------
-
-/*
-int validate_natural_keyboard_statics(void)
-{
-    int i;
-    int error = FALSE;
-    unicode_char last_char = 0;
-    const char_info *ci;
-
-    // check to make sure that charinfo is in order
-    for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
-    {
-        if (last_char >= charinfo[i].ch)
-        {
-            osd_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
-            error = TRUE;
-        }
-        last_char = charinfo[i].ch;
-    }
-
-    // check to make sure that I can look up everything on alternate_charmap
-    for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
-    {
-        ci = char_info::find(charinfo[i].ch);
-        if (ci != &charinfo[i])
-        {
-            osd_printf_error("ioport: expected char_info::find(0x%08x) to work properly\n", charinfo[i].ch);
-            error = TRUE;
-        }
-    }
-    return error;
-}
-*/
