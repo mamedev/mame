@@ -6,7 +6,8 @@
     Fidelity Electronics 6502 based board driver
 
     TODO:
-    - x
+    - Why does fexcelp give error beeps at start? As if chessboard buttons are
+      pressed (button logic is not inverted). It works fine after pressing clear.
 
 ******************************************************************************
 
@@ -173,12 +174,13 @@ PCB label 510-1035A01
 ******************************************************************************
 
 Elite A/S Challenger (EAS)
-This was out in 1982. 2 program updates were released in 1983 and 1984,
+This came out in 1982. 2 program updates were released in 1983 and 1984,
 named Budapest and Glasgow, places where Fidelity won chess computer matches.
+A/S stands for auto sensory, it's the 1st Fidelity board with magnet sensors.
 ---------------------------------
 
 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
-R65C02P4 CPU, default frequency 3MHz*
+R65C02P4 or R6502BP CPU, default frequency 3MHz*
 4KB RAM (2*HM6116), 24KB ROM
 TSI S14001A + speech ROM
 I/O with 8255 PPI and bunch of TTL
@@ -409,7 +411,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sc9_led_w);
 	DECLARE_READ8_MEMBER(sc9_input_r);
 
-	// SC12/6086
+	// SC12
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	DECLARE_READ8_MEMBER(sc12_cart_r);
@@ -423,6 +425,7 @@ public:
 
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
+	DECLARE_READ8_MEMBER(chesster_input_r);
 	DECLARE_DRIVER_INIT(chesster);
 };
 
@@ -679,7 +682,7 @@ READ8_MEMBER(fidel6502_state::sc9_input_r)
 
 
 /******************************************************************************
-    SC12/6086
+    SC12
 ******************************************************************************/
 
 // TTL/generic
@@ -836,6 +839,12 @@ WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
 }
 
+READ8_MEMBER(fidel6502_state::chesster_input_r)
+{
+	// a0-a2,d7: multiplexed inputs (active low)
+	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+}
+
 DRIVER_INIT_MEMBER(fidel6502_state, chesster)
 {
 	membank("bank1")->configure_entries(0, 8, memregion("speech")->base(), 0x4000);
@@ -940,7 +949,7 @@ static ADDRESS_MAP_START( fexcel_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fexcelp_map, AS_PROGRAM, 8, fidel6502_state )
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -956,7 +965,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(sc12_input_r, chesster_control_w)
+	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(chesster_input_r, chesster_control_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1658,7 +1667,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( fexcelp, fexcel )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz)
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
@@ -1964,7 +1973,7 @@ ROM_END
 
 ROM_START( fexcelp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) )
+	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) ) // GI 27C256, no label
 ROM_END
 
 ROM_START( fexcelv )
