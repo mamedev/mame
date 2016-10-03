@@ -28,13 +28,13 @@
 	ptm6840_device::set_external_clocks(*device, _clk0, _clk1, _clk2);
 
 #define MCFG_PTM6840_OUT0_CB(_devcb) \
-	devcb = &ptm6840_device::set_out0_callback(*device, DEVCB_##_devcb);
+	devcb = &ptm6840_device::set_out_callback(*device, 0, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_OUT1_CB(_devcb) \
-	devcb = &ptm6840_device::set_out1_callback(*device, DEVCB_##_devcb);
+	devcb = &ptm6840_device::set_out_callback(*device, 1, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_OUT2_CB(_devcb) \
-	devcb = &ptm6840_device::set_out2_callback(*device, DEVCB_##_devcb);
+	devcb = &ptm6840_device::set_out_callback(*device, 2, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_IRQ_CB(_devcb) \
 	devcb = &ptm6840_device::set_irq_callback(*device, DEVCB_##_devcb);
@@ -53,9 +53,7 @@ public:
 
 	static void set_internal_clock(device_t &device, double clock) { downcast<ptm6840_device &>(device).m_internal_clock = clock; }
 	static void set_external_clocks(device_t &device, double clock0, double clock1, double clock2) { downcast<ptm6840_device &>(device).m_external_clock[0] = clock0; downcast<ptm6840_device &>(device).m_external_clock[1] = clock1; downcast<ptm6840_device &>(device).m_external_clock[2] = clock2; }
-	template<class _Object> static devcb_base &set_out0_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_out0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out1_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_out1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out2_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_out2_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_callback(device_t &device, int index, _Object object) { return downcast<ptm6840_device &>(device).m_out_cb[index].set_callback(object); }
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_irq_cb.set_callback(object); }
 
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
@@ -130,10 +128,8 @@ private:
 	double m_internal_clock;
 	double m_external_clock[3];
 
-	devcb_write_line m_out0_cb;
-	devcb_write_line m_out1_cb;
-	devcb_write_line m_out2_cb;
-	devcb_write_line m_irq_cb;  // function called if IRQ line changes
+	devcb_write_line m_out_cb[3];
+	devcb_write_line m_irq_cb;
 
 	UINT8 m_control_reg[3];
 	UINT8 m_output[3]; // Output states
