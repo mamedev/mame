@@ -31,7 +31,6 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_ppu(*this, "ppu") { }
 
-	//gb_state driver_data;
 	UINT8       m_gb_io[0x10];
 
 	/* Timer related */
@@ -91,6 +90,12 @@ public:
 	optional_device<gb_cart_slot_device> m_cartslot;
 
 protected:
+	enum {
+		SIO_ENABLED = 0x80,
+		SIO_FAST_CLOCK = 0x02,
+		SIO_INTERNAL_CLOCK = 0x01
+	};
+
 	required_device<lr35902_cpu_device> m_maincpu;
 	required_device<gameboy_sound_device> m_apu;
 	required_memory_region m_region_maincpu;

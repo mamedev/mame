@@ -517,7 +517,7 @@ logerror("IF read, serial clock is %04x\n", m_internal_serial_clock);
 /* Called when 512 internal cycles are passed */
 void gb_state::gb_serial_timer_tick()
 {
-	if (SIOCONT & 0x80)
+	if (SIOCONT & SIO_ENABLED)
 	{
 		if (m_sio_count & 1)
 		{
@@ -531,7 +531,7 @@ void gb_state::gb_serial_timer_tick()
 		/* If all bits done, stop timer and trigger interrupt */
 		if (m_sio_count == 0)
 		{
-			SIOCONT &= 0x7F;
+			SIOCONT &= ~SIO_ENABLED;
 			m_maincpu->set_input_line(lr35902_cpu_device::SIO_INT, ASSERT_LINE);
 			// Make sure the state is updated during the current timeslice in case it is read.
 			m_maincpu->execute_set_input(lr35902_cpu_device::SIO_INT, ASSERT_LINE);
@@ -601,7 +601,7 @@ WRITE8_MEMBER(gb_state::gb_timer_callback)
 		}
 	}
 
-	if ((m_internal_serial_clock ^ old_internal_serial_clock) & m_internal_serial_frequency)
+	if (((m_internal_serial_clock ^ old_internal_serial_clock) & m_internal_serial_frequency) && (SIOCONT & SIO_INTERNAL_CLOCK))
 	{
 		gb_serial_timer_tick();
 	}
@@ -615,8 +615,8 @@ WRITE8_MEMBER(gb_state::gbc_io_w)
 	// On CGB the internal serial transfer clock is selectable
 	if (offset == 0x02)
 	{
-		m_internal_serial_frequency = ((data & 0x02) ? 16 : 512) / 2;
-		SIOCONT = (SIOCONT & ~0x02) | (data & 0x02);
+		m_internal_serial_frequency = ((data & SIO_FAST_CLOCK) ? 16 : 512) / 2;
+		SIOCONT = (SIOCONT & ~SIO_FAST_CLOCK) | (data & SIO_FAST_CLOCK);
 	}
 }
 
