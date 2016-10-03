@@ -99,6 +99,41 @@ struct bstr_deleter
 	}
 };
 
+class variant_wrapper
+{
+private:
+	DISABLE_COPYING(variant_wrapper);
+	VARIANT m_variant;
+
+public:
+	variant_wrapper()
+		: m_variant({0})
+	{
+	}
+
+	~variant_wrapper()
+	{
+		Clear();
+	}
+
+	const VARIANT & Get() const
+	{
+		return m_variant;
+	}
+
+	VARIANT* ClearAndGetAddressOf()
+	{
+		Clear();
+		return &m_variant;
+	}
+
+	void Clear()
+	{
+		if (m_variant.vt != VT_EMPTY)
+			VariantClear(&m_variant);
+	}
+};
+
 typedef std::unique_ptr<OLECHAR, bstr_deleter> bstr_ptr;
 
 //============================================================
@@ -295,7 +330,7 @@ private:
 		bstr_ptr bstrNamespace;
 		DWORD uReturned = 0;
 		UINT iDevice;
-		VARIANT var;
+		variant_wrapper var;
 		HRESULT hr;
 
 		// CoInit if needed
@@ -376,20 +411,20 @@ private:
 					continue;
 
 				// For each device, get its device ID
-				hr = pDevices[iDevice]->Get(bstrDeviceID.get(), 0L, &var, nullptr, nullptr);
-				if (SUCCEEDED(hr) && var.vt == VT_BSTR && var.bstrVal != nullptr)
+				hr = pDevices[iDevice]->Get(bstrDeviceID.get(), 0L, var.ClearAndGetAddressOf(), nullptr, nullptr);
+				if (SUCCEEDED(hr) && var.Get().vt == VT_BSTR && var.Get().bstrVal != nullptr)
 				{
 					// Check if the device ID contains "IG_".  If it does, then it's an XInput device
 					// Unfortunately this information can not be found by just using DirectInput
-					if (wcsstr(var.bstrVal, L"IG_"))
+					if (wcsstr(var.Get().bstrVal, L"IG_"))
 					{
 						// If it does, then get the VID/PID from var.bstrVal
 						DWORD dwPid = 0, dwVid = 0;
-						WCHAR* strVid = wcsstr(var.bstrVal, L"VID_");
+						WCHAR* strVid = wcsstr(var.Get().bstrVal, L"VID_");
 						if (strVid && swscanf(strVid, L"VID_%4X", &dwVid) != 1)
 							dwVid = 0;
 
-						WCHAR* strPid = wcsstr(var.bstrVal, L"PID_");
+						WCHAR* strPid = wcsstr(var.Get().bstrVal, L"PID_");
 						if (strPid && swscanf(strPid, L"PID_%4X", &dwPid) != 1)
 							dwPid = 0;
 

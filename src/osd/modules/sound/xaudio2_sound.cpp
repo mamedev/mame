@@ -29,7 +29,6 @@
 #include <thread>
 #include <queue>
 #include <chrono>
-#include <utility>
 
 // MAME headers
 #include "emu.h"
@@ -343,10 +342,7 @@ void sound_xaudio2::exit()
 {
 	// Wait on processing thread to end
 	if (m_hEventExiting)
-	{
 		SetEvent(m_hEventExiting);
-		m_hEventExiting = nullptr;
-	}
 
 	if (m_audioThread.joinable())
 		m_audioThread.join();
