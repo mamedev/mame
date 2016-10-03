@@ -2360,7 +2360,8 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 {
 	vertex_nv vert[4];
 	int m, u;
-	float t[4],v[4];
+	//float t[4];
+	float v[4];
 
 	// take each vertex with its attributes and obtain data for drawing
 	// should use either the vertex program or transformation matrices
@@ -2368,16 +2369,25 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 		// transformation matrices
 		// this part needs more testing
 		for (m = 0; m < count; m++) {
+#if 0
 			for (int i = 0; i < 4; i++) {
 				t[i] = 0;
+				// in matrix.modelview[c][r] c is the column and r is the row of the direct3d matrix
 				for (int j = 0; j < 4; j++)
 					t[i] += matrix.modelview[i][j] * source[m].attribute[0].fv[j];
 			};
 			for (int i = 0; i < 4; i++) {
 				v[i] = 0;
 				for (int j = 0; j < 4; j++)
-					v[i] += matrix.projection[i][j] * t[j];
+					v[i] += matrix.composite[i][j] * t[j];
 			};
+#else
+			for (int i = 0; i < 4; i++) {
+				v[i] = 0;
+				for (int j = 0; j < 4; j++)
+					v[i] += matrix.composite[i][j] * source[m].attribute[0].fv[j];
+			};
+#endif
 			/* it seems these are not needed ?
 			for (int i = 0; i < 3; i++) {
 			    v[i] *= matrix.scale[i];
@@ -3486,9 +3496,29 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		}
 		countlen--;
 	}
+	// projection matrix
+	if ((maddress >= 0x0440) && (maddress < 0x0480)) {
+		maddress = (maddress - 0x0440) / 4;
+		*(UINT32 *)(&matrix.projection[maddress >> 2][maddress & 3]) = data;
+		countlen--;
+	}
 	// modelview matrix
 	if ((maddress >= 0x0480) && (maddress < 0x04c0)) {
 		maddress = (maddress - 0x0480) / 4;
+		/* the modelview matrix is obtained by direct3d by multiplyng the world matrix and the view matrix
+		    modelview = world * view
+		   given a point in 3d space with coordinates x y and z, to find te transformed coordinates
+		   first create a row vector with components (x,y,z,1) then multyply the vector by the matrix
+		    transformed = rowvector * matrix
+		   in direct3d the matrix is stored as the sequence (first digit row, second digit column)
+			11 12 13 14
+			21 22 23 24
+			31 32 33 34
+			41 42 43 44
+		   but it is sent trasposed as the sequence
+			11 21 31 41 12 22 32 42 13 23 33 43 14 24 34 44
+		   so in matrix.modelview[x][y] x is the column and y is the row of the direct3d matrix
+		*/
 		*(UINT32 *)(&matrix.modelview[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
@@ -3498,10 +3528,15 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		*(UINT32 *)(&matrix.modelview_inverse[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
-	// projection matrix
+	// composite matrix
 	if ((maddress >= 0x0680) && (maddress < 0x06c0)) {
 		maddress = (maddress - 0x0680) / 4;
-		*(UINT32 *)(&matrix.projection[maddress >> 2][maddress & 3]) = data;
+		/* the composite matrix is computed by direct3d by multiplying the
+		   world, view, projection and viewport matrices
+		    composite = world * view * projection * viewport
+		   the viewport matrix applies the viewport scale and offset
+		 */
+		*(UINT32 *)(&matrix.composite[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
 	// viewport translate
