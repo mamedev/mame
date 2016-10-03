@@ -4597,22 +4597,22 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="Where in Time is Carmen Sandiego side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" offset="0x0000" />
+				<rom name="where in time is carmen sandiego side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="Where in Time is Carmen Sandiego side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" offset="0x0000" />
+				<rom name="where in time is carmen sandiego side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="Where in Time is Carmen Sandiego side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" offset="0x0000" />
+				<rom name="where in time is carmen sandiego side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="Where in Time is Carmen Sandiego side d (1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
+				<rom name="where in time is carmen sandiego side d (1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4624,7 +4624,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="Where in Time is Carmen Sandiego 800k 3.5 disk (1989)(broderbund)(trex crack).2mg" size="819264" crc="36d3ff6d" sha1="21051ecf94f598da648355e75e46641351ed3230" offset="0x0000" />
+				<rom name="where in time is carmen sandiego 800k 3.5 disk (1989)(broderbund)(trex crack).2mg" size="819264" crc="36d3ff6d" sha1="21051ecf94f598da648355e75e46641351ed3230" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5332,13 +5332,14 @@
 	</software>
 
 	<software name="minr2049">
-		<description>Miner 2049er</description>
+		<description>Miner 2049er (clean crack)</description>
+		<!-- High scores stored on disc, reset to AAA 5000, AAA 4000, AAA 3000, AAA 2000 & AAA 1000 -->
 		<year>1982</year>
 		<publisher>Micro Fun</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="miner_2049er.dsk" size="143360" crc="8c16b767" sha1="b336bb4975674eaf6d8ae2234b19df4fb08b473d" offset="0x0000" />
+				<rom name="miner 2049er (1982)(micro fun)(clean crack).dsk" size="143360" crc="c1024360" sha1="a5913a155a4902310de20c5037067655e11ab088" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
