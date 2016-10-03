@@ -46,7 +46,6 @@ private:
 	int m_rom_cnt;
 	int m_rom_incr;
 	int m_sample_num;
-	int m_temp_vol;
 	bool m_cnt_reset;
 	bool m_rom_out_en;
 	UINT8 m_prev_data;
@@ -66,7 +65,6 @@ istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig
 		m_rom_cnt(0),
 		m_rom_incr(0),
 		m_sample_num(0),
-		m_temp_vol(0),
 		m_cnt_reset(true),
 		m_rom_out_en(false),
 		m_prev_data(0)
@@ -87,7 +85,13 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_
 	{
 		int smpl = 0;
 		if (m_rom_out_en)
-			smpl = ((m_rom[m_rom_cnt] >> m_sample_num) & 1) * 4000;
+			smpl = (m_rom[m_rom_cnt] >> m_sample_num) & 1;
+
+		// below is huge guess
+		if ((m_prev_data & 0x40) == 0)				// b6 noice enable ?
+			smpl &= rand() & 1;	
+		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
+
 		*sample++ = smpl;
 		m_rom_cnt = (m_rom_cnt + m_rom_incr) & 0x1ff;
 	}
@@ -95,23 +99,19 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_
 
 void istrebiteli_sound_device::sound_w(UINT8 data)
 {
-//	if (m_prev_data != data)
-//		printf("sound %02X rescnt %d sample %d outen %d vol %d\n", data, (data >> 1) & 1, (data >> 2) & 7, (data >> 5) & 1, (data >> 6) & 3);
-
-	m_cnt_reset = ((data >> 1) & 1) ? true : false;
+	m_cnt_reset = (data & 2) ? true : false;
 	m_sample_num = (data >> 2) & 7;
-	m_rom_out_en = ((data >> 5) & 1) ? false : true;
+	m_rom_out_en = (data & 0x20) ? false : true;
 
-	if (m_cnt_reset) {
+	if (m_cnt_reset)
+	{
 		m_rom_cnt = 0;
 		m_rom_incr = 0;
-		m_temp_vol = 0;
-	} else
+	}
+	else
 		m_rom_incr = 1;
-
-	if (((data >> 6) & 1) && ((m_prev_data >> 6) & 1) == 0)
-		m_temp_vol = (m_temp_vol + 1) & 3;
-
+//	if (m_prev_data != data)
+//		printf("sound %02X rescnt %d sample %d outen %d b6 %d b7 %d\n", data, (data >> 1) & 1, (data >> 2) & 7, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
 	m_prev_data = data;
 }
 
