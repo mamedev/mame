@@ -446,6 +446,7 @@ void d3d_texture_manager::create_resources()
 		texture.height = m_default_bitmap.height();
 		texture.palette = nullptr;
 		texture.seqid = 0;
+		texture.osddata = 0;
 
 		// now create it
 		auto tex = std::make_unique<texture_info>(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
