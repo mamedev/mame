@@ -20,6 +20,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_reset() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
@@ -35,6 +36,10 @@ public:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq(void);
+	void irq_w(UINT8 sc , int state);
+	void update_flg_sts(void);
+	void sts_w(UINT8 sc , int state);
+	void flg_w(UINT8 sc , int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	DECLARE_READ16_MEMBER(kb_scancode_r);
@@ -108,7 +113,6 @@ private:
 	gv_fsm_state_t m_gv_fsm_state;
 	bool m_gv_int_en;
 	bool m_gv_dma_en;
-	bool m_gv_ready;
 	UINT8 m_gv_cmd; // U65 (GC)
 	UINT16 m_gv_data_w;     // U29, U45, U28 & U44 (GC)
 	UINT16 m_gv_data_r;     // U59 & U60 (GC)
@@ -123,6 +127,11 @@ private:
 	// Interrupt handling
 	UINT8 m_irl_pending;
 	UINT8 m_irh_pending;
+
+	// FLG/STS handling
+	UINT8 m_pa;
+	UINT16 m_flg_status;
+	UINT16 m_sts_status;
 
 	// State of keyboard
 	ioport_value m_kb_state[ 4 ];

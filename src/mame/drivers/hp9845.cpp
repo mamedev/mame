@@ -283,33 +283,45 @@ void hp9845b_state::machine_start()
 				m_graphic_mem.resize(GVIDEO_MEM_SIZE);
 }
 
+void hp9845b_state::device_reset()
+{
+	// FLG & STS are to be reset before sub-devices,
+	// because the latter may set the former in their own reset functions
+	m_flg_status = 0;
+	m_sts_status = 0;
+}
+
 void hp9845b_state::machine_reset()
 {
-		m_lpu->halt_w(1);
-		m_ppu->halt_w(0);
+	m_lpu->halt_w(1);
+	m_ppu->halt_w(0);
 
-		// Some sensible defaults
-		m_video_mar = VIDEO_BUFFER_BASE;
-		m_video_load_mar = false;
-				m_video_first_mar = false;
-		m_video_byte_idx = false;
-		m_video_attr = 0;
-		m_video_buff_idx = false;
-		m_video_blanked = false;
-				m_graphic_sel = false;
-				m_gv_fsm_state = GV_STAT_RESET;
-				m_gv_int_en = false;
-				m_gv_dma_en = false;
-				m_gv_ready = true;
+	// Some sensible defaults
+	m_video_mar = VIDEO_BUFFER_BASE;
+	m_video_load_mar = false;
+	m_video_first_mar = false;
+	m_video_byte_idx = false;
+	m_video_attr = 0;
+	m_video_buff_idx = false;
+	m_video_blanked = false;
+	m_graphic_sel = false;
+	m_gv_fsm_state = GV_STAT_RESET;
+	m_gv_int_en = false;
+	m_gv_dma_en = false;
 
-		m_irl_pending = 0;
-				m_irh_pending = 0;
+	m_irl_pending = 0;
+	m_irh_pending = 0;
+	m_pa = 0;
 
-		memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
-		m_kb_scancode = 0x7f;
-		m_kb_status = 0;
+	sts_w(GVIDEO_PA , true);
 
-		m_beeper->set_state(0);
+	memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
+	m_kb_scancode = 0x7f;
+	m_kb_status = 0;
+
+	m_beeper->set_state(0);
+
+	logerror("STS=%04x FLG=%04x\n" , m_sts_status , m_flg_status);
 }
 
 void hp9845b_state::set_video_mar(UINT16 mar)
@@ -732,27 +744,19 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
 
 void hp9845b_state::update_graphic_bits(void)
 {
-		m_gv_ready = m_gv_fsm_state == GV_STAT_WAIT_DS_0 ||
+		bool gv_ready = m_gv_fsm_state == GV_STAT_WAIT_DS_0 ||
 			m_gv_fsm_state == GV_STAT_WAIT_DS_1 ||
 			m_gv_fsm_state == GV_STAT_WAIT_DS_2;
 
-		bool irq = m_gv_int_en && !m_gv_dma_en && m_gv_ready;
+		flg_w(GVIDEO_PA , gv_ready);
 
-		if (irq) {
-				BIT_SET(m_irh_pending, GVIDEO_PA - 8);
-		} else {
-				BIT_CLR(m_irh_pending, GVIDEO_PA - 8);
-		}
+		bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-		update_irq();
+		irq_w(GVIDEO_PA , irq);
 
-		bool dmar = m_gv_ready && m_gv_dma_en;
+		bool dmar = gv_ready && m_gv_dma_en;
 
 		m_ppu->dmar_w(dmar);
-
-		if (m_ppu->pa_r() == GVIDEO_PA) {
-				m_ppu->flag_w(m_gv_ready);
-		}
 }
 
 void hp9845b_state::graphic_video_render(unsigned video_scanline)
@@ -797,10 +801,10 @@ void hp9845b_state::graphic_video_render(unsigned video_scanline)
 IRQ_CALLBACK_MEMBER(hp9845b_state::irq_callback)
 {
 		if (irqline == HPHYBRID_IRL) {
-						logerror("irq ack L %02x\n" , m_irl_pending);
+			//logerror("irq ack L %02x\n" , m_irl_pending);
 				return m_irl_pending;
 		} else {
-						logerror("irq ack H %02x\n" , m_irh_pending);
+			//logerror("irq ack H %02x\n" , m_irh_pending);
 				return m_irh_pending;
 		}
 }
@@ -809,6 +813,58 @@ void hp9845b_state::update_irq(void)
 {
 		m_ppu->set_input_line(HPHYBRID_IRL , m_irl_pending != 0);
 		m_ppu->set_input_line(HPHYBRID_IRH , m_irh_pending != 0);
+}
+
+void hp9845b_state::irq_w(UINT8 sc , int state)
+{
+	unsigned bit_n = sc % 8;
+
+	if (sc < 8) {
+		if (state) {
+			BIT_SET(m_irl_pending, bit_n);
+		} else {
+			BIT_CLR(m_irl_pending, bit_n);
+		}
+	} else {
+		if (state) {
+			BIT_SET(m_irh_pending, bit_n);
+		} else {
+			BIT_CLR(m_irh_pending, bit_n);
+		}
+	}
+	update_irq();
+}
+
+void hp9845b_state::update_flg_sts(void)
+{
+	bool sts = BIT(m_sts_status , m_pa);
+	bool flg = BIT(m_flg_status , m_pa);
+	m_ppu->status_w(sts);
+	m_ppu->flag_w(flg);
+}
+
+void hp9845b_state::sts_w(UINT8 sc , int state)
+{
+	if (state) {
+		BIT_SET(m_sts_status, sc);
+	} else {
+		BIT_CLR(m_sts_status, sc);
+	}
+	if (sc == m_pa) {
+		update_flg_sts();
+	}
+}
+
+void hp9845b_state::flg_w(UINT8 sc , int state)
+{
+	if (state) {
+		BIT_SET(m_flg_status, sc);
+	} else {
+		BIT_CLR(m_flg_status, sc);
+	}
+	if (sc == m_pa) {
+		update_flg_sts();
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
@@ -867,9 +923,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
 				if ((input[ idx ] & ~m_kb_state[ idx ]) & mask) {
 						// Key pressed, store scancode & generate IRL
 						m_kb_scancode = i;
-						BIT_SET(m_irl_pending , 0);
+						irq_w(0 , 1);
 						BIT_SET(m_kb_status, 0);
-						update_irq();
 
 						// Special case: pressing stop key sets LPU "status" flag
 						if (i == 0x47) {
@@ -893,9 +948,8 @@ READ16_MEMBER(hp9845b_state::kb_status_r)
 
 WRITE16_MEMBER(hp9845b_state::kb_irq_clear_w)
 {
-		BIT_CLR(m_irl_pending , 0);
+		irq_w(0 , 0);
 		BIT_CLR(m_kb_status, 0);
-		update_irq();
 		m_lpu->status_w(0);
 
 		if (BIT(data , 15)) {
@@ -912,42 +966,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::beeper_off)
 
 WRITE8_MEMBER(hp9845b_state::pa_w)
 {
-		if (data == T15_PA) {
-						// RHS tape drive (T15)
-						m_ppu->status_w(m_t15->sts_r());
-						m_ppu->flag_w(m_t15->flg_r());
-				} else if (data == GVIDEO_PA) {
-						// Graphic video
-						m_ppu->status_w(1);
-						m_ppu->flag_w(m_gv_ready);
-		} else {
-				m_ppu->status_w(0);
-				m_ppu->flag_w(0);
-		}
+	if (data != m_pa) {
+		m_pa = data;
+		update_flg_sts();
+	}
 }
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_irq_w)
 {
-		if (state) {
-				BIT_SET(m_irh_pending , T15_PA - 8);
-		} else {
-				BIT_CLR(m_irh_pending , T15_PA - 8);
-		}
-		update_irq();
+	irq_w(T15_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_flg_w)
 {
-	if (m_ppu->pa_r() == T15_PA) {
-				m_ppu->flag_w(state);
-		}
+	flg_w(T15_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_sts_w)
 {
-	if (m_ppu->pa_r() == T15_PA) {
-				m_ppu->status_w(state);
-		}
+	sts_w(T15_PA , state);
 }
 
 static MACHINE_CONFIG_START( hp9845a, hp9845_state )
