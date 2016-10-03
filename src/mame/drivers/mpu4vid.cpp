@@ -283,9 +283,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(cpu1_ptm_irq);
-	DECLARE_WRITE8_MEMBER(vid_o1_callback);
-	DECLARE_WRITE8_MEMBER(vid_o2_callback);
-	DECLARE_WRITE8_MEMBER(vid_o3_callback);
+	DECLARE_WRITE_LINE_MEMBER(vid_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
+	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
 	DECLARE_READ8_MEMBER(pia_ic5_porta_track_r);
 	void mpu4vid_char_cheat( int address);
 	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
@@ -352,26 +352,26 @@ WRITE_LINE_MEMBER(mpu4vid_state::cpu1_ptm_irq)
 }
 
 
-WRITE8_MEMBER(mpu4vid_state::vid_o1_callback)
+WRITE_LINE_MEMBER(mpu4vid_state::vid_o1_callback)
 {
-	m_ptm->set_c2(data); /* this output is the clock for timer2 */
+	m_ptm->set_c2(state); /* this output is the clock for timer2 */
 
-	m_acia_0->write_txc(data);
-	m_acia_0->write_rxc(data);
-	m_acia_1->write_txc(data);
-	m_acia_1->write_rxc(data);
+	m_acia_0->write_txc(state);
+	m_acia_0->write_rxc(state);
+	m_acia_1->write_txc(state);
+	m_acia_1->write_rxc(state);
 }
 
 
-WRITE8_MEMBER(mpu4vid_state::vid_o2_callback)
+WRITE_LINE_MEMBER(mpu4vid_state::vid_o2_callback)
 {
-	m_ptm->set_c3(data); /* this output is the clock for timer3 */
+	m_ptm->set_c3(state); /* this output is the clock for timer3 */
 }
 
 
-WRITE8_MEMBER(mpu4vid_state::vid_o3_callback)
+WRITE_LINE_MEMBER(mpu4vid_state::vid_o3_callback)
 {
-	m_ptm->set_c1(data); /* this output is the clock for timer1 */
+	m_ptm->set_c1(state); /* this output is the clock for timer1 */
 }
 
 
@@ -1383,9 +1383,9 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(mpu4vid_state, vid_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITE8(mpu4vid_state, vid_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(mpu4vid_state, vid_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
+	MCFG_PTM6840_OUT1_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4vid_state, cpu1_ptm_irq))
 	/* Present on all video cards */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -216,7 +216,7 @@ public:
 
 	static void set_channel_number(device_t &device, int channel) { dynamic_cast<cmi01a_device&>(device).m_channel = channel; }
 
-	DECLARE_WRITE8_MEMBER( ptm_out0 );
+	DECLARE_WRITE_LINE_MEMBER( ptm_out0 );
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
@@ -326,7 +326,7 @@ MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 0) // ptm_cmi01a_config
 	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_OUT0_CB(WRITE8(cmi01a_device, ptm_out0))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(cmi01a_device, ptm_out0))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ptm_irq))
 MACHINE_CONFIG_END
 
@@ -1929,9 +1929,9 @@ void cmi01a_device::update_wave_addr(int inc)
 	/* Zero crossing interrupt is a pulse */
 }
 
-WRITE8_MEMBER( cmi01a_device::ptm_out0 )
+WRITE_LINE_MEMBER( cmi01a_device::ptm_out0 )
 {
-	m_ptm_out0 = data;
+	m_ptm_out0 = state;
 }
 
 READ_LINE_MEMBER( cmi01a_device::eosi_r )
@@ -1947,6 +1947,7 @@ READ_LINE_MEMBER( cmi01a_device::zx_r )
 WRITE8_MEMBER( cmi01a_device::write )
 {
 	//printf("C%d W: %02x = %02x\n", m_channel, offset, data);
+
 	switch (offset)
 	{
 		case 0x0:

@@ -228,9 +228,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mpu3ptm_w);
 	DECLARE_READ8_MEMBER(mpu3ptm_r);
 	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
-	DECLARE_WRITE8_MEMBER(ic2_o1_callback);
-	DECLARE_WRITE8_MEMBER(ic2_o2_callback);
-	DECLARE_WRITE8_MEMBER(ic2_o3_callback);
+	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
+	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
 	DECLARE_READ8_MEMBER(pia_ic3_porta_r);
 	DECLARE_WRITE8_MEMBER(pia_ic3_portb_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
@@ -323,17 +323,17 @@ WRITE_LINE_MEMBER(mpu3_state::cpu0_irq)
 
 
 /* IC2 6840 PTM handler probably clocked from elsewhere*/
-WRITE8_MEMBER(mpu3_state::ic2_o1_callback)
+WRITE_LINE_MEMBER(mpu3_state::ic2_o1_callback)
 {
 }
 
 //FIXME FROM HERE
-WRITE8_MEMBER(mpu3_state::ic2_o2_callback)
+WRITE_LINE_MEMBER(mpu3_state::ic2_o2_callback)
 {
 }
 
 
-WRITE8_MEMBER(mpu3_state::ic2_o3_callback)
+WRITE_LINE_MEMBER(mpu3_state::ic2_o3_callback)
 {
 }
 
@@ -860,9 +860,9 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	MCFG_DEVICE_ADD("ptm_ic2", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(MPU3_MASTER_CLOCK)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(mpu3_state, ic2_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITE8(mpu3_state, ic2_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(mpu3_state, ic2_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(mpu3_state, ic2_o1_callback))
+	MCFG_PTM6840_OUT1_CB(WRITELINE(mpu3_state, ic2_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(mpu3_state, ic2_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu3_state, cpu0_irq))
 
 	MCFG_DEVICE_ADD("pia_ic3", PIA6821, 0)

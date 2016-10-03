@@ -130,9 +130,9 @@ private:
 	double m_internal_clock;
 	double m_external_clock[3];
 
-	devcb_write8 m_out0_cb;
-	devcb_write8 m_out1_cb;
-	devcb_write8 m_out2_cb;
+	devcb_write_line m_out0_cb;
+	devcb_write_line m_out1_cb;
+	devcb_write_line m_out2_cb;
 	devcb_write_line m_irq_cb;  // function called if IRQ line changes
 
 	UINT8 m_control_reg[3];

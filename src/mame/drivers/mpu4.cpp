@@ -534,29 +534,29 @@ WRITE8_MEMBER(mpu4_state::bankset_w)
 
 
 /* IC2 6840 PTM handler */
-WRITE8_MEMBER(mpu4_state::ic2_o1_callback)
+WRITE_LINE_MEMBER(mpu4_state::ic2_o1_callback)
 {
-	m_6840ptm->set_c2(data);    /* copy output value to IC2 c2
+	m_6840ptm->set_c2(state);    /* copy output value to IC2 c2
 	this output is the clock for timer2 */
 	/* 1200Hz System interrupt timer */
 }
 
 
-WRITE8_MEMBER(mpu4_state::ic2_o2_callback)
+WRITE_LINE_MEMBER(mpu4_state::ic2_o2_callback)
 {
-	m_pia3->ca1_w(data);    /* copy output value to IC3 ca1 */
+	m_pia3->ca1_w(state);    /* copy output value to IC3 ca1 */
 	/* the output from timer2 is the input clock for timer3 */
 	/* miscellaneous interrupts generated here */
-	m_6840ptm->set_c3(data);
+	m_6840ptm->set_c3(state);
 }
 
 
-WRITE8_MEMBER(mpu4_state::ic2_o3_callback)
+WRITE_LINE_MEMBER(mpu4_state::ic2_o3_callback)
 {
 	/* the output from timer3 is used as a square wave for the alarm output
 	and as an external clock source for timer 1! */
 	/* also runs lamp fade */
-	m_6840ptm->set_c1(data);
+	m_6840ptm->set_c1(state);
 }
 
 /* 6821 PIA handlers */
@@ -3005,9 +3005,9 @@ MACHINE_CONFIG_FRAGMENT( mpu4_common )
 	MCFG_DEVICE_ADD("ptm_ic2", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(MPU4_MASTER_CLOCK / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(mpu4_state, ic2_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITE8(mpu4_state, ic2_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(mpu4_state, ic2_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(mpu4_state, ic2_o1_callback))
+	MCFG_PTM6840_OUT1_CB(WRITELINE(mpu4_state, ic2_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(mpu4_state, ic2_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4_state, cpu0_irq))
 
 	MCFG_DEVICE_ADD("pia_ic3", PIA6821, 0)

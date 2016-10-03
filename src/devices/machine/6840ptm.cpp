@@ -391,13 +391,13 @@ void ptm6840_device::reload_count(int idx)
 		switch (idx)
 		{
 			case 0:
-				m_out0_cb((offs_t)0, m_output[0]);
+				m_out0_cb(m_output[0]);
 				break;
 			case 1:
-				m_out1_cb((offs_t)0, m_output[1]);
+				m_out1_cb(m_output[1]);
 				break;
 			case 2:
-				m_out2_cb((offs_t)0, m_output[2]);
+				m_out2_cb(m_output[2]);
 				break;
 		}
 	}
@@ -528,13 +528,13 @@ WRITE8_MEMBER( ptm6840_device::write )
 				switch (idx)
 				{
 					case 0:
-						m_out0_cb((offs_t)0, 0);
+						m_out0_cb(0);
 						break;
 					case 1:
-						m_out1_cb((offs_t)0, 0);
+						m_out1_cb(0);
 						break;
 					case 2:
-						m_out2_cb((offs_t)0, 0);
+						m_out2_cb(0);
 						break;
 				}
 			}
@@ -629,13 +629,13 @@ void ptm6840_device::timeout(int idx)
 			switch (idx)
 			{
 				case 0:
-					m_out0_cb((offs_t)0, m_output[0]);
+					m_out0_cb(m_output[0]);
 					break;
 				case 1:
-					m_out1_cb((offs_t)0, m_output[1]);
+					m_out1_cb(m_output[1]);
 					break;
 				case 2:
-					m_out2_cb((offs_t)0, m_output[2]);
+					m_out2_cb(m_output[2]);
 					break;
 			}
 		}
@@ -649,13 +649,13 @@ void ptm6840_device::timeout(int idx)
 				switch (idx)
 				{
 					case 0:
-						m_out0_cb((offs_t)0, m_output[0]);
+						m_out0_cb(m_output[0]);
 						break;
 					case 1:
-						m_out1_cb((offs_t)0, m_output[1]);
+						m_out1_cb(m_output[1]);
 						break;
 					case 2:
-						m_out2_cb((offs_t)0, m_output[2]);
+						m_out2_cb(m_output[2]);
 						break;
 				}
 
