@@ -43,6 +43,9 @@ namespace
 	};
 };
 
+namespace osd {
+namespace text {
+
 //============================================================
 //  mbstring_from_wstring
 //============================================================
@@ -74,13 +77,13 @@ static std::wstring &wstring_from_mbstring(std::wstring &dst, const string_sourc
 
 
 //============================================================
-//  astring_from_utf8
+//  to_astring
 //============================================================
 
-std::string &astring_from_utf8(std::string &dst, const std::string &s)
+std::string &to_astring(std::string &dst, const std::string &s)
 {
 	// convert MAME string (UTF-8) to UTF-16
-	std::wstring wstring = wstring_from_utf8(s);
+	std::wstring wstring = to_wstring(s);
 
 	// convert UTF-16 to "ANSI code page" string
 	return mbstring_from_wstring(dst, CP_ACP, string_source<wchar_t>(wstring));
@@ -89,13 +92,13 @@ std::string &astring_from_utf8(std::string &dst, const std::string &s)
 
 
 //============================================================
-//  astring_from_utf8
+//  to_astring
 //============================================================
 
-std::string &astring_from_utf8(std::string &dst, const char *s)
+std::string &to_astring(std::string &dst, const char *s)
 {
 	// convert MAME string (UTF-8) to UTF-16
-	std::wstring wstring = wstring_from_utf8(s);
+	std::wstring wstring = to_wstring(s);
 
 	// convert UTF-16 to "ANSI code page" string
 	return mbstring_from_wstring(dst, CP_ACP, string_source<wchar_t>(wstring));
@@ -103,88 +106,88 @@ std::string &astring_from_utf8(std::string &dst, const char *s)
 
 
 //============================================================
-//  astring_from_utf8
+//  to_astring
 //============================================================
 
-std::string astring_from_utf8(const std::string &s)
+std::string to_astring(const std::string &s)
 {
 	std::string result;
-	astring_from_utf8(result, s);
+	to_astring(result, s);
 	return result;
 }
 
 
 //============================================================
-//  astring_from_utf8
+//  to_astring
 //============================================================
 
-std::string astring_from_utf8(const char *s)
+std::string to_astring(const char *s)
 {
 	std::string result;
-	astring_from_utf8(result, s);
+	to_astring(result, s);
 	return result;
 }
 
 
 //============================================================
-//  utf8_from_astring
+//  from_astring
 //============================================================
 
-std::string &utf8_from_astring(std::string &dst, const std::string &s)
+std::string &from_astring(std::string &dst, const std::string &s)
 {
 	// convert "ANSI code page" string to UTF-16
 	std::wstring wstring;
 	wstring_from_mbstring(wstring, string_source<char>(s), CP_ACP);
 
 	// convert UTF-16 to MAME string (UTF-8)
-	return utf8_from_wstring(dst, wstring);
+	return from_wstring(dst, wstring);
 }
 
 
 //============================================================
-//  utf8_from_astring
+//  from_astring
 //============================================================
 
-std::string &utf8_from_astring(std::string &dst, const CHAR *s)
+std::string &from_astring(std::string &dst, const CHAR *s)
 {
 	// convert "ANSI code page" string to UTF-16
 	std::wstring wstring;
 	wstring_from_mbstring(wstring, string_source<char>(s), CP_ACP);
 
 	// convert UTF-16 to MAME string (UTF-8)
-	return utf8_from_wstring(dst, wstring);
+	return from_wstring(dst, wstring);
 }
 
 
 //============================================================
-//  utf8_from_astring
+//  from_astring
 //============================================================
 
-std::string utf8_from_astring(const std::string &s)
+std::string from_astring(const std::string &s)
 {
 	std::string result;
-	utf8_from_astring(result, s);
+	from_astring(result, s);
 	return result;
 }
 
 
 //============================================================
-//  utf8_from_astring
+//  from_astring
 //============================================================
 
-std::string utf8_from_astring(const CHAR *s)
+std::string from_astring(const CHAR *s)
 {
 	std::string result;
-	utf8_from_astring(result, s);
+	from_astring(result, s);
 	return result;
 }
 
 
 //============================================================
-//  wstring_from_utf8
+//  to_wstring
 //============================================================
 
-std::wstring &wstring_from_utf8(std::wstring &dst, const std::string &s)
+std::wstring &to_wstring(std::wstring &dst, const std::string &s)
 {
 	// convert MAME string (UTF-8) to UTF-16
 	return wstring_from_mbstring(dst, string_source<char>(s), CP_UTF8);
@@ -192,10 +195,10 @@ std::wstring &wstring_from_utf8(std::wstring &dst, const std::string &s)
 
 
 //============================================================
-//  wstring_from_utf8
+//  to_wstring
 //============================================================
 
-std::wstring &wstring_from_utf8(std::wstring &dst, const char *s)
+std::wstring &to_wstring(std::wstring &dst, const char *s)
 {
 	// convert MAME string (UTF-8) to UTF-16
 	return wstring_from_mbstring(dst, string_source<char>(s), CP_UTF8);
@@ -203,34 +206,34 @@ std::wstring &wstring_from_utf8(std::wstring &dst, const char *s)
 
 
 //============================================================
-//  wstring_from_utf8
+//  to_wstring
 //============================================================
 
-std::wstring wstring_from_utf8(const std::string &s)
+std::wstring to_wstring(const std::string &s)
 {
 	std::wstring result;
-	wstring_from_utf8(result, s);
+	to_wstring(result, s);
 	return result;
 }
 
 
 //============================================================
-//  wstring_from_utf8
+//  to_wstring
 //============================================================
 
-std::wstring wstring_from_utf8(const char *s)
+std::wstring to_wstring(const char *s)
 {
 	std::wstring result;
-	wstring_from_utf8(result, s);
+	to_wstring(result, s);
 	return result;
 }
 
 
 //============================================================
-//  utf8_from_wstring
+//  from_wstring
 //============================================================
 
-std::string &utf8_from_wstring(std::string &dst, const std::wstring &s)
+std::string &from_wstring(std::string &dst, const std::wstring &s)
 {
 	// convert UTF-16 to MAME string (UTF-8)
 	return mbstring_from_wstring(dst, CP_UTF8, string_source<wchar_t>(s));
@@ -238,10 +241,10 @@ std::string &utf8_from_wstring(std::string &dst, const std::wstring &s)
 
 
 //============================================================
-//  utf8_from_wstring
+//  from_wstring
 //============================================================
 
-std::string &utf8_from_wstring(std::string &dst, const WCHAR *s)
+std::string &from_wstring(std::string &dst, const WCHAR *s)
 {
 	// convert UTF-16 to MAME string (UTF-8)
 	return mbstring_from_wstring(dst, CP_UTF8, string_source<wchar_t>(s));
@@ -249,27 +252,30 @@ std::string &utf8_from_wstring(std::string &dst, const WCHAR *s)
 
 
 //============================================================
-//  utf8_from_wstring
+//  from_wstring
 //============================================================
 
-std::string utf8_from_wstring(const std::wstring &s)
+std::string from_wstring(const std::wstring &s)
 {
 	std::string result;
-	utf8_from_wstring(result, s);
+	from_wstring(result, s);
 	return result;
 }
 
 
 //============================================================
-//  utf8_from_wstring
+//  from_wstring
 //============================================================
 
-std::string utf8_from_wstring(const WCHAR *s)
+std::string from_wstring(const WCHAR *s)
 {
 	std::string result;
-	utf8_from_wstring(result, s);
+	from_wstring(result, s);
 	return result;
 }
+
+}; // namespace text
+}; // namespace osd
 
 
 //============================================================
@@ -297,6 +303,7 @@ error:
 	*uchar = 0;
 	return static_cast<int>(count);
 }
+
 
 #else
 #include "unicode.h"

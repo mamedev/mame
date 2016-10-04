@@ -36,7 +36,7 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 	// convert arguments to UTF-8
 	for (i = 0; i < argc; i++)
 	{
-		argv_vectors[i] = utf8_from_tstring(argv[i]);
+		argv_vectors[i] = osd::text::from_tstring(argv[i]);
 		utf8_argv[i] = (char *) argv_vectors[i].c_str();
 	}
 
