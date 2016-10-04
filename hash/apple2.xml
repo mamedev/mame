@@ -4591,40 +4591,67 @@
 	</software>
 
 	<software name="carmntime">
+		<description>Where in Time is Carmen Sandiego v1.1 (clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side d (1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmntime35">
+		<description>Where in Time is Carmen Sandiego v1.1 800K 3.5 disc (clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="where in time is carmen sandiego v1.1 800k 3.5 disk (1989)(broderbund)(trex crack).2mg" size="819264" crc="36d3ff6d" sha1="21051ecf94f598da648355e75e46641351ed3230" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmntime10">
 		<description>Where in Time is Carmen Sandiego v1.0 (clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" offset="0x0000" />
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side a.dsk" size="143360" crc="cd3da2a7" sha1="21a9fc7220c84ffec91b4e76b28dc8b514ab56a3" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" offset="0x0000" />
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side b.dsk" size="143360" crc="3bad4b59" sha1="7e84dc0db9e964db44692fa340b6c6828f83bfe6" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" offset="0x0000" />
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side c.dsk" size="143360" crc="650735af" sha1="aecf8b17bb26e73036100ac648e5eddede12fe91" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego side d (1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="carmntime35">
-		<description>Where in Time is Carmen Sandiego v1.0 800K 3.5 disc (clean crack)</description>
-		<year>1989</year>
-		<publisher>Broderbund</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="where in time is carmen sandiego 800k 3.5 disk (1989)(broderbund)(trex crack).2mg" size="819264" crc="36d3ff6d" sha1="21051ecf94f598da648355e75e46641351ed3230" offset="0x0000" />
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side d.dsk " size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
