@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
 		Each board expects reads from the other boards and writes to own bank.
 		Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
 		so it's likely to be the only thing needed. */
-	AM_RANGE(0x084000, 0x087fff) AM_RAM                                                 // Linking with other units
+	AM_RANGE(0x084000, 0x0847ff) AM_RAM                                                 // Linking with other units
 	AM_RANGE(0x088000, 0x08bfff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x08c000, 0x08ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
 
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_WRITE(cischeat_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM                                                                     // Linking with other units
 
 /*  Only the first 0x800 bytes are tested but:
     CPU #0 PC 0000278c: warning - write 68c0 to unmapped memory address 0009c7fe
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM                                                                     // Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( wildplt_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+//	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
@@ -417,7 +417,8 @@ static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+	// 0x100 RAM banks instead of 0x200
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM                                                                     // Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
@@ -1381,6 +1382,20 @@ static INPUT_PORTS_START( f1gpstar )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( f1gpstr2 )
+	PORT_INCLUDE( f1gpstar )
+	
+	PORT_MODIFY("IN4")
+	PORT_DIPNAME( 0x0e, 0x00, "Unit ID" ) PORT_DIPLOCATION("SW03:2,3,4")          // -> !f901c
+	PORT_DIPSETTING(    0x00, "1 (McLaren)" )
+	PORT_DIPSETTING(    0x02, "2 (Williams)" )
+	PORT_DIPSETTING(    0x04, "3 (Benetton)" )
+	PORT_DIPSETTING(    0x06, "4 (Ferrari)" )
+	PORT_DIPSETTING(    0x08, "5 (Tyrrell)" )
+	PORT_DIPSETTING(    0x0a, "6 (Lotus)" )
+	PORT_DIPSETTING(    0x0c, "7 (Jordan)" )
+	PORT_DIPSETTING(    0x0e, "8 (Ligier)" )
+INPUT_PORTS_END
 
 /**************************************************************************
                                 Wild Pilot
@@ -1874,7 +1889,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigrun)
-	MCFG_PALETTE_ADD("palette", 0x4000/2)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000/2)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -2040,7 +2055,7 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
-	MCFG_PALETTE_ADD("palette", 0x8000/2)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
@@ -2129,7 +2144,7 @@ static MACHINE_CONFIG_START( captflag, cischeat_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
-	MCFG_PALETTE_ADD("palette", 0x8000/2)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
@@ -3451,12 +3466,12 @@ DRIVER_INIT_MEMBER(cischeat_state, captflag)
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,   0,        bigrun,   bigrun, cischeat_state,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES?)
+GAMEL( 1989, bigrun,   0,        bigrun,   bigrun, cischeat_state,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
 GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )
 GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
 GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, driver_device, 0,         ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
 GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, driver_device, 0,         ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, wildplt,  0,        wildplt,  wildplt, cischeat_state,  f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS )
-GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAME ( 1992, wildplt,  0,        wildplt,  wildplt, cischeat_state,  f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // can start a play even without a credit, no p2 start, busted timings
+GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstr2, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
 GAME ( 1993, captflag, 0,        captflag, captflag, cischeat_state, captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
 GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, driver_device, 0,         ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
