@@ -551,7 +551,7 @@ public:
 	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 
-	// VBRC/7014
+	// VBRC
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
@@ -882,17 +882,9 @@ READ8_MEMBER(fidelz80_state::bcc_input_r)
 
 void fidelz80_state::vsc_prepare_display()
 {
-	// 4 7seg leds + H
-	for (int i = 0; i < 4; i++)
-		m_display_state[i] = (m_led_select >> i & 1) ? m_7seg_data : 0;
-
-	// 8*8 chessboard leds
-	for (int i = 0; i < 8; i++)
-		m_display_state[i+4] = (m_led_select >> i & 1) ? m_led_data : 0;
-
-	set_display_size(8, 12);
+	// 4 7seg leds+H, 8*8 chessboard leds
 	set_display_segmask(0xf, 0x7f);
-	display_update();
+	display_matrix(16, 8, m_led_data << 8 | m_7seg_data, m_led_select);
 }
 
 
@@ -963,7 +955,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 
 
 /******************************************************************************
-    VBRC/7014
+    VBRC
 ******************************************************************************/
 
 // misc handlers
@@ -1092,7 +1084,7 @@ static ADDRESS_MAP_START( vsc_io, AS_IO, 8, fidelz80_state )
 ADDRESS_MAP_END
 
 
-// VBRC/7014
+// VBRC
 
 WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 {

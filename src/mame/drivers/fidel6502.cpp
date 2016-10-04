@@ -7,7 +7,6 @@
 
     TODO:
     - add EAG external module support, there should be a bankswitch bit somewhere
-    - EAG says part of the intro line at boot, it should be quiet if voice option is disabled
     - Why does fexcelp give error beeps at start? As if chessboard buttons are
       pressed (button logic is not inverted). It works fine after pressing clear.
 
@@ -385,7 +384,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 
-	// CSC
+	// CSC, SU9, RSC
 	void csc_prepare_display();
 	DECLARE_READ8_MEMBER(csc_speech_r);
 	DECLARE_WRITE8_MEMBER(csc_pia0_pa_w);
@@ -400,7 +399,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 
-	// EAS
+	// EAS, EAG
+	void eas_prepare_display();
 	DECLARE_WRITE8_MEMBER(eas_segment_w);
 	DECLARE_WRITE8_MEMBER(eas_led_w);
 	DECLARE_READ8_MEMBER(eas_input_r);
@@ -437,7 +437,7 @@ public:
 // Devices, I/O
 
 /******************************************************************************
-    CSC
+    CSC, SU9, RSC
 ******************************************************************************/
 
 // misc handlers
@@ -450,8 +450,8 @@ void fidel6502_state::csc_prepare_display()
 	// 7442 9: speaker out
 	m_speaker->level_w(m_inp_mux >> 9 & 1);
 
-	// 7seg leds+H(not on all models) + 8*8(+1) chessboard leds
-	set_display_segmask(0x1ef, 0x7f);
+	// 7seg leds+H (not on all models), 8*8(+1) chessboard leds
+	set_display_segmask(0xf, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, m_inp_mux);
 }
 
@@ -559,24 +559,31 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
 
 
 /******************************************************************************
-    EAS
+    EAS, EAG
 ******************************************************************************/
 
 // TTL/generic
+
+void fidel6502_state::eas_prepare_display()
+{
+	// 4/8 7seg leds+H, 8*8(+1) chessboard leds
+	set_display_segmask(0x1ef, 0x7f);
+	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, m_led_select);
+}
 
 WRITE8_MEMBER(fidel6502_state::eas_segment_w)
 {
 	// a0-a2,d7: digit segment
 	m_7seg_data = (data & 0x80) >> offset;
 	m_7seg_data = BITSWAP8(m_7seg_data,7,6,4,5,0,2,1,3);
-	csc_prepare_display();
+	eas_prepare_display();
 }
 
 WRITE8_MEMBER(fidel6502_state::eas_led_w)
 {
 	// a0-a2,d0: led data
 	m_led_data = (data & 1) << offset;
-	csc_prepare_display();
+	eas_prepare_display();
 }
 
 READ8_MEMBER(fidel6502_state::eas_input_r)
@@ -590,6 +597,10 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
+	// pull output low during reset
+	if (machine().phase() == MACHINE_PHASE_RESET)
+		data = 0;
+
 	// d0-d5: TSI C0-C5
 	// d6: TSI START line
 	m_speech->data_w(space, 0, data & 0x3f);
@@ -600,9 +611,18 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 {
-	// d0-d3: input/led mux
-	m_led_select = data & 0xf;
-	csc_prepare_display();
+	// pull output low during reset
+	if (machine().phase() == MACHINE_PHASE_RESET)
+		data = 0;
+
+	// d0-d3: 7442 a0-a3
+	// 7442 0-8: led select, input mux
+	m_led_select = 1 << (data & 0xf) & 0x3ff;
+	m_inp_mux = m_led_select & 0x1ff;
+	eas_prepare_display();
+
+	// 7442 9: speaker out
+	m_speaker->level_w(m_led_select >> 9 & 1);
 
 	// d4: speech ROM A12
 	m_speech->force_update(); // update stream to now
@@ -851,17 +871,7 @@ DRIVER_INIT_MEMBER(fidel6502_state, chesster)
     Address Maps
 ******************************************************************************/
 
-// RSC
-
-static ADDRESS_MAP_START( rsc_map, AS_PROGRAM, 8, fidel6502_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-// CSC
+// CSC, SU9, RSC
 
 static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -873,8 +883,25 @@ static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( su9_map, AS_PROGRAM, 8, fidel6502_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x1800, 0x1803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
+	AM_RANGE(0xa000, 0xa7ff) AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
-// EAS
+static ADDRESS_MAP_START( rsc_map, AS_PROGRAM, 8, fidel6502_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0xf000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+// EAS, EAG
 
 static ADDRESS_MAP_START( eas_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -888,9 +915,6 @@ static ADDRESS_MAP_START( eas_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
-// EAG
-
 static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
@@ -900,19 +924,6 @@ static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x7030, 0x7037) AM_WRITE(eas_led_w) AM_READNOP
 	AM_RANGE(0x7050, 0x7050) AM_READ(eas_input_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM //AM_WRITENOP
-ADDRESS_MAP_END
-
-
-// SU9
-
-static ADDRESS_MAP_START( su9_map, AS_PROGRAM, 8, fidel6502_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x1800, 0x1803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -934,7 +945,7 @@ static ADDRESS_MAP_START( sc9b_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 
-// SC12/6086
+// SC12
 
 static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1895,6 +1906,52 @@ ROM_START( cscfr )
 ROM_END
 
 
+ROM_START( super9cc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
+	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
+	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
+	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-english.bin", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
+	ROM_RELOAD(                 0x1000, 0x1000)
+ROM_END
+
+ROM_START( super9ccsp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
+	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
+	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
+	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
+ROM_END
+
+ROM_START( super9ccg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
+	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
+	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
+	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( super9ccfr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
+	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
+	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
+	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
+ROM_END
+
+
 ROM_START( feasbu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A, unknown label
@@ -2072,52 +2129,6 @@ ROM_START( feag2100fr )
 ROM_END
 
 
-ROM_START( super9cc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
-	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
-	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
-	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-english.bin", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
-	ROM_RELOAD(                 0x1000, 0x1000)
-ROM_END
-
-ROM_START( super9ccsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
-	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
-	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
-	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
-ROM_END
-
-ROM_START( super9ccg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
-	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
-	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
-	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
-ROM_END
-
-ROM_START( super9ccfr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
-	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
-	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
-	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
-ROM_END
-
-
 ROM_START( fscc9 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("b30", 0xc000, 0x2000, CRC(b845c458) SHA1(d3fda65dbd9fae44fa4b93f8207839d8fa0c367a) ) // HN48364P
@@ -2192,6 +2203,11 @@ CONS( 1981, cscsp,      csc,      0,      csc,      cscg,     driver_device, 0, 
 CONS( 1981, cscg,       csc,      0,      csc,      cscg,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, cscfr,      csc,      0,      csc,      cscg,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
+CONS( 1983, super9cc,   0,        0,      su9,      su9,      driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, super9ccsp, super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, super9ccg,  super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, super9ccfr, super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1983, feasbu,     0,        0,      eas,      eas,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, feasbusp,   feasbu,   0,      eas,      easg,     driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, feasbug,    feasbu,   0,      eas,      easg,     driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -2205,11 +2221,6 @@ CONS( 1986, feag2100,   0,        0,      eag,      eag,      driver_device, 0, 
 CONS( 1986, feag2100sp, feag2100, 0,      eag,      eagg,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, feag2100g,  feag2100, 0,      eag,      eagg,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, feag2100fr, feag2100, 0,      eag,      eagg,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-
-CONS( 1983, super9cc,   0,        0,      su9,      su9,      driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, super9ccsp, super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, super9ccg,  super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, super9ccfr, super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1982, fscc9,      0,        0,      sc9,      sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, fscc9b,     fscc9,    0,      sc9b,     sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
