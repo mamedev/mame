@@ -23,6 +23,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_oki(*this, "oki"),
+			m_mainram(*this, "mainram"),
 			m_vram(*this, "vram"),
 			m_palette(*this, "palette")
 	{
@@ -32,6 +33,7 @@ public:
 	required_device<e132xt_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 
+	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_vram;
 	UINT8 m_pal[0x200];
 
@@ -43,6 +45,9 @@ public:
 	void set_palette(int offset);
 	
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+
+	DECLARE_READ32_MEMBER(mjsenpu_speedup_r);
 
 	DECLARE_DRIVER_INIT(mjsenpu);
 	virtual void machine_start() override;
@@ -85,14 +90,18 @@ WRITE8_MEMBER(mjsenpu_state::palette_high_w)
 
 WRITE8_MEMBER(mjsenpu_state::oki_bank_w)
 {
-// or some input muxing?
-//	printf("oki bank_w %02x\n", data);
+	// or some input muxing?
+	if (data!=0x80 && data !=0x81)
+		printf("oki bank_w %02x\n", data);
 }
 
-
+WRITE8_MEMBER(mjsenpu_state::mux_w)
+{
+//	printf("mux_w %02x\n", data);
+}
 
 static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("user2",0) // main game rom
 
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM AM_SHARE("vram")
@@ -116,7 +125,7 @@ static ADDRESS_MAP_START( mjsenpu_io, AS_IO, 32, mjsenpu_state )
 	AM_RANGE(0x4040, 0x4043)  AM_READ_PORT("DSW2")
 	AM_RANGE(0x4050, 0x4053)  AM_READ_PORT("DSW3")
 
-//	AM_RANGE(0x4060, 0x4063) AM_WRITE8 ( ) // input mux?
+	AM_RANGE(0x4060, 0x4063)  AM_WRITE8( mux_w, 0x000000ff)
 
 	AM_RANGE(0x4070, 0x4073)  AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x000000ff)
 ADDRESS_MAP_END
@@ -280,8 +289,6 @@ UINT32 mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind16 
 		}
 	}
 	return 0;
-
-	return 0;
 }
 
 
@@ -306,7 +313,7 @@ following clocks are on the PCB
 static MACHINE_CONFIG_START( mjsenpu, mjsenpu_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 27000000) /* ?? Mhz */
+	MCFG_CPU_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(mjsenpu_32bit_map)
 	MCFG_CPU_IO_MAP(mjsenpu_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
@@ -344,10 +351,39 @@ ROM_END
 
 
 
+READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
+{
+	int pc = m_maincpu->pc();
+	
+	if (pc == 0xadb8)
+	{
+		space.device().execute().spin_until_interrupt();
+	}
+	else
+	{
+	//	printf("%08x\n", pc);
+	}
+
+	return m_mainram[0x23468/4];
+}
+
+
 
 
 DRIVER_INIT_MEMBER(mjsenpu_state,mjsenpu)
 {
+/*
+0000ADAE: LDHU.D L42, L38, $0
+0000ADB2: LDW.A 0, L39, $23468
+0000ADB8: ADDI L38, $1
+0000ADBA: STHU.D L42, L38, $0
+0000ADBE: CMPI L39, $0
+0000ADC0: BNE $adae
+
+   (loops for 744256 instructions)
+*/
+	// not especially effective, might be wrong.
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x23468, 0x2346b, read32_delegate(FUNC(mjsenpu_state::mjsenpu_speedup_r), this));
 }
 
 
