@@ -9,6 +9,13 @@
   SPR800F1
     0011E
 
+ where is the OKI sound bank? the rom contains 2 banks and the
+ test mode even has checks for 2 banks, but I can't see a bank write.
+ enter test mode (F2) then press bet (M) a few times to get to the
+ sound test.
+
+ inputs need finishing off
+
 *********************************************************************/
 
 #include "emu.h"
@@ -24,7 +31,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_oki(*this, "oki"),
 			m_mainram(*this, "mainram"),
-			m_vram(*this, "vram"),
+	//		m_vram(*this, "vram"),
 			m_palette(*this, "palette")
 	{
 	}
@@ -34,9 +41,12 @@ public:
 	required_device<okim6295_device> m_oki;
 
 	required_shared_ptr<UINT32> m_mainram;
-	required_shared_ptr<UINT32> m_vram;
+//	required_shared_ptr<UINT32> m_vram;
 	UINT8 m_pal[0x200];
-
+	UINT32 m_vram0[0x20000 / 4];
+	UINT32 m_vram1[0x20000 / 4];
+	UINT8 m_control;
+	UINT8 m_mux;
 
 	DECLARE_READ8_MEMBER(palette_low_r);
 	DECLARE_READ8_MEMBER(palette_high_r);
@@ -44,10 +54,15 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_high_w);
 	void set_palette(int offset);
 	
-	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 
+	DECLARE_READ32_MEMBER(muxed_inputs_r);
+
 	DECLARE_READ32_MEMBER(mjsenpu_speedup_r);
+
+	DECLARE_READ32_MEMBER(vram_r);
+	DECLARE_WRITE32_MEMBER(vram_w);
 
 	DECLARE_DRIVER_INIT(mjsenpu);
 	virtual void machine_start() override;
@@ -88,38 +103,92 @@ WRITE8_MEMBER(mjsenpu_state::palette_high_w)
 	set_palette(offset);
 }
 
-WRITE8_MEMBER(mjsenpu_state::oki_bank_w)
+
+READ32_MEMBER(mjsenpu_state::vram_r)
 {
-	// or some input muxing?
+	if (m_control & 0x01) return m_vram1[offset];
+	else return m_vram0[offset];
+}
+
+WRITE32_MEMBER(mjsenpu_state::vram_w)
+{
+	if (m_control & 0x01) COMBINE_DATA(&m_vram1[offset]);
+	else COMBINE_DATA(&m_vram0[offset]);
+}
+
+WRITE8_MEMBER(mjsenpu_state::control_w)
+{
+	// bit 0 alternates frequently, using as video buffer, but that's a complete guess
+
+	m_control = data;
+
+
+	// bit 7 is always set?
+
+	// other bits don't seem to be OKI bank?
+
 	if (data &~0x93)
-		printf("oki bank_w %02x\n", data);
+		printf("control_w %02x\n", data);
 }
 
 WRITE8_MEMBER(mjsenpu_state::mux_w)
 {
-//	printf("mux_w %02x\n", data);
+	if ((data != 0x80) &&
+		(data != 0x9e) &&
+		(data != 0x9d) &&
+		(data != 0x9b) &&
+		(data != 0x97) &&
+		(data != 0x8f))
+			printf("mux_w %02x\n", data);
+
+	m_mux = data;
+}
+
+READ32_MEMBER(mjsenpu_state::muxed_inputs_r)
+{
+	switch (m_mux)
+	{
+	case 0x80: // not read
+		break;
+
+	case 0x9e:
+		return ioport("MUX_9E")->read();
+
+	case 0x9d:
+		return ioport("MUX_9D")->read();
+
+	case 0x9b:
+		return ioport("MUX_9B")->read();
+
+	case 0x8f:
+		return ioport("MUX_8F")->read();
+	}
+
+	logerror("muxed_inputs_r with %02x\n", m_mux);
+
+	return 0x00000000;// 0xffffffff;
 }
 
 static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("user2",0) // main game rom
 
-	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x80000000, 0x8001ffff) AM_READWRITE(vram_r,vram_w)
 
 	AM_RANGE(0xffc00000, 0xffc000ff) AM_READWRITE8(palette_low_r, palette_low_w, 0xffffffff)
 	AM_RANGE(0xffd00000, 0xffd000ff) AM_READWRITE8(palette_high_r, palette_high_w, 0xffffffff)
 
-	AM_RANGE(0xffe00000, 0xffe0ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xffe00000, 0xffe007ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mjsenpu_io, AS_IO, 32, mjsenpu_state )
-	AM_RANGE(0x4000, 0x4003)  AM_READ_PORT("IN0")
+	AM_RANGE(0x4000, 0x4003)  AM_READ(muxed_inputs_r)
 	AM_RANGE(0x4010, 0x4013)  AM_READ_PORT("IN1")
 
-	AM_RANGE(0x4020, 0x4023)  AM_WRITE8( oki_bank_w, 0x000000ff)
+	AM_RANGE(0x4020, 0x4023)  AM_WRITE8( control_w, 0x000000ff)
 
 	AM_RANGE(0x4030, 0x4033)  AM_READ_PORT("DSW1")
 	AM_RANGE(0x4040, 0x4043)  AM_READ_PORT("DSW2")
@@ -132,29 +201,25 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mjsenpu )
 
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN0" )
-	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_BET    )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_START("MUX_8F") // in joystick mode?
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 ) // or button1? seems to have multiple uses
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MUX_9E")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("MUX_9D")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("MUX_9B")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // or maybe service?
@@ -167,53 +232,51 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE( 0x00000010, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(          0x00000020, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) // not on the mahjong panel? used when in Joystick mode
 	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	// the input test mode seems broken in MAME? the first switch controls if the dipswitch shows at all, the 2nd switch displays 0/1 for the first position etc.
 	// the actual test mode section which shows the effect of the dips works as expected tho.
 	// maybe a game bug? maybe a core bug?
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x00000003, 0x00000003, "Ratio 1" )
-	PORT_DIPSETTING(          0x00000000, "0" )
-	PORT_DIPSETTING(          0x00000001, "1" )
-	PORT_DIPSETTING(          0x00000002, "2" )
-	PORT_DIPSETTING(          0x00000003, "3" )
+	PORT_DIPNAME( 0x00000003, 0x00000003, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(          0x00000003, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(          0x00000002, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(          0x00000001, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x0000000c, 0x0000000c, "Value 1" )
-	PORT_DIPSETTING(          0x00000000, "0" )
-	PORT_DIPSETTING(          0x00000004, "1" )
-	PORT_DIPSETTING(          0x00000008, "2" )
-	PORT_DIPSETTING(          0x0000000c, "3" )
+	PORT_DIPSETTING(          0x00000000, "100" )
+	PORT_DIPSETTING(          0x00000004, "50" )
+	PORT_DIPSETTING(          0x00000008, "10" )
+	PORT_DIPSETTING(          0x0000000c, "5" )
 	PORT_DIPNAME( 0x00000030, 0x00000030, "Ratio 2" )
-	PORT_DIPSETTING(          0x00000000, "0" )
-	PORT_DIPSETTING(          0x00000010, "1" )
-	PORT_DIPSETTING(          0x00000020, "2" )
-	PORT_DIPSETTING(          0x00000030, "3" )
+	PORT_DIPSETTING(          0x00000000, "1:10" )
+	PORT_DIPSETTING(          0x00000010, "1:5" )
+	PORT_DIPSETTING(          0x00000020, "1:2" )
+	PORT_DIPSETTING(          0x00000030, "1:1" )
 	PORT_DIPNAME( 0x000000c0, 0x000000c0, "Percentage 1" )
-	PORT_DIPSETTING(          0x00000000, "0" )
-	PORT_DIPSETTING(          0x00000040, "1" )
-	PORT_DIPSETTING(          0x00000080, "2" )
-	PORT_DIPSETTING(          0x000000c0, "3" )
+	PORT_DIPSETTING(          0x00000000, "96" )
+	PORT_DIPSETTING(          0x00000040, "92" )
+	PORT_DIPSETTING(          0x00000080, "88" )
+	PORT_DIPSETTING(          0x000000c0, "84" )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x00000003, 0x00000003, "Value 2" )
-	PORT_DIPSETTING(          0x00000000, "0" )
-	PORT_DIPSETTING(          0x00000001, "1" )
+	PORT_DIPSETTING(          0x00000000, "5" )
+	PORT_DIPSETTING(          0x00000001, "3" )
 	PORT_DIPSETTING(          0x00000002, "2" )
-	PORT_DIPSETTING(          0x00000003, "3" )
+	PORT_DIPSETTING(          0x00000003, "1" )
 	PORT_DIPNAME( 0x00000004, 0x00000004, "Value 3" )
-	PORT_DIPSETTING(          0x00000004, "0" )
-	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPSETTING(          0x00000004, "10" )
+	PORT_DIPSETTING(          0x00000000, "20" )
 	PORT_DIPNAME( 0x00000008, 0x00000000, DEF_STR( Demo_Sounds )  )
 	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
@@ -221,39 +284,42 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x000000e0, 0x000000e0, "Percentage 2" )
-	PORT_DIPSETTING(          0x00000000, "0" )
-	PORT_DIPSETTING(          0x00000020, "1" )
-	PORT_DIPSETTING(          0x00000040, "2" )
-	PORT_DIPSETTING(          0x00000060, "3" )
-	PORT_DIPSETTING(          0x00000080, "4" )
-	PORT_DIPSETTING(          0x000000a0, "5" )
-	PORT_DIPSETTING(          0x000000c0, "6" )
-	PORT_DIPSETTING(          0x000000e0, "7" )
+	PORT_DIPSETTING(          0x00000000, "60" )
+	PORT_DIPSETTING(          0x00000020, "65" )
+	PORT_DIPSETTING(          0x00000040, "70" )
+	PORT_DIPSETTING(          0x00000060, "75" )
+	PORT_DIPSETTING(          0x00000080, "80" )
+	PORT_DIPSETTING(          0x000000a0, "85" )
+	PORT_DIPSETTING(          0x000000c0, "90" )
+	PORT_DIPSETTING(          0x000000e0, "95" )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x00000001, 0x00000001, "Value 4" )
-	PORT_DIPSETTING(          0x00000001, "0" )
-	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPSETTING(          0x00000001, "100" )
+	PORT_DIPSETTING(          0x00000000, "500" )
 	PORT_DIPNAME( 0x00000002, 0x00000002, "Symbol 2" )
 	PORT_DIPSETTING(          0x00000002, "0" )
 	PORT_DIPSETTING(          0x00000000, "1" )
 	PORT_DIPNAME( 0x00000004, 0x00000004, "Symbol 3" )
 	PORT_DIPSETTING(          0x00000004, "0" )
 	PORT_DIPSETTING(          0x00000000, "1" )
-	PORT_DIPNAME( 0x00000008, 0x00000008, "Control Type" )
+	PORT_DIPNAME( 0x00000008, 0x00000000, "Control Type" )
 	PORT_DIPSETTING(          0x00000008, "Mahjong Panel" )
 	PORT_DIPSETTING(          0x00000000, "Joystick" )
 	PORT_DIPNAME( 0x00000010, 0x00000010, "Symbol 5" )
 	PORT_DIPSETTING(          0x00000010, "0" )
 	PORT_DIPSETTING(          0x00000000, "1" )
 	PORT_DIPNAME( 0x00000060, 0x00000060, "Percentage 3" )
-	PORT_DIPSETTING(          0x00000000, "0" )
-	PORT_DIPSETTING(          0x00000020, "1" )
-	PORT_DIPSETTING(          0x00000040, "2" )
-	PORT_DIPSETTING(          0x00000060, "3" )
+	PORT_DIPSETTING(          0x00000000, "92" )
+	PORT_DIPSETTING(          0x00000020, "88" )
+	PORT_DIPSETTING(          0x00000040, "84" )
+	PORT_DIPSETTING(          0x00000060, "80" )
 	PORT_DIPNAME( 0x00000080, 0x00000080, "Symbol 6" )
 	PORT_DIPSETTING(          0x00000080, "0" )
 	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 
@@ -268,21 +334,28 @@ UINT32 mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind16 
 	int x,y,count;
 	int color;
 
+	UINT32* vram;
+
+	if (m_control & 0x01) vram = m_vram0;
+	else  vram = m_vram1;
+
+
+
 	count = 0;
 	for (y=0;y < 256;y++)
 	{
 		for (x=0;x < 512/4;x++)
 		{
-			color = m_vram[count] & 0x000000ff;
+			color = vram[count] & 0x000000ff;
 			bitmap.pix16(y, x*4 + 2) = color;
 
-			color = (m_vram[count] & 0x0000ff00) >> 8;
+			color = (vram[count] & 0x0000ff00) >> 8;
 			bitmap.pix16(y, x*4 + 3) = color;
 
-			color = (m_vram[count] & 0x00ff0000) >> 16;
+			color = (vram[count] & 0x00ff0000) >> 16;
 			bitmap.pix16(y, x*4 + 0) = color;
 
-			color = (m_vram[count] & 0xff000000) >> 24;
+			color = (vram[count] & 0xff000000) >> 24;
 			bitmap.pix16(y, x*4 + 1) = color;
 
 			count++;
@@ -295,6 +368,10 @@ UINT32 mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind16 
 void mjsenpu_state::machine_start()
 {
 	save_item(NAME(m_pal));
+	save_item(NAME(m_vram0));
+	save_item(NAME(m_vram1));
+	save_item(NAME(m_control));
+	save_item(NAME(m_mux));
 }
 
 void mjsenpu_state::machine_reset()
@@ -389,4 +466,4 @@ DRIVER_INIT_MEMBER(mjsenpu_state,mjsenpu)
 
 
 
-GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", MACHINE_NOT_WORKING )
+GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
