@@ -20322,6 +20322,9 @@ mits680b                        //
 @source:mjkjidai.cpp
 mjkjidai                        // (c) 1986 Sanritsu
 
+@source:mjsenpu.cpp
+mjsenpu
+
 @source:mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
 
