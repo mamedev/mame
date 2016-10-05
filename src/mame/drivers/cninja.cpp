@@ -1009,6 +1009,11 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cninjabl2, stoneage )
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl2)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cninjabl, cninja_state )
 
@@ -2291,6 +2296,11 @@ DRIVER_INIT_MEMBER(cninja_state,stoneage)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::stoneage_sound_w),this));
 }
 
+DRIVER_INIT_MEMBER(cninja_state,cninjabl2)
+{
+	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
+}
+
 DRIVER_INIT_MEMBER(cninja_state,mutantf)
 {
 	const UINT8 *src = memregion("gfx2")->base();
@@ -2318,7 +2328,7 @@ GAME( 1991, cninjau,  cninja,  cninja,   cninjau,  cninja_state,  cninja,   ROT0
 GAME( 1991, joemac,   cninja,  cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, stoneage, cninja,  stoneage, cninja,   cninja_state,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, cninjabl, cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, cninjabl2,cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", MACHINE_NOT_WORKING )
+GAME( 1991, cninjabl2,cninja,  cninjabl2,cninja,   cninja_state,  cninjabl2,ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", MACHINE_NOT_WORKING ) // sprites are missing, tile layers need verifying, sound is wrong
 
 GAME( 1991, robocop2, 0,       robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, robocop2u,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.10)", MACHINE_SUPPORTS_SAVE )

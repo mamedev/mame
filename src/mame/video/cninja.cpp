@@ -142,6 +142,17 @@ UINT32 cninja_state::screen_update_cninja(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
+UINT32 cninja_state::screen_update_cninjabl2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* force layers to be enabled */
+	m_deco_tilegen1->set_enable(0, 1 );
+	m_deco_tilegen1->set_enable(1, 1 );
+
+	screen_update_cninja(screen, bitmap, cliprect);
+	
+	return 0;
+}
+
 UINT32 cninja_state::screen_update_cninjabl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
