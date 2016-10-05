@@ -158,6 +158,12 @@ WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
+READ16_MEMBER(cninja_state::cninjabl2_sprite_dma_r)
+{
+	m_spriteram->copy();
+	return 0;
+}
+
 
 static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
@@ -2299,6 +2305,7 @@ DRIVER_INIT_MEMBER(cninja_state,stoneage)
 DRIVER_INIT_MEMBER(cninja_state,cninjabl2)
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(FUNC(cninja_state::cninjabl2_sprite_dma_r),this));
 }
 
 DRIVER_INIT_MEMBER(cninja_state,mutantf)
