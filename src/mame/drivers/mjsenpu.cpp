@@ -33,6 +33,14 @@ public:
 	required_device<okim6295_device> m_oki;
 
 	required_shared_ptr<UINT32> m_vram;
+	UINT8 m_pal[0x200];
+
+
+	DECLARE_READ8_MEMBER(palette_low_r);
+	DECLARE_READ8_MEMBER(palette_high_r);
+	DECLARE_WRITE8_MEMBER(palette_low_w);
+	DECLARE_WRITE8_MEMBER(palette_high_w);
+	void set_palette(int offset);
 
 	DECLARE_DRIVER_INIT(mjsenpu);
 	virtual void machine_start() override;
@@ -44,14 +52,47 @@ public:
 };
 
 
+READ8_MEMBER(mjsenpu_state::palette_low_r)
+{
+	return m_pal[(offset * 2) + 0];
+}
+
+
+READ8_MEMBER(mjsenpu_state::palette_high_r)
+{
+	return m_pal[(offset * 2) + 1];
+}
+
+void mjsenpu_state::set_palette(int offset)
+{
+	UINT16 paldata = (m_pal[(offset * 2) + 0] << 8) | (m_pal[(offset * 2) + 1]);
+	m_palette->set_pen_color(offset, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal6bit(paldata >> 10));
+}
+
+WRITE8_MEMBER(mjsenpu_state::palette_low_w)
+{
+	m_pal[(offset * 2)+0] = data;
+	set_palette(offset);
+}
+
+WRITE8_MEMBER(mjsenpu_state::palette_high_w)
+{
+	m_pal[(offset * 2)+1] = data;
+	set_palette(offset);
+}
+
+
+
+
+
 static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("user2",0) // main game rom
 
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM AM_SHARE("vram")
 
-	AM_RANGE(0xffc00000, 0xffc000ff) AM_RAM
-	AM_RANGE(0xffd00000, 0xffd000ff) AM_RAM
+	AM_RANGE(0xffc00000, 0xffc000ff) AM_READWRITE8(palette_low_r, palette_low_w, 0xffffffff)
+	AM_RANGE(0xffd00000, 0xffd000ff) AM_READWRITE8(palette_high_r, palette_high_w, 0xffffffff)
 
 
 	AM_RANGE(0xffe00000, 0xffe0ffff) AM_RAM
@@ -107,6 +148,7 @@ UINT32 mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind16 
 
 void mjsenpu_state::machine_start()
 {
+	save_item(NAME(m_pal));
 }
 
 void mjsenpu_state::machine_reset()
@@ -141,8 +183,7 @@ static MACHINE_CONFIG_START( mjsenpu, mjsenpu_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mjsenpu_state, screen_update_mjsenpu)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
