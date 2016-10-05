@@ -158,6 +158,12 @@ WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
+READ16_MEMBER(cninja_state::cninjabl2_sprite_dma_r)
+{
+	m_spriteram->copy();
+	return 0;
+}
+
 
 static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
@@ -2299,6 +2305,7 @@ DRIVER_INIT_MEMBER(cninja_state,stoneage)
 DRIVER_INIT_MEMBER(cninja_state,cninjabl2)
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(FUNC(cninja_state::cninjabl2_sprite_dma_r),this));
 }
 
 DRIVER_INIT_MEMBER(cninja_state,mutantf)
@@ -2328,7 +2335,7 @@ GAME( 1991, cninjau,  cninja,  cninja,   cninjau,  cninja_state,  cninja,   ROT0
 GAME( 1991, joemac,   cninja,  cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, stoneage, cninja,  stoneage, cninja,   cninja_state,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, cninjabl, cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, cninjabl2,cninja,  cninjabl2,cninja,   cninja_state,  cninjabl2,ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", MACHINE_NOT_WORKING ) // sprites are missing, tile layers need verifying, sound is wrong
+GAME( 1991, cninjabl2,cninja,  cninjabl2,cninja,   cninja_state,  cninjabl2,ROT0, "bootleg",               "Tatakae Genshizin Joe & Mac (Japan, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // tile layers need adjusting, sound is wrong
 
 GAME( 1991, robocop2, 0,       robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, robocop2u,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.10)", MACHINE_SUPPORTS_SAVE )
