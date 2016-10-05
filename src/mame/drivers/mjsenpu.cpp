@@ -160,6 +160,9 @@ READ32_MEMBER(mjsenpu_state::muxed_inputs_r)
 	case 0x9b:
 		return ioport("MUX_9B")->read();
 
+	case 0x97:
+		return ioport("MUX_97")->read();
+
 	case 0x8f:
 		return ioport("MUX_8F")->read();
 	}
@@ -220,6 +223,10 @@ static INPUT_PORTS_START( mjsenpu )
 
 	PORT_START("MUX_9B")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("MUX_97")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // or maybe service?
