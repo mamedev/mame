@@ -79,7 +79,7 @@ void editwin_info::set_editwnd_bounds(RECT const &bounds)
 
 void editwin_info::set_editwnd_text(char const *text)
 {
-	auto tc_buffer = tstring_from_utf8(text);
+	auto tc_buffer = osd::text::to_tstring(text);
 	SendMessage(m_editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)tc_buffer.c_str());
 }
 
@@ -187,7 +187,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 						// process
 						{
-							auto utf8_buffer = utf8_from_tstring(buffer);
+							auto utf8_buffer = osd::text::from_tstring(buffer);
 							process_string(utf8_buffer.c_str());
 						}
 						break;
