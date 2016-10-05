@@ -4222,7 +4222,7 @@ void sh34_base_device::device_start()
 	state_add(SH4_XF14,           "XF14", m_debugger_temp).callimport().formatstr("%25s");
 	state_add(SH4_XF15,           "XF15", m_debugger_temp).callimport().formatstr("%25s");
 
-	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callimport().noshow();
+	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 	state_add(STATE_GENSP, "GENSP", m_r[15]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%20s").noshow();
@@ -4378,6 +4378,16 @@ void sh34_base_device::state_import(const device_state_entry &entry)
 		case SH4_XF15:
 			m_xf[15 ^ fpu_xor] = m_debugger_temp;
 			break;
+	}
+}
+
+void sh34_base_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case STATE_GENPC:
+		m_debugger_temp = (m_pc & AM);
+		break;
 	}
 }
 
