@@ -278,9 +278,6 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	// the input test mode seems broken in MAME? the first switch controls if the dipswitch shows at all, the 2nd switch displays 0/1 for the first position etc.
-	// the actual test mode section which shows the effect of the dips works as expected tho.
-	// maybe a game bug? maybe a core bug?
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x00000003, 0x00000003, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( 2C_1C ) )
