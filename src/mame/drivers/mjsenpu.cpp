@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_low_w);
 	DECLARE_WRITE8_MEMBER(palette_high_w);
 	void set_palette(int offset);
+	
+	DECLARE_WRITE8_MEMBER(oki_bank_w);
 
 	DECLARE_DRIVER_INIT(mjsenpu);
 	virtual void machine_start() override;
@@ -81,7 +83,11 @@ WRITE8_MEMBER(mjsenpu_state::palette_high_w)
 	set_palette(offset);
 }
 
-
+WRITE8_MEMBER(mjsenpu_state::oki_bank_w)
+{
+// or some input muxing?
+//	printf("oki bank_w %02x\n", data);
+}
 
 
 
@@ -94,18 +100,151 @@ static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
 	AM_RANGE(0xffc00000, 0xffc000ff) AM_READWRITE8(palette_low_r, palette_low_w, 0xffffffff)
 	AM_RANGE(0xffd00000, 0xffd000ff) AM_READWRITE8(palette_high_r, palette_high_w, 0xffffffff)
 
-
-	AM_RANGE(0xffe00000, 0xffe0ffff) AM_RAM
+	AM_RANGE(0xffe00000, 0xffe0ffff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mjsenpu_io, AS_IO, 32, mjsenpu_state )
-//	AM_RANGE(0x000c, 0x000f) AM_READ(unk_r)
+	AM_RANGE(0x4000, 0x4003)  AM_READ_PORT("IN0")
+	AM_RANGE(0x4010, 0x4013)  AM_READ_PORT("IN1")
+
+	AM_RANGE(0x4020, 0x4023)  AM_WRITE8( oki_bank_w, 0x000000ff)
+
+	AM_RANGE(0x4030, 0x4033)  AM_READ_PORT("DSW1")
+	AM_RANGE(0x4040, 0x4043)  AM_READ_PORT("DSW2")
+	AM_RANGE(0x4050, 0x4053)  AM_READ_PORT("DSW3")
+
+//	AM_RANGE(0x4060, 0x4063) AM_WRITE8 ( ) // input mux?
+
+	AM_RANGE(0x4070, 0x4073)  AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x000000ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mjsenpu )
+
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x00000001, 0x00000001, "IN0" )
+	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_BET    )
+	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // or maybe service?
+	PORT_DIPNAME( 0x00000002, 0x00000002, "IN1" )
+	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000020, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+
+	// the input test mode seems broken in MAME? the first switch controls if the dipswitch shows at all, the 2nd switch displays 0/1 for the first position etc.
+	// the actual test mode section which shows the effect of the dips works as expected tho.
+	// maybe a game bug? maybe a core bug?
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x00000003, 0x00000003, "Ratio 1" )
+	PORT_DIPSETTING(          0x00000000, "0" )
+	PORT_DIPSETTING(          0x00000001, "1" )
+	PORT_DIPSETTING(          0x00000002, "2" )
+	PORT_DIPSETTING(          0x00000003, "3" )
+	PORT_DIPNAME( 0x0000000c, 0x0000000c, "Value 1" )
+	PORT_DIPSETTING(          0x00000000, "0" )
+	PORT_DIPSETTING(          0x00000004, "1" )
+	PORT_DIPSETTING(          0x00000008, "2" )
+	PORT_DIPSETTING(          0x0000000c, "3" )
+	PORT_DIPNAME( 0x00000030, 0x00000030, "Ratio 2" )
+	PORT_DIPSETTING(          0x00000000, "0" )
+	PORT_DIPSETTING(          0x00000010, "1" )
+	PORT_DIPSETTING(          0x00000020, "2" )
+	PORT_DIPSETTING(          0x00000030, "3" )
+	PORT_DIPNAME( 0x000000c0, 0x000000c0, "Percentage 1" )
+	PORT_DIPSETTING(          0x00000000, "0" )
+	PORT_DIPSETTING(          0x00000040, "1" )
+	PORT_DIPSETTING(          0x00000080, "2" )
+	PORT_DIPSETTING(          0x000000c0, "3" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x00000003, 0x00000003, "Value 2" )
+	PORT_DIPSETTING(          0x00000000, "0" )
+	PORT_DIPSETTING(          0x00000001, "1" )
+	PORT_DIPSETTING(          0x00000002, "2" )
+	PORT_DIPSETTING(          0x00000003, "3" )
+	PORT_DIPNAME( 0x00000004, 0x00000004, "Value 3" )
+	PORT_DIPSETTING(          0x00000004, "0" )
+	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPNAME( 0x00000008, 0x00000008, "Symbol 1" )
+	PORT_DIPSETTING(          0x00000008, "0" )
+	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000000e0, 0x000000e0, "Percentage 2" )
+	PORT_DIPSETTING(          0x00000000, "0" )
+	PORT_DIPSETTING(          0x00000020, "1" )
+	PORT_DIPSETTING(          0x00000040, "2" )
+	PORT_DIPSETTING(          0x00000060, "3" )
+	PORT_DIPSETTING(          0x00000080, "4" )
+	PORT_DIPSETTING(          0x000000a0, "5" )
+	PORT_DIPSETTING(          0x000000c0, "6" )
+	PORT_DIPSETTING(          0x000000e0, "7" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x00000001, 0x00000001, "Value 4" )
+	PORT_DIPSETTING(          0x00000001, "0" )
+	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPNAME( 0x00000002, 0x00000002, "Symbol 2" )
+	PORT_DIPSETTING(          0x00000002, "0" )
+	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPNAME( 0x00000004, 0x00000004, "Symbol 3" )
+	PORT_DIPSETTING(          0x00000004, "0" )
+	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPNAME( 0x00000008, 0x00000008, "Symbol 4" )
+	PORT_DIPSETTING(          0x00000008, "0" )
+	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPNAME( 0x00000010, 0x00000010, "Symbol 5" )
+	PORT_DIPSETTING(          0x00000010, "0" )
+	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPNAME( 0x00000060, 0x00000060, "Percentage 3" )
+	PORT_DIPSETTING(          0x00000000, "0" )
+	PORT_DIPSETTING(          0x00000020, "1" )
+	PORT_DIPSETTING(          0x00000040, "2" )
+	PORT_DIPSETTING(          0x00000060, "3" )
+	PORT_DIPNAME( 0x00000080, 0x00000080, "Symbol 6" )
+	PORT_DIPSETTING(          0x00000080, "0" )
+	PORT_DIPSETTING(          0x00000000, "1" )
 INPUT_PORTS_END
 
 
@@ -172,14 +311,14 @@ static MACHINE_CONFIG_START( mjsenpu, mjsenpu_state )
 	MCFG_CPU_IO_MAP(mjsenpu_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
 
-//	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mjsenpu_state, screen_update_mjsenpu)
 	MCFG_SCREEN_PALETTE("palette")
 
