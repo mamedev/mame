@@ -11,6 +11,35 @@
 
  inputs need finishing off
 
+ -- Test Mode Note --
+
+ The test mode for this game is very buggy, this is not a MAME bug
+ the same behavior has been observed on the original PCB.
+
+ One example of this is the dipswitch viewer, which should show 3
+ rows of 8 1/0 values, one for each switch. ie
+
+ 00000000
+ 00000000
+ 00000000
+
+ However..
+
+ Instead of properly representing each of the dips, the 1st switch in
+ each bank ends up turning on/off the entire row display (for rows 2/3
+ it shifts row 1 by one pixel)
+ 
+ This then means the 2nd switch changes the digit in the 1st position
+ so
+
+ 10000000
+
+ the 8th switch changes the 7th digit so
+
+ 10000010
+
+ and there's no way at all to change the last digit.
+
 *********************************************************************/
 
 #include "emu.h"
