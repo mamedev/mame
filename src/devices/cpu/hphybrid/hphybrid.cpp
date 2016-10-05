@@ -262,14 +262,22 @@ void hp_hybrid_cpu_device::execute_set_input(int inputnum, int state)
  */
 UINT16 hp_hybrid_cpu_device::execute_one(UINT16 opcode)
 {
-				if ((opcode & 0x7fe0) == 0x7000) {
-								// EXE
-								m_icount -= 8;
-								return RM(opcode & 0x1f);
-				} else {
-								m_reg_P = execute_one_sub(opcode);
-								return fetch();
-				}
+	if ((opcode & 0x7fe0) == 0x7000) {
+		// EXE
+		m_icount -= 8;
+		// Indirect addressing in EXE instruction seems to use AEC case A instead of case C
+		// (because it's an opcode fetch)
+		UINT16 reg = RM(opcode & 0x1f);
+		if (BIT(opcode , 15)) {
+			m_icount -= 6;
+			return RM(add_mae(AEC_CASE_A , reg));
+		} else {
+			return reg;
+		}
+	} else {
+		m_reg_P = execute_one_sub(opcode);
+		return fetch();
+	}
 }
 
 /**
