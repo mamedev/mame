@@ -59,19 +59,7 @@ machine_info::machine_info(running_machine &machine)
 
 std::string machine_info::warnings_string()
 {
-	constexpr UINT32 warning_flags = ( MACHINE_NOT_WORKING |
-						MACHINE_UNEMULATED_PROTECTION |
-						MACHINE_MECHANICAL |
-						MACHINE_WRONG_COLORS |
-						MACHINE_IMPERFECT_COLORS |
-						MACHINE_REQUIRES_ARTWORK |
-						MACHINE_NO_SOUND |
-						MACHINE_IMPERFECT_SOUND |
-						MACHINE_IMPERFECT_GRAPHICS |
-						MACHINE_IMPERFECT_KEYBOARD |
-						MACHINE_NO_COCKTAIL |
-						MACHINE_IS_INCOMPLETE |
-						MACHINE_NO_SOUND_HW );
+	constexpr UINT32 warning_flags = ( MACHINE_FATAL_FLAGS | MACHINE_WARNING_FLAGS | MACHINE_BTANB_FLAGS );
 
 	// if no warnings, nothing to return
 	if (m_machine.rom_load().warnings() == 0 && m_machine.rom_load().knownbad() == 0 && !(m_machine.system().flags & warning_flags) && m_machine.rom_load().software_load_warnings_message().length() == 0)
@@ -120,7 +108,7 @@ std::string machine_info::warnings_string()
 
 		// check if external artwork is present before displaying this warning?
 		if (m_machine.system().flags & MACHINE_REQUIRES_ARTWORK) {
-			buf << _("The machine requires external artwork files\n");
+			buf << _("The machine requires external artwork files.\n");
 		}
 
 		if (m_machine.system().flags & MACHINE_IS_INCOMPLETE )
@@ -128,13 +116,29 @@ std::string machine_info::warnings_string()
 			buf << _("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
 		}
 
+		if (m_machine.system().flags & MACHINE_NODEVICE_MICROPHONE )
+			buf << _("This machine has unemulated microphone device.\n");	
+		
+		if (m_machine.system().flags & MACHINE_NODEVICE_CAMERA )
+			buf << _("This machine has unemulated camera device.\n");	
+		
+		if (m_machine.system().flags & MACHINE_NODEVICE_PRINTER )
+			buf << _("This machine has unemulated printer device.\n");	
+		
+		if (m_machine.system().flags & MACHINE_NODEVICE_LAN )
+			buf << _("This machine has unemulated linking capabilities.\n");	
+		
+		if (m_machine.system().flags & MACHINE_NODEVICE_WAN )
+			buf << _("This machine has unemulated networking capabilities.\n");	
+		
 		if (m_machine.system().flags & MACHINE_NO_SOUND_HW )
 		{
 			buf << _("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 		}
 
+	
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
-		if (m_machine.system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
+		if (m_machine.system().flags & (MACHINE_FATAL_FLAGS))
 		{
 			// add the strings for these warnings
 			if (m_machine.system().flags & MACHINE_UNEMULATED_PROTECTION) {

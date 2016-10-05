@@ -313,9 +313,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				if (!messagebox_text.empty())
 				{
 					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
-					if (machine().system().flags & (MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_KEYBOARD | MACHINE_NO_SOUND))
+					// TODO: don't think BTANB should be marked yellow? Also move this snippet to specific getter
+					if (machine().system().flags & (MACHINE_WARNING_FLAGS|MACHINE_BTANB_FLAGS))
 						messagebox_backcolor = UI_YELLOW_COLOR;
-					if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
+					if (machine().system().flags & (MACHINE_FATAL_FLAGS))
 						messagebox_backcolor = UI_RED_COLOR;
 				}
 				break;
