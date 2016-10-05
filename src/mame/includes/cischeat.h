@@ -55,6 +55,7 @@ public:
 	int m_armold;
 	UINT16 m_scudhamm_motor_command;
 	int m_ip_select;
+	UINT16 m_wildplt_output;
 	UINT8 m_drawmode_table[16];
 	int m_debugsprites;
 	int m_show_unknown;
@@ -91,6 +92,8 @@ public:
 	DECLARE_READ16_MEMBER(f1gpstar_wheel_r);
 	DECLARE_READ16_MEMBER(f1gpstr2_ioready_r);
 	DECLARE_READ16_MEMBER(wildplt_xy_r);
+	DECLARE_READ16_MEMBER(wildplt_mux_r);
+	DECLARE_WRITE16_MEMBER(wildplt_mux_w);
 	DECLARE_WRITE16_MEMBER(f1gpstar_motor_w);
 	DECLARE_WRITE16_MEMBER(f1gpstar_soundint_w);
 	DECLARE_WRITE16_MEMBER(f1gpstar_comms_w);

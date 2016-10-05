@@ -270,12 +270,6 @@ READ16_MEMBER(cischeat_state::f1gpstr2_ioready_r)
                             Wild Pilot
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::wildplt_xy_r)
-{
-	// X, Y
-	return ioport("IN2")->read() | (ioport("IN3")->read()<<8);
-}
-
 
 WRITE16_MEMBER(cischeat_state::f1gpstar_motor_w)
 {
