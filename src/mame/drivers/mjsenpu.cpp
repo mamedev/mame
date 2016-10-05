@@ -9,11 +9,6 @@
   SPR800F1
     0011E
 
- where is the OKI sound bank? the rom contains 2 banks and the
- test mode even has checks for 2 banks, but I can't see a bank write.
- enter test mode (F2) then press bet (M) a few times to get to the
- sound test.
-
  inputs need finishing off
 
 *********************************************************************/
@@ -118,17 +113,22 @@ WRITE32_MEMBER(mjsenpu_state::vram_w)
 
 WRITE8_MEMBER(mjsenpu_state::control_w)
 {
-	// bit 0 alternates frequently, using as video buffer, but that's a complete guess
-
 	m_control = data;
+	// bit 0x80 is always set?
 
+	// bit 0x40 not used?
+	// bit 0x20 not used?
 
-	// bit 7 is always set?
+	// bit 0x10 is the M6295 bank, samples <26 are the same in both banks and so bank switch isn't written for them, not even in sound test.
+	m_oki->set_rom_bank((data&0x10)>>4);
 
-	// other bits don't seem to be OKI bank?
+	// bits 0x08 and 0x04 seem to be hopper/ticket related? different ones get used depending on the dips
 
-	if (data &~0x93)
-		printf("control_w %02x\n", data);
+	// bit 0x02 could be coin counter?
+	// bit 0x01 alternates frequently, using as video buffer, but that's a complete guess
+
+//	if (data &~0x9e)
+//		printf("control_w %02x\n", data);
 }
 
 WRITE8_MEMBER(mjsenpu_state::mux_w)
@@ -173,7 +173,7 @@ READ32_MEMBER(mjsenpu_state::muxed_inputs_r)
 }
 
 static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("user2",0) // main game rom
 
 	AM_RANGE(0x80000000, 0x8001ffff) AM_READWRITE(vram_r,vram_w)
