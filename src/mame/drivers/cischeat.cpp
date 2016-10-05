@@ -108,7 +108,7 @@ ROM                 R       000000-03ffff       <
 Work RAM            RW      0c0000-0c3fff       180000-183fff
 Shared RAM          RW      040000-047fff       080000-087fff
 Road RAM            RW      080000-0807ff       100000-1007ff
-Whatchdog                   100000-100001       200000-200001
+Watchdog                    100000-100001       200000-200001
 ----------------------------------------------------------------
 
 ----------------------------------------------------------------
@@ -1834,19 +1834,22 @@ GFXDECODE_END
                     Big Run, Cisco Heat, F1 GrandPrix Star
 **************************************************************************/
 
-/* TODO: this is hackish */
+/*
+ irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. Wild Pilot of course doesn't need it.
+ irq 2/4 controls gameplay speed, currently unknown about the timing
+ */
 TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_cpu1->set_input_line(4, HOLD_LINE);
+		m_cpu1->set_input_line(m_screen->frame_number() & 1 ? 4 : 1, HOLD_LINE);
 
-	if(scanline == 154)
+	if(scanline == 0)
 		m_cpu1->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 69)
-		m_cpu1->set_input_line(1, HOLD_LINE);
+//	if(scanline == 69)
+//		m_cpu1->set_input_line(1, HOLD_LINE);
 }
 
 
@@ -1881,7 +1884,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-1)

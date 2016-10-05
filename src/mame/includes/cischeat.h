@@ -24,6 +24,7 @@ public:
 		m_cpu3(*this, "cpu3"),
 		m_cpu5(*this, "cpu5"),
 		m_soundcpu(*this, "soundcpu"),
+		m_screen(*this, "screen"),
 		m_watchdog(*this, "watchdog"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
@@ -119,6 +120,7 @@ public:
 	optional_device<cpu_device> m_cpu3;
 	optional_device<cpu_device> m_cpu5;
 	optional_device<cpu_device> m_soundcpu;
+	required_device<screen_device> m_screen;
 	optional_device<watchdog_timer_device> m_watchdog;
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
