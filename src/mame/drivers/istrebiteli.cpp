@@ -6,7 +6,6 @@
 
     TODO:
       sound emulation
-      check sprite priorities
       accurate sprite collision
 
 	how to play:
@@ -15,6 +14,10 @@
 	
 	test mode:
 	  insert 12 or more coins then press 2 player start
+
+    note:
+      dumped PCB is early game version, have several bugs, possible test/prototype.
+      later version was seen in St.Petersburg arcade museum.
 
 **************************************************************************/
 
@@ -158,26 +161,27 @@ public:
 	tilemap_t *m_tilemap;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 m_spr0_ctrl;
-	UINT8 m_spr1_ctrl;
 	UINT8 coin_count;
+	UINT8 m_spr_ctrl[2];
+	UINT8 m_spr_collision[2];
 	UINT8 m_spr_xy[8];
 	UINT8 m_tileram[16];
 };
 
 void istrebiteli_state::machine_start()
 {
-	save_item(NAME(m_spr0_ctrl));
-	save_item(NAME(m_spr1_ctrl));
 	save_item(NAME(coin_count));
+	save_item(NAME(m_spr_ctrl));
+	save_item(NAME(m_spr_collision));
 	save_item(NAME(m_spr_xy));
 	save_item(NAME(m_tileram));
 }
 
 void istrebiteli_state::machine_reset()
 {
-	m_spr0_ctrl = m_spr1_ctrl = 0;
 	coin_count = 0;
+	memset(m_spr_ctrl, 0, sizeof(m_spr_ctrl));
+	memset(m_spr_collision, 0, sizeof(m_spr_collision));
 	memset(m_spr_xy, 0, sizeof(m_spr_xy));
 	memset(m_tileram, 0, sizeof(m_tileram));
 }
@@ -213,7 +217,7 @@ void istrebiteli_state::video_start()
 		memcpy(&gfx[offs], &temp[0], 64);
 	}
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(istrebiteli_state::get_tile_info), this), TILEMAP_SCAN_ROWS_FLIP_X,
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(istrebiteli_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
 		8, 16, 16, 1);
 	m_tilemap->set_scrolldx(96, 96);
 }
@@ -227,21 +231,22 @@ UINT32 istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	rect.set_size(16*8, 16);
 	m_tilemap->draw(screen, bitmap, rect, 0, 0);
 
+	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr_ctrl[0] & 0x40) ? 5 : 7, 0, 0, 0, m_spr_xy[4], m_spr_xy[5], 1);
+	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr_ctrl[1] & 0x40) ? 4 : 6, 0, 0, 0, m_spr_xy[6], m_spr_xy[7], 1);
+
 	int spritecode;
 
-	spritecode = (m_spr0_ctrl & 0x1f) + ((m_spr0_ctrl & 0x80) >> 2);
-	m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[7], m_spr_xy[6], 1);
-	spritecode = (m_spr1_ctrl & 0x1f) + ((m_spr1_ctrl & 0x80) >> 2);
-	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,	spritecode, 0, 0, 0, m_spr_xy[5], m_spr_xy[4], 1);
-
-	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr0_ctrl & 0x40) ? 5:7, 0, 0, 0, m_spr_xy[3], m_spr_xy[2], 1);
-	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr1_ctrl & 0x40) ? 4:6, 0, 0, 0, m_spr_xy[1], m_spr_xy[0], 1);
+	spritecode = (m_spr_ctrl[0] & 0x1f) + ((m_spr_ctrl[0] & 0x80) >> 2);
+	m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[0], m_spr_xy[1], 1);
+	spritecode = (m_spr_ctrl[1] & 0x1f) + ((m_spr_ctrl[1] & 0x80) >> 2);
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[2], m_spr_xy[3], 1);
 
 	return 0;
 }
 
 WRITE8_MEMBER(istrebiteli_state::tileram_w)
 {
+	offset ^= 15;
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
@@ -273,17 +278,21 @@ WRITE8_MEMBER(istrebiteli_state::sound_w)
 
 WRITE8_MEMBER(istrebiteli_state::spr0_ctrl_w)
 {
-	m_spr0_ctrl = data;
+	m_spr_ctrl[0] = data;
+	if (data & 0x80)
+		m_spr_collision[0] = 0;
 }
 
 WRITE8_MEMBER(istrebiteli_state::spr1_ctrl_w)
 {
-	m_spr1_ctrl = data;
+	m_spr_ctrl[1] = data;
+	if (data & 0x80)
+		m_spr_collision[1] = 0;
 }
 
 WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
 {
-	m_spr_xy[offset] = data;
+	m_spr_xy[offset ^ 7] = data;
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, istrebiteli_state)
@@ -304,20 +313,19 @@ CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
 {
 	// piece of HACK
 	// real hardware does per-pixel sprite collision detection
-	int id = *(int*)&param * 2;
+	int id = *(int*)&param;
 
-	int sx = m_spr_xy[5 + id];
-	int sy = m_spr_xy[4 + id];
-	int px = m_spr_xy[3 - id] + 3;
-	int py = m_spr_xy[2 - id] + 3;
+	if ((m_spr_ctrl[id] & 0x80) == 0)
+	{
+		int sx = m_spr_xy[0 + id * 2];
+		int sy = m_spr_xy[1 + id * 2];
+		int px = m_spr_xy[6 - id * 2] + 3;
+		int py = m_spr_xy[7 - id * 2] + 3;
 
-	if (sx < 56)
-		return 0;
-
-	if (px >= sx && px < (sx + 8) && py >= sy && py < (sy + 8))
-		return 1;
-
-	return 0;
+		if (sx > 56 && px >= sx && px < (sx + 8) && py >= sy && py < (sy + 8))
+			m_spr_collision[id] |= 1;
+	}
+	return m_spr_collision[id];
 }
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::coin_r)
@@ -338,7 +346,7 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -348,7 +356,7 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
