@@ -5597,6 +5597,18 @@
 		</part>
 	</software>
 
+	<software name="pipedream">
+		<description>Pipe Dream (clean crack)</description>
+		<year>1990</year>
+		<publisher>Lucasfilm</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pipe dream (1990)(lucasfilm)(trex crack).dsk" size="143360" crc="46befc67" sha1="654d9f22147a111a77f59cd775a3e2822579b085" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pirates">
 		<description>Pirates!</description>
 		<year>1987</year>
