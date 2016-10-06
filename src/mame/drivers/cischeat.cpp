@@ -363,7 +363,7 @@ READ16_MEMBER(cischeat_state::wildplt_xy_r)
 	return 0xffff;
 }
 
-// buttons & sensors are 
+// buttons & sensors are muxed. bit 0 routes to coin chute (single according to test mode)
 READ16_MEMBER(cischeat_state::wildplt_mux_r)
 {
 	UINT16 split_in = 0xffff;
@@ -409,7 +409,7 @@ static ADDRESS_MAP_START( wildplt_map, AS_PROGRAM, 16, cischeat_state )
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
-
+	
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0

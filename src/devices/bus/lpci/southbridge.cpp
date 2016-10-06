@@ -329,7 +329,7 @@ READ8_MEMBER(southbridge_device::pc_dma_read_byte)
 	if(m_dma_channel == -1)
 		return 0xff;
 	UINT8 result;
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
+	offs_t page_offset = ((offs_t) m_dma_offset[0][m_dma_channel]) << 16;
 
 	result = prog_space.read_byte(page_offset + offset);
 	return result;
@@ -341,7 +341,7 @@ WRITE8_MEMBER(southbridge_device::pc_dma_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
+	offs_t page_offset = ((offs_t) m_dma_offset[0][m_dma_channel]) << 16;
 
 	prog_space.write_byte(page_offset + offset, data);
 }
@@ -353,9 +353,9 @@ READ8_MEMBER(southbridge_device::pc_dma_read_word)
 	if(m_dma_channel == -1)
 		return 0xff;
 	UINT16 result;
-	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
+	offs_t page_offset = ((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16;
 
-	result = prog_space.read_word(page_offset + ( offset << 1 ) );
+	result = prog_space.read_word((page_offset & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result & 0xFF00;
 
 	return result & 0xFF;
@@ -367,9 +367,9 @@ WRITE8_MEMBER(southbridge_device::pc_dma_write_word)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
+	offs_t page_offset = ((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16;
 
-	prog_space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
+	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
 }
 
 

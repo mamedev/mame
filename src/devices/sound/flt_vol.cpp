@@ -48,5 +48,6 @@ void filter_volume_device::sound_stream_update(sound_stream &stream, stream_samp
 
 void filter_volume_device::flt_volume_set_volume(float volume)
 {
+	m_stream->update();
 	m_gain = (int)(volume * 256);
 }
