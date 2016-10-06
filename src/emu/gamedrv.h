@@ -45,12 +45,18 @@ const UINT32 MACHINE_TYPE_OTHER                = 0x00200000;   // any other emul
 const UINT32 MACHINE_IMPERFECT_KEYBOARD        = 0x00400000;   // keyboard is known to be wrong
 const UINT32 MACHINE_CLICKABLE_ARTWORK         = 0x00800000;   // marking that artwork is clickable and require mouse cursor
 const UINT32 MACHINE_IS_INCOMPLETE             = 0x01000000;   // any official game/system with blantantly incomplete HW or SW should be marked with this
+const UINT32 MACHINE_NODEVICE_MICROPHONE       = 0x02000000;   // any game/system that has unemulated recording voice device peripheral
+const UINT32 MACHINE_NODEVICE_CAMERA           = 0x04000000;   // any game/system that has unemulated capturing image device peripheral
+const UINT32 MACHINE_NODEVICE_PRINTER          = 0x08000000;   // any game/system that has unemulated grabbing of screen content device
+const UINT32 MACHINE_NODEVICE_LAN              = 0x10000000;   // any game/system that has unemulated multi-linking capability 
+const UINT32 MACHINE_NODEVICE_WAN              = 0x20000000;   // any game/system that has unemulated networking capability
 
 // useful combinations of flags
 const UINT32 MACHINE_IS_SKELETON               = MACHINE_NO_SOUND | MACHINE_NOT_WORKING; // mask for skelly games
 const UINT32 MACHINE_IS_SKELETON_MECHANICAL    = MACHINE_IS_SKELETON | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK; // mask for skelly mechanical games
-
-
+const UINT32 MACHINE_FATAL_FLAGS               = MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL; // red disclaimer
+const UINT32 MACHINE_WARNING_FLAGS             = MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_KEYBOARD | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_MICROPHONE | MACHINE_NODEVICE_CAMERA | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_WAN;  // yellow disclaimer
+const UINT32 MACHINE_BTANB_FLAGS               = MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND_HW; // default disclaimer
 
 //**************************************************************************
 //  TYPE DEFINITIONS

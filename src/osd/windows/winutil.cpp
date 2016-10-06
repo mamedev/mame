@@ -106,9 +106,9 @@ void osd_subst_env(std::string &dst, const std::string &src)
 {
 	TCHAR buffer[MAX_PATH];
 
-	auto t_src = tstring_from_utf8(src.c_str());
+	osd::text::tstring t_src = osd::text::to_tstring(src);
 	ExpandEnvironmentStrings(t_src.c_str(), buffer, ARRAY_LENGTH(buffer));
-	utf8_from_tstring(dst, buffer);
+	osd::text::from_tstring(dst, buffer);
 }
 
 //-------------------------------------------------

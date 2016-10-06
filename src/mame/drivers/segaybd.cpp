@@ -2809,7 +2809,7 @@ GAMEL(1988, pdrift,    0,        yboard,      pdrift,   segaybd_state, pdrift,  
 GAMEL(1988, pdrifta,   pdrift,   yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 GAMEL(1988, pdrifte,   pdrift,   yboard,      pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftj,   pdrift,   yboard,      pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdriftl,   pdrift,   yboard_link, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan, Link Version)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING, layout_pdrift)
+GAMEL(1988, pdriftl,   pdrift,   yboard_link, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan, Link Version)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
 
 GAME( 1991, rchase,    0,        yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )

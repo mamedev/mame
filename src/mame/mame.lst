@@ -12219,6 +12219,7 @@ fexcelp                         //
 fexcelv                         //
 fscc9                           //
 fscc9b                          //
+fscc9ps                         //
 fscc12                          //
 reversic                        //
 super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
@@ -13205,6 +13206,7 @@ geimulti                        // (c) 1992 Grayhound Electronics
 gepoker                         // (c) 1984 Greyhound Electronics
 gepoker1                        // (c) 1984 Greyhound Electronics
 gepoker2                        // (c) 1984 Greyhound Electronics
+gepoker3                        // (c) 1984 Greyhound Electronics
 gs4002                          // (c) 1982 G.E.I.
 gs4002a                         // (c) 1982 G.E.I.
 gt103a1                         // (c) 1984 Greyhound Electronics
@@ -20319,6 +20321,9 @@ mits680b                        //
 
 @source:mjkjidai.cpp
 mjkjidai                        // (c) 1986 Sanritsu
+
+@source:mjsenpu.cpp
+mjsenpu
 
 @source:mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
@@ -34059,6 +34064,7 @@ statriv2                        // (c) 1984 Status Games
 statriv2v                       // (c) 1984 Status Games
 statriv4                        // (c) 1985 Status Games
 statusbj                        // (c) 1981 Status Games
+supertr                         // (c) 1986 Status Games
 supertr2                        // (c) 1986 Status Games
 supertr3                        // (c) 1986 Status Games
 tripdraw                        // (c) 1981 Status Games

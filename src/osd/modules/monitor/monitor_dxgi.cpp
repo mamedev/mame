@@ -46,7 +46,7 @@ public:
 		m_output->GetDesc(&desc);
 
 		// fetch the latest info about the monitor
-		m_name = utf8_from_wstring(desc.DeviceName);
+		m_name = osd::text::from_wstring(desc.DeviceName);
 
 		m_pos_size = RECT_to_osd_rect(desc.DesktopCoordinates);
 		m_usuable_pos_size = RECT_to_osd_rect(desc.DesktopCoordinates);
@@ -139,7 +139,7 @@ protected:
 				float aspect = float(coords->right - coords->left) / float(coords->bottom - coords->top);
 
 				// allocate a new monitor info
-				std::string devicename = utf8_from_wstring(desc.DeviceName);
+				std::string devicename = osd::text::from_wstring(desc.DeviceName);
 
 				// allocate a new monitor info
 				auto monitor = std::make_shared<dxgi_monitor_info>(*this, desc.Monitor, devicename.c_str(), aspect, output);

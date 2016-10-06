@@ -273,7 +273,6 @@ void pcu_service_interrupts(dsp56k_core* cpustate)
 		{
 			/* TODO: Implement long interrupts & fast interrupts correctly! */
 			/*       Right now they are handled in the JSR & BSR ops.  SupahLame. */
-			cpustate->ppc = PC;
 
 			/* Are you anything but the Host Command interrupt? */
 			if (interrupt_index != 22)

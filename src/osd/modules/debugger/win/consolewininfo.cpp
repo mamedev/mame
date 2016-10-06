@@ -43,7 +43,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			m_devices_menu = CreatePopupMenu();
 			for (device_image_interface &img : iter)
 			{
-				auto tc_buf = tstring_from_utf8(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]").c_str());
+				osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]"));
 				AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
 			}
 			AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_devices_menu, TEXT("Images"));
@@ -189,7 +189,7 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			auto tc_buf = tstring_from_utf8(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]").c_str());
+			osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]"));
 			ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf.c_str());
 
 			cnt++;
@@ -214,7 +214,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					std::string filter;
 					build_generic_filter(img, false, filter);
 					{
-						auto t_filter = tstring_from_utf8(filter.c_str());
+						osd::text::tstring t_filter = osd::text::to_tstring(filter);
 
 						// convert a pipe-char delimited string into a NUL delimited string
 						for (int i = 0; t_filter[i] != '\0'; i++)
@@ -241,7 +241,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 						if (GetOpenFileName(&ofn))
 						{
-							auto utf8_buf = utf8_from_tstring(selectedFilename);
+							auto utf8_buf = osd::text::from_tstring(selectedFilename);
 							img->load(utf8_buf.c_str());
 						}
 					}
@@ -252,7 +252,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					std::string filter;
 					build_generic_filter(img, true, filter);
 					{
-						auto t_filter = tstring_from_utf8(filter.c_str());
+						osd::text::tstring t_filter = osd::text::to_tstring(filter);
 						// convert a pipe-char delimited string into a NUL delimited string
 						for (int i = 0; t_filter[i] != '\0'; i++)
 						{
@@ -278,7 +278,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 						if (GetSaveFileName(&ofn))
 						{
-							auto utf8_buf = utf8_from_tstring(selectedFilename);
+							auto utf8_buf = osd::text::from_tstring(selectedFilename);
 							img->create(utf8_buf.c_str(), img->device_get_indexed_creatable_format(0), nullptr);
 						}
 					}

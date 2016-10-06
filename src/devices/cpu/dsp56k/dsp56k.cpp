@@ -421,7 +421,6 @@ void dsp56k_device::device_reset()
 	logerror("Dsp56k reset\n");
 
 	m_dsp56k_core.interrupt_cycles = 0;
-	m_dsp56k_core.ppc = 0x0000;
 
 	m_dsp56k_core.repFlag = 0;
 	m_dsp56k_core.repAddr = 0x0000;
@@ -430,6 +429,8 @@ void dsp56k_device::device_reset()
 	mem_reset(&m_dsp56k_core);
 	agu_reset(&m_dsp56k_core);
 	alu_reset(&m_dsp56k_core);
+
+	m_dsp56k_core.ppc = m_dsp56k_core.PCU.pc;
 
 	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU locked to the instruction at address 0x0000 */
 	m_dsp56k_core.program->write_word(0x0000, 0x0124);
@@ -450,9 +451,10 @@ void dsp56k_device::device_reset()
 static size_t execute_one_new(dsp56k_core* cpustate)
 {
 	// For MAME
-	cpustate->op = ROPCODE(ADDRESS(PC));
+	cpustate->ppc = PC;
 	debugger_instruction_hook(cpustate->device, PC);
 
+	cpustate->op = ROPCODE(ADDRESS(PC));
 	UINT16 w0 = ROPCODE(ADDRESS(PC));
 	UINT16 w1 = ROPCODE(ADDRESS(PC) + ADDRESS(1));
 

@@ -13,6 +13,10 @@
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
 		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
 	</element>
+	<element name="led2" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.14" green="0.014" blue="0.02" /></disk>
+	</element>
 
 	<element name="hl" defstate="0">
 		<text string=" ">
@@ -350,15 +354,15 @@
 
 	<!-- bottom side -->
 
-		<bezel name="8.8" element="led"><bounds x="42" y="90" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.9" element="led"><bounds x="45" y="90" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.10" element="led"><bounds x="48" y="90" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.11" element="led"><bounds x="51" y="90" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.12" element="led"><bounds x="54" y="90" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.13" element="led"><bounds x="57" y="90" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.8" element="led2"><bounds x="42" y="90" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.9" element="led2"><bounds x="45" y="90" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.10" element="led2"><bounds x="48" y="90" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.11" element="led2"><bounds x="51" y="90" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.12" element="led2"><bounds x="54" y="90" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.13" element="led2"><bounds x="57" y="90" width="1.5" height="1.5" /></bezel>
 
-		<bezel name="8.14" element="led"><bounds x="76.5" y="90" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.15" element="led"><bounds x="76.5" y="94" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.14" element="led2"><bounds x="76.5" y="90" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.15" element="led2"><bounds x="76.5" y="94" width="1.5" height="1.5" /></bezel>
 
 		<bezel element="but" inputtag="IN.8" inputmask="0x01"><bounds x="33.9" y="94" width="1.5" height="1.5" /></bezel>
 		<bezel element="but" inputtag="IN.8" inputmask="0x02"><bounds x="36.9" y="94" width="1.5" height="1.5" /></bezel>

@@ -297,7 +297,7 @@ static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LP
 
 static std::string convert_wide(LPCVOID data)
 {
-	return utf8_from_wstring((LPCWSTR) data);
+	return osd::text::from_wstring((LPCWSTR) data);
 }
 
 //============================================================
@@ -306,7 +306,7 @@ static std::string convert_wide(LPCVOID data)
 
 static std::string convert_ansi(LPCVOID data)
 {
-	return utf8_from_astring((LPCSTR) data);
+	return osd::text::from_astring((LPCSTR) data);
 }
 
 //============================================================
@@ -367,7 +367,7 @@ protected:
 
 		for (auto const &library : m_libraries)
 		{
-			auto tempstr = tstring_from_utf8(library.c_str());
+			osd::text::tstring tempstr = osd::text::to_tstring(library);
 			HMODULE module = load_library(tempstr.c_str());
 
 			if (module != nullptr)

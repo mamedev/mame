@@ -433,7 +433,8 @@ void dmg_ppu_device::common_start()
 	save_item(NAME(m_next_state));
 	save_item(NAME(m_old_curline));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_layer); i++) {
+	for (int i = 0; i < ARRAY_LENGTH(m_layer); i++)
+	{
 		save_item(NAME(m_layer[i].enabled), i);
 		save_item(NAME(m_layer[i].xindex), i);
 		save_item(NAME(m_layer[i].xshift), i);
@@ -468,7 +469,8 @@ void dmg_ppu_device::common_start()
 	save_item(NAME(m_line.window_enable));
 	save_item(NAME(m_line.window_enable_index));
 	save_item(NAME(m_line.window_should_trigger));
-	for (int i = 0; i < ARRAY_LENGTH(m_line.sprite); i++) {
+	for (int i = 0; i < ARRAY_LENGTH(m_line.sprite); i++)
+	{
 		save_item(NAME(m_line.sprite[i].enabled), i);
 		save_item(NAME(m_line.sprite[i].x), i);
 		save_item(NAME(m_line.sprite[i].y), i);
@@ -822,7 +824,7 @@ void dmg_ppu_device::update_line_state(UINT64 cycles)
 			if (m_line.scrollx_to_apply > 0)
 			{
 				// TODO: Determine when the scrollx shifts are applied when window-x is <= 0x07
-//logerror("scrollx_to_apply: %u\n", m_line.scrollx_to_apply);
+LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 				if (!m_line.window_active)
 				{
 					m_line.shift_register <<= 2;
@@ -969,6 +971,15 @@ void dmg_ppu_device::update_line_state(UINT64 cycles)
 			next_tile_cycle = m_line.sprite_delay_cycles == 0 ? 0 : 8;
 			break;
 
+		case 9:   // eat scrollx delay cycles before starting window
+			LOG(("eating scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
+			m_line.window_compare_position--;
+			m_line.scrollx_to_apply--;
+			m_cycles_left++;
+			m_scrollx_adjust++;
+			next_tile_cycle = m_line.scrollx_to_apply == 0 ? 0 : 9;
+			break;
+
 		default:
 			next_tile_cycle &= 7;
 			break;
@@ -1013,7 +1024,7 @@ LOG(("enable window, m_current_line = %u, WNDPOSY = %u, WNDPOSX = %u, m_line.win
 		m_line.starting = true;
 		m_line.window_active = true;
 		m_frame_window_active = true;
-		m_line.tile_cycle = 0;
+		m_line.tile_cycle = !m_line.drawing && m_line.scrollx_to_apply > 0 ? 9 : 0;
 		m_line.tile_count = 0;
 		m_window_cycles = 6;
 		m_cycles_left += 6;

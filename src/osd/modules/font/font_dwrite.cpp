@@ -362,7 +362,7 @@ public:
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
 		// convert the face name
-		std::wstring familyName = wstring_from_utf8(name.c_str());
+		std::wstring familyName = osd::text::to_wstring(name.c_str());
 
 		// find the font
 		HR_RET0(find_font(
@@ -757,7 +757,7 @@ public:
 			std::unique_ptr<WCHAR[]> name = nullptr;
 			HR_RET0(get_localized_familyname(names, name));
 
-			std::string utf8_name = utf8_from_wstring(name.get());
+			std::string utf8_name = osd::text::from_wstring(name.get());
 			name.reset();
 
 			// Review: should the config name, be unlocalized?
