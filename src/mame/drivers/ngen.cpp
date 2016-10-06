@@ -715,9 +715,9 @@ READ8_MEMBER(ngen_state::dma_read_word)
 		return 0xff;
 	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
 
-	result = prog_space.read_word(page_offset + ((offset << 1) & 0xffff));
+	result = prog_space.read_word((page_offset & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result & 0xFF00;
-	popmessage("DMA byte address %06x read %04x\n", page_offset + ((offset << 1) & 0xffff),result);
+	popmessage("DMA byte address %06x read %04x\n", (page_offset & 0xfe0000) | (offset << 1),result);
 	return result & 0xff;
 }
 
@@ -736,8 +736,8 @@ WRITE8_MEMBER(ngen_state::dma_write_word)
 		return;
 	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
 
-	prog_space.write_word(page_offset + ((offset << 1) & 0xffff), data);
-	popmessage("DMA byte address %06x write %04x\n", page_offset + ((offset << 1) & 0xffff), m_dma_high_byte | data);
+	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), data);
+	popmessage("DMA byte address %06x write %04x\n", (page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
 }
 
 
