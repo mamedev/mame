@@ -25,16 +25,20 @@ and an unpopulated position for a YM2413 or UM3567
 
 
 
+
+
 class fun_tech_corp_state : public driver_device
 {
 public:
 	fun_tech_corp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
+		m_reel1_ram(*this, "reel1ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_fgram;
+	required_shared_ptr<UINT8> m_reel1_ram;
 
 	INTERRUPT_GEN_MEMBER(funtech_vblank_interrupt);
 
@@ -49,8 +53,16 @@ public:
 	UINT8 m_unk03;
 
 	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_reel1_tilemap;
+
 	DECLARE_WRITE8_MEMBER(fgram_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	
+	DECLARE_WRITE8_MEMBER(reel1_ram_w);
+	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
+
+	
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -68,7 +80,6 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_fg_tile_info)
 
 	code |= (attr & 0x0f) << 8;
 
-	// maybe
 	if (m_unk03&1) code |= 0x1000;
 
 	SET_TILE_INFO_MEMBER(0,
@@ -78,9 +89,31 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_fg_tile_info)
 }
 
 
+TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel1_tile_info)
+{
+	int code = m_reel1_ram[tile_index];
+	if (m_unk03 & 0x4) code |= 0x100;
+//	if (m_unk03 & 0x8) code |= 0x200; // there needs to be a bit for this somehwere as we have 0x400 tiles.
+
+	SET_TILE_INFO_MEMBER(1,
+			code ,
+			0,
+			0);
+}
+
+WRITE8_MEMBER(fun_tech_corp_state::reel1_ram_w)
+{
+	m_reel1_ram[offset] = data;
+	m_reel1_tilemap->mark_tile_dirty(offset);
+}
+
+
 void fun_tech_corp_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+
 }
 
 WRITE8_MEMBER(fun_tech_corp_state::fgram_w)
@@ -117,7 +150,8 @@ static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(reel1_ram_w) AM_SHARE("reel1ram")
+	AM_RANGE(0xf200, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -140,9 +174,15 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_00_w)
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_03_w)
 {
-//	printf("funtech_unk_03_w %02x\n", data);
+	//printf("funtech_unk_03_w %02x\n", data);
+
+	// ---- -r-t
+	// t = text tile bank
+	// r = reel tile bank
+
 	m_unk03 = data;
 	m_fg_tilemap->mark_all_dirty();
+	m_reel1_tilemap->mark_all_dirty();
 }
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_11_w)
@@ -205,7 +245,7 @@ static const gfx_layout tiles8x8_layout =
 
 static GFXDECODE_START( funtech )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32_layout, 0x100, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32_layout, 0x100, 1 )
 GFXDECODE_END
 
 
