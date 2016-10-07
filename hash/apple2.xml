@@ -4908,7 +4908,19 @@
 				<rom name="genesis (1983)(datasoft - design labs)(trex single file crack).dsk" size="143360" crc="c55fd79c" sha1="34940df9dc08c88f38000f9d3311bae429a2f735" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>708fc0c0903a7c3f61b0b873ce032e81762367ba
+	</software>
+
+	<software name="gbust">
+		<description>Ghostbusters (clean crack)</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ghostbusters (1984)(activision)(clean crack).dsk" size="143360" crc="7664a255" sha1="708fc0c0903a7c3f61b0b873ce032e81762367ba" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="gijoe">
 		<description>G.I. Joe</description>
