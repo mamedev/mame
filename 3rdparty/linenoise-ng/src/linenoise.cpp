@@ -924,8 +924,10 @@ static struct termios orig_termios; /* in order to restore at exit */
 
 static KillRing killRing;
 
-//static int rawmode = 0; /* for atexit() function to check if restore is needed*/
-//static int atexit_registered = 0; /* register atexit just 1 time */
+#ifndef _WIN32
+static int rawmode = 0; /* for atexit() function to check if restore is needed*/
+static int atexit_registered = 0; /* register atexit just 1 time */
+#endif
 static int historyMaxLen = LINENOISE_DEFAULT_HISTORY_MAX_LEN;
 static int historyLen = 0;
 static int historyIndex = 0;
@@ -937,8 +939,9 @@ static char8_t** history = NULL;
 // and zero is a valid index (so -1 is a valid "previous index")
 static int historyPreviousIndex = -2;
 static bool historyRecallMostRecent = false;
-
-//static void linenoiseAtExit(void);
+#ifndef _WIN32
+static void linenoiseAtExit(void);
+#endif
 
 static bool isUnsupportedTerm(void) {
   char* term = getenv("TERM");
@@ -1026,8 +1029,9 @@ static void disableRawMode(void) {
 }
 
 // At exit we'll try to fix the terminal to the initial conditions
-//static void linenoiseAtExit(void) { disableRawMode(); }
-
+#ifndef _WIN32
+static void linenoiseAtExit(void) { disableRawMode(); }
+#endif
 static int getScreenColumns(void) {
   int cols;
 #ifdef _WIN32
@@ -3326,7 +3330,7 @@ void linenoisePrintKeyCodes(void) {
     char c;
     int nread;
 
-#if _WIN32
+#ifdef _WIN32
     nread = _read(STDIN_FILENO, &c, 1);
 #else
     nread = read(STDIN_FILENO, &c, 1);
