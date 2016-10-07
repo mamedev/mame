@@ -335,7 +335,7 @@ void gameboy_sound_device::update_square_channel(struct SOUND &snd, UINT64 cycle
 {
 	if (snd.on)
 	{
-		// compensate for left over cycles
+		// compensate for leftover cycles
 		if (snd.cycles_left > 0)
 		{
 			// Emit sample(s)
@@ -381,7 +381,7 @@ void dmg_apu_device::update_wave_channel(struct SOUND &snd, UINT64 cycles)
 {
 	if (snd.on)
 	{
-		// compensate for left over cycles
+		// compensate for leftover cycles
 		if (snd.cycles_left > 0)
 		{
 			if (cycles <= snd.cycles_left)
@@ -813,6 +813,12 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 		break;
 	case NR13: /* Frequency lo (R/W) */
 		m_snd_1.reg[3] = data;
+		// Only enabling the frequency line breaks blarggs's sound test #5
+		// This condition may not be correct
+		if (!m_snd_1.sweep_enabled)
+		{
+			m_snd_1.frequency = ((m_snd_1.reg[4] & 0x7) << 8) | m_snd_1.reg[3];
+		}
 		break;
 	case NR14: /* Frequency hi / Initialize (R/W) */
 		m_snd_1.reg[4] = data;
@@ -857,6 +863,14 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 				if (m_snd_1.length == 0 && m_snd_1.length_enabled && !(m_snd_control.cycles & FRAME_CYCLES))
 				{
 					tick_length(m_snd_1);
+				}
+			}
+			else
+			{
+				// This condition may not be correct
+				if (!m_snd_1.sweep_enabled)
+				{
+					m_snd_1.frequency = ((m_snd_1.reg[4] & 0x7) << 8) | m_snd_1.reg[3];
 				}
 			}
 		}
@@ -924,6 +938,10 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 					tick_length(m_snd_2);
 				}
 			}
+			else
+			{
+				m_snd_2.frequency = ((m_snd_2.reg[4] & 0x7) << 8) | m_snd_2.reg[3];
+			}
 		}
 		break;
 
@@ -946,7 +964,7 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 		break;
 	case NR33: /* Frequency lo (W) */
 		m_snd_3.reg[3] = data;
-		m_snd_3.frequency = ((m_snd_3.reg[4] & 0x7) << 8) + m_snd_3.reg[3];
+		m_snd_3.frequency = ((m_snd_3.reg[4] & 0x7) << 8) | m_snd_3.reg[3];
 		break;
 	case NR34: /* Frequency hi / Initialize (W) */
 		m_snd_3.reg[4] = data;
@@ -974,7 +992,7 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 				m_snd_3.duty = 1;
 				m_snd_3.duty_count = 0;
 				m_snd_3.length_counting = true;
-				m_snd_3.frequency = ((m_snd_3.reg[4] & 0x7) << 8) + m_snd_3.reg[3];
+				m_snd_3.frequency = ((m_snd_3.reg[4] & 0x7) << 8) | m_snd_3.reg[3];
 				m_snd_3.frequency_counter = m_snd_3.frequency;
 				// There is a tiny bit of delay in starting up the wave channel(?)
 				//
@@ -993,6 +1011,10 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 				{   
 					tick_length(m_snd_3);
 				}
+			}
+			else
+			{
+				m_snd_3.frequency = ((m_snd_3.reg[4] & 0x7) << 8) | m_snd_3.reg[3];
 			}
 		}
 		break;
