@@ -18,6 +18,7 @@ YM2149: higher resolution, selectable clock divider
 YM3439: same as 2149
 YMZ284: 0 I/O port, different clock divider
 YMZ294: 0 I/O port
+OKI M5255: differences not known
 */
 
 #define ALL_8910_CHANNELS -1
