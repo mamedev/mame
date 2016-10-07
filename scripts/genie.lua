@@ -368,15 +368,6 @@ newoption {
 }
 
 newoption {
-	trigger = "USE_LIBUV",
-	description = "Use libuv.",
-	allowed = {
-		{ "0",   "Disabled"     },
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "DEBUG_DIR",
 	description = "Default directory for debugger.",
 }
@@ -410,10 +401,6 @@ if not _OPTIONS["NOASM"] then
 	else
 		_OPTIONS["NOASM"] = "0"
 	end
-end
-
-if not _OPTIONS["USE_LIBUV"] then
-	_OPTIONS["USE_LIBUV"] = "1"
 end
 
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
@@ -526,12 +513,6 @@ configuration { "gmake or ninja" }
 	}
 
 dofile ("toolchain.lua")
-
-if _OPTIONS["USE_LIBUV"]=="0" then
-	defines {
-		"NO_LIBUV",
-	}
-end
 
 if _OPTIONS["targetos"]=="windows" then
 	configuration { "x64" }
