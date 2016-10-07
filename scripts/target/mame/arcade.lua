@@ -1838,6 +1838,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/goldstar.cpp",
 	MAME_DIR .. "src/mame/includes/goldstar.h",
 	MAME_DIR .. "src/mame/video/goldstar.cpp",
+	MAME_DIR .. "src/mame/drivers/funtech.cpp",
 	MAME_DIR .. "src/mame/drivers/jackie.cpp",
 	MAME_DIR .. "src/mame/drivers/igspoker.cpp",
 	MAME_DIR .. "src/mame/drivers/igs009.cpp",

@@ -12436,6 +12436,9 @@ funkyjeta                       // MAT (c) 1992 Data East (Mitchell license) (Wo
 funkyjetj                       // MAT (c) 1992 Data East (Mitchell license) (Japan, Rev 2)
 sotsugyo                        // (c) 1995 Mitchell (Atlus license)
 
+@source:funtech.cpp
+fts2in1
+
 @source:funworld.cpp
 bigdeal                         // (c) 1986 Fun World
 bigdealb                        // (c) 1986 Fun World
