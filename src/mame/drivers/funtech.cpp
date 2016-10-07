@@ -23,7 +23,7 @@ and an unpopulated position for a YM2413 or UM3567
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
+#include "fts2in1.lh"
 
 
 
@@ -55,8 +55,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(funtech_vblank_interrupt);
 
-	DECLARE_WRITE8_MEMBER(funtech_unk_00_w);
-	DECLARE_WRITE8_MEMBER(funtech_unk_01_w);
+	DECLARE_WRITE8_MEMBER(funtech_lamps_w);
+	DECLARE_WRITE8_MEMBER(funtech_coins_w);
 	DECLARE_WRITE8_MEMBER(funtech_vreg_w);
 
 
@@ -255,14 +255,27 @@ static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_00_w)
+WRITE8_MEMBER(fun_tech_corp_state::funtech_lamps_w)
 {
-//	printf("funtech_unk_00_w %02x\n", data);
+	output().set_lamp_value(0, (data >> 0) & 1);
+	output().set_lamp_value(1, (data >> 1) & 1);
+	output().set_lamp_value(2, (data >> 2) & 1);
+	output().set_lamp_value(3, (data >> 3) & 1);
+	output().set_lamp_value(4, (data >> 4) & 1);
+	output().set_lamp_value(5, (data >> 5) & 1);
+	output().set_lamp_value(6, (data >> 6) & 1);
+	output().set_lamp_value(7, (data >> 7) & 1);
 }
 
-WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_01_w)
+WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 {
-//	printf("funtech_unk_01_w %02x\n", data);
+	if (data & 0x43) printf("funtech_coins_w %02x\n", data);
+	// 80 = hopper motor?
+
+	// 20 = coin 3 counter
+	// 10 = coin 2 counter
+	// 08 = coin 4 counter
+	// 04 = coin 1 counter
 }
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
@@ -284,8 +297,8 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
 static ADDRESS_MAP_START( funtech_io_map, AS_IO, 8, fun_tech_corp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// lamps?
-	AM_RANGE(0x00, 0x00) AM_WRITE(funtech_unk_00_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(funtech_unk_01_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(funtech_lamps_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(funtech_coins_w)
 
 	AM_RANGE(0x03, 0x03) AM_WRITE(funtech_vreg_w)
 
@@ -315,7 +328,7 @@ static INPUT_PORTS_START( funtech )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_DIPNAME( 0x04, 0x04, "IN1-04" )
+	PORT_DIPNAME( 0x04, 0x04, "IN1-04" ) // hopper status?
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "IN1-08" )
@@ -496,4 +509,4 @@ ROM_START( fts2in1 )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00001, 0x20000, CRC(d572bddc) SHA1(06499aeb47085a02af9eb4987ed987f9a3a397f7) )
 ROM_END
 
-GAME( 1993, fts2in1,  0,    funtech, funtech, driver_device,  0, ROT0, "Fun Tech Corporation", "Super Two In One", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAMEL( 1993, fts2in1,  0,    funtech, funtech, driver_device,  0, ROT0, "Fun Tech Corporation", "Super Two In One", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_fts2in1 )
