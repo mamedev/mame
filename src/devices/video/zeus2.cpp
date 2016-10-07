@@ -850,7 +850,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 			log_fifo_command(data, numwords, " -- reg32");
 		if (((data[0] >> 16) & 0x7f) != 0x08)
 			zeus2_register32_w((data[0] >> 16) & 0x7f, data[1], log_fifo);
-			break;
+		break;
 
 		/* 0x08: set matrix and point (thegrid) */
 		case 0x08:
