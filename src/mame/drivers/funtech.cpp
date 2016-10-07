@@ -23,6 +23,8 @@ and an unpopulated position for a YM2413 or UM3567
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "fts2in1.lh"
 
 
@@ -41,6 +43,7 @@ public:
 		m_reel3_scroll(*this, "reel3_scroll"),
 		m_reel1_alt_scroll(*this, "reel1_alt_scroll"),
 		m_maincpu(*this, "maincpu"),
+		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_fgram;
@@ -85,6 +88,7 @@ public:
 	virtual void video_start() override;
 	UINT32 screen_update_funtech(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
@@ -239,7 +243,7 @@ static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
 
 	AM_RANGE(0xd000, 0xd7ff) AM_ROM // maybe
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(reel1_ram_w) AM_SHARE("reel1ram")
@@ -270,17 +274,26 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_lamps_w)
 WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 {
 	if (data & 0x43) printf("funtech_coins_w %02x\n", data);
+
 	// 80 = hopper motor?
+	m_hopper->write(space, 0, data & 0x80);
 
 	// 20 = coin 3 counter
+	machine().bookkeeping().coin_counter_w(2, data & 0x20 );
+
 	// 10 = coin 2 counter
+	machine().bookkeeping().coin_counter_w(1, data & 0x10 );
+
 	// 08 = coin 4 counter
+	machine().bookkeeping().coin_counter_w(3, data & 0x08 );
+
 	// 04 = coin 1 counter
+	machine().bookkeeping().coin_counter_w(0, data & 0x04 );
 }
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
 {
-//	printf("funtech_vreg_w %02x\n", data);
+	if (data & 0xb2) printf("funtech_vreg_w %02x\n", data);
 
 	// -x-- rr-t
 	// t = text tile bank
@@ -328,10 +341,8 @@ static INPUT_PORTS_START( funtech )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_DIPNAME( 0x04, 0x04, "IN1-04" ) // hopper status?
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN1-08" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) 
+	PORT_DIPNAME( 0x08, 0x08, "IN1-08" ) // some kind of key-out? reduces credits to 0
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "IN1-10" )
@@ -474,7 +485,6 @@ static MACHINE_CONFIG_START( funtech, fun_tech_corp_state )
 	MCFG_CPU_IO_MAP(funtech_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fun_tech_corp_state,  funtech_vblank_interrupt)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -487,6 +497,10 @@ static MACHINE_CONFIG_START( funtech, fun_tech_corp_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funtech)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
