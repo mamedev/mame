@@ -1473,3 +1473,23 @@ end
 		}
 
 end
+
+--------------------------------------------------
+-- linenoise-ng library
+--------------------------------------------------
+
+project "linenoise-ng"
+	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
+	kind (LIBTYPE)
+
+	addprojectflags()
+
+	includedirs {
+		MAME_DIR .. "3rdparty/linenoise-ng/include",
+	}
+
+	files {
+		MAME_DIR .. "3rdparty/linenoise-ng/src/ConvertUTF.cpp",
+		MAME_DIR .. "3rdparty/linenoise-ng/src/linenoise.cpp",
+		MAME_DIR .. "3rdparty/linenoise-ng/src/wcwidth.cpp",
+	}
