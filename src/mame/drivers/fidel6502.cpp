@@ -7,7 +7,7 @@
 
     TODO:
     - verify cpu speed and rom labels where unknown
-    - add EAG external module support, there should be a bankswitch bit somewhere
+    - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - Why does fexcelp give error beeps at start? As if chessboard buttons are
       pressed (button logic is not inverted). It works fine after pressing clear.
 
@@ -192,6 +192,8 @@ PCB label 510-1071A01
 *It was advertised as 3.2, 3.6, or 4MHz, with unofficial modifications up to 8MHz.
 PCB photos show only a 3MHz XTAL.
 
+A condensator keeps RAM contents alive for a few hours when powered off.
+
 Elite Avant Garde (models 6081,6088,6089) is on the same hardware.
 
 
@@ -199,7 +201,8 @@ Elite Avant Garde (models 6081,6088,6089) is on the same hardware.
 
 Sensory Chess Challenger "9" (SC9)
 2 versions were available, the newer "B" version was 2MHz and included the Budapest program.
-The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9.
+The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
+with magnet sensors and came with CB9 and CB16.
 ---------------------------------
 
 8*(8+1) buttons, 8*8+1 LEDs
@@ -923,7 +926,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x5fff) AM_ROM //AM_READ(sc12_cart_r)
+	AM_RANGE(0x2000, 0x5fff) AM_READ(sc12_cart_r)
 	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x7020, 0x7027) AM_WRITE(eas_segment_w) AM_READNOP
 	AM_RANGE(0x7030, 0x7037) AM_WRITE(eas_led_w) AM_READNOP
@@ -1897,8 +1900,7 @@ ROM_END
 
 ROM_START( feag2100 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100.1", 0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
-	ROM_RELOAD(          0x8000, 0x8000)
+	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 	ROM_LOAD("el2100.2", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -1909,8 +1911,7 @@ ROM_END
 
 ROM_START( feag2100sp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100.1", 0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
-	ROM_RELOAD(          0x8000, 0x8000)
+	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 	ROM_LOAD("el2100.2", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -1920,8 +1921,7 @@ ROM_END
 
 ROM_START( feag2100g )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100.1", 0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
-	ROM_RELOAD(          0x8000, 0x8000)
+	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 	ROM_LOAD("el2100.2", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -1931,8 +1931,7 @@ ROM_END
 
 ROM_START( feag2100fr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100.1", 0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
-	ROM_RELOAD(          0x8000, 0x8000)
+	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 	ROM_LOAD("el2100.2", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -2041,7 +2040,7 @@ CONS( 1986, feag2100g,  feag2100, 0,      eag,       eagg,      driver_device, 0
 CONS( 1986, feag2100fr, feag2100, 0,      eag,       eagg,      driver_device, 0, "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1982, fscc9,      0,        0,      sc9,       sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, fscc9b,     fscc9,    0,      sc9b,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9b,     fscc9,    0,      sc9b,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, fscc9ps,    fscc9,    0,      playmatic, playmatic, driver_device, 0, "Fidelity Electronics", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1984, fscc12,     0,        0,      sc12,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

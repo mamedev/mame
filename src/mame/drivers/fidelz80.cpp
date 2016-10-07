@@ -968,6 +968,13 @@ void fidelz80_state::vbrc_prepare_display()
 	display_matrix(16, 8, outdata, m_led_select);
 }
 
+WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
+{
+	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->start_w(1);
+	m_speech->start_w(0);
+}
+
 
 // I8243 I/O expander
 
@@ -1085,13 +1092,6 @@ ADDRESS_MAP_END
 
 
 // VBRC
-
-WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
-{
-	m_speech->data_w(space, 0, data & 0x3f);
-	m_speech->start_w(1);
-	m_speech->start_w(0);
-}
 
 static ADDRESS_MAP_START( vbrc_main_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
