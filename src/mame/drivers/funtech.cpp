@@ -39,6 +39,7 @@ public:
 		m_reel1_scroll(*this, "reel1_scroll"),
 		m_reel2_scroll(*this, "reel2_scroll"),
 		m_reel3_scroll(*this, "reel3_scroll"),
+		m_reel1_alt_scroll(*this, "reel1_alt_scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
@@ -49,15 +50,14 @@ public:
 	required_shared_ptr<UINT8> m_reel1_scroll;
 	required_shared_ptr<UINT8> m_reel2_scroll;
 	required_shared_ptr<UINT8> m_reel3_scroll;
+	required_shared_ptr<UINT8> m_reel1_alt_scroll;
 
 
 	INTERRUPT_GEN_MEMBER(funtech_vblank_interrupt);
 
-	DECLARE_READ8_MEMBER(funtech_unk_r);
-//	DECLARE_WRITE8_MEMBER(funtech_unk_w);
 	DECLARE_WRITE8_MEMBER(funtech_unk_00_w);
-//	DECLARE_WRITE8_MEMBER(funtech_unk_01_w);
-	DECLARE_WRITE8_MEMBER(funtech_unk_03_w);
+	DECLARE_WRITE8_MEMBER(funtech_unk_01_w);
+	DECLARE_WRITE8_MEMBER(funtech_vreg_w);
 
 
 	UINT8 m_vreg;
@@ -207,10 +207,10 @@ UINT32 fun_tech_corp_state::screen_update_funtech(screen_device &screen, bitmap_
 	}
 	else
 	{
-		// this mode seems to draw reel1 as fullscreen in a fixed position.
+		// this mode seems to draw reel1 as fullscreen using a different set of scroll regs
 		for (int i = 0; i < 64; i++)
 		{
-			m_reel1_tilemap->set_scrolly(i, -8);
+			m_reel1_tilemap->set_scrolly(i, m_reel1_alt_scroll[i]);
 		}
 
 		m_reel1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -250,29 +250,24 @@ static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
 	AM_RANGE(0xf840, 0xf87f) AM_RAM AM_SHARE("reel1_scroll")
 	AM_RANGE(0xf880, 0xf8bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xf900, 0xf93f) AM_RAM AM_SHARE("reel3_scroll")
+
+	AM_RANGE(0xf9c0, 0xf9ff) AM_RAM AM_SHARE("reel1_alt_scroll") // or a mirror, gets used in 'full screen' mode.
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(fun_tech_corp_state::funtech_unk_r)
-{
-	return 0xff;
-}
-
-/*
-WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_w)
-{
-}
-*/
-
 WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_00_w)
 {
-// lots of 00 / 80 writes
 //	printf("funtech_unk_00_w %02x\n", data);
 }
 
-WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_03_w)
+WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_01_w)
 {
-	printf("funtech_unk_03_w %02x\n", data);
+//	printf("funtech_unk_01_w %02x\n", data);
+}
+
+WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
+{
+//	printf("funtech_vreg_w %02x\n", data);
 
 	// -x-- rr-t
 	// t = text tile bank
@@ -288,15 +283,16 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_03_w)
 
 static ADDRESS_MAP_START( funtech_io_map, AS_IO, 8, fun_tech_corp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	// lamps?
 	AM_RANGE(0x00, 0x00) AM_WRITE(funtech_unk_00_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(funtech_unk_01_w)
 
-//	AM_RANGE(0x01, 0x01) AM_WRITE(funtech_unk_01_w) // on startup
-	AM_RANGE(0x03, 0x03) AM_WRITE(funtech_unk_03_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(funtech_vreg_w)
 
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN1")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN2")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN3")
+	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW1")
+	AM_RANGE(0x07, 0x07) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN4")
 
@@ -319,74 +315,77 @@ static INPUT_PORTS_START( funtech )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN1-04" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN1-08" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN1-10" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE(   0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 ) // note?
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	// the board contains 4 banks of 8 dipswitches, the code does not appear to read that many.
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Reel Speed" )
+	PORT_DIPSETTING(    0x01, "Low" )
+	PORT_DIPSETTING(    0x00, "High" )
+	PORT_DIPNAME( 0x06, 0x06, "Max Bet" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x04, "16" )
+	PORT_DIPSETTING(    0x02, "32" )
+	PORT_DIPSETTING(    0x06, "64" )
+	PORT_DIPNAME( 0x08, 0x08, "Min Bet for Bonus" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x08, "16" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // unused?
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) // unused?
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // unused?
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // unused?
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Percent" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x08, "53" )
+	PORT_DIPSETTING(    0x04, "56" )
+	PORT_DIPSETTING(    0x0c, "59" )
+	PORT_DIPSETTING(    0x02, "62" )
+	PORT_DIPSETTING(    0x0a, "65" )
+	PORT_DIPSETTING(    0x06, "68" )
+	PORT_DIPSETTING(    0x0e, "71" )
+	PORT_DIPSETTING(    0x01, "74" )
+	PORT_DIPSETTING(    0x09, "77" )
+	PORT_DIPSETTING(    0x05, "80" )
+	PORT_DIPSETTING(    0x0d, "83" )
+	PORT_DIPSETTING(    0x03, "86" )
+	PORT_DIPSETTING(    0x0b, "89" )
+	PORT_DIPSETTING(    0x07, "92" )
+	PORT_DIPSETTING(    0x0f, "95" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // unused?
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Percent" )
+	PORT_DIPSETTING(    0x00, "80" )
+	PORT_DIPSETTING(    0x20, "90" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // unused?
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // unused?
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN4")
+	PORT_START("IN4") // is this another unused dip bank, or something else?
 	PORT_DIPNAME( 0x01, 0x01, "4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
