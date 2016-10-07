@@ -273,10 +273,12 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_lamps_w)
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 {
-	if (data & 0x41) printf("funtech_coins_w %02x\n", data);
+	if (data & 0x01) printf("funtech_coins_w %02x\n", data);
 
 	// 80 = hopper motor?
 	m_hopper->write(space, 0, data & 0x80);
+
+	// 40 = ? sometimes
 
 	// 20 = coin 3 counter
 	machine().bookkeeping().coin_counter_w(2, data & 0x20 );
@@ -398,9 +400,9 @@ static INPUT_PORTS_START( funtech )
 	PORT_DIPSETTING(    0x0b, "89" )
 	PORT_DIPSETTING(    0x07, "92" )
 	PORT_DIPSETTING(    0x0f, "95" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // unused?
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game Enable" )
+	PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x10, "Enabled" )
 	PORT_DIPNAME( 0x20, 0x20, "Double Up Percent" )
 	PORT_DIPSETTING(    0x00, "80" )
 	PORT_DIPSETTING(    0x20, "90" )
