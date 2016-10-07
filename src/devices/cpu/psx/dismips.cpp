@@ -297,7 +297,7 @@ int main( int argc, char *argv[] )
 			break;
 		case CPU_R3000:
 			{
-				legacy_cpu_device *device = nullptr;
+				cpu_device *device = nullptr;
 				int options = 0;
 				UINT8 *opram = filebuf + pc;
 				UINT8 *oprom = opram;
