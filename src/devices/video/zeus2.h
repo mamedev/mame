@@ -53,10 +53,8 @@ struct zeus2_poly_extra_data
 *  Macros
 *************************************/
 
-#define WAVERAM_BLOCK0(blocknum)                ((void *)((UINT8 *)waveram[0] + 8 * (blocknum)))
-#define WAVERAM_BLOCK1(blocknum)                ((void *)((UINT8 *)waveram[1] + 12 * (blocknum)))
-#define WAVERAM_BLOCK0_EXT(blocknum)                ((void *)((UINT8 *)m_state->waveram[0] + 8 * (blocknum)))
-#define WAVERAM_BLOCK1_EXT(blocknum)                ((void *)((UINT8 *)m_state->waveram[1] + 12 * (blocknum)))
+#define WAVERAM_BLOCK0(blocknum)                ((void *)((UINT8 *)waveram + 8 * (blocknum)))
+#define WAVERAM_BLOCK0_EXT(blocknum)                ((void *)((UINT8 *)m_state->waveram + 8 * (blocknum)))
 
 #define WAVERAM_PTR8(base, bytenum)             ((UINT8 *)(base) + BYTE4_XOR_LE(bytenum))
 #define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
@@ -69,17 +67,6 @@ struct zeus2_poly_extra_data
 #define WAVERAM_PTR32(base, dwordnum)           ((UINT32 *)(base) + (dwordnum))
 #define WAVERAM_READ32(base, dwordnum)          (*WAVERAM_PTR32(base, dwordnum))
 #define WAVERAM_WRITE32(base, dwordnum, data)   do { *WAVERAM_PTR32(base, dwordnum) = (data); } while (0)
-
-#define PIXYX_TO_DWORDNUM(y, x)                 (((((y) & 0x1ff) << 8) | (((x) & 0x1fe) >> 1)) * 3 + ((x) & 1))
-#define DEPTHYX_TO_DWORDNUM(y, x)               (PIXYX_TO_DWORDNUM(y, (x) & ~1) + 2)
-
-#define WAVERAM_PTRPIX(base, y, x)              WAVERAM_PTR32(base, PIXYX_TO_DWORDNUM(y, x))
-#define WAVERAM_READPIX(base, y, x)             (*WAVERAM_PTRPIX(base, y, x))
-#define WAVERAM_WRITEPIX(base, y, x, color)     do { *WAVERAM_PTRPIX(base, y, x) = (color);  } while (0)
-
-#define WAVERAM_PTRDEPTH(base, y, x)            WAVERAM_PTR16(base, DEPTHYX_TO_DWORDNUM(y, x) * 2 + (x & 1))
-#define WAVERAM_READDEPTH(base, y, x)           (*WAVERAM_PTRDEPTH(base, y, x))
-#define WAVERAM_WRITEDEPTH(base, y, x, color)   do { *WAVERAM_PTRDEPTH(base, y, x) = (color);  } while (0)
 
 /*************************************
 *  Polygon renderer
@@ -135,7 +122,7 @@ public:
 	int m_atlantis; // Used to switch to using IEEE754 floating point format for atlantis
 
 	UINT32 m_zeusbase[0x80];
-	UINT32 m_renderRegs[0x40];
+	UINT32 m_renderRegs[0x50];
 
 	zeus2_renderer* poly;
 
@@ -145,13 +132,15 @@ public:
 	float zeus_point[3];
 	float zeus_point2[3];
 	UINT32 zeus_texbase;
-	UINT32 m_renderMode;
 	int zeus_quad_size;
-	UINT32 m_renderPtr;
+	UINT32 m_renderAddr;
+	bool m_thegrid;
+	UINT32 *m_directCmd;
 
-	UINT32 *waveram[2];
+	UINT32 *waveram;
 	std::unique_ptr<UINT32[]> m_frameColor;
 	std::unique_ptr<UINT16[]> m_frameDepth;
+	UINT32 m_pal_table[0x100];
 
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
@@ -171,10 +160,11 @@ private:
 	void zeus2_register_update(offs_t offset, UINT32 oldval, int logit);
 	int zeus2_fifo_process(const UINT32 *data, int numwords);
 	void zeus2_pointer_write(UINT8 which, UINT32 value, int logit);
+	void load_pal_table(void *wavePtr, UINT32 ctrl, int logit);
 	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
 	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
 	void print_fifo_command(const UINT32 *data, int numwords, const char *suffix);
-	void log_render_info();
+	void log_render_info(UINT32 texdata);
 	/*************************************
 	*  Member variables
 	*************************************/
@@ -187,6 +177,7 @@ private:
 	UINT32 m_fill_depth;
 
 	int m_yScale;
+
 
 #if TRACK_REG_USAGE
 	struct reg_info
@@ -282,12 +273,6 @@ public:
 	{
 		UINT32 blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
 		return WAVERAM_BLOCK0(blocknum);
-	}
-
-	inline void *waveram1_ptr_from_expanded_addr(UINT32 addr)
-	{
-		UINT32 blocknum = (addr % WAVERAM1_WIDTH) + ((addr >> 16) % WAVERAM1_HEIGHT) * WAVERAM1_WIDTH;
-		return WAVERAM_BLOCK1(blocknum);
 	}
 
 #ifdef UNUSED_FUNCTION
