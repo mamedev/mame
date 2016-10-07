@@ -22,7 +22,7 @@ and an unpopulated position for a YM2413 or UM3567
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-
+#include "sound/ay8910.h"
 
 
 
@@ -58,8 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(funtech_unk_00_w);
 //	DECLARE_WRITE8_MEMBER(funtech_unk_01_w);
 	DECLARE_WRITE8_MEMBER(funtech_unk_03_w);
-	DECLARE_WRITE8_MEMBER(funtech_unk_11_w);
-	DECLARE_WRITE8_MEMBER(funtech_unk_12_w);
+
 
 	UINT8 m_vreg;
 
@@ -285,15 +284,6 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_03_w)
 	m_reel1_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_11_w)
-{
-//	printf("funtech_unk_11_w %02x\n", data);
-}
-
-WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_12_w)
-{
-//	printf("funtech_unk_12_w %02x\n", data);
-}
 
 
 static ADDRESS_MAP_START( funtech_io_map, AS_IO, 8, fun_tech_corp_state )
@@ -310,45 +300,25 @@ static ADDRESS_MAP_START( funtech_io_map, AS_IO, 8, fun_tech_corp_state )
 
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN4")
 
-	AM_RANGE(0x11, 0x11) AM_WRITE(funtech_unk_11_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(funtech_unk_12_w)
-
+	AM_RANGE(0x11, 0x11) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funtech )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	// the buttons are all multi-purpose as it's a 2-in-1.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5, Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1, Take, Odds, Stop 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4, Double")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3, Small, Stop 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2, Big, Stop 2")
+	
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -361,12 +331,8 @@ static INPUT_PORTS_START( funtech )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 ) // note?
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x01, "2" )
@@ -512,6 +478,9 @@ static MACHINE_CONFIG_START( funtech, fun_tech_corp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) /* M5255, ? MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
