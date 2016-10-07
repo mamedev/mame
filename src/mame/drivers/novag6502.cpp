@@ -4,6 +4,11 @@
 
     Novag generic 6502 based chess computer driver
 
+    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
+    greatly affecting user playability of emulated electronic board games.
+    As workaround for the chess games, use an external chess GUI on the side,
+    such as Arena(in editmode).
+
     TODO:
     - move other Novag sets here when applicable
 

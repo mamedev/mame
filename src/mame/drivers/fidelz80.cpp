@@ -7,6 +7,11 @@
     for 6502 based boards, see drivers/fidel6502.cpp
     for 68000 based boards, see drivers/fidel68k.cpp
 
+    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
+    greatly affecting user playability of emulated electronic board games.
+    As workaround for the chess games, use an external chess GUI on the side,
+    such as Arena(in editmode).
+
     TODO:
     - Figure out why it says the first speech line twice; it shouldn't?
       It sometimes does this on Voice Sensory Chess Challenger real hardware.
@@ -14,8 +19,6 @@
       "I I am Fidelity's chess challenger", instead.
     - VBRC card scanner
 
-    Chess pieces are required, but theoretically blindfold chess is possible.
-    Chessboard artwork is provided for boards with pressure/magnet sensors.
     Read the official manual(s) on how to play.
 
     Keypad legend:

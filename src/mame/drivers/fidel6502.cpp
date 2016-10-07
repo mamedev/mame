@@ -4,6 +4,11 @@
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
+    
+    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
+    greatly affecting user playability of emulated electronic board games.
+    As workaround for the chess games, use an external chess GUI on the side,
+    such as Arena(in editmode).
 
     TODO:
     - verify cpu speed and rom labels where unknown
@@ -364,7 +369,7 @@ I/O is via TTL, see source code for more info
 
 // internal artwork
 #include "fidel_chesster.lh" // clickable
-#include "fidel_csc.lh" // clickable
+#include "fidel_csc.lh" // clickable, with preliminary boardpieces simulation
 #include "fidel_eag.lh" // clickable
 #include "fidel_eas.lh" // clickable
 #include "fidel_ex.lh" // clickable

@@ -5,6 +5,11 @@
 
     Fidelity Electronics 68000 based board driver
 
+    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
+    greatly affecting user playability of emulated electronic board games.
+    As workaround for the chess games, use an external chess GUI on the side,
+    such as Arena(in editmode).
+
     TODO:
     - how does dual-CPU work?
     - IRQ level/timing is unknown
