@@ -337,8 +337,8 @@
 		<publisher>Taito</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819272">
-				<rom name="arkanoid (1988)(taito)(trex crack).2mg" size="819272" crc="15aef159" sha1="3691ef5908d48fadab3c9602a2becfc8160dd7ad" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="arkanoid (1988)(taito)(trex crack).2mg" size="819264" crc="15aef159" sha1="3691ef5908d48fadab3c9602a2becfc8160dd7ad" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -349,8 +349,8 @@
 		<publisher>Taito</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819275">
-				<rom name="arkanoid ii - revenge of doh (1988)(taito)(trex crack).2mg" size="819275" crc="21e92966" sha1="ff1143ee948490666b02c09f6bb532b077cff130" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="arkanoid ii - revenge of doh (1988)(taito)(trex crack).2mg" size="819264" crc="21e92966" sha1="ff1143ee948490666b02c09f6bb532b077cff130" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -591,8 +591,8 @@
 		<publisher>Electronic Arts / Interplay</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819274">
-				<rom name="bard's tale - tales of the unknown, the (1987)(electronic arts)(disk 1 of 2)(trex crack).2mg" size="819274" crc="9294901d" sha1="bd9ca1ca5a0dbb24c0890831336416403a871b44" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="bard's tale - tales of the unknown, the (1987)(electronic arts)(disk 1 of 2)(trex crack).2mg" size="819264" crc="9294901d" sha1="bd9ca1ca5a0dbb24c0890831336416403a871b44" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -620,8 +620,8 @@
 		<publisher>Interplay</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819274">
-				<rom name="battle chess (1988-89)(interplay)(trex crack).2mg" size="819274" crc="f3b3de94" sha1="bc28e66e75ef41af5194a65dfe217cfff9abfc2b" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="battle chess (1988-89)(interplay)(trex crack).2mg" size="819264" crc="f3b3de94" sha1="bc28e66e75ef41af5194a65dfe217cfff9abfc2b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3019,8 +3019,8 @@
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819278">
-				<rom name="last ninja, the (1987-88)(activision)(trex crack).2mg" size="819278" crc="40d81298" sha1="1735192463be1457feea28b1a1be118cf99f8e55" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="last ninja, the (1987-88)(activision)(trex crack).2mg" size="819264" crc="40d81298" sha1="1735192463be1457feea28b1a1be118cf99f8e55" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
