@@ -12,6 +12,7 @@
 #pragma clang diagnostic ignored "-Winconsistent-missing-override"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsuggest-override"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #endif 
 
 #define ASIO_HEADER_ONLY
