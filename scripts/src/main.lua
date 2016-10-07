@@ -229,11 +229,6 @@ if (STANDALONE~=true) then
 		"lualibs",
 	}
 end
-	if _OPTIONS["USE_LIBUV"]=="1" then
-		links {
-			ext_lib("uv"),
-		}
-	end
 	links {
 		ext_lib("zlib"),
 		ext_lib("flac"),
