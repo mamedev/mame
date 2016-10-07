@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(funtech_unk_11_w);
 	DECLARE_WRITE8_MEMBER(funtech_unk_12_w);
 
-	UINT8 m_unk03;
+	UINT8 m_vreg;
 
 	tilemap_t *m_fg_tilemap;
 	
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_fg_tile_info)
 
 	code |= (attr & 0x0f) << 8;
 
-	if (m_unk03&1) code |= 0x1000;
+	if (m_vreg&1) code |= 0x1000;
 
 	SET_TILE_INFO_MEMBER(0,
 			code,
@@ -109,8 +109,8 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel1_tile_info)
 {
 	int code = m_reel1_ram[tile_index];
-	if (m_unk03 & 0x4) code |= 0x100;
-//	if (m_unk03 & 0x8) code |= 0x200; // there needs to be a bit for this somehwere as we have 0x400 tiles.
+	if (m_vreg & 0x4) code |= 0x100;
+	if (m_vreg & 0x8) code |= 0x200;
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
@@ -121,8 +121,8 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel1_tile_info)
 TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel2_tile_info)
 {
 	int code = m_reel2_ram[tile_index];
-	if (m_unk03 & 0x4) code |= 0x100;
-//	if (m_unk03 & 0x8) code |= 0x200; // there needs to be a bit for this somehwere as we have 0x400 tiles.
+	if (m_vreg & 0x4) code |= 0x100;
+	if (m_vreg & 0x8) code |= 0x200;
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
@@ -134,8 +134,8 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel2_tile_info)
 TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel3_tile_info)
 {
 	int code = m_reel3_ram[tile_index];
-	if (m_unk03 & 0x4) code |= 0x100;
-//	if (m_unk03 & 0x8) code |= 0x200; // there needs to be a bit for this somehwere as we have 0x400 tiles.
+	if (m_vreg & 0x4) code |= 0x100;
+	if (m_vreg & 0x8) code |= 0x200;
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
@@ -189,20 +189,34 @@ UINT32 fun_tech_corp_state::screen_update_funtech(screen_device &screen, bitmap_
 {
 	bitmap.fill(0, cliprect);
 
-	for (int i = 0; i < 64; i++)
+	if (!(m_vreg & 0x40))
 	{
-		m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-		m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-		m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+		for (int i = 0; i < 64; i++)
+		{
+			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
+			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+		}
+
+		const rectangle visible1(0 * 8, (14 + 48) * 8 - 1, 4 * 8, (4 + 7) * 8 - 1);
+		const rectangle visible2(0 * 8, (14 + 48) * 8 - 1, 12 * 8, (12 + 7) * 8 - 1);
+		const rectangle visible3(0 * 8, (14 + 48) * 8 - 1, 18 * 8, (18 + 7) * 8 - 1);
+
+		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+	}
+	else
+	{
+		// this mode seems to draw reel1 as fullscreen in a fixed position.
+		for (int i = 0; i < 64; i++)
+		{
+			m_reel1_tilemap->set_scrolly(i, -8);
+		}
+
+		m_reel1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
-	const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
-	const rectangle visible3(0*8, (14+48)*8-1, 18*8, (18+7)*8-1);
-
-	m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-	m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-	m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -259,13 +273,14 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_00_w)
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_unk_03_w)
 {
-	//printf("funtech_unk_03_w %02x\n", data);
+	printf("funtech_unk_03_w %02x\n", data);
 
-	// ---- -r-t
+	// -x-- rr-t
 	// t = text tile bank
 	// r = reel tile bank
+	// x = show reel 1 full screen?
 
-	m_unk03 = data;
+	m_vreg = data;
 	m_fg_tilemap->mark_all_dirty();
 	m_reel1_tilemap->mark_all_dirty();
 }
@@ -288,12 +303,12 @@ static ADDRESS_MAP_START( funtech_io_map, AS_IO, 8, fun_tech_corp_state )
 //	AM_RANGE(0x01, 0x01) AM_WRITE(funtech_unk_01_w) // on startup
 	AM_RANGE(0x03, 0x03) AM_WRITE(funtech_unk_03_w)
 
-	AM_RANGE(0x04, 0x04) AM_READ(funtech_unk_r)
-	AM_RANGE(0x05, 0x05) AM_READ(funtech_unk_r)
-//	AM_RANGE(0x06, 0x06) AM_READ(funtech_unk_r)
-//	AM_RANGE(0x07, 0x07) AM_READ(funtech_unk_r)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN0")
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN1")
+	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN2")
+	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN3")
 
-	AM_RANGE(0x10, 0x10) AM_READ(funtech_unk_r)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN4")
 
 	AM_RANGE(0x11, 0x11) AM_WRITE(funtech_unk_11_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(funtech_unk_12_w)
@@ -301,6 +316,135 @@ static ADDRESS_MAP_START( funtech_io_map, AS_IO, 8, fun_tech_corp_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funtech )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x01, 0x01, "4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
