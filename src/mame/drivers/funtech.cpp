@@ -273,7 +273,7 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_lamps_w)
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 {
-	if (data & 0x83) printf("funtech_coins_w %02x\n", data);
+	if (data & 0x41) printf("funtech_coins_w %02x\n", data);
 
 	// 80 = hopper motor?
 	m_hopper->write(space, 0, data & 0x80);
@@ -289,6 +289,8 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 
 	// 04 = coin 1 counter
 	machine().bookkeeping().coin_counter_w(0, data & 0x04 );
+
+	// 02 = used when hopper is used (coin out counter?)
 }
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
@@ -345,7 +347,7 @@ static INPUT_PORTS_START( funtech )
 	PORT_DIPNAME( 0x08, 0x08, "IN1-08" ) // some kind of key-out? reduces credits to 0
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN1-10" )
+	PORT_DIPNAME( 0x10, 0x10, "IN1-10" ) // prevents start from working in the poker game at least
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE(   0x20, IP_ACTIVE_LOW )
@@ -409,28 +411,27 @@ static INPUT_PORTS_START( funtech )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN4") // is this another unused dip bank, or something else?
-	PORT_DIPNAME( 0x01, 0x01, "4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN4") // the dipswitch screen doesn't list these, maybe determined by the hopper?
+	PORT_DIPNAME( 0x07, 0x07, "Coin 4 Value" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x06, "10" )
+	PORT_DIPSETTING(    0x01, "20" )
+	PORT_DIPSETTING(    0x05, "25" )
+	PORT_DIPSETTING(    0x03, "50" )
+	PORT_DIPSETTING(    0x07, "100" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x00, "Payout Value" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x60, "50" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
