@@ -146,8 +146,8 @@ public:
 		double m_Kn[32];
 	};
 
-	void ay8910_write_ym(int addr, int data);
-	int ay8910_read_ym();
+	void ay8910_write_ym(int addr, uint8_t data);
+	uint8_t ay8910_read_ym();
 	void ay8910_reset_ym();
 
 protected:
@@ -172,6 +172,7 @@ private:
 	int m_ioports;
 	int m_ready;
 	sound_stream *m_channel;
+	bool m_active;
 	INT32 m_register_latch;
 	UINT8 m_regs[16];
 	INT32 m_last_enable;
