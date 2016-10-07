@@ -34,11 +34,22 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_reel1_ram(*this, "reel1ram"),
+		m_reel2_ram(*this, "reel2ram"),
+		m_reel3_ram(*this, "reel3ram"),
+		m_reel1_scroll(*this, "reel1_scroll"),
+		m_reel2_scroll(*this, "reel2_scroll"),
+		m_reel3_scroll(*this, "reel3_scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_fgram;
 	required_shared_ptr<UINT8> m_reel1_ram;
+	required_shared_ptr<UINT8> m_reel2_ram;
+	required_shared_ptr<UINT8> m_reel3_ram;
+	required_shared_ptr<UINT8> m_reel1_scroll;
+	required_shared_ptr<UINT8> m_reel2_scroll;
+	required_shared_ptr<UINT8> m_reel3_scroll;
+
 
 	INTERRUPT_GEN_MEMBER(funtech_vblank_interrupt);
 
@@ -53,16 +64,22 @@ public:
 	UINT8 m_unk03;
 
 	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_reel1_tilemap;
-
+	
 	DECLARE_WRITE8_MEMBER(fgram_w);
+	
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
+	tilemap_t *m_reel1_tilemap;
+	tilemap_t *m_reel2_tilemap;
+	tilemap_t *m_reel3_tilemap;
 	
 	DECLARE_WRITE8_MEMBER(reel1_ram_w);
-	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
+	DECLARE_WRITE8_MEMBER(reel2_ram_w);
+	DECLARE_WRITE8_MEMBER(reel3_ram_w);
 
-	
+	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -96,10 +113,36 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel1_tile_info)
 //	if (m_unk03 & 0x8) code |= 0x200; // there needs to be a bit for this somehwere as we have 0x400 tiles.
 
 	SET_TILE_INFO_MEMBER(1,
-			code ,
+			code,
 			0,
 			0);
 }
+
+TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel2_tile_info)
+{
+	int code = m_reel2_ram[tile_index];
+	if (m_unk03 & 0x4) code |= 0x100;
+//	if (m_unk03 & 0x8) code |= 0x200; // there needs to be a bit for this somehwere as we have 0x400 tiles.
+
+	SET_TILE_INFO_MEMBER(1,
+			code,
+			0,
+			0);
+}
+
+
+TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel3_tile_info)
+{
+	int code = m_reel3_ram[tile_index];
+	if (m_unk03 & 0x4) code |= 0x100;
+//	if (m_unk03 & 0x8) code |= 0x200; // there needs to be a bit for this somehwere as we have 0x400 tiles.
+
+	SET_TILE_INFO_MEMBER(1,
+			code,
+			0,
+			0);
+}
+
 
 WRITE8_MEMBER(fun_tech_corp_state::reel1_ram_w)
 {
@@ -107,12 +150,31 @@ WRITE8_MEMBER(fun_tech_corp_state::reel1_ram_w)
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
+WRITE8_MEMBER(fun_tech_corp_state::reel2_ram_w)
+{
+	m_reel2_ram[offset] = data;
+	m_reel2_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(fun_tech_corp_state::reel3_ram_w)
+{
+	m_reel3_ram[offset] = data;
+	m_reel3_tilemap->mark_tile_dirty(offset);
+}
+
 
 void fun_tech_corp_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
 	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	
+	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
 
 }
 
@@ -125,6 +187,23 @@ WRITE8_MEMBER(fun_tech_corp_state::fgram_w)
 
 UINT32 fun_tech_corp_state::screen_update_funtech(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
+	for (int i = 0; i < 64; i++)
+	{
+		m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+		m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
+		m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+	}
+
+	const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+	const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
+	const rectangle visible3(0*8, (14+48)*8-1, 18*8, (18+7)*8-1);
+
+	m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+	m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+	m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -151,7 +230,13 @@ static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
 
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(reel1_ram_w) AM_SHARE("reel1ram")
-	AM_RANGE(0xf200, 0xffff)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(reel2_ram_w) AM_SHARE("reel2ram")
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(reel3_ram_w) AM_SHARE("reel3ram")
+	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+
+	AM_RANGE(0xf840, 0xf87f) AM_RAM AM_SHARE("reel1_scroll")
+	AM_RANGE(0xf880, 0xf8bf) AM_RAM AM_SHARE("reel2_scroll")
+	AM_RANGE(0xf900, 0xf93f) AM_RAM AM_SHARE("reel3_scroll")
 ADDRESS_MAP_END
 
 
