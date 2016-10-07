@@ -273,7 +273,7 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_lamps_w)
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 {
-	if (data & 0x43) printf("funtech_coins_w %02x\n", data);
+	if (data & 0x83) printf("funtech_coins_w %02x\n", data);
 
 	// 80 = hopper motor?
 	m_hopper->write(space, 0, data & 0x80);
@@ -500,7 +500,7 @@ static MACHINE_CONFIG_START( funtech, fun_tech_corp_state )
 	
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
