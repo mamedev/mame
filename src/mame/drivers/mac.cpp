@@ -567,6 +567,41 @@ WRITE8_MEMBER(mac_state::mac_5396_w)
 	}
 }
 
+#define MAC_MAIN_SND_BUF_OFFSET 0x0300
+#define MAC_ALT_SND_BUF_OFFSET  0x5F00
+
+TIMER_DEVICE_CALLBACK_MEMBER(mac_state::mac_scanline)
+{
+	int scanline = param;
+	UINT16 *mac_snd_buf_ptr;
+	UINT16 last_val;
+
+	if (m_snd_enable)
+	{
+		if (m_main_buffer)
+		{
+			mac_snd_buf_ptr = (UINT16 *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
+		}
+		else
+		{
+			mac_snd_buf_ptr = (UINT16 *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
+		}
+
+		last_val = (UINT8)((mac_snd_buf_ptr[scanline] >> 8) & 0xff);
+	}
+	else
+	{
+		last_val = 0x80;
+	}
+
+	// apply 0-7 volume
+	last_val *= m_snd_vol;
+	last_val <<= 5;
+
+	m_dac->write_unsigned16(last_val);
+}
+
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -898,11 +933,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.15)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
-	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
+	MCFG_SCREEN_RAW_PARAMS(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_mac)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -911,9 +942,12 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac_state, mac_scanline, "screen", 0, 1)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", MAC_SOUND, 0)
+	//MCFG_SOUND_ADD("custom", MAC_SOUND, 0)
+	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
