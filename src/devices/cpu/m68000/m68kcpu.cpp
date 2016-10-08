@@ -1060,6 +1060,14 @@ void m68000_base_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case STATE_GENPC:
+			ppc = pc;
+			break;
+		
+		case STATE_GENPCBASE:
+			pc = ppc;
+			break;
+
 		case M68K_SR:
 		case STATE_GENFLAGS:
 			m68ki_set_sr(this, iotemp);
@@ -1687,9 +1695,8 @@ void m68000_base_device::define_state(void)
 {
 	UINT32 addrmask = (cpu_type & MASK_24BIT_SPACE) ? 0xffffff : 0xffffffff;
 
-	state_add(M68K_PC,         "PC",        pc).mask(addrmask);
-	state_add(STATE_GENPC,     "GENPC",     pc).mask(addrmask).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",     ppc).mask(addrmask).noshow();
+	state_add(STATE_GENPC,     "PC",        pc).mask(addrmask).callimport();
+	state_add(STATE_GENPCBASE, "CURPC",     ppc).mask(addrmask).callimport().noshow();
 	state_add(M68K_SP,         "SP",        dar[15]);
 	state_add(STATE_GENSP,     "GENSP",     dar[15]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  iotemp).noshow().callimport().callexport().formatstr("%16s");

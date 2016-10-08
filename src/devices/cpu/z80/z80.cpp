@@ -3415,9 +3415,8 @@ void z80_device::device_start()
 	F = ZF;            /* Zero flag is set */
 
 	/* set up the state table */
-	state_add(Z80_PC,          "PC",        m_pc.w.l);
-	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w.l).noshow();
+	state_add(STATE_GENPC,     "PC",        m_pc.w.l).callimport();
+	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w.l).callimport().noshow();
 	state_add(Z80_SP,          "SP",        SP);
 	state_add(STATE_GENSP,     "GENSP",     SP).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  F).noshow().formatstr("%8s");
@@ -3615,6 +3614,14 @@ void z80_device::state_import( const device_state_entry &entry )
 {
 	switch (entry.index())
 	{
+		case STATE_GENPC:
+			m_prvpc = m_pc;
+			break;
+			
+		case STATE_GENPCBASE:
+			m_pc = m_prvpc;
+			break;
+
 		case Z80_R:
 			m_r = m_rtemp & 0x7f;
 			m_r2 = m_rtemp & 0x80;

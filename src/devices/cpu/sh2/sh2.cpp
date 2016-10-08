@@ -2309,7 +2309,7 @@ void sh2_device::execute_run()
 	{
 		UINT32 opcode;
 
-		debugger_instruction_hook(this, m_sh2_state->pc & AM);
+		debugger_instruction_hook(this, m_sh2_state->pc);
 
 		opcode = m_program->read_word(m_sh2_state->pc & AM);
 
@@ -2421,7 +2421,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_wtcsr));
 	save_item(NAME(m_sh2_state->sleep_mode));
 
-	state_add( SH2_PC,   "PC",   m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(AM).callimport();
 	state_add( SH2_SR,   "SR",   m_sh2_state->sr).callimport().formatstr("%08X");
 	state_add( SH2_PR,   "PR",   m_sh2_state->pr).formatstr("%08X");
 	state_add( SH2_GBR,  "GBR",  m_sh2_state->gbr).formatstr("%08X");
@@ -2446,8 +2446,7 @@ void sh2_device::device_start()
 	state_add( SH2_R15,  "R15",  m_sh2_state->r[15]).formatstr("%08X");
 	state_add( SH2_EA,   "EA",   m_sh2_state->ea).formatstr("%08X");
 
-	state_add( STATE_GENPC, "GENPC", m_sh2_state->pc ).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
 	state_add( STATE_GENSP, "GENSP", m_sh2_state->r[15] ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr ).formatstr("%6s").noshow();
 
@@ -2590,24 +2589,13 @@ void sh2_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case SH2_PC:
-			m_sh2_state->pc = m_debugger_temp;
+		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			m_delay = 0;
 			break;
 
 		case SH2_SR:
 			CHECK_PENDING_IRQ("sh2_set_reg");
-			break;
-	}
-}
-
-
-void sh2_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case SH2_PC:
-			m_debugger_temp = m_sh2_state->pc & AM;
 			break;
 	}
 }
