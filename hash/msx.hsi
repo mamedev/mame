@@ -4117,11 +4117,6 @@
 		<manufacturer>Champion Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
-	<hash crc32="b581f746" name="The Legend of Kage (hacked)">
-		<manufacturer>Taito</manufacturer>
-		<year>1986</year>
-		<extrainfo>0</extrainfo>
-	</hash>
 	<hash crc32="fe23d253" name="The Maze Of Galious">
 		<year>1987</year>
 		<manufacturer>Konami</manufacturer>
