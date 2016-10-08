@@ -35,28 +35,18 @@
 		</text>
 	</element>
 
-	<element name="counter" defstate="0">
-		<simplecounter digits="3">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</simplecounter>
-	</element>
-
-	<view name="Simple LEDs">
+	<view name="Dashboard">
 		<bounds left="0" top="0" right="4" bottom="3.472" />
 
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp0" element="lamp">
+		<bezel name="lamp0" element="lamp" inputtag="IN1" inputmask="0x0800">
 			<bounds x="3.75" y="3.05" width="0.2" height="0.4" />
 		</bezel>
-		<bezel name="lamp1" element="lamp">
+		<bezel name="lamp1" element="lamp" inputtag="IN1" inputmask="0x0200">
 			<bounds x="0.05" y="3.05" width="0.2" height="0.4" />
-		</bezel>
-
-		<bezel name="wheel" element="counter">
-			<bounds x="1.9" y="3.0" width="0.2" height="0.1" />
 		</bezel>
 	</view>
 </mamelayout>
