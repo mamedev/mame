@@ -71,7 +71,7 @@ newoption {
 newoption {
 	trigger = "with-android",
 	value   = "#",
-	description = "Set Android platform version (default: android-14).",
+	description = "Set Android platform version (default: android-21).",
 }
 
 newoption {
@@ -90,7 +90,7 @@ function toolchain(_buildDir, _subDir)
 
 	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
 
-	local androidPlatform = "android-14"
+	local androidPlatform = "android-21"
 	if _OPTIONS["with-android"] then
 		androidPlatform = "android-" .. _OPTIONS["with-android"]
 	elseif _OPTIONS["PLATFORM"]:find("64", -2) then
