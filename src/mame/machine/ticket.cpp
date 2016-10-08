@@ -98,6 +98,7 @@ void ticket_dispenser_device::static_set_senses(device_t &device, UINT8 motor_se
 
 //-------------------------------------------------
 //  read - read the status line via the active bit
+//  (legacy method)
 //-------------------------------------------------
 
 READ8_MEMBER( ticket_dispenser_device::read )
@@ -119,7 +120,7 @@ READ_LINE_MEMBER( ticket_dispenser_device::line_r )
 
 //-------------------------------------------------
 //  write - write the control line via the active
-//  bit
+//  bit (legacy method)
 //-------------------------------------------------
 
 WRITE8_MEMBER( ticket_dispenser_device::write )
@@ -147,6 +148,15 @@ WRITE8_MEMBER( ticket_dispenser_device::write )
 	}
 }
 
+//-------------------------------------------------
+//  motor_w - write the control line as a proper
+//  line
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
+{
+	write(machine().driver_data()->generic_space(), 0, state ? m_active_bit : 0);
+}
 
 
 //**************************************************************************
