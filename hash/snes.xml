@@ -12026,6 +12026,28 @@ more investigation needed...
 		</part>
 	</software>
 
+	<software name="fatfury">
+		<description>Fatal Fury (Euro)</description>
+		<year>1993</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="SNSP-GN-NOE" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D413A 9226 C" />
+			<feature name="cart_model" value="" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1572864">
+				<rom name="spal-gn-0 p0.u1" size="1048576" crc="b48cfd3d" sha1="fc4910aa8dc8945f3d2402b737eb9e999424908f" offset="0x000000" />
+				<rom name="spal-gn-0 p1.u2" size="524288"  crc="9df54331" sha1="36c5081a05353cc0b200b26b0d19f33057cb2ae7" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fatfuryu" cloneof="fatfury">
 		<description>Fatal Fury (USA)</description>
 		<year>1993</year>
@@ -23564,12 +23586,12 @@ more investigation needed...
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D413A 9402 BA" />
 			<feature name="cart_model" value="SNSP-006(-01)" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="spal-amcp-0.u1" size="2097152" crc="d2b0d5fe" sha1="cc83ec37d7669834047510d6bbde1e0eee4667c9" offset="0x000000" />
+				<rom name="spal-amcp-0.u1" size="2097152" crc="4c68c5cf" sha1="5b10fab4bbb58c57eaa40760d59c56bf775ad466" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38999,18 +39021,6 @@ List of unclassified roms
 				<rom name="farland story 2 (japan).sfc" size="3145728" crc="1cf58de9" sha1="fc2c596cc601e7d7dbb4abc7262bc91b97a5ceb7" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fatfury">
-		<description>Fatal Fury (Euro)</description>
-		<year>1993</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1572864">
-				<rom name="fatal fury (europe).sfc" size="1572864" crc="f93611c6" sha1="ebf3eb02a975c71332685cd85a88858de80bafb0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
