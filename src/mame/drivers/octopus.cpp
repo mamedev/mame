@@ -182,6 +182,8 @@ public:
 	IRQ_CALLBACK_MEMBER(x86_irq_cb);
 	DECLARE_READ8_MEMBER(rtc_r);
 	DECLARE_WRITE8_MEMBER(rtc_w);
+	DECLARE_READ8_MEMBER(z80_vector_r);
+	DECLARE_WRITE8_MEMBER(z80_vector_w);
 
 	DECLARE_WRITE_LINE_MEMBER(spk_w);
 	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
@@ -242,6 +244,8 @@ private:
 	bool m_rtc_address;
 	bool m_rtc_data;
 	UINT8 m_prev_cntl;
+	UINT8 m_rs232_vector;
+	UINT8 m_rs422_vector;
 
 	emu_timer* m_timer_beep;
 };
@@ -283,8 +287,7 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0xca, 0xca) AM_RAM // attribute writes go here
 	// 0xcf: mode control
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
-	// 0xe0: Z80 interrupt vector for RS232
-	// 0xe4: Z80 interrupt vector for RS422
+	AM_RANGE(0xe0, 0xe4) AM_READWRITE(z80_vector_r, z80_vector_w)
 	// 0xf0-f1: Parallel interface data I/O (Centronics), and control/status
 	AM_RANGE(0xf8, 0xff) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -432,6 +435,38 @@ WRITE8_MEMBER(octopus_state::z80_io_w)
 	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_z80_active = false;
+}
+
+// Z80 vector for RS232 and RS422
+READ8_MEMBER(octopus_state::z80_vector_r)
+{
+	switch(offset)
+	{
+		case 0:
+			return m_rs232_vector;
+		case 4:
+			return m_rs422_vector;
+		default:
+			return 0xff;
+	}
+	return 0xff;
+}
+
+WRITE8_MEMBER(octopus_state::z80_vector_w)
+{
+	switch(offset)
+	{
+		case 0:
+			m_rs232_vector = data;
+			logerror("RS232 vector set to %02x\n",data);
+			break;
+		case 4:
+			m_rs422_vector = data;
+			logerror("RS422 vector set to %02x\n",data);
+			break;
+		default:
+			logerror("Read invalid vector port 0x%02x\n",0xe0 + offset);
+	}
 }
 
 // RTC data and I/O - PPI port A
@@ -610,7 +645,10 @@ IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
 	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_z80_active = false;
-	return m_pic1->inta_cb(device,irqline);
+	if((strcmp(device.tag(),"pic_master") == 0) && irqline == 1)
+		return m_serial->m1_r();
+	else
+		return m_pic1->inta_cb(device,irqline);
 }
 
 void octopus_state::machine_start()
