@@ -10,7 +10,9 @@
 
 // Clang warnings with -Weverything
 #ifdef __clang__
+#pragma clang diagnostic ignored "-Wunknown-pragmas"
 #pragma clang diagnostic ignored "-Winconsistent-missing-override"
+#pragma clang diagnostic ignored "-Wunused-local-typedef"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #pragma GCC diagnostic ignored "-Wunused-variable"

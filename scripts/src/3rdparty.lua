@@ -757,7 +757,7 @@ end
 		end
 	end
 
-	if _OPTIONS["targetos"]=="macosx" then
+	if _OPTIONS["targetos"]=="macosx" or  _OPTIONS["targetos"]=="linux" then
 		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions {
 				"-Wno-switch",
