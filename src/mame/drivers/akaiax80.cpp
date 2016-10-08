@@ -19,7 +19,7 @@
     		TL082CP low-pass filter
  
     Service manual incl. schematics at:
-	https://ia800500.us.archive.org/25/items/AkaiAX80ServiceManual/Akai%20AX80%20Service%20Manual.pdf
+	https://archive.org/download/AkaiAX80ServiceManual/Akai%20AX80%20Service%20Manual.pdf
  
 ****************************************************************************/
 
