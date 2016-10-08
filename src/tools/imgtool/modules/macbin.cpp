@@ -233,7 +233,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 		0
 	};
 	imgtoolerr_t err;
-	imgtool_image *image = imgtool_partition_image(partition);
+	imgtool::image *image = imgtool_partition_image(partition);
 	UINT8 header[128];
 	UINT32 datafork_size;
 	UINT32 resourcefork_size;

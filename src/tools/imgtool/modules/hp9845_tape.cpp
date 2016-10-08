@@ -1023,9 +1023,9 @@ bool tape_image_t::decode_dir(void)
 	return true;
 }
 
-static tape_state_t& get_tape_state(imgtool_image *img)
+static tape_state_t& get_tape_state(imgtool::image *img)
 {
-	tape_state_t *ts = (tape_state_t*)imgtool_image_extra_bytes(img);
+	tape_state_t *ts = (tape_state_t*)img->extra_bytes();
 
 	return *ts;
 }
@@ -1042,7 +1042,7 @@ static tape_image_t& get_tape_image(tape_state_t& ts)
 /********************************************************************************
  * Imgtool functions
  ********************************************************************************/
-static imgtoolerr_t hp9845_tape_open(imgtool_image *image, imgtool_stream *stream)
+static imgtoolerr_t hp9845_tape_open(imgtool::image *image, imgtool_stream *stream)
 {
 	tape_state_t& state = get_tape_state(image);
 
@@ -1053,7 +1053,7 @@ static imgtoolerr_t hp9845_tape_open(imgtool_image *image, imgtool_stream *strea
 	return tape_image.load_from_file(stream);
 }
 
-static imgtoolerr_t hp9845_tape_create(imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t hp9845_tape_create(imgtool::image *image, imgtool_stream *stream, util::option_resolution *opts)
 {
 	tape_state_t& state = get_tape_state(image);
 
@@ -1066,7 +1066,7 @@ static imgtoolerr_t hp9845_tape_create(imgtool_image *image, imgtool_stream *str
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void hp9845_tape_close(imgtool_image *image)
+static void hp9845_tape_close(imgtool::image *image)
 {
 	tape_state_t& state = get_tape_state(image);
 	tape_image_t& tape_image = get_tape_image(state);

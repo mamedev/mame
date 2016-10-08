@@ -173,7 +173,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	int total_count, total_size, freespace_err;
 	UINT64 freespace;
-	imgtool_image *image = nullptr;
+	imgtool::image::ptr image;
 	imgtool_partition *partition = nullptr;
 	imgtool_directory *imgenum = nullptr;
 	imgtool_dirent ent;
@@ -182,13 +182,13 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	const char *path;
 	int partition_index = 0;
 
-	/* attempt to open image */
-	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_READ, &image);
+	// attempt to open image
+	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_READ, image);
 	if (err)
 		goto done;
 
 	/* attempt to open partition */
-	err = imgtool_partition_open(image, partition_index, &partition);
+	err = imgtool_partition_open(image.get(), partition_index, &partition);
 	if (err)
 		goto done;
 
@@ -205,7 +205,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 
 	fprintf(stdout, "Contents of %s:%s\n", argv[1], path ? path : "");
 
-	imgtool_image_info(image, buf, sizeof(buf));
+	image->info(buf, sizeof(buf));
 	if (buf[0])
 		fprintf(stdout, "%s\n", buf);
 	fprintf(stdout, "------------------------------  --------  ---------------  ------------------\n");
@@ -253,8 +253,6 @@ done:
 		imgtool_directory_close(imgenum);
 	if (partition)
 		imgtool_partition_close(partition);
-	if (image)
-		imgtool_image_close(image);
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
@@ -265,7 +263,7 @@ done:
 static int cmd_get(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
+	std::unique_ptr<imgtool::image> image;
 	imgtool_partition *partition = nullptr;
 	const char *filename;
 	char *new_filename;
@@ -274,11 +272,11 @@ static int cmd_get(const struct command *c, int argc, char *argv[])
 	const char *fork;
 	int partition_index = 0;
 
-	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_READ, &image);
+	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_READ, image);
 	if (err)
 		goto done;
 
-	err = imgtool_partition_open(image, partition_index, &partition);
+	err = imgtool_partition_open(image.get(), partition_index, &partition);
 	if (err)
 		goto done;
 
@@ -301,8 +299,6 @@ done:
 		reporterror(err, c, argv[0], argv[1], argv[2], argv[3], nullptr);
 	if (partition)
 		imgtool_partition_close(partition);
-	if (image)
-		imgtool_image_close(image);
 	return (err || (unnamedargs < 0)) ? -1 : 0;
 }
 
@@ -312,7 +308,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	int i;
-	imgtool_image *image = nullptr;
+	std::unique_ptr<imgtool::image> image;
 	imgtool_partition *partition = nullptr;
 	const char *filename = nullptr;
 	int unnamedargs;
@@ -340,12 +336,12 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	if (argc >= 2)
 	{
 		/* open up the image */
-		err = imgtool_image_open(module, argv[1], OSD_FOPEN_RW, &image);
+		err = imgtool::image::open(module, argv[1], OSD_FOPEN_RW, image);
 		if (err)
 			goto done;
 
 		/* open up the partition */
-		err = imgtool_partition_open(image, partition_index, &partition);
+		err = imgtool_partition_open(image.get(), partition_index, &partition);
 		if (err)
 			goto done;
 
@@ -386,8 +382,6 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 done:
 	if (partition)
 		imgtool_partition_close(partition);
-	if (image)
-		imgtool_image_close(image);
 	if (err)
 		reporterror(err, c, argv[0], argv[1], filename, nullptr, resolution.get());
 	return err ? -1 : 0;
@@ -398,7 +392,7 @@ done:
 static int cmd_getall(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
+	std::unique_ptr<imgtool::image> image;
 	imgtool_partition *partition = nullptr;
 	imgtool_directory *imgenum = nullptr;
 	imgtool_dirent ent;
@@ -408,11 +402,11 @@ static int cmd_getall(const struct command *c, int argc, char *argv[])
 	int arg;
 	int partition_index = 0;
 
-	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_READ, &image);
+	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_READ, image);
 	if (err)
 		goto done;
 
-	err = imgtool_partition_open(image, partition_index, &partition);
+	err = imgtool_partition_open(image.get(), partition_index, &partition);
 	if (err)
 		goto done;
 
@@ -446,8 +440,6 @@ done:
 		imgtool_directory_close(imgenum);
 	if (partition)
 		imgtool_partition_close(partition);
-	if (image)
-		imgtool_image_close(image);
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
@@ -458,15 +450,15 @@ done:
 static int cmd_del(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
+	std::unique_ptr<imgtool::image> image;
 	imgtool_partition *partition = nullptr;
 	int partition_index = 0;
 
-	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
+	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_RW, image);
 	if (err)
 		goto done;
 
-	err = imgtool_partition_open(image, partition_index, &partition);
+	err = imgtool_partition_open(image.get(), partition_index, &partition);
 	if (err)
 		goto done;
 
@@ -477,8 +469,6 @@ static int cmd_del(const struct command *c, int argc, char *argv[])
 done:
 	if (partition)
 		imgtool_partition_close(partition);
-	if (image)
-		imgtool_image_close(image);
 	if (err)
 		reporterror(err, c, argv[0], argv[1], argv[2], nullptr, nullptr);
 	return err ? -1 : 0;
@@ -489,15 +479,15 @@ done:
 static int cmd_mkdir(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
+	std::unique_ptr<imgtool::image> image;
 	imgtool_partition *partition = nullptr;
 	int partition_index = 0;
 
-	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
+	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_RW, image);
 	if (err)
 		goto done;
 
-	err = imgtool_partition_open(image, partition_index, &partition);
+	err = imgtool_partition_open(image.get(), partition_index, &partition);
 	if (err)
 		goto done;
 
@@ -508,8 +498,6 @@ static int cmd_mkdir(const struct command *c, int argc, char *argv[])
 done:
 	if (partition)
 		imgtool_partition_close(partition);
-	if (image)
-		imgtool_image_close(image);
 	if (err)
 		reporterror(err, c, argv[0], argv[1], argv[2], nullptr, nullptr);
 	return err ? -1 : 0;
@@ -520,15 +508,15 @@ done:
 static int cmd_rmdir(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = nullptr;
+	std::unique_ptr<imgtool::image> image;
 	imgtool_partition *partition = nullptr;
 	int partition_index = 0;
 
-	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
+	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_RW, image);
 	if (err)
 		goto done;
 
-	err = imgtool_partition_open(image, partition_index, &partition);
+	err = imgtool_partition_open(image.get(), partition_index, &partition);
 	if (err)
 		goto done;
 
@@ -539,8 +527,6 @@ static int cmd_rmdir(const struct command *c, int argc, char *argv[])
 done:
 	if (partition)
 		imgtool_partition_close(partition);
-	if (image)
-		imgtool_image_close(image);
 	if (err)
 		reporterror(err, c, argv[0], argv[1], argv[2], nullptr, nullptr);
 	return err ? -1 : 0;
@@ -554,7 +540,7 @@ static int cmd_identify(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	int i;
 
-	err = imgtool_identify_file(argv[0], modules, ARRAY_LENGTH(modules));
+	err = imgtool::image::identify_file(argv[0], modules, ARRAY_LENGTH(modules));
 	if (err)
 	{
 		reporterror(err, c, nullptr, argv[0], nullptr, nullptr, nullptr);
@@ -579,7 +565,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 	int unnamedargs;
 	const imgtool_module *module;
 	std::unique_ptr<util::option_resolution> resolution;
-
+	
 	module = imgtool_find_module(argv[0]);
 	if (!module)
 	{
@@ -602,7 +588,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 	if (unnamedargs < 0)
 		return -1;
 
-	err = imgtool_image_create(module, argv[1], resolution.get(), nullptr);
+	err = imgtool::image::create(module, argv[1], resolution.get());
 	if (err)
 		goto error;
 
@@ -618,13 +604,13 @@ error:
 static int cmd_readsector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *img;
+	std::unique_ptr<imgtool::image> img;
 	imgtool_stream *stream = nullptr;
 	std::vector<UINT8> buffer;
 	UINT32 track, head, sector;
 
 	/* attempt to open image */
-	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_READ, &img);
+	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_READ, img);
 	if (err)
 		goto done;
 
@@ -632,7 +618,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	head = atoi(argv[3]);
 	sector = atoi(argv[4]);
 
-	err = imgtool_image_read_sector(img, track, head, sector, buffer);
+	err = img->read_sector(track, head, sector, buffer);
 	if (err)
 		goto done;
 
@@ -658,13 +644,13 @@ done:
 static int cmd_writesector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *img;
+	std::unique_ptr<imgtool::image> img;
 	imgtool_stream *stream = nullptr;
 	dynamic_buffer buffer;
 	UINT32 size, track, head, sector;
 
-	/* attempt to open image */
-	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &img);
+	// attempt to open image
+	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_RW, img);
 	if (err)
 		goto done;
 
@@ -685,7 +671,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 
 	stream_read(stream, &buffer[0], size);
 
-	err = imgtool_image_write_sector(img, track, head, sector, &buffer[0], size);
+	err = img->write_sector(track, head, sector, &buffer[0], size);
 	if (err)
 		goto done;
 
