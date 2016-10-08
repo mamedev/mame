@@ -908,6 +908,9 @@ ajax                            // GX770 (c) 1987
 ajaxj                           // GX770 (c) 1987 (Japan)
 typhoon                         // GX770 (c) 1987
 
+@source:akaiax80.cpp
+ax80
+
 @source:albazc.cpp
 hanaroku                        // (c) 1988 Alba
 
