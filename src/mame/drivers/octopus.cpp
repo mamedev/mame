@@ -149,7 +149,7 @@ public:
 		m_speaker(*this, "speaker"),
 		m_serial(*this, "serial"),
 		m_z80_bankdev(*this, "z80_bank"),
-		m_ram(*this, "main_ram"),
+		m_ram(*this, "ram"),
 		m_current_dma(-1),
 		m_speaker_active(false),
 		m_beep_active(false),
@@ -619,7 +619,7 @@ void octopus_state::machine_start()
 
 	// install extra RAM
 	if(m_ram->size() > 0x20000)
-		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"extra_ram_bank");
+		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x20000,m_ram->size()-1,"extra_ram_bank");
 }
 
 void octopus_state::machine_reset()
@@ -632,6 +632,8 @@ void octopus_state::machine_reset()
 	m_rtc_address = true;
 	m_rtc_data = false;
 	membank("main_ram_bank")->set_base(m_ram->pointer());
+	if(m_ram->size() > 0x20000)
+		membank("extra_ram_bank")->set_base(m_ram->pointer()+0x20000);
 	m_kb_uart->write_dsr(1);  // DSR is used to determine if a keyboard is connected?  If DSR is high, then the CHAR_OUT BIOS function will not output to the screen.
 }
 
@@ -790,9 +792,9 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
-	MCFG_RAM_ADD("main_ram")
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
+	MCFG_RAM_ADD("ram")
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("128K,512K,768K")
 
 MACHINE_CONFIG_END
 
