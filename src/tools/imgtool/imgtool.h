@@ -123,6 +123,11 @@ namespace imgtool
 		object_pool *m_pool;
 		void *m_extra_bytes;
 
+		// because of an idiosycracy of how imgtool::image::internal_open() works, we are only "okay to close"
+		// by invoking the module's close function once internal_open() succeeds.  the long term solution is
+		// better C++ adoption (e.g. - std::unique_ptr<>, std:move() etc)
+		bool m_okay_to_close;
+
 		static imgtoolerr_t internal_open(const imgtool_module *module, const char *fname,
 			int read_or_write, util::option_resolution *createopts, imgtool::image::ptr &outimg);
 	};

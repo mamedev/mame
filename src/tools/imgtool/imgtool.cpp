@@ -1024,7 +1024,9 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 		goto done;
 	}
 
-	// we've succeeded - set the output image
+	// we've succeeded - set the output image, and record that
+	// we are "okay to close"
+	image->m_okay_to_close = true;
 	outimg = std::move(image);
 
 done:
@@ -1072,6 +1074,7 @@ imgtool::image::image(const imgtool_module &module, object_pool *pool, void *ext
 	: m_module(module)
 	, m_pool(pool)
 	, m_extra_bytes(extra_bytes)
+	, m_okay_to_close(false)
 {
 }
 
@@ -1082,7 +1085,7 @@ imgtool::image::image(const imgtool_module &module, object_pool *pool, void *ext
 
 imgtool::image::~image()
 {
-	if (module().close)
+	if (m_okay_to_close && module().close)
 		module().close(this);
 	pool_free_lib(m_pool);
 }
