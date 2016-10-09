@@ -244,10 +244,10 @@ Sticker: 837-14280-92
 Notes:
       (* these parts on other side of the PCB)
       RV5C386A  - I2C Bus Serial Interface Real-Time Clock IC with Voltage Monitoring Function (SSOP10)
-      24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8)
-      24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8)
-      M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32)
-      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80) firmware in IC11
+      24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8) contains firmware for AN2131 chips
+      24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8) contain system/game configuration data
+      M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32) work ram for AN2131QC
+      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80) firmware in IC10
       AN2131SC  /                                                             (QFP44) firmware in IC32
       ADM3222   - Analog Devices ADM3222 High-Speed, +3.3V, 2-Channel RS232/V.28 Interface Device (SOIC20)
       SN65240   - Texas Instruments SN65240 USB Port Transient Suppressor (SOIC8)
@@ -256,7 +256,7 @@ Notes:
       DS485     - National DS485 Low-Power RS-485/RS-422 Multipoint Transceiver (SOIC8)
       3771      - Fujitsu MB3771 System Reset IC (SOIC8)
       PC410     - Sharp PC410 Ultra-high Speed Response OPIC Photocoupler
-      CN1       - 22-pin multi-wire cable connector joining to XBox board
+      CN1       - 22-pin multi-wire cable connector joining to XBox board (JST B22B-PHTSS)
       CN5       - USB connector joining to JVS I/O board with standard USB cable
       CN8       - A/V input connector (from XBox board via short A/V cable)
       CN9       - VGA output connector
@@ -345,8 +345,8 @@ Notes:
       CN1   - 8-pin JVS power input connector
       CN2   - 6-pin JVS power input connector
       CN3   - Red/white RCA unamplified stereo audio output jacks
-      CN4   - 11-pin connector
-      CN5   - 8-pin connector
+      CN4   - 11-pin connector, has signals for 2 usb ports connected to the xbox board
+      CN5   - 8-pin connector, has signals for 2 rs232 ports
       CN6   - 7-pin connector
       SW1/2 - test/service buttons
       DIN1  - 96-pin connector joining to Base Board
