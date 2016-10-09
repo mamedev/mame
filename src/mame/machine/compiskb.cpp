@@ -239,15 +239,7 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 	: device_t(mconfig, COMPIS_KEYBOARD, "Compis Keyboard", tag, owner, clock, "compiskb", __FILE__),
 		m_maincpu(*this, I8748_TAG),
 		m_speaker(*this, SPEAKER_TAG),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
+		m_y(*this, "Y%u", 1),
 		m_special(*this, "SPECIAL"),
 		m_out_tx_handler(*this),
 		m_bus(0xff),
@@ -336,15 +328,15 @@ READ8_MEMBER( compis_keyboard_device::p1_r )
 
 	switch (m_keylatch)
 	{
-	case 1: data &= m_y1->read(); break;
-	case 2: data &= m_y2->read(); break;
-	case 3: data &= m_y3->read(); break;
-	case 4: data &= m_y4->read(); break;
-	case 5: data &= m_y5->read(); break;
-	case 6: data &= m_y6->read(); break;
-	case 7: data &= m_y7->read(); break;
-	case 8: data &= m_y8->read(); break;
-	case 9: data &= m_y9->read(); break;
+	case 1: data &= m_y[0]->read(); break;
+	case 2: data &= m_y[1]->read(); break;
+	case 3: data &= m_y[2]->read(); break;
+	case 4: data &= m_y[3]->read(); break;
+	case 5: data &= m_y[4]->read(); break;
+	case 6: data &= m_y[5]->read(); break;
+	case 7: data &= m_y[6]->read(); break;
+	case 8: data &= m_y[7]->read(); break;
+	case 9: data &= m_y[8]->read(); break;
 	}
 
 	return data;
@@ -361,15 +353,15 @@ READ8_MEMBER( compis_keyboard_device::p2_r )
 
 	switch (m_keylatch)
 	{
-	case 1: data &= m_y1->read() >> 8; break;
-	case 2: data &= m_y2->read() >> 8; break;
-	case 3: data &= m_y3->read() >> 8; break;
-	case 4: data &= m_y4->read() >> 8; break;
-	case 5: data &= m_y5->read() >> 8; break;
-	case 6: data &= m_y6->read() >> 8; break;
-	case 7: data &= m_y7->read() >> 8; break;
-	case 8: data &= m_y8->read() >> 8; break;
-	case 9: data &= m_y9->read() >> 8; break;
+	case 1: data &= m_y[0]->read() >> 8; break;
+	case 2: data &= m_y[1]->read() >> 8; break;
+	case 3: data &= m_y[2]->read() >> 8; break;
+	case 4: data &= m_y[3]->read() >> 8; break;
+	case 5: data &= m_y[4]->read() >> 8; break;
+	case 6: data &= m_y[5]->read() >> 8; break;
+	case 7: data &= m_y[6]->read() >> 8; break;
+	case 8: data &= m_y[7]->read() >> 8; break;
+	case 9: data &= m_y[8]->read() >> 8; break;
 	}
 
 	data &= m_special->read();

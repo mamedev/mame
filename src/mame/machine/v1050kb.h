@@ -60,21 +60,10 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_sound_device> m_discrete;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_ya;
-	required_ioport m_yb;
+	required_ioport_array<12> m_y;
 	devcb_write_line   m_out_tx_handler;
 
-	UINT8 m_y;
+	UINT8 m_keylatch;
 };
 
 

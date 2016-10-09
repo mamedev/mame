@@ -86,17 +86,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<vcs_control_port_device> m_joy;
 
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
+	required_ioport_array<11> m_y;
 
 	devcb_write_line   m_write_clock;
 	devcb_write_line   m_write_data;

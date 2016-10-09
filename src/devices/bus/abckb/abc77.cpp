@@ -422,50 +422,13 @@ inline void abc77_device::key_down(int state)
 //  abc77_device - constructor
 //-------------------------------------------------
 
-abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__),
-	abc_keyboard_interface(mconfig, *this),
-	m_maincpu(*this, I8035_TAG),
-	m_watchdog(*this, "watchdog"),
-	m_discrete(*this, DISCRETE_TAG),
-	m_x0(*this, "X0"),
-	m_x1(*this, "X1"),
-	m_x2(*this, "X2"),
-	m_x3(*this, "X3"),
-	m_x4(*this, "X4"),
-	m_x5(*this, "X5"),
-	m_x6(*this, "X6"),
-	m_x7(*this, "X7"),
-	m_x8(*this, "X8"),
-	m_x9(*this, "X9"),
-	m_x10(*this, "X10"),
-	m_x11(*this, "X11"),
-	m_dsw(*this, "DSW"),
-	m_txd(1), m_keylatch(0),
-	m_keydown(1),
-	m_clock(0), m_hys(0), m_reset(0),
-	m_stb(1), m_j3(0), m_serial_timer(nullptr), m_reset_timer(nullptr)
-{
-}
-
 abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8035_TAG),
 	m_watchdog(*this, "watchdog"),
 	m_discrete(*this, DISCRETE_TAG),
-	m_x0(*this, "X0"),
-	m_x1(*this, "X1"),
-	m_x2(*this, "X2"),
-	m_x3(*this, "X3"),
-	m_x4(*this, "X4"),
-	m_x5(*this, "X5"),
-	m_x6(*this, "X6"),
-	m_x7(*this, "X7"),
-	m_x8(*this, "X8"),
-	m_x9(*this, "X9"),
-	m_x10(*this, "X10"),
-	m_x11(*this, "X11"),
+	m_x(*this, "X%u", 0),
 	m_dsw(*this, "DSW"),
 	m_txd(1), m_keylatch(0),
 	m_keydown(1),
@@ -476,6 +439,9 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 
 abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock, "abc55", __FILE__) { }
+
+abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	abc77_device(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -565,20 +531,9 @@ READ8_MEMBER( abc77_device::p1_r )
 
 	if (m_stb)
 	{
-		switch (m_keylatch)
+		if (m_keylatch < 12)
 		{
-		case 0: data = m_x0->read(); break;
-		case 1: data = m_x1->read(); break;
-		case 2: data = m_x2->read(); break;
-		case 3: data = m_x3->read(); break;
-		case 4: data = m_x4->read(); break;
-		case 5: data = m_x5->read(); break;
-		case 6: data = m_x6->read(); break;
-		case 7: data = m_x7->read(); break;
-		case 8: data = m_x8->read(); break;
-		case 9: data = m_x9->read(); break;
-		case 10: data = m_x10->read(); break;
-		case 11: data = m_x11->read(); break;
+			data = m_x[m_keylatch]->read();
 		}
 	}
 

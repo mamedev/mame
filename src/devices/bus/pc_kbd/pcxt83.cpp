@@ -251,18 +251,7 @@ ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config 
 	: device_t(mconfig, PC_KBD_IBM_PC_XT_83, "IBM PC/XT Keyboard", tag, owner, clock, "kb_pcxt83", __FILE__),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
-		m_md00(*this, "MD00"),
-		m_md01(*this, "MD01"),
-		m_md02(*this, "MD02"),
-		m_md03(*this, "MD03"),
-		m_md04(*this, "MD04"),
-		m_md05(*this, "MD05"),
-		m_md06(*this, "MD06"),
-		m_md07(*this, "MD07"),
-		m_md08(*this, "MD08"),
-		m_md09(*this, "MD09"),
-		m_md10(*this, "MD10"),
-		m_md11(*this, "MD11"),
+		m_md(*this, "MD%02u", 0),
 		m_bus(0xff),
 		m_p1(0xff),
 		m_p2(0xff),
@@ -356,18 +345,18 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 	{
 		UINT8 data = 0xff;
 
-		if (BIT(m_p1, 0)) data &= m_md00->read();
-		if (BIT(m_p1, 1)) data &= m_md01->read();
-		if (BIT(m_p1, 2)) data &= m_md02->read();
-		if (BIT(m_p1, 3)) data &= m_md03->read();
-		if (BIT(m_p1, 4)) data &= m_md04->read();
-		if (BIT(m_p1, 5)) data &= m_md05->read();
-		if (BIT(m_p1, 6)) data &= m_md06->read();
-		if (BIT(m_p1, 7)) data &= m_md07->read();
-		if (BIT(m_p2, 4)) data &= m_md08->read();
-		if (BIT(m_p2, 5)) data &= m_md09->read();
-		if (BIT(m_p2, 6)) data &= m_md10->read();
-		if (BIT(m_p2, 7)) data &= m_md11->read();
+		if (BIT(m_p1, 0)) data &= m_md[0]->read();
+		if (BIT(m_p1, 1)) data &= m_md[1]->read();
+		if (BIT(m_p1, 2)) data &= m_md[2]->read();
+		if (BIT(m_p1, 3)) data &= m_md[3]->read();
+		if (BIT(m_p1, 4)) data &= m_md[4]->read();
+		if (BIT(m_p1, 5)) data &= m_md[5]->read();
+		if (BIT(m_p1, 6)) data &= m_md[6]->read();
+		if (BIT(m_p1, 7)) data &= m_md[7]->read();
+		if (BIT(m_p2, 4)) data &= m_md[8]->read();
+		if (BIT(m_p2, 5)) data &= m_md[9]->read();
+		if (BIT(m_p2, 6)) data &= m_md[10]->read();
+		if (BIT(m_p2, 7)) data &= m_md[11]->read();
 
 		m_q = BIT(data, m_sense);
 	}

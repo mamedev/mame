@@ -353,66 +353,25 @@ ioport_constructor ibm_3270pc_122_keyboard_device::device_input_ports() const
 //  ibm_pc_at_84_keyboard_device - constructor
 //-------------------------------------------------
 
-ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_pc_kbd_interface(mconfig, *this),
-		m_maincpu(*this, I8048_TAG),
-		m_dr00(*this, "DR00"),
-		m_dr01(*this, "DR01"),
-		m_dr02(*this, "DR02"),
-		m_dr03(*this, "DR03"),
-		m_dr04(*this, "DR04"),
-		m_dr05(*this, "DR05"),
-		m_dr06(*this, "DR06"),
-		m_dr07(*this, "DR07"),
-		m_dr08(*this, "DR08"),
-		m_dr09(*this, "DR09"),
-		m_dr10(*this, "DR10"),
-		m_dr11(*this, "DR11"),
-		m_dr12(*this, "DR12"),
-		m_dr13(*this, "DR13"),
-		m_dr14(*this, "DR14"),
-		m_dr15(*this, "DR15"),
-		m_kbdida(*this, "KBDIDA"),
-		m_kbdidb(*this, "KBDIDB"),
-		m_db(0),
-		m_cnt(0),
-		m_sense(0),
-		m_t1(1)
+ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	device_pc_kbd_interface(mconfig, *this),
+	m_maincpu(*this, I8048_TAG),
+	m_dr(*this, "DR%02u", 0),
+	m_kbdida(*this, "KBDIDA"),
+	m_kbdidb(*this, "KBDIDB"),
+	m_db(0),
+	m_cnt(0),
+	m_sense(0),
+	m_t1(1)
 {
 }
 
-ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC_KBD_IBM_PC_AT_84, "IBM PC/AT Keyboard", tag, owner, clock, "kb_pcat84", __FILE__),
-		device_pc_kbd_interface(mconfig, *this),
-		m_maincpu(*this, I8048_TAG),
-		m_dr00(*this, "DR00"),
-		m_dr01(*this, "DR01"),
-		m_dr02(*this, "DR02"),
-		m_dr03(*this, "DR03"),
-		m_dr04(*this, "DR04"),
-		m_dr05(*this, "DR05"),
-		m_dr06(*this, "DR06"),
-		m_dr07(*this, "DR07"),
-		m_dr08(*this, "DR08"),
-		m_dr09(*this, "DR09"),
-		m_dr10(*this, "DR10"),
-		m_dr11(*this, "DR11"),
-		m_dr12(*this, "DR12"),
-		m_dr13(*this, "DR13"),
-		m_dr14(*this, "DR14"),
-		m_dr15(*this, "DR15"),
-		m_kbdida(*this, "KBDIDA"),
-		m_kbdidb(*this, "KBDIDB"),
-		m_db(0),
-		m_cnt(0),
-		m_sense(0),
-		m_t1(1)
-{
-}
+ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	ibm_pc_at_84_keyboard_device(mconfig, PC_KBD_IBM_PC_AT_84, "IBM PC/AT Keyboard", tag, owner, clock, "kb_pcat84", __FILE__) { }
 
-ibm_3270pc_122_keyboard_device::ibm_3270pc_122_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ibm_pc_at_84_keyboard_device(mconfig, PC_KBD_IBM_3270PC_122, "IBM 3270PC Keyboard", tag, owner, clock, "kb_3270pc", __FILE__) { }
+ibm_3270pc_122_keyboard_device::ibm_3270pc_122_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	ibm_pc_at_84_keyboard_device(mconfig, PC_KBD_IBM_3270PC_122, "IBM 3270PC Keyboard", tag, owner, clock, "kb_3270pc", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -615,27 +574,7 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::t1_r )
 
 int ibm_pc_at_84_keyboard_device::key_depressed()
 {
-	UINT8 data = 0xff;
-
-	switch (m_cnt)
-	{
-	case  0: data = m_dr00->read(); break;
-	case  1: data = m_dr01->read(); break;
-	case  2: data = m_dr02->read(); break;
-	case  3: data = m_dr03->read(); break;
-	case  4: data = m_dr04->read(); break;
-	case  5: data = m_dr05->read(); break;
-	case  6: data = m_dr06->read(); break;
-	case  7: data = m_dr07->read(); break;
-	case  8: data = m_dr08->read(); break;
-	case  9: data = m_dr09->read(); break;
-	case 10: data = m_dr10->read(); break;
-	case 11: data = m_dr11->read(); break;
-	case 12: data = m_dr12->read(); break;
-	case 13: data = m_dr13->read(); break;
-	case 14: data = m_dr14->read(); break;
-	case 15: data = m_dr15->read(); break;
-	}
+	UINT8 data = m_dr[m_cnt]->read();
 
 	return m_t1 && BIT(data, m_sense);
 }
