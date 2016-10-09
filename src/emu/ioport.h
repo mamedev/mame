@@ -1412,7 +1412,6 @@ public:
 	digital_joystick &digjoystick(int player, int joysticknum);
 	int count_players() const;
 	bool crosshair_position(int player, float &x, float &y);
-	bool has_keyboard() const;
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	std::string input_type_to_token(ioport_type type, int player);

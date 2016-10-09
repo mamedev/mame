@@ -27,6 +27,7 @@ public:
 	bool has_analog() const { return m_has_analog; }
 	bool has_dips() const { return m_has_dips; }
 	bool has_bioses() const { return m_has_bioses; }
+	bool has_keyboard() const { return m_has_keyboard; }
 
 	// text generators
 	std::string warnings_string();
@@ -43,6 +44,7 @@ private:
 	bool                    m_has_analog;
 	bool                    m_has_dips;
 	bool                    m_has_bioses;
+	bool                    m_has_keyboard;
 };
 
 class menu_game_info : public menu

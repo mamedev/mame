@@ -795,6 +795,10 @@ std::string ioport_field::key_name(int which) const
 		case UCHAR_MAMEKEY(PLUS_PAD): return "Keypad +";
 		case UCHAR_MAMEKEY(DEL_PAD): return "Keypad .";
 		case UCHAR_MAMEKEY(ENTER_PAD): return "Keypad Enter";
+		case UCHAR_MAMEKEY(BS_PAD): return "Keypad Backspace";
+		case UCHAR_MAMEKEY(TAB_PAD): return "Keypad Tab";
+		case UCHAR_MAMEKEY(00_PAD): return "Keypad 00";
+		case UCHAR_MAMEKEY(000_PAD): return "Keypad 000";
 		case UCHAR_MAMEKEY(PRTSCR): return "Print Screen";
 		case UCHAR_MAMEKEY(PAUSE): return "Pause";
 		case UCHAR_MAMEKEY(LSHIFT): return "Left Shift";
@@ -1943,29 +1947,6 @@ bool ioport_manager::type_class_present(ioport_type_class inputclass)
 	return false;
 }
 
-
-//-------------------------------------------------
-//  has_keyboard - determine if there is a
-//  keyboard present in the control list
-//-------------------------------------------------
-
-bool ioport_manager::has_keyboard() const
-{
-	// iterate over ports and fields
-	for (auto &port : m_portlist)
-		for (ioport_field &field : port.second->fields())
-		{
-			// if we are at init, check IPT_KEYBOARD
-			if (!m_safe_to_read && field.type() == IPT_KEYBOARD)
-				return true;
-
-			// else, check if there is a keyboard and if such a keyboard is enabled
-			if (field.type() == IPT_KEYBOARD && field.enabled())
-				return true;
-		}
-
-	return false;
-}
 
 //-------------------------------------------------
 //  count_players - counts the number of active

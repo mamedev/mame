@@ -1070,7 +1070,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// determine if we should disable the rest of the UI
-	bool has_keyboard = machine().ioport().has_keyboard();
+	bool has_keyboard = machine_info().has_keyboard();
 	bool ui_disabled = (has_keyboard && !machine().ui_active());
 
 	// is ScrLk UI toggling applicable here?
