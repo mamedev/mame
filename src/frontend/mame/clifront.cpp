@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "luaengine.h"
 #include "mame.h"
 #include "chd.h"
 #include "emuopts.h"
@@ -30,6 +31,10 @@
 #include "ui/moptions.h"
 #include "language.h"
 #include "pluginopts.h"
+
+#include "linenoise-ng/include/linenoise.h"
+#include <atomic>
+#include <thread>
 
 #include <new>
 #include <ctype.h>
@@ -482,6 +487,189 @@ cli_frontend::~cli_frontend()
 	mame_options::remove_device_options(m_options);
 }
 
+void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char **argv,std::string &option_errors)
+{
+	if (*(m_options.software_name()) != 0)
+	{
+		const game_driver *system = mame_options::system(m_options);
+		if (system == nullptr && *(m_options.system_name()) != 0)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+
+		machine_config config(*system, m_options);
+		software_list_device_iterator iter(config.root_device());
+		if (iter.count() == 0)
+			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
+
+		bool found = false;
+		bool compatible = false;
+		for (software_list_device &swlistdev : iter)
+		{
+			const software_info *swinfo = swlistdev.find(m_options.software_name());
+			if (swinfo != nullptr)
+			{
+				// loop through all parts
+				for (const software_part &swpart : swinfo->parts())
+				{
+					// only load compatible software this way
+					if (swlistdev.is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
+					{
+						device_image_interface *image = software_list_device::find_mountable_image(config, swpart);
+						if (image != nullptr)
+						{
+							std::string val = string_format("%s:%s:%s", swlistdev.list_name(), m_options.software_name(), swpart.name());
+
+							// call this in order to set slot devices according to mounting
+							mame_options::parse_slot_devices(m_options, argc, argv, option_errors, image->instance_name(), val.c_str(), &swpart);
+						}
+						compatible = true;
+					}
+				}
+				found = true;
+			}
+
+			if (compatible)
+				break;
+		}
+		if (!compatible)
+		{
+			software_list_device::display_matches(config, nullptr, m_options.software_name());
+			if (!found)
+				throw emu_fatalerror(EMU_ERR_FATALERROR, nullptr);
+			else
+				throw emu_fatalerror(EMU_ERR_FATALERROR, "Software '%s' is incompatible with system '%s'\n", m_options.software_name(), m_options.system_name());
+		}
+	}
+	// parse the command line, adding any system-specific options
+	if (!mame_options::parse_command_line(m_options, argc, argv, option_errors))
+	{
+		// if we failed, check for no command and a system name first; in that case error on the name
+		if (*(m_options.command()) == 0 && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+
+		// otherwise, error on the options
+		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", strtrimspace(option_errors).c_str());
+	}
+	if (!option_errors.empty())
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
+
+	// determine the base name of the EXE
+	std::string exename = core_filename_extract_base(argv[0], true);
+
+	// if we have a command, execute that
+	if (*(m_options.command()) != 0)
+		execute_commands(exename.c_str());
+
+	// otherwise, check for a valid system
+	else
+	{
+		// We need to preprocess the config files once to determine the web server's configuration
+		// and file locations
+		if (m_options.read_config())
+		{
+			m_options.revert(OPTION_PRIORITY_INI);
+			mame_options::parse_standard_inis(m_options, option_errors);
+		}
+		if (!option_errors.empty())
+			osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
+
+		// if we can't find it, give an appropriate error
+		const game_driver *system = mame_options::system(m_options);
+		if (system == nullptr && *(m_options.system_name()) != 0)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+
+		// otherwise just run the game
+		m_result = manager->execute();
+	}
+}
+/*
+static const char* examples[] = {
+	"db", "hello", "hallo", "hans", "hansekogge", "seamann", "quetzalcoatl", "quit", "power", NULL
+};
+
+void completionHook(char const* prefix, linenoiseCompletions* lc) {
+	size_t i;
+
+	for (i = 0; examples[i] != NULL; ++i) {
+		if (strncmp(prefix, examples[i], strlen(prefix)) == 0) {
+			linenoiseAddCompletion(lc, examples[i]);
+		}
+	}
+}
+*/
+
+void read_console(std::atomic<bool>& run, std::atomic<bool>& wait, std::string &cmdLine)
+{
+	char const* prompt = "\x1b[1;36m[MAME]\x1b[0m> ";
+
+	while (run.load())
+	{
+		while (wait.load())
+		{
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(100ms);
+		}
+		char* result = linenoise(prompt);
+		if (result == NULL)
+		{
+			continue;
+		}
+/*		else if (!strncmp(result, "/history", 8)) {
+			// Display the current history. 
+			for (int index = 0; ; ++index) {
+				char* hist = linenoiseHistoryLine(index);
+				if (hist == NULL) break;
+				printf("%4d: %s\n", index, hist);
+				free(hist);
+			}
+		}*/
+		else if (*result == '\0') {
+			free(result);
+			continue;
+		}
+		cmdLine = std::string(result);
+		linenoiseHistoryAdd(result);
+		//prompt = "\x1b[1;36m[MAME]\x1b[0m \x1b[1;32m[test]\x1b[0m> ";
+
+		free(result);
+		wait.store(true);
+	}
+}
+
+void cli_frontend::start_console()
+{
+	linenoiseInstallWindowChangeHandler();
+	std::string cmdLine = "";
+	const char* file = "./history";
+
+	linenoiseHistoryLoad(file);
+	//linenoiseSetCompletionCallback(completionHook);
+	printf("    _/      _/    _/_/    _/      _/  _/_/_/_/\n");
+	printf("   _/_/  _/_/  _/    _/  _/_/  _/_/  _/       \n");
+	printf("  _/  _/  _/  _/_/_/_/  _/  _/  _/  _/_/_/    \n");
+	printf(" _/      _/  _/    _/  _/      _/  _/         \n");
+	printf("_/      _/  _/    _/  _/      _/  _/_/_/_/    \n");
+	printf("\n");
+	printf("%s v%s\n%s\n\n", emulator_info::get_appname(), build_version, emulator_info::get_copyright_info());
+
+	std::atomic<bool> run(true), wait(false);
+	std::thread cinThread(read_console, std::ref(run), std::ref(wait), std::ref(cmdLine));
+
+	while (run.load())
+	{
+		if (wait.load())
+		{
+			//printf("command %s\n", cmdLine.c_str());
+			cmdLine.clear();
+			wait.store(false);
+		}
+	}
+
+	run.store(false);
+	cinThread.join();
+
+	linenoiseHistorySave(file);
+	linenoiseHistoryFree();
+}
 //-------------------------------------------------
 //  execute - execute a game via the standard
 //  command line interface
@@ -505,100 +693,13 @@ int cli_frontend::execute(int argc, char **argv)
 
 		manager->start_luaengine();
 
-		if (*(m_options.software_name()) != 0)
-		{
-			const game_driver *system = mame_options::system(m_options);
-			if (system == nullptr && *(m_options.system_name()) != 0)
-				throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
-
-			machine_config config(*system, m_options);
-			software_list_device_iterator iter(config.root_device());
-			if (iter.count() == 0)
-				throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
-
-			bool found = false;
-			bool compatible = false;
-			for (software_list_device &swlistdev : iter)
-			{
-				const software_info *swinfo = swlistdev.find(m_options.software_name());
-				if (swinfo != nullptr)
-				{
-					// loop through all parts
-					for (const software_part &swpart : swinfo->parts())
-					{
-						// only load compatible software this way
-						if (swlistdev.is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
-						{
-							device_image_interface *image = software_list_device::find_mountable_image(config, swpart);
-							if (image != nullptr)
-							{
-								std::string val = string_format("%s:%s:%s", swlistdev.list_name(), m_options.software_name(), swpart.name());
-
-								// call this in order to set slot devices according to mounting
-								mame_options::parse_slot_devices(m_options, argc, argv, option_errors, image->instance_name(), val.c_str(), &swpart);
-							}
-							compatible = true;
-						}
-					}
-					found = true;
-				}
-
-				if (compatible)
-					break;
-			}
-			if (!compatible)
-			{
-				software_list_device::display_matches(config, nullptr, m_options.software_name());
-				if (!found)
-					throw emu_fatalerror(EMU_ERR_FATALERROR, nullptr);
-				else
-					throw emu_fatalerror(EMU_ERR_FATALERROR, "Software '%s' is incompatible with system '%s'\n", m_options.software_name(), m_options.system_name());
-			}
-		}
-
-		// parse the command line, adding any system-specific options
-		if (!mame_options::parse_command_line(m_options,argc, argv, option_errors))
-		{
-			// if we failed, check for no command and a system name first; in that case error on the name
-			if (*(m_options.command()) == 0 && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
-				throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
-
-			// otherwise, error on the options
-			throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", strtrimspace(option_errors).c_str());
-		}
-		if (!option_errors.empty())
-			osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
-
-		// determine the base name of the EXE
-		std::string exename = core_filename_extract_base(argv[0], true);
-
-		// if we have a command, execute that
-		if (*(m_options.command()) != 0)
-			execute_commands(exename.c_str());
-
-		// otherwise, check for a valid system
-		else
-		{
-			// We need to preprocess the config files once to determine the web server's configuration
-			// and file locations
-			if (m_options.read_config())
-			{
-				m_options.revert(OPTION_PRIORITY_INI);
-				mame_options::parse_standard_inis(m_options,option_errors);
-			}
-			if (!option_errors.empty())
-				osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
-
-			// if we can't find it, give an appropriate error
-			const game_driver *system = mame_options::system(m_options);
-			if (system == nullptr && *(m_options.system_name()) != 0)
-				throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
-
-			// otherwise just run the game
-			m_result = manager->execute();
+		if (m_options.console()) {
+			//manager->lua()->start_console();
+			start_console();
+		} else {
+			start_execution(manager, argc, argv, option_errors);
 		}
 	}
-
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
 	{

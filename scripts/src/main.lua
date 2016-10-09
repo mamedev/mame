@@ -195,6 +195,7 @@ end
 if (STANDALONE~=true) then
 	links {
 		"frontend",
+		"linenoise-ng",
 	}
 end
 if (MACHINES["NETLIST"]~=null) then
