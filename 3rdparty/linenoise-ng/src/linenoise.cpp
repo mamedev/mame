@@ -2296,7 +2296,7 @@ int InputBuffer::incrementalHistorySearch(PromptBase& pi, int startChar) {
                          historyLinePosition);
         }
 		fprintf(stdout, "\n");
-		std::exit(0);
+		exit(0);
 //#endif
 
       // these characters update the search string, and hence the selected input
@@ -2938,7 +2938,7 @@ int InputBuffer::getInputLine(PromptBase& pi) {
         //if (!pi.write()) break;  // Redraw prompt
         //refreshLine(pi);         // Refresh the line
 		fprintf(stdout,"\n");
-		std::exit(0);
+		exit(0);
 		//break;
 //#endif
 
