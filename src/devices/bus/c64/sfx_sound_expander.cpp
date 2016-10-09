@@ -221,17 +221,7 @@ UINT8 c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, of
 	{
 		if (BIT(offset, 3))
 		{
-			switch (offset & 0x07)
-			{
-			case 0: data = m_kb[0]->read(); break;
-			case 1: data = m_kb[1]->read(); break;
-			case 2: data = m_kb[2]->read(); break;
-			case 3: data = m_kb[3]->read(); break;
-			case 4: data = m_kb[4]->read(); break;
-			case 5: data = m_kb[5]->read(); break;
-			case 6: data = m_kb[6]->read(); break;
-			case 7: data = m_kb[7]->read(); break;
-			}
+			data = m_kb[offset & 0x07]->read();
 		}
 
 		if (BIT(offset, 5))

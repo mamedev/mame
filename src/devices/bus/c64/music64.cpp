@@ -186,15 +186,11 @@ UINT8 c64_music64_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 
 	if (!io2)
 	{
-		switch (offset & 0x07)
+		int kb = offset & 0x07;
+
+		if (kb < 7)
 		{
-		case 0x00: data = m_kb[0]->read(); break;
-		case 0x01: data = m_kb[1]->read(); break;
-		case 0x02: data = m_kb[2]->read(); break;
-		case 0x03: data = m_kb[3]->read(); break;
-		case 0x04: data = m_kb[4]->read(); break;
-		case 0x05: data = m_kb[5]->read(); break;
-		case 0x06: data = m_kb[6]->read(); break;
+			data = m_kb[kb]->read();
 		}
 	}
 
