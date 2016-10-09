@@ -275,14 +275,14 @@ static const char fat32_string[8] = { 'F', 'A', 'T', '3', '2', ' ', ' ', ' ' };
 
 
 
-static fat_partition_info *fat_get_partition_info(imgtool_partition *partition)
+static fat_partition_info *fat_get_partition_info(imgtool::partition *partition)
 {
-	return (fat_partition_info *) imgtool_partition_extra_bytes(partition);
+	return (fat_partition_info *)partition->extra_bytes();
 }
 
 
 
-static imgtoolerr_t fat_read_sector(imgtool_partition *partition, UINT32 sector_index,
+static imgtoolerr_t fat_read_sector(imgtool::partition *partition, UINT32 sector_index,
 	int offset, void *buffer, size_t buffer_len)
 {
 	//const fat_partition_info *disk_info;
@@ -294,14 +294,14 @@ static imgtoolerr_t fat_read_sector(imgtool_partition *partition, UINT32 sector_
 	//disk_info = fat_get_partition_info(partition);
 
 	/* sanity check */
-	err = imgtool_partition_get_block_size(partition, block_size);
+	err = partition->get_block_size(block_size);
 	if (err)
 		return err;
 	assert(block_size == sizeof(data));
 
 	while(buffer_len > 0)
 	{
-		err = imgtool_partition_read_block(partition, sector_index++, data);
+		err = partition->read_block(sector_index++, data);
 		if (err)
 			return err;
 
@@ -317,7 +317,7 @@ static imgtoolerr_t fat_read_sector(imgtool_partition *partition, UINT32 sector_
 
 
 
-static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector_index,
+static imgtoolerr_t fat_write_sector(imgtool::partition *partition, UINT32 sector_index,
 	int offset, const void *buffer, size_t buffer_len)
 {
 	//const fat_partition_info *disk_info;
@@ -330,7 +330,7 @@ static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector
 	//disk_info = fat_get_partition_info(partition);
 
 	/* sanity check */
-	err = imgtool_partition_get_block_size(partition, block_size);
+	err = partition->get_block_size(block_size);
 	if (err)
 		return err;
 	assert(block_size == sizeof(data));
@@ -341,7 +341,7 @@ static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector
 
 		if ((offset != 0) || (buffer_len < sizeof(data)))
 		{
-			err = imgtool_partition_read_block(partition, sector_index, data);
+			err = partition->read_block(sector_index, data);
 			if (err)
 				return err;
 			memcpy(data + offset, buffer, len);
@@ -352,7 +352,7 @@ static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector
 			write_data = buffer;
 		}
 
-		err = imgtool_partition_write_block(partition, sector_index++, write_data);
+		err = partition->write_block(sector_index++, write_data);
 		if (err)
 			return err;
 
@@ -365,7 +365,7 @@ static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector
 
 
 #ifdef UNUSED_FUNCTION
-static imgtoolerr_t fat_clear_sector(imgtool_partition *partition, UINT32 sector_index, UINT8 data)
+static imgtoolerr_t fat_clear_sector(imgtool::partition *partition, UINT32 sector_index, UINT8 data)
 {
 	char buf[FAT_SECLEN];
 	memset(buf, data, sizeof(buf));
@@ -374,7 +374,7 @@ static imgtoolerr_t fat_clear_sector(imgtool_partition *partition, UINT32 sector
 #endif
 
 
-static imgtoolerr_t fat_partition_open(imgtool_partition *partition, UINT64 first_block, UINT64 block_count)
+static imgtoolerr_t fat_partition_open(imgtool::partition *partition, UINT64 first_block, UINT64 block_count)
 {
 	UINT8 header[FAT_SECLEN];
 	imgtoolerr_t err;
@@ -593,7 +593,7 @@ static imgtoolerr_t fat_partition_create(imgtool::image *image, UINT64 first_blo
 
 
 
-static imgtoolerr_t fat_load_fat(imgtool_partition *partition, UINT8 **fat_table)
+static imgtoolerr_t fat_load_fat(imgtool::partition *partition, UINT8 **fat_table)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	const fat_partition_info *disk_info;
@@ -641,7 +641,7 @@ done:
 
 
 
-static imgtoolerr_t fat_save_fat(imgtool_partition *partition, const UINT8 *fat_table)
+static imgtoolerr_t fat_save_fat(imgtool::partition *partition, const UINT8 *fat_table)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	const fat_partition_info *disk_info;
@@ -673,7 +673,7 @@ done:
 
 
 
-static UINT32 fat_get_fat_entry(imgtool_partition *partition, const UINT8 *fat_table, UINT32 fat_entry)
+static UINT32 fat_get_fat_entry(imgtool::partition *partition, const UINT8 *fat_table, UINT32 fat_entry)
 {
 	const fat_partition_info *disk_info;
 	UINT64 entry;
@@ -720,7 +720,7 @@ static UINT32 fat_get_fat_entry(imgtool_partition *partition, const UINT8 *fat_t
 
 
 
-static void fat_set_fat_entry(imgtool_partition *partition, UINT8 *fat_table, UINT32 fat_entry, UINT32 value)
+static void fat_set_fat_entry(imgtool::partition *partition, UINT8 *fat_table, UINT32 fat_entry, UINT32 value)
 {
 	const fat_partition_info *disk_info;
 	UINT64 entry;
@@ -747,7 +747,7 @@ static void fat_set_fat_entry(imgtool_partition *partition, UINT8 *fat_table, UI
 
 
 
-static void fat_debug_integrity_check(imgtool_partition *partition, const UINT8 *fat_table, const fat_file *file)
+static void fat_debug_integrity_check(imgtool::partition *partition, const UINT8 *fat_table, const fat_file *file)
 {
 #ifdef MAME_DEBUG
 	/* debug function to test the integrity of a file */
@@ -770,7 +770,7 @@ static void fat_debug_integrity_check(imgtool_partition *partition, const UINT8 
 
 
 
-static imgtoolerr_t fat_seek_file(imgtool_partition *partition, fat_file *file, UINT32 pos)
+static imgtoolerr_t fat_seek_file(imgtool::partition *partition, fat_file *file, UINT32 pos)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	const fat_partition_info *disk_info;
@@ -831,7 +831,7 @@ done:
 
 
 
-static UINT32 fat_get_filepos_sector_index(imgtool_partition *partition, fat_file *file)
+static UINT32 fat_get_filepos_sector_index(imgtool::partition *partition, fat_file *file)
 {
 	UINT32 sector_index;
 	const fat_partition_info *disk_info;
@@ -873,7 +873,7 @@ static imgtoolerr_t fat_corrupt_file_error(const fat_file *file)
 
 
 
-static imgtoolerr_t fat_readwrite_file(imgtool_partition *partition, fat_file *file,
+static imgtoolerr_t fat_readwrite_file(imgtool::partition *partition, fat_file *file,
 	void *buffer, size_t buffer_len, size_t *bytes_read, int read_or_write)
 {
 	imgtoolerr_t err;
@@ -921,7 +921,7 @@ static imgtoolerr_t fat_readwrite_file(imgtool_partition *partition, fat_file *f
 
 
 
-static imgtoolerr_t fat_read_file(imgtool_partition *partition, fat_file *file,
+static imgtoolerr_t fat_read_file(imgtool::partition *partition, fat_file *file,
 	void *buffer, size_t buffer_len, size_t *bytes_read)
 {
 	return fat_readwrite_file(partition, file, buffer, buffer_len, bytes_read, 0);
@@ -929,7 +929,7 @@ static imgtoolerr_t fat_read_file(imgtool_partition *partition, fat_file *file,
 
 
 
-static imgtoolerr_t fat_write_file(imgtool_partition *partition, fat_file *file,
+static imgtoolerr_t fat_write_file(imgtool::partition *partition, fat_file *file,
 	const void *buffer, size_t buffer_len, size_t *bytes_read)
 {
 	return fat_readwrite_file(partition, file, (void *) buffer, buffer_len, bytes_read, 1);
@@ -937,7 +937,7 @@ static imgtoolerr_t fat_write_file(imgtool_partition *partition, fat_file *file,
 
 
 
-static UINT32 fat_allocate_cluster(imgtool_partition *partition, UINT8 *fat_table)
+static UINT32 fat_allocate_cluster(imgtool::partition *partition, UINT8 *fat_table)
 {
 	const fat_partition_info *disk_info;
 	UINT32 i, val;
@@ -959,7 +959,7 @@ static UINT32 fat_allocate_cluster(imgtool_partition *partition, UINT8 *fat_tabl
 
 
 /* sets the size of a file; ~0 means 'delete' */
-static imgtoolerr_t fat_set_file_size(imgtool_partition *partition, fat_file *file,
+static imgtoolerr_t fat_set_file_size(imgtool::partition *partition, fat_file *file,
 	UINT32 new_size)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
@@ -1277,7 +1277,7 @@ static UINT32 fat_setup_time(time_t ansi_time)
 
 
 
-static imgtoolerr_t fat_read_dirent(imgtool_partition *partition, fat_file *file,
+static imgtoolerr_t fat_read_dirent(imgtool::partition *partition, fat_file *file,
 	fat_dirent *ent, fat_freeentry_info *freeent)
 {
 	imgtoolerr_t err;
@@ -1600,7 +1600,7 @@ done:
 
 
 
-static void fat_bump_dirent(imgtool_partition *partition, UINT8 *entry, size_t entry_len)
+static void fat_bump_dirent(imgtool::partition *partition, UINT8 *entry, size_t entry_len)
 {
 	UINT8 *sfn_entry;
 	int pos, digit_count, i;
@@ -1635,7 +1635,7 @@ static void fat_bump_dirent(imgtool_partition *partition, UINT8 *entry, size_t e
 	{
 		/* extreme degenerate case; simply randomize the filename */
 		for (i = 0; i < 6; i++)
-			sfn_entry[i] = 'A' + (imgtool_partition_rand(partition) % 26);
+			sfn_entry[i] = 'A' + (imgtool::image::rand() % 26);
 		sfn_entry[6] = '~';
 		sfn_entry[7] = '0';
 	}
@@ -1661,7 +1661,7 @@ static void fat_bump_dirent(imgtool_partition *partition, UINT8 *entry, size_t e
 
 
 
-static imgtoolerr_t fat_lookup_path(imgtool_partition *partition, const char *path,
+static imgtoolerr_t fat_lookup_path(imgtool::partition *partition, const char *path,
 	creation_policy_t create, fat_file *file)
 {
 	imgtoolerr_t err;
@@ -1809,14 +1809,14 @@ done:
 
 
 
-static imgtoolerr_t fat_partition_beginenum(imgtool_directory *enumeration, const char *path)
+static imgtoolerr_t fat_partition_beginenum(imgtool::directory *enumeration, const char *path)
 {
 	imgtoolerr_t err;
 	fat_file *file;
 
-	file = (fat_file *) imgtool_directory_extrabytes(enumeration);
+	file = (fat_file *) enumeration->extra_bytes();
 
-	err = fat_lookup_path(imgtool_directory_partition(enumeration), path, CREATE_NONE, file);
+	err = fat_lookup_path(&enumeration->partition(), path, CREATE_NONE, file);
 	if (err)
 		return err;
 	if (!file->directory)
@@ -1826,14 +1826,14 @@ static imgtoolerr_t fat_partition_beginenum(imgtool_directory *enumeration, cons
 
 
 
-static imgtoolerr_t fat_partition_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t fat_partition_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
 {
 	imgtoolerr_t err;
 	fat_file *file;
 	fat_dirent fatent;
 
-	file = (fat_file *) imgtool_directory_extrabytes(enumeration);
-	err = fat_read_dirent(imgtool_directory_partition(enumeration), file, &fatent, NULL);
+	file = (fat_file *) enumeration->extra_bytes();
+	err = fat_read_dirent(&enumeration->partition(), file, &fatent, NULL);
 	if (err)
 		return err;
 
@@ -1850,7 +1850,7 @@ static imgtoolerr_t fat_partition_nextenum(imgtool_directory *enumeration, imgto
 
 
 
-static imgtoolerr_t fat_read_bootblock(imgtool_partition *partition, imgtool_stream *stream)
+static imgtoolerr_t fat_read_bootblock(imgtool::partition *partition, imgtool_stream *stream)
 {
 	imgtoolerr_t err;
 	UINT8 block[FAT_SECLEN];
@@ -1865,7 +1865,7 @@ static imgtoolerr_t fat_read_bootblock(imgtool_partition *partition, imgtool_str
 
 
 
-static imgtoolerr_t fat_write_bootblock(imgtool_partition *partition, imgtool_stream *stream)
+static imgtoolerr_t fat_write_bootblock(imgtool::partition *partition, imgtool_stream *stream)
 {
 	imgtoolerr_t err;
 	UINT8 block[FAT_SECLEN];
@@ -1899,7 +1899,7 @@ static imgtoolerr_t fat_write_bootblock(imgtool_partition *partition, imgtool_st
 
 
 
-static imgtoolerr_t fat_partition_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t fat_partition_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
 {
 	imgtoolerr_t err;
 	fat_file file;
@@ -1931,7 +1931,7 @@ static imgtoolerr_t fat_partition_readfile(imgtool_partition *partition, const c
 
 
 
-static imgtoolerr_t fat_partition_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t fat_partition_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	fat_file file;
@@ -1971,7 +1971,7 @@ static imgtoolerr_t fat_partition_writefile(imgtool_partition *partition, const 
 
 
 
-static imgtoolerr_t fat_partition_delete(imgtool_partition *partition, const char *filename, unsigned int dir)
+static imgtoolerr_t fat_partition_delete(imgtool::partition *partition, const char *filename, unsigned int dir)
 {
 	imgtoolerr_t err;
 	fat_file file;
@@ -2001,14 +2001,14 @@ static imgtoolerr_t fat_partition_delete(imgtool_partition *partition, const cha
 
 
 
-static imgtoolerr_t fat_partition_deletefile(imgtool_partition *partition, const char *filename)
+static imgtoolerr_t fat_partition_deletefile(imgtool::partition *partition, const char *filename)
 {
 	return fat_partition_delete(partition, filename, 0);
 }
 
 
 
-static imgtoolerr_t fat_partition_freespace(imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t fat_partition_freespace(imgtool::partition *partition, UINT64 *size)
 {
 	imgtoolerr_t err;
 	const fat_partition_info *disk_info;
@@ -2036,7 +2036,7 @@ done:
 
 
 
-static imgtoolerr_t fat_partition_createdir(imgtool_partition *partition, const char *path)
+static imgtoolerr_t fat_partition_createdir(imgtool::partition *partition, const char *path)
 {
 	imgtoolerr_t err;
 	fat_file file;
@@ -2070,7 +2070,7 @@ static imgtoolerr_t fat_partition_createdir(imgtool_partition *partition, const 
 
 
 
-static imgtoolerr_t fat_partition_deletedir(imgtool_partition *partition, const char *path)
+static imgtoolerr_t fat_partition_deletedir(imgtool::partition *partition, const char *path)
 {
 	return fat_partition_delete(partition, path, 1);
 }

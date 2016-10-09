@@ -63,7 +63,7 @@ static UINT32 pad128(UINT32 length)
 
 
 
-static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
 {
 	static const UINT32 attrs[] =
 	{
@@ -101,7 +101,7 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 	imgtool_attribute attr_values[10];
 
 	/* get the forks */
-	err = imgtool_partition_list_file_forks(partition, filename, fork_entries, sizeof(fork_entries));
+	err = partition->list_file_forks(filename, fork_entries, sizeof(fork_entries));
 	if (err)
 		return err;
 	for (i = 0; fork_entries[i].type != FORK_END; i++)
@@ -113,7 +113,7 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 	}
 
 	/* get the attributes */
-	err = imgtool_partition_get_file_attributes(partition, filename, attrs, attr_values);
+	err = partition->get_file_attributes(filename, attrs, attr_values);
 	if (err && (ERRORCODE(err) != IMGTOOLERR_UNIMPLEMENTED))
 		return err;
 	if (err == IMGTOOLERR_SUCCESS)
@@ -160,7 +160,7 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 
 	if (data_fork)
 	{
-		err = imgtool_partition_read_file(partition, filename, "", destf, NULL);
+		err = partition->read_file(filename, "", destf, NULL);
 		if (err)
 			return err;
 
@@ -169,7 +169,7 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 
 	if (resource_fork)
 	{
-		err = imgtool_partition_read_file(partition, filename, "RESOURCE_FORK", destf, NULL);
+		err = partition->read_file(filename, "RESOURCE_FORK", destf, NULL);
 		if (err)
 			return err;
 
@@ -181,7 +181,7 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 
 
 
-static imgtoolerr_t write_fork(imgtool_partition *partition, const char *filename, const char *fork,
+static imgtoolerr_t write_fork(imgtool::partition *partition, const char *filename, const char *fork,
 	imgtool_stream *sourcef, UINT64 pos, UINT64 fork_len, util::option_resolution *opts)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
@@ -203,7 +203,7 @@ static imgtoolerr_t write_fork(imgtool_partition *partition, const char *filenam
 			stream_fill(mem_stream, 0, fork_len);
 
 		stream_seek(mem_stream, 0, SEEK_SET);
-		err = imgtool_partition_write_file(partition, filename, fork, mem_stream, opts, NULL);
+		err = partition->write_file(filename, fork, mem_stream, opts, NULL);
 		if (err)
 			goto done;
 	}
@@ -216,7 +216,7 @@ done:
 
 
 
-static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	static const UINT32 attrs[] =
 	{
@@ -233,7 +233,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 		0
 	};
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	UINT8 header[128];
 	UINT32 datafork_size;
 	UINT32 resourcefork_size;
@@ -332,7 +332,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 		attr_values[8].i = script_code;
 		attr_values[9].i = extended_flags;
 
-		err = imgtool_partition_put_file_attributes(partition, filename, attrs, attr_values);
+		err = partition->put_file_attributes(filename, attrs, attr_values);
 		if (err)
 			return err;
 	}

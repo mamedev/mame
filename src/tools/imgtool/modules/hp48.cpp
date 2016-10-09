@@ -436,12 +436,12 @@ static imgtoolerr_t hp48_list_partitions(imgtool::image *img,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp48_open_partition(imgtool_partition *part,
+static imgtoolerr_t hp48_open_partition(imgtool::partition *part,
 					UINT64 first_block, UINT64 block_count)
 {
-	imgtool::image* img = imgtool_partition_image( part );
+	imgtool::image* img = &part->image();
 	hp48_card* c = (hp48_card*) img->extra_bytes();
-	hp48_partition* p = (hp48_partition*) imgtool_partition_extra_bytes( part );
+	hp48_partition* p = (hp48_partition*) part->extra_bytes();
 
 		if ( first_block + block_count > c->size )
 				return IMGTOOLERR_INVALIDPARTITION;
@@ -455,10 +455,10 @@ static imgtoolerr_t hp48_open_partition(imgtool_partition *part,
 
 
 
-static imgtoolerr_t hp48_beginenum(imgtool_directory *enumeration,
+static imgtoolerr_t hp48_beginenum(imgtool::directory *enumeration,
 									const char *path)
 {
-	hp48_directory* d = (hp48_directory*) imgtool_directory_extrabytes( enumeration );
+	hp48_directory* d = (hp48_directory*) enumeration->extra_bytes();
 
 		d->pos = 0;
 
@@ -467,14 +467,14 @@ static imgtoolerr_t hp48_beginenum(imgtool_directory *enumeration,
 
 
 
-static imgtoolerr_t hp48_nextenum(imgtool_directory *enumeration,
+static imgtoolerr_t hp48_nextenum(imgtool::directory *enumeration,
 									imgtool_dirent *ent)
 {
-	imgtool_partition *part = imgtool_directory_partition( enumeration );
-	//imgtool::image* img = imgtool_partition_image( part );
+	imgtool::partition *part = &enumeration->partition();
+	//imgtool::image* img = &part->image();
 	//hp48_card* c = (hp48_card*) img->extra_bytes();
-	hp48_partition* p = (hp48_partition*) imgtool_partition_extra_bytes( part );
-	hp48_directory* d = (hp48_directory*) imgtool_directory_extrabytes( enumeration );
+	hp48_partition* p = (hp48_partition*) part->extra_bytes();
+	hp48_directory* d = (hp48_directory*) enumeration->extra_bytes();
 
 		UINT8* data = p->data;
 		int pos = d->pos;
@@ -526,11 +526,11 @@ static imgtoolerr_t hp48_nextenum(imgtool_directory *enumeration,
 
 
 
-static imgtoolerr_t hp48_freespace(imgtool_partition *part, UINT64 *size)
+static imgtoolerr_t hp48_freespace(imgtool::partition *part, UINT64 *size)
 {
-	//imgtool::image* img = imgtool_partition_image( part );
+	//imgtool::image* img = &part->image();
 	//hp48_card* c = (hp48_card*) img->extra_bytes();
-	hp48_partition* p = (hp48_partition*) imgtool_partition_extra_bytes( part );
+	hp48_partition* p = (hp48_partition*) part->extra_bytes();
 
 		*size = p->size - (find_end(p)+1)/2;
 
@@ -539,14 +539,14 @@ static imgtoolerr_t hp48_freespace(imgtool_partition *part, UINT64 *size)
 
 
 
-static imgtoolerr_t hp48_readfile(imgtool_partition *part,
+static imgtoolerr_t hp48_readfile(imgtool::partition *part,
 									const char *filename,
 									const char *fork,
 									imgtool_stream *destf)
 {
-	//imgtool::image* img = imgtool_partition_image( part );
+	//imgtool::image* img = &part->image();
 	//hp48_card* c = (hp48_card*) img->extra_bytes();
-	hp48_partition* p = (hp48_partition*) imgtool_partition_extra_bytes( part );
+	hp48_partition* p = (hp48_partition*) part->extra_bytes();
 
 		/* find entry */
 		int totalsize, start, size;
@@ -584,12 +584,12 @@ static imgtoolerr_t hp48_readfile(imgtool_partition *part,
 
 
 
-static imgtoolerr_t hp48_deletefile(imgtool_partition *part,
+static imgtoolerr_t hp48_deletefile(imgtool::partition *part,
 									const char *filename)
 {
-	imgtool::image* img = imgtool_partition_image( part );
+	imgtool::image* img = &part->image();
 		hp48_card* c = (hp48_card*) img->extra_bytes();
-	hp48_partition* p = (hp48_partition*) imgtool_partition_extra_bytes( part );
+	hp48_partition* p = (hp48_partition*) part->extra_bytes();
 
 		/* find entry */
 		int totalsize;
@@ -610,15 +610,15 @@ static imgtoolerr_t hp48_deletefile(imgtool_partition *part,
 
 
 
-static imgtoolerr_t hp48_writefile(imgtool_partition *part,
+static imgtoolerr_t hp48_writefile(imgtool::partition *part,
 									const char *filename,
 									const char *fork,
 									imgtool_stream *sourcef,
 									util::option_resolution *opts)
 {
-	imgtool::image* img = imgtool_partition_image( part );
+	imgtool::image* img = &part->image();
 		hp48_card* c = (hp48_card*) img->extra_bytes();
-	hp48_partition* p = (hp48_partition*) imgtool_partition_extra_bytes( part );
+	hp48_partition* p = (hp48_partition*) part->extra_bytes();
 
 		/* check header */
 		char head[8];
