@@ -11,6 +11,10 @@
     such as Arena(in editmode).
 
     TODO:
+    - Our i8255 device emulation writes $FF to ports A/B on reset, causing a bug
+      with speech at boot for EAS and EAG. The core problem is lack of tri-state
+      pins emulation(with pullup/pulldown), for now there's a workaround which
+      can be removed together with this note when we implement it across MAME.
     - verify cpu speed and rom labels where unknown
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - Why does fexcelp give error beeps at start? As if chessboard buttons are
@@ -610,7 +614,7 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
-	// pull output low during reset
+	// pull output low during reset (see TODO)
 	if (machine().phase() == MACHINE_PHASE_RESET)
 		data = 0;
 
@@ -624,10 +628,6 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 {
-	// pull output low during reset
-	if (machine().phase() == MACHINE_PHASE_RESET)
-		data = 0;
-
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led select, input mux
 	m_led_select = 1 << (data & 0xf) & 0x3ff;

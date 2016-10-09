@@ -13,10 +13,10 @@
     such as Arena(in editmode).
 
     TODO:
-    - Figure out why it says the first speech line twice; it shouldn't?
-      It sometimes does this on Voice Sensory Chess Challenger real hardware.
-      It can also be heard on Advanced Voice Chess Challenger real hardware, but not the whole line:
-      "I I am Fidelity's chess challenger", instead.
+    - Our i8255 device emulation writes $FF to ports A/B on reset, causing a bug
+      with speech at boot for VCC and UVC. The core problem is lack of tri-state
+      pins emulation(with pullup/pulldown), for now there's a workaround which
+      can be removed together with this note when we implement it across MAME.
     - VBRC card scanner
 
     Read the official manual(s) on how to play.
@@ -538,6 +538,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
+	DECLARE_MACHINE_START(vcc);
 
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
@@ -558,7 +559,8 @@ public:
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
-	DECLARE_READ8_MEMBER(vbrc_mcu_t_r);
+	DECLARE_READ8_MEMBER(vbrc_mcu_t0_r);
+	DECLARE_READ8_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
 	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
 };
@@ -775,11 +777,24 @@ READ8_MEMBER(fidelz80_state::vcc_speech_r)
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
 
+MACHINE_START_MEMBER(fidelz80_state,vcc)
+{
+	machine_start();
+	
+	// game relies on RAM initialized filled with 1
+	for (int i = 0; i < 0x400; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, 0xff);
+}
+
 
 // I8255 PPI
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
+	// pull output low during reset (see TODO)
+	if (machine().phase() == MACHINE_PHASE_RESET)
+		data = 0;
+
 	// d0-d6: digit segment data, bits are xABCDEFG
 	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 	vcc_prepare_display();
@@ -806,6 +821,10 @@ READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 {
+	// pull output low during reset (see TODO)
+	if (machine().phase() == MACHINE_PHASE_RESET)
+		data = 0;
+
 	// d0,d2-d5: digit/led select
 	// _d6: enable language switches
 	m_led_select = data;
@@ -1005,15 +1024,16 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 	return (m_i8243->i8243_p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_mcu_t_r)
+READ8_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
 {
 	// T0: card scanner?
-	if (offset == 0)
-		return 0;
+	return 0;
+}
 
-	// T1: ?
-	else
-		return rand() & 1;
+READ8_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
+{
+	// T1: ? (locks up on const 0 or 1)
+	return rand() & 1;
 }
 
 
@@ -1113,7 +1133,8 @@ static ADDRESS_MAP_START( vbrc_mcu_map, AS_IO, 8, fidelz80_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(vbrc_mcu_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(vbrc_mcu_p2_r) AM_DEVWRITE("i8243", i8243_device, i8243_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T1) AM_READ(vbrc_mcu_t_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(vbrc_mcu_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vbrc_mcu_t1_r)
 ADDRESS_MAP_END
 
 
@@ -1478,6 +1499,8 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
+	
+	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
