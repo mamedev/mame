@@ -23,7 +23,7 @@
 // ======================> c64_music64_cartridge_device
 
 class c64_music64_cartridge_device : public device_t,
-										public device_c64_expansion_card_interface
+									 public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -46,13 +46,7 @@ protected:
 
 private:
 	required_device<c64_expansion_slot_device> m_exp;
-	required_ioport m_kb0;
-	required_ioport m_kb1;
-	required_ioport m_kb2;
-	required_ioport m_kb3;
-	required_ioport m_kb4;
-	required_ioport m_kb5;
-	required_ioport m_kb6;
+	required_ioport_array<7> m_kb;
 };
 
 

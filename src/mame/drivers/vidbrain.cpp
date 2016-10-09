@@ -103,14 +103,11 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
 	UINT8 data = m_joy_r->read();
 
-	if (BIT(m_keylatch, 0)) data |= m_io00->read();
-	if (BIT(m_keylatch, 1)) data |= m_io01->read();
-	if (BIT(m_keylatch, 2)) data |= m_io02->read();
-	if (BIT(m_keylatch, 3)) data |= m_io03->read();
-	if (BIT(m_keylatch, 4)) data |= m_io04->read();
-	if (BIT(m_keylatch, 5)) data |= m_io05->read();
-	if (BIT(m_keylatch, 6)) data |= m_io06->read();
-	if (BIT(m_keylatch, 7)) data |= m_io07->read();
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_keylatch, i)) data |= m_io[i]->read();	
+	}
+
 	if (!m_uv->kbd_r()) data |= m_uv201_31->read();
 
 	return data;

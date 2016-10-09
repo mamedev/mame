@@ -185,14 +185,7 @@ c64_sfx_sound_expander_cartridge_device::c64_sfx_sound_expander_cartridge_device
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_opl(*this, YM3526_TAG),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG),
-	m_kb0(*this, "KB0"),
-	m_kb1(*this, "KB1"),
-	m_kb2(*this, "KB2"),
-	m_kb3(*this, "KB3"),
-	m_kb4(*this, "KB4"),
-	m_kb5(*this, "KB5"),
-	m_kb6(*this, "KB6"),
-	m_kb7(*this, "KB7")
+	m_kb(*this, "KB%u", 0)
 {
 }
 
@@ -230,14 +223,14 @@ UINT8 c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, of
 		{
 			switch (offset & 0x07)
 			{
-			case 0: data = m_kb0->read(); break;
-			case 1: data = m_kb1->read(); break;
-			case 2: data = m_kb2->read(); break;
-			case 3: data = m_kb3->read(); break;
-			case 4: data = m_kb4->read(); break;
-			case 5: data = m_kb5->read(); break;
-			case 6: data = m_kb6->read(); break;
-			case 7: data = m_kb7->read(); break;
+			case 0: data = m_kb[0]->read(); break;
+			case 1: data = m_kb[1]->read(); break;
+			case 2: data = m_kb[2]->read(); break;
+			case 3: data = m_kb[3]->read(); break;
+			case 4: data = m_kb[4]->read(); break;
+			case 5: data = m_kb[5]->read(); break;
+			case 6: data = m_kb[6]->read(); break;
+			case 7: data = m_kb[7]->read(); break;
 			}
 		}
 
