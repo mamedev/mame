@@ -80,7 +80,7 @@ public:
 		m_ram(*this, "ram"),
 		m_rom(*this, M80C88A_TAG),
 		m_char_rom(*this, HD61830_TAG),
-		m_y(*this, "Y%01u"),
+		m_y(*this, "Y%01u", 0),
 		m_battery(*this, "BATTERY"),
 		m_keylatch(0xff)
 	{ }
