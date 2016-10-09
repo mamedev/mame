@@ -279,7 +279,27 @@ const char_info charinfo[] =
 	{ 0xffee,                   "\xE2\x97\xA6" },   // fullwidth open circle
 	{ UCHAR_MAMEKEY(ESC),       "\033" },   // Esc key
 	{ UCHAR_MAMEKEY(DEL),       "\010" },   // Delete key
-	{ UCHAR_MAMEKEY(HOME),      "\014" }    // Home key
+	{ UCHAR_MAMEKEY(HOME),      "\014" },   // Home key
+	{ UCHAR_MAMEKEY(0_PAD),     "0" },      // 0 on the numeric keypad
+	{ UCHAR_MAMEKEY(1_PAD),     "1" },      // 1 on the numeric keypad
+	{ UCHAR_MAMEKEY(2_PAD),     "2" },      // 2 on the numeric keypad
+	{ UCHAR_MAMEKEY(3_PAD),     "3" },      // 3 on the numeric keypad
+	{ UCHAR_MAMEKEY(4_PAD),     "4" },      // 4 on the numeric keypad
+	{ UCHAR_MAMEKEY(5_PAD),     "5" },      // 5 on the numeric keypad
+	{ UCHAR_MAMEKEY(6_PAD),     "6" },      // 6 on the numeric keypad
+	{ UCHAR_MAMEKEY(7_PAD),     "7" },      // 7 on the numeric keypad
+	{ UCHAR_MAMEKEY(8_PAD),     "8" },      // 8 on the numeric keypad
+	{ UCHAR_MAMEKEY(9_PAD),     "9" },      // 9 on the numeric keypad
+	{ UCHAR_MAMEKEY(SLASH_PAD), "/" },      // / on the numeric keypad
+	{ UCHAR_MAMEKEY(ASTERISK),  "*" },      // * on the numeric keypad
+	{ UCHAR_MAMEKEY(MINUS_PAD), "-" },      // - on the numeric Keypad
+	{ UCHAR_MAMEKEY(PLUS_PAD),  "+" },      // + on the numeric Keypad
+	{ UCHAR_MAMEKEY(DEL_PAD),   "." },      // . on the numeric keypad
+	{ UCHAR_MAMEKEY(ENTER_PAD), "\015" },   // Enter on the numeric keypad
+	{ UCHAR_MAMEKEY(BS_PAD),    "\010" },   // Backspace on the numeric keypad
+	{ UCHAR_MAMEKEY(TAB_PAD),   "\011" },   // Tab on the numeric keypad
+	{ UCHAR_MAMEKEY(00_PAD),    "00" },     // 00 on the numeric keypad
+	{ UCHAR_MAMEKEY(000_PAD),   "000" }     // 000 on the numeric keypad
 };
 
 
@@ -299,18 +319,17 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 		m_status_keydown(false),
 		m_last_cr(false),
 		m_timer(nullptr),
-		m_current_rate(attotime::zero)
+		m_current_rate(attotime::zero),
+		m_queue_chars(),
+		m_accept_char(),
+		m_charqueue_empty()
 {
-	m_queue_chars = ioport_queue_chars_delegate();
-	m_accept_char = ioport_accept_char_delegate();
-	m_charqueue_empty = ioport_charqueue_empty_delegate();
-
-	// posting keys directly only makes sense for a computer
-	if (machine.ioport().has_keyboard())
+	// try building a list of keycodes; if none are available, don't bother
+	build_codes(machine.ioport());
+	if (!m_keycode_map.empty())
 	{
 		m_buffer.resize(KEY_BUFFER_SIZE);
 		m_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
-		build_codes(machine.ioport());
 	}
 }
 

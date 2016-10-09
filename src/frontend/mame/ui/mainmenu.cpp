@@ -109,7 +109,7 @@ void menu_main::populate()
 		item_append(_("Network Devices"), "", 0, (void*)NETWORK_DEVICES);
 
 	/* add keyboard mode menu */
-	if (machine().ioport().has_keyboard() && machine().ioport().natkeyboard().can_post())
+	if (ui().machine_info().has_keyboard() && machine().ioport().natkeyboard().can_post())
 		item_append(_("Keyboard Mode"), "", 0, (void *)KEYBOARD_MODE);
 
 	/* add sliders menu */
