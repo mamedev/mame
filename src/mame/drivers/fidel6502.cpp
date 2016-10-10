@@ -19,6 +19,7 @@
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - Why does fexcelp give error beeps at start? As if chessboard buttons are
       pressed (button logic is not inverted). It works fine after pressing clear.
+      This also happens on real hardware if you manually upgrade model 6080.
 
 ******************************************************************************
 

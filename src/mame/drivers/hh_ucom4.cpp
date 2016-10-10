@@ -48,7 +48,7 @@
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
  *296     uPD553C  1984, Epoch Computer Beam Gun Professional
 
- *511     uPD557LC?1980, Gakken Game Robot 9/Mego Fabulous Fred
+ *511     uPD557LC 1980, Gakken Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
 
  @060     uPD650C  1979, Mattel Computer Gin
