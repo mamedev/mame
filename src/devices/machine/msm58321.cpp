@@ -243,10 +243,6 @@ void msm58321_device::device_start()
 	save_item(NAME(m_cs1));
 	save_item(NAME(m_address));
 	save_item(NAME(m_reg));
-
-	set_current_time(machine());
-
-	update_output();
 }
 
 

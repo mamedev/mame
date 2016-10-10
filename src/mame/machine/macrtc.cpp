@@ -62,8 +62,6 @@ void rtc3430042_device::device_start()
 
 void rtc3430042_device::device_reset()
 {
-	set_current_time(machine());
-
 	m_rtc_rTCEnb = 0;
 	m_rtc_rTCClk = 0;
 	m_rtc_bit_count = 0;

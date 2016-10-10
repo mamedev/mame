@@ -224,9 +224,6 @@ void rp5c01_device::device_reset()
 
 	// 24 hour mode
 	m_reg[MODE01][REGISTER_12_24_SELECT] = 1;
-
-	if (m_battery_backed && clock() > 0)
-		set_current_time(machine());
 }
 
 

@@ -68,16 +68,6 @@ void e0516_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void e0516_device::device_reset()
-{
-	set_current_time(machine());
-}
-
-
-//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
@@ -195,4 +185,13 @@ WRITE_LINE_MEMBER( e0516_device::dio_w )
 READ_LINE_MEMBER( e0516_device::dio_r )
 {
 	return m_dio;
+}
+
+
+//-------------------------------------------------
+//  rtc_clock_updated -
+//-------------------------------------------------
+
+void e0516_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
 }

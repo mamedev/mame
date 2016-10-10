@@ -83,8 +83,6 @@ void mm58167_device::device_start()
 
 void mm58167_device::device_reset()
 {
-	set_current_time(machine());
-
 	m_regs[R_CTL_STATUS] = 0;   // not busy
 	m_regs[R_CTL_IRQSTATUS] = 0;
 	m_regs[R_CTL_IRQCONTROL] = 0;

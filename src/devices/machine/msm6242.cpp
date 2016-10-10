@@ -86,9 +86,6 @@ void msm6242_device::device_start()
 	m_timer = timer_alloc(TIMER_RTC_CALLBACK);
 	m_timer->adjust(attotime::zero);
 
-	// get real time from system
-	set_current_time(machine());
-
 	// set up registers
 	m_tick = 0;
 	m_irq_flag = 0;
