@@ -81,8 +81,8 @@ public:
 		// convert instance name to utf8
 		std::string utf8_instance_name = osd::text::from_tstring(instance->tszInstanceName);
 
-		// set device id to name
-		std::string utf8_instance_id = utf8_instance_name;
+		// set device id to name + product unique identifier + instance unique identifier
+		std::string utf8_instance_id = utf8_instance_name + " product_" + guid_to_string(instance->guidProduct) + " instance_" + guid_to_string(instance->guidInstance);
 
 		// allocate memory for the device object
 		TDevice* devinfo = module.devicelist()->create_device<TDevice>(machine, utf8_instance_name.c_str(), utf8_instance_id.c_str(), module);
@@ -133,6 +133,19 @@ public:
 	}
 
 	HRESULT enum_attached_devices(int devclass, device_enum_interface *enumerate_interface, void *state) const;
+
+	const std::string guid_to_string(const GUID& guid)
+	{
+		char guid_string[37];
+		sprintf_s(
+			guid_string, ARRAY_LENGTH(guid_string),
+			"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+			guid.Data1, guid.Data2, guid.Data3,
+			guid.Data4[0], guid.Data4[1], guid.Data4[2],
+			guid.Data4[3], guid.Data4[4], guid.Data4[5],
+			guid.Data4[6], guid.Data4[7]);
+		return guid_string;
+	}
 };
 
 class dinput_device : public device_info
