@@ -173,7 +173,7 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 		return win_open_ptty(path, openflags, file, filesize);
 
 	// convert path to TCHAR
-	auto t_path = tstring_from_utf8(path.c_str());
+	osd::text::tstring t_path = osd::text::to_tstring(path);
 
 	// convert the path into something Windows compatible (the actual interesting part appears
 	// to have been commented out???)
@@ -274,7 +274,7 @@ osd_file::error osd_file::openpty(ptr &file, std::string &name)
 
 osd_file::error osd_file::remove(std::string const &filename)
 {
-	auto tempstr = tstring_from_utf8(filename.c_str());
+	osd::text::tstring tempstr = osd::text::to_tstring(filename);
 
 	error filerr = error::NONE;
 	if (!DeleteFile(tempstr.c_str()))
@@ -301,7 +301,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 		return FALSE;
 
 	// do a create file on the drive
-	auto t_filename = tstring_from_utf8(filename);
+	auto t_filename = osd::text::to_tstring(filename);
 	file = CreateFile(t_filename.c_str(), GENERIC_READ, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, nullptr);
 	if (file == INVALID_HANDLE_VALUE)
 		return FALSE;
@@ -338,7 +338,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 {
 	// convert the path to TCHARs
-	auto t_path = tstring_from_utf8(path.c_str());
+	osd::text::tstring t_path = osd::text::to_tstring(path);
 
 	// is this path a root directory (e.g. - C:)?
 	WIN32_FIND_DATA find_data;
@@ -382,7 +382,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 {
 	// convert the path to TCHARs
-	auto t_path = tstring_from_utf8(path.c_str());
+	osd::text::tstring t_path = osd::text::to_tstring(path);
 
 	// cannonicalize the path
 	TCHAR buffer[MAX_PATH];
@@ -390,7 +390,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 		return win_error_to_file_error(GetLastError());
 
 	// convert the result back to UTF-8
-	utf8_from_tstring(dst, buffer);
+	osd::text::from_tstring(dst, buffer);
 	return osd_file::error::NONE;
 }
 
@@ -402,7 +402,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 
 bool osd_is_absolute_path(std::string const &path)
 {
-	auto t_path = tstring_from_utf8(path.c_str());
+	osd::text::tstring t_path = osd::text::to_tstring(path);
 	return !PathIsRelative(t_path.c_str());
 }
 

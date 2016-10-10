@@ -79,7 +79,7 @@ public:
 		HRESULT result;
 
 		// convert instance name to utf8
-		std::string utf8_instance_name = utf8_from_tstring(instance->tszInstanceName);
+		std::string utf8_instance_name = osd::text::from_tstring(instance->tszInstanceName);
 
 		// set device id to name + product unique identifier + instance unique identifier
 		std::string utf8_instance_id = utf8_instance_name + " product_" + guid_to_string(instance->guidProduct) + " instance_" + guid_to_string(instance->guidInstance);

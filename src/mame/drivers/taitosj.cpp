@@ -67,10 +67,10 @@ Address          Dir Data     Name       Description
 11010101----1001   W xxxxxxxx EXROM1     low 8 bits of address to read from graphics ROMs
 11010101----1010   W xxxxxxxx EXROM2     high 8 bits of address to read from graphics ROMs
 11010101----1011   W xxxxxxxx EPORT1     command to sound CPU
-11010101----1100   W -------x EPORT2     single bit signal to audio CPU (not used?)
+11010101----1100   W -------x EPORT2     single bit signal to audio CPU (used in jungle hunt to disable music in attract mode)
 11010101----1101   W -------- TIME RESET watchdog reset
 11010101----1110   W -------x COIN LOCK  coin lockout
-11010101----1110   W ------x- SOUND STOP mute sound
+11010101----1110   W ------x- SOUND STOP mute sound (time tunnel bogus coin sample at POST needs this?)
 11010101----1110   W -xxxxx-- n.c.
 11010101----1110   W x------- BANK SEL   program ROM bank select
 11010101----1111   W ---xxxxx EXPORT     to a PAL (ROM6 @ 14)
@@ -118,11 +118,11 @@ Address          Dir Data     Name      Description
 01001--------01x R/W xxxxxxxx CS5       AY-3-8910 #2
 01001--------1-x R/W xxxxxxxx CS5       AY-3-8910 #3
 01010---------00 R   xxxxxxxx RD5000    read command from main CPU
-01010---------00   W -------- WR5000    clear bit 7 of command from main CPU (not used?)
-01010---------01 R   ----x--- RD5001    command pending from main CPU (not used?)
-01010---------01 R   -----x-- RD5001    single bit from main CPU (not used?)
+01010---------00   W -------- WR5000    clear bit 7 of command from main CPU
+01010---------01 R   ----x--- RD5001    command pending from main CPU
+01010---------01 R   -----x-- RD5001    secondary semaphore from main CPU
 01010---------01 R   ------11 RD5001    always 1
-01010---------01   W -------- WR5001    clear single bit from main CPU (not used?)
+01010---------01   W -------- WR5001    clear secondary semaphore from main CPU
 01010---------10              n.c.
 01010---------11              n.c.
 111xxxxxxxxxxxxx R   xxxxxxxx           space for diagnostics ROM? not shown in the schematics
@@ -169,25 +169,42 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
-#include "sound/ay8910.h"
 #include "includes/taitosj.h"
 
 
 WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
 {
-	m_sndnmi_disable = data & 0x01;
+	m_sndnmi_disable = (data & 1);
+	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(taitosj_state::taitosj_soundcommand_w)
+WRITE8_MEMBER(taitosj_state::sound_command_w)
 {
-	m_soundlatch->write(space,offset,data);
-	if (!m_sndnmi_disable) m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_sound_cmd_written = true;
+	m_soundlatch->write(space,0,data);
+	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
 {
 	m_input_port_4_f0 = data >> 4;
+}
+
+// EPORT2
+WRITE8_MEMBER(taitosj_state::sound_semaphore_w)
+{
+	m_sound_semaphore = (data & 1);
+	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
@@ -225,8 +242,9 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("gfxpointer")
-	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
-	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
+	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(sound_command_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_MIRROR(0x00f0) AM_WRITE(sound_semaphore_w)
+	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
 	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_SHARE("video_mode")
@@ -237,41 +255,9 @@ ADDRESS_MAP_END
 
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
 static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07fe) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x07fe) AM_READ(taitosj_mcu_status_r)
-	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_SHARE("characterram")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("videoram_1")
-	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_SHARE("videoram_2")
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_SHARE("videoram_3")
-	AM_RANGE(0xd000, 0xd05f) AM_RAM AM_SHARE("colscrolly")
-	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd200, 0xd27f) AM_MIRROR(0x0080) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITEONLY AM_SHARE("video_priority")
-	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READONLY AM_SHARE("collision_reg")
-	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
-	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
-	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
-	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")         /* DSW1 */
-	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
-	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")          /* Service */
-	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
-	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD("ay1", ay8910_device, data_r)   /* DSW2 and DSW3 */
-	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
-	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
-	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("gfxpointer")
-	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
-	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
-	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
-	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
-	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_SHARE("video_mode")
-	AM_RANGE(0xd700, 0xdfff) AM_NOP
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_IMPORT_FROM( taitosj_main_nomcu_map )
 ADDRESS_MAP_END
 
 
@@ -297,7 +283,7 @@ CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
 	return m_kikstart_gears[player];
 }
 
-
+// TODO: merge with above
 static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
@@ -328,13 +314,43 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD("ay1", ay8910_device, data_r) /* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_SHARE("gfxpointer")
-	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(sound_command_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_WRITE(sound_semaphore_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_SHARE("video_mode")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("kikstart_scroll")// scroll ram + ???
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 ADDRESS_MAP_END
+
+// RD5000
+READ8_MEMBER(taitosj_state::sound_command_r)
+{
+	m_sound_cmd_written = false;
+	return m_soundlatch->read(space,0);
+}
+
+// RD5001
+READ8_MEMBER(taitosj_state::sound_status_r)
+{
+	return (m_sound_cmd_written == true ? 8 : 0) | (m_sound_semaphore == true ? 4 : 0) | 3;
+}
+
+// WR5000
+WRITE8_MEMBER(taitosj_state::sound_command_ack_w)
+{
+	m_soundlatch->write(space,0, m_soundlatch->read(space,0) & 0x7f);
+}
+
+// WR5001
+WRITE8_MEMBER(taitosj_state::sound_semaphore_clear_w)
+{
+	m_sound_semaphore = false;
+	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
 
 
 static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
@@ -346,7 +362,8 @@ static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x5000, 0x5000) AM_READWRITE(sound_command_r, sound_command_ack_w)
+	AM_RANGE(0x5001, 0x5001) AM_READWRITE(sound_status_r,  sound_semaphore_clear_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM */
 ADDRESS_MAP_END
 
@@ -1746,17 +1763,17 @@ WRITE8_MEMBER(taitosj_state::dac_vol_w)
 static MACHINE_CONFIG_START( nomcu, taitosj_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,8000000/2)      /* 4 MHz */
+	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)      /* 8 MHz / 2, on CPU board */
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitosj_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,6000000/2)    /* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_6MHz/2)    /* 6 MHz / 2, on GAME board */
 	MCFG_CPU_PROGRAM_MAP(taitosj_audio_map)
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
 			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
+	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold,  (double)XTAL_6MHz/(4*16*16*10*16))
 
 
 	/* video hardware */
@@ -1777,23 +1794,35 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 6000000/4)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 6000000/4)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitosj_state, dac_out_w))   /* port Awrite */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, dac_vol_w))    /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 6000000/4)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitosj_state, input_port_4_f0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay4", AY8910, 6000000/4)
+	MCFG_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
+	   collector inverter, to selectively tie none, either or both of two
+	   capacitors between the ay4 audio output signal and ground, or between
+	   audio output signal and high-z (i.e. do nothing).
+	   Bio Attack uses this?
+	*/
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
@@ -1807,7 +1836,7 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_CPU_ADD("mcu", M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
+	MCFG_CPU_ADD("mcu", M68705,XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(taitosj_mcu_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1819,8 +1848,6 @@ static MACHINE_CONFIG_DERIVED( kikstart, mcu )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kikstart_main_map)
-
-	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_kikstart)
@@ -2288,8 +2315,7 @@ ROM_END
 Elevator Action (4 Board Version, typical Taito SJ hardware)
 Taito, 1983
 
-Manual shows two versions, 4-board without protection, and
-5-board, using an additional 68705 MCU.
+Manual shows two versions, 4-board and 5-board, both using a 68705 MCU.
 
 PCB Layout
 ----------
@@ -2415,71 +2441,125 @@ Notes:
       IC* - 2732 EPROMs
 */
 
-ROM_START( elevator )
-	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "ea-ic69.bin",  0x0000, 0x1000, CRC(24e277ef) SHA1(764e3b3a34bf0ec849d58023f710e5b0a0d0ccb5) )
-	ROM_LOAD( "ea-ic68.bin",  0x1000, 0x1000, CRC(13702e39) SHA1(b72fea84f8322463ff224e3b06698a1ed7e305b7) )
-	ROM_LOAD( "ea-ic67.bin",  0x2000, 0x1000, CRC(46f52646) SHA1(11b68b89ab0f580bfe88047e59bd9bba237a2eb4) )
-	ROM_LOAD( "ea-ic66.bin",  0x3000, 0x1000, CRC(e22fe57e) SHA1(50888975e698c4d2a124e5731d0922df43eb01ef) )
-	ROM_LOAD( "ea-ic65.bin",  0x4000, 0x1000, CRC(c10691d7) SHA1(a7657d3d661421d1fca3b04e4025725272b77203) )
-	ROM_LOAD( "ea-ic64.bin",  0x5000, 0x1000, CRC(8913b293) SHA1(163daa07b6d45469f18e4f4a1904b60a890c8699) )
-	ROM_LOAD( "ea-ic55.bin",  0x6000, 0x1000, CRC(1cabda08) SHA1(8fff75a354ee7589bd0ffe8b0271fd9111b2b241) )
-	ROM_LOAD( "ea-ic54.bin",  0x7000, 0x1000, CRC(f4647b4f) SHA1(711a9447d30b35bc38e149e0cf6e835ff06efd54) )
+ROM_START( elevator ) // 5 board set, using 2732s on both mainboard and square rom board, and 68705 on daughterboard at bottom of stack, upside down
+	ROM_REGION( 0x12000, "maincpu", 0 ) // on CPU BOARD
+	ROM_LOAD( "ea_12.2732.ic69",  0x0000, 0x1000, CRC(24e277ef) SHA1(764e3b3a34bf0ec849d58023f710e5b0a0d0ccb5) ) // needs label verified
+	ROM_LOAD( "ea_13.2732.ic68",  0x1000, 0x1000, CRC(13702e39) SHA1(b72fea84f8322463ff224e3b06698a1ed7e305b7) ) // needs label verified
+	ROM_LOAD( "ea_14.2732.ic67",  0x2000, 0x1000, CRC(46f52646) SHA1(11b68b89ab0f580bfe88047e59bd9bba237a2eb4) ) // needs label verified
+	ROM_LOAD( "ea_15.2732.ic66",  0x3000, 0x1000, CRC(e22fe57e) SHA1(50888975e698c4d2a124e5731d0922df43eb01ef) ) // needs label verified
+	ROM_LOAD( "ea_16.2732.ic65",  0x4000, 0x1000, CRC(c10691d7) SHA1(a7657d3d661421d1fca3b04e4025725272b77203) ) // needs label verified \ one of these is probably -1
+	ROM_LOAD( "ea_17.2732.ic64",  0x5000, 0x1000, CRC(8913b293) SHA1(163daa07b6d45469f18e4f4a1904b60a890c8699) ) // needs label verified /
+	ROM_LOAD( "ea_18.2732.ic55",  0x6000, 0x1000, CRC(1cabda08) SHA1(8fff75a354ee7589bd0ffe8b0271fd9111b2b241) ) // needs label verified \ one of these is probably -1
+	ROM_LOAD( "ea_19.2732.ic54",  0x7000, 0x1000, CRC(f4647b4f) SHA1(711a9447d30b35bc38e149e0cf6e835ff06efd54) ) // needs label verified /
 	/* 10000-11fff space for banked ROMs (not used) */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ea-9.ic70",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) )
-	ROM_LOAD( "ea-10.ic71",  0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on GAME BOARD
+	ROM_LOAD( "ea_9.2732.ic70",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) )
+	ROM_LOAD( "ea_10.2732.ic71", 0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) )
+
+	ROM_REGION( 0x0800, "pal", 0 ) // on GAME BOARD
+	ROM_LOAD( "ww15.pal16l8.ic24.jed.bin",  0x0000, 0x0117, CRC(c3ec20d6) SHA1(4bcdd92ca6b75ba825a7f90b1f35d8dcaeaf8a96) ) // what format is this? jed2bin?
 
 	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
-	ROM_LOAD( "ba3.11.ic4",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) ) // IC4 on the z80+security daughterboard; older 4-layer pcbs the mcu is at a different location on the maincpu board itself. The MCU itself has a strange custom from-factory silkscreen, rather than "MC68705P3S" it is labeled "15-00011-001 // DA68237"
+	ROM_LOAD( "ba3__11.mc68705p3.ic4",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) ) // IC4 on the older Z80+security daughterboard; The MCU itself has a strange custom from-factory silkscreen, rather than "MC68705P3S" it is labeled "15-00011-001 // DA68237"
 
-	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
-	ROM_LOAD( "ea-ic1.bin",   0x0000, 0x1000, CRC(bbbb3fba) SHA1(a8e3a0886ea5dc8e70aa280b4cef5fb26ca0e125) )
-	ROM_LOAD( "ea-ic2.bin",   0x1000, 0x1000, CRC(639cc2fd) SHA1(0ba292ac34dbf779a929db6358cd842d38077b3d) )
-	ROM_LOAD( "ea-ic3.bin",   0x2000, 0x1000, CRC(61317eea) SHA1(f1a18c09e31edb4ec3ad7ab853f425383ca22314) )
-	ROM_LOAD( "ea-ic4.bin",   0x3000, 0x1000, CRC(55446482) SHA1(0767701213920d30d5a3a226b25cfbbd3f24437a) )
-	ROM_LOAD( "ea-ic5.bin",   0x4000, 0x1000, CRC(77895c0f) SHA1(fe116c53a7e8ac523a17249a56df9f40b503b30d) )
-	ROM_LOAD( "ea-ic6.bin",   0x5000, 0x1000, CRC(9a1b6901) SHA1(646491c1d28904d9e662b1bff554bb74ec47708d) )
-	ROM_LOAD( "ea-ic7.bin",   0x6000, 0x1000, CRC(839112ec) SHA1(30bca7f5214bf424aa10184094947496f054ddf4) )
-	ROM_LOAD( "ea-ic8.bin",   0x7000, 0x1000, CRC(db7ff692) SHA1(4d0d9ab0c9d8d758e121f2bcfc6422ffadf2d760) )
+	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime, on Square ROM board */
+	ROM_LOAD( "ea_20.2732.ic1",   0x0000, 0x1000, CRC(bbbb3fba) SHA1(a8e3a0886ea5dc8e70aa280b4cef5fb26ca0e125) )
+	ROM_LOAD( "ea_21.2732.ic2",   0x1000, 0x1000, CRC(639cc2fd) SHA1(0ba292ac34dbf779a929db6358cd842d38077b3d) )
+	ROM_LOAD( "ea_22.2732.ic3",   0x2000, 0x1000, CRC(61317eea) SHA1(f1a18c09e31edb4ec3ad7ab853f425383ca22314) )
+	ROM_LOAD( "ea_23.2732.ic4",   0x3000, 0x1000, CRC(55446482) SHA1(0767701213920d30d5a3a226b25cfbbd3f24437a) )
+	ROM_LOAD( "ea_24.2732.ic5",   0x4000, 0x1000, CRC(77895c0f) SHA1(fe116c53a7e8ac523a17249a56df9f40b503b30d) )
+	ROM_LOAD( "ea_25.2732.ic6",   0x5000, 0x1000, CRC(9a1b6901) SHA1(646491c1d28904d9e662b1bff554bb74ec47708d) )
+	ROM_LOAD( "ea_26.2732.ic7",   0x6000, 0x1000, CRC(839112ec) SHA1(30bca7f5214bf424aa10184094947496f054ddf4) )
+	ROM_LOAD( "ea_27.2732.ic8",   0x7000, 0x1000, CRC(db7ff692) SHA1(4d0d9ab0c9d8d758e121f2bcfc6422ffadf2d760) )
 
 	ROM_REGION( 0x0100, "proms", 0 )      /* layer PROM */
-	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
+	ROM_LOAD( "eb16.ic22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
 
-ROM_START( elevatorb )
+ROM_START( elevatorb ) // bootleg of 5 board set above, with protection patched out
+/* Rom labels below are made up except where they are identical to the set above,
+in which case they use those names.
+The reason for this is that different elevator action bootlegs have the roms labeled
+completely differently, at the whim of whoever copied the roms.
+I'm guessing the bootlegs are mostly this set, but it is quite likely we are missing
+dumps of other variations on this bootleg.
+Examples of names:
+position - real name - name1 - name2
+ic1        "ea_20"   - "9"   - "EAS1"
+ic2        "ea_21"   - "10"  - "EAS2"
+ic3        "ea_22"   - "11"  - "EAS3"
+ic4        "ea_23"   - "12"  - "EAS4"
+ic5        "ea_24"   - "13"  - "EAS5"
+ic6        "ea_25"   - "14"  - "EAS6"
+ic7        "ea_26"   - "15"  - "EAS7"
+ic8        "ea_27"   - "16"  - "EAS8"
+
+real name - http://i.ebayimg.com/images/g/75kAAOSwXeJXfVvj/s-l1600.jpg
+name1 - https://s7.postimg.org/lo6dxb09n/IMG_7573.jpg
+name2 - http://s133.photobucket.com/user/phetishboy/media/Rampagee/DSC01184.jpg.html
+        http://s133.photobucket.com/user/phetishboy/media/Rampagee/DSC01183.jpg.html
+*/
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "ea69.bin",     0x0000, 0x1000, CRC(66baa214) SHA1(fad660d2983daad478085be3b1a951b0864485dd) )
-	ROM_LOAD( "ea-ic68.bin",  0x1000, 0x1000, CRC(13702e39) SHA1(b72fea84f8322463ff224e3b06698a1ed7e305b7) )
-	ROM_LOAD( "ea-ic67.bin",  0x2000, 0x1000, CRC(46f52646) SHA1(11b68b89ab0f580bfe88047e59bd9bba237a2eb4) )
-	ROM_LOAD( "ea66.bin",     0x3000, 0x1000, CRC(b88f3383) SHA1(99f23d82d7866e4bca8f5a508e0913673d12489b) )
-	ROM_LOAD( "ea-ic65.bin",  0x4000, 0x1000, CRC(c10691d7) SHA1(a7657d3d661421d1fca3b04e4025725272b77203) )
-	ROM_LOAD( "ea-ic64.bin",  0x5000, 0x1000, CRC(8913b293) SHA1(163daa07b6d45469f18e4f4a1904b60a890c8699) )
-	ROM_LOAD( "ea55.bin",     0x6000, 0x1000, CRC(d546923e) SHA1(1de128cf96e6d976f6f09e4ac2b4d2507935bfe9) )
-	ROM_LOAD( "ea54.bin",     0x7000, 0x1000, CRC(963ec5a5) SHA1(b2f684b61feb31e3d1856c16edcef33262f68581) )
+	ROM_LOAD( "eabl_12.2732.ic69",    0x0000, 0x1000, CRC(66baa214) SHA1(fad660d2983daad478085be3b1a951b0864485dd) )
+	ROM_LOAD( "ea_13.2732.ic68",  0x1000, 0x1000, CRC(13702e39) SHA1(b72fea84f8322463ff224e3b06698a1ed7e305b7) )
+	ROM_LOAD( "ea_14.2732.ic67",  0x2000, 0x1000, CRC(46f52646) SHA1(11b68b89ab0f580bfe88047e59bd9bba237a2eb4) )
+	ROM_LOAD( "eabl_15.2732.ic66",     0x3000, 0x1000, CRC(b88f3383) SHA1(99f23d82d7866e4bca8f5a508e0913673d12489b) )
+	ROM_LOAD( "ea_16.2732.ic65",  0x4000, 0x1000, CRC(c10691d7) SHA1(a7657d3d661421d1fca3b04e4025725272b77203) )
+	ROM_LOAD( "ea_17.2732.ic64",  0x5000, 0x1000, CRC(8913b293) SHA1(163daa07b6d45469f18e4f4a1904b60a890c8699) )
+	ROM_LOAD( "eabl_18.2732.ic55",     0x6000, 0x1000, CRC(d546923e) SHA1(1de128cf96e6d976f6f09e4ac2b4d2507935bfe9) )
+	ROM_LOAD( "eabl_19.2732.ic54",     0x7000, 0x1000, CRC(963ec5a5) SHA1(b2f684b61feb31e3d1856c16edcef33262f68581) )
 	/* 10000-10fff space for another banked ROM (not used) */
-	ROM_LOAD( "ea52.bin",     0x11000, 0x1000, CRC(44b1314a) SHA1(e8980536f787fcb603943d4b2b3a64f475e51a16) ) /* protection crack, bank switched at 7000 */
+	ROM_LOAD( "eabl.2732.ic52",     0x11000, 0x1000, CRC(44b1314a) SHA1(e8980536f787fcb603943d4b2b3a64f475e51a16) ) /* protection crack, bank switched at 7000 */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ea-9.ic70",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) )
-	ROM_LOAD( "ea-10.ic71",  0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on GAME BOARD
+	ROM_LOAD( "ea_9.2732.ic70",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) )
+	ROM_LOAD( "ea_10.2732.ic71", 0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) )
+
+	ROM_REGION( 0x0800, "pal", 0 ) // on GAME BOARD
+	ROM_LOAD( "ww15.pal16l8.ic24.jed.bin",  0x0000, 0x0117, CRC(c3ec20d6) SHA1(4bcdd92ca6b75ba825a7f90b1f35d8dcaeaf8a96) ) // what format is this? jed2bin? probably wrong label for bootleg
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
-	ROM_LOAD( "ea-ic1.bin",   0x0000, 0x1000, CRC(bbbb3fba) SHA1(a8e3a0886ea5dc8e70aa280b4cef5fb26ca0e125) )
-	ROM_LOAD( "ea-ic2.bin",   0x1000, 0x1000, CRC(639cc2fd) SHA1(0ba292ac34dbf779a929db6358cd842d38077b3d) )
-	ROM_LOAD( "ea-ic3.bin",   0x2000, 0x1000, CRC(61317eea) SHA1(f1a18c09e31edb4ec3ad7ab853f425383ca22314) )
-	ROM_LOAD( "ea-ic4.bin",   0x3000, 0x1000, CRC(55446482) SHA1(0767701213920d30d5a3a226b25cfbbd3f24437a) )
-	ROM_LOAD( "ea-ic5.bin",   0x4000, 0x1000, CRC(77895c0f) SHA1(fe116c53a7e8ac523a17249a56df9f40b503b30d) )
-	ROM_LOAD( "ea-ic6.bin",   0x5000, 0x1000, CRC(9a1b6901) SHA1(646491c1d28904d9e662b1bff554bb74ec47708d) )
-	ROM_LOAD( "ea-ic7.bin",   0x6000, 0x1000, CRC(839112ec) SHA1(30bca7f5214bf424aa10184094947496f054ddf4) )
-	ROM_LOAD( "ea08.bin",     0x7000, 0x1000, CRC(67ebf7c1) SHA1(ec4db1392967f3959574bc4ca03e95938a6e5173) )
+	ROM_LOAD( "ea_20.2732.ic1",   0x0000, 0x1000, CRC(bbbb3fba) SHA1(a8e3a0886ea5dc8e70aa280b4cef5fb26ca0e125) )
+	ROM_LOAD( "ea_21.2732.ic2",   0x1000, 0x1000, CRC(639cc2fd) SHA1(0ba292ac34dbf779a929db6358cd842d38077b3d) )
+	ROM_LOAD( "ea_22.2732.ic3",   0x2000, 0x1000, CRC(61317eea) SHA1(f1a18c09e31edb4ec3ad7ab853f425383ca22314) )
+	ROM_LOAD( "ea_23.2732.ic4",   0x3000, 0x1000, CRC(55446482) SHA1(0767701213920d30d5a3a226b25cfbbd3f24437a) )
+	ROM_LOAD( "ea_24.2732.ic5",   0x4000, 0x1000, CRC(77895c0f) SHA1(fe116c53a7e8ac523a17249a56df9f40b503b30d) )
+	ROM_LOAD( "ea_25.2732.ic6",   0x5000, 0x1000, CRC(9a1b6901) SHA1(646491c1d28904d9e662b1bff554bb74ec47708d) )
+	ROM_LOAD( "ea_26.2732.ic7",   0x6000, 0x1000, CRC(839112ec) SHA1(30bca7f5214bf424aa10184094947496f054ddf4) )
+	ROM_LOAD( "eabl_27.2732.ic8",     0x7000, 0x1000, CRC(67ebf7c1) SHA1(ec4db1392967f3959574bc4ca03e95938a6e5173) )
 
 	ROM_REGION( 0x0100, "proms", 0 )      /* layer PROM */
-	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
+	ROM_LOAD( "eb16.ic22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
 
+ROM_START( elevator4 ) // later 4 board set, with rom data on 2764s, split between gfx and cpu data.
+	ROM_REGION( 0x12000, "maincpu", 0 ) // on L-shaped rom board
+	ROM_LOAD( "ba3__01.2764.ic1",  0x0000, 0x2000, CRC(da775a24) SHA1(b4341d2c87285d7a3d1773e2d94B3f621ebb4489) ) // == ea_12.2732.ic69 + ea_13.2732.ic68
+	ROM_LOAD( "ba3__02.2764.ic2",  0x2000, 0x2000, CRC(fbfd8b3a) SHA1(9dff36dcaf43a2403b9a3497512dfec228144a7c) ) // == ea_14.2732.ic67 + ea_15.2732.ic66
+	ROM_LOAD( "ba3__03-1.2764.ic3",0x4000, 0x2000, CRC(a2e69833) SHA1(0f324c3adec27fcfebd779328db6f1da6cc8d227) ) // == ea_16.2732.ic65 + ea_17.2732.ic64
+	ROM_LOAD( "ba3__04-1.2764.ic6",0x6000, 0x2000, CRC(2b78c462) SHA1(ae41e0089c7f445fa271f6af7e141b112f0009e6) ) // == ea_18.2732.ic55 + ea_19.2732.ic54
+	/* 10000-11fff space for banked ROMs (not used) */
 
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on GAME BOARD
+	ROM_LOAD( "ba3__09.2732.ic70",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) ) // == ea_9.2732.ic70
+	ROM_LOAD( "ba3__10.2732.ic71",  0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) ) // == ea_10.2732.ic71
+
+	ROM_REGION( 0x0800, "pal", 0 ) // on GAME BOARD
+	ROM_LOAD( "ww15.pal16l8.ic24.jed.bin",  0x0000, 0x0117, CRC(c3ec20d6) SHA1(4bcdd92ca6b75ba825a7f90b1f35d8dcaeaf8a96) ) // what format is this? jed2bin?
+
+	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_LOAD( "ba3__11.mc68705p3.ic24",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) ) // IC24 on the later CPU BOARD; The MCU itself has a strange custom from-factory silkscreen, rather than "MC68705P3S" it is labeled "15-00011-001 // DA68237"
+
+	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime, on L-shaped rom board */
+	ROM_LOAD( "ba3__05.2764.ic4",   0x0000, 0x2000, CRC(6c4ee58f) SHA1(122369a0fc901b0a60a3fb3b3646427beb1cd0c6) ) // == ea_20.2732.ic1 + ea_21.2732.ic2
+	ROM_LOAD( "ba3__06.2764.ic5",   0x2000, 0x2000, CRC(41ab0afc) SHA1(d18df5a5d054a35d20da04a3f35cf005387a1de4) ) // == ea_22.2732.ic3 + ea_23.2732.ic4
+	ROM_LOAD( "ba3__07.2764.ic9",   0x4000, 0x2000, CRC(efe43731) SHA1(7815df72f0d7a5752628986ec97de96fa764699e) ) // == ea_24.2732.ic5 + ea_25.2732.ic6
+	ROM_LOAD( "ba3__08.2764.ic10",  0x6000, 0x2000, CRC(3ca20696) SHA1(2c2d4f82a4e6aa72510337ee330d8c22098a0944) ) // == ea_26.2732.ic7 + ea_27.2732.ic8
+
+	ROM_REGION( 0x0100, "proms", 0 )      /* layer PROM */
+	ROM_LOAD( "eb16.ic22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
+ROM_END
 
 ROM_START( tinstar )
 	ROM_REGION( 0x12000, "maincpu", 0 )
@@ -2697,7 +2777,15 @@ ROM_END
 
 void taitosj_state::reset_common()
 {
-	m_sndnmi_disable = 1;
+	m_sndnmi_disable = false; // ay-3-8910 resets all registers to 0 on reset
+	m_sound_semaphore = false;
+	m_ay1->set_output_gain(0, 0.0); // 3 outputs for Ay1 since it doesn't use tied together outs
+	m_ay1->set_output_gain(1, 0.0);
+	m_ay1->set_output_gain(2, 0.0);
+	m_ay2->set_output_gain(0, 0.0);
+	m_ay3->set_output_gain(0, 0.0);
+	m_ay4->set_output_gain(0, 0.0);
+	m_dac->set_output_gain(0, 0.0);
 	m_input_port_4_f0 = 0;
 	/* start in 1st gear */
 	m_kikstart_gears[0] = 0x02;
@@ -2709,6 +2797,8 @@ void taitosj_state::reset_common()
 void taitosj_state::init_common()
 {
 	save_item(NAME(m_sndnmi_disable));
+	save_item(NAME(m_sound_cmd_written));
+	save_item(NAME(m_sound_semaphore));
 	save_item(NAME(m_input_port_4_f0));
 	save_item(NAME(m_kikstart_gears));
 	save_item(NAME(m_dac_out));
@@ -2771,8 +2861,9 @@ GAME( 1982, timetunl, 0,        nomcu,    timetunl, taitosj_state,   taitosj, RO
 GAME( 1982, wwestern, 0,        nomcu,    wwestern, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wwestern1,wwestern, nomcu,    wwestern, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, frontlin, 0,        mcu,      frontlin, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Front Line", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator, 0,        mcu,      elevator, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Elevator Action", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator, 0,        mcu,      elevator, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Elevator Action (5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, elevatorb,elevator, nomcu,    elevator, taitosj_state,   taitosj, ROT0,   "bootleg", "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator4,elevator, mcu,      elevator, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Elevator Action (4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tinstar,  0,        mcu,      tinstar, taitosj_state,    taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tinstar2, tinstar,  mcu,      tinstar, taitosj_state,    taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, waterski, 0,        nomcu,    waterski, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Water Ski", MACHINE_SUPPORTS_SAVE )

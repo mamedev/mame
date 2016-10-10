@@ -108,11 +108,11 @@ data / ay8910-#0 read
 81 ay8910-#1 read port
 
 write:
-60 ay8910-#0 controll port
+60 ay8910-#0 control port
 61 ay8910-#0 data port
-80 ay8910-#1 controll port
+80 ay8910-#1 control port
 81 ay8910-#1 data port
-   ay8910-A  : NMI controll ?
+   ay8910-A  : NMI control ?
 a0 unknown
 e0 unknown (watch dog?)
 
@@ -274,7 +274,7 @@ WRITE8_MEMBER(gsword_state::nmi_set_w)
 		break;
 	}
 	/* bit1= nmi disable , for ram check */
-	logerror("NMI controll %02x\n",data);
+	logerror("NMI control %02x\n",data);
 #endif
 }
 

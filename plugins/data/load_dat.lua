@@ -55,7 +55,7 @@ function datfile.open(file, vertag)
 							set:gsub("([^,]+)", function(s) sets[#sets + 1] = s end)
 							repeat
 								tag1, epos = iter()
-							until tag1:sub(1, 1) == "$" 
+							until tag1:sub(1, 1) == "$"
 							tag1 = tag1:match("^$([^%s]*)")
 							if not data[tag1] then
 								data[tag1] = {}
@@ -84,7 +84,7 @@ function datfile.open(file, vertag)
 		end
 		fh:seek("set", data[tag1][tag2][set])
 		for line in fh:lines() do
-			if line == "$end" then
+			if line:sub(1, 4) == "$end" then
 				return table.concat(output, "\n")
 			end
 			output[#output + 1] = line
@@ -94,4 +94,4 @@ function datfile.open(file, vertag)
 	return read, ver
 end
 
-return datfile 
+return datfile

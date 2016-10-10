@@ -34,10 +34,6 @@
 
 osd_video_config video_config;
 
-// monitor info
-std::list<std::shared_ptr<osd_monitor_info>> osd_monitor_info::list;
-
-
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
@@ -49,7 +45,6 @@ std::list<std::shared_ptr<osd_monitor_info>> osd_monitor_info::list;
 
 static void check_osd_inputs(running_machine &machine);
 
-static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
 
@@ -63,9 +58,6 @@ bool sdl_osd_interface::video_init()
 
 	// extract data from the options
 	extract_video_config();
-
-	// set up monitors first
-	sdl_monitor_info::init();
 
 	// we need the beam width in a float, contrary to what the core does.
 	video_config.beamwidth = options().beam_width_min();
@@ -82,7 +74,7 @@ bool sdl_osd_interface::video_init()
 		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
 
 		// create window ...
-		std::shared_ptr<sdl_window_info> win = std::make_shared<sdl_window_info>(machine(), index, osd_monitor_info::pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf);
+		std::shared_ptr<sdl_window_info> win = std::make_shared<sdl_window_info>(machine(), index, m_monitor_module->pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf);
 
 		if (win->window_init())
 			return false;
@@ -98,34 +90,6 @@ bool sdl_osd_interface::video_init()
 void sdl_osd_interface::video_exit()
 {
 	window_exit();
-	sdl_monitor_info::exit();
-}
-
-
-//============================================================
-//  sdlvideo_monitor_refresh
-//============================================================
-
-inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
-{
-	return osd_rect(r.x, r.y, r.w, r.h);
-}
-
-void sdl_monitor_info::refresh()
-{
-	SDL_DisplayMode dmode;
-
-	#if defined(SDLMAME_WIN32)
-	SDL_GetDesktopDisplayMode(m_handle, &dmode);
-	#else
-	SDL_GetCurrentDisplayMode(m_handle, &dmode);
-	#endif
-	SDL_Rect dimensions;
-	SDL_GetDisplayBounds(m_handle, &dimensions);
-
-	m_pos_size = SDL_Rect_to_osd_rect(dimensions);
-	m_usuable_pos_size = SDL_Rect_to_osd_rect(dimensions);
-	m_is_primary = (m_handle == 0);
 }
 
 //============================================================
@@ -153,116 +117,6 @@ void sdl_osd_interface::update(bool skip_redraw)
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
 }
-
-
-//============================================================
-//  init_monitors
-//============================================================
-
-void sdl_monitor_info::init()
-{
-	// make a list of monitors
-	{
-		int i;
-
-		osd_printf_verbose("Enter init_monitors\n");
-
-		for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
-		{
-			char temp[64];
-			snprintf(temp, sizeof(temp)-1, "%s%d", OSDOPTION_SCREEN,i);
-
-			// allocate a new monitor info
-
-			std::shared_ptr<osd_monitor_info> monitor = std::make_shared<sdl_monitor_info>(i, temp, 1.0f);
-
-			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->devicename(),
-					monitor->position_size().width(), monitor->position_size().height());
-
-			// guess the aspect ratio assuming square pixels
-			monitor->set_aspect(static_cast<float>(monitor->position_size().width()) / static_cast<float>(monitor->position_size().height()));
-
-			// hook us into the list
-			osd_monitor_info::list.push_back(monitor);
-		}
-	}
-	osd_printf_verbose("Leave init_monitors\n");
-}
-
-void sdl_monitor_info::exit()
-{
-	// free all of our monitor information
-	while (!osd_monitor_info::list.empty())
-	{
-		osd_monitor_info::list.remove(osd_monitor_info::list.front());
-	}
-}
-
-
-//============================================================
-//  pick_monitor
-//============================================================
-
-std::shared_ptr<osd_monitor_info> osd_monitor_info::pick_monitor(osd_options &generic_options, int index)
-{
-	sdl_options &options = reinterpret_cast<sdl_options &>(generic_options);
-	std::shared_ptr<osd_monitor_info> monitor;
-	const char *scrname, *scrname2;
-	int moncount = 0;
-	float aspect;
-
-	// get the screen option
-	scrname = options.screen();
-	scrname2 = options.screen(index);
-
-	// decide which one we want to use
-	if (strcmp(scrname2, "auto") != 0)
-		scrname = scrname2;
-
-	// get the aspect ratio
-	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
-
-	// look for a match in the name first
-	if (scrname != nullptr && (scrname[0] != 0))
-	{
-		for (auto mon : osd_monitor_info::list)
-		{
-			moncount++;
-			if (strcmp(scrname, mon->devicename()) == 0)
-			{
-				monitor = mon;
-				goto finishit;
-			}
-		}
-	}
-
-	// didn't find it; alternate monitors until we hit the jackpot
-	index %= moncount;
-	for (auto mon : osd_monitor_info::list)
-		if (index-- == 0)
-		{
-			monitor = mon;
-			goto finishit;
-		}
-
-	// return the primary just in case all else fails
-	for (auto mon : osd_monitor_info::list)
-		if (mon->is_primary())
-		{
-			monitor = mon;
-			goto finishit;
-		}
-
-	// FIXME: FatalError?
-finishit:
-	if (aspect != 0)
-	{
-		monitor->set_aspect(aspect);
-	}
-
-	return monitor;
-}
-
 
 //============================================================
 //  check_osd_inputs
@@ -476,26 +330,6 @@ void sdl_osd_interface::extract_video_config()
 		osd_printf_warning("scalemode is only for -video soft, overriding\n");
 		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
 	}
-}
-
-
-//============================================================
-//  get_aspect
-//============================================================
-
-static float get_aspect(const char *defdata, const char *data, int report_error)
-{
-	int num = 0, den = 1;
-
-	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
-	{
-		if (strcmp(defdata,OSDOPTVAL_AUTO) == 0)
-			return 0;
-		data = defdata;
-	}
-	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
-		osd_printf_error("Illegal aspect ratio value = %s\n", data);
-	return (float)num / (float)den;
 }
 
 

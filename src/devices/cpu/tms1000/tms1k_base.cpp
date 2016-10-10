@@ -74,6 +74,7 @@ void tms1k_base_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			str = string_format("%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
 			break;
 	}
@@ -194,7 +195,8 @@ void tms1k_base_device::device_start()
 	state_add(TMS1XXX_Y,      "Y",      m_y     ).formatstr("%01X");
 	state_add(TMS1XXX_STATUS, "STATUS", m_status).formatstr("%01X");
 
-	state_add(STATE_GENPC, "curpc", m_rom_address).formatstr("%03X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_rom_address).formatstr("%03X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_rom_address).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;

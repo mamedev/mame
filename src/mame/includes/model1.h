@@ -405,9 +405,9 @@ private:
 	std::unique_ptr<UINT32[]> m_poly_ram;
 
 	// Rendering helper functions
-	UINT32  readi(const UINT16 *adr) const;
-	INT16   readi16(const UINT16 *adr) const;
-	float   readf(const UINT16 *adr) const;
+	UINT32  readi(int adr) const;
+	INT16   readi16(int adr) const;
+	float   readf(int adr) const;
 	void    cross_product(point_t* o, const point_t* p, const point_t* q) const;
 	float   view_determinant(const point_t *p1, const point_t *p2, const point_t *p3) const;
 
@@ -441,17 +441,20 @@ private:
 	static float    max4f(float a, float b, float c, float d);
 	static float    compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse,int lmode);
 
+	int push_direct(int list_offset);
+	int draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, int list_offset);
+	int skip_direct(int list_offset) const;
 	void    push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size);
-	UINT16* push_direct(UINT16 *list);
-	UINT16* skip_direct(UINT16 *list) const;
 	void    draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT16* draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 *list);
 
-	UINT16* get_list();
+	void set_current_render_list();
 	int     get_list_number();
 	void    end_frame();
 
 	clipper_t m_clipfn[4];
+
+	// run-time rendering
+	UINT16* m_display_list_current;
 
 	optional_shared_ptr<UINT16> m_paletteram16;
 	required_device<palette_device> m_palette;
@@ -461,6 +464,7 @@ private:
 	UINT16  m_lamp_state;
 	optional_ioport_array<8> m_analog_ports;
 	required_ioport_array<3> m_digital_ports;
+
 };
 
 

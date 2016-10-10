@@ -13,7 +13,6 @@ local extlibs = {
 	portmidi   = { "portmidi",  "3rdparty/portmidi/pm_common" },
 	portaudio  = { "portaudio", "3rdparty/portaudio/include" },
 	lua        = { "lua",       "3rdparty/lua/src" },
-	uv         = { "uv" ,       "3rdparty/libuv/include" },
 }
 
 -- system lib options
@@ -50,11 +49,6 @@ newoption {
 newoption {
 	trigger = "with-system-lua",
 	description = "Use system LUA library",
-}
-
-newoption {
-	trigger = 'with-system-uv',
-	description = 'Use system uv library',
 }
 
 -- build helpers

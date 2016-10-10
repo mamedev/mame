@@ -42,6 +42,7 @@ public:
 	template<class _Object> static devcb_base &static_set_reset_callback(device_t &device, _Object object) { return downcast<gromport_device &>(device).m_console_reset.set_callback(object); }
 
 	void    cartridge_inserted();
+	bool    is_grom_idle();
 
 protected:
 	virtual void device_start() override;
@@ -100,6 +101,7 @@ public:
 
 	bool    is_available() { return m_pcb != nullptr; }
 	void    set_slot(int i);
+	bool    is_grom_idle();
 
 protected:
 	virtual void device_start() override { };
@@ -159,8 +161,7 @@ public:
 
 	virtual void insert(int index, ti99_cartridge_device* cart) { m_gromport->cartridge_inserted(); };
 	virtual void remove(int index) { };
-	// UINT16 grom_base();
-	// UINT16 grom_mask();
+	virtual bool is_grom_idle() =0;
 
 protected:
 	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
@@ -185,6 +186,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
 	DECLARE_WRITE8_MEMBER(set_gromlines) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
+
+	bool is_grom_idle() override;
 
 protected:
 	virtual void device_start() override;
@@ -220,6 +223,8 @@ public:
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
+
+	bool is_grom_idle() override;
 
 protected:
 	virtual void device_start() override;
@@ -257,6 +262,9 @@ public:
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
+
+	// We may have a cartridge plugged into the GK
+	bool is_grom_idle() override;
 
 protected:
 	virtual void device_start() override;
@@ -317,9 +325,11 @@ protected:
 	void                set_cartridge(ti99_cartridge_device *cart);
 	const char*         tag() { return m_tag; }
 	void                set_tag(const char* tag) { m_tag = tag; }
+	bool                is_grom_idle() { return m_grom_idle; }
 
 	ti99_cartridge_device*  m_cart;
 	tmc0430_device*     m_grom[5];
+	bool                m_grom_idle;
 	int                 m_grom_size;
 	int                 m_rom_size;
 	int                 m_ram_size;

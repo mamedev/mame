@@ -531,11 +531,11 @@ WRITE_LINE_MEMBER(jpmsys5_state::ptm_irq)
 	m_maincpu->set_input_line(INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(jpmsys5_state::u26_o1_callback)
+WRITE_LINE_MEMBER(jpmsys5_state::u26_o1_callback)
 {
-	if (m_mpxclk !=data)
+	if (m_mpxclk != state)
 	{
-		if (!data) //falling edge
+		if (!state) //falling edge
 		{
 			m_lamp_strobe++;
 			if (m_lamp_strobe >15)
@@ -545,7 +545,7 @@ WRITE8_MEMBER(jpmsys5_state::u26_o1_callback)
 		}
 		sys5_draw_lamps();
 	}
-	m_mpxclk = data;
+	m_mpxclk = state;
 }
 
 
@@ -672,7 +672,7 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 MACHINE_CONFIG_END
 
@@ -877,7 +877,7 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 
@@ -930,7 +930,7 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 

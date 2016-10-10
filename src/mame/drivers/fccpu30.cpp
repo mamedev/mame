@@ -232,10 +232,10 @@ fccpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	DECLARE_WRITE32_MEMBER (bootvect_w);
 
 	/* Interrupt  support */
-	//	IRQ_CALLBACK_MEMBER(maincpu_iack_callback);
+	//  IRQ_CALLBACK_MEMBER(maincpu_iack_callback);
 	DECLARE_WRITE_LINE_MEMBER(fga_irq_callback);
 	UINT8 fga_irq_state;
-	//	int fga_irq_vector;
+	//  int fga_irq_vector;
 	int fga_irq_level;
 
 	/* Rotary switch PIT input */
@@ -492,7 +492,7 @@ void fccpu30_state::update_irq_to_maincpu()
 	LOGINT((" - fga_irq_level: %02x\n", fga_irq_level));
 	LOGINT((" - fga_irq_state: %02x\n", fga_irq_state));
 	switch (fga_irq_level & 0x07)
-    {
+	{
 	case 1: m_maincpu->set_input_line(M68K_IRQ_1, fga_irq_state); break;
 	case 2: m_maincpu->set_input_line(M68K_IRQ_2, fga_irq_state); break;
 	case 3: m_maincpu->set_input_line(M68K_IRQ_3, fga_irq_state); break;
@@ -515,8 +515,8 @@ static MACHINE_CONFIG_START (fccpu30, fccpu30_state)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Terminal Port config */
-    /* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
-       firmware uses p1 as console and in an operating system environment there may be user login shells on the other.
+	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
+	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.
 
 	   In order to use more than just one terminal MAME supports serial socket servers to which it is possible to
 	   connect a telnet terminal to. The general syntax to open a socket server from the command prompts is:
@@ -537,27 +537,27 @@ static MACHINE_CONFIG_START (fccpu30, fccpu30_state)
 #define RS232P4_TAG      "rs232p4"
 
 	MCFG_DUSCC68562_ADD("duscc", DUSCC_CLOCK, 0, 0, 0, 0 )
-    /* Port 1 on Port B */
+	/* Port 1 on Port B */
 	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
 	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
-    /* Port 4 on Port A */
+	/* Port 4 on Port A */
 	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
 	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
-    /* DUSCC1 interrupt signal REQN is connected to LOCAL IRQ4 of the FGA-002 and level is programmable */
+	/* DUSCC1 interrupt signal REQN is connected to LOCAL IRQ4 of the FGA-002 and level is programmable */
 	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq4_w))
 
 	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
-    /* Port 2 on Port A */
+	/* Port 2 on Port A */
 	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
 	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
-    /* Port 3 on Port B */
+	/* Port 3 on Port B */
 	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
 	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
-    /* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
+	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
 	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq5_w))
 
 	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, nullptr)
@@ -700,7 +700,7 @@ ROM_END
  *  A Reg 04 <- 7f - Tx 8 bits, CTS and RTS, 1 STOP bit
  *  A Reg 06 <- 1b - Rx RTS, 8 bits, no DCD, no parity
  *  A Reg 0b <- e1 - RTS low, OUT1 = OUT2 = high, RxRdy asserted on FIFO not empty
- *            		  TxRdy asserted on FIFO not full, Same Tx Residual Character Length as for REG_TPR
+ *                    TxRdy asserted on FIFO not full, Same Tx Residual Character Length as for REG_TPR
  *  A Reg 0e <- 27 - TRxC = RxCLK 1x, RTxC is input, RTS, GPO2, crystal oscillator connected to X2
  *  A Reg 07 <- 2d - Rx BRG 9600 (assuming a 14.7456 crystal)
  *  A Reg 05 <- 3d - Tx BRG 9600 (assuming a 14.7456 crystal)

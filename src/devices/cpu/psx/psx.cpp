@@ -1820,6 +1820,7 @@ void psxcpu_device::device_start()
 	save_item( NAME( m_multiplier_operand2 ) );
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( PSXCPU_PC, "pc", m_pc );
 	state_add( PSXCPU_DELAYR, "delayr", m_delayr ).formatstr("%8s");
 	state_add( PSXCPU_DELAYV, "delayv", m_delayv );

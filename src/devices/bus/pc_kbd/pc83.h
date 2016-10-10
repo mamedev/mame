@@ -52,30 +52,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_dr00;
-	required_ioport m_dr01;
-	required_ioport m_dr02;
-	required_ioport m_dr03;
-	required_ioport m_dr04;
-	required_ioport m_dr05;
-	required_ioport m_dr06;
-	required_ioport m_dr07;
-	required_ioport m_dr08;
-	required_ioport m_dr09;
-	required_ioport m_dr10;
-	required_ioport m_dr11;
-	required_ioport m_dr12;
-	required_ioport m_dr13;
-	required_ioport m_dr14;
-	required_ioport m_dr15;
-	required_ioport m_dr16;
-	required_ioport m_dr17;
-	required_ioport m_dr18;
-	required_ioport m_dr19;
-	required_ioport m_dr20;
-	required_ioport m_dr21;
-	required_ioport m_dr22;
-	required_ioport m_dr23;
+	required_ioport_array<24> m_dr;
 
 	UINT8 m_cnt;
 };

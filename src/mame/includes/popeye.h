@@ -11,6 +11,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_color_prom(*this, "proms"),
+		m_color_prom_spr(*this, "sprpal"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
@@ -24,6 +26,9 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
+	required_region_ptr<UINT8> m_color_prom;
+	required_region_ptr<UINT8> m_color_prom_spr;
+
 	std::unique_ptr<UINT8[]> m_bitmapram;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
 	UINT8 m_invertmask;
@@ -47,6 +52,7 @@ public:
 	DECLARE_PALETTE_INIT(popeye);
 	DECLARE_VIDEO_START(popeye);
 	DECLARE_PALETTE_INIT(popeyebl);
+	DECLARE_PALETTE_INIT(skyskipr);
 	UINT32 screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(popeye_interrupt);
 	DECLARE_CUSTOM_INPUT_MEMBER( pop_field_r );

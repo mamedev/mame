@@ -262,14 +262,14 @@ public:
 		}
 
 		// convert the name to utf8
-		std::string namestring = utf8_from_tstring(instance.tszName);
+		std::string namestring = osd::text::from_tstring(instance.tszName);
 
 		// if no suffix, return as-is
 		if (suffix == nullptr)
 			return namestring;
 
 		// convert the suffix to utf8
-		std::string suffix_utf8 = utf8_from_tstring(suffix);
+		std::string suffix_utf8 = osd::text::from_tstring(suffix);
 
 		// Concat the name and suffix
 		return namestring + " " + suffix_utf8;

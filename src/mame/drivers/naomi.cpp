@@ -412,8 +412,8 @@ Puyo Puyo Da!                                   841-0006C    22206   20 (64Mb)  
 Ring Out 4x4                                    840-0004C    21779   10 (64Mb)   present     315-6213  317-0250-COM   requires 2 JVS boards
 Samba de Amigo (Rev B) (Rev A)                  840-0020C    22966B  16 (64Mb)   present     315-6213  317-0270-COM   will boot but requires special controller to play it
 Sega Marine Fishing                             840-0027C    22221   10 (64Mb)   ?           315-6213  not present    ROM 3&4 not present. Requires 837-13844 JVS IO with all DIPSW Off and fishing controller
-Sega Strike Fighter (Rev A, set 1)              840-0035C    23323A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on case
-Sega Strike Fighter (Rev A, set 2)              840-0035C    23786A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on PCB
+Sega Strike Fighter (Rev A)                     840-0035C    23323A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on case
+Sega Strike Fighter (Rev A, no training mode)   840-0035C    23786A  20 (64Mb)   present     315-6213  317-0281-COM   have no training mode, "Rev. A" label on PCB, cart case have no revision label
 Sega Tetris                                     840-0018C    22909    6 (64Mb)   present     315-6213  317-0268-COM
 Slashout                                        840-0041C    23341   17 (64Mb)   ?           315-6213  317-0286-COM   joystick + 4 buttons
 Spawn In the Demon's Hand (Rev B)               841-0005C    22977B  10 (64Mb)   ?           315-6213  317-5051-COM   joystick + 4 buttons
@@ -2962,8 +2962,8 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 	ROM_REGION( 0x4000, "altera_pof", 0) \
 	ROM_LOAD("315-6188.ic31", 0x0000, 0x2034, CRC(7c9fea46) SHA1(f77c07ae65dfed18c1c4c632c8945be21d02ddaf) )
 
-/* 
- dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096 
+/*
+ dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096
 
  zukinver0930.ipl comes from 837-13502-01 / 837-13663 PCB which contains:
   22 empty sockets ROM0 - ROM21
@@ -4968,7 +4968,6 @@ ROM_START( sstrkfgt )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28132303" )
 ROM_END
 
-// EPR ROM have different number, possible updated/bugfixed re-release or STD/DLX version, difference with original set is unknown, have "Rev.A" label too
 ROM_START( sstrkfgta )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -9610,8 +9609,8 @@ ROM_END
 /* 0027 */ GAME( 2000, smarinef, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Sega Marine Fishing", GAME_FLAGS )
 /* 0028 */ GAME( 2000, vonot,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_FLAGS )
 /* 0030 */ GAME( 2000, qmegamis, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Quiz Ah Megamisama", GAME_FLAGS )
-/* 0035 */ GAME( 2000, sstrkfgt, naomi,    naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, set 1)", GAME_FLAGS )
-/* 0035 */ GAME( 2000, sstrkfgta,sstrkfgt, naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, set 2)", GAME_FLAGS )
+/* 0035 */ GAME( 2000, sstrkfgt, naomi,    naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A)", GAME_FLAGS )
+/* 0035 */ GAME( 2000, sstrkfgta,sstrkfgt, naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, no training mode)", GAME_FLAGS )
 /* 0036 */ GAME( 2000, 18wheels, 18wheelr, naomim2, 18wheelr,naomi_state, naomi,   ROT0, "Sega", "18 Wheeler (standard)", GAME_FLAGS )
 /* 0037 */ GAME( 2000, 18wheelu, 18wheelr, naomim2, 18wheelr,naomi_state, naomi,   ROT0, "Sega", "18 Wheeler (upright)", GAME_FLAGS )
 /* 0039 */ GAME( 2000, gram2000, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
@@ -9714,7 +9713,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 25469801 */ GAME( 2000, ninjaslta,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (Asia, NJA2 Ver.A)", GAME_FLAGS )
 /* 25469801 */ GAME( 2000, ninjasltu,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (US, NJA3 Ver.A)", GAME_FLAGS )
 /* 25469801 */ GAME( 2000, ninjaslt, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (World, NJA4 Ver.A)", GAME_FLAGS )
-/* 25509801 */ GAME( 2000, wldkicksj,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks PCB (Japan, WKC1 Ver.A)", GAME_FLAGS )	// "PCB" means upright version, uses analog button on control panel to kick the ball
+/* 25509801 */ GAME( 2000, wldkicksj,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks PCB (Japan, WKC1 Ver.A)", GAME_FLAGS )    // "PCB" means upright version, uses analog button on control panel to kick the ball
 /* 25709801 */ GAME( 2001, gunsur2j, gunsur2, naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)", GAME_FLAGS )
 /* 25709801 */ GAME( 2001, gunsur2,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)", GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazana,   mazan,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)", GAME_FLAGS )

@@ -91,7 +91,7 @@ const directory::entry *win_directory::read()
 	m_is_first = false;
 
 	// extract the data
-	utf8_from_tstring(m_name, m_data.cFileName);
+	osd::text::from_tstring(m_name, m_data.cFileName);
 	m_entry.name = m_name.c_str();
 	m_entry.type = win_attributes_to_entry_type(m_data.dwFileAttributes);
 	m_entry.size = m_data.nFileSizeLow | (std::uint64_t(m_data.nFileSizeHigh) << 32);
@@ -112,7 +112,7 @@ bool win_directory::open_impl(std::string const &dirname)
 	std::string dirfilter = string_format("%s\\*.*", dirname);
 
 	// convert the path to TCHARs
-	auto t_dirfilter = tstring_from_utf8(dirfilter.c_str());
+	osd::text::tstring t_dirfilter = osd::text::to_tstring(dirfilter);
 
 	// attempt to find the first file
 	m_find = FindFirstFileEx(t_dirfilter.c_str(), FindExInfoStandard, &m_data, FindExSearchNameMatch, nullptr, 0);

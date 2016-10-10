@@ -121,6 +121,11 @@ void ti_speech_synthesizer_device::device_start()
 	// Need to configure the speech ROM for inverse bit order
 	speechrom_device* mem = subdevice<speechrom_device>("vsm");
 	mem->set_reverse_bit_order(true);
+
+	// We don't need to save m_space because the calling method
+	// combined_rsq_wsq_w only needs the address space formally.
+	save_item(NAME(m_reading));
+	save_item(NAME(m_sbe));
 }
 
 void ti_speech_synthesizer_device::device_reset()

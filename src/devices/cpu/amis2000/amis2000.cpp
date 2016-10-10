@@ -170,7 +170,8 @@ void amis2000_base_device::device_start()
 	state_add(S2000_E,      "E",      m_e     ).formatstr("%01X");
 	state_add(S2000_CY,     "CY",     m_carry ).formatstr("%01X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%6s").noshow();
 
 	m_icountptr = &m_icount;

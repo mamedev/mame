@@ -74,7 +74,6 @@
 #define IDE_IRQ_NUM             MIPS3_IRQ4
 
 #define LOG_RTC         (0)
-#define LOG_RED         (0)
 #define LOG_PORT        (0)
 #define LOG_IRQ         (0)
 

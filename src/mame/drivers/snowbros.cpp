@@ -556,6 +556,36 @@ static ADDRESS_MAP_START( finalttr_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( yutnori_map, AS_PROGRAM, 16, snowbros_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+
+	// 0x100000  clr.w on startup
+
+	// 0x200000 could be the protection device, it makes several writes, then executes an entire subroutine of NOPs..
+
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("SYSTEM")
+
+	// could be one of the OKIs? but gets value to write from RAM, always seems to be 0?
+	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP
+	AM_RANGE(0x30000e, 0x30000f) AM_READNOP //AM_READ( yutnori_unk_r ) // ??
+
+//	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // maybe?
+	AM_RANGE(0x400000, 0x400001) AM_NOP
+
+	AM_RANGE(0x500000, 0x5001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+
+	AM_RANGE(0x600000, 0x601fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
+
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM
+
+	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
+	AM_RANGE(0x900000, 0x900001) AM_READNOP AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
+	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( snowbros )
 	PORT_START("DSW1")  /* 500001 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Region ) )       PORT_DIPLOCATION("SW1:1") /* Listed as "NOT USE" in the manual */
@@ -1537,6 +1567,84 @@ static INPUT_PORTS_START( suhosong )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+
+
+static INPUT_PORTS_START( yutnori )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x007,  0x0007, "Coin / Credit" ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(      0x0004, "1 / 50" )
+	PORT_DIPSETTING(      0x0003, "1 / 40" )
+	PORT_DIPSETTING(      0x0002, "1 / 30" )
+	PORT_DIPSETTING(      0x0007, "2 / 50" )
+	PORT_DIPSETTING(      0x0006, "2 / 40" )
+	PORT_DIPSETTING(      0x0005, "2 / 30" )
+	PORT_DIPSETTING(      0x0001, "3 / 50" )
+	PORT_DIPSETTING(      0x0000, "3 / 40" )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(      0x0030, "1" )
+	PORT_DIPSETTING(      0x0028, "2" )
+	PORT_DIPSETTING(      0x0020, "3" )
+	PORT_DIPSETTING(      0x0038, "4" )
+	PORT_DIPSETTING(      0x0018, "5" )
+	PORT_DIPSETTING(      0x0010, "6" )
+	PORT_DIPSETTING(      0x0008, "7" )
+	PORT_DIPSETTING(      0x0000, "8" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Mal Count" )   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Base Bet" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPSETTING(    0x01, "30" )
+	PORT_DIPSETTING(    0x02, "40" )
+	PORT_DIPSETTING(    0x03, "50" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x04, "150" )
+	PORT_DIPSETTING(    0x08, "200" )
+	PORT_DIPSETTING(    0x0c, "300" )
+	PORT_DIPSETTING(    0x00, "400" )
+	PORT_DIPNAME( 0x30, 0x30, "Score" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x10, "800 1200 1600" )
+	PORT_DIPSETTING(    0x30, "1000 1500 2000" )
+	PORT_DIPSETTING(    0x00, "1200 1800 2400" )
+	PORT_DIPSETTING(    0x20, "1000 2000 3000" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Bet -> Score" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW2:8" )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 /* SnowBros */
 
 static const gfx_layout tilelayout =
@@ -1893,6 +2001,44 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state ) /* PCB has 16MHz & 12MHz
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+
+static MACHINE_CONFIG_START( yutnori, snowbros_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)
+	MCFG_CPU_PROGRAM_MAP(yutnori_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
+
+//	MCFG_WATCHDOG_ADD("watchdog") // maybe
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
+	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperpac)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
+	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2603,6 +2749,27 @@ ROM_START( suhosong )
 ROM_END
 
 
+ROM_START( yutnori )
+	ROM_REGION( 0x80000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "SYS_D0-D7",    0x000001, 0x20000, CRC(d5c853da) SHA1(578f29c3a307f82fcaa23a7fe2931c0a673e777e) )
+	ROM_LOAD16_BYTE( "SYS_D8-D15",   0x000000, 0x20000, CRC(bf108119) SHA1(e64f64ddb577d6750cbc3a6c9d8d2ec4482cafe0) )
+
+	ROM_REGION( 0x4010, "mcu", 0 )    /* PIC code */
+	ROM_LOAD( "pic16c64a-04-p",    0x000000, 0x4010, BAD_DUMP CRC(46fd3671) SHA1(54cf7a38f7743cdad73a2741183b2720ee42e6c8) ) // dump seems to be 99% empty, protected, only configuration bytes dumped?
+		
+	ROM_REGION( 0x120000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "GRAPHICS_ROM_1",    0x000000, 0x80000, CRC(d4881b49) SHA1(e169b7eca48a0bd66ad55fe21197a4bb491198bb) )
+	ROM_LOAD( "GRAPHICS_ROM_2",    0x080000, 0x80000, CRC(8cd9ce60) SHA1(d1db929ca6128ec2ebe983e6161f200ba421bd31) )
+	ROM_LOAD( "GRAPHICS_ROM_3",    0x100000, 0x20000, CRC(04f7c2ac) SHA1(927fa0f76ff1801845776d47aa5311f485b0b809) )
+	
+	ROM_REGION(0x80000, "oki1", 0 ) // 2 banks, 1 large sample in each (music)
+	ROM_LOAD("SOUND ROM", 0x000000, 0x080000, CRC(d24c2e43) SHA1(5c7a130048463558d695857ffc056a95a8072219) )
+
+	ROM_REGION(0x40000, "oki2", 0 ) 
+	ROM_LOAD("VOICE_ROM", 0x000000, 0x040000, CRC(25e85201) SHA1(6c0001e2942f49b62e1bbf3a68c59abad1e2f94c) )
+ROM_END
+
+
 
 DRIVER_INIT_MEMBER(snowbros_state,cookbib2)
 {
@@ -2727,6 +2894,17 @@ DRIVER_INIT_MEMBER(snowbros_state, hyperpac)
 }
 
 
+DRIVER_INIT_MEMBER(snowbros_state, yutnori)
+{
+	// presumably related to the PIC protection
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	rom[0x4878 / 2] = 0x4e71;
+	rom[0xd820 / 2] = 0x4e71;
+	rom[0xc3b6 / 2] = 0x4e71;
+
+	m_pandora->set_bg_pen(0xf0);
+}
+
 GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, snowbrosa, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", MACHINE_SUPPORTS_SAVE )
@@ -2770,3 +2948,5 @@ GAME( 1996, multi96,  twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Bar
 // these use an MCU to drive the sound
 GAME( 2002, snowbro3, 0,        snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
 GAME( 2003, ballboy,  snowbro3, snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "bootleg", "Ball Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1999, yutnori,    0,        yutnori, yutnori, snowbros_state, yutnori, ROT0, "Nunal",                        "Puzzle Yutnori (Korea)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer

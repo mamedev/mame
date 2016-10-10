@@ -823,6 +823,14 @@ static INPUT_PORTS_START( tetrisse ) /* Used By Tetris */
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( slapshtr )
+	PORT_INCLUDE( segae_joy1_generic )
+
+	PORT_MODIFY("f3")   /* Read from Port 0xf3 */
+	// todo
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( hangonjr ) /* Used By Hang On Jr */
 	PORT_INCLUDE( segae_hangonjr_generic )
 
@@ -921,6 +929,17 @@ ROM_START( tetrisse )
 	ROM_LOAD( "epr12211.4", 0x18000, 0x08000, CRC(5aa114e9) SHA1(f9fc7fe4d0444a264185e74d2abc8475f0976534) )
 	/* ic3 unpopulated */
 	/* ic2 unpopulated */
+ROM_END
+
+// ROM BD # 834-5930
+ROM_START( slapshtr )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "epr-7351.ic7",   0x00000, 0x08000, CRC(894adb04) SHA1(e38d296aa56c531985cde75423ae03f0d9cc8f5d) ) /* Fixed Code */
+
+	ROM_LOAD( "epr-7352.ic5",   0x10000, 0x08000, CRC(61c938b6) SHA1(bdce617050371c7b2880967c7c7356f34b91911d) )
+	ROM_LOAD( "epr-7353.ic4",   0x18000, 0x08000, CRC(8ee2951a) SHA1(562fef28e6358cbbb4889cc7cd592ca659c238fb) )
+	ROM_LOAD( "epr-7354.ic3",   0x20000, 0x08000, CRC(41482aa0) SHA1(280d5a1c5685c692a924c62ed928fc25fec2352a) )
+	ROM_LOAD( "epr-7355.ic2",   0x28000, 0x08000, CRC(c67e1aef) SHA1(121bc40d652449c7b1b5f66a837baeaffb7af0b9) )
 ROM_END
 
 
@@ -1064,3 +1083,4 @@ GAME( 1986, ridleofp, 0,        systeme,  ridleofp, systeme_state, ridleofp, ROT
 GAME( 1987, opaopa,   0,        systemeb, opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, fantzn2,  0,        systemex, fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tetrisse, 0,        systeme,  tetrisse, driver_device, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, slapshtr, 0,        systeme,  slapshtr, driver_device, 0,        ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer

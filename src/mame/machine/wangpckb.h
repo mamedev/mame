@@ -82,25 +82,10 @@ protected:
 
 private:
 	required_device<i8051_device> m_maincpu;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_ya;
-	required_ioport m_yb;
-	required_ioport m_yc;
-	required_ioport m_yd;
-	required_ioport m_ye;
-	required_ioport m_yf;
+	required_ioport_array<16> m_y;
 	devcb_write_line m_txd_handler;
 
-	UINT8 m_y;
+	UINT8 m_keylatch;
 	int m_rxd;
 };
 

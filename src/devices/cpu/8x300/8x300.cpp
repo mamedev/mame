@@ -140,7 +140,8 @@ void n8x300_cpu_device::device_start()
 	state_add( _8X300_OVF,  "OVF",  m_OVF).mask(0x01).formatstr("%01X");
 	state_add( _8X300_IVL,  "IVL",  m_IVL).mask(0xff).formatstr("%02X");
 	state_add( _8X300_IVR,  "IVR",  m_IVR).mask(0xff).formatstr("%02X");
-	state_add(STATE_GENPC, "curpc", m_genPC).noshow();
+	state_add(STATE_GENPC, "GENPC", m_genPC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_genPC).noshow();
 
 	m_icountptr = &m_icount;
 }

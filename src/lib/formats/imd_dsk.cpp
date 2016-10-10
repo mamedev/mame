@@ -498,7 +498,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, gap_3);
 
 		for(int i=0; i<sector_count; i++)
-			if(sects[i].data && (sects[i].data < &img[0] || sects[i].data >= &img[size]))
+			if(sects[i].data && (sects[i].data < &img[0] || sects[i].data >= (&img[0] + size)))
 				global_free_array(sects[i].data);
 	}
 

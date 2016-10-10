@@ -288,6 +288,10 @@ static const code_string_table itemid_token_table[] =
 	{ ITEM_ID_PLUS_PAD,      "PLUSPAD" },
 	{ ITEM_ID_DEL_PAD,       "DELPAD" },
 	{ ITEM_ID_ENTER_PAD,     "ENTERPAD" },
+	{ ITEM_ID_BS_PAD,        "BSPAD" },
+	{ ITEM_ID_TAB_PAD,       "TABPAD" },
+	{ ITEM_ID_00_PAD,        "00PAD" },
+	{ ITEM_ID_000_PAD,       "000PAD" },
 	{ ITEM_ID_PRTSCR,        "PRTSCR" },
 	{ ITEM_ID_PAUSE,         "PAUSE" },
 	{ ITEM_ID_LSHIFT,        "LSHIFT" },
@@ -2106,7 +2110,7 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 }
 
 //-------------------------------------------------
-//  map_device_to_controller - map device to 
+//  map_device_to_controller - map device to
 //  controller based on device map table
 //-------------------------------------------------
 
@@ -2117,13 +2121,13 @@ bool input_manager::map_device_to_controller(const devicemap_table_type *devicem
 
 	for (devicemap_table_type::const_iterator it = devicemap_table->begin(); it != devicemap_table->end(); it++)
 	{
-		const char *deviceid = it->first.c_str(); 
-		const char *controllername = it->second.c_str(); 
+		const char *deviceid = it->first.c_str();
+		const char *controllername = it->second.c_str();
 
 		// tokenize the controller name into device class and index (i.e. controller name should be of the form "GUNCODE_1")
 		std::string token[2];
 		int numtokens;
-		const char *_token = controllername; 
+		const char *_token = controllername;
 		for (numtokens = 0; numtokens < ARRAY_LENGTH(token); )
 		{
 			// make a token up to the next underscore

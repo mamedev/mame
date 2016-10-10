@@ -394,6 +394,7 @@ fungames.cpp
 funkball.cpp
 funkybee.cpp
 funkyjet.cpp
+funtech.cpp
 funworld.cpp
 funybubl.cpp
 fuukifg2.cpp
@@ -527,6 +528,7 @@ iqblock.cpp
 irobot.cpp
 ironhors.cpp
 istellar.cpp
+istrebiteli.cpp
 iteagle.cpp
 itech32.cpp
 itech8.cpp
@@ -663,6 +665,7 @@ marineb.cpp
 marinedt.cpp
 mario.cpp
 markham.cpp
+marywu.cpp
 mastboy.cpp
 matmania.cpp
 maxaflex.cpp

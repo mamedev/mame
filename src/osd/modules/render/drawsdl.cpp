@@ -27,6 +27,7 @@
 #include "window.h"
 
 #include "drawsdl.h"
+#include "modules/monitor/monitor_module.h"
 
 //============================================================
 //  DEBUGGING
@@ -108,7 +109,7 @@ void renderer_sdl1::setup_texture(const osd_dim &size)
 	auto win = assert_window();
 
 	// Determine preferred pixelformat and set up yuv if necessary
-	SDL_GetCurrentDisplayMode(*((UINT64 *)win->monitor()->oshandle()), &mode);
+	SDL_GetCurrentDisplayMode(win->monitor()->oshandle(), &mode);
 
 	if (m_yuv_bitmap)
 	{

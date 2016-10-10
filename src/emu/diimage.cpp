@@ -542,8 +542,8 @@ UINT32 device_image_interface::crc()
 
 //-------------------------------------------------
 //  support_command_line_image_creation - do we
-//	want to support image creation from the front
-//	end command line?
+//  want to support image creation from the front
+//  end command line?
 //-------------------------------------------------
 
 bool device_image_interface::support_command_line_image_creation() const

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "emuopts.h"
+#include "natkeyboard.h"
 #include "mame.h"
 #include "luaengine.h"
 #include "ui/menu.h"
@@ -108,7 +109,7 @@ void menu_main::populate()
 		item_append(_("Network Devices"), "", 0, (void*)NETWORK_DEVICES);
 
 	/* add keyboard mode menu */
-	if (machine().ioport().has_keyboard() && machine().ioport().natkeyboard().can_post())
+	if (ui().machine_info().has_keyboard() && machine().ioport().natkeyboard().can_post())
 		item_append(_("Keyboard Mode"), "", 0, (void *)KEYBOARD_MODE);
 
 	/* add sliders menu */
@@ -129,7 +130,7 @@ void menu_main::populate()
 		item_append(_("Plugin Options"), "", 0, (void *)PLUGINS);
 
 	// add dats menu
-	if (ui().options().enabled_dats() && mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
+	if (mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
 		item_append(_("External DAT View"), "", 0, (void *)EXTERNAL_DATS);
 
 	item_append(menu_item_type::SEPARATOR);

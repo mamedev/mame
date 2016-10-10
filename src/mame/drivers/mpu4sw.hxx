@@ -1242,7 +1242,7 @@ ROM_START( m4eaw__bz ) \
 	M4EAW_EXTRA_ROMS
 ROM_END
 
-GAME(199?, m4eaw__bz, m4eaw ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,"Barcrest","Everyone's A Winner (Barcrest) (MPU4) (unkown rev, bad)",GAME_FLAGS )
+GAME(199?, m4eaw__bz, m4eaw ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,"Barcrest","Everyone's A Winner (Barcrest) (MPU4) (unknown rev, bad)",GAME_FLAGS )
 
 #define M4WTA_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \

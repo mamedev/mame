@@ -137,6 +137,7 @@ void lh5801_cpu_device::device_start()
 	state_add( LH5801_DP, "DP", m_dp    ).formatstr("%04X");
 
 	state_add(STATE_GENPC,  "GENPC",  m_p.w.l).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_p.w.l).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_t).noshow().formatstr("%8s");
 
 	m_icountptr = &m_icount;

@@ -1041,6 +1041,24 @@ void ti_rs232_pio_device::device_start()
 	m_pio_write = true; // required for call_load of pio_attached_device
 	m_pio_writable = false;
 	m_pio_handshakein = false;
+
+	// We don't save the receive buffers for persistent state
+	save_pointer(NAME(m_signals),2);
+	save_pointer(NAME(m_recv_mode),2);
+	save_pointer(NAME(m_time_hold),2);
+	save_item(NAME(m_pio_direction_in));
+	save_item(NAME(m_pio_handshakeout));
+	save_item(NAME(m_pio_handshakein));
+	save_item(NAME(m_pio_spareout));
+	save_item(NAME(m_pio_sparein));
+	save_item(NAME(m_flag0));
+	save_item(NAME(m_led));
+	save_item(NAME(m_pio_out_buffer));
+	save_item(NAME(m_pio_in_buffer));
+	save_item(NAME(m_pio_readable));
+	save_item(NAME(m_pio_writable));
+	save_item(NAME(m_pio_write));
+	save_item(NAME(m_ila));
 }
 
 void ti_rs232_pio_device::device_stop()

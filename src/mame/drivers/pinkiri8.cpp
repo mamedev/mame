@@ -1086,7 +1086,7 @@ static GFXDECODE_START( pinkiri8 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( pinkiri8, pinkiri8_state )
-	MCFG_CPU_ADD("maincpu",Z180,16000000)
+	MCFG_CPU_ADD("maincpu",Z180,XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pinkiri8_map)
 	MCFG_CPU_IO_MAP(pinkiri8_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pinkiri8_state, nmi_line_assert)
@@ -1150,7 +1150,7 @@ ROM_START( janshi )
 	ROM_LOAD( "6.1k", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
 ROM_END
 
-ROM_START( ronjan )
+ROM_START( ronjans )
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "ver201.bin",    0x00000, 0x20000, CRC(caa98c79) SHA1(e18f52fc910e3a77142ad2a3167805cfd664f0f4) )
 	ROM_LOAD( "9009 1996.08 ron jan.bin", 0x00000, 0x4000, CRC(4eb74322) SHA1(84f864c0da3fb69948f6eb7ffecf0e722a882efc) ) //overlapped internal ROM
@@ -1166,6 +1166,21 @@ ROM_START( ronjan )
 	ROM_LOAD( "eagle.6", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
 ROM_END
 
+ROM_START( ronjan ) // the Z180 internal ROM wasn't extracted from this PCB. Using the one from the above set for the time being, which might be the same but should be checked.
+	ROM_REGION( 0x24000, "maincpu", 0 )
+	ROM_LOAD( "9.l1",    0x00000, 0x20000, CRC(1bc4468e) SHA1(5b317c922d9a6f533958526e676f95af0ee6a19f) )
+	ROM_LOAD( "9009 1991.11 ron jan.bin", 0x00000, 0x4000, BAD_DUMP CRC(4eb74322) SHA1(84f864c0da3fb69948f6eb7ffecf0e722a882efc) ) //overlapped internal ROM
+
+	ROM_REGION( 0x140000, "gfx1", 0 )
+	ROM_LOAD( "1.a1", 0x000000, 0x20000, CRC(8242a791) SHA1(bb753e81293685499513e83b7a103396b3a32ad8) )
+	ROM_LOAD( "2.c1", 0x040000, 0x20000, CRC(4b25c09a) SHA1(edbe1907c300f12bf65c81b2d9e034d6f5545bd0) )
+	ROM_LOAD( "3.d1", 0x080000, 0x20000, CRC(7b956af6) SHA1(4a661d5cc5b06658804c8d377d5a266f5bd9ce85) )
+	ROM_LOAD( "4.f1", 0x0c0000, 0x20000, CRC(4bebed0b) SHA1(f6e95b3aad1905a397b594db43c65902330945f4) )
+	ROM_LOAD( "5.h1", 0x100000, 0x20000, CRC(ec1d36bf) SHA1(5db8cfeea40a85ba62730976b15e8ed00e541dd2) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "6.j1", 0x00000, 0x20000, CRC(d0b53513) SHA1(e94402f494adae741989c98a8c9587f464f144d2) )
+ROM_END
 
 READ8_MEMBER(pinkiri8_state::ronjan_prot_r)
 {
@@ -1214,6 +1229,7 @@ DRIVER_INIT_MEMBER(pinkiri8_state,ronjan)
 	m_maincpu->space(AS_IO).install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), this));
 }
 
-GAME( 1992,  janshi,    0,   pinkiri8, janshi, driver_device,    0,      ROT0, "Eagle",         "Janshi",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1994,  ronjan,    0,   pinkiri8, ronjan, pinkiri8_state,    ronjan, ROT0, "Wing Co., Ltd", "Ron Jan (Super)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
-GAME( 1994,  pinkiri8,  0,   pinkiri8, pinkiri8, driver_device,  0,      ROT0, "Alta",          "Pinkiri 8",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1992,  janshi,   0,       pinkiri8, janshi,   driver_device,  0,      ROT0, "Eagle",         "Janshi",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1991,  ronjan,   ronjans, pinkiri8, ronjan,   pinkiri8_state, ronjan, ROT0, "Wing Co., Ltd", "Ron Jan",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1994,  ronjans,  0,       pinkiri8, ronjan,   pinkiri8_state, ronjan, ROT0, "Wing Co., Ltd", "Ron Jan Super", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
+GAME( 1994,  pinkiri8, 0,       pinkiri8, pinkiri8, driver_device,  0,      ROT0, "Alta",          "Pinkiri 8",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

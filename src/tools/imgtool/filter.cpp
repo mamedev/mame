@@ -61,6 +61,7 @@ const filter_getinfoproc filters[] =
 	filter_thombas128_getinfo,
 	filter_thomcrypt_getinfo,
 	filter_bml3bas_getinfo,
+		filter_hp9845data_getinfo,
 	nullptr
 };
 

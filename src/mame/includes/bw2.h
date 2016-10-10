@@ -31,31 +31,22 @@
 class bw2_state : public driver_device
 {
 public:
-	bw2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_uart(*this, I8251_TAG),
-			m_fdc(*this, WD2797_TAG),
-			m_lcdc(*this, MSM6255_TAG),
-			m_pit(*this, I8253_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_exp(*this, BW2_EXPANSION_SLOT_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, WD2797_TAG":0"),
-			m_floppy1(*this, WD2797_TAG":1"),
-			m_floppy(nullptr),
-			m_rom(*this, Z80_TAG),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8"),
-			m_y9(*this, "Y9"),
-			m_video_ram(*this, "videoram")
+	bw2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_uart(*this, I8251_TAG),
+		m_fdc(*this, WD2797_TAG),
+		m_lcdc(*this, MSM6255_TAG),
+		m_pit(*this, I8253_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_exp(*this, BW2_EXPANSION_SLOT_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, WD2797_TAG":0"),
+		m_floppy1(*this, WD2797_TAG":1"),
+		m_floppy(nullptr),
+		m_rom(*this, Z80_TAG),
+		m_y(*this, "Y%u", 0),
+		m_video_ram(*this, "videoram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -70,16 +61,7 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
 	required_memory_region m_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
+	required_ioport_array<10> m_y;
 
 	virtual void machine_start() override;
 

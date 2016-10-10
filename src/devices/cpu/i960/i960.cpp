@@ -2070,6 +2070,7 @@ void i960_cpu_device::device_start()
 	state_add( I960_G15,  "fp", m_r[31]).formatstr("%08X");
 
 	state_add( STATE_GENPC, "GENPC", m_IP).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_IP).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_AC).noshow().formatstr("%2s");
 
 	m_immediate_vector = 0;

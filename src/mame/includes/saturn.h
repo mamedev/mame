@@ -16,6 +16,10 @@
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
 
+#include "debug/debugcon.h"
+#include "debug/debugcmd.h"
+#include "debugger.h"
+
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
 #define MAX_DIR_SIZE    (256*1024)
@@ -684,6 +688,11 @@ public:
 	void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv);
 	DECLARE_READ8_MEMBER( stv_SMPC_r );
 	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
+
+	void debug_scudma_command(int ref, int params, const char **param);
+	void debug_scuirq_command(int ref, int params, const char **param);
+	void debug_help_command(int ref, int params, const char **param);
+	void debug_commands(int ref, int params, const char **param);
 
 };
 

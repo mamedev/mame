@@ -190,7 +190,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("YA")
+	PORT_START("Y10")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -200,7 +200,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("YB")
+	PORT_START("Y11")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -210,7 +210,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("YC")
+	PORT_START("Y12")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -248,19 +248,7 @@ ioport_constructor apricot_keyboard_device::device_input_ports() const
 apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock, "aprikb", __FILE__),
 	m_write_txd(*this),
-	m_y0(*this, "Y0"),
-	m_y1(*this, "Y1"),
-	m_y2(*this, "Y2"),
-	m_y3(*this, "Y3"),
-	m_y4(*this, "Y4"),
-	m_y5(*this, "Y5"),
-	m_y6(*this, "Y6"),
-	m_y7(*this, "Y7"),
-	m_y8(*this, "Y8"),
-	m_y9(*this, "Y9"),
-	m_ya(*this, "YA"),
-	m_yb(*this, "YB"),
-	m_yc(*this, "YC"),
+	m_y(*this, "Y%u", 0),
 	m_modifiers(*this, "MODIFIERS")
 {
 }
@@ -294,19 +282,10 @@ UINT8 apricot_keyboard_device::read_keyboard()
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_kb_y, 0)) data &= m_y0->read();
-	if (!BIT(m_kb_y, 1)) data &= m_y1->read();
-	if (!BIT(m_kb_y, 2)) data &= m_y2->read();
-	if (!BIT(m_kb_y, 3)) data &= m_y3->read();
-	if (!BIT(m_kb_y, 4)) data &= m_y4->read();
-	if (!BIT(m_kb_y, 5)) data &= m_y5->read();
-	if (!BIT(m_kb_y, 6)) data &= m_y6->read();
-	if (!BIT(m_kb_y, 7)) data &= m_y7->read();
-	if (!BIT(m_kb_y, 8)) data &= m_y8->read();
-	if (!BIT(m_kb_y, 9)) data &= m_y9->read();
-	if (!BIT(m_kb_y, 10)) data &= m_ya->read();
-	if (!BIT(m_kb_y, 11)) data &= m_yb->read();
-	if (!BIT(m_kb_y, 12)) data &= m_yc->read();
+	for (int i = 0; i < 13; i++)
+	{
+		if (!BIT(m_kb_y, i)) data &= m_y[i]->read();
+	}
 
 	return data;
 }

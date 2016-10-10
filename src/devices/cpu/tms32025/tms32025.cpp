@@ -1747,10 +1747,10 @@ void tms32025_device::device_start()
 	state_add( TMS32025_GREG, "GREG", m_debugger_temp).callimport().callexport().formatstr("%04X");
 
 	state_add(STATE_GENPC, "GENPC", m_PC).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_PREVPC).formatstr("%04X").noshow();
 	/* This is actually not a stack pointer, but the stack contents */
 	state_add(STATE_GENSP, "GENSP", m_STACK[7]).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_STR0).formatstr("%33s").noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_PREVPC).formatstr("%04X").noshow();
 
 	m_icountptr = &m_icount;
 }

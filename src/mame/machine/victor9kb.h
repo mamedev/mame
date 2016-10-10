@@ -62,25 +62,13 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_ya;
-	required_ioport m_yb;
-	required_ioport m_yc;
+	required_ioport_array<13> m_y;
 
 	devcb_write_line   m_kbrdy_cb;
 	devcb_write_line   m_kbdata_cb;
 
 	UINT8 m_p1;
-	UINT8 m_y;
+	UINT8 m_keylatch;
 	int m_stb;
 	int m_y12;
 	int m_kbrdy;

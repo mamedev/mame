@@ -225,26 +225,15 @@ ioport_constructor tandy2k_keyboard_device::device_input_ports() const
 //  tandy2k_keyboard_device - constructor
 //-------------------------------------------------
 
-tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock, "tandy2kb", __FILE__),
-		m_maincpu(*this, I8048_TAG),
-		m_y0(*this, "Y0"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
-		m_y10(*this, "Y10"),
-		m_y11(*this, "Y11"),
-		m_write_clock(*this),
-		m_write_data(*this),
-		m_keylatch(0xffff),
-		m_clock(0),
-		m_data(0)
+tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock, "tandy2kb", __FILE__),
+	m_maincpu(*this, I8048_TAG),
+	m_y(*this, "Y%u", 0),
+	m_write_clock(*this),
+	m_write_data(*this),
+	m_keylatch(0xffff),
+	m_clock(0),
+	m_data(0)
 {
 }
 
@@ -339,18 +328,10 @@ READ8_MEMBER( tandy2k_keyboard_device::kb_p1_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= m_y0->read();
-	if (!BIT(m_keylatch, 1)) data &= m_y1->read();
-	if (!BIT(m_keylatch, 2)) data &= m_y2->read();
-	if (!BIT(m_keylatch, 3)) data &= m_y3->read();
-	if (!BIT(m_keylatch, 4)) data &= m_y4->read();
-	if (!BIT(m_keylatch, 5)) data &= m_y5->read();
-	if (!BIT(m_keylatch, 6)) data &= m_y6->read();
-	if (!BIT(m_keylatch, 7)) data &= m_y7->read();
-	if (!BIT(m_keylatch, 8)) data &= m_y8->read();
-	if (!BIT(m_keylatch, 9)) data &= m_y9->read();
-	if (!BIT(m_keylatch, 10)) data &= m_y10->read();
-	if (!BIT(m_keylatch, 11)) data &= m_y11->read();
+	for (int i = 0; i < 12; i++)
+	{
+		if (!BIT(m_keylatch, i)) data &= m_y[i]->read();
+	}
 
 	return ~data;
 }

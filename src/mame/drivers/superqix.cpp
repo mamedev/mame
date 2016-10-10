@@ -27,9 +27,9 @@ Super Qix:
   (bit 3 was stuck high). It was originally recovered by carefully checking
   the disassembly, and this repair was later verified from another dump to be
   correct. The majority of the bootleg 8031 MCU code matches the decapped
-  sqixu b03-03.l2 mcu code, implying the sq07.ic108 8031 MCU code ROM was
-  derived from code dumped from an original Taito b03-03.l2 8751 MCU somehow.
-  The bootleg MCU code is different from the original b03-03.l2 MCU since
+  sqixu b03__03.l2 mcu code, implying the sq07.ic108 8031 MCU code ROM was
+  derived from code dumped from an original Taito b03__03.l2 8751 MCU somehow.
+  The bootleg MCU code is different from the original b03__03.l2 MCU since
   an 8031 when running in external ROM mode cannot use ports 0 or 2, hence
   the code was extensively patched by the bootleggers to avoid use of those
   ports, by adding an additional multiplexer to port 1, and moving various
@@ -45,14 +45,37 @@ Super Qix:
   This happens in all sets. There appears to be code that would check part of
   the MCU init sequence ($5973 onwards), but it doesn't seem to be called.
 
-- sqixb1 might be based on an earlier version because there is a bug with coin
-  lockout: it is activated after inserting 10 coins instead of 9.
-  sqix doesn't have that bug and also inverts the coin lockout output compared
-  to the bootleg.
-  The older sqixr1 non-bootleg set does not have the 10 coin lockout bug
-  either, so it is possible that the bootleggers introduced it themselves, or
-  the bootleg is based on some sort of early (location test?) set (older than
-  the sqixr1 set) which we don't have a dump of.
+- sqixr0 (World/Japan V1.0) (and sqixb1 which is the exact same ROMs but the
+  8751 MCU replaced with an 8031) has a bug with coin lockout: it is activated
+  after inserting 10 coins instead of 9.
+  This is fixed in World/Japan V1.1, V1.2 and the US set.
+  In addition, the polarity of the coin lockout on V1.0 (and sqixb1) is
+  flat-out reversed, so the pcb will not work in a standard JAMMA harness with
+  coin lockouts without inverting JAMMA pins K and/or 9. The hack below on V1.0
+  pcbs with the two wires connecting to IC 7H may have been a workaround which
+  involved a customized JAMMA connector/harness. How exactly is unclear.
+
+- All Taito Super Qix PCBS are part M6100237A, and have a wiring hack on top of
+  component 7H (a 74LS86 Quad XOR gate):
+  (reference: 74LS86 pins 4, 5 and 12 are 2A, 2B and 4A respectively, none are
+  outputs)
+  The V1.0 PCBs have two greenwires running on the back of the pcb, connected
+  from 7H pins 4 and 5, to JAMMA pins e (GND) and d (unused) respectively.
+  This implies there was a hack done on the JAMMA harness connector itself
+  (possibly to invert the coin lockout value using one of the XOR gates
+  at 7H (or perhaps 7H controls the coin lockouts themselves?)) but what
+  exactly the hack does is unclear without further tracing.
+
+  The V1.1, V1.2 and US PCBS have two resistors from VCC to GND forming a
+  voltage divider on top of 7H, the resistor from VCC/Pin 14 to Common is
+  22KOhms, the other resistor is also 22KOhms and seems to connect to
+  GND/Pin 7. The center of the two resistors connects to one end of a 0.1uf
+  capacitor and also to 7H pin 4, the other end of the capacitor connects to
+  7H pin 12.
+  This implies some sort of brief/reset pulse generation or filter on pin 12,
+  or more likely some abuse of the TTL input hysteresis of the 74LS86 IC itself
+  such that transitions of pin 12 cause transitions on pin 4 as well, or similar.
+  Again, what exactly this accomplishes is unclear without further tracing.
 
 - sqixb2 is a bootleg of sqixb1, with the MCU removed.
 
@@ -68,7 +91,8 @@ TODO:
 
 - I'm not sure about the NMI ack at 0418 in the original sqix, but the game hangs
   at the end of a game without it. Note that the bootleg replaces that call with
-  something else.
+  something else. That something else is actually reading the system/Coin/Start
+  inputs from 0418, which the MCU normally reads from its port 0, hence...
 - Given the behavior of prebillian and hotsmash, I'm guessing 0418 resetting the
   NMI latch (i.e. NMI ACK) is correct. [LN]
 
@@ -179,7 +203,7 @@ WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 /**************************************************************************
 
   Timers
-  
+
 **************************************************************************/
 
 void superqix_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -363,7 +387,7 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 	machine().bookkeeping().coin_counter_w(1,data & 4);
 
 	// bit 3 = coin lockout
-	machine().bookkeeping().coin_lockout_global_w(~data & 8);
+	machine().bookkeeping().coin_lockout_global_w(((data & 8)>>3) ^ m_invert_coin_lockout);
 
 	// bit 4 = flip screen
 	flip_screen_set(data & 0x10);
@@ -420,20 +444,20 @@ WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
 /***************************************************************************
 
  Hot Smash Z80 <-> 68705 protection interface
- 
+
  High level commands; these commands are parsed by the MCU from the z80->mcu
  register when the MCU's /INT pin is activated, which seems to occur on a
  write to the Z80->MCU register by the Z80.
- 
+
  MCU Commands Legend (hotsmash)
  0x00 - Reset MCU (jumps to reset vector; does not return anything or set mcu->z80 semaphore)
  0x01 - Read Spinner Position Counter for Player 1 (p1, bits 2 and 3 quadrature, counter range is clamped to 00-7f) OR Protection Read
-		Protection reads are reads of a variable length of a rom extending from MCU rom 0x80 to 0xff, and are only every even byte;
-		the strange values returned by the protection functions below are actually the raw rom offset in mcu rom where the reads will come from.
-		The first byte of each read is checked if it is >= or < 0x32, if it is >= it is thrown out and the next byte is ignored. if it is <, it is thrown out,
-		and the next byte is returned instead of reading spinner 1. In the case where the byte of the rom WOULD BE 0xFF, instead based on the LSB of the spinner
-		counter value (effectively a random coin flip) 0x8A or 0x8B is returned. This protection value might actually be the ball speed or AI aggressiveness
-		per level after a certain number of ball hits/points scored, as it always increases, to a limit.
+        Protection reads are reads of a variable length of a rom extending from MCU rom 0x80 to 0xff, and are only every even byte;
+        the strange values returned by the protection functions below are actually the raw rom offset in mcu rom where the reads will come from.
+        The first byte of each read is checked if it is >= or < 0x32, if it is >= it is thrown out and the next byte is ignored. if it is <, it is thrown out,
+        and the next byte is returned instead of reading spinner 1. In the case where the byte of the rom WOULD BE 0xFF, instead based on the LSB of the spinner
+        counter value (effectively a random coin flip) 0x8A or 0x8B is returned. This protection value might actually be the ball speed or AI aggressiveness
+        per level after a certain number of ball hits/points scored, as it always increases, to a limit.
  0x02 - Read Spinner Position Counter for Player 2 (p2, bits 3 and 2 quadrature, counter range is clamped to 00-7f)
  0x04 - Read dipswitch array sw1 and send to z80
  0x08 - Read dipswitch array sw2 and send to z80 and also write them to $3b
@@ -441,229 +465,229 @@ WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
  0x40 - Reset score and start 1P vs CPU game; returns number of points per game win based on sw2:3; clears counters and clears $3a
  0x41 - Reset score and start 2P game; returns number of points per game win based on sw2:3; clears counters and sets $3a bit 0
  0x80 - Increment score for CPU/P2, reset protection read suboffset and set protection read enable flag
-		If in a 2P game, if p2 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xb3
-		If in a 2P game, if p2 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0x9d
-		If in a 2P game, if p2 did not yet score more than sw2.5?4:3 points, return 0x89
-		If in a 1P game, if cpu scored more than sw2.5?4:3 points, return 0xee
-		If in a 1P game, if cpu did not yet score more than sw2.5?4:3 points, return 0xd9
+        If in a 2P game, if p2 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xb3
+        If in a 2P game, if p2 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0x9d
+        If in a 2P game, if p2 did not yet score more than sw2.5?4:3 points, return 0x89
+        If in a 1P game, if cpu scored more than sw2.5?4:3 points, return 0xee
+        If in a 1P game, if cpu did not yet score more than sw2.5?4:3 points, return 0xd9
  0x81 - Increment score for P1, reset protection read suboffset and set protection read enable flag
-		If in a 2P game, if p1 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xa8
-		If in a 2P game, if p1 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0x92
-		If in a 2P game, if p1 did not yet score more than sw2.5?4:3 points, return 0x80
-		If in a 1P game, if p1 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xe2
-		If in a 1P game, if p1 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0xe2
-		If in a 1P game, if p1 did not yet score more than sw2.5?4:3 points, return 0xd0
+        If in a 2P game, if p1 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xa8
+        If in a 2P game, if p1 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0x92
+        If in a 2P game, if p1 did not yet score more than sw2.5?4:3 points, return 0x80
+        If in a 1P game, if p1 scored more than sw2.5?4:3 points, and won 2 matches, clear matches won by both players and return 0xe2
+        If in a 1P game, if p1 scored more than sw2.5?4:3 points, and did not yet win 2 matches, return 0xe2
+        If in a 1P game, if p1 did not yet score more than sw2.5?4:3 points, return 0xd0
  0x83 - Increment score for BOTH PLAYERS, reset protection read offset and set protection read enable flag, return 0xbe
  0x84 - Reset protection read suboffset and set protection read enable flag, return 0xc9
  0xF0 - Reset protection read suboffset, return 0xf0 (sent on mcu timeout from z80 side?)
  other - Echo (returns whatever the command byte was back to the z80 immediately)
- 
+
  MCU Commands Detail:
  0x00 - Reset MCU (jumps to reset vector; does not return anything or set mcu->z80 semaphore)
  0x01 - Read Spinner Position Counter for Player 1 (p1, bits 2 and 3 quadrature, counter range is clamped to 00-7f) OR Protection Read
-	if $31 has bit 1 set
-	jump to 239
-		increment $32
-		load a with $34
-		add $33 to a
-		transfer a to x
-		load a with $x
-		if a is 0
-		jump to 247
-			jump to 204, see below
-		if a < 0x32
-		jump to 24a
-			increment $33
-			load a with $34
-			add $33 to a
-			transfer a to x
-			load a with $x
-			if a == 0xFF
-			jump to 25b
-				load x with 0x10
-				load a with [x+1] which is 0x11 (spinner 1 value)
-				store a (value of $11) into $2a
-				if $2a has bit 0 set
-				jump to 269
-					load a with 0x8B
-					store a (value of $34) into $2e
-					store $2e to the mcu->z80 latch
-				otherwise
-					load a with 0x8A
-					store a (value of $34) into $2e
-					store $2e to the mcu->z80 latch
-			otherwise jump to 22a <- I believe this path is the 'protection succeeded' path, as it allows an offset of the first 256 bytes of the mcu rom to be read...
-				store accum into $2e
-				store $2e to the mcu->z80 latch
-		otherwise jump to 204, see below
-	204:
-		load x with 0x10
-		load a with [x+1] which is 0x11 (spinner 1 value)
-		store a (value of $11) into $2e
-		store $2e to the mcu->z80 latch
+    if $31 has bit 1 set
+    jump to 239
+        increment $32
+        load a with $34
+        add $33 to a
+        transfer a to x
+        load a with $x
+        if a is 0
+        jump to 247
+            jump to 204, see below
+        if a < 0x32
+        jump to 24a
+            increment $33
+            load a with $34
+            add $33 to a
+            transfer a to x
+            load a with $x
+            if a == 0xFF
+            jump to 25b
+                load x with 0x10
+                load a with [x+1] which is 0x11 (spinner 1 value)
+                store a (value of $11) into $2a
+                if $2a has bit 0 set
+                jump to 269
+                    load a with 0x8B
+                    store a (value of $34) into $2e
+                    store $2e to the mcu->z80 latch
+                otherwise
+                    load a with 0x8A
+                    store a (value of $34) into $2e
+                    store $2e to the mcu->z80 latch
+            otherwise jump to 22a <- I believe this path is the 'protection succeeded' path, as it allows an offset of the first 256 bytes of the mcu rom to be read...
+                store accum into $2e
+                store $2e to the mcu->z80 latch
+        otherwise jump to 204, see below
+    204:
+        load x with 0x10
+        load a with [x+1] which is 0x11 (spinner 1 value)
+        store a (value of $11) into $2e
+        store $2e to the mcu->z80 latch
  0x02 - Read Spinner Position Counter for Player 2 (p2, bits 3 and 2 quadrature, counter range is clamped to 00-7f)
-	load x with 0x1a
-	load accum with [x+1] which is 0x1b (spinner 2 value)
-	store accum (value of $1b) into $2e
-	store $2e to the mcu->z80 latch
+    load x with 0x1a
+    load accum with [x+1] which is 0x1b (spinner 2 value)
+    store accum (value of $1b) into $2e
+    store $2e to the mcu->z80 latch
  0x04 - Read dipswitch array sw1 and send to z80
  0x08 - Read dipswitch array sw2 and send to z80 and also write them to $3b
-	same as command 0x04, but polls the other port, and also stores the result to $3b
+    same as command 0x04, but polls the other port, and also stores the result to $3b
  0x20 - Reset quadrature counters to 0x38, clears protection read enable flag, return 0x38
-	load a with 0x38
-	load x with 0x10
-	store a to $11
-	load x with 0x1a
-	store a to $1b
-	clear $31
-	store a into $2e
-	store $2e to the mcu->z80 latch
+    load a with 0x38
+    load x with 0x10
+    store a to $11
+    load x with 0x1a
+    store a to $1b
+    clear $31
+    store a into $2e
+    store $2e to the mcu->z80 latch
  0x40 Reset score and start 1P vs CPU game; returns number of points per game win based on sw2:3; clears counters and clears $3a
  0x41 Reset score and start 2P game; returns number of points per game win based on sw2:3; clears counters and sets $3a bit 0
-	clear $32
-	clear $35
-	clear $36
-	clear $37
-	clear $38
-	if $3b has bit 4 clear (number of points per game dipswitch is set to 3)
-	jump to 29c
-		store 0x03 in $39
-		goto in all cases:
-	otherwise (number of points per game dipswitch is set to 4)
-		store 0x04 in $39
-		goto in all cases:
-	in all cases:
+    clear $32
+    clear $35
+    clear $36
+    clear $37
+    clear $38
+    if $3b has bit 4 clear (number of points per game dipswitch is set to 3)
+    jump to 29c
+        store 0x03 in $39
+        goto in all cases:
+    otherwise (number of points per game dipswitch is set to 4)
+        store 0x04 in $39
+        goto in all cases:
+    in all cases:
 ****if command was 0x40: clears $31, $3a,
 ****if command was 0x41: clears $31, sets bit 0x01 of $3a
-	store accum (value of $39) into $2e
-	store $2e to the mcu->z80 latch
+    store accum (value of $39) into $2e
+    store $2e to the mcu->z80 latch
  0x80 - Increment score for CPU/P2, reset protection read suboffset and set protection read enable flag
-	if $3a has bit 0x01 set
-	jump to 2ad
-		set bit 1 of $31
-		clear $33
-		increment $36 
-		check if $36 == $39, if so
-		jump to 2c2
-			clear $36
-			clear $35
-			increment $38
-			check if $38 == 0x02, if so
-			jump to 2d7
-				clear $38
-				clear $37
-				store 0xb3 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-			otherwise
-				store 0x9d into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-		otherwise
-			store 0x89 into $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
-	otherwise jump to 31b <- we're in a 1p game
-		set bit 1 of $31
-		clear $33
-		increment $36
-		check if $36 == $39, if so
-		jump to 330
-			store 0xee into $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
-		otherwise
-			store 0xd9 into $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
+    if $3a has bit 0x01 set
+    jump to 2ad
+        set bit 1 of $31
+        clear $33
+        increment $36
+        check if $36 == $39, if so
+        jump to 2c2
+            clear $36
+            clear $35
+            increment $38
+            check if $38 == 0x02, if so
+            jump to 2d7
+                clear $38
+                clear $37
+                store 0xb3 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+            otherwise
+                store 0x9d into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+        otherwise
+            store 0x89 into $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
+    otherwise jump to 31b <- we're in a 1p game
+        set bit 1 of $31
+        clear $33
+        increment $36
+        check if $36 == $39, if so
+        jump to 330
+            store 0xee into $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
+        otherwise
+            store 0xd9 into $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
  0x81 - Increment score for P1, reset protection read suboffset and set protection read enable flag
-	if $3a has bit 0x01 set
-	jump to 2e4
-		set bit 0x01 of $31
-		clear $33
-		increment $35
-		check if $35 == $39, if so
-		jump to 2f9
-			clear $36
-			clear $35
-			increment $37
-			check if $37 == 0x02, if so
-			jump to 30e
-				clear $38
-				clear $37
-				store 0xA8 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-			otherwise
-				store 0x92 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-		otherwise
-			store 0x80 to $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
-	otherwise jump to 339
-		set bit 0x01 of $31
-		clear $33
-		increment $35
-		check if $35 == $39, if so
-		jump to 34e
-			clear $35
-			clear $36
-			increment $37
-			check if $37 == 0x02
-			if so jump to 363
-				clear $37
-				clear $38
-				store 0xE2 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-			otherwise 
-				store 0xE2 into $34
-				clear $32
-				store a (value of $34) into $2e
-				store $2e to the mcu->z80 latch
-		otherwise
-			store 0xd0 to $34
-			clear $32
-			store a (value of $34) into $2e
-			store $2e to the mcu->z80 latch
+    if $3a has bit 0x01 set
+    jump to 2e4
+        set bit 0x01 of $31
+        clear $33
+        increment $35
+        check if $35 == $39, if so
+        jump to 2f9
+            clear $36
+            clear $35
+            increment $37
+            check if $37 == 0x02, if so
+            jump to 30e
+                clear $38
+                clear $37
+                store 0xA8 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+            otherwise
+                store 0x92 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+        otherwise
+            store 0x80 to $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
+    otherwise jump to 339
+        set bit 0x01 of $31
+        clear $33
+        increment $35
+        check if $35 == $39, if so
+        jump to 34e
+            clear $35
+            clear $36
+            increment $37
+            check if $37 == 0x02
+            if so jump to 363
+                clear $37
+                clear $38
+                store 0xE2 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+            otherwise
+                store 0xE2 into $34
+                clear $32
+                store a (value of $34) into $2e
+                store $2e to the mcu->z80 latch
+        otherwise
+            store 0xd0 to $34
+            clear $32
+            store a (value of $34) into $2e
+            store $2e to the mcu->z80 latch
  0x83 - Increment score for BOTH PLAYERS, reset protection read offset and set protection read enable flag, return 0xbe
-	increment $35
-	increment $36
-	store 0xbe to $34
-	clear $32
-	clear $33
-	set bit 1 of $31
-	store a (value of $34) into $2e
-	store $2e to the mcu->z80 latch
+    increment $35
+    increment $36
+    store 0xbe to $34
+    clear $32
+    clear $33
+    set bit 1 of $31
+    store a (value of $34) into $2e
+    store $2e to the mcu->z80 latch
  0x84 - Reset protection read suboffset and set protection read enable flag, return 0xc9
- 	store 0xc9 to $34
-	clear $32
-	clear $33
-	set bit 1 of $31
-	store a (value of $34) into $2e
-	store $2e to the mcu->z80 latch
+    store 0xc9 to $34
+    clear $32
+    clear $33
+    set bit 1 of $31
+    store a (value of $34) into $2e
+    store $2e to the mcu->z80 latch
  0xF0 - Reset protection read suboffset, return 0xf0 (sent on mcu timeout from z80 side?)
-	clear $32
-	clear $33
-	store a (0xF0) into $2e
-	store $2e to the mcu->z80 latch
+    clear $32
+    clear $33
+    store a (0xF0) into $2e
+    store $2e to the mcu->z80 latch
  other - Echo (returns whatever the command byte was back to the z80 immediately)
- 
+
  MCU idle quadrature read loop starts at 165
  MCU reset vector is 120
  The block of code between 100 and 120 is unknown.
- 
+
  MCU memory addresses known:
  10 - cleared by reset, holds the player 1 raw quadrature inputs as last read in bits 2 and 3
  11 - cleared by reset, holds the player 1 spinner position counter, clamped between 0x00 and 0x7f
@@ -690,7 +714,7 @@ WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
  39 - number of points being played for in total (3 or 4, based on sw2:5 dipswitch)
  3a - bit 0: if set: 2P/VS game; if clear: 1P/CPU game
  3b - contents of dipswitch 2; bit 0x10 (switch 5?) affects the value loaded to 39
- 
+
 The Prebillian/Hotsmash hardware seems to be an evolution of the arkanoid hardware in regards to the mcu:
 arkanoid:
 Port A[7:0] <> bidir comms with z80
@@ -905,7 +929,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::hle_68705_w_cb)
 	m_Z80HasWritten = 0; // unset the z80->mcu semaphore
 	switch (m_fromZ80)
 	{
-		case 0x00: break;
+		case 0x00: m_curr_player = 0; break; // this command should fully reset the mcu and quadrature counters by jumping to its reset vector, as in hotsmash. it does not return a response value.
 		case 0x01:
 		{
 			UINT8 p = ioport(m_curr_player ? "PLUNGER2" : "PLUNGER1")->read() & 0xbf;
@@ -1266,7 +1290,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_DIPSETTING(    0x40, "80%" )
 	PORT_DIPSETTING(    0x00, "85%" )
 
-	PORT_START("SYSTEM")
+	PORT_START("SYSTEM") /* Port 0 of MCU, might also be readable by z80 at io 0x0418 (nmi ack read port) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1274,8 +1298,13 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )   // doesn't work in bootleg
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, superqix_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	/* The bits 0xc0 above is known to be WRONG from tracing:
+	bit 6 connects to whatever bit 7 is connected to on AY-3-8910 #1 @3P Port A
+	bit 7 connects to whatever bit 7 is connected to on AY-3-8910 #1 @3P Port B
+	however what those ay bits actually each connect to (semaphores? service button?) is currently unknown
+	*/
 
-	PORT_START("P1")
+	PORT_START("P1") /* AY-3-8910 #1 @3P Port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -1285,7 +1314,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")   /* ??? */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("P2")
+	PORT_START("P2") /* AY-3-8910 #1 @3P Port B */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
@@ -1405,12 +1434,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sqix, superqix_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)    /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sqix_port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
-	MCFG_CPU_ADD("mcu", I8751, 12000000/3)  /* ??? */
+	MCFG_CPU_ADD("mcu", I8751, XTAL_12MHz/3)  /* TODO: VERIFY DIVISOR, is this 3mhz or 4mhz? */
 	MCFG_CPU_IO_MAP(sqix_mcu_io_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1435,12 +1464,14 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) // AY-3-8910 @3P, outputs directly tied together
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, in4_mcu_r)) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) // AY-3-8910 @3M, outputs directly tied together
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, sqix_from_mcu_r)) /* port Bread */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(superqix_state,sqix_z80_mcu_w)) /* port Bwrite */
@@ -1483,11 +1514,13 @@ static MACHINE_CONFIG_START( sqix_nomcu, superqix_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, in4_mcu_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, bootleg_in0_r)) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1539,101 +1572,120 @@ ROM_START( hotsmash )
 	ROM_LOAD( "b18-03",  0x14000, 0x04000, CRC(1c82717d) SHA1(6942c8877e24ac51ed71036e771a1655d82f3491) )
 ROM_END
 
-ROM_START( sqix )
+ROM_START( sqix ) // It is unclear what this set fixes vs 1.1 below, but the 'rug pattern' on the bitmap test during POST has the left edge entirely black, unlike v1.0 or v1.1, but like sqixu
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03-01-2.f3",   0x00000, 0x08000, CRC(5ded636b) SHA1(827954001b4617b3bd439be75094d8dca06ea32b) )
-	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "b03__01-2.ef3",  0x00000, 0x08000, CRC(5ded636b) SHA1(827954001b4617b3bd439be75094d8dca06ea32b) )
+	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03-03.l2",    0x00000, 0x1000, NO_DUMP ) /* Original Taito ID code for this set's MCU */
-	/* sq07.108 is from the sqixb1 set, it will be removed once the actual MCU code from b03-03.l2 is decapped / dumped */
-	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
+	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
-ROM_START( sqixr1 )
+ROM_START( sqixr1 ) // This set has the coin lockout polarity inverted, and also fixes the 10 vs 9 lockout bug
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03-01-1.f3",   0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
-	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "b03__01-1.ef3",  0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
+	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03-03.l2",    0x00000, 0x1000, NO_DUMP ) /* Original Taito ID code for this set's MCU */
-	/* sq07.108 is from the sqixb1 set, it will be removed once the actual MCU code from b03-03.l2 is decapped / dumped */
-	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
+	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+ROM_END
+
+ROM_START( sqixr0 ) // This set is older than the above two: it has the coin lockout only trigger after 10 coins (causing the last coin to be lost), and the coin lockout polarity is not inverted
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "b03__01.ef3",    0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
+	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
+	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
+	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( sqixu )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03-06.f3",    0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
-	ROM_LOAD( "b03-07.h3",    0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
+	ROM_LOAD( "b03__06.ef3",   0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
+	ROM_LOAD( "b03__07.h3",    0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03-08.l2",    0x00000, 0x01000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) )
+	ROM_LOAD( "b03__08.l2",    0x00000, 0x01000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03-09.t8",    0x00000, 0x10000, CRC(69d2a84a) SHA1(b461d8a01f73c6aaa4aac85602c688c111bdca5d) )
+	ROM_LOAD( "b03__09.t8",    0x00000, 0x10000, CRC(69d2a84a) SHA1(b461d8a01f73c6aaa4aac85602c688c111bdca5d) )
 ROM_END
 
 /* this is a bootleg with an 8031+external rom in place of the 8751 of the
-   original board; The mcu code is extensively hacked to avoid use of port 2,
-   which is used as the rom data bus, using a multiplexed latch on one of the
-   other ports instead. This is based on dumped original b03-03.l2 code. */
+   original board; The MCU code is extensively hacked to avoid use of ports 0
+   and 2, which are used as the rom data and address buses, using a multiplexed
+   latch on the other ports instead. This bootleg MCU is based on a dump of the
+   original b03__03.l2 code, obtained by the pirates through unknown means.
+   Barring the bootleg MCU, the actual rom set is an exact copy of sqixr0 above. */
 ROM_START( sqixb1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
-	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) ) // == b03__01.ef3
+	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I8031 code */
-	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* 1st half of sq-iu3.p8, fake label */
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* 2nd half of sq-iu3.p8, fake label */
+	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
+	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) ) // actual label is something different on the bootleg
 ROM_END
 
-ROM_START( sqixb2 )
+ROM_START( sqixb2 ) // this bootleg set has been extensively hacked to avoid using the MCU at all, though a few checks for the semaphore flags were never patched out
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cpu.2",         0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
-	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* 1st half of sq-iu3.p8 */
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* 2nd half of sq-iu3.p8 */
+	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
+	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) ) // actual label is something different on the bootleg
 ROM_END
 
 ROM_START( perestrof )
@@ -1666,14 +1718,12 @@ ROM_START( perestro )
 	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
-
-
 DRIVER_INIT_MEMBER(superqix_state,sqix)
 {
 	m_invert_coin_lockout = 1;
 }
 
-DRIVER_INIT_MEMBER(superqix_state,sqixa)
+DRIVER_INIT_MEMBER(superqix_state,sqixr0)
 {
 	m_invert_coin_lockout = 0;
 }
@@ -1744,10 +1794,11 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 
 GAME( 1986, pbillian, 0,        pbillian,   pbillian, driver_device,  0,        ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hotsmash, 0,        hotsmash,   hotsmash, driver_device,  0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix_8031,  superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix_8031,  superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqix,       superqix, driver_device,  0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1, 8031 MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
-GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, driver_device,  0,        ROT90, "bootleg", "Super Qix (bootleg set 2, No MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
+GAME( 1987, sqix,     0,        sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr0,   sqix,     sqix,       superqix, superqix_state, sqixr0,   ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, sqixr0,   ROT90, "bootleg", "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
+GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, superqix_state, sqix,     ROT90, "bootleg", "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
 GAME( 1994, perestro, 0,        sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, perestrof,perestro, sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )

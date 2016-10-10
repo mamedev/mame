@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "pckeybrd.h"
+#include "natkeyboard.h"
 
 /* AT keyboard documentation comes from www.beyondlogic.org and HelpPC documentation */
 

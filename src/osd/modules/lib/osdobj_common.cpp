@@ -56,6 +56,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_MAXIMIZE ";max",              "1",              OPTION_BOOLEAN,   "default to maximized windows; otherwise, windows will be minimized" },
 	{ OSDOPTION_WAITVSYNC ";vs",              "0",              OPTION_BOOLEAN,   "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	{ OSDOPTION_SYNCREFRESH ";srf",           "0",              OPTION_BOOLEAN,   "enable using the start of VBLANK for throttling instead of the game time" },
+	{ OSD_MONITOR_PROVIDER,                   OSDOPTVAL_AUTO,   OPTION_STRING,    "monitor discovery method" },
 
 	// per-window options
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD PER-WINDOW VIDEO OPTIONS" },
@@ -179,6 +180,7 @@ osd_common_t::osd_common_t(osd_options &options)
 		m_lightgun_input(nullptr),
 		m_joystick_input(nullptr),
 		m_output(nullptr),
+		m_monitor_module(nullptr),
 		m_watchdog(nullptr)
 {
 	osd_output::push(this);
@@ -212,6 +214,10 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
+
+	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
+	REGISTER_MODULE(m_mod_man, MONITOR_WIN32);
+	REGISTER_MODULE(m_mod_man, MONITOR_DXGI);
 
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
@@ -265,8 +271,15 @@ void osd_common_t::register_options()
 
 	const char *names[20];
 	int num;
-	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
 	std::vector<const char *> dnames;
+
+	m_mod_man.get_module_names(OSD_MONITOR_PROVIDER, 20, &num, names);
+	for (int i = 0; i < num; i++)
+		dnames.push_back(names[i]);
+	update_option(OSD_MONITOR_PROVIDER, dnames);
+
+	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
+	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_FONT_PROVIDER, dnames);
@@ -618,6 +631,11 @@ static void output_notifier_callback(const char *outname, INT32 value, void *par
 
 void osd_common_t::init_subsystems()
 {
+	// monitors have to be initialized before video init
+	m_monitor_module = select_module_options<monitor_module *>(options(), OSD_MONITOR_PROVIDER);
+	assert(m_monitor_module != nullptr);
+	m_monitor_module->init(options());
+
 	if (!video_init())
 	{
 		video_exit();

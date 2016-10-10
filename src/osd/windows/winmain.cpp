@@ -32,6 +32,7 @@
 #include "winutil.h"
 #include "winfile.h"
 #include "modules/diagnostics/diagnostics_module.h"
+#include "modules/monitor/monitor_common.h"
 
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 using namespace Windows::ApplicationModel;
@@ -98,8 +99,8 @@ public:
 			char buffer[1024];
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
 
-			osd_unique_wstr wcbuffer(wstring_from_utf8(buffer));
-			osd_unique_wstr wcappname(wstring_from_utf8(emulator_info::get_appname()));
+			osd_unique_wstr wcbuffer(osd::text::to_wstring(buffer));
+			osd_unique_wstr wcappname(osd::text::to_wstring(emulator_info::get_appname()));
 
 			auto dlg = ref new MessageDialog(ref new Platform::String(wcbuffer.get()), ref new Platform::String(wcappname.get()));
 			dlg->ShowAsync();

@@ -239,7 +239,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2ND") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL)) // 25
 
-	PORT_START("YA")
+	PORT_START("Y10")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEC TAB") PORT_CODE(KEYCODE_F4) // 7b
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FORMAT") PORT_CODE(KEYCODE_F5) // 7a
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x95") // 71
@@ -249,7 +249,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 27
 
-	PORT_START("YB")
+	PORT_START("Y11")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAGE") PORT_CODE(KEYCODE_F2) // 7d
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CENTER") PORT_CODE(KEYCODE_F3) // 7c
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MOVE") PORT_CODE(KEYCODE_F12) // 73
@@ -259,7 +259,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("YC")
+	PORT_START("Y12")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_ESC) // 36
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INDENT") PORT_CODE(KEYCODE_F1) // 7e
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPLC") PORT_CODE(KEYCODE_F10) // 75
@@ -269,7 +269,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // 1d
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("YD")
+	PORT_START("Y13")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad \xC3\x97") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) // 14
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad \xC3\xB7") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // 18
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PRINT") // 19
@@ -279,7 +279,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 1c
 
-	PORT_START("YE")
+	PORT_START("Y14")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad + *") PORT_CODE(KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))// 60
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad - !") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 13
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8 >") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) // 15
@@ -289,7 +289,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3 #") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) // 10
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 1b
 
-	PORT_START("YF")
+	PORT_START("Y15")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INSERT") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) // 62
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PREV") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP)) // 61
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NEXT") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) // 51
@@ -376,23 +376,10 @@ wangpc_keyboard_t::wangpc_keyboard_t(const machine_config &mconfig, const char *
 	device_t(mconfig, WANGPC_KEYBOARD, "Wang PC Keyboard", tag, owner, clock, "wangpckb", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, I8051_TAG),
-	m_y0(*this, "Y0"),
-	m_y1(*this, "Y1"),
-	m_y2(*this, "Y2"),
-	m_y3(*this, "Y3"),
-	m_y4(*this, "Y4"),
-	m_y5(*this, "Y5"),
-	m_y6(*this, "Y6"),
-	m_y7(*this, "Y7"),
-	m_y8(*this, "Y8"),
-	m_y9(*this, "Y9"),
-	m_ya(*this, "YA"),
-	m_yb(*this, "YB"),
-	m_yc(*this, "YC"),
-	m_yd(*this, "YD"),
-	m_ye(*this, "YE"),
-	m_yf(*this, "YF"),
-	m_txd_handler(*this)
+	m_y(*this, "Y%u", 0),
+	m_txd_handler(*this),
+	m_keylatch(0),
+	m_rxd(1)
 {
 }
 
@@ -409,6 +396,9 @@ void wangpc_keyboard_t::device_start()
 
 	set_rcv_rate(62500);
 	//set_tra_rate(62500);
+
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_rxd));
 }
 
 
@@ -533,29 +523,7 @@ WRITE8_MEMBER(wangpc_keyboard_t::mcs51_tx_callback)
 
 READ8_MEMBER( wangpc_keyboard_t::kb_p1_r )
 {
-	UINT8 data = 0xff;
-
-	switch (m_y & 0x0f)
-	{
-		case 0: data &= m_y0->read(); break;
-		case 1: data &= m_y1->read(); break;
-		case 2: data &= m_y2->read(); break;
-		case 3: data &= m_y3->read(); break;
-		case 4: data &= m_y4->read(); break;
-		case 5: data &= m_y5->read(); break;
-		case 6: data &= m_y6->read(); break;
-		case 7: data &= m_y7->read(); break;
-		case 8: data &= m_y8->read(); break;
-		case 9: data &= m_y9->read(); break;
-		case 0xa: data &= m_ya->read(); break;
-		case 0xb: data &= m_yb->read(); break;
-		case 0xc: data &= m_yc->read(); break;
-		case 0xd: data &= m_yd->read(); break;
-		case 0xe: data &= m_ye->read(); break;
-		case 0xf: data &= m_yf->read(); break;
-	}
-
-	return data;
+	return m_y[m_keylatch]->read();
 }
 
 
@@ -610,7 +578,7 @@ WRITE8_MEMBER( wangpc_keyboard_t::kb_p2_w )
 
 	*/
 
-	m_y = data & 0x0f;
+	m_keylatch = data & 0x0f;
 
 	//if (LOG) logerror("P2 %02x\n", data);
 }

@@ -111,10 +111,10 @@ private:
 	bool    m_see_switches;
 
 	// IRQ state
-	line_state    m_irq;
+	int    m_irq;
 
 	// DMA in Progress state
-	line_state    m_dip;
+	int    m_dip;
 
 	// When true, motor monoflop is high
 	bool    m_motor_running;
@@ -171,7 +171,7 @@ private:
 	UINT8 m_lastval;
 
 	// Signal motor_on. When TRUE, makes all drives turning.
-	line_state m_MOTOR_ON;
+	int m_MOTOR_ON;
 
 	// Calculates the index from the bit
 	int bit_to_index(int value);

@@ -7811,12 +7811,12 @@ ROM_END
 
 
 GAME( 1989, tharrier,  0,       tharrier, tharrier, nmk16_state, tharrier,   ROT270, "UPL",                          "Task Force Harrier", 0 )
-GAME( 1989, tharrieru, tharrier,tharrier, tharrier, nmk16_state, tharrier,   ROT270, "UPL (American Sammy license)", "Task Force Harrier (US?)", 0 )
+GAME( 1989, tharrieru, tharrier,tharrier, tharrier, nmk16_state, tharrier,   ROT270, "UPL (American Sammy license)", "Task Force Harrier (US)", 0 ) // US version but no regional notice
 
 GAME( 1990, mustang,  0,        mustang,  mustang, driver_device,  0,        ROT0,   "UPL",                          "US AAF Mustang (25th May. 1990)", 0 )
 GAME( 1990, mustangs, mustang,  mustang,  mustang, driver_device,  0,        ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", 0 )
 
-GAME( 1990, bioship,  0,        bioship,  bioship, driver_device,  0,        ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", 0 )
+GAME( 1990, bioship,  0,        bioship,  bioship, driver_device,  0,        ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", 0 ) // US version but no regional notice
 GAME( 1990, sbsgomo,  bioship,  bioship,  bioship, driver_device,  0,        ROT0,   "UPL",                          "Space Battle Ship Gomorrah", 0 )
 
 GAME( 1990, vandyke,    0,       vandyke,  vandyke, driver_device, 0,        ROT270, "UPL",                          "Vandyke (Japan)",  0 )

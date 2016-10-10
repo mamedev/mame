@@ -496,6 +496,7 @@ MACHINES["PC_FDC"] = true
 MACHINES["PC_LPT"] = true
 MACHINES["PCCARD"] = true
 MACHINES["PCF8593"] = true
+MACHINES["PCI"] = true
 MACHINES["PCKEYBRD"] = true
 MACHINES["PDC"] = true
 MACHINES["PIC8259"] = true
@@ -611,6 +612,7 @@ BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
 BUSES["BBC_FDC"] = true
 BUSES["BBC_ANALOGUE"] = true
+BUSES["BBC_JOYPORT"] = true
 BUSES["BBC_1MHZBUS"] = true
 BUSES["BBC_TUBE"] = true
 BUSES["BBC_USERPORT"] = true
@@ -1386,7 +1388,6 @@ files {
 	MAME_DIR .. "src/mame/machine/lisa.cpp",
 	MAME_DIR .. "src/mame/drivers/mac.cpp",
 	MAME_DIR .. "src/mame/includes/mac.h",
-	MAME_DIR .. "src/mame/audio/mac.cpp",
 	MAME_DIR .. "src/mame/machine/egret.cpp",
 	MAME_DIR .. "src/mame/machine/egret.h",
 	MAME_DIR .. "src/mame/machine/mac.cpp",
@@ -1560,24 +1561,17 @@ files {
 createMESSProjects(_target, _subtarget, "cbm")
 files {
 	MAME_DIR .. "src/mame/drivers/c128.cpp",
-	MAME_DIR .. "src/mame/includes/c128.h",
 	MAME_DIR .. "src/mame/drivers/c64.cpp",
-	MAME_DIR .. "src/mame/includes/c64.h",
 	MAME_DIR .. "src/mame/drivers/c64dtv.cpp",
 	MAME_DIR .. "src/mame/drivers/c65.cpp",
 	MAME_DIR .. "src/mame/includes/c65.h",
 	MAME_DIR .. "src/mame/drivers/c900.cpp",
 	MAME_DIR .. "src/mame/drivers/cbm2.cpp",
-	MAME_DIR .. "src/mame/includes/cbm2.h",
 	MAME_DIR .. "src/mame/drivers/clcd.cpp",
 	MAME_DIR .. "src/mame/drivers/pet.cpp",
-	MAME_DIR .. "src/mame/includes/pet.h",
 	MAME_DIR .. "src/mame/drivers/plus4.cpp",
-	MAME_DIR .. "src/mame/includes/plus4.h",
 	MAME_DIR .. "src/mame/drivers/vic10.cpp",
-	MAME_DIR .. "src/mame/includes/vic10.h",
 	MAME_DIR .. "src/mame/drivers/vic20.cpp",
-	MAME_DIR .. "src/mame/includes/vic20.h",
 	MAME_DIR .. "src/mame/machine/cbm_snqk.cpp",
 	MAME_DIR .. "src/mame/machine/cbm_snqk.h",
 	MAME_DIR .. "src/mame/drivers/mps1230.cpp",
@@ -1622,7 +1616,6 @@ files {
 createMESSProjects(_target, _subtarget, "cce")
 files {
 	MAME_DIR .. "src/mame/drivers/mc1000.cpp",
-	MAME_DIR .. "src/mame/includes/mc1000.h",
 }
 
 createMESSProjects(_target, _subtarget, "ccs")
@@ -1826,7 +1819,6 @@ files {
 createMESSProjects(_target, _subtarget, "enterprise")
 files {
 	MAME_DIR .. "src/mame/drivers/ep64.cpp",
-	MAME_DIR .. "src/mame/includes/ep64.h",
 	MAME_DIR .. "src/mame/audio/dave.cpp",
 	MAME_DIR .. "src/mame/audio/dave.h",
 	MAME_DIR .. "src/mame/video/nick.cpp",
@@ -2724,7 +2716,6 @@ files {
 	MAME_DIR .. "src/mame/machine/spec_snqk.cpp",
 	MAME_DIR .. "src/mame/machine/spec_snqk.h",
 	MAME_DIR .. "src/mame/drivers/ql.cpp",
-	MAME_DIR .. "src/mame/includes/ql.h",
 	MAME_DIR .. "src/mame/machine/qimi.cpp",
 	MAME_DIR .. "src/mame/machine/qimi.h",
 	MAME_DIR .. "src/mame/video/zx8301.cpp",
@@ -2740,6 +2731,7 @@ files {
 	MAME_DIR .. "src/mame/machine/pcd_kbd.h",
 	MAME_DIR .. "src/mame/video/pcd.cpp",
 	MAME_DIR .. "src/mame/video/pcd.h",
+	MAME_DIR .. "src/mame/drivers/pg685.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "slicer")
@@ -3218,6 +3210,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "skeleton")
 files {
+	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",
 	MAME_DIR .. "src/mame/drivers/alphasma.cpp",
 	MAME_DIR .. "src/mame/drivers/ampro.cpp",
@@ -3254,6 +3247,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/daruma.cpp",
 	MAME_DIR .. "src/mame/drivers/didact.cpp",
 	MAME_DIR .. "src/mame/drivers/digel804.cpp",
+	MAME_DIR .. "src/mame/drivers/digijet.cpp",
 	MAME_DIR .. "src/mame/drivers/dim68k.cpp",
 	MAME_DIR .. "src/mame/drivers/dm7000.cpp",
 	MAME_DIR .. "src/mame/includes/dm7000.h",
@@ -3307,7 +3301,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/lg-dvd.cpp",
 	MAME_DIR .. "src/mame/drivers/lola8a.cpp",
 	MAME_DIR .. "src/mame/drivers/m79152pc.cpp",
-	MAME_DIR .. "src/mame/drivers/marywu.cpp",
 	MAME_DIR .. "src/mame/drivers/mccpm.cpp",
 	MAME_DIR .. "src/mame/drivers/mes.cpp",
 	MAME_DIR .. "src/mame/drivers/mice.cpp",
@@ -3332,6 +3325,8 @@ files {
 	MAME_DIR .. "src/mame/machine/ngen_kb.cpp",
 	MAME_DIR .. "src/mame/machine/ngen_kb.h",
 	MAME_DIR .. "src/mame/drivers/octopus.cpp",
+	MAME_DIR .. "src/mame/machine/octo_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/octo_kbd.h",
 	MAME_DIR .. "src/mame/drivers/onyx.cpp",
 	MAME_DIR .. "src/mame/drivers/okean240.cpp",
 	MAME_DIR .. "src/mame/drivers/p8k.cpp",

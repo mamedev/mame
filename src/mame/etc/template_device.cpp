@@ -7,7 +7,7 @@ Template for skeleton device
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/xxx.h"
+#include "xxx.h"
 
 
 
@@ -33,14 +33,6 @@ xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t 
 }
 
 
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void xxx_device::device_validity_check(validity_checker &valid) const
-{
-}
 
 
 //-------------------------------------------------

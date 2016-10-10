@@ -41,7 +41,7 @@ enum
 	VIDEO_MODE_NONE = 0,
 	VIDEO_MODE_GDI,
 	VIDEO_MODE_BGFX,
-#if (USE_OPENGL)
+#if defined(USE_OPENGL) && USE_OPENGL
 	VIDEO_MODE_OPENGL,
 #endif
 	VIDEO_MODE_SDL2ACCEL,
@@ -49,46 +49,6 @@ enum
 	VIDEO_MODE_SOFT,
 
 	VIDEO_MODE_COUNT
-};
-
-class osd_monitor_info
-{
-public:
-	osd_monitor_info(void *handle, const char *monitor_device, float aspect)
-	: m_is_primary(false), m_name(monitor_device), m_handle(handle), m_aspect(aspect)
-	{
-	}
-
-	virtual ~osd_monitor_info() { }
-
-	virtual void refresh() = 0;
-
-	const void *oshandle() const { return m_handle; }
-
-	const osd_rect &position_size() const { return m_pos_size; }
-	const osd_rect &usuable_position_size() const { return m_usuable_pos_size; }
-
-	const char *devicename() const { return m_name.length() ? m_name.c_str() : "UNKNOWN"; }
-
-	float aspect() const { return m_aspect; }
-	float pixel_aspect() const { return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height()); }
-
-	void update_resolution(const int new_width, const int new_height) const { m_pos_size.resize(new_width, new_height); }
-	void set_aspect(const float a) { m_aspect = a; }
-	bool is_primary() const { return m_is_primary; }
-
-	static std::shared_ptr<osd_monitor_info> pick_monitor(osd_options &options, int index);
-
-	static std::list<std::shared_ptr<osd_monitor_info>> list;
-
-protected:
-	osd_rect            m_pos_size;
-	osd_rect            m_usuable_pos_size;
-	bool                m_is_primary;
-	std::string         m_name;
-private:
-	void *              m_handle;                 // handle to the monitor
-	float               m_aspect;                 // computed/configured aspect ratio of the physical device
 };
 
 class osd_window_config
@@ -104,6 +64,7 @@ public:
 };
 
 class osd_renderer;
+class osd_monitor_info;
 
 class osd_window : public std::enable_shared_from_this<osd_window>
 {
@@ -126,15 +87,17 @@ public:
 	virtual int fullscreen() const = 0;
 	virtual running_machine &machine() const = 0;
 
+	bool has_renderer() const { return m_renderer != nullptr; }
 	osd_renderer &renderer() const { return *m_renderer; }
 	void set_renderer(std::unique_ptr<osd_renderer> renderer)
 	{
 		m_renderer = std::move(renderer);
 	}
+	void renderer_reset() { m_renderer.reset(); }
 
 	int prescale() const { return m_prescale; };
 
-	float pixel_aspect() const { return monitor()->pixel_aspect(); }
+	float pixel_aspect() const;
 
 	bool swap_xy()
 	{
@@ -173,11 +136,8 @@ public:
 	virtual void update() = 0;
 	virtual void destroy() = 0;
 
-	void renderer_reset() { m_renderer.reset(); }
 #ifndef OSD_SDL
 	virtual bool win_has_menu() = 0;
-	// FIXME: cann we replace winwindow_video_window_monitor(nullptr) with monitor() ?
-	virtual std::shared_ptr<osd_monitor_info> winwindow_video_window_monitor(const osd_rect *proposed) = 0;
 
 	HDC                     m_dc;       // only used by GDI renderer!
 

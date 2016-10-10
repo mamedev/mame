@@ -108,7 +108,7 @@ private:
 
 	int          m_ref;
 	std::string  m_current_path;
-	char         m_search[40];
+	std::string  m_search;
 	bool         m_change;
 	std::vector<std::string> m_folders;
 };

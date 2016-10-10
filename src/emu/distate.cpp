@@ -76,10 +76,8 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 	format_from_mask();
 
 	// override well-known symbols
-	if (index == STATE_GENPC)
+	if (index == STATE_GENPCBASE)
 		m_symbol.assign("CURPC");
-	else if (index == STATE_GENPCBASE)
-		m_symbol.assign("CURPCBASE");
 	else if (index == STATE_GENSP)
 		m_symbol.assign("CURSP");
 	else if (index == STATE_GENFLAGS)

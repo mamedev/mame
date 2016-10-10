@@ -1583,45 +1583,45 @@ WRITE32_MEMBER(seattle_state::output_w)
 {
 	UINT8 op = (data >> 8) & 0xF;
 	UINT8 arg = data & 0xFF;
-	
+
 	switch (op)
 	{
 		default:
 			logerror("Unknown output (%02X) = %02X\n", op, arg);
 			break;
-			
+
 		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
-		
+
 		case 0x7:
 			m_output_mode = arg;
 			break;
-			
+
 		case 0xB:
 			switch (m_output_mode)
 			{
 				default:
 					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
 					break;
-				
+
 				case 0x04:
 					output().set_value("wheel", arg); // wheel motor delta. signed byte.
 					break;
-					
+
 				case 0x05:
 					for (UINT8 bit = 0; bit < 8; bit++)
 						output().set_lamp_value(bit, (arg >> bit) & 0x1);
 					break;
-					
+
 				case 0x06: // Hyperdrive LEDs 0-7
 					for (UINT8 bit = 0; bit < 8; bit++)
 						output().set_led_value(bit, (arg >> bit) & 0x1);
 					break;
-					
+
 				case 0x07: // Hyperdrive LEDs 8-15
 					for (UINT8 bit = 0; bit < 8; bit++)
 						output().set_led_value(8 + bit, (arg >> bit) & 0x1);
 					break;
-					
+
 				case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
 					for (UINT8 bit = 0; bit < 8; bit++)
 						output().set_led_value(16 + bit, (arg >> bit) & 0x1);
@@ -1646,7 +1646,7 @@ READ32_MEMBER(seattle_state::widget_r)
 			result = m_ethernet_irq_state << WINT_ETHERNET_SHIFT;
 			result = ~result;
 			break;
-			
+
 		case WREG_OUTPUT:
 			result = output_r(m_maincpu->space(AS_PROGRAM), 0, mem_mask);
 			break;
@@ -1681,7 +1681,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 			m_widget.irq_mask = data;
 			update_widget_irq();
 			break;
-			
+
 		case WREG_OUTPUT:
 			output_w(m_maincpu->space(AS_PROGRAM), 0, data, mem_mask);
 			break;
@@ -2538,9 +2538,9 @@ static INPUT_PORTS_START( hyprdriv )
 	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN2")

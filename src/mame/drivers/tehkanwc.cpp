@@ -1,21 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Roberto Fresca
-/* Notes: DJH 04 Jan 2008
-
-  fixed gridiron079gre (shared access to spriteram was broken)
-
-  The inputs seem to be a hacky mess (although there was reportedly a
-  hardware joystick hack for tehkanwc via plugin logic subboard, is this
-  attempting to simulate it?
-
-  Also there is a hack to reset the sound CPU...
-
-*/
-
 /***************************************************************************
 
 Tehkan World Cup - (c) Tehkan 1985
-
 
 Ernesto Corvi
 ernesto@imagina.com
@@ -89,6 +76,17 @@ TO DO :
   - Confirm "Difficulty" Dip Switch in 'teedoff'
 
 ***************************************************************************/
+/* Notes: DJH 04 Jan 2008
+
+  fixed gridiron079gre (shared access to spriteram was broken)
+
+  The inputs seem to be a hacky mess (although there was reportedly a
+  hardware joystick hack for tehkanwc via plugin logic subboard, is this
+  attempting to simulate it?
+
+  Also there is a hack to reset the sound CPU...
+
+*/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -665,12 +663,12 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
+	MCFG_SOUND_ADD("ay1", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
+	MCFG_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, portA_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

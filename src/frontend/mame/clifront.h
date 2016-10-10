@@ -61,6 +61,8 @@ private:
 	void display_help(const char *exename);
 	void display_suggestions(const char *gamename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
+	void start_execution(mame_machine_manager *manager, int argc, char **argv, std::string &option_errors);
+	void start_console();
 
 	// internal state
 	emu_options &       m_options;

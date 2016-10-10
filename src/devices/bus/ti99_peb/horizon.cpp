@@ -364,6 +364,18 @@ void horizon_ramdisk_device::device_start(void)
 {
 	m_cru_horizon = 0;
 	m_cru_phoenix = 0;
+
+	save_item(NAME(m_select6_value));
+	save_item(NAME(m_select_all));
+	save_item(NAME(m_page));
+	save_item(NAME(m_cru_horizon));
+	save_item(NAME(m_cru_phoenix));
+	save_item(NAME(m_timode));
+	save_item(NAME(m_32k_installed));
+	save_item(NAME(m_split_mode));
+	save_item(NAME(m_rambo_mode));
+	save_item(NAME(m_hideswitch));
+	save_item(NAME(m_use_rambo));
 }
 
 void horizon_ramdisk_device::device_reset(void)

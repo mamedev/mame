@@ -255,6 +255,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/joyport/joyport.h,BUSES["BBC_JOYPORT"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_JOYPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joyport.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joyport.h",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joystick.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/1mhzbus/1mhzbus.h,BUSES["BBC_1MHZBUS"] = true
 ---------------------------------------------------
 
@@ -262,6 +277,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
 	}
 end
 
@@ -941,6 +958,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/svga_trident.h",
 		MAME_DIR .. "src/devices/bus/isa/num9rev.cpp",
 		MAME_DIR .. "src/devices/bus/isa/num9rev.h",
+		MAME_DIR .. "src/devices/bus/isa/mcd.cpp",
+		MAME_DIR .. "src/devices/bus/isa/mcd.h",
 	}
 end
 
@@ -2396,6 +2415,7 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_multi.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.cpp",
 	}
 end
 
