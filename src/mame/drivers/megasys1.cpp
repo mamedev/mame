@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( megasys1Z_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram")
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(ram_w) AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x050000, 0x053fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x054000, 0x057fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
 	AM_RANGE(0x058000, 0x05bfff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")
-	AM_RANGE(0x060000, 0x07ffff) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram")
+	AM_RANGE(0x060000, 0x07ffff) AM_RAM_WRITE(ram_w) AM_SHARE("ram")
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(ip_select_r,ip_select_w)
 ADDRESS_MAP_END
@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_C INTERRUPT_NUM_B
 #define interrupt_C     interrupt_B
 
-WRITE16_MEMBER(megasys1_state::ms1_ram_w )
+WRITE16_MEMBER(megasys1_state::ram_w )
 {
 	// DON'T use COMBINE_DATA
 	// byte writes end up mirroring in both bytes of the word like nmk16.c
@@ -379,7 +379,7 @@ static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_MIRROR(0x4000) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_MIRROR(0x4000) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM_WRITE(ram_w) AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
 
 
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x100000, 0x100001) // protection
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM /*_WRITE(ms1_ram_w)*/ AM_SHARE("ram")
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM /*_WRITE(ram_w)*/ AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1D_oki_map, AS_0, 8, megasys1_state )
@@ -1621,8 +1621,8 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	//MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
 	MCFG_SCREEN_RAW_PARAMS(SYS_A_CPU_CLOCK,406,0,256,263,16,240)
 
-	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
-	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
+	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -1706,8 +1706,8 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
-	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
+	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -1784,8 +1784,8 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
-	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
+	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ABC)
@@ -1836,7 +1836,7 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
+	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", Z)
@@ -4200,6 +4200,8 @@ DRIVER_INIT_MEMBER(megasys1_state,64street)
 	m_ip_select_values[5] = 0xfa;
 	m_ip_select_values[6] = 0x06;
 
+	save_item(NAME(m_ip_latched));
+	save_item(NAME(m_sprite_bank));
 }
 
 READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
@@ -4243,6 +4245,12 @@ DRIVER_INIT_MEMBER(megasys1_state,astyanax)
 	astyanax_rom_decode(machine(), "maincpu");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
+
+	m_mcu_hs = 0;
+	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+
+	save_item(NAME(m_mcu_hs));
+	save_item(NAME(m_mcu_hs_ram));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,avspirit)
@@ -4260,6 +4268,8 @@ DRIVER_INIT_MEMBER(megasys1_state,avspirit)
 	// has twice less RAM
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
+
+	save_item(NAME(m_ip_latched));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,bigstrik)
@@ -4273,6 +4283,8 @@ DRIVER_INIT_MEMBER(megasys1_state,bigstrik)
 	m_ip_select_values[5] = 0xfb;
 	m_ip_select_values[6] = 0x06;
 
+	save_item(NAME(m_ip_latched));
+	save_item(NAME(m_sprite_bank));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,chimerab)
@@ -4287,6 +4299,8 @@ DRIVER_INIT_MEMBER(megasys1_state,chimerab)
 	m_ip_select_values[5] = 0xf2;
 	m_ip_select_values[6] = 0x06;
 
+	save_item(NAME(m_ip_latched));
+	save_item(NAME(m_sprite_bank));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,cybattlr)
@@ -4299,6 +4313,9 @@ DRIVER_INIT_MEMBER(megasys1_state,cybattlr)
 
 	m_ip_select_values[5] = 0xf2;
 	m_ip_select_values[6] = 0x06;
+
+	save_item(NAME(m_ip_latched));
+	save_item(NAME(m_sprite_bank));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,edf)
@@ -4312,6 +4329,7 @@ DRIVER_INIT_MEMBER(megasys1_state,edf)
 	m_ip_select_values[5] = 0xf0;
 	m_ip_select_values[6] = 0x06;
 
+	save_item(NAME(m_ip_latched));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,edfp)
@@ -4330,6 +4348,7 @@ DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
 	m_ip_select_values[5] = 0xfc;
 	m_ip_select_values[6] = 0x06;
 
+	save_item(NAME(m_ip_latched));
 }
 
 READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
@@ -4374,6 +4393,12 @@ DRIVER_INIT_MEMBER(megasys1_state,iganinju)
 
 	//m_rom_maincpu[0x00006e/2] = 0x0420; // the only game that does
 										// not like lev 3 interrupts
+
+	m_mcu_hs = 0;
+	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+
+	save_item(NAME(m_mcu_hs));
+	save_item(NAME(m_mcu_hs_ram));
 }
 
 // jitsupro writes oki commands to both the lsb and msb; it works because of byte smearing
@@ -4397,6 +4422,12 @@ DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),this));
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),this));
+
+	m_mcu_hs = 0;
+	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+
+	save_item(NAME(m_mcu_hs));
+	save_item(NAME(m_mcu_hs_ram));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
@@ -4408,6 +4439,8 @@ DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
 	okibank->configure_entries(0, 7, &ROM[0x20000], 0x20000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
+
+	save_item(NAME(m_protection_val));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,phantasm)
@@ -4499,6 +4532,12 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragon)
 	phantasm_rom_decode(machine(), "maincpu");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
+
+	m_mcu_hs = 0;
+	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+
+	save_item(NAME(m_mcu_hs));
+	save_item(NAME(m_mcu_hs_ram));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,stdragona)
@@ -4510,6 +4549,12 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragona)
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
+
+	m_mcu_hs = 0;
+	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+
+	save_item(NAME(m_mcu_hs));
+	save_item(NAME(m_mcu_hs_ram));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,stdragonb)
@@ -4534,7 +4579,7 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
 		}
 	}
 
-	megasys1_priority_create();
+	priority_create();
 }
 
 /*************************************
@@ -4544,52 +4589,52 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
  *************************************/
 
 // Type Z
-GAME( 1988, lomakai,  0,        system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", 0 )
-GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", 0 )
+GAME( 1988, lomakai,  0,        system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type A
-GAME( 1988, p47,      0,        system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", 0 )
-GAME( 1988, p47j,     p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
-GAME( 1988, p47je,    p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", 0 )
-GAME( 1988, kickoff,  0,        system_A,          kickoff,  driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
-GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
-GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
-GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Astyanax", 0 )
-GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", 0 )
-GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, astyanax, ROT0,   "Jaleco", "Hachoo!", 0 )
-GAME( 1989, jitsupro, 0,        system_A,          jitsupro, megasys1_state, jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", 0 )
-GAME( 1989, plusalph, 0,        system_A,          plusalph, megasys1_state, astyanax, ROT270, "Jaleco", "Plus Alpha", 0 )
-GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", 0 )
-GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", 0 )
-GAME( 1989, stdragonb,stdragon, system_A,          stdragon, megasys1_state, stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", 0 )
-GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )
-GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
-GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype?)", 0 )
-GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
-GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
-GAME( 1991, edfp,     edf,      system_A,          edfp,     megasys1_state, edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", 0 )
-GAME( 1992, soldam,   0,        system_A_soldam,   soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", 0 )
-GAME( 1992, soldamj,  soldam,   system_A_soldam,   soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
+GAME( 1988, p47,      0,        system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47j,     p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47je,    p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoff,  0,        system_A,          kickoff,  driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Astyanax", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, jitsupro, 0,        system_A,          jitsupro, megasys1_state, jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, plusalph, 0,        system_A,          plusalph, megasys1_state, astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragonb,stdragon, system_A,          stdragon, megasys1_state, stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfp,     edf,      system_A,          edfp,     megasys1_state, edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldam,   0,        system_A_soldam,   soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldamj,  soldam,   system_A_soldam,   soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
-GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
-GAME( 1990, monkelf,  avspirit, system_B_monkelf,  avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", 0 )
-GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", 0 )
-GAME( 1991, edfa,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", 0 )
-GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
-GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      driver_device,  0,        ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND )
-GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, monkelf,  avspirit, system_B_monkelf,  avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfa,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      driver_device,  0,        ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Type C
-GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
-GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", 0 )
-GAME( 1991, 64streetja,64street,system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", 0 )
-GAME( 1992, bigstrik, 0,        system_C,          bigstrik, megasys1_state, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 )
-GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", 0 )
-GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
+GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetja,64street,system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrik, 0,        system_C,          bigstrik, megasys1_state, bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
-GAME( 1993, peekaboo, 0,        system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", 0 )
-GAME( 1993, peekaboou,peekaboo, system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", 0 )
+GAME( 1993, peekaboo, 0,        system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboou,peekaboo, system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )

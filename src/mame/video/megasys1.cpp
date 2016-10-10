@@ -215,6 +215,14 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 		m_hardware_type_z = 1;
 
 	m_screen->register_screen_bitmap(m_sprite_buffer_bitmap);
+
+	save_pointer(NAME(m_buffer_objectram.get()), 0x2000);
+	save_pointer(NAME(m_buffer_spriteram16.get()), 0x2000);
+	save_pointer(NAME(m_buffer2_objectram.get()), 0x2000);
+	save_pointer(NAME(m_buffer2_spriteram16.get()), 0x2000);
+	save_item(NAME(m_screen_flag));
+	save_item(NAME(m_active_layers));
+	save_item(NAME(m_sprite_flag));
 }
 
 /***************************************************************************
@@ -603,7 +611,7 @@ struct priority
     the bottom layer's opaque pens, but above its transparent
     pens.
 */
-void megasys1_state::megasys1_priority_create()
+void megasys1_state::priority_create()
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pri_code, offset, i, order;
@@ -746,7 +754,7 @@ void megasys1_state::megasys1_priority_create()
 
 PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 {
-	megasys1_priority_create();
+	priority_create();
 }
 
 
@@ -758,7 +766,7 @@ PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 ***************************************************************************/
 
 
-UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, flag, pri, primask;
 	int active_layers;
@@ -856,7 +864,7 @@ UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void megasys1_state::screen_eof_megasys1(screen_device &screen, bool state)
+void megasys1_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)

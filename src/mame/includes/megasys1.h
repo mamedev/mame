@@ -61,26 +61,40 @@ public:
 	optional_ioport m_io_dsw1;
 	optional_ioport m_io_dsw2;
 
-	bitmap_ind16 m_sprite_buffer_bitmap;
-
-	UINT16 *m_spriteram;
-	UINT16 m_ip_select_values[7];
-	UINT16 m_ip_latched;
+	// configuration
+	UINT16 m_ip_select_values[7]; // System B and C
+	int m_hardware_type_z; // System Z
+	int m_layers_order[16];
 	UINT8 m_ignore_oki_status;
-	UINT16 m_protection_val;
-	UINT16 m_active_layers;
-	UINT16 m_sprite_bank;
+
+	// all
+	bitmap_ind16 m_sprite_buffer_bitmap;
 	UINT16 m_screen_flag;
-	UINT16 m_sprite_flag;
-	int m_hardware_type_z;
 	std::unique_ptr<UINT16[]> m_buffer_objectram;
 	std::unique_ptr<UINT16[]> m_buffer2_objectram;
 	std::unique_ptr<UINT16[]> m_buffer_spriteram16;
 	std::unique_ptr<UINT16[]> m_buffer2_spriteram16;
-	int m_layers_order[16];
 
-	int m_mcu_hs;
+	// all but System Z
+	UINT16 m_active_layers;
+	UINT16 m_sprite_flag;
+
+	// System B and C
+	UINT16 m_ip_latched; 
+
+	 // System C
+	UINT16 m_sprite_bank;
+
+	// System A only
+	int m_mcu_hs; 
 	UINT16 m_mcu_hs_ram[0x10];
+
+	// peekaboo
+	UINT16 m_protection_val;
+
+	// soldam
+	UINT16 *m_spriteram;
+
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_READ16_MEMBER(ip_select_r);
 	DECLARE_WRITE16_MEMBER(ip_select_w);
@@ -109,6 +123,8 @@ public:
 	DECLARE_READ8_MEMBER(oki_status_2_r);
 	DECLARE_WRITE16_MEMBER(okim6295_both_1_w);
 	DECLARE_WRITE16_MEMBER(okim6295_both_2_w);
+	DECLARE_WRITE16_MEMBER(ram_w);
+
 	DECLARE_DRIVER_INIT(64street);
 	DECLARE_DRIVER_INIT(chimerab);
 	DECLARE_DRIVER_INIT(peekaboo);
@@ -138,15 +154,15 @@ public:
 	DECLARE_VIDEO_START(megasys1);
 	DECLARE_PALETTE_INIT(megasys1);
 	DECLARE_MACHINE_RESET(megasys1_hachoo);
-	UINT32 screen_update_megasys1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_megasys1(screen_device &screen, bool state);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
-	DECLARE_WRITE16_MEMBER(ms1_ram_w);
 
-	void megasys1_priority_create();
+	void priority_create();
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 param);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
