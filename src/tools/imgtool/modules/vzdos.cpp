@@ -385,11 +385,11 @@ static imgtoolerr_t vzdos_write_formatted_sector(imgtool::image *img, int track,
     Imgtool module code
 *********************************************************************/
 
-static imgtoolerr_t vzdos_diskimage_beginenum(imgtool_directory *enumeration, const char *path)
+static imgtoolerr_t vzdos_diskimage_beginenum(imgtool::directory *enumeration, const char *path)
 {
 	vz_iterator *iter;
 
-	iter = (vz_iterator *) imgtool_directory_extrabytes(enumeration);
+	iter = (vz_iterator *) enumeration->extra_bytes();
 	if (!iter) return IMGTOOLERR_OUTOFMEMORY;
 
 	iter->index = 1;
@@ -398,9 +398,9 @@ static imgtoolerr_t vzdos_diskimage_beginenum(imgtool_directory *enumeration, co
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
 {
-	vz_iterator *iter = (vz_iterator *) imgtool_directory_extrabytes(enumeration);
+	vz_iterator *iter = (vz_iterator *) enumeration->extra_bytes();
 
 	if (iter->eof == 1 || iter->index > MAX_DIRENTS) {
 		ent->eof = 1;
@@ -410,7 +410,7 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, img
 		int ret, len;
 		vzdos_dirent dirent;
 
-		ret = vzdos_get_dirent(imgtool_directory_image(enumeration), iter->index - 1, &dirent);
+		ret = vzdos_get_dirent(&enumeration->image(), iter->index - 1, &dirent);
 
 		if (ret == IMGTOOLERR_FILENOTFOUND)
 		{
@@ -455,11 +455,11 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, img
 
 /* TRK 0 sector 15 is used to hold the track map of the disk with one bit
    corresponding to a sector used. */
-static imgtoolerr_t vzdos_diskimage_freespace(imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t vzdos_diskimage_freespace(imgtool::partition *partition, UINT64 *size)
 {
 	imgtoolerr_t ret;
 	int i;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	UINT8 c, v, buffer[DATA_SIZE + 2];
 	*size = 0;
 
@@ -478,10 +478,10 @@ static imgtoolerr_t vzdos_diskimage_freespace(imgtool_partition *partition, UINT
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t vzdos_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
 {
 	imgtoolerr_t ret;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	int filesize, track, sector;
 	vzdos_dirent ent;
 	UINT8 buffer[DATA_SIZE + 2];
@@ -524,10 +524,10 @@ static imgtoolerr_t vzdos_diskimage_readfile(imgtool_partition *partition, const
 }
 
 /* deletes directory entry, clears trackmap entries and sectors */
-static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, const char *fname)
+static imgtoolerr_t vzdos_diskimage_deletefile(imgtool::partition *partition, const char *fname)
 {
 	imgtoolerr_t ret;
-	imgtool::image *img = imgtool_partition_image(partition);
+	imgtool::image *img = &partition->image();
 	int index, filesize, track, sector, next_track, next_sector;
 	vzdos_dirent entry, next_entry;
 	UINT8 buffer[DATA_SIZE + 2];
@@ -602,10 +602,10 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, con
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, imgtool_stream *sourcef, vzdos_dirent *entry)
+static imgtoolerr_t vzdos_writefile(imgtool::partition *partition, int offset, imgtool_stream *sourcef, vzdos_dirent *entry)
 {
 	imgtoolerr_t ret;
-	imgtool::image *img = imgtool_partition_image(partition);
+	imgtool::image *img = &partition->image();
 	int index, track, sector, toread, next_track, next_sector;
 	vzdos_dirent temp_entry;
 	UINT64 filesize = 0, freespace = 0;
@@ -700,7 +700,7 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 }
 
 /* create a new file or overwrite a file */
-static imgtoolerr_t vzdos_diskimage_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t vzdos_diskimage_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int ftype;
@@ -741,10 +741,10 @@ static imgtoolerr_t vzdos_diskimage_writefile(imgtool_partition *partition, cons
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool_partition *partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool::partition *partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t ret;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	vzdos_dirent entry;
 
 	if (fname) {
@@ -808,10 +808,10 @@ static imgtoolerr_t vzdos_diskimage_create(imgtool::image *img, imgtool_stream *
     Imgtool vz filter code
 *********************************************************************/
 
-static imgtoolerr_t vzsnapshot_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t vzsnapshot_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
 {
 	imgtoolerr_t ret;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	vzdos_dirent entry;
 	UINT8 header[24];
 
@@ -852,7 +852,7 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool_partition *partition, const char
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzsnapshot_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t vzsnapshot_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int fnameopt;

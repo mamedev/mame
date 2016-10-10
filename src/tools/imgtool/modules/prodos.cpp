@@ -1486,7 +1486,7 @@ static UINT32 prodos_get_storagetype_maxfilesize(UINT8 storage_type)
 
 
 
-static imgtoolerr_t prodos_diskimage_beginenum(imgtool_directory *enumeration, const char *path)
+static imgtoolerr_t prodos_diskimage_beginenum(imgtool::directory *enumeration, const char *path)
 {
 	imgtoolerr_t err;
 	imgtool::image *image;
@@ -1494,8 +1494,8 @@ static imgtoolerr_t prodos_diskimage_beginenum(imgtool_directory *enumeration, c
 	prodos_dirent ent;
 	UINT16 block = ROOTDIR_BLOCK;
 
-	image = imgtool_directory_image(enumeration);
-	appleenum = (prodos_direnum *) imgtool_directory_extrabytes(enumeration);
+	image = &enumeration->image();
+	appleenum = (prodos_direnum *) enumeration->extra_bytes();
 
 	/* find subdirectory, if appropriate */
 	if (*path)
@@ -1521,7 +1521,7 @@ static imgtoolerr_t prodos_diskimage_beginenum(imgtool_directory *enumeration, c
 
 
 
-static imgtoolerr_t prodos_diskimage_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
 {
 	imgtoolerr_t err;
 	imgtool::image *image;
@@ -1529,8 +1529,8 @@ static imgtoolerr_t prodos_diskimage_nextenum(imgtool_directory *enumeration, im
 	prodos_dirent pd_ent;
 	UINT32 max_filesize;
 
-	image = imgtool_directory_image(enumeration);
-	appleenum = (prodos_direnum *) imgtool_directory_extrabytes(enumeration);
+	image = &enumeration->image();
+	appleenum = (prodos_direnum *) enumeration->extra_bytes();
 
 	do
 	{
@@ -1675,10 +1675,10 @@ static imgtoolerr_t prodos_write_file_tree(imgtool::image *image, UINT32 *filesi
 
 
 
-static imgtoolerr_t prodos_diskimage_freespace(imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t prodos_diskimage_freespace(imgtool::partition *partition, UINT64 *size)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_diskinfo *di;
 	UINT8 *bitmap = NULL;
 	UINT16 i;
@@ -1704,10 +1704,10 @@ done:
 
 
 
-static imgtoolerr_t prodos_diskimage_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t prodos_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	UINT16 key_pointer;
 	int nest_level;
@@ -1744,10 +1744,10 @@ static imgtoolerr_t prodos_diskimage_readfile(imgtool_partition *partition, cons
 
 
 
-static imgtoolerr_t prodos_diskimage_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	prodos_direnum direnum;
 	UINT64 file_size;
@@ -1782,10 +1782,10 @@ static imgtoolerr_t prodos_diskimage_writefile(imgtool_partition *partition, con
 
 
 
-static imgtoolerr_t prodos_diskimage_deletefile(imgtool_partition *partition, const char *path)
+static imgtoolerr_t prodos_diskimage_deletefile(imgtool::partition *partition, const char *path)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	prodos_direnum direnum;
 
@@ -1815,10 +1815,10 @@ static imgtoolerr_t prodos_diskimage_deletefile(imgtool_partition *partition, co
 
 
 
-static imgtoolerr_t prodos_diskimage_listforks(imgtool_partition *partition, const char *path, imgtool_forkent *ents, size_t len)
+static imgtoolerr_t prodos_diskimage_listforks(imgtool::partition *partition, const char *path, imgtool_forkent *ents, size_t len)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	prodos_direnum direnum;
 	int fork_num = 0;
@@ -1851,10 +1851,10 @@ static imgtoolerr_t prodos_diskimage_listforks(imgtool_partition *partition, con
 
 
 
-static imgtoolerr_t prodos_diskimage_createdir(imgtool_partition *partition, const char *path)
+static imgtoolerr_t prodos_diskimage_createdir(imgtool::partition *partition, const char *path)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	prodos_direnum direnum;
 
@@ -1909,10 +1909,10 @@ static imgtoolerr_t prodos_free_directory(imgtool::image *image, UINT8 *volume_b
 
 
 
-static imgtoolerr_t prodos_diskimage_deletedir(imgtool_partition *partition, const char *path)
+static imgtoolerr_t prodos_diskimage_deletedir(imgtool::partition *partition, const char *path)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	prodos_direnum direnum;
 	UINT8 *volume_bitmap = NULL;
@@ -1999,10 +1999,10 @@ static imgtoolerr_t prodos_get_file_tree(imgtool::image *image, imgtool_chainent
 
 
 
-static imgtoolerr_t prodos_diskimage_getattrs(imgtool_partition *partition, const char *path, const UINT32 *attrs, imgtool_attribute *values)
+static imgtoolerr_t prodos_diskimage_getattrs(imgtool::partition *partition, const char *path, const UINT32 *attrs, imgtool_attribute *values)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	int i;
 
@@ -2062,10 +2062,10 @@ static imgtoolerr_t prodos_diskimage_getattrs(imgtool_partition *partition, cons
 
 
 
-static imgtoolerr_t prodos_diskimage_setattrs(imgtool_partition *partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values)
+static imgtoolerr_t prodos_diskimage_setattrs(imgtool::partition *partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	prodos_direnum direnum;
 	int i;
@@ -2130,10 +2130,10 @@ static imgtoolerr_t prodos_diskimage_setattrs(imgtool_partition *partition, cons
 
 
 
-static imgtoolerr_t prodos_diskimage_suggesttransfer(imgtool_partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t prodos_diskimage_suggesttransfer(imgtool::partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	mac_filecategory_t file_category = MAC_FILECATEGORY_DATA;
 
@@ -2153,10 +2153,10 @@ static imgtoolerr_t prodos_diskimage_suggesttransfer(imgtool_partition *partitio
 
 
 
-static imgtoolerr_t prodos_diskimage_getchain(imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size)
+static imgtoolerr_t prodos_diskimage_getchain(imgtool::partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	prodos_dirent ent;
 	size_t chain_pos = 0;
 	int fork_num;

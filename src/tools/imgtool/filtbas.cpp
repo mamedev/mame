@@ -69,7 +69,7 @@ struct basictokens
 -------------------------------------------------*/
 
 static imgtoolerr_t basic_readfile(const basictokens *tokens,
-	imgtool_partition *partition, const char *filename,
+	imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *destf)
 {
 	imgtoolerr_t err;
@@ -91,7 +91,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	}
 
 	/* read actual file */
-	err = imgtool_partition_read_file(partition, filename, fork, mem_stream, nullptr);
+	err = partition->read_file(filename, fork, mem_stream, nullptr);
 	if (err)
 		goto done;
 
@@ -174,7 +174,7 @@ done:
 -------------------------------------------------*/
 
 static imgtoolerr_t basic_writefile(const basictokens *tokens,
-	imgtool_partition *partition, const char *filename,
+	imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
@@ -343,7 +343,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	}
 
 	/* write actual file */
-	err = imgtool_partition_write_file(partition, filename, fork, mem_stream, opts, nullptr);
+	err = partition->write_file(filename, fork, mem_stream, opts, nullptr);
 	if (err)
 		goto done;
 
@@ -2958,13 +2958,13 @@ static const basictokens cocobas_tokens =
 	ARRAY_LENGTH(cocobas_tokenents)
 };
 
-static imgtoolerr_t cocobas_readfile(imgtool_partition *partition, const char *filename,
+static imgtoolerr_t cocobas_readfile(imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *destf)
 {
 	return basic_readfile(&cocobas_tokens, partition, filename, fork, destf);
 }
 
-static imgtoolerr_t cocobas_writefile(imgtool_partition *partition, const char *filename,
+static imgtoolerr_t cocobas_writefile(imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&cocobas_tokens, partition, filename, fork, sourcef, opts);
@@ -3002,13 +3002,13 @@ static const basictokens dragonbas_tokens =
 	ARRAY_LENGTH(dragonbas_tokenents)
 };
 
-static imgtoolerr_t dragonbas_readfile(imgtool_partition *partition, const char *filename,
+static imgtoolerr_t dragonbas_readfile(imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *destf)
 {
 	return basic_readfile(&dragonbas_tokens, partition, filename, fork, destf);
 }
 
-static imgtoolerr_t dragonbas_writefile(imgtool_partition *partition, const char *filename,
+static imgtoolerr_t dragonbas_writefile(imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&dragonbas_tokens, partition, filename, fork, sourcef, opts);
@@ -3047,13 +3047,13 @@ static const basictokens vzbas_tokens =
 	ARRAY_LENGTH(vzbas_tokenents)
 };
 
-static imgtoolerr_t vzbas_readfile(imgtool_partition *partition, const char *filename,
+static imgtoolerr_t vzbas_readfile(imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *destf)
 {
 	return basic_readfile(&vzbas_tokens, partition, filename, fork, destf);
 }
 
-static imgtoolerr_t vzbas_writefile(imgtool_partition *partition, const char *filename,
+static imgtoolerr_t vzbas_writefile(imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&vzbas_tokens, partition, filename, fork, sourcef, opts);
@@ -3091,13 +3091,13 @@ static const basictokens bml3bas_tokens =
 	ARRAY_LENGTH(bml3bas_tokenents)
 };
 
-static imgtoolerr_t bml3bas_readfile(imgtool_partition *partition, const char *filename,
+static imgtoolerr_t bml3bas_readfile(imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *destf)
 {
 	return basic_readfile(&bml3bas_tokens, partition, filename, fork, destf);
 }
 
-static imgtoolerr_t bml3bas_writefile(imgtool_partition *partition, const char *filename,
+static imgtoolerr_t bml3bas_writefile(imgtool::partition *partition, const char *filename,
 	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&bml3bas_tokens, partition, filename, fork, sourcef, opts);

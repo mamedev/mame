@@ -447,19 +447,19 @@ static void datapack_close( imgtool::image *image)
 	stream_close( pack->stream );
 }
 
-static imgtoolerr_t datapack_begin_enum(imgtool_directory *enumeration, const char *path)
+static imgtoolerr_t datapack_begin_enum(imgtool::directory *enumeration, const char *path)
 {
-	psion_iter *iter = (psion_iter*)imgtool_directory_extrabytes(enumeration);
+	psion_iter *iter = (psion_iter*)enumeration->extra_bytes();
 	iter->index = 0;
 
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_next_enum(imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t datapack_next_enum(imgtool::directory *enumeration, imgtool_dirent *ent)
 {
-	imgtool::image *image = imgtool_directory_image(enumeration);
+	imgtool::image *image = &enumeration->image();
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
-	psion_iter *iter = (psion_iter*)imgtool_directory_extrabytes(enumeration);
+	psion_iter *iter = (psion_iter*)enumeration->extra_bytes();
 	UINT8 data = 0;
 
 	if (!pack->pack_index[iter->index].name_rec)
@@ -492,13 +492,13 @@ static imgtoolerr_t datapack_next_enum(imgtool_directory *enumeration, imgtool_d
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void datapack_close_enum( imgtool_directory *enumeration)
+static void datapack_close_enum( imgtool::directory *enumeration)
 {
 }
 
-static imgtoolerr_t datapack_free_space( imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t datapack_free_space( imgtool::partition *partition, UINT64 *size)
 {
-	imgtool::image *image = imgtool_partition_image( partition);
+	imgtool::image *image = &partition->image();
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
 	UINT32 pack_size = 0;
 
@@ -511,9 +511,9 @@ static imgtoolerr_t datapack_free_space( imgtool_partition *partition, UINT64 *s
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_read_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
 {
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
 	int index = seek_file_name(pack, filename);
 
@@ -543,9 +543,9 @@ static imgtoolerr_t datapack_read_file(imgtool_partition *partition, const char 
 		return IMGTOOLERR_FILENOTFOUND;
 }
 
-static imgtoolerr_t datapack_write_file( imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
 	static const UINT8 data_head[4] = {0x02, 0x80, 0x00, 0x00};
 	UINT8 head[3];
@@ -605,9 +605,9 @@ static imgtoolerr_t datapack_write_file( imgtool_partition *partition, const cha
 		return IMGTOOLERR_CORRUPTIMAGE;
 }
 
-static imgtoolerr_t datapack_delete_file( imgtool_partition *partition, const char *filename)
+static imgtoolerr_t datapack_delete_file( imgtool::partition *partition, const char *filename)
 {
-	imgtool::image *image = imgtool_partition_image(partition);
+	imgtool::image *image = &partition->image();
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
 	int index = seek_file_name(pack, filename);
 
