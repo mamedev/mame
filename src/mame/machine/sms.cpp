@@ -458,6 +458,22 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 WRITE8_MEMBER(sms_state::smsj_audio_control_w)
 {
 	m_smsj_audio_control = data & 0x03;
+
+	/*  Mute settings:
+		0,0 : PSG only (power-on default)
+		0,1 : FM only
+		1,0 : Both PSG and FM disabled
+		1,1 : Both PSG and FM enabled 
+	*/
+	if (m_smsj_audio_control == 0x00 || m_smsj_audio_control == 0x03)
+		m_psg_sms->set_output_gain(0, 1.0);
+	else
+		m_psg_sms->set_output_gain(0, 0.0);
+
+	if (m_smsj_audio_control == 0x01 || m_smsj_audio_control == 0x03)
+		m_ym->set_output_gain(0, 1.0);
+	else
+		m_ym->set_output_gain(0, 0.0);
 }
 
 
@@ -492,29 +508,19 @@ READ8_MEMBER(sms_state::smsj_audio_control_r)
 
 WRITE8_MEMBER(sms_state::smsj_ym2413_register_port_w)
 {
-	if (m_smsj_audio_control == 0x01 || m_smsj_audio_control == 0x03)
-		m_ym->write(space, 0, data & 0x3f);
+	m_ym->write(space, 0, data & 0x3f);
 }
 
 
 WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
 {
-	if (m_smsj_audio_control == 0x01 || m_smsj_audio_control == 0x03)
-	{
-		//logerror("data_port_w %x %x\n", offset, data);
-		m_ym->write(space, 1, data);
-	}
+	//logerror("data_port_w %x %x\n", offset, data);
+	m_ym->write(space, 1, data);
 }
 
 
 WRITE8_MEMBER(sms_state::sms_psg_w)
 {
-	if (m_is_smsj)
-	{
-		if (m_smsj_audio_control != 0x00 && m_smsj_audio_control != 0x03)
-			return;
-	}
-
 	m_psg_sms->write(space, offset, data, mem_mask);
 }
 
