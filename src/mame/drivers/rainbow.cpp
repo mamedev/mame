@@ -3,8 +3,7 @@
 //#define BOOST_DEBUG_PERFORMANCE
 
 
-/* NEW COLOR EMULATION (state as of Oct. 1st 2016):
-
+/* GDC COLOR EMULATION
 //-------------------- Differences to VT240: ---------------------------------------------------
 // - Registers of graphics option not directly mapped (indirect access via mode register)
 // - write mask is 16 bits wide (not only 8)
@@ -17,33 +16,30 @@
 // Palette takes 2 byte per palette entry. CLUT ("color map") is 32 byte long. 
 ------------------------------------------------------------------------------------------------
 
+THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
+// The standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
+// (DIP setting COLOR_MONITOR).
+//
+// An unofficial DIY cable enabled R-G-B graphics + seperate text (emulated by DIP setting DUAL MONITOR).
+// As DEC decided not to endorse R-G-B, many commercial programs show incorrect colors.
+// A patch from one of the archives corrects the GWBASIC palette problem when using 2 monitors [Bavarese].
+
+EMULATION SPECIFIC
+// If a program disables text output (via port $0A), a log message is given. 
+
+// DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off 
+// (helps debugging semi broken programs, for example Doodle). 
+
 SCREEN 1 vs. SCREEN 2 IN EMULATION
 // All GDC 7220 output is displayed on the right. Be it color or monochrome, Option Graphics output is on screen 2.
 // If you select MONO_MONITOR via DIP, output from GDC will appear on screen 2 in 16 shades of grey.
 // The type of monochrome monitor (VR-210 A, B or C) is selectable via another DIP (coarsly simulates a phosphor color).
 
-THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
-// VR-241 came with a standard DEC "color cable", where the green gun is wired to the mono output (DIP switch COLOR_MONITOR).
-// Port $0A decides whether the mono out pin on the back of the Rainbow holds graphics signals or simple text.
-// 
-// An unofficial DIY cable gave R-G-B graphics plus seperate text (emulated by DIP setting: DUAL MONITOR).
-// Unfortunately, popular programs like AutoCAD and GWBASIC were initially written for 1 single VR201 or VT241 monitor.
-// A 'R-M-B' cable is expected, and thus writes go to M(ono) instead of G(reen). An awful tint results on R-G-B.
-
-// DEC decided not to support this mode. Nevertheless, AutoCad 2.6 offers a true dual monitor mode.
-// A patch from one of the archives corrects the GWBASIC palette problem when using 2 monitors [Bavarese].
-
-EMULATION SPECIFIC
-// A log message informs the user if text output is disabled. Means: software is not ready / patched for dual monitor use.
-// In our emulation, DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off 
-// (helps debugging semi broken programs, try Doodle). 
-
 BUGS
-- HIRES-MODE WRONG.  MEDRES SEMI-CORRECT.
-BROKEN SPRITES / NO BORDER GRAPHICS IN "PACMAN" (freeware clone; MEDRES; borders probably drawn in vector mode)
-
-- VECTOR MODE SEEMS TO DISPLAY NOTHING AT ALL (16 bit access botched?)
-- CLEARING THE SCREEN DOES NOT WORK (bug in VRAM_W...?)
+- MEDRES LOOKS CORRECT 
+- HIRES-MODE UNTESTED.  
+- VECTOR MODE SEEMS TO DISPLAY NOTHING AT ALL (16 bit access botched?) Examples: MMIND (MasterMind, after BMP logo), SOLIT (Solitair).
+- GDC diagnostic disk bails out on 11 of 13 low level tests. SCROLL CHECK crashes CPU.
 
 UNIMPLEMENTED:
 // - Video levels for color modes.
@@ -2353,7 +2349,7 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 
 	// VIDEO LEVELS:  0 is 100 % output; F is 0 % output
 	// Levels for 100-B model, taken from page 46 of PDF, multiplied by 2.55 to obtain a range of 0...255
-	const int v_levels[16] = { 255, 217,  201,186, 171, 156, 140, 125, 110, 97, 79, 66, 54, 31, 18, 0 };
+	const UINT8 v_levels[16] = { 255, 217,  201,186, 171, 156, 140, 125, 110, 97, 79, 66, 54, 31, 18, 0 };
 
 	if(m_scroll_buffer_changed)
 	{	
@@ -2715,6 +2711,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 	if(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR) // VT240 : if(SELECT_VECTOR_PATTERN_REGISTER) 
 	{
 			chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+			chr |= (chr << 8);
 			if(m_patcnt-- == 0)
 			{
 				m_patcnt = m_patmult;
@@ -2735,7 +2732,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 	{
 		// ALU_PS register: controls logic used in writing to the bitmap / inhibiting of writing to specified planes.
 		//     plane select and logic operations on write buffer... (and more)  **** SEE  PAGE 36 ****
-		int ps = ~m_GDC_ALU_PS_REGISTER & 0x0F; // PLANE SELECT 0..3    // VT 240 : ~m_GDC_ALU_PS_REGISTER & 3;
+		int ps = m_GDC_ALU_PS_REGISTER & 0x0F; // PLANE SELECT 0..3    // VT 240 : ~m_GDC_ALU_PS_REGISTER & 3;
   		UINT8 fore = ( (m_GDC_FG_BG & 0xf0) ) >> 4;
 		UINT8 back =   (m_GDC_FG_BG & 0x0f);		// background : 0..3 confirmed, see p.39 AA-AE36A (PDF)
 
@@ -2795,9 +2792,6 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 {
 	static int last_message, last_mode, last_readback, last_scroll_index;
-//	rectangle curvisarea = m_screen2->visible_area();
-//	int vert_pix_total = 256;  // should be 240
-//	int horiz_pix_total;
 
 	if(offset > 0) // Port $50 reset done @ boot ROM 1EB4/8 regardless if option present. 
 		if (m_inp7->read() != 1) 
@@ -2878,7 +2872,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_PATTERN)
 			{	
-				m_vpat = data;                           // VGl.  "vpat_w"   im Original!
+				m_vpat = data;                           
 				m_patcnt = m_patmult;
 				m_patidx = 7; // correct...?
 				break;
@@ -2892,7 +2886,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_ALU_PS)
 			{	
-				m_GDC_ALU_PS_REGISTER = data;  // Neither bitswap nor negated (and also not both)...
+				m_GDC_ALU_PS_REGISTER = ~data;  // Negated...
 				break;
 			}
 			 
@@ -2905,19 +2899,10 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 					last_message = 2;
 
 					if(data & GDC_MODE_HIGHRES) 
-					{
-//						horiz_pix_total = 800;
 						printf(" * HIGH RESOLUTION * ");
-					}
 					else
-					{	
-//						horiz_pix_total = 384;
 						printf(" MEDIUM RESOLUTION ");
-					}
 				}
-				// DOES NOT WORK - at least for medres the screen is too far stretched :
-//				curvisarea.set(0, horiz_pix_total - 1, 0, vert_pix_total - 1); 				
-//				subdevice<screen_device>("screen2")->configure(horiz_pix_total, vert_pix_total, curvisarea, HZ_TO_ATTOSECONDS(60));
 
 				if(last_mode != (data & GDC_MODE_VECTOR))
 				{
@@ -2990,12 +2975,12 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 		// --------- WRITE MASK (2 x 8 = 16 bits) USED IN WORD MODE ONLY !
         // NOTE: there is NO specific order for the WRITE_MASK (according to txt/code samples in PDF)!
-		// LOW... HI VERIFED
+		// !! NEW: LOW... HI JUXTAPOSITION...!!
 		case 4: // 54h   Write Mask LOW
-			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(~data, 0, 1, 2, 3, 4, 5, 6, 7);
+			m_GDC_WRITE_MASK = ( BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF ); 
 			break;
 		case 5: // 55h   Write Mask HIGH
-			m_GDC_WRITE_MASK =  ( BITSWAP8(~data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF ); 
+			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
 			break;
 	}
 }
