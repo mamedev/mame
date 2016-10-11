@@ -1602,6 +1602,17 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<software name="bgelmntt">
+		<description>Blade of The Great Elements (Test Version)</description>
+		<year>1990</year>
+		<publisher>アミューズメント (Amusement)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blade of the great elements (test version) (1990)(amusement).dim" size="1261824" crc="F0C71952" sha1="7D11252BB23CE4F8C242CFA71F9B04FC1B368B25" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="btlchess">
 		<description>Battle Chess</description>
 		<year>1989</year>
@@ -8392,33 +8403,36 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<!-- The first 3 disks are in 2HDE format and are not handled properly -->
+	<!-- This software is compressed game disk unzipping tool (All unzipped to 17 disks (12 titles))
+	Disk 1,2 and 3 use the 2HDE format (Unsupported), Disk 4 system boot disk (2HD format) -->
 	<software name="ldb_x68k" supported="no">
-		<description>LOGiN Disk &amp; Book Series - X68000 Kessaku Game-sen</description>
-		<year>19??</year>
+		<description>LOGiN Disk &amp; Book Series - LOGiN Software Contest X68000 Kessaku Game-sen</description>
+		<year>1993</year>
 		<publisher>Login</publisher>
+		<info name="alt_title" value="LOGiN DISK&amp;BOOKシリーズ - ログインソフトウェアコンテスト X68000傑作ゲーム選" />
+		<info name="release" value="19931025" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1474560">
-				<rom name="ldbx68k_1.hdm" size="1474560" crc="35a29e6e" sha1="68be72d44ed55bdc2bb84ab2396475e22452a43b" offset="0" />
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1261824">
+				<rom name="ldbx68k_4.dim" size="1261824" crc="2c235674" sha1="97729CD1071EABA6EA98DFEB172311520F7E8A24" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1474560">
-				<rom name="ldbx68k_2.hdm" size="1474560" crc="0e1d25f0" sha1="53f3a6b192b788469142092ae4515612ebb0892c" offset="0" />
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474816">
+				<rom name="ldbx68k_1.dim" size="1474816" crc="F04FAEF1" sha1="CA01E3367B84B0752E2D3BF21560D12F776D0778" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1474560">
-				<rom name="ldbx68k_3.hdm" size="1474560" crc="77726148" sha1="850bc85f0f6ef28082d13a4e7eb3fb0cffca9035" offset="0" />
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474816">
+				<rom name="ldbx68k_2.dim" size="1474816" crc="CBF0156F" sha1="904BB6FEB5A6DA7EE04C641E19E6B0E950042C97" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1261568">
-				<rom name="ldbx68k_4.hdm" size="1261568" crc="bfccf8e0" sha1="ee7f6f56086e997620fef4dc1e9e102f33732a68" offset="0" />
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474816">
+				<rom name="ldbx68k_3.dim" size="1474816" crc="B29F51D7" sha1="06DBE68C097D7D152DEE8F2AD938731B681913A3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8595,6 +8609,38 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
 				<rom name="mahjongg gensou kyoku (1992)(active)(disk 4 of 4)(disk d).dim" size="1261824" crc="84ef8bee" sha1="b459709d17dc3ee7f835095401d5ba481c3ff716" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mjfants2">
+		<description>Mahjong Gensoukyoku II - Mahjong Fantasia -The 2nd Stage</description>
+		<year>1993</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="alt_title" value="麻雀幻想曲Ⅱ" />
+		<info name="release" value="19930828" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261824">
+				<rom name="mahjong gensoukyoku ii (1993)(active)(disk 1 of 4)(disk a).dim" size="1261824" crc="E22A0A22" sha1="BD62BFA94F7D54273227F56C8798C5669462AF1D" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261824">
+				<rom name="mahjong gensoukyoku ii (1993)(active)(disk 2 of 4)(disk b).dim" size="1261824" crc="11CF0B83" sha1="E7595FA0BE1D176BC54AE7760F7ABB94E554C329" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261824">
+				<rom name="mahjong gensoukyoku ii (1993)(active)(disk 3 of 4)(disk c).dim" size="1261824" crc="8DF65565" sha1="4AFD22C642C1C37FF714BAF32F8DB156BF79414B" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261824">
+				<rom name="mahjong gensoukyoku ii (1993)(active)(disk 4 of 4)(disk d).dim" size="1261824" crc="880B66CE" sha1="B21AB349547585A9859135979CB44B49EED004A1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10490,6 +10536,18 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="phalanx (demo) (1991)(zoom).dim" size="1261824" crc="5E4B01D7" sha1="52C735985A64F73947AAC3C79DA7F393B6C328FC" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phalanxs" cloneof="phalanx">
+		<description>Phalanx (Sample)</description>
+		<year>1991</year>
+		<publisher>Zoom</publisher>
+		<info name="alt_title" value="ファランクス" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="phalanx (sample) (1991)(zoom).dim" size="1261824" crc="B3D81E59" sha1="92874C431F465968E25AE9FB3B29FAA34D92C966" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -20365,6 +20423,113 @@ a contest among doujin programmers...  -->
 
 
 
+<!-- Distributed with Magazine Book from "The World of X68000". There are winner of a
+ "The first all japan X68000 art festival (第1回全日本X68000芸術祭)" among programmers. -->
+
+	<software name="formulaxa" cloneof="formulax">
+		<description>The World of X68000 - Formula X</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="フォーミュラX (ザ・ワールド・オブ・X68000)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="the world of x68000 (disk 3 of 3) - formula x.dim" size="1261824" crc="17E7DCB5" sha1="4CA19B5054F77139F5951CE00A8A47D4A98783AF" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This image file is multi boot disk.
+	 Set drive 0 to boot "Fortress Attack", Set drive 1 to boot "Fortress Attack". -->
+	<software name="fortatgj">
+		<description>The World of X68000 - Fortress Attack &amp; GJ</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="フォートレスアタック ＆ GJ (ザ・ワールド・オブ・X68000)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="the world of x68000 (disk 1 of 3) - fortress attack &amp; gj.dim" size="1261824" crc="373B5D62" sha1="B0E9D5304C33546BEE2FFC3E6380B8FE2F3D3E95" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This image file is multi boot disk.
+	 Set drive 0 to boot "Logic Rush", Set drive 1 to boot "Ah! Ohimesama!". -->
+	<software name="lcmyprin" supported="no">
+		<description>The World of X68000 - Logic Rush &amp; Ah! Ohimesama!</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="ロジックラッシュ ＆ ああっ！お姫さまっ！ (ザ・ワールド・オブ・X68000)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="the world of x68000 (disk 2 of 3) - logic rush &amp; ah! ohimesama!.dim" size="1261824" crc="235F83CA" sha1="A40470D9FAB4C7D13184B5300EB16AA52DB2D39E" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cryokua" cloneof="cryoku">
+		<description>The World of X68000 II - C Ryoku Kensa</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="C力検査 (ザ・ワールド・オブ・X68000 Ⅱ)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="the world of x68000 ii (disk 1 of 4) - c ryoku kensa.dim" size="1261824" crc="962C135E" sha1="12FC6F23E4AC4F8F32C1BA711A7BE926D3CBEB0B" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cynthiaa">
+		<description>The World of X68000 II - Cynthia</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="シンシア (ザ・ワールド・オブ・X68000 Ⅱ)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="the world of x68000 ii (disk 2 of 4) - cynthia.dim" size="1261824" crc="EB2F94E9" sha1="430E931D2C0DE8BB6CD2DC1D6B64781EDE15B03D" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This image file is multi boot disk.
+	 Set drive 0 to boot "Rush!", Set drive 1 to boot "Useful". -->
+	<software name="rushusfl">
+		<description>The World of X68000 II - Rush! &amp; Useful</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="ラッシュ！ ＆ ユースフル (ザ・ワールド・オブ・X68000 Ⅱ)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="the world of x68000 ii (disk 3 of 4) - rush! &amp; useful.dim" size="1261824" crc="F60F3B1B" sha1="A4FF175494A9438ED4444E533816BAC8303A6E4C" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="t94xa" cloneof="t94x">
+		<description>The World of X68000 II - T-94X</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="T-94X (ザ・ワールド・オブ・X68000 Ⅱ)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="the world of x68000 ii (disk 4 of 4) - t-94x.dim" size="1261824" crc="78930F80" sha1="AF8ECDCA86289F203B30DC4F0BFDE025B54E78C8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This boot disk is copied file from "The World of X68000" -->
+	<software name="aahime">
+		<description>Aa! O-Hime-sama!</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aa! o-hime-sama!.dim" size="1261824" crc="6605a6b5" sha1="05e30f93a6688a57c34fae9779d7b1cec142fd4c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
 <!-- Doujin -->
 
 
@@ -20401,17 +20566,6 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="a-jine.xdf" size="1261568" crc="05c86e29" sha1="b84a0ba53509f95153c64ad9b55fa004f27d82bf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aahime">
-		<description>Aa! O-Hime-sama!</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261824">
-				<rom name="aa! o-hime-sama!.dim" size="1261824" crc="6605a6b5" sha1="05e30f93a6688a57c34fae9779d7b1cec142fd4c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23414,25 +23568,6 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="formula x yosen han (1991)(hayabusa soft).dim" size="1261824" crc="91622ff9" sha1="389d8ec15a3362d2f44d2bdb19ac66057d2133fd" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fortatk">
-		<description>Fortress Attack</description>
-		<year>1993</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Shibahara A." />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1261824">
-				<rom name="fortress attack (1993)(shibahara a.)(disk 1 of 2).dim" size="1261824" crc="a919b870" sha1="ad7a2a1400c2bc9106021370f9d959f11e96d56e" offset="000000" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1261824">
-				<rom name="fortress attack (1993)(shibahara a.)(disk 2 of 2).dim" size="1261824" crc="ebbf3a16" sha1="28db90ef8a65d405243bf7a43a235ad1a0c5938b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30892,40 +31027,6 @@ Technically speaking these are invalid XDF files, because they contain more trac
 a DIM dump with DIFC, these are at least confirmed as coming from real disk (by SuperDeadite)
 -->
 
-	<software name="cryokua" cloneof="cryoku">
-		<description>C Ryokukensa V3</description>
-		<year>1992</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Hayabusa Soft" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1277952">
-				<rom name="ct.xdf" size="1277952" crc="b494d29c" sha1="4ac45dfa372e0bc4cfd63f16407ed382a942e03a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cynthi2">
-		<description>Cynthia V2</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1277952">
-				<rom name="cyn.xdf" size="1277952" crc="24b71a3b" sha1="018b73eedd25ae89466157da0de1bf84dd3bb048" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="formulaxa" cloneof="formulax">
-		<description>Formula X (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1277952">
-				<rom name="for.xdf" size="1277952" crc="593d49fe" sha1="523a83919076de11d377b0d4aeff88c6c271459e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="grdiusac">
 		<description>Gradius Arcade</description>
 		<year>19??</year>
@@ -30968,29 +31069,6 @@ a DIM dump with DIFC, these are at least confirmed as coming from real disk (by 
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1277952">
 				<rom name="lc.xdf" size="1277952" crc="030aab19" sha1="aeb493eb2587e6801149be9661c31dbce7661d54" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="t94xa" cloneof="t94x">
-		<description>T-94X - The Ground Warriors (Alt)</description>
-		<year>1994</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Team Acquire" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1277952">
-				<rom name="tx.xdf" size="1277952" crc="955385f5" sha1="b71782694fd7184351c4551c7d58b9aefd705ba9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lcmyprin" supported="no">
-		<description>Logic Crush + Ahh My Princess!</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1277952">
-				<rom name="worldii.xdf" size="1277952" crc="66671996" sha1="77421d225dcdb944d07a3f0e2e3714ba3f1988c2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
