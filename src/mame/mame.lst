@@ -14104,6 +14104,9 @@ victor                          //
 hexion                          // GX122 (c) 1992
 hexionb                         // bootleg
 
+@source:hh_amis2k.cpp
+wildfire                        // Parker Bros
+
 @source:hh_cop400.cpp
 bship82                         // Milton Bradley
 ctstein                         // Castle Toy
@@ -37001,9 +37004,6 @@ wicat                           //
 
 @source:wico.cpp
 aftor                           //
-
-@source:wildfire.cpp
-wildfire                        // Parker Bros
 
 @source:wildpkr.cpp
 tabpkr                          // 199?, TAB Austira

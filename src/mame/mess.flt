@@ -222,6 +222,7 @@ h8.cpp
 h89.cpp
 harriet.cpp
 hec2hrp.cpp
+hh_amis2k.cpp
 hh_cop400.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
@@ -667,7 +668,6 @@ vtech1.cpp
 vtech2.cpp
 wangpc.cpp
 wicat.cpp
-wildfire.cpp
 wswan.cpp
 x07.cpp
 x1.cpp

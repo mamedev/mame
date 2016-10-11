@@ -13,6 +13,8 @@
 
 
   TODO:
+  - driver needs a cleanup when another AMI S2000 handheld gets dumped/added
+  
   - sound emulation could still be improved
   - when the game strobes a led faster, it should appear brighter, for example when
     the ball hits one of the bumpers

@@ -866,6 +866,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"adc",
 		"alesis",
 		"altos",
+		"ami",
 		"amiga",
 		"amstrad",
 		"apf",
@@ -980,7 +981,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"osborne",
 		"osi",
 		"palm",
-		"parker",
 		"pc",
 		"pdp1",
 		"pel",
@@ -1313,6 +1313,11 @@ createMESSProjects(_target, _subtarget, "altos")
 files {
 	MAME_DIR .. "src/mame/drivers/altos5.cpp",
 	MAME_DIR .. "src/mame/drivers/altos486.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "ami")
+files {
+	MAME_DIR .. "src/mame/drivers/hh_amis2k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "amiga")
@@ -2411,11 +2416,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/palm.cpp",
 	MAME_DIR .. "src/mame/drivers/palm_dbg.hxx",
 	MAME_DIR .. "src/mame/drivers/palmz22.cpp",
-}
-
-createMESSProjects(_target, _subtarget, "parker")
-files {
-	MAME_DIR .. "src/mame/drivers/wildfire.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "pitronic")
