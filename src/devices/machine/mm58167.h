@@ -11,6 +11,7 @@
 #ifndef __MM58167_H__
 #define __MM58167_H__
 
+#include "emu.h"
 #include "dirtc.h"
 
 
