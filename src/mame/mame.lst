@@ -11807,9 +11807,6 @@ einst256                        //
 einstei2                        //
 einstein                        //
 
-@source:elecbowl.cpp
-elecbowl                        // Marx
-
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
 
@@ -14191,6 +14188,7 @@ ebball2                         // Entex
 ebball3                         // Entex
 efootb4                         // Entex
 einvader                        // Entex
+elecbowl                        // Marx
 elecdet                         // Ideal
 esoccer                         // Entex
 fxmcr165                        // Gakken
@@ -14202,6 +14200,7 @@ h2hfootb                        // Coleco
 lostreas                        // Parker Bros
 matchnum                        // A-One
 mathmagi                        // APF
+mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
 merlin                          // Parker Bros
 mmerlin                         // Parker Bros
@@ -19559,9 +19558,6 @@ mbc200                          //
 
 @source:mbc55x.cpp
 mbc55x                          // Sanyo MBC-550, MBC-555
-
-@source:mbdtower.cpp
-mbdtower                        // Milton Bradley
 
 @source:mbee.cpp
 mbee                            // Microbee 16 Standard or Plus

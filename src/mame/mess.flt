@@ -162,7 +162,6 @@ eacc.cpp
 ec184x.cpp
 ec65.cpp
 einstein.cpp
-elecbowl.cpp
 electron.cpp
 elekscmp.cpp
 elf.cpp
@@ -314,7 +313,6 @@ mac.cpp
 macpci.cpp
 mbc200.cpp
 mbc55x.cpp
-mbdtower.cpp
 mbee.cpp
 mc10.cpp
 mc1000.cpp
