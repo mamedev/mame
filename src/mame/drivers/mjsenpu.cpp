@@ -46,6 +46,7 @@
 #include "cpu/e132xs/e132xs.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 
 class mjsenpu_state : public driver_device
 {
@@ -54,6 +55,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_oki(*this, "oki"),
+			m_hopper(*this, "hopper"),
 			m_mainram(*this, "mainram"),
 	//		m_vram(*this, "vram"),
 			m_palette(*this, "palette")
@@ -63,6 +65,7 @@ public:
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_device<ticket_dispenser_device> m_hopper;
 
 	required_shared_ptr<UINT32> m_mainram;
 //	required_shared_ptr<UINT32> m_vram;
@@ -142,8 +145,7 @@ WRITE32_MEMBER(mjsenpu_state::vram_w)
 
 WRITE8_MEMBER(mjsenpu_state::control_w)
 {
-	m_control = data;
-	// bit 0x80 is always set?
+	// bit 0x80 is always set? (sometimes disabled during screen transitions briefly, could be display enable?)
 
 	// bit 0x40 not used?
 	// bit 0x20 not used?
@@ -151,10 +153,16 @@ WRITE8_MEMBER(mjsenpu_state::control_w)
 	// bit 0x10 is the M6295 bank, samples <26 are the same in both banks and so bank switch isn't written for them, not even in sound test.
 	m_oki->set_rom_bank((data&0x10)>>4);
 
-	// bits 0x08 and 0x04 seem to be hopper/ticket related? different ones get used depending on the dips
+	// bits 0x08 is used in the alt payout / hopper mode (see dipswitches)
+	
+	// 0x04 seem to be hopper/ticket related? different ones get used depending on the dips
+	m_hopper->write(space, 0, data & 0x04);
 
 	// bit 0x02 could be coin counter?
+	machine().bookkeeping().coin_counter_w(0, data & 0x02 );
+
 	// bit 0x01 alternates frequently, using as video buffer, but that's a complete guess
+	m_control = data;
 
 //	if (data &~0x9e)
 //		printf("control_w %02x\n", data);
@@ -286,26 +294,21 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // or maybe service?
-	PORT_DIPNAME( 0x00000002, 0x00000002, "IN1" )
-	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_SERVICE_NO_TOGGLE( 0x00000010, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT(                 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(                 0x00000002, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // might be coin out
+	PORT_BIT(                 0x00000008, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_SERVICE_NO_TOGGLE(   0x00000010, IP_ACTIVE_LOW )
+	PORT_BIT(                 0x00000020, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // clears stats in bookkeeping
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_CONDITION("DSW3", 0x08,EQUALS,0x00)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) ) // unused??
 	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
+		
+
+		
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x00000003, 0x00000003, DEF_STR( Coin_A ) )
@@ -313,7 +316,7 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_DIPSETTING(          0x00000003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(          0x00000002, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(          0x00000001, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0000000c, 0x0000000c, "Value 1" )
+	PORT_DIPNAME( 0x0000000c, 0x0000000c, "Note Value" ) // used if DSW3 bit 0x02 is changed
 	PORT_DIPSETTING(          0x00000000, "100" )
 	PORT_DIPSETTING(          0x00000004, "50" )
 	PORT_DIPSETTING(          0x00000008, "10" )
@@ -357,15 +360,15 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "Value 4" )
+	PORT_DIPNAME( 0x00000001, 0x00000001, "Credit Limit" )
 	PORT_DIPSETTING(          0x00000001, "100" )
 	PORT_DIPSETTING(          0x00000000, "500" )
-	PORT_DIPNAME( 0x00000002, 0x00000002, "Symbol 2" )
-	PORT_DIPSETTING(          0x00000002, "0" )
-	PORT_DIPSETTING(          0x00000000, "1" )
-	PORT_DIPNAME( 0x00000004, 0x00000004, "Symbol 3" )
-	PORT_DIPSETTING(          0x00000004, "0" )
-	PORT_DIPSETTING(          0x00000000, "1" )
+	PORT_DIPNAME( 0x00000002, 0x00000002, "Coin Type?" ) // uses different coinage
+	PORT_DIPSETTING(          0x00000002, "Coins?" )
+	PORT_DIPSETTING(          0x00000000, "Notes?" )
+	PORT_DIPNAME( 0x00000004, 0x00000004, "Hopper Type?" )
+	PORT_DIPSETTING(          0x00000004, "Normal?" ) // pressing Pay Out button activates hopper on bit 0x04 and pays out
+	PORT_DIPSETTING(          0x00000000, "Other?" ) // pressing Pay Out activates something on bit 0x08, prints KEY OUT and quickly resets the game
 	PORT_DIPNAME( 0x00000008, 0x00000008, "Control Type" )
 	PORT_DIPSETTING(          0x00000008, "Mahjong Panel" )
 	PORT_DIPSETTING(          0x00000000, "Joystick" )
@@ -459,6 +462,9 @@ static MACHINE_CONFIG_START( mjsenpu, mjsenpu_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	// more likely coins out?
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -526,6 +532,4 @@ DRIVER_INIT_MEMBER(mjsenpu_state,mjsenpu)
 }
 
 
-
-
-GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )
