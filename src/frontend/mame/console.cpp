@@ -16,7 +16,7 @@
 #include <atomic>
 #include <thread>
 
-
+static console_frontend *gConsole = nullptr;
 //-------------------------------------------------
 //  console_frontend - constructor
 //-------------------------------------------------
@@ -31,6 +31,7 @@ console_frontend::console_frontend(emu_options &options, osd_interface &osd)
 	using namespace std::placeholders;
 	m_commands.insert(std::make_pair("quit", std::bind(&console_frontend::cmd_quit, this, _1)));
 	m_commands.insert(std::make_pair("exit", std::bind(&console_frontend::cmd_quit, this, _1)));
+	gConsole = this;
 }
 
 
@@ -42,16 +43,13 @@ console_frontend::~console_frontend()
 {
 }
 
-static const char* commandList[] = {
-	"quit", "exit", NULL
-};
-
-void completionHook(char const* prefix, linenoiseCompletions* lc) {
-	size_t i;
-
-	for (i = 0; commandList[i] != NULL; ++i) {
-		if (strncmp(prefix, commandList[i], strlen(prefix)) == 0) {
-			linenoiseAddCompletion(lc, commandList[i]);
+void console_frontend::completion(char const* prefix, linenoiseCompletions* lc)
+{
+	for (auto cmd : m_commands) 
+	{
+		if (strncmp(prefix, cmd.first.c_str(), strlen(prefix)) == 0) 
+		{
+			linenoiseAddCompletion(lc, cmd.first.c_str());
 		}
 	}
 }
@@ -129,6 +127,11 @@ void console_frontend::split_command(std::vector<std::string>& arg, std::string 
 		}
 		arg.push_back(command.substr(start, arglen));
 	}
+}
+
+static void completionHook(char const* prefix, linenoiseCompletions* lc)
+{
+	gConsole->completion(prefix, lc);
 }
 
 void console_frontend::start_console()

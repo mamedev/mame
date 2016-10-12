@@ -14,6 +14,8 @@
 
 #include "emu.h"
 
+struct linenoiseCompletions;
+
 class console_frontend
 {
 public:
@@ -22,6 +24,7 @@ public:
 	~console_frontend();
 
 	void start_console();
+	void completion(char const* prefix, linenoiseCompletions* lc);
 	
 private:
 	void read_console(std::string &cmdLine);
