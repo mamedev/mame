@@ -36,6 +36,7 @@
 #define OPTION_CROSSHAIRPATH        "crosshairpath"
 #define OPTION_PLUGINSPATH          "pluginspath"
 #define OPTION_LANGUAGEPATH         "languagepath"
+#define OPTION_SWPATH               "swpath"
 
 // core directory options
 #define OPTION_CFG_DIRECTORY        "cfg_directory"
@@ -224,6 +225,7 @@ public:
 	const char *crosshair_path() const { return value(OPTION_CROSSHAIRPATH); }
 	const char *plugins_path() const { return value(OPTION_PLUGINSPATH); }
 	const char *language_path() const { return value(OPTION_LANGUAGEPATH); }
+	const char *sw_path() const { return value(OPTION_SWPATH); }
 
 	// core directory options
 	const char *cfg_directory() const { return value(OPTION_CFG_DIRECTORY); }

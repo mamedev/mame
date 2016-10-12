@@ -39,6 +39,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_CROSSHAIRPATH,                              "crosshair", OPTION_STRING,     "path to crosshair files" },
 	{ OPTION_PLUGINSPATH,                                "plugins",   OPTION_STRING,     "path to plugin files" },
 	{ OPTION_LANGUAGEPATH,                               "language",  OPTION_STRING,     "path to language files" },
+	{ OPTION_SWPATH,                                     "software",  OPTION_STRING,     "path to loose software" },
 
 	// output directory options
 	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },

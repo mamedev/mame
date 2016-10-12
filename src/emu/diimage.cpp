@@ -377,11 +377,29 @@ bool device_image_interface::try_change_working_directory(const std::string &sub
 
 void device_image_interface::setup_working_directory()
 {
-	// first set up the working directory to be the starting directory
-	osd_get_full_path(m_working_directory, ".");
+	bool success = false;
+	// get user-specified directory and make sure it exists
+	m_working_directory = device().mconfig().options().sw_path();
+	// if multipath, get first
+	size_t i = m_working_directory.find_first_of(";");
+	if (i != std::string::npos)
+		m_working_directory.resize(i);
+	// validate directory
+	if (!m_working_directory.empty())
+		if (osd::directory::open(m_working_directory))
+			success = true;
 
-	// now try browsing down to "software"
-	if (try_change_working_directory("software"))
+	// if not exist, use previous method
+	if (!success)
+	{
+		// first set up the working directory to be the starting directory
+		osd_get_full_path(m_working_directory, ".");
+		// now try browsing down to "software"
+		if (try_change_working_directory("software"))
+			success = true;
+	}
+
+	if (success)
 	{
 		// now down to a directory for this computer
 		int gamedrv = driver_list::find(device().machine().system());
