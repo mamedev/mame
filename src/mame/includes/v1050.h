@@ -90,6 +90,8 @@ public:
 		m_rom(*this, Z80_TAG),
 		m_video_ram(*this, "video_ram"),
 		m_attr_ram(*this, "attr_ram"),
+		m_int_mask(0),
+		m_int_state(0),
 		m_rtc_ppi_pa(0),
 		m_rtc_ppi_pc(0)
 	{
@@ -192,6 +194,7 @@ public: // HACK for MC6845
 
 	// interrupt state
 	UINT8 m_int_mask;           // interrupt mask
+	UINT8 m_int_state;
 	int m_f_int_enb;            // floppy interrupt enable
 	bool m_fdc_irq;
 	bool m_fdc_drq;

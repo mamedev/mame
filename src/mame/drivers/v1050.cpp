@@ -142,7 +142,6 @@ Notes:
 
     TODO:
 
-    - does not boot CP/M anymore
     - floppy 1 is broken
     - write to banked RAM at 0x0000-0x1fff when ROM is active
     - real keyboard w/i8049
@@ -156,7 +155,16 @@ Notes:
 
 void v1050_state::set_interrupt(int line, int state)
 {
-	m_pic->r_w(line, (m_int_mask & (1 << state)) ? 0 : 1);
+	if (state)
+	{
+		m_int_state |= (1 << line);
+	}
+	else
+	{
+		m_int_state &= ~(1 << line);
+	}
+
+	m_pic->r_w(line, ((m_int_state & m_int_mask) & (1 << line)) ? 0 : 1);
 }
 
 void v1050_state::bankswitch()
@@ -1137,4 +1145,4 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                     FULLNAME        FLAGS
-COMP( 1983, v1050,  0,      0,      v1050,  v1050, driver_device,   0,      "Visual Technology Inc",    "Visual 1050", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_KEYBOARD )
+COMP( 1983, v1050,  0,      0,      v1050,  v1050, driver_device,   0,      "Visual Technology Inc",    "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_KEYBOARD )
