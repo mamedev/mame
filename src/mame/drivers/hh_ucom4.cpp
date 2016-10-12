@@ -48,7 +48,7 @@
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
  *296     uPD553C  1984, Epoch Computer Beam Gun Professional
 
- *511     uPD557LC 1980, Gakken Game Robot 9/Mego Fabulous Fred
+ @511     uPD557LC 1980, Gakken Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
 
  @060     uPD650C  1979, Mattel Computer Gin
@@ -70,6 +70,7 @@ TODO:
 
 // internal artwork
 #include "efball.lh"
+#include "grobot9.lh" // clickable
 #include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
@@ -88,6 +89,7 @@ void hh_ucom4_state::machine_start()
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 
 	memset(m_port, 0, sizeof(m_port));
+	m_int = 0;
 	m_inp_mux = 0;
 	m_grid = 0;
 	m_plate = 0;
@@ -103,6 +105,7 @@ void hh_ucom4_state::machine_start()
 	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_port));
+	save_item(NAME(m_int));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
 	save_item(NAME(m_plate));
@@ -110,6 +113,7 @@ void hh_ucom4_state::machine_start()
 
 void hh_ucom4_state::machine_reset()
 {
+	refresh_interrupts();
 }
 
 
@@ -219,6 +223,31 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 			ret |= m_inp_matrix[i]->read();
 
 	return ret;
+}
+
+
+// interrupt handling
+
+void hh_ucom4_state::refresh_interrupts()
+{
+	m_maincpu->set_input_line(0, m_int ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void hh_ucom4_state::set_interrupt(int state)
+{
+	state = state ? 1 : 0;
+
+	if (state != m_int)
+	{
+		if (machine().phase() >= MACHINE_PHASE_RESET)
+			m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+		m_int = state;
+	}
+}
+
+INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
+{
+	set_interrupt(newval);
 }
 
 
@@ -1630,6 +1659,121 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Gakken Game Robot 9
+  * PCB label GAME ROBOT 7520
+  * NEC uCOM-43 MCU, label TTGR-512 (die label NEC D557 511)
+  * 9 lamps behind buttons
+
+  known releases:
+  - Japan: Game Robot 9 (Takatoku Toys?)
+  - USA: Fabulous Fred - The Ultimate Electronic Game, distributed by Mego
+  - Mexico: Fabuloso Fred, distributed by Ensueno Toys (also released as
+    12-button version, a clone of Tandy-12)
+
+  Accessories were included for some of the minigames.
+
+***************************************************************************/
+
+class grobot9_state : public hh_ucom4_state
+{
+public:
+	grobot9_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(input_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
+
+// handlers
+
+WRITE8_MEMBER(grobot9_state::lamps_w)
+{
+	if (offset == NEC_UCOM4_PORTE)
+	{
+		// E1: speaker out
+		m_speaker->level_w(data >> 1 & 1);
+		
+		// E3: input mux high bit
+		m_inp_mux = (m_inp_mux & 7) | (data & 8);
+	}
+	
+	// D,F,E0: lamps
+	m_port[offset] = data;
+	display_matrix(9, 1, m_port[NEC_UCOM4_PORTD] | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE] << 8, 1);
+}
+
+WRITE8_MEMBER(grobot9_state::input_w)
+{
+	// C012: input mux low
+	m_inp_mux = (m_inp_mux & 8) | (data & 7);
+}
+
+READ8_MEMBER(grobot9_state::input_r)
+{
+	// A: multiplexed inputs
+	return read_inputs(5);
+}
+
+
+// config
+
+static INPUT_PORTS_START( grobot9 )
+	PORT_START("IN.0") // C0 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_W) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_E) PORT_NAME("Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D) PORT_NAME("Button 4")
+
+	PORT_START("IN.1") // C1 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_C) PORT_NAME("Button 5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_X) PORT_NAME("Button 6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_A) PORT_NAME("Button 8")
+
+	PORT_START("IN.2") // C2 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_S) PORT_NAME("Button 9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Rest")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Eighth Note")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // E3 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Hit")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat")
+
+	PORT_START("IN.4") // INT
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, nullptr) PORT_NAME("Start-Pitch")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( grobot9, grobot9_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D557L, 160000) // approximation
+	MCFG_UCOM4_READ_A_CB(READ8(grobot9_state, input_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(grobot9_state, input_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(grobot9_state, lamps_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(grobot9_state, lamps_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(grobot9_state, lamps_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_grobot9)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Mattel Computer Gin
   * NEC uCOM-43 MCU, label D650C 060
   * Hughes HLCD0569 LCD driver
@@ -2624,6 +2768,12 @@ ROM_START( edracula )
 ROM_END
 
 
+ROM_START( grobot9 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "ttgr-511", 0x0000, 0x0800, CRC(1f25b2bb) SHA1(55ae7e23f6dd46cc6e1a65839327726678410c3a) )
+ROM_END
+
+
 ROM_START( mcompgin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d650c-060", 0x0000, 0x0800, BAD_DUMP CRC(92a4d8be) SHA1(d67f14a2eb53b79a7d9eb08103325299bc643781) ) // d5 stuck: xx1x xxxx
@@ -2709,6 +2859,8 @@ CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  driver_device, 0, "Epoch"
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  driver_device, 0, "Gakken", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+
 CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, driver_device, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
@@ -2719,3 +2871,6 @@ CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy",
 CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
+
+// ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
+// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
