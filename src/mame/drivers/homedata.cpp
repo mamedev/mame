@@ -163,6 +163,7 @@ Mahjong Vitamin C
 (c)1989 Home Data
 
 Board:  X73-PWB-A(A)
+Board:  X83-PWB-AC(A)
 
 CPU:    68B09E uPD7807CW(?)
 Sound:  SN76489AN DAC
@@ -189,10 +190,11 @@ Mahjong Kinjirareta Asobi
 Board:  X83-PWB-A(A)
 
 CPU:    68B09E uPD7807CW
-Sound:  SN76489AN
-        DAC
+Sound:  SN76489AN DAC
 OSC:    11.000MHz 16.000MHz
 Custom: GX61A01
+
+Note: seems likely above 11mhz crystal was a repair
 
 ----------------------------------------------------------------------------
 Mahjong Jogakuen
