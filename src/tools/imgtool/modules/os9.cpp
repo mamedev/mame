@@ -622,7 +622,7 @@ done:
 
 
 
-static imgtoolerr_t os9_diskimage_open(imgtool::image *image, imgtool_stream *stream)
+static imgtoolerr_t os9_diskimage_open(imgtool::image *image, imgtool::stream *stream)
 {
 	imgtoolerr_t err;
 	floperr_t ferr;
@@ -710,7 +710,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool::image *image, imgtool_stream *st
 
 
 
-static imgtoolerr_t os9_diskimage_create(imgtool::image *img, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t os9_diskimage_create(imgtool::image *img, imgtool::stream *stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	dynamic_buffer header;
@@ -988,7 +988,7 @@ static imgtoolerr_t os9_diskimage_freespace(imgtool::partition *partition, UINT6
 
 
 
-static imgtoolerr_t os9_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t os9_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
 	imgtoolerr_t err;
 	imgtool::image *img = &partition->image();
@@ -1017,7 +1017,7 @@ static imgtoolerr_t os9_diskimage_readfile(imgtool::partition *partition, const 
 				buffer, used_size);
 			if (err)
 				return err;
-			stream_write(destf, buffer, used_size);
+			destf->write(buffer, used_size);
 			file_size -= used_size;
 		}
 	}
@@ -1026,7 +1026,7 @@ static imgtoolerr_t os9_diskimage_readfile(imgtool::partition *partition, const 
 
 
 
-static imgtoolerr_t os9_diskimage_writefile(imgtool::partition *partition, const char *path, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t os9_diskimage_writefile(imgtool::partition *partition, const char *path, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool::image *image = &partition->image();
@@ -1047,7 +1047,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool::partition *partition, const
 	if (err)
 		goto done;
 
-	sz = (UINT32) stream_size(sourcef);
+	sz = (UINT32) sourcef->size();
 
 	err = os9_set_file_size(image, &file_info, sz);
 	if (err)
@@ -1057,7 +1057,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool::partition *partition, const
 	{
 		write_size = (std::min<UINT64>)(sz, disk_info->sector_size);
 
-		stream_read(sourcef, &buf[0], write_size);
+		sourcef->read(&buf[0], write_size);
 
 		while(count == 0)
 		{

@@ -232,7 +232,7 @@ static imgtoolerr_t pc_chd_read_partition_header(imgtool::image *image)
 
 
 
-static imgtoolerr_t pc_chd_image_create(imgtool::image *image, imgtool_stream *f, util::option_resolution *opts)
+static imgtoolerr_t pc_chd_image_create(imgtool::image *image, imgtool::stream *f, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	UINT32 cylinders, heads, sectors;
@@ -278,7 +278,7 @@ done:
 
 
 
-static imgtoolerr_t pc_chd_image_open(imgtool::image *image, imgtool_stream *stream)
+static imgtoolerr_t pc_chd_image_open(imgtool::image *image, imgtool::stream *stream)
 {
 	imgtoolerr_t err;
 	pc_chd_image_info *info;

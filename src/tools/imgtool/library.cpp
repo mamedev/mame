@@ -69,8 +69,8 @@ void library::add_class(const imgtool_class *imgclass)
 	module->tracks_are_called_cylinders = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? 1 : 0;
 	module->writing_untested            = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_WRITING_UNTESTED) ? 1 : 0;
 	module->creation_untested           = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_CREATION_UNTESTED) ? 1 : 0;
-	module->open                        = (imgtoolerr_t (*)(imgtool::image *, imgtool_stream *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
-	module->create                      = (imgtoolerr_t (*)(imgtool::image *, imgtool_stream *, util::option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
+	module->open                        = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
+	module->create                      = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *, util::option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
 	module->close                       = (void (*)(imgtool::image *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CLOSE);
 	module->info                        = (void (*)(imgtool::image *, char *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_INFO);
 	module->read_sector                 = (imgtoolerr_t (*)(imgtool::image *, UINT32, UINT32, UINT32, std::vector<UINT8> &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_SECTOR);

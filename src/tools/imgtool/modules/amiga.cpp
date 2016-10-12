@@ -209,7 +209,7 @@ struct softlink_block
 /* Basic Amiga floppy disk image info */
 struct amiga_floppy
 {
-	imgtool_stream *stream;
+	imgtool::stream *stream;
 	UINT8 sectors;
 };
 
@@ -1567,7 +1567,7 @@ static imgtoolerr_t checkdir(imgtool::image *img, const char *path, int parent)
 
 
 /* Writes the file data from the specified block into the stream */
-static imgtoolerr_t write_file_block_data(imgtool::image *img, int block, int size, imgtool_stream *destf)
+static imgtoolerr_t write_file_block_data(imgtool::image *img, int block, int size, imgtool::stream *destf)
 {
 	imgtoolerr_t ret;
 	UINT8 buffer[BSIZE];
@@ -1606,7 +1606,7 @@ static imgtoolerr_t write_file_block_data(imgtool::image *img, int block, int si
 	}
 
 	/* Write data to stream */
-	if (stream_write (destf, buffer, size) != size)
+	if (destf->write(buffer, size) != size)
 	{
 		return IMGTOOLERR_WRITEERROR;
 	}
@@ -1615,7 +1615,7 @@ static imgtoolerr_t write_file_block_data(imgtool::image *img, int block, int si
 }
 
 
-static imgtoolerr_t walk_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize, imgtool_stream *destf, int write)
+static imgtoolerr_t walk_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize, imgtool::stream *destf, int write)
 {
 	int i, blocksize = is_ffs(img) ? BSIZE : BSIZE-24;
 	imgtoolerr_t ret;
@@ -1646,7 +1646,7 @@ static imgtoolerr_t walk_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *f
 }
 
 
-static imgtoolerr_t write_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize, imgtool_stream *destf)
+static imgtoolerr_t write_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize, imgtool::stream *destf)
 {
 	return walk_data_block_ptr(img, ptr, filesize, destf, TRUE);
 }
@@ -1659,7 +1659,7 @@ static imgtoolerr_t clear_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *
 }
 
 
-static imgtoolerr_t walk_file_ext_data(imgtool::image *img, int block, int *filesize, imgtool_stream *destf, int write)
+static imgtoolerr_t walk_file_ext_data(imgtool::image *img, int block, int *filesize, imgtool::stream *destf, int write)
 {
 	file_ext_block file_ext;
 	imgtoolerr_t ret;
@@ -1698,7 +1698,7 @@ static imgtoolerr_t walk_file_ext_data(imgtool::image *img, int block, int *file
 }
 
 
-static imgtoolerr_t write_file_ext_data(imgtool::image *img, int block, int *filesize, imgtool_stream *destf)
+static imgtoolerr_t write_file_ext_data(imgtool::image *img, int block, int *filesize, imgtool::stream *destf)
 {
 	return walk_file_ext_data(img, block, filesize, destf, TRUE);
 }
@@ -1742,10 +1742,10 @@ static imgtoolerr_t update_disk_alteration_date(imgtool::image *img)
 *****************************************************************************/
 
 
-static imgtoolerr_t amiga_image_open(imgtool::image *img, imgtool_stream *stream)
+static imgtoolerr_t amiga_image_open(imgtool::image *img, imgtool::stream *stream)
 {
 	amiga_floppy *f = (amiga_floppy *) img->extra_bytes();
-	UINT64 size = stream_size(stream);
+	UINT64 size = stream->size();
 
 	f->stream = stream;
 	f->sectors = size/BSIZE/80/2;
@@ -1801,15 +1801,15 @@ static imgtoolerr_t amiga_image_read_sector(imgtool::image* img, UINT32 track, U
 	amiga_floppy *f = (amiga_floppy *) img->extra_bytes();
 
 	/* skip ahead to the area we want to read */
-	stream_seek(f->stream, track * (head+1) * f->sectors * BSIZE + sector * BSIZE, SEEK_CUR);
+	f->stream->seek(track * (head+1) * f->sectors * BSIZE + sector * BSIZE, SEEK_CUR);
 
-	if (stream_read(f->stream, buf, len) != len)
+	if (f->stream->read(buf, len) != len)
 	{
 		return IMGTOOLERR_READERROR;
 	}
 
 	/* reset stream */
-	stream_seek(f->stream, 0, 0);
+	f->stream->seek(0, 0);
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -1830,16 +1830,16 @@ static imgtoolerr_t amiga_image_write_sector(imgtool::image* img, UINT32 track, 
 	amiga_floppy *f = (amiga_floppy *) img->extra_bytes();
 
 	/* skip ahead to the area we want to write */
-	stream_seek(f->stream, track * (head+1) * f->sectors * BSIZE + sector * BSIZE, SEEK_CUR);
+	f->stream->seek(track * (head+1) * f->sectors * BSIZE + sector * BSIZE, SEEK_CUR);
 
 	/* write data */
-	if (stream_write(f->stream, buf, len) != len)
+	if (f->stream->write(buf, len) != len)
 	{
 		return IMGTOOLERR_WRITEERROR;
 	}
 
 	/* reset stream */
-	stream_seek(f->stream, 0, 0);
+	f->stream->seek(0, 0);
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -2079,7 +2079,7 @@ static imgtoolerr_t amiga_image_freespace(imgtool::partition *partition, UINT64 
 }
 
 
-static imgtoolerr_t amiga_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t amiga_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
 	imgtool::image *img = &partition->image();
 	imgtoolerr_t ret;
@@ -2189,13 +2189,13 @@ static imgtoolerr_t amiga_image_deletefile(imgtool::partition *partition, const 
 }
 
 
-static imgtoolerr_t amiga_image_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t amiga_image_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
 }
 
 
-static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool::stream *stream, util::option_resolution *opts)
 {
 	amiga_floppy *f = (amiga_floppy *) img->extra_bytes();
 	const std::string &dskname = opts->lookup_string('N');

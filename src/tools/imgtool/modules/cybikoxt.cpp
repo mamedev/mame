@@ -14,7 +14,7 @@
 
 struct cybiko_file_system
 {
-	imgtool_stream *stream;
+	imgtool::stream *stream;
 	UINT32 page_count, page_size, block_count_boot, block_count_file;
 	UINT16 write_count;
 };
@@ -150,16 +150,16 @@ static int cfs_page_to_block( cybiko_file_system *cfs, UINT32 page, int *block_t
 static int cfs_page_read( cybiko_file_system *cfs, UINT8 *buffer, UINT32 page)
 {
 	if (page >= cfs->page_count) return FALSE;
-	stream_seek( cfs->stream, page * cfs->page_size, SEEK_SET);
-	stream_read( cfs->stream, buffer, cfs->page_size);
+	cfs->stream->seek(page * cfs->page_size, SEEK_SET);
+	cfs->stream->read(buffer, cfs->page_size);
 	return TRUE;
 }
 
 static int cfs_page_write( cybiko_file_system *cfs, UINT8 *buffer, UINT32 page)
 {
 	if (page >= cfs->page_count) return FALSE;
-	stream_seek( cfs->stream, page * cfs->page_size, SEEK_SET);
-	stream_write( cfs->stream, buffer, cfs->page_size);
+	cfs->stream->seek(page * cfs->page_size, SEEK_SET);
+	cfs->stream->write(buffer, cfs->page_size);
 	return TRUE;
 }
 
@@ -260,7 +260,7 @@ static int cfs_verify( cybiko_file_system *cfs)
 	return TRUE;
 }
 
-static int cfs_init( cybiko_file_system *cfs, imgtool_stream *stream)
+static int cfs_init( cybiko_file_system *cfs, imgtool::stream *stream)
 {
 	cfs->stream = stream;
 	cfs->page_count = 2005;
@@ -292,7 +292,7 @@ static int cfs_format( cybiko_file_system *cfs)
 	buffer[0] = 0xFF;
 	for (i=0;i<0x1B56;i++)
 	{
-		stream_write( cfs->stream, buffer, 1);
+		cfs->stream->write(buffer, 1);
 	}
 	// ok
 	return TRUE;
@@ -319,7 +319,7 @@ static UINT32 cfs_calc_free_space( cybiko_file_system *cfs, UINT16 blocks)
 	return free_space;
 }
 
-static imgtoolerr_t cybiko_image_open( imgtool::image *image, imgtool_stream *stream)
+static imgtoolerr_t cybiko_image_open( imgtool::image *image, imgtool::stream *stream)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
 	// init
@@ -333,10 +333,10 @@ static imgtoolerr_t cybiko_image_open( imgtool::image *image, imgtool_stream *st
 static void cybiko_image_close( imgtool::image *image)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
-	stream_close( cfs->stream);
+	delete cfs->stream;
 }
 
-static imgtoolerr_t cybiko_image_create( imgtool::image *image, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t cybiko_image_create( imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
 	// init
@@ -401,7 +401,7 @@ static imgtoolerr_t cybiko_image_free_space( imgtool::partition *partition, UINT
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_read_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t cybiko_image_read_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
 	imgtool::image *image = &partition->image();
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
@@ -421,7 +421,7 @@ static imgtoolerr_t cybiko_image_read_file( imgtool::partition *partition, const
 			if (!cfs_block_read( cfs, buffer, BLOCK_TYPE_FILE, i)) return IMGTOOLERR_READERROR;
 			if (BLOCK_USED(buffer) && (BLOCK_FILE_ID(buffer) == file_id) && (BLOCK_PART_ID(buffer) == part_id))
 			{
-				stream_write( destf, buffer + 6 + ((part_id == 0) ? FILE_HEADER_SIZE : 0), buffer[1]);
+				destf->write(buffer + 6 + ((part_id == 0) ? FILE_HEADER_SIZE : 0), buffer[1]);
 				part_id++;
 			}
 		}
@@ -430,7 +430,7 @@ static imgtoolerr_t cybiko_image_read_file( imgtool::partition *partition, const
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t cybiko_image_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
 	imgtool::image *image = &partition->image();
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
@@ -450,14 +450,14 @@ static imgtoolerr_t cybiko_image_write_file( imgtool::partition *partition, cons
 		if (!cfs_file_info( cfs, file_id, &file)) return IMGTOOLERR_UNEXPECTED;
 		free_blocks += file.blocks;
 	}
-	if (cfs_calc_free_space( cfs, free_blocks) < stream_size( sourcef)) return IMGTOOLERR_NOSPACE;
+	if (cfs_calc_free_space( cfs, free_blocks) < sourcef->size()) return IMGTOOLERR_NOSPACE;
 	// delete file
 	if (file_id != INVALID_FILE_ID)
 	{
 		if (!cfs_file_delete( cfs, file_id)) return IMGTOOLERR_UNEXPECTED;
 	}
 	// create/write destination file
-	bytes_left = stream_size( sourcef);
+	bytes_left = sourcef->size();
 	i = 0;
 	while (i < cfs->block_count_file)
 	{
@@ -476,11 +476,11 @@ static imgtoolerr_t cybiko_image_write_file( imgtool::partition *partition, cons
 				buffer[6] = 0x20;
 				strcpy( BLOCK_FILENAME(buffer), filename);
 				buffer_write_32_be( buffer + 6 + FILE_HEADER_SIZE - 4, time_setup( time( NULL)));
-				stream_read( sourcef, buffer + 6 + FILE_HEADER_SIZE, buffer[1]);
+				sourcef->read(buffer + 6 + FILE_HEADER_SIZE, buffer[1]);
 			}
 			else
 			{
-				stream_read( sourcef, buffer + 6, buffer[1]);
+				sourcef->read(buffer + 6, buffer[1]);
 			}
 			if (!cfs_block_write( cfs, buffer, BLOCK_TYPE_FILE, i)) return IMGTOOLERR_WRITEERROR;
 			bytes_left -= buffer[1];

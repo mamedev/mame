@@ -63,7 +63,7 @@ static UINT32 pad128(UINT32 length)
 
 
 
-static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
 {
 	static const UINT32 attrs[] =
 	{
@@ -156,7 +156,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 	place_integer_be(header, 123, 1, 0x81);
 	place_integer_be(header, 124, 2, ccitt_crc16(0, header, 124));
 
-	stream_write(destf, header, sizeof(header));
+	destf->write(header, sizeof(header));
 
 	if (data_fork)
 	{
@@ -164,7 +164,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 		if (err)
 			return err;
 
-		stream_fill(destf, 0, pad128(data_fork->size));
+		destf->fill(0, pad128(data_fork->size));
 	}
 
 	if (resource_fork)
@@ -173,7 +173,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 		if (err)
 			return err;
 
-		stream_fill(destf, 0, pad128(resource_fork->size));
+		destf->fill(0, pad128(resource_fork->size));
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -182,27 +182,27 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 
 
 static imgtoolerr_t write_fork(imgtool::partition *partition, const char *filename, const char *fork,
-	imgtool_stream *sourcef, UINT64 pos, UINT64 fork_len, util::option_resolution *opts)
+	imgtool::stream *sourcef, UINT64 pos, UINT64 fork_len, util::option_resolution *opts)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	imgtool_stream *mem_stream = NULL;
+	imgtool::stream *mem_stream = NULL;
 	size_t len;
 
 	if (fork_len > 0)
 	{
-		mem_stream = stream_open_mem(NULL, 0);
+		mem_stream = imgtool::stream::open_mem(NULL, 0);
 		if (!mem_stream)
 		{
 			err = IMGTOOLERR_OUTOFMEMORY;
 			goto done;
 		}
 
-		stream_seek(sourcef, pos, SEEK_SET);
-		len = stream_transfer(mem_stream, sourcef, fork_len);
+		sourcef->seek(pos, SEEK_SET);
+		len = imgtool::stream::transfer(*mem_stream, *sourcef, fork_len);
 		if (len < fork_len)
-			stream_fill(mem_stream, 0, fork_len);
+			mem_stream->fill(0, fork_len);
 
-		stream_seek(mem_stream, 0, SEEK_SET);
+		mem_stream->seek(0, SEEK_SET);
 		err = partition->write_file(filename, fork, mem_stream, opts, NULL);
 		if (err)
 			goto done;
@@ -210,13 +210,13 @@ static imgtoolerr_t write_fork(imgtool::partition *partition, const char *filena
 
 done:
 	if (mem_stream)
-		stream_close(mem_stream);
+		delete mem_stream;
 	return err;
 }
 
 
 
-static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
 {
 	static const UINT32 attrs[] =
 	{
@@ -254,7 +254,7 @@ static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const cha
 
 	/* read in the header */
 	memset(header, 0, sizeof(header));
-	stream_read(sourcef, header, sizeof(header));
+	sourcef->read(header, sizeof(header));
 
 	/* check magic and zero fill bytes */
 	if (header[0] != 0x00)
@@ -266,7 +266,7 @@ static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const cha
 
 	datafork_size = pick_integer_be(header, 83, 4);
 	resourcefork_size = pick_integer_be(header, 87, 4);
-	total_size = stream_size(sourcef);
+	total_size = sourcef->size();
 
 	/* size of a MacBinary header is always 128 bytes */
 	if (total_size - pad128(datafork_size) - pad128(resourcefork_size) != 128)
@@ -342,7 +342,7 @@ static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const cha
 
 
 
-static imgtoolerr_t macbinary_checkstream(imgtool_stream *stream, imgtool_suggestion_viability_t *viability)
+static imgtoolerr_t macbinary_checkstream(imgtool::stream *stream, imgtool_suggestion_viability_t *viability)
 {
 	imgtoolerr_t err;
 

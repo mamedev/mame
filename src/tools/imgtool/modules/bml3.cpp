@@ -283,7 +283,7 @@ static void granule_location(imgtool::image *image, UINT8 granule, UINT8 *head, 
 
 
 
-static imgtoolerr_t transfer_granule(imgtool::image *img, UINT8 granule, int length, imgtool_stream *f, imgtoolerr_t (*proc)(imgtool::image *, int, int, int, int, size_t, imgtool_stream *))
+static imgtoolerr_t transfer_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream *f, imgtoolerr_t (*proc)(imgtool::image *, int, int, int, int, size_t, imgtool::stream *))
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	UINT8 head, track, sector;
@@ -294,14 +294,14 @@ static imgtoolerr_t transfer_granule(imgtool::image *img, UINT8 granule, int len
 }
 
 
-static imgtoolerr_t transfer_from_granule(imgtool::image *img, UINT8 granule, int length, imgtool_stream *destf)
+static imgtoolerr_t transfer_from_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream *destf)
 {
 	return transfer_granule(img, granule, length, destf, imgtool_floppy_read_sector_to_stream);
 }
 
 
 
-static imgtoolerr_t transfer_to_granule(imgtool::image *img, UINT8 granule, int length, imgtool_stream *sourcef)
+static imgtoolerr_t transfer_to_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream *sourcef)
 {
 	return transfer_granule(img, granule, length, sourcef, imgtool_floppy_write_sector_from_stream);
 }
@@ -422,7 +422,7 @@ static imgtoolerr_t get_file_size(struct bml3_dirent *ent, imgtool::image *img, 
 
 
 
-static imgtoolerr_t process_bml3_file(struct bml3_dirent *ent, imgtool::image *img, imgtool_stream *destf, size_t *size)
+static imgtoolerr_t process_bml3_file(struct bml3_dirent *ent, imgtool::image *img, imgtool::stream *destf, size_t *size)
 {
 	imgtoolerr_t err;
 	size_t remaining_size, granule_size;
@@ -498,7 +498,7 @@ static imgtoolerr_t prepare_dirent(UINT8 variant, struct bml3_dirent *ent, const
 
 
 
-static imgtoolerr_t bml3_diskimage_open(imgtool::image *image, imgtool_stream *stream)
+static imgtoolerr_t bml3_diskimage_open(imgtool::image *image, imgtool::stream *stream)
 {
 	// imgtoolerr_t err;
 	floperr_t ferr;
@@ -673,7 +673,7 @@ static imgtoolerr_t delete_entry(imgtool::image *img, struct bml3_dirent *ent, i
 
 
 
-static imgtoolerr_t bml3_diskimage_readfile(imgtool::partition *partition, const char *fname, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t bml3_diskimage_readfile(imgtool::partition *partition, const char *fname, const char *fork, imgtool::stream *destf)
 {
 	imgtoolerr_t err;
 	struct bml3_dirent ent;
@@ -696,7 +696,7 @@ static imgtoolerr_t bml3_diskimage_readfile(imgtool::partition *partition, const
 
 
 
-static imgtoolerr_t bml3_diskimage_writefile(imgtool::partition *partition, const char *fname, const char *fork, imgtool_stream *sourcef, util::option_resolution *writeoptions)
+static imgtoolerr_t bml3_diskimage_writefile(imgtool::partition *partition, const char *fname, const char *fork, imgtool::stream *sourcef, util::option_resolution *writeoptions)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -724,7 +724,7 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool::partition *partition, cons
 		return err;
 
 	/* is there enough space? */
-	sz = read_sz = stream_size(sourcef);
+	sz = read_sz = sourcef->size();
 	if (info->variant == 0) {
 		// also need to write EOF
 		sz++;

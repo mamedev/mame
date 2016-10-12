@@ -17,7 +17,7 @@
 #define FAT_SECLEN              512
 
 
-static imgtoolerr_t fat_image_create(imgtool::image *image, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t fat_image_create(imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	UINT32 tracks, heads, sectors;
