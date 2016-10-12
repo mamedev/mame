@@ -1635,6 +1635,13 @@ static MACHINE_CONFIG_DERIVED( fexcelp, fexcel )
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( fdes2000, fexcel )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // R65C02P4
+	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
 
 	/* sound hardware */
@@ -1988,6 +1995,11 @@ ROM_START( fexcelp )
 	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) ) // GI 27C256, no label
 ROM_END
 
+ROM_START( fdes2000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) ) // AMI
+ROM_END
+
 ROM_START( fexcelv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // PCB1, M27256
@@ -2057,5 +2069,7 @@ CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,   fexcel,    driver_device, 0
 CONS( 1987, fexcelb,    fexcel,   0,      fexcelb,   fexcelb,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0, "Fidelity Electronics", "Voice Excellence (model 6092)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display (model 6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1988, fdes2000,   0,        0,      fdes2000,  fexcel,    driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
 
 CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
