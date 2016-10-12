@@ -23,8 +23,14 @@
 
 console_frontend::console_frontend(emu_options &options, osd_interface &osd)
 	: m_options(options),
-	  m_osd(osd)
+	  m_osd(osd),
+	  m_run(true),
+	  m_wait(false),
+	  m_prompt("\x1b[1;36m[MAME]\x1b[0m> ")
 {
+	using namespace std::placeholders;
+	m_commands.insert(std::make_pair("quit", std::bind(&console_frontend::cmd_quit, this, _1)));
+	m_commands.insert(std::make_pair("exit", std::bind(&console_frontend::cmd_quit, this, _1)));
 }
 
 
@@ -36,58 +42,92 @@ console_frontend::~console_frontend()
 {
 }
 
-
-/*
-static const char* examples[] = {
-	"db", "hello", "hallo", "hans", "hansekogge", "seamann", "quetzalcoatl", "quit", "power", NULL
+static const char* commandList[] = {
+	"quit", "exit", NULL
 };
 
 void completionHook(char const* prefix, linenoiseCompletions* lc) {
 	size_t i;
 
-	for (i = 0; examples[i] != NULL; ++i) {
-		if (strncmp(prefix, examples[i], strlen(prefix)) == 0) {
-			linenoiseAddCompletion(lc, examples[i]);
+	for (i = 0; commandList[i] != NULL; ++i) {
+		if (strncmp(prefix, commandList[i], strlen(prefix)) == 0) {
+			linenoiseAddCompletion(lc, commandList[i]);
 		}
 	}
 }
-*/
 
-static void read_console(std::atomic<bool>& run, std::atomic<bool>& wait, std::string &cmdLine)
+void console_frontend::cmd_quit(std::vector<std::string>& arg)
 {
-	char const* prompt = "\x1b[1;36m[MAME]\x1b[0m> ";
+	printf("Exiting application\n");
+	m_run.store(false);
+	m_wait.store(false);
+}
 
-	while (run.load())
+void console_frontend::read_console(std::string &cmdLine)
+{
+	while (m_run.load())
 	{
-		while (wait.load())
+		while (m_wait.load())
 		{
 			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(100ms);
+			std::this_thread::sleep_for(100ms);			
 		}
-		char* result = linenoise(prompt);
+		if (!m_run.load()) break;
+		char* result = linenoise(m_prompt.c_str());
 		if (result == NULL)
 		{
 			continue;
 		}
-/*		else if (!strncmp(result, "/history", 8)) {
-			// Display the current history. 
-			for (int index = 0; ; ++index) {
-				char* hist = linenoiseHistoryLine(index);
-				if (hist == NULL) break;
-				printf("%4d: %s\n", index, hist);
-				free(hist);
-			}
-		}*/
 		else if (*result == '\0') {
 			free(result);
 			continue;
 		}
 		cmdLine = std::string(result);
 		linenoiseHistoryAdd(result);
-		//prompt = "\x1b[1;36m[MAME]\x1b[0m \x1b[1;32m[test]\x1b[0m> ";
+		//m_prompt = "\x1b[1;36m[MAME]\x1b[0m \x1b[1;32m[test]\x1b[0m> ";
 
 		free(result);
-		wait.store(true);
+		m_wait.store(true);
+	}
+}
+
+void console_frontend::split_command(std::vector<std::string>& arg, std::string command) 
+{
+	int len = command.length();
+	bool qot = false, sqot = false;
+	int arglen;
+	for (int i = 0; i < len; i++) {
+		int start = i;
+		if (command[i] == '\"') {
+			qot = true;
+		}
+		else if (command[i] == '\'') sqot = true;
+
+		if (qot) {
+			i++;
+			start++;
+			while (i<len && command[i] != '\"')
+				i++;
+			if (i<len)
+				qot = false;
+			arglen = i - start;
+			i++;
+		}
+		else if (sqot) {
+			i++;
+			while (i<len && command[i] != '\'')
+				i++;
+			if (i<len)
+				sqot = false;
+			arglen = i - start;
+			i++;
+		}
+		else {
+			while (i<len && command[i] != ' ')
+				i++;
+			arglen = i - start;
+		}
+		arg.push_back(command.substr(start, arglen));
 	}
 }
 
@@ -98,7 +138,7 @@ void console_frontend::start_console()
 	const char* file = "./history";
 
 	linenoiseHistoryLoad(file);
-	//linenoiseSetCompletionCallback(completionHook);
+	linenoiseSetCompletionCallback(completionHook);
 
 	// Display app info
 	printf("    _/      _/    _/_/    _/      _/  _/_/_/_/\n");
@@ -109,23 +149,32 @@ void console_frontend::start_console()
 	printf("\n");
 	printf("%s v%s\n%s\n\n", emulator_info::get_appname(), build_version, emulator_info::get_copyright_info());
 
-	std::atomic<bool> run(true), wait(false);
-	std::thread cinThread(read_console, std::ref(run), std::ref(wait), std::ref(cmdLine));
+	
+	std::thread cinThread(&console_frontend::read_console, this, std::ref(cmdLine));
 
-	while (run.load())
+	while (m_run.load())
 	{
-		if (wait.load())
+		if (m_wait.load())
 		{
-			//printf("command %s\n", cmdLine.c_str());
+			std::vector<std::string> arg;
+			split_command(arg, cmdLine);
+			auto command = m_commands.find(arg[0]);
+			if (command != m_commands.end())
+			{
+				command->second(arg);
+			}
+			else {
+				printf("Unknown command: %s\n", arg[0].c_str());
+			}
 			cmdLine.clear();
-			wait.store(false);
+			m_wait.store(false);
 		} else {
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(100ms);
 		}
 	}
 
-	run.store(false);
+	m_run.store(false);
 	cinThread.join();
 
 	linenoiseHistorySave(file);
