@@ -6686,6 +6686,33 @@ ROM_START( bjtwinp )
 	ROM_LOAD( "bottom.ic27",    0x0c0000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
 ROM_END
 
+
+ROM_START( bjtwinpa )
+	ROM_REGION( 0x80000, "maincpu", 0 )  /* 68000 code */
+	ROM_LOAD16_BYTE( "ic76.bin",  0x00000, 0x20000, CRC(81106d1e) SHA1(81c195173cf859f6266c160ee94ac4734edef085) )
+	ROM_LOAD16_BYTE( "ic75.bin",  0x00001, 0x20000, CRC(7c99b97f) SHA1(36e34b7a5bb876b7bbee46ace7acc03faeee211e) )
+
+	ROM_REGION( 0x010000, "fgtile", 0 )
+	ROM_LOAD( "ic35.bin",  0x000000, 0x010000, CRC(aa13df7c) SHA1(162d4f12364c68028e86fe97ee75c262daa4c699) ) /* 8x8 tiles */
+
+	ROM_REGION( 0x200000, "bgtile", 0 )
+	ROM_LOAD( "ic32_1.bin", 0x000000, 0x080000, CRC(e2d2b331) SHA1(d8fdbff497303a00fc866f0ef07ba74b369c0636) )
+	ROM_LOAD( "ic32_2.bin", 0x080000, 0x080000, CRC(28a3a845) SHA1(4daf71dce5e598ee7ee7e09bb08ec1b2f06f2b01) )
+	ROM_LOAD( "ic32_3.bin", 0x100000, 0x080000, CRC(ecce80c9) SHA1(ae7410f47e911988f654e78d585d78cf40e0ae5e) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ic100_1.bin", 0x000000, 0x080000, CRC(2ea7e460) SHA1(b8dc13994ae2433fc7c38412c9ea6f10f945bca5) )
+	ROM_LOAD16_BYTE( "ic100_2.bin", 0x000001, 0x080000, CRC(ec85e1b7) SHA1(2f9a60ad2beb22d1b41dab7db3634b8e36cfce3e) )
+
+	ROM_REGION( 0x140000, "oki1", 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "bottom.ic30",    0x040000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) /* all banked */
+	ROM_LOAD( "top.ic30",       0x0c0000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
+
+	ROM_REGION( 0x140000, "oki2", 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "top.ic27",       0x040000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) /* all banked */
+	ROM_LOAD( "bottom.ic27",    0x0c0000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
+ROM_END
+
 ROM_START( atombjt ) // based off bjtwina set
 	ROM_REGION( 0x40000, "maincpu", 0 )  /* 68000 code */
 	ROM_LOAD16_BYTE( "22.u67",  0x00000, 0x20000, CRC(bead8c70) SHA1(2694bb0639f6b94119c21faf3810f00ef20b50da) )
@@ -7861,8 +7888,9 @@ GAME( 1992, cactus,   sabotenb, bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,
 
 GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
 GAME( 1993, bjtwina,  bjtwin,   bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwinp,  bjtwin,   bjtwin,   bjtwin, driver_device, 0,        ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures)", MACHINE_NO_COCKTAIL ) // Genuine NMK PCB but GFX aren't encrypted
-GAME( 1993, atombjt,  bjtwin,   atombjt,  bjtwin, driver_device, 0,        ROT270, "bootleg",                      "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw
+GAME( 1993, bjtwinp,  bjtwin,   bjtwin,   bjtwin, driver_device, 0,        ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", MACHINE_NO_COCKTAIL ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
+GAME( 1993, bjtwinpa, bjtwin,   bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", MACHINE_NO_COCKTAIL ) // same PCB as above, different program revision, GFX are encrypted
+GAME( 1993, atombjt,  bjtwin,   atombjt,  bjtwin, driver_device, 0,        ROT270, "bootleg",                      "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw (playmark hardware?)
 
 
 GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk16_state,   nmk,      ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", MACHINE_NO_COCKTAIL )
