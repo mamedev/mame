@@ -71,6 +71,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/mame.h",
 	MAME_DIR .. "src/frontend/mame/mameopts.cpp",
 	MAME_DIR .. "src/frontend/mame/mameopts.h",
+	MAME_DIR .. "src/frontend/mame/media_ident.cpp",
+	MAME_DIR .. "src/frontend/mame/media_ident.h",
 	MAME_DIR .. "src/frontend/mame/pluginopts.cpp",
 	MAME_DIR .. "src/frontend/mame/pluginopts.h",
 	MAME_DIR .. "src/frontend/mame/ui/ui.cpp",
