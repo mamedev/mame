@@ -257,7 +257,8 @@ hp9845b_state::hp9845b_state(const machine_config &mconfig, device_type type, co
 			  m_io_key3(*this , "KEY3"),
 			  m_t15(*this , "t15"),
 			  m_beeper(*this , "beeper"),
-			  m_beep_timer(*this , "beep_timer")
+			  m_beep_timer(*this , "beep_timer"),
+			  m_io_slot0(*this , "slot0")
 {
 }
 
@@ -867,6 +868,12 @@ void hp9845b_state::flg_w(UINT8 sc , int state)
 	}
 }
 
+void hp9845b_state::install_readwrite_handler(UINT8 sc , read16_delegate rhandler, write16_delegate whandler)
+{
+	// Install r/w handlers to cover all I/O addresses of PPU belonging to "sc" select code
+	m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
 {
 		ioport_value input[ 4 ];
@@ -1103,7 +1110,9 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 	MCFG_DEVICE_ADD("drawer8", HP_OPTROM_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
 
-		MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+
+	MCFG_HP9845_IO_SLOT_ADD("slot0")
 MACHINE_CONFIG_END
 
 ROM_START( hp9845a )

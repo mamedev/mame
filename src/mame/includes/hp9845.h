@@ -10,6 +10,7 @@
 #include "cpu/hphybrid/hphybrid.h"
 #include "machine/hp_taco.h"
 #include "sound/beep.h"
+#include "bus/hp9845_io/hp9845_io.h"
 
 class hp9845b_state : public driver_device
 {
@@ -40,6 +41,7 @@ public:
 	void update_flg_sts(void);
 	void sts_w(UINT8 sc , int state);
 	void flg_w(UINT8 sc , int state);
+	void install_readwrite_handler(UINT8 sc , read16_delegate rhandler, write16_delegate whandler);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	DECLARE_READ16_MEMBER(kb_scancode_r);
@@ -66,6 +68,7 @@ private:
 	required_device<hp_taco_device> m_t15;
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
+	required_device<hp9845_io_slot_device> m_io_slot0;
 
 	void set_video_mar(UINT16 mar);
 	void video_fill_buff(bool buff_idx);
