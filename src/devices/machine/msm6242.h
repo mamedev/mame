@@ -11,6 +11,7 @@
 #ifndef __MSM6242DEV_H__
 #define __MSM6242DEV_H__
 
+#include "emu.h"
 #include "dirtc.h"
 
 
