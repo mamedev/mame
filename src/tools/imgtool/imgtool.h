@@ -187,12 +187,11 @@ namespace imgtool
 
 	private:
 		imgtool::image &m_image;
-		int m_partition_index;
+		//int m_partition_index;
 		UINT64 m_base_block;
 		UINT64 m_block_count;
 
 		imgtool_class m_imgclass;
-		size_t m_partition_extra_bytes;
 		size_t m_directory_extra_bytes;
 
 		char m_path_separator;

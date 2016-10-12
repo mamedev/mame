@@ -549,7 +549,7 @@ UINT64 imgtool::image::rand()
 
 imgtool::partition::partition(imgtool::image &image, imgtool_class &imgclass, int partition_index, UINT64 base_block, UINT64 block_count)
 	: m_image(image)
-	, m_partition_index(partition_index)
+	//, m_partition_index(partition_index)
 	, m_base_block(base_block)
 	, m_block_count(block_count)
 	, m_imgclass(imgclass)
