@@ -6,17 +6,17 @@
 // were 0x7026 & 0x7027.
 // I searched for a while for any kind of documentation about them but found nothing at all.
 // Some time later I found the mnemonics in the binary dump of assembly development option ROM:
-// CIM & SIM, respectively. From the mnemonic I deduced their function: Clear & Set Interrupt Mask.
+// CIM & SIM, respectively. From the mnemonic I deduced their function: Clear & Set Interrupt Mode.
 // After a few experiments, crashes, etc. here's my opinion on their purpose.
 // When the CPU receives an interrupt, its AEC registers can be in any state so it could
 // be impossible to properly save state, fetch the interrupt vector and start executing the ISR.
-// The solution is having an hidden "interrupt mask" flag that gets set when an interrupt (either
+// The solution is having an hidden "interrupt mode" flag that gets set when an interrupt (either
 // low or high priority) is acknowledged and is cleared when the "ret 0,p" instruction that ends
-// the ISR is executed. The effects of having the interrupt mask set are:
+// the ISR is executed. The effects of having the interrupt mode set are:
 // * No interrupts are recognized
 // * A few essential AEC registers are overridden to establish a "safe" environment to save state
 // and execute ISR (see hp_5061_3001_cpu_device::add_mae).
-// Inside the ISR, CIM & SIM instructions can be used to change the interrupt mask and switch
+// Inside the ISR, CIM & SIM instructions can be used to change the interrupt mode and switch
 // between normal & overridden settings of AEC.
 // As an example of CIM&SIM usage, we can have a look at the keyboard ISR in 9845B PPU processor:
 // * A key is pressed and IRQ 0 is set
@@ -88,7 +88,7 @@ enum {
 #define HPHYBRID_STS_BIT        13  // Status flag
 #define HPHYBRID_FLG_BIT        14  // "Flag" flag
 #define HPHYBRID_DC_BIT         15  // Decimal carry
-#define HPHYBRID_IM_BIT         16  // Interrupt mask
+#define HPHYBRID_IM_BIT         16  // Interrupt mode
 
 #define HPHYBRID_IV_MASK        0xfff0  // IV mask
 
@@ -263,14 +263,22 @@ void hp_hybrid_cpu_device::execute_set_input(int inputnum, int state)
  */
 UINT16 hp_hybrid_cpu_device::execute_one(UINT16 opcode)
 {
-				if ((opcode & 0x7fe0) == 0x7000) {
-								// EXE
-								m_icount -= 8;
-								return RM(opcode & 0x1f);
-				} else {
-								m_reg_P = execute_one_sub(opcode);
-								return fetch();
-				}
+	if ((opcode & 0x7fe0) == 0x7000) {
+		// EXE
+		m_icount -= 8;
+		// Indirect addressing in EXE instruction seems to use AEC case A instead of case C
+		// (because it's an opcode fetch)
+		UINT16 reg = RM(opcode & 0x1f);
+		if (BIT(opcode , 15)) {
+			m_icount -= 6;
+			return RM(add_mae(AEC_CASE_A , reg));
+		} else {
+			return reg;
+		}
+	} else {
+		m_reg_P = execute_one_sub(opcode);
+		return fetch();
+	}
 }
 
 /**
@@ -1492,21 +1500,21 @@ UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
 								case 0x7026:
 										// CIM
 										// Undocumented instruction, see beginning of this file
-										// Probably "Clear Interrupt Mask"
+										// Probably "Clear Interrupt Mode"
 										// No idea at all about exec. time: make it 9 cycles
 										m_icount -= 9;
 										BIT_CLR(m_flags, HPHYBRID_IM_BIT);
-										logerror("hp-5061-3001: CIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
+										//logerror("hp-5061-3001: CIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
 										break;
 
 								case 0x7027:
 										// SIM
 										// Undocumented instruction, see beginning of this file
-										// Probably "Set Interrupt Mask"
+										// Probably "Set Interrupt Mode"
 										// No idea at all about exec. time: make it 9 cycles
 										m_icount -= 9;
 										BIT_SET(m_flags, HPHYBRID_IM_BIT);
-										logerror("hp-5061-3001: SIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
+										//logerror("hp-5061-3001: SIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
 										break;
 
 				default:
@@ -1680,7 +1688,7 @@ void hp_5061_3001_cpu_device::write_non_common_reg(UINT16 addr , UINT16 v)
 
 void hp_5061_3001_cpu_device::enter_isr(void)
 {
-	// Set interrupt mask when entering an ISR
+	// Set interrupt mode when entering an ISR
 	BIT_SET(m_flags, HPHYBRID_IM_BIT);
 }
 
