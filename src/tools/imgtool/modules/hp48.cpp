@@ -351,8 +351,8 @@ static imgtoolerr_t hp48_open(imgtool::image *img, imgtool::stream *stream)
 		}
 
 		/* fully load image */
-	stream->seek(0, SEEK_SET );
-	if ( stream->read(c->data, size ) < size )
+	stream->seek(0, SEEK_SET);
+	if ( stream->read(c->data, size) < size )
 		{
 				return IMGTOOLERR_READERROR;
 		}
@@ -397,8 +397,8 @@ static void hp48_close(imgtool::image *img)
 		{
 				/* save image */
 				pack( c->data, c->data, 2 * c->size );
-				c->stream->seek(0, SEEK_SET );
-				c->stream->write(c->data, c->size );
+				c->stream->seek(0, SEEK_SET);
+				c->stream->write(c->data, c->size);
 		}
 
 		/* clean up */
@@ -576,7 +576,7 @@ static imgtoolerr_t hp48_readfile(imgtool::partition *part,
 				return IMGTOOLERR_FILENOTFOUND;
 		}
 		pack( buf, p->data + start, size );
-		destf->write(buf, bytesize );
+		destf->write(buf, bytesize);
 		free( buf );
 
 		return IMGTOOLERR_SUCCESS;
@@ -622,7 +622,7 @@ static imgtoolerr_t hp48_writefile(imgtool::partition *part,
 
 		/* check header */
 		char head[8];
-		sourcef->read(head, 8 );
+		sourcef->read(head, 8);
 		if ( memcmp( head, hp48_prefix, 7) )
 		{
 				return IMGTOOLERR_READERROR;
@@ -649,7 +649,7 @@ static imgtoolerr_t hp48_writefile(imgtool::partition *part,
 		/* load file */
 		UINT8* buf = (UINT8*) malloc( filesize );
 		if ( !buf ) return IMGTOOLERR_NOSPACE;
-		sourcef->read(buf, filesize );
+		sourcef->read(buf, filesize);
 
 		/* store backup object */
 		int org = pos;
