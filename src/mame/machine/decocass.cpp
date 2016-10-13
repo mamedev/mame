@@ -401,6 +401,38 @@ static UINT8 type1_latch_16_pass_3_inv_1_table[8] = { T1PROM,T1LATCHINV,T1PROM,T
 
 /***************************************************************************
  *
+ *  TYPE1 DONGLE DP-1100/DP-2100 map for Ocean to Ocean
+ *
+ * Latched bits                          = $44 (2 latch bits)
+ * Input bits that are passed uninverted = $10 (1 true bits)
+ * Input bits that are passed inverted   = $00 (0 inverted bits)
+ * Remaining bits for addressing PROM    = $AB (5 bits)
+ * Latched bit #0:
+ * Input bit position  = 2
+ * Output bit position = 2
+ * Type                = Inverting latch
+ * Latched bit #1:
+ * Input bit position  = 6
+ * Output bit position = 6
+ * Type                = Non-inverting latch
+ *
+ ***************************************************************************/
+
+static UINT8 type1_map1100[8] = { T1PROM,T1PROM,T1LATCHINV,T1PROM,T1DIRECT,T1PROM,T1LATCH,T1PROM };
+
+MACHINE_RESET_MEMBER(decocass_state,cocean1a) /* 10 */
+{
+	decocass_state::machine_reset();
+	LOG(0,("dongle type #1 (DP-1100 map)\n"));
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_map1100;
+	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
+}
+
+
+/***************************************************************************
+ *
  *  TYPE2 DONGLE (CS82-007)
  *  - Disco No 1
  *  - Tornado
