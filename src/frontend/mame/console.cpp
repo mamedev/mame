@@ -22,8 +22,8 @@ static console_frontend *gConsole = nullptr;
 //-------------------------------------------------
 
 console_frontend::console_frontend(emu_options &options, osd_interface &osd)
-	: m_options(options),
-	  m_osd(osd),
+	: //m_options(options),
+	  //m_osd(osd),
 	  m_run(true),
 	  m_wait(false),
 	  m_prompt("\x1b[1;36m[MAME]\x1b[0m> ")
