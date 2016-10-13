@@ -249,6 +249,42 @@ static INPUT_PORTS_START( csuperas )
 	/* Switches 6, 7 & 8 are listed as "Country Code" A through F and "Don't Change" */
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( cocean1a ) /* 10 */
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW1") /* Switches 5 and 6 defined as blank/2100/2100/2100 and "Don't change" */
+	PORT_DIPNAME( 0x07, 0x07, "Number of 1 Coin Credit")                PORT_DIPLOCATION("SW1:1,2,3") /* Credits for 1 coin */
+	PORT_DIPSETTING(    0x07, "1")
+	PORT_DIPSETTING(    0x06, "2")
+	PORT_DIPSETTING(    0x05, "5")
+	PORT_DIPSETTING(    0x04, "10")
+	PORT_DIPSETTING(    0x03, "20")
+	PORT_DIPSETTING(    0x02, "30")
+	PORT_DIPSETTING(    0x01, "40")
+	PORT_DIPSETTING(    0x00, "50")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( None ) )                         PORT_DIPLOCATION("SW1:4")     /* Default is "Off" and shown as "Don't change" */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Key Switch Credit" )                     PORT_DIPLOCATION("SW2:1,2")   /* Unknown */
+	PORT_DIPSETTING(    0x03, "1 Coin 10 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin 20 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin 100 Credits" )
+	PORT_DIPNAME( 0x04, 0x04, "Game Select" )                           PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "1 to 8 Lines" )
+	PORT_DIPSETTING(    0x00, "Center Line" )	
+	PORT_DIPNAME( 0x08, 0x08, "Background Music" )                      PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+	PORT_DIPNAME( 0x10, 0x10, "Pay Out %" )                             PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "Payout 75%")
+	PORT_DIPSETTING(    0x00, "Payout 85%")
+	/* Switches 6 to 8 are shown as completly blank and "Don't change" */
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( clocknch )
 	PORT_INCLUDE( decocass )
 
@@ -816,6 +852,13 @@ static MACHINE_CONFIG_DERIVED( csuperas, decocass )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( cocean1a, decocass ) /* 10 */
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cocean1a)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( clocknch, decocass )
 
 	/* basic machine hardware */
@@ -991,46 +1034,106 @@ static MACHINE_CONFIG_DERIVED( cflyball, decocass )
 MACHINE_CONFIG_END
 
 
-#define DECOCASS_COMMON_ROMS    \
-	ROM_REGION( 0x10000, "audiocpu", 0 )      \
-	ROM_LOAD( "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */ \
-\
+#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+
+
+/************ Version A bios roms *************/
+
+/* v0a.7e, New boardset bios, revision A */
+#define DECOCASS_BIOS_A_MAINCPU \
+	ROM_SYSTEM_BIOS( 0, "a",   "Bios A (Japan)" ) \
+	ROM_LOAD_BIOS( 0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */
+#define DECOCASS_BIOS_A_AUDIOCPU \
+	ROM_LOAD_BIOS( 0, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
+#define DECOCASS_BIOS_A_PROMS \
+	ROM_LOAD_BIOS( 0, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 0, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 0, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+
+/* Old boardset bios, version A for Japan, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
+#define DECOCASS_BIOS_A0_MAINCPU \
+	ROM_SYSTEM_BIOS( 1, "a0",   "Bios A (Japan, older)" ) \
+	ROM_LOAD_BIOS( 1, "dsp-3_p0-a.m9",      0xf000, 0x0800, CRC(2541e34b) SHA1(4f983513dbae1350c83a433dea77a4465748b9c6) ) \
+	ROM_LOAD_BIOS( 1, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) )
+#define DECOCASS_BIOS_A0_AUDIOCPU \
+	ROM_LOAD_BIOS( 1, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
+#define DECOCASS_BIOS_A0_PROMS \
+	ROM_LOAD_BIOS( 1, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 1, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 1, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
+
+/************ Version B bios roms *************/
+
+/* rms8.7e, New boardset bios, revision B */ \
+#define DECOCASS_BIOS_B_MAINCPU \
+	ROM_SYSTEM_BIOS( 2, "b",   "Bios B (USA)" ) \
+	ROM_LOAD_BIOS( 2, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */
+#define DECOCASS_BIOS_B_AUDIOCPU \
+	ROM_LOAD_BIOS( 2, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
+#define DECOCASS_BIOS_B_PROMS \
+	ROM_LOAD_BIOS( 2, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 2, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 2, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+
+/* Old boardset bios, version B for USA, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
+/* dsp3.p0b/p1b, Old boardset bios, revision B?; from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
+#define DECOCASS_BIOS_B0_MAINCPU \
+	ROM_SYSTEM_BIOS( 3, "b0",   "Bios B (USA, older)" ) \
+	ROM_LOAD_BIOS( 3, "dsp-3_p0-b.m9",      0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
+	ROM_LOAD_BIOS( 3, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) )
+#define DECOCASS_BIOS_B0_AUDIOCPU \
+	ROM_LOAD_BIOS( 3, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
+#define DECOCASS_BIOS_B0_PROMS \
+	ROM_LOAD_BIOS( 3, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 3, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 3, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
+
+/************ Common MCU bios rom *************/
+
+#define DECOCASS_BIOS_MCU \
+	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) ) /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff; This info needs additional verification, as the d8041-535 mcu has not been dumped yet to prove code is the same. */
+
+
+
+#define DECOCASS_BIOS_MAIN \
+	ROM_REGION( 0x10000, "maincpu", 0 ) \
+	DECOCASS_BIOS_A_MAINCPU \
+	DECOCASS_BIOS_A0_MAINCPU \
+	DECOCASS_BIOS_B_MAINCPU \
+	DECOCASS_BIOS_B0_MAINCPU \
+	ROM_REGION( 0x10000, "audiocpu", 0 ) \
+	DECOCASS_BIOS_A_AUDIOCPU \
+	DECOCASS_BIOS_A0_AUDIOCPU \
+	DECOCASS_BIOS_B_AUDIOCPU \
+	DECOCASS_BIOS_B0_AUDIOCPU \
+	ROM_REGION( 0x00060, "proms", 0 ) \
+	DECOCASS_BIOS_A_PROMS \
+	DECOCASS_BIOS_A0_PROMS \
+	DECOCASS_BIOS_B_PROMS \
+	DECOCASS_BIOS_B0_PROMS \
 	ROM_REGION( 0x10000, "mcu", 0 )   /* 4k for the 8041 MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
-	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) ) /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff; This info needs additional verification, as the d8041-535 mcu has not been dumped yet to prove code is the same. */ \
-\
-	ROM_REGION( 0x00060, "proms", 0 )     /* PROMS */ \
-	ROM_LOAD( "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD( "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD( "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+	DECOCASS_BIOS_MCU
 
-#define DECOCASS_BIOS_A_ROMS    \
-	/* v0a.7e, New boardset bios, revision A */ \
-\
-	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_LOAD( "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */ \
-\
-	DECOCASS_COMMON_ROMS
 
-#define DECOCASS_BIOS_B_ROMS    \
-	/* rms8.7e, New boardset bios, revision B */ \
-\
-	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_LOAD( "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */ \
-\
-	DECOCASS_COMMON_ROMS
+#define DECOCASS_BIOS_B_ROMS \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "b" )
 
-#define DECOCASS_BIOS_B2_ROMS   \
-	/* dsp3.p0b/p1b, Old boardset bios, revision B?; from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
-\
-	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_LOAD( "dsp3.p0b",   0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
-	ROM_LOAD( "dsp3.p1b",   0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
-\
-	DECOCASS_COMMON_ROMS
+#define DECOCASS_BIOS_BO_ROMS   \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "b0" )
+
+#define DECOCASS_BIOS_A_ROMS \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "a" )
+
+#define DECOCASS_BIOS_AO_ROMS   \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "a0" )
 
 ROM_START( decocass )
-	DECOCASS_BIOS_B_ROMS
-
+	DECOCASS_BIOS_MAIN
 ROM_END
 
 /* The Following use Dongle Type 1 (DE-0061)
@@ -1100,6 +1203,27 @@ ROM_START( csuperas )
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "csuperas.cas", 0x0000, 0x8000, CRC(fabcd07f) SHA1(4070c668ad6725f0710cf7fe6df0d5f80272a449) )
+ROM_END
+
+/* 10 Ocean to Ocean (World) */
+ROM_START( cocean1a ) // version MD 1-A-0 verified, 061 blocks, decrypted main data CRC(b97ab3cb)
+	DECOCASS_BIOS_AO_ROMS
+
+	ROM_REGION( 0x10000, "cassette", 0 )  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1101-a-0.cas", 0x0000, 0x3e00, CRC(db8ab848) SHA1(2b2acb249bf66e6c5e15d89b7ebd294ed2eee066) )
+
+	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "dp-1100-a.rom",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
+ROM_END
+
+ROM_START( cocean6b ) // version MD 10-B-0 not verified, 068 blocks, decrypted main data CRC(410d1f19)	
+	DECOCASS_BIOS_BO_ROMS
+
+	ROM_REGION( 0x10000, "cassette", 0 )  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1106-b-0.cas", 0x0000, 0x4500, CRC(fa6ffc95) SHA1(95f881503aa8cd97d04b327abeb68891d053563f) )
+	
+	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "dp-1100-b.rom",   0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 ROM_END
 
 /* 11 Lock'n'Chase */
@@ -1661,7 +1785,8 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* 07 */ GAME( 1981, castfant,  decocass, castfant, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette)", 0 )
 /* 08 */ // 1981.03 The Tower
 /* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_state, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette)", 0 )
-/* 10 */ // 1981.?? Ocean to Ocean (medal)
+/* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) [DECO Cassette MD] (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
+/*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) [DECO Cassette MD] (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette)", 0 )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )

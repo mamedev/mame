@@ -183,6 +183,7 @@ public:
 	DECLARE_MACHINE_RESET(cbdash);
 	DECLARE_MACHINE_RESET(cflyball);
 	DECLARE_MACHINE_RESET(cmanhat);
+	DECLARE_MACHINE_RESET(cocean1a); /* 10 */
 	UINT32 screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);
