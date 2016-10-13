@@ -364,7 +364,7 @@
 		<bezel element="but" inputtag="IN.8" inputmask="0x02"><bounds x="91.5" y="57" width="2" height="2" /></bezel>
 		<bezel element="but" inputtag="IN.8" inputmask="0x01"><bounds x="91.5" y="61" width="2" height="2" /></bezel>
 
-		<bezel name="8.7" element="led2"><bounds x="91.75" y="65.25" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.0" element="led2"><bounds x="91.75" y="65.25" width="1.5" height="1.5" /></bezel>
 
 	</view>
 </mamelayout>
