@@ -169,9 +169,9 @@ UINT8 hpc104_t::nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom
 	{
 		if (!(!m_ncc1_out || ncc1))
 		{
-			if (LOG) logerror("%s %s CCM0 read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
-
 			data = m_ccm->nrdi_r(space, offset & 0x1ffff);
+
+			if (LOG) logerror("%s %s CCM1 read %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
 		}
 
 		if (m_sw1)
@@ -234,7 +234,7 @@ void hpc104_t::nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom,
 			{
 				m_ncc1_out = BIT(data, 0);
 
-				if (LOG) logerror("NCC1 out %u\n", machine().time().as_string(), machine().describe_context(), m_ncc1_out);
+				if (LOG) logerror("%s %s NCC1 out %u\n", machine().time().as_string(), machine().describe_context(), m_ncc1_out);
 			}
 		}
 	}
