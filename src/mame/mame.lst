@@ -4,9 +4,9 @@
 
     mame.lst
 
-    This is not automatically generated file, and should be manually updated when
-    new driver is added. From time to time we will auto update comments
-    according to meta-data from source files.
+    This is not an automatically generated file, and it should be manually
+    updated when new driver is added. From time to time, we will auto-update
+    comments according to metadata from source files.
 
 ******************************************************************************/
 
@@ -35795,6 +35795,9 @@ trackfldnz                      // (c) 1982 Goldberg Enterprizes Inc.
 wizzquiz                        // (c) 1985 Konami
 wizzquiza                       // (c) 1985 Zilec-Zenitone
 yieartf                         // GX361 (c) 1985
+
+@source:tranz330.cpp
+tranz330                        // (c) 1985 VeriFone
 
 @source:travrusa.cpp
 motorace                        // (c) 1983 Williams license
