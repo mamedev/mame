@@ -2427,6 +2427,8 @@ ROM_START( demonwld )
 	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
+// has the same sound rom and same attract order as the parent set, but still a 1989 copyright
+// main 68k program ROMs had an additional 'N' stamped on them
 ROM_START( demonwld1 )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o16n-10.bin", 0x000000, 0x20000, CRC(fc38aeaa) SHA1(db338b3ade4ee90a9528b42a6128b854efdb289f) )
