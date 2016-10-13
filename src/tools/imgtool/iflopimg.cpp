@@ -45,29 +45,29 @@ imgtoolerr_t imgtool_floppy_error(floperr_t err)
 
 static void imgtool_floppy_closeproc(void *file)
 {
-	delete (imgtool::stream *) file;
+	delete reinterpret_cast<imgtool::stream *>(file);
 }
 
 static int imgtool_floppy_seekproc(void *file, INT64 offset, int whence)
 {
-	((imgtool::stream *) file)->seek(offset, whence);
+	reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
 	return 0;
 }
 
 static size_t imgtool_floppy_readproc(void *file, void *buffer, size_t length)
 {
-	return ((imgtool::stream *) file)->read(buffer, length);
+	return reinterpret_cast<imgtool::stream *>(file)->read(buffer, length);
 }
 
 static size_t imgtool_floppy_writeproc(void *file, const void *buffer, size_t length)
 {
-	((imgtool::stream *) file)->write(buffer, length);
+	reinterpret_cast<imgtool::stream *>(file)->write(buffer, length);
 	return length;
 }
 
 static UINT64 imgtool_floppy_filesizeproc(void *file)
 {
-	return ((imgtool::stream *) file)->size();
+	return reinterpret_cast<imgtool::stream *>(file)->size();
 }
 
 static const struct io_procs imgtool_ioprocs =

@@ -169,7 +169,10 @@ void imghd_close(struct mess_hard_disk_file *disk)
 		disk->hard_disk = nullptr;
 	}
 	if (disk->stream)
+	{
 		delete disk->stream;
+		disk->stream = nullptr;
+	}
 }
 
 
