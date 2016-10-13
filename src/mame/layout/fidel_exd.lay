@@ -3,8 +3,6 @@
 
 <!-- define elements -->
 
-	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
@@ -226,9 +224,6 @@
 
 	<view name="Internal Layout">
 		<bounds left="-2" right="98" top="-14.5" bottom="89" />
-		<bezel element="static_black">
-			<bounds left="-2" right="98" top="-14.5" bottom="89" />
-		</bezel>
 
 		<bezel element="white"><bounds x="-2.5" y="-2" width="101" height="91.5" /></bezel>
 
@@ -478,7 +473,6 @@
 		<bezel element="hlb" inputtag="IN.8" inputmask="0x04"><bounds x="87" y="55" width="8" height="4" /><color alpha="0.4" /></bezel>
 		<bezel element="hlb" inputtag="IN.8" inputmask="0x02"><bounds x="87" y="64" width="8" height="4" /><color alpha="0.4" /></bezel>
 		<bezel element="hlb" inputtag="IN.8" inputmask="0x01"><bounds x="87" y="73" width="8" height="4" /><color alpha="0.4" /></bezel>
-
 
 	</view>
 </mamelayout>

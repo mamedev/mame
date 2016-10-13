@@ -5,8 +5,6 @@
 
 <!-- define elements -->
 
-	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
@@ -206,9 +204,6 @@
 
 	<view name="Internal Layout">
 		<bounds left="-2" right="100" top="-18" bottom="88" />
-		<bezel element="static_black">
-			<bounds left="-2" right="100" top="-18" bottom="88" />
-		</bezel>
 
 		<bezel element="white"><bounds x="-2.5" y="-2" width="103" height="90.5" /></bezel>
 

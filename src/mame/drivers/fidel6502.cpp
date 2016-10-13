@@ -347,6 +347,24 @@ CPU D6 to W: (model 6092, tied to VCC otherwise)
 
 ******************************************************************************
 
+Designer series:
+
+Designer 2000 (model 6102)
+----------------
+8KB RAM(KM6264AL-10), 32KB ROM(AMI 101.1077A01)
+Ricoh RP65C02G CPU, 3MHz XTAL
+PCB label 510-1129A01
+basically same as Excellence hardware, reskinned board
+
+Designer 1500 is on Z80 hardware
+
+Designer 2100 Display (model 6106)
+----------------
+TODO
+
+
+******************************************************************************
+
 Chesster (model 6120)
 There is also a German version titled Kishon Chesster
 ----------------
@@ -375,6 +393,7 @@ I/O is via TTL, see source code for more info
 // internal artwork
 #include "fidel_chesster.lh" // clickable
 #include "fidel_csc.lh" // clickable, with preliminary boardpieces simulation
+#include "fidel_des2000.lh" // clickable
 #include "fidel_eag.lh" // clickable
 #include "fidel_eas.lh" // clickable
 #include "fidel_ex.lh" // clickable
@@ -1638,8 +1657,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( fdes2000, fexcel )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // R65C02P4
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // RP65C02G
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+
+	MCFG_DEFAULT_LAYOUT(layout_fidel_des2000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
@@ -2065,11 +2086,11 @@ CONS( 1984, fscc12,     0,        0,      sc12,      sc12,      driver_device, 0
 
 CONS( 1985, fexcel,     0,        0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence (model 6083)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelb,    fexcel,   0,      fexcelb,   fexcelb,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0, "Fidelity Electronics", "Voice Excellence (model 6092)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display (model 6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, fdes2000,   0,        0,      fdes2000,  fexcel,    driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
+CONS( 1989, fdes2000,   0,        0,      fdes2000,  fexcel,    driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
 
 CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
