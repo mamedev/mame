@@ -1785,8 +1785,8 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* 07 */ GAME( 1981, castfant,  decocass, castfant, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette)", 0 )
 /* 08 */ // 1981.03 The Tower
 /* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_state, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette)", 0 )
-/* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) [DECO Cassette MD] (No.10/Ver.1,Japan)", MACHINE_NOT_WORKING ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
-/*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) [DECO Cassette MD] (No.10/Ver.6,US)", MACHINE_NOT_WORKING ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
+/* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) [DECO Cassette MD] (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
+/*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) [DECO Cassette MD] (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette)", 0 )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )

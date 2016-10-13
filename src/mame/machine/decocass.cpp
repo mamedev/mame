@@ -418,7 +418,7 @@ static UINT8 type1_latch_16_pass_3_inv_1_table[8] = { T1PROM,T1LATCHINV,T1PROM,T
  *
  ***************************************************************************/
 
-static UINT8 type1_map1100[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM,T1PROM,T1LATCH,T1PROM };
+static UINT8 type1_map1100[8] = { T1PROM,T1PROM,T1LATCHINV,T1PROM,T1DIRECT,T1PROM,T1LATCH,T1PROM };
 
 MACHINE_RESET_MEMBER(decocass_state,cocean1a) /* 10 */
 {
