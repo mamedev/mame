@@ -32,8 +32,8 @@ private:
 
 	void cmd_quit(std::vector<std::string>& arg);
 	// internal state
-	emu_options &       m_options;
-	osd_interface &     m_osd;
+	//emu_options &       m_options;
+	//osd_interface &     m_osd;
 	std::atomic<bool>   m_run;
 	std::atomic<bool>   m_wait;
 	std::string		    m_prompt;
