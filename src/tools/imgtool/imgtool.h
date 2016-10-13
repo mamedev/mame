@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <functional>
 
 #include "corestr.h"
 #include "formats/flopimg.h"
@@ -202,23 +203,23 @@ namespace imgtool
 		unsigned int m_supports_lastmodified_time : 1;
 		unsigned int m_supports_bootblock : 1;            /* this module supports loading/storing the boot block */
 
-		imgtoolerr_t(*m_begin_enum)   (imgtool::directory *enumeration, const char *path);
-		imgtoolerr_t(*m_next_enum)    (imgtool::directory *enumeration, imgtool_dirent *ent);
-		void(*m_close_enum)   (imgtool::directory *enumeration);
-		imgtoolerr_t(*m_free_space)   (imgtool::partition *partition, UINT64 *size);
-		imgtoolerr_t(*m_read_file)    (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf);
-		imgtoolerr_t(*m_write_file)   (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts);
-		imgtoolerr_t(*m_delete_file)  (imgtool::partition *partition, const char *filename);
-		imgtoolerr_t(*m_list_forks)   (imgtool::partition *partition, const char *path, imgtool_forkent *ents, size_t len);
-		imgtoolerr_t(*m_create_dir)   (imgtool::partition *partition, const char *path);
-		imgtoolerr_t(*m_delete_dir)   (imgtool::partition *partition, const char *path);
-		imgtoolerr_t(*m_list_attrs)   (imgtool::partition *partition, const char *path, UINT32 *attrs, size_t len);
-		imgtoolerr_t(*m_get_attrs)    (imgtool::partition *partition, const char *path, const UINT32 *attrs, imgtool_attribute *values);
-		imgtoolerr_t(*m_set_attrs)    (imgtool::partition *partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values);
-		imgtoolerr_t(*m_attr_name)    (UINT32 attribute, const imgtool_attribute *attr, char *buffer, size_t buffer_len);
-		imgtoolerr_t(*m_get_iconinfo) (imgtool::partition *partition, const char *path, imgtool_iconinfo *iconinfo);
-		imgtoolerr_t(*m_suggest_transfer)(imgtool::partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length);
-		imgtoolerr_t(*m_get_chain)    (imgtool::partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size);
+		std::function<imgtoolerr_t(imgtool::directory *enumeration, const char *path)> m_begin_enum;
+		std::function<imgtoolerr_t(imgtool::directory *enumeration, imgtool_dirent *ent)> m_next_enum;
+		std::function<void(imgtool::directory *enumeration)> m_close_enum;
+		std::function<imgtoolerr_t(imgtool::partition *partition, UINT64 *size)> m_free_space;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)> m_read_file;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)> m_write_file;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *filename)> m_delete_file;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path, imgtool_forkent *ents, size_t len)> m_list_forks;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path)> m_create_dir;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path)> m_delete_dir;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path, UINT32 *attrs, size_t len)> m_list_attrs;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path, const UINT32 *attrs, imgtool_attribute *values)> m_get_attrs;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values)> m_set_attrs;
+		std::function<imgtoolerr_t(UINT32 attribute, const imgtool_attribute *attr, char *buffer, size_t buffer_len)> m_attr_name;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path, imgtool_iconinfo *iconinfo)> m_get_iconinfo;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)> m_suggest_transfer;
+		std::function<imgtoolerr_t(imgtool::partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size)> m_get_chain;
 
 		const util::option_guide *m_writefile_optguide;
 		std::string m_writefile_optspec;
