@@ -2,7 +2,7 @@
 // copyright-holders:Joakim Larsson Edstrom
 /*
 
- This is a driver for the Accexx 28.8kbps modem containing the following chips
+ This is a driver for the Aceex DM2814 28.8kbps modem containing the following chips
 
  U1-U3   JRC 4558D Dual op amps
  U4      SN74LS374N
@@ -40,8 +40,6 @@
  |LED9-11                 U20       U21                SW1
  +------------------------------------------------------+
 
-
-
  The U16 EPROM contains the following string
 
   COPYWRITE BY TSAI CHIH-HWA
@@ -51,10 +49,10 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 
-class accexx_state : public driver_device
+class aceex2814_state : public driver_device
 {
 public:
-	accexx_state(const machine_config &mconfig, device_type type, const char *tag)
+	aceex2814_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 	{ }
@@ -63,33 +61,34 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( accexx_map, AS_PROGRAM, 8, accexx_state )
+static ADDRESS_MAP_START( aceex2814_map, AS_PROGRAM, 8, aceex2814_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( accexx )
+static INPUT_PORTS_START( aceex2814 )
 INPUT_PORTS_END
 
-void accexx_state::machine_start()
+void aceex2814_state::machine_start()
 {
 }
 
-void accexx_state::machine_reset()
+void aceex2814_state::machine_reset()
 {
 }
 
 #define Y1_CLOCK 40320000
 #define Y2_CLOCK 45342720
-static MACHINE_CONFIG_START( accexx, accexx_state )
+static MACHINE_CONFIG_START( aceex2814, aceex2814_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, Y2_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(accexx_map)
+	MCFG_CPU_PROGRAM_MAP(aceex2814_map)
 MACHINE_CONFIG_END
 
-ROM_START( accexx )
+ROM_START( aceex2814 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u16.bin", 0x00000, 0x10000, CRC(36dc423d) SHA1(0f350b7c533eb5270a72587ab3e050e5fe453006) )
+	ROM_LOAD( "dm2814u16-194.bin", 0x00000, 0x10000, CRC(36dc423d) SHA1(0f350b7c533eb5270a72587ab3e050e5fe453006) )
 ROM_END
 
-COMP( 1995, accexx,      0,          0,      accexx,      accexx,  driver_device,   0,          "Accexx",        "Accexx",           MACHINE_IS_SKELETON )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY              FULLNAME           FLAGS
+COMP( 1995, aceex2814,   0,          0,      aceex2814,  aceex2814, driver_device,   0,          "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )
