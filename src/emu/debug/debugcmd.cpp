@@ -206,9 +206,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2, _3));
 	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2, _3));
 
-	m_console.register_command("dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
-	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA, 3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
-	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO, 3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
+	m_console.register_command("dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
+	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
+	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
 
 	m_console.register_command("cheatinit", CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2, _3));
 	m_console.register_command("ci",        CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2, _3));
@@ -1713,8 +1713,12 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 	if (!validate_number_parameter(param[4], &ascii))
 		return;
 
+	UINT64 rowsize = 16;
+	if (!validate_number_parameter(param[5], &rowsize))
+		return;
+
 	address_space *space;
-	if (!validate_cpu_space_parameter((params > 5) ? param[5] : nullptr, ref, space))
+	if (!validate_cpu_space_parameter((params > 6) ? param[6] : nullptr, ref, space))
 		return;
 
 	/* further validation */
@@ -1727,6 +1731,12 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 		m_console.printf("Invalid width! (must be 1,2,4 or 8)\n");
 		return;
 	}
+	if (rowsize == 0 || (rowsize % width) != 0)
+	{
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)", width);
+		return;
+	}
+
 	UINT64 endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
 	offset = space->address_to_byte(offset) & space->bytemask();
 
@@ -1741,7 +1751,7 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 	/* now write the data out */
 	util::ovectorstream output;
 	output.reserve(200);
-	for (UINT64 i = offset; i <= endoffset; i += 16)
+	for (UINT64 i = offset; i <= endoffset; i += rowsize)
 	{
 		output.clear();
 		output.rdbuf()->clear();
@@ -1750,7 +1760,7 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 		util::stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
 
 		/* print the bytes */
-		for (UINT64 j = 0; j < 16; j += width)
+		for (UINT64 j = 0; j < rowsize; j += width)
 		{
 			if (i + j <= endoffset)
 			{
@@ -1773,7 +1783,7 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (UINT64 j = 0; j < 16 && (i + j) <= endoffset; j++)
+			for (UINT64 j = 0; j < rowsize && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
