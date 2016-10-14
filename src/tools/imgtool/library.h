@@ -48,9 +48,9 @@ union filterinfo
 	void *  f;                                          /* generic function pointers */
 	const char *s;                                      /* generic strings */
 
-	imgtoolerr_t (*read_file)(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf);
-	imgtoolerr_t (*write_file)(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts);
-	imgtoolerr_t (*check_stream)(imgtool::stream *stream, imgtool_suggestion_viability_t *viability);
+	imgtoolerr_t (*read_file)(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf);
+	imgtoolerr_t (*write_file)(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts);
+	imgtoolerr_t (*check_stream)(imgtool::stream &stream, imgtool_suggestion_viability_t *viability);
 };
 
 typedef void (*filter_getinfoproc)(UINT32 state, union filterinfo *info);
@@ -254,9 +254,9 @@ union imgtoolinfo
 	void *  f;                                          /* generic function pointers */
 	char *  s;                                          /* generic strings */
 
-	imgtoolerr_t    (*open)             (imgtool::image *image, imgtool::stream *stream);
+	imgtoolerr_t    (*open)             (imgtool::image *image, imgtool::stream &stream);
 	void            (*close)            (imgtool::image *image);
-	imgtoolerr_t    (*create)           (imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts);
+	imgtoolerr_t    (*create)           (imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts);
 	imgtoolerr_t    (*create_partition) (imgtool::image *image, UINT64 first_block, UINT64 block_count);
 	void            (*info)             (imgtool::image *image, char *string, size_t len);
 	imgtoolerr_t    (*begin_enum)       (imgtool::directory *enumeration, const char *path);
@@ -264,8 +264,8 @@ union imgtoolinfo
 	void            (*close_enum)       (imgtool::directory *enumeration);
 	imgtoolerr_t    (*open_partition)   (imgtool::partition *partition, UINT64 first_block, UINT64 block_count);
 	imgtoolerr_t    (*free_space)       (imgtool::partition *partition, UINT64 *size);
-	imgtoolerr_t    (*read_file)        (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf);
-	imgtoolerr_t    (*write_file)       (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts);
+	imgtoolerr_t    (*read_file)        (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf);
+	imgtoolerr_t    (*write_file)       (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts);
 	imgtoolerr_t    (*delete_file)      (imgtool::partition *partition, const char *filename);
 	imgtoolerr_t    (*list_forks)       (imgtool::partition *partition, const char *path, imgtool_forkent *ents, size_t len);
 	imgtoolerr_t    (*create_dir)       (imgtool::partition *partition, const char *path);

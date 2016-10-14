@@ -70,7 +70,7 @@ struct basictokens
 
 static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *destf)
+	const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	imgtool::stream *mem_stream;
@@ -91,7 +91,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	}
 
 	/* read actual file */
-	err = partition->read_file(filename, fork, mem_stream, nullptr);
+	err = partition->read_file(filename, fork, *mem_stream, nullptr);
 	if (err)
 		goto done;
 
@@ -116,7 +116,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		}
 
 		/* write the line number */
-		destf->printf("%u ", (unsigned) line_number);
+		destf.printf("%u ", (unsigned) line_number);
 		shift = 0x00;
 
 		while((mem_stream->read(&b, 1) > 0) && (b != 0x00))
@@ -149,15 +149,15 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 				}
 
 				if (shift == 0x00)
-					destf->puts(token ? token : "!");
+					destf.puts(token ? token : "!");
 			}
 			else
 			{
-				destf->putc((char) b);
+				destf.putc((char) b);
 			}
 		}
 
-		destf->puts(EOLN);
+		destf.puts(EOLN);
 	}
 
 done:
@@ -175,7 +175,7 @@ done:
 
 static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+	const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool::stream *mem_stream;
@@ -208,7 +208,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	{
 		/* read a line */
 		pos = 0;
-		while((len = sourcef->read(&c, 1)) > 0)
+		while((len = sourcef.read(&c, 1)) > 0)
 		{
 			/* break if at end of line */
 			if ((c == '\r') || (c == '\n'))
@@ -343,7 +343,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	}
 
 	/* write actual file */
-	err = partition->write_file(filename, fork, mem_stream, opts, nullptr);
+	err = partition->write_file(filename, fork, *mem_stream, opts, nullptr);
 	if (err)
 		goto done;
 
@@ -2959,13 +2959,13 @@ static const basictokens cocobas_tokens =
 };
 
 static imgtoolerr_t cocobas_readfile(imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *destf)
+	const char *fork, imgtool::stream &destf)
 {
 	return basic_readfile(&cocobas_tokens, partition, filename, fork, destf);
 }
 
 static imgtoolerr_t cocobas_writefile(imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+	const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&cocobas_tokens, partition, filename, fork, sourcef, opts);
 }
@@ -3003,13 +3003,13 @@ static const basictokens dragonbas_tokens =
 };
 
 static imgtoolerr_t dragonbas_readfile(imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *destf)
+	const char *fork, imgtool::stream &destf)
 {
 	return basic_readfile(&dragonbas_tokens, partition, filename, fork, destf);
 }
 
 static imgtoolerr_t dragonbas_writefile(imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+	const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&dragonbas_tokens, partition, filename, fork, sourcef, opts);
 }
@@ -3048,13 +3048,13 @@ static const basictokens vzbas_tokens =
 };
 
 static imgtoolerr_t vzbas_readfile(imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *destf)
+	const char *fork, imgtool::stream &destf)
 {
 	return basic_readfile(&vzbas_tokens, partition, filename, fork, destf);
 }
 
 static imgtoolerr_t vzbas_writefile(imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+	const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&vzbas_tokens, partition, filename, fork, sourcef, opts);
 }
@@ -3092,13 +3092,13 @@ static const basictokens bml3bas_tokens =
 };
 
 static imgtoolerr_t bml3bas_readfile(imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *destf)
+	const char *fork, imgtool::stream &destf)
 {
 	return basic_readfile(&bml3bas_tokens, partition, filename, fork, destf);
 }
 
 static imgtoolerr_t bml3bas_writefile(imgtool::partition *partition, const char *filename,
-	const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+	const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&bml3bas_tokens, partition, filename, fork, sourcef, opts);
 }

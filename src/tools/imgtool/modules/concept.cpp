@@ -126,14 +126,14 @@ struct concept_iterator
 };
 
 
-static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream *f);
+static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream &f);
 static void concept_image_exit(imgtool::image *img);
 static void concept_image_info(imgtool::image *img, char *string, size_t len);
 static imgtoolerr_t concept_image_beginenum(imgtool::directory *enumeration, const char *path);
 static imgtoolerr_t concept_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent);
 static void concept_image_closeenum(imgtool::directory *enumeration);
 static imgtoolerr_t concept_image_freespace(imgtool::partition *partition, UINT64 *size);
-static imgtoolerr_t concept_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf);
+static imgtoolerr_t concept_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf);
 #if 0
 static imgtoolerr_t concept_image_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *writeoptions);
 static imgtoolerr_t concept_image_deletefile(imgtool::partition *partition, const char *filename);
@@ -180,16 +180,16 @@ void concept_get_info(const imgtool_class *imgclass, UINT32 state, union imgtool
 
     Return non-zero on error
 */
-static int read_physical_record(imgtool::stream *file_handle, int secnum, void *dest)
+static int read_physical_record(imgtool::stream &file_handle, int secnum, void *dest)
 {
 	int reply;
 
 	/* seek to sector */
-	reply = file_handle->seek(secnum*512, SEEK_SET);
+	reply = file_handle.seek(secnum*512, SEEK_SET);
 	if (reply)
 		return 1;
 	/* read it */
-	reply = file_handle->read(dest, 512);
+	reply = file_handle.read(dest, 512);
 	if (reply != 512)
 		return 1;
 
@@ -260,14 +260,14 @@ static int get_catalog_entry(concept_image *image, const unsigned char *filename
 /*
     Open a file as a concept_image.
 */
-static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream *f)
+static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream &f)
 {
 	concept_image *image = (concept_image *) img->extra_bytes();
 	int reply;
 	int i;
 	unsigned totphysrecs;
 
-	image->file_handle = f;
+	image->file_handle = &f;
 
 	/* read device directory */
 	for (i=0; i<4; i++)
@@ -426,7 +426,7 @@ static imgtoolerr_t concept_image_freespace(imgtool::partition *partition, UINT6
 /*
     Extract a file from a concept_image.
 */
-static imgtoolerr_t concept_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
+static imgtoolerr_t concept_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtool::image *img = &partition->image();
 	concept_image *image = (concept_image *) img->extra_bytes();
@@ -449,10 +449,10 @@ static imgtoolerr_t concept_image_readfile(imgtool::partition *partition, const 
 			i < get_UINT16xE(image->dev_dir.vol_hdr.disk_flipped, image->dev_dir.file_dir[catalog_index].next_block);
 			i++)
 	{
-		if (read_physical_record(image->file_handle, i, buf))
+		if (read_physical_record(*image->file_handle, i, buf))
 			return IMGTOOLERR_READERROR;
 
-		if (destf->write(buf, 512) != 512)
+		if (destf.write(buf, 512) != 512)
 			return IMGTOOLERR_WRITEERROR;
 	}
 

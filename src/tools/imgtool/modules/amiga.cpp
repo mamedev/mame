@@ -1567,7 +1567,7 @@ static imgtoolerr_t checkdir(imgtool::image *img, const char *path, int parent)
 
 
 /* Writes the file data from the specified block into the stream */
-static imgtoolerr_t write_file_block_data(imgtool::image *img, int block, int size, imgtool::stream *destf)
+static imgtoolerr_t write_file_block_data(imgtool::image *img, int block, int size, imgtool::stream &destf)
 {
 	imgtoolerr_t ret;
 	UINT8 buffer[BSIZE];
@@ -1606,7 +1606,7 @@ static imgtoolerr_t write_file_block_data(imgtool::image *img, int block, int si
 	}
 
 	/* Write data to stream */
-	if (destf->write(buffer, size) != size)
+	if (destf.write(buffer, size) != size)
 	{
 		return IMGTOOLERR_WRITEERROR;
 	}
@@ -1615,7 +1615,7 @@ static imgtoolerr_t write_file_block_data(imgtool::image *img, int block, int si
 }
 
 
-static imgtoolerr_t walk_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize, imgtool::stream *destf, int write)
+static imgtoolerr_t walk_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize, imgtool::stream *destf, bool write)
 {
 	int i, blocksize = is_ffs(img) ? BSIZE : BSIZE-24;
 	imgtoolerr_t ret;
@@ -1627,7 +1627,7 @@ static imgtoolerr_t walk_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *f
 
 		if (write)
 		{
-			ret = write_file_block_data(img, ptr[i], bytes_left, destf);
+			ret = write_file_block_data(img, ptr[i], bytes_left, *destf);
 			if (ret) return ret;
 		}
 		else
@@ -1646,16 +1646,16 @@ static imgtoolerr_t walk_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *f
 }
 
 
-static imgtoolerr_t write_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize, imgtool::stream *destf)
+static imgtoolerr_t write_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize, imgtool::stream &destf)
 {
-	return walk_data_block_ptr(img, ptr, filesize, destf, TRUE);
+	return walk_data_block_ptr(img, ptr, filesize, &destf, true);
 }
 
 
 /* Marks all blocks pointed to by the data block pointers as free */
 static imgtoolerr_t clear_data_block_ptr(imgtool::image *img, UINT32 *ptr, int *filesize)
 {
-	return walk_data_block_ptr(img, ptr, filesize, NULL, FALSE);
+	return walk_data_block_ptr(img, ptr, filesize, nullptr, false);
 }
 
 
@@ -1742,12 +1742,12 @@ static imgtoolerr_t update_disk_alteration_date(imgtool::image *img)
 *****************************************************************************/
 
 
-static imgtoolerr_t amiga_image_open(imgtool::image *img, imgtool::stream *stream)
+static imgtoolerr_t amiga_image_open(imgtool::image *img, imgtool::stream &stream)
 {
 	amiga_floppy *f = (amiga_floppy *) img->extra_bytes();
-	UINT64 size = stream->size();
+	UINT64 size = stream.size();
 
-	f->stream = stream;
+	f->stream = &stream;
 	f->sectors = size/BSIZE/80/2;
 
 	if (f->sectors != 11 && f->sectors != 22)
@@ -2079,7 +2079,7 @@ static imgtoolerr_t amiga_image_freespace(imgtool::partition *partition, UINT64 
 }
 
 
-static imgtoolerr_t amiga_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
+static imgtoolerr_t amiga_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtool::image *img = &partition->image();
 	imgtoolerr_t ret;
@@ -2105,7 +2105,7 @@ static imgtoolerr_t amiga_image_readfile(imgtool::partition *partition, const ch
 	if (filesize == 0) return IMGTOOLERR_SUCCESS;
 
 	/* Phase 2: Follow file extension blocks */
-	ret = write_file_ext_data(img, file.extension, &filesize, destf);
+	ret = write_file_ext_data(img, file.extension, &filesize, &destf);
 	if (ret) return ret;
 
 	return IMGTOOLERR_SUCCESS;
@@ -2189,13 +2189,13 @@ static imgtoolerr_t amiga_image_deletefile(imgtool::partition *partition, const 
 }
 
 
-static imgtoolerr_t amiga_image_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t amiga_image_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
 }
 
 
-static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool::stream *stream, util::option_resolution *opts)
+static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool::stream &stream, util::option_resolution *opts)
 {
 	amiga_floppy *f = (amiga_floppy *) img->extra_bytes();
 	const std::string &dskname = opts->lookup_string('N');
@@ -2206,7 +2206,7 @@ static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool::stream *str
 	time_t now;
 	int blocks;
 
-	f->stream = stream;
+	f->stream = &stream;
 
 	switch (opts->lookup_int('S'))
 	{

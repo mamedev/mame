@@ -59,12 +59,12 @@ UINT16 head_checksum(UINT8* data)
 	return checksum;
 }
 
-UINT16 get_long_rec_size(imgtool::stream *stream)
+UINT16 get_long_rec_size(imgtool::stream &stream)
 {
 	UINT8 size_h, size_l;
 
-	stream->read(&size_h, 1);
-	stream->read(&size_l, 1);
+	stream.read(&size_h, 1);
+	stream.read(&size_l, 1);
 
 	return (size_h<<8) | size_l;
 }
@@ -93,7 +93,7 @@ UINT32 update_pack_index(psion_pack *pack)
 		{
 			// long record without name are ignored
 			pack->stream->read(&data, 1);
-			size = get_long_rec_size(pack->stream);
+			size = get_long_rec_size(*pack->stream);
 			pack->stream->seek(size, SEEK_CUR);
 		}
 		else
@@ -127,39 +127,39 @@ UINT32 update_pack_index(psion_pack *pack)
 	return FALSE;
 }
 
-int seek_next_record(imgtool::stream *stream, UINT8 id)
+int seek_next_record(imgtool::stream &stream, UINT8 id)
 {
 	UINT8 data, rec_id;
 	UINT16 size;
 
 	do
 	{
-		stream->read(&data, 1);
+		stream.read(&data, 1);
 
 		if(data == 0xff)
 			break;
 
 		if (data == 2)
 		{
-			stream->read(&rec_id, 1);
+			stream.read(&rec_id, 1);
 			size = get_long_rec_size(stream);
 
 		}
 		else
 		{
-			stream->read(&rec_id, 1);
+			stream.read(&rec_id, 1);
 			if (id == rec_id)
 			{
-				stream->seek(-2, SEEK_CUR);
+				stream.seek(-2, SEEK_CUR);
 				return TRUE;
 			}
 			size = data;
 		}
 
 		// next record
-		stream->seek(size, SEEK_CUR);
+		stream.seek(size, SEEK_CUR);
 
-	} while (stream->size() > stream->tell());
+	} while (stream.size() > stream.tell());
 
 	return FALSE;
 }
@@ -194,7 +194,7 @@ UINT8 get_free_file_id(psion_pack *pack)
 	return 0xff;
 }
 
-void put_name_record(imgtool::stream *stream, const char* filename, UINT8 record_type, UINT8 record_id)
+static void put_name_record(imgtool::stream &stream, const char* filename, UINT8 record_type, UINT8 record_id)
 {
 	char data[0x10];
 	int i = 0;
@@ -211,35 +211,35 @@ void put_name_record(imgtool::stream *stream, const char* filename, UINT8 record
 
 	data[i++] = record_id;
 
-	stream->write(data, i);
+	stream.write(data, i);
 }
 
-void update_opk_head(imgtool::stream *stream)
+static void update_opk_head(imgtool::stream &stream)
 {
-	UINT16 size = stream->size() - 6;
+	UINT16 size = stream.size() - 6;
 
-	stream->seek(4, SEEK_SET);
-	stream->putc((size>>8) & 0xff);
-	stream->putc(size & 0xff);
+	stream.seek(4, SEEK_SET);
+	stream.putc((size>>8) & 0xff);
+	stream.putc(size & 0xff);
 }
 
-char *stream_getline(imgtool::stream *source, UINT16 max_len)
+char *stream_getline(imgtool::stream &source, UINT16 max_len)
 {
 	UINT16 pos = 0;
 	char data;
 	char *line = (char*)malloc(max_len);
 	memset(line, 0, max_len);
 
-	while (pos < max_len && source->size() > source->tell())
+	while (pos < max_len && source.size() > source.tell())
 	{
-		source->read(&data, 1);
+		source.read(&data, 1);
 
 		switch(data)
 		{
 			case '\r':
-				source->read(&data, 1);
+				source.read(&data, 1);
 				if (data != '\n')
-					source->seek(-1, SEEK_CUR);
+					source.seek(-1, SEEK_CUR);
 			case '\n':
 				return line;
 			default:
@@ -255,21 +255,21 @@ char *stream_getline(imgtool::stream *source, UINT16 max_len)
 	return NULL;
 }
 
-UINT16 put_odb(imgtool::stream *instream, imgtool::stream *outstream, UINT8 file_id)
+UINT16 put_odb(imgtool::stream &instream, imgtool::stream &outstream, UINT8 file_id)
 {
 	char *line;
 	UINT16 out_size = 0;
 
 	// reset stream
-	instream->seek(0, SEEK_SET);
+	instream.seek(0, SEEK_SET);
 
 	while ((line = stream_getline(instream, 256)))
 	{
 		UINT16 len = strlen(line);
 
-		outstream->putc((UINT8)len);
-		outstream->putc(file_id);
-		outstream->write(line, len);
+		outstream.putc((UINT8)len);
+		outstream.putc(file_id);
+		outstream.write(line, len);
 
 		out_size += (len + 1);
 
@@ -277,37 +277,37 @@ UINT16 put_odb(imgtool::stream *instream, imgtool::stream *outstream, UINT8 file
 	}
 
 	// end of pack
-	outstream->fill(0xff, 2);
+	outstream.fill(0xff, 2);
 
 	return out_size + 4;
 }
 
-UINT16 put_ob3(imgtool::stream *instream, imgtool::stream *outstream)
+UINT16 put_ob3(imgtool::stream &instream, imgtool::stream &outstream)
 {
-	UINT16 size = instream->size() - 6;
+	UINT16 size = instream.size() - 6;
 	dynamic_buffer buffer(size);
 
-	instream->seek(6, SEEK_SET);
-	instream->read(&buffer[0], size);
+	instream.seek(6, SEEK_SET);
+	instream.read(&buffer[0], size);
 
-	outstream->write(&buffer[0], size);
+	outstream.write(&buffer[0], size);
 
 	// end of pack
-	outstream->fill(0xff, 2);
+	outstream.fill(0xff, 2);
 
 	return size;
 }
 
-UINT16 put_opl(imgtool::stream *instream, imgtool::stream *outstream)
+UINT16 put_opl(imgtool::stream &instream, imgtool::stream &outstream)
 {
 	UINT16 out_size = 0;
-	UINT32 rec_start = outstream->tell();
+	UINT32 rec_start = outstream.tell();
 	char *line;
 
 	// reset stream
-	instream->seek(0, SEEK_SET);
+	instream.seek(0, SEEK_SET);
 
-	outstream->fill(0x00, 4);
+	outstream.fill(0x00, 4);
 
 	// replace all eol with 0x00
 	while ((line = stream_getline(instream, 256)))
@@ -316,24 +316,24 @@ UINT16 put_opl(imgtool::stream *instream, imgtool::stream *outstream)
 		for (int i=0; i<strlen(line); i++)
 			if (line[i] == '\t') line[i] = ' ';
 
-		outstream->write(line, strlen(line));
-		outstream->putc(0x00);
+		outstream.write(line, strlen(line));
+		outstream.putc(0x00);
 		out_size += strlen(line) + 1;
 		free(line);
 	}
 
 	// end of pack
-	outstream->fill(0xff, 2);
+	outstream.fill(0xff, 2);
 
 	// update the size in the head
-	outstream->seek(rec_start + 2, SEEK_SET);
-	outstream->putc((out_size>>8) & 0xff);
-	outstream->putc(out_size & 0xff);
+	outstream.seek(rec_start + 2, SEEK_SET);
+	outstream.putc((out_size>>8) & 0xff);
+	outstream.putc(out_size & 0xff);
 
 	return out_size + 4;
 }
 
-UINT16 get_odb(imgtool::stream *instream, imgtool::stream *outstream, UINT8 type, UINT8 file_id)
+UINT16 get_odb(imgtool::stream &instream, imgtool::stream &outstream, UINT8 type, UINT8 file_id)
 {
 	UINT8 data, *buffer;
 	UINT16 out_size = 0;
@@ -341,13 +341,13 @@ UINT16 get_odb(imgtool::stream *instream, imgtool::stream *outstream, UINT8 type
 	if (file_id >= 0x90)
 		while (seek_next_record(instream, file_id))
 		{
-			instream->read(&data, 1);
-			instream->seek(1, SEEK_CUR);
+			instream.read(&data, 1);
+			instream.seek(1, SEEK_CUR);
 			buffer = (UINT8*)malloc(data);
-			instream->read(buffer, data);
-			outstream->write(buffer, data);
-			outstream->putc('\r');
-			outstream->putc('\n');
+			instream.read(buffer, data);
+			outstream.write(buffer, data);
+			outstream.putc('\r');
+			outstream.putc('\n');
 			free (buffer);
 			out_size += data;
 		}
@@ -355,47 +355,47 @@ UINT16 get_odb(imgtool::stream *instream, imgtool::stream *outstream, UINT8 type
 	return out_size;
 }
 
-UINT16 get_ob3(imgtool::stream *instream, imgtool::stream *outstream, UINT8 type, UINT8 file_id)
+UINT16 get_ob3(imgtool::stream &instream, imgtool::stream &outstream, UINT8 type, UINT8 file_id)
 {
 	UINT8 data, *buffer = NULL;
 	UINT16 size = 0;
 	static const char ob3_magic[3] = {'O', 'R', 'G'};
 
-	instream->read(&data, 1);
+	instream.read(&data, 1);
 
 	if (data == 0x02)
 	{
-		instream->seek(1, SEEK_CUR);
+		instream.seek(1, SEEK_CUR);
 		size = get_long_rec_size(instream);
 		buffer = (UINT8*)malloc(size);
-		instream->read(buffer, size);
+		instream.read(buffer, size);
 	}
 
-	outstream->write(ob3_magic, 3);
-	outstream->putc((size>>8) & 0xff);
-	outstream->putc(size & 0xff);
-	outstream->putc(type | 0x80);
+	outstream.write(ob3_magic, 3);
+	outstream.putc((size>>8) & 0xff);
+	outstream.putc(size & 0xff);
+	outstream.putc(type | 0x80);
 
 	if (buffer)
 	{
-		outstream->write(buffer, size);
+		outstream.write(buffer, size);
 		free (buffer);
 	}
 
 	return size;
 }
 
-static imgtoolerr_t datapack_open( imgtool::image *image, imgtool::stream *stream)
+static imgtoolerr_t datapack_open(imgtool::image *image, imgtool::stream &stream)
 {
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
 	char opk_magic[4];
 
-	stream->read(opk_magic, 4);
+	stream.read(opk_magic, 4);
 
 	if(strcmp(opk_magic, "OPK\0"))
 		return IMGTOOLERR_UNEXPECTED;
 
-	pack->stream = stream;
+	pack->stream = &stream;
 
 	if (update_pack_index(pack))
 		return IMGTOOLERR_SUCCESS;
@@ -403,7 +403,7 @@ static imgtoolerr_t datapack_open( imgtool::image *image, imgtool::stream *strea
 		return IMGTOOLERR_CORRUPTIMAGE;
 }
 
-static imgtoolerr_t datapack_create( imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
+static imgtoolerr_t datapack_create(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
 {
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
 	static const UINT8 opk_magic[4] = {'O', 'P', 'K', 0x00};
@@ -419,20 +419,20 @@ static imgtoolerr_t datapack_create( imgtool::image *image, imgtool::stream *str
 
 	checksum = head_checksum(pack_head);
 
-	stream->write(opk_magic, 4);
-	stream->fill(0x00, 2);
-	stream->write(pack_head, 8);
+	stream.write(opk_magic, 4);
+	stream.fill(0x00, 2);
+	stream.write(pack_head, 8);
 
-	stream->putc((checksum>>8) & 0xff);
-	stream->putc(checksum & 0xff);
+	stream.putc((checksum>>8) & 0xff);
+	stream.putc(checksum & 0xff);
 
 	put_name_record(stream, "MAIN", 0x81, 0x90);
 
-	stream->fill(0xff, 2);
+	stream.fill(0xff, 2);
 
 	update_opk_head(stream);
 
-	pack->stream = stream;
+	pack->stream = &stream;
 
 	if (update_pack_index(pack))
 		return IMGTOOLERR_SUCCESS;
@@ -473,14 +473,14 @@ static imgtoolerr_t datapack_next_enum(imgtool::directory *enumeration, imgtool_
 	if (pack->pack_index[iter->index].data_rec)
 	{
 		pack->stream->seek(pack->pack_index[iter->index].data_rec + 2, SEEK_SET);
-		ent->filesize = get_long_rec_size(pack->stream);
+		ent->filesize = get_long_rec_size(*pack->stream);
 	}
 
 	// seek all file's records
 	if (pack->pack_index[iter->index].id >= 0x90)
 	{
 		pack->stream->seek(0x10, SEEK_SET);
-		while (seek_next_record(pack->stream, pack->pack_index[iter->index].id))
+		while (seek_next_record(*pack->stream, pack->pack_index[iter->index].id))
 		{
 			pack->stream->read(&data, 1);
 			pack->stream->seek(data + 1, SEEK_CUR);
@@ -511,7 +511,7 @@ static imgtoolerr_t datapack_free_space( imgtool::partition *partition, UINT64 *
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
+static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtool::image *image = &partition->image();
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
@@ -523,13 +523,13 @@ static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char
 		{
 			// ODB files
 			pack->stream->seek(0x10, SEEK_SET);
-			get_odb(pack->stream, destf, pack->pack_index[index].type, pack->pack_index[index].id);
+			get_odb(*pack->stream, destf, pack->pack_index[index].type, pack->pack_index[index].id);
 		}
 		else if ((pack->pack_index[index].type & 0x7f) == 0x03)
 		{
 			// OB3/OPL files
 			pack->stream->seek(pack->pack_index[index].data_rec, SEEK_SET);
-			get_ob3(pack->stream, destf, pack->pack_index[index].type, pack->pack_index[index].id);
+			get_ob3(*pack->stream, destf, pack->pack_index[index].type, pack->pack_index[index].id);
 		}
 		else
 		{
@@ -543,7 +543,7 @@ static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char
 		return IMGTOOLERR_FILENOTFOUND;
 }
 
-static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtool::image *image = &partition->image();
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
@@ -565,7 +565,7 @@ static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const ch
 			return IMGTOOLERR_NOSPACE;
 	}
 
-	sourcef->read(head, 3);
+	sourcef.read(head, 3);
 	pack->stream->seek(pack->eop, SEEK_SET);
 
 	if (type == 0)
@@ -574,18 +574,18 @@ static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const ch
 	switch (type)
 	{
 		case 1:     //OB3 file
-			put_name_record(pack->stream, filename, 0x83, file_id);
+			put_name_record(*pack->stream, filename, 0x83, file_id);
 			pack->stream->write(data_head, 4);
-			size = put_ob3(sourcef, pack->stream);
+			size = put_ob3(sourcef, *pack->stream);
 			break;
 		case 2:     //OPL file
-			put_name_record(pack->stream, filename, 0x83, file_id);
+			put_name_record(*pack->stream, filename, 0x83, file_id);
 			pack->stream->write(data_head, 4);
-			size = put_opl(sourcef, pack->stream);
+			size = put_opl(sourcef, *pack->stream);
 			break;
 		case 3:     //ODB file
-			put_name_record(pack->stream, filename, 0x81, file_id);
-			size = put_odb(sourcef, pack->stream, file_id);
+			put_name_record(*pack->stream, filename, 0x81, file_id);
+			size = put_odb(sourcef, *pack->stream, file_id);
 			break;
 	}
 
@@ -597,7 +597,7 @@ static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const ch
 		pack->stream->putc(size & 0xff);
 	}
 
-	update_opk_head(pack->stream);
+	update_opk_head(*pack->stream);
 
 	if (update_pack_index(pack))
 		return IMGTOOLERR_SUCCESS;

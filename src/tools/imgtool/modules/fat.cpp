@@ -1850,7 +1850,7 @@ static imgtoolerr_t fat_partition_nextenum(imgtool::directory *enumeration, imgt
 
 
 
-static imgtoolerr_t fat_read_bootblock(imgtool::partition *partition, imgtool::stream *stream)
+static imgtoolerr_t fat_read_bootblock(imgtool::partition *partition, imgtool::stream &stream)
 {
 	imgtoolerr_t err;
 	UINT8 block[FAT_SECLEN];
@@ -1859,21 +1859,21 @@ static imgtoolerr_t fat_read_bootblock(imgtool::partition *partition, imgtool::s
 	if (err)
 		return err;
 
-	stream->write(block, sizeof(block));
+	stream.write(block, sizeof(block));
 	return IMGTOOLERR_SUCCESS;
 }
 
 
 
-static imgtoolerr_t fat_write_bootblock(imgtool::partition *partition, imgtool::stream *stream)
+static imgtoolerr_t fat_write_bootblock(imgtool::partition *partition, imgtool::stream &stream)
 {
 	imgtoolerr_t err;
 	UINT8 block[FAT_SECLEN];
 	UINT8 new_block[FAT_SECLEN];
 
-	if (stream->size() != sizeof(new_block))
+	if (stream.size() != sizeof(new_block))
 		return IMGTOOLERR_UNEXPECTED;
-	stream->read(new_block, sizeof(new_block));
+	stream.read(new_block, sizeof(new_block));
 
 	if (new_block[510] != 0x55)
 		return IMGTOOLERR_UNEXPECTED;
@@ -1899,7 +1899,7 @@ static imgtoolerr_t fat_write_bootblock(imgtool::partition *partition, imgtool::
 
 
 
-static imgtoolerr_t fat_partition_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
+static imgtoolerr_t fat_partition_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	fat_file file;
@@ -1923,7 +1923,7 @@ static imgtoolerr_t fat_partition_readfile(imgtool::partition *partition, const 
 		if (err)
 			return err;
 
-		destf->write(buffer, bytes_read);
+		destf.write(buffer, bytes_read);
 	}
 	while(bytes_read > 0);
 	return IMGTOOLERR_SUCCESS;
@@ -1931,7 +1931,7 @@ static imgtoolerr_t fat_partition_readfile(imgtool::partition *partition, const 
 
 
 
-static imgtoolerr_t fat_partition_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t fat_partition_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	fat_file file;
@@ -1949,7 +1949,7 @@ static imgtoolerr_t fat_partition_writefile(imgtool::partition *partition, const
 	if (file.directory)
 		return IMGTOOLERR_FILENOTFOUND;
 
-	bytes_left = (UINT32) sourcef->size();
+	bytes_left = (UINT32) sourcef.size();
 
 	err = fat_set_file_size(partition, &file, bytes_left);
 	if (err)
@@ -1958,7 +1958,7 @@ static imgtoolerr_t fat_partition_writefile(imgtool::partition *partition, const
 	while(bytes_left > 0)
 	{
 		len = (std::min<size_t>)(bytes_left, sizeof(buffer));
-		sourcef->read(buffer, len);
+		sourcef.read(buffer, len);
 
 		err = fat_write_file(partition, &file, buffer, len, NULL);
 		if (err)

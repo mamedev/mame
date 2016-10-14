@@ -153,8 +153,8 @@ namespace imgtool
 		imgtoolerr_t get_directory_entry(const char *path, int index, imgtool_dirent &ent);
 		imgtoolerr_t get_file_size(const char *filename, UINT64 &filesize);
 		imgtoolerr_t get_free_space(UINT64 &sz);
-		imgtoolerr_t read_file(const char *filename, const char *fork, imgtool::stream *destf, filter_getinfoproc filter);
-		imgtoolerr_t write_file(const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *resolution, filter_getinfoproc filter);
+		imgtoolerr_t read_file(const char *filename, const char *fork, imgtool::stream &destf, filter_getinfoproc filter);
+		imgtoolerr_t write_file(const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *resolution, filter_getinfoproc filter);
 		imgtoolerr_t get_file(const char *filename, const char *fork, const char *dest, filter_getinfoproc filter);
 		imgtoolerr_t put_file(const char *newfname, const char *fork, const char *source, util::option_resolution *opts, filter_getinfoproc filter);
 		imgtoolerr_t delete_file(const char *fname);
@@ -207,8 +207,8 @@ namespace imgtool
 		imgtoolerr_t(*m_next_enum)    (imgtool::directory *enumeration, imgtool_dirent *ent);
 		void(*m_close_enum)   (imgtool::directory *enumeration);
 		imgtoolerr_t(*m_free_space)   (imgtool::partition *partition, UINT64 *size);
-		imgtoolerr_t(*m_read_file)    (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf);
-		imgtoolerr_t(*m_write_file)   (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts);
+		imgtoolerr_t(*m_read_file)    (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf);
+		imgtoolerr_t(*m_write_file)   (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts);
 		imgtoolerr_t(*m_delete_file)  (imgtool::partition *partition, const char *filename);
 		imgtoolerr_t(*m_list_forks)   (imgtool::partition *partition, const char *path, imgtool_forkent *ents, size_t len);
 		imgtoolerr_t(*m_create_dir)   (imgtool::partition *partition, const char *path);

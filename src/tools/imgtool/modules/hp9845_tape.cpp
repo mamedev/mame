@@ -1042,22 +1042,22 @@ static tape_image_t& get_tape_image(tape_state_t& ts)
 /********************************************************************************
  * Imgtool functions
  ********************************************************************************/
-static imgtoolerr_t hp9845_tape_open(imgtool::image *image, imgtool::stream *stream)
+static imgtoolerr_t hp9845_tape_open(imgtool::image *image, imgtool::stream &stream)
 {
 	tape_state_t& state = get_tape_state(image);
 
-	state.stream = stream;
+	state.stream = &stream;
 
 	tape_image_t& tape_image = get_tape_image(state);
 
-	return tape_image.load_from_file(stream);
+	return tape_image.load_from_file(&stream);
 }
 
-static imgtoolerr_t hp9845_tape_create(imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
+static imgtoolerr_t hp9845_tape_create(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
 {
 	tape_state_t& state = get_tape_state(image);
 
-	state.stream = stream;
+	state.stream = &stream;
 
 	tape_image_t& tape_image = get_tape_image(state);
 
@@ -1125,7 +1125,7 @@ static imgtoolerr_t hp9845_tape_free_space(imgtool::partition *partition, UINT64
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
+static imgtoolerr_t hp9845_tape_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	tape_state_t& state = get_tape_state(&partition->image());
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1153,13 +1153,13 @@ static imgtoolerr_t hp9845_tape_read_file(imgtool::partition *partition, const c
 			tape_image_t::tape_word_to_bytes(buff_w[ i ], buff_b[ i * 2 ], buff_b[ i * 2 + 1 ]);
 		}
 
-		destf->write(buff_b , SECTOR_LEN);
+		destf.write(buff_b , SECTOR_LEN);
 	}
 
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t hp9845_tape_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	tape_state_t& state = get_tape_state(&partition->image());
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1171,7 +1171,7 @@ static imgtoolerr_t hp9845_tape_write_file(imgtool::partition *partition, const 
 		tape_image.delete_dir_entry(idx);
 	}
 
-	unsigned blocks = (unsigned)((sourcef->size() + SECTOR_LEN - 1) / SECTOR_LEN);
+	unsigned blocks = (unsigned)((sourcef.size() + SECTOR_LEN - 1) / SECTOR_LEN);
 
 	if (!blocks) {
 		fprintf(stderr , "Null file, not writing..\n");
@@ -1199,7 +1199,7 @@ static imgtoolerr_t hp9845_tape_write_file(imgtool::partition *partition, const 
 
 		memset(&buff_b[ 0 ] , 0 , sizeof(buff_b));
 
-		if (sourcef->read(buff_b , SECTOR_LEN) != SECTOR_LEN && i != (blocks - 1)) {
+		if (sourcef.read(buff_b , SECTOR_LEN) != SECTOR_LEN && i != (blocks - 1)) {
 			return IMGTOOLERR_READERROR;
 		}
 		for (unsigned j = 0; j < WORDS_PER_SECTOR; j++) {
@@ -1354,22 +1354,22 @@ void hp9845_tape_get_info(const imgtool_class *imgclass, UINT32 state, union img
 /********************************************************************************
  * Filter functions
  ********************************************************************************/
-static unsigned len_to_eor(imgtool::stream *inp)
+static unsigned len_to_eor(imgtool::stream &inp)
 {
-	return SECTOR_LEN - (unsigned)(inp->tell() % SECTOR_LEN);
+	return SECTOR_LEN - (unsigned)(inp.tell() % SECTOR_LEN);
 }
 
-static bool get_record_part(imgtool::stream *inp , void *buf , unsigned len)
+static bool get_record_part(imgtool::stream &inp , void *buf , unsigned len)
 {
 	// Reading must never cross sector boundary
 	if (len > len_to_eor(inp)) {
 		return false;
 	}
 
-	return inp->read(buf, len) == len;
+	return inp.read(buf, len) == len;
 }
 
-static bool dump_string(imgtool::stream *inp, imgtool::stream *out , unsigned len , bool add_eoln)
+static bool dump_string(imgtool::stream &inp, imgtool::stream &out , unsigned len , bool add_eoln)
 {
 	UINT8 tmp[ SECTOR_LEN ];
 
@@ -1384,15 +1384,15 @@ static bool dump_string(imgtool::stream *inp, imgtool::stream *out , unsigned le
 		}
 	}
 
-	out->write(tmp , len);
+	out.write(tmp , len);
 	if (add_eoln) {
-		out->puts(EOLN);
+		out.puts(EOLN);
 	}
 
 	return true;
 }
 
-static imgtoolerr_t hp9845data_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
+static imgtoolerr_t hp9845data_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtool::stream *inp_data;
 	imgtoolerr_t res;
@@ -1403,7 +1403,7 @@ static imgtoolerr_t hp9845data_read_file(imgtool::partition *partition, const ch
 		return IMGTOOLERR_OUTOFMEMORY;
 	}
 
-	res = hp9845_tape_read_file(partition , filename , fork , inp_data);
+	res = hp9845_tape_read_file(partition , filename , fork , *inp_data);
 	if (res != IMGTOOLERR_SUCCESS) {
 		delete inp_data;
 		return res;
@@ -1418,7 +1418,7 @@ static imgtoolerr_t hp9845data_read_file(imgtool::partition *partition, const ch
 
 	do {
 		// Get record type
-		if (!get_record_part(inp_data , tmp , 2)) {
+		if (!get_record_part(*inp_data , tmp , 2)) {
 			return IMGTOOLERR_READERROR;
 		}
 		rec_type = (UINT16)pick_integer_be(tmp , 0 , 2);
@@ -1441,7 +1441,7 @@ static imgtoolerr_t hp9845data_read_file(imgtool::partition *partition, const ch
 				return IMGTOOLERR_CORRUPTFILE;
 			}
 
-			if (!get_record_part(inp_data , tmp , 2)) {
+			if (!get_record_part(*inp_data , tmp , 2)) {
 				return IMGTOOLERR_READERROR;
 			}
 			tmp_len = (unsigned)pick_integer_be(tmp , 0 , 2);
@@ -1456,14 +1456,14 @@ static imgtoolerr_t hp9845data_read_file(imgtool::partition *partition, const ch
 			if (rec_type == REC_TYPE_FULLSTR || rec_type == REC_TYPE_ENDSTR) {
 				rec_len = accum_len;
 			} else {
-				rec_len = std::min(accum_len , len_to_eor(inp_data));
+				rec_len = std::min(accum_len , len_to_eor(*inp_data));
 			}
-			if (!dump_string(inp_data , destf , rec_len , rec_type == REC_TYPE_FULLSTR || rec_type == REC_TYPE_ENDSTR)) {
+			if (!dump_string(*inp_data , destf , rec_len , rec_type == REC_TYPE_FULLSTR || rec_type == REC_TYPE_ENDSTR)) {
 				return IMGTOOLERR_READERROR;
 			}
 			if (rec_len & 1) {
 				// Keep length of string pieces even
-				get_record_part(inp_data , tmp , 1);
+				get_record_part(*inp_data , tmp , 1);
 			}
 			accum_len -= rec_len;
 			break;
@@ -1481,7 +1481,7 @@ static imgtoolerr_t hp9845data_read_file(imgtool::partition *partition, const ch
 	return IMGTOOLERR_SUCCESS;
 }
 
-static bool split_string_n_dump(const char *s , imgtool::stream *dest)
+static bool split_string_n_dump(const char *s , imgtool::stream &dest)
 {
 	unsigned s_len = strlen(s);
 	UINT16 rec_type = REC_TYPE_1STSTR;
@@ -1494,7 +1494,7 @@ static bool split_string_n_dump(const char *s , imgtool::stream *dest)
 			// Not enough free space at end of current record: fill with EORs
 			place_integer_be(tmp , 0 , 2 , REC_TYPE_EOR);
 			while (free_len) {
-				if (dest->write(tmp , 2) != 2) {
+				if (dest.write(tmp , 2) != 2) {
 					return false;
 				}
 				free_len -= 2;
@@ -1507,8 +1507,8 @@ static bool split_string_n_dump(const char *s , imgtool::stream *dest)
 			}
 			place_integer_be(tmp , 0 , 2 , rec_type);
 			place_integer_be(tmp , 2 , 2 , s_len);
-			if (dest->write(tmp , 4) != 4 ||
-				dest->write(s, s_part_len) != s_part_len) {
+			if (dest.write(tmp , 4) != 4 ||
+				dest.write(s, s_part_len) != s_part_len) {
 				return false;
 			}
 			rec_type = REC_TYPE_MIDSTR;
@@ -1520,20 +1520,20 @@ static bool split_string_n_dump(const char *s , imgtool::stream *dest)
 
 	place_integer_be(tmp , 0 , 2 , at_least_one ? REC_TYPE_ENDSTR : REC_TYPE_FULLSTR);
 	place_integer_be(tmp , 2 , 2 , s_len);
-	if (dest->write(tmp , 4) != 4 ||
-		dest->write(s , s_len) != s_len) {
+	if (dest.write(tmp , 4) != 4 ||
+		dest.write(s , s_len) != s_len) {
 		return false;
 	}
 	if (s_len & 1) {
 		tmp[ 0 ] = 0;
-		if (dest->write(tmp , 1) != 1) {
+		if (dest.write(tmp , 1) != 1) {
 			return false;
 		}
 	}
 	return true;
 }
 
-static imgtoolerr_t hp9845data_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t hp9845data_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtool::stream *out_data;
 
@@ -1546,7 +1546,7 @@ static imgtoolerr_t hp9845data_write_file(imgtool::partition *partition, const c
 		char line[ 256 ];
 
 		// Read input file one line at time
-		if (sourcef->core_file()->gets(line , sizeof(line)) == nullptr) {
+		if (sourcef.core_file()->gets(line , sizeof(line)) == nullptr) {
 			// EOF
 			break;
 		}
@@ -1568,13 +1568,13 @@ static imgtoolerr_t hp9845data_write_file(imgtool::partition *partition, const c
 			continue;
 		}
 
-		if (!split_string_n_dump(line , out_data)) {
+		if (!split_string_n_dump(line, *out_data)) {
 			return IMGTOOLERR_WRITEERROR;
 		}
 	}
 
 	// Fill free space of last record with EOFs
-	unsigned free_len = len_to_eor(out_data);
+	unsigned free_len = len_to_eor(*out_data);
 	UINT8 tmp[ 2 ];
 	place_integer_be(tmp , 0 , 2 , REC_TYPE_EOF);
 
@@ -1587,7 +1587,7 @@ static imgtoolerr_t hp9845data_write_file(imgtool::partition *partition, const c
 
 	out_data->seek(0 , SEEK_SET);
 
-	imgtoolerr_t res = hp9845_tape_write_file(partition , filename , fork , out_data , opts);
+	imgtoolerr_t res = hp9845_tape_write_file(partition, filename, fork, *out_data, opts);
 
 	delete out_data;
 

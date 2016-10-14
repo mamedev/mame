@@ -502,7 +502,7 @@ static imgtoolerr_t prodos_diskimage_open(imgtool::image *image)
 
 
 
-static imgtoolerr_t prodos_diskimage_open_525(imgtool::image *image, imgtool::stream *stream)
+static imgtoolerr_t prodos_diskimage_open_525(imgtool::image *image, imgtool::stream &stream)
 {
 	prodos_setprocs_525(image);
 	return prodos_diskimage_open(image);
@@ -510,7 +510,7 @@ static imgtoolerr_t prodos_diskimage_open_525(imgtool::image *image, imgtool::st
 
 
 
-static imgtoolerr_t prodos_diskimage_open_35(imgtool::image *image, imgtool::stream *stream)
+static imgtoolerr_t prodos_diskimage_open_35(imgtool::image *image, imgtool::stream &stream)
 {
 	prodos_setprocs_35(image);
 	return prodos_diskimage_open(image);
@@ -702,7 +702,7 @@ static imgtoolerr_t prodos_diskimage_create(imgtool::image *image, util::option_
 
 
 
-static imgtoolerr_t prodos_diskimage_create_525(imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_create_525(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
 {
 	prodos_setprocs_525(image);
 	return prodos_diskimage_create(image, opts);
@@ -710,7 +710,7 @@ static imgtoolerr_t prodos_diskimage_create_525(imgtool::image *image, imgtool::
 
 
 
-static imgtoolerr_t prodos_diskimage_create_35(imgtool::image *image, imgtool::stream *stream, util::option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_create_35(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
 {
 	prodos_setprocs_35(image);
 	return prodos_diskimage_create(image, opts);
@@ -1571,7 +1571,7 @@ static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory *enumeration, i
 
 
 static imgtoolerr_t prodos_read_file_tree(imgtool::image *image, UINT32 *filesize,
-	UINT32 block, int nest_level, imgtool::stream *destf)
+	UINT32 block, int nest_level, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
@@ -1612,7 +1612,7 @@ static imgtoolerr_t prodos_read_file_tree(imgtool::image *image, UINT32 *filesiz
 	{
 		/* this is a leaf block */
 		bytes_to_write = std::min(size_t(*filesize), sizeof(buffer));
-		destf->write(buffer, bytes_to_write);
+		destf.write(buffer, bytes_to_write);
 		*filesize -= bytes_to_write;
 	}
 	return IMGTOOLERR_SUCCESS;
@@ -1621,7 +1621,7 @@ static imgtoolerr_t prodos_read_file_tree(imgtool::image *image, UINT32 *filesiz
 
 
 static imgtoolerr_t prodos_write_file_tree(imgtool::image *image, UINT32 *filesize,
-	UINT32 block, int nest_level, imgtool::stream *sourcef)
+	UINT32 block, int nest_level, imgtool::stream &sourcef)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
@@ -1663,7 +1663,7 @@ static imgtoolerr_t prodos_write_file_tree(imgtool::image *image, UINT32 *filesi
 	{
 		/* this is a leaf block */
 		bytes_to_read = std::min(size_t(*filesize), sizeof(buffer));
-		sourcef->read(buffer, bytes_to_read);
+		sourcef.read(buffer, bytes_to_read);
 		*filesize -= bytes_to_read;
 
 		err = prodos_save_block(image, block, buffer);
@@ -1704,7 +1704,7 @@ done:
 
 
 
-static imgtoolerr_t prodos_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
+static imgtoolerr_t prodos_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	imgtool::image *image = &partition->image();
@@ -1737,14 +1737,14 @@ static imgtoolerr_t prodos_diskimage_readfile(imgtool::partition *partition, con
 
 	/* have we not actually received the correct amount of bytes? if not, fill in the rest */
 	if (ent.filesize[fork_num] > 0)
-		destf->fill(0, ent.filesize[fork_num]);
+		destf.fill(0, ent.filesize[fork_num]);
 
 	return IMGTOOLERR_SUCCESS;
 }
 
 
 
-static imgtoolerr_t prodos_diskimage_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool::image *image = &partition->image();
@@ -1753,7 +1753,7 @@ static imgtoolerr_t prodos_diskimage_writefile(imgtool::partition *partition, co
 	UINT64 file_size;
 	mac_fork_t fork_num;
 
-	file_size = sourcef->size();
+	file_size = sourcef.size();
 
 	err = prodos_lookup_path(image, filename, CREATE_FILE, &direnum, &ent);
 	if (err)

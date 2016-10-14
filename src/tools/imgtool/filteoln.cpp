@@ -16,13 +16,13 @@
 
 
 
-static imgtoolerr_t convert_stream_eolns(imgtool::stream *source, imgtool::stream *dest, const char *eoln)
+static imgtoolerr_t convert_stream_eolns(imgtool::stream &source, imgtool::stream &dest, const char *eoln)
 {
 	size_t len, i, pos;
 	char buffer[2000];
 	int hit_cr = FALSE;
 
-	while((len = source->read(buffer, sizeof(buffer))) > 0)
+	while((len = source.read(buffer, sizeof(buffer))) > 0)
 	{
 		pos = 0;
 
@@ -35,8 +35,8 @@ static imgtoolerr_t convert_stream_eolns(imgtool::stream *source, imgtool::strea
 					if (!hit_cr || (buffer[i] != '\n'))
 					{
 						if (i > pos)
-							dest->write(buffer + pos, i - pos);
-						dest->write(eoln, strlen(eoln));
+							dest.write(buffer + pos, i - pos);
+						dest.write(eoln, strlen(eoln));
 					}
 					pos = i + 1;
 					break;
@@ -45,7 +45,7 @@ static imgtoolerr_t convert_stream_eolns(imgtool::stream *source, imgtool::strea
 		}
 
 		if (i > pos)
-			dest->write(buffer + pos, i - pos);
+			dest.write(buffer + pos, i - pos);
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -53,7 +53,7 @@ static imgtoolerr_t convert_stream_eolns(imgtool::stream *source, imgtool::strea
 
 
 
-static imgtoolerr_t ascii_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *destf)
+static imgtoolerr_t ascii_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	imgtool::stream *mem_stream;
@@ -65,12 +65,12 @@ static imgtoolerr_t ascii_readfile(imgtool::partition *partition, const char *fi
 		goto done;
 	}
 
-	err = partition->read_file(filename, fork, mem_stream, nullptr);
+	err = partition->read_file(filename, fork, *mem_stream, nullptr);
 	if (err)
 		goto done;
 
 	mem_stream->seek(SEEK_SET, 0);
-	err = convert_stream_eolns(mem_stream, destf, EOLN);
+	err = convert_stream_eolns(*mem_stream, destf, EOLN);
 	if (err)
 		goto done;
 
@@ -82,7 +82,7 @@ done:
 
 
 
-static imgtoolerr_t ascii_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t ascii_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool::stream *mem_stream = nullptr;
@@ -98,12 +98,12 @@ static imgtoolerr_t ascii_writefile(imgtool::partition *partition, const char *f
 
 	eoln = partition->get_info_string(IMGTOOLINFO_STR_EOLN);
 
-	err = convert_stream_eolns(sourcef, mem_stream, eoln);
+	err = convert_stream_eolns(sourcef, *mem_stream, eoln);
 	if (err)
 		goto done;
 	mem_stream->seek(SEEK_SET, 0);
 
-	err = partition->write_file(filename, fork, mem_stream, opts, nullptr);
+	err = partition->write_file(filename, fork, *mem_stream, opts, nullptr);
 	if (err)
 		goto done;
 

@@ -177,12 +177,12 @@ static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
    (.fd have 40 or 80 tracks, .qd have 25 tracks) and the file size.
 */
 
-static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool::stream *stream)
+static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool::stream &stream)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
-	int size = stream->size();
+	int size = stream.size();
 
-	f->stream = stream;
+	f->stream = &stream;
 	f->modified = 0;
 
 	/* guess format */
@@ -238,8 +238,8 @@ static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool::stream *stream
 
 	assert( size == f->heads * f->tracks * 16 * f->sector_size );
 
-	stream->seek(0, SEEK_SET);
-	if ( stream->read(f->data, size ) < size )
+	stream.seek(0, SEEK_SET);
+	if ( stream.read(f->data, size ) < size )
 	return IMGTOOLERR_READERROR;
 
 	return IMGTOOLERR_SUCCESS;
@@ -308,21 +308,21 @@ static UINT16 thom_sap_crc( UINT8* data, int size )
 	return crc;
 }
 
-static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream *stream)
+static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream &stream)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
 	UINT8 buf[262];
 
-	f->stream = stream;
+	f->stream = &stream;
 	f->modified = 0;
 
 	/* check image header */
-	stream->seek(0, SEEK_SET);
-	stream->read(buf, 66 );
+	stream.seek(0, SEEK_SET);
+	stream.read(buf, 66 );
 	if ( memcmp( buf+1, sap_header+1, 65 ) ) return IMGTOOLERR_CORRUPTIMAGE;
 
 	/* guess format */
-	stream->read(buf, 1 );
+	stream.read(buf, 1 );
 	switch ( buf[0] ) {
 	case 1:
 	case 3:
@@ -342,13 +342,13 @@ static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream *stream)
 	default: return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
-	stream->seek(66, SEEK_SET);
+	stream.seek(66, SEEK_SET);
 	while ( 1) {
 	int i, sector, track;
 	UINT16 crc;
 
 	/* load sector */
-	if ( stream->read(buf, 6 + f->sector_size ) < 6 + f->sector_size )
+	if ( stream.read(buf, 6 + f->sector_size ) < 6 + f->sector_size )
 		break;
 
 	/* parse sector header */
@@ -678,7 +678,7 @@ static int thom_get_free_blocks(thom_floppy* f, unsigned head)
 
 /* dump file contents into dst */
 static void thom_get_file(thom_floppy* f, unsigned head,
-				thom_dirent* d, imgtool::stream *dst)
+				thom_dirent* d, imgtool::stream &dst)
 {
 	UINT8* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
@@ -693,7 +693,7 @@ static void thom_get_file(thom_floppy* f, unsigned head,
 		int i;
 		for ( i = 0; i < 8; i++ ) {
 	UINT8* data = thom_get_sector( f, head, track, firstsect + i );
-	dst->write(data, f->sectuse_size);
+	dst.write(data, f->sectuse_size);
 		}
 		block = fat[ block + 1 ];
 	}
@@ -703,16 +703,16 @@ static void thom_get_file(thom_floppy* f, unsigned head,
 		UINT8* data;
 		for ( i = 0; i < nextblock - 0xc1; i++ ) {
 	data = thom_get_sector( f, head, track, firstsect + i );
-	dst->write(data, f->sectuse_size);
+	dst.write(data, f->sectuse_size);
 		}
 		data = thom_get_sector( f, head, track, firstsect + i );
-		dst->write(data, d->lastsectsize);
+		dst.write(data, d->lastsectsize);
 		return;
 	}
 	else {
 		/* invalid, assume last block */
 		UINT8* data = thom_get_sector( f, head, track, firstsect );
-		dst->write(data, d->lastsectsize);
+		dst.write(data, d->lastsectsize);
 		return;
 	}
 	block = nextblock;
@@ -739,9 +739,9 @@ static void thom_del_file(thom_floppy* f, unsigned head, thom_dirent* d)
 
 /* create a new file or overwrite an old one, with the contents of src */
 static void thom_put_file(thom_floppy* f, unsigned head,
-				thom_dirent* d, imgtool::stream *src)
+				thom_dirent* d, imgtool::stream &src)
 {
-	int size = src->size();
+	int size = src.size();
 	UINT8* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int block;
@@ -760,14 +760,14 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 	/* store data, full sectors */
 	for ( i = 0; i < 8 && size > f->sectuse_size; i++ ) {
 		UINT8* dst = thom_get_sector( f, head, track, firstsect + i );
-		src->read(dst, f->sectuse_size );
+		src.read(dst, f->sectuse_size );
 		size -= f->sectuse_size;
 	}
 
 	/* store data, last sector */
 	if ( i < 8 ) {
 		UINT8* dst = thom_get_sector( f, head, track, firstsect + i );
-		src->read(dst, size );
+		src.read(dst, size );
 		fat[ block + 1 ] = 0xc1 + i;
 		d->lastsectsize = size;
 		break;
@@ -937,7 +937,7 @@ static imgtoolerr_t thom_free_space(imgtool::partition *part, UINT64 *size)
 static imgtoolerr_t thom_read_file(imgtool::partition *part,
 					const char *filename,
 					const char *fork,
-					imgtool::stream *destf)
+					imgtool::stream &destf)
 {
 	int head = *( (int*) part->extra_bytes() );
 	imgtool::image* img = &part->image();
@@ -982,14 +982,14 @@ static imgtoolerr_t thom_delete_file(imgtool::partition *part,
 static imgtoolerr_t thom_write_file(imgtool::partition *part,
 					const char *filename,
 					const char *fork,
-					imgtool::stream *sourcef,
+					imgtool::stream &sourcef,
 					util::option_resolution *opts)
 {
 	int head = *( (int*) part->extra_bytes() );
 	imgtool::image* img = &part->image();
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
 	thom_dirent d;
-	int size = sourcef->size();
+	int size = sourcef.size();
 	int blocks = thom_get_free_blocks( f, head );
 	char name[9], ext[4], fname[14];
 	int is_new = 1;
@@ -1107,7 +1107,7 @@ static imgtoolerr_t thom_suggest_transfer(imgtool::partition *part,
 }
 
 static imgtoolerr_t thom_create(imgtool::image* img,
-				imgtool::stream *stream,
+				imgtool::stream &stream,
 				util::option_resolution *opts)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
@@ -1115,7 +1115,7 @@ static imgtoolerr_t thom_create(imgtool::image* img,
 	UINT8* buf;
 	const char* name;
 
-	f->stream = stream;
+	f->stream = &stream;
 	f->modified = 0;
 
 	/* get parameters */
@@ -1274,38 +1274,40 @@ static const UINT8 crypt2[13] = {
 };
 
 /* decrypt BASIC protected files */
-static void thom_decrypt(imgtool::stream* out, imgtool::stream* in)
+static void thom_decrypt(imgtool::stream &out, imgtool::stream &in)
 {
 	int i1 = 11, i2 = 13;
-	while ( 1 ) {
-	UINT8 b;
-	if ( in->read(&b, 1) < 1 ) break;
-	b = ( (UINT8)(b - i2) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i1;
-	out->putc(b );
-	i1--; i2--;
-	if ( !i1 ) i1 = 11;
-	if ( !i2 ) i2 = 13;
+	while ( 1 )
+	{
+		UINT8 b;
+		if ( in.read(&b, 1) < 1 ) break;
+		b = ( (UINT8)(b - i2) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i1;
+		out.putc(b );
+		i1--; i2--;
+		if ( !i1 ) i1 = 11;
+		if ( !i2 ) i2 = 13;
 	}
 }
 
 /* encrypt BASIC protected files */
-static void thom_encrypt(imgtool::stream* out, imgtool::stream* in)
+static void thom_encrypt(imgtool::stream &out, imgtool::stream &in)
 {
 	int i1 = 11, i2 = 13;
-	while ( 1 ) {
-	UINT8 b;
-	if ( in->read(&b, 1) < 1 ) break;
-	b = ( (UINT8)(b - i1) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i2;
-	out->putc(b );
-	i1--; i2--;
-	if ( !i1 ) i1 = 11;
-	if ( !i2 ) i2 = 13;
+	while ( 1 )
+	{
+		UINT8 b;
+		if ( in.read(&b, 1) < 1 ) break;
+		b = ( (UINT8)(b - i1) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i2;
+		out.putc(b );
+		i1--; i2--;
+		if ( !i1 ) i1 = 11;
+		if ( !i2 ) i2 = 13;
 	}
 }
 
 static imgtoolerr_t thomcrypt_read_file(imgtool::partition *part,
 					const char *name,
-					const char *fork, imgtool::stream *dst)
+					const char *fork, imgtool::stream &dst)
 {
 	UINT8 buf[3];
 	imgtool::stream *org = imgtool::stream::open_mem( NULL, 0 );
@@ -1313,23 +1315,25 @@ static imgtoolerr_t thomcrypt_read_file(imgtool::partition *part,
 	if ( !org ) return IMGTOOLERR_OUTOFMEMORY;
 
 	/* read file */
-	err = thom_read_file( part, name, fork, org );
+	err = thom_read_file( part, name, fork, *org );
 	if ( err ) {
 	delete org;
 	return err;
 	}
 
 	org->seek(0, SEEK_SET);
-	if ( org->read(buf, 3 ) < 3 || buf[0] != 0xfe ) {
-	/* regular file */
-	org->seek(0, SEEK_SET);
-	imgtool::stream::transfer_all( *dst, *org );
+	if ( org->read(buf, 3 ) < 3 || buf[0] != 0xfe )
+	{
+		/* regular file */
+		org->seek(0, SEEK_SET);
+		imgtool::stream::transfer_all( dst, *org );
 	}
-	else {
-	/* encrypted file */
-	dst->putc( '\xff' );
-	dst->write(buf+1, 2);
-	thom_decrypt( dst, org );
+	else
+	{
+		/* encrypted file */
+		dst.putc( '\xff' );
+		dst.write(buf+1, 2);
+		thom_decrypt( dst, *org );
 	}
 
 	delete org;
@@ -1338,28 +1342,30 @@ static imgtoolerr_t thomcrypt_read_file(imgtool::partition *part,
 
 static imgtoolerr_t thomcrypt_write_file(imgtool::partition *part,
 						const char *name,
-						const char *fork, imgtool::stream *src,
+						const char *fork, imgtool::stream &src,
 						util::option_resolution *opts)
 {
 	UINT8 buf[3];
 
-	if ( src->read(buf, 3 ) < 3 || buf[0] == 0xfe ) {
-	/* too short or already encrypted file */
-	src->seek(0, SEEK_SET);
-	return thom_write_file( part, name, fork, src, opts );
+	if ( src.read(buf, 3 ) < 3 || buf[0] == 0xfe )
+	{
+		/* too short or already encrypted file */
+		src.seek(0, SEEK_SET);
+		return thom_write_file( part, name, fork, src, opts );
 	}
-	else {
-	/* regular file */
-	imgtool::stream *dst = imgtool::stream::open_mem( NULL, 0 );
-	imgtoolerr_t err;
-	if ( !dst ) return IMGTOOLERR_OUTOFMEMORY;
-	dst->putc( '\xfe' );
-	dst->write(buf+1, 2);
-	thom_encrypt( dst, src );
-	dst->seek(0, SEEK_SET);
-	err = thom_write_file( part, name, fork, dst, opts );
-	delete dst;
-	return err;
+	else
+	{
+		/* regular file */
+		imgtool::stream *dst = imgtool::stream::open_mem( NULL, 0 );
+		imgtoolerr_t err;
+		if ( !dst ) return IMGTOOLERR_OUTOFMEMORY;
+		dst->putc( '\xfe' );
+		dst->write(buf+1, 2);
+		thom_encrypt( *dst, src );
+		dst->seek(0, SEEK_SET);
+		err = thom_write_file( part, name, fork, *dst, opts );
+		delete dst;
+		return err;
 	}
 }
 
@@ -1385,7 +1391,7 @@ void filter_thomcrypt_getinfo(UINT32 state, union filterinfo *info)
 static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
 						const char *name,
 						const char *fork,
-						imgtool::stream *dst,
+						imgtool::stream &dst,
 						const char *const table[2][128])
 {
 	imgtool::stream *org = imgtool::stream::open_mem( NULL, 0 );
@@ -1395,7 +1401,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
 
 	if ( !org ) return IMGTOOLERR_OUTOFMEMORY;
 
-	err = thomcrypt_read_file( part, name, fork, org );
+	err = thomcrypt_read_file( part, name, fork, *org );
 	if (err)
 	{
 		delete org;
@@ -1414,7 +1420,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
 	if ( linelength <= 0 ) goto end;
 	if ( org->read(buf, 2 ) < 2 ) goto end;
 	linenum = ((int)buf[0] << 8) + buf[1];
-	dst->printf( "%u ", linenum );
+	dst.printf( "%u ", linenum );
 
 	/* process line */
 	for ( i = 0; i < linelength; i++ ) {
@@ -1434,18 +1440,18 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
 	if ( c >= 0x80 && ! in_str ) {
 		/* token */
 		const char* token = table[ in_fun ][ c - 0x80 ];
-		if ( token ) dst->puts(token );
-		else dst->puts("???" );
+		if ( token ) dst.puts(token );
+		else dst.puts("???" );
 	}
 	else {
 		/* regular character */
 		if ( c == '"' ) in_str = 1 - in_str;
-		dst->putc( c ); /* normal letter */
+		dst.putc( c ); /* normal letter */
 	}
 	in_fun = 0;
 		}
 	}
-	dst->putc( '\n' );
+	dst.putc( '\n' );
 	}
 	end:
 
@@ -1456,7 +1462,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
 static imgtoolerr_t thom_basic_write_file(imgtool::partition *part,
 						const char *name,
 						const char *fork,
-						imgtool::stream *src,
+						imgtool::stream &src,
 						util::option_resolution *opts,
 						const char *const table[2][128])
 {
@@ -1468,14 +1474,14 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition *part,
 	static imgtoolerr_t short##_read_file(imgtool::partition *part,  \
 					const char *name,       \
 					const char *fork,       \
-					imgtool::stream *dst)        \
+					imgtool::stream &dst)        \
 	{                                   \
 	return thom_basic_read_file( part, name, fork, dst, short );    \
 	}                                   \
 	static imgtoolerr_t short##_write_file(imgtool::partition *part, \
 						const char *name,       \
 						const char *fork,       \
-						imgtool::stream *src,        \
+						imgtool::stream &src,        \
 						util::option_resolution *opts)    \
 	{                                   \
 	return thom_basic_write_file( part, name, fork, src, opts, short ); \
