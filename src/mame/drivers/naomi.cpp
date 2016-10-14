@@ -3479,7 +3479,9 @@ ROM_START( doa2a )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0008ad01" )
 ROM_END
 
-// later version, have unlocked Tag and Survival game modes, possible USA or international release
+// later original version, have unlocked Tag and Survival game modes, but unlike Millennium have no option to disable them
+// like original rev have 1 life in story mode and no way to tweak it (Millennium have it 2 and test mode option to change it)
+// possible USA or international release
 ROM_START( doa2 )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM_NO_BD
