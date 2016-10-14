@@ -466,14 +466,14 @@ WRITE8_MEMBER(sms_state::smsj_audio_control_w)
 		1,1 : Both PSG and FM enabled 
 	*/
 	if (m_smsj_audio_control == 0x00 || m_smsj_audio_control == 0x03)
-		m_psg_sms->set_output_gain(0, 1.0);
+		m_psg_sms->set_output_gain(ALL_OUTPUTS, 1.0);
 	else
-		m_psg_sms->set_output_gain(0, 0.0);
+		m_psg_sms->set_output_gain(ALL_OUTPUTS, 0.0);
 
 	if (m_smsj_audio_control == 0x01 || m_smsj_audio_control == 0x03)
-		m_ym->set_output_gain(0, 1.0);
+		m_ym->set_output_gain(ALL_OUTPUTS, 1.0);
 	else
-		m_ym->set_output_gain(0, 0.0);
+		m_ym->set_output_gain(ALL_OUTPUTS, 0.0);
 }
 
 
