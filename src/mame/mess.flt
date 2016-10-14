@@ -34,6 +34,7 @@ ampro.cpp
 amstr_pc.cpp
 amstrad.cpp
 amust.cpp
+anzterm.cpp
 apc.cpp
 apexc.cpp
 apf.cpp
