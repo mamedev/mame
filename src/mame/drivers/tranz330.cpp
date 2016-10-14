@@ -11,6 +11,9 @@
 	it presumably needs some kind of interrupt in order to kick it into
 	running.
 
+    Interrupt Vectors are located at 0200-02FF.
+    Display ram at 9000-90FF says GRAMING ERR 0 (part of PROGRAMING ERR message)
+
     TODO:
     - get working, driver needs a Z80 peripheral expert to look at it.
     - hook up magstripe reader
@@ -26,7 +29,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tranz330_io, AS_IO, 8, tranz330_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PIO_TAG, z80pio_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PIO_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE(RTC_TAG, msm6242_device, read, write)
@@ -78,6 +81,15 @@ WRITE_LINE_MEMBER( tranz330_state::sound_w )
 	m_ctc->trg3(state);
 }
 
+WRITE_LINE_MEMBER( tranz330_state::clock_w )
+{
+	// Ch 0 and 1 might be DART Ch A & B baud clocks
+	//m_ctc->trg0(state);
+	//m_ctc->trg1(state);
+	// Ch 2 speaker clock
+	m_ctc->trg2(state);
+}
+
 READ8_MEMBER( tranz330_state::card_r )
 {
 	// return 0x80 for a magstripe 0, return 0x00 for a magstripe 1.
@@ -121,6 +133,9 @@ static MACHINE_CONFIG_START( tranz330, tranz330_state )
 	MCFG_CPU_IO_MAP(tranz330_io)
 	MCFG_Z80_DAISY_CHAIN(tranz330_daisy_chain)
 
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_7_15909MHz/4) // ?
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tranz330_state, clock_w))
+
 	MCFG_DEVICE_ADD(RTC_TAG, MSM6242, XTAL_32_768kHz)
 
 	MCFG_DEVICE_ADD(PIO_TAG, Z80PIO, XTAL_7_15909MHz/2) //*
@@ -138,6 +153,7 @@ static MACHINE_CONFIG_START( tranz330, tranz330_state )
 
 	MCFG_DEVICE_ADD(CTC_TAG, Z80CTC, XTAL_7_15909MHz/2) //*
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(tranz330_state, sound_w))
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(DART_TAG, z80dart_device, rxb_w))
@@ -160,5 +176,5 @@ ROM_START( tranz330 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS             INIT    COMPANY     FULLNAME   		FLAGS
-COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, driver_device,	0,		"VeriFone",	"Tranz 330",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS             INIT    COMPANY     FULLNAME        FLAGS
+COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, driver_device,    0,     "VeriFone",  "Tranz 330",    MACHINE_NOT_WORKING )

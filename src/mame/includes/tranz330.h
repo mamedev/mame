@@ -14,6 +14,7 @@
 #include "machine/roc10937.h"
 #include "bus/rs232/rs232.h"
 #include "sound/speaker.h"
+#include "machine/clock.h"
 
 #define CPU_TAG		"cpu"
 #define DART_TAG	"dart"
@@ -44,6 +45,7 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER( syncb_w );
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 	DECLARE_WRITE_LINE_MEMBER( sound_w );
 
