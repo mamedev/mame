@@ -122,6 +122,7 @@ void menu_input_general::populate()
 				item->defseq = &entry.defseq(seqtype);
 				item->sortorder = sortorder * 4 + suborder[seqtype];
 				item->type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+				item->is_optional = false;
 				item->name = entry.name();
 				item->owner_name = nullptr;
 				item->next = itemlist;
@@ -199,6 +200,7 @@ void menu_input_specific::populate()
 					item->defseq = &field.defseq(seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+					item->is_optional = field.optional();
 					item->name = field.name();
 					item->owner_name = field.device().tag();
 					item->next = itemlist;
@@ -420,6 +422,8 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 		}
 
 		std::string text = string_format(nameformat[item->type], item->name);
+		if (item->is_optional)
+			text = "(" + text + ")";
 
 		/* if we're polling this item, use some spaces with left/right arrows */
 		if (pollingref == item->ref)

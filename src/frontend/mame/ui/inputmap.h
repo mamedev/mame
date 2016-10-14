@@ -55,6 +55,7 @@ protected:
 		const char *        owner_name;         /* pointer to the name of the owner of the item */
 		UINT32              sortorder;          /* sorting information */
 		UINT8               type;               /* type of port */
+		bool                is_optional;        /* true if this input is considered optional */
 	};
 
 	void populate_and_sort(struct input_item_data *itemlist);
