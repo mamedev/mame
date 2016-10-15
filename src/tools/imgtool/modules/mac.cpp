@@ -1542,7 +1542,7 @@ struct mfs_dirref
 
 
 
-static imgtoolerr_t mfs_image_create(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t mfs_image_create(imgtool::image *image, imgtool::stream::ptr &&dummy, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	UINT8 buffer[512];
@@ -1606,7 +1606,7 @@ static imgtoolerr_t mfs_image_create(imgtool::image *image, imgtool::stream &str
 
     Return imgtool error code
 */
-static imgtoolerr_t mfs_image_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t mfs_image_open(imgtool::image *image, imgtool::stream::ptr &&dummy)
 {
 	imgtoolerr_t err;
 	struct mac_l2_imgref *l2_img;
@@ -3033,7 +3033,7 @@ static int hfs_catKey_compare(const void *p1, const void *p2)
 
     Return imgtool error code
 */
-static imgtoolerr_t hfs_image_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t hfs_image_open(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
 	imgtoolerr_t err;
 	struct mac_l2_imgref *l2_img;

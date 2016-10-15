@@ -232,7 +232,7 @@ static imgtoolerr_t pc_chd_read_partition_header(imgtool::image &image)
 
 
 
-static imgtoolerr_t pc_chd_image_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *opts)
+static imgtoolerr_t pc_chd_image_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	UINT32 cylinders, heads, sectors;
@@ -246,11 +246,11 @@ static imgtoolerr_t pc_chd_image_create(imgtool::image *image, imgtool::stream &
 	info = pc_chd_get_image_info(*image);
 
 	/* create the hard disk image */
-	err = imghd_create(f, 0, cylinders, heads, sectors, FAT_SECLEN);
+	err = imghd_create(*stream, 0, cylinders, heads, sectors, FAT_SECLEN);
 	if (err)
 		goto done;
 
-	err = imghd_open(f, &info->hard_disk);
+	err = imghd_open(*stream, &info->hard_disk);
 	if (err)
 		goto done;
 
@@ -278,7 +278,7 @@ done:
 
 
 
-static imgtoolerr_t pc_chd_image_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t pc_chd_image_open(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
 	imgtoolerr_t err;
 	pc_chd_image_info *info;
@@ -286,7 +286,7 @@ static imgtoolerr_t pc_chd_image_open(imgtool::image *image, imgtool::stream &st
 	info = pc_chd_get_image_info(*image);
 
 	/* open the hard drive */
-	err = imghd_open(stream, &info->hard_disk);
+	err = imghd_open(*stream, &info->hard_disk);
 	if (err)
 		return err;
 

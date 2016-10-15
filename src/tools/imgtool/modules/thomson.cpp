@@ -177,71 +177,72 @@ static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
    (.fd have 40 or 80 tracks, .qd have 25 tracks) and the file size.
 */
 
-static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool::stream &stream)
+static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool::stream::ptr &&stream)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
-	int size = stream.size();
+	int size = stream->size();
 
-	f->stream = &stream;
+	f->stream = stream.get();
 	f->modified = 0;
 
 	/* guess format */
 	switch ( size ) {
 	case 81920:
-	f->tracks = 40;
-	f->sector_size = 128;
-	f->sectuse_size = 128;
-	f->heads = 1;
-	break;
+		f->tracks = 40;
+		f->sector_size = 128;
+		f->sectuse_size = 128;
+		f->heads = 1;
+		break;
 
 	case 163840:
-	f->tracks = 40;
-	f->sector_size = 256;
-	f->sectuse_size = 255;
-	f->heads = 1;
-	/* could also be: sector_size=128, heads=2 */
-	/* maight even be: tracks=80, sector_size=128 */
-	break;
+		f->tracks = 40;
+		f->sector_size = 256;
+		f->sectuse_size = 255;
+		f->heads = 1;
+		/* could also be: sector_size=128, heads=2 */
+		/* maight even be: tracks=80, sector_size=128 */
+		break;
 
 	case 327680:
-	f->tracks = 80;
-	f->sector_size = 256;
-	f->sectuse_size = 255;
-	f->heads = 1;
-	/* could also be: tracks=40, heads=2 */
-	break;
+		f->tracks = 80;
+		f->sector_size = 256;
+		f->sectuse_size = 255;
+		f->heads = 1;
+		/* could also be: tracks=40, heads=2 */
+		break;
 
 	case 655360:
-	f->tracks = 80;
-	f->sector_size = 256;
-	f->sectuse_size = 255;
-	f->heads = 2;
-	break;
+		f->tracks = 80;
+		f->sector_size = 256;
+		f->sectuse_size = 255;
+		f->heads = 2;
+		break;
 
 	case 51200:
-	f->tracks = 25;
-	f->sector_size = 128;
-	f->sectuse_size = 128;
-	f->heads = 1;
-	break;
+		f->tracks = 25;
+		f->sector_size = 128;
+		f->sectuse_size = 128;
+		f->heads = 1;
+		break;
 
 	case 62400:
-	f->tracks = 25;
-	f->sector_size = 128;
-	f->sectuse_size = 128;
-	f->heads = 2;
-	break;
+		f->tracks = 25;
+		f->sector_size = 128;
+		f->sectuse_size = 128;
+		f->heads = 2;
+		break;
 
 	default:
-	return IMGTOOLERR_CORRUPTIMAGE;
+		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
 	assert( size == f->heads * f->tracks * 16 * f->sector_size );
 
-	stream.seek(0, SEEK_SET);
-	if ( stream.read(f->data, size ) < size )
-	return IMGTOOLERR_READERROR;
+	f->stream->seek(0, SEEK_SET);
+	if (f->stream->read(f->data, size ) < size)
+		return IMGTOOLERR_READERROR;
 
+	f->stream = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -308,47 +309,49 @@ static UINT16 thom_sap_crc( UINT8* data, int size )
 	return crc;
 }
 
-static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream &stream)
+static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream::ptr &&stream)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
 	UINT8 buf[262];
 
-	f->stream = &stream;
+	f->stream = stream.get();
 	f->modified = 0;
 
-	/* check image header */
-	stream.seek(0, SEEK_SET);
-	stream.read(buf, 66 );
+	// check image header
+	f->stream->seek(0, SEEK_SET);
+	f->stream->read(buf, 66 );
 	if ( memcmp( buf+1, sap_header+1, 65 ) ) return IMGTOOLERR_CORRUPTIMAGE;
 
 	/* guess format */
-	stream.read(buf, 1 );
-	switch ( buf[0] ) {
+	f->stream->read(buf, 1 );
+	switch ( buf[0] )
+	{
 	case 1:
 	case 3:
-	f->heads = 1;
-	f->tracks = 40;
-	f->sector_size = 128;
-	f->sectuse_size = 128;
-	break;
+		f->heads = 1;
+		f->tracks = 40;
+		f->sector_size = 128;
+		f->sectuse_size = 128;
+		break;
 	case 0:
 	case 2:
 	case 4:
-	f->heads = 1;
-	f->tracks = 80;
-	f->sector_size = 256;
-	f->sectuse_size = 255;
-	break;
-	default: return IMGTOOLERR_CORRUPTIMAGE;
+		f->heads = 1;
+		f->tracks = 80;
+		f->sector_size = 256;
+		f->sectuse_size = 255;
+		break;
+	default:
+		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
-	stream.seek(66, SEEK_SET);
+	f->stream->seek(66, SEEK_SET);
 	while ( 1) {
 	int i, sector, track;
 	UINT16 crc;
 
 	/* load sector */
-	if ( stream.read(buf, 6 + f->sector_size ) < 6 + f->sector_size )
+	if (f->stream->read(buf, 6 + f->sector_size ) < 6 + f->sector_size )
 		break;
 
 	/* parse sector header */
@@ -368,6 +371,7 @@ static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream &stream)
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
+	f->stream = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -1113,7 +1117,7 @@ static imgtoolerr_t thom_suggest_transfer(imgtool::partition *part,
 }
 
 static imgtoolerr_t thom_create(imgtool::image* img,
-				imgtool::stream &stream,
+				imgtool::stream::ptr &&stream,
 				util::option_resolution *opts)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
@@ -1121,7 +1125,7 @@ static imgtoolerr_t thom_create(imgtool::image* img,
 	UINT8* buf;
 	const char* name;
 
-	f->stream = &stream;
+	f->stream = stream.get();
 	f->modified = 0;
 
 	/* get parameters */
@@ -1167,6 +1171,7 @@ static imgtoolerr_t thom_create(imgtool::image* img,
 
 	f->modified = 1;
 
+	f->stream = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 

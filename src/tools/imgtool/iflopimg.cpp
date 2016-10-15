@@ -102,10 +102,11 @@ struct imgtool_floppy_image
 
 
 
-static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image *image, imgtool::stream &f, int noclose)
+static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image *image, imgtool::stream::ptr &&stream, int noclose)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
+	imgtool::stream *f = nullptr;
 	struct imgtool_floppy_image *fimg;
 	const imgtool_class *imgclass;
 	const struct FloppyFormat *format;
@@ -116,14 +117,18 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image *image, imgtool:
 	format = (const struct FloppyFormat *) imgclass->derived_param;
 	open = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_OPEN);
 
-	/* open up the floppy */
-	ferr = floppy_open(&f, noclose ? &imgtool_noclose_ioprocs : &imgtool_ioprocs,
+	// extract the pointer
+	f = stream.release();
+
+	// open up the floppy
+	ferr = floppy_open(f, noclose ? &imgtool_noclose_ioprocs : &imgtool_ioprocs,
 		"", format, FLOPPY_FLAGS_READWRITE, &fimg->floppy);
 	if (ferr)
 	{
 		err = imgtool_floppy_error(ferr);
 		return err;
 	}
+	f = nullptr;	// the floppy object has the stream now
 
 	if (open)
 	{
@@ -137,17 +142,18 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image *image, imgtool:
 
 
 
-static imgtoolerr_t imgtool_floppy_open(imgtool::image *image, imgtool::stream &f)
+static imgtoolerr_t imgtool_floppy_open(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
-	return imgtool_floppy_open_internal(image, f, FALSE);
+	return imgtool_floppy_open_internal(image, std::move(stream), FALSE);
 }
 
 
 
-static imgtoolerr_t imgtool_floppy_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *opts)
+static imgtoolerr_t imgtool_floppy_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	floperr_t ferr;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
+	imgtool::stream *f = nullptr;
 	struct imgtool_floppy_image *fimg;
 	const imgtool_class *imgclass;
 	const struct FloppyFormat *format;
@@ -160,15 +166,19 @@ static imgtoolerr_t imgtool_floppy_create(imgtool::image *image, imgtool::stream
 	create = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *, util::option_resolution *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_CREATE);
 	open = (imgtoolerr_t (*)(imgtool::image *, imgtool::stream *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_OPEN);
 
-	/* open up the floppy */
-	ferr = floppy_create(&f, &imgtool_ioprocs, format, opts, &fimg->floppy);
+	// extract the pointer
+	f = stream.release();
+
+	// open up the floppy
+	ferr = floppy_create(f, &imgtool_ioprocs, format, opts, &fimg->floppy);
 	if (ferr)
 	{
 		err = imgtool_floppy_error(ferr);
 		goto done;
 	}
+	f = nullptr;	// the floppy object has the stream now
 
-	/* do we have to do extra stuff when creating the image? */
+	// do we have to do extra stuff when creating the image?
 	if (create)
 	{
 		err = create(image, nullptr, opts);
@@ -176,7 +186,7 @@ static imgtoolerr_t imgtool_floppy_create(imgtool::image *image, imgtool::stream
 			goto done;
 	}
 
-	/* do we have to do extra stuff when opening the image? */
+	// do we have to do extra stuff when opening the image?
 	if (open)
 	{
 		err = open(image, nullptr);
@@ -185,6 +195,8 @@ static imgtoolerr_t imgtool_floppy_create(imgtool::image *image, imgtool::stream
 	}
 
 done:
+	if (f)
+		delete f;
 	return err;
 }
 

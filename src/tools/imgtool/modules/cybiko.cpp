@@ -265,9 +265,9 @@ static int cfs_verify(cybiko_file_system &cfs)
 	return TRUE;
 }
 
-static int cfs_init(cybiko_file_system &cfs, imgtool::stream &stream, int flash_type)
+static int cfs_init(cybiko_file_system &cfs, imgtool::stream::ptr &&stream, int flash_type)
 {
-	cfs.stream = &stream;
+	cfs.stream = stream.release();
 	switch (flash_type)
 	{
 		case FLASH_TYPE_AT45DB041 : cfs.page_count = 2048; cfs.page_size = 264; break;
@@ -345,13 +345,13 @@ static int flash_option_to_flash_type( int option)
 	}
 }
 
-static imgtoolerr_t cybiko_image_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t cybiko_image_open(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
 	int flash_type;
 	// init
-	flash_type = flash_size_to_flash_type(stream.size());
-	if (!cfs_init(*cfs, stream, flash_type)) return IMGTOOLERR_CORRUPTIMAGE;
+	flash_type = flash_size_to_flash_type(stream->size());
+	if (!cfs_init(*cfs, std::move(stream), flash_type)) return IMGTOOLERR_CORRUPTIMAGE;
 	// verify
 	if (!cfs_verify(*cfs)) return IMGTOOLERR_CORRUPTIMAGE;
 	// ok
@@ -364,13 +364,13 @@ static void cybiko_image_close( imgtool::image *image)
 	delete cfs->stream;
 }
 
-static imgtoolerr_t cybiko_image_create( imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t cybiko_image_create( imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
 	int flash_type;
 	// init
 	flash_type = flash_option_to_flash_type(opts->lookup_int('F'));
-	if (!cfs_init(*cfs, stream, flash_type)) return IMGTOOLERR_CORRUPTIMAGE;
+	if (!cfs_init(*cfs, std::move(stream), flash_type)) return IMGTOOLERR_CORRUPTIMAGE;
 	// format
 	if (!cfs_format(cfs)) return IMGTOOLERR_CORRUPTIMAGE;
 	// ok

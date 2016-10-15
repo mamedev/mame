@@ -386,7 +386,7 @@ struct ti990_iterator
 };
 
 
-static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream &f);
+static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream::ptr &&stream);
 static void ti990_image_exit(imgtool::image *img);
 static void ti990_image_info(imgtool::image *img, char *string, size_t len);
 static imgtoolerr_t ti990_image_beginenum(imgtool::directory *enumeration, const char *path);
@@ -398,7 +398,7 @@ static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const ch
 static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions);
 static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const char *fpath);
 #endif
-static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions);
+static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions);
 
 enum
 {
@@ -1106,15 +1106,15 @@ static int qsort_catalog_compare(const void *p1, const void *p2)
 /*
     Open a file as a ti990_image.
 */
-static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream &f)
+static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream::ptr &&stream)
 {
 	ti990_image *image = (ti990_image *) img->extra_bytes();
 	disk_image_header header;
 	int reply;
 	unsigned totsecs;
 
-	image->file_handle = &f;
-	reply = f.read(&header, sizeof(header));
+	image->file_handle = stream.get();
+	reply = image->file_handle->read(&header, sizeof(header));
 	if (reply != sizeof(header))
 		return IMGTOOLERR_READERROR;
 
@@ -1131,14 +1131,14 @@ static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream &f)
 		|| (image->geometry.heads > MAX_HEADS)
 		|| (image->geometry.cylinders > MAX_CYLINDERS)
 		|| (totsecs < 1)
-		|| (f.size() != header_len + totsecs*image->geometry.bytes_per_sector))
+		|| (image->file_handle->size() != header_len + totsecs*image->geometry.bytes_per_sector))
 	{
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
 	{
 		ti990_phys_sec_address address = { 0, 0, 0 };
-		reply = read_sector_physical_len(f, &address, &image->geometry, & image->sec0, sizeof(image->sec0));
+		reply = read_sector_physical_len(*image->file_handle, &address, &image->geometry, & image->sec0, sizeof(image->sec0));
 	}
 	if (reply)
 	{
@@ -1156,6 +1156,7 @@ static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream &f)
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
+	image->file_handle = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -1764,7 +1765,7 @@ static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const 
 /*
     Create a blank ti990_image.
 */
-static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions)
+static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions)
 {
 	//const char *volname;
 	ti990_geometry geometry;
@@ -1790,7 +1791,7 @@ static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f
 	set_UINT32BE(& header.sectors_per_track, geometry.sectors_per_track);
 	set_UINT32BE(& header.bytes_per_sector, geometry.bytes_per_sector);
 
-	reply = f.write(&header, sizeof(header));
+	reply = stream->write(&header, sizeof(header));
 	if (reply != sizeof(header))
 	{
 		return IMGTOOLERR_WRITEERROR;
@@ -1803,7 +1804,7 @@ static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f
 
 
 	/* write sector 0 */
-	if (write_sector_logical(f, 0, & geometry, &sec0))
+	if (write_sector_logical(*stream, 0, & geometry, &sec0))
 		return IMGTOOLERR_WRITEERROR;
 
 
@@ -1811,7 +1812,7 @@ static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f
 	memset(empty_sec, 0, geometry.bytes_per_sector);
 
 	for (i=1; i<totsecs; i++)
-		if (write_sector_logical(f, i, & geometry, empty_sec))
+		if (write_sector_logical(*stream, i, & geometry, empty_sec))
 			return IMGTOOLERR_WRITEERROR;
 
 	return (imgtoolerr_t)0;

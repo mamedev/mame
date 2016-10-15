@@ -1042,22 +1042,27 @@ static tape_image_t& get_tape_image(tape_state_t& ts)
 /********************************************************************************
  * Imgtool functions
  ********************************************************************************/
-static imgtoolerr_t hp9845_tape_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t hp9845_tape_open(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
 	tape_state_t& state = get_tape_state(image);
 
-	state.stream = &stream;
+	state.stream = stream.get();
 
 	tape_image_t& tape_image = get_tape_image(state);
 
-	return tape_image.load_from_file(&stream);
+	imgtoolerr_t err = tape_image.load_from_file(state.stream);
+	if (err)
+		return err;
+
+	state.stream = stream.release();
+	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_create(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t hp9845_tape_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	tape_state_t& state = get_tape_state(image);
 
-	state.stream = &stream;
+	state.stream = stream.release();
 
 	tape_image_t& tape_image = get_tape_image(state);
 

@@ -789,7 +789,7 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool::partition *partitio
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_create(imgtool::image *img, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t vzdos_diskimage_create(imgtool::image *img, imgtool::stream::ptr &&dummy, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int track, sector;

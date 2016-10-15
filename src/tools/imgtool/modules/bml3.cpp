@@ -498,7 +498,7 @@ static imgtoolerr_t prepare_dirent(UINT8 variant, struct bml3_dirent *ent, const
 
 
 
-static imgtoolerr_t bml3_diskimage_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t bml3_diskimage_open(imgtool::image *image, imgtool::stream::ptr &&dummy)
 {
 	// imgtoolerr_t err;
 	floperr_t ferr;
