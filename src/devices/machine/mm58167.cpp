@@ -9,6 +9,7 @@
 **********************************************************************/
 
 #include "mm58167.h"
+#include "machine/timehelp.h"
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -91,11 +92,6 @@ void mm58167_device::device_reset()
 }
 
 
-static inline UINT8 make_bcd(UINT8 data)
-{
-	return ((data / 10) << 4) | (data % 10);
-}
-
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
@@ -124,8 +120,8 @@ void mm58167_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		if ((m_regs[R_CTL_IRQCONTROL] & 0x80) && m_regs[R_CNT_MONTH]      != old_month)         set_irq(7); // every month
 	}
 
-	m_regs[R_CNT_MILLISECONDS] = make_bcd(m_milliseconds % 10);
-	m_regs[R_CNT_HUNDTENTHS] = make_bcd(m_milliseconds / 10);
+	m_regs[R_CNT_MILLISECONDS] = time_helper::make_bcd(m_milliseconds % 10);
+	m_regs[R_CNT_HUNDTENTHS] = time_helper::make_bcd(m_milliseconds / 10);
 
 	// 10Hz IRQ
 	if ((m_regs[R_CTL_IRQCONTROL] & 0x02) && (m_milliseconds % 100) == 0)
@@ -158,12 +154,12 @@ void mm58167_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void mm58167_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	m_regs[R_CNT_SECONDS] = make_bcd(second);           // seconds (BCD)
-	m_regs[R_CNT_MINUTES] = make_bcd(minute);           // minutes (BCD)
-	m_regs[R_CNT_HOURS] = make_bcd(hour);               // hour (BCD)
-	m_regs[R_CNT_DAYOFWEEK] = make_bcd(day_of_week);    // day of the week (BCD)
-	m_regs[R_CNT_DAYOFMONTH] = make_bcd(day);           // day of the month (BCD)
-	m_regs[R_CNT_MONTH] = make_bcd(month);              // month (BCD)
+	m_regs[R_CNT_SECONDS] = time_helper::make_bcd(second);           // seconds (BCD)
+	m_regs[R_CNT_MINUTES] = time_helper::make_bcd(minute);           // minutes (BCD)
+	m_regs[R_CNT_HOURS] = time_helper::make_bcd(hour);               // hour (BCD)
+	m_regs[R_CNT_DAYOFWEEK] = time_helper::make_bcd(day_of_week);    // day of the week (BCD)
+	m_regs[R_CNT_DAYOFMONTH] = time_helper::make_bcd(day);           // day of the month (BCD)
+	m_regs[R_CNT_MONTH] = time_helper::make_bcd(month);              // month (BCD)
 }
 
 void mm58167_device::set_irq(int bit)

@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "machine/timekpr.h"
-
+#include "machine/timehelp.h"
 
 // device type definition
 const device_type M48T02 = &device_creator<m48t02_device>;
@@ -62,39 +62,6 @@ const device_type MK48T12 = &device_creator<mk48t12_device>;
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
-static inline UINT8 make_bcd(UINT8 data)
-{
-	return ( ( ( data / 10 ) % 10 ) << 4 ) + ( data % 10 );
-}
-
-static inline UINT8 from_bcd( UINT8 data )
-{
-	return ( ( ( data >> 4 ) & 15 ) * 10 ) + ( data & 15 );
-}
-
-static int inc_bcd( UINT8 *data, int mask, int min, int max )
-{
-	int bcd;
-	int carry;
-
-	bcd = ( *( data ) + 1 ) & mask;
-	carry = 0;
-
-	if( ( bcd & 0x0f ) > 9 )
-	{
-		bcd &= 0xf0;
-		bcd += 0x10;
-		if( bcd > max )
-		{
-			bcd = min;
-			carry = 1;
-		}
-	}
-
-	*( data ) = ( *( data ) & ~mask ) | ( bcd & mask );
-	return carry;
-}
 
 static void counter_to_ram( UINT8 *data, int offset, int counter )
 {
@@ -233,14 +200,14 @@ void timekeeper_device::device_start()
 	machine().base_datetime(systime);
 
 	m_control = 0;
-	m_seconds = make_bcd( systime.local_time.second );
-	m_minutes = make_bcd( systime.local_time.minute );
-	m_hours = make_bcd( systime.local_time.hour );
-	m_day = make_bcd( systime.local_time.weekday + 1 );
-	m_date = make_bcd( systime.local_time.mday );
-	m_month = make_bcd( systime.local_time.month + 1 );
-	m_year = make_bcd( systime.local_time.year % 100 );
-	m_century = make_bcd( systime.local_time.year / 100 );
+	m_seconds = time_helper::make_bcd( systime.local_time.second );
+	m_minutes = time_helper::make_bcd( systime.local_time.minute );
+	m_hours = time_helper::make_bcd( systime.local_time.hour );
+	m_day = time_helper::make_bcd( systime.local_time.weekday + 1 );
+	m_date = time_helper::make_bcd( systime.local_time.mday );
+	m_month = time_helper::make_bcd( systime.local_time.month + 1 );
+	m_year = time_helper::make_bcd( systime.local_time.year % 100 );
+	m_century = time_helper::make_bcd( systime.local_time.year / 100 );
 	m_data.resize( m_size );
 
 	save_item( NAME(m_control) );
@@ -298,14 +265,14 @@ void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		return;
 	}
 
-	int carry = inc_bcd( &m_seconds, MASK_SECONDS, 0x00, 0x59 );
+	int carry = time_helper::inc_bcd( &m_seconds, MASK_SECONDS, 0x00, 0x59 );
 	if( carry )
 	{
-		carry = inc_bcd( &m_minutes, MASK_MINUTES, 0x00, 0x59 );
+		carry = time_helper::inc_bcd( &m_minutes, MASK_MINUTES, 0x00, 0x59 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &m_hours, MASK_HOURS, 0x00, 0x23 );
+		carry = time_helper::inc_bcd( &m_hours, MASK_HOURS, 0x00, 0x23 );
 	}
 
 	if( carry )
@@ -313,10 +280,10 @@ void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		UINT8 maxdays;
 		static const UINT8 daysinmonth[] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 
-		inc_bcd( &m_day, MASK_DAY, 0x01, 0x07 );
+		time_helper::inc_bcd( &m_day, MASK_DAY, 0x01, 0x07 );
 
-		UINT8 month = from_bcd( m_month );
-		UINT8 year = from_bcd( m_year );
+		UINT8 month = time_helper::from_bcd( m_month );
+		UINT8 year = time_helper::from_bcd( m_year );
 
 		if( month == 2 && ( year % 4 ) == 0 )
 		{
@@ -331,19 +298,19 @@ void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int p
 			maxdays = 0x31;
 		}
 
-		carry = inc_bcd( &m_date, MASK_DATE, 0x01, maxdays );
+		carry = time_helper::inc_bcd( &m_date, MASK_DATE, 0x01, maxdays );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &m_month, MASK_MONTH, 0x01, 0x12 );
+		carry = time_helper::inc_bcd( &m_month, MASK_MONTH, 0x01, 0x12 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &m_year, MASK_YEAR, 0x00, 0x99 );
+		carry = time_helper::inc_bcd( &m_year, MASK_YEAR, 0x00, 0x99 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &m_century, MASK_CENTURY, 0x00, 0x99 );
+		carry = time_helper::inc_bcd( &m_century, MASK_CENTURY, 0x00, 0x99 );
 
 		if( type() == M48T35 ||
 			type() == M48T58 )

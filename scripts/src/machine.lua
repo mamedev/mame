@@ -671,6 +671,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds1386.h,MACHINES["DS1386"] = true
+---------------------------------------------------
+
+if (MACHINES["DS1386"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds1386.cpp",
+		MAME_DIR .. "src/devices/machine/ds1386.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds2401.h,MACHINES["DS2401"] = true
 ---------------------------------------------------
 
