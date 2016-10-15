@@ -115,6 +115,9 @@ public:
 	/// \param [in] index Index of desired element (zero-based).
 	/// \return Reference to element at specified index.
 	T &operator[](unsigned index) { assert(index < Count); return m_array[index]; }
+
+	/// \brief Returns the count
+	unsigned size() const { return Count; }
 };
 
 
