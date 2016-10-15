@@ -3782,6 +3782,9 @@ static INPUT_PORTS_START( majxtal7 )
 	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0xff, DEF_STR( On ) )
+
+	/* the following are needed to make happy the read handlers shared with mjelctrn */
+	PORT_START("SW1")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( neruton )
@@ -3849,6 +3852,7 @@ static INPUT_PORTS_START( neruton )
 	PORT_INCLUDE( MAHJONG_KEYS )
 
 	/* 2008-06 FP: the following are needed to make happy the read handlers shared with mjelctrn */
+	PORT_START("SW1")
 	PORT_START("DSW2")
 	PORT_START("DSW3")
 	PORT_START("FAKE")
