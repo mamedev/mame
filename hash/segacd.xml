@@ -16,9 +16,9 @@ http://segaretro.org/
 
 <!--
 Currently undumped discs that are known to still exist:
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 |                            Title                            |                               Notes                               |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 | AH3 - ThunderStrike (Prototype)                             |                                                                   |
 | Android Assault (Prototype 19940308)                        |                                                                   |
 | Black Hole Assault (Prototype 19921006)                     |                                                                   |
@@ -41,12 +41,12 @@ Currently undumped discs that are known to still exist:
 | The Terminator (Prototype)                                  |                                                                   |
 | Vay (Prototype 19941006)                                    |                                                                   |
 | What is X'Eye Multi Entertainment System                    |                                                                   |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 
 Announced but never relased games. Probably lost forever:
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 |                            Title                            |                               Notes                               |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 | Akira                                                       |                                                                   |
 | Alexandria                                                  |                                                                   |
 | Alien                                                       |                                                                   |
@@ -123,12 +123,12 @@ Announced but never relased games. Probably lost forever:
 | World Championship Rally                                    |                                                                   |
 | World Series Baseball                                       |                                                                   |
 | Ys IV: Mask of the Sun                                      |                                                                   |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 
 Dumps that are known to exist, but are lost in the aether:
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 |                            Title                            |                               Notes                               |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 | Batman Returns (Prototype)                                  |                                                                   |
 | Cobra Command (Prototype)                                   |                                                                   |
 | Final Fight (Prototype)                                     |                                                                   |
@@ -145,20 +145,20 @@ Dumps that are known to exist, but are lost in the aether:
 | The Secret of Monkey Island                                 | Redump.org dump. http://redump.org/disc/36040/                    |
 | Tomcat Alley (Prototype)                                    |                                                                   |
 | Virtual VCR - Colors of Modern Rock (Prototype)             |                                                                   |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 
 Unlisted dumps:
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 |                            Title                            |                               Notes                               |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 | Sonic the Hedgehog Megamix v4.0b                            | Homebrew hack of Sonic the Hedgehog. It's not listed here due to  |
 |                                                             | the fact that it's a hack of an existing game with no apparent    |
 |                                                             | releases outside ISOs on the Internet.                            |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 | Sonic the Hedgehog CD (Prototype 409)                       | This is a hoax prototype made and released by Nemesis. It wasn't  |
 |                                                             | ever dumped off a disc, but a hack made from existing dumps. As   |
 |                                                             | such it's not listed here.                                        |
-+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––+
++=============================================================+===================================================================+
 -->
 
 <!-- TODO:
@@ -516,7 +516,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="dracula">
+	<software name="draculaa" cloneof="dracula">
 		<!-- Source: redump.org - http://redump.org/disc/3882/
 		<rom name="Bram Stoker's Dracula (USA).cue" size="829" crc="dc1f4075" />
 		<rom name="Bram Stoker's Dracula (USA) (Track 1).bin" size="275525040" crc="9fae63c4" />
@@ -540,7 +540,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="draculaa" cloneof="dracula">
+	<software name="draculab" cloneof="dracula">
 		<!-- Source: redump.org - http://redump.org/disc/17156/
 		<rom name="Bram Stoker's Dracula (USA) (Alt).cue" size="871" crc="55aea57f" />
 		<rom name="Bram Stoker's Dracula (USA) (Alt) (Track 1).bin" size="275525040" crc="9fae63c4" />
@@ -564,7 +564,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="draculab" cloneof="dracula">
+	<software name="dracula">
 		<!-- Source: redump.org - http://redump.org/disc/29309/
 		<rom name="Bram Stoker's Dracula (USA) (Rev A).cue" size="975" crc="219c0525" md5="3dae6cc30ccf1d728dba4d5f8bb8d34c" sha1="7d1e1e09394c01629a7f0a04da4cef735ed280ed"/>
 		<rom name="Bram Stoker's Dracula (USA) (Rev A) (Track 1).bin" size="275525040" crc="60ce4ef0" md5="9bf11502375d74e17f5b835278d99256" sha1="fed388b738f273b56b7f4f2569d5e951079be2bd"/>
@@ -720,7 +720,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="comptonsa" cloneof="comptons">
+	<software name="comptons201r" cloneof="comptons">
 		<!-- Source: redump.org - http://redump.org/disc/20214/
 		<rom name="Compton's Interactive Encyclopedia (USA) (2.01R).cue" size="289" crc="6fc690d9" md5="97a41ab3899c5911900d2bb6d1c95bf0" sha1="679e29f743ab4b02181f5adcfc5d9abf0b432e3d"/>
 		<rom name="Compton's Interactive Encyclopedia (USA) (2.01R) (Track 1).bin" size="380264304" crc="1d9b11c8" md5="1e181c4677a7dd9160f4559c5037a698" sha1="e7e839dbdaf68cf043dc322b4024dcd684218e85"/>
@@ -1014,7 +1014,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="eternalc">
+	<software name="eternalca" cloneof="eternalc">
 		<!-- Source: redump.org - http://redump.org/disc/2263/
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA).cue" size="2813" crc="c12d13d7" />
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (Track 01).bin" size="155641248" crc="5fd53235" />
@@ -1049,7 +1049,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="eternalca" cloneof="eternalc">
+	<software name="eternalc">
 		<!-- Source: redump.org - http://redump.org/disc/19031/
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE).cue" size="2931" crc="c9279545" md5="bad0ff27158810a9b22d5ddeef28b172" sha1="58140771e4544b19bd29e8c979640272593df22f"/>
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE) (Track 01).bin" size="155641248" crc="4a5ecc21" md5="44a65c6270861647d8711a8006209c02" sha1="06ccf19a9d84ed0efc4e8a0a40c22252411f6fe6"/>
@@ -2268,7 +2268,7 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- This is a dump from the original edition. Investigate if the re-release is different. -->
-	<software name="ntrap">
+	<software name="ntrapa" cloneof="ntrap">
 		<!-- Source: redump.org - http://redump.org/disc/17158/ http://redump.org/disc/17159/
 		<rom name="Night Trap (USA) (Disc 1).cue" size="91" crc="b5fae72b" />
 		<rom name="Night Trap (USA) (Disc 1).bin" size="616997808" crc="900cf0aa" />
@@ -2298,7 +2298,7 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- Only the first disk is different from the parent. -->
-	<software name="ntrapa" cloneof="ntrap">
+	<software name="ntrapb" cloneof="ntrap">
 		<!-- Source: redump.org - http://redump.org/disc/20867/ http://redump.org/disc/17159/
 		<rom name="Night Trap (USA) (Disc 1) (Alt).cue" size="97" crc="f2950016" md5="c9261a74b06972b2e1fbf7addc5fb5a0" sha1="2456d059254e74ebaf8b8f17fc665222fa47c323"/>
 		<rom name="Night Trap (USA) (Disc 1) (Alt).bin" size="616645008" crc="133b76ce" md5="6bfe493a225713115096d730edf77afe" sha1="9cd08d3718e17134a013cae92a52a2ac0b226b77"/>
@@ -3406,7 +3406,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="advbatr" supported="no">
+	<software name="advbatr">
 		<!-- Source: redump.org - http://redump.org/disc/16136/
 		<rom name="Adventures of Batman and Robin, The (USA).cue" size="927" crc="28438349" />
 		<rom name="Adventures of Batman and Robin, The (USA) (Track 1).bin" size="161845824" crc="0edec85f" />
@@ -3862,7 +3862,7 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- This disc uses an internal serial number of T-6401 unlike the redump.org dump which has T-6400. Investigate why. -->
-	<software name="blackha" cloneof="balckh">
+	<software name="blackha" cloneof="blackh">
 		<!-- source toseciso
 		<rom name="Blackhole Assault (1993)(Bignet)(NTSC)(US)[!][CDAC-031700 2].cue" size="3639" crc="3595fca2" />
 		<rom name="Blackhole Assault (1993)(Bignet)(NTSC)(US)(Track 01 of 23)[!][CDAC-031700 2].iso" size="12064768" crc="b75afe61" />
@@ -3908,7 +3908,7 @@ See: http://rawdump.net/
 	Good Deal Games released a set of reproduction discs based off a (final) prototype build. This is a dump
 	from one of those reproduction discs.
 	-->
-	<software name="bugblast">
+	<software name="bugblast" cloneof="bugblastse">
 		<!-- source TOSEC-ISO
 		<rom name="Bug Blasters - The Exterminators (2000)(Good Deal Games)(NTSC)(US)(Track 1 of 2).iso" size="492976128" crc="e46108f1" md5="12938bc2a8060529dde71513ec157965" sha1="7f8e7d7f172bfb60a7c53ccce8c1bc934d6bb0bd"/>
 		<rom name="Bug Blasters - The Exterminators (2000)(Good Deal Games)(NTSC)(US)(Track 2 of 2).wav" size="39036188" crc="2514f737" md5="17abb3aba0581b8a3824133dcc7fbbb8" sha1="1fc932cb99a91c4b7b46d8cd7a5b6b558eaf632a"/>
@@ -3931,7 +3931,7 @@ See: http://rawdump.net/
 	Good Deal Games released a set of reproduction discs based off a (final) prototype build. A later
 	production run, called Special Edition, is the basis for this dump.
 	-->
-	<software name="bugblastse" cloneof="bugblast">
+	<software name="bugblastse">
 		<!-- source TOSEC-ISO
 		<rom name="Bug Blasters - The Exterminators (2003)(Good Deal Games)(US)(Track 1 of 2)[!][Special Edition].iso" size="492976128" crc="b075d182" md5="6355c5edff71253657a2fea615e4c1d9" sha1="3309530e9a8365a62b7644a066397907c392f7df"/>
 		<rom name="Bug Blasters - The Exterminators (2003)(Good Deal Games)(US)(Track 2 of 2)[!][Special Edition].wav" size="39036188" crc="ac3f1d80" md5="6037ed6379d9cdc1aee4c6906832bfeb" sha1="f97c6d45c2e25da8c6a9cf386eec7f911ebd8c6a"/>
@@ -3982,7 +3982,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="dino2b" cloneof="dino2">
+	<software name="dino2br" cloneof="dino2">
 		<!-- Source: TOSEC-ISO
 		<rom name="Cadillacs and Dinosaurs - The Second Cataclysm (1994)(Sega - Tec Toy)(NTSC)(Br)(en)[!].cue" size="369" crc="250e2bf0" />
 		<rom name="Cadillacs and Dinosaurs - The Second Cataclysm (1994)(Sega - Tec Toy)(NTSC)(Br)(en)(Track 1 of 2)[!].iso" size="567900160" crc="0def7fd1" />
@@ -4055,7 +4055,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="dlaird" cloneof="dlair">
+	<software name="dlairdemo" cloneof="dlair">
 		<!-- Source: TOSEC-ISO
 		<rom name="Dragon's Lair - Demo CD (1993)(ReadySoft)(NTSC)(US).cue" size="140" crc="186a5613" />
 		<rom name="Dragon's Lair - Demo CD (1993)(ReadySoft)(NTSC)(US).iso" size="12802048" crc="22189e3c" />
@@ -4362,7 +4362,7 @@ See: http://rawdump.net/
 		<rom name="Links - The Challenge of Golf (1994)(Virgin)(NTSC)(US)(Track 1 of 2)[!][SEGAT70095 R1J].iso" size="530802688" crc="4139c33c" />
 		<rom name="Links - The Challenge of Golf (1994)(Virgin)(NTSC)(US)(Track 2 of 2)[!][SEGAT70095 R1J].wav" size="705644" crc="6eddd6e8" />
 		-->
-		<description>Links - The Challenge of Golf (USA)</description>
+		<description>Links - The Challenge of Golf (USA, Alt)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70095"/>
@@ -4380,7 +4380,7 @@ See: http://rawdump.net/
 		<rom name="Links - The Challenge of Golf (1994)(Virgin)(NTSC)(US)(Track 1 of 2)[!][SEGAT70095RE R1J].iso" size="497592320" crc="b05bc99a" />
 		<rom name="Links - The Challenge of Golf (1994)(Virgin)(NTSC)(US)(Track 2 of 2)[!][SEGAT70095RE R1J].wav" size="705644" crc="dfb596bb" />
 		-->
-		<description>Links - The Challenge of Golf (USA, Alt)</description>
+		<description>Links - The Challenge of Golf (USA)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70095"/>
@@ -4793,7 +4793,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="spaceaced" cloneof="spaceace">
+	<software name="spaceacedemo" cloneof="spaceace">
 		<!-- Source: TOSEC-ISO
 		<rom name="Space Ace - Demo Disc (1994)(ReadySoft)(NTSC)(US).cue" size="138" crc="b931b4d1" />
 		<rom name="Space Ace - Demo Disc (1994)(ReadySoft)(NTSC)(US).iso" size="8802304" crc="884f4f1f" />
@@ -5249,6 +5249,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
+<!--
 	<software name="colrmech">
 		<description>Color Mechanica (USA)</description>
 		<year>2013</year>
@@ -5260,9 +5261,11 @@ See: http://rawdump.net/
 			</diskarea>
 		</part>
 	</software>
+-->
 
 	<!-- This was exclusively bundled with the JVC X'Eye console -->
-	<software name="comptonsb" cloneof="comptons">
+<!--
+	<software name="comptons200s" cloneof="comptons">
 		<description>Compton's Interactive Encyclopedia v2.00S (USA)</description>
 		<year>1994</year>
 		<publisher>Compton's NewMedia</publisher>
@@ -5273,9 +5276,10 @@ See: http://rawdump.net/
 			</diskarea>
 		</part>
 	</software>
+-->
 
 	<!-- This was exclusively bundled with the JVC X'Eye console -->
-	<software name="comptonsc" cloneof="comptons">
+	<software name="comptons201s" cloneof="comptons">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Compton&apos;s Interactive Encyclopedia (Bundled with JVC X&apos;Eye RG-M10BU) (1994)(Compton&apos;s NewMedia)(US) - [05041994].ccd" size="932" crc="bb889eac" md5="f4533ef4fe6e085fb014f7dd699301e1" sha1="1958362b0de44c13f353ef71975d7b4f25fd2b2f"/>
 		<rom name="Media (CD-ROM)\Compton&apos;s Interactive Encyclopedia (Bundled with JVC X&apos;Eye RG-M10BU) (1994)(Compton&apos;s NewMedia)(US) - [05041994].img" size="222993120" crc="9ba98ddd" md5="231f593dd27b48d83f0337f2e3b37332" sha1="1d9c41457269c14ca4e6f5090c1554849adf13bd"/>
@@ -5408,7 +5412,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="frogd" cloneof="frog">
+	<software name="frogdemo" cloneof="frog">
 		<!-- Source: http://frogfeast.rastersoft.net/SegaCD.html
 		<rom name="Frog.iso" size="411648" crc="d96c1966" />
 		-->
@@ -5513,6 +5517,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
+<!--
 	<software name="musijpbr">
 		<description>Music from the Sega CD Games - Jurassic Park, Batman Returns (USA)</description>
 		<year>1993</year>
@@ -5523,6 +5528,7 @@ See: http://rawdump.net/
 			</diskarea>
 		</part>
 	</software>
+-->
 
 	<software name="mypaint">
 		<!-- Source: TruRip
@@ -5559,7 +5565,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="ntraprr" cloneof="ntrap">
+	<software name="ntrap">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Night Trap (Rerelease) (1994)(Digital Pictures)(US) - (Disc 1 of 2).ccd" size="934" crc="a9d84328" md5="2d6273e67c6602ac5756c3dedabe23ca" sha1="7534eaccfd1977956f36e7492516e0252a111e79"/>
 		<rom name="Media (CD-ROM)\Night Trap (Rerelease) (1994)(Digital Pictures)(US) - (Disc 1 of 2).img" size="619613232" crc="7cb50000" md5="6061e5642a6070ca6e46269386f4cf06" sha1="53693355efedd1b5afdb24aca323697c860ffd46"/>
@@ -5717,7 +5723,8 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="surgical">
+	<!--
+	<software name="surgical32x" cloneof="surgical">
 		<description>Surgical Strike (Bra, 32X)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -5729,6 +5736,7 @@ See: http://rawdump.net/
 			</diskarea>
 		</part>
 	</software>
+	-->
 
 	<!-- Sourced from the hiddenpalace forums - http://hiddenpalace.org/forums/viewtopic.php?t=2880 -->
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
@@ -5812,11 +5820,12 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<!--
+<!--
 	This game was developed for the Sega Mega-CD system by Virtual Studio and was released in Europe.
 	A stateside release never happened, but in 2014 Good Deal Games released a set of reproduction disc
 	made from a prototype build of the US version of the game.
 	-->
+	<!--
 	<software name="smurfs">
 		<description>The Smurfs (USA, Prototype)</description>
 		<year>2014</year>
@@ -5827,6 +5836,7 @@ See: http://rawdump.net/
 			</diskarea>
 		</part>
 	</software>
+-->
 
 	<software name="cobra">
 		<!-- Source: TruRip
@@ -5848,7 +5858,7 @@ See: http://rawdump.net/
 
 	<!-- Is the Good Deal Games disc based off this dump? -->
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
-	<software name="timecopa" cloneof="timecop">
+	<software name="timecopp" cloneof="timecop">
 		<description>Timecop (USA, Early Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5859,6 +5869,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
+<!--
 	<software name="wixeye">
 		<description>What is X'Eye Multi Entertainment System (USA)</description>
 		<year>1993?</year>
@@ -5870,6 +5881,7 @@ See: http://rawdump.net/
 			</diskarea>
 		</part>
 	</software>
+-->
 
 	<software name="wolfchld">
 		<!-- Source: TruRip
