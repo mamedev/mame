@@ -684,38 +684,44 @@ static void thom_get_file(thom_floppy* f, unsigned head,
 	int nbblocks = thom_nb_blocks(f);
 	int block = d->firstblock;
 	if ( block >= nbblocks ) return;
-	while ( 1 ) {
-	int nextblock = fat[ block + 1 ];
-	int track = block / 2;
-	int firstsect = (block % 2) ? 9 : 1;
-	if ( nextblock < nbblocks ) {
-		/* full block */
-		int i;
-		for ( i = 0; i < 8; i++ ) {
-	UINT8* data = thom_get_sector( f, head, track, firstsect + i );
-	dst.write(data, f->sectuse_size);
+	while ( 1 )
+	{
+		int nextblock = fat[ block + 1 ];
+		int track = block / 2;
+		int firstsect = (block % 2) ? 9 : 1;
+		if ( nextblock < nbblocks )
+		{
+			/* full block */
+			int i;
+			for ( i = 0; i < 8; i++ )
+			{
+				UINT8* data = thom_get_sector( f, head, track, firstsect + i );
+				dst.write(data, f->sectuse_size);
+			}
+			block = fat[ block + 1 ];
 		}
-		block = fat[ block + 1 ];
-	}
-	else if ( nextblock >= 0xc1 && nextblock <= 0xc8 ) {
-		/* last block in file */
-		int i;
-		UINT8* data;
-		for ( i = 0; i < nextblock - 0xc1; i++ ) {
-	data = thom_get_sector( f, head, track, firstsect + i );
-	dst.write(data, f->sectuse_size);
+		else if ( nextblock >= 0xc1 && nextblock <= 0xc8 )
+		{
+			/* last block in file */
+			int i;
+			UINT8* data;
+			for ( i = 0; i < nextblock - 0xc1; i++ )
+			{
+				data = thom_get_sector( f, head, track, firstsect + i );
+				dst.write(data, f->sectuse_size);
+			}
+			data = thom_get_sector( f, head, track, firstsect + i );
+			dst.write(data, d->lastsectsize);
+			return;
 		}
-		data = thom_get_sector( f, head, track, firstsect + i );
-		dst.write(data, d->lastsectsize);
-		return;
-	}
-	else {
-		/* invalid, assume last block */
-		UINT8* data = thom_get_sector( f, head, track, firstsect );
-		dst.write(data, d->lastsectsize);
-		return;
-	}
-	block = nextblock;
+		else
+		{
+			/* invalid, assume last block */
+			UINT8* data = thom_get_sector( f, head, track, firstsect );
+			dst.write(data, d->lastsectsize);
+			return;
+		}
+		block = nextblock;
 	}
 }
 
@@ -760,14 +766,14 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 	/* store data, full sectors */
 	for ( i = 0; i < 8 && size > f->sectuse_size; i++ ) {
 		UINT8* dst = thom_get_sector( f, head, track, firstsect + i );
-		src.read(dst, f->sectuse_size );
+		src.read(dst, f->sectuse_size);
 		size -= f->sectuse_size;
 	}
 
 	/* store data, last sector */
 	if ( i < 8 ) {
 		UINT8* dst = thom_get_sector( f, head, track, firstsect + i );
-		src.read(dst, size );
+		src.read(dst, size);
 		fat[ block + 1 ] = 0xc1 + i;
 		d->lastsectsize = size;
 		break;
@@ -1409,49 +1415,55 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
 	}
 	org->seek(3, SEEK_SET); /* skip header */
 
-	while ( 1 ) {
-	int in_str = 0, in_fun = 0;
-	int linelength, linenum;
+	while ( 1 )
+	{
+		int in_str = 0, in_fun = 0;
+		int linelength, linenum;
 
-	/* line header: line length and line number */
-	/* I am not sure this is 100% correct but it works in many cases */
-	if ( org->read(buf, 2 ) < 2 ) goto end;
-	linelength = ((int)buf[0] << 8) + (int)buf[1] - 4;
-	if ( linelength <= 0 ) goto end;
-	if ( org->read(buf, 2 ) < 2 ) goto end;
-	linenum = ((int)buf[0] << 8) + buf[1];
-	dst.printf( "%u ", linenum );
+		/* line header: line length and line number */
+		/* I am not sure this is 100% correct but it works in many cases */
+		if ( org->read(buf, 2 ) < 2 ) goto end;
+		linelength = ((int)buf[0] << 8) + (int)buf[1] - 4;
+		if ( linelength <= 0 ) goto end;
+		if ( org->read(buf, 2 ) < 2 ) goto end;
+		linenum = ((int)buf[0] << 8) + buf[1];
+		dst.printf( "%u ", linenum );
 
-	/* process line */
-	for ( i = 0; i < linelength; i++ ) {
-		UINT8 c;
-		if ( org->read(&c, 1 ) < 1 ) break;
-		if ( c == 0 ) {
-	/* Sometimes, linelength seems wrong and we must rely on the fact that
-	   BASIC lines are 0-terminated.
-	   At other times, there are 0 embedded within lines or extra stuff
-	   between the 0 and the following line, and so, we must rely
-	   on linelength to cut the line (!)
-	*/
-	if ( linelength > 256 ) break;
+		/* process line */
+		for ( i = 0; i < linelength; i++ )
+		{
+			UINT8 c;
+			if ( org->read(&c, 1 ) < 1 ) break;
+			if ( c == 0 )
+			{
+				/* Sometimes, linelength seems wrong and we must rely on the fact that
+				   BASIC lines are 0-terminated.
+				   At other times, there are 0 embedded within lines or extra stuff
+				   between the 0 and the following line, and so, we must rely
+				   on linelength to cut the line (!)
+				*/
+				if ( linelength > 256 ) break;
+			}
+			else if ( c == 0xff && ! in_str ) in_fun = 1; /* function prefix */
+			else
+			{
+				if ( c >= 0x80 && ! in_str )
+				{
+					/* token */
+					const char* token = table[ in_fun ][ c - 0x80 ];
+					if ( token ) dst.puts(token );
+					else dst.puts("???" );
+				}
+				else
+				{
+					/* regular character */
+					if ( c == '"' ) in_str = 1 - in_str;
+					dst.putc( c ); /* normal letter */
+				}
+				in_fun = 0;
+			}
 		}
-		else if ( c == 0xff && ! in_str ) in_fun = 1; /* function prefix */
-		else {
-	if ( c >= 0x80 && ! in_str ) {
-		/* token */
-		const char* token = table[ in_fun ][ c - 0x80 ];
-		if ( token ) dst.puts(token );
-		else dst.puts("???" );
-	}
-	else {
-		/* regular character */
-		if ( c == '"' ) in_str = 1 - in_str;
-		dst.putc( c ); /* normal letter */
-	}
-	in_fun = 0;
-		}
-	}
-	dst.putc( '\n' );
+		dst.putc( '\n' );
 	}
 	end:
 
