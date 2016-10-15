@@ -12,6 +12,7 @@
 #include "formats/flopimg.h"
 #include "formats/d88_dsk.h"
 #include "formats/dfi_dsk.h"
+#include "formats/hxchfe_dsk.h"
 #include "formats/hxcmfm_dsk.h"
 #include "formats/imd_dsk.h"
 #include "formats/ipf_dsk.h"
@@ -42,6 +43,7 @@
 		, \
 		FLOPPY_D88_FORMAT, \
 		FLOPPY_DFI_FORMAT, \
+		FLOPPY_HFE_FORMAT, \
 		FLOPPY_IMD_FORMAT, \
 		FLOPPY_IPF_FORMAT, \
 		FLOPPY_MFI_FORMAT, \

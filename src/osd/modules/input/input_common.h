@@ -202,6 +202,7 @@ class device_info
 
 private:
 	std::string             m_name;
+	std::string             m_id;
 	input_device *          m_device;
 	running_machine &       m_machine;
 	input_module &          m_module;
@@ -209,8 +210,9 @@ private:
 
 public:
 	// Constructor
-	device_info(running_machine &machine, const char *name, input_device_class deviceclass, input_module &module)
+	device_info(running_machine &machine, const char *name, const char *id, input_device_class deviceclass, input_module &module)
 		: m_name(name),
+		m_id(id),
 		m_device(nullptr),
 		m_machine(machine),
 		m_module(module),
@@ -224,6 +226,7 @@ public:
 	// Getters
 	running_machine &         machine() const { return m_machine; }
 	const char *              name() const { return m_name.c_str(); }
+	const char *              id() const { return m_id.c_str(); }
 	input_device *            device() const { return m_device; }
 	input_module &            module() const { return m_module; }
 	input_device_class        deviceclass() const { return m_deviceclass; }
@@ -251,8 +254,8 @@ protected:
 	virtual void process_event(TEvent &ev) = 0;
 
 public:
-	event_based_device(running_machine &machine, const char *name, input_device_class deviceclass, input_module &module)
-		: device_info(machine, name, deviceclass, module)
+	event_based_device(running_machine &machine, const char *name, const char *id, input_device_class deviceclass, input_module &module)
+		: device_info(machine, name, id, deviceclass, module)
 	{
 	}
 
@@ -327,13 +330,13 @@ public:
 	}
 
 	template <typename TActual, typename... TArgs>
-	TActual* create_device(running_machine &machine, const char *name, input_module &module, TArgs&&... args)
+	TActual* create_device(running_machine &machine, const char *name, const char *id, input_module &module, TArgs&&... args)
 	{
 		// allocate the device object
-		auto devinfo = std::make_unique<TActual>(machine, name, module, std::forward<TArgs>(args)...);
+		auto devinfo = std::make_unique<TActual>(machine, name, id, module, std::forward<TArgs>(args)...);
 
 		// Add the device to the machine
-		devinfo->m_device = machine.input().device_class(devinfo->deviceclass()).add_device(devinfo->name(), devinfo.get());
+		devinfo->m_device = machine.input().device_class(devinfo->deviceclass()).add_device(devinfo->name(), devinfo->id(), devinfo.get());
 
 		// append us to the list
 		m_list.push_back(std::move(devinfo));

@@ -706,6 +706,7 @@ public:
 	struct {
 		float modelview[4][4];
 		float modelview_inverse[4][4];
+		float composite[4][4];
 		float projection[4][4];
 		float translate[4];
 		float scale[4];

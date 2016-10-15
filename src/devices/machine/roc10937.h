@@ -40,6 +40,16 @@
 #define MCFG_MSC1937_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
+#define MCFG_MIC10937_ADD(_tag,_val) \
+		MCFG_DEVICE_ADD(_tag, MIC10937,60)\
+		MCFG_MIC10937_PORT(_val)
+
+#define MCFG_MIC10937_PORT(_val) \
+	MCFG_ROC10937_PORT(_val)
+
+#define MCFG_MIC10937_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
+
 #define MCFG_S16LF01_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, S16LF01,60)\
 		MCFG_S16LF01_PORT(_val)
@@ -95,6 +105,11 @@ public:
 	msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class mic10937_t : public rocvfd_t {
+public:
+	mic10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class roc10957_t : public rocvfd_t {
 public:
 	roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -109,6 +124,7 @@ public:
 
 extern const device_type ROC10937;
 extern const device_type MSC1937;
+extern const device_type MIC10937;
 extern const device_type ROC10957;
 extern const device_type S16LF01;
 

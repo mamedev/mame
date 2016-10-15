@@ -440,7 +440,7 @@ ADDRESS_MAP_END
 // TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
 READ16_MEMBER(artmagic_state::shtstar_unk_r)
 {
-	// bits 7-4 should be 0 
+	// bits 7-4 should be 0
 	// bit 2 and 0 are status ready related.
 	return 4 | 1; //machine().rand();
 }

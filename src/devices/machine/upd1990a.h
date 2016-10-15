@@ -22,6 +22,7 @@
 #define __UPD1990A__
 
 #include "emu.h"
+#include "dirtc.h"
 
 
 

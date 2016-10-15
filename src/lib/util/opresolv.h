@@ -45,33 +45,35 @@
 #include <vector>
 #include <string>
 
+#include "coretmpl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-#define OPTION_GUIDE_START(option_guide_)														\
-	namespace option_guide_impl_##option_guide_													\
-	{																							\
-		static const util::option_guide &get();													\
-	};																							\
-	const util::option_guide &option_guide_ = option_guide_impl_##option_guide_::get();			\
-	namespace option_guide_impl_##option_guide_													\
-	{																							\
+#define OPTION_GUIDE_START(option_guide_)                                                       \
+	namespace option_guide_impl_##option_guide_                                                 \
+	{                                                                                           \
+		static const util::option_guide &get();                                                 \
+	};                                                                                          \
+	const util::option_guide &option_guide_ = option_guide_impl_##option_guide_::get();         \
+	namespace option_guide_impl_##option_guide_                                                 \
+	{                                                                                           \
 		static const auto actual = util::make_option_guide(0
-#define OPTION_GUIDE_END																		\
-		);																						\
-		static const util::option_guide &get() { return actual; }								\
-	};	
-#define OPTION_GUIDE_EXTERN(option_guide_)														\
+#define OPTION_GUIDE_END                                                                        \
+		);                                                                                      \
+		static const util::option_guide &get() { return actual; }                               \
+	};
+#define OPTION_GUIDE_EXTERN(option_guide_)                                                      \
 	extern const util::option_guide &option_guide_
-#define OPTION_INT(option_char, identifier, display_name)										\
+#define OPTION_INT(option_char, identifier, display_name)                                       \
 	,util::option_guide::entry(util::option_guide::entry::option_type::INT, (option_char), (identifier), (display_name))
-#define OPTION_STRING(option_char, identifier, display_name)                					\
+#define OPTION_STRING(option_char, identifier, display_name)                                    \
 	,util::option_guide::entry(util::option_guide::entry::option_type::STRING, (option_char), (identifier), (display_name))
-#define OPTION_ENUM_START(option_char, identifier, display_name)            					\
+#define OPTION_ENUM_START(option_char, identifier, display_name)                                \
 	,util::option_guide::entry(util::option_guide::entry::option_type::ENUM_BEGIN, (option_char), (identifier), (display_name))
-#define OPTION_ENUM(value, identifier, display_name)                        					\
+#define OPTION_ENUM(value, identifier, display_name)                                            \
 	,util::option_guide::entry(util::option_guide::entry::option_type::ENUM_VALUE, (value), (identifier), (display_name))
 #define OPTION_ENUM_END
 
@@ -109,28 +111,26 @@ public:
 		int parameter() const { return m_parameter; }
 		const char *identifier() const { return m_identifier; }
 		const char *display_name() const { return m_display_name; }
-	
+
 	private:
-		option_type	m_type;
-		int			m_parameter;
+		option_type m_type;
+		int         m_parameter;
 		const char *m_identifier;
 		const char *m_display_name;
 	};
 
 	// methods
-	const entry *begin() const { return m_begin; }
-	const entry *end() const { return m_end; }
+	const util::contiguous_sequence_wrapper<const entry> &entries() const { return m_entries; }
 
 protected:
-	option_guide(const entry *begin, const entry *end)
-		: m_begin(begin), m_end(end)
+	option_guide(const entry *begin, size_t count)
+		: m_entries(begin, count)
 	{
 	}
 
 
 private:
-	const entry *m_begin;
-	const entry *m_end;
+	util::contiguous_sequence_wrapper<const entry> m_entries;
 };
 
 // ======================> option_guide_impl
@@ -142,7 +142,7 @@ public:
 	template<typename... T>
 	option_guide_impl(T &&... elems)
 		: std::array<option_guide::entry, Count>({ std::forward<T>(elems)... })
-		, option_guide(&(*this)[0], &(*this)[0] + Count)
+		, option_guide(Count > 0 ? &(*this)[0] : nullptr, Count)
 	{
 	}
 };
@@ -222,15 +222,15 @@ public:
 
 	private:
 		// references to the option guide
-		const option_guide::entry &				m_guide_entry;
-		const option_guide::entry *				m_enum_value_begin;
-		const option_guide::entry *				m_enum_value_end;
+		const option_guide::entry &             m_guide_entry;
+		const option_guide::entry *             m_enum_value_begin;
+		const option_guide::entry *             m_enum_value_end;
 
 		// runtime state
-		bool									m_is_pertinent;
-		std::string								m_value;
-		std::string								m_default_value;
-		rangelist								m_ranges;
+		bool                                    m_is_pertinent;
+		std::string                             m_value;
+		std::string                             m_default_value;
+		rangelist                               m_ranges;
 
 		// methods
 		void parse_specification(const char *specification);

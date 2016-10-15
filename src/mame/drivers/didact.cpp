@@ -10,7 +10,8 @@
  * and BASIC for electro mechanical applications such as stepper motors, simple process control, buttons
  * and LED:s. Didact designs were marketed by Esselte Studium to the swedish schools. The Candela computer
  * was designed to be the big breakthough and was based on OS9 but lost the battle of the swedish schools to
- * the Compis computer by TeleNova which was based on CP/M initially but later both lost to IBM PC.
+ * the Compis computer by TeleNova which was based on CP/M initially but later both lost to IBM PC. There was
+ * also an Esselte 1000 which was an educational package based on Apple II plus software and litterature.
  *
  * Misc links about the boards supported by this driver.
  *-----------------------------------------------------
@@ -22,17 +23,18 @@
  *  TODO:
  *  Didact designs:    mp68a, md6802, Modulab, Esselte 100, Candela
  * --------------------------------------------------------------------------
- *  - Add PCB layouts   OK     OK				 OK
- *  - Dump ROM:s,       OK     OK				 rev2
- *  - Keyboard          OK     OK				 rev2
- *  - Display/CRT       OK     OK				 OK
+ *  - Add PCB layouts   OK     OK                OK
+ *  - Dump ROM:s,       OK     OK                rev2
+ *  - Keyboard          OK     OK                rev2
+ *  - Display/CRT       OK     OK                OK
  *  - Clickable Artwork RQ     RQ
  *  - Sound             NA     NA
- *  - Cassette i/f								 OK
+ *  - Cassette i/f                               OK
  *  - Expansion bus
  *  - Expansion overlay
  *  - Interrupts        OK                       OK
- *
+ *  - Serial                   XX                XX
+ *   XX = needs debug
  ****************************************************************************/
 
 #include "emu.h"
@@ -41,6 +43,7 @@
 #include "video/dm9368.h"    // For the mp68a
 #include "machine/74145.h"   // For the md6802 and e100
 #include "imagedev/cassette.h"
+#include "bus/rs232/rs232.h"
 // Generated artwork includes
 #include "mp68a.lh"
 #include "md6802.lh"
@@ -49,7 +52,8 @@
 
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x) {}
-#define LOGSCAN(x) LOGPRINT(x)
+#define LOGSCAN(x) {}
+#define LOGSER(x) LOGPRINT(x)
 #define LOGSCREEN(x) {}
 #define RLOG(x) {}
 #define LOGCS(x) {}
@@ -85,6 +89,7 @@ class didact_state : public driver_device
 		,m_reset(0)
 		,m_shift(0)
 		,m_led(0)
+		,m_rs232(*this, "rs232")
 		{ }
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
@@ -98,6 +103,7 @@ class didact_state : public driver_device
 	UINT8 m_reset;
 	UINT8 m_shift;
 	UINT8 m_led;
+	optional_device<rs232_port_device> m_rs232;
 	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
 };
 
@@ -181,11 +187,6 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 	m_line2 = m_io_line2->read();
 	m_line3 = m_io_line3->read();
 
-#if VERBOSE > 2
-	if ((m_line0 | m_line1 | m_line2 | m_line3) != 0)
-		LOG(("%s()-->%02x %02x %02x %02x modified by %02x displaying %02x\n", FUNCNAME, m_line0, m_line1, m_line2, m_line3, m_shift, ls145));
-#endif
-
 	// Mask out those rows that has a button pressed
 	pa &= ~(((~m_line0 & ls145 ) != 0) ? 1 : 0);
 	pa &= ~(((~m_line1 & ls145 ) != 0) ? 2 : 0);
@@ -198,10 +199,8 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 		LOG( ("SHIFT is pressed\n") );
 	}
 
-#if VERBOSE > 2
-	if ((m_line0 | m_line1 | m_line2 | m_line3) != 0)
-		LOG(("%s()-->LINE: 0:%02x 1:%02x 2:%02x 3:%02x SHIFT:%02x LS145:%02x PA:%02x\n", FUNCNAME, m_line0, m_line1, m_line2, m_line3, m_shift, ls145, pa));
-#endif
+	// Serial IN - needs debug/verification
+	pa &= (m_rs232->rxd_r() != 0 ? 0xff : 0x7f);
 
 	return pa;
 }
@@ -242,6 +241,10 @@ WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 {
 	LOG(("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state));
 	output().set_led_value(m_led, !state);
+
+	// Serial Out - needs debug/verification
+	m_rs232->write_txd(state);
+
 	m_shift = !state;
 }
 
@@ -353,11 +356,6 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 {
 	UINT8 digit_nbr;
 
-#if 0
-	static UINT8 display[] = {' ',' ',' ',' ',' ',' ',' ',' ','\0'};
-	const UINT8 hex[] = {' ','0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-#endif
-
 	/* Display memory is at $702 to $708 in AAAADD format (A=address digit, D=Data digit)
 	   but we are using data read from the port. */
 	digit_nbr = (data >> 4) & 0x07;
@@ -375,11 +373,6 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 	case 7: break; // used as an 'unselect' by the ROM between digit accesses.
 	default: logerror("Invalid digit index %d\n", digit_nbr);
 	}
-
-#if 0
-	display[(data >> 4) & 0x07] = hex[data & 0x0f];
-	LOG(("--->%s(%02x) ==> %s\n", FUNCNAME, data, display));
-#endif
 }
 
 READ8_MEMBER( mp68a_state::pia2_kbB_r )
@@ -542,6 +535,10 @@ public:
 	DECLARE_WRITE8_MEMBER( pia1_kbA_w );
 	DECLARE_READ8_MEMBER( pia1_kbB_r );
 	DECLARE_WRITE8_MEMBER( pia1_kbB_w );
+	DECLARE_READ_LINE_MEMBER( pia1_ca1_r );
+	DECLARE_READ_LINE_MEMBER( pia1_cb1_r );
+	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
 protected:
 	required_device<pia6821_device> m_pia1;
@@ -701,27 +698,78 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
   PB0-PB3 is connected to U601 (74LS145) which select a column to scan
   PB4-PB5 together with CA1, CA2, CB1 and CB2 are used for the printer interface
   PB6-PB7 forms the cassette interface
+
+  The serial bitbanging perform enreliable atm, can be poor original code or inexact CPU timing.
+  Best results is achieved with 8 bit at 9600 baud as follows:
+
+    mame e100 -window -rs232 null_modem -bitbngr socket.127.0.0.1:4321
+
+  Start the favourite Telnet client towards the 4321 port and exit the startup screen of MAME.
+  At the "Esselte 100 #" prompt change to 8 bit communication and start the terminal mode:
+
+   POKE (69,1)
+   TERM(9600)
+
+  It is now possible to send characters from the Esselte screen to the Telnet terminal. When a
+  carriage return has been sent to the terminal the Esselte 100 goes into receiving mode until
+  it receives a carriage return from the terminal at which point it will start sending again.
+
+  TODO:
+  - Fix key mapping of the Ctl-PI exit sequence to get out of the TERM mode.
+  - Fix timing issues for the PIA bit banging, could be related to that the CPU emulation is not
+    cycle exact or the ROM code is buggy
 */
+#define SERIAL_OUT 0x10
+#define SERIAL_IN  0x20
+#define CASS_OUT   0x40
+#define CASS_IN    0x80
 WRITE8_MEMBER( e100_state::pia1_kbB_w )
 {
 	UINT8 col;
 
 	// Keyboard
-	//	if (VERBOSE && data != m_pia1_B) LOGSCAN(("%s(%02x)\n", FUNCNAME, data));
+	//  if (VERBOSE && data != m_pia1_B) LOGSCAN(("%s(%02x)\n", FUNCNAME, data));
 	m_pia1_B = data;
 	col = data & 0x0f;
 	m_kbd_74145->write( col );
 
 	// Cassette
-	m_cassette->output(data & 0x40 ? 1.0 : -1.0);
+	m_cassette->output(data & CASS_OUT ? 1.0 : -1.0);
+
+	// Serial
+	m_rs232->write_txd(data & SERIAL_OUT ? 0 : 1);
 }
 
 READ8_MEMBER( e100_state::pia1_kbB_r )
 {
-	m_pia1_B &= 0x7F;
-	m_pia1_B |= (m_cassette->input() > 0.03 ? 0x80 : 0x00);
+	m_pia1_B &= ~(CASS_IN|SERIAL_IN);
+
+	m_pia1_B |= (m_cassette->input() > 0.03 ? CASS_IN : 0x00);
+
+	m_pia1_B |= (m_rs232->rxd_r() != 0 ? SERIAL_IN : 0x00);
 
 	return m_pia1_B;
+}
+
+READ_LINE_MEMBER(e100_state::pia1_ca1_r)
+{
+	// TODO: Make this a slot device for time meassurements
+	return ASSERT_LINE;  // Default is handshake for serial port TODO: Fix RS 232 handshake as default
+}
+
+READ_LINE_MEMBER(e100_state::pia1_cb1_r)
+{
+	return m_rs232->rxd_r();
+}
+
+WRITE_LINE_MEMBER(e100_state::pia1_ca2_w)
+{
+	// TODO: Make this a slot device to trigger time meassurements
+}
+
+WRITE_LINE_MEMBER(e100_state::pia1_cb2_w)
+{
+	m_rs232->write_txd(!state);
 }
 
 // This map is derived from info in "TEMAL 100 - teknisk manual Esselte 100"
@@ -758,106 +806,106 @@ ADDRESS_MAP_END
  * - The 'REPT' key has a so far unknown function
  */
 static INPUT_PORTS_START( e100 )
-/*	Bits read on PIA1 A when issueing line number on PIA1 B bits 0-3 through a 74145 demultiplexer */
+/*  Bits read on PIA1 A when issueing line number on PIA1 B bits 0-3 through a 74145 demultiplexer */
 	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD) 								PORT_CODE(KEYCODE_SPACE)		PORT_CHAR(' ')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD) 								PORT_CODE(KEYCODE_LSHIFT)		PORT_CODE(KEYCODE_RSHIFT)		PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD) 								PORT_CODE(KEYCODE_LCONTROL)		PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)	PORT_NAME("REPT") /* Not mapped yet */
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_LSHIFT)       PORT_CODE(KEYCODE_RSHIFT)       PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_LCONTROL)     PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)   PORT_NAME("REPT") /* Not mapped yet */
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_UNUSED)
 
 	PORT_START("LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_Z)  			PORT_CHAR('z')	PORT_CHAR('Z')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_A)  			PORT_CHAR('a')	PORT_CHAR('A')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_Q)  			PORT_CHAR('q')  PORT_CHAR('Q')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_1)  			PORT_CHAR('1')	PORT_CHAR('!')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_Z)            PORT_CHAR('z')  PORT_CHAR('Z')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_A)            PORT_CHAR('a')  PORT_CHAR('A')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_Q)            PORT_CHAR('q')  PORT_CHAR('Q')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_1)            PORT_CHAR('1')  PORT_CHAR('!')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_UNUSED)
 
 	PORT_START("LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_PLUS_PAD)  	PORT_CHAR('+')
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_MINUS_PAD)	PORT_CHAR('-')
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_X)  			PORT_CHAR('x')  PORT_CHAR('X')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_S)  			PORT_CHAR('s')  PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_W)  			PORT_CHAR('w')  PORT_CHAR('W')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_2)  			PORT_CHAR('2')  PORT_CHAR('"')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_SLASH_PAD)  	PORT_CHAR('/')
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_ASTERISK)		PORT_CHAR('*')
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_PLUS_PAD)     PORT_CHAR('+')
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_MINUS_PAD)    PORT_CHAR('-')
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_X)            PORT_CHAR('x')  PORT_CHAR('X')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_S)            PORT_CHAR('s')  PORT_CHAR('S')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_W)            PORT_CHAR('w')  PORT_CHAR('W')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_2)            PORT_CHAR('2')  PORT_CHAR('"')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_SLASH_PAD)    PORT_CHAR('/')
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_ASTERISK)     PORT_CHAR('*')
 
 	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_COLON) 		PORT_CHAR(0xF6) PORT_CHAR(0xD6)
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_STOP) 		PORT_CHAR('.')  PORT_CHAR(':')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_L)  			PORT_CHAR('l')  PORT_CHAR('L')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_O)  			PORT_CHAR('o')  PORT_CHAR('O')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_9)  			PORT_CHAR(')')  PORT_CHAR('9')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_P)  			PORT_CHAR('p')  PORT_CHAR('P')
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_0)  			PORT_CHAR('0')  PORT_CHAR('=')
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_COLON)        PORT_CHAR(0xF6) PORT_CHAR(0xD6)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.')  PORT_CHAR(':')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_L)            PORT_CHAR('l')  PORT_CHAR('L')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_O)            PORT_CHAR('o')  PORT_CHAR('O')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_9)            PORT_CHAR(')')  PORT_CHAR('9')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_P)            PORT_CHAR('p')  PORT_CHAR('P')
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_0)            PORT_CHAR('0')  PORT_CHAR('=')
 
 	PORT_START("LINE4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR(0xE4) PORT_CHAR(0xC4)
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_SLASH)		PORT_CHAR('-')  PORT_CHAR('_')
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_COMMA)		PORT_CHAR(',')  PORT_CHAR(';')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_K)  			PORT_CHAR('k')  PORT_CHAR('K')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_I)  			PORT_CHAR('i')  PORT_CHAR('I')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_8)  			PORT_CHAR('8')  PORT_CHAR('(')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_OPENBRACE) 	PORT_CHAR(0xE5) PORT_CHAR(0xC5)
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_MINUS)		PORT_CHAR('+')  PORT_CHAR('?')
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(0xE4) PORT_CHAR(0xC4)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('-')  PORT_CHAR('_')
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')  PORT_CHAR(';')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_K)            PORT_CHAR('k')  PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_I)            PORT_CHAR('i')  PORT_CHAR('I')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_8)            PORT_CHAR('8')  PORT_CHAR('(')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(0xE5) PORT_CHAR(0xC5)
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('+')  PORT_CHAR('?')
 
 	PORT_START("LINE5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD) PORT_NAME("'/*") /* No good mapping */
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_M)  			PORT_CHAR('m')	PORT_CHAR('M')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_J)  			PORT_CHAR('j')  PORT_CHAR('J')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_U)  			PORT_CHAR('u')  PORT_CHAR('U')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_7)  			PORT_CHAR('7')  PORT_CHAR('/')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_CLOSEBRACE)	PORT_CHAR('^')
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD) PORT_NAME("PI")				PORT_CODE(KEYCODE_ESC)			PORT_CHAR(0x27)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("'/*") /* No good mapping */
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_M)            PORT_CHAR('m')  PORT_CHAR('M')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_J)            PORT_CHAR('j')  PORT_CHAR('J')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_U)            PORT_CHAR('u')  PORT_CHAR('U')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_7)            PORT_CHAR('7')  PORT_CHAR('/')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR('^')
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("PI")               PORT_CODE(KEYCODE_ESC)          PORT_CHAR(0x27)
 
 	PORT_START("LINE6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_LEFT)			PORT_CHAR(UCHAR_MAMEKEY(LEFT))  PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_RIGHT)	  	PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_N)  			PORT_CHAR('n')  PORT_CHAR('N')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_H)  			PORT_CHAR('h')  PORT_CHAR('H')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_Y)  			PORT_CHAR('y')  PORT_CHAR('Y')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_6)  			PORT_CHAR('&')  PORT_CHAR('6')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_ENTER)		PORT_CHAR('\r')
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_BACKSLASH2)	PORT_CHAR('<')  PORT_CHAR('>')
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))  PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_N)            PORT_CHAR('n')  PORT_CHAR('N')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_H)            PORT_CHAR('h')  PORT_CHAR('H')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_Y)            PORT_CHAR('y')  PORT_CHAR('Y')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_6)            PORT_CHAR('&')  PORT_CHAR('6')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_ENTER)        PORT_CHAR('\r')
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('<')  PORT_CHAR('>')
 
 	PORT_START("LINE7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_1_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_0_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_B)			PORT_CHAR('b')	PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_G)			PORT_CHAR('g')  PORT_CHAR('G')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_T)  			PORT_CHAR('t')  PORT_CHAR('T')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_5)  			PORT_CHAR('5')  PORT_CHAR('%')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_4_PAD)		PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_7_PAD)		PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_1_PAD)        PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_B)            PORT_CHAR('b')  PORT_CHAR('B')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_G)            PORT_CHAR('g')  PORT_CHAR('G')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_T)            PORT_CHAR('t')  PORT_CHAR('T')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_5)            PORT_CHAR('5')  PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_4_PAD)        PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_7_PAD)        PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 
 	PORT_START("LINE8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_2_PAD)		PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_DEL_PAD)		PORT_CHAR(UCHAR_MAMEKEY(STOP))
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_V)  			PORT_CHAR('v')	PORT_CHAR('V')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_F)  			PORT_CHAR('f')  PORT_CHAR('F')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_R)  			PORT_CHAR('r')  PORT_CHAR('R')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_4)  			PORT_CHAR('4')  PORT_CHAR('$')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_5_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_8_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_2_PAD)        PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_DEL_PAD)      PORT_CHAR(UCHAR_MAMEKEY(STOP))
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_V)            PORT_CHAR('v')  PORT_CHAR('V')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_F)            PORT_CHAR('f')  PORT_CHAR('F')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_R)            PORT_CHAR('r')  PORT_CHAR('R')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_4)            PORT_CHAR('4')  PORT_CHAR('$')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_5_PAD)        PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_8_PAD)        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 
 	PORT_START("LINE9")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x02, IP_ACTIVE_LOW,	IPT_KEYBOARD) PORT_NAME("Keypad E") /* No good mapping */
-	PORT_BIT(0x04, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_C)			PORT_CHAR('c')	PORT_CHAR('C')
-	PORT_BIT(0x08, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_D)			PORT_CHAR('d')  PORT_CHAR('D')
-	PORT_BIT(0x10, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_E)			PORT_CHAR('e')  PORT_CHAR('E')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_3)			PORT_CHAR('3')  PORT_CHAR('#')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_6_PAD)		PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x80, IP_ACTIVE_LOW,	IPT_KEYBOARD)								PORT_CODE(KEYCODE_9_PAD)		PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("Keypad E") /* No good mapping */
+	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_C)            PORT_CHAR('c')  PORT_CHAR('C')
+	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_D)            PORT_CHAR('d')  PORT_CHAR('D')
+	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_E)            PORT_CHAR('e')  PORT_CHAR('E')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_3)            PORT_CHAR('3')  PORT_CHAR('#')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_6_PAD)        PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_9_PAD)        PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( md6802 )
@@ -930,6 +978,18 @@ static INPUT_PORTS_START( mp68a )
 	PORT_BIT(0xf3, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+#ifdef UNUSED_VARIABLE
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
+#endif
+
+// TODO: Fix shift led for mp68a correctly, workaround doesn't work anymore! Shift works though...
 TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 {
 	//  LOG(("--->%s()\n", FUNCNAME));
@@ -990,19 +1050,26 @@ static MACHINE_CONFIG_START( e100, e100_state )
 	MCFG_PIA_READPA_HANDLER(READ8(e100_state, pia1_kbA_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(e100_state, pia1_kbB_w))
 	MCFG_PIA_READPB_HANDLER(READ8(e100_state, pia1_kbB_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(e100_state, pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(e100_state, pia1_cb1_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(e100_state, pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(e100_state, pia1_cb2_w))
 
 	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
 	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
+	/* Serial port support */
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
 	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active
-     * Once running enable/disable internal UI by pressing Scroll Lock in case it interferes with target keys
+	 * Once running enable/disable internal UI by pressing Scroll Lock in case it interferes with target keys
 	 * Open the internal UI by pressing TAB and then select 'Tape Control' or use F2/Shift F2 for PLAY/PAUSE
-     * In order to use a wav file it has first to be created using TAB and select the 'File manager'
-     * Once created it may be given on the commandline or mounted via TAB and select
-     * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
-     */
+	 * In order to use a wav file it has first to be created using TAB and select the 'File manager'
+	 * Once created it may be given on the commandline or mounted via TAB and select
+	 * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
+	 */
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED)
 
@@ -1046,6 +1113,8 @@ static MACHINE_CONFIG_START( md6802, md6802_state )
 	MCFG_PIA_READPB_HANDLER(READ8(md6802_state, pia2_kbB_r))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(md6802_state, pia2_ca2_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", md6802_state, scan_artwork, attotime::from_hz(10))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mp68a, mp68a_state )

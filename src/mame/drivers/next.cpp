@@ -874,10 +874,6 @@ void next_state::machine_start()
 	}
 
 	timer_tm = timer_alloc(0);
-
-	system_time systime;
-	machine().base_datetime(systime);
-	rtc->set_counter(systime.time);
 }
 
 void next_state::machine_reset()

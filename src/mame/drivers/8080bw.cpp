@@ -1594,13 +1594,23 @@ static INPUT_PORTS_START( schasercv )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
+MACHINE_START_MEMBER(_8080bw_state,schasercv)
+{
+	m_scattered_colorram = std::make_unique<UINT8 []>(0x800);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
+
+	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
+	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
+	MACHINE_START_CALL_MEMBER(mw8080bw);
+}
+
 static MACHINE_CONFIG_DERIVED_CLASS( schasercv, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(schasercv_io_map)
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, schaser)
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, schasercv)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")

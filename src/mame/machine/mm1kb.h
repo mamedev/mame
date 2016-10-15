@@ -71,16 +71,7 @@ private:
 
 	required_device<samples_device> m_samples;
 	required_memory_region m_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
+	required_ioport_array<10> m_y;
 	required_ioport m_special;
 
 	int m_sense;

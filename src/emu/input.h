@@ -189,6 +189,10 @@ enum input_item_id
 	ITEM_ID_PLUS_PAD,
 	ITEM_ID_DEL_PAD,
 	ITEM_ID_ENTER_PAD,
+	ITEM_ID_BS_PAD,
+	ITEM_ID_TAB_PAD,
+	ITEM_ID_00_PAD,
+	ITEM_ID_000_PAD,
 	ITEM_ID_PRTSCR,
 	ITEM_ID_PAUSE,
 	ITEM_ID_LSHIFT,
@@ -352,6 +356,8 @@ class input_manager;
 // callback for getting the value of an item on a device
 typedef INT32 (*item_get_state_func)(void *device_internal, void *item_internal);
 
+// controller alias table typedef
+typedef std::map<std::string, std::string> devicemap_table_type;
 
 // ======================> joystick_map
 
@@ -547,13 +553,14 @@ class input_device
 
 public:
 	// construction/destruction
-	input_device(input_class &_class, int _devindex, const char *_name, void *_internal);
+	input_device(input_class &_class, int _devindex, const char *_name, const char *_id, void *_internal);
 	// getters
 	input_class &device_class() const { return m_class; }
 	input_manager &manager() const;
 	running_machine &machine() const;
 	input_device_class devclass() const;
 	const char *name() const { return m_name.c_str(); }
+	const char *id() const { return m_id.c_str(); }
 	int devindex() const { return m_devindex; }
 	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
 	input_item_id maxitem() const { return m_maxitem; }
@@ -562,6 +569,9 @@ public:
 	bool steadykey_enabled() const { return m_steadykey_enabled; }
 	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
 
+	// setters
+	void set_devindex(int devindex) { m_devindex = devindex; }
+
 	// item management
 	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
 	void set_joystick_map(const joystick_map &map) { m_joymap = map; }
@@ -569,11 +579,13 @@ public:
 	// helpers
 	INT32 apply_deadzone_and_saturation(INT32 value) const;
 	void apply_steadykey() const;
+	bool match_device_id(const char * deviceid);
 
 private:
 	// internal state
 	input_class &           m_class;                // reference to our class
 	std::string             m_name;                 // string name of device
+	std::string             m_id;                   // id of device
 	int                     m_devindex;             // device index of this device
 	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
 	input_item_id           m_maxitem;              // maximum item index
@@ -611,11 +623,12 @@ public:
 	void set_multi(bool multi = true) { m_multi = multi; }
 
 	// device management
-	input_device *add_device(const char *name, void *internal = nullptr);
-	input_device *add_device(int devindex, const char *name, void *internal = nullptr);
+	input_device *add_device(const char *name, const char *id, void *internal = nullptr);
+	input_device *add_device(int devindex, const char *name, const char *id, void *internal = nullptr);
 
 	// misc helpers
 	input_item_class standard_item_class(input_item_id itemid);
+	void remap_device_index(int oldindex, int newindex);
 
 private:
 	// internal helpers
@@ -679,6 +692,7 @@ public:
 
 	// misc
 	bool set_global_joystick_map(const char *mapstring);
+	bool map_device_to_controller(const devicemap_table_type *devicemap_table = nullptr);
 
 private:
 	// internal helpers
@@ -811,6 +825,10 @@ private:
 #define KEYCODE_PLUS_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PLUS_PAD)
 #define KEYCODE_DEL_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_DEL_PAD)
 #define KEYCODE_ENTER_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_ENTER_PAD)
+#define KEYCODE_BS_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BS_PAD)
+#define KEYCODE_TAB_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_TAB_PAD)
+#define KEYCODE_00_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_00_PAD)
+#define KEYCODE_000_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_000_PAD)
 #define KEYCODE_PRTSCR_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PRTSCR)
 #define KEYCODE_PAUSE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PAUSE)
 #define KEYCODE_LSHIFT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_LSHIFT)
@@ -926,6 +944,10 @@ private:
 #define KEYCODE_PLUS_PAD KEYCODE_PLUS_PAD_INDEXED(0)
 #define KEYCODE_DEL_PAD KEYCODE_DEL_PAD_INDEXED(0)
 #define KEYCODE_ENTER_PAD KEYCODE_ENTER_PAD_INDEXED(0)
+#define KEYCODE_BS_PAD KEYCODE_BS_PAD_INDEXED(0)
+#define KEYCODE_TAB_PAD KEYCODE_TAB_PAD_INDEXED(0)
+#define KEYCODE_00_PAD KEYCODE_00_PAD_INDEXED(0)
+#define KEYCODE_000_PAD KEYCODE_000_PAD_INDEXED(0)
 #define KEYCODE_PRTSCR KEYCODE_PRTSCR_INDEXED(0)
 #define KEYCODE_PAUSE KEYCODE_PAUSE_INDEXED(0)
 #define KEYCODE_LSHIFT KEYCODE_LSHIFT_INDEXED(0)

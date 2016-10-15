@@ -440,15 +440,10 @@ READ8_MEMBER( kc85_state::keyboard_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= m_y0->read();
-	if (!BIT(m_keylatch, 1)) data &= m_y1->read();
-	if (!BIT(m_keylatch, 2)) data &= m_y2->read();
-	if (!BIT(m_keylatch, 3)) data &= m_y3->read();
-	if (!BIT(m_keylatch, 4)) data &= m_y4->read();
-	if (!BIT(m_keylatch, 5)) data &= m_y5->read();
-	if (!BIT(m_keylatch, 6)) data &= m_y6->read();
-	if (!BIT(m_keylatch, 7)) data &= m_y7->read();
-	if (!BIT(m_keylatch, 8)) data &= m_y8->read();
+	for (int i = 0; i < 9; i++)
+	{
+		if (!BIT(m_keylatch, i)) data &= m_y[i]->read();
+	}
 
 	return data;
 }
@@ -500,15 +495,10 @@ READ8_MEMBER( tandy200_state::stbk_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= m_y0->read();
-	if (!BIT(m_keylatch, 1)) data &= m_y1->read();
-	if (!BIT(m_keylatch, 2)) data &= m_y2->read();
-	if (!BIT(m_keylatch, 3)) data &= m_y3->read();
-	if (!BIT(m_keylatch, 4)) data &= m_y4->read();
-	if (!BIT(m_keylatch, 5)) data &= m_y5->read();
-	if (!BIT(m_keylatch, 6)) data &= m_y6->read();
-	if (!BIT(m_keylatch, 7)) data &= m_y7->read();
-	if (!BIT(m_keylatch, 8)) data &= m_y8->read();
+	for (int i = 0; i < 9; i++)
+	{
+		if (!BIT(m_keylatch, i)) data &= m_y[i]->read();
+	}
 
 	return data;
 }

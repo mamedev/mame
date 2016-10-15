@@ -180,20 +180,9 @@ READ8_MEMBER( tiki100_state::keyboard_r )
 {
 	UINT8 data = 0xff;
 
-	switch (m_keylatch)
+	if (m_keylatch < 12)
 	{
-	case 0: data = m_y1->read(); break;
-	case 1: data = m_y2->read(); break;
-	case 2: data = m_y3->read(); break;
-	case 3: data = m_y4->read(); break;
-	case 4: data = m_y5->read(); break;
-	case 5: data = m_y6->read(); break;
-	case 6: data = m_y7->read(); break;
-	case 7: data = m_y8->read(); break;
-	case 8: data = m_y9->read(); break;
-	case 9: data = m_y10->read(); break;
-	case 10: data = m_y11->read(); break;
-	case 11: data = m_y12->read(); break;
+		data = m_y[m_keylatch]->read();
 	}
 
 	m_keylatch++;

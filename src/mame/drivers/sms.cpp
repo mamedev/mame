@@ -890,6 +890,8 @@ static MACHINE_CONFIG_DERIVED( smsj, sms1_kr )
 	MCFG_CPU_IO_MAP(smsj_io)
 
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_10_738635MHz/3)
+	// if this output gain is changed, the gain set when unmute the output need
+	// to be changed too, probably along the gain set for the Mark III FM Unit.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

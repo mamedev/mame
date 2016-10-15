@@ -13,11 +13,13 @@ abc1600.cpp
 abc80.cpp
 abc80x.cpp
 ac1.cpp
+aceex.cpp
 acrnsys1.cpp
 adam.cpp
 advision.cpp
 aim65.cpp
 aim65_40.cpp
+akaiax80.cpp
 alesis.cpp
 alesis_qs.cpp
 alphasma.cpp
@@ -32,6 +34,7 @@ ampro.cpp
 amstr_pc.cpp
 amstrad.cpp
 amust.cpp
+anzterm.cpp
 apc.cpp
 apexc.cpp
 apf.cpp
@@ -143,6 +146,7 @@ decwritr.cpp
 dgn_beta.cpp
 didact.cpp
 digel804.cpp
+digijet.cpp
 dim68k.cpp
 dm7000.cpp
 dmax8000.cpp
@@ -160,7 +164,6 @@ eacc.cpp
 ec184x.cpp
 ec65.cpp
 einstein.cpp
-elecbowl.cpp
 electron.cpp
 elekscmp.cpp
 elf.cpp
@@ -221,6 +224,7 @@ h8.cpp
 h89.cpp
 harriet.cpp
 hec2hrp.cpp
+hh_amis2k.cpp
 hh_cop400.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
@@ -310,10 +314,8 @@ m6805evs.cpp
 m79152pc.cpp
 mac.cpp
 macpci.cpp
-marywu.cpp
 mbc200.cpp
 mbc55x.cpp
-mbdtower.cpp
 mbee.cpp
 mc10.cpp
 mc1000.cpp
@@ -429,6 +431,7 @@ pcd.cpp
 pce.cpp
 pce220.cpp
 pcfx.cpp
+pcipc.cpp
 pcm.cpp
 pcw.cpp
 pcw16.cpp
@@ -442,6 +445,7 @@ pentagon.cpp
 peoplepc.cpp
 pes.cpp
 pet.cpp
+pg685.cpp
 phc25.cpp
 phantom.cpp
 phunsy.cpp
@@ -493,6 +497,7 @@ radio86.cpp
 rainbow.cpp
 rambo.cpp
 ravens.cpp
+rc702.cpp
 rc759.cpp
 rd100.cpp
 rd110.cpp
@@ -612,6 +617,7 @@ tmc1800.cpp
 tmc2000e.cpp
 tmc600.cpp
 tr606.cpp
+tranz330.cpp
 tricep.cpp
 trs80.cpp
 trs80m2.cpp
@@ -665,7 +671,6 @@ vtech1.cpp
 vtech2.cpp
 wangpc.cpp
 wicat.cpp
-wildfire.cpp
 wswan.cpp
 x07.cpp
 x1.cpp

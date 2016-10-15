@@ -221,7 +221,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 
 	if (LOG_AY8912){
 		if(( data&0x30) !=  (m_p1_data&0x30)){
-			logerror("write ay8910 controll bc1= %02X bdir= %02X\n",data&0x10, data&0x20);
+			logerror("write ay8910 control bc1= %02X bdir= %02X\n",data&0x10, data&0x20);
 		}
 	}
 
@@ -231,7 +231,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 
 	if (LOG_P1){
 		if(( data&0xc8) !=  (m_p1_data&0xc8)){
-			logerror("Unkonow P1 data changed, old data %02X, new data %02X\n",m_p1_data,data);
+			logerror("Unknown P1 data changed, old data %02X, new data %02X\n",m_p1_data,data);
 		}
 	}
 

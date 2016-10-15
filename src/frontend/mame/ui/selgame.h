@@ -38,7 +38,7 @@ private:
 	};
 
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	char m_search[40];
+	std::string m_search;
 	static bool first_start;
 	static int m_isabios;
 	int highlight;

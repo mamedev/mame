@@ -107,6 +107,7 @@ class system_time
 {
 public:
 	system_time();
+	explicit system_time(time_t t);
 	void set(time_t t);
 
 	struct full_time
@@ -226,6 +227,7 @@ public:
 	// date & time
 	void base_datetime(system_time &systime);
 	void current_datetime(system_time &systime);
+	void set_rtc_datetime(const system_time &systime);
 
 	// misc
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }

@@ -18,6 +18,7 @@ YM2149: higher resolution, selectable clock divider
 YM3439: same as 2149
 YMZ284: 0 I/O port, different clock divider
 YMZ294: 0 I/O port
+OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : differences to be listed
 */
 
 #define ALL_8910_CHANNELS -1
@@ -145,8 +146,8 @@ public:
 		double m_Kn[32];
 	};
 
-	void ay8910_write_ym(int addr, int data);
-	int ay8910_read_ym();
+	void ay8910_write_ym(int addr, uint8_t data);
+	uint8_t ay8910_read_ym();
 	void ay8910_reset_ym();
 
 protected:
@@ -171,6 +172,7 @@ private:
 	int m_ioports;
 	int m_ready;
 	sound_stream *m_channel;
+	bool m_active;
 	INT32 m_register_latch;
 	UINT8 m_regs[16];
 	INT32 m_last_enable;

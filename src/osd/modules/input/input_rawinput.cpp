@@ -289,8 +289,8 @@ private:
 	HANDLE  m_handle;
 
 public:
-	rawinput_device(running_machine& machine, const char* name, input_device_class deviceclass, input_module& module)
-		: event_based_device(machine, name, deviceclass, module),
+	rawinput_device(running_machine& machine, const char *name, const char *id, input_device_class deviceclass, input_module& module)
+		: event_based_device(machine, name, id, deviceclass, module),
 			m_handle(nullptr)
 	{
 	}
@@ -308,8 +308,8 @@ class rawinput_keyboard_device : public rawinput_device
 public:
 	keyboard_state keyboard;
 
-	rawinput_keyboard_device(running_machine& machine, const char* name, input_module& module)
-		: rawinput_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
+	rawinput_keyboard_device(running_machine& machine, const char *name, const char *id, input_module& module)
+		: rawinput_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
 			keyboard({{0}})
 	{
 	}
@@ -344,8 +344,8 @@ private:
 public:
 	mouse_state          mouse;
 
-	rawinput_mouse_device(running_machine& machine, const char* name, input_module& module)
-		: rawinput_device(machine, name, DEVICE_CLASS_MOUSE, module),
+	rawinput_mouse_device(running_machine& machine, const char *name, const char *id, input_module& module)
+		: rawinput_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
 			mouse({0})
 	{
 	}
@@ -404,8 +404,8 @@ private:
 public:
 	mouse_state          lightgun;
 
-	rawinput_lightgun_device(running_machine& machine, const char* name, input_module& module)
-		: rawinput_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
+	rawinput_lightgun_device(running_machine& machine, const char *name, const char *id, input_module& module)
+		: rawinput_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module),
 		lightgun({0})
 	{
 	}
@@ -573,9 +573,12 @@ protected:
 		std::wstring name = rawinput_device_improve_name(tname.get());
 
 		// convert name to utf8
-		std::string utf8_name = utf8_from_wstring(name.c_str());
+		std::string utf8_name = osd::text::from_wstring(name.c_str());
 
-		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.c_str(), *this);
+		// set device id to raw input name
+		std::string utf8_id = osd::text::from_wstring(tname.get());
+
+		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.c_str(), utf8_id.c_str(), *this);
 
 		// Add the handle
 		devinfo->set_handle(rawinputdevice->hDevice);
@@ -676,7 +679,7 @@ protected:
 			// generate the name
 			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
 				_sntprintf(keyname, ARRAY_LENGTH(keyname), TEXT("Scan%03d"), keynum);
-			std::string name = utf8_from_tstring(keyname);
+			std::string name = osd::text::from_tstring(keyname);
 
 			// add the item to the device
 			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);

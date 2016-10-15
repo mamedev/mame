@@ -36,7 +36,6 @@
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
-
 bool menu_select_game::first_start = true;
 std::vector<const game_driver *> menu_select_game::m_sortedlist;
 int menu_select_game::m_isabios = 0;
@@ -139,11 +138,15 @@ menu_select_game::~menu_select_game()
 	game_driver const *const driver(isfavorite() ? nullptr : reinterpret_cast<game_driver const *>(get_selection_ref()));
 	ui_software_info *const swinfo(isfavorite() ? reinterpret_cast<ui_software_info *>(get_selection_ref()) : nullptr);
 
-	if ((FPTR)driver > skip_main_items)
+	if (reinterpret_cast<FPTR>(driver) > skip_main_items)
 		last_driver = driver->name;
+	else if (driver && m_prev_selected)
+		last_driver = reinterpret_cast<game_driver const *>(m_prev_selected)->name;
 
-	if ((FPTR)swinfo > skip_main_items)
+	if (reinterpret_cast<FPTR>(swinfo) > skip_main_items)
 		last_driver = swinfo->shortname;
+	else if (swinfo && m_prev_selected)
+		last_driver = reinterpret_cast<ui_software_info *>(m_prev_selected)->shortname;
 
 	std::string filter(main_filters::text[main_filters::actual]);
 	if (main_filters::actual == FILTER_MANUFACTURER)
@@ -168,7 +171,6 @@ void menu_select_game::handle()
 		m_prev_selected = item[0].ref;
 
 	bool check_filter = false;
-	bool enabled_dats = ui().options().enabled_dats();
 
 	// if i have to load datfile, performe an hard reset
 	if (ui_globals::reset)
@@ -291,7 +293,7 @@ void menu_select_game::handle()
 				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < ui_globals::curdats_total)
+					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
 					{
 						ui_globals::curdats_view++;
 						m_topline_datsview = 0;
@@ -300,12 +302,12 @@ void menu_select_game::handle()
 				else
 				{
 					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
-					if (drv->startempty == 1 && ui_globals::curdats_view < ui_globals::curdats_total)
+					if (drv->startempty == 1 && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
 					{
 						ui_globals::curdats_view++;
 						m_topline_datsview = 0;
 					}
-					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view < ui_globals::cur_sw_dats_total)
+					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 					{
 						ui_globals::cur_sw_dats_view++;
 						m_topline_datsview = 0;
@@ -339,7 +341,7 @@ void menu_select_game::handle()
 			m_search[0] = '\0';
 			reset(reset_options::SELECT_FIRST);
 		}
-		else if (menu_event->iptkey == IPT_UI_DATS && enabled_dats)
+		else if (menu_event->iptkey == IPT_UI_DATS && mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
 		{
 			// handle UI_DATS
 			if (!isfavorite())
@@ -394,7 +396,7 @@ void menu_select_game::handle()
 				}
 			}
 		}
-		else if (menu_event->iptkey == IPT_UI_EXPORT && !isfavorite())
+		else if (menu_event->iptkey == IPT_UI_EXPORT)
 		{
 			// handle UI_EXPORT
 			inkey_export();
@@ -501,7 +503,7 @@ void menu_select_game::populate()
 	if (!isfavorite())
 	{
 		// if search is not empty, find approximate matches
-		if (m_search[0] != 0 && !isfavorite())
+		if (m_search[0] != 0)
 			populate_search();
 		else
 		{
@@ -549,36 +551,37 @@ void menu_select_game::populate()
 			}
 		}
 	}
-	// populate favorites list
 	else
 	{
+		// populate favorites list
 		m_search[0] = '\0';
 		int curitem = 0;
+
 		// iterate over entries
-		for (auto & mfavorite : mame_machine_manager::instance()->favorite().m_list)
+		for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
 		{
 			auto flags = flags_ui | FLAG_UI_FAVORITE;
-			if (mfavorite.startempty == 1)
+			if (favmap.second.startempty == 1)
 			{
-				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
+				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver)
 					old_item_selected = curitem;
 
-				bool cloneof = strcmp(mfavorite.driver->parent, "0");
+				bool cloneof = strcmp(favmap.second.driver->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(mfavorite.driver->parent);
+					int cx = driver_list::find(favmap.second.driver->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
-				item_append(mfavorite.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&mfavorite);
+				item_append(favmap.second.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&favmap.second);
 			}
 			else
 			{
-				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
+				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver)
 					old_item_selected = curitem;
-				item_append(mfavorite.longname, mfavorite.devicetype,
-					mfavorite.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&mfavorite);
+				item_append(favmap.second.longname, favmap.second.devicetype,
+							favmap.second.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&favmap.second);
 			}
 			curitem++;
 		}
@@ -966,23 +969,8 @@ void menu_select_game::inkey_special(const event *menu_event)
 {
 	if (!isfavorite())
 	{
-		auto const buflen = std::strlen(m_search);
-
-		if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
-		{
-			// if it's a backspace and we can handle it, do so
-			if (0 < buflen)
-			{
-				*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
-				reset(reset_options::SELECT_FIRST);
-			}
-		}
-		else if (menu_event->is_char_printable())
-		{
-			// if it's any other key and we're not maxed out, update
-			if (menu_event->append_char(m_search, buflen))
-				reset(reset_options::SELECT_FIRST);
-		}
+		if (input_character(m_search, menu_event->unichar, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
 	}
 }
 
@@ -993,9 +981,6 @@ void menu_select_game::inkey_special(const event *menu_event)
 
 void menu_select_game::build_list(const char *filter_text, int filter, bool bioscheck, std::vector<const game_driver *> s_drivers)
 {
-	int cx = 0;
-	bool cloneof = false;
-
 	if (s_drivers.empty())
 	{
 		filter = main_filters::actual;
@@ -1037,20 +1022,21 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 
 		case FILTER_PARENT:
 		case FILTER_CLONES:
-			cloneof = strcmp(s_driver->parent, "0");
-			if (cloneof)
 			{
-				cx = driver_list::find(s_driver->parent);
-				if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
-					cloneof = false;
+				bool cloneof = strcmp(s_driver->parent, "0");
+				if (cloneof)
+				{
+					auto cx = driver_list::find(s_driver->parent);
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+						cloneof = false;
+				}
+
+				if (filter == FILTER_CLONES && cloneof)
+					m_displaylist.push_back(s_driver);
+				else if (filter == FILTER_PARENT && !cloneof)
+					m_displaylist.push_back(s_driver);
 			}
-
-			if (filter == FILTER_CLONES && cloneof)
-				m_displaylist.push_back(s_driver);
-			else if (filter == FILTER_PARENT && !cloneof)
-				m_displaylist.push_back(s_driver);
 			break;
-
 		case FILTER_NOT_WORKING:
 			if (s_driver->flags & MACHINE_NOT_WORKING)
 				m_displaylist.push_back(s_driver);
@@ -1353,8 +1339,23 @@ void menu_select_game::inkey_export()
 	}
 	else
 	{
-		list = m_displaylist;
+		if (isfavorite())
+		{
+			// iterate over favorites
+			for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
+			{
+				if (favmap.second.startempty == 1)
+					list.push_back(favmap.second.driver);
+				else
+					return;
+			}
+		}
+		else
+		{
+			list = m_displaylist;
+		}
 	}
+
 	menu::stack_push<menu_export>(ui(), container(), std::move(list));
 }
 
@@ -1417,11 +1418,10 @@ bool menu_select_game::load_available_machines()
 
 	file.gets(rbuf, MAX_CHAR_INFO);
 	file.gets(rbuf, MAX_CHAR_INFO);
-	int avsize = 0, unavsize = 0;
 	file.gets(rbuf, MAX_CHAR_INFO);
-	avsize = atoi(rbuf);
+	auto avsize = atoi(rbuf);
 	file.gets(rbuf, MAX_CHAR_INFO);
-	unavsize = atoi(rbuf);
+	auto unavsize = atoi(rbuf);
 
 	// load available list
 	for (int x = 0; x < avsize; ++x)

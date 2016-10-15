@@ -65,22 +65,7 @@ private:
 	int key_depressed();
 
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_dr00;
-	required_ioport m_dr01;
-	required_ioport m_dr02;
-	required_ioport m_dr03;
-	required_ioport m_dr04;
-	required_ioport m_dr05;
-	required_ioport m_dr06;
-	required_ioport m_dr07;
-	required_ioport m_dr08;
-	required_ioport m_dr09;
-	required_ioport m_dr10;
-	required_ioport m_dr11;
-	required_ioport m_dr12;
-	required_ioport m_dr13;
-	required_ioport m_dr14;
-	required_ioport m_dr15;
+	required_ioport_array<16> m_dr;
 	optional_ioport m_kbdida;
 	optional_ioport m_kbdidb;
 

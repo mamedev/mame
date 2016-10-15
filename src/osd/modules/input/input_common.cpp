@@ -154,7 +154,11 @@ key_trans_entry keyboard_trans_table::s_default_table[] =
 	KEY_TRANS_ENTRY1(RWIN,         RGUI,         RGUI,         RWIN,           VK_RWIN,        0),
 	KEY_TRANS_ENTRY1(MENU,         MENU,         MENU,         APPS,           VK_APPS,        0),
 	KEY_TRANS_ENTRY1(PAUSE,        PAUSE,        PAUSE,        PAUSE,          VK_PAUSE,       0),
-	KEY_TRANS_ENTRY0(CANCEL,       UNKNOWN,      UNKNOWN,      UNKNOWN,        0,              0,        "CANCEL"),
+	KEY_TRANS_ENTRY0(CANCEL,       CANCEL,       CANCEL,       UNKNOWN,        0,              0,        "CANCEL"),
+	KEY_TRANS_ENTRY1(BS_PAD,       KP_BACKSPACE, KP_BACKSPACE, UNKNOWN,        0,              0),
+	KEY_TRANS_ENTRY1(TAB_PAD,      KP_TAB,       KP_TAB,       UNKNOWN,        0,              0),
+	KEY_TRANS_ENTRY1(00_PAD,       KP_00,        KP_00,        UNKNOWN,        0,              0),
+	KEY_TRANS_ENTRY1(000_PAD,      KP_000,       KP_000,       UNKNOWN,        0,              0),
 
 	// New keys introduced in Windows 2000. These have no MAME codes to
 	// preserve compatibility with old config files that may refer to them

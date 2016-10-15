@@ -153,13 +153,7 @@ c64_music64_cartridge_device::c64_music64_cartridge_device(const machine_config 
 	device_t(mconfig, C64_MUSIC64, "C64 Music 64 cartridge", tag, owner, clock, "c64_music64", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG),
-	m_kb0(*this, "KB0"),
-	m_kb1(*this, "KB1"),
-	m_kb2(*this, "KB2"),
-	m_kb3(*this, "KB3"),
-	m_kb4(*this, "KB4"),
-	m_kb5(*this, "KB5"),
-	m_kb6(*this, "KB6")
+	m_kb(*this, "KB%u", 0)
 {
 }
 
@@ -192,15 +186,11 @@ UINT8 c64_music64_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 
 	if (!io2)
 	{
-		switch (offset & 0x07)
+		int kb = offset & 0x07;
+
+		if (kb < 7)
 		{
-		case 0x00: data = m_kb0->read(); break;
-		case 0x01: data = m_kb1->read(); break;
-		case 0x02: data = m_kb2->read(); break;
-		case 0x03: data = m_kb3->read(); break;
-		case 0x04: data = m_kb4->read(); break;
-		case 0x05: data = m_kb5->read(); break;
-		case 0x06: data = m_kb6->read(); break;
+			data = m_kb[kb]->read();
 		}
 	}
 

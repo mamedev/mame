@@ -2735,7 +2735,7 @@ static void do_add_metadata(parameters_t &params)
 	if (text_str != params.end())
 		err = input_chd.write_metadata(tag, index, text, flags);
 	else
-		err = input_chd.write_metadata(tag, index, &file[0], flags);
+		err = input_chd.write_metadata(tag, index, file, flags);
 	if (err != CHDERR_NONE)
 		report_error(1, "Error adding metadata: %s", chd_file::error_string(err));
 	else

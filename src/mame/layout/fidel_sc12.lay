@@ -3,9 +3,6 @@
 
 <!-- define elements -->
 
-	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-	<element name="blackl"><rect><color red="0.01" green="0.01" blue="0.01" /></rect></element>
-
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
 		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
@@ -32,6 +29,7 @@
 		</disk>
 	</element>
 
+	<element name="blackl"><rect><color red="0.01" green="0.01" blue="0.01" /></rect></element>
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
@@ -263,9 +261,6 @@
 
 	<view name="Internal Layout">
 		<bounds left="-7" right="98" top="-2" bottom="93" />
-		<bezel element="static_black">
-			<bounds left="-7" right="98" top="-2" bottom="93" />
-		</bezel>
 
 		<bezel element="white"><bounds x="-7.5" y="-2.5" width="106" height="96" /></bezel>
 

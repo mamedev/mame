@@ -15,6 +15,7 @@
 #include "ui/ui.h"
 #include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
+#include "ui/utils.h"
 
 #include "audit.h"
 #include "drivenum.h"
@@ -33,8 +34,8 @@ namespace ui {
 simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename) : menu(mui, container), m_driverlist(driver_list::total() + 1)
 {
 	build_driver_list();
-	if(gamename)
-		strcpy(m_search, gamename);
+	if (gamename)
+		m_search.assign(gamename);
 	m_matchlist[0] = -1;
 }
 
@@ -199,23 +200,12 @@ void simple_menu_select_game::inkey_cancel()
 void simple_menu_select_game::inkey_special(const event *menu_event)
 {
 	// typed characters append to the buffer
-	auto const buflen = std::strlen(m_search);
-
-	if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
+	size_t old_size = m_search.size();
+	if (input_character(m_search, menu_event->unichar, uchar_is_printable))
 	{
-		// if it's a backspace and we can handle it, do so
-		if (0 < buflen)
-		{
-			*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+		if (m_search.size() < old_size)
 			m_rerandomize = true;
-			reset(reset_options::SELECT_FIRST);
-		}
-	}
-	else if (menu_event->is_char_printable())
-	{
-		// if it's any other key and we're not maxed out, update
-		if (menu_event->append_char(m_search, buflen))
-			reset(reset_options::SELECT_FIRST);
+		reset(reset_options::SELECT_FIRST);
 	}
 }
 
@@ -249,7 +239,7 @@ void simple_menu_select_game::populate()
 	// otherwise, rebuild the match list
 	assert(m_drivlist != nullptr);
 	if (m_search[0] != 0 || m_matchlist[0] == -1 || m_rerandomize)
-		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
+		m_drivlist->find_approximate_matches(m_search.c_str(), matchcount, m_matchlist);
 	m_rerandomize = false;
 
 	// iterate over entries

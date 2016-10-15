@@ -1589,7 +1589,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<year>1988</year>
 		<publisher>Krisalis</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="terramex (1988)(grand slam).adf" size="819200" crc="19a649e0" sha1="d41ea1ab6065971a48e82cecd96cb6fb679a07be" offset="0" />
 			</dataarea>
@@ -2301,7 +2300,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<year>2000</year>
 		<publisher>Digital Phenomena</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="vzap (2000)(vigay, paul).adf" size="819200" crc="bde476ec" sha1="7f9824d11b22c7c57dba6a8c85a9962e8e284e22" offset="0" />
 			</dataarea>
@@ -2684,11 +2682,13 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<year>1994</year>
 		<publisher>Ten Out Of Ten Educational Systems</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - driving test (disk 1) (1994).adf" size="819200" crc="44d3d133" sha1="ea23a86d067b115cfcb9fc9b8bb2c32793b26975" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - driving test (disk 2) (1994).adf" size="819200" crc="e181d252" sha1="330edc4cc6b4347e1ae67436340523011fab0840" offset="0"/>
 			</dataarea>
@@ -2700,11 +2700,13 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<year>1993</year>
 		<publisher>Ten Out Of Ten Educational Systems</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - early essentials (disk 1) (1993).adf" size="819200" crc="188a6209" sha1="a1eca639dd01a69caf629d8fe2aa8f335c961bf4" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - early essentials (disk 2) (1993).adf" size="819200" crc="82ade207" sha1="3f689f5c10d732c804904647d6270b90d45a9f32" offset="0"/>
 			</dataarea>
@@ -2793,11 +2795,13 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<year>1993</year>
 		<publisher>Ten Out Of Ten Educational Systems</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - maths - algebra (disk 1) (1993).adf" size="819200" crc="46d3007a" sha1="bb5c75ba559b37a858040418054f53b9be66866f" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - maths - algebra (disk 2) (1993).adf" size="819200" crc="e5b5fb4c" sha1="257671f4f2e7fad26ecef7e289a2082b55d70876" offset="0"/>
 			</dataarea>
@@ -2831,11 +2835,13 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<year>1993</year>
 		<publisher>Ten Out Of Ten Educational Systems</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - maths - statistics (disk 1) (1993).adf" size="819200" crc="074816d6" sha1="38c25831ed9dc5ddf99761a2a6013fca630d50e2" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - maths - statistics (disk 2) (1993).adf" size="819200" crc="935346d3" sha1="c80f98ef7385924a3b0ad070de05a21afd86f970" offset="0"/>
 			</dataarea>

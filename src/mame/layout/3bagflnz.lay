@@ -240,51 +240,51 @@
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp11" element="collect">
+		<bezel name="lamp11" element="collect" inputtag="500d" inputmask="0x04">
 			<bounds x="0.67" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp6" element="bet1">
+		<bezel name="lamp6" element="bet1" inputtag="500e" inputmask="0x01">
 			<bounds x="1.08" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp5" element="bet2">
+		<bezel name="lamp5" element="bet2" inputtag="500e" inputmask="0x04">
 			<bounds x="1.49" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp8" element="bet3">
+		<bezel name="lamp8" element="bet3" inputtag="500e" inputmask="0x10">
 			<bounds x="1.91" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp12" element="bet4">
+		<bezel name="lamp12" element="bet4" inputtag="500d" inputmask="0x01">
 			<bounds x="2.31" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp7" element="bet5">
+		<bezel name="lamp7" element="bet5" inputtag="500d" inputmask="0x02">
 			<bounds x="2.72" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp10" element="reserve">
+		<bezel name="lamp10" element="reserve" inputtag="500d" inputmask="0x08">
 			<bounds x="0.67" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp1" element="1 line">
+		<bezel name="lamp1" element="1 line" inputtag="500e" inputmask="0x02">
 			<bounds x="1.08" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp2" element="3 lines">
+		<bezel name="lamp2" element="3 lines" inputtag="500e" inputmask="0x80">
 			<bounds x="1.49" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp3" element="5 lines">
+		<bezel name="lamp3" element="5 lines" inputtag="500e" inputmask="0x40">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp9" element="7 lines">
+		<bezel name="lamp9" element="7 lines" inputtag="500e" inputmask="0x20">
 			<bounds x="2.31" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp4" element="9 lines">
+		<bezel name="lamp4" element="9 lines" inputtag="500e" inputmask="0x08">
 			<bounds x="2.72" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 
@@ -304,11 +304,11 @@
 			<bounds x="3.80" y="3.38" width="0.10" height="0.10" />
 		</bezel>
 
-		<bezel name="lamp19" element="auditkey">
+		<bezel name="lamp19" element="auditkey" inputtag="5002" inputmask="0x10">
 			<bounds x="0.26" y="3.09" width="0.31" height="0.12" />
 		</bezel>
 
-		<bezel name="lamp20" element="jackpotkey">
+		<bezel name="lamp20" element="jackpotkey" inputtag="5003" inputmask="0x04">
 			<bounds x="0.26" y="3.34" width="0.31" height="0.12" />
 		</bezel>
 

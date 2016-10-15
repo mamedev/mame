@@ -211,4 +211,3 @@ private:
 bool software_name_parse(const std::string &identifier, std::string *list_name = nullptr, std::string *software_name = nullptr, std::string *part_name = nullptr);
 
 #endif // __SOFTLIST_H_
-

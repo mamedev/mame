@@ -276,7 +276,7 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", kim1_state, kim1_cassette_input, attotime::from_hz(44100))
 
 	// software list
-    MCFG_SOFTWARE_LIST_ADD ("cass_list", "kim1_cass")
+	MCFG_SOFTWARE_LIST_ADD ("cass_list", "kim1_cass")
 
 MACHINE_CONFIG_END
 

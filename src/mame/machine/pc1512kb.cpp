@@ -221,17 +221,7 @@ pc1512_keyboard_t::pc1512_keyboard_t(const machine_config &mconfig, const char *
 	device_t(mconfig, PC1512_KEYBOARD, "Amstrad PC1512 Keyboard", tag, owner, clock, "pc1512kb", __FILE__),
 	m_maincpu(*this, I8048_TAG),
 	m_joy(*this, "joy"),
-	m_y1(*this, "Y1"),
-	m_y2(*this, "Y2"),
-	m_y3(*this, "Y3"),
-	m_y4(*this, "Y4"),
-	m_y5(*this, "Y5"),
-	m_y6(*this, "Y6"),
-	m_y7(*this, "Y7"),
-	m_y8(*this, "Y8"),
-	m_y9(*this, "Y9"),
-	m_y10(*this, "Y10"),
-	m_y11(*this, "Y11"),
+	m_y(*this, "Y%u", 1),
 	m_write_clock(*this),
 	m_write_data(*this),
 	m_data_in(1),
@@ -365,17 +355,17 @@ READ8_MEMBER( pc1512_keyboard_t::kb_bus_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_kb_y, 0)) data &= m_y1->read();
-	if (!BIT(m_kb_y, 1)) data &= m_y2->read();
-	if (!BIT(m_kb_y, 2)) data &= m_y3->read();
-	if (!BIT(m_kb_y, 3)) data &= m_y4->read();
-	if (!BIT(m_kb_y, 4)) data &= m_y5->read();
-	if (!BIT(m_kb_y, 5)) data &= m_y6->read();
-	if (!BIT(m_kb_y, 6)) data &= m_y7->read();
-	if (!BIT(m_kb_y, 7)) data &= m_y8->read();
-	if (!BIT(m_kb_y, 8)) data &= m_y9->read();
-	if (!BIT(m_kb_y, 9)) data &= m_y10->read();
-	if (!BIT(m_kb_y, 10)) data &= m_y11->read();
+	if (!BIT(m_kb_y, 0)) data &= m_y[0]->read();
+	if (!BIT(m_kb_y, 1)) data &= m_y[1]->read();
+	if (!BIT(m_kb_y, 2)) data &= m_y[2]->read();
+	if (!BIT(m_kb_y, 3)) data &= m_y[3]->read();
+	if (!BIT(m_kb_y, 4)) data &= m_y[4]->read();
+	if (!BIT(m_kb_y, 5)) data &= m_y[5]->read();
+	if (!BIT(m_kb_y, 6)) data &= m_y[6]->read();
+	if (!BIT(m_kb_y, 7)) data &= m_y[7]->read();
+	if (!BIT(m_kb_y, 8)) data &= m_y[8]->read();
+	if (!BIT(m_kb_y, 9)) data &= m_y[9]->read();
+	if (!BIT(m_kb_y, 10)) data &= m_y[10]->read();
 	if (!m_joy_com)
 	{
 		data &= m_joy->joy_r();

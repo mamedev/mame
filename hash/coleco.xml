@@ -2937,24 +2937,24 @@
 
 <!-- Utilities -->
 
-<!-- CBS Colecovision Monitor Test (1982)(CBS).bin 
-		This image may not have been on a real cartridge so until proof of this being something that was actually on a physical chip
-		or any dump history can be discovered (research has produced nothing) it will remain commented.  The "cbsmon.2" image is a 100%
-		dupe of the normal Colecovision BIOS image.  The program itself doesn't have the telltale AA55/55AA header which is present on
-		ALL Colecovision cartridges. -->
+<!-- CBS Colecovision Monitor Test (1982)(CBS).bin
+        This image may not have been on a real cartridge so until proof of this being something that was actually on a physical chip
+        or any dump history can be discovered (research has produced nothing) it will remain commented.  The "cbsmon.2" image is a 100%
+        dupe of the normal Colecovision BIOS image.  The program itself doesn't have the telltale AA55/55AA header which is present on
+        ALL Colecovision cartridges. -->
 
 <!--
-	<software name="cbsmon">
-		<description>CBS Colecovision Monitor Test</description>
-		<year>1982</year>
-		<publisher>CBS</publisher>
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="cbsmon.1" size="8192" crc="1cc13594" sha1="33a2b0ed67feb1193116badbf6b8c7d9a99fa63a" offset="0x0000" />
-				<rom name="cbsmon.2" size="8192" crc="3aa93ef3" sha1="45bedc4cbdeac66c7df59e9e599195c778d86a92" offset="0x2000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="cbsmon">
+        <description>CBS Colecovision Monitor Test</description>
+        <year>1982</year>
+        <publisher>CBS</publisher>
+        <part name="cart" interface="coleco_cart">
+            <dataarea name="rom" size="16384">
+                <rom name="cbsmon.1" size="8192" crc="1cc13594" sha1="33a2b0ed67feb1193116badbf6b8c7d9a99fa63a" offset="0x0000" />
+                <rom name="cbsmon.2" size="8192" crc="3aa93ef3" sha1="45bedc4cbdeac66c7df59e9e599195c778d86a92" offset="0x2000" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="finaltst">

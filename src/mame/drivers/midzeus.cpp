@@ -31,13 +31,11 @@ The Grid         v1.2   10/18/2000
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "includes/midzeus.h"
-#include "includes/midzeus2.h"
 #include "machine/midwayic.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
 
 #include "crusnexo.lh"
-#include "video/zeus2.h"
 
 
 #define CPU_CLOCK       XTAL_60MHz
@@ -61,6 +59,21 @@ static UINT8 cmos_protected;
 static emu_timer *timer[2];
 
 
+/*************************************************************************
+Driver for Midway Zeus2 games
+**************************************************************************/
+#include "video/zeus2.h"
+
+class midzeus2_state : public midzeus_state
+{
+public:
+	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: midzeus_state(mconfig, type, tag), m_zeus(*this, "zeus2") { }
+	required_device<zeus2_device> m_zeus;
+
+	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
+private:
+};
 
 
 

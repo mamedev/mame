@@ -64,6 +64,7 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_READ_LINE_MEMBER( line_r );
 	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( motor_w );
 
 protected:
 	// device-level overrides

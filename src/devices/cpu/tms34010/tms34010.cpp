@@ -586,7 +586,7 @@ void tms340x0_device::device_start()
 	{
 		state_add(TMS34010_PC,     "PC",        m_pc);
 		state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
-		state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
+		state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
 		state_add(TMS34010_SP,     "SP",        m_regs[15].reg);
 		state_add(STATE_GENSP,     "GENSP",     m_regs[15].reg).noshow();
 		state_add(TMS34010_ST,     "ST",        m_st);
@@ -742,8 +742,8 @@ void tms340x0_device::execute_run()
 		do
 		{
 			UINT16 op;
-			debugger_instruction_hook(this, m_pc);
 			m_ppc = m_pc;
+			debugger_instruction_hook(this, m_pc);
 			op = ROPCODE();
 			(this->*s_opcode_table[op >> 4])(op);
 		} while (m_icount > 0);

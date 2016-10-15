@@ -125,8 +125,6 @@ static const int roc10937poslut[]=
 	0//15
 };
 
-const device_type ROC10937 = &device_creator<roc10937_t>;
-
 rocvfd_t::rocvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
@@ -246,6 +244,8 @@ void rocvfd_t::shift_clock(int state)
 }
 
 ///////////////////////////////////////////////////////////////////////////
+const device_type ROC10937 = &device_creator<roc10937_t>;
+
 roc10937_t::roc10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: rocvfd_t(mconfig, ROC10937, "Rockwell 10937 VFD controller and compatible", tag, owner, clock, "roc10937", __FILE__)
 {
@@ -256,6 +256,22 @@ const device_type MSC1937 = &device_creator<msc1937_t>;
 
 msc1937_t::msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: rocvfd_t(mconfig, MSC1937, "OKI MSC1937 VFD controller", tag, owner, clock, "msc1937", __FILE__)
+{
+	m_port_val=0;
+}
+
+const device_type MIC10937 = &device_creator<mic10937_t>;
+
+mic10937_t::mic10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: rocvfd_t(mconfig, MIC10937, "Micrel MIC10937 VFD controller", tag, owner, clock, "mic10937", __FILE__)
+{
+	m_port_val=0;
+}
+
+const device_type S16LF01 = &device_creator<s16lf01_t>;
+
+s16lf01_t::s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: rocvfd_t(mconfig, S16LF01, "Samsung 16LF01 Series VFD controller and compatible", tag, owner, clock, "s16lf01", __FILE__)
 {
 	m_port_val=0;
 }
@@ -377,12 +393,4 @@ void roc10957_t::write_char(int data)
 		break;
 		}
 	}
-}
-
-const device_type S16LF01 = &device_creator<s16lf01_t>;
-
-s16lf01_t::s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: rocvfd_t(mconfig, S16LF01, "Samsung 16LF01 Series VFD controller and compatible", tag, owner, clock, "s16lf01", __FILE__)
-{
-	m_port_val=0;
 }

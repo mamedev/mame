@@ -222,24 +222,12 @@ ioport_constructor adam_keyboard_device::device_input_ports() const
 //  adam_keyboard_device - constructor
 //-------------------------------------------------
 
-adam_keyboard_device::adam_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ADAM_KB, "Adam keyboard", tag, owner, clock, "adam_kb", __FILE__),
-		device_adamnet_card_interface(mconfig, *this),
-		m_maincpu(*this, M6801_TAG),
-		m_y0(*this, "Y0"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
-		m_y10(*this, "Y10"),
-		m_y11(*this, "Y11"),
-		m_y12(*this, "Y12"),
-		m_key_y(0x1ff)
+adam_keyboard_device::adam_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, ADAM_KB, "Adam keyboard", tag, owner, clock, "adam_kb", __FILE__),
+	device_adamnet_card_interface(mconfig, *this),
+	m_maincpu(*this, M6801_TAG),
+	m_y(*this, "Y%u", 0),
+	m_key_y(0x1ff)
 {
 }
 
@@ -288,19 +276,10 @@ READ8_MEMBER( adam_keyboard_device::p1_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_key_y, 0)) data &= m_y0->read();
-	if (!BIT(m_key_y, 1)) data &= m_y1->read();
-	if (!BIT(m_key_y, 2)) data &= m_y2->read();
-	if (!BIT(m_key_y, 3)) data &= m_y3->read();
-	if (!BIT(m_key_y, 4)) data &= m_y4->read();
-	if (!BIT(m_key_y, 5)) data &= m_y5->read();
-	if (!BIT(m_key_y, 6)) data &= m_y6->read();
-	if (!BIT(m_key_y, 7)) data &= m_y7->read();
-	if (!BIT(m_key_y, 8)) data &= m_y8->read();
-	if (!BIT(m_key_y, 9)) data &= m_y9->read();
-	if (!BIT(m_key_y, 10)) data &= m_y10->read();
-	if (!BIT(m_key_y, 11)) data &= m_y11->read();
-	if (!BIT(m_key_y, 12)) data &= m_y12->read();
+	for (int i = 0; i < 13; i++)
+	{
+		if (!BIT(m_key_y, i)) data &= m_y[i]->read();	
+	}
 
 	return data;
 }

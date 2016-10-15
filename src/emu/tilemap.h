@@ -492,7 +492,7 @@ class tilemap_t
 	static const pen_t MAX_PEN_TO_FLAGS = 256;
 
 protected:
-	// tilemap_manager controlls our allocations
+	// tilemap_manager controls our allocations
 	tilemap_t();
 	virtual ~tilemap_t();
 

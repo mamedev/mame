@@ -105,7 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pia_u17_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
 
-	DECLARE_WRITE8_MEMBER(ptm_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
 	UINT8 read_keyboard(int pa);
 };
@@ -248,9 +248,9 @@ INPUT_PORTS_END
     ptm6840_interface ptm_intf
 -------------------------------------------------*/
 
-WRITE8_MEMBER(arachnid_state::ptm_o1_callback)
+WRITE_LINE_MEMBER(arachnid_state::ptm_o1_callback)
 {
-	m_speaker->level_w(data);
+	m_speaker->level_w(state);
 }
 
 UINT8 arachnid_state::read_keyboard(int pa)
@@ -453,7 +453,7 @@ static MACHINE_CONFIG_START( arachnid, arachnid_state )
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_8MHz / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(arachnid_state, ptm_o1_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(arachnid_state, ptm_o1_callback))
 MACHINE_CONFIG_END
 
 /***************************************************************************

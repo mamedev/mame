@@ -11,6 +11,7 @@
 #ifndef __UPD4992DEV_H__
 #define __UPD4992DEV_H__
 
+#include "dirtc.h"
 
 
 //**************************************************************************
@@ -41,7 +42,6 @@ protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 

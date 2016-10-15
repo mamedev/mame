@@ -21,6 +21,7 @@ Notes(general):
   adding a value to these RAM areas according to what button is pressed.
 
 TODO:
+-kakumei2: unemulated RNG;
 -Back layer pens looks ugly in some circumstances (i.e. suchipi when you win, mjzoomin when coined up),
  static or controlled by something else?
 -daireika: the ranking screen on the original pcb shows some hearts instead of the "0".
@@ -39,7 +40,7 @@ TODO:
  the programs are actually into the m68k program itself (like hachamf/tdragon/ddealer);
 -Video code could be optimized too (for example by calling the priority function only when
  priority number is updated), might also need a merging with Jaleco Mega System 1/NMK16 drivers;
-
+ 
 Notes (1st MCU ver.):
 -$f000e is bogus,maybe the program snippets can modify this value,or the MCU itself can
  do that,returning the contents of D0 register seems enough for now...
@@ -52,7 +53,8 @@ Notes (1st MCU ver.):
  BTW,the real HW is using a sort of bankswitch or I'm missing something?
 -$f0020 is for the sound program,same for all games, for example mjzoomin hasn't any clear
  write to $80040 area and the program jumps to $f0020 when there should be a sample.
-
+-Likewise, D0 upper byte is used but currently ignored.
+ 
 ============================================================================================
 Debug cheats:
 
@@ -2471,10 +2473,10 @@ DRIVER_INIT_MEMBER(jalmah_state,suchipi)
 }
 
 /*First version of the MCU*/
-GAME( 1989, urashima, 0, urashima,  urashima, jalmah_state,   urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, daireika, 0, jalmah,    daireika, jalmah_state,   daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin, jalmah_state,   mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, urashima, 0, urashima,  urashima, jalmah_state,   urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1989, daireika, 0, jalmah,    daireika, jalmah_state,   daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin, jalmah_state,   mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 /*Second version of the MCU*/
 GAME( 1990, kakumei,  0, jalmah,    kakumei, jalmah_state,    kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state,   kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state,   kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1993, suchipi,  0, jalmah,    suchipi, jalmah_state,    suchipi,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special (Japan)",       MACHINE_IMPERFECT_GRAPHICS )

@@ -61,16 +61,6 @@ void upd4992_device::device_start()
 }
 
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void upd4992_device::device_reset()
-{
-	set_current_time(machine());
-}
-
-
 void upd4992_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)

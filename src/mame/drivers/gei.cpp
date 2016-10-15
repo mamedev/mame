@@ -1465,6 +1465,19 @@ ROM_START( gepoker2 ) /* v50.02 with control dated 9-30-84 */
 	ROM_LOAD( "horserace_icb_1-1-87",      0x12000, 0x2000, CRC(6d5092e3) SHA1(ef99d1b858aef3c438c61c2b17e371dc6aca6623) )
 ROM_END
 
+ROM_START( gepoker3 ) /* v50.02 with control dated 9-30-84 */
+	ROM_REGION( 0x1b000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "cont_9-30_m105_pts.2c",  0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
+	ROM_LOAD( "hrom_6-25_m105_pts.1c",  0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
+	/* Banked roms */
+	ROM_LOAD( "pokr_chig_2-12_m105.1",	0x10000, 0x2000, CRC(a1cbf67b) SHA1(a6cd081bbb19b2dd1a84b7750eac8a5258a663eb) )//not original sticker, twice the size of a regular rom, but still don't match
+	ROM_CONTINUE( 0x10000, 0x2000) /* Discarding 1nd half, 0xff filled*/
+	ROM_LOAD( "bljk_9-30_m105_pts.2",	0x12000, 0x2000, CRC(82804184) SHA1(2e2e6a80c99c8eb226dc54c1d32d0bf24de300a4) )
+	ROM_LOAD( "bone_8-16_m105_pts.3",   0x14000, 0x2000, CRC(52d66cb6) SHA1(57db34906fcafd37f3a361df209dafe080aeac16) )
+	ROM_LOAD( "slot_9-30_m105_pts.4", 	0x16000, 0x2000, CRC(713c3963) SHA1(a9297c04fc44522ca6891516a2c744712132896a) )
+	ROM_LOAD( "bingo_8-16_m105.5",	 	0x18000, 0x2000, CRC(de87ed0a) SHA1(4a26d93368c1a39dd38aabe450c34203101f0ef7) ) //not original sticker selftest report 10-7-86 date!!
+ROM_END
+
 ROM_START( amuse ) /* v50.08 with most roms for IAM dated 8-16-84 */
 	ROM_REGION( 0x24000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "control_iam_8-16",  0x00000, 0x4000, CRC(345434b9) SHA1(ec880f6f5e90aa971937e0270701e323f6a83671) ) /* all roms were 27128, twice the size of other sets */
@@ -1889,6 +1902,7 @@ GAME( 1983, amuse1a,  amuse,    amuse1,   gepoker, driver_device,  0,       ROT0
 GAME( 1984, gepoker,  0,        gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1984, gepoker1, gepoker,  gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1984, gepoker2, gepoker,  gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 3)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gepoker3, gepoker,  gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 4)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1984, gtsers1,  0,        getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 1)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1984, gtsers2,  gtsers1,  getrivia, getrivia, driver_device, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 2)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

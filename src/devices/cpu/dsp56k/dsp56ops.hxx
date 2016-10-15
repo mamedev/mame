@@ -240,9 +240,10 @@ static void execute_one(dsp56k_core* cpustate)
 	UINT8 cycle_count = 0;
 
 	/* For MAME */
-	cpustate->op = ROPCODE(ADDRESS(PC));
+	cpustate->ppc = PC;
 	debugger_instruction_hook(cpustate->device, PC);
 
+	cpustate->op = ROPCODE(ADDRESS(PC));
 	/* The words we're going to be working with */
 	op = ROPCODE(ADDRESS(PC));
 	op2 = ROPCODE(ADDRESS(PC) + ADDRESS(1));
@@ -2499,10 +2500,7 @@ static size_t dsp56k_op_bcc(dsp56k_core* cpustate, const UINT16 op, const UINT16
 	{
 		INT16 offset = (INT16)op2;
 
-		PC += 2;
-
-		cpustate->ppc = PC;
-		PC += offset;
+		PC += offset + 2;
 
 		cycles += 4;
 		return 0;
@@ -2527,10 +2525,7 @@ static size_t dsp56k_op_bcc_1(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	{
 		INT16 offset = (INT16)assemble_address_from_6bit_signed_relative_short_address(cpustate, BITS(op,0x003f));
 
-		PC += 1;
-
-		cpustate->ppc = PC;
-		PC += offset;
+		PC += offset + 1;
 
 		cycles += 4;
 		return 0;
@@ -2572,7 +2567,6 @@ static size_t dsp56k_op_bra_1(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	PC += 1;
 
 	/* Jump */
-	cpustate->ppc = PC;
 	PC += branchOffset;
 
 	/* S L E U N Z V C */
@@ -2597,7 +2591,6 @@ static size_t dsp56k_op_brkcc(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	if (shouldBreak)
 	{
 		/* TODO: I think this PC = LA thing is off-by-1, but it's working this way because its consistently so */
-		cpustate->ppc = PC;
 		PC = LA;
 
 		SR = SSL;   /* TODO: A-83.  I believe only the Loop Flag and Forever Flag come back here. */
@@ -2637,7 +2630,6 @@ static size_t dsp56k_op_bscc(dsp56k_core* cpustate, const UINT16 op, const UINT1
 		SSL = SR;
 
 		/* Change */
-		cpustate->ppc = PC;
 		PC = PC + (INT16)op2;
 
 		/* S L E U N Z V C */
@@ -2672,7 +2664,6 @@ static size_t dsp56k_op_bsr(dsp56k_core* cpustate, const UINT16 op, const UINT16
 	SSL = SR;
 
 	/* Change */
-	cpustate->ppc = PC;
 	PC = PC + (INT16)op2;
 
 	/* S L E U N Z V C */
@@ -2838,7 +2829,6 @@ static size_t dsp56k_op_do_1(dsp56k_core* cpustate, const UINT16 op, const UINT1
 	else
 	{
 		/* Skip over the contents of the loop */
-		cpustate->ppc = PC;
 		PC = PC + 2 + op2;
 
 		cycles += 10;   /* TODO: + mv oscillator cycles */
@@ -2908,7 +2898,6 @@ static size_t dsp56k_op_do_2(dsp56k_core* cpustate, const UINT16 op, const UINT1
 	else
 	{
 		/* Skip over the contents of the loop */
-		cpustate->ppc = PC;
 		PC = PC + 2 + op2;
 
 		cycles += 10;   /* TODO: + mv oscillator cycles */
@@ -3048,7 +3037,6 @@ static size_t dsp56k_op_jcc_1(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 /* JMP : 0000 0001 0011 01-- xxxx xxxx xxxx xxxx : A-110 */
 static size_t dsp56k_op_jmp(dsp56k_core* cpustate, const UINT16 op, const UINT16 op2, UINT8* cycles)
 {
-	cpustate->ppc = PC;
 	PC = op2;
 
 	/* S L E U N Z V C */
@@ -3064,7 +3052,6 @@ static size_t dsp56k_op_jmp_1(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	typed_pointer R = { nullptr, DT_BYTE };
 	decode_RR_table(cpustate, BITS(op,0x0003), &R);
 
-	cpustate->ppc = PC;
 	PC = *((UINT16*)R.addr);
 
 	/* S L E U N Z V C */
@@ -3091,7 +3078,6 @@ static size_t dsp56k_op_jscc(dsp56k_core* cpustate, const UINT16 op, const UINT1
 		SSH = PC;
 		SSL = SR;
 
-		cpustate->ppc = PC;
 		PC = branchOffset;
 
 		cycles += 4;    /* TODO: +jx oscillator clock cycles */
@@ -3133,7 +3119,6 @@ static size_t dsp56k_op_jsr(dsp56k_core* cpustate, const UINT16 op, const UINT16
 		SSH = cpustate->ppc;
 		SSL = SR;
 
-		cpustate->ppc = cpustate->ppc;
 		PC = branchOffset;
 	}
 	else
@@ -3143,7 +3128,6 @@ static size_t dsp56k_op_jsr(dsp56k_core* cpustate, const UINT16 op, const UINT16
 		SSH = PC;
 		SSL = SR;
 
-		cpustate->ppc = PC;
 		PC = branchOffset;
 	}
 
@@ -3863,7 +3847,6 @@ static size_t dsp56k_op_rti(dsp56k_core* cpustate, const UINT16 op, UINT8* cycle
 		return 0;
 	}
 
-	cpustate->ppc = PC;
 	PC = SSH;
 
 	SR = SSL;
@@ -3880,7 +3863,6 @@ static size_t dsp56k_op_rti(dsp56k_core* cpustate, const UINT16 op, UINT8* cycle
 static size_t dsp56k_op_rts(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
 	/* Pop */
-	cpustate->ppc = PC;
 	PC = SSH;
 
 	/* SR = SSL; The status register is not affected. */
@@ -4586,7 +4568,6 @@ static void dsp56k_process_loop(dsp56k_core* cpustate)
 		{
 			LC--;
 
-			cpustate->ppc = PC;
 			PC = SSH;
 		}
 	}

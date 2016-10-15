@@ -13,6 +13,7 @@
 #define __RTC4543_H__
 
 #include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -63,7 +64,7 @@ protected:
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
-	virtual bool rtc_feature_leap_year() override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
 
 	// helpers
 	virtual void ce_rising();

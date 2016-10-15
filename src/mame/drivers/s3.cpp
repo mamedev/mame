@@ -523,7 +523,7 @@ ROM_START(wldcp_l1)
 	ROM_LOAD("white2wc.716", 0x1800, 0x0800, CRC(618d15b5) SHA1(527387893eeb2cd4aa563a4cfb1948a15d2ed741))
 
 	ROM_REGION(0x0800, "audioroms", 0)
-	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_LOAD("481_s0_world_cup.716",   0x0000, 0x0800, CRC(cf012812) SHA1(26074f6a44075a94e6f91de1dbf92f8ec3ff8ca4))
 ROM_END
 
 /*-------------------------------------
@@ -536,7 +536,7 @@ ROM_START(cntct_l1)
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
 	ROM_REGION(0x0800, "audioroms", 0)
-	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_LOAD("482_s0_contact.716",   0x0000, 0x0800, CRC(d3c713da) SHA1(1fc4a8fadf472e9a04b3a86f60a9d625d07764e1))
 ROM_END
 
 /*-------------------------------------
@@ -549,7 +549,7 @@ ROM_START(disco_l1)
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
 	ROM_REGION(0x0800, "audioroms", 0)
-	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_LOAD("483_s0_disco_fever.716",   0x0000, 0x0800, CRC(d1cb5047) SHA1(7f36296975df19feecc6456ffb91f4a23bcad037))
 ROM_END
 
 /*--------------------------------
@@ -562,7 +562,7 @@ ROM_START(phnix_l1)
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
 	ROM_REGION(0x0800, "audioroms", 0)
-	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_LOAD("485_s0_phoenix.716",   0x0000, 0x0800, CRC(1c3dea6e) SHA1(04bfe952be2eab66f023b204c21a1bd461ea572f))
 ROM_END
 
 /*--------------------------------

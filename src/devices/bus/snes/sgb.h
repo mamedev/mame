@@ -20,12 +20,11 @@ class sns_rom_sgb_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_sgb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) override;
@@ -45,10 +44,12 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(gb_ie_w);
 	virtual DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
-	required_device<lr35902_cpu_device> m_gb_cpu;
-	required_device<gameboy_sound_device> m_gb_snd;
-	required_device<sgb_lcd_device> m_gb_lcd;
+protected:
+	required_device<lr35902_cpu_device> m_sgb_cpu;
+	required_device<gameboy_sound_device> m_sgb_apu;
+	required_device<sgb_ppu_device> m_sgb_ppu;
 	required_device<gb_cart_slot_device> m_cartslot;
+	required_memory_region m_region_bios;
 
 	void lcd_render(UINT32 *source);
 
@@ -69,10 +70,36 @@ public:
 	// input bits
 	int m_packetsize;
 	UINT8 m_packet_data[64][16];
+
+	bool m_bios_disabled;
 };
 
 
+class sns_rom_sgb1_device : public sns_rom_sgb_device
+{
+public:
+	// construction/destruction
+	sns_rom_sgb1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
+class sns_rom_sgb2_device : public sns_rom_sgb_device
+{
+public:
+    // construction/destruction
+    sns_rom_sgb2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    // device-level overrides
+    virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
 // device type definition
 extern const device_type SNS_LOROM_SUPERGB;
+extern const device_type SNS_LOROM_SUPERGB2;
 
 #endif

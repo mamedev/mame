@@ -70,6 +70,7 @@ void necdsp_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC, "GENPC", regs.pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", regs.pc).noshow();
 	state_add(UPD7725_PC, "PC", regs.pc);
 	state_add(UPD7725_RP, "RP", regs.rp);
 	state_add(UPD7725_DP, "DP", regs.dp);

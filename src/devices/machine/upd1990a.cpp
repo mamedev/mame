@@ -83,9 +83,6 @@ void upd1990a_device::device_start()
 	m_write_data.resolve_safe();
 	m_write_tp.resolve_safe();
 
-	// initialize
-	set_current_time(machine());
-
 	for (auto & elem : m_shift_reg)
 		elem = 0;
 

@@ -28,13 +28,13 @@
 	ptm6840_device::set_external_clocks(*device, _clk0, _clk1, _clk2);
 
 #define MCFG_PTM6840_OUT0_CB(_devcb) \
-	devcb = &ptm6840_device::set_out0_callback(*device, DEVCB_##_devcb);
+	devcb = &ptm6840_device::set_out_callback(*device, 0, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_OUT1_CB(_devcb) \
-	devcb = &ptm6840_device::set_out1_callback(*device, DEVCB_##_devcb);
+	devcb = &ptm6840_device::set_out_callback(*device, 1, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_OUT2_CB(_devcb) \
-	devcb = &ptm6840_device::set_out2_callback(*device, DEVCB_##_devcb);
+	devcb = &ptm6840_device::set_out_callback(*device, 2, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_IRQ_CB(_devcb) \
 	devcb = &ptm6840_device::set_irq_callback(*device, DEVCB_##_devcb);
@@ -53,13 +53,11 @@ public:
 
 	static void set_internal_clock(device_t &device, double clock) { downcast<ptm6840_device &>(device).m_internal_clock = clock; }
 	static void set_external_clocks(device_t &device, double clock0, double clock1, double clock2) { downcast<ptm6840_device &>(device).m_external_clock[0] = clock0; downcast<ptm6840_device &>(device).m_external_clock[1] = clock1; downcast<ptm6840_device &>(device).m_external_clock[2] = clock2; }
-	template<class _Object> static devcb_base &set_out0_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_out0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out1_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_out1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out2_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_out2_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_callback(device_t &device, int index, _Object object) { return downcast<ptm6840_device &>(device).m_out_cb[index].set_callback(object); }
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_irq_cb.set_callback(object); }
 
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
-	int irq_state() const { return m_IRQ; }                 // get IRQ state
+	int irq_state() const { return m_irq; }                 // get IRQ state
 	UINT16 count(int counter) const { return compute_counter(counter); }    // get counter value
 	void set_ext_clock(int counter, double clock);  // set clock frequency
 	int ext_clock(int counter) const { return m_external_clock[counter]; }  // get clock frequency
@@ -108,13 +106,30 @@ private:
 		PTM_6840_LSB3    = 7
 	};
 
+	enum
+	{
+		RESET_TIMERS    = 0x01,
+		CR1_SELECT      = 0x01,
+		T3_PRESCALE_EN  = 0x01,
+		INTERNAL_CLK_EN = 0x02,
+		COUNT_MODE_8BIT = 0x04,
+		INTERRUPT_EN    = 0x40,
+		COUNT_OUT_EN    = 0x80
+	};
+
+	enum
+	{
+		TIMER1_IRQ  = 0x01,
+		TIMER2_IRQ  = 0x02,
+		TIMER3_IRQ  = 0x04,
+		ANY_IRQ     = 0x80
+	};
+
 	double m_internal_clock;
 	double m_external_clock[3];
 
-	devcb_write8 m_out0_cb;
-	devcb_write8 m_out1_cb;
-	devcb_write8 m_out2_cb;
-	devcb_write_line m_irq_cb;  // function called if IRQ line changes
+	devcb_write_line m_out_cb[3];
+	devcb_write_line m_irq_cb;
 
 	UINT8 m_control_reg[3];
 	UINT8 m_output[3]; // Output states
@@ -125,7 +140,7 @@ private:
 	UINT8 m_fired[3];
 	UINT8 m_t3_divisor;
 	UINT8 m_t3_scaler;
-	UINT8 m_IRQ;
+	UINT8 m_irq;
 	UINT8 m_status_reg;
 	UINT8 m_status_read_since_int;
 	UINT8 m_lsb_buffer;

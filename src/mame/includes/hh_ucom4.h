@@ -36,9 +36,13 @@ public:
 
 	// misc common
 	UINT8 m_port[9];                    // MCU port A-I write data (optional)
+	UINT8 m_int;                        // MCU INT pin state
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
 
 	UINT8 read_inputs(int columns);
+	void refresh_interrupts(void);
+	void set_interrupt(int state);
+	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)

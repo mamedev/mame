@@ -7498,6 +7498,12 @@ static GFXDECODE_START( tndrcade )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
 GFXDECODE_END
 
+// TODO: pairlove sets up two identical palette banks at 0-1ff and 0x200-0x3ff in-game, 0x200-0x3ff only in service mode.
+//       Maybe there's a color offset register to somewhere?
+static GFXDECODE_START( pairlove )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*1, 32 ) // [0] Sprites
+GFXDECODE_END
+
 /***************************************************************************
                                 Orbs
 ***************************************************************************/
@@ -9457,7 +9463,7 @@ static MACHINE_CONFIG_START( pairlove, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pairlove)
 	MCFG_PALETTE_ADD("palette", 2048)   /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)

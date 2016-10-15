@@ -10,10 +10,6 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef __DIRTC_H__
 #define __DIRTC_H__
 
@@ -52,7 +48,9 @@ public:
 	virtual ~device_rtc_interface();
 
 	void set_time(bool update, int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	void set_current_time(running_machine &machine);
+	void set_current_time(const system_time &systime);
+
+	bool has_battery() const { return rtc_battery_backed(); }
 
 protected:
 	static UINT8 convert_to_bcd(int val);
@@ -68,12 +66,16 @@ protected:
 	void adjust_seconds();
 
 	// derived class overrides
-	virtual bool rtc_feature_y2k() { return false; }
-	virtual bool rtc_feature_leap_year() { return false; }
-	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) { }
+	virtual bool rtc_feature_y2k() const { return false; }
+	virtual bool rtc_feature_leap_year() const { return false; }
+	virtual bool rtc_battery_backed() const { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) = 0;
 
 	int m_register[7];
 };
+
+// iterator
+typedef device_interface_iterator<device_rtc_interface> rtc_interface_iterator;
 
 
 #endif  /* __DIRTC_H__ */

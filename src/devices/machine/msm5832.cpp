@@ -122,16 +122,6 @@ void msm5832_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void msm5832_device::device_reset()
-{
-	set_current_time(machine());
-}
-
-
-//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 

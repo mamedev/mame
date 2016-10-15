@@ -879,5 +879,3 @@ bool software_name_parse(const std::string &identifier, std::string *list_name, 
 		*part_name = identifier.substr(split2 + 1);
 	return true;
 }
-
-

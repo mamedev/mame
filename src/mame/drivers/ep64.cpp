@@ -149,8 +149,72 @@ Notes: (All IC's shown)
 
 */
 
-#include "includes/ep64.h"
+#include "emu.h"
 #include "softlist.h"
+#include "audio/dave.h"
+#include "bus/rs232/rs232.h"
+#include "bus/ep64/exp.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "machine/ram.h"
+#include "video/nick.h"
+
+#define Z80_TAG         "u1"
+#define DAVE_TAG        "u3"
+#define NICK_TAG        "u4"
+#define CENTRONICS_TAG  "centronics"
+#define RS232_TAG       "rs232"
+#define CASSETTE1_TAG   "cassette1"
+#define CASSETTE2_TAG   "cassette2"
+#define SCREEN_TAG      "screen"
+
+class ep64_state : public driver_device
+{
+public:
+	ep64_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_dave(*this, DAVE_TAG),
+		m_nick(*this, NICK_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_rs232(*this, RS232_TAG),
+		m_cassette1(*this, CASSETTE1_TAG),
+		m_cassette2(*this, CASSETTE2_TAG),
+		m_cart(*this, "cartslot"),
+		m_ram(*this, RAM_TAG),
+		m_rom(*this, Z80_TAG),
+		m_y(*this, "Y%u", 0)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<dave_device> m_dave;
+	required_device<nick_device> m_nick;
+	required_device<centronics_device> m_centronics;
+	required_device<rs232_port_device> m_rs232;
+	required_device<cassette_image_device> m_cassette1;
+	required_device<cassette_image_device> m_cassette2;
+	required_device<generic_slot_device> m_cart;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_ioport_array<10> m_y;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_READ8_MEMBER( rd0_r );
+	DECLARE_WRITE8_MEMBER( wr0_w );
+	DECLARE_READ8_MEMBER( rd1_r );
+	DECLARE_WRITE8_MEMBER( wr2_w );
+
+	UINT8 m_key;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	int m_centronics_busy;
+};
+
 
 
 //**************************************************************************
@@ -165,18 +229,9 @@ READ8_MEMBER( ep64_state::rd0_r )
 {
 	UINT8 data = 0xff;
 
-	switch (m_key)
+	if (m_key < 10)
 	{
-	case 0: data &= m_y0->read(); break;
-	case 1: data &= m_y1->read(); break;
-	case 2: data &= m_y2->read(); break;
-	case 3: data &= m_y3->read(); break;
-	case 4: data &= m_y4->read(); break;
-	case 5: data &= m_y5->read(); break;
-	case 6: data &= m_y6->read(); break;
-	case 7: data &= m_y7->read(); break;
-	case 8: data &= m_y8->read(); break;
-	case 9: data &= m_y9->read(); break;
+		data &= m_y[m_key]->read();
 	}
 
 	return data;

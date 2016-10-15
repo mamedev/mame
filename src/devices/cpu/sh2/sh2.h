@@ -42,7 +42,7 @@
 
 enum
 {
-	SH2_PC=1, SH2_SR, SH2_PR, SH2_GBR, SH2_VBR, SH2_MACH, SH2_MACL,
+	SH2_PC = STATE_GENPC, SH2_SR=1, SH2_PR, SH2_GBR, SH2_VBR, SH2_MACH, SH2_MACL,
 	SH2_R0, SH2_R1, SH2_R2, SH2_R3, SH2_R4, SH2_R5, SH2_R6, SH2_R7,
 	SH2_R8, SH2_R9, SH2_R10, SH2_R11, SH2_R12, SH2_R13, SH2_R14, SH2_R15, SH2_EA
 };
@@ -130,7 +130,6 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
@@ -145,7 +144,6 @@ private:
 	// Data that needs to be stored close to the generated DRC code
 	struct internal_sh2_state
 	{
-		UINT32  ppc;
 		UINT32  pc;
 		UINT32  pr;
 		UINT32  sr;

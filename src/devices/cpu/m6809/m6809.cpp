@@ -140,7 +140,7 @@ void m6809_base_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc.w).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_ppc.w).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_cc).callimport().callexport().formatstr("%8s").noshow();
 	state_add(M6809_PC,        "PC",        m_pc.w).mask(0xffff);
 	state_add(M6809_S,         "S",         m_s.w).mask(0xffff);

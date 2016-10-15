@@ -947,7 +947,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(38*8, 32*8)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcona1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
@@ -985,6 +985,13 @@ static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
 	MCFG_CPU_REPLACE("mcu", NAMCO_C70, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( namcona2w, namcona2 )
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 38*8-1-0, 4*8, 32*8-1)
 MACHINE_CONFIG_END
 
 
@@ -1324,7 +1331,7 @@ GAME( 1993, tinklpit,   0,        namcona1w, namcona1_joy, namcona1_state, tinkl
 GAME( 1992, knckhead,   0,        namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, knckheadj,  knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, knckheadjp, knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan, Prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, emeralda,   0,        namcona2,  namcona1_joy, namcona1_state, emeralda, ROT0, "Namco", "Emeraldia (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, emeralda,   0,        namcona2w, namcona1_joy, namcona1_state, emeralda, ROT0, "Namco", "Emeraldia (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, numanath,   0,        namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, numanathj,  numanath, namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona1_state,quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", MACHINE_SUPPORTS_SAVE )

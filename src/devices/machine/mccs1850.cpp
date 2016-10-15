@@ -299,13 +299,17 @@ mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  set_counter - set the counter at startup time
+//  rtc_clock_changed -
 //-------------------------------------------------
 
-void mccs1850_device::set_counter(UINT32 value)
+void mccs1850_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	m_counter = value;
+	// FIXME: implement this properly
+	system_time systime;
+	machine().base_datetime(systime);
+	m_counter = systime.time;
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup

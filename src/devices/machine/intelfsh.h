@@ -18,6 +18,9 @@
 #define MCFG_SHARP_LH28F016S_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SHARP_LH28F016S, 0)
 
+#define MCFG_SHARP_LH28F016S_16BIT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SHARP_LH28F016S_16BIT, 0)
+
 #define MCFG_ATMEL_29C010_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, ATMEL_29C010, 0)
 
@@ -124,6 +127,7 @@ public:
 		FLASH_AMD_29F800T,
 		FLASH_AMD_29LV200T,
 		FLASH_SHARP_LH28F016S,
+		FLASH_SHARP_LH28F016S_16BIT,
 		FLASH_INTEL_E28F008SA,
 		FLASH_MACRONIX_29L001MC,
 		FLASH_MACRONIX_29LV160TMC,
@@ -305,6 +309,12 @@ public:
 	sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class sharp_lh28f016s_16bit_device : public intelfsh16_device
+{
+public:
+	sharp_lh28f016s_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class intel_e28f008sa_device : public intelfsh8_device
 {
 public:
@@ -406,6 +416,7 @@ public:
 // device type definition
 extern const device_type INTEL_28F016S5;
 extern const device_type SHARP_LH28F016S;
+extern const device_type SHARP_LH28F016S_16BIT;
 extern const device_type ATMEL_29C010;
 extern const device_type AMD_29F010;
 extern const device_type AMD_29F040;

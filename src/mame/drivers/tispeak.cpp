@@ -157,9 +157,9 @@ Speak & Math:
     - VSM(2/2): 16KB CD2393
     - VFD: Futaba 9SY -02Z 7E
     - notes: As with the Speak & Spell, the voice actor was a radio announcer.
-      However, the phrase "is greater than or less than" had to be added in a
-      hurry by one of the TI employees in a hurry, the day before a demo.
-      Apparently QA never found out and it ended up in the final product.
+      However, the phrase "is greater than or less than" had to be added by one
+      of the TI employees in a hurry, the day before a demo. Apparently QA
+      never found out and it ended up in the final product.
 
     Speak & Math (US), 1986
     - MCU: CD2708, label CD2708N2L (die label TMC0270F 2708A)

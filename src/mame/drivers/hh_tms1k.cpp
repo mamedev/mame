@@ -7,8 +7,6 @@
   part of a series is (or will be) in its own driver, see:
   - hh_tms1k: here
   - microvsn: Milton Bradley MicroVision
-  - mbdtower: Milton Bradley Dark Tower
-  - elecbowl: Marx Electronic Bowling
   - ticalc1x: TI TMS1K-based calculators
   - tispellb: TI Spelling B series gen. 1
   - tispeak: TI Speak & Spell series gen. 1
@@ -21,38 +19,40 @@
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
- @MP0158   TMS1000   1979, Entex Soccer
- *MP0163   TMS1000   1979, LJN Electronic Concentration
+ @MP0158   TMS1000   1979, Entex Soccer (6003)
+ @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
  *MP0168   TMS1000   1979, Conic Basketball/Tandy Sports Arena
  @MP0170   TMS1000   1979, Conic Football
- *MP0230   TMS1000?  1980, Entex Blast It
+ *MP0230   TMS1000?  1980, Entex Blast It (6015)
  @MP0914   TMS1000   1979, Entex Baseball 1
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
- @MP0923   TMS1000   1979, Entex Baseball 2
+ *MP0920   TMS1000   1979, Entex Space Battle (6004)
+ @MP0923   TMS1000   1979, Entex Baseball 2 (6002)
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
  @MP1180   TMS1100   1980, Tomy Power House Pinball
  @MP1181   TMS1100   1979, Conic Football 2
- *MP1193   TMS1100   1980, Tandy Championship Football (model 60-2150)
+ @MP1183   TMS1100   1980, E.R.S. Superbowl XV Football/Tandy Championship Football (model 60-2151)
+ @MP1193   TMS1100   1980, Tandy Championship Football (model 60-2150)
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
- @MP1211   TMS1100   1980, Entex Space Invader
+ @MP1211   TMS1100   1980, Entex Space Invader (6012)
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
- @MP1221   TMS1100   1980, Entex Raise The Devil
+ @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
  *MP1296   TMS1100?  1982, Entex Black Knight
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
  *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000 (? note: VFD-capable)
- *MP1801   TMS1100?  1981, Tiger Copycat Jr/Ditto/Tandy Pocket Repeat
- @MP2105   TMS1370   1979, Gakken/Entex Poker
+ @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
+ @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
- *MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, 1st version)
- @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
+ @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
+ @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
  *MP3300   TMS1000   1980, Estrela Genius (from Brazil, looks and plays identical to Simon)
@@ -60,7 +60,7 @@
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
  *M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device, decap/dump is available
-  MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.cpp
+ @MP3403   TMS1100   1978, Marx Electronic Bowling
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
@@ -82,7 +82,7 @@
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
- *M34018   TMS1100   1981, Coleco Head to Head Boxing
+ @M34018   TMS1100   1981, Coleco Head to Head Boxing
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  *M34078A  TMS1100   1983, Milton Bradley Arcade Mania
@@ -93,11 +93,11 @@
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
   MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tispeak.cpp
-  MP7332   TMS1400   1981, Milton Bradley Dark Tower -> mbdtower.cpp
+ @MP7332   TMS1400   1981, Milton Bradley Dark Tower
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400   1982, Parker Brothers Master Merlin
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
- @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (note: assume F to be a misprint)
+ @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
  *MP7573   TMS1670?  1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
 
   inconsistent:
@@ -118,7 +118,9 @@
     brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
-  - finish bship SN76477 sound
+  - bship discrete sound, netlist is documented
+  - finish bshipb SN76477 sound
+  - improve elecbowl driver
 
 ***************************************************************************/
 
@@ -140,6 +142,7 @@
 #include "comp4.lh" // clickable
 #include "copycat.lh" // clickable
 #include "copycatm2.lh" // clickable
+#include "ditto.lh" // clickable
 #include "cqback.lh"
 #include "ebball.lh"
 #include "ebball2.lh"
@@ -147,15 +150,19 @@
 #include "ebaskb2.lh"
 #include "efootb4.lh"
 #include "einvader.lh" // test-layout(but still playable)
+#include "elecbowl.lh"
 #include "elecdet.lh"
 #include "esoccer.lh"
 #include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
 #include "gpoker.lh"
 #include "h2hbaseb.lh"
+#include "h2hboxing.lh"
 #include "h2hfootb.lh"
 #include "lostreas.lh" // clickable
+#include "matchnum.lh" // clickable
 #include "mathmagi.lh"
+#include "mbdtower.lh" // clickable
 #include "mdndclab.lh" // clickable
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
@@ -166,10 +173,12 @@
 #include "ssimon.lh" // clickable
 #include "ssports4.lh"
 #include "starwbc.lh" // clickable
-#include "stopthie.lh" // clickable
+#include "stopthief.lh"
 #include "tandy12.lh" // clickable
 #include "tbreakup.lh"
 #include "tc4.lh"
+#include "tcfball.lh"
+#include "tcfballa.lh"
 #include "zodiac.lh"
 
 #include "hh_tms1k_test.lh" // common test-layout - use external artwork
@@ -385,6 +394,137 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 
 /***************************************************************************
 
+  A-One LSI Match Number
+  * PCB label PT-204 "Pair Card"
+  * TMS1000NLL MP0163 (die label 1000B, MP0163)
+  * 2x2-digit 7seg LED displays + 3 LEDs, 1-bit sound
+
+  A-One was a subsidiary of Bandai? The PCB serial PT-xxx is same, and the font
+  used on the boxes for "A-One LSI" is same as "Bandai Electronics" from early-80s.
+
+  known releases:
+  - Japan: Match Number (white case, Queen playing card bezel)
+  - USA: Electronic Concentration, distributed by LJN (black case, rainbow pattern bezel)
+  - UK: Electronic Concentration, distributed by Peter Pan Playthings (same as USA version)
+
+***************************************************************************/
+
+class matchnum_state : public hh_tms1k_state
+{
+public:
+	matchnum_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void matchnum_state::prepare_display()
+{
+	set_display_segmask(0xf, 0x7f);
+	display_matrix(8, 4, m_o, m_r);
+}
+
+WRITE16_MEMBER(matchnum_state::write_r)
+{
+	// R3-R5,R8-R10: input mux
+	m_inp_mux = (data >> 3 & 7) | (data >> 5 & 0x38);
+
+	// R6,R7: speaker out
+	m_speaker->level_w(data >> 6 & 3);
+
+	// R0-R3: digit/led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(matchnum_state::write_o)
+{
+	// O0-O6: digit segments A-G
+	// O7: led data
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(matchnum_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+
+// config
+
+static INPUT_PORTS_START( matchnum )
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 16")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 15")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 14")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 13")
+
+	PORT_START("IN.1") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 20")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 19")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 18")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 17")
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Change")
+	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("IN.3") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 12")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 11")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 10")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 9")
+
+	PORT_START("IN.4") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 5")
+
+	PORT_START("IN.5") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 1")
+INPUT_PORTS_END
+
+static const INT16 matchnum_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+
+static MACHINE_CONFIG_START( matchnum, matchnum_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(matchnum_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(matchnum_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(matchnum_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_matchnum)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, matchnum_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   APF Mathemagician
   * TMS1100 MCU, label MP1030 (no decap)
   * 2 x DS8870N - Hex LED Digit Driver
@@ -503,7 +643,6 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
-
 
 // output PLA is not decapped
 static const UINT16 mathmagi_output_pla[0x20] =
@@ -793,7 +932,6 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 // output PLA is not decapped
 static const UINT16 zodiac_output_pla[0x20] =
 {
@@ -974,12 +1112,12 @@ MACHINE_CONFIG_END
   * TMS1100NLLE (rev. E!) MP3460 (die label same)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
+  LED electronic football game. To distinguish between offense and defense,
+  offense blips (should) appear brighter. The hardware is similar to cqback.
+
   known releases:
   - USA(1): Head to Head Football
   - USA(2): Team Play Football, distributed by Sears
-
-  LED electronic football game. To distinguish between offense and defense,
-  offense blips (should) appear brighter. The hardware is similar to cqback.
 
 ***************************************************************************/
 
@@ -1228,6 +1366,118 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Coleco Head to Head Boxing
+  * TMS1100NLL M34018-N2 (die label M34018)
+  * 2-digit 7seg LED display, LED grid display, 1-bit sound
+
+  This appears to be the last game of Coleco's Head to Head series.
+
+***************************************************************************/
+
+class h2hboxing_state : public hh_tms1k_state
+{
+public:
+	h2hboxing_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void h2hboxing_state::prepare_display()
+{
+	set_display_segmask(0x600, 0x7f);
+	display_matrix(8, 11, m_o, m_r);
+}
+
+WRITE16_MEMBER(h2hboxing_state::write_r)
+{
+	// R0-R4: input mux
+	m_inp_mux = data & 0x1f;
+
+	// R8: speaker out
+	m_speaker->level_w(data >> 8 & 1);
+
+	// R0-R7: select led
+	// R9,R10: select digit
+	m_r = data & ~0x100;
+	prepare_display();
+}
+
+WRITE16_MEMBER(h2hboxing_state::write_o)
+{
+	// O0-O7: digit segments/led data
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(h2hboxing_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(5);
+}
+
+
+// config
+
+static INPUT_PORTS_START( h2hboxing )
+	PORT_START("IN.0") // R0
+	PORT_CONFNAME( 0x01, 0x00, "Players" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Punch / Pro")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Block / Amateur")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Punch")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Block")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( h2hboxing, h2hboxing_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=39K, C=100pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(h2hboxing_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hboxing_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hboxing_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hboxing)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Coleco Total Control 4
   * TMS1400NLL MP7334-N2 (die label MP7334)
   * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1-bit sound
@@ -1391,7 +1641,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - Hong Kong: Electronic Football, Conic
-  - USA(1): Football, ERS(Electronic Readout Systems)
+  - USA(1): Football, E.R.S.(Electronic Readout Systems)
   - USA(2): Football, ELECsonic
   - USA(3): Football, no brand!
 
@@ -1598,7 +1848,6 @@ static INPUT_PORTS_START( cnfball2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
-
 
 // output PLA is not decapped
 static const UINT16 cnfball2_output_pla[0x20] =
@@ -2779,7 +3028,6 @@ static INPUT_PORTS_START( gpoker )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet") // BT
 INPUT_PORTS_END
 
-
 void gpoker_state::machine_reset()
 {
 	hh_tms1k_state::machine_reset();
@@ -3440,6 +3688,175 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Marx Series 300 Electronic Bowling Game
+  * TMS1100NLL MP3403 DBS 7836 SINGAPORE (no decap)
+  * 4*SN75492 quad segment driver, 2*SN74259 8-line demultiplexer,
+    2*CD4043 quad r/s input latch
+  * 5 7seg LEDs, 15 lamps(10 lamps projected to bowling pins reflection),
+    1bit-sound with crude volume control
+  * edge connector to sensors(switches trigger when ball rolls over)
+    and other inputs
+
+  lamp translation table: SN74259.u5(mux 1) goes to MAME output lamp5x,
+  SN74259.u6(mux 2) goes to MAME output lamp6x. u1-u3 are SN75492 ICs,
+  where other: u1 A2 is N/C, u3 A1 is from O2 and goes to digits seg C.
+
+    u5 Q0 -> u1 A4 -> L2 (pin #2)       u6 Q0 -> u3 A4 -> L1 (pin #1)
+    u5 Q1 -> u1 A5 -> L4 (pin #4)       u6 Q1 -> u3 A5 -> L5 (pin #5)
+    u5 Q2 -> u1 A6 -> L7 (pin #7)       u6 Q2 -> u2 A3 -> L11 (player 1)
+    u5 Q3 -> u1 A1 -> L8 (pin #8)       u6 Q3 -> u2 A2 -> L12 (player 2)
+    u5 Q4 -> u3 A2 -> L3 (pin #3)       u6 Q4 -> u2 A1 -> L15 (?)
+    u5 Q5 -> u2 A6 -> L6 (pin #6)       u6 Q5 -> u3 A6 -> L14 (?)
+    u5 Q6 -> u2 A5 -> L10 (pin #10)     u6 Q6 -> u1 A3 -> L13 (spare)
+    u5 Q7 -> u2 A4 -> L9 (pin #9)       u6 Q7 -> u3 A3 -> digit 4 B+C
+
+***************************************************************************/
+
+class elecbowl_state : public hh_tms1k_state
+{
+public:
+	elecbowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void elecbowl_state::prepare_display()
+{
+	// standard 7segs
+	for (int y = 0; y < 4; y++)
+	{
+		m_display_segmask[y] = 0x7f;
+		m_display_state[y] = (m_r >> (y + 4) & 1) ? m_o : 0;
+	}
+
+	// lamp muxes
+	UINT8 mask = 1 << (m_o & 7);
+	UINT8 d = (m_r & 2) ? mask : 0;
+	if (~m_r & 1)
+		m_display_state[5] = (m_display_state[5] & ~mask) | d;
+	if (~m_r & 4)
+		m_display_state[6] = (m_display_state[6] & ~mask) | d;
+
+	// digit 4 is from mux2 Q7
+	m_display_segmask[4] = 6;
+	m_display_state[4] = (m_display_state[6] & 0x80) ? 6 : 0;
+
+	set_display_size(8, 7);
+	display_update();
+}
+
+WRITE16_MEMBER(elecbowl_state::write_r)
+{
+	// R5-R7,R10: input mux
+	m_inp_mux = (data >> 5 & 7) | (data >> 7 & 8);
+
+	// R9: speaker out
+	// R3,R8: speaker volume..
+	m_speaker->level_w(data >> 9 & 1);
+
+	// R4-R7: select digit
+	// R0,R2: lamp mux1,2 _enable
+	// R1: lamp muxes state
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(elecbowl_state::write_o)
+{
+	//if (data & 0x80) printf("%X ",data&0x7f);
+
+	// O0-O2: lamp muxes select
+	// O0-O6: digit segments A-G
+	// O7: N/C
+	m_o = data & 0x7f;
+	prepare_display();
+}
+
+READ8_MEMBER(elecbowl_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+
+// config
+
+static INPUT_PORTS_START( elecbowl )
+	PORT_START("IN.0") // R5
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
+
+	PORT_START("IN.1") // R6
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // reset/test?
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // reset/test?
+
+	PORT_START("IN.2") // R7
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
+
+	PORT_START("IN.3") // R10
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) // 2 players sw?
+INPUT_PORTS_END
+
+// output PLA is not decapped
+static const UINT16 elecbowl_output_pla[0x20] =
+{
+	lA+lB+lC+lD+lE+lF,      // 0
+	lB+lC,                  // 1
+	lA+lB+lG+lE+lD,         // 2
+	lA+lB+lG+lC+lD,         // 3
+	lF+lB+lG+lC,            // 4
+	lA+lF+lG+lC+lD,         // 5
+	lA+lF+lG+lC+lD+lE,      // 6
+	lA+lB+lC,               // 7
+	lA+lB+lC+lD+lE+lF+lG,   // 8
+	lA+lB+lG+lF+lC+lD,      // 9
+
+	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
+	0,1,2,3,4,5,6,7,        // lamp muxes select
+	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
+};
+
+static MACHINE_CONFIG_START( elecbowl, elecbowl_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pf
+	MCFG_TMS1XXX_OUTPUT_PLA(elecbowl_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(elecbowl_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(elecbowl_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(elecbowl_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_elecbowl)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Mattel Dungeons & Dragons - Computer Labyrinth Game
   * TMS1100 M34012-N2LL (die label M34012)
   * 72 buttons, no LEDs, 1-bit sound
@@ -3489,52 +3906,52 @@ READ8_MEMBER(mdndclab_state::read_k)
 
 static INPUT_PORTS_START( mdndclab )
 	PORT_START("IN.0") // O0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square a4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square a3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square a2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square a1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square b4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square b3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square b2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square b1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.2") // O2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square c4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square c3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square c2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square c1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.3") // O3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square d4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square d3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square d2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square d1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.4") // O4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square e4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square e3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square e2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square e1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.5") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square f4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square f3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square f2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square f1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.6") // O6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square g4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square g3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square g2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square g1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.7") // O7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square h4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square h3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square h2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square h1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.8") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Wall / Door")
@@ -3543,52 +3960,52 @@ static INPUT_PORTS_START( mdndclab )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Warrior 2 / Treasure")
 
 	PORT_START("IN.9") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square a8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square a7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square a6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square a5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.10") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square b8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square b7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square b6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square b5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.11") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square c8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square c7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square c6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square c5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.12") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square d8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square d7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square d6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square d5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.13") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square e8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square e7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square e6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square e5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.14") // R6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square f8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square f7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square f6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square f5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.15") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square g8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square g7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square g6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square g5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.16") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square h8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square h7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square h6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square h5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.17") // R9
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Switch Key")
@@ -3596,7 +4013,6 @@ static INPUT_PORTS_START( mdndclab )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Dragon Flying / Defeat Tune")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Dragon Attacks / Dragon Wakes")
 INPUT_PORTS_END
-
 
 static MACHINE_CONFIG_START( mdndclab, mdndclab_state )
 
@@ -3625,15 +4041,15 @@ MACHINE_CONFIG_END
   * TMC0904NL CP0904A (die label 4A0970D-04A)
   * 10 LEDs behind bezel, no sound
 
-  known releases:
-  - USA: Comp IV (two versions, different case)
-  - Europe: Logic 5
-  - Japan: Pythaligoras
-
   This is small tabletop Mastermind game; a code-breaking game where the player
   needs to find out the correct sequence of colours (numbers in our case).
   Press the R key to start, followed by a set of unique numbers and E.
   Refer to the official manual for more information.
+
+  known releases:
+  - USA: Comp IV (two versions, different case)
+  - Europe: Logic 5
+  - Japan: Pythaligoras
 
 ***************************************************************************/
 
@@ -3723,20 +4139,21 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Milton Bradley Electronic Battleship (1977 version)
-  * PCB label MB 4750B
-  * TMS1000NLL MP3208 (die label 1000C, MP3208)
-  * SN75494N (acting as inverters), SN76477 sound
+  Milton Bradley Electronic Battleship (1977 version, model 4750A)
+  * PCB label 4750A
+  * TMS1000NL MP3201 (die label 1000C, MP3201)
+  * LM324N, MC14016CP/TP4016AN, NE555P, discrete sound
   * 4 sliding buttons, light bulb
 
   This is a 2-player electronic board game. It still needs game pieces like the
   original Battleship board game.
 
-  It went through 4 hardware revisions:
-  1977: TODO
-  1977: model 4750A or B, see notes above
-  1979: model 4750C: cost-reduced single chip design, lesser quality game board.
+  It went through at least 5 hardware revisions (not counting Talking Battleship):
+  1977: model 4750A, TMS1000 discrete sound, see notes above
+  1977: model 4750B, TMS1000 SN76477 sound, see notes at bshipb (driver below this)
+  1979: model 4750C: cost-reduced single-chip design, lesser quality game board.
         The chip is assumed to be custom, no MCU: 28-pin DIP, label 4750, SCUS 0462
+  1982: similar custom single-chip hardware, chip label MB4750 SCUS 0562
   1982: back to MCU, COP420 instead of choosing TI, emulated in hh_cop400.cpp
 
 ***************************************************************************/
@@ -3745,11 +4162,8 @@ class bship_state : public hh_tms1k_state
 {
 public:
 	bship_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
-		m_sn(*this, "sn76477")
+		: hh_tms1k_state(mconfig, type, tag)
 	{ }
-
-	required_device<sn76477_device> m_sn;
 
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
@@ -3762,44 +4176,14 @@ WRITE16_MEMBER(bship_state::write_r)
 {
 	// R0-R10: input mux
 	m_inp_mux = data;
-
-	// R4: 75494 to R12 33K to SN76477 pin 20
-	m_sn->slf_res_w((data & 0x10) ? RES_INF : RES_K(33));
 }
 
 WRITE16_MEMBER(bship_state::write_o)
 {
-	//printf("%X ", m_maincpu->debug_peek_o_index() & 0xf);
+	// O4: explosion light bulb
+	display_matrix(1, 1, data >> 4 & 1, 1);
 
-	// O0: SN76477 pin 9
-	m_sn->enable_w(data & 1);
-
-	// O1: 75494 to R4 100K to SN76477 pin 18
-	// O2: 75494 to R3 150K to SN76477 pin 18
-	double o12 = RES_INF;
-	switch (~data >> 1 & 3)
-	{
-		case 0: o12 = RES_INF; break;
-		case 1: o12 = RES_K(100); break;
-		case 2: o12 = RES_K(150); break;
-		case 3: o12 = RES_2_PARALLEL(RES_K(100), RES_K(150)); break;
-	}
-	m_sn->vco_res_w(o12);
-
-	// O2,O6: (TODO) to SN76477 pin 21
-	//m_sn->slf_cap_w(x);
-
-	// O4: SN76477 pin 22
-	m_sn->vco_w(data >> 4 & 1);
-
-	// O5: R11 27K to SN76477 pin 23
-	m_sn->one_shot_cap_w((data & 0x20) ? RES_K(27) : RES_INF);
-
-	// O6: SN76477 pin 25
-	m_sn->mixer_b_w(data >> 6 & 1);
-
-	// O7: 75494 to light bulb
-	display_matrix(1, 1, data >> 7 & 1, 1);
+	// other: sound
 }
 
 READ8_MEMBER(bship_state::read_k)
@@ -3888,10 +4272,113 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( bship, bship_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 225000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(bship_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bship_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bship_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bship)
+
+	/* sound hardware */
+	// TODO
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Milton Bradley Electronic Battleship (1977 version, model 4750B)
+  * PCB label MB 4750B
+  * TMS1000NLL MP3208 (die label 1000C, MP3208)
+  * SN75494N (acting as inverters), SN76477 sound
+  * 4 sliding buttons, light bulb
+
+  This is the 2nd version. The sound hardware was changed to a SN76477.
+
+***************************************************************************/
+
+class bshipb_state : public hh_tms1k_state
+{
+public:
+	bshipb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_sn(*this, "sn76477")
+	{ }
+
+	required_device<sn76477_device> m_sn;
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(bshipb_state::write_r)
+{
+	// R0-R10: input mux
+	m_inp_mux = data;
+
+	// R4: 75494 to R12 33K to SN76477 pin 20
+	m_sn->slf_res_w((data & 0x10) ? RES_INF : RES_K(33));
+}
+
+WRITE16_MEMBER(bshipb_state::write_o)
+{
+	//printf("%X ", m_maincpu->debug_peek_o_index() & 0xf);
+
+	// O0: SN76477 pin 9
+	m_sn->enable_w(data & 1);
+
+	// O1: 75494 to R4 100K to SN76477 pin 18
+	// O2: 75494 to R3 150K to SN76477 pin 18
+	double o12 = RES_INF;
+	switch (~data >> 1 & 3)
+	{
+		case 0: o12 = RES_INF; break;
+		case 1: o12 = RES_K(100); break;
+		case 2: o12 = RES_K(150); break;
+		case 3: o12 = RES_2_PARALLEL(RES_K(100), RES_K(150)); break;
+	}
+	m_sn->vco_res_w(o12);
+
+	// O2,O6: (TODO) to SN76477 pin 21
+	//m_sn->slf_cap_w(x);
+
+	// O4: SN76477 pin 22
+	m_sn->vco_w(data >> 4 & 1);
+
+	// O5: R11 27K to SN76477 pin 23
+	m_sn->one_shot_cap_w((data & 0x20) ? RES_K(27) : RES_INF);
+
+	// O6: SN76477 pin 25
+	m_sn->mixer_b_w(data >> 6 & 1);
+
+	// O7: 75494 to light bulb
+	display_matrix(1, 1, data >> 7 & 1, 1);
+}
+
+READ8_MEMBER(bshipb_state::read_k)
+{
+	// K: multiplexed inputs (note: the Vss row is always on)
+	return m_inp_matrix[11]->read() | read_inputs(11);
+}
+
+
+// config
+
+// buttons are same as bship set
+
+static MACHINE_CONFIG_START( bshipb, bshipb_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(bshipb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bshipb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bshipb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_bship)
@@ -4313,7 +4800,6 @@ static INPUT_PORTS_START( bigtrak )
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 void bigtrak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
@@ -4341,6 +4827,238 @@ static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SPEAKER_LEVELS(8, bigtrak_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Milton Bradley Dark Tower
+  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die label MP7332
+    (assume same ROM contents between revisions)
+  * SN75494N MOS-to-LED digit driver
+  * motorized rotating reel + lightsensor, 1bit-sound
+
+  This is a board game, it obviously requires game pieces and the board.
+  The emulated part is the centerpiece, a black tower with a rotating card
+  panel and LED digits for displaying health, amount of gold, etc. As far
+  as MAME is concerned, the game works fine.
+
+  To start up the game, first press [MOVE], the machine now does a self-test.
+  Then select level and number of players and the game will start. Read the
+  official manual on how to play the game.
+
+***************************************************************************/
+
+class mbdtower_state : public hh_tms1k_state
+{
+public:
+	mbdtower_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	bool sensor_led_on() { return m_display_decay[0][0] != 0; }
+
+	int m_motor_pos;
+	int m_motor_pos_prev;
+	int m_motor_decay;
+	bool m_motor_on;
+	bool m_sensor_blind;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+
+protected:
+	virtual void machine_start() override;
+};
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
+{
+	// it rotates counter-clockwise (when viewed from above)
+	if (m_motor_on)
+	{
+		m_motor_pos = (m_motor_pos - 1) & 0x7f;
+
+		// give it some time to spin out when it's turned off
+		if (m_r & 0x200)
+			m_motor_decay += (m_motor_decay < 4);
+		else if (m_motor_decay > 0)
+			m_motor_decay--;
+		else
+			m_motor_on = false;
+	}
+
+	// 8 evenly spaced holes in the rotation disc for the sensor to 'see' through.
+	// The first hole is much bigger, enabling the game to determine the position.
+	if ((m_motor_pos & 0xf) < 4 || m_motor_pos < 0xc)
+		m_sensor_blind = false;
+	else
+		m_sensor_blind = true;
+
+	// on change, output info
+	if (m_motor_pos != m_motor_pos_prev)
+		output().set_value("motor_pos", 100 * (m_motor_pos / (float)0x80));
+
+	/* 3 display cards per hole, like this:
+
+	    (0)                <---- display increments this way <----                   (7)
+
+	    CURSED   VICTORY    WIZARD         DRAGON    GOLD KEY     SCOUT    WARRIOR   (void)
+	    LOST     WARRIORS   BAZAAR CLOSED  SWORD     SILVER KEY   HEALER   FOOD      (void)
+	    PLAGUE   BRIGANDS   KEY MISSING    PEGASUS   BRASS KEY    GOLD     BEAST     (void)
+	*/
+	int card_pos = m_motor_pos >> 4 & 7;
+	if (card_pos != (m_motor_pos_prev >> 4 & 7))
+		output().set_value("card_pos", card_pos);
+
+	m_motor_pos_prev = m_motor_pos;
+}
+
+
+void mbdtower_state::prepare_display()
+{
+	// declare display matrix size and the 2 7segs
+	set_display_size(7, 3);
+	set_display_segmask(6, 0x7f);
+
+	// update current state
+	if (~m_r & 0x10)
+	{
+		UINT8 o = BITSWAP8(m_o,7,0,4,3,2,1,6,5) & 0x7f;
+		m_display_state[2] = (m_o & 0x80) ? o : 0;
+		m_display_state[1] = (m_o & 0x80) ? 0 : o;
+		m_display_state[0] = (m_r >> 8 & 1) | (m_r >> 4 & 0xe);
+
+		display_update();
+	}
+	else
+	{
+		// display items turned off
+		display_matrix(7, 3, 0, 0);
+	}
+}
+
+WRITE16_MEMBER(mbdtower_state::write_r)
+{
+	// R0-R2: input mux
+	m_inp_mux = data & 7;
+
+	// R9: motor on
+	if ((m_r ^ data) & 0x200)
+		output().set_value("motor_on", data >> 9 & 1);
+	if (data & 0x200)
+		m_motor_on = true;
+
+	// R3: N/C
+	// R4: 75494 /EN (speaker, lamps, digit select go through that IC)
+	// R5-R7: tower lamps
+	// R8: rotation sensor led
+	m_r = data;
+	prepare_display();
+
+	// R10: speaker out
+	m_speaker->level_w(~data >> 4 & data >> 10 & 1);
+}
+
+WRITE16_MEMBER(mbdtower_state::write_o)
+{
+	// O0-O6: led segments A-G
+	// O7: digit select
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(mbdtower_state::read_k)
+{
+	// K: multiplexed inputs
+	// K8: rotation sensor
+	return read_inputs(3) | ((!m_sensor_blind && sensor_led_on()) ? 8 : 0);
+}
+
+
+// config
+
+/* physical button layout and labels is like this:
+
+    (green)     (l.blue)    (red)
+    [YES/       [REPEAT]    [NO/
+     BUY]                    END]
+
+    (yellow)    (blue)      (white)
+    [HAGGLE]    [BAZAAR]    [CLEAR]
+
+    (blue)      (blue)      (blue)
+    [TOMB/      [MOVE]      [SANCTUARY/
+     RUIN]                   CITADEL]
+
+    (orange)    (blue)      (d.yellow)
+    [DARK       [FRONTIER]  [INVENTORY]
+     TOWER]
+*/
+
+static INPUT_PORTS_START( mbdtower )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Inventory")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("No/End")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Clear")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Sanctuary/Citadel")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Frontier")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Repeat")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Bazaar")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Move")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Dark Tower")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Yes/Buy")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Haggle")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Tomb/Ruin")
+INPUT_PORTS_END
+
+void mbdtower_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill
+	m_motor_pos = 0;
+	m_motor_pos_prev = -1;
+	m_motor_decay = 0;
+	m_motor_on = false;
+	m_sensor_blind = false;
+
+	// register for savestates
+	save_item(NAME(m_motor_pos));
+	/* save_item(NAME(m_motor_pos_prev)); */ // don't save!
+	save_item(NAME(m_motor_decay));
+	save_item(NAME(m_motor_on));
+	save_item(NAME(m_sensor_blind));
+}
+
+static MACHINE_CONFIG_START( mbdtower, mbdtower_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=43K, C=56pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(mbdtower_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mbdtower_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mbdtower_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tower_motor", mbdtower_state, motor_sim_tick, attotime::from_msec(3500/0x80)) // ~3.5sec for a full rotation
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4748,7 +5466,7 @@ static MACHINE_CONFIG_START( stopthief, stopthief_state )
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_stopthie)
+	MCFG_DEFAULT_LAYOUT(layout_stopthief)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -5100,16 +5818,195 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tandy Radio Shack Championship Football (model 60-2150)
+  * PCB label CYG-316
+  * TMS1100NLL MP1193 (die label 1100B, MP1193)
+  * 7-digit 7seg LED display + LED grid, 1-bit sound
+
+  Another clone of Mattel Football II. The original manufacturer is unknown, but
+  suspected to be Conic/E.R.S.(Electronic Readout Systems).
+
+***************************************************************************/
+
+class tcfball_state : public hh_tms1k_state
+{
+public:
+	tcfball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void tcfball_state::prepare_display()
+{
+	// R8 enables leds, R9 enables digits
+	UINT16 mask = ((m_r >> 9 & 1) * 0x7f) | ((m_r >> 8 & 1) * 0x780);
+	UINT16 sel = ((m_r & 0x7f) | (m_r << 7 & 0x780)) & mask;
+
+	set_display_segmask(0x77, 0x7f);
+	set_display_segmask(0x08, 0xff); // R3 has DP
+	display_matrix(8, 11, m_o, sel);
+}
+
+WRITE16_MEMBER(tcfball_state::write_r)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R5-R7: input mux
+	m_inp_mux = data >> 5 & 7;
+
+	// R8+R0-R3: select led
+	// R9+R0-R6: select digit
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(tcfball_state::write_o)
+{
+	// O0-O7: digit segments/led data
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(tcfball_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( tcfball )
+	PORT_START("IN.0") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+
+	PORT_START("IN.1") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Kick")
+
+	PORT_START("IN.2") // R7
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" ) // college
+	PORT_CONFSETTING(    0x08, "2" ) // professional
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( tcfball, tcfball_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=56K, C=24pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(tcfball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tcfball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tcfball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tcfball)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Tandy Radio Shack Championship Football (model 60-2151)
+  * TMS1100NLL MP1183 (no decap)
+  * 7-digit 7seg LED display + LED grid, 1-bit sound
+
+  The hardware is almost the same as the MP1193 one, they added an extra row of leds.
+
+  known releases:
+  - World(1): Superbowl XV Football, distributed by E.R.S.(Electronic Readout Systems)
+  - World(2): Super-Pro Football, no brand
+  - USA: Championship Football (model 60-2151), distributed by Tandy
+
+***************************************************************************/
+
+class tcfballa_state : public tcfball_state
+{
+public:
+	tcfballa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tcfball_state(mconfig, type, tag)
+	{ }
+};
+
+// handlers: uses the ones in tcfball_state
+
+
+// config
+
+static INPUT_PORTS_START( tcfballa )
+	PORT_INCLUDE( tcfball )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Display")
+INPUT_PORTS_END
+
+// output PLA is not decapped, dumped electronically
+static const UINT16 tcfballa_output_pla[0x20] =
+{
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x46, 0x70, 0x00, 0x00, 0x00,
+	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+static MACHINE_CONFIG_START( tcfballa, tcfballa_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=50pf
+	MCFG_TMS1XXX_OUTPUT_PLA(tcfballa_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(tcfballa_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tcfballa_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tcfballa_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tcfballa)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
   * TMS1100 MCU, label CD7282SL
   * 12 lamps behind buttons, 1-bit sound
 
-  This handheld contains 12 minigames. It looks and plays like "Fabulous Fred"
-  by the Japanese company Mego Corp. in 1980, which in turn is a mix of Merlin
-  and Simon. Unlike Merlin and Simon, spin-offs like these were not successful.
-  There were releases with and without the prefix "Tandy-12", I don't know
-  which name was more common. Also not worth noting is that it needed five
-  batteries; 4 C-cells and a 9-volt.
+  known releases:
+  - World: Tandy-12: Computerized Arcade
+  - Mexico: Fabuloso Fred, distributed by Ensueno Toys (also released as
+    9-button version, a clone of Mego Fabulous Fred)
+
+  This handheld contains 12 minigames. It looks and plays like Game Robot 9 by
+  Gakken (aka Mego's Fabulous Fred) from 1980, which in turn is a mix of Merlin
+  and Simon. Unlike Merlin and Simon, spin-offs were not as successful in the USA.
+  There were releases with and without the prefix "Tandy-12", I don't know which
+  name was more common. Also not worth noting is that it needed five batteries;
+  four C-cells and a 9-volt.
 
   Some of the games require accessories included with the toy (eg. the Baseball
   game is played with a board representing the playing field). To start a game,
@@ -5222,7 +6119,6 @@ static INPUT_PORTS_START( tandy12 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
 INPUT_PORTS_END
 
-
 // output PLA is not decapped
 static const UINT16 tandy12_output_pla[0x20] =
 {
@@ -5260,7 +6156,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  TSI Speech+
+  Telesensory Systems, Inc.(TSI) Speech+
   * TMS1000 MCU, label TMS1007NL (die label 1000B, 1007A)
   * TSI S14001A speech chip, GI S14007-A 2KB maskrom for samples
   * 9-digit 7seg LED display
@@ -5520,7 +6416,8 @@ MACHINE_CONFIG_END
   * TMS1730 MCU, label MP3005N (die label 1700 MP3005)
   * 4 LEDs, 1-bit sound
 
-  This is a simplified rerelease of Copy Cat, 10(!) years later.
+  This is a simplified rerelease of Copy Cat, 10(!) years later. The gameplay
+  is identical to Ditto.
 
   3 variations exist, each with a different colored case. Let's assume that
   they're on the same hardware.
@@ -5576,6 +6473,77 @@ static MACHINE_CONFIG_START( copycatm2, copycatm2_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_copycatm2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Ditto (model 7-530)
+  * TMS1700 MCU, label MP1801-N2LL (die label 1700 MP1801)
+  * 4 LEDs, 1-bit sound
+
+  known releases:
+  - World: Ditto
+  - USA: Electronic Pocket Repeat (model 60-2152/60-2468A), distributed by Tandy
+    note: 1996 model 60-2482 MCU is a Z8, and is assumed to be a clone of Tiger Copycat Jr.
+
+***************************************************************************/
+
+class ditto_state : public hh_tms1k_state
+{
+public:
+	ditto_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+};
+
+// handlers
+
+WRITE16_MEMBER(ditto_state::write_r)
+{
+	// R0-R3: leds
+	display_matrix(4, 1, data & 0xf, 1);
+}
+
+WRITE16_MEMBER(ditto_state::write_o)
+{
+	// O5,O6: speaker out
+	m_speaker->level_w(data >> 5 & 3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( ditto )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Yellow Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Blue Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Orange Button")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Red Button")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( ditto, ditto_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ditto_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ditto_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ditto)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6020,7 +6988,6 @@ static INPUT_PORTS_START( ssports4 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 // output PLA is not decapped, dumped electronically
 static const UINT16 ssports4_output_pla[0x20] =
 {
@@ -6055,6 +7022,17 @@ MACHINE_CONFIG_END
   Game driver(s)
 
 ***************************************************************************/
+
+ROM_START( matchnum )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0163", 0x0000, 0x0400, CRC(37507600) SHA1(b1d4d8ea563e97ef378b42c44cb3ea4eb6abe0d2) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_matchnum_output.pla", 0, 365, CRC(da29670c) SHA1(bcec28bf25dc8c81d08851ad8a3f4e89f413017a) )
+ROM_END
+
 
 ROM_START( mathmagi )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -6119,6 +7097,17 @@ ROM_START( h2hbaseb )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_h2hbaseb_output.pla", 0, 365, CRC(cb3d7e38) SHA1(6ab4a7c52e6010b7c7158463cb499973e52ff556) )
+ROM_END
+
+
+ROM_START( h2hboxing )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34018", 0x0000, 0x0800, CRC(e26a11a3) SHA1(aa2735088d709fa8d9188c4fb7982a53e3a8c1bc) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_h2hboxing_output.pla", 0, 365, CRC(ffb0e63d) SHA1(31ee3f779270a23f05f9ad508283d2569ef069f1) )
 ROM_END
 
 
@@ -6323,6 +7312,17 @@ ROM_START( astro )
 ROM_END
 
 
+ROM_START( elecbowl )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3403.u9", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_elecbowl_output.pla", 0, 365, NO_DUMP )
+ROM_END
+
+
 ROM_START( mdndclab )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "m34012", 0x0000, 0x0800, CRC(e851fccd) SHA1(158362c2821678a51554e02dbb2f9ef5aaf5f59f) )
@@ -6351,12 +7351,22 @@ ROM_END
 
 ROM_START( bship )
 	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3201", 0x0000, 0x0400, CRC(bf6104a6) SHA1(8d28b43a2aa39dcbbe71f669cdafc518715812c9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bship_output.pla", 0, 365, CRC(ea0570b0) SHA1(6eb803b40717486d7b24939985f245327ac8a7e9) )
+ROM_END
+
+ROM_START( bshipb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp3208", 0x0000, 0x0400, CRC(982fa720) SHA1(1c6dbbe7b9e55d62a510225a88cd2de55fe9b181) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_bship_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_bship_output.pla", 0, 365, BAD_DUMP CRC(74a9a244) SHA1(479c1f1e37cf8f75352e10226b20322906bee813) ) // part of decap photo was obscured
+	ROM_LOAD( "tms1000_bshipb_output.pla", 0, 365, BAD_DUMP CRC(74a9a244) SHA1(479c1f1e37cf8f75352e10226b20322906bee813) ) // part of decap photo was obscured
 ROM_END
 
 
@@ -6390,6 +7400,17 @@ ROM_START( bigtrak )
 	ROM_LOAD( "tms1000_bigtrak_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bigtrak_output.pla", 0, 365, CRC(63be45f6) SHA1(918e38a223152db883c1a6f7acf56e87d7074734) )
+ROM_END
+
+
+ROM_START( mbdtower )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7332", 0x0000, 0x1000, CRC(ebeab91a) SHA1(7edbff437da371390fa8f28b3d183f833eaa9be9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_mbdtower_output.pla", 0, 557, CRC(64c84697) SHA1(72ce6d24cedf9c606f1742cd5620f75907246e87) )
 ROM_END
 
 
@@ -6430,7 +7451,7 @@ ROM_START( mmerlin )
 ROM_END
 
 
-ROM_START( stopthie )
+ROM_START( stopthief )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
 
@@ -6439,12 +7460,12 @@ ROM_START( stopthie )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_stopthie_output.pla", 0, 352, CRC(680ca1c1) SHA1(dea6365f2e6b50a52f1a8f1d8417176b905d2bc9) )
+	ROM_LOAD( "tms0980_stopthief_output.pla", 0, 352, CRC(680ca1c1) SHA1(dea6365f2e6b50a52f1a8f1d8417176b905d2bc9) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
 
-ROM_START( stopthiep )
+ROM_START( stopthiefp )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "us4341385", 0x0000, 0x1000, CRC(07aec38a) SHA1(0a3d0956495c0d6d9ea771feae6c14a473a800dc) ) // from patent US4341385, data should be correct (it included checksums)
 
@@ -6453,7 +7474,7 @@ ROM_START( stopthiep )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_stopthie_output.pla", 0, 352, CRC(680ca1c1) SHA1(dea6365f2e6b50a52f1a8f1d8417176b905d2bc9) )
+	ROM_LOAD( "tms0980_stopthief_output.pla", 0, 352, CRC(680ca1c1) SHA1(dea6365f2e6b50a52f1a8f1d8417176b905d2bc9) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
@@ -6492,6 +7513,27 @@ ROM_START( lostreas )
 ROM_END
 
 
+ROM_START( tcfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1193", 0x0000, 0x0800, CRC(7d9f446f) SHA1(bb6af47b42d989494f21475a73f072cddf58c99f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tcfball_output.pla", 0, 365, CRC(26b2996e) SHA1(df0e706c552bf74123aa65e71b0c9b4d33cddb2b) )
+ROM_END
+
+ROM_START( tcfballa )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1183", 0x0000, 0x0800, CRC(2a4db1d5) SHA1(5df15d1115bb425578ad522d607a582dd478f35c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tcfballa_output.pla", 0, 365, NO_DUMP )
+ROM_END
+
+
 ROM_START( tandy12 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "cd7282sl", 0x0000, 0x0800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
@@ -6508,7 +7550,7 @@ ROM_START( speechp )
 	ROM_LOAD( "tms1007nl", 0x0000, 0x0400, CRC(c2669d5c) SHA1(7943d6f39508a9a82bc21e4fe34a5b9f86e3add2) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_speechp_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_speechp_output.pla", 0, 365, CRC(e1b4197f) SHA1(258f4276a9f15c9bfbfa58df2f7202aed1542fdc) )
 
@@ -6535,6 +7577,17 @@ ROM_START( copycatm2 )
 	ROM_LOAD( "tms1000_copycatm2_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_copycatm2_output.pla", 0, 365, CRC(d1999aaf) SHA1(0c27789b349e491d5230f9c75c4741e621f5a14e) )
+ROM_END
+
+
+ROM_START( ditto )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "mp1801", 0x0000, 0x0200, CRC(cee6043b) SHA1(4ec334be6835688413637ff9d9d7a5f0d61eba27) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ditto_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ditto_output.pla", 0, 365, CRC(2b708a27) SHA1(e95415e51ffbe5da3bde1484fcd20467dde9f09a) )
 ROM_END
 
 
@@ -6573,6 +7626,8 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1979, matchnum,  0,        0, matchnum,  matchnum,  driver_device, 0, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1978, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
@@ -6580,6 +7635,7 @@ COMP( 1979, zodiac,    0,        0, zodiac,    zodiac,    driver_device, 0, "Col
 CONS( 1978, cqback,    0,        0, cqback,    cqback,    driver_device, 0, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, h2hboxing, 0,        0, h2hboxing, h2hboxing, driver_device, 0, "Coleco", "Head to Head Boxing", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
@@ -6605,29 +7661,36 @@ CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Ken
 
 COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
+CONS( 1978, elecbowl,  0,        0, elecbowl,  elecbowl,  driver_device, 0, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
+
 CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-CONS( 1977, bship,     0,        0, bship,     bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
+CONS( 1977, bship,     0,        0, bship,     bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977 version, model 4750A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ***
+CONS( 1977, bshipb,    bship,    0, bshipb,    bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977 version, model 4750B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
+CONS( 1981, mbdtower,  0,        0, mbdtower,  mbdtower,  driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
-CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
+CONS( 1979, stopthief, 0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, stopthiefp,stopthief,0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
+CONS( 1980, tcfball,   0,        0, tcfball,   tcfball,   driver_device, 0, "Tandy Radio Shack", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tcfballa,  tcfball,  0, tcfballa,  tcfballa,  driver_device, 0, "Tandy Radio Shack", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
 COMP( 1976, speechp,   0,        0, speechp,   speechp,   driver_device, 0, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, copycat,   0,        0, copycat,   copycat,   driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2, copycat,  0, copycatm2, copycatm2, driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, ditto,     0,        0, ditto,     ditto,     driver_device, 0, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,   0,        0, phpball,   phpball,   driver_device, 0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

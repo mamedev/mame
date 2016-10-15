@@ -1973,7 +1973,7 @@ void z180_device::device_start()
 	{
 		state_add(Z180_PC,         "PC",        m_PC.w.l);
 		state_add(STATE_GENPC,     "GENPC",     _PCD).noshow();
-		state_add(STATE_GENPCBASE, "GENPCBASE", m_PREPC.w.l).noshow();
+		state_add(STATE_GENPCBASE, "CURPC",     m_PREPC.w.l).noshow();
 		state_add(Z180_SP,         "SP",        _SPD);
 		state_add(STATE_GENSP,     "GENSP",     m_SP.w.l).noshow();
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_AF.b.l).noshow().formatstr("%8s");
@@ -2346,7 +2346,6 @@ void z180_device::execute_run()
 	if (m_nmi_pending)
 	{
 		LOG(("Z180 '%s' take NMI\n", tag()));
-		_PPC = -1;            /* there isn't a valid previous program counter */
 		LEAVE_HALT();       /* Check if processor was halted */
 
 		/* disable DMA transfers!! */

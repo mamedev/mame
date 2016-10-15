@@ -55,38 +55,30 @@
 class kc85_state : public driver_device
 {
 public:
-	kc85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8085_TAG),
-			m_rtc(*this, UPD1990A_TAG),
-			m_uart(*this, IM6402_TAG),
-			m_lcdc0(*this, HD44102_0_TAG),
-			m_lcdc1(*this, HD44102_1_TAG),
-			m_lcdc2(*this, HD44102_2_TAG),
-			m_lcdc3(*this, HD44102_3_TAG),
-			m_lcdc4(*this, HD44102_4_TAG),
-			m_lcdc5(*this, HD44102_5_TAG),
-			m_lcdc6(*this, HD44102_6_TAG),
-			m_lcdc7(*this, HD44102_7_TAG),
-			m_lcdc8(*this, HD44102_8_TAG),
-			m_lcdc9(*this, HD44102_9_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette"),
-			m_opt_cart(*this, "opt_cartslot"),
-			m_ram(*this, RAM_TAG),
-			m_rs232(*this, RS232_TAG),
-			m_rom(*this, I8085_TAG),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8"),
-			m_battery(*this, "BATTERY")
+	kc85_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8085_TAG),
+		m_rtc(*this, UPD1990A_TAG),
+		m_uart(*this, IM6402_TAG),
+		m_lcdc0(*this, HD44102_0_TAG),
+		m_lcdc1(*this, HD44102_1_TAG),
+		m_lcdc2(*this, HD44102_2_TAG),
+		m_lcdc3(*this, HD44102_3_TAG),
+		m_lcdc4(*this, HD44102_4_TAG),
+		m_lcdc5(*this, HD44102_5_TAG),
+		m_lcdc6(*this, HD44102_6_TAG),
+		m_lcdc7(*this, HD44102_7_TAG),
+		m_lcdc8(*this, HD44102_8_TAG),
+		m_lcdc9(*this, HD44102_9_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_opt_cart(*this, "opt_cartslot"),
+		m_ram(*this, RAM_TAG),
+		m_rs232(*this, RS232_TAG),
+		m_rom(*this, I8085_TAG),
+		m_y(*this, "Y%u", 0),
+		m_battery(*this, "BATTERY")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -109,15 +101,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_memory_region m_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
+	required_ioport_array<9> m_y;
 	required_ioport m_battery;
 
 	virtual void machine_start() override;
@@ -199,28 +183,20 @@ public:
 class tandy200_state : public driver_device
 {
 public:
-	tandy200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8085_TAG),
-			m_rtc(*this, RP5C01A_TAG),
-			m_lcdc(*this, HD61830_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_cent_data_out(*this, "cent_data_out"),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette"),
-			m_opt_cart(*this, "opt_cartslot"),
-			m_ram(*this, RAM_TAG),
-			m_rs232(*this, RS232_TAG),
-			m_rom(*this, I8085_TAG),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8")
+	tandy200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8085_TAG),
+		m_rtc(*this, RP5C01A_TAG),
+		m_lcdc(*this, HD61830_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_cent_data_out(*this, "cent_data_out"),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_opt_cart(*this, "opt_cartslot"),
+		m_ram(*this, RAM_TAG),
+		m_rs232(*this, RS232_TAG),
+		m_rom(*this, I8085_TAG),
+		m_y(*this, "Y%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -234,15 +210,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_memory_region m_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
+	required_ioport_array<9> m_y;
 
 	virtual void machine_start() override;
 	memory_region *m_opt_region;

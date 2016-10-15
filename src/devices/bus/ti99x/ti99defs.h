@@ -25,7 +25,8 @@
 #define JOYPORT_TAG     "joyport"
 #define EVPC_CONN_TAG   "evpc_conn"
 #define DATAMUX_TAG     "datamux_16_8"
-
+#define PADRAM_TAG       "scratchpad"
+#define EXPRAM_TAG       "internal_32k_mod"
 #define DSRROM          "dsrrom"
 #define CONSOLEROM      "console_rom"
 #define CONSOLEGROM     "cons_grom"
@@ -137,6 +138,18 @@ public:
     Connector from EVPC
     We need this for the TI-99/4A console as well as for the SGCPU, so we have
     to use callbacks
+
+    This is actually a separate cable lead going from
+    the EPVC in the PEB to a pin inside the console. This cable sends the
+    video interrupt from the v9938 on the EVPC into the console.
+    This workaround must be done on the real system because the peripheral
+    box and its connector were not designed to deliver a video interrupt signal.
+    This was fixed with the EVPC2 which uses the external interrupt EXTINT
+    with a special firmware (DSR).
+
+    Emulation detail: We are using a separate device class in order to avoid
+    exposing the console class to the external class.
+
 ****************************************************************************/
 class ti99_4x_state;
 

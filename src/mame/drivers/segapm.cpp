@@ -79,4 +79,5 @@ ROM_START( segapm ) // was more than one cartridge available? if so softlist the
 	// todo, sh2 bios roms etc.
 ROM_END
 
-GAME( 1996, segapm,    0,        segapm,    segapm, driver_device,    0, ROT0,  "Sega", "Picture Magic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   CLASS           INIT   COMPANY     FULLNAME            FLAGS */
+CONS( 1996, segapm,    0,       0,      segapm, segapm, driver_device,    0,   "Sega", "Picture Magic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

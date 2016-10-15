@@ -196,7 +196,7 @@ void vgmplay_device::device_start()
 	save_item(NAME(m_pc));
 
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_pc).noshow();
 }
 
 void vgmplay_device::device_reset()
@@ -1328,7 +1328,7 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("dmg", GAMEBOY, 0)
+	MCFG_SOUND_ADD("dmg", DMG_APU, XTAL_4_194304Mhz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 

@@ -175,6 +175,15 @@ void mecmouse_device::device_start(void)
 	// has no clock line on the joystick port. The rate is not mentioned in
 	// the specs; however, if it is too low, the mouse pointer will do jumps
 	m_poll_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+
+	save_item(NAME(m_last_select));
+	save_item(NAME(m_read_y_axis));
+	save_item(NAME(m_x));
+	save_item(NAME(m_y));
+	save_item(NAME(m_x_buf));
+	save_item(NAME(m_y_buf));
+	save_item(NAME(m_last_mx));
+	save_item(NAME(m_last_my));
 }
 
 void mecmouse_device::device_reset(void)

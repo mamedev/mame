@@ -229,8 +229,21 @@ case 0x0F: /*      RRCA */
 	}
 	break;
 case 0x10: /*      STOP */
-	if ( m_gb_speed_change_pending ) {
-	m_gb_speed = ( m_gb_speed == 1 ) ? 2 : 1;
+	if ( m_gb_speed_change_pending )
+	{
+		if (m_gb_speed == 1)
+		{
+			// Quite a lot of time for a simple input clock change...
+			// And still not all speedchange related tests are passing.
+			UINT32 cycles = ( 2 * 45 + 1 ) * 65536 + 8;
+
+			do {
+				cycles_passed(128);
+				cycles -= 128;
+			} while (cycles > 128);
+			cycles_passed(cycles);
+		}
+		m_gb_speed = ( m_gb_speed == 1 ) ? 2 : 1;
 	}
 	m_gb_speed_change_pending = 0;
 	break;
@@ -717,6 +730,9 @@ case 0x75: /*      LD (HL),L */
 	break;
 case 0x76: /*      HALT */
 	m_enable |= HALTED;
+	m_entering_halt = true;
+	// Prefetch the next instruction
+	m_op = mem_read_byte( m_PC );
 	m_PC--;
 	break;
 case 0x77: /*      LD (HL),A */
@@ -1060,16 +1076,17 @@ case 0xC4: /*      CALL NZ,n16 */
 
 		if ( ! (m_F & FLAG_Z) )
 		{
-			m_SP -= 2;
-			mem_write_word( m_SP, m_PC );
-			m_PC = addr;
+			// Internal delay
 			cycles_passed( 4 );
+			PUSH( m_PC >> 8, m_PC & 0xff );
+			m_PC = addr;
 		}
 	}
 	break;
 case 0xC5: /*      PUSH BC */
-	PUSH( m_B, m_C );
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_B, m_C );
 	break;
 case 0xC6: /*      ADD A,n8 */
 
@@ -1077,10 +1094,10 @@ case 0xC6: /*      ADD A,n8 */
 	ADD_A_X (x)
 	break;
 case 0xC7: /*      RST 0 */
-	m_SP -= 2;
-	mem_write_word( m_SP, m_PC );
-	m_PC = 0;
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_PC >> 8, m_PC & 0xff );
+	m_PC = 0;
 	break;
 case 0xC8: /*      RET Z */
 	cycles_passed( 4 );
@@ -1122,10 +1139,10 @@ case 0xCC: /*      CALL Z,n16 */
 
 		if (m_F & FLAG_Z)
 		{
-			m_SP -= 2;
-			mem_write_word( m_SP, m_PC );
-			m_PC = addr;
+			// Internal delay
 			cycles_passed( 4 );
+			PUSH( m_PC >> 8, m_PC & 0xff );
+			m_PC = addr;
 		}
 	}
 	break;
@@ -1134,10 +1151,11 @@ case 0xCD: /*      CALL n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		m_SP -= 2;
-		mem_write_word( m_SP, m_PC );
-		m_PC = addr;
+		// Internal delay
 		cycles_passed( 4 );
+
+		PUSH( m_PC >> 8, m_PC & 0xff );
+		m_PC = addr;
 	}
 	break;
 case 0xCE: /*      ADC A,n8 */
@@ -1146,10 +1164,10 @@ case 0xCE: /*      ADC A,n8 */
 	ADC_A_X (x)
 	break;
 case 0xCF: /*      RST 8 */
-	m_SP -= 2;
-	mem_write_word( m_SP, m_PC );
-	m_PC = 8;
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_PC >> 8, m_PC & 0xff );
+	m_PC = 8;
 	break;
 case 0xD0: /*      RET NC */
 	cycles_passed( 4 );
@@ -1182,16 +1200,17 @@ case 0xD4: /*      CALL NC,n16 */
 
 		if ( ! (m_F & FLAG_C) )
 		{
-			m_SP -= 2;
-			mem_write_word( m_SP, m_PC );
-			m_PC = addr;
+			// Internal delay
 			cycles_passed( 4 );
+			PUSH( m_PC >> 8, m_PC & 0xff );
+			m_PC = addr;
 		}
 	}
 	break;
 case 0xD5: /*      PUSH DE */
-	PUSH( m_D, m_E );
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_D, m_E );
 	break;
 case 0xD6: /*      SUB A,n8 */
 
@@ -1199,10 +1218,10 @@ case 0xD6: /*      SUB A,n8 */
 	SUB_A_X (x)
 	break;
 case 0xD7: /*      RST     $10 */
-	m_SP -= 2;
-	mem_write_word( m_SP, m_PC );
-	m_PC = 0x10;
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_PC >> 8, m_PC & 0xff );
+	m_PC = 0x10;
 	break;
 case 0xD8: /*      RET C */
 	cycles_passed( 4 );
@@ -1238,10 +1257,10 @@ case 0xDC: /*      CALL C,n16 */
 
 		if (m_F & FLAG_C)
 		{
-			m_SP -= 2;
-			mem_write_word( m_SP, m_PC );
-			m_PC = addr;
+			// Internal delay
 			cycles_passed( 4 );
+			PUSH( m_PC >> 8, m_PC & 0xff );
+			m_PC = addr;
 		}
 	}
 	break;
@@ -1251,10 +1270,10 @@ case 0xDE: /*      SBC A,n8 */
 	SBC_A_X (x)
 	break;
 case 0xDF: /*      RST     $18 */
-	m_SP -= 2;
-	mem_write_word( m_SP, m_PC );
-	m_PC = 0x18;
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_PC >> 8, m_PC & 0xff );
+	m_PC = 0x18;
 	break;
 case 0xE0: /*      LD      ($FF00+n8),A */
 	{
@@ -1270,8 +1289,9 @@ case 0xE2: /*      LD ($FF00+C),A */
 	mem_write_byte( 0xFF00 + m_C, m_A );
 	break;
 case 0xE5: /*      PUSH HL */
-	PUSH( m_H, m_L );
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_H, m_L );
 	break;
 case 0xE6: /*      AND A,n8 */
 
@@ -1279,10 +1299,10 @@ case 0xE6: /*      AND A,n8 */
 	AND_A_X (x)
 	break;
 case 0xE7: /*      RST $20 */
-	m_SP -= 2;
-	mem_write_word( m_SP, m_PC );
-	m_PC = 0x20;
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_PC >> 8, m_PC & 0xff );
+	m_PC = 0x20;
 	break;
 case 0xE8: /*      ADD SP,n8 */
 /*
@@ -1329,10 +1349,10 @@ case 0xEE: /*      XOR A,n8 */
 	XOR_A_X (x)
 	break;
 case 0xEF: /*      RST $28 */
-	m_SP -= 2;
-	mem_write_word( m_SP, m_PC );
-	m_PC = 0x28;
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_PC >> 8, m_PC & 0xff );
+	m_PC = 0x28;
 	break;
 case 0xF0: /*      LD A,($FF00+n8) */
 	{
@@ -1353,9 +1373,10 @@ case 0xF3: /*      DI */
 	m_enable &= ~IME;
 	break;
 case 0xF5: /*      PUSH AF */
+	// Internal delay
+	cycles_passed( 4 );
 	m_F &= 0xF0;
 	PUSH( m_A, m_F );
-	cycles_passed( 4 );
 	break;
 case 0xF6: /*      OR A,n8 */
 
@@ -1363,10 +1384,10 @@ case 0xF6: /*      OR A,n8 */
 	OR_A_X (x)
 	break;
 case 0xF7: /*      RST $30 */
-	m_SP -= 2;
-	mem_write_word( m_SP, m_PC );
-	m_PC = 0x30;
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_PC >> 8, m_PC & 0xff );
+	m_PC = 0x30;
 	break;
 case 0xF8: /*      LD HL,SP+n8 */
 /*
@@ -1422,8 +1443,8 @@ case 0xFE: /*      CP A,n8 */
 	CP_A_X (x)
 	break;
 case 0xFF: /*      RST $38 */
-	m_SP -= 2;
-	mem_write_word( m_SP, m_PC );
-	m_PC = 0x38;
+	// Internal delay
 	cycles_passed( 4 );
+	PUSH( m_PC >> 8, m_PC & 0xff );
+	m_PC = 0x38;
 	break;

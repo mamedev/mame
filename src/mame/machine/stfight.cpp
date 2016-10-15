@@ -75,6 +75,9 @@ DRIVER_INIT_MEMBER(stfight_state,cshooter)
 
 void stfight_state::machine_start()
 {
+	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("mainbank")->set_entry(0);
+
 	save_item(NAME(m_fm_data));
 	save_item(NAME(m_cpu_to_mcu_data));
 	save_item(NAME(m_cpu_to_mcu_empty));
@@ -102,27 +105,21 @@ void stfight_state::machine_reset()
 
 	// Coin signals are active low
 	m_coin_state = 3;
-
-	// initialise ROM bank
-	stfight_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
 // It's entirely possible that this bank is never switched out
 // - in fact I don't even know how/where it's switched in!
 WRITE8_MEMBER(stfight_state::stfight_bank_w)
 {
-	UINT8   *ROM2 = memregion("maincpu")->base() + 0x10000;
-	UINT16 bank_num;
-
-	bank_num = 0;
+	UINT8 bank_num = 0;
 
 	if(data & 0x80)
-		bank_num |= 0x8000;
+		bank_num |= 2;
 
 	if(data & 0x04)
-		bank_num |= 0x4000;
+		bank_num |= 1;
 
-	membank("bank1")->set_base(&ROM2[bank_num]);
+	membank("mainbank")->set_entry(bank_num);
 }
 
 /*

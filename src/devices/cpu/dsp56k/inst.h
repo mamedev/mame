@@ -1524,7 +1524,6 @@ public:
 	}
 	void evaluate(dsp56k_core* cpustate) override
 	{
-		cpustate->ppc = PC;
 		PC = m_displacement;
 
 		/* S L E U N Z V C */
@@ -1557,7 +1556,6 @@ public:
 	}
 	void evaluate(dsp56k_core* cpustate) override
 	{
-		cpustate->ppc = PC;
 		PC = regValue16(cpustate, m_destination);
 
 		/* S L E U N Z V C */

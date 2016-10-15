@@ -142,7 +142,7 @@ READ32_MEMBER(pci_device::address_base_r)
 WRITE32_MEMBER(pci_device::address_base_w)
 {
 	if(bank_reg_infos[offset].bank == -1) {
-		logerror("%s: write to address base (%d, %08x) not linked to any bank\n", tag(), offset, data);
+		logerror("write to address base (%d, %08x) not linked to any bank\n", offset, data);
 		return;
 	}
 
@@ -174,7 +174,7 @@ WRITE16_MEMBER(pci_device::command_w)
 {
 	mem_mask &= command_mask;
 	COMBINE_DATA(&command);
-	logerror("%s: command = %04x\n", tag(), command);
+	logerror("command = %04x\n", command);
 }
 
 READ16_MEMBER(pci_device::status_r)
@@ -285,14 +285,14 @@ void pci_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end
 		}
 
 		space->install_device_delegate(start, end, *this, bi.map);
-		logerror("%s: map %s at %0*x-%0*x\n", tag(), bi.map.name(), bi.flags & M_IO ? 4 : 8, UINT32(start), bi.flags & M_IO ? 4 : 8, UINT32(end));
+		logerror("map %s at %0*x-%0*x\n", bi.map.name(), bi.flags & M_IO ? 4 : 8, UINT32(start), bi.flags & M_IO ? 4 : 8, UINT32(end));
 	}
 
 	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
 				io_window_start, io_window_end, io_offset, io_space);
 
 	if(expansion_rom_base & 1) {
-		logerror("%s: map expansion rom at %08x-%08x\n", tag(), expansion_rom_base & ~1, (expansion_rom_base & ~1) + expansion_rom_size - 1);
+		logerror("map expansion rom at %08x-%08x\n", expansion_rom_base & ~1, (expansion_rom_base & ~1) + expansion_rom_size - 1);
 		UINT32 start = (expansion_rom_base & ~1) + memory_offset;
 		UINT32 end = start + expansion_rom_size - 1;
 		if(end > memory_window_end)
@@ -521,7 +521,7 @@ UINT32 pci_bridge_device::do_config_read(UINT8 bus, UINT8 device, UINT16 reg, UI
 {
 	if(sub_devices[device]) {
 		UINT32 data = space(AS_PROGRAM).read_dword((device << 12) | reg, mem_mask);
-		logerror("%s: config_read %02x:%02x.%x:%02x %08x @ %08x\n", tag(), bus, device >> 3, device & 7, reg, data, mem_mask);
+		logerror("config_read %02x:%02x.%x:%02x %08x @ %08x\n", bus, device >> 3, device & 7, reg, data, mem_mask);
 		return data;
 	} else
 		return 0xffffffff;
@@ -550,7 +550,7 @@ void pci_bridge_device::do_config_write(UINT8 bus, UINT8 device, UINT16 reg, UIN
 {
 	if(sub_devices[device]) {
 		space(AS_PROGRAM).write_dword((device << 12) | reg, data, mem_mask);
-		logerror("%s: config_write %02x:%02x.%x:%02x %08x @ %08x\n", tag(), bus, device >> 3, device & 7, reg, data, mem_mask);
+		logerror("config_write %02x:%02x.%x:%02x %08x @ %08x\n", bus, device >> 3, device & 7, reg, data, mem_mask);
 	}
 }
 
@@ -571,60 +571,60 @@ void pci_bridge_device::config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32
 
 READ32_MEMBER (pci_bridge_device::b_address_base_r)
 {
-	logerror("%s: b_address_base_r %d\n", tag(), offset);
+	logerror("b_address_base_r %d\n", offset);
 	return 0xffffffff;
 }
 
 WRITE32_MEMBER(pci_bridge_device::b_address_base_w)
 {
-	logerror("%s: b_address_base_w %d, %08x\n", tag(), offset, data);
+	logerror("b_address_base_w %d, %08x\n", offset, data);
 }
 
 READ8_MEMBER  (pci_bridge_device::primary_bus_r)
 {
-	logerror("%s: primary_bus_r\n", tag());
+	logerror("primary_bus_r\n");
 	return primary_bus;
 }
 
 WRITE8_MEMBER (pci_bridge_device::primary_bus_w)
 {
 	primary_bus = data;
-	logerror("%s: primary_bus_w %02x\n", tag(), data);
+	logerror("primary_bus_w %02x\n", data);
 }
 
 READ8_MEMBER  (pci_bridge_device::secondary_bus_r)
 {
-	logerror("%s: secondary_bus_r\n", tag());
+	logerror("secondary_bus_r\n");
 	return secondary_bus;
 }
 
 WRITE8_MEMBER (pci_bridge_device::secondary_bus_w)
 {
 	secondary_bus = data;
-	logerror("%s: secondary_bus_w %02x\n", tag(), data);
+	logerror("secondary_bus_w %02x\n", data);
 }
 
 READ8_MEMBER  (pci_bridge_device::subordinate_bus_r)
 {
-	logerror("%s: subordinate_bus_r\n", tag());
+	logerror("subordinate_bus_r\n");
 	return subordinate_bus;
 }
 
 WRITE8_MEMBER (pci_bridge_device::subordinate_bus_w)
 {
 	subordinate_bus = data;
-	logerror("%s: subordinate_bus_w %02x\n", tag(), data);
+	logerror("subordinate_bus_w %02x\n", data);
 }
 
 READ8_MEMBER  (pci_bridge_device::secondary_latency_r)
 {
-	logerror("%s: secondary_latency_r\n", tag());
+	logerror("secondary_latency_r\n");
 	return 0xff;
 }
 
 WRITE8_MEMBER (pci_bridge_device::secondary_latency_w)
 {
-	logerror("%s: secondary_latency_w %02x\n", tag(), data);
+	logerror("secondary_latency_w %02x\n", data);
 }
 
 READ8_MEMBER  (pci_bridge_device::iobase_r)
@@ -635,7 +635,7 @@ READ8_MEMBER  (pci_bridge_device::iobase_r)
 WRITE8_MEMBER (pci_bridge_device::iobase_w)
 {
 	iobase = data;
-	logerror("%s: iobase_w %02x\n", tag(), data);
+	logerror("iobase_w %02x\n", data);
 }
 
 READ8_MEMBER  (pci_bridge_device::iolimit_r)
@@ -646,18 +646,18 @@ READ8_MEMBER  (pci_bridge_device::iolimit_r)
 WRITE8_MEMBER (pci_bridge_device::iolimit_w)
 {
 	iolimit = data;
-	logerror("%s: iolimit_w %02x\n", tag(), data);
+	logerror("iolimit_w %02x\n", data);
 }
 
 READ16_MEMBER (pci_bridge_device::secondary_status_r)
 {
-	logerror("%s: secondary_status_r\n", tag());
+	logerror("secondary_status_r\n");
 	return 0xffff;
 }
 
 WRITE16_MEMBER(pci_bridge_device::secondary_status_w)
 {
-	logerror("%s: secondary_status_w %04x\n", tag(), data);
+	logerror("secondary_status_w %04x\n", data);
 }
 
 READ16_MEMBER (pci_bridge_device::memory_base_r)
@@ -668,7 +668,7 @@ READ16_MEMBER (pci_bridge_device::memory_base_r)
 WRITE16_MEMBER(pci_bridge_device::memory_base_w)
 {
 	COMBINE_DATA(&memory_base);
-	logerror("%s: memory_base_w %04x\n", tag(), memory_base);
+	logerror("memory_base_w %04x\n", memory_base);
 }
 
 READ16_MEMBER (pci_bridge_device::memory_limit_r)
@@ -679,7 +679,7 @@ READ16_MEMBER (pci_bridge_device::memory_limit_r)
 WRITE16_MEMBER(pci_bridge_device::memory_limit_w)
 {
 	COMBINE_DATA(&memory_limit);
-	logerror("%s: memory_limit_w %04x\n", tag(), memory_limit);
+	logerror("memory_limit_w %04x\n", memory_limit);
 }
 
 READ16_MEMBER (pci_bridge_device::prefetch_base_r)
@@ -690,7 +690,7 @@ READ16_MEMBER (pci_bridge_device::prefetch_base_r)
 WRITE16_MEMBER(pci_bridge_device::prefetch_base_w)
 {
 	COMBINE_DATA(&prefetch_base);
-	logerror("%s: prefetch_base_w %04x\n", tag(), prefetch_base);
+	logerror("prefetch_base_w %04x\n", prefetch_base);
 }
 
 READ16_MEMBER (pci_bridge_device::prefetch_limit_r)
@@ -701,7 +701,7 @@ READ16_MEMBER (pci_bridge_device::prefetch_limit_r)
 WRITE16_MEMBER(pci_bridge_device::prefetch_limit_w)
 {
 	COMBINE_DATA(&prefetch_limit);
-	logerror("%s: prefetch_limit_w %04x\n", tag(), prefetch_limit);
+	logerror("prefetch_limit_w %04x\n", prefetch_limit);
 }
 
 READ32_MEMBER (pci_bridge_device::prefetch_baseu_r)
@@ -712,7 +712,7 @@ READ32_MEMBER (pci_bridge_device::prefetch_baseu_r)
 WRITE32_MEMBER(pci_bridge_device::prefetch_baseu_w)
 {
 	COMBINE_DATA(&prefetch_baseu);
-	logerror("%s: prefetch_baseu_w %08x\n", tag(), prefetch_baseu);
+	logerror("prefetch_baseu_w %08x\n", prefetch_baseu);
 }
 
 READ32_MEMBER (pci_bridge_device::prefetch_limitu_r)
@@ -723,7 +723,7 @@ READ32_MEMBER (pci_bridge_device::prefetch_limitu_r)
 WRITE32_MEMBER(pci_bridge_device::prefetch_limitu_w)
 {
 	COMBINE_DATA(&prefetch_limitu);
-	logerror("%s: prefetch_limitu_w %08x\n", tag(), prefetch_limitu);
+	logerror("prefetch_limitu_w %08x\n", prefetch_limitu);
 }
 
 READ16_MEMBER (pci_bridge_device::iobaseu_r)
@@ -734,7 +734,7 @@ READ16_MEMBER (pci_bridge_device::iobaseu_r)
 WRITE16_MEMBER(pci_bridge_device::iobaseu_w)
 {
 	COMBINE_DATA(&iobaseu);
-	logerror("%s: iobaseu_w %04x\n", tag(), iobaseu);
+	logerror("iobaseu_w %04x\n", iobaseu);
 }
 
 READ16_MEMBER (pci_bridge_device::iolimitu_r)
@@ -745,29 +745,29 @@ READ16_MEMBER (pci_bridge_device::iolimitu_r)
 WRITE16_MEMBER(pci_bridge_device::iolimitu_w)
 {
 	COMBINE_DATA(&iolimitu);
-	logerror("%s: iolimitu_w %04x\n", tag(), iolimitu);
+	logerror("iolimitu_w %04x\n", iolimitu);
 }
 
 READ8_MEMBER  (pci_bridge_device::interrupt_line_r)
 {
-	logerror("%s: interrupt_line_r\n", tag());
+	logerror("interrupt_line_r\n");
 	return 0xff;
 }
 
 WRITE8_MEMBER (pci_bridge_device::interrupt_line_w)
 {
-	logerror("%s: interrupt_line_w %02x\n", tag(), data);
+	logerror("interrupt_line_w %02x\n", data);
 }
 
 READ8_MEMBER  (pci_bridge_device::interrupt_pin_r)
 {
-	logerror("%s: interrupt_pin_r\n", tag());
+	logerror("interrupt_pin_r\n");
 	return 0xff;
 }
 
 WRITE8_MEMBER (pci_bridge_device::interrupt_pin_w)
 {
-	logerror("%s: interrupt_pin_w %02x\n", tag(), data);
+	logerror("interrupt_pin_w %02x\n", data);
 }
 
 READ16_MEMBER (pci_bridge_device::bridge_control_r)
@@ -778,7 +778,7 @@ READ16_MEMBER (pci_bridge_device::bridge_control_r)
 WRITE16_MEMBER(pci_bridge_device::bridge_control_w)
 {
 	COMBINE_DATA(&bridge_control);
-	logerror("%s: bridge_control_w %04x\n", tag(), bridge_control);
+	logerror("bridge_control_w %04x\n", bridge_control);
 }
 
 

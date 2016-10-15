@@ -70,7 +70,8 @@ void xxx_cpu_device::device_start()
 
 	// Register state for debugger
 	state_add( CP1610_R0, "PC", m_pc ).formatstr("%02X");
-	state_add( STATE_GENPC, "curpc", m_r[7] ).noshow();
+	state_add( STATE_GENPC, "GENPC", m_r[7] ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_r[7] ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
 
 	m_icountptr = &m_icount;

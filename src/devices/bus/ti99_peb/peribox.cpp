@@ -430,6 +430,13 @@ void peribox_device::device_start(void)
 			logerror("%s: Slot %d = %s\n", tag(), i, (m_slot[i] != nullptr)? m_slot[i]->m_card->tag() : "EMPTY");
 		}
 	}
+
+	save_item(NAME(m_inta_flag));
+	save_item(NAME(m_intb_flag));
+	save_item(NAME(m_lcp_flag));
+	save_item(NAME(m_ready_flag));
+	save_item(NAME(m_msast));
+	save_item(NAME(m_memen));
 }
 
 void peribox_device::device_config_complete()

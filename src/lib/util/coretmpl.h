@@ -17,6 +17,7 @@
 #include "corealloc.h"
 
 #include <iterator>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -350,5 +351,77 @@ private:
 	simple_list<_ItemType>  m_freelist;     // list of free objects
 };
 
+
+// ======================> contiguous_sequence_wrapper
+
+namespace util {
+
+// wraps an existing sequence of values
+template<typename T>
+class contiguous_sequence_wrapper
+{
+public:
+	typedef std::ptrdiff_t difference_type;
+	typedef std::size_t size_type;
+	typedef T value_type;
+	typedef T &reference;
+	typedef const T &const_reference;
+	typedef T *pointer;
+	typedef T *iterator;
+	typedef const T *const_iterator;
+	typedef std::reverse_iterator<iterator> reverse_iterator;
+	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
+	contiguous_sequence_wrapper(T *ptr, std::size_t size)
+		: m_begin(ptr)
+		, m_end(ptr + size)
+	{
+	}
+
+	contiguous_sequence_wrapper(const contiguous_sequence_wrapper &that) = default;
+
+	// iteration
+	iterator begin() { return m_begin; }
+	const_iterator begin() const { return m_begin; }
+	const_iterator cbegin() const { return m_begin; }
+	iterator end() { return m_end; }
+	const_iterator end() const { return m_end; }
+	const_iterator cend() const { return m_end; }
+
+	// reverse iteration
+	reverse_iterator rbegin() { return std::reverse_iterator<iterator>(end()); }
+	const_reverse_iterator rbegin() const { return std::reverse_iterator<const_iterator>(end()); }
+	const_reverse_iterator crbegin() const { return std::reverse_iterator<const_iterator>(cend()); }
+	reverse_iterator rend() { return std::reverse_iterator<iterator>(begin()); }
+	const_reverse_iterator rend() const { return std::reverse_iterator<iterator>(begin()); }
+	const_reverse_iterator crend() const { return std::reverse_iterator<iterator>(begin()); }
+
+	// capacity
+	size_type size() const { return m_end - m_begin; }
+	size_type max_size() const { return size(); }
+	bool empty() const { return size() == 0; }
+
+	// element access
+	reference front() { return operator[](0); }
+	const_reference front() const { return operator[](0); }
+	reference back() { return operator[](size() - 1); }
+	const_reference back() const { return operator[](size() - 1); }
+	reference operator[] (size_type n) { return m_begin[n]; }
+	const_reference operator[] (size_type n) const { return m_begin[n]; }
+	reference at(size_type n) { check_in_bounds(n); return operator[](n); }
+	const_reference at(size_type n) const { check_in_bounds(n); return operator[](n); }
+
+private:
+	iterator m_begin;
+	iterator m_end;
+
+	void check_in_bounds(size_type n)
+	{
+		if (n < 0 || n >= size())
+			throw std::out_of_range("invalid contiguous_sequence_wrapper<T> subscript");
+	}
+};
+
+}; // namespace util
 
 #endif

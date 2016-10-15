@@ -640,7 +640,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	// interrupt acknowledge
- 	DECLARE_READ8_MEMBER( iack );
+	DECLARE_READ8_MEMBER( iack );
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
@@ -734,17 +734,17 @@ protected:
 
 	enum
 	{
-		REG_ICR_CHB				= 0x01,
-		REG_ICR_CHA				= 0x02,
-		REG_ICR_VEC_MOD			= 0x04,
-		REG_ICR_V2V4_MOD		= 0x08,
-		REG_ICR_VEC_MODE_MASK	= 0x30,
-		REG_ICR_VEC_MODE_NONE	= 0x30,
-		REG_ICR_PRIO_MASK		= 0xC0,
-		REG_ICR_PRIO_AHI		= 0x00,
-		REG_ICR_PRIO_BHI		= 0x40,
-		REG_ICR_PRIO_AINT		= 0x80,
-		REG_ICR_PRIO_BINT		= 0xC0,
+		REG_ICR_CHB             = 0x01,
+		REG_ICR_CHA             = 0x02,
+		REG_ICR_VEC_MOD         = 0x04,
+		REG_ICR_V2V4_MOD        = 0x08,
+		REG_ICR_VEC_MODE_MASK   = 0x30,
+		REG_ICR_VEC_MODE_NONE   = 0x30,
+		REG_ICR_PRIO_MASK       = 0xC0,
+		REG_ICR_PRIO_AHI        = 0x00,
+		REG_ICR_PRIO_BHI        = 0x40,
+		REG_ICR_PRIO_AINT       = 0x80,
+		REG_ICR_PRIO_BINT       = 0xC0,
 	};
 };
 

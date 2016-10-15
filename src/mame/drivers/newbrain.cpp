@@ -490,25 +490,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 
 	if (!m_cop_k6 && k6) {
 		//CD4076 CLK
-		switch (m_keylatch)
-		{
-		case 0: m_keydata = m_y0->read(); break;
-		case 1: m_keydata = m_y1->read(); break;
-		case 2: m_keydata = m_y2->read(); break;
-		case 3: m_keydata = m_y3->read(); break;
-		case 4: m_keydata = m_y4->read(); break;
-		case 5: m_keydata = m_y5->read(); break;
-		case 6: m_keydata = m_y6->read(); break;
-		case 7: m_keydata = m_y7->read(); break;
-		case 8: m_keydata = m_y8->read(); break;
-		case 9: m_keydata = m_y9->read(); break;
-		case 10: m_keydata = m_y10->read(); break;
-		case 11: m_keydata = m_y11->read(); break;
-		case 12: m_keydata = m_y12->read(); break;
-		case 13: m_keydata = m_y13->read(); break;
-		case 14: m_keydata = m_y14->read(); break;
-		case 15: m_keydata = m_y15->read(); break;
-		}
+		m_keydata = m_y[m_keylatch]->read();
 
 		if (LOG_COP) logerror("%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_keydata);
 	} else if (m_cop_k6 && k6) {

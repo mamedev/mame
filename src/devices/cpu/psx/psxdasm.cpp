@@ -124,7 +124,7 @@ static const char *const s_gtelm[] =
 
 static char *effective_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 {
-	static char s_address[ 20 ];
+	static char s_address[ 30 ];
 
 	if( state != nullptr && state->pc() == pc )
 	{

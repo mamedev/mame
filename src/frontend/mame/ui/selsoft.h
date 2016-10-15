@@ -31,7 +31,7 @@ protected:
 
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	char                m_search[40];
+	std::string         m_search;
 	const game_driver   *m_driver;
 	bool                m_has_empty_start;
 	s_filter            m_filter;

@@ -23,6 +23,7 @@
 #define __MCCS1850__
 
 #include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -67,9 +68,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( por_w );
 	DECLARE_WRITE_LINE_MEMBER( test_w );
 
-	// For setting the time at startup
-	void set_counter(UINT32 value);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -80,6 +78,9 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
+
+	// device_rtc_interface overrides
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
 	inline void check_interrupt();

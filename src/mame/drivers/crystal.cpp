@@ -270,6 +270,8 @@ public:
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
 	UINT8 m_trivrus_input;
 
+	DECLARE_READ32_MEMBER(crzyddz2_4_r);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -284,8 +286,6 @@ public:
 	void PatchReset(  );
 	UINT16 GetVidReg( address_space &space, UINT16 reg );
 	void SetVidReg( address_space &space, UINT16 reg, UINT16 val );
-
-
 };
 
 void crystal_state::IntReq( int num )
@@ -662,6 +662,48 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 
+ADDRESS_MAP_END
+
+// Crazy Dou Di Zhu II
+// To do: HY04 (pic?) protection
+
+READ32_MEMBER(crystal_state::crzyddz2_4_r)
+{
+	return 0xffffff3f | (machine().rand() & 0xc0);
+}
+
+static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
+	AM_RANGE(0x00000000, 0x00ffffff) AM_ROM AM_WRITENOP
+
+	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
+	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x01500000, 0x01500003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x01500004, 0x01500007) AM_READ(crzyddz2_4_r)
+
+	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
+	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
+	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
+	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
+	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
+
+	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
+	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+
+	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
+
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
+
+	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
+	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
+
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
+	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+
+//  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
 
 
@@ -1174,6 +1216,12 @@ static MACHINE_CONFIG_DERIVED( trivrus, crystal )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( crzyddz2, crystal )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(crzyddz2_mem)
+MACHINE_CONFIG_END
+
+
 ROM_START( crysbios )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb) )
@@ -1287,6 +1335,68 @@ ROM_START( ddz )
 	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
 ROM_END
 
+/***************************************************************************
+
+Crazy Dou Di Zhu II
+Sealy, 2006
+
+PCB Layout
+----------
+
+070405-fd-VER1.2
+|--------------------------------------|
+|       PAL        27C322.U36          |
+|                               BATTERY|
+|    M59PW1282     62256  14.31818MHz  |
+|                             W9864G66 |
+|                                      |
+|J                     VRENDERZERO+    |
+|A            W9864G66                 |
+|M                            W9864G66 |
+|M              8MHz                   |
+|A    HY04    0260F8A                  |
+|                     28.63636MHz      |
+|                                      |
+|                 VR1       TLDA1311   |
+|                               TDA1519|
+|  18WAY                  VOL  10WAY   |
+|--------------------------------------|
+Notes:
+      0260F8A   - unknown TQFP44
+      HY04      - rebadged DIP8 PIC - type unknown *
+      W9864G66  - Winbond 64MBit DRAM
+      M59PW1282 - ST Microelectronics 128MBit SOP44 FlashROM.
+                  This is two 64MB SOP44 ROMs in one package
+
+* The pins are:
+  1 ground
+  2 nothing
+  3 data (only active for 1/4 second when the playing cards or "PASS" shows in game next to each player)
+  4 nothing
+  5 nothing
+  6 clock
+  7 +5V (could be VPP for programming voltage)
+  8 +5V
+
+***************************************************************************/
+
+// if you bypass the hy04 error, if fails with "THERE IS NO IMAGE" as it tries to load files from the flash.
+// Indeed, apart from logo.bmp, the rest of the filenames it tries to load are not in the flash.
+
+ROM_START( crzyddz2 )
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
+
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 )	// copy flash here
+	ROM_LOAD( "27c322.u36", 0x000000, 0x0200000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) )	// 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(           0x000000, 0x0200000 )
+
+	ROM_REGION( 0x4280, "pic", 0 ) // hy04
+	ROM_LOAD("hy04", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
+ROM_END
 
 
 
@@ -1416,8 +1526,9 @@ GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT
 GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
 GAME( 2003, topbladv, crysbios, crystal,  crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
-GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING ) // still has some instability issues
-GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING )
+GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
+GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, crzyddz2,        0, crzyddz2, crystal, driver_device,  0,        ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
 // has a CF card instead of flash roms
 GAME( 2004, psattack, 0, crystal, crystal, crystal_state, psattack, ROT0, "Uniana", "P's Attack", MACHINE_IS_SKELETON )

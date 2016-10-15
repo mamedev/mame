@@ -1421,7 +1421,6 @@ READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 
 WRITE8_MEMBER(mac_state::mac_via_out_a)
 {
-	mac_sound_device *sound = machine().device<mac_sound_device>("custom");
 	device_t *fdc = machine().device("fdc");
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1435,12 +1434,12 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 
 	if (m_model < MODEL_MAC_SE) // SE no longer has dual buffers
 	{
-		sound->set_sound_buffer((data & 0x08) >> 3);
+		m_main_buffer = ((data & 0x08) == 0x08) ? true : false;
 	}
 
 	if (m_model < MODEL_MAC_II)
 	{
-		sound->set_volume(data & 0x07);
+		m_snd_vol = data & 0x07;
 	}
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
@@ -1465,12 +1464,11 @@ WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b)
 {
-	mac_sound_device *sound = machine().device<mac_sound_device>("custom");
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
 	if (AUDIO_IS_CLASSIC)
 	{
-		sound->enable_sound((data & 0x80) == 0);
+		m_snd_enable = ((data & 0x80) == 0) ? true : false;
 	}
 
 	m_rtc->ce_w((data & 0x04)>>2);
@@ -1955,12 +1953,7 @@ void mac_state::machine_reset()
 	/* setup videoram */
 	this->m_screen_buffer = 1;
 
-	/* setup 'classic' sound */
-	if (machine().device("custom") != nullptr)
-	{
-		machine().device<mac_sound_device>("custom")->set_sound_buffer(0);
-	}
-	else if (MAC_HAS_VIA2)  // prime CB1 for ASC and slot interrupts
+	if (MAC_HAS_VIA2)  // prime CB1 for ASC and slot interrupts
 	{
 		m_via2_ca1_hack = 1;
 		m_via2->write_ca1(1);
@@ -1974,8 +1967,6 @@ void mac_state::machine_reset()
 
 	if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
 	{
-		machine().device<mac_sound_device>("custom")->set_sound_buffer(1);
-
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(m_ram->pointer(), 0, m_ram->size());
 	}
@@ -1998,6 +1989,10 @@ void mac_state::machine_reset()
 	m_pm_data_send = m_pm_data_recv = m_pm_ack = m_pm_req = m_pm_dptr = 0;
 	m_pm_state = 0;
 	m_last_taken_interrupt = 0;
+
+	m_snd_enable = false;
+	m_main_buffer = true;
+	m_snd_vol = 3;
 }
 
 WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
@@ -2289,11 +2284,6 @@ void mac_state::vblank_irq()
 TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 {
 	int scanline;
-
-	if (machine().device("custom") != nullptr)
-	{
-		machine().device<mac_sound_device>("custom")->sh_updatebuffer();
-	}
 
 	if (m_rbv_vbltime > 0)
 	{

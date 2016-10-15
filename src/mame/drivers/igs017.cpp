@@ -21,8 +21,8 @@ Year + Game                     PCB        CPU    Sound         Custom          
 98  Mj Long Hu Zheng Ba 2       NO-0206    68000  M6295         IGS031 IGS025 IGS022* Battery
 98  Mj Shuang Long Qiang Zhu 2  NO-0207    68000  M6295         IGS031 IGS025 IGS022  Battery
 98  Mj Man Guan Cai Shen        NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
-99? Tarzan (V107)?              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
-99? Tarzan (V109C)?             NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
+99  Tarzan (V107)               NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
+99  Tarzan (V109C)              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
 ??  Super Poker / Formosa       NO-0187    Z180   M6295 YM2413  IGS017 IGS025         Battery
 -------------------------------------------------------------------------------------------------------------
@@ -181,6 +181,9 @@ public:
 	void mgcs_flip_sprites();
 	void mgcs_patch_rom();
 	void mgcs_igs029_run();
+	void tarzan_decrypt_tiles();
+	void tarzan_decrypt_program_rom();
+	void tarzana_decrypt_program_rom();
 	void starzan_decrypt(UINT8 *ROM, int size, bool isOpcode);
 	void lhzb2_patch_rom();
 	void lhzb2_decrypt_tiles();
@@ -488,8 +491,23 @@ DRIVER_INIT_MEMBER(igs017_state,mgcs)
 
 // tarzan, tarzana
 
+void igs017_state::tarzan_decrypt_tiles()
+{
+	int length = memregion("tilemaps")->bytes();
+	UINT8 *rom = memregion("tilemaps")->base();
+	dynamic_buffer tmp(length);
+	int i;
+
+	memcpy(&tmp[0],rom,length);
+	for (i = 0;i < length;i++)
+	{
+		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,7,8,6,10,9,5,4,3,2,1,0);
+		rom[i] = BITSWAP8(tmp[addr],0,1,2,3,4,5,6,7);
+	}
+}
+
 // decryption is incomplete, the first part of code doesn't seem right.
-DRIVER_INIT_MEMBER(igs017_state,tarzan)
+void igs017_state::tarzan_decrypt_program_rom()
 {
 	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 	int i;
@@ -515,7 +533,7 @@ DRIVER_INIT_MEMBER(igs017_state,tarzan)
 	}
 }
 // by iq_132
-DRIVER_INIT_MEMBER(igs017_state,tarzana)
+void igs017_state::tarzana_decrypt_program_rom()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
@@ -533,6 +551,17 @@ DRIVER_INIT_MEMBER(igs017_state,tarzana)
 	}
 }
 
+DRIVER_INIT_MEMBER(igs017_state,tarzan)
+{
+	tarzan_decrypt_program_rom();
+	tarzan_decrypt_tiles();
+}
+
+DRIVER_INIT_MEMBER(igs017_state,tarzana)
+{
+	tarzana_decrypt_program_rom();
+//	tarzana_decrypt_tiles();	// to do
+}
 
 // starzan
 
@@ -4089,17 +4118,75 @@ ROM_END
 
 /***************************************************************************
 
-Tarzan
+Taishan (Tarzan) Chuang Tian Guan
+IGS 1999
+
+PCB Layout
+----------
+
+IGS PCB NO-0248-1
+|------------------------------|
+|          J A M M A           |
+|1  22MHz  T2105.U5  A2104.U15 |
+|8                   DIP42     |
+|W                             |
+|A          IGS031     U19     |
+|Y    24257                    |
+|                              |
+|           IGS025      PAL.U20|
+|     DSW1                     |
+|                    Z180      |
+|     DSW2          16MHz      |
+|1                      PAL.U21|
+|0    DSW3                     |
+|W                        BATT |
+|A     VOL    LM7805     RES_SW|
+|Y UPC1242    M6295     U14    |
+|------------------------------|
+Notes:
+      IGS025 - custom IGS chip labelled 'TARZAN 1'
+      IGS031 - custom IGS chip
+      VSync  - 60.0060Hz
+      HSync  - 15.3002kHz
+      M6295  - Clock 1.000MHz [16/16], pin 7 high
+      Z180   - Clock 16.000MHz
+      DIP42  - Empty socket
+      U19    - 28F2000 Flash ROM (DIP32)
+      U14    - 23C4000 mask ROM (DIP32)
+      U5     - 23C2048 mask ROM (DIP40)
+      U15    - 23C3210 mask ROM (DIP42)
+      24257  - 32kx8 SRAM
 
 ***************************************************************************/
 
+// IGS PCB NO-0248-1
+ROM_START( tarzanc )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // V109C TARZAN C (same as tarzan set)
+	ROM_LOAD( "u19", 0x00000, 0x40000, CRC(e6c552a5) SHA1(f156de9459833474c85a1f5b35917881b390d34c) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u15", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u5", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) ) // 27C4096 (27C2048 printed on the PCB)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", 0 )
+	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+ROM_END
+
+// sets below are guesswork, assembled from partial dumps...
+
 // IGS NO-0248-1? Mislabeled?
 ROM_START( tarzan )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // V109C TARZAN C
+	ROM_REGION( 0x40000, "maincpu", 0 ) // V109C TARZAN C (same as tarzanc set)
 	ROM_LOAD( "0228-u16.bin", 0x00000, 0x40000, CRC(e6c552a5) SHA1(f156de9459833474c85a1f5b35917881b390d34c) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "a2104_cg_v110.u15", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "sprites.u15", 0x00000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "tilemaps", 0 )
 	ROM_LOAD( "0228-u6.bin", 0x00000, 0x80000, CRC(55e94832) SHA1(b15409f4f1264b6d1218d5dc51c5bd1de2e40284) )
@@ -4108,20 +4195,20 @@ ROM_START( tarzan )
 	ROM_LOAD( "sound.u14", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x2dd * 2, "plds", 0 )
-	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
-	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+	ROM_LOAD( "pal1", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "pal2", 0x2dd, 0x2dd, NO_DUMP )
 ROM_END
 
 // IGS NO-0228?
 ROM_START( tarzana )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // V107 TAISAN
-	ROM_LOAD( "0228-u21.bin", 0x00000, 0x80000, CRC(80aaece4) SHA1(07cad92492c5de36c3915867ed4c6544b1a30c07) )
+	ROM_LOAD( "0228-u21.bin", 0x00000, 0x80000, CRC(80aaece4) SHA1(07cad92492c5de36c3915867ed4c6544b1a30c07) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "sprites.u17", 0x00000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "tilemaps", 0 )
-	ROM_LOAD( "text.u6", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "0228-u6.bin", 0x00000, 0x80000, CRC(55e94832) SHA1(b15409f4f1264b6d1218d5dc51c5bd1de2e40284) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	ROM_LOAD( "sound.u16", 0x00000, 0x40000, NO_DUMP )
@@ -4232,19 +4319,20 @@ ROM_START( spkrform )
 ROM_END
 
 
-GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",              "Shu Zi Le Yuan (V127M)",                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",              "Shu Zi Le Yuan (V113FR)",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
-GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
-GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",              "Mahjong Super Da Man Guan II (China, V754C)", 0 )
-GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",              "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",              "Mahjong Man Guan Cai Shen (V103CS)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
-GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (set 1)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
-GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",              "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999?, tarzan,   0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",              "Tarzan (V109C)",                              MACHINE_NOT_WORKING )
-GAME( 1999?, tarzana,  tarzan,   iqblocka, iqblocka, igs017_state, tarzana,  ROT0, "IGS",              "Tarzan (V107)",                               MACHINE_NOT_WORKING )
-GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, starzan,  ROT0, "IGS / G.F. Gioca", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
+GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shu Zi Le Yuan (V127M)",                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",                      "Shu Zi Le Yuan (V113FR)",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
+GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
+GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
+GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Cai Shen (V103CS)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
+GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zheng Ba 2 (set 1)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
+GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
+GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )
+GAME( 1999,  tarzana,  tarzanc,  iqblocka, iqblocka, igs017_state, tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING )
+GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
 
 /* Parent spk306us in driver spoker.cpp.  Move this set to that driver? */
 GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, spkrform, ROT0, "IGS",              "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

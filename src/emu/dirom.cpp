@@ -90,4 +90,3 @@ void device_rom_interface::interface_pre_start()
 		}
 	}
 }
-

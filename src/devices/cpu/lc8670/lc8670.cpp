@@ -260,8 +260,8 @@ void lc8670_cpu_device::device_start()
 	state_add(LC8670_SFR + 0x65, "VRMAD2", REG_VRMAD2).callimport().callexport().formatstr("%02X");
 	state_add(LC8670_SFR + 0x7f, "BTCR"  , REG_BTCR  ).callimport().callexport().formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).callimport().callexport().formatstr("%04X").noshow();
-	state_add(STATE_GENPCBASE, "curpcbase", m_ppc).callimport().callexport().formatstr("%4X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).callimport().formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_ppc).callimport().formatstr("%4X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  REG_PSW).mask(0xff).formatstr("%7s").noshow();
 
 	// save state
@@ -358,6 +358,7 @@ void lc8670_cpu_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			set_pc(m_pc);
 			break;
 	}
@@ -416,10 +417,10 @@ void lc8670_cpu_device::execute_run()
 	{
 		check_irqs();
 
+		m_ppc = m_pc;
 		debugger_instruction_hook(this, m_pc);
 
 		int cycles;
-		m_ppc = m_pc;
 
 		if (REG_PCON & HALT_MODE)
 		{
