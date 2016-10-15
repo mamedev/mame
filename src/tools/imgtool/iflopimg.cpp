@@ -105,7 +105,7 @@ struct imgtool_floppy_image
 static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image *image, imgtool::stream::ptr &&stream, int noclose)
 {
 	floperr_t ferr;
-	imgtoolerr_t err;
+	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	imgtool::stream *f = nullptr;
 	struct imgtool_floppy_image *fimg;
 	const imgtool_class *imgclass;
@@ -126,7 +126,7 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image *image, imgtool:
 	if (ferr)
 	{
 		err = imgtool_floppy_error(ferr);
-		return err;
+		goto done;
 	}
 	f = nullptr;	// the floppy object has the stream now
 
@@ -134,10 +134,13 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image *image, imgtool:
 	{
 		err = open(image, nullptr);
 		if (err)
-			return err;
+			goto done;
 	}
 
-	return IMGTOOLERR_SUCCESS;
+done:
+	if (f)
+		delete f;
+	return err;
 }
 
 
