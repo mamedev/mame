@@ -587,7 +587,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
-	imgtool_stream *stream = nullptr;
+	imgtool::stream *stream = nullptr;
 	std::vector<UINT8> buffer;
 	UINT32 track, head, sector;
 
@@ -604,18 +604,18 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	stream = stream_open(argv[5], OSD_FOPEN_WRITE);
+	stream = imgtool::stream::open(argv[5], OSD_FOPEN_WRITE);
 	if (!stream)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
 		goto done;
 	}
 
-	stream_write(stream, &buffer[0], buffer.size());
+	stream->write(&buffer[0], buffer.size());
 
 done:
 	if (stream)
-		stream_close(stream);
+		delete stream;
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
@@ -627,7 +627,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
-	imgtool_stream *stream = nullptr;
+	imgtool::stream *stream = nullptr;
 	dynamic_buffer buffer;
 	UINT32 size, track, head, sector;
 
@@ -640,18 +640,18 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 	head = atoi(argv[3]);
 	sector = atoi(argv[4]);
 
-	stream = stream_open(argv[5], OSD_FOPEN_READ);
+	stream = imgtool::stream::open(argv[5], OSD_FOPEN_READ);
 	if (!stream)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
 		goto done;
 	}
 
-	size = (UINT32) stream_size(stream);
+	size = (UINT32) stream->size();
 
 	buffer.resize(size);
 
-	stream_read(stream, &buffer[0], size);
+	stream->read(&buffer[0], size);
 
 	err = img->write_sector(track, head, sector, &buffer[0], size);
 	if (err)
@@ -659,7 +659,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 
 done:
 	if (stream)
-		stream_close(stream);
+		delete stream;
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;

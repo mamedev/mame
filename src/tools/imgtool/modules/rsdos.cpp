@@ -149,7 +149,7 @@ static floperr_t put_granule_map(imgtool::image *img, const UINT8 *granule_map, 
 
 
 
-static imgtoolerr_t transfer_granule(imgtool::image *img, UINT8 granule, int length, imgtool_stream *f, imgtoolerr_t (*proc)(imgtool::image *, int, int, int, int, size_t, imgtool_stream *))
+static imgtoolerr_t transfer_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream &f, imgtoolerr_t (*proc)(imgtool::image *, int, int, int, int, size_t, imgtool::stream &))
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	UINT8 track, sector;
@@ -167,21 +167,21 @@ static imgtoolerr_t transfer_granule(imgtool::image *img, UINT8 granule, int len
 
 
 
-static imgtoolerr_t transfer_from_granule(imgtool::image *img, UINT8 granule, int length, imgtool_stream *destf)
+static imgtoolerr_t transfer_from_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream &destf)
 {
 	return transfer_granule(img, granule, length, destf, imgtool_floppy_read_sector_to_stream);
 }
 
 
 
-static imgtoolerr_t transfer_to_granule(imgtool::image *img, UINT8 granule, int length, imgtool_stream *sourcef)
+static imgtoolerr_t transfer_to_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream &sourcef)
 {
 	return transfer_granule(img, granule, length, sourcef, imgtool_floppy_write_sector_from_stream);
 }
 
 
 
-static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool::image *img, imgtool_stream *destf, size_t *size)
+static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool::image *img, imgtool::stream *destf, size_t *size)
 {
 	floperr_t ferr;
 	size_t s, lastgransize;
@@ -204,7 +204,7 @@ static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool::image 
 	{
 		usedmap[granule] = 1;
 		if (destf)
-			transfer_from_granule(img, granule, 9*256, destf);
+			transfer_from_granule(img, granule, 9*256, *destf);
 
 		/* i is the next granule */
 		s += (256 * 9);
@@ -219,7 +219,7 @@ static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool::image 
 	lastgransize += (256 * (i - 0xc0));
 
 	if (destf)
-		transfer_from_granule(img, granule, lastgransize, destf);
+		transfer_from_granule(img, granule, lastgransize, *destf);
 
 	if (size)
 		*size = s + lastgransize;
@@ -300,7 +300,7 @@ eof:
 	else
 	{
 		/* Not the end of file */
-		err = process_rsdos_file(&rsent, image, NULL, &filesize);
+		err = process_rsdos_file(&rsent, image, nullptr, &filesize);
 		if (err)
 			return err;
 
@@ -386,7 +386,7 @@ static imgtoolerr_t delete_entry(imgtool::image *img, struct rsdos_dirent *ent, 
 
 
 
-static imgtoolerr_t rsdos_diskimage_readfile(imgtool::partition *partition, const char *fname, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t rsdos_diskimage_readfile(imgtool::partition *partition, const char *fname, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	struct rsdos_dirent ent;
@@ -397,7 +397,7 @@ static imgtoolerr_t rsdos_diskimage_readfile(imgtool::partition *partition, cons
 	if (err)
 		return err;
 
-	err = process_rsdos_file(&ent, img, destf, &size);
+	err = process_rsdos_file(&ent, img, &destf, &size);
 	if (err)
 		return err;
 
@@ -409,7 +409,7 @@ static imgtoolerr_t rsdos_diskimage_readfile(imgtool::partition *partition, cons
 
 
 
-static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition *partition, const char *fname, const char *fork, imgtool_stream *sourcef, util::option_resolution *writeoptions)
+static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition *partition, const char *fname, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -432,7 +432,7 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition *partition, con
 		return err;
 
 	/* is there enough space? */
-	sz = stream_size(sourcef);
+	sz = sourcef.size();
 	if (sz > freespace)
 		return IMGTOOLERR_NOSPACE;
 

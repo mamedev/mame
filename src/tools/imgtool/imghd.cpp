@@ -46,7 +46,7 @@ static imgtoolerr_t map_chd_error(chd_error chderr)
 
     Create a MAME HD image
 */
-imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
+imgtoolerr_t imghd_create(imgtool::stream &stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	chd_file chd;
@@ -63,7 +63,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 		hunksize = 1024;    /* default value */
 
 	/* bail if we are read only */
-	if (stream_isreadonly(stream))
+	if (stream.is_read_only())
 	{
 		err = IMGTOOLERR_READONLY;
 		return err;
@@ -73,7 +73,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	const UINT64 logicalbytes = (UINT64)cylinders * heads * sectors * seclen;
 
 	/* create the new hard drive */
-	rc = chd.create(*stream_core_file(stream), logicalbytes, hunksize, seclen, compression);
+	rc = chd.create(*stream.core_file(), logicalbytes, hunksize, seclen, compression);
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
@@ -81,7 +81,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* open the new hard drive */
-	rc = chd.open(*stream_core_file(stream));
+	rc = chd.open(*stream.core_file());
 
 	if (rc != CHDERR_NONE)
 	{
@@ -125,7 +125,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 
     Open stream as a MAME HD image
 */
-imgtoolerr_t imghd_open(imgtool_stream *stream, struct mess_hard_disk_file *hard_disk)
+imgtoolerr_t imghd_open(imgtool::stream &stream, struct mess_hard_disk_file *hard_disk)
 {
 	chd_error chderr;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
@@ -133,7 +133,7 @@ imgtoolerr_t imghd_open(imgtool_stream *stream, struct mess_hard_disk_file *hard
 	hard_disk->hard_disk = nullptr;
 	hard_disk->chd = nullptr;
 
-	chderr = hard_disk->chd->open(*stream_core_file(stream), stream_isreadonly(stream));
+	chderr = hard_disk->chd->open(*stream.core_file(), stream.is_read_only());
 	if (chderr)
 	{
 		err = map_chd_error(chderr);
@@ -146,7 +146,7 @@ imgtoolerr_t imghd_open(imgtool_stream *stream, struct mess_hard_disk_file *hard
 		err = IMGTOOLERR_UNEXPECTED;
 		goto done;
 	}
-	hard_disk->stream = stream;
+	hard_disk->stream = &stream;
 
 done:
 	if (err)
@@ -169,7 +169,10 @@ void imghd_close(struct mess_hard_disk_file *disk)
 		disk->hard_disk = nullptr;
 	}
 	if (disk->stream)
-		stream_close(disk->stream);
+	{
+		delete disk->stream;
+		disk->stream = nullptr;
+	}
 }
 
 
@@ -215,7 +218,7 @@ const hard_disk_info *imghd_get_header(struct mess_hard_disk_file *disk)
 }
 
 
-static imgtoolerr_t mess_hd_image_create(imgtool::image *image, imgtool_stream *f, util::option_resolution *createoptions);
+static imgtoolerr_t mess_hd_image_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions);
 
 enum
 {
@@ -254,7 +257,7 @@ void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo 
 
 
 
-static imgtoolerr_t mess_hd_image_create(imgtool::image *image, imgtool_stream *f, util::option_resolution *createoptions)
+static imgtoolerr_t mess_hd_image_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions)
 {
 	UINT32  blocksize, cylinders, heads, sectors, seclen;
 

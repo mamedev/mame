@@ -573,8 +573,8 @@ imgtool::partition::partition(imgtool::image &image, imgtool_class &imgclass, in
 	m_next_enum = (imgtoolerr_t(*)(imgtool::directory *, imgtool_dirent *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
 	m_close_enum = (void(*)(imgtool::directory *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CLOSE_ENUM);
 	m_free_space = (imgtoolerr_t(*)(imgtool::partition *, UINT64 *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_FREE_SPACE);
-	m_read_file = (imgtoolerr_t(*)(imgtool::partition *, const char *, const char *, imgtool_stream *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
-	m_write_file = (imgtoolerr_t(*)(imgtool::partition *, const char *, const char *, imgtool_stream *, util::option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
+	m_read_file = (imgtoolerr_t(*)(imgtool::partition *, const char *, const char *, imgtool::stream &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
+	m_write_file = (imgtoolerr_t(*)(imgtool::partition *, const char *, const char *, imgtool::stream &, util::option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
 	m_delete_file = (imgtoolerr_t(*)(imgtool::partition *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_DELETE_FILE);
 	m_list_forks = (imgtoolerr_t(*)(imgtool::partition *, const char *, imgtool_forkent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_FORKS);
 	m_create_dir = (imgtoolerr_t(*)(imgtool::partition *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CREATE_DIR);
@@ -896,7 +896,7 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	int read_or_write, util::option_resolution *createopts, imgtool::image::ptr &outimg)
 {
 	imgtoolerr_t err;
-	imgtool_stream *f = nullptr;
+	imgtool::stream *f = nullptr;
 	imgtool::image::ptr image;
 	object_pool *pool = nullptr;
 	void *extra_bytes = nullptr;
@@ -919,7 +919,7 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	}
 
 	// open the stream
-	f = stream_open(fname, read_or_write);
+	f = imgtool::stream::open(fname, read_or_write);
 	if (!f)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_IMAGEFILE);
@@ -966,7 +966,7 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 
 done:
 	if (err && f)
-		stream_close(f);
+		delete f;
 
 	if (pool)
 		pool_free_lib(pool);
@@ -1502,12 +1502,12 @@ done:
 //-------------------------------------------------
 
 imgtoolerr_t imgtool::partition::suggest_file_filters(const char *path,
-	imgtool_stream *stream, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+	imgtool::stream *stream, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t err;
 	int i, j;
 	char *alloc_path = nullptr;
-	imgtoolerr_t (*check_stream)(imgtool_stream *stream, imgtool_suggestion_viability_t *viability);
+	imgtoolerr_t (*check_stream)(imgtool::stream &stream, imgtool_suggestion_viability_t *viability);
 	size_t position;
 
 	// clear out buffer
@@ -1537,12 +1537,12 @@ imgtoolerr_t imgtool::partition::suggest_file_filters(const char *path,
 	{
 		if (stream && suggestions[i].filter)
 		{
-			check_stream = (imgtoolerr_t (*)(imgtool_stream *, imgtool_suggestion_viability_t *)) filter_get_info_fct(suggestions[i].filter, FILTINFO_PTR_CHECKSTREAM);
+			check_stream = (imgtoolerr_t (*)(imgtool::stream &, imgtool_suggestion_viability_t *)) filter_get_info_fct(suggestions[i].filter, FILTINFO_PTR_CHECKSTREAM);
 			if (check_stream)
 			{
-				position = stream_tell(stream);
-				err = check_stream(stream, &suggestions[i].viability);
-				stream_seek(stream, position, SEEK_SET);
+				position = stream->tell();
+				err = check_stream(*stream, &suggestions[i].viability);
+				stream->seek(position, SEEK_SET);
 				if (err)
 					goto done;
 			}
@@ -1697,7 +1697,7 @@ imgtoolerr_t imgtool::partition::get_free_space(UINT64 &sz)
 //  from a file on a partition with a stream
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::read_file(const char *filename, const char *fork, imgtool_stream *destf, filter_getinfoproc filter)
+imgtoolerr_t imgtool::partition::read_file(const char *filename, const char *fork, imgtool::stream &destf, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
 	char *alloc_path = nullptr;
@@ -1758,7 +1758,7 @@ done:
 //  to a new file on an image with a stream
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts, filter_getinfoproc filter)
+imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
 	char *buf = nullptr;
@@ -1842,7 +1842,7 @@ imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fo
 				goto done;
 			}
 
-			file_size = stream_size(sourcef);
+			file_size = sourcef.size();
 
 			if (file_size > free_space)
 			{
@@ -1878,7 +1878,7 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 	const char *dest, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
-	imgtool_stream *f;
+	imgtool::stream *f;
 	char *new_fname = nullptr;
 	char *alloc_dest = nullptr;
 	const char *filter_extension = nullptr;
@@ -1907,7 +1907,7 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 		}
 	}
 
-	f = stream_open(dest, OSD_FOPEN_WRITE);
+	f = imgtool::stream::open(dest, OSD_FOPEN_WRITE);
 	if (!f)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
@@ -1921,13 +1921,13 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 		goto done;
 	}
 
-	err = read_file(new_fname, fork, f, filter);
+	err = read_file(new_fname, fork, *f, filter);
 	if (err)
 		goto done;
 
 done:
 	if (f != nullptr)
-		stream_close(f);
+		delete f;
 	if (alloc_dest != nullptr)
 		free(alloc_dest);
 	if (new_fname != nullptr)
@@ -1945,7 +1945,7 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 	const char *source, util::option_resolution *opts, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
-	imgtool_stream *f = nullptr;
+	imgtool::stream *f = nullptr;
 	imgtool_charset charset;
 	char *alloc_newfname = nullptr;
 	std::string basename;
@@ -1970,16 +1970,16 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 		newfname = alloc_newfname;
 	}
 
-	f = stream_open(source, OSD_FOPEN_READ);
+	f = imgtool::stream::open(source, OSD_FOPEN_READ);
 	if (f)
-		err = write_file(newfname, fork, f, opts, filter);
+		err = write_file(newfname, fork, *f, opts, filter);
 	else
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
 
 done:
 	/* clean up */
 	if (f != nullptr)
-		stream_close(f);
+		delete f;
 	if (alloc_newfname != nullptr)
 		osd_free(alloc_newfname);
 	return err;
