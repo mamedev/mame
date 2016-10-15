@@ -120,7 +120,7 @@
 #define MAXSIZE 80*16*256*2 /* room for two faces, double-density, 80 tracks */
 
 struct thom_floppy {
-	imgtool_stream *stream;
+	imgtool::stream *stream;
 
 	UINT16 sector_size;   /* 128 or 256 */
 	UINT16 sectuse_size;  /* bytes used in sector: 128 or 255 */
@@ -177,12 +177,12 @@ static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
    (.fd have 40 or 80 tracks, .qd have 25 tracks) and the file size.
 */
 
-static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool_stream *stream)
+static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool::stream &stream)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
-	int size = stream_size( stream );
+	int size = stream.size();
 
-	f->stream = stream;
+	f->stream = &stream;
 	f->modified = 0;
 
 	/* guess format */
@@ -238,8 +238,8 @@ static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool_stream *stream)
 
 	assert( size == f->heads * f->tracks * 16 * f->sector_size );
 
-	stream_seek( stream, 0, SEEK_SET );
-	if ( stream_read( stream, f->data, size ) < size )
+	stream.seek(0, SEEK_SET);
+	if ( stream.read(f->data, size ) < size )
 	return IMGTOOLERR_READERROR;
 
 	return IMGTOOLERR_SUCCESS;
@@ -252,14 +252,14 @@ static void thom_close_fd_qd(imgtool::image *img)
 	/* save image */
 	if ( f->modified ) {
 	int size = f->heads * f->tracks * 16 * f->sector_size;
-	stream_seek( f->stream, 0, SEEK_SET );
-	if ( stream_write( f->stream, f->data, size ) < size )
+	f->stream->seek(0, SEEK_SET);
+	if (f->stream->write(f->data, size) < size)
 	{
 		/* logerror( "thom_diskimage_close_fd_qd: write error\n" ); */
 	}
 	}
 
-	stream_close( f->stream );
+	delete f->stream;
 }
 
 
@@ -308,21 +308,21 @@ static UINT16 thom_sap_crc( UINT8* data, int size )
 	return crc;
 }
 
-static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool_stream *stream)
+static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream &stream)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
 	UINT8 buf[262];
 
-	f->stream = stream;
+	f->stream = &stream;
 	f->modified = 0;
 
 	/* check image header */
-	stream_seek( stream, 0, SEEK_SET );
-	stream_read( stream, buf, 66 );
+	stream.seek(0, SEEK_SET);
+	stream.read(buf, 66 );
 	if ( memcmp( buf+1, sap_header+1, 65 ) ) return IMGTOOLERR_CORRUPTIMAGE;
 
 	/* guess format */
-	stream_read( stream, buf, 1 );
+	stream.read(buf, 1 );
 	switch ( buf[0] ) {
 	case 1:
 	case 3:
@@ -342,13 +342,13 @@ static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool_stream *stream)
 	default: return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
-	stream_seek( stream, 66, SEEK_SET );
+	stream.seek(66, SEEK_SET);
 	while ( 1) {
 	int i, sector, track;
 	UINT16 crc;
 
 	/* load sector */
-	if ( stream_read( stream, buf, 6 + f->sector_size ) < 6 + f->sector_size )
+	if ( stream.read(buf, 6 + f->sector_size ) < 6 + f->sector_size )
 		break;
 
 	/* parse sector header */
@@ -381,10 +381,10 @@ static void thom_close_sap(imgtool::image *img)
 	UINT16 crc;
 
 	/* rewind */
-	stream_seek( f->stream, 0, SEEK_SET );
+	f->stream->seek(0, SEEK_SET);
 
 	/* image header */
-	if ( stream_write( f->stream, sap_header, 66 ) < 66 ) {
+	if ( f->stream->write(sap_header, 66) < 66) {
 		/* logerror( "thom_diskimage_close_sap: write error\n" ); */
 		return;
 	}
@@ -408,15 +408,15 @@ static void thom_close_sap(imgtool::image *img)
 	for ( i = 0; i < f->sector_size; i++ ) buf[ i + 4 ] ^= sap_magic_num;
 
 	/* save */
-	if ( stream_write( f->stream, buf, f->sector_size + 6 ) <
-			f->sector_size + 6 ) {
+	if (f->stream->write(buf, f->sector_size + 6) <
+			f->sector_size + 6) {
 		/* logerror( "thom_diskimage_close_sap: write error\n" ); */
 		return;
 	}
 		}
 	}
 
-	stream_close( f->stream );
+	delete f->stream;
 }
 
 
@@ -678,44 +678,50 @@ static int thom_get_free_blocks(thom_floppy* f, unsigned head)
 
 /* dump file contents into dst */
 static void thom_get_file(thom_floppy* f, unsigned head,
-				thom_dirent* d, imgtool_stream *dst)
+				thom_dirent* d, imgtool::stream &dst)
 {
 	UINT8* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int block = d->firstblock;
 	if ( block >= nbblocks ) return;
-	while ( 1 ) {
-	int nextblock = fat[ block + 1 ];
-	int track = block / 2;
-	int firstsect = (block % 2) ? 9 : 1;
-	if ( nextblock < nbblocks ) {
-		/* full block */
-		int i;
-		for ( i = 0; i < 8; i++ ) {
-	UINT8* data = thom_get_sector( f, head, track, firstsect + i );
-	stream_write( dst, data, f->sectuse_size );
+	while ( 1 )
+	{
+		int nextblock = fat[ block + 1 ];
+		int track = block / 2;
+		int firstsect = (block % 2) ? 9 : 1;
+		if ( nextblock < nbblocks )
+		{
+			/* full block */
+			int i;
+			for ( i = 0; i < 8; i++ )
+			{
+				UINT8* data = thom_get_sector( f, head, track, firstsect + i );
+				dst.write(data, f->sectuse_size);
+			}
+			block = fat[ block + 1 ];
 		}
-		block = fat[ block + 1 ];
-	}
-	else if ( nextblock >= 0xc1 && nextblock <= 0xc8 ) {
-		/* last block in file */
-		int i;
-		UINT8* data;
-		for ( i = 0; i < nextblock - 0xc1; i++ ) {
-	data = thom_get_sector( f, head, track, firstsect + i );
-	stream_write( dst, data, f->sectuse_size );
+		else if ( nextblock >= 0xc1 && nextblock <= 0xc8 )
+		{
+			/* last block in file */
+			int i;
+			UINT8* data;
+			for ( i = 0; i < nextblock - 0xc1; i++ )
+			{
+				data = thom_get_sector( f, head, track, firstsect + i );
+				dst.write(data, f->sectuse_size);
+			}
+			data = thom_get_sector( f, head, track, firstsect + i );
+			dst.write(data, d->lastsectsize);
+			return;
 		}
-		data = thom_get_sector( f, head, track, firstsect + i );
-		stream_write( dst, data, d->lastsectsize );
-		return;
-	}
-	else {
-		/* invalid, assume last block */
-		UINT8* data = thom_get_sector( f, head, track, firstsect );
-		stream_write( dst, data, d->lastsectsize );
-		return;
-	}
-	block = nextblock;
+		else
+		{
+			/* invalid, assume last block */
+			UINT8* data = thom_get_sector( f, head, track, firstsect );
+			dst.write(data, d->lastsectsize);
+			return;
+		}
+		block = nextblock;
 	}
 }
 
@@ -739,9 +745,9 @@ static void thom_del_file(thom_floppy* f, unsigned head, thom_dirent* d)
 
 /* create a new file or overwrite an old one, with the contents of src */
 static void thom_put_file(thom_floppy* f, unsigned head,
-				thom_dirent* d, imgtool_stream *src)
+				thom_dirent* d, imgtool::stream &src)
 {
-	int size = stream_size( src );
+	int size = src.size();
 	UINT8* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int block;
@@ -760,14 +766,14 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 	/* store data, full sectors */
 	for ( i = 0; i < 8 && size > f->sectuse_size; i++ ) {
 		UINT8* dst = thom_get_sector( f, head, track, firstsect + i );
-		stream_read( src, dst, f->sectuse_size );
+		src.read(dst, f->sectuse_size);
 		size -= f->sectuse_size;
 	}
 
 	/* store data, last sector */
 	if ( i < 8 ) {
 		UINT8* dst = thom_get_sector( f, head, track, firstsect + i );
-		stream_read( src, dst, size );
+		src.read(dst, size);
 		fat[ block + 1 ] = 0xc1 + i;
 		d->lastsectsize = size;
 		break;
@@ -823,7 +829,7 @@ static imgtoolerr_t thom_write_sector(imgtool::image *img, UINT32 track,
 						const void *buf, size_t len, int ddam)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
-	if ( stream_isreadonly( f->stream ) ) return IMGTOOLERR_WRITEERROR;
+	if ( f->stream->is_read_only() ) return IMGTOOLERR_WRITEERROR;
 	if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks )
 	return IMGTOOLERR_SEEKERROR;
 	if ( len > f->sector_size) return IMGTOOLERR_WRITEERROR;
@@ -937,7 +943,7 @@ static imgtoolerr_t thom_free_space(imgtool::partition *part, UINT64 *size)
 static imgtoolerr_t thom_read_file(imgtool::partition *part,
 					const char *filename,
 					const char *fork,
-					imgtool_stream *destf)
+					imgtool::stream &destf)
 {
 	int head = *( (int*) part->extra_bytes() );
 	imgtool::image* img = &part->image();
@@ -974,7 +980,7 @@ static imgtoolerr_t thom_delete_file(imgtool::partition *part,
 	if ( ! thom_find_dirent( f, head, fname, &d ) )
 	return IMGTOOLERR_FILENOTFOUND;
 	/*if ( thom_get_file_size( f, head, &d ) < 0 ) return IMGTOOLERR_CORRUPTFILE;*/
-	if ( stream_isreadonly( f->stream ) ) return IMGTOOLERR_WRITEERROR;
+	if ( f->stream->is_read_only() ) return IMGTOOLERR_WRITEERROR;
 	thom_del_file( f, head, &d );
 	return IMGTOOLERR_SUCCESS;
 }
@@ -982,19 +988,19 @@ static imgtoolerr_t thom_delete_file(imgtool::partition *part,
 static imgtoolerr_t thom_write_file(imgtool::partition *part,
 					const char *filename,
 					const char *fork,
-					imgtool_stream *sourcef,
+					imgtool::stream &sourcef,
 					util::option_resolution *opts)
 {
 	int head = *( (int*) part->extra_bytes() );
 	imgtool::image* img = &part->image();
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
 	thom_dirent d;
-	int size = stream_size( sourcef );
+	int size = sourcef.size();
 	int blocks = thom_get_free_blocks( f, head );
 	char name[9], ext[4], fname[14];
 	int is_new = 1;
 
-	if ( stream_isreadonly( f->stream ) ) return IMGTOOLERR_WRITEERROR;
+	if ( f->stream->is_read_only() ) return IMGTOOLERR_WRITEERROR;
 
 	/* convert filename */
 	thom_conv_filename( filename, name, ext );
@@ -1107,7 +1113,7 @@ static imgtoolerr_t thom_suggest_transfer(imgtool::partition *part,
 }
 
 static imgtoolerr_t thom_create(imgtool::image* img,
-				imgtool_stream *stream,
+				imgtool::stream &stream,
 				util::option_resolution *opts)
 {
 	thom_floppy* f = (thom_floppy*) img->extra_bytes();
@@ -1115,7 +1121,7 @@ static imgtoolerr_t thom_create(imgtool::image* img,
 	UINT8* buf;
 	const char* name;
 
-	f->stream = stream;
+	f->stream = &stream;
 	f->modified = 0;
 
 	/* get parameters */
@@ -1274,92 +1280,98 @@ static const UINT8 crypt2[13] = {
 };
 
 /* decrypt BASIC protected files */
-static void thom_decrypt(imgtool_stream* out, imgtool_stream* in)
+static void thom_decrypt(imgtool::stream &out, imgtool::stream &in)
 {
 	int i1 = 11, i2 = 13;
-	while ( 1 ) {
-	UINT8 b;
-	if ( stream_read( in, &b, 1) < 1 ) break;
-	b = ( (UINT8)(b - i2) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i1;
-	stream_putc( out, b );
-	i1--; i2--;
-	if ( !i1 ) i1 = 11;
-	if ( !i2 ) i2 = 13;
+	while ( 1 )
+	{
+		UINT8 b;
+		if ( in.read(&b, 1) < 1 ) break;
+		b = ( (UINT8)(b - i2) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i1;
+		out.putc(b );
+		i1--; i2--;
+		if ( !i1 ) i1 = 11;
+		if ( !i2 ) i2 = 13;
 	}
 }
 
 /* encrypt BASIC protected files */
-static void thom_encrypt(imgtool_stream* out, imgtool_stream* in)
+static void thom_encrypt(imgtool::stream &out, imgtool::stream &in)
 {
 	int i1 = 11, i2 = 13;
-	while ( 1 ) {
-	UINT8 b;
-	if ( stream_read( in, &b, 1) < 1 ) break;
-	b = ( (UINT8)(b - i1) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i2;
-	stream_putc( out, b );
-	i1--; i2--;
-	if ( !i1 ) i1 = 11;
-	if ( !i2 ) i2 = 13;
+	while ( 1 )
+	{
+		UINT8 b;
+		if ( in.read(&b, 1) < 1 ) break;
+		b = ( (UINT8)(b - i1) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i2;
+		out.putc(b );
+		i1--; i2--;
+		if ( !i1 ) i1 = 11;
+		if ( !i2 ) i2 = 13;
 	}
 }
 
 static imgtoolerr_t thomcrypt_read_file(imgtool::partition *part,
 					const char *name,
-					const char *fork, imgtool_stream *dst)
+					const char *fork, imgtool::stream &dst)
 {
 	UINT8 buf[3];
-	imgtool_stream *org = stream_open_mem( NULL, 0 );
+	imgtool::stream *org = imgtool::stream::open_mem( NULL, 0 );
 	imgtoolerr_t err;
 	if ( !org ) return IMGTOOLERR_OUTOFMEMORY;
 
 	/* read file */
-	err = thom_read_file( part, name, fork, org );
+	err = thom_read_file( part, name, fork, *org );
 	if ( err ) {
-	stream_close( org );
+	delete org;
 	return err;
 	}
 
-	stream_seek( org, 0, SEEK_SET );
-	if ( stream_read( org, buf, 3 ) < 3 || buf[0] != 0xfe ) {
-	/* regular file */
-	stream_seek( org, 0, SEEK_SET );
-	stream_transfer_all( dst, org );
+	org->seek(0, SEEK_SET);
+	if ( org->read(buf, 3 ) < 3 || buf[0] != 0xfe )
+	{
+		/* regular file */
+		org->seek(0, SEEK_SET);
+		imgtool::stream::transfer_all( dst, *org );
 	}
-	else {
-	/* encrypted file */
-	stream_putc( dst, '\xff' );
-	stream_write( dst, buf+1, 2 );
-	thom_decrypt( dst, org );
+	else
+	{
+		/* encrypted file */
+		dst.putc( '\xff' );
+		dst.write(buf+1, 2);
+		thom_decrypt( dst, *org );
 	}
 
-	stream_close( org );
+	delete org;
 	return IMGTOOLERR_SUCCESS;
 }
 
 static imgtoolerr_t thomcrypt_write_file(imgtool::partition *part,
 						const char *name,
-						const char *fork, imgtool_stream *src,
+						const char *fork, imgtool::stream &src,
 						util::option_resolution *opts)
 {
 	UINT8 buf[3];
 
-	if ( stream_read( src, buf, 3 ) < 3 || buf[0] == 0xfe ) {
-	/* too short or already encrypted file */
-	stream_seek( src, 0, SEEK_SET );
-	return thom_write_file( part, name, fork, src, opts );
+	if ( src.read(buf, 3 ) < 3 || buf[0] == 0xfe )
+	{
+		/* too short or already encrypted file */
+		src.seek(0, SEEK_SET);
+		return thom_write_file( part, name, fork, src, opts );
 	}
-	else {
-	/* regular file */
-	imgtool_stream *dst = stream_open_mem( NULL, 0 );
-	imgtoolerr_t err;
-	if ( !dst ) return IMGTOOLERR_OUTOFMEMORY;
-	stream_putc( dst, '\xfe' );
-	stream_write( dst, buf+1, 2 );
-	thom_encrypt( dst, src );
-	stream_seek( dst, 0, SEEK_SET );
-	err = thom_write_file( part, name, fork, dst, opts );
-	stream_close( dst);
-	return err;
+	else
+	{
+		/* regular file */
+		imgtool::stream *dst = imgtool::stream::open_mem( NULL, 0 );
+		imgtoolerr_t err;
+		if ( !dst ) return IMGTOOLERR_OUTOFMEMORY;
+		dst->putc( '\xfe' );
+		dst->write(buf+1, 2);
+		thom_encrypt( *dst, src );
+		dst->seek(0, SEEK_SET);
+		err = thom_write_file( part, name, fork, *dst, opts );
+		delete dst;
+		return err;
 	}
 }
 
@@ -1385,77 +1397,84 @@ void filter_thomcrypt_getinfo(UINT32 state, union filterinfo *info)
 static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
 						const char *name,
 						const char *fork,
-						imgtool_stream *dst,
+						imgtool::stream &dst,
 						const char *const table[2][128])
 {
-	imgtool_stream *org = stream_open_mem( NULL, 0 );
+	imgtool::stream *org = imgtool::stream::open_mem( NULL, 0 );
 	imgtoolerr_t err;
 	UINT8 buf[4];
 	int i;
 
 	if ( !org ) return IMGTOOLERR_OUTOFMEMORY;
 
-	err = thomcrypt_read_file( part, name, fork, org );
-	if ( err ) {
-	stream_close( org );
-	return err;
+	err = thomcrypt_read_file( part, name, fork, *org );
+	if (err)
+	{
+		delete org;
+		return err;
 	}
-	stream_seek( org, 3, SEEK_SET ); /* skip header */
+	org->seek(3, SEEK_SET); /* skip header */
 
-	while ( 1 ) {
-	int in_str = 0, in_fun = 0;
-	int linelength, linenum;
+	while ( 1 )
+	{
+		int in_str = 0, in_fun = 0;
+		int linelength, linenum;
 
-	/* line header: line length and line number */
-	/* I am not sure this is 100% correct but it works in many cases */
-	if ( stream_read( org, buf, 2 ) < 2 ) goto end;
-	linelength = ((int)buf[0] << 8) + (int)buf[1] - 4;
-	if ( linelength <= 0 ) goto end;
-	if ( stream_read( org, buf, 2 ) < 2 ) goto end;
-	linenum = ((int)buf[0] << 8) + buf[1];
-	stream_printf( dst, "%u ", linenum );
+		/* line header: line length and line number */
+		/* I am not sure this is 100% correct but it works in many cases */
+		if ( org->read(buf, 2 ) < 2 ) goto end;
+		linelength = ((int)buf[0] << 8) + (int)buf[1] - 4;
+		if ( linelength <= 0 ) goto end;
+		if ( org->read(buf, 2 ) < 2 ) goto end;
+		linenum = ((int)buf[0] << 8) + buf[1];
+		dst.printf( "%u ", linenum );
 
-	/* process line */
-	for ( i = 0; i < linelength; i++ ) {
-		UINT8 c;
-		if ( stream_read( org, &c, 1 ) < 1 ) break;
-		if ( c == 0 ) {
-	/* Sometimes, linelength seems wrong and we must rely on the fact that
-	   BASIC lines are 0-terminated.
-	   At other times, there are 0 embedded within lines or extra stuff
-	   between the 0 and the following line, and so, we must rely
-	   on linelength to cut the line (!)
-	*/
-	if ( linelength > 256 ) break;
+		/* process line */
+		for ( i = 0; i < linelength; i++ )
+		{
+			UINT8 c;
+			if ( org->read(&c, 1 ) < 1 ) break;
+			if ( c == 0 )
+			{
+				/* Sometimes, linelength seems wrong and we must rely on the fact that
+				   BASIC lines are 0-terminated.
+				   At other times, there are 0 embedded within lines or extra stuff
+				   between the 0 and the following line, and so, we must rely
+				   on linelength to cut the line (!)
+				*/
+				if ( linelength > 256 ) break;
+			}
+			else if ( c == 0xff && ! in_str ) in_fun = 1; /* function prefix */
+			else
+			{
+				if ( c >= 0x80 && ! in_str )
+				{
+					/* token */
+					const char* token = table[ in_fun ][ c - 0x80 ];
+					if ( token ) dst.puts(token );
+					else dst.puts("???" );
+				}
+				else
+				{
+					/* regular character */
+					if ( c == '"' ) in_str = 1 - in_str;
+					dst.putc( c ); /* normal letter */
+				}
+				in_fun = 0;
+			}
 		}
-		else if ( c == 0xff && ! in_str ) in_fun = 1; /* function prefix */
-		else {
-	if ( c >= 0x80 && ! in_str ) {
-		/* token */
-		const char* token = table[ in_fun ][ c - 0x80 ];
-		if ( token ) stream_puts( dst, token );
-		else stream_puts( dst, "???" );
-	}
-	else {
-		/* regular character */
-		if ( c == '"' ) in_str = 1 - in_str;
-		stream_putc( dst, c ); /* normal letter */
-	}
-	in_fun = 0;
-		}
-	}
-	stream_putc( dst, '\n' );
+		dst.putc( '\n' );
 	}
 	end:
 
-	stream_close( org );
+	delete org;
 	return IMGTOOLERR_SUCCESS;
 }
 
 static imgtoolerr_t thom_basic_write_file(imgtool::partition *part,
 						const char *name,
 						const char *fork,
-						imgtool_stream *src,
+						imgtool::stream &src,
 						util::option_resolution *opts,
 						const char *const table[2][128])
 {
@@ -1467,14 +1486,14 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition *part,
 	static imgtoolerr_t short##_read_file(imgtool::partition *part,  \
 					const char *name,       \
 					const char *fork,       \
-					imgtool_stream *dst)        \
+					imgtool::stream &dst)        \
 	{                                   \
 	return thom_basic_read_file( part, name, fork, dst, short );    \
 	}                                   \
 	static imgtoolerr_t short##_write_file(imgtool::partition *part, \
 						const char *name,       \
 						const char *fork,       \
-						imgtool_stream *src,        \
+						imgtool::stream &src,        \
 						util::option_resolution *opts)    \
 	{                                   \
 	return thom_basic_write_file( part, name, fork, src, opts, short ); \

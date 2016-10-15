@@ -478,7 +478,7 @@ static imgtoolerr_t vzdos_diskimage_freespace(imgtool::partition *partition, UIN
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t vzdos_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t ret;
 	imgtool::image *image = &partition->image();
@@ -514,7 +514,7 @@ static imgtoolerr_t vzdos_diskimage_readfile(imgtool::partition *partition, cons
 		/* write either DATA_SIZE or the remaining bytes */
 		towrite = filesize > DATA_SIZE ? DATA_SIZE : filesize;
 
-		if (stream_write(destf, buffer, towrite) != towrite)
+		if (destf.write(buffer, towrite) != towrite)
 			return IMGTOOLERR_WRITEERROR;
 
 		filesize -= DATA_SIZE;
@@ -602,7 +602,7 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool::partition *partition, co
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_writefile(imgtool::partition *partition, int offset, imgtool_stream *sourcef, vzdos_dirent *entry)
+static imgtoolerr_t vzdos_writefile(imgtool::partition *partition, int offset, imgtool::stream &sourcef, vzdos_dirent *entry)
 {
 	imgtoolerr_t ret;
 	imgtool::image *img = &partition->image();
@@ -629,11 +629,11 @@ static imgtoolerr_t vzdos_writefile(imgtool::partition *partition, int offset, i
 		return ret;
 	}
 
-	ret = (imgtoolerr_t)stream_seek(sourcef, offset, SEEK_SET);
+	ret = (imgtoolerr_t) sourcef.seek(offset, SEEK_SET);
 	if (ret) return ret;
 
 	/* check if there is enough space */
-	filesize = stream_size(sourcef) - offset;
+	filesize = sourcef.size() - offset;
 
 	ret = vzdos_diskimage_freespace(partition, &freespace);
 	if (ret) return ret;
@@ -668,7 +668,7 @@ static imgtoolerr_t vzdos_writefile(imgtool::partition *partition, int offset, i
 	/* write data to disk */
 	while (filesize > 0) {
 		toread = filesize > DATA_SIZE ? DATA_SIZE : filesize;
-		stream_read(sourcef, buffer, toread);
+		sourcef.read(buffer, toread);
 
 		filesize -= toread;
 
@@ -700,7 +700,7 @@ static imgtoolerr_t vzdos_writefile(imgtool::partition *partition, int offset, i
 }
 
 /* create a new file or overwrite a file */
-static imgtoolerr_t vzdos_diskimage_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t vzdos_diskimage_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int ftype;
@@ -789,7 +789,7 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool::partition *partitio
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_create(imgtool::image *img, imgtool_stream *stream, util::option_resolution *opts)
+static imgtoolerr_t vzdos_diskimage_create(imgtool::image *img, imgtool::stream &stream, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int track, sector;
@@ -808,7 +808,7 @@ static imgtoolerr_t vzdos_diskimage_create(imgtool::image *img, imgtool_stream *
     Imgtool vz filter code
 *********************************************************************/
 
-static imgtoolerr_t vzsnapshot_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t vzsnapshot_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t ret;
 	imgtool::image *image = &partition->image();
@@ -843,7 +843,7 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool::partition *partition, const cha
 	place_integer_le(header, 22, 2, entry.start_address);
 
 	/* write header to file */
-	stream_write(destf, header, sizeof(header));
+	destf.write(header, sizeof(header));
 
 	/* write data to file */
 	ret = vzdos_diskimage_readfile(partition, filename, "", destf);
@@ -852,7 +852,7 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool::partition *partition, const cha
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzsnapshot_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
+static imgtoolerr_t vzsnapshot_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int fnameopt;
@@ -860,7 +860,7 @@ static imgtoolerr_t vzsnapshot_writefile(imgtool::partition *partition, const ch
 	UINT8 header[24];
 
 	/* get header infos from file */
-	stream_read(sourcef, header, sizeof(header));
+	sourcef.read(header, sizeof(header));
 
 	/* prepare directory entry */
 	entry.ftype         = header[21] == 0xF1 ? 'B' : 'T';

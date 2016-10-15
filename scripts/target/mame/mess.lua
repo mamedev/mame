@@ -1048,6 +1048,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"unisys",
 		"usp",
 		"veb",
+		"verifone",
 		"vidbrain",
 		"videoton",
 		"visual",
@@ -3087,6 +3088,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/sc2.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "verifone")
+files {
+	MAME_DIR .. "src/mame/drivers/tranz330.cpp",
+	MAME_DIR .. "src/mame/includes/tranz330.h"
+}
+
 createMESSProjects(_target, _subtarget, "vidbrain")
 files {
 	MAME_DIR .. "src/mame/drivers/vidbrain.cpp",
@@ -3210,6 +3217,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/alphasma.cpp",
 	MAME_DIR .. "src/mame/drivers/ampro.cpp",
 	MAME_DIR .. "src/mame/drivers/amust.cpp",
+	MAME_DIR .. "src/mame/drivers/anzterm.cpp",
 	MAME_DIR .. "src/mame/drivers/applix.cpp",
 	MAME_DIR .. "src/mame/drivers/argox.cpp",
 	MAME_DIR .. "src/mame/drivers/attache.cpp",

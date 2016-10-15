@@ -4,9 +4,9 @@
 
     mame.lst
 
-    This is not automatically generated file, and should be manually updated when
-    new driver is added. From time to time we will auto update comments
-    according to meta-data from source files.
+    This is not an automatically generated file, and it should be manually
+    updated when new driver is added. From time to time, we will auto-update
+    comments according to metadata from source files.
 
 ******************************************************************************/
 
@@ -1165,6 +1165,9 @@ amust                           //
 @source:angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?
 spcpostn                        // (c) 1986 Sega / Nasco"
+
+@source:anzterm.cpp
+anzterm                         // Burroughs EF315-I220
 
 @source:apc.cpp
 apc                             //
@@ -10317,7 +10320,8 @@ wizzard                         //
 @source:crystal.cpp
 crysbios                        //
 crysking                        // 2001 Brezzasoft. Crystal of the kings
-ddz                             // (c) 200?
+crzyddz2                        // 2006 Sealy
+ddz                             // 200?
 donghaer                        //
 evosocc                         // 2001 Evoga. Evolution Soccer
 officeye                        //
@@ -14593,8 +14597,9 @@ sdmg2                           // (c) 1997
 slqz2                           // (c) 1998
 spkrform                        // (c) ????
 starzan                         // (c) 2000?
-tarzan                          // (c) 1999?
-tarzana                         // (c) 1999?
+tarzan                          // (c) 1999
+tarzana                         // (c) 1999
+tarzanc                         // (c) 1999
 tjsb                            // (c) 1997
 
 @source:igspc.cpp
@@ -28157,7 +28162,8 @@ derbyoc                         // 1999.10 Derby Owners Club (Japan) (Rev B)
 derbyoc2                        // 2001.10 Derby Owners Club II Ver.2.1 (Japan) (Rev B)
 derbyocw                        // 2005.?? Derby Owners Club World Edition EX (Rev D)
 dirtypig                        // 2004.09 Dirty Pig Skin Football
-doa2                            // 1999.11 Dead or Alive 2
+doa2                            // 1999.12? Dead or Alive 2
+doa2a                           // 1999.11 Dead or Alive 2 (Rev A)
 doa2m                           // 2000.01 Dead or Alive 2 Millennium
 dolphin                         // 2003.08 Dolphin Blue
 dragntr2                        // 2004.?? Dragon Treasure 2 (Rev A)
@@ -35795,6 +35801,9 @@ trackfldnz                      // (c) 1982 Goldberg Enterprizes Inc.
 wizzquiz                        // (c) 1985 Konami
 wizzquiza                       // (c) 1985 Zilec-Zenitone
 yieartf                         // GX361 (c) 1985
+
+@source:tranz330.cpp
+tranz330                        // (c) 1985 VeriFone
 
 @source:travrusa.cpp
 motorace                        // (c) 1983 Williams license

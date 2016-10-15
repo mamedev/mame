@@ -128,17 +128,17 @@ WRITE8_MEMBER(sega_fm_unit_device::peripheral_w)
 			m_audio_control = data & 0x01;
 			if (m_audio_control == 0x01)
 			{
-				m_ym->set_output_gain(0, 1.0);
+				m_ym->set_output_gain(ALL_OUTPUTS, 1.0);
 				// assume the PSG output is muted when FM is active.
 				// Out Run need this. Needs confirmation (see TODO).
 				if (m_psg.found())
-					m_psg->set_output_gain(0, 0.0);
+					m_psg->set_output_gain(ALL_OUTPUTS, 0.0);
 			}
 			else
 			{
-				m_ym->set_output_gain(0, 0.0);
+				m_ym->set_output_gain(ALL_OUTPUTS, 0.0);
 				if (m_psg.found())
-					m_psg->set_output_gain(0, 1.0);
+					m_psg->set_output_gain(ALL_OUTPUTS, 1.0);
 			}
 			break;
 		default:

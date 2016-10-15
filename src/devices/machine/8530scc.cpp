@@ -530,7 +530,7 @@ void scc8530_t::write_reg(int offset, UINT8 data)
 		case 0: /* Channel B (Printer Port) Control */
 		case 1: /* Channel A (Modem Port) Control */
 		{
-			int chan = ((offset == 2) ? 1 : 0);
+			int chan = ((offset == 0) ? 1 : 0);
 			if (mode == 0)
 			{
 				if((data & 0xf0) == 0)  // not a reset command

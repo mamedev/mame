@@ -260,7 +260,7 @@ Notes:
       CN5       - USB connector joining to JVS I/O board with standard USB cable
       CN8       - A/V input connector (from XBox board via short A/V cable)
       CN9       - VGA output connector
-      CN10      - 14 pin connector (purpose unknown but appears to be unused)
+      CN10      - 14 pin connector (purpose unknown, maybe another video connector)
       CN11      - 16-pin flat cable connector joining to LPC connector on XBox board
       CN12      - 40-pin IDE flat cable connector joining to IDE connector on XBox board
       CN14S     - 7-pin power output connector joining to XBox board
@@ -869,9 +869,10 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		sense = 3;
 	else
 		sense = 0; // need to check
-	// PINSA register, bits 4-1 special value, must be 10 xor 15, but bit 3 is ignored since its used as the CS pin of the chip
+	// PINSA register, bits 0-2 connected do dip switches 1-3 on filter board, bit 4 to dip switch 4, bit 5 to dip switch 5, bits 6-7 to buttons 1-2 on filter board
+	// bits 4-1 value must be 10 xor 15, and bit 3 is ignored since its used as the CS pin of the chip
 	endpoints[endpoint].buffer[1] = 0x4b;
-	// PINSB register, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 is the sense pin of the jvs connector
+	// PINSB register, bits 5-7 connected to 3 leds not mounted on pcb, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 give the status of the sense pin of the jvs connector
 	// if bits 0-1 are 11, the not all the connected jvs devices have been assigned an address yet
 	endpoints[endpoint].buffer[2] = 0x52 | sense;
 	// OUTB register
