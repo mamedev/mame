@@ -106,6 +106,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
+	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER(hack_coin1_r);
 	DECLARE_READ8_MEMBER(hack_coin2_r);
 	DECLARE_READ8_MEMBER(hack_908_r);
@@ -130,6 +131,7 @@ public:
 	required_device<screen_device> m_screen;
 	UINT8 m_mc6845_address;
 	UINT16 m_video_update_address;
+	UINT8 m_rtc_data;
 };
 
 
@@ -163,6 +165,11 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 void amusco_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amusco_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
+}
+
+void amusco_state::machine_start()
+{
+	m_rtc_data = 0;
 }
 
 
@@ -290,12 +297,15 @@ WRITE8_MEMBER(amusco_state::rtc_w)
 		case 1:
 			m_rtc->address_w(data & 0x0f);
 			m_rtc->cs_w(BIT(data, 6));
+			m_rtc->hold_w(BIT(data, 6));
 			m_rtc->write_w(BIT(data, 5));
+			if (BIT(data, 5))
+				m_rtc->data_w(space, 0, m_rtc_data);
 			m_rtc->read_w(BIT(data, 4));
 			break;
 
 		case 3:
-			m_rtc->data_w(space, 0, data);
+			m_rtc_data = data;
 			break;
 
 		default:
@@ -489,4 +499,4 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY   FULLNAME                      FLAGS */
-GAME( 1987, amusco,   0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco", "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS ) // runs much too fast; palette totally wrong
+GAME( 1987, amusco,   0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco", "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER ) // runs much too fast; palette totally wrong
