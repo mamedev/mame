@@ -231,7 +231,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-078200 2"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="3 ninjas kick back (usa)" sha1="6ebb602efa04127f905b39fafa6aa37ef69d1c7c"/>
+				<disk name="3 ninjas kick back (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="SEGAT86015RE R1J MFD BY JVC"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ax-101 (usa)" sha1="e0a323a38305dc8cbb4d9c778d8256dd0fcd4dc5"/>
+				<disk name="ax-101 (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -278,7 +278,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-040200 3"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="after burner iii (usa)" sha1="95697301e1a81136a635f9dc93db9645cd31d3f8"/>
+				<disk name="after burner iii (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -345,7 +345,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-040500 1"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="batman returns (usa)" sha1="49dc8d5f2760123f8babc57837c3818b90c546c8"/>
+				<disk name="batman returns (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -484,7 +484,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-031700 1"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="black hole assault (usa)" sha1="028afbfd19ac39d3573725fb0caa5c05e3288fa5"/>
+				<disk name="black hole assault (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -510,7 +510,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC 082400 1"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bouncers (usa)" sha1="278c615b7d3411f7cc760e0147988c64b848cfdf"/>
+				<disk name="bouncers (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -582,7 +582,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-068700 1"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bram stoker's dracula (usa, rev. a)" sha1="ae70b55e7e614b3cb98e03e207103fec0bc31873"/>
+				<disk name="bram stoker's dracula (usa, rev. a)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -642,7 +642,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-032500 5"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="chuck rock (usa)" sha1="409746c3e505b9d5dade6cf4b5b01165930ade86"/>
+				<disk name="chuck rock (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -671,7 +671,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="SEGACD86006 R1D MFD BY JVC"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="chuck rock ii - son of chuck (usa)" sha1="b8445f6352fed1242b6dbf40807a0b1913a3cdad"/>
+				<disk name="chuck rock ii - son of chuck (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -732,7 +732,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="SEGAT118025 R1F MFD BY JVC"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="compton's interactive encyclopedia v2.01r (usa)" sha1="14ee396c5d4d02059527d9894fbf1d4ae17e2f0a"/>
+				<disk name="compton's interactive encyclopedia v2.01r (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -3454,7 +3454,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="SEGAT110015 R1J"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="the adventures of willy beamish (usa)" sha1="c1516b30726c0335ca732e9595eba12b9dd62deb"/>
+				<disk name="the adventures of willy beamish (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -3484,7 +3484,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-047100 2"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="the amazing spider-man vs. the kingpin (usa)" sha1="f0b2ef9e37fb5f3f10129e438a1a98d7c36f10fd"/>
+				<disk name="the amazing spider-man vs. the kingpin (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
@@ -3842,7 +3842,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="T-163015-00"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bari-arm (usa)" sha1="a89e004547338bbe021f9acde219748a4c948661"/>
+				<disk name="bari-arm (usa)" sha1=""/>
 			</diskarea>
 		</part>
 	</software>
