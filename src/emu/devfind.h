@@ -116,8 +116,11 @@ public:
 	/// \return Reference to element at specified index.
 	T &operator[](unsigned index) { assert(index < Count); return m_array[index]; }
 
-	/// \brief Returns the count
-	unsigned size() const { return Count; }
+	/// \brief Get array size
+	///
+	/// Returns number of objects in array (compile-time constant).
+	/// \return The size of the array.
+	constexpr unsigned size() const { return Count; }
 };
 
 

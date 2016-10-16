@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco.c
+    coco.cpp
 
     TRS-80 Radio Shack Color Computer Family
 
@@ -93,7 +93,7 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_vhd_1(*this, VHD1_TAG),
 	m_beckerport(*this, DWSOCK_TAG),
 	m_beckerportconfig(*this, BECKERPORT_TAG),
-	m_keyboard(*this, { "row0", "row1", "row2", "row3", "row4", "row5", "row6" }),
+	m_keyboard(*this, "row%u", 0),
 	m_joystick_type_control(*this, CTRL_SEL_TAG),
 	m_joystick_hires_control(*this, HIRES_INTF_TAG)
 {
@@ -857,7 +857,7 @@ void coco_state::poll_keyboard(void)
 	UINT8 pia0_pa_z = 0x7F;
 
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
-	for (int i = 0; i < m_keyboard.size(); i++)
+	for (unsigned i = 0; i < m_keyboard.size(); i++)
 	{
 		int value = m_keyboard[i]->read();
 		if ((value | pia0_pb) != 0xFF)
