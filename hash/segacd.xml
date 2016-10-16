@@ -3842,7 +3842,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="T-163015-00"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bari-arm (usa)" sha1=""/>
+				<disk name="bari-arm (usa)" sha1="99419bf60689cf563a26236f7db116b72ad6ab8b"/>
 			</diskarea>
 		</part>
 	</software>
