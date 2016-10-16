@@ -447,7 +447,7 @@ static imgtoolerr_t fat_partition_open(imgtool::partition *partition, UINT64 fir
 
 
 
-static imgtoolerr_t fat_partition_create(imgtool::image *image, UINT64 first_block, UINT64 block_count)
+static imgtoolerr_t fat_partition_create(imgtool::image &image, UINT64 first_block, UINT64 block_count)
 {
 	imgtoolerr_t err;
 	UINT32 heads, tracks, sectors_per_track;
@@ -469,7 +469,7 @@ static imgtoolerr_t fat_partition_create(imgtool::image *image, UINT64 first_blo
 		return IMGTOOLERR_PARAMTOOLARGE;
 
 	/* get the geometry */
-	err = image->get_geometry(&tracks, &heads, &sectors_per_track);
+	err = image.get_geometry(&tracks, &heads, &sectors_per_track);
 	if (err)
 		return err;
 
@@ -560,14 +560,14 @@ static imgtoolerr_t fat_partition_create(imgtool::image *image, UINT64 first_blo
 		header[2] = (UINT8) ((boot_sector_offset - 2) >> 8); /* (offset) */
 	}
 
-	err = image->write_block(first_block, header);
+	err = image.write_block(first_block, header);
 	if (err)
 		return err;
 
 	/* clear out file allocation table */
 	for (i = reserved_sectors; i < (reserved_sectors + sectors_per_fat * fat_count + root_dir_sectors); i++)
 	{
-		err = image->clear_block(first_block + i, 0);
+		err = image.clear_block(first_block + i, 0);
 		if (err)
 			return err;
 	}

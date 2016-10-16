@@ -1023,9 +1023,9 @@ bool tape_image_t::decode_dir(void)
 	return true;
 }
 
-static tape_state_t& get_tape_state(imgtool::image *img)
+static tape_state_t& get_tape_state(imgtool::image &img)
 {
-	tape_state_t *ts = (tape_state_t*)img->extra_bytes();
+	tape_state_t *ts = (tape_state_t*)img.extra_bytes();
 
 	return *ts;
 }
@@ -1042,7 +1042,7 @@ static tape_image_t& get_tape_image(tape_state_t& ts)
 /********************************************************************************
  * Imgtool functions
  ********************************************************************************/
-static imgtoolerr_t hp9845_tape_open(imgtool::image *image, imgtool::stream::ptr &&stream)
+static imgtoolerr_t hp9845_tape_open(imgtool::image &image, imgtool::stream::ptr &&stream)
 {
 	tape_state_t& state = get_tape_state(image);
 
@@ -1058,7 +1058,7 @@ static imgtoolerr_t hp9845_tape_open(imgtool::image *image, imgtool::stream::ptr
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
+static imgtoolerr_t hp9845_tape_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	tape_state_t& state = get_tape_state(image);
 
@@ -1071,7 +1071,7 @@ static imgtoolerr_t hp9845_tape_create(imgtool::image *image, imgtool::stream::p
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void hp9845_tape_close(imgtool::image *image)
+static void hp9845_tape_close(imgtool::image &image)
 {
 	tape_state_t& state = get_tape_state(image);
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1097,7 +1097,7 @@ static imgtoolerr_t hp9845_tape_begin_enum (imgtool::directory *enumeration, con
 
 static imgtoolerr_t hp9845_tape_next_enum (imgtool::directory *enumeration, imgtool_dirent *ent)
 {
-	tape_state_t& state = get_tape_state(&enumeration->image());
+	tape_state_t& state = get_tape_state(enumeration->image());
 	tape_image_t& tape_image = get_tape_image(state);
 	dir_state_t *ds = (dir_state_t*)enumeration->extra_bytes();
 
@@ -1122,7 +1122,7 @@ static imgtoolerr_t hp9845_tape_next_enum (imgtool::directory *enumeration, imgt
 
 static imgtoolerr_t hp9845_tape_free_space(imgtool::partition *partition, UINT64 *size)
 {
-	tape_state_t& state = get_tape_state(&partition->image());
+	tape_state_t& state = get_tape_state(partition->image());
 	tape_image_t& tape_image = get_tape_image(state);
 
 	*size = tape_image.free_sectors() * SECTOR_LEN;
@@ -1132,7 +1132,7 @@ static imgtoolerr_t hp9845_tape_free_space(imgtool::partition *partition, UINT64
 
 static imgtoolerr_t hp9845_tape_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
-	tape_state_t& state = get_tape_state(&partition->image());
+	tape_state_t& state = get_tape_state(partition->image());
 	tape_image_t& tape_image = get_tape_image(state);
 
 	unsigned idx;
@@ -1166,7 +1166,7 @@ static imgtoolerr_t hp9845_tape_read_file(imgtool::partition *partition, const c
 
 static imgtoolerr_t hp9845_tape_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	tape_state_t& state = get_tape_state(&partition->image());
+	tape_state_t& state = get_tape_state(partition->image());
 	tape_image_t& tape_image = get_tape_image(state);
 
 	unsigned idx;
@@ -1252,7 +1252,7 @@ static imgtoolerr_t hp9845_tape_write_file(imgtool::partition *partition, const 
 
 static imgtoolerr_t hp9845_tape_delete_file(imgtool::partition *partition, const char *filename)
 {
-	tape_state_t& state = get_tape_state(&partition->image());
+	tape_state_t& state = get_tape_state(partition->image());
 	tape_image_t& tape_image = get_tape_image(state);
 
 	unsigned idx;

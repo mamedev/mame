@@ -49,6 +49,11 @@ struct psion_iter
 	UINT16 index;
 };
 
+static psion_pack *get_psion_pack(imgtool::image &image)
+{
+	return (psion_pack*)image.extra_bytes();
+}
+
 UINT16 head_checksum(UINT8* data)
 {
 	UINT16 checksum = 0;
@@ -385,9 +390,9 @@ UINT16 get_ob3(imgtool::stream &instream, imgtool::stream &outstream, UINT8 type
 	return size;
 }
 
-static imgtoolerr_t datapack_open(imgtool::image *image, imgtool::stream::ptr &&stream)
+static imgtoolerr_t datapack_open(imgtool::image &image, imgtool::stream::ptr &&stream)
 {
-	psion_pack *pack = (psion_pack*)image->extra_bytes();
+	psion_pack *pack = get_psion_pack(image);
 	char opk_magic[4];
 
 	stream->read(opk_magic, 4);
@@ -408,9 +413,9 @@ static imgtoolerr_t datapack_open(imgtool::image *image, imgtool::stream::ptr &&
 	}
 }
 
-static imgtoolerr_t datapack_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
+static imgtoolerr_t datapack_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
-	psion_pack *pack = (psion_pack*)image->extra_bytes();
+	psion_pack *pack = get_psion_pack(image);
 	static const UINT8 opk_magic[4] = {'O', 'P', 'K', 0x00};
 	UINT8 pack_head[8] = {0x40, 0x00, 0x59, 0x01, 0x01, 0x01, 0x00, 0x00};
 	UINT16 checksum;
@@ -450,9 +455,9 @@ static imgtoolerr_t datapack_create(imgtool::image *image, imgtool::stream::ptr 
 	}
 }
 
-static void datapack_close( imgtool::image *image)
+static void datapack_close(imgtool::image &image)
 {
-	psion_pack *pack = (psion_pack*)image->extra_bytes();
+	psion_pack *pack = get_psion_pack(image);
 
 	delete pack->stream;
 }
@@ -467,8 +472,8 @@ static imgtoolerr_t datapack_begin_enum(imgtool::directory *enumeration, const c
 
 static imgtoolerr_t datapack_next_enum(imgtool::directory *enumeration, imgtool_dirent *ent)
 {
-	imgtool::image *image = &enumeration->image();
-	psion_pack *pack = (psion_pack*)image->extra_bytes();
+	imgtool::image &image(enumeration->image());
+	psion_pack *pack = get_psion_pack(image);
 	psion_iter *iter = (psion_iter*)enumeration->extra_bytes();
 	UINT8 data = 0;
 
@@ -508,8 +513,8 @@ static void datapack_close_enum( imgtool::directory *enumeration)
 
 static imgtoolerr_t datapack_free_space( imgtool::partition *partition, UINT64 *size)
 {
-	imgtool::image *image = &partition->image();
-	psion_pack *pack = (psion_pack*)image->extra_bytes();
+	imgtool::image &image(partition->image());
+	psion_pack *pack = get_psion_pack(image);
 	UINT32 pack_size = 0;
 
 	pack->stream->seek(0x07, SEEK_SET);
@@ -523,8 +528,8 @@ static imgtoolerr_t datapack_free_space( imgtool::partition *partition, UINT64 *
 
 static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
-	imgtool::image *image = &partition->image();
-	psion_pack *pack = (psion_pack*)image->extra_bytes();
+	imgtool::image &image(partition->image());
+	psion_pack *pack = get_psion_pack(image);
 	int index = seek_file_name(pack, filename);
 
 	if (index >= 0)
@@ -555,8 +560,8 @@ static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char
 
 static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	imgtool::image *image = &partition->image();
-	psion_pack *pack = (psion_pack*)image->extra_bytes();
+	imgtool::image &image(partition->image());
+	psion_pack *pack = get_psion_pack(image);
 	static const UINT8 data_head[4] = {0x02, 0x80, 0x00, 0x00};
 	UINT8 head[3];
 	UINT16 size = 0;
@@ -617,8 +622,8 @@ static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const ch
 
 static imgtoolerr_t datapack_delete_file( imgtool::partition *partition, const char *filename)
 {
-	imgtool::image *image = &partition->image();
-	psion_pack *pack = (psion_pack*)image->extra_bytes();
+	imgtool::image &image(partition->image());
+	psion_pack *pack = get_psion_pack(image);
 	int index = seek_file_name(pack, filename);
 
 	if (index >= 0)
