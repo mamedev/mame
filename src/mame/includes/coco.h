@@ -233,9 +233,9 @@ private:
 	UINT8 floating_bus_read(void);
 
 	// input ports
-	ioport_port *m_keyboard[7];
-	ioport_port *m_joystick_type_control;
-	ioport_port *m_joystick_hires_control;
+	required_ioport_array<7> m_keyboard;
+	optional_ioport m_joystick_type_control;
+	optional_ioport m_joystick_hires_control;
 	analog_input_t m_joystick;
 	analog_input_t m_rat_mouse;
 	analog_input_t m_diecom_lightgun;

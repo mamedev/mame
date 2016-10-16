@@ -208,7 +208,25 @@ INPUT_PORTS_START( xerox_820_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 
-	PORT_START("YF")
+	PORT_START("Y9")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("Y10")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("Y11")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("Y12")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("Y13")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("Y14")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("Y15")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Left CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -242,16 +260,7 @@ ioport_constructor xerox_820_keyboard_t::device_input_ports() const
 xerox_820_keyboard_t::xerox_820_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, XEROX_820_KEYBOARD, "Xerox 820 Keyboard", tag, owner, clock, "x820kb", __FILE__),
 	m_maincpu(*this, I8748_TAG),
-	m_y0(*this, "Y0"),
-	m_y1(*this, "Y1"),
-	m_y2(*this, "Y2"),
-	m_y3(*this, "Y3"),
-	m_y4(*this, "Y4"),
-	m_y5(*this, "Y5"),
-	m_y6(*this, "Y6"),
-	m_y7(*this, "Y7"),
-	m_y8(*this, "Y8"),
-	m_yf(*this, "YF"),
+	m_y(*this, "Y%u", 0),
 	m_kbstb_cb(*this),
 	m_p1(0xff),
 	m_bus(0xff)
@@ -329,23 +338,7 @@ WRITE8_MEMBER( xerox_820_keyboard_t::kb_p1_w )
 
 READ8_MEMBER( xerox_820_keyboard_t::kb_p2_r )
 {
-	UINT8 data = 0xff;
-
-	switch (m_p1 & 0x0f)
-	{
-		case 0: data &= m_y0->read(); break;
-		case 1: data &= m_y1->read(); break;
-		case 2: data &= m_y2->read(); break;
-		case 3: data &= m_y3->read(); break;
-		case 4: data &= m_y4->read(); break;
-		case 5: data &= m_y5->read(); break;
-		case 6: data &= m_y6->read(); break;
-		case 7: data &= m_y7->read(); break;
-		case 8: data &= m_y8->read(); break;
-		case 0xf: data &= m_yf->read(); break;
-	}
-
-	return data;
+	return m_y[m_p1 & 0x0f]->read();
 }
 
 

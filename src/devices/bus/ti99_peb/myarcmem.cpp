@@ -164,6 +164,8 @@ WRITE8_MEMBER(myarc_memory_expansion_device::cruwrite)
 void myarc_memory_expansion_device::device_start()
 {
 	m_dsrrom = memregion(DSRROM)->base();
+	save_item(NAME(m_bank));
+	save_item(NAME(m_size));
 }
 
 void myarc_memory_expansion_device::device_reset()

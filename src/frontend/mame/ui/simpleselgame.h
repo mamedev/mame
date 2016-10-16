@@ -45,7 +45,7 @@ private:
 	// internal state
 	UINT8                   m_error;
 	bool                    m_rerandomize;
-	char                    m_search[40];
+	std::string             m_search;
 	int						m_skip_main_items;
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
 	std::vector<const game_driver *> m_driverlist;

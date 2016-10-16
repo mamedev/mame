@@ -975,7 +975,8 @@ void scudsp_cpu_device::device_start()
 	state_add( SCUDSP_CT1, "CT1", m_ct1 ).formatstr("%02X");
 	state_add( SCUDSP_CT2, "CT2", m_ct2 ).formatstr("%02X");
 	state_add( SCUDSP_CT3, "CT3", m_ct3 ).formatstr("%02X");
-	state_add( STATE_GENPC, "curpc", m_pc ).noshow();
+	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).formatstr("%17s").noshow();
 
 	m_out_irq_cb.resolve_safe();

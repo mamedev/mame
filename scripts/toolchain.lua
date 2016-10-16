@@ -71,7 +71,7 @@ newoption {
 newoption {
 	trigger = "with-android",
 	value   = "#",
-	description = "Set Android platform version (default: android-14).",
+	description = "Set Android platform version (default: android-21).",
 }
 
 newoption {
@@ -90,7 +90,7 @@ function toolchain(_buildDir, _subDir)
 
 	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
 
-	local androidPlatform = "android-14"
+	local androidPlatform = "android-21"
 	if _OPTIONS["with-android"] then
 		androidPlatform = "android-" .. _OPTIONS["with-android"]
 	elseif _OPTIONS["PLATFORM"]:find("64", -2) then
@@ -1040,30 +1040,30 @@ function strip()
 		return true
 	end
 
-	configuration { "osx-*", "Release" }
+	configuration { "osx-*" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix) .. "strip \"$(TARGET)\"",
 		}
 
-	configuration { "android-*", "Release" }
+	configuration { "android-*" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. toolchainPrefix .. "strip -s \"$(TARGET)\""
 		}
 
-	configuration { "linux-* or rpi", "Release" }
+	configuration { "linux-* or rpi" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) strip -s \"$(TARGET)\""
 		}
 
-	configuration { "mingw*", "x64", "Release" }
+	configuration { "mingw*", "x64" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW64)/bin/") .. "strip -s \"$(TARGET)\"",
 		}
-	configuration { "mingw*", "x32", "Release" }
+	configuration { "mingw*", "x32" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW32)/bin/") .. "strip -s \"$(TARGET)\"",

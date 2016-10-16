@@ -22,8 +22,99 @@
 
 */
 
-#include "includes/mc1000.h"
 #include "softlist.h"
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "video/mc6845.h"
+#include "video/mc6847.h"
+#include "sound/ay8910.h"
+#include "bus/centronics/ctronics.h"
+#include "machine/rescap.h"
+#include "machine/ram.h"
+
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "u13"
+#define AY8910_TAG      "u21"
+#define MC6845_TAG      "mc6845"
+#define MC6847_TAG      "u19"
+#define CENTRONICS_TAG  "centronics"
+
+#define MC1000_MC6845_VIDEORAM_SIZE     0x800
+#define MC1000_MC6847_VIDEORAM_SIZE     0x1800
+
+class mc1000_state : public driver_device
+{
+public:
+	mc1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_vdg(*this, MC6847_TAG),
+		m_crtc(*this, MC6845_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG),
+		m_rom(*this, Z80_TAG),
+		m_mc6845_video_ram(*this, "mc6845_vram"),
+		m_mc6847_video_ram(*this, "mc6847_vram"),
+		m_y(*this, "Y%u", 0),
+		m_joy(*this, "JOY%u", 0),
+		m_modifiers(*this, "MODIFIERS"),
+		m_joykeymap(*this, "JOYKEYMAP%u", 0)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6847_base_device> m_vdg;
+	optional_device<mc6845_device> m_crtc;
+	required_device<centronics_device> m_centronics;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_shared_ptr<UINT8> m_mc6845_video_ram;
+	required_shared_ptr<UINT8> m_mc6847_video_ram;
+	required_ioport_array<8> m_y;
+	required_ioport_array<2> m_joy;
+	required_ioport m_modifiers;
+	required_ioport_array<2> m_joykeymap;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_READ8_MEMBER( printer_r );
+	DECLARE_WRITE8_MEMBER( printer_w );
+	DECLARE_WRITE8_MEMBER( mc6845_ctrl_w );
+	DECLARE_WRITE8_MEMBER( mc6847_attr_w );
+	DECLARE_WRITE_LINE_MEMBER( fs_w );
+	DECLARE_WRITE_LINE_MEMBER( hs_w );
+	DECLARE_READ8_MEMBER( videoram_r );
+	DECLARE_WRITE8_MEMBER( keylatch_w );
+	DECLARE_READ8_MEMBER( keydata_r );
+	DIRECT_UPDATE_MEMBER(mc1000_direct_update_handler);
+
+	void bankswitch();
+
+	/* cpu state */
+	int m_ne555_int;
+
+	/* memory state */
+	int m_rom0000;
+	int m_mc6845_bank;
+	int m_mc6847_bank;
+
+	/* keyboard state */
+	int m_keylatch;
+
+	/* video state */
+	int m_hsync;
+	int m_vsync;
+	UINT8 m_mc6847_attr;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	int m_centronics_busy;
+
+	DECLARE_DRIVER_INIT(mc1000);
+	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
+};
 
 /* Memory Banking */
 
@@ -155,7 +246,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( mc1000 )
-	PORT_START("JOYA") /* Player 1 */
+	PORT_START("JOY0") /* Player 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    /* = 'I' */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  /* = 'Q' */
@@ -164,7 +255,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )        /* = '9' */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("JOYB") /* Player 2 */
+	PORT_START("JOY1") /* Player 2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)        /* = '@' */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)    /* = 'H' */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)  /* = 'P' */
@@ -248,12 +339,12 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 
-	PORT_START("JOYAKEYMAP")
+	PORT_START("JOYKEYMAP0")
 	PORT_CONFNAME( 0x01, 0x00, "JOYSTICK A (P1) keyboard mapping" )
 	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 
-	PORT_START("JOYBKEYMAP")
+	PORT_START("JOYKEYMAP1")
 	PORT_CONFNAME( 0x01, 0x00, "JOYSTICK B (P2) keyboard mapping" )
 	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
@@ -295,20 +386,20 @@ READ8_MEMBER( mc1000_state::keydata_r )
 
 	if (!BIT(m_keylatch, 0))
 	{
-		data &= m_y0->read();
-		if (m_joybkeymap->read()) data &= m_joyb->read();
+		data &= m_y[0]->read();
+		if (m_joykeymap[1]->read()) data &= m_joy[1]->read();
 	}
 	if (!BIT(m_keylatch, 1))
 	{
-		data &= m_y1->read();
-		if (m_joyakeymap->read()) data &= m_joya->read();
+		data &= m_y[1]->read();
+		if (m_joykeymap[0]->read()) data &= m_joy[0]->read();
 	}
-	if (!BIT(m_keylatch, 2)) data &= m_y2->read();
-	if (!BIT(m_keylatch, 3)) data &= m_y3->read();
-	if (!BIT(m_keylatch, 4)) data &= m_y4->read();
-	if (!BIT(m_keylatch, 5)) data &= m_y5->read();
-	if (!BIT(m_keylatch, 6)) data &= m_y6->read();
-	if (!BIT(m_keylatch, 7)) data &= m_y7->read();
+	if (!BIT(m_keylatch, 2)) data &= m_y[2]->read();
+	if (!BIT(m_keylatch, 3)) data &= m_y[3]->read();
+	if (!BIT(m_keylatch, 4)) data &= m_y[4]->read();
+	if (!BIT(m_keylatch, 5)) data &= m_y[5]->read();
+	if (!BIT(m_keylatch, 6)) data &= m_y[6]->read();
+	if (!BIT(m_keylatch, 7)) data &= m_y[7]->read();
 
 	data = (m_modifiers->read() & 0xc0) | (data & 0x3f);
 

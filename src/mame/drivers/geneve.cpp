@@ -275,13 +275,14 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
 
-	line_state  m_inta;
-	line_state  m_intb;
-	line_state  m_int2;
-	line_state  m_keyint;
-	line_state  m_video_wait; // reflects the line to the mapper for CRU query
+	int  m_inta;
+	int  m_intb;
+	int  m_int2;
+	int  m_keyint;
+	int  m_video_wait; // reflects the line to the mapper for CRU query
 
-	int m_ready_line, m_ready_line1;
+	int m_ready_line;
+	int m_ready_line1;
 };
 
 /*
@@ -658,6 +659,13 @@ DRIVER_INIT_MEMBER(geneve_state,geneve)
 
 void geneve_state::machine_start()
 {
+	save_item(NAME(m_inta));
+	save_item(NAME(m_intb));
+	save_item(NAME(m_int2));
+	save_item(NAME(m_keyint));
+	save_item(NAME(m_video_wait)); // reflects the line to the mapper for CRU query
+	save_item(NAME(m_ready_line));
+	save_item(NAME(m_ready_line1));
 }
 
 /*

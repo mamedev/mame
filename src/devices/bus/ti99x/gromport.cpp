@@ -211,6 +211,8 @@ void gromport_device::device_start()
 {
 	m_console_ready.resolve();
 	m_console_reset.resolve();
+
+	save_item(NAME(m_romgq));
 }
 
 void gromport_device::device_reset()
@@ -232,6 +234,18 @@ void gromport_device::cartridge_inserted()
 		m_console_reset(ASSERT_LINE);
 		m_console_reset(CLEAR_LINE);
 	}
+}
+
+/*
+    Find out whether the GROMs in the cartridge are idle. In that case,
+    cut the clock line.
+*/
+bool gromport_device::is_grom_idle()
+{
+	if (m_connector != nullptr)
+		return m_connector->is_grom_idle();
+	else
+		return false;
 }
 
 void gromport_device::device_config_complete()
@@ -345,6 +359,14 @@ WRITE_LINE_MEMBER(single_conn_device::gclock_in)
 {
 	// Pass through
 	m_cartridge->gclock_in(state);
+}
+
+/*
+    Check whether the GROMs are idle.
+*/
+bool single_conn_device::is_grom_idle()
+{
+	return m_cartridge->is_grom_idle();
 }
 
 void single_conn_device::device_start()
@@ -619,6 +641,22 @@ WRITE8_MEMBER(multi_conn_device::cruwrite)
 	}
 }
 
+/*
+    Check whether the GROMs are idle. Just ask the currently
+    active cartridge.
+*/
+bool multi_conn_device::is_grom_idle()
+{
+	/* Sanity check. Higher slots are always empty. */
+	if (m_active_slot >= NUMBER_OF_CARTRIDGE_SLOTS)
+		return false;
+
+	if (m_cartridge[m_active_slot] != nullptr)
+		return m_cartridge[m_active_slot]->is_grom_idle();
+
+	return false;
+}
+
 void multi_conn_device::device_start()
 {
 	m_next_free_slot = 0;
@@ -627,6 +665,10 @@ void multi_conn_device::device_start()
 	{
 		elem = nullptr;
 	}
+	save_item(NAME(m_readrom));
+	save_item(NAME(m_active_slot));
+	save_item(NAME(m_fixed_slot));
+	save_item(NAME(m_next_free_slot));
 }
 
 void multi_conn_device::device_reset(void)
@@ -816,6 +858,14 @@ WRITE8_MEMBER(gkracker_device::set_gromlines)
 WRITE_LINE_MEMBER(gkracker_device::gclock_in)
 {
 	if (m_cartridge != nullptr) m_cartridge->gclock_in(state);
+}
+
+/*
+    Check whether the GROMs are idle.
+*/
+bool gkracker_device::is_grom_idle()
+{
+	return (m_cartridge != nullptr)? m_cartridge->is_grom_idle() : false;
 }
 
 READ8Z_MEMBER(gkracker_device::readz)
@@ -1043,6 +1093,11 @@ void gkracker_device::device_start()
 	m_grom_ptr = memregion(GKRACKER_ROM_TAG)->base();
 	m_cartridge = nullptr;
 	for (int i=1; i < 6; i++) m_gk_switch[i] = 0;
+	save_pointer(NAME(m_gk_switch),6);
+	save_item(NAME(m_romspace_selected));
+	save_item(NAME(m_ram_page));
+	save_item(NAME(m_grom_address));
+	save_item(NAME(m_waddr_LSB));
 }
 
 void gkracker_device::device_reset()
@@ -1466,6 +1521,11 @@ WRITE_LINE_MEMBER(ti99_cartridge_device::gclock_in)
 	if (m_pcb != nullptr) m_pcb->gclock_in(state);
 }
 
+bool ti99_cartridge_device::is_grom_idle()
+{
+	return (m_pcb != nullptr)? m_pcb->is_grom_idle() : false;
+}
+
 void ti99_cartridge_device::device_config_complete()
 {
 	update_names();
@@ -1527,6 +1587,7 @@ const device_type TI99CART = &device_creator<ti99_cartridge_device>;
 
 ti99_cartridge_pcb::ti99_cartridge_pcb()
 	: m_cart(nullptr),
+		m_grom_idle(false),
 		m_grom_size(0),
 		m_rom_size(0),
 		m_ram_size(0),
@@ -1629,13 +1690,25 @@ WRITE_LINE_MEMBER( ti99_cartridge_pcb::romgq_line )
 WRITE8_MEMBER(ti99_cartridge_pcb::set_gromlines)
 {
 	for (auto& elem : m_grom)
-		if (elem != nullptr) elem->set_lines(space, offset, data);
+	{
+		if (elem != nullptr)
+		{
+			elem->set_lines(space, offset, data);
+			if (data==ASSERT_LINE) m_grom_idle = false;
+		}
+	}
 }
 
 WRITE_LINE_MEMBER(ti99_cartridge_pcb::gclock_in)
 {
 	for (auto& elem : m_grom)
-		if (elem != nullptr) elem->gclock_in(state);
+	{
+		if (elem != nullptr)
+		{
+			elem->gclock_in(state);
+			m_grom_idle = elem->idle();
+		}
+	}
 }
 
 

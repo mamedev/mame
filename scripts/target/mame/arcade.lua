@@ -388,6 +388,7 @@ MACHINES["CR589"] = true
 MACHINES["DS1204"] = true
 MACHINES["DS1302"] = true
 --MACHINES["DS1315"] = true
+--MACHINES["DS1386"] = true
 MACHINES["DS2401"] = true
 MACHINES["DS2404"] = true
 MACHINES["DS75160A"] = true
@@ -1838,6 +1839,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/goldstar.cpp",
 	MAME_DIR .. "src/mame/includes/goldstar.h",
 	MAME_DIR .. "src/mame/video/goldstar.cpp",
+	MAME_DIR .. "src/mame/drivers/funtech.cpp",
 	MAME_DIR .. "src/mame/drivers/jackie.cpp",
 	MAME_DIR .. "src/mame/drivers/igspoker.cpp",
 	MAME_DIR .. "src/mame/drivers/igs009.cpp",
@@ -2017,6 +2019,8 @@ files {
 	MAME_DIR .. "src/mame/machine/jalcrpt.h",
 	MAME_DIR .. "src/mame/video/jalblend.cpp",
 	MAME_DIR .. "src/mame/video/jalblend.h",
+	MAME_DIR .. "src/mame/video/ms1_tmap.cpp",
+	MAME_DIR .. "src/mame/video/ms1_tmap.h",
 }
 
 createMAMEProjects(_target, _subtarget, "jpm")
@@ -2516,9 +2520,7 @@ files {
 	MAME_DIR .. "src/mame/video/midyunit.cpp",
 	MAME_DIR .. "src/mame/drivers/midzeus.cpp",
 	MAME_DIR .. "src/mame/includes/midzeus.h",
-	MAME_DIR .. "src/mame/includes/midzeus2.h",
 	MAME_DIR .. "src/mame/video/midzeus.cpp",
-	MAME_DIR .. "src/mame/video/midzeus2.cpp",
 	MAME_DIR .. "src/mame/drivers/mw18w.cpp",
 	MAME_DIR .. "src/mame/drivers/mwsub.cpp",
 	MAME_DIR .. "src/mame/drivers/omegrace.cpp",
@@ -4441,6 +4443,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/imolagp.cpp",
 	MAME_DIR .. "src/mame/drivers/intrscti.cpp",
 	MAME_DIR .. "src/mame/drivers/istellar.cpp",
+	MAME_DIR .. "src/mame/drivers/istrebiteli.cpp",
 	MAME_DIR .. "src/mame/drivers/itgambl2.cpp",
 	MAME_DIR .. "src/mame/drivers/itgambl3.cpp",
 	MAME_DIR .. "src/mame/drivers/itgamble.cpp",
@@ -4484,6 +4487,7 @@ files {
 	MAME_DIR .. "src/mame/includes/malzak.h",
 	MAME_DIR .. "src/mame/video/malzak.cpp",
 	MAME_DIR .. "src/mame/drivers/manohman.cpp",
+	MAME_DIR .. "src/mame/drivers/marywu.cpp",
 	MAME_DIR .. "src/mame/drivers/mcatadv.cpp",
 	MAME_DIR .. "src/mame/includes/mcatadv.h",
 	MAME_DIR .. "src/mame/video/mcatadv.cpp",
@@ -4498,6 +4502,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/midas.cpp",
 	MAME_DIR .. "src/mame/drivers/miniboy7.cpp",
 	MAME_DIR .. "src/mame/drivers/mirax.cpp",
+	MAME_DIR .. "src/mame/drivers/mjsenpu.cpp",
 	MAME_DIR .. "src/mame/drivers/mole.cpp",
 	MAME_DIR .. "src/mame/drivers/mosaic.cpp",
 	MAME_DIR .. "src/mame/includes/mosaic.h",

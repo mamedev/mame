@@ -244,10 +244,10 @@ Sticker: 837-14280-92
 Notes:
       (* these parts on other side of the PCB)
       RV5C386A  - I2C Bus Serial Interface Real-Time Clock IC with Voltage Monitoring Function (SSOP10)
-      24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8)
-      24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8)
-      M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32)
-      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80) firmware in IC11
+      24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8) contains firmware for AN2131 chips
+      24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8) contain system/game configuration data
+      M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32) work ram for AN2131QC
+      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80) firmware in IC10
       AN2131SC  /                                                             (QFP44) firmware in IC32
       ADM3222   - Analog Devices ADM3222 High-Speed, +3.3V, 2-Channel RS232/V.28 Interface Device (SOIC20)
       SN65240   - Texas Instruments SN65240 USB Port Transient Suppressor (SOIC8)
@@ -256,11 +256,11 @@ Notes:
       DS485     - National DS485 Low-Power RS-485/RS-422 Multipoint Transceiver (SOIC8)
       3771      - Fujitsu MB3771 System Reset IC (SOIC8)
       PC410     - Sharp PC410 Ultra-high Speed Response OPIC Photocoupler
-      CN1       - 22-pin multi-wire cable connector joining to XBox board
+      CN1       - 22-pin multi-wire cable connector joining to XBox board (JST B22B-PHTSS)
       CN5       - USB connector joining to JVS I/O board with standard USB cable
       CN8       - A/V input connector (from XBox board via short A/V cable)
       CN9       - VGA output connector
-      CN10      - 14 pin connector (purpose unknown but appears to be unused)
+      CN10      - 14 pin connector (purpose unknown, maybe another video connector)
       CN11      - 16-pin flat cable connector joining to LPC connector on XBox board
       CN12      - 40-pin IDE flat cable connector joining to IDE connector on XBox board
       CN14S     - 7-pin power output connector joining to XBox board
@@ -345,8 +345,8 @@ Notes:
       CN1   - 8-pin JVS power input connector
       CN2   - 6-pin JVS power input connector
       CN3   - Red/white RCA unamplified stereo audio output jacks
-      CN4   - 11-pin connector
-      CN5   - 8-pin connector
+      CN4   - 11-pin connector, has signals for 2 usb ports connected to the xbox board
+      CN5   - 8-pin connector, has signals for 2 rs232 ports
       CN6   - 7-pin connector
       SW1/2 - test/service buttons
       DIN1  - 96-pin connector joining to Base Board
@@ -585,21 +585,23 @@ St.     Instr.       Comment
 /* jamtable disassembler */
 void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32 size) // 0xff000080 == fff00080
 {
+	debugger_cpu &cpu = machine().debugger().cpu();
+	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
 	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
 	{
-		machine().debugger().console().printf("Address is unmapped.\n");
+		con.printf("Address is unmapped.\n");
 		return;
 	}
 	while (1)
 	{
 		offs_t base = addr;
 
-		UINT32 opcode = space.read_byte(addr);
+		UINT32 opcode = cpu.read_byte(space, address, true);
 		addr++;
-		UINT32 op1 = space.read_dword_unaligned(addr);
+		UINT32 op1 = cpu.read_dword(space, address, true);
 		addr += 4;
-		UINT32 op2 = space.read_dword_unaligned(addr);
+		UINT32 op2 = cpu.read_dword(space, address, true);
 		addr += 4;
 
 		char sop1[16];
@@ -620,7 +622,7 @@ void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32
 			sprintf(sop1, "%08X", op1);
 			sprintf(pcrel, "%08X", base + 9 + op1);
 		}
-		machine().debugger().console().printf("%08X ", base);
+		con.printf("%08X ", base);
 		// dl=instr ebx=par1 eax=par2
 		switch (opcode)
 		{
@@ -635,39 +637,39 @@ void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32
 			// | | Reserved | Bus Number | Device Number | Function Number | Register Number |0|0|
 			// +-+----------+------------+---------------+-----------------+-----------------+-+-+
 			// 31 - Enable bit
-			machine().debugger().console().printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
+			con.printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x02:
-			machine().debugger().console().printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
+			con.printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x03:
-			machine().debugger().console().printf("POKE    MEM[%s]=%s\n", sop2, sop1);
+			con.printf("POKE    MEM[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x04:
-			machine().debugger().console().printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
+			con.printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
 			break;
 		case 0x05:
 			// out cf8,op2
 			// in acc,cfc
-			machine().debugger().console().printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
+			con.printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
 			break;
 		case 0x06:
-			machine().debugger().console().printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
+			con.printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
 			break;
 		case 0x07:
-			machine().debugger().console().printf("BRA     PC=%s\n", pcrel);
+			con.printf("BRA     PC=%s\n", pcrel);
 			break;
 		case 0x08:
-			machine().debugger().console().printf("INB     ACC=PORT[%s]\n", sop2);
+			con.printf("INB     ACC=PORT[%s]\n", sop2);
 			break;
 		case 0x09:
-			machine().debugger().console().printf("PEEK    ACC=MEM[%s]\n", sop2);
+			con.printf("PEEK    ACC=MEM[%s]\n", sop2);
 			break;
 		case 0xee:
-			machine().debugger().console().printf("END\n");
+			con.printf("END\n");
 			break;
 		default:
-			machine().debugger().console().printf("NOP     ????\n");
+			con.printf("NOP     ????\n");
 			break;
 		}
 		if (opcode == 0xee)
@@ -696,34 +698,35 @@ void chihiro_state::threadlist_command(int ref, int params, const char **param)
 {
 	const UINT32 thlists = 0x8003aae0; // magic address
 	address_space &space = m_maincpu->space();
-	debugger_console con = machine().debugger().console();
+	debugger_cpu &cpu = machine().debugger().cpu();
+	debugger_console &con = machine().debugger().console();
 
 	con.printf("Pri. _KTHREAD   Stack  Function\n");
 	con.printf("-------------------------------\n");
 	for (int pri=0;pri < 16;pri++)
 	{
 		UINT32 curr = thlists + pri * 8;
-		UINT32 next = machine().debugger().cpu().read_dword(space, curr, true);
+		UINT32 next = cpu.read_dword(space, curr, true);
 
 		while (next != curr)
 		{
 			UINT32 kthrd = next - 0x5c;
-			UINT32 topstack = machine().debugger().cpu().read_dword(space, kthrd + 0x1c, true);
-			UINT32 tlsdata = machine().debugger().cpu().read_dword(space, kthrd + 0x28, true);
+			UINT32 topstack = cpu.read_dword(space, kthrd + 0x1c, true);
+			UINT32 tlsdata = cpu.read_dword(space, kthrd + 0x28, true);
 			UINT32 function;
 			if (tlsdata == 0)
-				function = machine().debugger().cpu().read_dword(space, topstack - 0x210 - 8, true);
+				function = cpu.read_dword(space, topstack - 0x210 - 8, true);
 			else
-				function = machine().debugger().cpu().read_dword(space, tlsdata - 8, true);
+				function = cpu.read_dword(space, tlsdata - 8, true);
 			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
-			next = machine().debugger().cpu().read_dword(space, next, true);
+			next = cpu.read_dword(space, next, true);
 		}
 	}
 }
 
 void chihiro_state::chihiro_help_command(int ref, int params, const char **param)
 {
-	debugger_console con = machine().debugger().console();
+	debugger_console &con = machine().debugger().console();
 
 	con.printf("Available Chihiro commands:\n");
 	con.printf("  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
@@ -746,10 +749,10 @@ void chihiro_state::debug_commands(int ref, int params, const char **param)
 void chihiro_state::hack_eeprom()
 {
 	// 8003b744,3b744=0x90 0x90
-	m_maincpu->space(0).write_byte(0x3b744, 0x90);
-	m_maincpu->space(0).write_byte(0x3b745, 0x90);
-	m_maincpu->space(0).write_byte(0x3b766, 0xc9);
-	m_maincpu->space(0).write_byte(0x3b767, 0xc3);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b744, 0x90);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b745, 0x90);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b766, 0xc9);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b767, 0xc3);
 }
 
 #define HACK_ITEMS 5
@@ -866,9 +869,10 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		sense = 3;
 	else
 		sense = 0; // need to check
-	// PINSA register, bits 4-1 special value, must be 10 xor 15, but bit 3 is ignored since its used as the CS pin of the chip
+	// PINSA register, bits 0-2 connected do dip switches 1-3 on filter board, bit 4 to dip switch 4, bit 5 to dip switch 5, bits 6-7 to buttons 1-2 on filter board
+	// bits 4-1 value must be 10 xor 15, and bit 3 is ignored since its used as the CS pin of the chip
 	endpoints[endpoint].buffer[1] = 0x4b;
-	// PINSB register, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 is the sense pin of the jvs connector
+	// PINSB register, bits 5-7 connected to 3 leds not mounted on pcb, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 give the status of the sense pin of the jvs connector
 	// if bits 0-1 are 11, the not all the connected jvs devices have been assigned an address yet
 	endpoints[endpoint].buffer[2] = 0x52 | sense;
 	// OUTB register

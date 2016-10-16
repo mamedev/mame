@@ -63,23 +63,24 @@ public:
 
 	UINT8 a_r();
 	void b_w(UINT8 data);
-	void r_w(UINT8 data);
+	void r_w(int line, int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
-	inline void trigger_interrupt(int level);
-	inline void check_interrupt();
+	void trigger_interrupt(int level);
+	void check_interrupt();
+	void update_interrupt_line();
 
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_enlg;
 
 	int m_inte;                 // interrupt enable
-	int m_int_dis;              // interrupt disable flip-flop
+	int m_int_dis;              // interrupt (latch) disable flip-flop
 	int m_a;                    // request level
-	int m_b;                    // current status register
+	int m_current_status;
 	UINT8 m_r;                  // interrupt request latch
 	int m_sgs;                  // status group select
 	int m_etlg;                 // enable this level group

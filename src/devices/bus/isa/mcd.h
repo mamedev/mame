@@ -31,23 +31,33 @@ public:
 	DECLARE_READ8_MEMBER(flag_r);
 	DECLARE_WRITE8_MEMBER(cmd_w);
 	DECLARE_WRITE8_MEMBER(reset_w);
+	virtual UINT16 dack16_r(int line) override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
+	bool read_sector();
+
+	bool m_change;
+	bool m_newstat;
 	bool m_data;
 	UINT8 m_stat;
-	UINT8 m_flag;
-	UINT8 m_buf[2048];
+	UINT8 m_buf[2352];
 	int m_buf_count;
 	int m_buf_idx;
-	int m_rd_count;
+	UINT8 m_cmdbuf[16];
+	int m_cmdbuf_count;
+	int m_cmdrd_count;
+	int m_cmdbuf_idx;
 	UINT8 m_mode;
 	UINT8 m_cmd;
 	UINT8 m_conf;
 	UINT8 m_irq;
 	UINT8 m_dma;
+	UINT16 m_dmalen;
+	UINT32 m_readmsf;
+	UINT8 m_readcount;
 	bool m_locked;
 	int m_drvmode;
 	int m_curtoctrk;
@@ -70,8 +80,8 @@ private:
 		CMD_STOPCDDA = 0x70,
 		CMD_CONFIG = 0x90,
 		CMD_SET_VOL = 0xae,
-		CMD_READ = 0xc0,
-		CMD_READCDDA = 0xc1,
+		CMD_READ1X = 0xc0,
+		CMD_READ2X = 0xc1,
 		CMD_GET_VER = 0xdc,
 		CMD_STOP = 0xf0,
 		CMD_EJECT = 0xf6,
@@ -90,9 +100,15 @@ private:
 		DRV_MODE_CDDA
 	};
 	enum {
-		FLAG_DATA = 2,
-		FLAG_STAT = 4,
+		FLAG_NODATA = 2,
+		FLAG_NOSTAT = 4,
+		FLAG_DATAREADY = 8, //??
 		FLAG_OPEN = 16
+	};
+	enum {
+		IRQ_DATAREADY = 1,
+		IRQ_DATACOMP = 2,
+		IRQ_ERROR = 4
 	};
 };
 

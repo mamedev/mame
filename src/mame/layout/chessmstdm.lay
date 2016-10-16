@@ -40,8 +40,8 @@
 		elseif enpassant and board[to.y][to.x] == 0 and board[from.y][from.x] == 6  and from.y == 5 and to.y == 6 and from.x ~= to.x and board[to.y - 1][to.x] == 12 then
 			enpassant_pos = {x = to.x, y = to.y - 1}
 		end
-		if board[to.y][to.x] == 0 and from.x == to.x and ((board[from.y][from.x] == 6  and from.y == 2 and to.y == 4) or 
-		                                                  (board[from.y][from.x] == 12 and from.y == 7 and to.y == 5)) then
+		if board[to.y][to.x] == 0 and from.x == to.x and ((board[from.y][from.x] == 6  and from.y == 2 and to.y == 4) or
+														  (board[from.y][from.x] == 12 and from.y == 7 and to.y == 5)) then
 			enpassant = true
 		else
 			enpassant = false

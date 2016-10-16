@@ -183,16 +183,6 @@ void hd64610_device::device_start()
 
 
 //-------------------------------------------------
-//  device_start - device-specific reset
-//-------------------------------------------------
-
-void hd64610_device::device_reset()
-{
-	set_current_time(machine());
-}
-
-
-//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 

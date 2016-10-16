@@ -393,7 +393,7 @@ void jaguar_cpu_device::device_start()
 	state_add( JAGUAR_R31,   "R31", m_r[31]).formatstr("%08X");
 
 	state_add( STATE_GENPC, "GENPC", PC).noshow();
-	state_add( STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", FLAGS).formatstr("%11s").noshow();
 
 	m_icountptr = &m_icount;

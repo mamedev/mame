@@ -62,7 +62,7 @@ public:
 	DECLARE_READ16_MEMBER( link_r );
 	DECLARE_READ16_MEMBER( link2_r );
 	DECLARE_WRITE16_MEMBER( link2_w );
-	DECLARE_READ8_MEMBER( link_portc0_r );
+//	DECLARE_READ8_MEMBER( link_portc0_r );
 
 	// game-specific output handlers
 	void gforce2_output_cb1(UINT16 data);

@@ -12,6 +12,7 @@
 
 #include "ui/barcode.h"
 #include "ui/ui.h"
+#include "ui/utils.h"
 
 namespace ui {
 // itemrefs for key menu items
@@ -67,7 +68,7 @@ void menu_barcode_reader::populate()
 		}
 		else
 		{
-			new_barcode = m_barcode_buffer;
+			new_barcode = m_barcode_buffer.c_str();
 		}
 
 		item_append(_("New Barcode:"), new_barcode, 0, ITEMREF_NEW_BARCODE);
@@ -121,8 +122,7 @@ void menu_barcode_reader::handle()
 				{
 					current_device()->write_code(tmp_file.c_str(), tmp_file.length());
 					// if sending was successful, reset char buffer
-					if (m_barcode_buffer[0] != '\0')
-						memset(m_barcode_buffer, '\0', ARRAY_LENGTH(m_barcode_buffer));
+					m_barcode_buffer.clear();
 					reset(reset_options::REMEMBER_POSITION);
 				}
 			}
@@ -131,26 +131,14 @@ void menu_barcode_reader::handle()
 		case IPT_SPECIAL:
 			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
 			{
-				auto const buflen = std::strlen(m_barcode_buffer);
-
-				// if it's a backspace and we can handle it, do so
-				if ((event->unichar == 8) || (event->unichar == 0x7f))
-				{
-					if (0 < buflen)
-						*const_cast<char *>(utf8_previous_char(&m_barcode_buffer[buflen])) = 0;
-				}
-				else if ((event->unichar >= '0') && (event->unichar <= '9'))
-				{
-					event->append_char(m_barcode_buffer, buflen);
-				}
-				reset(reset_options::REMEMBER_POSITION);
+				if (input_character(m_barcode_buffer, event->unichar, uchar_is_digit))
+					reset(reset_options::REMEMBER_POSITION);
 			}
 			break;
 
 		case IPT_UI_CANCEL:
 			// reset the char buffer also in this case
-			if (m_barcode_buffer[0] != '\0')
-				memset(m_barcode_buffer, '\0', ARRAY_LENGTH(m_barcode_buffer));
+			m_barcode_buffer.clear();
 			break;
 		}
 	}

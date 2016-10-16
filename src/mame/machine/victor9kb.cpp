@@ -513,7 +513,7 @@ INPUT_PORTS_START( victor9k_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD) // S93
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad Enter") PORT_CODE(KEYCODE_ENTER_PAD) // S94
 
-	PORT_START("YA")
+	PORT_START("Y10")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad " UTF8_MULTIPLY) PORT_CODE(KEYCODE_ASTERISK) // unicode multiply sign U+00D7 // S32
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F10 [10]") PORT_CODE(KEYCODE_F10) // S11
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD) // S53
@@ -523,17 +523,17 @@ INPUT_PORTS_START( victor9k_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F7 [7]") PORT_CODE(KEYCODE_F7) // S07
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F6 [6]") PORT_CODE(KEYCODE_F6) // S06
 
-	PORT_START("YB")
+	PORT_START("Y11")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("UNUSED S04") // unused // S104
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD) // S103
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 00") // S102
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 00") PORT_CODE(KEYCODE_00_PAD) // S102
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD) // S101
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT"/Contrast Down \xe2\x97\x90\xe2\x96\xbe") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // U+2190/U+25D0 + U+25BE S100
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT"/Contrast Up \xe2\x97\x90\xe2\x96\xb4") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // U+2190/U+25D0 + U+25B4 S99
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAUSE/CONT") PORT_CODE(KEYCODE_PAUSE) // S98
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Spacebar") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') // S97
 
-	PORT_START("YC")
+	PORT_START("Y12")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F5 [5]") PORT_CODE(KEYCODE_F5) // S05
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F4 [4]") PORT_CODE(KEYCODE_F4) // S04
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F3 [3]") PORT_CODE(KEYCODE_F3) // S03
@@ -567,22 +567,10 @@ ioport_constructor victor_9000_keyboard_t::device_input_ports() const
 victor_9000_keyboard_t::victor_9000_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VICTOR9K_KEYBOARD, "Victor 9000 Keyboard", tag, owner, clock, "victor9kb", __FILE__),
 	m_maincpu(*this, I8021_TAG),
-	m_y0(*this, "Y0"),
-	m_y1(*this, "Y1"),
-	m_y2(*this, "Y2"),
-	m_y3(*this, "Y3"),
-	m_y4(*this, "Y4"),
-	m_y5(*this, "Y5"),
-	m_y6(*this, "Y6"),
-	m_y7(*this, "Y7"),
-	m_y8(*this, "Y8"),
-	m_y9(*this, "Y9"),
-	m_ya(*this, "YA"),
-	m_yb(*this, "YB"),
-	m_yc(*this, "YC"),
+	m_y(*this, "Y%u", 0),
 	m_kbrdy_cb(*this),
 	m_kbdata_cb(*this),
-	m_y(0),
+	m_keylatch(0),
 	m_kbrdy(-1),
 	m_kbdata(-1),
 	m_kback(1)
@@ -602,7 +590,7 @@ void victor_9000_keyboard_t::device_start()
 
 	// state saving
 	save_item(NAME(m_p1));
-	save_item(NAME(m_y));
+	save_item(NAME(m_keylatch));
 	save_item(NAME(m_stb));
 	save_item(NAME(m_y12));
 	save_item(NAME(m_kbrdy));
@@ -631,25 +619,14 @@ READ8_MEMBER( victor_9000_keyboard_t::kb_p1_r )
 {
 	UINT8 data = 0xff;
 
-	switch (m_y)
+	if (m_keylatch < 12)
 	{
-		case 0: data &= m_y0->read(); break;
-		case 1: data &= m_y1->read(); break;
-		case 2: data &= m_y2->read(); break;
-		case 3: data &= m_y3->read(); break;
-		case 4: data &= m_y4->read(); break;
-		case 5: data &= m_y5->read(); break;
-		case 6: data &= m_y6->read(); break;
-		case 7: data &= m_y7->read(); break;
-		case 8: data &= m_y8->read(); break;
-		case 9: data &= m_y9->read(); break;
-		case 0xa: data &= m_ya->read(); break;
-		case 0xb: data &= m_yb->read(); break;
+		data &= m_y[m_keylatch]->read();
 	}
 
 	if (!m_y12)
 	{
-		data &= m_yc->read();
+		data &= m_y[12]->read();
 	}
 
 	return data;
@@ -686,7 +663,7 @@ WRITE8_MEMBER( victor_9000_keyboard_t::kb_p2_w )
 	// falling (?edge or level?), latch keyboard rows 0-11
 	if (!BIT(data, 0))
 	{
-		m_y = m_p1 & 0x0f;
+		m_keylatch = m_p1 & 0x0f;
 		m_y12 = BIT(data, 2);
 	}
 

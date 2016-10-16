@@ -91,6 +91,7 @@ void i8089_device::device_start()
 	state_add(CH2_PP, "CH2  PP", m_ch2->m_r[i8089_channel::PP].w).mask(0xfffff);
 	state_add(CH2_PSW, "CH2 PSW", m_ch2->m_r[i8089_channel::PSW].w).callimport().callexport().formatstr("%12s");
 	state_add(STATE_GENPC, "GENPC", m_current_tp).mask(0xfffff).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_current_tp).mask(0xfffff).noshow();
 
 	// register for save states
 	save_item(NAME(m_sysbus));

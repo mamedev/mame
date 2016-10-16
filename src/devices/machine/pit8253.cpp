@@ -317,7 +317,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 	static const UINT32 CYCLES_NEVER = (0xffffffff);
 	UINT32 cycles_to_output = 0;
 
-	LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
+	LOG2(("simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
 			(int)elapsed_cycles, timer->index, mode, bcd, timer->phase, timer->gate, timer->output, timer->value));
 
 	switch (mode)
@@ -698,7 +698,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 		timer->updatetimer->adjust(next_fire_time - machine().time(), timer->index);
 	}
 
-	LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
+	LOG2(("simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
 			(int)elapsed_cycles, timer->index, mode, bcd, timer->phase, timer->gate, timer->output, timer->value, cycles_to_output));
 }
 
@@ -723,7 +723,7 @@ void pit8253_device::update(pit8253_timer *timer)
 	attotime elapsed_time = now - timer->last_updated;
 	INT64 elapsed_cycles = elapsed_time.as_double() * timer->clockin;
 
-	LOG1(("pit8253: update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
+	LOG1(("update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
 
 	if (timer->clockin)
 		timer->last_updated += elapsed_cycles * attotime::from_hz(timer->clockin);
@@ -739,7 +739,7 @@ void pit8253_device::update(pit8253_timer *timer)
    mask this bit off. */
 UINT16 pit8253_device::masked_value(pit8253_timer *timer)
 {
-	LOG2(("pit8253: masked_value\n"));
+	LOG2(("masked_value\n"));
 	if (CTRL_MODE(timer->control) == 3)
 		return timer->value & 0xfffe;
 	return timer->value;
@@ -756,7 +756,7 @@ READ8_MEMBER( pit8253_device::read )
 	UINT8 data;
 	UINT16 value;
 
-	LOG2(("pit8253_r(): offset %d\n", offset));
+	LOG2(("read(): offset %d\n", offset));
 
 	if (timer == nullptr)
 	{
@@ -816,7 +816,7 @@ READ8_MEMBER( pit8253_device::read )
 		}
 	}
 
-	LOG2(("pit8253: read(): offset=%d data=0x%02x\n", offset, data));
+	LOG2(("read(): offset=%d data=0x%02x\n", offset, data));
 	return data;
 }
 
@@ -825,7 +825,7 @@ READ8_MEMBER( pit8253_device::read )
 void pit8253_device::load_count(pit8253_timer *timer, UINT16 newcount)
 {
 	int mode = CTRL_MODE(timer->control);
-	LOG1(("pit8253: load_count(): %04x\n", newcount));
+	LOG1(("load_count(): %04x\n", newcount));
 
 	if (newcount == 1)
 	{
@@ -912,7 +912,7 @@ void pit8253_device::readback_command(UINT8 data)
 
 void pit8254_device::readback_command(UINT8 data)
 {
-	LOG1(("pit8253: write(): readback %02x\n", data & 0x3f));
+	LOG1(("write(): readback %02x\n", data & 0x3f));
 
 	/* Bit 0 of data must be 0. Todo: find out what the hardware does if it isn't. */
 	int read_command = (data >> 4) & 3;
@@ -933,7 +933,7 @@ WRITE8_MEMBER( pit8253_device::write )
 {
 	pit8253_timer *timer = get_timer(offset);
 
-	LOG2(("pit8253: write(): offset=%d data=0x%02x\n", offset, data));
+	LOG2(("write(): offset=%d data=0x%02x\n", offset, data));
 
 	if (timer == nullptr)
 	{
@@ -949,7 +949,7 @@ WRITE8_MEMBER( pit8253_device::write )
 
 		if (CTRL_ACCESS(data) == 0)
 		{
-			LOG1(("pit8253: write(): timer=%d readback\n", (data >> 6) & 3));
+			LOG1(("write(): timer=%d readback\n", (data >> 6) & 3));
 
 			/* Latch current timer value */
 			/* Experimentally verified: this command does not affect the mode control register */
@@ -957,7 +957,7 @@ WRITE8_MEMBER( pit8253_device::write )
 		}
 		else
 		{
-			LOG1(("pit8253: write(): timer=%d bytes=%d mode=%d bcd=%d\n", (data >> 6) & 3, (data >> 4) & 3, (data >> 1) & 7, data & 1));
+			LOG1(("write(): timer=%d bytes=%d mode=%d bcd=%d\n", (data >> 6) & 3, (data >> 4) & 3, (data >> 1) & 7, data & 1));
 
 			timer->control = (data & 0x3f);
 			timer->null_count = 1;
@@ -1045,7 +1045,7 @@ void pit8253_device::gate_w(int gate, int state)
 	if (timer == nullptr)
 		return;
 
-	LOG2(("pit8253 : gate_w(): gate=%d state=%d\n", gate, state));
+	LOG2(("gate_w(): gate=%d state=%d\n", gate, state));
 
 	if (state != timer->gate)
 	{
@@ -1084,7 +1084,7 @@ void pit8253_device::set_clockin(int timerno, double new_clockin)
 	pit8253_timer *timer = get_timer(timerno);
 	assert(timer != nullptr);
 
-	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %f\n", timerno, new_clockin));
+	LOG2(("set_clockin(): PIT timer=%d, clockin = %f\n", timerno, new_clockin));
 
 	update(timer);
 	timer->clockin = new_clockin;
@@ -1097,7 +1097,7 @@ void pit8253_device::set_clock_signal(int timerno, int state)
 	pit8253_timer *timer = get_timer(timerno);
 	assert(timer != nullptr);
 
-	LOG2(("pit8253_set_clock_signal(): PIT timer=%d, state = %d\n", timerno, state));
+	LOG2(("set_clock_signal(): PIT timer=%d, state = %d\n", timerno, state));
 
 	/* Trigger on low to high transition */
 	if (!timer->clock && state)

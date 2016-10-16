@@ -711,6 +711,22 @@ ROM_START( funcsino )
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
+ROM_START( bigcsino )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bc1k.u7", 0x0000, 0x1000, CRC(51f35f51) SHA1(3c1b9b613402e178d0d8752bf025e5d7fc9f1081) )
+	ROM_LOAD( "bc2k.u8", 0x1000, 0x1000, CRC(8102d1eb) SHA1(e2ffa04d705b82b19e978429851690426cb4b474) )
+	ROM_LOAD( "bc3k.u9", 0x2000, 0x1000, CRC(fdfb304e) SHA1(b000d7533c1613fb253b9f48143cc4add73aa23c) )
+	ROM_LOAD( "bc4k.u10", 0x3000, 0x1000, CRC(521347c3) SHA1(539ce6e93bf6db2ca2a8fa22d0aef9933f8cd825) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "bc0k.u36", 0x0000, 0x1000, CRC(baf66e19) SHA1(4b78571e9370453e96e64c08d69b92b4d64e1a41) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "82s123.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
+	ROM_LOAD( "82s123.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) /* Soldered in (Color?) */
+	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+ROM_END
+
 ROM_START( hangman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "main_hang_1b_2732.u7", 0x0000, 0x1000, CRC(0d71b2ad) SHA1(636e5e0e356c9c7de174a0b6a5663fedcb1e697f) )
@@ -908,6 +924,35 @@ ROM_START( quaquiz2 )
 
 	ROM_REGION( 0x0140, "proms", 0 )
 	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+ROM_END
+
+// Dumper's note: I got the pcb with Triv Quiz (trivquiz) question rom pcb, but I don't think that's the correct one.
+// If you use Triv Quiz question data the game will boot to playable state
+
+ROM_START( supertr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u07.bin",  0x00000, 0x01000, CRC(6573d17c) SHA1(0ec4a572312393c9efbf580f015bcf418d867079) )
+	ROM_LOAD( "u08.bin",  0x01000, 0x01000, CRC(734f7e0a) SHA1(42b4ec0396a7150b78901e0279fc7904abd94d06) )
+	ROM_LOAD( "u09.bin",  0x02000, 0x01000, CRC(41b9bb46) SHA1(d440ec19c9962b3e35c50e2cc1ba0c218c05c0e1) )
+	ROM_LOAD( "u10.bin",  0x03000, 0x01000, CRC(2f7b2207) SHA1(2c58fde128824fb553a6ec5336cadbf194ec81b7) )
+
+	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "u36.bin", 0x00000, 0x01000, CRC(01f30203) SHA1(b902845af0e4d96446550539596354d9962d78be) )
+
+	ROM_REGION( 0x40000, "questions", 0 ) 
+	ROM_LOAD( "q1.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q2.rom", 0x08000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q3.rom", 0x10000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q4.rom", 0x18000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q5.rom", 0x20000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q6.rom", 0x28000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q7.rom", 0x30000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q8.rom", 0x38000, 0x08000, NO_DUMP )
+	
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -1125,9 +1170,10 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
  *
  *************************************/
 
-GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,          ROT0, "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,          ROT0, "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,          ROT0, "Status Games", "Tripple Draw (V3.1 s)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, bigcsino, 0,        funcsino,  funcsino, driver_device, 0,          ROT0, "Status Games", "Big Casino", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) //needs correct inputs
 GAME( 1984, hangman,  0,        statriv2,  hangman, statriv2_state,  addr_lmh,  ROT0, "Status Games", "Hangman", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, trivquiz, 0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Triv Quiz", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, statriv2, 0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0, "Status Games", "Triv Two", MACHINE_SUPPORTS_SAVE )
@@ -1135,6 +1181,7 @@ GAME( 1985, statriv2v,statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  
 GAME( 1985, statriv4, 0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0, "Status Games", "Triv Four", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sextriv,  0,        statriv2,  sextriv, statriv2_state,  addr_lhx,  ROT0, "Status Games", "Sex Triv", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, quaquiz2, 0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Quadro Quiz II", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, supertr,  0,        statriv2,  supertr2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Super Triv Quiz I", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) // missing questions' ROMs
 GAME( 1986, supertr2, 0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0, "Status Games", "Super Triv II", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, supertr3, 0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Super Triv III", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cstripxi, 0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0, "Status Games", "Casino Strip XI", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

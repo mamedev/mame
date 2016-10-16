@@ -274,6 +274,7 @@ public:
 	int m_scrollx;
 	int m_scrolly;
 	UINT8 m_reg_a002;
+	UINT8 m_motor_active;
 	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
 	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
 	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
@@ -295,6 +296,7 @@ public:
 	virtual void video_start() override;
 	UINT32 screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void machine_reset() override;
 };
 
 
@@ -420,8 +422,7 @@ WRITE8_MEMBER(witch_state::write_a006)
 	if (data == 0)
 		return;
 
-	// TODO: this assumes the "Hopper Active" DSW is "Low"
-	m_hopper->write(space, 0, !BIT(data, 1) ? 0x80 : 0);
+	m_hopper->motor_w(!BIT(data, 1) ^ m_motor_active);
 
 	// TODO: Bit 3 = Attendant Pay
 
@@ -695,6 +696,7 @@ void witch_state::video_start()
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_reg_a002));
+	save_item(NAME(m_motor_active));
 }
 
 void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -754,6 +756,12 @@ UINT32 witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bit
 	draw_sprites(bitmap, cliprect);
 	m_gfx0b_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
+}
+
+void witch_state::machine_reset()
+{
+	// Keep track of the "Hopper Active" DSW value because the program will use it
+	m_motor_active = (ioport("YM_PortB")->read() & 0x08) ? 0 : 1;
 }
 
 static MACHINE_CONFIG_START( witch, witch_state )

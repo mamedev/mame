@@ -43,7 +43,7 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container
 	auto lang = mui.machine().options().language();
 	const osd::directory::entry *dirent;
 	std::size_t cnt = 0;
-	while ((dirent = path.next()) != nullptr)
+	while ((dirent = path.next()))
 	{
 		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
 		{
@@ -829,6 +829,7 @@ void menu_rgb_ui::populate()
 	// set filter arrow
 	UINT32 arrow_flags = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	std::string s_text = std::string(m_search).append("_");
+	item_append(_("ARGB Settings"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 
 	if (m_lock_ref != RGB_ALPHA)
 	{
@@ -878,9 +879,8 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	float width, maxwidth = origx2 - origx1;
 
 	// top text
-	std::string topbuf = std::string(m_title).append(_(" - ARGB Settings"));
-	ui().draw_text_full(container(), topbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container(), m_title.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+						mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = std::max(maxwidth, width);
 
@@ -899,41 +899,37 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container(), topbuf.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container(), m_title.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+						mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR);
 
 	std::string sampletxt(_("Color preview ="));
-	maxwidth = origx2 - origx1;
 	ui().draw_text_full(container(), sampletxt.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+						mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = std::max(maxwidth, width);
+	maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
-	x1 -= UI_BOX_LR_BORDER;
-	x2 = x1 + width;
+	x1 = 0.5f - 0.5f * maxwidth;
+	x2 = x1 + maxwidth;
 	y1 = origy2 + UI_BOX_TB_BORDER;
 	y2 = origy2 + bottom;
 
 	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_RED_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x1 + width, y2, UI_RED_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the normal text
-	ui().draw_text_full(container(), sampletxt.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, rgb_t::white, rgb_t::black, nullptr, nullptr);
+	ui().draw_text_full(container(), sampletxt.c_str(), x1, y1, width - UI_BOX_LR_BORDER, ui::text_layout::CENTER, ui::text_layout::NEVER,
+						mame_ui_manager::NORMAL, rgb_t::white, rgb_t::black);
 
-	float t_x2 = x1 - UI_BOX_LR_BORDER + maxwidth;
-	x1 = x2 + 2.0f * UI_BOX_LR_BORDER;
-	x2 = t_x2;
+	x1 += width + UI_BOX_LR_BORDER;
 	y1 -= UI_BOX_TB_BORDER;
 
+	// draw color box
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, *m_color);
-
 }
 
 //-------------------------------------------------
@@ -949,7 +945,7 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 
 		if (!m_key_active)
 		{
-			int val = atoi(m_search);
+			int val = atoi(m_search.data());
 			val = m_color->clamp(val);
 
 			switch ((FPTR)menu_event->itemref)
@@ -971,7 +967,7 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 				break;
 			}
 
-			m_search[0] = 0;
+			m_search.erase();
 			m_lock_ref = 0;
 			return;
 		}
@@ -979,26 +975,11 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 
 	if (!m_key_active)
 	{
-		m_search[0] = 0;
+		m_search.erase();
 		return;
 	}
 
-	auto const buflen = std::strlen(m_search);
-	if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
-	{
-		// if it's a backspace and we can handle it, do so
-		if (0 < buflen)
-			*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
-	}
-	else if (buflen >= 3)
-	{
-		return;
-	}
-	else if ((menu_event->unichar >= '0' && menu_event->unichar <= '9'))
-	{
-		// if it's any other key and we're not maxed out, update
-		menu_event->append_char(m_search, buflen);
-	}
+	input_character(m_search, 3, menu_event->unichar, uchar_is_digit);
 }
 
 std::pair<const char *, const char *> const menu_palette_sel::s_palette[] = {

@@ -45,7 +45,7 @@ public:
 		result = GetMonitorInfo(reinterpret_cast<HMONITOR>(oshandle()), static_cast<LPMONITORINFO>(&m_info));
 		assert(result);
 
-		m_name = utf8_from_tstring(m_info.szDevice);
+		m_name = osd::text::from_tstring(m_info.szDevice);
 
 		m_pos_size = RECT_to_osd_rect(m_info.rcMonitor);
 		m_usuable_pos_size = RECT_to_osd_rect(m_info.rcWork);
@@ -122,7 +122,7 @@ private:
 		float aspect = static_cast<float>(info.rcMonitor.right - info.rcMonitor.left) / static_cast<float>(info.rcMonitor.bottom - info.rcMonitor.top);
 
 		// allocate a new monitor info
-		auto temp = utf8_from_tstring(info.szDevice);
+		auto temp = osd::text::from_tstring(info.szDevice);
 
 		// copy in the data
 		auto monitor = std::make_shared<win32_monitor_info>(*self, handle, temp.c_str(), aspect);

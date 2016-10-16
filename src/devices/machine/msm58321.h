@@ -23,6 +23,7 @@
 #define __MSM58321__
 
 #include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -89,7 +90,7 @@ protected:
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
-	virtual bool rtc_feature_y2k() override { return m_year0 != 0; }
+	virtual bool rtc_feature_y2k() const override { return m_year0 != 0; }
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;

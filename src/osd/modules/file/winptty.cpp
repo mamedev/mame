@@ -87,7 +87,7 @@ bool win_check_ptty_path(std::string const &path)
 
 osd_file::error win_open_ptty(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize)
 {
-	auto t_name = tstring_from_utf8(path.c_str());
+	osd::text::tstring t_name = osd::text::to_tstring(path);
 
 	HANDLE pipe = CreateNamedPipe(t_name.c_str(), PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT, 1, 32, 32, 0, nullptr);
 

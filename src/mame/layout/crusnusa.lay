@@ -25,6 +25,21 @@
 			<bounds x="0.25" y="0.5" width="1.5" height="1.0" />
 		</text>
 	</element>
+	
+	<element name="radio" defstate="0">
+		<disk state="0">
+			<bounds x="0" y="0" width="2.0" height="2.0" />
+			<color red="0.1" green="0.021" blue="0.002" />
+		</disk>
+		<disk state="1">
+			<bounds x="0" y="0" width="2.0" height="2.0" />
+			<color red="0.1" green="0.021" blue="0.002" />
+		</disk>
+		<text string="RADIO">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.25" y="0.5" width="1.5" height="1.0" />
+		</text>
+	</element>
 
 	<element name="view1" defstate="0">
 		<rect state="0">
@@ -71,29 +86,23 @@
 		</text>
 	</element>
 
-	<element name="counter" defstate="0">
-		<simplecounter digits="3">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</simplecounter>
-	</element>
-
-	<view name="Simple LEDs">
+	<view name="Dashboard">
 		<bounds left="0" top="0" right="4" bottom="3.472" />
 
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp0" element="start">
+		<bezel name="lamp0" element="start" inputtag="IN0" inputmask="0x04">
 			<bounds x="3.60" y="3.1" width="0.3" height="0.3" />
 		</bezel>
-		<bezel name="lamp1" element="view1">
+		<bezel name="lamp1" element="view1" inputtag="IN1" inputmask="0x10">
 			<bounds x="0.1" y="3.075" width="0.5" height="0.1" />
 		</bezel>
-		<bezel name="lamp2" element="view2">
+		<bezel name="lamp2" element="view2" inputtag="IN1" inputmask="0x20">
 			<bounds x="0.1" y="3.2" width="0.5" height="0.1" />
 		</bezel>
-		<bezel name="lamp3" element="view3">
+		<bezel name="lamp3" element="view3" inputtag="IN1" inputmask="0x40">
 			<bounds x="0.1" y="3.325" width="0.5" height="0.1" />
 		</bezel>
 
@@ -110,8 +119,8 @@
 			<bounds x="2.115" y="3.2" width="0.1" height="0.1" />
 		</bezel>
 
-		<bezel name="wheel" element="counter">
-			<bounds x="1.9" y="3.0" width="0.2" height="0.1" />
+		<bezel element="radio" inputtag="IN1" inputmask="0x02">
+			<bounds x="3.20" y="3.1" width="0.3" height="0.3" />
 		</bezel>
 	</view>
 </mamelayout>

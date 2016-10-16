@@ -11,6 +11,8 @@ $input v_color0, v_texcoord0
 // Autos
 uniform vec4 u_swap_xy;
 uniform vec4 u_source_dims; // size of the guest machine
+uniform vec4 u_target_dims;
+uniform vec4 u_target_scale;
 uniform vec4 u_quad_dims;
 uniform vec4 u_screen_scale;
 uniform vec4 u_screen_offset;
@@ -63,13 +65,19 @@ vec2 GetAdjustedCoords(vec2 coord)
 	return coord;
 }
 
-vec2 GetShadowCoord(vec2 QuadCoord, vec2 SourceCoord)
+vec2 GetShadowCoord(vec2 TargetCoord, vec2 SourceCoord)
 {
+	// base-target dimensions (remove oversampling)
+	vec2 BaseTargetDims = u_target_dims.xy / u_target_scale.xy;
+	BaseTargetDims = u_swap_xy.x > 0.0
+		? BaseTargetDims.yx
+		: BaseTargetDims.xy;
+
 	vec2 canvasCoord = u_shadow_tile_mode.x == 0.0
-		? QuadCoord + u_shadow_uv_offset.xy / u_quad_dims.xy
+		? TargetCoord + u_shadow_uv_offset.xy / BaseTargetDims
 		: SourceCoord + u_shadow_uv_offset.xy / u_source_dims.xy;
 	vec2 canvasTexelDims = u_shadow_tile_mode.x == 0.0
-		? vec2(1.0, 1.0) / u_quad_dims.xy
+		? vec2(1.0, 1.0) / BaseTargetDims
 		: vec2(1.0, 1.0) / u_source_dims.xy;
 
 	vec2 shadowUV = u_shadow_uv.xy;

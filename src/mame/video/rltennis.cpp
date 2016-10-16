@@ -40,14 +40,14 @@ Blitter registers description (reg/bit names selected arbitrary ) :
   fedcba98 76543210
   -------- -------x BLTFLAG_DST_X_DIR    x dst direction (step inc or dec)
   -------- ------x- BLTFLAG_DST_Y_DIR    y dst direction
-  -------- -----x-- BLTFLAG_DST_LR       LR and UD controlls the quarter of framebuffer to use
+  -------- -----x-- BLTFLAG_DST_LR       LR and UD controls the quarter of framebuffer to use
   -------- ----x--- BLTFLAG_DST_UD       /
   -------- ---?----                      unknown
   -------- --x----- BLTFLAG_DISPLAY_UD   display buffer select
   -------- ??------                      unknown
   -------x -------- BLTFLAG_SRC_X_DIR    x src direction
   ------x- -------- BLTFLAG_SRC_Y_DIR    y src direction
-  -----x-- -------- BLTFLAG_SRC_LR       LR and UD controlls the quarter of src buffer to use
+  -----x-- -------- BLTFLAG_SRC_LR       LR and UD controls the quarter of src buffer to use
   ----x--- -------- BLTFLAG_SRC_UD       /
   xxxx---- --------                      src ROM num
 

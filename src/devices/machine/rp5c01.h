@@ -24,6 +24,7 @@
 #define __RP5C01__
 
 #include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -64,11 +65,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
-	virtual bool rtc_feature_leap_year() override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual bool rtc_battery_backed() const override { return m_battery_backed; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	// device_nvram_interface overrides

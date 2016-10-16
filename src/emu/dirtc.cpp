@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-
+#include "dirtc.h"
 
 
 //**************************************************************************
@@ -76,11 +76,8 @@ void device_rtc_interface::set_time(bool update, int year, int month, int day, i
 //  to the current system time
 //-------------------------------------------------
 
-void device_rtc_interface::set_current_time(running_machine &machine)
+void device_rtc_interface::set_current_time(const system_time &systime)
 {
-	system_time systime;
-	machine.base_datetime(systime);
-
 	set_time(true, systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday, systime.local_time.weekday + 1,
 		systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
 }

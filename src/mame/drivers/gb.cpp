@@ -18,134 +18,6 @@
   - Emulate OAM corruption bug on 16bit inc/dec in $fe** region
 
 
-Timers
-======
-
-There seems to be some kind of selectable internal clock divider which is used to drive
-the timer increments. This causes the first timer cycle to now always be a full cycle.
-For instance in 1024 clock cycle mode, the first timer cycle could easily only take 400
-clock cycles. The next timer cycle will take the full 1024 clock cycles though.
-
-Writes to the DIV register seem to cause this internal clock divider/register to be
-reset in such a way that the next stimulus cause a timer increment (in any mode).
-
-
-Interrupts
-==========
-
-Taking an interrupt seems to take around 20 clock cycles.
-
-
-Stat timing
-===========
-
-This timing table is accurate within 4 cycles:
-           | stat = 2 | stat = 3 | stat = 0 |
-No sprites |    80    |    172   |    204   |
-1 sprite   |    80    |    182   |    194   |
-2 sprites  |    80    |    192   |    184   |
-3 sprites  |    80    |    202   |    174   |
-4 sprites  |    80    |    212   |    164   |
-5 sprites  |    80    |    222   |    154   |
-6 sprites  |    80    |    232   |    144   |
-7 sprites  |    80    |    242   |    134   |
-8 sprites  |    80    |    252   |    124   |
-9 sprites  |    80    |    262   |    114   |
-10 sprites |    80    |    272   |    104   |
-
-In other words, each sprite on a line makes stat 3 last 10 cycles longer.
-
-
-For lines 1 - 143 when stat changes to 2 the line counter is incremented.
-
-Line 153 is little odd timing wise. The line counter stays 153 for ~4 clock cycles
-and is then rolls over to 0.
-
-When the line counter is changed it gets checked against the lyc register.
-
-Here is a detailed run of the STAT and LY register together with LYC set to 3 on a
-dmg and mgb. The time between each sample is 4 clock cycles:
-STAT:
-22222222 22233333 33333333 33333333 33333333 33333333 33333300 00000000 00000000 00000000
-00000000 00000000 00000000 06666666 66666666 66666777 77777777 77777777 77777777 77777777
-77777777 44444444 44444444 44444444 44444444 44444444 44444444 44022222 22222222
-
-  LY:
-33333333 33333333 33333333 33333333 33333333 33333333 33333333 33333333 33333333 33333333
-33333333 33333333 33333333 44444444 44444444 44444444 44444444 44444444 44444444 44444444
-44444444 44444444 44444444 44444444 44444444 44444444 44444444 44555555 55555555
-                           ^                                     ^
-
-As you can see, it seems as though the LY register is incremented slightly before the STAT
-register is changed, resulting in a short period where STAT goes 0 before going to 2. This
-bug/feature has been fixed in the CGB and AGB.
-
-
-
-Around lines 152-153-0 the picture becomes as follows:
-STAT:
-11111111 11111111 11111111 11111111 11111111 11111111 11111111 11111111 11111111 11111111
-11111111 11111111 11111111 15555555 55555555 55555555 55555555 55555555 55555555 55555555
-55555555 55555555 55555555 55555555 55555555 55555555 55555555 55111111 11111111 11111111
-11111111 11111111 11111111 11111111 11111111 11111111 11111111 11111111 11111111 11111111
-11111111 11110222 22222222 22222222 23333333 33333333 33333333 33333333 33333333
-
-  LY:
-77777777 77777777 77777777 77777777 77777777 77777777 77777777 77777777 77777777 77777777
-77777777 77777777 77777777 88888888 88888888 88888888 88888888 88888888 88888888 88888888
-88888888 88888888 88888888 88888888 88888888 88888888 88888888 88900000 00000000 00000000
-00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-
-
-The full STAT/LY value state machine.
-=====================================
-
-The timing information below is with sprites disabled.
-
-For STAT we only show the lower 3 bits and for LY only the lower 5 bits of the full
-register. Each digit stands for 4 clock cycles (the smallest measurable unit on a
-dmg or mgb). When the video hardware is switched on the LY register is set 0 and
-the STAT mode is 0. The values for STAT and LY will change as follows:
-
-STAT 000000000000000000003333333333333333333333333333333333333333333000000000000000000000000000000000000000000000000000
-  LY 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001  line #0
-     ^LY=LYC bit can get set here                                                             LY=LYC bit is reset here^
-
-STAT 222222222222222222223333333333333333333333333333333333333333333000000000000000000000000000000000000000000000000000
-  LY 111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111112  line #1
-
-     :
-     :
-
-STAT 222222222222222222223333333333333333333333333333333333333333333000000000000000000000000000000000000000000000000000
-  LY FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0  line #143
-
-STAT 111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
-  LY 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001  line #144
-
-     :
-     :
-
-STAT 111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
-  LY 888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888889  line #152
-
-STAT 111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110
-  LY 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000  line #153
-     ^
-     LY=LYC interrupt for 153 can get triggered here
-
-STAT 222222222222222222223333333333333333333333333333333333333333333000000000000000000000000000000000000000000000000000
-  LY 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001  line #0
-
-STAT 222222222222222222223333333333333333333333333333333333333333333000000000000000000000000000000000000000000000000000
-  LY 111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111112  line #1
-
-     :
-     etc
-
-
 Mappers used in the Game Boy
 ===========================
 
@@ -429,6 +301,11 @@ space. This mapper uses 32KB sized banks.
 #include "bus/gameboy/mbc.h"
 #include "softlist.h"
 
+
+#define DMG_FRAMES_PER_SECOND   59.732155
+#define SGB_FRAMES_PER_SECOND   61.17
+
+
 READ8_MEMBER(gb_state::gb_cart_r)
 {
 	if (m_bios_disable && m_cartslot)
@@ -545,75 +422,75 @@ WRITE8_MEMBER(megaduck_state::bank2_w)
 }
 
 
-static ADDRESS_MAP_START(gameboy_map, AS_PROGRAM, 8, gb_state )
+static ADDRESS_MAP_START(gameboy_map, AS_PROGRAM, 8, gb_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("lcd", gb_lcd_device, vram_r, vram_w)  /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)    /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM                               /* 8k low RAM */
-	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)  /* echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("lcd", gb_lcd_device, oam_r, oam_w)    /* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)      /* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("custom", gameboy_sound_device, sound_r, sound_w)      /* sound registers */
-	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("custom", gameboy_sound_device, wave_r, wave_w)        /* Wave ram */
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREAD("lcd", gb_lcd_device, video_r) AM_WRITE(gb_io2_w)     /* Video controller & BIOS flip-flop */
-	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ppu", dmg_ppu_device, vram_r, vram_w)          /* 8k VRAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)                                /* 8k switched RAM bank (cartridge) */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM                                                          /* 8k low RAM */
+	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("ppu", dmg_ppu_device, oam_r, oam_w)            /* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)                                  /* I/O */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("apu", gameboy_sound_device, sound_r, sound_w)  /* sound registers */
+	AM_RANGE(0xff27, 0xff2f) AM_NOP                                                          /* unused */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("apu", gameboy_sound_device, wave_r, wave_w)    /* Wave ram */
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREAD("ppu", dmg_ppu_device, video_r) AM_WRITE(gb_io2_w)   /* Video controller & BIOS flip-flop */
+	AM_RANGE(0xff80, 0xfffe) AM_RAM                                                          /* High RAM */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)                                  /* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state )
+static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("lcd", sgb_lcd_device, vram_r, vram_w)  /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)    /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM                               /* 8k low RAM */
-	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)  /* echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("lcd", sgb_lcd_device, oam_r, oam_w)    /* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, sgb_io_w)     /* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("custom", gameboy_sound_device, sound_r, sound_w)      /* sound registers */
-	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("custom", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREAD("lcd", sgb_lcd_device, video_r) AM_WRITE(gb_io2_w)        /* Video controller & BIOS flip-flop */
-	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ppu", sgb_ppu_device, vram_r, vram_w)          /* 8k VRAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)                                /* 8k switched RAM bank (cartridge) */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM                                                          /* 8k low RAM */
+	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("ppu", sgb_ppu_device, oam_r, oam_w)            /* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, sgb_io_w)                                 /* I/O */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("apu", gameboy_sound_device, sound_r, sound_w)  /* sound registers */
+	AM_RANGE(0xff27, 0xff2f) AM_NOP                                                          /* unused */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("apu", gameboy_sound_device, wave_r, wave_w)    /* Wave RAM */
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREAD("ppu", sgb_ppu_device, video_r) AM_WRITE(gb_io2_w)   /* Video controller & BIOS flip-flop */
+	AM_RANGE(0xff80, 0xfffe) AM_RAM                                                          /* High RAM */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)                                  /* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state )
+static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gbc_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("lcd", cgb_lcd_device, vram_r, vram_w) /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)   /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM                     /* 4k fixed RAM bank */
-	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("cgb_ram")                    /* 4k switched RAM bank */
-	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)  /* echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("lcd", cgb_lcd_device, oam_r, oam_w)  /* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)        /* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("custom", gameboy_sound_device, sound_r, sound_w)      /* sound controller */
-	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("custom", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(gbc_io2_r, gbc_io2_w)        /* Other I/O and video controller */
-	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* high RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ppu", cgb_ppu_device, vram_r, vram_w)          /* 8k banked VRAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)                                /* 8k switched RAM bank (cartridge) */
+	AM_RANGE(0xc000, 0xcfff) AM_RAM                                                          /* 4k fixed RAM bank */
+	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("cgb_ram")                                           /* 4k switched RAM bank */
+	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("ppu", cgb_ppu_device, oam_r, oam_w)            /* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gbc_io_w)                                 /* I/O */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("apu", gameboy_sound_device, sound_r, sound_w)  /* sound controller */
+	AM_RANGE(0xff27, 0xff2f) AM_NOP                                                          /* unused */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("apu", gameboy_sound_device, wave_r, wave_w)    /* Wave RAM */
+	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(gbc_io2_r, gbc_io2_w)                              /* Other I/O and video controller */
+	AM_RANGE(0xff80, 0xfffe) AM_RAM                                                          /* high RAM */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)                                  /* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, megaduck_state )
+static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, megaduck_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(cart_r, bank1_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("lcd", gb_lcd_device, vram_r, vram_w)        /* 8k VRAM */
-	AM_RANGE(0xa000, 0xafff) AM_NOP                         /* unused? */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ppu", dmg_ppu_device, vram_r, vram_w)          /* 8k VRAM */
+	AM_RANGE(0xa000, 0xafff) AM_NOP                                                          /* unused? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(bank2_w)
-	AM_RANGE(0xb001, 0xbfff) AM_NOP                         /* unused? */
-	AM_RANGE(0xc000, 0xfe9f) AM_RAM                         /* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("lcd", gb_lcd_device, oam_r, oam_w)      /* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)            /* I/O */
-	AM_RANGE(0xff10, 0xff1f) AM_READWRITE(megaduck_video_r, megaduck_video_w)  /* video controller */
-	AM_RANGE(0xff20, 0xff2f) AM_READWRITE(megaduck_sound_r1, megaduck_sound_w1) /* sound controller pt1 */
-	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("custom", gameboy_sound_device, wave_r, wave_w)            /* wave ram */
-	AM_RANGE(0xff40, 0xff46) AM_READWRITE(megaduck_sound_r2, megaduck_sound_w2) /* sound controller pt2 */
-	AM_RANGE(0xff47, 0xff7f) AM_NOP                         /* unused */
-	AM_RANGE(0xff80, 0xfffe) AM_RAM                         /* high RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)            /* interrupt enable register */
+	AM_RANGE(0xb001, 0xbfff) AM_NOP                                                          /* unused? */
+	AM_RANGE(0xc000, 0xfe9f) AM_RAM                                                          /* 8k/16k? RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("ppu", dmg_ppu_device, oam_r, oam_w)            /* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)                                  /* I/O */
+	AM_RANGE(0xff10, 0xff1f) AM_READWRITE(megaduck_video_r, megaduck_video_w)                /* video controller */
+	AM_RANGE(0xff20, 0xff2f) AM_READWRITE(megaduck_sound_r1, megaduck_sound_w1)              /* sound controller pt1 */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("apu", gameboy_sound_device, wave_r, wave_w)    /* wave ram */
+	AM_RANGE(0xff40, 0xff46) AM_READWRITE(megaduck_sound_r2, megaduck_sound_w2)              /* sound controller pt2 */
+	AM_RANGE(0xff47, 0xff7f) AM_NOP                                                          /* unused */
+	AM_RANGE(0xff80, 0xfffe) AM_RAM                                                          /* high RAM */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)                                  /* interrupt enable register */
 ADDRESS_MAP_END
 
 static GFXDECODE_START( gb )
@@ -758,7 +635,7 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_UPDATE_DEVICE("lcd", gb_lcd_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -770,11 +647,11 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
-	MCFG_GB_LCD_DMG_ADD("lcd")
+	MCFG_DMG_PPU_ADD("ppu", "maincpu")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
+	MCFG_SOUND_ADD("apu", DMG_APU, XTAL_4_194304Mhz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -785,13 +662,11 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 
+static MACHINE_CONFIG_START( supergb, gb_state )
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
+	MCFG_CPU_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
-
-	MCFG_CPU_MODIFY("maincpu")
 	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
@@ -799,29 +674,41 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_horizont) /* runs on a TV, not an LCD */
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(SGB_FRAMES_PER_SECOND)
+	MCFG_SCREEN_VBLANK_TIME(0)
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_DEFAULT_LAYOUT(layout_horizont) /* runs on a TV, not an LCD */
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32768)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
-	MCFG_DEVICE_REMOVE("lcd")
-	MCFG_GB_LCD_SGB_ADD("lcd")
+	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("apu", DMG_APU, 4295454)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+
+	/* cartslot */
+	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( supergb2, gameboy )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
-	MCFG_LR35902_HALT_BUG
-
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
 
@@ -836,9 +723,10 @@ static MACHINE_CONFIG_DERIVED( supergb2, gameboy )
 	MCFG_PALETTE_ENTRIES(32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
-	MCFG_DEVICE_REMOVE("lcd")
-	MCFG_GB_LCD_SGB_ADD("lcd")
+	MCFG_DEVICE_REMOVE("ppu")
+	MCFG_SGB_PPU_ADD("ppu", "maincpu")
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 
@@ -846,8 +734,8 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
 
-	MCFG_DEVICE_REMOVE("lcd")
-	MCFG_GB_LCD_MGB_ADD("lcd")
+	MCFG_DEVICE_REMOVE("ppu")
+	MCFG_MGB_PPU_ADD("ppu", "maincpu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gbcolor, gb_state )
@@ -864,7 +752,7 @@ static MACHINE_CONFIG_START( gbcolor, gb_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_UPDATE_DEVICE("lcd", gb_lcd_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -877,11 +765,11 @@ static MACHINE_CONFIG_START( gbcolor, gb_state )
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
-	MCFG_GB_LCD_CGB_ADD("lcd")
+	MCFG_CGB_PPU_ADD("ppu", "maincpu")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
+	MCFG_SOUND_ADD("apu", CGB04_APU, XTAL_4_194304Mhz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -899,7 +787,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( megaduck, megaduck_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, 4194304) /* 4.194304 MHz */
+	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) /* 4.194304 MHz */
 	MCFG_CPU_PROGRAM_MAP(megaduck_map)
 	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
@@ -913,7 +801,7 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck)
 	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck)
 
-	MCFG_SCREEN_UPDATE_DEVICE("lcd", gb_lcd_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
 	MCFG_SCREEN_SIZE(20*8, 18*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
@@ -923,11 +811,11 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
 
-	MCFG_GB_LCD_DMG_ADD("lcd")
+	MCFG_DMG_PPU_ADD("ppu", "maincpu")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
+	MCFG_SOUND_ADD("apu", DMG_APU, XTAL_4_194304Mhz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

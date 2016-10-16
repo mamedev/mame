@@ -153,18 +153,18 @@ Notes:
 #include "bus/rs232/rs232.h"
 #include "softlist.h"
 
-void v1050_state::set_interrupt(UINT8 mask, int state)
+void v1050_state::set_interrupt(int line, int state)
 {
 	if (state)
 	{
-		m_int_state |= mask;
+		m_int_state |= (1 << line);
 	}
 	else
 	{
-		m_int_state &= ~mask;
+		m_int_state &= ~(1 << line);
 	}
 
-	m_pic->r_w(~(m_int_state & m_int_mask));
+	m_pic->r_w(line, ((m_int_state & m_int_mask) & (1 << line)) ? 0 : 1);
 }
 
 void v1050_state::bankswitch()
@@ -989,7 +989,6 @@ void v1050_state::machine_start()
 
 	// register for state saving
 	save_item(NAME(m_int_mask));
-	save_item(NAME(m_int_state));
 	save_item(NAME(m_f_int_enb));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
@@ -1097,8 +1096,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(v1050_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
 	// SASI bus
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)

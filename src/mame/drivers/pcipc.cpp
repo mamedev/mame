@@ -10,7 +10,7 @@
   -> intel 430hx, aka 82439hx northbridge (pci, no agp)
   -> intel piix3, aka 82371sb southbridge (pci-isa bridge, ide, ioapic, timer, irq, dma, usb)
   -> smsc fdc37c93x superio (isa-connected, keyboard, rtc, fdc, rs232, ide)
-  - A Matrox Millenium PCI video card
+  - A Matrox Millennium PCI video card
 
   We'll see about sound, networking, etc later
 
@@ -189,7 +189,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_w)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-			
+
 }
 
 static MACHINE_CONFIG_START(pcipc, pcipc_state)
@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START(pcipc, pcipc_state)
 	MCFG_I82439HX_ADD(    ":pci:00.0", ":maincpu", 256*1024*1024)
 	MCFG_I82371SB_ISA_ADD(":pci:07.0")
 	MCFG_I82371SB_BOOT_STATE_HOOK(DEVWRITE8(":", pcipc_state, boot_state_w))
-//	MCFG_IDE_PCI_ADD(     ":pci:07.1", 0x80867010, 0x03, 0x00000000)
+//  MCFG_IDE_PCI_ADD(     ":pci:07.1", 0x80867010, 0x03, 0x00000000)
 	MCFG_MGA2064W_ADD(    ":pci:12.0")
 MACHINE_CONFIG_END
 

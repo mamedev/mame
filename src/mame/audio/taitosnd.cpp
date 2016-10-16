@@ -118,7 +118,7 @@ WRITE8_MEMBER( tc0140syt_device::master_port_w )
 
 WRITE8_MEMBER( tc0140syt_device::master_comm_w )
 {
-	machine().scheduler().synchronize(); // let slavecpu catch up before changing anything
+	machine().scheduler().synchronize(); // let slavecpu catch up (after we return and the main cpu finishes what it's doing)
 	data &= 0x0f; /* this is important, otherwise ballbros won't work */
 
 	switch (m_mainmode)
@@ -155,7 +155,7 @@ WRITE8_MEMBER( tc0140syt_device::master_comm_w )
 
 READ8_MEMBER( tc0140syt_device::master_comm_r )
 {
-	machine().scheduler().synchronize(); // let slavecpu catch up before changing anything
+	machine().scheduler().synchronize(); // let slavecpu catch up (after we return and the main cpu finishes what it's doing)
 	UINT8 res = 0;
 
 	switch (m_mainmode)

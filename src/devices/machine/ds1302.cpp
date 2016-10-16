@@ -113,8 +113,6 @@ void ds1302_device::device_start()
 
 void ds1302_device::device_reset()
 {
-	set_current_time(machine());
-
 	m_clk = 0;
 	m_ce = 0;
 	m_state = STATE_COMMAND;

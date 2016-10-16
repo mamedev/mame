@@ -21,8 +21,8 @@ Notes:
 - To bypass the startup message, toggle "Reset" dip-switch or reset with F3.
 - If the Work RAM is not hooked-up (areas $67xx),a sound sample is played.I can't understand what it says though,
   appears to japanese words for "RAM failed".
-- Playing with the debugger I've found this -> http://img444.imageshack.us/img444/2980/0000ti3.png (notice the "credit" at
-  the bottom). Maybe a non-BET version exists? Or there's a jumper setting?
+- Snippets of a non-BET Version are scattered thru the code (for example a credit display). 
+  Might be either undumped revision or selectable somehow.
 
 CPU:    uPD70116C-8 (V30)
 Sound:  Z80-A

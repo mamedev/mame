@@ -1048,6 +1048,52 @@ ROM_START( eurodsr )
 ROM_END
 
 
+/*
+  Grande Fratello (Ver 1.7)
+
+  CPUs
+
+  1x H8/3337 u1 32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+  1x D7759GC u25 ADPCM Speech Synthesizer LSIs - sound
+  1x TDA2003 u26 Audio Amplifier - sound
+  1x oscillator 14.31818MHz u30
+  1x oscillator 16.000MHz x1
+
+  ROMs
+  1x MX27C2000 0 dumped
+  4x M27C4001 1-4 dumped
+
+  RAMs
+  1x MX66C1024MC-70 u9,u10,u11
+
+  PLDs
+  1x ispLSI1032E-70LJ u2,u3 read protected
+
+  Others
+
+  1x 28x2 JAMMA edge connector (J1)
+  1x RS232 connector (J2)
+  1x 7x2 pins connector (J3)
+  1x 17x2 pins connector (J5)
+  2x trimmer (P1-A/S)(P2-VOL)
+  2x 8x2 switches DIP (SW1,SW2)
+  1x battery 3.6V (BT1) 
+*/
+
+ROM_START( granfrat )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "granfrat_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "gra.frat.ep1.u4", 0x000000, 0x80000, CRC(e200dd23) SHA1(ffe9f6517a0b2de0863cefaf9696ca256ae8b555) )
+	ROM_LOAD( "gra.frat.ep2.u5", 0x080000, 0x80000, CRC(1b4861c2) SHA1(9b70d8bd8d682b754be4a90b01eea7bdf9d400e1) )
+	ROM_LOAD( "gra.frat.ep3.u6", 0x100000, 0x80000, CRC(37d63df2) SHA1(bcb5271d7c966087b3059c1c7cbefa68427e7e07) )
+	ROM_LOAD( "gra.frat.ep4.u7", 0x180000, 0x80000, CRC(a71a39a2) SHA1(2f53f30c415d2c6acf8201090b4cfab4b3e0f4d0) )
+
+	ROM_REGION( 0x40000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "gra.frat.msg0.u8", 0x00000, 0x40000, CRC(1c58d0e8) SHA1(69c125775f7b9a2e4db6aa942d8a7b099ea19c36) )
+ROM_END
+
 /*************************
 *      Game Drivers      *
 *************************/
@@ -1072,3 +1118,4 @@ GAME( 200?, europass, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<
 GAME( 200?, thedrink, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "The Drink",                             MACHINE_IS_SKELETON )
 GAME( 200?, unkh8gam, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "unknown H8 Italian Gambling game",      MACHINE_IS_SKELETON )
 GAME( 200?, eurodsr,  0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Double Star Record (ver.1.2)",     MACHINE_IS_SKELETON )
+GAME( 200?, granfrat, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Grande Fratello (Ver. 1.7)",            MACHINE_IS_SKELETON )

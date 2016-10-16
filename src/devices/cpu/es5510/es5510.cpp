@@ -552,6 +552,7 @@ void es5510_device::ser_w(int offset, INT16 data)
 void es5510_device::device_start() {
 	m_icountptr = &icount;
 	state_add(STATE_GENPC,"GENPC", pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", pc).noshow();
 }
 
 void es5510_device::device_reset() {

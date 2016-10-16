@@ -50,14 +50,7 @@ protected:
 private:
 	required_device<ym3526_device> m_opl;
 	required_device<c64_expansion_slot_device> m_exp;
-	required_ioport m_kb0;
-	required_ioport m_kb1;
-	required_ioport m_kb2;
-	required_ioport m_kb3;
-	required_ioport m_kb4;
-	required_ioport m_kb5;
-	required_ioport m_kb6;
-	required_ioport m_kb7;
+	required_ioport_array<8> m_kb;
 
 	inline offs_t get_offset(offs_t offset, int rw);
 };

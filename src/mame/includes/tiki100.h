@@ -59,18 +59,7 @@ public:
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
 		m_video_ram(*this, "video_ram"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
-		m_y10(*this, "Y10"),
-		m_y11(*this, "Y11"),
-		m_y12(*this, "Y12"),
+		m_y(*this, "Y%u", 1),
 		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
 		m_rome(1),
@@ -92,18 +81,7 @@ public:
 	required_memory_region m_rom;
 	required_memory_region m_prom;
 	optional_shared_ptr<UINT8> m_video_ram;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
-	required_ioport m_y12;
+	required_ioport_array<12> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
 

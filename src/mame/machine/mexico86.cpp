@@ -66,7 +66,7 @@ void mexico86_state::mcu_simulate(  )
 		int i;
 		bool coin_curr;
 		UINT8 coin_in_read = ioport("IN0")->read() & 3;
-		
+
 		// TODO: still needs Coinage B into account
 		for(int coin_idx = 0; coin_idx < 2; coin_idx++)
 		{
@@ -74,7 +74,7 @@ void mexico86_state::mcu_simulate(  )
 			if (coin_curr && m_coin_last[coin_idx] == false)
 			{
 				UINT8 coinage_setting = (ioport("DSW0")->read() >> (coin_idx*2 + 4)) & 3;
-				
+
 				// increase credits counter
 				switch(coinage_setting)
 				{
@@ -95,7 +95,7 @@ void mexico86_state::mcu_simulate(  )
 						break;
 
 				}
-				
+
 				m_protection_ram[0x0a] = 0x01;   // set flag (coin inserted sound is not played otherwise)
 			}
 			m_coin_last[coin_idx] = coin_curr;
@@ -103,7 +103,7 @@ void mexico86_state::mcu_simulate(  )
 		// Purge any coin counter higher than 9 TODO: is this limit correct?
 		if(m_protection_ram[0x01] > 9)
 			m_protection_ram[0x01] = 9;
-		
+
 		m_protection_ram[0x04] = 0x3c | (coin_in_read ^ 3);   // coin inputs
 
 		m_protection_ram[0x02] = BITSWAP8(ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1

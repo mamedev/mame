@@ -44,13 +44,27 @@
 // ----------------------------------
 #define FDC_TAG "fd1771"
 #define MOTOR_TIMER 1
+#define NONE -1
 
 #define TI_FDC_TAG "ti_dssd_controller"
 
 ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__), m_address(0), m_DRQ(), m_IRQ(),
-	m_lastval(0), m_DVENA(), m_inDsrArea(false), m_WAITena(false), m_WDsel(false), m_DSEL(0), m_SIDSEL(), m_motor_on_timer(nullptr),
-			m_fd1771(*this, FDC_TAG), m_dsrrom(nullptr), m_current_floppy(nullptr), m_debug_dataout(false)
+			: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__),
+			m_address(0),
+			m_DRQ(0),
+			m_IRQ(0),
+			m_lastval(0),
+			m_DVENA(0),
+			m_inDsrArea(false),
+			m_WAITena(false),
+			m_WDsel(false),
+			m_DSEL(0),
+			m_SIDSEL(0),
+			m_motor_on_timer(nullptr),
+			m_fd1771(*this, FDC_TAG),
+			m_dsrrom(nullptr),
+			m_current(NONE),
+			m_debug_dataout(false)
 		{ }
 
 /*
@@ -279,7 +293,7 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 			// Select side of disk (bit 7)
 			m_SIDSEL = (data==1)? ASSERT_LINE : CLEAR_LINE;
 			if (TRACE_CRU) logerror("tifdc: set side (bit 7) = %d\n", data);
-			if (m_current_floppy != nullptr) m_current_floppy->ss_w(data);
+			if (m_current != NONE) m_floppy[m_current]->ss_w(data);
 			break;
 
 		default:
@@ -290,37 +304,35 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 
 void ti_fdc_device::set_drive()
 {
-	int i = -1;
 	switch (m_DSEL)
 	{
 	case 0:
-		m_current_floppy = nullptr;
+		m_current = NONE;
 		if (TRACE_CRU) logerror("tifdc: all drives deselected\n");
 		break;
 	case 1:
-		i = 0;
+		m_current = 0;
 		break;
 	case 2:
-		i = 1;
+		m_current = 1;
 		break;
 	case 3:
 		// The schematics do not reveal any countermeasures against multiple selection
 		// so we assume that the highest value wins.
-		i = 1;
+		m_current = 1;
 		logerror("tifdc: Warning - multiple drives selected\n");
 		break;
 	case 4:
-		i = 2;
+		m_current = 2;
 		break;
 	default:
-		i = 2;
+		m_current = 2;
 		logerror("tifdc: Warning - multiple drives selected\n");
 		break;
 	}
 	if (TRACE_CRU) logerror("tifdc: new DSEL = %d\n", m_DSEL);
-	if (i != -1) m_current_floppy = m_floppy[i];
 
-	m_fd1771->set_floppy(m_current_floppy);
+	m_fd1771->set_floppy((m_current == NONE)? nullptr : m_floppy[m_current]);
 }
 
 /*
@@ -369,6 +381,18 @@ void ti_fdc_device::device_start()
 	m_cru_base = 0x1100;
 	// In case we implement a callback after all:
 	// m_fd1771->setup_ready_cb(wd_fdc_t::rline_cb(FUNC(ti_fdc_device::dvena_r), this));
+
+	save_item(NAME(m_address));
+	save_item(NAME(m_DRQ));
+	save_item(NAME(m_IRQ));
+	save_item(NAME(m_lastval));
+	save_item(NAME(m_DVENA));
+	save_item(NAME(m_inDsrArea));
+	save_item(NAME(m_WAITena));
+	save_item(NAME(m_WDsel));
+	save_item(NAME(m_DSEL));
+	save_item(NAME(m_SIDSEL));
+	save_item(NAME(m_current));
 }
 
 void ti_fdc_device::device_reset()
@@ -405,7 +429,8 @@ void ti_fdc_device::device_reset()
 			logerror("tifdc: No floppy attached to connector %d\n", i);
 	}
 
-	m_fd1771->set_floppy(m_current_floppy = m_floppy[0]);
+	m_current = 0;
+	m_fd1771->set_floppy(m_floppy[m_current]);
 }
 
 void ti_fdc_device::device_config_complete()

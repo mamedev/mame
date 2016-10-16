@@ -62,8 +62,8 @@ public:
 	DECLARE_READ8_MEMBER(pia1_b_in);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE8_MEMBER( ptm_o2_callback );
-	DECLARE_WRITE8_MEMBER( ptm_o3_callback );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
 
 protected:
 	virtual void machine_reset() override;
@@ -140,14 +140,14 @@ WRITE_LINE_MEMBER( poly_state::write_acia_clock )
 	m_acia->write_rxc(state);
 }
 
-WRITE8_MEMBER( poly_state::ptm_o2_callback )
+WRITE_LINE_MEMBER( poly_state::ptm_o2_callback )
 {
-	m_ptm->set_c1(data);
+	m_ptm->set_c1(state);
 }
 
-WRITE8_MEMBER( poly_state::ptm_o3_callback )
+WRITE_LINE_MEMBER( poly_state::ptm_o3_callback )
 {
-	m_speaker->level_w(data);
+	m_speaker->level_w(state);
 }
 
 static MACHINE_CONFIG_START( poly, poly_state )
@@ -186,8 +186,8 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_12MHz / 3)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT1_CB(WRITE8(poly_state, ptm_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(poly_state, ptm_o3_callback))
+	MCFG_PTM6840_OUT1_CB(WRITELINE(poly_state, ptm_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(poly_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)

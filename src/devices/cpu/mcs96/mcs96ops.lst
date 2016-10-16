@@ -15,9 +15,9 @@ fetch
 		standard_irq_callback(OP1);
 		check_irq();
 	}
+	PPC = PC;
 	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 		debugger_instruction_hook(this, PC);
-	PPC = PC;
 	OP1 = read_pc();
 	if(OP1 == 0xfe) {
 		OP1 = read_pc();
@@ -26,9 +26,9 @@ fetch
 		inst_state = OP1;
 
 fetch_noirq
+	PPC = PC;
 	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 		debugger_instruction_hook(this, PC);
-	PPC = PC;
 	OP1 = read_pc();
 	if(OP1 == 0xfe) {
 		OP1 = read_pc();

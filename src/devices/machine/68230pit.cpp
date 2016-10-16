@@ -30,7 +30,7 @@
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x)
 #define LOGR(x)
-#define LOGINT(x) 	LOGPRINT(x)
+#define LOGINT(x)   LOGPRINT(x)
 #define LOGSETUP(x) LOGPRINT(x)
 #if VERBOSE == 2
 #define logerror printf

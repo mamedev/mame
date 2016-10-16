@@ -399,6 +399,7 @@ void tms3203x_device::device_start()
 	// register our state for the debugger
 	state_add(TMS3203X_PC,      "PC",        m_pc);
 	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
+	state_add(STATE_GENPCBASE,  "CURPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS",  m_r[TMR_ST].i32[0]).mask(0xff).noshow().formatstr("%8s");
 	state_add(TMS3203X_R0,      "R0",        m_r[TMR_R0].i32[0]);
 	state_add(TMS3203X_R1,      "R1",        m_r[TMR_R1].i32[0]);

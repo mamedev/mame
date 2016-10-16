@@ -25,13 +25,13 @@ public:
 
 	virtual uint16_t decrypt(uint16_t cipherword)=0;
 	virtual ~ns10_decrypter_device();
-	
+
 protected:
 	ns10_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual void init(int iv)=0;
 	virtual void device_start()override=0;
-	
+
 	bool _active;
 };
 

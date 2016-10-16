@@ -69,18 +69,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_sound_device> m_discrete;
-	required_ioport m_x0;
-	required_ioport m_x1;
-	required_ioport m_x2;
-	required_ioport m_x3;
-	required_ioport m_x4;
-	required_ioport m_x5;
-	required_ioport m_x6;
-	required_ioport m_x7;
-	required_ioport m_x8;
-	required_ioport m_x9;
-	required_ioport m_x10;
-	required_ioport m_x11;
+	required_ioport_array<12> m_x;
 	required_ioport m_dsw;
 
 	int m_txd;                      // transmit data

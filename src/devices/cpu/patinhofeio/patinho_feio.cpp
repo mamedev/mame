@@ -117,6 +117,7 @@ void patinho_feio_cpu_device::device_start()
 	state_add( PATINHO_FEIO_EXT,        "EXT",      m_ext        ).mask(0xFF);
 	state_add( PATINHO_FEIO_IDX,        "IDX",      m_idx        ).mask(0xFF);
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("0%06O").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("0%06O").noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).noshow().formatstr("%8s");
 
 	if (m_rc_read_cb.isnull()){

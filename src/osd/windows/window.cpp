@@ -1416,7 +1416,7 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
 	float pixel_aspect;
-	
+
 	auto monitor = monitor_from_rect(&rect);
 
 	// Sometimes this gets called when monitors have already been torn down

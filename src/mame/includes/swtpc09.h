@@ -66,8 +66,8 @@ public:
 	DECLARE_READ8_MEMBER(pia0_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 
-	DECLARE_WRITE8_MEMBER( ptm_o1_callback );
-	DECLARE_WRITE8_MEMBER( ptm_o3_callback );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o1_callback );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );

@@ -651,12 +651,12 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_a_write_cb.isnull())
 					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
 				else
-					logerror("warning - write %02x to 8910 Port A\n", m_regs[AY_PORTA]);
+					logerror("warning: unmapped write %02x to %s Port A\n", v, name());
 			}
 			else
 			{
 #if LOG_IGNORED_WRITES
-				logerror("warning: write %02x to 8910 Port A set as input - ignored\n", v);
+				logerror("warning: write %02x to %s Port A set as input - ignored\n", v, name());
 #endif
 			}
 			break;
@@ -666,12 +666,12 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_b_write_cb.isnull())
 					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
 				else
-					logerror("warning - write %02x to 8910 Port B\n", m_regs[AY_PORTB]);
+					logerror("warning: unmapped write %02x to %s Port B\n", v, name());
 			}
 			else
 			{
 #if LOG_IGNORED_WRITES
-				logerror("warning: write %02x to 8910 Port B set as input - ignored\n", v);
+				logerror("warning: write %02x to %s Port B set as input - ignored\n", v, name());
 #endif
 			}
 			break;
@@ -817,7 +817,7 @@ void ay8910_device::build_mixer_table()
 
 	if ((m_flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
-		logerror("AY-3-8910/YM2149 using legacy output levels!\n");
+		logerror("%s using legacy output levels!\n", name());
 		normalize = 1;
 	}
 
@@ -852,6 +852,7 @@ void ay8910_device::build_mixer_table()
 
 void ay8910_device::ay8910_statesave()
 {
+	save_item(NAME(m_active));
 	save_item(NAME(m_register_latch));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_last_enable));
@@ -894,7 +895,7 @@ void ay8910_device::device_start()
 
 	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
-		logerror("%s device '%s' using single output!\n", name(), tag());
+		logerror("%s device using single output!\n", name());
 		m_streams = 1;
 	}
 
@@ -920,6 +921,7 @@ void ay8910_device::ay8910_reset_ym()
 {
 	int i;
 
+	m_active = false;
 	m_register_latch = 0;
 	m_rng = 1;
 	m_output[0] = 0;
@@ -967,33 +969,43 @@ void ay8910_device::ay_set_clock(int clock)
 	m_channel->set_sample_rate( clock / 8 );
 }
 
-void ay8910_device::ay8910_write_ym(int addr, int data)
+void ay8910_device::ay8910_write_ym(int addr, uint8_t data)
 {
 	if (addr & 1)
-	{   /* Data port */
-		int r = m_register_latch;
-
-		if (r > 15) return;
-		if (r == AY_ESHAPE || m_regs[r] != data)
+	{
+		if (m_active)
 		{
-			/* update the output buffer before changing the register */
-			m_channel->update();
-		}
+			/* Data port */
+			if (m_register_latch == AY_ESHAPE || m_regs[m_register_latch] != data)
+			{
+				/* update the output buffer before changing the register */
+				m_channel->update();
+			}
 
-		ay8910_write_reg(r,data);
+			ay8910_write_reg(m_register_latch, data);
+		}
 	}
 	else
-	{   /* Register port */
-		m_register_latch = data & 0x0f;
+	{
+		m_active = (data >> 4) == 0; // mask programmed 4-bit code
+		if (m_active)
+		{
+			/* Register port */
+			m_register_latch = data & 0x0f;
+		}
+		else
+		{
+			logerror("%s: warning - %s upper address mismatch\n", machine().describe_context(), name());
+		}
 	}
 }
 
-int ay8910_device::ay8910_read_ym()
+UINT8 ay8910_device::ay8910_read_ym()
 {
 	device_type chip_type = type();
 	int r = m_register_latch;
 
-	if (r > 15) return 0;
+	if (!m_active) return 0xff; // high impedance
 
 	/* There are no state dependent register in the AY8910! */
 	/* m_channel->update(); */
@@ -1002,7 +1014,7 @@ int ay8910_device::ay8910_read_ym()
 	{
 	case AY_PORTA:
 		if ((m_regs[AY_ENABLE] & 0x40) != 0)
-			logerror("%s: warning - read from 8910 '%s' Port A set as output\n", machine().describe_context());
+			logerror("%s: warning - read from %s Port A set as output\n", machine().describe_context(), name());
 		/*
 		   even if the port is set as output, we still need to return the external
 		   data. Some games, like kidniki, need this to work.
@@ -1140,6 +1152,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 		m_ioports(2),
 		m_ready(0),
 		m_channel(nullptr),
+		m_active(false),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),
@@ -1182,6 +1195,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_ioports(ioports),
 		m_ready(0),
 		m_channel(nullptr),
+		m_active(false),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),

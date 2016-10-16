@@ -35,7 +35,6 @@ Known to exist but not dumped:
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
 #include "crusnusa.lh"
-#include <iostream>
 
 
 #define CPU_CLOCK       50000000
@@ -379,7 +378,8 @@ READ32_MEMBER(midvunit_state::midvunit_output_r)
 	return m_output;
 }
 
-void midvunit_state::set_input(const char *s) {
+void midvunit_state::set_input(const char *s) 
+{
 	m_galil_input = s;
 	m_galil_input_index = 0;
 	m_galil_input_length = strlen(s);
@@ -387,66 +387,101 @@ void midvunit_state::set_input(const char *s) {
 
 WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 {
-	int bit;
-	UINT8 op = (data >> 8) & 0xFF;
+	UINT8 op = (data >> 8) & 0xF;
 	UINT8 arg = data & 0xFF;
-	switch (op) {
-		case 0xF7: m_output_mode = arg; break;
-		case 0xFB:
-		switch (m_output_mode) {
-			case 0x00:
-				set_input(":");
-				m_galil_output_index = 0;
-				memset(m_galil_output, 0, 450);
-			break; //device init? 3C 1C are the only 2 writes at boot.
-			case 0x04: output().set_value("wheel", arg); break; //wheel motor delta. signed byte.
-			case 0x05: for (bit = 0; bit < 8; bit++) output().set_lamp_value(bit, (arg >> bit) & 0x1); break;
-			case 0x08: m_output = m_galil_input[m_galil_input_index++] << 8; break; //get next character from input string.
-			case 0x09:
-				if (arg != 0xD) {
-					m_galil_output[m_galil_output_index] = (char)arg;
-					if (m_galil_output_index < 450)
-						m_galil_output_index++;
-				}
-				else {
-					// G, W, S, and Q are commented out because they are error commands.
-					// When the motion tests succeeds it will send the program over to
-					// the motion controller and as this is not a real system it will
-					// assume it wants to execute them which turns off the motion system.
-					// If anyone wishes to implement a real Galil motion controller feel
-					// free to do so. This will only dump everything to stdout.
-					if (strstr(m_galil_output,"MG \"V\" IBO {$2.0}"))
-						set_input("V$00");
-					else if (strstr(m_galil_output,"MG \"X\", _TSX {$2.0}"))
-						set_input("X$00");
-					else if (strstr(m_galil_output,"MG \"Y\", _TSY {$2.0}"))
-						set_input("Y$00");
-					else if (strstr(m_galil_output,"MG \"Z\", _TSZ {$2.0}"))
-						set_input("Z$00");
-					/*else if (strstr(m_galil_output,"MG \"G\""))
-					    set_input("G");
-					else if (strstr(m_galil_output,"MG \"W\""))
-					    set_input("W");
-					else if (strstr(m_galil_output,"MG \"S\""))
-					    set_input("S");
-					else if (strstr(m_galil_output,"MG \"Q\""))
-					    set_input("Q");*/
-					else
-						set_input(":");
-					std::cout << m_galil_output << std::endl;
-					//osd_printf_error("Galil << %s\n", m_galil_output);
-					memset(m_galil_output, 0, m_galil_output_index);
+	switch (op)
+	{
+		default:
+			logerror("Unknown output (%02X) = %02X\n", op, arg);
+			break;
+
+		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
+
+		case 0x7:
+			m_output_mode = arg;
+			break;
+
+		case 0xB:
+			switch (m_output_mode)
+			{
+				default:
+					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
+					break;
+
+				case 0x00: //device init? 3C 1C are the only 2 writes at boot.
+					set_input(":");
 					m_galil_output_index = 0;
-				}
-			break; //Galil command input. ascii inputs terminated with carriage return.
-			case 0x0A: m_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0; break; //set output to 0x8000 if there is data available, otherwise 0.
-			case 0x0B: break; //0 written at boot.
-			case 0x0C: break; //0 written at boot.
-			case 0x0E: break; //0 written after test.
-		}
-		break;
-		//receives same data as midvunit_sound_w. unsure what its purpose is, but it is redundant.
-		//case 0xFD: m_dcs->data_w(arg); break;
+					memset(m_galil_output, 0, 450);
+					break;
+
+				case 0x04: //wheel motor delta. signed byte.
+					output().set_value("wheel", arg);
+					break;
+
+				case 0x05:
+					for (UINT8 bit = 0; bit < 8; bit++)
+						output().set_lamp_value(bit, (arg >> bit) & 0x1);
+					break;
+
+				case 0x08: //get next character from input string.
+					m_output = m_galil_input[m_galil_input_index++] << 8;
+					break;
+
+				case 0x09: //Galil command input. ascii inputs terminated with carriage return.
+					if (arg != 0xD)
+					{
+						m_galil_output[m_galil_output_index] = (char)arg;
+						if (m_galil_output_index < 450)
+							m_galil_output_index++;
+					}
+					else
+					{
+						// G, W, S, and Q are commented out because they are error commands.
+						// When the motion tests succeeds it will send the program over to
+						// the motion controller and as this is not a real system it will
+						// assume it wants to execute them which turns off the motion system.
+						// If anyone wishes to implement a real Galil motion controller feel
+						// free to do so. This will only dump everything to stdout.
+						if (strstr(m_galil_output,"MG \"V\" IBO {$2.0}"))
+							set_input("V$00");
+						else if (strstr(m_galil_output,"MG \"X\", _TSX {$2.0}"))
+							set_input("X$00");
+						else if (strstr(m_galil_output,"MG \"Y\", _TSY {$2.0}"))
+							set_input("Y$00");
+						else if (strstr(m_galil_output,"MG \"Z\", _TSZ {$2.0}"))
+							set_input("Z$00");
+						/*else if (strstr(m_galil_output,"MG \"G\""))
+							set_input("G");
+						else if (strstr(m_galil_output,"MG \"W\""))
+							set_input("W");
+						else if (strstr(m_galil_output,"MG \"S\""))
+							set_input("S");
+						else if (strstr(m_galil_output,"MG \"Q\""))
+							set_input("Q");*/
+						else
+							set_input(":");
+						logerror("Galil Command: %s\n", m_galil_output);
+						memset(m_galil_output, 0, m_galil_output_index);
+						m_galil_output_index = 0;
+					}
+					break;
+
+				case 0x0A: //set output to 0x8000 if there is data available, otherwise 0.
+					m_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0;
+					break;
+
+				case 0x0B: break; //0 written at boot.
+
+				case 0x0C: break; //0 written at boot.
+
+				case 0x0E: break; //0 written after test.
+			}
+			break;
+
+		case 0xD: //receives same data as midvunit_sound_w. unsure what its purpose is, but it is redundant.
+			logerror("Wheelboard Sound W = %02X\n", arg);
+			//m_dcs->data_w(arg);
+			break;
 	}
 }
 

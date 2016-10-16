@@ -1,10 +1,14 @@
+<?xml version="1.0"?>
 <!-- Basic display of keyboard LEDs for the BBC Micro series -->
 
 <mamelayout version="2">
 
-	<element name="red_led">
-		<disk>
-			<color red="1.0" green="0.0" blue="0.0" />
+	<element name="red_led" defstate="1">
+		<disk state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.20" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 

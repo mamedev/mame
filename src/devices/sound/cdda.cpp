@@ -148,6 +148,7 @@ int cdda_device::audio_paused()
 
 int cdda_device::audio_ended()
 {
+	m_stream->update();
 	return m_audio_ended_normally;
 }
 

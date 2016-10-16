@@ -27,10 +27,12 @@
 #include "charconv.h"
 #include "pool.h"
 
-
-struct imgtool_image;
-struct imgtool_partition;
-struct imgtool_directory;
+namespace imgtool
+{
+	class image;
+	class partition;
+	class directory;
+};
 
 enum imgtool_suggestion_viability_t
 {
@@ -46,9 +48,9 @@ union filterinfo
 	void *  f;                                          /* generic function pointers */
 	const char *s;                                      /* generic strings */
 
-	imgtoolerr_t (*read_file)(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf);
-	imgtoolerr_t (*write_file)(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts);
-	imgtoolerr_t (*check_stream)(imgtool_stream *stream, imgtool_suggestion_viability_t *viability);
+	imgtoolerr_t (*read_file)(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf);
+	imgtoolerr_t (*write_file)(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts);
+	imgtoolerr_t (*check_stream)(imgtool::stream &stream, imgtool_suggestion_viability_t *viability);
 };
 
 typedef void (*filter_getinfoproc)(UINT32 state, union filterinfo *info);
@@ -193,7 +195,6 @@ enum
 	IMGTOOLINFO_PTR_GET_ICON_INFO,
 	IMGTOOLINFO_PTR_SUGGEST_TRANSFER,
 	IMGTOOLINFO_PTR_GET_CHAIN,
-	IMGTOOLINFO_PTR_GET_SECTOR_SIZE,
 	IMGTOOLINFO_PTR_GET_GEOMETRY,
 	IMGTOOLINFO_PTR_READ_SECTOR,
 	IMGTOOLINFO_PTR_WRITE_SECTOR,
@@ -253,36 +254,35 @@ union imgtoolinfo
 	void *  f;                                          /* generic function pointers */
 	char *  s;                                          /* generic strings */
 
-	imgtoolerr_t    (*open)             (imgtool_image *image, imgtool_stream *stream);
-	void            (*close)            (imgtool_image *image);
-	imgtoolerr_t    (*create)           (imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts);
-	imgtoolerr_t    (*create_partition) (imgtool_image *image, UINT64 first_block, UINT64 block_count);
-	void            (*info)             (imgtool_image *image, char *string, size_t len);
-	imgtoolerr_t    (*begin_enum)       (imgtool_directory *enumeration, const char *path);
-	imgtoolerr_t    (*next_enum)        (imgtool_directory *enumeration, imgtool_dirent *ent);
-	void            (*close_enum)       (imgtool_directory *enumeration);
-	imgtoolerr_t    (*open_partition)   (imgtool_partition *partition, UINT64 first_block, UINT64 block_count);
-	imgtoolerr_t    (*free_space)       (imgtool_partition *partition, UINT64 *size);
-	imgtoolerr_t    (*read_file)        (imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf);
-	imgtoolerr_t    (*write_file)       (imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts);
-	imgtoolerr_t    (*delete_file)      (imgtool_partition *partition, const char *filename);
-	imgtoolerr_t    (*list_forks)       (imgtool_partition *partition, const char *path, imgtool_forkent *ents, size_t len);
-	imgtoolerr_t    (*create_dir)       (imgtool_partition *partition, const char *path);
-	imgtoolerr_t    (*delete_dir)       (imgtool_partition *partition, const char *path);
-	imgtoolerr_t    (*list_attrs)       (imgtool_partition *partition, const char *path, UINT32 *attrs, size_t len);
-	imgtoolerr_t    (*get_attrs)        (imgtool_partition *partition, const char *path, const UINT32 *attrs, imgtool_attribute *values);
-	imgtoolerr_t    (*set_attrs)        (imgtool_partition *partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values);
+	imgtoolerr_t    (*open)             (imgtool::image *image, imgtool::stream::ptr &&stream);
+	void            (*close)            (imgtool::image *image);
+	imgtoolerr_t    (*create)           (imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
+	imgtoolerr_t    (*create_partition) (imgtool::image *image, UINT64 first_block, UINT64 block_count);
+	void            (*info)             (imgtool::image *image, char *string, size_t len);
+	imgtoolerr_t    (*begin_enum)       (imgtool::directory *enumeration, const char *path);
+	imgtoolerr_t    (*next_enum)        (imgtool::directory *enumeration, imgtool_dirent *ent);
+	void            (*close_enum)       (imgtool::directory *enumeration);
+	imgtoolerr_t    (*open_partition)   (imgtool::partition *partition, UINT64 first_block, UINT64 block_count);
+	imgtoolerr_t    (*free_space)       (imgtool::partition *partition, UINT64 *size);
+	imgtoolerr_t    (*read_file)        (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf);
+	imgtoolerr_t    (*write_file)       (imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts);
+	imgtoolerr_t    (*delete_file)      (imgtool::partition *partition, const char *filename);
+	imgtoolerr_t    (*list_forks)       (imgtool::partition *partition, const char *path, imgtool_forkent *ents, size_t len);
+	imgtoolerr_t    (*create_dir)       (imgtool::partition *partition, const char *path);
+	imgtoolerr_t    (*delete_dir)       (imgtool::partition *partition, const char *path);
+	imgtoolerr_t    (*list_attrs)       (imgtool::partition *partition, const char *path, UINT32 *attrs, size_t len);
+	imgtoolerr_t    (*get_attrs)        (imgtool::partition *partition, const char *path, const UINT32 *attrs, imgtool_attribute *values);
+	imgtoolerr_t    (*set_attrs)        (imgtool::partition *partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values);
 	imgtoolerr_t    (*attr_name)        (UINT32 attribute, const imgtool_attribute *attr, char *buffer, size_t buffer_len);
-	imgtoolerr_t    (*get_iconinfo)     (imgtool_partition *partition, const char *path, imgtool_iconinfo *iconinfo);
-	imgtoolerr_t    (*suggest_transfer) (imgtool_partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length);
-	imgtoolerr_t    (*get_chain)        (imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size);
-	imgtoolerr_t    (*get_sector_size)  (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size);
-	imgtoolerr_t    (*get_geometry)     (imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors);
-	imgtoolerr_t    (*read_sector)      (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len);
-	imgtoolerr_t    (*write_sector)     (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam);
-	imgtoolerr_t    (*read_block)       (imgtool_image *image, void *buffer, UINT64 block);
-	imgtoolerr_t    (*write_block)      (imgtool_image *image, const void *buffer, UINT64 block);
-	imgtoolerr_t    (*list_partitions)  (imgtool_image *image, imgtool_partition_info *partitions, size_t len);
+	imgtoolerr_t    (*get_iconinfo)     (imgtool::partition *partition, const char *path, imgtool_iconinfo *iconinfo);
+	imgtoolerr_t    (*suggest_transfer) (imgtool::partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length);
+	imgtoolerr_t    (*get_chain)        (imgtool::partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size);
+	imgtoolerr_t    (*get_geometry)     (imgtool::image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors);
+	imgtoolerr_t    (*read_sector)      (imgtool::image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
+	imgtoolerr_t    (*write_sector)     (imgtool::image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam);
+	imgtoolerr_t    (*read_block)       (imgtool::image *image, void *buffer, UINT64 block);
+	imgtoolerr_t    (*write_block)      (imgtool::image *image, const void *buffer, UINT64 block);
+	imgtoolerr_t    (*list_partitions)  (imgtool::image *image, imgtool_partition_info *partitions, size_t len);
 	int             (*approve_filename_char)(unicode_char ch);
 	int             (*make_class)(int index, imgtool_class *imgclass);
 
@@ -347,17 +347,16 @@ struct imgtool_module
 	unsigned int writing_untested : 1;              /* used when we support writing, but not in main build */
 	unsigned int creation_untested : 1;             /* used when we support creation, but not in main build */
 
-	imgtoolerr_t    (*open)         (imgtool_image *image, imgtool_stream *f);
-	void            (*close)        (imgtool_image *image);
-	void            (*info)         (imgtool_image *image, char *string, size_t len);
-	imgtoolerr_t    (*create)       (imgtool_image *image, imgtool_stream *f, util::option_resolution *opts);
-	imgtoolerr_t    (*get_sector_size)(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size);
-	imgtoolerr_t    (*get_geometry) (imgtool_image *image, UINT32 *track, UINT32 *heads, UINT32 *sectors);
-	imgtoolerr_t    (*read_sector)  (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len);
-	imgtoolerr_t    (*write_sector) (imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len);
-	imgtoolerr_t    (*read_block)   (imgtool_image *image, void *buffer, UINT64 block);
-	imgtoolerr_t    (*write_block)  (imgtool_image *image, const void *buffer, UINT64 block);
-	imgtoolerr_t    (*list_partitions)(imgtool_image *image, imgtool_partition_info *partitions, size_t len);
+	imgtoolerr_t    (*open)         (imgtool::image *image, imgtool::stream::ptr &&stream);
+	void            (*close)        (imgtool::image *image);
+	void            (*info)         (imgtool::image *image, char *string, size_t len);
+	imgtoolerr_t    (*create)       (imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
+	imgtoolerr_t    (*get_geometry) (imgtool::image *image, UINT32 *track, UINT32 *heads, UINT32 *sectors);
+	imgtoolerr_t    (*read_sector)  (imgtool::image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
+	imgtoolerr_t    (*write_sector) (imgtool::image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len);
+	imgtoolerr_t    (*read_block)   (imgtool::image *image, void *buffer, UINT64 block);
+	imgtoolerr_t    (*write_block)  (imgtool::image *image, const void *buffer, UINT64 block);
+	imgtoolerr_t    (*list_partitions)(imgtool::image *image, imgtool_partition_info *partitions, size_t len);
 
 	UINT32 block_size;
 
@@ -392,23 +391,23 @@ public:
 	void add(imgtool_get_info get_info);
 
 	// seeks out and removes a module from an imgtool library
-	void unlink(const char *module_name);
+	void unlink(const std::string &module_name);
 
 	// sorts an imgtool library
 	void sort(sort_type sort);
 
 	// finds a module
-	const imgtool_module *findmodule(const char *module_name);
+	const imgtool_module *findmodule(const std::string &module_name);
 
 	// module iteration
 	const modulelist &modules() { return m_modules; }
 
 private:
-	object_pool *	m_pool;
-	modulelist		m_modules;
+	object_pool *   m_pool;
+	modulelist      m_modules;
 
 	// internal lookup and iteration
-	modulelist::iterator find(const char *module_name);
+	modulelist::iterator find(const std::string &module_name);
 
 	// helpers
 	void add_class(const imgtool_class *imgclass);

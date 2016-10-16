@@ -76,6 +76,7 @@ static const float HalfPI = PI * 0.5f;
 uniform float2 ScreenDims;
 uniform float2 SourceDims;
 uniform float2 TargetDims;
+uniform float2 TargetScale;
 uniform float2 QuadDims;
 
 uniform float2 ShadowDims = float2(32.0f, 32.0f); // size of the shadow texture (extended to power-of-two size)
@@ -158,17 +159,20 @@ float2 GetAdjustedCoords(float2 coord)
 	return coord;
 }
 
-float2 GetShadowCoord(float2 QuadCoord, float2 SourceCoord)
+float2 GetShadowCoord(float2 TargetCoord, float2 SourceCoord)
 {
-	float2 QuadTexel = 1.0f / QuadDims;
-	float2 SourceTexel = 1.0f / SourceDims;
+	// base-target dimensions (without oversampling)
+	float2 BaseTargetDims = TargetDims / TargetScale;
+	BaseTargetDims = SwapXY
+		? BaseTargetDims.yx
+		: BaseTargetDims.xy;
 
 	float2 canvasCoord = ShadowTileMode == 0
-		? QuadCoord + ShadowUVOffset / QuadDims
+		? TargetCoord + ShadowUVOffset / BaseTargetDims
 		: SourceCoord + ShadowUVOffset / SourceDims;
 	float2 canvasTexelDims = ShadowTileMode == 0
-		? QuadTexel
-		: SourceTexel;
+		? 1.0f / BaseTargetDims
+		: 1.0f / SourceDims;
 
 	float2 shadowDims = ShadowDims;
 	float2 shadowUV = ShadowUV;
@@ -204,15 +208,15 @@ float2 GetShadowCoord(float2 QuadCoord, float2 SourceCoord)
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenCoord = Input.ScreenCoord;
-	float2 TexCoord = GetAdjustedCoords(Input.TexCoord);
+	float2 BaseCoord = GetAdjustedCoords(Input.TexCoord);
 	float2 SourceCoord = GetAdjustedCoords(Input.SourceCoord);
 
 	// Color
-	float4 BaseColor = tex2D(DiffuseSampler, TexCoord);
+	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
 	BaseColor.a = 1.0f;
 
 	// clip border
-	clip(TexCoord < 0.0f || TexCoord > 1.0f ? -1 : 1);
+	clip(BaseCoord < 0.0f || BaseCoord > 1.0f ? -1 : 1);
 
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom && ShadowAlpha > 0.0f)

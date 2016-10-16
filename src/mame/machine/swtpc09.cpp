@@ -29,8 +29,11 @@
 /******* MC6840 PTM on MPID Board *******/
 
 /* 6840 PTM handlers */
-WRITE8_MEMBER( swtpc09_state::ptm_o1_callback )
+WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
 {
+	// RH 3 Oct. 2016 FIXME: Does the hardware actually work this way, incrementing a counter any time
+	// the O1 line on the PTM changes? This seems unlikely, as the current implementation will increment
+	// m_pia_counter on both 0->1 and 1->0 transitions. Is that really correct?
 	pia6821_device *pia = machine().device<pia6821_device>("pia");
 
 	m_pia_counter++;
@@ -38,11 +41,11 @@ WRITE8_MEMBER( swtpc09_state::ptm_o1_callback )
 	if (m_pia_counter & 0x80) pia->ca1_w(1);
 }
 
-WRITE8_MEMBER( swtpc09_state::ptm_o3_callback )
+WRITE_LINE_MEMBER( swtpc09_state::ptm_o3_callback )
 {
 	//ptm6840_device *ptm = machine().device<ptm6840_device>("ptm");
 	/* the output from timer3 is the input clock for timer2 */
-	//m_ptm->set_c2(data);
+	//m_ptm->set_c2(state);
 }
 
 WRITE_LINE_MEMBER( swtpc09_state::ptm_irq )

@@ -23,7 +23,7 @@ Year  Game                         Manufacturer    Notes
 1997  Jingle Bell (EU, V153UE)     IGS             patched protection
 1995  Jingle Bell (EU, V141UE)     IGS             patched protection
 1995? Jingle Bell (Italy, V133I)   IGS             patched protection
-1998  Grand Prix '98               Romtec          1 reel gfx rom is bad
+1998  Grand Prix '98               Romtec
 ---------------------------------------------------------------------------
 
 ***************************************************************************/
@@ -1138,9 +1138,9 @@ ROM_START( gp98 )
 	ROM_COPY( "maincpu", 0x18000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x180000, "tempgfx", 0 ) // 6bpp (2bpp per rom) font at tile # 0x4000
-	ROM_LOAD( "49", 0x000000, 0x80000, BAD_DUMP CRC(a9d9367d) SHA1(91c74740fc8394f1e1cd68feb8c993afd2042d70) )
-	ROM_LOAD( "50", 0x080000, 0x80000, CRC(48f6190d) SHA1(b430131a258b4e2fc178ac0e3e3f0010a82eac65) )
-	ROM_LOAD( "51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
+	ROM_LOAD( "em-03.u49", 0x000000, 0x80000, CRC(f92c510d) SHA1(f8dc4d7d1fdc6f62fcdd86caf8fd703db4b5fb18) )
+	ROM_LOAD( "em-02.u50", 0x080000, 0x80000, CRC(48f6190d) SHA1(b430131a258b4e2fc178ac0e3e3f0010a82eac65) )
+	ROM_LOAD( "em-01.u51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
 
 	ROM_REGION( 0xc0000, "reels", 0 )
 	ROM_COPY( "tempgfx", 0x000000, 0x00000, 0x40000 )
@@ -1163,4 +1163,4 @@ GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell,  
 GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,      0,        gp98,     jingbell, driver_device, 0,         ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,      0,        gp98,     jingbell, driver_device, 0,         ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_SUPPORTS_SAVE )

@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "sound/ym2413.h"
+#include "sound/sn76496.h"
 #include "sg1000exp.h"
 
 
@@ -44,6 +45,7 @@ protected:
 
 private:
 	required_device<ym2413_device> m_ym;
+	optional_device<segapsg_device> m_psg;
 	UINT8 m_audio_control;
 };
 

@@ -273,7 +273,8 @@ void i8086_cpu_device::device_start()
 	state_add( I8086_DS, "DS", m_sregs[DS] ).callimport().callexport().formatstr("%04X");
 	state_add( I8086_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).callimport().callexport().formatstr("%05X");
+	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%05X");
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%05X");
 }
 
 i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -323,6 +324,7 @@ void i8086_common_cpu_device::state_string_export(const device_state_entry &entr
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			str = string_format("%08X", (m_sregs[CS] << 4) + m_ip);
 			break;
 

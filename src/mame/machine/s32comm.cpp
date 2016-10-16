@@ -371,7 +371,7 @@ void s32comm_device::comm_tick_14084()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						osd_printf_verbose("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -468,7 +468,7 @@ void s32comm_device::comm_tick_14084()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					osd_printf_verbose("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
@@ -624,7 +624,7 @@ void s32comm_device::comm_tick_15033()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						osd_printf_verbose("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -721,7 +721,7 @@ void s32comm_device::comm_tick_15033()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					osd_printf_verbose("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
@@ -865,7 +865,7 @@ void s32comm_device::comm_tick_15612()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						osd_printf_verbose("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -962,7 +962,7 @@ void s32comm_device::comm_tick_15612()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					osd_printf_verbose("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}

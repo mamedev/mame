@@ -119,7 +119,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="actionfg0" cloneof="actionfg">
 		<description>Action Fighter (v0, prototype)</description>
 		<year>1986</year>
@@ -130,7 +130,7 @@
 				<rom name="action fighter [v0] [proto].bin" size="131072" crc="e2d765ad" sha1="88fe2ee194981c82b5db2a9166dd97a8edb6d852" offset="000000" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="actionfgtw" cloneof="actionfg">
 		<description>Action Fighter / Mo zhan che (Taiwan)</description>
@@ -1311,7 +1311,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Notes: FM support -->
 	<software name="captsilvp" cloneof="captsilv">
 		<description>Captain Silver (prototype)</description>
@@ -1322,7 +1322,7 @@
 				<rom name="captain silver [proto].bin" size="131072" crc="2532a7cd" sha1="e128c74fd5f0f1ad2f34d408feedff2bfe1adc71" offset="000000" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Notes: FM support -->
 	<software name="casino">
@@ -6810,7 +6810,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="transbot">
 		<description>TransBot (Euro, USA, Bra)</description>
 		<year>1985</year>

@@ -89,8 +89,6 @@ void rtc4543_device::device_start()
 
 void rtc4543_device::device_reset()
 {
-	set_current_time(machine());
-
 	m_ce = 0;
 	m_wr = 0;
 	m_clk = 0;

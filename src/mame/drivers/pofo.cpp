@@ -80,14 +80,7 @@ public:
 		m_ram(*this, "ram"),
 		m_rom(*this, M80C88A_TAG),
 		m_char_rom(*this, HD61830_TAG),
-		m_y0(*this, "Y0"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
+		m_y(*this, "Y%01u", 0),
 		m_battery(*this, "BATTERY"),
 		m_keylatch(0xff)
 	{ }
@@ -102,14 +95,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_region_ptr<UINT8> m_rom;
 	required_region_ptr<UINT8> m_char_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
+	required_ioport_array<8> m_y;
 	required_ioport m_battery;
 
 	virtual void machine_start() override;
@@ -293,12 +279,9 @@ void portfolio_state::scan_keyboard()
 {
 	UINT8 keycode = 0xff;
 
-	UINT32 keydata[8] = { m_y0->read(), m_y1->read(), m_y2->read(), m_y3->read(),
-							m_y4->read(), m_y5->read(), m_y6->read(), m_y7->read() };
-
 	for (int row = 0; row < 8; row++)
 	{
-		UINT8 data = static_cast<int>(keydata[row]);
+		UINT8 data = static_cast<int>(m_y[row]->read());
 
 		if (data != 0xff)
 		{
