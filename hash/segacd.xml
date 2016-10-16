@@ -5197,7 +5197,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-115075"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bc racers (usa)" sha1="7550f60f088232ea714d7a43ee134980ad849491"/>
+				<disk name="bc racers (usa)" sha1="b60b60c6fccc892bf9bf4ebc876b78da10182350"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5244,7 +5244,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-93185"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="championship soccer '94 (usa)" sha1="ff926905e5e633f839c380e7c9c101df465a63b2"/>
+				<disk name="championship soccer '94 (usa)" sha1="314522011b559b18082a1c867de1ace574a4a680"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5291,7 +5291,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-118025"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="compton's interactive encyclopedia v2.01s (usa)" sha1="8a1139781c870b71525ed0881d0087561813d251" />
+				<disk name="compton's interactive encyclopedia v2.01s (usa)" sha1="79ca6bb38c296ac3cc6352823be337371ad7a396" />
 			</diskarea>
 		</part>
 	</software>
@@ -5309,7 +5309,7 @@ See: http://rawdump.net/
 		<part name="cdrom" interface="scd_cdrom">
 			<feature name="peripheral" value="menacer" />
 			<diskarea name="cdrom">
-				<disk name="crime patrol (usa)" sha1="d1380a6e3325e74eb1ab90ec12e4f7aff2bfecc4"/>
+				<disk name="crime patrol (usa)" sha1="544f2ac30e49c141d5a185a30c80b2ee51f12fd1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5326,7 +5326,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-81045"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="demolition man (usa)" sha1="e740d0801ae4dc7906a45016b394848562c8ab61"/>
+				<disk name="demolition man (usa)" sha1="5d7a96692fe79c8a1f6105c208bd60ced82d6014"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5343,7 +5343,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-125045"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="earthworm jim - special edition (usa)" sha1="7da7ca78e62a19e353fc322bfe01e30ba0573e56"/>
+				<disk name="earthworm jim - special edition (usa)" sha1="0f7052a3c22367e7c5e0f857254849ffee9c941b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5360,7 +5360,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-93245 "/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="espn nba hangtime '95 (usa)" sha1="da5998bfc4354a4475abd3d23ab078f701e6f8e7"/>
+				<disk name="espn nba hangtime '95 (usa)" sha1="86f1f4ee8da0f04109cf20b6b8ad455900562abe"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5377,7 +5377,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-60165"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fatal fury special (usa)" sha1="0ccce1d896124f261af478e3dc521e01859751d0"/>
+				<disk name="fatal fury special (usa)" sha1="07010baf387179950d62efe19745718fd5bc0744"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5407,7 +5407,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-23055"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="flink (usa)" sha1="f287ffa7efd7a9d92b03fd11b4da1a693963db12"/>
+				<disk name="flink (usa)" sha1="3395bc2c0291f5af9f19ce5ab246c8ff15f6ced3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5477,7 +5477,7 @@ See: http://rawdump.net/
 		<info name="serial" value="ACDG-GP1"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="karaoke - jvc cd+g karaoke - top hit sampler (usa)" sha1="95e3d4bf84d8fb39e7548adab933c514bda0df78" status="baddump" />
+				<disk name="karaoke - jvc cd+g karaoke - top hit sampler (usa)" sha1="e969df346a8106b837b471cc87670b6aab981ec3" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -5495,7 +5495,7 @@ See: http://rawdump.net/
 		<info name="release" value="199501xx" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="keio flying squadron (usa)" sha1="b9fa1b5b06b4da724323ae8665fc423713c3410e"/>
+				<disk name="keio flying squadron (usa)" sha1="4e47afd43c13ae481dd159fd6e0f2fc4d180a211"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5512,7 +5512,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-111065"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mad dog ii - the lost gold (usa)" sha1="d5da43e27679382a010c2df1c71199c4e8a35c08"/>
+				<disk name="mad dog ii - the lost gold (usa)" sha1="bb599adbb99cfc6fbd667f60429bb1f504af16c6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5543,7 +5543,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-109015"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="my paint (usa)" sha1="82827238d892956329191189963be9b5e786ef95"/>
+				<disk name="my paint (usa)" sha1="30917da8038266ad3d76498e3fbe565c4456d602"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5560,7 +5560,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-135015"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl football trivia challenge (usa)" sha1="28d65b5541fe70a3888bf71482f1a6b90c0b9d0b"/>
+				<disk name="nfl football trivia challenge (usa)" sha1="eadf0633891eb5d94dcb0336d367abca750fa903"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5582,13 +5582,13 @@ See: http://rawdump.net/
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
-				<disk name="night trap (usa, re-release) (disc 1)" sha1="96d1119f7672ddffb140f2e550776ce78ceea7db"/>
+				<disk name="night trap (usa, re-release) (disc 1)" sha1="69cd893b1b2d971da405cac1c4c71114e8a91648"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 2" />
 			<diskarea name="cdrom">
-				<disk name="night trap (usa, re-release) (disc 2)" sha1="cc06731d2167bb5770d61014747daa3cadbee461"/>
+				<disk name="night trap (usa, re-release) (disc 2)" sha1="d8447c507abf9b7afc64b943fa3b4f794ddf25f1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5606,7 +5606,7 @@ See: http://rawdump.net/
 		<info name="release" value="199406xx" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="panic! (usa)" sha1="753925aab3ba016b5c6c8bfd6f07f7264dd6a10a"/>
+				<disk name="panic! (usa)" sha1="44216917d5e42f131c0854cd8fb5066f5e39c87f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5643,7 +5643,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-22035"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="revengers of vengeance (usa)" sha1="2f323e3cb3b16c47c22c508b5fac14d504b2d701"/>
+				<disk name="revengers of vengeance (usa)" sha1="fda7766a0480655c1a23ca40f33258c0d83abe3e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5678,7 +5678,7 @@ See: http://rawdump.net/
 		<info name="release" value="199308xx" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="robo aleste (usa)" sha1="e4f48ddcd1b8bc66a4b1c0e3c6d9fb3b95ee3904"/>
+				<disk name="robo aleste (usa)" sha1="16f734ed901182e0e435e6c2b4f559e99615f148"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5701,7 +5701,7 @@ See: http://rawdump.net/
 		<info name="release" value="19921015" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rock paintings (usa)" sha1="fbd05b5cfe361871ab155ba40438bb395b0f661e" status="baddump" />
+				<disk name="rock paintings (usa)" sha1="614f3f8e89e4b91923ff69719c38baef679f8e8d" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -5718,7 +5718,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-113045"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shadow of the beast ii (usa)" sha1="882e8574b002c6ce5d82e115d8eb4535eba22e32"/>
+				<disk name="shadow of the beast ii (usa)" sha1="7c341dbce23c5b166d4d949e977dae44a553f8a4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5815,7 +5815,7 @@ See: http://rawdump.net/
 		<info name="release" value="199212xx" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="the secret of monkey island (usa)" sha1="e374566e1efbf937b75561debab625d388840b1b"/>
+				<disk name="the secret of monkey island (usa)" sha1="1f90af90c880bad8e9acf6c0f2fa10000072abbe"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5851,7 +5851,7 @@ See: http://rawdump.net/
 		<info name="alt_title" value="The Space Adventure (Box)" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="the space adventure - cobra the legendary bandit (usa)" sha1="3fd85178155f7644bd0ff8c14b75d8e170138a46"/>
+				<disk name="the space adventure - cobra the legendary bandit (usa)" sha1="51a755087713cc945adf5d5e85da713343ea3a0e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5896,7 +5896,7 @@ See: http://rawdump.net/
 		<info name="release" value="199212xx" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wolfchild (usa)" sha1="11cbe214ddfdf2536a7448bfd1534d17434f2783"/>
+				<disk name="wolfchild (usa)" sha1="700228109f9fe28bd5af6525c9fe0354913e1c6a"/>
 			</diskarea>
 		</part>
 	</software>
