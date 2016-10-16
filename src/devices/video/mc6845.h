@@ -141,6 +141,7 @@ public:
 
 	// read cursor line state
 	DECLARE_READ_LINE_MEMBER( cursor_r );
+	DECLARE_READ_LINE_MEMBER( cursor_state_r );
 
 	// read horizontal sync line state
 	DECLARE_READ_LINE_MEMBER( hsync_r );
