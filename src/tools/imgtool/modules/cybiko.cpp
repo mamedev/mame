@@ -428,17 +428,17 @@ static void cybiko_image_close_enum( imgtool::directory *enumeration)
 	// nothing
 }
 
-static imgtoolerr_t cybiko_image_free_space(imgtool::partition *partition, UINT64 *size)
+static imgtoolerr_t cybiko_image_free_space(imgtool::partition &partition, UINT64 *size)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	cybiko_file_system *cfs = get_cfs(image);
 	if (size) *size = cfs_calc_free_space( cfs, cfs_calc_free_blocks( cfs));
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
+static imgtoolerr_t cybiko_image_read_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	cybiko_file_system *cfs = get_cfs(image);
 	UINT8 buffer[MAX_PAGE_SIZE];
 	UINT16 file_id, part_id = 0, old_part_id;
@@ -463,9 +463,9 @@ static imgtoolerr_t cybiko_image_read_file(imgtool::partition *partition, const 
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
+static imgtoolerr_t cybiko_image_write_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	cybiko_file_system *cfs = get_cfs(image);
 	UINT8 buffer[MAX_PAGE_SIZE];
 	UINT16 file_id, part_id = 0, free_blocks;
@@ -523,9 +523,9 @@ static imgtoolerr_t cybiko_image_write_file(imgtool::partition *partition, const
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_delete_file( imgtool::partition *partition, const char *filename)
+static imgtoolerr_t cybiko_image_delete_file(imgtool::partition &partition, const char *filename)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	cybiko_file_system *cfs = get_cfs(image);
 	UINT16 file_id;
 	// find file

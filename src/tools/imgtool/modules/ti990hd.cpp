@@ -397,11 +397,11 @@ static void ti990_image_info(imgtool::image &img, char *string, size_t len);
 static imgtoolerr_t ti990_image_beginenum(imgtool::directory *enumeration, const char *path);
 static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent);
 static void ti990_image_closeenum(imgtool::directory *enumeration);
-static imgtoolerr_t ti990_image_freespace(imgtool::partition *partition, UINT64 *size);
+static imgtoolerr_t ti990_image_freespace(imgtool::partition &partition, UINT64 *size);
 #ifdef UNUSED_FUNCTION
-static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const char *fpath, imgtool::stream *destf);
-static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions);
-static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const char *fpath);
+static imgtoolerr_t ti990_image_readfile(imgtool::partition &partition, const char *fpath, imgtool::stream *destf);
+static imgtoolerr_t ti990_image_writefile(imgtool::partition &partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions);
+static imgtoolerr_t ti990_image_deletefile(imgtool::partition &partition, const char *fpath);
 #endif
 static imgtoolerr_t ti990_image_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions);
 
@@ -1419,9 +1419,9 @@ static void ti990_image_closeenum(imgtool::directory *enumeration)
 /*
     Compute free space on disk image (in ADUs)
 */
-static imgtoolerr_t ti990_image_freespace(imgtool::partition *partition, UINT64 *size)
+static imgtoolerr_t ti990_image_freespace(imgtool::partition &partition, UINT64 *size)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	ti990_image *image = get_ti990_image(img);
 	int totadus = get_UINT16BE(image->sec0.tna);
 	int adu, record, sub_adu;
@@ -1459,7 +1459,7 @@ static imgtoolerr_t ti990_image_freespace(imgtool::partition *partition, UINT64 
 /*
     Extract a file from a ti990_image.
 */
-static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const char *fpath, imgtool::stream *destf)
+static imgtoolerr_t ti990_image_readfile(imgtool::partition &partition, const char *fpath, imgtool::stream *destf)
 {
 	imgtool::image *img = &partition->image();
 	ti990_image *image = get_ti990_image(img);
@@ -1556,7 +1556,7 @@ static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const ch
 /*
     Add a file to a ti990_image.
 */
-static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions)
+static imgtoolerr_t ti990_image_writefile(imgtool::partition &partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions)
 {
 	imgtool::image *img = &partition->image();
 	ti990_image *image = get_ti990_image(img);
@@ -1680,7 +1680,7 @@ static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const c
 /*
     Delete a file from a ti990_image.
 */
-static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const char *fpath)
+static imgtoolerr_t ti990_image_deletefile(imgtool::partition &partition, const char *fpath)
 {
 	imgtool::image *img = &partition->image();
 	ti990_image *image = get_ti990_image(img);

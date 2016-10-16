@@ -881,14 +881,14 @@ static imgtoolerr_t thom_list_partitions(imgtool::image &img,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_open_partition(imgtool::partition *part,
+static imgtoolerr_t thom_open_partition(imgtool::partition &part,
 					UINT64 first_block, UINT64 block_count)
 {
-	imgtool::image &img(part->image());
+	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
 	if ( first_block >= f->heads )
 	return IMGTOOLERR_INVALIDPARTITION;
-	* ( (int*) part->extra_bytes() ) = first_block;
+	* ( (int*) part.extra_bytes() ) = first_block;
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -904,9 +904,9 @@ static imgtoolerr_t thom_begin_enum(imgtool::directory *enumeration,
 static imgtoolerr_t thom_next_enum(imgtool::directory *enumeration,
 					imgtool_dirent *ent)
 {
-	imgtool::partition *part = &enumeration->partition();
-	int head = *( (int*) part->extra_bytes() );
-	imgtool::image &img(part->image());
+	imgtool::partition &part(enumeration->partition());
+	int head = *( (int*) part.extra_bytes() );
+	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
 	int* n = (int*) enumeration->extra_bytes();
 	thom_dirent d;
@@ -939,23 +939,23 @@ static imgtoolerr_t thom_next_enum(imgtool::directory *enumeration,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_free_space(imgtool::partition *part, UINT64 *size)
+static imgtoolerr_t thom_free_space(imgtool::partition &part, UINT64 *size)
 {
-	int head = *( (int*) part->extra_bytes() );
-	imgtool::image &img(part->image());
+	int head = *( (int*) part.extra_bytes() );
+	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
 	int nb = thom_get_free_blocks( f, head );
 	(*size) = nb * f->sectuse_size * 8;
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_read_file(imgtool::partition *part,
+static imgtoolerr_t thom_read_file(imgtool::partition &part,
 					const char *filename,
 					const char *fork,
 					imgtool::stream &destf)
 {
-	int head = *( (int*) part->extra_bytes() );
-	imgtool::image &img(part->image());
+	int head = *( (int*) part.extra_bytes() );
+	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
 	thom_dirent d;
 	char name[9], ext[4], fname[14];
@@ -973,11 +973,11 @@ static imgtoolerr_t thom_read_file(imgtool::partition *part,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_delete_file(imgtool::partition *part,
+static imgtoolerr_t thom_delete_file(imgtool::partition &part,
 						const char *filename)
 {
-	int head = *( (int*) part->extra_bytes() );
-	imgtool::image &img(part->image());
+	int head = *( (int*) part.extra_bytes() );
+	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
 	thom_dirent d;
 	char name[9], ext[4], fname[14];
@@ -994,14 +994,14 @@ static imgtoolerr_t thom_delete_file(imgtool::partition *part,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_write_file(imgtool::partition *part,
+static imgtoolerr_t thom_write_file(imgtool::partition &part,
 					const char *filename,
 					const char *fork,
 					imgtool::stream &sourcef,
 					util::option_resolution *opts)
 {
-	int head = *( (int*) part->extra_bytes() );
-	imgtool::image &img(part->image());
+	int head = *( (int*) part.extra_bytes() );
+	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
 	thom_dirent d;
 	int size = sourcef.size();
@@ -1078,13 +1078,13 @@ static imgtoolerr_t thom_write_file(imgtool::partition *part,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_suggest_transfer(imgtool::partition *part,
+static imgtoolerr_t thom_suggest_transfer(imgtool::partition &part,
 						const char *fname,
 						imgtool_transfer_suggestion *suggestions,
 						size_t suggestions_length)
 {
-	int head = *( (int*) part->extra_bytes() );
-	imgtool::image &img(part->image());
+	int head = *( (int*) part.extra_bytes() );
+	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
 	thom_dirent d;
 	int is_basic = 0;
@@ -1321,7 +1321,7 @@ static void thom_encrypt(imgtool::stream &out, imgtool::stream &in)
 	}
 }
 
-static imgtoolerr_t thomcrypt_read_file(imgtool::partition *part,
+static imgtoolerr_t thomcrypt_read_file(imgtool::partition &part,
 					const char *name,
 					const char *fork, imgtool::stream &dst)
 {
@@ -1356,7 +1356,7 @@ static imgtoolerr_t thomcrypt_read_file(imgtool::partition *part,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thomcrypt_write_file(imgtool::partition *part,
+static imgtoolerr_t thomcrypt_write_file(imgtool::partition &part,
 						const char *name,
 						const char *fork, imgtool::stream &src,
 						util::option_resolution *opts)
@@ -1404,7 +1404,7 @@ void filter_thomcrypt_getinfo(UINT32 state, union filterinfo *info)
 }
 
 /* untokenization automatically decrypt protected files */
-static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
+static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 						const char *name,
 						const char *fork,
 						imgtool::stream &dst,
@@ -1481,7 +1481,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition *part,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_basic_write_file(imgtool::partition *part,
+static imgtoolerr_t thom_basic_write_file(imgtool::partition &part,
 						const char *name,
 						const char *fork,
 						imgtool::stream &src,
@@ -1493,14 +1493,14 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition *part,
 
 
 #define FILTER(short,long)                      \
-	static imgtoolerr_t short##_read_file(imgtool::partition *part,  \
+	static imgtoolerr_t short##_read_file(imgtool::partition &part,  \
 					const char *name,       \
 					const char *fork,       \
 					imgtool::stream &dst)        \
 	{                                   \
 	return thom_basic_read_file( part, name, fork, dst, short );    \
 	}                                   \
-	static imgtoolerr_t short##_write_file(imgtool::partition *part, \
+	static imgtoolerr_t short##_write_file(imgtool::partition &part, \
 						const char *name,       \
 						const char *fork,       \
 						imgtool::stream &src,        \

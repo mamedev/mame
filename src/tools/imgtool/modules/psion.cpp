@@ -511,9 +511,9 @@ static void datapack_close_enum( imgtool::directory *enumeration)
 {
 }
 
-static imgtoolerr_t datapack_free_space( imgtool::partition *partition, UINT64 *size)
+static imgtoolerr_t datapack_free_space(imgtool::partition &partition, UINT64 *size)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	psion_pack *pack = get_psion_pack(image);
 	UINT32 pack_size = 0;
 
@@ -526,9 +526,9 @@ static imgtoolerr_t datapack_free_space( imgtool::partition *partition, UINT64 *
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
+static imgtoolerr_t datapack_read_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	psion_pack *pack = get_psion_pack(image);
 	int index = seek_file_name(pack, filename);
 
@@ -558,9 +558,9 @@ static imgtoolerr_t datapack_read_file(imgtool::partition *partition, const char
 		return IMGTOOLERR_FILENOTFOUND;
 }
 
-static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
+static imgtoolerr_t datapack_write_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	psion_pack *pack = get_psion_pack(image);
 	static const UINT8 data_head[4] = {0x02, 0x80, 0x00, 0x00};
 	UINT8 head[3];
@@ -620,9 +620,9 @@ static imgtoolerr_t datapack_write_file( imgtool::partition *partition, const ch
 		return IMGTOOLERR_CORRUPTIMAGE;
 }
 
-static imgtoolerr_t datapack_delete_file( imgtool::partition *partition, const char *filename)
+static imgtoolerr_t datapack_delete_file(imgtool::partition &partition, const char *filename)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	psion_pack *pack = get_psion_pack(image);
 	int index = seek_file_name(pack, filename);
 

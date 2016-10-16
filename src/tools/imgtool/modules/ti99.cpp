@@ -3864,11 +3864,11 @@ static imgtoolerr_t dsk_image_beginenum(imgtool::directory *enumeration, const c
 static imgtoolerr_t dsk_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent);
 static imgtoolerr_t win_image_beginenum(imgtool::directory *enumeration, const char *path);
 static imgtoolerr_t win_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent);
-static imgtoolerr_t ti99_image_freespace(imgtool::partition *partition, UINT64 *size);
-static imgtoolerr_t ti99_image_readfile(imgtool::partition *partition, const char *fpath, const char *fork, imgtool::stream &destf);
-static imgtoolerr_t ti99_image_writefile(imgtool::partition *partition, const char *fpath, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions);
-static imgtoolerr_t dsk_image_deletefile(imgtool::partition *partition, const char *fpath);
-static imgtoolerr_t win_image_deletefile(imgtool::partition *partition, const char *fpath);
+static imgtoolerr_t ti99_image_freespace(imgtool::partition &partition, UINT64 *size);
+static imgtoolerr_t ti99_image_readfile(imgtool::partition &partition, const char *fpath, const char *fork, imgtool::stream &destf);
+static imgtoolerr_t ti99_image_writefile(imgtool::partition &partition, const char *fpath, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions);
+static imgtoolerr_t dsk_image_deletefile(imgtool::partition &partition, const char *fpath);
+static imgtoolerr_t win_image_deletefile(imgtool::partition &partition, const char *fpath);
 static imgtoolerr_t dsk_image_create_mess(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions);
 static imgtoolerr_t dsk_image_create_v9t9(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions);
 
@@ -4483,9 +4483,9 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory *enumeration, imgtool_
 /*
     Compute free space on disk image (in AUs)
 */
-static imgtoolerr_t ti99_image_freespace(imgtool::partition *partition, UINT64 *size)
+static imgtoolerr_t ti99_image_freespace(imgtool::partition &partition, UINT64 *size)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	struct ti99_lvl2_imgref *image = get_lvl2_imgref(img);
 	size_t freeAUs;
 	int i;
@@ -4507,9 +4507,9 @@ static imgtoolerr_t ti99_image_freespace(imgtool::partition *partition, UINT64 *
 /*
     Extract a file from a ti99_image.  The file is saved in tifile format.
 */
-static imgtoolerr_t ti99_image_readfile(imgtool::partition *partition, const char *fpath, const char *fork, imgtool::stream &destf)
+static imgtoolerr_t ti99_image_readfile(imgtool::partition &partition, const char *fpath, const char *fork, imgtool::stream &destf)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 #if 1
 
 	/* extract data as TIFILES */
@@ -4649,9 +4649,9 @@ static imgtoolerr_t ti99_image_readfile(imgtool::partition *partition, const cha
 /*
     Add a file to a ti99_image.  The file must be in tifile format.
 */
-static imgtoolerr_t ti99_image_writefile(imgtool::partition *partition, const char *fpath, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions)
+static imgtoolerr_t ti99_image_writefile(imgtool::partition &partition, const char *fpath, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	struct ti99_lvl2_imgref *image = get_lvl2_imgref(img);
 	const char *filename;
 	char ti_fname[10];
@@ -4875,9 +4875,9 @@ static imgtoolerr_t ti99_image_writefile(imgtool::partition *partition, const ch
 /*
     Delete a file from a ti99_image.
 */
-static imgtoolerr_t dsk_image_deletefile(imgtool::partition *partition, const char *fpath)
+static imgtoolerr_t dsk_image_deletefile(imgtool::partition &partition, const char *fpath)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	struct ti99_lvl2_imgref *image = get_lvl2_imgref(img);
 	dsk_fdr fdr;
 	int i, cluster_index;
@@ -5017,9 +5017,9 @@ static imgtoolerr_t dsk_image_deletefile(imgtool::partition *partition, const ch
 	return (imgtoolerr_t)0;
 }
 
-static imgtoolerr_t win_image_deletefile(imgtool::partition *partition, const char *fpath)
+static imgtoolerr_t win_image_deletefile(imgtool::partition &partition, const char *fpath)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	struct ti99_lvl2_imgref *image = get_lvl2_imgref(img);
 	int parent_ddr_AU, is_dir, catalog_index;
 	win_fdr fdr;
