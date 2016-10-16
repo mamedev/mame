@@ -971,9 +971,9 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory *enumeration, imgt
 
 
 
-static imgtoolerr_t os9_diskimage_freespace(imgtool::partition *partition, UINT64 *size)
+static imgtoolerr_t os9_diskimage_freespace(imgtool::partition &partition, UINT64 *size)
 {
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	const os9_diskinfo *disk_info;
 	UINT32 free_lsns;
 
@@ -986,10 +986,10 @@ static imgtoolerr_t os9_diskimage_freespace(imgtool::partition *partition, UINT6
 
 
 
-static imgtoolerr_t os9_diskimage_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
+static imgtoolerr_t os9_diskimage_readfile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	const os9_diskinfo *disk_info;
 	struct os9_fileinfo file_info;
 	UINT8 buffer[256];
@@ -1024,10 +1024,10 @@ static imgtoolerr_t os9_diskimage_readfile(imgtool::partition *partition, const 
 
 
 
-static imgtoolerr_t os9_diskimage_writefile(imgtool::partition *partition, const char *path, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
+static imgtoolerr_t os9_diskimage_writefile(imgtool::partition &partition, const char *path, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	struct os9_fileinfo file_info;
 	size_t write_size;
 	dynamic_buffer buf;
@@ -1079,11 +1079,11 @@ done:
 
 
 
-static imgtoolerr_t os9_diskimage_delete(imgtool::partition *partition, const char *path,
+static imgtoolerr_t os9_diskimage_delete(imgtool::partition &partition, const char *path,
 	unsigned int delete_directory)
 {
 	imgtoolerr_t err;
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	struct os9_fileinfo file_info;
 	UINT32 dirent_lsn, dirent_index;
 	UINT32 entry_lsn, entry_index;
@@ -1160,17 +1160,17 @@ static imgtoolerr_t os9_diskimage_delete(imgtool::partition *partition, const ch
 
 
 
-static imgtoolerr_t os9_diskimage_deletefile(imgtool::partition *partition, const char *path)
+static imgtoolerr_t os9_diskimage_deletefile(imgtool::partition &partition, const char *path)
 {
 	return os9_diskimage_delete(partition, path, 0);
 }
 
 
 
-static imgtoolerr_t os9_diskimage_createdir(imgtool::partition *partition, const char *path)
+static imgtoolerr_t os9_diskimage_createdir(imgtool::partition &partition, const char *path)
 {
 	imgtoolerr_t err;
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	struct os9_fileinfo file_info;
 	UINT8 dir_data[64];
 	UINT32 parent_lsn;
@@ -1200,7 +1200,7 @@ done:
 
 
 
-static imgtoolerr_t os9_diskimage_deletedir(imgtool::partition *partition, const char *path)
+static imgtoolerr_t os9_diskimage_deletedir(imgtool::partition &partition, const char *path)
 {
 	return os9_diskimage_delete(partition, path, 1);
 }

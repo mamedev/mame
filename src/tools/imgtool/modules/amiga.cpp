@@ -2035,10 +2035,10 @@ static void amiga_image_closeenum(imgtool::directory *enumeration)
 }
 
 
-static imgtoolerr_t amiga_image_freespace(imgtool::partition *partition, UINT64 *size)
+static imgtoolerr_t amiga_image_freespace(imgtool::partition &partition, UINT64 *size)
 {
 	imgtoolerr_t ret;
-	imgtool::image &image(partition->image());
+	imgtool::image &image(partition.image());
 	const int data_size = is_ffs(image) ? BSIZE : BSIZE-24;
 	root_block root;
 	bitmap_block bm;
@@ -2089,9 +2089,9 @@ static imgtoolerr_t amiga_image_freespace(imgtool::partition *partition, UINT64 
 }
 
 
-static imgtoolerr_t amiga_image_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
+static imgtoolerr_t amiga_image_readfile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	imgtoolerr_t ret;
 	file_block file;
 	int filesize, block;
@@ -2126,9 +2126,9 @@ static imgtoolerr_t amiga_image_readfile(imgtool::partition *partition, const ch
  * the Directory block (or from the same-hash-value list) and the bitmap is
  * updated. File header block, Data blocks and File extension blocks are not
  * cleared, but the bitmap blocks are updated. */
-static imgtoolerr_t amiga_image_deletefile(imgtool::partition *partition, const char *fname)
+static imgtoolerr_t amiga_image_deletefile(imgtool::partition &partition, const char *fname)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	imgtoolerr_t ret;
 	int parent, block;
 	char filename[31];
@@ -2199,7 +2199,7 @@ static imgtoolerr_t amiga_image_deletefile(imgtool::partition *partition, const 
 }
 
 
-static imgtoolerr_t amiga_image_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
+static imgtoolerr_t amiga_image_writefile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
 }
@@ -2311,9 +2311,9 @@ static imgtoolerr_t amiga_image_create(imgtool::image &img, imgtool::stream::ptr
 }
 
 
-static imgtoolerr_t amiga_image_createdir(imgtool::partition *partition, const char *path)
+static imgtoolerr_t amiga_image_createdir(imgtool::partition &partition, const char *path)
 {
-	imgtool::image &img(partition->image());
+	imgtool::image &img(partition.image());
 	imgtoolerr_t ret;
 
 	/* Create directories */
@@ -2328,25 +2328,25 @@ static imgtoolerr_t amiga_image_createdir(imgtool::partition *partition, const c
 }
 
 
-static imgtoolerr_t amiga_image_getattrs(imgtool::partition *partition, const char *path, const UINT32 *attrs, imgtool_attribute *values)
+static imgtoolerr_t amiga_image_getattrs(imgtool::partition &partition, const char *path, const UINT32 *attrs, imgtool_attribute *values)
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
 }
 
 
-static imgtoolerr_t amiga_image_setattrs(imgtool::partition *partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values)
+static imgtoolerr_t amiga_image_setattrs(imgtool::partition &partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values)
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
 }
 
 
-static imgtoolerr_t amiga_image_geticoninfo(imgtool::partition *partition, const char *path, imgtool_iconinfo *iconinfo)
+static imgtoolerr_t amiga_image_geticoninfo(imgtool::partition &partition, const char *path, imgtool_iconinfo *iconinfo)
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
 }
 
 
-static imgtoolerr_t amiga_image_suggesttransfer(imgtool::partition *partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t amiga_image_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
 }

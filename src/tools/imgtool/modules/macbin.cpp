@@ -63,7 +63,7 @@ static UINT32 pad128(UINT32 length)
 
 
 
-static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
+static imgtoolerr_t macbinary_readfile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	static const UINT32 attrs[] =
 	{
@@ -101,7 +101,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 	imgtool_attribute attr_values[10];
 
 	/* get the forks */
-	err = partition->list_file_forks(filename, fork_entries, sizeof(fork_entries));
+	err = partition.list_file_forks(filename, fork_entries, sizeof(fork_entries));
 	if (err)
 		return err;
 	for (i = 0; fork_entries[i].type != FORK_END; i++)
@@ -113,7 +113,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 	}
 
 	/* get the attributes */
-	err = partition->get_file_attributes(filename, attrs, attr_values);
+	err = partition.get_file_attributes(filename, attrs, attr_values);
 	if (err && (ERRORCODE(err) != IMGTOOLERR_UNIMPLEMENTED))
 		return err;
 	if (err == IMGTOOLERR_SUCCESS)
@@ -160,7 +160,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 
 	if (data_fork)
 	{
-		err = partition->read_file(filename, "", destf, NULL);
+		err = partition.read_file(filename, "", destf, NULL);
 		if (err)
 			return err;
 
@@ -169,7 +169,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 
 	if (resource_fork)
 	{
-		err = partition->read_file(filename, "RESOURCE_FORK", destf, NULL);
+		err = partition.read_file(filename, "RESOURCE_FORK", destf, NULL);
 		if (err)
 			return err;
 
@@ -181,7 +181,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition *partition, const char
 
 
 
-static imgtoolerr_t write_fork(imgtool::partition *partition, const char *filename, const char *fork,
+static imgtoolerr_t write_fork(imgtool::partition &partition, const char *filename, const char *fork,
 	imgtool::stream &sourcef, UINT64 pos, UINT64 fork_len, util::option_resolution *opts)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
@@ -203,7 +203,7 @@ static imgtoolerr_t write_fork(imgtool::partition *partition, const char *filena
 			mem_stream->fill(0, fork_len);
 
 		mem_stream->seek(0, SEEK_SET);
-		err = partition->write_file(filename, fork, *mem_stream, opts, NULL);
+		err = partition.write_file(filename, fork, *mem_stream, opts, NULL);
 		if (err)
 			goto done;
 	}
@@ -216,7 +216,7 @@ done:
 
 
 
-static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
+static imgtoolerr_t macbinary_writefile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	static const UINT32 attrs[] =
 	{
@@ -233,7 +233,7 @@ static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const cha
 		0
 	};
 	imgtoolerr_t err;
-	imgtool::image *image = &partition->image();
+	imgtool::image *image = &partition.image();
 	UINT8 header[128];
 	UINT32 datafork_size;
 	UINT32 resourcefork_size;
@@ -332,7 +332,7 @@ static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const cha
 		attr_values[8].i = script_code;
 		attr_values[9].i = extended_flags;
 
-		err = partition->put_file_attributes(filename, attrs, attr_values);
+		err = partition.put_file_attributes(filename, attrs, attr_values);
 		if (err)
 			return err;
 	}
@@ -341,7 +341,8 @@ static imgtoolerr_t macbinary_writefile(imgtool::partition *partition, const cha
 }
 
 
-
+// this was completely broken - it was calling macbinary_writefile() with a nullptr partition
+#if 0
 static imgtoolerr_t macbinary_checkstream(imgtool::stream &stream, imgtool_suggestion_viability_t *viability)
 {
 	imgtoolerr_t err;
@@ -360,6 +361,7 @@ static imgtoolerr_t macbinary_checkstream(imgtool::stream &stream, imgtool_sugge
 	}
 	return err;
 }
+#endif
 
 
 
@@ -372,6 +374,6 @@ void filter_macbinary_getinfo(UINT32 state, union filterinfo *info)
 		case FILTINFO_STR_EXTENSION:    info->s = "bin"; break;
 		case FILTINFO_PTR_READFILE:     info->read_file = macbinary_readfile; break;
 		case FILTINFO_PTR_WRITEFILE:    info->write_file = macbinary_writefile; break;
-		case FILTINFO_PTR_CHECKSTREAM:  info->check_stream = macbinary_checkstream; break;
+		//case FILTINFO_PTR_CHECKSTREAM:  info->check_stream = macbinary_checkstream; break;
 	}
 }
