@@ -50,6 +50,11 @@ enum
 
 #define FILE_HEADER_SIZE  0x48
 
+static cybiko_file_system *get_cfs(imgtool::image &image)
+{
+	return (cybiko_file_system*)image.extra_bytes();
+}
+
 // 2208988800 is the number of seconds between 1900/01/01 and 1970/01/01
 
 static time_t time_crack( UINT32 cfs_time)
@@ -319,9 +324,9 @@ static UINT32 cfs_calc_free_space( cybiko_file_system *cfs, UINT16 blocks)
 	return free_space;
 }
 
-static imgtoolerr_t cybiko_image_open(imgtool::image *image, imgtool::stream::ptr &&stream)
+static imgtoolerr_t cybiko_image_open(imgtool::image &image, imgtool::stream::ptr &&stream)
 {
-	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
+	cybiko_file_system *cfs = get_cfs(image);
 	// init
 	if (!cfs_init(*cfs, std::move(stream))) return IMGTOOLERR_CORRUPTIMAGE;
 	// verify
@@ -330,15 +335,15 @@ static imgtoolerr_t cybiko_image_open(imgtool::image *image, imgtool::stream::pt
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void cybiko_image_close(imgtool::image *image)
+static void cybiko_image_close(imgtool::image &image)
 {
-	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
+	cybiko_file_system *cfs = get_cfs(image);
 	delete cfs->stream;
 }
 
-static imgtoolerr_t cybiko_image_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
+static imgtoolerr_t cybiko_image_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
-	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
+	cybiko_file_system *cfs = get_cfs(image);
 	// init
 	if (!cfs_init(*cfs, std::move(stream))) return IMGTOOLERR_CORRUPTIMAGE;
 	// format
@@ -356,8 +361,8 @@ static imgtoolerr_t cybiko_image_begin_enum( imgtool::directory *enumeration, co
 
 static imgtoolerr_t cybiko_image_next_enum( imgtool::directory *enumeration, imgtool_dirent *ent)
 {
-	imgtool::image *image = &enumeration->image();
-	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
+	imgtool::image &image(enumeration->image());
+	cybiko_file_system *cfs = get_cfs(image);
 	cybiko_iter *iter = (cybiko_iter*)enumeration->extra_bytes();
 	UINT8 buffer[MAX_PAGE_SIZE];
 	UINT16 file_id = INVALID_FILE_ID;
@@ -395,16 +400,16 @@ static void cybiko_image_close_enum( imgtool::directory *enumeration)
 
 static imgtoolerr_t cybiko_image_free_space( imgtool::partition *partition, UINT64 *size)
 {
-	imgtool::image *image = &partition->image();
-	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
+	imgtool::image &image(partition->image());
+	cybiko_file_system *cfs = get_cfs(image);
 	if (size) *size = cfs_calc_free_space( cfs, cfs_calc_free_blocks( cfs));
 	return IMGTOOLERR_SUCCESS;
 }
 
 static imgtoolerr_t cybiko_image_read_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
-	imgtool::image *image = &partition->image();
-	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
+	imgtool::image &image(partition->image());
+	cybiko_file_system *cfs = get_cfs(image);
 	UINT8 buffer[MAX_PAGE_SIZE];
 	UINT16 file_id, part_id = 0, old_part_id;
 	int i;
@@ -432,8 +437,8 @@ static imgtoolerr_t cybiko_image_read_file(imgtool::partition *partition, const 
 
 static imgtoolerr_t cybiko_image_write_file(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	imgtool::image *image = &partition->image();
-	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
+	imgtool::image &image(partition->image());
+	cybiko_file_system *cfs = get_cfs(image);
 	UINT8 buffer[MAX_PAGE_SIZE];
 	UINT16 file_id, part_id = 0, free_blocks;
 	UINT64 bytes_left;
@@ -495,8 +500,8 @@ static imgtoolerr_t cybiko_image_write_file(imgtool::partition *partition, const
 
 static imgtoolerr_t cybiko_image_delete_file( imgtool::partition *partition, const char *filename)
 {
-	imgtool::image *image = &partition->image();
-	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
+	imgtool::image &image(partition->image());
+	cybiko_file_system *cfs = get_cfs(image);
 	UINT16 file_id;
 	// check filename
 	if (strlen(filename) > 58) return IMGTOOLERR_BADFILENAME;

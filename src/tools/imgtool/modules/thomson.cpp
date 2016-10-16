@@ -167,6 +167,11 @@ static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
 					unsigned track, unsigned sector);
 
 
+static thom_floppy *get_thom_floppy(imgtool::image &image)
+{
+	return (thom_floppy*)image.extra_bytes();
+}
+
 /*********************** .fd / .qd format ************************/
 
 /* .fd and .qd formats are very simple: the sectors are simply put one after
@@ -177,9 +182,9 @@ static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
    (.fd have 40 or 80 tracks, .qd have 25 tracks) and the file size.
 */
 
-static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool::stream::ptr &&stream)
+static imgtoolerr_t thom_open_fd_qd(imgtool::image &img, imgtool::stream::ptr &&stream)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 	int size = stream->size();
 
 	f->stream = stream.get();
@@ -246,9 +251,9 @@ static imgtoolerr_t thom_open_fd_qd(imgtool::image *img, imgtool::stream::ptr &&
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void thom_close_fd_qd(imgtool::image *img)
+static void thom_close_fd_qd(imgtool::image &img)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 
 	/* save image */
 	if ( f->modified ) {
@@ -309,9 +314,9 @@ static UINT16 thom_sap_crc( UINT8* data, int size )
 	return crc;
 }
 
-static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream::ptr &&stream)
+static imgtoolerr_t thom_open_sap(imgtool::image &img, imgtool::stream::ptr &&stream)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 	UINT8 buf[262];
 
 	f->stream = stream.get();
@@ -375,9 +380,9 @@ static imgtoolerr_t thom_open_sap(imgtool::image *img, imgtool::stream::ptr &&st
 	return IMGTOOLERR_SUCCESS;
 }
 
-static void thom_close_sap(imgtool::image *img)
+static void thom_close_sap(imgtool::image &img)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 
 	if ( f->modified ) {
 	int i, sector, track;
@@ -803,20 +808,20 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 
 /********************** module functions ***********************/
 
-static imgtoolerr_t thom_get_geometry(imgtool::image* img, UINT32* tracks,
+static imgtoolerr_t thom_get_geometry(imgtool::image &img, UINT32* tracks,
 						UINT32* heads, UINT32* sectors)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 	if ( tracks ) *tracks = f->tracks;
 	if ( heads ) *heads = f->heads;
 	if ( sectors ) *sectors = 16;
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_read_sector(imgtool::image* img, UINT32 track,
+static imgtoolerr_t thom_read_sector(imgtool::image &img, UINT32 track,
 						UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 	if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks )
 		return IMGTOOLERR_SEEKERROR;
 
@@ -828,11 +833,11 @@ static imgtoolerr_t thom_read_sector(imgtool::image* img, UINT32 track,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_write_sector(imgtool::image *img, UINT32 track,
+static imgtoolerr_t thom_write_sector(imgtool::image &img, UINT32 track,
 						UINT32 head, UINT32 sector,
 						const void *buf, size_t len, int ddam)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 	if ( f->stream->is_read_only() ) return IMGTOOLERR_WRITEERROR;
 	if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks )
 	return IMGTOOLERR_SEEKERROR;
@@ -845,9 +850,9 @@ static imgtoolerr_t thom_write_sector(imgtool::image *img, UINT32 track,
 /* returns floopy name */
 /* actually, each side has its own name, but we only return the one on side 0.
  */
-static void thom_info(imgtool::image *img, char *string, size_t len)
+static void thom_info(imgtool::image &img, char *string, size_t len)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 	UINT8* base = thom_get_sector( f, 0, 20, 1 );
 	char buf[9];
 	memcpy( buf, base, 8 );
@@ -858,11 +863,11 @@ static void thom_info(imgtool::image *img, char *string, size_t len)
 
 /* each side of a floppy has its own filesystem, we treat them as'partitions'
  */
-static imgtoolerr_t thom_list_partitions(imgtool::image *img,
+static imgtoolerr_t thom_list_partitions(imgtool::image &img,
 						imgtool_partition_info *partitions,
 						size_t len)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 	if ( len >= 1 ) {
 	partitions[0].get_info = thom_basic_get_info;
 	partitions[0].base_block = 0;
@@ -879,8 +884,8 @@ static imgtoolerr_t thom_list_partitions(imgtool::image *img,
 static imgtoolerr_t thom_open_partition(imgtool::partition *part,
 					UINT64 first_block, UINT64 block_count)
 {
-	imgtool::image* img = &part->image();
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	imgtool::image &img(part->image());
+	thom_floppy* f = get_thom_floppy(img);
 	if ( first_block >= f->heads )
 	return IMGTOOLERR_INVALIDPARTITION;
 	* ( (int*) part->extra_bytes() ) = first_block;
@@ -901,8 +906,8 @@ static imgtoolerr_t thom_next_enum(imgtool::directory *enumeration,
 {
 	imgtool::partition *part = &enumeration->partition();
 	int head = *( (int*) part->extra_bytes() );
-	imgtool::image* img = &part->image();
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	imgtool::image &img(part->image());
+	thom_floppy* f = get_thom_floppy(img);
 	int* n = (int*) enumeration->extra_bytes();
 	thom_dirent d;
 
@@ -937,8 +942,8 @@ static imgtoolerr_t thom_next_enum(imgtool::directory *enumeration,
 static imgtoolerr_t thom_free_space(imgtool::partition *part, UINT64 *size)
 {
 	int head = *( (int*) part->extra_bytes() );
-	imgtool::image* img = &part->image();
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	imgtool::image &img(part->image());
+	thom_floppy* f = get_thom_floppy(img);
 	int nb = thom_get_free_blocks( f, head );
 	(*size) = nb * f->sectuse_size * 8;
 	return IMGTOOLERR_SUCCESS;
@@ -950,8 +955,8 @@ static imgtoolerr_t thom_read_file(imgtool::partition *part,
 					imgtool::stream &destf)
 {
 	int head = *( (int*) part->extra_bytes() );
-	imgtool::image* img = &part->image();
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	imgtool::image &img(part->image());
+	thom_floppy* f = get_thom_floppy(img);
 	thom_dirent d;
 	char name[9], ext[4], fname[14];
 	int size;
@@ -972,8 +977,8 @@ static imgtoolerr_t thom_delete_file(imgtool::partition *part,
 						const char *filename)
 {
 	int head = *( (int*) part->extra_bytes() );
-	imgtool::image* img = &part->image();
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	imgtool::image &img(part->image());
+	thom_floppy* f = get_thom_floppy(img);
 	thom_dirent d;
 	char name[9], ext[4], fname[14];
 
@@ -996,8 +1001,8 @@ static imgtoolerr_t thom_write_file(imgtool::partition *part,
 					util::option_resolution *opts)
 {
 	int head = *( (int*) part->extra_bytes() );
-	imgtool::image* img = &part->image();
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	imgtool::image &img(part->image());
+	thom_floppy* f = get_thom_floppy(img);
 	thom_dirent d;
 	int size = sourcef.size();
 	int blocks = thom_get_free_blocks( f, head );
@@ -1079,8 +1084,8 @@ static imgtoolerr_t thom_suggest_transfer(imgtool::partition *part,
 						size_t suggestions_length)
 {
 	int head = *( (int*) part->extra_bytes() );
-	imgtool::image* img = &part->image();
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	imgtool::image &img(part->image());
+	thom_floppy* f = get_thom_floppy(img);
 	thom_dirent d;
 	int is_basic = 0;
 
@@ -1116,11 +1121,11 @@ static imgtoolerr_t thom_suggest_transfer(imgtool::partition *part,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_create(imgtool::image* img,
+static imgtoolerr_t thom_create(imgtool::image &img,
 				imgtool::stream::ptr &&stream,
 				util::option_resolution *opts)
 {
-	thom_floppy* f = (thom_floppy*) img->extra_bytes();
+	thom_floppy* f = get_thom_floppy(img);
 	int i;
 	UINT8* buf;
 	const char* name;

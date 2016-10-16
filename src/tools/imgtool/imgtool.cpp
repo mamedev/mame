@@ -382,7 +382,7 @@ imgtoolerr_t imgtool::image::get_geometry(UINT32 *tracks, UINT32 *heads, UINT32 
 	if (!module().get_geometry)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().get_geometry(this, tracks, heads, sectors);
+	return module().get_geometry(*this, tracks, heads, sectors);
 }
 
 
@@ -398,7 +398,7 @@ imgtoolerr_t imgtool::image::read_sector(UINT32 track, UINT32 head,
 	if (!module().read_sector)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().read_sector(this, track, head, sector, buffer);
+	return module().read_sector(*this, track, head, sector, buffer);
 }
 
 
@@ -414,7 +414,7 @@ imgtoolerr_t imgtool::image::write_sector(UINT32 track, UINT32 head,
 	if (!module().write_sector)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().write_sector(this, track, head, sector, buffer, len);
+	return module().write_sector(*this, track, head, sector, buffer, len);
 }
 
 
@@ -445,7 +445,7 @@ imgtoolerr_t imgtool::image::read_block(UINT64 block, void *buffer)
 	if (!module().read_block)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().read_block(this, buffer, block);
+	return module().read_block(*this, buffer, block);
 }
 
 
@@ -459,7 +459,7 @@ imgtoolerr_t imgtool::image::write_block(UINT64 block, const void *buffer)
 	if (!module().write_block)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().write_block(this, buffer, block);
+	return module().write_block(*this, buffer, block);
 }
 
 
@@ -507,7 +507,7 @@ imgtoolerr_t imgtool::image::list_partitions(imgtool_partition_info *partitions,
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
 	memset(partitions, '\0', sizeof(*partitions) * len);
-	return module().list_partitions(this, partitions, len);
+	return module().list_partitions(*this, partitions, len);
 }
 
 
@@ -635,7 +635,7 @@ imgtoolerr_t imgtool::partition::open(imgtool::image &image, int partition_index
 
 		// retrieve the info on the partitions
 		memset(partition_info, '\0', sizeof(partition_info));
-		err = image.module().list_partitions(&image, partition_info, ARRAY_LENGTH(partition_info));
+		err = image.module().list_partitions(image, partition_info, ARRAY_LENGTH(partition_info));
 		if (err)
 			return err;
 
@@ -951,8 +951,8 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 
 	// actually call create or open
 	err = (read_or_write == OSD_FOPEN_RW_CREATE)
-		? module->create(image.get(), std::move(stream), createopts)
-		: module->open(image.get(), std::move(stream));
+		? module->create(*image, std::move(stream), createopts)
+		: module->open(*image, std::move(stream));
 	if (err)
 	{
 		err = markerrorsource(err);
@@ -1018,7 +1018,7 @@ imgtool::image::image(const imgtool_module &module, object_pool *pool, void *ext
 imgtool::image::~image()
 {
 	if (m_okay_to_close && module().close)
-		module().close(this);
+		module().close(*this);
 	pool_free_lib(m_pool);
 }
 
@@ -1097,7 +1097,7 @@ imgtoolerr_t imgtool::image::info(char *string, size_t len)
 	{
 		string[0] = '\0';
 		if (module().info)
-			module().info(this, string, len);
+			module().info(*this, string, len);
 	}
 	return IMGTOOLERR_SUCCESS;
 }
