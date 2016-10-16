@@ -231,7 +231,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-078200 2"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="3 ninjas kick back (usa)" sha1=""/>
+				<disk name="3 ninjas kick back (usa)" sha1="7dfca4e3bfad7b8e6f98b24651970409fd0d7d6f"/>
 			</diskarea>
 		</part>
 	</software>
