@@ -1096,9 +1096,15 @@ void es5505_device::generate_samples(INT32 **outputs, int offset, int samples)
 		es550x_voice *voice = &m_voice[v];
 		UINT16 *base = m_region_base[voice->control >> 14];
 
+// This special case does not appear to match the behaviour observed in the es5505 in
+// actual Ensoniq synthesizers: those, it turns out, do set loop start and end to the
+// same value, and expect the voice to keep running. Examples can be found among the
+// transwaves on the VFX / SD-1 series of synthesizers.
+#if 0
 		/* special case: if end == start, stop the voice */
 		if (voice->start == voice->end)
 			voice->control |= CONTROL_STOP0;
+#endif
 
 		int voice_channel = (voice->control & CONTROL_CAMASK) >> 10;
 		int channel = voice_channel % m_channels;
@@ -2163,6 +2169,16 @@ inline UINT16 es5505_device::reg_read_test(es550x_voice *voice, offs_t offset)
 		case 0x09:  /* PAR */
 			if (!m_read_port_cb.isnull())
 				result = m_read_port_cb(0);
+			break;
+
+		/* The following are global, and thus accessible form all pages */
+		case 0x0d:  /* ACT */
+			result = m_active_voices;
+			break;
+
+		case 0x0e:  /* IRQV */
+			result = m_irqv;
+			update_internal_irq_state();
 			break;
 
 		case 0x0f:  /* PAGE */
