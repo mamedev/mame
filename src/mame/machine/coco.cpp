@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco.c
+    coco.cpp
 
     TRS-80 Radio Shack Color Computer Family
 
@@ -92,7 +92,10 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_vhd_0(*this, VHD0_TAG),
 	m_vhd_1(*this, VHD1_TAG),
 	m_beckerport(*this, DWSOCK_TAG),
-	m_beckerportconfig(*this, BECKERPORT_TAG)
+	m_beckerportconfig(*this, BECKERPORT_TAG),
+	m_keyboard(*this, "row%u", 0),
+	m_joystick_type_control(*this, CTRL_SEL_TAG),
+	m_joystick_hires_control(*this, HIRES_INTF_TAG)
 {
 }
 
@@ -121,14 +124,6 @@ void coco_state::device_start()
 	/* call base device_start */
 	driver_device::device_start();
 
-	/* look up keyboard ports */
-	for (int i = 0; i < ARRAY_LENGTH(m_keyboard); i++)
-	{
-		char name[32];
-		snprintf(name, ARRAY_LENGTH(name), "row%d", i);
-		m_keyboard[i] =  ioport(name);
-	}
-
 	/* look up analog ports */
 	analog_port_start(&m_joystick, JOYSTICK_RX_TAG, JOYSTICK_RY_TAG,
 		JOYSTICK_LX_TAG, JOYSTICK_LY_TAG, JOYSTICK_BUTTONS_TAG);
@@ -136,10 +131,6 @@ void coco_state::device_start()
 		RAT_MOUSE_LX_TAG, RAT_MOUSE_LY_TAG, RAT_MOUSE_BUTTONS_TAG);
 	analog_port_start(&m_diecom_lightgun, DIECOM_LIGHTGUN_RX_TAG, DIECOM_LIGHTGUN_RY_TAG,
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
-
-	/* look up miscellaneous controls */
-	m_joystick_type_control =  ioport(CTRL_SEL_TAG);
-	m_joystick_hires_control =  ioport(HIRES_INTF_TAG);
 
 	/* timers */
 	m_hiresjoy_transition_timer[0] = timer_alloc(TIMER_HIRES_JOYSTICK_X);
@@ -723,7 +714,7 @@ void coco_state::update_sound(void)
 coco_state::joystick_type_t coco_state::joystick_type(int index)
 {
 	assert((index == 0) || (index == 1));
-	return (m_joystick_type_control != nullptr)
+	return m_joystick_type_control
 		? (joystick_type_t) ((m_joystick_type_control->read() >> (index * 4)) & 0x0F)
 		: JOYSTICK_NONE;
 }
@@ -736,7 +727,7 @@ coco_state::joystick_type_t coco_state::joystick_type(int index)
 
 coco_state::hires_type_t coco_state::hires_interface_type(void)
 {
-	return (m_joystick_hires_control != nullptr)
+	return m_joystick_hires_control
 		? (hires_type_t) m_joystick_hires_control->read()
 		: HIRES_NONE;
 }
@@ -866,7 +857,7 @@ void coco_state::poll_keyboard(void)
 	UINT8 pia0_pa_z = 0x7F;
 
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
-	for (int i = 0; i < ARRAY_LENGTH(m_keyboard); i++)
+	for (unsigned i = 0; i < m_keyboard.size(); i++)
 	{
 		int value = m_keyboard[i]->read();
 		if ((value | pia0_pb) != 0xFF)
