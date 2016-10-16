@@ -2008,7 +2008,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-073600 1"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mickey mania - timeless adventures of mickey mouse (usa)" sha1="fe66ef3cd4429671d5a50b7f95271542af7e138cm"/>
+				<disk name="mickey mania - timeless adventures of mickey mouse (usa)" sha1="fe66ef3cd4429671d5a50b7f95271542af7e138c"/>
 			</diskarea>
 		</part>
 	</software>
