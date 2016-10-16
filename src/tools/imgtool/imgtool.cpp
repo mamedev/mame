@@ -896,7 +896,7 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	int read_or_write, util::option_resolution *createopts, imgtool::image::ptr &outimg)
 {
 	imgtoolerr_t err;
-	imgtool::stream *f = nullptr;
+	imgtool::stream::ptr stream;
 	imgtool::image::ptr image;
 	object_pool *pool = nullptr;
 	void *extra_bytes = nullptr;
@@ -919,8 +919,8 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	}
 
 	// open the stream
-	f = imgtool::stream::open(fname, read_or_write);
-	if (!f)
+	stream = imgtool::stream::ptr(imgtool::stream::open(fname, read_or_write));
+	if (!stream)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_IMAGEFILE);
 		goto done;
@@ -951,8 +951,8 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 
 	// actually call create or open
 	err = (read_or_write == OSD_FOPEN_RW_CREATE)
-		? module->create(image.get(), f, createopts)
-		: module->open(image.get(), f);
+		? module->create(image.get(), std::move(stream), createopts)
+		: module->open(image.get(), std::move(stream));
 	if (err)
 	{
 		err = markerrorsource(err);
@@ -965,9 +965,6 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	outimg = std::move(image);
 
 done:
-	if (err && f)
-		delete f;
-
 	if (pool)
 		pool_free_lib(pool);
 	return err;

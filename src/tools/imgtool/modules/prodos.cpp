@@ -502,7 +502,7 @@ static imgtoolerr_t prodos_diskimage_open(imgtool::image *image)
 
 
 
-static imgtoolerr_t prodos_diskimage_open_525(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t prodos_diskimage_open_525(imgtool::image *image, imgtool::stream::ptr &&dummy)
 {
 	prodos_setprocs_525(image);
 	return prodos_diskimage_open(image);
@@ -510,7 +510,7 @@ static imgtoolerr_t prodos_diskimage_open_525(imgtool::image *image, imgtool::st
 
 
 
-static imgtoolerr_t prodos_diskimage_open_35(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t prodos_diskimage_open_35(imgtool::image *image, imgtool::stream::ptr &&dummy)
 {
 	prodos_setprocs_35(image);
 	return prodos_diskimage_open(image);
@@ -702,7 +702,7 @@ static imgtoolerr_t prodos_diskimage_create(imgtool::image *image, util::option_
 
 
 
-static imgtoolerr_t prodos_diskimage_create_525(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_create_525(imgtool::image *image, imgtool::stream::ptr &&dummy, util::option_resolution *opts)
 {
 	prodos_setprocs_525(image);
 	return prodos_diskimage_create(image, opts);
@@ -710,7 +710,7 @@ static imgtoolerr_t prodos_diskimage_create_525(imgtool::image *image, imgtool::
 
 
 
-static imgtoolerr_t prodos_diskimage_create_35(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_create_35(imgtool::image *image, imgtool::stream::ptr &&dummy, util::option_resolution *opts)
 {
 	prodos_setprocs_35(image);
 	return prodos_diskimage_create(image, opts);

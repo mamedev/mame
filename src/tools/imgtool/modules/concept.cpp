@@ -126,7 +126,7 @@ struct concept_iterator
 };
 
 
-static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream &f);
+static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream::ptr &&stream);
 static void concept_image_exit(imgtool::image *img);
 static void concept_image_info(imgtool::image *img, char *string, size_t len);
 static imgtoolerr_t concept_image_beginenum(imgtool::directory *enumeration, const char *path);
@@ -260,19 +260,17 @@ static int get_catalog_entry(concept_image *image, const unsigned char *filename
 /*
     Open a file as a concept_image.
 */
-static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream &f)
+static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream::ptr &&stream)
 {
 	concept_image *image = (concept_image *) img->extra_bytes();
 	int reply;
 	int i;
 	unsigned totphysrecs;
 
-	image->file_handle = &f;
-
 	/* read device directory */
 	for (i=0; i<4; i++)
 	{
-		reply = read_physical_record(f, i+2, ((char *) & image->dev_dir)+i*512);
+		reply = read_physical_record(*stream, i+2, ((char *) & image->dev_dir)+i*512);
 		if (reply)
 			return IMGTOOLERR_READERROR;
 	}
@@ -289,6 +287,7 @@ static imgtoolerr_t concept_image_init(imgtool::image *img, imgtool::stream &f)
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
+	image->file_handle = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 

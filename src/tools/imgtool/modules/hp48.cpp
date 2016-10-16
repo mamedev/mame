@@ -327,10 +327,10 @@ static UINT16 crc(UINT8* data, int len)
 *****************************************************************************/
 
 
-static imgtoolerr_t hp48_open(imgtool::image *img, imgtool::stream &stream)
+static imgtoolerr_t hp48_open(imgtool::image *img, imgtool::stream::ptr &&stream)
 {
 	hp48_card* c = (hp48_card*) img->extra_bytes();
-	int size = stream.size();
+	int size = stream->size();
 
 	/* check that size is a power of 2 between 32 KB and 4 MG */
 	if ( (size < 32 * 1024) ||
@@ -341,30 +341,31 @@ static imgtoolerr_t hp48_open(imgtool::image *img, imgtool::stream &stream)
 	}
 
 	/* store info */
-	c->stream = &stream;
+	c->stream = stream.get();
 	c->modified = 0;
 	c->size = size;
 	c->data = (UINT8*) malloc( 2 * size );
 	if ( !c->data )
 	{
-			return IMGTOOLERR_READERROR;
+		return IMGTOOLERR_READERROR;
 	}
 
 	/* fully load image */
-	stream.seek(0, SEEK_SET);
-	if (stream.read(c->data, size) < size)
+	c->stream->seek(0, SEEK_SET);
+	if (c->stream->read(c->data, size) < size)
 	{
-			return IMGTOOLERR_READERROR;
+		return IMGTOOLERR_READERROR;
 	}
 	unpack( c->data, c->data, 2 * size );
 
+	c->stream = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 
 
 
 static imgtoolerr_t hp48_create(imgtool::image* img,
-				imgtool::stream &stream,
+				imgtool::stream::ptr &&stream,
 				util::option_resolution *opts)
 {
 	hp48_card* c = (hp48_card*) img->extra_bytes();
@@ -372,7 +373,7 @@ static imgtoolerr_t hp48_create(imgtool::image* img,
 
 	size = opts->lookup_int('S');
 
-	c->stream = &stream;
+	c->stream = stream.get();
 	c->modified = 1;
 	c->size = size * 1024;
 	c->data = (UINT8*) malloc( 2 * c->size );
@@ -384,6 +385,7 @@ static imgtoolerr_t hp48_create(imgtool::image* img,
 	/* zeroing the image seems fine */
 	memset( c->data, 0, 2 * c->size );
 
+	c->stream = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 

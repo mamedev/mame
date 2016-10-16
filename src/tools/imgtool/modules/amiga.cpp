@@ -1742,12 +1742,11 @@ static imgtoolerr_t update_disk_alteration_date(imgtool::image *img)
 *****************************************************************************/
 
 
-static imgtoolerr_t amiga_image_open(imgtool::image *img, imgtool::stream &stream)
+static imgtoolerr_t amiga_image_open(imgtool::image *img, imgtool::stream::ptr &&stream)
 {
 	amiga_floppy *f = (amiga_floppy *) img->extra_bytes();
-	UINT64 size = stream.size();
+	UINT64 size = stream->size();
 
-	f->stream = &stream;
 	f->sectors = size/BSIZE/80/2;
 
 	if (f->sectors != 11 && f->sectors != 22)
@@ -1755,12 +1754,16 @@ static imgtoolerr_t amiga_image_open(imgtool::image *img, imgtool::stream &strea
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
+	f->stream = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 
 
 static void amiga_image_exit(imgtool::image *img)
 {
+	amiga_floppy *f = (amiga_floppy *)img->extra_bytes();
+	if (f->stream)
+		delete f->stream;
 }
 
 
@@ -2195,7 +2198,7 @@ static imgtoolerr_t amiga_image_writefile(imgtool::partition *partition, const c
 }
 
 
-static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	amiga_floppy *f = (amiga_floppy *) img->extra_bytes();
 	const std::string &dskname = opts->lookup_string('N');
@@ -2206,7 +2209,7 @@ static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool::stream &str
 	time_t now;
 	int blocks;
 
-	f->stream = &stream;
+	f->stream = stream.get();
 
 	switch (opts->lookup_int('S'))
 	{
@@ -2296,6 +2299,7 @@ static imgtoolerr_t amiga_image_create(imgtool::image *img, imgtool::stream &str
 	ret = write_block(img, blocks - 1, buffer);
 	if (ret) return ret;
 
+	f->stream = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 

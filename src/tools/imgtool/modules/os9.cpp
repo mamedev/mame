@@ -622,7 +622,7 @@ done:
 
 
 
-static imgtoolerr_t os9_diskimage_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t os9_diskimage_open(imgtool::image *image, imgtool::stream::ptr &&dummy)
 {
 	imgtoolerr_t err;
 	floperr_t ferr;
@@ -710,7 +710,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool::image *image, imgtool::stream &s
 
 
 
-static imgtoolerr_t os9_diskimage_create(imgtool::image *img, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t os9_diskimage_create(imgtool::image *img, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	dynamic_buffer header;

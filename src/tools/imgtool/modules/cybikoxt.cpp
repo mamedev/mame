@@ -260,9 +260,9 @@ static bool cfs_verify(cybiko_file_system &cfs)
 	return true;
 }
 
-static bool cfs_init(cybiko_file_system &cfs, imgtool::stream &stream)
+static bool cfs_init(cybiko_file_system &cfs, imgtool::stream::ptr &&stream)
 {
-	cfs.stream = &stream;
+	cfs.stream = stream.release();
 	cfs.page_count = 2005;
 	cfs.page_size = 258;
 	cfs.block_count_boot = 5;
@@ -319,11 +319,11 @@ static UINT32 cfs_calc_free_space( cybiko_file_system *cfs, UINT16 blocks)
 	return free_space;
 }
 
-static imgtoolerr_t cybiko_image_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t cybiko_image_open(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
 	// init
-	if (!cfs_init(*cfs, stream)) return IMGTOOLERR_CORRUPTIMAGE;
+	if (!cfs_init(*cfs, std::move(stream))) return IMGTOOLERR_CORRUPTIMAGE;
 	// verify
 	if (!cfs_verify(*cfs)) return IMGTOOLERR_CORRUPTIMAGE;
 	// ok
@@ -336,11 +336,11 @@ static void cybiko_image_close(imgtool::image *image)
 	delete cfs->stream;
 }
 
-static imgtoolerr_t cybiko_image_create(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t cybiko_image_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)image->extra_bytes();
 	// init
-	if (!cfs_init(*cfs, stream)) return IMGTOOLERR_CORRUPTIMAGE;
+	if (!cfs_init(*cfs, std::move(stream))) return IMGTOOLERR_CORRUPTIMAGE;
 	// format
 	if (!cfs_format(cfs)) return IMGTOOLERR_CORRUPTIMAGE;
 	// ok

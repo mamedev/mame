@@ -385,25 +385,30 @@ UINT16 get_ob3(imgtool::stream &instream, imgtool::stream &outstream, UINT8 type
 	return size;
 }
 
-static imgtoolerr_t datapack_open(imgtool::image *image, imgtool::stream &stream)
+static imgtoolerr_t datapack_open(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
 	char opk_magic[4];
 
-	stream.read(opk_magic, 4);
+	stream->read(opk_magic, 4);
 
 	if(strcmp(opk_magic, "OPK\0"))
 		return IMGTOOLERR_UNEXPECTED;
 
-	pack->stream = &stream;
+	pack->stream = stream.get();
 
 	if (update_pack_index(pack))
+	{
+		pack->stream = stream.release();
 		return IMGTOOLERR_SUCCESS;
+	}
 	else
+	{
 		return IMGTOOLERR_CORRUPTIMAGE;
+	}
 }
 
-static imgtoolerr_t datapack_create(imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts)
+static imgtoolerr_t datapack_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	psion_pack *pack = (psion_pack*)image->extra_bytes();
 	static const UINT8 opk_magic[4] = {'O', 'P', 'K', 0x00};
@@ -419,25 +424,30 @@ static imgtoolerr_t datapack_create(imgtool::image *image, imgtool::stream &stre
 
 	checksum = head_checksum(pack_head);
 
-	stream.write(opk_magic, 4);
-	stream.fill(0x00, 2);
-	stream.write(pack_head, 8);
+	stream->write(opk_magic, 4);
+	stream->fill(0x00, 2);
+	stream->write(pack_head, 8);
 
-	stream.putc((checksum>>8) & 0xff);
-	stream.putc(checksum & 0xff);
+	stream->putc((checksum>>8) & 0xff);
+	stream->putc(checksum & 0xff);
 
-	put_name_record(stream, "MAIN", 0x81, 0x90);
+	put_name_record(*stream, "MAIN", 0x81, 0x90);
 
-	stream.fill(0xff, 2);
+	stream->fill(0xff, 2);
 
-	update_opk_head(stream);
+	update_opk_head(*stream);
 
-	pack->stream = &stream;
+	pack->stream = stream.get();
 
 	if (update_pack_index(pack))
+	{
+		pack->stream = stream.release();
 		return IMGTOOLERR_SUCCESS;
+	}
 	else
+	{
 		return IMGTOOLERR_CORRUPTIMAGE;
+	}
 }
 
 static void datapack_close( imgtool::image *image)

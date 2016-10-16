@@ -966,21 +966,19 @@ static int read_image_vib_no_geometry(imgtool::stream &file_handle, ti99_img_for
 
     Return imgtool error code
 */
-static imgtoolerr_t open_image_lvl1(imgtool::stream &file_handle, ti99_img_format img_format, ti99_lvl1_imgref *l1_img, dsk_vib *vib)
+static imgtoolerr_t open_image_lvl1(imgtool::stream::ptr &&file_handle, ti99_img_format img_format, ti99_lvl1_imgref *l1_img, dsk_vib *vib)
 {
 	imgtoolerr_t err;
 	int reply;
 	UINT16 totphysrecs;
 
-
 	l1_img->img_format = img_format;
-	l1_img->file_handle = &file_handle;
 
 	if (img_format == if_harddisk)
 	{
 		const hard_disk_info *info;
 
-		err = imghd_open(file_handle, &l1_img->harddisk_handle);
+		err = imghd_open(*file_handle, &l1_img->harddisk_handle);
 		if (err)
 			return err;
 
@@ -1004,7 +1002,7 @@ static imgtoolerr_t open_image_lvl1(imgtool::stream &file_handle, ti99_img_forma
 	else
 	{
 		/* read vib */
-		reply = read_image_vib_no_geometry(file_handle, img_format, vib);
+		reply = read_image_vib_no_geometry(*file_handle, img_format, vib);
 		if (reply)
 			return (imgtoolerr_t)reply;
 
@@ -1032,7 +1030,7 @@ static imgtoolerr_t open_image_lvl1(imgtool::stream &file_handle, ti99_img_forma
 				|| (totphysrecs < 2)
 				|| memcmp(vib->id, "DSK", 3) || (! strchr(" P", vib->protection))
 				|| (((img_format == if_mess) || (img_format == if_v9t9))
-					&& (file_handle.size() != totphysrecs*256U)))
+					&& (file_handle->size() != totphysrecs*256U)))
 			return (imgtoolerr_t)IMGTOOLERR_CORRUPTIMAGE;
 
 		if ((img_format == if_pc99_fm) || (img_format == if_pc99_mfm))
@@ -1040,7 +1038,7 @@ static imgtoolerr_t open_image_lvl1(imgtool::stream &file_handle, ti99_img_forma
 			l1_img->pc99_data_offset_array = (UINT32*)malloc(sizeof(*l1_img->pc99_data_offset_array)*totphysrecs);
 			if (! l1_img->pc99_data_offset_array)
 				return IMGTOOLERR_OUTOFMEMORY;
-			reply = parse_pc99_image(file_handle, img_format == if_pc99_fm, 1, NULL, & l1_img->geometry, l1_img->pc99_data_offset_array, &l1_img->pc99_track_len);
+			reply = parse_pc99_image(*file_handle, img_format == if_pc99_fm, 1, NULL, & l1_img->geometry, l1_img->pc99_data_offset_array, &l1_img->pc99_track_len);
 			if (reply)
 			{
 				free(l1_img->pc99_data_offset_array);
@@ -1048,6 +1046,8 @@ static imgtoolerr_t open_image_lvl1(imgtool::stream &file_handle, ti99_img_forma
 			}
 		}
 	}
+
+	l1_img->file_handle = file_handle.release();	// we can only do this when we're sure we're successful
 
 	return (imgtoolerr_t)0;
 }
@@ -3848,11 +3848,11 @@ struct win_iterator
 };
 
 
-static imgtoolerr_t dsk_image_init_mess(imgtool::image *image, imgtool::stream &f);
-static imgtoolerr_t dsk_image_init_v9t9(imgtool::image *image, imgtool::stream &f);
-static imgtoolerr_t dsk_image_init_pc99_fm(imgtool::image *image, imgtool::stream &f);
-static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool::image *image, imgtool::stream &f);
-static imgtoolerr_t win_image_init(imgtool::image *image, imgtool::stream &f);
+static imgtoolerr_t dsk_image_init_mess(imgtool::image *image, imgtool::stream::ptr &&stream);
+static imgtoolerr_t dsk_image_init_v9t9(imgtool::image *image, imgtool::stream::ptr &&stream);
+static imgtoolerr_t dsk_image_init_pc99_fm(imgtool::image *image, imgtool::stream::ptr &&stream);
+static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool::image *image, imgtool::stream::ptr &&stream);
+static imgtoolerr_t win_image_init(imgtool::image *image, imgtool::stream::ptr &&stream);
 static void ti99_image_exit(imgtool::image *img);
 static void ti99_image_info(imgtool::image *img, char *string, size_t len);
 static imgtoolerr_t dsk_image_beginenum(imgtool::directory *enumeration, const char *path);
@@ -3864,8 +3864,8 @@ static imgtoolerr_t ti99_image_readfile(imgtool::partition *partition, const cha
 static imgtoolerr_t ti99_image_writefile(imgtool::partition *partition, const char *fpath, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions);
 static imgtoolerr_t dsk_image_deletefile(imgtool::partition *partition, const char *fpath);
 static imgtoolerr_t win_image_deletefile(imgtool::partition *partition, const char *fpath);
-static imgtoolerr_t dsk_image_create_mess(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions);
-static imgtoolerr_t dsk_image_create_v9t9(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions);
+static imgtoolerr_t dsk_image_create_mess(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions);
+static imgtoolerr_t dsk_image_create_v9t9(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions);
 
 enum
 {
@@ -3995,17 +3995,17 @@ void ti99_ti99hd_get_info(const imgtool_class *imgclass, UINT32 state, union img
 /*
     Open a file as a ti99_image (common code).
 */
-static int dsk_image_init(imgtool::image *img, imgtool::stream &f, ti99_img_format img_format)
+static imgtoolerr_t dsk_image_init(imgtool::image *img, imgtool::stream::ptr &&stream, ti99_img_format img_format)
 {
 	struct ti99_lvl2_imgref *image = (struct ti99_lvl2_imgref *) img->extra_bytes();
 	dsk_vib vib;
-	int reply;
+	imgtoolerr_t reply;
 	int totphysrecs;
 	unsigned fdir_aphysrec;
 	int i;
 
 	/* open disk image at level 1 */
-	reply = open_image_lvl1(f, img_format, &image->l1_img, &vib);
+	reply = open_image_lvl1(std::move(stream), img_format, &image->l1_img, &vib);
 	if (reply)
 		return reply;
 
@@ -4029,7 +4029,7 @@ static int dsk_image_init(imgtool::image *img, imgtool::stream &f, ti99_img_form
 	image->dsk.totphysrecs = get_UINT16BE(vib.totphysrecs);
 
 	/* read and check main volume catalog */
-	reply = dsk_read_catalog(image, 1, &image->dsk.catalogs[0]);
+	reply = (imgtoolerr_t)dsk_read_catalog(image, 1, &image->dsk.catalogs[0]);
 	if (reply)
 		return reply;
 
@@ -4072,7 +4072,7 @@ static int dsk_image_init(imgtool::image *img, imgtool::stream &f, ti99_img_form
 			image->dsk.fdir_aphysrec[image->dsk.catalogs[0].num_subdirs+1] = fdir_aphysrec;
 			/*image->dsk.catalogs[0].subdirs[image->dsk.catalogs[0].num_subdirs].dir_ptr = fdir_aphysrec;*/
 			memcpy(image->dsk.catalogs[0].subdirs[image->dsk.catalogs[0].num_subdirs].name, vib.subdir[i].name, 10);
-			reply = dsk_read_catalog(image, fdir_aphysrec, &image->dsk.catalogs[image->dsk.catalogs[0].num_subdirs+1]);
+			reply = (imgtoolerr_t) dsk_read_catalog(image, fdir_aphysrec, &image->dsk.catalogs[image->dsk.catalogs[0].num_subdirs+1]);
 			if (reply)
 			{
 				/* error: invalid fdir */
@@ -4090,45 +4090,45 @@ static int dsk_image_init(imgtool::image *img, imgtool::stream &f, ti99_img_form
 	/* initialize default data_offset */
 	image->data_offset = 32+2;
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
     Open a file as a ti99_image (MESS format).
 */
-static imgtoolerr_t dsk_image_init_mess(imgtool::image *image, imgtool::stream &f)
+static imgtoolerr_t dsk_image_init_mess(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
-	return (imgtoolerr_t)dsk_image_init(image, f, if_mess);
+	return dsk_image_init(image, std::move(stream), if_mess);
 }
 
 /*
     Open a file as a ti99_image (V9T9 format).
 */
-static imgtoolerr_t dsk_image_init_v9t9(imgtool::image *image, imgtool::stream &f)
+static imgtoolerr_t dsk_image_init_v9t9(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
-	return (imgtoolerr_t)dsk_image_init(image, f, if_v9t9);
+	return dsk_image_init(image, std::move(stream), if_v9t9);
 }
 
 /*
     Open a file as a ti99_image (PC99 FM format).
 */
-static imgtoolerr_t dsk_image_init_pc99_fm(imgtool::image *image, imgtool::stream &f)
+static imgtoolerr_t dsk_image_init_pc99_fm(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
-	return (imgtoolerr_t)dsk_image_init(image, f, if_pc99_fm);
+	return dsk_image_init(image, std::move(stream), if_pc99_fm);
 }
 
 /*
     Open a file as a ti99_image (PC99 MFM format).
 */
-static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool::image *image, imgtool::stream &f)
+static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool::image *image, imgtool::stream::ptr &&stream)
 {
-	return (imgtoolerr_t)dsk_image_init(image, f, if_pc99_mfm);
+	return dsk_image_init(image, std::move(stream), if_pc99_mfm);
 }
 
 /*
     Open a file as a ti99_image (harddisk format).
 */
-static imgtoolerr_t win_image_init(imgtool::image *img, imgtool::stream &f)
+static imgtoolerr_t win_image_init(imgtool::image *img, imgtool::stream::ptr &&stream)
 {
 	struct ti99_lvl2_imgref *image = (struct ti99_lvl2_imgref *) img->extra_bytes();
 	win_vib_ddr vib;
@@ -4136,7 +4136,7 @@ static imgtoolerr_t win_image_init(imgtool::image *img, imgtool::stream &f)
 	int i;
 
 	/* open disk image at level 1 */
-	reply = open_image_lvl1(f, if_harddisk, & image->l1_img, NULL);
+	reply = open_image_lvl1(std::move(stream), if_harddisk, & image->l1_img, NULL);
 	if (reply)
 		return (imgtoolerr_t)reply;
 
@@ -5226,7 +5226,7 @@ static imgtoolerr_t win_image_deletefile(imgtool::partition *partition, const ch
 
     Supports MESS and V9T9 formats only
 */
-static imgtoolerr_t dsk_image_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions, ti99_img_format img_format)
+static imgtoolerr_t dsk_image_create(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions, ti99_img_format img_format)
 {
 	const char *volname;
 	int density;
@@ -5241,7 +5241,7 @@ static imgtoolerr_t dsk_image_create(imgtool::image *image, imgtool::stream &f, 
 	int i;
 
 	l1_img.img_format = img_format;
-	l1_img.file_handle = &f;
+	l1_img.file_handle = stream.get();	// can't release here
 
 	/* read options */
 	volname = createoptions->lookup_string(dsk_createopts_volname).c_str();
@@ -5328,7 +5328,7 @@ static imgtoolerr_t dsk_image_create(imgtool::image *image, imgtool::stream &f, 
 	vib.abm[0] |= (physrecsperAU == 1) ? 3 : 1;
 
 	/* write aphysrec 0 */
-	if (write_absolute_physrec(& l1_img, 0, &vib))
+	if (write_absolute_physrec(&l1_img, 0, &vib))
 		return IMGTOOLERR_WRITEERROR;
 
 
@@ -5340,21 +5340,21 @@ static imgtoolerr_t dsk_image_create(imgtool::image *image, imgtool::stream &f, 
 			return IMGTOOLERR_WRITEERROR;
 
 
-	return (imgtoolerr_t)dsk_image_init(image, f, img_format);
+	return dsk_image_init(image, std::move(stream), img_format);
 }
 
 /*
     Create a blank ti99_image (MESS format).
 */
-static imgtoolerr_t dsk_image_create_mess(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions)
+static imgtoolerr_t dsk_image_create_mess(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions)
 {
-	return dsk_image_create(image, f, createoptions, if_mess);
+	return dsk_image_create(image, std::move(stream), createoptions, if_mess);
 }
 
 /*
     Create a blank ti99_image (V9T9 format).
 */
-static imgtoolerr_t dsk_image_create_v9t9(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions)
+static imgtoolerr_t dsk_image_create_v9t9(imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions)
 {
-	return dsk_image_create(image, f, createoptions, if_v9t9);
+	return dsk_image_create(image, std::move(stream), createoptions, if_v9t9);
 }

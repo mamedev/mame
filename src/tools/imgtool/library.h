@@ -254,9 +254,9 @@ union imgtoolinfo
 	void *  f;                                          /* generic function pointers */
 	char *  s;                                          /* generic strings */
 
-	imgtoolerr_t    (*open)             (imgtool::image *image, imgtool::stream &stream);
+	imgtoolerr_t    (*open)             (imgtool::image *image, imgtool::stream::ptr &&stream);
 	void            (*close)            (imgtool::image *image);
-	imgtoolerr_t    (*create)           (imgtool::image *image, imgtool::stream &stream, util::option_resolution *opts);
+	imgtoolerr_t    (*create)           (imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
 	imgtoolerr_t    (*create_partition) (imgtool::image *image, UINT64 first_block, UINT64 block_count);
 	void            (*info)             (imgtool::image *image, char *string, size_t len);
 	imgtoolerr_t    (*begin_enum)       (imgtool::directory *enumeration, const char *path);
@@ -347,10 +347,10 @@ struct imgtool_module
 	unsigned int writing_untested : 1;              /* used when we support writing, but not in main build */
 	unsigned int creation_untested : 1;             /* used when we support creation, but not in main build */
 
-	imgtoolerr_t    (*open)         (imgtool::image *image, imgtool::stream *f);
+	imgtoolerr_t    (*open)         (imgtool::image *image, imgtool::stream::ptr &&stream);
 	void            (*close)        (imgtool::image *image);
 	void            (*info)         (imgtool::image *image, char *string, size_t len);
-	imgtoolerr_t    (*create)       (imgtool::image *image, imgtool::stream *f, util::option_resolution *opts);
+	imgtoolerr_t    (*create)       (imgtool::image *image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
 	imgtoolerr_t    (*get_geometry) (imgtool::image *image, UINT32 *track, UINT32 *heads, UINT32 *sectors);
 	imgtoolerr_t    (*read_sector)  (imgtool::image *image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);
 	imgtoolerr_t    (*write_sector) (imgtool::image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len);
