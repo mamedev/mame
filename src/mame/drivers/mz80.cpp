@@ -366,18 +366,7 @@ ROM_START( mz80a )
 	ROM_LOAD( "mz80acg.rom", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2) )
 ROM_END
 
-ROM_START( mz80b )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ipl.rom",  0x0000, 0x0800, CRC(80beeec0) SHA1(d2b8167cc77ad023a807198993cb5e7a94c9e19e) )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
-ROM_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   INIT   COMPANY    FULLNAME */
 COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K (Japanese)", 0 )
 COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K", 0 )
-
-// These may need a separate driver!
 COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A", 0 )
-COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80B", MACHINE_NOT_WORKING )
