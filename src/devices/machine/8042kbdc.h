@@ -72,7 +72,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 
 	void at_8042_set_outport(UINT8 data, int initial);
-	TIMER_CALLBACK_MEMBER( kbdc8042_clr_int );
 	void at_8042_receive(UINT8 data);
 	void at_8042_check_keyboard();
 	void at_8042_clear_keyboard_received();

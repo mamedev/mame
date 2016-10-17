@@ -267,28 +267,18 @@ WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
 		at_8042_check_keyboard();
 }
 
-TIMER_CALLBACK_MEMBER( kbdc8042_device::kbdc8042_clr_int )
-{
-	/* Lets 8952's timers do their job before clear the interrupt line, */
-	/* else Keyboard interrupt never happens. */
-	m_input_buffer_full_cb(0);
-}
-
 void kbdc8042_device::at_8042_receive(UINT8 data)
 {
 	if (LOG_KEYBOARD)
 		logerror("at_8042_receive Received 0x%02x\n", data);
 
 	m_data = data;
-	m_keyboard.received = 1;
-
-	if (!m_input_buffer_full_cb.isnull())
+	if(!(m_speaker & 0x80))
 	{
-		m_input_buffer_full_cb(1);
-		/* Lets 8952's timers do their job before clear the interrupt line, */
-		/* else Keyboard interrupt never happens. */
-		/* Why was this done?  It dies when an extended scan code is received */
-		//machine().scheduler().timer_set(attotime::from_usec(2), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_clr_int),this));
+		m_keyboard.received = 1;
+
+		if (!m_input_buffer_full_cb.isnull())
+			m_input_buffer_full_cb(1);
 	}
 }
 
@@ -312,6 +302,7 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 			logerror("kbdc8042_8_r(): Clearing m_keyboard.received\n");
 	}
 
+	m_input_buffer_full_cb(0);
 	m_keyboard.received = 0;
 	m_mouse.received = 0;
 }
@@ -348,28 +339,13 @@ READ8_MEMBER(kbdc8042_device::data_r)
 	switch (offset) {
 	case 0:
 		data = m_data;
-		m_input_buffer_full_cb(0);
-		if ((m_status_read_mode != 3) || (data != 0xfa))
-		{
-			if (m_keybtype != KBDC8042_AT386 || (data != 0x55))
-			{
-				/* at386 self test doesn't like this */
-				at_8042_clear_keyboard_received();
-			}
-			at_8042_check_keyboard();
-		}
-		else
-		{
-			m_status_read_mode = 4;
-		}
+		at_8042_clear_keyboard_received();
+		at_8042_check_keyboard();
 		break;
 
 	case 1:
 		data = m_speaker;
 		data &= ~0xc0; /* AT BIOS don't likes this being set */
-
-		/* needed for AMI BIOS, maybe only some keyboard controller revisions! */
-		at_8042_clear_keyboard_received();
 
 		/* polled for changes in ibmat bios */
 		if (--m_poll_delay < 0)
@@ -420,10 +396,6 @@ READ8_MEMBER(kbdc8042_device::data_r)
 		case 2:
 			data |= m_inport<<4;
 			break;
-		case 4:
-			at_8042_receive(0xaa);
-			m_status_read_mode = 0;
-			break;
 		}
 		break;
 	}
@@ -464,9 +436,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 
 		case 2:
 			/* preceded by writing 0xD2 to port 60h */
-			m_data = data;
-			m_sending=1;
-			m_keyboard_dev->write(space, 0, data);
+			at_8042_receive(data);
 			break;
 
 		case 3:
@@ -489,13 +459,19 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 
 	case 1:
 		m_speaker = data;
+		if (data & 0x80)
+		{
+			at_8042_check_keyboard();
+			at_8042_clear_keyboard_received();
+		}
+		m_speaker &= ~0x80;
 		if (!m_speaker_cb.isnull())
 					m_speaker_cb((offs_t)0, m_speaker);
 
 		break;
 
 	case 4:
-		m_last_write_to_control=0;
+		m_last_write_to_control=1;
 
 		/* switch based on the command */
 		switch(data) {
@@ -544,6 +520,9 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 			break;
 		case 0xc2:  /* read input port 7..4 until write to 0x60 */
 			m_status_read_mode = 2;
+			break;
+		case 0xca: /* unknown used by savquest (read controller mode AT=0/PS2=1 ?) */
+			at_8042_receive(1);
 			break;
 		case 0xd0:  /* read output port */
 			at_8042_receive(m_outport);
