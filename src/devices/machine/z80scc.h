@@ -169,6 +169,7 @@ public:
 	UINT8 do_sccreg_rr5();
 	UINT8 do_sccreg_rr6();
 	UINT8 do_sccreg_rr7();
+	UINT8 do_sccreg_rr7p(){ return 0; } // Needs to be implemented for Synchronous mode 
 	// UINT8 do_sccreg_rr8(); Short cutted due to frequent use
 	UINT8 do_sccreg_rr9();
 	UINT8 do_sccreg_rr10();
@@ -188,6 +189,7 @@ public:
 	void do_sccreg_wr5(UINT8 data);
 	void do_sccreg_wr6(UINT8 data);
 	void do_sccreg_wr7(UINT8 data);
+	void do_sccreg_wr7p(UINT8 data){}; // Needs to be implemented for Synchronous mode 
 	void do_sccreg_wr8(UINT8 data);
 	void do_sccreg_wr9(UINT8 data);
 	void do_sccreg_wr10(UINT8 data);
@@ -228,6 +230,7 @@ public:
 	UINT8 m_rr5; // REG_RR5_WR5_OR_RR0
 	UINT8 m_rr6; // REG_RR6_LSB_OR_RR2
 	UINT8 m_rr7; // REG_RR7_MSB_OR_RR3
+	UINT8 m_rr7p; 
 	UINT8 m_rr8; // REG_RR8_RECEIVE_DATA
 	UINT8 m_rr9; //  REG_RR9_WR3_OR_RR13
 	UINT8 m_rr10; // REG_RR10_MISC_STATUS
@@ -246,8 +249,9 @@ public:
 	UINT8 m_wr5; // REG_WR5_TX_CONTROL
 	UINT8 m_wr6; // REG_WR6_SYNC_OR_SDLC_A
 	UINT8 m_wr7; // REG_WR7_SYNC_OR_SDLC_F
+	UINT8 m_wr7p; // 
 	UINT8 m_wr8;  // REG_WR8_TRANSMIT_DATA
-	UINT8 m_wr9;  // REG_WR9_MASTER_INT_CTRL
+	//	UINT8 m_wr9;  // REG_WR9_MASTER_INT_CTRL
 	UINT8 m_wr10; // REG_WR10_MSC_RX_TX_CTRL
 	UINT8 m_wr11; // REG_WR11_CLOCK_MODES
 	UINT8 m_wr12; // REG_WR12_LO_BAUD_GEN
@@ -506,7 +510,19 @@ protected:
 		WR14_BRG_SOURCE     = 0x02,
 		WR14_DTR_REQ_FUNC   = 0x04,
 		WR14_AUTO_ECHO      = 0x08,
-		WR14_LOCAL_LOOPBACK = 0x010
+		WR14_LOCAL_LOOPBACK = 0x10
+	};
+
+	enum
+	{
+		WR15_WR7PRIME		= 0x01,
+		WR15_ZEROCOUNT		= 0x02,
+		WR15_STATUS_FIFO	= 0x04,
+		WR15_DCD     		= 0x08,
+		WR15_SYNC    		= 0x10,
+		WR15_CTS      		= 0x20,
+		WR15_TX_EOM      	= 0x40,
+		WR15_BREAK_ABORT	= 0x80
 	};
 
 	enum
@@ -526,6 +542,8 @@ protected:
 	unsigned int m_delayed_tx_brg_change;
 	unsigned int m_brg_const;
 
+	void scc_register_write(UINT8 reg, UINT8 data);
+	UINT8 scc_register_read(UINT8 reg);
 	void update_serial();
 	void set_dtr(int state);
 	void set_rts(int state);
@@ -631,8 +649,14 @@ public:
 	DECLARE_READ8_MEMBER( cb_r ) { return m_chanB->control_read(); }
 	DECLARE_WRITE8_MEMBER( cb_w ) { m_chanB->control_write(data); }
 
+	DECLARE_READ8_MEMBER( zbus_r );
+	DECLARE_WRITE8_MEMBER( zbus_w );
+
 	// interrupt acknowledge
 	int m1_r();
+
+	// Single registers instances accessed from both channels
+	UINT8 m_wr9;  // REG_WR9_MASTER_INT_CTRL
 
 	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_chanA->write_rx(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_chanB->write_rx(state); }
