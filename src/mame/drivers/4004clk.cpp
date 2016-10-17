@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/i4004/i4004.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "4004clk.lh"
 
 class nixieclock_state : public driver_device
@@ -19,17 +20,14 @@ public:
 	nixieclock_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
 		m_input(*this, "INPUT")
 	{ }
 
 	required_device<i4004_cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 	required_ioport m_input;
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
-	DECLARE_WRITE8_MEMBER( relays_w );
 	UINT16 m_nixie[16];
 	UINT8 m_timer;
 	virtual void machine_start() override;
@@ -88,11 +86,6 @@ WRITE8_MEMBER(nixieclock_state::neon_w)
 	output_set_neon_value(3,BIT(data,0));
 }
 
-WRITE8_MEMBER(nixieclock_state::relays_w)
-{
-	m_dac->write_unsigned8((data & 1) ? 0x80 : 0x40); //tick - tock
-}
-
 static ADDRESS_MAP_START(4004clk_rom, AS_PROGRAM, 8, nixieclock_state)
 	AM_RANGE(0x0000, 0x0FFF) AM_ROM
 ADDRESS_MAP_END
@@ -107,7 +100,7 @@ static ADDRESS_MAP_START( 4004clk_io, AS_IO, 8, nixieclock_state)
 	AM_RANGE(0x00, 0x0e) AM_WRITE(nixie_w)
 	AM_RANGE(0x00, 0x00) AM_READ(data_r)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(neon_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(relays_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("dac", dac_bit_interface, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -159,9 +152,10 @@ static MACHINE_CONFIG_START( 4004clk, nixieclock_state )
 	MCFG_DEFAULT_LAYOUT(layout_4004clk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("4004clk_timer", nixieclock_state, timer_callback, attotime::from_hz(120))
 MACHINE_CONFIG_END

@@ -8,18 +8,20 @@
  */
 
 #include "s11c_bg.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 const device_type S11C_BG = &device_creator<s11c_bg_device>;
 
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig,S11C_BG,"Williams System 11C Background Music",tag,owner,clock, "s11c_bg", __FILE__),
-		m_cpu(*this,"bgcpu"),
-		m_ym2151(*this,"ym2151"),
-		m_hc55516(*this,"hc55516_bg"),
-		m_dac1(*this,"dac1"),
-		m_pia40(*this,"pia40"),
-		m_cpubank(*this,"bgbank")
+	device_mixer_interface(mconfig, *this),
+	m_cpu(*this,"bgcpu"),
+	m_ym2151(*this,"ym2151"),
+	m_hc55516(*this,"hc55516_bg"),
+	m_pia40(*this,"pia40"),
+	m_cpubank(*this,"bgbank")
 {
 }
 
@@ -32,11 +34,6 @@ static ADDRESS_MAP_START( s11c_bg_map, AS_PROGRAM, 8, s11c_bg_device )
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(bgbank_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bgbank")
 ADDRESS_MAP_END
-
-WRITE8_MEMBER( s11c_bg_device::pia40_pa_w )
-{
-	m_dac1->write_unsigned8(data);
-}
 
 WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
 {
@@ -69,19 +66,19 @@ MACHINE_CONFIG_FRAGMENT( s11c_bg )
 	MCFG_CPU_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_SPEAKER_STANDARD_MONO("bg")
 	MCFG_YM2151_ADD("ym2151", 3580000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(s11c_bg_device, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("hc55516_bg", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
 
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11c_bg_device, pia40_pa_w))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11c_bg_device, pia40_pb_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s11c_bg_device, pia40_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s11c_bg_device, pia40_cb2_w))
@@ -110,7 +107,7 @@ void s11c_bg_device::device_reset()
 	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 }
 
-void s11c_bg_device::static_set_gfxregion(device_t &device, const char *tag)
+void s11c_bg_device::static_set_romregion(device_t &device, const char *tag)
 {
 	s11c_bg_device &cpuboard = downcast<s11c_bg_device &>(device);
 	cpuboard.m_regiontag = tag;

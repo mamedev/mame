@@ -8,7 +8,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "sound/speaker.h"
+#include "sound/dac.h"
 #include "sound/s14001a.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -23,7 +23,7 @@ public:
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
-		m_speaker(*this, "speaker"),
+		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -35,7 +35,7 @@ public:
 	optional_ioport_array<11> m_inp_matrix; // max 11
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<UINT8> m_speech_rom;
-	optional_device<speaker_sound_device> m_speaker;
+	optional_device<dac_bit_interface> m_dac;
 	optional_device<generic_slot_device> m_cart;
 
 	// misc common

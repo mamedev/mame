@@ -55,8 +55,8 @@ READ8_MEMBER( sb16_lle_device::adc_data_r )
 
 WRITE8_MEMBER( sb16_lle_device::dac_data_w )
 {
-	m_dacl->write_unsigned8(data);
-	m_dacr->write_unsigned8(data);
+	m_ldac->write(data << 8);
+	m_rdac->write(data << 8);
 }
 
 READ8_MEMBER( sb16_lle_device::p1_r )
@@ -412,10 +412,8 @@ static MACHINE_CONFIG_FRAGMENT( sb16 )
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
@@ -681,8 +679,8 @@ WRITE8_MEMBER( sb16_lle_device::mpu401_w )
 sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISA16_SB16, "SoundBlaster 16 Audio Adapter LLE", tag, owner, clock, "sb16", __FILE__),
 	device_isa16_card_interface(mconfig, *this),
-	m_dacl(*this, "dacl"),
-	m_dacr(*this, "dacr"),
+	m_ldac(*this, "ldac"),
+	m_rdac(*this, "rdac"),
 	m_joy(*this, "pc_joy"),
 	m_cpu(*this, "sb16_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_freq(0), m_mode(0), m_dac_fifo_ctrl(0), m_adc_fifo_ctrl(0), m_ctrl8(0), m_ctrl16(0), m_mpu_byte(0),
 	m_dma8_len(0), m_dma16_len(0), m_dma8_cnt(0), m_dma16_cnt(0), m_adc_fifo_head(0), m_adc_fifo_tail(0), m_dac_fifo_head(0), m_dac_fifo_tail(0), m_adc_r(false), m_dac_r(false), m_adc_h(false),
@@ -754,20 +752,20 @@ void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 		switch(m_mode & 0xa0) // dac 16
 		{
 			case 0x00: // unsigned stereo
-				dacl = (m_dac_fifo[m_dac_fifo_tail].h[0] - 0x8000);
-				dacr = (m_dac_fifo[m_dac_fifo_tail].h[1] - 0x8000);
-				break;
-			case 0x20: // signed stereo
 				dacl = m_dac_fifo[m_dac_fifo_tail].h[0];
 				dacr = m_dac_fifo[m_dac_fifo_tail].h[1];
 				break;
-			case 0x80: // unsigned mono
-				dacl = (m_dac_fifo[m_dac_fifo_tail].h[0] - 0x8000);
-				dacr = (m_dac_fifo[m_dac_fifo_tail].h[0] - 0x8000);
+			case 0x20: // signed stereo
+				dacl = (m_dac_fifo[m_dac_fifo_tail].h[0] ^ 0x8000);
+				dacr = (m_dac_fifo[m_dac_fifo_tail].h[1] ^ 0x8000);
 				break;
-			case 0xa0: // signed mono
+			case 0x80: // unsigned mono
 				dacl = m_dac_fifo[m_dac_fifo_tail].h[0];
 				dacr = m_dac_fifo[m_dac_fifo_tail].h[0];
+				break;
+			case 0xa0: // signed mono
+				dacl = (m_dac_fifo[m_dac_fifo_tail].h[0] ^ 0x8000);
+				dacr = (m_dac_fifo[m_dac_fifo_tail].h[0] ^ 0x8000);
 				break;
 		}
 		switch(m_mode & 0x50) // adc 8; placeholder
@@ -795,20 +793,20 @@ void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 		switch(m_mode & 0x50) // dac 8
 		{
 			case 0x00: // unsigned stereo
-				dacl = (m_dac_fifo[m_dac_fifo_tail].b[0] - 0x80) << 8;
-				dacr = (m_dac_fifo[m_dac_fifo_tail].b[2] - 0x80) << 8;
-				break;
-			case 0x10: // signed stereo
 				dacl = m_dac_fifo[m_dac_fifo_tail].b[0] << 8;
 				dacr = m_dac_fifo[m_dac_fifo_tail].b[2] << 8;
 				break;
-			case 0x40: // unsigned mono
-				dacl = (m_dac_fifo[m_dac_fifo_tail].b[0] - 0x80) << 8;
-				dacr = (m_dac_fifo[m_dac_fifo_tail].b[0] - 0x80) << 8;
+			case 0x10: // signed stereo
+				dacl = (m_dac_fifo[m_dac_fifo_tail].b[0] ^ 0x80) << 8;
+				dacr = (m_dac_fifo[m_dac_fifo_tail].b[2] ^ 0x80) << 8;
 				break;
-			case 0x50: // signed mono
+			case 0x40: // unsigned mono
 				dacl = m_dac_fifo[m_dac_fifo_tail].b[0] << 8;
 				dacr = m_dac_fifo[m_dac_fifo_tail].b[0] << 8;
+				break;
+			case 0x50: // signed mono
+				dacl = (m_dac_fifo[m_dac_fifo_tail].b[0] ^ 0x80) << 8;
+				dacr = (m_dac_fifo[m_dac_fifo_tail].b[0] ^ 0x80) << 8;
 				break;
 		}
 		switch(m_mode & 0xa0) // adc 16; placeholder
@@ -831,8 +829,8 @@ void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 				break;
 		}
 	}
-	m_dacr->write(dacr);
-	m_dacl->write(dacl);
+	m_rdac->write(dacr);
+	m_ldac->write(dacl);
 
 	if(!(m_ctrl8 & 2))
 		m_isa->drq1_w(1);

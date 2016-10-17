@@ -2,7 +2,6 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
-#include "sound/dac.h"
 
 class suna16_state : public driver_device
 {
@@ -10,10 +9,6 @@ public:
 	suna16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
-		m_dac3(*this, "dac3"),
-		m_dac4(*this, "dac4"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -27,10 +22,6 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
-	optional_device<dac_device> m_dac3;
-	optional_device<dac_device> m_dac4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -52,8 +43,6 @@ public:
 	DECLARE_READ16_MEMBER(paletteram_r);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(DAC1_w);
-	DECLARE_WRITE8_MEMBER(DAC2_w);
 
 	// bestbest specific
 	DECLARE_WRITE16_MEMBER(bestbest_flipscreen_w);
@@ -66,8 +55,6 @@ public:
 	DECLARE_WRITE16_MEMBER(bssoccer_leds_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_pcm_1_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_pcm_2_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bssoccer_DAC3_w);
-	DECLARE_WRITE8_MEMBER(bssoccer_DAC4_w);
 
 	// uballoon specific
 	DECLARE_WRITE16_MEMBER(uballoon_leds_w);

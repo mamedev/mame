@@ -41,12 +41,12 @@ If you do nothing for about 20 secs, it turns itself off (screen goes white).
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
-
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "sound/volt_reg.h"
 
 #define MAX_PS_TIMERS   3
 
@@ -108,13 +108,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_lcd_buffer(*this, "lcd_buffer"),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot")
 	{ }
 
 	required_shared_ptr<UINT32> m_lcd_buffer;
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_rom;
 
@@ -143,7 +141,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ps_flash_w);
 	DECLARE_READ32_MEMBER(ps_audio_r);
 	DECLARE_WRITE32_MEMBER(ps_audio_w);
-	DECLARE_WRITE32_MEMBER(ps_dac_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	UINT32 screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -840,11 +837,6 @@ WRITE32_MEMBER(pockstat_state::ps_audio_w)
 	verboselog(0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
 }
 
-WRITE32_MEMBER(pockstat_state::ps_dac_w)
-{
-	m_dac->write_unsigned16((UINT16)((data + 0x8000) & 0x0000ffff));
-}
-
 static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32, pockstat_state )
 	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
 	AM_RANGE(0x02000000, 0x02ffffff) AM_READ(ps_rombank_r)
@@ -858,7 +850,7 @@ static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32, pockstat_state )
 	AM_RANGE(0x0d000000, 0x0d000003) AM_READWRITE(ps_lcd_r, ps_lcd_w)
 	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_SHARE("lcd_buffer")
 	AM_RANGE(0x0d80000c, 0x0d80000f) AM_READWRITE(ps_audio_r, ps_audio_w)
-	AM_RANGE(0x0d800014, 0x0d800017) AM_WRITE(ps_dac_w)
+	AM_RANGE(0x0d800014, 0x0d800017) AM_DEVWRITE16("dac", dac_word_interface, write, 0x0000ffff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -993,9 +985,10 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockstat_cart")

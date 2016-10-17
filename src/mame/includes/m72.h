@@ -53,7 +53,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;
-	optional_device<dac_device> m_dac;
+	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

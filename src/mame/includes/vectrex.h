@@ -126,7 +126,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via6522_0;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<ay8910_device> m_ay8912;
 	required_device<vector_device> m_vector;
 	optional_device<vectrex_cart_slot_device> m_cart;

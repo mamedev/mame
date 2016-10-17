@@ -41,13 +41,15 @@ ToDO:
 
 *****************************************************************************************/
 
-#include "machine/genpin.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/genpin.h"
 #include "sound/ay8910.h"
-#include "sound/votrax.h"
 #include "sound/dac.h"
+#include "sound/votrax.h"
+#include "sound/volt_reg.h"
 #include "taito.lh"
 
 class taito_state : public genpin_class
@@ -332,13 +334,14 @@ static MACHINE_CONFIG_START( taito, taito_state )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
-	MCFG_SPEAKER_STANDARD_MONO("dacsnd")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "dacsnd", 0.95)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.475) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	//MCFG_PIA_READPA_HANDLER(READ8(taito_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_READPB_HANDLER(READ8(taito_state, pia_pb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(taito_state, pia_pb_w))
 	//MCFG_PIA_CA2_HANDLER(WRITELINE(taito_state, pia_ca2_w))
@@ -368,16 +371,8 @@ static MACHINE_CONFIG_DERIVED( taito4, taito )
 	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(taito_state, votrax_request))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "voxsnd", 0.15) // todo: fix - it makes noise continuously
 
-	MCFG_DEVICE_REMOVE("pia")
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(taito_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_PIA_READPB_HANDLER(READ8(taito_state, pia_pb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(taito_state, pia_pb_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(taito_state, pia_ca2_w))
+	MCFG_DEVICE_MODIFY("pia")
 	MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( taito_ay_audio )

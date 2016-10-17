@@ -213,7 +213,7 @@ private:
 	optional_device<v9958_device> m_v9958;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ay8910_device> m_ay8910;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	optional_device<rp5c01_device> m_rtc;
 	address_space_config m_switched_device_as_config;
 	required_memory_region m_region_maincpu;

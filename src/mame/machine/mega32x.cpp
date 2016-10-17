@@ -199,6 +199,7 @@ GFX check (these don't explicitly fails):
 */
 #include "emu.h"
 #include "machine/mega32x.h"
+#include "sound/volt_reg.h"
 
 
 const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
@@ -208,8 +209,8 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_master_cpu(*this, "32x_master_sh2")
 	, m_slave_cpu(*this, "32x_slave_sh2")
-	, m_lch_pwm(*this, "lch_pwm")
-	, m_rch_pwm(*this, "rch_pwm")
+	, m_ldac(*this, "ldac")
+	, m_rdac(*this, "rdac")
 	, m_sh2_shared(*this, "sh2_shared")
 	, m_palette(*this, finder_base::DUMMY_TAG)
 {
@@ -821,8 +822,8 @@ TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 		switch(m_pwm_ctrl & 3)
 		{
 			case 0: m_lch_index_r++; /*Speaker OFF*/ break;
-			case 1: m_lch_pwm->write_signed16(m_cur_lch[m_lch_index_r++]); break;
-			case 2: m_rch_pwm->write_signed16(m_cur_lch[m_lch_index_r++]); break;
+			case 1: m_ldac->write(m_cur_lch[m_lch_index_r++]); break;
+			case 2: m_rdac->write(m_cur_lch[m_lch_index_r++]); break;
 			case 3: popmessage("Undefined PWM Lch value 3, contact MESSdev"); break;
 		}
 
@@ -836,8 +837,8 @@ TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 		switch((m_pwm_ctrl & 0xc) >> 2)
 		{
 			case 0: m_rch_index_r++; /*Speaker OFF*/ break;
-			case 1: m_rch_pwm->write_signed16(m_cur_rch[m_rch_index_r++]); break;
-			case 2: m_lch_pwm->write_signed16(m_cur_rch[m_rch_index_r++]); break;
+			case 1: m_rdac->write(m_cur_rch[m_rch_index_r++]); break;
+			case 2: m_ldac->write(m_cur_rch[m_rch_index_r++]); break;
 			case 3: popmessage("Undefined PWM Rch value 3, contact MESSdev"); break;
 		}
 
@@ -1769,11 +1770,11 @@ static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
-	MCFG_DAC_ADD("lch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.40)
-
-	MCFG_DAC_ADD("rch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.40)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.4) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
@@ -1799,11 +1800,11 @@ static MACHINE_CONFIG_FRAGMENT( _32x_pal )
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
-	MCFG_DAC_ADD("lch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.40)
-
-	MCFG_DAC_ADD("rch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.40)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.4) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END

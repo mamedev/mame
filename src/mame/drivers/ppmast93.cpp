@@ -134,8 +134,9 @@ Dip locations added based on the notes above.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2413.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2413.h"
 
 
 class ppmast93_state : public driver_device
@@ -144,15 +145,11 @@ public:
 	ppmast93_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
-		m_ymsnd(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_bgram(*this, "bgram"),
 		m_fgram(*this, "fgram") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
-	required_device<ym2413_device> m_ymsnd;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<UINT8> m_bgram;
@@ -164,7 +161,6 @@ public:
 	DECLARE_WRITE8_MEMBER(fgram_w);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(port4_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -225,20 +221,10 @@ static ADDRESS_MAP_START( ppmast93_cpu2_map, AS_PROGRAM, 8, ppmast93_state )
 	AM_RANGE(0xfd00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-
-WRITE8_MEMBER(ppmast93_state::sound_w)
-{
-	switch(offset&0xff)
-	{
-		case 0:
-		case 1: m_ymsnd->write(space,offset,data); break;
-		case 2: m_dac->write_unsigned8(data);break;
-		default: logerror("%x %x - %x\n",offset,data,space.device().safe_pcbase());
-	}
-}
-
 static ADDRESS_MAP_START( ppmast93_cpu2_io, AS_IO, 8, ppmast93_state )
-		AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITE(sound_w) AM_REGION("sub", 0x20000)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("sub", 0x20000)
+	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x0002, 0x0002) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ppmast93 )
@@ -398,16 +384,16 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 5000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( ppmast93 )

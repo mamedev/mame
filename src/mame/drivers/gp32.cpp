@@ -17,9 +17,10 @@
  **************************************************************************/
 
 #include "emu.h"
+#include "includes/gp32.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "includes/gp32.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "softlist.h"
 
@@ -1519,8 +1520,8 @@ WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 			if (m_s3c240x_iis.fifo_index == 2)
 			{
 				m_s3c240x_iis.fifo_index = 0;
-				m_dac1->write_signed16(m_s3c240x_iis.fifo[0] + 0x8000);
-				m_dac2->write_signed16(m_s3c240x_iis.fifo[1] + 0x8000);
+				m_ldac->write(m_s3c240x_iis.fifo[0]);
+				m_rdac->write(m_s3c240x_iis.fifo[1]);
 			}
 		}
 		break;
@@ -1693,10 +1694,11 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

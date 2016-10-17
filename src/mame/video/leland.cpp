@@ -35,10 +35,10 @@ TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
 
 	/* update the DACs */
 	if (!(m_dac_control & 0x01))
-		m_dac0->write_unsigned8(m_video_ram[(m_last_scanline) * 256 + 160]);
+		m_dac0->write(m_video_ram[(m_last_scanline) * 256 + 160]);
 
 	if (!(m_dac_control & 0x02))
-		m_dac1->write_unsigned8(m_video_ram[(m_last_scanline) * 256 + 161]);
+		m_dac1->write(m_video_ram[(m_last_scanline) * 256 + 161]);
 
 	m_last_scanline = scanline;
 

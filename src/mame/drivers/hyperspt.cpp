@@ -9,18 +9,19 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
-#include "cpu/m6809/m6809.h"
-#include "sound/dac.h"
-#include "machine/konami1.h"
-#include "machine/nvram.h"
-#include "machine/gen_latch.h"
-#include "machine/watchdog.h"
 #include "includes/konamipt.h"
+#include "includes/hyperspt.h"
 #include "audio/trackfld.h"
 #include "audio/hyprolyb.h"
-#include "includes/hyperspt.h"
+#include "cpu/m6800/m6800.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/konami1.h"
+#include "machine/nvram.h"
+#include "machine/watchdog.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 WRITE8_MEMBER(hyperspt_state::hyperspt_coin_counter_w)
@@ -82,7 +83,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)      /* speech and output control */
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
@@ -94,7 +95,7 @@ static ADDRESS_MAP_START( roadf_sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
 	AM_RANGE(0xc000, 0xdfff) AM_NOP // No VLM
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
@@ -106,7 +107,7 @@ static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_NOP
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)   /* speech and output control */
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
@@ -320,20 +321,21 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("snsnd", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

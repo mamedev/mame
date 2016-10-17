@@ -30,7 +30,7 @@ public:
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
 
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 
 protected:
 	// device-level overrides

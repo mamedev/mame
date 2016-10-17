@@ -112,7 +112,7 @@ public:
 
 private:
 	UINT8 *m_bank_base;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 };
 
 

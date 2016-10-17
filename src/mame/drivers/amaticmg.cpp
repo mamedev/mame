@@ -421,7 +421,7 @@
 #include "video/mc6845.h"
 #include "machine/i8255.h"
 #include "sound/3812intf.h"
-#include "sound/dac.h"
+//#include "sound/dac.h"
 
 #include "suprstar.lh"
 
@@ -627,7 +627,7 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
 
 WRITE8_MEMBER( amaticmg_state::unk80_w )
 {
-//  m_dac->write_unsigned8(data & 0x01);       /* Sound DAC */
+//  m_dac->write(BIT(data, 0));       /* Sound DAC */
 }
 
 
@@ -656,8 +656,8 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE(unk80_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_device, write_signed8)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_device, write_signed8)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, write)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, write)
 
 ADDRESS_MAP_END
 
@@ -858,14 +858,10 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-//  MCFG_DAC_ADD("dac")   /* Y3014B */
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK) /* Y3014B DAC */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 

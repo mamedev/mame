@@ -97,8 +97,8 @@ public:
 		m_s3c240x_ram(*this, "s3c240x_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_smartmedia(*this, "smartmedia"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
 		m_nvram(*this, "nvram"),
 		m_io_in0(*this, "IN0"),
 		m_io_in1(*this, "IN1"),
@@ -187,8 +187,8 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<smartmedia_image_device> m_smartmedia;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
 	required_device<nvram_device> m_nvram;
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;

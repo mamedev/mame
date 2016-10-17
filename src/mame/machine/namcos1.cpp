@@ -513,10 +513,6 @@ void namcos1_state::machine_start()
 	m_soundbank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 	m_mcubank->configure_entries(0, 24, memregion("voice")->base(), 0x8000);
 
-	save_item(NAME(m_dac0_value));
-	save_item(NAME(m_dac1_value));
-	save_item(NAME(m_dac0_gain));
-	save_item(NAME(m_dac1_gain));
 	save_item(NAME(m_key));
 	save_item(NAME(m_mcu_patch_data));
 	save_item(NAME(m_reset));
@@ -527,7 +523,6 @@ void namcos1_state::machine_reset()
 	/* mcu patch data clear */
 	m_mcu_patch_data = 0;
 
-	init_DACs();
 	memset(m_key, 0, sizeof(m_key));
 	m_key_quotient = 0;
 	m_key_reminder = 0;

@@ -1782,32 +1782,32 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// basic speaker configuration
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gottlieb1, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R1_ADD("r1sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gottlieb2, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R2_ADD("r2sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R2_ADD("r2sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(gottlieb_state::laserdisc_audio_process), (gottlieb_state*)owner))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
 	/* right channel is processed as data */
 
 	MCFG_DEVICE_REMOVE("screen")
@@ -1856,8 +1856,8 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1891,15 +1891,16 @@ static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R2_ADD_COBRAM3("r2sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(gottlieb_state::laserdisc_audio_process), (gottlieb_state*)owner))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
 	/* right channel is processed as data */
 
 	MCFG_DEVICE_REMOVE("screen")

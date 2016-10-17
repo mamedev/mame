@@ -12,6 +12,7 @@
 **********************************************************************/
 
 #include "p1_sound.h"
+#include "sound/volt_reg.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -59,11 +60,12 @@ static MACHINE_CONFIG_FRAGMENT( p1_sound )
 	MCFG_PIT8253_CLK2(XTAL_12_5MHz/10)
 //  MCFG_PIT8253_OUT2_HANDLER(XXX)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_FILTER_RC_ADD("filter", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -143,7 +145,7 @@ WRITE8_MEMBER( p1_sound_device::dac_w )
 WRITE_LINE_MEMBER( p1_sound_device::sampler_sync )
 {
 	if (state) {
-		m_dac->write_unsigned8(m_dac_data[m_dac_ptr++]);
+		m_dac->write(m_dac_data[m_dac_ptr++]);
 		m_dac_ptr &= 7;
 		if ((m_dac_ptr % 8) == 0) {
 			m_isa->irq7_w(state);

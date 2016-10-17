@@ -25,12 +25,14 @@ Year + Game                 By      Board      Hardware
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/ay8910.h"
-#include "sound/3526intf.h"
 #include "includes/suna16.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/3526intf.h"
+#include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2151.h"
 
 /***************************************************************************
 
@@ -332,38 +334,19 @@ ADDRESS_MAP_END
 
 
 
-/* 2 DACs per CPU - 4 bits per sample */
-
-WRITE8_MEMBER(suna16_state::DAC1_w)
-{
-	m_dac1->write_unsigned8( (data & 0xf) * 0x11 );
-}
-WRITE8_MEMBER(suna16_state::DAC2_w)
-{
-	m_dac2->write_unsigned8( (data & 0xf) * 0x11 );
-}
-WRITE8_MEMBER(suna16_state::bssoccer_DAC3_w)
-{
-	m_dac3->write_unsigned8( (data & 0xf) * 0x11 );
-}
-WRITE8_MEMBER(suna16_state::bssoccer_DAC4_w)
-{
-	m_dac4->write_unsigned8( (data & 0xf) * 0x11 );
-}
-
 static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)    // From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_WRITE(DAC1_w)  // 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_WRITE(DAC2_w)  // 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac", dac_byte_interface, write)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("rdac", dac_byte_interface, write)
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_1_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_pcm_2_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch3", generic_latch_8_device, read)    // From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_WRITE(bssoccer_DAC3_w)  // 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_WRITE(bssoccer_DAC4_w)  // 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac2", dac_byte_interface, write)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("rdac2", dac_byte_interface, write)
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_2_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
 
@@ -391,8 +374,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)    // From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_WRITE(DAC1_w)  // 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_WRITE(DAC2_w)  // 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac", dac_byte_interface, write)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("rdac", dac_byte_interface, write)
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
 
@@ -421,8 +404,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bestbest_pcm_1_iomap, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)   // From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x02) AM_WRITE(DAC1_w)  // 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x02) AM_WRITE(DAC2_w)  // 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac", dac_byte_interface, write)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("rdac", dac_byte_interface, write)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ldac2", dac_byte_interface, write)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("rdac2", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -851,20 +836,18 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)  /* 3.579545MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.2)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.2)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-
-	MCFG_DAC_ADD("dac3")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-
-	MCFG_DAC_ADD("dac4")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
+	MCFG_SOUND_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
+	MCFG_SOUND_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -917,11 +900,11 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -973,11 +956,11 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1038,17 +1021,15 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-
-	MCFG_DAC_ADD("dac3")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-
-	MCFG_DAC_ADD("dac4")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
+	MCFG_SOUND_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
+	MCFG_SOUND_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -16,10 +16,10 @@ public:
 	gba_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ladac(*this, "direct_a_left"),
-		m_radac(*this, "direct_a_right"),
-		m_lbdac(*this, "direct_b_left"),
-		m_rbdac(*this, "direct_b_right"),
+		m_ldaca(*this, "ldaca"),
+		m_rdaca(*this, "rdaca"),
+		m_ldacb(*this, "ldacb"),
+		m_rdacb(*this, "rdacb"),
 		m_gbsound(*this, "custom"),
 		m_cart(*this, "cartslot"),
 		m_region_maincpu(*this, "maincpu"),
@@ -28,10 +28,10 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_ladac;
-	required_device<dac_device> m_radac;
-	required_device<dac_device> m_lbdac;
-	required_device<dac_device> m_rbdac;
+	required_device<dac_byte_interface> m_ldaca;
+	required_device<dac_byte_interface> m_rdaca;
+	required_device<dac_byte_interface> m_ldacb;
+	required_device<dac_byte_interface> m_rdacb;
 	required_device<gameboy_sound_device> m_gbsound;
 	required_device<gba_cart_slot_device> m_cart;
 

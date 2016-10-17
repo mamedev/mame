@@ -9,7 +9,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
 
 class joctronic_state : public genpin_class
 {

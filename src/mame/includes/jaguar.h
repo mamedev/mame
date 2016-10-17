@@ -32,8 +32,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_gpu(*this, "gpu"),
 			m_dsp(*this, "dsp"),
-			m_dac1(*this, "dac1"),
-			m_dac2(*this, "dac2"),
+			m_ldac(*this, "ldac"),
+			m_rdac(*this, "rdac"),
 			m_cdrom(*this, "cdrom"),
 			m_nvram(*this, "nvram"),
 			m_rom_base(*this, "rom"),
@@ -73,8 +73,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<jaguargpu_cpu_device> m_gpu;
 	required_device<jaguardsp_cpu_device> m_dsp;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
 	optional_device<cdrom_image_device> m_cdrom;
 
 	// memory

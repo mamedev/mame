@@ -143,10 +143,10 @@ B0000x-xxxxxx: see V7, -800000
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/fidelz80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-
-#include "includes/fidelz80.h"
+#include "sound/volt_reg.h"
 
 // internal artwork
 #include "fidel_eag_68k.lh" // clickable
@@ -224,7 +224,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	// 74145 0-8: input mux, digit/led select
 	// 74145 9: speaker out
 	UINT16 sel = 1 << (data & 0xf);
-	m_speaker->level_w(sel >> 9 & 1);
+	m_dac->write(BIT(sel, 9));
 	m_inp_mux = sel & 0x1ff;
 	eag_prepare_display();
 }
@@ -415,9 +415,10 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")

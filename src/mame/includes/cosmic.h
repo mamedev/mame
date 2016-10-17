@@ -55,7 +55,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<samples_device> m_samples;
-	required_device<dac_device> m_dac;
+	optional_device<dac_bit_interface> m_dac;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -64,6 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(panic_sound_output2_w);
 	DECLARE_WRITE8_MEMBER(cosmicg_output_w);
 	DECLARE_WRITE8_MEMBER(cosmica_sound_output_w);
+	DECLARE_WRITE8_MEMBER(dac_w);
 	DECLARE_READ8_MEMBER(cosmica_pixel_clock_r);
 	DECLARE_READ8_MEMBER(cosmicg_port_0_r);
 	DECLARE_READ8_MEMBER(magspot_coinage_dip_r);
@@ -71,7 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(cosmic_color_register_w);
 	DECLARE_WRITE8_MEMBER(cosmic_background_enable_w);
-	DECLARE_INPUT_CHANGED_MEMBER(panic_coin_inserted);
+	DECLARE_WRITE_LINE_MEMBER(panic_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);

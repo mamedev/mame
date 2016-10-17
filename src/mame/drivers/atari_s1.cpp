@@ -47,6 +47,7 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "atari_s1.lh"
 
 
@@ -98,7 +99,7 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
-	required_device<dac_device> m_dac;
+	required_device<dac_4bit_r2r_device> m_dac;
 	required_ioport_array<10> m_switch;
 };
 
@@ -403,7 +404,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::timer_s )
 		{
 			m_timer_s[2]++;
 			offs_t offs = (m_timer_s[2] & 31) | ((m_1080 & 15) << 5);
-			m_dac->write_unsigned8(m_p_prom[offs]<< 4);
+			m_dac->write(m_p_prom[offs]);
 		}
 		else
 			m_timer_s[2] = 0;
@@ -425,6 +426,7 @@ void atari_s1_state::machine_reset()
 {
 	m_p_prom = memregion("proms")->base();
 	m_vol = 0;
+	m_dac->set_output_gain(0, 0);
 	m_t_c = 0;
 	m_audiores = 0;
 }
@@ -438,9 +440,11 @@ static MACHINE_CONFIG_START( atari_s1, atari_s1_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s1)

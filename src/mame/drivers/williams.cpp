@@ -503,6 +503,8 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "emu.h"
 #include "includes/williams.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define MASTER_CLOCK        (XTAL_12MHz)
@@ -1459,10 +1461,10 @@ static MACHINE_CONFIG_START( williams, williams_state )
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1476,7 +1478,7 @@ static MACHINE_CONFIG_START( williams, williams_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
@@ -1556,7 +1558,7 @@ static MACHINE_CONFIG_DERIVED( sinistar, williams )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
@@ -1578,7 +1580,7 @@ static MACHINE_CONFIG_DERIVED( playball, williams )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_1")
@@ -1624,20 +1626,25 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 	MCFG_DEVICE_MODIFY("pia_1")
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blaster_state, blaster_snd_cmd_w))
 
+	MCFG_DEVICE_MODIFY("pia_2")
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("ldac", dac_byte_interface, write))
+
 	MCFG_DEVICE_ADD("pia_2b", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("wmsdac_b", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("rdac", dac_byte_interface, write))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("wmsdac")
-	MCFG_DEVICE_REMOVE("mono")
+	MCFG_DEVICE_REMOVE("speaker")
+	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_DAC_ADD("wmsdac_b")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1678,10 +1685,10 @@ static MACHINE_CONFIG_START( williams2, williams2_state )
 	MCFG_VIDEO_START_OVERRIDE(williams2_state,williams2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1698,7 +1705,7 @@ static MACHINE_CONFIG_START( williams2, williams2_state )
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia_1", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
@@ -1749,8 +1756,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( joust2, williams2, joust2_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(williams2_d000_rom_map)
 
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_MACHINE_START_OVERRIDE(joust2_state,joust2)
 	MCFG_MACHINE_RESET_OVERRIDE(joust2_state,joust2)

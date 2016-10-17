@@ -36,6 +36,8 @@
 */
 
 #include "includes/vidbrain.h"
+#include "machine/rescap.h"
+#include "sound/volt_reg.h"
 #include "softlist.h"
 #include "vidbrain.lh"
 
@@ -142,19 +144,7 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 
 	if (!m_sound_clk && sound_clk)
 	{
-		//m_discrete->write(space, NODE_01, m_keylatch & 0x03);
-
-		UINT8 dac_data = 0;
-
-		switch (m_keylatch & 0x03)
-		{
-		case 0: dac_data = 0x00; break;
-		case 1: dac_data = 0x55; break;
-		case 2: dac_data = 0xaa; break;
-		case 3: dac_data = 0xff; break;
-		}
-
-		m_dac->write_unsigned8(dac_data);
+		m_dac->write(m_keylatch & 3);
 	}
 
 	m_sound_clk = sound_clk;
@@ -367,29 +357,6 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  SOUND
-//**************************************************************************
-
-//-------------------------------------------------
-//  DISCRETE_SOUND( vidbrain )
-//-------------------------------------------------
-
-static const discrete_dac_r1_ladder vidbrain_dac =
-{
-	2,
-	{ RES_K(120), RES_K(120) }, // R=56K, 2R=120K
-	0, 0, RES_K(120), 0
-};
-
-static DISCRETE_SOUND_START( vidbrain )
-	DISCRETE_INPUT_DATA(NODE_01)
-	DISCRETE_DAC_R1(NODE_02, NODE_01, DEFAULT_TTL_V_LOGIC_1, &vidbrain_dac)
-	DISCRETE_OUTPUT(NODE_02, 5000)
-DISCRETE_SOUND_END
-
-
-
-//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -545,13 +512,10 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_UV201_DB_CALLBACK(READ8(vidbrain_state, memory_read_byte))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(vidbrain)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.167) // 74ls74.u16 + 120k + 56k
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// devices
 	MCFG_DEVICE_ADD(F3853_TAG, F3853, XTAL_4MHz/2)

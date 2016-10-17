@@ -11,8 +11,6 @@
 #ifndef __MEA8000_H__
 #define __MEA8000_H__
 
-#include "sound/dac.h"
-
 #define MCFG_MEA8000_DAC(_tag) \
 	mea8000_device::static_set_dac_tag(*device, "^" _tag);
 
@@ -54,13 +52,13 @@ struct filter_t
 #endif
 };
 
-class mea8000_device : public device_t
+class mea8000_device : public device_t,
+	public device_sound_interface
 {
 public:
 	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mea8000_device() {}
 
-	static void static_set_dac_tag(device_t &device, const char *tag) { downcast<mea8000_device &>(device).m_dac.set_tag(tag); }
 	template<class _Object> static devcb_base &set_req_wr_callback(device_t &device, _Object object) { return downcast<mea8000_device &>(device).m_write_req.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
@@ -69,7 +67,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state
@@ -100,8 +98,6 @@ private:
 
 	devcb_write8 m_write_req;
 
-	required_device<dac_device> m_dac;
-
 	/* state */
 	mea8000_state m_state; /* current state */
 
@@ -126,6 +122,8 @@ private:
 	UINT8  m_noise;
 
 	emu_timer *m_timer;
+	sound_stream * m_stream;
+	stream_sample_t m_output;
 
 	int m_cos_table[TABLE_LEN];  /* fm => cos coefficient */
 	int m_exp_table[TABLE_LEN];  /* bw => exp coefficient */

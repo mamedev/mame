@@ -12,7 +12,6 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/s3c44b0.h"
-#include "sound/dac.h"
 #include "coreutil.h"
 
 #define VERBOSE_LEVEL ( 0 )

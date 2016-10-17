@@ -164,9 +164,8 @@ Notes:
 **************************************************************************************/
 
 #include "emu.h"
+#include "includes/mw8080bw.h"
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
-#include "sound/sn76496.h"
 
 
 /*************************************
@@ -185,7 +184,13 @@ public:
 		m_io9400(*this, "io9400"),
 		m_io9401(*this, "io9401"),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_samples(*this, "samples"),
+		m_sn(*this, "snsnd"),
+		m_sound1(0),
+		m_sound2(0),
+		m_sound3(0)
+	{ }
 
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -197,7 +202,26 @@ public:
 	UINT32 screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_device<samples_device> m_samples;
+	required_device<sn76477_device> m_sn;
+
+	DECLARE_WRITE8_MEMBER(sound1_w);
+	DECLARE_WRITE8_MEMBER(sound2_w);
+	DECLARE_WRITE8_MEMBER(sound3_w);
+	uint8_t m_sound1;
+	uint8_t m_sound2;
+	uint8_t m_sound3;
+
+protected:
+	virtual void driver_start() override;
 };
+
+void spaceg_state::driver_start()
+{
+	save_item(NAME(m_sound1));
+	save_item(NAME(m_sound2));
+	save_item(NAME(m_sound3));
+}
 
 /*************************************
  *
@@ -327,6 +351,47 @@ UINT32 spaceg_state::screen_update_spaceg(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
+WRITE8_MEMBER(spaceg_state::sound1_w)
+{
+	if (!BIT(m_sound1, 1) && BIT(data, 1))
+		m_samples->start(1, 1); // Death
+
+	if (!BIT(m_sound1, 2) && BIT(data, 2))
+		m_samples->start(0, 0); // Shoot
+
+	m_sn->enable_w(!(data & 0x08)); // Boss
+
+	m_sound1 = data;
+
+	if (data & ~0x0e) logerror("spaceg sound3 unmapped %02x\n", data & ~0x0e);
+}
+
+WRITE8_MEMBER(spaceg_state::sound2_w)
+{
+	// game writes 0x01 at bootup & 0x11 when you start a game
+	m_sound2 = data;
+
+	if (data & ~0x11) logerror("spaceg sound2 unmapped %02x\n", data & ~0x11);
+}
+
+WRITE8_MEMBER(spaceg_state::sound3_w)
+{
+	if (!BIT(m_sound3, 0) && BIT(data, 0))
+		m_samples->start(4, 8); // Start of level
+
+	if (!BIT(m_sound3, 1) && BIT(data, 1))
+		m_samples->start(5, 8); // Rocket
+
+	if (!BIT(m_sound3, 2) && BIT(data, 2))
+		m_samples->start(2, 2); // Hit
+
+	if (!BIT(m_sound3, 3) && BIT(data, 3))
+		m_samples->start(3, 7); // Dive bomb
+
+	m_sound3 = data;
+
+	if (data & ~0x0f) logerror("spaceg sound3 unmapped %02x\n", data & ~0x0f);
+}
 
 /*************************************
  *
@@ -350,7 +415,10 @@ static ADDRESS_MAP_START( spaceg_map, AS_PROGRAM, 8, spaceg_state )
 	    bit 3 is probably a flip screen
 	    bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
 	*/
-	AM_RANGE(0x9402, 0x9407) AM_RAM     /* surely wrong */
+	AM_RANGE(0x9402, 0x9402) AM_WRITENOP
+	AM_RANGE(0x9405, 0x9405) AM_WRITE(sound1_w)
+	AM_RANGE(0x9406, 0x9406) AM_WRITE(sound2_w)
+	AM_RANGE(0x9407, 0x9407) AM_WRITE(sound3_w)
 
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("9800")
 	AM_RANGE(0x9801, 0x9801) AM_READ_PORT("9801")
@@ -432,19 +500,7 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
-
-//  MCFG_SOUND_ADD("sn1", SN76496, 15468480/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-//  MCFG_SOUND_ADD("sn2", SN76496, 15468480/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-//  MCFG_SOUND_ADD("sn3", SN76496, 15468480/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-//  MCFG_DAC_ADD("dac")
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
 
 
@@ -481,4 +537,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spaceg, 0, spaceg, spaceg, driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

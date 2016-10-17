@@ -12,10 +12,10 @@
 ***************************************************************************/
 
 #include "sblaster.h"
+#include "machine/pic8259.h"
 #include "sound/speaker.h"
 #include "sound/262intf.h"
-#include "sound/dac.h"
-#include "machine/pic8259.h"
+#include "sound/volt_reg.h"
 
 /*
   adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
@@ -73,10 +73,11 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("sbdacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("sbdacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_PC_JOY_ADD("pc_joy")
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
@@ -92,10 +93,11 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 	/* no CM/S support (empty sockets) */
 
-	MCFG_SOUND_ADD("sbdacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("sbdacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_PC_JOY_ADD("pc_joy")
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
@@ -111,10 +113,12 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("sbdacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("sbdacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_PC_JOY_ADD("pc_joy")
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
@@ -755,8 +759,8 @@ void sb_device::adpcm_decode(UINT8 sample, int size)
 	else if(dec_sample < 0)
 		dec_sample = 0;
 	m_dsp.adpcm_ref = dec_sample;
-	m_dacl->write_unsigned8(m_dsp.adpcm_ref);
-	m_dacr->write_unsigned8(m_dsp.adpcm_ref);
+	m_ldac->write(m_dsp.adpcm_ref << 8);
+	m_rdac->write(m_dsp.adpcm_ref << 8);
 }
 
 READ8_MEMBER( sb16_device::mpu401_r )
@@ -835,8 +839,8 @@ void sb16_device::mixer_set()
 	ymf262_device *ymf = subdevice<ymf262_device>("ymf262");
 	float lmain = m_mixer.main_vol[0]/248.0;
 	float rmain = m_mixer.main_vol[1]/248.0;
-	m_dacl->set_output_gain(ALL_OUTPUTS, lmain*(m_mixer.dac_vol[0]/248.0f));
-	m_dacr->set_output_gain(ALL_OUTPUTS, rmain*(m_mixer.dac_vol[1]/248.0f));
+	m_ldac->set_output_gain(ALL_OUTPUTS, lmain*(m_mixer.dac_vol[0]/248.0f));
+	m_rdac->set_output_gain(ALL_OUTPUTS, rmain*(m_mixer.dac_vol[1]/248.0f));
 	ymf->set_output_gain(0, lmain*(m_mixer.fm_vol[0]/248.0f));
 	ymf->set_output_gain(1, rmain*(m_mixer.fm_vol[1]/248.0f));
 	ymf->set_output_gain(2, lmain*(m_mixer.fm_vol[0]/248.0f));
@@ -1216,8 +1220,8 @@ machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() c
 sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
-	m_dacl(*this, "sbdacl"),
-	m_dacr(*this, "sbdacr"),
+	m_ldac(*this, "ldac"),
+	m_rdac(*this, "rdac"),
 	m_joy(*this, "pc_joy"),
 	m_mdout(*this, "mdout"),
 	m_config(*this, "CONFIG"), m_dack_out(0), m_onebyte_midi(false), m_uart_midi(false), m_uart_irq(false), m_mpu_midi(false), m_rx_waiting(0), m_tx_waiting(0), m_xmit_read(0), m_xmit_write(0), m_recv_read(0), m_recv_write(0), m_tx_busy(false), m_timer(nullptr)
@@ -1540,40 +1544,40 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 	UINT16 lsample, rsample;
 	switch (m_dsp.flags) {
 		case 0: // 8-bit unsigned mono
-			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
-			m_dacr->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
+			m_ldac->write(m_dsp.data[m_dsp.d_rptr] << 8);
+			m_rdac->write(m_dsp.data[m_dsp.d_rptr] << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			break;
 		case SIGNED: // 8-bit signed mono
-			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr] + 128);
-			m_dacr->write_unsigned8(m_dsp.data[m_dsp.d_rptr] + 128);
+			m_ldac->write((m_dsp.data[m_dsp.d_rptr] ^ 0x80) << 8);
+			m_rdac->write((m_dsp.data[m_dsp.d_rptr] ^ 0x80) << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			break;
 		case STEREO: // 8-bit unsigned stereo
-			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
+			m_ldac->write(m_dsp.data[m_dsp.d_rptr] << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x80;
-			m_dacr->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
+			m_rdac->write(m_dsp.data[m_dsp.d_rptr] << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			break;
 		case SIGNED | STEREO: // 8-bit signed stereo
-			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr] + 128);
+			m_ldac->write((m_dsp.data[m_dsp.d_rptr] ^ 0x80) << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
-			m_dacr->write_unsigned8(m_dsp.data[m_dsp.d_rptr] + 128);
+			m_rdac->write((m_dsp.data[m_dsp.d_rptr] ^ 0x80) << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			break;
 		case SIXTEENBIT: // 16-bit unsigned mono
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.data[m_dsp.d_rptr++] = 0x80;
-			m_dacl->write_unsigned16(lsample);
-			m_dacr->write_unsigned16(lsample);
+			m_ldac->write(lsample);
+			m_rdac->write(lsample);
 			break;
 		case SIXTEENBIT | SIGNED: // 16-bit signed mono
-			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
+			lsample = m_dsp.data[m_dsp.d_rptr] | ((m_dsp.data[m_dsp.d_rptr+1] ^ 0x80) << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
-			m_dacl->write_unsigned16(lsample + 32768);
-			m_dacr->write_unsigned16(lsample + 32768);
+			m_ldac->write(lsample);
+			m_rdac->write(lsample);
 			break;
 		case SIXTEENBIT | STEREO: // 16-bit unsigned stereo
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
@@ -1583,27 +1587,27 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 			rsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.data[m_dsp.d_rptr++] = 0x80;
-			m_dacl->write_unsigned16(lsample);
-			m_dacr->write_unsigned16(rsample);
+			m_ldac->write(lsample);
+			m_rdac->write(rsample);
 			break;
 		case SIXTEENBIT | SIGNED | STEREO: // 16-bit signed stereo
-			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
+			lsample = m_dsp.data[m_dsp.d_rptr] | ((m_dsp.data[m_dsp.d_rptr+1] ^ 0x80) << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.d_rptr %= 128;
-			rsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
+			rsample = m_dsp.data[m_dsp.d_rptr] | ((m_dsp.data[m_dsp.d_rptr+1] ^ 0x80) << 8);
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
-			m_dacl->write_unsigned16(lsample + 32768);
-			m_dacr->write_unsigned16(rsample + 32768);
+			m_ldac->write(lsample);
+			m_rdac->write(rsample);
 			break;
 		case ADPCM2:
 			if(m_dsp.adpcm_new_ref)
 			{
 				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
 				m_dsp.adpcm_new_ref = false;
-				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
-				m_dacr->write_unsigned8(m_dsp.adpcm_ref);
+				m_ldac->write(m_dsp.adpcm_ref << 8);
+				m_rdac->write(m_dsp.adpcm_ref << 8);
 				break;
 			}
 			lsample = m_dsp.data[m_dsp.d_rptr];
@@ -1630,8 +1634,8 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 			{
 				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
 				m_dsp.adpcm_new_ref = false;
-				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
-				m_dacr->write_unsigned8(m_dsp.adpcm_ref);
+				m_ldac->write(m_dsp.adpcm_ref << 8);
+				m_rdac->write(m_dsp.adpcm_ref << 8);
 				break;
 			}
 			lsample = m_dsp.data[m_dsp.d_rptr];
@@ -1655,8 +1659,8 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 			{
 				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
 				m_dsp.adpcm_new_ref = false;
-				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
-				m_dacr->write_unsigned8(m_dsp.adpcm_ref);
+				m_ldac->write(m_dsp.adpcm_ref << 8);
+				m_rdac->write(m_dsp.adpcm_ref << 8);
 				break;
 			}
 			lsample = m_dsp.data[m_dsp.d_rptr];

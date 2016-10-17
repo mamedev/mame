@@ -265,6 +265,7 @@ dgc (dg(no!spam)cx@mac.com)
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 class dectalk_state : public driver_device
@@ -311,7 +312,7 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_device<mc68681_device> m_duart;
 	required_device<x2212_device> m_nvram;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_txa);
 	DECLARE_READ8_MEMBER(dectalk_duart_input);
@@ -843,7 +844,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
 	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
-	m_dac->write_signed16(data);
+	m_dac->write(data >> 4);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
 	/*device_t *duart = machine().device("duartn68681");
@@ -888,9 +889,10 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	/* video hardware */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0) /* E88 10KHz OSC, handled by timer */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.9)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 

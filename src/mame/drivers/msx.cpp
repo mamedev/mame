@@ -532,6 +532,7 @@ PCB Layouts missing
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
+#include "sound/volt_reg.h"
 #include "softlist.h"
 
 
@@ -1334,7 +1335,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx_ym2413 )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_21_4772MHz/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx2_64kb_vram )
@@ -1356,18 +1357,20 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_10_738635MHz/3/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -1498,18 +1501,20 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", XTAL_21_4772MHz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_21_4772MHz/6/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -1554,18 +1559,20 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_21_4772MHz/6/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")

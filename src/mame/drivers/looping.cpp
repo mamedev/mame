@@ -55,6 +55,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 */
 
 #include "emu.h"
+#include "cpu/cop400/cop400.h"
 #include "cpu/tms9900/tms9995.h"
 #include "cpu/tms9900/tms9980a.h"
 #include "machine/gen_latch.h"
@@ -62,8 +63,8 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
+#include "sound/volt_reg.h"
 #include "video/resnet.h"
-#include "cpu/cop400/cop400.h"
 
 
 /*************************************
@@ -161,7 +162,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -419,7 +420,7 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
 	*/
 
 	m_sound[offset + 1] = data ^ 1;
-	m_dac->write_unsigned8(((m_sound[2] << 7) + (m_sound[3] << 6)) * m_sound[7]);
+	m_dac->write(((m_sound[2] << 1) + m_sound[3]) * m_sound[7]);
 }
 
 
@@ -649,20 +650,21 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
 	MCFG_SOUND_ADD("tms", TMS5220, TMS_CLOCK)
 	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(looping_state, looping_spcint))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

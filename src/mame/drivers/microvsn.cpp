@@ -16,13 +16,13 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
-
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 #include "softlist.h"
 
 #define LOG 0
@@ -89,7 +89,7 @@ public:
 	rc_type     m_rc_type;
 
 protected:
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<cpu_device> m_i8021;
 	required_device<cpu_device> m_tms1100;
 	required_device<generic_slot_device> m_cart;
@@ -111,7 +111,6 @@ protected:
 	// generic variables
 	void    update_lcd();
 	void    lcd_write(UINT8 control, UINT8 data);
-	void    speaker_write(UINT8 speaker);
 	bool    m_pla;
 
 	UINT8   m_lcd_latch[8];
@@ -314,17 +313,6 @@ void microvision_state::lcd_write(UINT8 control, UINT8 data)
 }
 
 
-/*
-speaker is SPKR1 SPKR0
-*/
-void microvision_state::speaker_write(UINT8 speaker)
-{
-	const INT8 speaker_level[4] = { 0, 127, -128, 0 };
-
-	m_dac->write_signed8( speaker_level[ speaker & 0x03 ] );
-}
-
-
 void microvision_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch ( id )
@@ -381,7 +369,7 @@ WRITE8_MEMBER( microvision_state::i8021_p2_write )
 
 	m_p2 = data;
 
-	speaker_write( m_p2 & 0x03 );
+	m_dac->write(m_p2 & 0x03);
 
 	if ( m_p2 & 0x0c )
 	{
@@ -488,7 +476,7 @@ WRITE16_MEMBER( microvision_state::tms1100_write_r )
 
 	m_r = data;
 
-	speaker_write( ( ( m_r & 0x01 ) << 1 ) | ( ( m_r & 0x02 ) >> 1 ) );
+	m_dac->write((BIT(m_r, 0) << 1) | BIT(m_r, 1));
 	lcd_write( ( m_r >> 6 ) & 0x03, m_o & 0x0f );
 }
 
@@ -681,9 +669,10 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "microvision_cart")
 	MCFG_GENERIC_MANDATORY

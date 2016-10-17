@@ -26,14 +26,12 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "cpu/tms32010/tms32010.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/tms32025/tms32025.h"
-#include "video/tlc34076.h"
-#include "sound/dac.h"
-#include "machine/nvram.h"
 #include "includes/coolpool.h"
+#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms32025/tms32025.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 
@@ -528,12 +526,6 @@ WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::dsp_dac_w)
-{
-	m_dac->write_signed16((INT16)(data << 4) + 0x8000);
-}
-
-
 
 /*************************************
  *
@@ -659,7 +651,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amerdart_dsp_io_map, AS_IO, 16, coolpool_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(amerdart_dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dsp_dac_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dac_word_interface, write)
 	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x06, 0x06) AM_READ(amerdart_trackball_r)
@@ -676,7 +668,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( coolpool_dsp_io_map, AS_IO, 16, coolpool_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dsp_dac_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dac_word_interface, write)
 	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN1")
@@ -812,10 +804,10 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -851,10 +843,10 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

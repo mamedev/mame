@@ -10,12 +10,12 @@
 
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
-#include "video/tlc34076.h"
 #include "machine/ticket.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
-
+#include "sound/volt_reg.h"
+#include "video/tlc34076.h"
 
 class xtheball_state : public driver_device
 {
@@ -248,7 +248,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xtheball_state )
 	AM_RANGE(0x03040160, 0x0304016f) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x03040170, 0x0304017f) AM_READ_PORT("SERVICE1")
 	AM_RANGE(0x03040180, 0x0304018f) AM_READ(analogy_watchdog_r)
-	AM_RANGE(0x03060000, 0x0306000f) AM_DEVWRITE8("dac", dac_device, write_unsigned8, 0xff00)
+	AM_RANGE(0x03060000, 0x0306000f) AM_DEVWRITE8("dac", dac_byte_interface, write, 0xff00)
 	AM_RANGE(0x04000000, 0x057fffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
@@ -360,10 +360,11 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

@@ -81,6 +81,8 @@ public:
 	device_sound_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_sound_interface();
 
+	virtual bool issound() { return true; } /// HACK: allow devices to hide from the ui
+
 	// configuration access
 	const std::vector<std::unique_ptr<sound_route>> &routes() const { return m_route_list; }
 

@@ -35,6 +35,7 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 class cntsteer_state : public driver_device
@@ -524,17 +525,12 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_sub_irq_w)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sub_nmi_w)
 {
-//  if (data)
-	machine().scheduler().synchronize(); // force resync
-
-	//m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 //  popmessage("%02x", data);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_main_irq_w)
 {
-	machine().scheduler().synchronize(); // force resync
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
@@ -944,19 +940,20 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
@@ -995,15 +992,15 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

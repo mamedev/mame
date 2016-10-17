@@ -64,16 +64,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/rescap.h"
-#include "machine/6821pia.h"
-#include "machine/74123.h"
-#include "video/mc6845.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/ay8910.h"
-#include "sound/dac.h"
+#include "machine/6821pia.h"
+#include "machine/74123.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/mc6845.h"
 
 
 #define MAIN_CPU_MASTER_CLOCK       XTAL_11_2MHz
@@ -637,7 +638,7 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(nyny_state,main_cpu_irq))
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -645,19 +646,20 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nyny_state, nyny_ay8910_37_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay3", AY8910, AUDIO_CPU_2_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.03)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

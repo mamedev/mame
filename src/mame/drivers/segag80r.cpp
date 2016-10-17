@@ -108,7 +108,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/samples.h"
 #include "machine/i8255.h"
@@ -826,7 +825,7 @@ static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
@@ -937,10 +936,10 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

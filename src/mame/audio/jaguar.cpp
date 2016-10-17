@@ -334,12 +334,12 @@ WRITE32_MEMBER( jaguar_state::serial_w )
 	{
 		/* right DAC */
 		case 2:
-			m_dac2->write_signed16((data & 0xffff) ^ 0x8000);
+			m_rdac->write(data & 0xffff);
 			break;
 
 		/* left DAC */
 		case 3:
-			m_dac1->write_signed16((data & 0xffff) ^ 0x8000);
+			m_ldac->write(data & 0xffff);
 			break;
 
 		/* frequency register */

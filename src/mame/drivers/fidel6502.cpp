@@ -380,15 +380,14 @@ I/O is via TTL, see source code for more info
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/fidelz80.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6821pia.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
-#include "sound/dac.h"
-
-#include "includes/fidelz80.h"
+#include "sound/volt_reg.h"
 
 // internal artwork
 #include "fidel_chesster.lh" // clickable
@@ -485,7 +484,7 @@ void fidel6502_state::csc_prepare_display()
 	m_inp_mux = 1 << m_led_select & 0x3ff;
 
 	// 7442 9: speaker out
-	m_speaker->level_w(m_inp_mux >> 9 & 1);
+	m_dac->write(BIT(m_inp_mux, 9));
 
 	// 7seg leds+H (not on all models), 8*8(+1) chessboard leds
 	set_display_segmask(0xf, 0x7f);
@@ -655,7 +654,7 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 	eas_prepare_display();
 
 	// 7442 9: speaker out
-	m_speaker->level_w(m_led_select >> 9 & 1);
+	m_dac->write(BIT(m_led_select, 9));
 
 	// d4: speech ROM A12
 	m_speech->force_update(); // update stream to now
@@ -708,7 +707,7 @@ WRITE8_MEMBER(fidel6502_state::sc9_control_w)
 	sc9_prepare_display();
 
 	// 74245 Q9: speaker out
-	m_speaker->level_w(sel >> 9 & 1);
+	m_dac->write(BIT(sel, 9));
 
 	// d4,d5: ?
 	// d6,d7: N/C
@@ -743,7 +742,7 @@ WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 	m_inp_mux = sel & 0x1ff;
 
 	// 7442 9: speaker out
-	m_speaker->level_w(sel >> 9 & 1);
+	m_dac->write(BIT(sel, 9));
 
 	// d6,d7: led select (active low)
 	display_matrix(9, 2, sel & 0x1ff, ~data >> 6 & 3);
@@ -804,7 +803,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	m_inp_mux = sel & 0x1ff;
 
 	// 7442 9: speaker out (optional?)
-	m_speaker->level_w(sel >> 9 & 1);
+	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q4-Q7,Q2,Q1: digit/led select (active low)
 	UINT8 led_sel = ~BITSWAP8(m_led_select,0,3,1,2,7,6,5,4) & 0x3f;
@@ -1020,7 +1019,7 @@ static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(chesster_input_r, chesster_control_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac8", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1466,9 +1465,10 @@ static MACHINE_CONFIG_START( rsc, fidel6502_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_rsc_v2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( csc, fidel6502_state )
@@ -1497,13 +1497,14 @@ static MACHINE_CONFIG_START( csc, fidel6502_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_csc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( su9, csc )
@@ -1533,13 +1534,14 @@ static MACHINE_CONFIG_START( eas, fidel6502_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1571,9 +1573,10 @@ static MACHINE_CONFIG_START( sc9, fidel6502_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc9)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1611,9 +1614,10 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1635,9 +1639,10 @@ static MACHINE_CONFIG_START( fexcel, fidel6502_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_ex)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fexcelb, fexcel )
@@ -1668,7 +1673,7 @@ static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
 	/* sound hardware */
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, fexcelv_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fexceld, fexcelb )
@@ -1688,9 +1693,11 @@ static MACHINE_CONFIG_START( chesster, fidel6502_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_chesster)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac8", DAC_8BIT_R2R, 0) // m74hc374b1.ic1 + 8l513_02.z2
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

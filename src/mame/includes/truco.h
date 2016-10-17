@@ -17,7 +17,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_battery_ram;

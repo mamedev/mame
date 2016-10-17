@@ -55,7 +55,7 @@ private:
 	optional_region_ptr<UINT8> m_samples;
 	UINT32 m_samples_size;
 	address_space *m_space;
-	dac_device *m_dac;
+	optional_device<dac_byte_interface> m_dac;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	TIMER_CALLBACK_MEMBER( setvector_callback );

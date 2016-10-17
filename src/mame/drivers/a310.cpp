@@ -70,13 +70,12 @@
 
 #include "emu.h"
 #include "cpu/arm/arm.h"
-#include "sound/dac.h"
 #include "includes/archimds.h"
+#include "formats/acorn_dsk.h"
 #include "machine/i2cmem.h"
-//#include "machine/aakart.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "formats/acorn_dsk.h"
+#include "sound/volt_reg.h"
 #include "softlist.h"
 
 class a310_state : public archimedes_state
@@ -151,11 +150,6 @@ DRIVER_INIT_MEMBER(a310_state,a310)
 void a310_state::machine_start()
 {
 	archimedes_init();
-
-
-
-	// reset the DAC to centerline
-	//m_dac->write_signed8(0x80);
 }
 
 void a310_state::machine_reset()
@@ -397,30 +391,24 @@ static MACHINE_CONFIG_START( a310, a310_state )
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "archimedes")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac0", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-
-	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-
-	MCFG_SOUND_ADD("dac3", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-
-	MCFG_SOUND_ADD("dac4", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-
-	MCFG_SOUND_ADD("dac5", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-
-	MCFG_SOUND_ADD("dac6", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-
-	MCFG_SOUND_ADD("dac7", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START(a310)

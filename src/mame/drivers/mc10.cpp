@@ -9,13 +9,14 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/dac.h"
-#include "video/mc6847.h"
-#include "video/ef9345.h"
+#include "formats/coco_cas.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
-#include "formats/coco_cas.h"
 #include "machine/ram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/mc6847.h"
+#include "video/ef9345.h"
 #include "softlist.h"
 
 //printer state
@@ -48,7 +49,7 @@ public:
 	required_device<m6803_cpu_device> m_maincpu;
 	optional_device<mc6847_base_device> m_mc6847;
 	optional_device<ef9345_device> m_ef9345;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
 	required_device<printer_image_device> m_printer;
@@ -131,13 +132,13 @@ WRITE8_MEMBER( mc10_state::mc10_bfff_w )
 	m_mc6847->css_w(BIT(data, 6));
 
 	/* bit 7, dac output */
-	m_dac->write_unsigned8(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER( mc10_state::alice32_bfff_w )
 {
 	/* bit 7, dac output */
-	m_dac->write_unsigned8(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
 }
 
 
@@ -490,9 +491,10 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_MC6847_INPUT_CALLBACK(READ8(mc10_state, mc6847_videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
@@ -531,9 +533,10 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(alice32_cassette_formats)

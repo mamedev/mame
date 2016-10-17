@@ -30,8 +30,8 @@
 #include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/resnet.h"
-
 #include "gldarrow.lh"
 
 
@@ -43,14 +43,12 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
 		m_heartbeat(*this, "heartbeat"),
-		m_dac(*this, "dac"),
 		m_switches(*this, {"C0", "C1", "C2", "C3"})
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_vram;
 	required_device<timer_device> m_heartbeat;
-	required_device<dac_device> m_dac;
 
 	optional_ioport_array<4> m_switches;
 
@@ -68,7 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8088_lights2_w);
 	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
 
-	DECLARE_WRITE_LINE_MEMBER(meyc8088_sound_out);
 	DECLARE_PALETTE_INIT(meyc8088);
 	UINT32 screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_meyc8088(screen_device &screen, bool state);
@@ -280,11 +277,6 @@ WRITE8_MEMBER(meyc8088_state::meyc8088_common_w)
 	m_common = data >> 2 & 0xf;
 }
 
-WRITE_LINE_MEMBER(meyc8088_state::meyc8088_sound_out)
-{
-	m_dac->write_signed8(state ? 0x7f : 0);
-}
-
 
 /***************************************************************************
 
@@ -368,7 +360,7 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(meyc8088_state, meyc8088_lights2_w))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(meyc8088_state, meyc8088_lights1_w))
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(meyc8088_state, meyc8088_common_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(meyc8088_state, meyc8088_sound_out))
+	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("dac", dac_bit_interface, write))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -385,10 +377,11 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

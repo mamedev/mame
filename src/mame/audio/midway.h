@@ -36,22 +36,6 @@ extern const device_type MIDWAY_SQUAWK_N_TALK;
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MIDWAY_SSIO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_SSIO, 0)
-#define MCFG_MIDWAY_CHIP_SQUEAK_DELUXE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_CHIP_SQUEAK_DELUXE, 0)
-#define MCFG_MIDWAY_SOUNDS_GOOD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_SOUNDS_GOOD, 0)
-#define MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_TURBO_CHIP_SQUEAK, 0)
-#define MCFG_MIDWAY_SQUAWK_N_TALK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_SQUAWK_N_TALK, 0)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -156,7 +140,7 @@ private:
 	// devices
 	required_device<m68000_device> m_cpu;
 	required_device<pia6821_device> m_pia;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 
 	// internal state
 	UINT8 m_status;
@@ -194,7 +178,7 @@ private:
 	// devices
 	required_device<m68000_device> m_cpu;
 	required_device<pia6821_device> m_pia;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 
 	// internal state
 	UINT8 m_status;
@@ -232,7 +216,7 @@ private:
 	// devices
 	required_device<m6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 
 	// internal state
 	UINT8 m_status;

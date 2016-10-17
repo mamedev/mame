@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "exp.h"
 #include "bus/vcs_ctrl/ctrl.h"
-#include "sound/dac.h"
 #include "sound/mos6581.h"
 
 

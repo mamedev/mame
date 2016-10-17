@@ -14,7 +14,6 @@
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/hc55516.h"
-#include "sound/dac.h"
 
 
 
@@ -26,18 +25,6 @@ extern const device_type WILLIAMS_NARC_SOUND;
 extern const device_type WILLIAMS_CVSD_SOUND;
 extern const device_type WILLIAMS_ADPCM_SOUND;
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_WILLIAMS_NARC_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_NARC_SOUND, 0)
-#define MCFG_WILLIAMS_CVSD_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_CVSD_SOUND, 0)
-#define MCFG_WILLIAMS_ADPCM_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_ADPCM_SOUND, 0)
 
 
 //**************************************************************************

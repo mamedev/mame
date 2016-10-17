@@ -103,7 +103,7 @@ public:
 	void hp48_update_annunciators();
 	void hp48_apply_modules();
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<palette_device> m_palette;
 	void hp48_pulse_irq( int irq_line);
 	void hp48_rs232_start_recv_byte( UINT8 data );

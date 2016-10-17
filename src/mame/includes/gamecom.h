@@ -281,9 +281,9 @@ private:
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_shared_ptr<UINT8> m_p_nvram;
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
-	required_device<dac_device> m_dac0;
-	required_device<dac_device> m_dac1;
+	required_device<dac_byte_interface> m_dac;
+	required_device<dac_byte_interface> m_dac0;
+	required_device<dac_byte_interface> m_dac1;
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_memory_bank m_bank1;

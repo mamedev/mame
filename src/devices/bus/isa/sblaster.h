@@ -99,8 +99,8 @@ public:
 		// construction/destruction
 		sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 
-		required_device<dac_device> m_dacl;
-		required_device<dac_device> m_dacr;
+		required_device<dac_16bit_r2r_device> m_ldac;
+		required_device<dac_16bit_r2r_device> m_rdac;
 		required_device<pc_joy_device> m_joy;
 		required_device<midi_port_device> m_mdout;
 		required_ioport m_config;

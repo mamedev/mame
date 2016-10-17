@@ -549,10 +549,10 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mappy.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
-#include "includes/mappy.h"
+#include "sound/volt_reg.h"
 
 /*************************************
  *
@@ -1696,11 +1696,11 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1766,8 +1766,9 @@ static MACHINE_CONFIG_START( grobda, mappy_state )
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 
 	/* sound hardware */
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1820,11 +1821,11 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1860,11 +1861,11 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mappy, mappy_state )
@@ -2397,11 +2398,6 @@ ROM_END
 
 
 
-WRITE8_MEMBER(mappy_state::grobda_DAC_w)
-{
-	m_dac->write_unsigned8((data << 4) | data);
-}
-
 DRIVER_INIT_MEMBER(mappy_state,superpac)
 {
 	m_type = GAME_SUPERPAC;
@@ -2424,7 +2420,7 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 	   However, removing the 15XX from the board causes sound to disappear completely, so
 	   the DAC might be built-in after all.
 	  */
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),this));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac));
 }
 
 DRIVER_INIT_MEMBER(mappy_state,phozon)

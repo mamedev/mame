@@ -692,7 +692,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 	// iterate over sound devices
 	for (device_sound_interface &sound : sound_interface_iterator(device))
 	{
-		if (strcmp(sound.device().tag(), device.tag()))
+		if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
 		{
 			std::string newtag(sound.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());

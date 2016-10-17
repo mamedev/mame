@@ -47,7 +47,7 @@ private:
 	UINT8 m_dma, m_vol, m_bio;
 
 	required_device<i80186_cpu_device> m_cpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_12bit_r2r_device> m_dac;
 	required_device<cpu_device> m_dsp;
 };
 

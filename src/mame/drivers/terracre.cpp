@@ -81,12 +81,13 @@ AT-2
 */
 
 #include "emu.h"
+#include "includes/terracre.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/terracre.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 static const UINT16 mAmazonProtData[] =
@@ -222,8 +223,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8, terracre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_signed8)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_signed8)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_byte_interface, write)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_byte_interface, write)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
@@ -231,8 +232,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8, terracre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_signed8)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_signed8)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_byte_interface, write)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_byte_interface, write)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
@@ -539,19 +540,19 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_16MHz/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ym2203, ym3526 )
 	MCFG_CPU_MODIFY("audiocpu")
@@ -560,10 +561,10 @@ static MACHINE_CONFIG_DERIVED( ym2203, ym3526 )
 	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_16MHz/4)
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.2)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.2)
+	MCFG_SOUND_ROUTE(2, "speaker", 0.2)
+	MCFG_SOUND_ROUTE(3, "speaker", 0.4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( amazon, ym3526 )

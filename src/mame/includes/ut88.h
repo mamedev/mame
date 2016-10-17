@@ -50,7 +50,7 @@ public:
 
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8255_device> m_ppi;
-	optional_device<dac_device> m_dac;
+	optional_device<dac_bit_interface> m_dac;
 	DECLARE_READ8_MEMBER(ut88_keyboard_r);
 	DECLARE_WRITE8_MEMBER(ut88_keyboard_w);
 	DECLARE_WRITE8_MEMBER(ut88_sound_w);

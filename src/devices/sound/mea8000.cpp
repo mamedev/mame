@@ -45,7 +45,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* digital filters work at 8 kHz */
-#define F0 8096
+#define F0 (clock() / 480)
 
 /* filtered output is supersampled x 8 */
 #define SUPERSAMPLING 8
@@ -115,9 +115,11 @@ const device_type MEA8000 = &device_creator<mea8000_device>;
 
 
 mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MEA8000, "Philips / Signetics MEA 8000 speech synthesizer", tag, owner, clock, "mea8000", __FILE__)
-	, m_write_req(*this)
-	, m_dac(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, MEA8000, "Philips / Signetics MEA 8000 speech synthesizer", tag, owner, clock, "mea8000", __FILE__),
+	device_sound_interface(mconfig, *this),
+	m_write_req(*this),
+	m_stream(nullptr),
+	m_output(0)
 {
 }
 
@@ -131,6 +133,9 @@ void mea8000_device::device_start()
 	m_write_req.resolve_safe();
 
 	init_tables();
+
+	m_stream = stream_alloc(0, 1, clock() / 60);
+	save_item(NAME(m_output));
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mea8000_device::timer_expire),this));
 
@@ -159,26 +164,6 @@ void mea8000_device::device_start()
 	save_item(NAME(m_last_pitch));
 	save_item(NAME(m_pitch));
 	save_item(NAME(m_noise));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void mea8000_device::device_reset()
-{
-	LOG(("mea8000_reset\n"));
-	m_timer->reset();
-	m_phi = 0;
-	m_cont = 0;
-	m_roe = 0;
-	m_state = MEA8000_STOPPED;
-	update_req();
-	for (auto & elem : m_f)
-	{
-		elem.last_output = 0;
-		elem.output = 0;
-	}
 }
 
 
@@ -431,10 +416,19 @@ void mea8000_device::stop_frame()
 	/* enter stop mode */
 	m_timer->reset();
 	m_state = MEA8000_STOPPED;
-	m_dac->write_signed16(0x8000);
+	m_stream->update();
+	m_output = 0;
 }
 
 
+
+void mea8000_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	for (int samp = 0; samp < samples; samp++)
+	{
+		outputs[0][samp] = m_output;
+	}
+}
 
 /* next sample in frame, sampling at 64 kHz */
 TIMER_CALLBACK_MEMBER( mea8000_device::timer_expire )
@@ -446,13 +440,15 @@ TIMER_CALLBACK_MEMBER( mea8000_device::timer_expire )
 		/* sample is really computed only every 8-th time */
 		m_lastsample = m_sample;
 		m_sample = compute_sample();
-		m_dac->write_signed16(0x8000 + m_lastsample);
+		m_stream->update();
+		m_output = m_lastsample;
 	}
 	else
 	{
 		/* other samples are simply interpolated */
 		int sample = m_lastsample + ((pos * (m_sample-m_lastsample)) / SUPERSAMPLING);
-		m_dac->write_signed16(0x8000 + sample);
+		m_stream->update();
+		m_output = sample;
 	}
 
 	m_framepos++;

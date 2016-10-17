@@ -2,7 +2,6 @@
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
 
 #include "machine/gen_latch.h"
-#include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/2203intf.h"
 
@@ -15,7 +14,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dac(*this, "dac"),
 		m_ymsnd(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -53,7 +51,6 @@ public:
 	/* device */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<dac_device> m_dac;
 	optional_device<ym2203_device> m_ymsnd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -65,7 +62,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mrokumei_keyboard_select_w);
 	DECLARE_READ8_MEMBER(mrokumei_sound_io_r);
 	DECLARE_WRITE8_MEMBER(mrokumei_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(mrokumei_sound_io_w);
 	DECLARE_WRITE8_MEMBER(mrokumei_sound_cmd_w);
 	DECLARE_READ8_MEMBER(reikaids_upd7807_porta_r);
 	DECLARE_WRITE8_MEMBER(reikaids_upd7807_porta_w);

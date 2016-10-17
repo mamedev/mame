@@ -16,6 +16,7 @@
 #include "machine/mc68328.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 
 #define MC68328_TAG "dragonball"
@@ -27,7 +28,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lsi(*this, MC68328_TAG),
-		m_dac(*this, "dac"),
 		m_ram(*this, RAM_TAG),
 		m_io_penx(*this, "PENX"),
 		m_io_peny(*this, "PENY"),
@@ -36,14 +36,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68328_device> m_lsi;
-	required_device<dac_device> m_dac;
 	required_device<ram_device> m_ram;
-	//DECLARE_WRITE8_MEMBER(palm_dac_transition);
-	//DECLARE_WRITE8_MEMBER(palm_port_f_out);
-	//DECLARE_READ8_MEMBER(palm_port_c_in);
-	//DECLARE_READ8_MEMBER(palm_port_f_in);
-	//DECLARE_WRITE16_MEMBER(palm_spim_out);
-	//DECLARE_READ16_MEMBER(palm_spim_in);
 	UINT8 m_port_f_latch;
 	UINT16 m_spim_data;
 	virtual void machine_start() override;
@@ -55,7 +48,6 @@ public:
 	DECLARE_READ8_MEMBER(palm_port_f_in);
 	DECLARE_WRITE16_MEMBER(palm_spim_out);
 	DECLARE_READ16_MEMBER(palm_spim_in);
-	DECLARE_WRITE8_MEMBER(palm_dac_transition);
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
 	DECLARE_PALETTE_INIT(palm);
 
@@ -170,16 +162,6 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
-    AUDIO HARDWARE
-***************************************************************************/
-
-WRITE8_MEMBER(palm_state::palm_dac_transition)
-{
-	m_dac->write_unsigned8(0x7f * data );
-}
-
-
-/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -206,16 +188,17 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_DEVICE_ADD( MC68328_TAG, MC68328, 0 ) // lsi device
 	MCFG_MC68328_CPU("maincpu")
 	MCFG_MC68328_OUT_PORT_F_CB(WRITE8(palm_state, palm_port_f_out)) // Port F Output
 	MCFG_MC68328_IN_PORT_C_CB(READ8(palm_state, palm_port_c_in)) // Port C Input
 	MCFG_MC68328_IN_PORT_F_CB(READ8(palm_state, palm_port_f_in)) // Port F Input
-	MCFG_MC68328_OUT_PWM_CB(WRITE8(palm_state, palm_dac_transition))
+	MCFG_MC68328_OUT_PWM_CB(DEVWRITELINE("dac", dac_bit_interface, write))
 	MCFG_MC68328_OUT_SPIM_CB(WRITE16(palm_state, palm_spim_out))
 	MCFG_MC68328_IN_SPIM_CB(READ16(palm_state, palm_spim_in))
 	MCFG_MC68328_SPIM_XCH_TRIGGER_CB(WRITELINE(palm_state, palm_spim_exchange))

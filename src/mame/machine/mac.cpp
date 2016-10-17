@@ -1440,6 +1440,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 	if (m_model < MODEL_MAC_II)
 	{
 		m_snd_vol = data & 0x07;
+		update_volume();
 	}
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
@@ -1468,12 +1469,33 @@ WRITE8_MEMBER(mac_state::mac_via_out_b)
 
 	if (AUDIO_IS_CLASSIC)
 	{
-		m_snd_enable = ((data & 0x80) == 0) ? true : false;
+		m_snd_enable = (data & 0x80) == 0;
+		update_volume();
 	}
 
 	m_rtc->ce_w((data & 0x04)>>2);
 	m_rtc->data_w(data & 0x01);
 	m_rtc->clk_w((data >> 1) & 0x01);
+}
+
+void mac_state::update_volume(void)
+{
+	if (AUDIO_IS_CLASSIC)
+	{
+		if (!m_snd_enable)
+		{
+			// ls161 clear input
+			m_dac->set_output_gain(ALL_OUTPUTS, 0);
+		}
+		else
+		{
+			// sound -> r13 (470k)
+			// sound -> r12 (470k) -> 4016 (pa0 != 0)
+			// sound -> r17 (150k) -> 4016 (pa1 != 0)
+			// sound -> r16 (68k)  -> 4016 (pa2 != 0)
+			m_dac->set_output_gain(ALL_OUTPUTS, 8.0 / (m_snd_vol + 1));
+		}
+	}
 }
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
@@ -1989,10 +2011,6 @@ void mac_state::machine_reset()
 	m_pm_data_send = m_pm_data_recv = m_pm_ack = m_pm_req = m_pm_dptr = 0;
 	m_pm_state = 0;
 	m_last_taken_interrupt = 0;
-
-	m_snd_enable = false;
-	m_main_buffer = true;
-	m_snd_vol = 3;
 }
 
 WRITE_LINE_MEMBER(mac_state::cuda_reset_w)

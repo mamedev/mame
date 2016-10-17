@@ -47,7 +47,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<sn76496_device> m_sn_1;
 	required_device<sn76496_device> m_sn_2;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<discrete_device> m_discrete;
 
 	UINT8          m_irq_mask;

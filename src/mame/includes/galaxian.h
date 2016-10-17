@@ -64,7 +64,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_audio2;
-	optional_device<dac_device> m_dac;
+	optional_device<dac_byte_interface> m_dac;
 	optional_device<ay8910_device> m_ay8910_0;
 	optional_device<ay8910_device> m_ay8910_1;
 	optional_device<ay8910_device> m_ay8910_2;

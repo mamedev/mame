@@ -261,6 +261,8 @@ SOUNDS["ES1373"] = true
 SOUNDS["L7A1045"] = true
 SOUNDS["AD1848"] = true
 --SOUNDS["UPD1771"] = true
+SOUNDS["VOLT_REG"] = true
+--SOUNDS["MEA8000"] = true
 
 --------------------------------------------------
 -- specify available video cores

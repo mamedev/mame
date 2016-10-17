@@ -20,7 +20,6 @@
 #include "machine/6522via.h"
 #include "machine/cbm_snqk.h"
 #include "machine/ram.h"
-#include "sound/dac.h"
 #include "sound/mos6560.h"
 
 #define M6502_TAG       "ue10"

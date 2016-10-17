@@ -74,9 +74,10 @@ NOTE: Trivia Question rom names are the internal names used. IE: read from the f
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/ticket.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 class gei_state : public driver_device
@@ -90,7 +91,7 @@ public:
 		m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	optional_device<ticket_dispenser_device> m_ticket;
 	required_device<screen_device> m_screen;
 
@@ -216,7 +217,7 @@ WRITE8_MEMBER(gei_state::sound_w)
 	m_nmi_mask = data & 0x40;
 
 	/* bit 7 goes directly to the sound amplifier */
-	m_dac->write_unsigned8(((data & 0x80) >> 7) * 255);
+	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER(gei_state::sound2_w)
@@ -233,7 +234,7 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	output().set_led_value(12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	m_dac->write(((data & 0x80) >> 7) * 255);
+	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER(gei_state::lamps2_w)
@@ -1053,10 +1054,10 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( findout, getrivia )

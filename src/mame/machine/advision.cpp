@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "includes/advision.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/dac.h"
 
 /*
     8048 Ports:
@@ -117,12 +116,8 @@ READ8_MEMBER( advision_state::sound_cmd_r )
 
 void advision_state::update_dac()
 {
-	if (m_sound_g == 0 && m_sound_d == 0)
-		m_dac->write_unsigned8(0xff);
-	else if (m_sound_g == 1 && m_sound_d == 1)
-		m_dac->write_unsigned8(0x80);
-	else
-		m_dac->write_unsigned8(0x00);
+	int translate[] = { 2, 0, 0, 1 };
+	m_dac->write(translate[(m_sound_g << 1) | m_sound_d]);
 }
 
 WRITE8_MEMBER( advision_state::sound_g_w )

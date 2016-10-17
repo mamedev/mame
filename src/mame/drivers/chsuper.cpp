@@ -22,8 +22,9 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "chsuper.lh"
 
@@ -218,7 +219,7 @@ static ADDRESS_MAP_START( chsuper_portmap, AS_IO, 8, chsuper_state )
 	AM_RANGE( 0x00fd, 0x00fd ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
 	AM_RANGE( 0x00fe, 0x00fe ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 	AM_RANGE( 0x8300, 0x8300 ) AM_READ_PORT("IN2")  // valid input port present in test mode.
-	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_device, write_unsigned8) // unk writes
+	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_byte_interface, write) // unk writes
 ADDRESS_MAP_END
 
 /* About Sound...
@@ -371,10 +372,11 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

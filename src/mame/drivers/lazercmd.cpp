@@ -235,6 +235,7 @@
 
 #include "emu.h"
 #include "includes/lazercmd.h"
+#include "sound/volt_reg.h"
 
 // color overlays, bbonk does not have an overlay
 #include "lazercmd.lh"
@@ -309,11 +310,10 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
 	switch (offset)
 	{
 		case 0: /* audio channels */
-			m_dac_data = (data & 0x80) ^ ((data & 0x40) << 1) ^ ((data & 0x20) << 2) ^ ((data & 0x10) << 3);
-			if (m_dac_data)
-				m_dac->write_unsigned8(0xff);
-			else
-				m_dac->write_unsigned8(0);
+			m_dac0->write(BIT(data, 7));
+			m_dac1->write(BIT(data, 6));
+			m_dac2->write(BIT(data, 5));
+			m_dac3->write(BIT(data, 4));
 			break;
 		case 1: /* marker Y position */
 			m_marker_y = data;
@@ -335,11 +335,8 @@ WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
 			/* bits 4 and 5 are used to control a sound board */
 			/* these could be used to control sound samples */
 			/* at the moment they are routed through the dac */
-			m_dac_data = ((data & 0x20) << 2) ^ ((data & 0x10) << 3);
-			if (m_dac_data)
-				m_dac->write_unsigned8(0xff);
-			else
-				m_dac->write_unsigned8(0);
+			m_dac2->write(BIT(data, 5));
+			m_dac3->write(BIT(data, 4));
 			break;
 		case 1: /* marker Y position */
 			m_marker_y = data;
@@ -361,11 +358,8 @@ WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
 			/* bits 4 and 5 are used to control a sound board */
 			/* these could be used to control sound samples */
 			/* at the moment they are routed through the dac */
-			m_dac_data = ((data & 0x20) << 2) ^ ((data & 0x10) << 3);
-			if (m_dac_data)
-				m_dac->write_unsigned8(0xff);
-			else
-				m_dac->write_unsigned8(0);
+			m_dac2->write(BIT(data, 5));
+			m_dac3->write(BIT(data, 4));
 			break;
 		case 3: /* D5 inverts video?, D4 clears coin detected and D0 toggles on attract mode */
 			m_attract = data;
@@ -613,7 +607,6 @@ void lazercmd_state::machine_start()
 	save_item(NAME(m_marker_y));
 	save_item(NAME(m_timer_count));
 	save_item(NAME(m_sense_state));
-	save_item(NAME(m_dac_data));
 	save_item(NAME(m_attract));
 }
 
@@ -623,7 +616,6 @@ void lazercmd_state::machine_reset()
 	m_marker_y = 0;
 	m_timer_count = 0;
 	m_sense_state = 0;
-	m_dac_data = 0;
 	m_attract = 0;
 }
 
@@ -654,10 +646,16 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_SOUND_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -687,10 +685,12 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -720,10 +720,12 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************

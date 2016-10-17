@@ -11,12 +11,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/dac.h"
-#include "sound/gb.h"
 #include "includes/gba.h"
 #include "bus/gba/rom.h"
+#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+#include "sound/gb.h"
+#include "sound/volt_reg.h"
 #include "softlist.h"
 
 /* Sound Registers */
@@ -329,11 +329,11 @@ void gba_state::audio_tick(int ref)
 
 			if (SOUNDCNT_H & 0x200)
 			{
-				m_ladac->write_signed8(m_fifo_a[m_fifo_a_ptr]^0x80);
+				m_ldaca->write(m_fifo_a[m_fifo_a_ptr]);
 			}
 			if (SOUNDCNT_H & 0x100)
 			{
-				m_radac->write_signed8(m_fifo_a[m_fifo_a_ptr]^0x80);
+				m_rdaca->write(m_fifo_a[m_fifo_a_ptr]);
 			}
 			m_fifo_a_ptr++;
 		}
@@ -365,11 +365,11 @@ void gba_state::audio_tick(int ref)
 
 			if (SOUNDCNT_H & 0x2000)
 			{
-				m_lbdac->write_signed8(m_fifo_b[m_fifo_b_ptr]^0x80);
+				m_ldacb->write(m_fifo_b[m_fifo_b_ptr]);
 			}
 			if (SOUNDCNT_H & 0x1000)
 			{
-				m_rbdac->write_signed8(m_fifo_b[m_fifo_b_ptr]^0x80);
+				m_rdacb->write(m_fifo_b[m_fifo_b_ptr]);
 			}
 			m_fifo_b_ptr++;
 		}
@@ -865,8 +865,8 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 				{
 					m_fifo_a_ptr = 17;
 					m_fifo_a_in = 17;
-					m_ladac->write_signed8(0x80);
-					m_radac->write_signed8(0x80);
+					m_ldaca->write(0);
+					m_rdaca->write(0);
 				}
 
 				// DAC B reset?
@@ -874,8 +874,8 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 				{
 					m_fifo_b_ptr = 17;
 					m_fifo_b_in = 17;
-					m_lbdac->write_signed8(0x80);
-					m_rbdac->write_signed8(0x80);
+					m_ldacb->write(0);
+					m_rdacb->write(0);
 				}
 			}
 			break;
@@ -887,10 +887,10 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 				{
 					m_fifo_a_ptr = m_fifo_a_in = 17;
 					m_fifo_b_ptr = m_fifo_b_in = 17;
-					m_ladac->write_signed8(0x80);
-					m_radac->write_signed8(0x80);
-					m_lbdac->write_signed8(0x80);
-					m_rbdac->write_signed8(0x80);
+					m_ldaca->write(0);
+					m_rdaca->write(0);
+					m_ldacb->write(0);
+					m_rdacb->write(0);
 				}
 			}
 			break;
@@ -1263,10 +1263,10 @@ void gba_state::machine_reset()
 	m_fifo_a_in = m_fifo_b_in = 17;
 
 	// and clear the DACs
-	m_ladac->write_signed8(0x80);
-	m_radac->write_signed8(0x80);
-	m_lbdac->write_signed8(0x80);
-	m_rbdac->write_signed8(0x80);
+	m_ldaca->write(0);
+	m_rdaca->write(0);
+	m_ldacb->write(0);
+	m_rdacb->write(0);
 }
 
 void gba_state::machine_start()
@@ -1407,18 +1407,20 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(gba_state, dma_hblank_callback))
 	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(gba_state, dma_vblank_callback))
 
-	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("custom", CGB04_APU, XTAL_16_777216MHz/4)
-	MCFG_SOUND_ROUTE(0, "spkleft", 0.50)
-	MCFG_SOUND_ROUTE(1, "spkright", 0.50)
-	MCFG_SOUND_ADD("direct_a_left", DAC, 0)         // GBA direct sound A left
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
-	MCFG_SOUND_ADD("direct_a_right", DAC, 0)        // GBA direct sound A right
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
-	MCFG_SOUND_ADD("direct_b_left", DAC, 0)         // GBA direct sound B left
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
-	MCFG_SOUND_ADD("direct_b_right", DAC, 0)        // GBA direct sound B right
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+
+	MCFG_SOUND_ADD("ldaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("ldacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")

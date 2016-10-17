@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/dac.h"
 #include "includes/slapstic.h"
 #include "includes/harddriv.h"
 
@@ -269,15 +268,15 @@ READ16_MEMBER( harddriv_state::hda68k_port1_r )
 
 READ16_MEMBER( harddriv_state::hdc68k_wheel_r )
 {
-	/* grab the new wheel value and upconvert to 12 bits */
-	UINT16 new_wheel = m_12badc[0].read_safe(0xffff) << 4;
+	/* grab the new wheel value */
+	UINT16 new_wheel = m_12badc[0].read_safe(0xffff);
 
 	/* hack to display the wheel position */
 	if (space.machine().input().code_pressed(KEYCODE_LSHIFT))
 		popmessage("%04X", new_wheel);
 
 	/* if we crossed the center line, latch the edge bit */
-	if ((m_hdc68k_last_wheel / 0xf0) != (new_wheel / 0xf0))
+	if ((m_hdc68k_last_wheel / 0xf00) != (new_wheel / 0xf00))
 		m_hdc68k_wheel_edge = 1;
 
 	/* remember the last value and return the low 8 bits */
@@ -328,7 +327,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 	if (m_adc_control & 0x40)
 	{
 		m_adc12_select = (m_adc_control >> 4) & 0x03;
-		m_adc12_data = m_12badc[m_adc12_select].read_safe(0xffff) << 4;
+		m_adc12_data = m_12badc[m_adc12_select].read_safe(0xffff);
 	}
 
 	/* bit 7 selects which byte of the 12 bit data to read */
@@ -1123,11 +1122,11 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_special_w )
 			break;
 
 		case 4:
-			m_ds3dac1->write_signed16(data);
+			m_ldac->write(data);
 			break;
 
 		case 5:
-			m_ds3dac2->write_signed16(data);
+			m_rdac->write(data);
 			break;
 
 		case 6:

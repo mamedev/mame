@@ -178,7 +178,7 @@ inline void mc6846_device::update_cto()
 		m_old_cto = cto;
 	}
 	if ( !m_out_cto_cb.isnull() )
-		m_out_cto_cb( (offs_t) 0, cto );
+		m_out_cto_cb( cto );
 }
 
 
@@ -396,7 +396,7 @@ WRITE8_MEMBER(mc6846_device::write)
 		{
 			m_cp2_cpu = (data >> 3) & 1;
 			if ( !m_out_cp2_cb.isnull() )
-				m_out_cp2_cb( (offs_t) 0, m_cp2_cpu );
+				m_out_cp2_cb( m_cp2_cpu );
 		}
 		else
 			logerror( "%s mc6846 acknowledge not implemented\n", machine().describe_context() );

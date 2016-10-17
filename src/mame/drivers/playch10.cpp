@@ -296,7 +296,6 @@ Notes & Todo:
 #include "cpu/z80/z80.h"
 #include "machine/rp5h01.h"
 #include "machine/nvram.h"
-#include "sound/dac.h"
 
 #include "rendlay.h"
 #include "includes/playch10.h"

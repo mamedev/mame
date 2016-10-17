@@ -26,6 +26,8 @@
  */
 
 #include "epson_lx810l.h"
+#include "sound/volt_reg.h"
+
 //extern const char layout_lx800[]; /* use layout from lx800 */
 
 //#define LX810LDEBUG
@@ -130,7 +132,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_UPD7810_AN6(READ8(epson_lx810l_t, an6_r))
 	MCFG_UPD7810_AN7(READ8(epson_lx810l_t, an7_r))
 	MCFG_UPD7810_CO0(WRITELINE(epson_lx810l_t, co0_w))
-	MCFG_UPD7810_CO1(WRITELINE(epson_lx810l_t, co1_w))
+	MCFG_UPD7810_CO1(DEVWRITELINE("dac", dac_bit_interface, write))
 
 //  MCFG_DEFAULT_LAYOUT(layout_lx800)
 
@@ -143,9 +145,10 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_SCREEN_UPDATE_DRIVER(epson_lx810l_t, screen_update_lx810l)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* gate array */
 	MCFG_DEVICE_ADD("e05a30", E05A30, 0)
@@ -292,7 +295,6 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
-	m_dac(*this, "dac"),
 	m_e05a30(*this, "e05a30"),
 	m_screen(*this, "screen"),
 	m_93c06_clk(0),
@@ -313,7 +315,6 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
-	m_dac(*this, "dac"),
 	m_e05a30(*this, "e05a30"),
 	m_screen(*this, "screen"),
 	m_93c06_clk(0),
@@ -352,7 +353,6 @@ void epson_lx810l_t::device_start()
 
 void epson_lx810l_t::device_reset()
 {
-	m_dac->write_unsigned8(0);
 }
 
 
@@ -600,11 +600,6 @@ WRITE_LINE_MEMBER( epson_lx810l_t::co0_w )
 			}
 		}
 	}
-}
-
-WRITE_LINE_MEMBER( epson_lx810l_t::co1_w )
-{
-	m_dac->write_unsigned8(0 - !state);
 }
 
 

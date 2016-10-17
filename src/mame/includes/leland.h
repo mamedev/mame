@@ -9,6 +9,7 @@
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/dac.h"
+#include "sound/ay8910.h"
 #include "machine/pit8253.h"
 #include "cpu/i86/i186.h"
 
@@ -36,6 +37,8 @@ public:
 		m_sound(*this, "custom"),
 		m_dac0(*this, "dac0"),
 		m_dac1(*this, "dac1"),
+		m_ay8910(*this, "ay8910"),
+		m_ay8912(*this, "ay8912"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
@@ -44,8 +47,10 @@ public:
 	required_shared_ptr<UINT8> m_mainram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<leland_80186_sound_device> m_sound;
-	optional_device<dac_device> m_dac0;
-	optional_device<dac_device> m_dac1;
+	optional_device<dac_byte_interface> m_dac0;
+	optional_device<dac_byte_interface> m_dac1;
+	optional_device<ay8910_device> m_ay8910;
+	optional_device<ay8912_device> m_ay8912;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -223,16 +228,13 @@ public:
 	DECLARE_WRITE16_MEMBER(peripheral_w);
 	DECLARE_WRITE8_MEMBER(leland_80186_command_lo_w);
 	DECLARE_WRITE8_MEMBER(leland_80186_command_hi_w);
-	DECLARE_READ16_MEMBER(main_to_sound_comm_r);
 	DECLARE_READ8_MEMBER(leland_80186_response_r);
-	DECLARE_WRITE16_MEMBER(sound_to_main_comm_w);
 	DECLARE_WRITE16_MEMBER(dac_w);
 	DECLARE_WRITE16_MEMBER(ataxx_dac_control);
 	DECLARE_WRITE_LINE_MEMBER(pit0_2_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_0_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_1_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_2_w);
-	DECLARE_WRITE_LINE_MEMBER(pit2_0_w);
 	DECLARE_WRITE_LINE_MEMBER(i80186_tmr0_w);
 	DECLARE_WRITE_LINE_MEMBER(i80186_tmr1_w);
 protected:
@@ -248,14 +250,23 @@ protected:
 		TYPE_WSF
 	};
 
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
-	required_device<dac_device> m_dac3;
-	required_device<dac_device> m_dac4;
-	optional_device<dac_device> m_dac5;
-	optional_device<dac_device> m_dac6;
-	optional_device<dac_device> m_dac7;
-	optional_device<dac_device> m_dac8;
+	required_device<dac_byte_interface> m_dac1;
+	required_device<dac_byte_interface> m_dac2;
+	required_device<dac_byte_interface> m_dac3;
+	required_device<dac_byte_interface> m_dac4;
+	optional_device<dac_byte_interface> m_dac5;
+	optional_device<dac_byte_interface> m_dac6;
+	optional_device<dac_byte_interface> m_dac7;
+	optional_device<dac_byte_interface> m_dac8;
+	optional_device<dac_word_interface> m_dac9;
+	required_device<dac_byte_interface> m_dac1vol;
+	required_device<dac_byte_interface> m_dac2vol;
+	required_device<dac_byte_interface> m_dac3vol;
+	required_device<dac_byte_interface> m_dac4vol;
+	optional_device<dac_byte_interface> m_dac5vol;
+	optional_device<dac_byte_interface> m_dac6vol;
+	optional_device<dac_byte_interface> m_dac7vol;
+	optional_device<dac_byte_interface> m_dac8vol;
 
 private:
 	void command_lo_sync(void *ptr, int param);

@@ -184,14 +184,15 @@ other supported games as well.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/m72.h"
+#include "includes/iremipt.h"
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
+#include "cpu/z80/z80.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
-#include "includes/iremipt.h"
-#include "includes/m72.h"
-#include "cpu/mcs51/mcs51.h"
+#include "sound/volt_reg.h"
 
 #define MASTER_CLOCK        XTAL_32MHz
 #define SOUND_CLOCK         XTAL_3_579545MHz
@@ -480,7 +481,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::main_mcu_sound_w),this));
 
 	/* sound cpu */
-	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_device::write_unsigned8),(dac_device*)m_dac));
+	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_byte_interface::write),(dac_byte_interface *)m_dac));
 	sndio.install_read_handler (0x84, 0x84, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
 
 	/* lohtb2 */
@@ -1869,18 +1870,19 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( m72_audio_chips )
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("m72", M72, 0);
+	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( m72_base, m72_state )
@@ -1923,7 +1925,6 @@ static MACHINE_CONFIG_DERIVED( m72_8751, m72_base )
 	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
-
 MACHINE_CONFIG_END
 
 
@@ -1935,6 +1936,7 @@ static MACHINE_CONFIG_DERIVED( rtype, m72_base )
 	MCFG_CPU_IO_MAP(rtype_sound_portmap)
 
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( m72_xmultipl, m72_8751 )

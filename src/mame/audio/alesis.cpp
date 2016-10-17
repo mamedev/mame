@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "includes/alesis.h"
+#include "sound/volt_reg.h"
 
 #define LOG 1
 
@@ -24,10 +25,11 @@ const device_type ALESIS_DM3AG = &device_creator<alesis_dm3ag_device>;
 ***************************************************************************/
 
 static MACHINE_CONFIG_FRAGMENT( alesis_dm3ag )
-	MCFG_SPEAKER_STANDARD_STEREO("out1_left", "out1_right")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "out1_left",  1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "out1_right", 1.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker1", "rspeaker1")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
+	MCFG_SOUND_ADD("dac", PCM54HP, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker1", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker1", 1.0) // PCM54HP DAC + R63/R73-75 + Sample and hold
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -114,7 +116,7 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 			sample = m_samples[m_cur_sample++];
 		}
 
-		m_dac->write_signed16((sample << m_shift) + 0x8000);
+		m_dac->write(sample << m_shift);
 	}
 }
 

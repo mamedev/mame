@@ -24,11 +24,11 @@ PCB has a single OSC at 24MHz
 
 *******************************************************************************************/
 #include "emu.h"
-#include "cpu/arm/arm.h"
-#include "sound/dac.h"
 #include "includes/archimds.h"
-#include "machine/i2cmem.h"
+#include "cpu/arm/arm.h"
 #include "machine/aakart.h"
+#include "machine/i2cmem.h"
+#include "sound/volt_reg.h"
 
 
 class ertictac_state : public archimedes_state
@@ -202,9 +202,6 @@ DRIVER_INIT_MEMBER(ertictac_state,ertictac)
 void ertictac_state::machine_start()
 {
 	archimedes_init();
-
-	// reset the DAC to centerline
-	//m_dac->write_signed8(0x80);
 }
 
 void ertictac_state::machine_reset()
@@ -241,30 +238,24 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac0")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac3")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac4")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac5")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac6")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac7")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( ertictac )

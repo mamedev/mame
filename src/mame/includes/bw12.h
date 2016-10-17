@@ -16,7 +16,6 @@
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
-#include "sound/dac.h"
 
 #define SCREEN_TAG          "screen"
 #define Z80_TAG             "ic35"
@@ -25,7 +24,6 @@
 #define Z80SIO_TAG          "ic15"
 #define PIT8253_TAG         "ic34"
 #define PIA6821_TAG         "ic16"
-#define MC1408_TAG          "ic4"
 #define AY3600PRO002_TAG    "ic74"
 #define CENTRONICS_TAG      "centronics"
 #define FLOPPY_TIMER_TAG    "motor_off"

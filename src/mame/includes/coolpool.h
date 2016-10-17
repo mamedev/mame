@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles,Nicola Salmoria
 #define NVRAM_UNLOCK_SEQ_LEN 10
-#include "sound/dac.h"
+
+#include "emu.h"
+#include "cpu/tms34010/tms34010.h"
+#include "video/tlc34076.h"
 
 class coolpool_state : public driver_device
 {
@@ -10,14 +13,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
-		m_dac(*this, "dac"),
 		m_tlc34076(*this, "tlc34076"),
 		m_vram_base(*this, "vram_base"),
 		m_nvram(*this, "nvram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
-	required_device<dac_device> m_dac;
 	optional_device<tlc34076_device> m_tlc34076;
 
 	required_shared_ptr<UINT16> m_vram_base;
@@ -62,7 +63,6 @@ public:
 	DECLARE_READ16_MEMBER(dsp_rom_r);
 	DECLARE_WRITE16_MEMBER(dsp_romaddr_w);
 	DECLARE_READ16_MEMBER(coolpool_input_r);
-	DECLARE_WRITE16_MEMBER(dsp_dac_w);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(amerdart_scanline);

@@ -17,7 +17,6 @@
 #include "cpu/m6502/m6510.h"
 #include "machine/mos6526.h"
 #include "machine/ram.h"
-#include "sound/dac.h"
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 

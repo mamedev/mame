@@ -35,10 +35,10 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/trucocl.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
-#include "includes/trucocl.h"
+#include "sound/volt_reg.h"
 
 WRITE8_MEMBER(trucocl_state::irq_enable_w)
 {
@@ -83,7 +83,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 
 	dac_address += 0x10000;
 
-	m_dac->write_unsigned8( rom[dac_address+m_cur_dac_address_index] );
+	m_dac->write(rom[dac_address+m_cur_dac_address_index]);
 
 	timer_set( attotime::from_hz( 16000 ), TIMER_DAC_IRQ);
 }
@@ -160,10 +160,11 @@ static MACHINE_CONFIG_START( trucocl, trucocl_state )
 	MCFG_PALETTE_INIT_OWNER(trucocl_state, trucocl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************

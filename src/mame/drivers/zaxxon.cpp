@@ -939,7 +939,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( zaxxon, root )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_FRAGMENT_ADD(zaxxon_samples)
 MACHINE_CONFIG_END
 
@@ -976,7 +976,7 @@ static MACHINE_CONFIG_DERIVED( futspye, root )
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_futspy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_FRAGMENT_ADD(zaxxon_samples)
 
 MACHINE_CONFIG_END
@@ -1000,7 +1000,7 @@ static MACHINE_CONFIG_DERIVED( razmataze, root )
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_razmataz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SEGAUSBROM_ADD("usbsnd")
 MACHINE_CONFIG_END
 
@@ -1038,15 +1038,15 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_FRAGMENT_ADD(congo_samples)
 MACHINE_CONFIG_END

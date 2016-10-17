@@ -18,7 +18,6 @@
 #include "imagedev/harddriv.h"
 #include "pci.h"
 
-#include "sound/dac.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"

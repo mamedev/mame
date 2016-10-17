@@ -35,8 +35,8 @@ public:
 
 	required_device<sh2_device> m_master_cpu;
 	required_device<sh2_device> m_slave_cpu;
-	required_device<dac_device> m_lch_pwm;
-	required_device<dac_device> m_rch_pwm;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
 
 	required_shared_ptr<UINT32> m_sh2_shared;
 

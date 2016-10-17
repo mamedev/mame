@@ -11,7 +11,6 @@
 #include "machine/z80ctc.h"
 #include "includes/cchasm.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
 
 
 WRITE8_MEMBER(cchasm_state::reset_coin_flag_w)
@@ -102,9 +101,8 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_1_w)
 {
 	if (state) /* rising edge */
 	{
-		m_output[0] ^= 0x7f;
-		m_channel_active[0] = 1;
-		m_dac1->write_unsigned8(m_output[0]);
+		m_output[0] = !m_output[0];
+		m_dac1->write(m_output[0]);
 	}
 }
 
@@ -112,9 +110,8 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
 {
 	if (state) /* rising edge */
 	{
-		m_output[1] ^= 0x7f;
-		m_channel_active[1] = 1;
-		m_dac2->write_unsigned8(m_output[0]);
+		m_output[1] = !m_output[1];
+		m_dac2->write(m_output[1]);
 	}
 }
 
@@ -127,6 +124,5 @@ void cchasm_state::sound_start()
 
 	save_item(NAME(m_sound_flags));
 	save_item(NAME(m_coin_flag));
-	save_item(NAME(m_channel_active));
 	save_item(NAME(m_output));
 }

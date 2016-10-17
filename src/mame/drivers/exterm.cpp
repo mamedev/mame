@@ -63,13 +63,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
+#include "includes/exterm.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
-#include "sound/ym2151.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/exterm.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2151.h"
 
 
 
@@ -238,14 +238,6 @@ READ8_MEMBER(exterm_state::sound_slave_latch_r)
 }
 
 
-WRITE8_MEMBER(exterm_state::sound_slave_dac_w)
-{
-	/* DAC A is used to modulate DAC B */
-	m_dac_value[offset & 1] = data;
-	m_dac->write_unsigned16((m_dac_value[0] ^ 0xff) * m_dac_value[1]);
-}
-
-
 READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
 {
 	/* a read from here triggers an NMI pulse to the slave */
@@ -320,7 +312,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_slave_map, AS_PROGRAM, 8, exterm_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_READ(sound_slave_latch_r)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(sound_slave_dac_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3ffe) AM_DEVWRITE("dacvol", dac_byte_interface, write)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -447,13 +440,16 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", AD7528, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ad7528j.e2
+	MCFG_SOUND_ADD("dacvol", AD7528, 0) // ad7528j.e2
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

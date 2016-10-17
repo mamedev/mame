@@ -4,16 +4,9 @@
     Williams System 11c
 */
 
-
-#include "machine/genpin.h"
+#include "includes/s11c.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "sound/hc55516.h"
-#include "sound/ym2151.h"
-#include "sound/dac.h"
-#include "audio/s11c_bg.h"
-#include "includes/s11c.h"
 #include "s11c.lh"
 
 
@@ -167,7 +160,7 @@ static MACHINE_CONFIG_START( s11c, s11c_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, dac_r))
+	MCFG_PIA_READPA_HANDLER(READ8(s11_state, sound_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, sol2_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia21_ca2_w))
@@ -216,30 +209,10 @@ static MACHINE_CONFIG_START( s11c, s11c_state )
 	// generic sound board is not used in System 11C, except for Star Trax
 
 	/* Add the background music card */
-	MCFG_WMS_S11C_BG_ADD("bgm",":bgcpu")
-	/*
-	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E (note: schematics show this as 8mhz/2, but games crash very quickly with that speed?)
-	MCFG_CPU_PROGRAM_MAP(s11c_bg_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
-
-	MCFG_SPEAKER_STANDARD_MONO("bg")
-	MCFG_YM2151_ADD("ym2151", 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(s11b_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
-
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-
-	MCFG_SOUND_ADD("hc55516_bg", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-
-	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, pia40_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia40_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia40_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("bgcpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("bgcpu", INPUT_LINE_NMI))
-	*/
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("bgm", S11C_BG, 0)
+	MCFG_S11C_BG_ROM_REGION(":bgcpu")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 /*--------------------

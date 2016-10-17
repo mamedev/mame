@@ -84,11 +84,12 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/20pacgal.h"
 #include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
-#include "includes/20pacgal.h"
+#include "sound/volt_reg.h"
 
 
 /*************************************
@@ -244,7 +245,7 @@ READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
 	AM_RANGE(0x87, 0x87) AM_READ( _25pacman_io_87_r ) // not eeprom on this
 	AM_RANGE(0x87, 0x87) AM_WRITENOP
 //  AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
-	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_SHARE("stars_ctrl")    /* stars: bits 3-4 = active set; bit 5 = enable */
 	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_SHARE("flip")
 	AM_RANGE(0x8c, 0x8c) AM_WRITENOP
@@ -265,7 +266,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_SHARE("stars_seed")    /* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
-	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_SHARE("stars_ctrl")    /* stars: bits 3-4 = active set; bit 5 = enable */
 	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_SHARE("flip")
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
@@ -402,14 +403,15 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	MCFG_FRAGMENT_ADD(20pacgal_video)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO_CUS30, NAMCO_AUDIO_CLOCK)
 	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

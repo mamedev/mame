@@ -83,7 +83,7 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_maincpu(*this, MAINCPU_TAG),
 	m_pia_0(*this, PIA0_TAG),
 	m_pia_1(*this, PIA1_TAG),
-	m_dac(*this, DAC_TAG),
+	m_dac(*this, "dac"),
 	m_wave(*this, WAVE_TAG),
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
@@ -692,7 +692,7 @@ void coco_state::update_sound(void)
 		m_analog_audio_level = dac_sound + cassette_sound + cart_sound;
 	}
 
-	m_dac->write_unsigned8(single_bit_sound + m_analog_audio_level);
+	m_dac->write(single_bit_sound + m_analog_audio_level);
 
 	/* determine the cassette sound status */
 	cassette_state cas_sound = bCassSoundEnable ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED;

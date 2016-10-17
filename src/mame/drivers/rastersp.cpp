@@ -21,9 +21,9 @@
 #include "machine/53c7xx.h"
 #include "machine/mc146818.h"
 #include "machine/nscsi_hd.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
-
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 /*************************************
  *
@@ -52,8 +52,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_dsp(*this, "dsp"),
 			m_dram(*this, "dram"),
-			m_dac_l(*this, "dac_l"),
-			m_dac_r(*this, "dac_r"),
+			m_ldac(*this, "ldac"),
+			m_rdac(*this, "rdac"),
 			m_tms_timer1(*this, "tms_timer1"),
 			m_tms_tx_timer(*this, "tms_tx_timer"),
 			m_palette(*this, "palette"),
@@ -99,8 +99,8 @@ public:
 	required_device<cpu_device>     m_maincpu;
 	required_device<cpu_device>     m_dsp;
 	required_shared_ptr<UINT32>     m_dram;
-	required_device<dac_device>     m_dac_l;
-	required_device<dac_device>     m_dac_r;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
 	required_device<timer_device>   m_tms_timer1;
 	required_device<timer_device>   m_tms_tx_timer;
 	required_device<palette_device> m_palette;
@@ -510,11 +510,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_tx_timer )
 	{
 		UINT32 data = m_tms_io_regs[SPORT_DATA_TX];
 
-		INT16 ldata = data & 0xffff;
-		INT16 rdata = data >> 16;
-
-		m_dac_l->write_signed16(0x8000 + ldata);
-		m_dac_r->write_signed16(0x8000 + rdata);
+		m_ldac->write(data & 0xffff);
+		m_rdac->write(data >> 16);
 	}
 
 	// Set XSREMPTY
@@ -884,10 +881,11 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DAC_ADD("dac_l")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_DAC_ADD("dac_r")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

@@ -27,7 +27,6 @@
 #include "machine/mos8722.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
-#include "sound/dac.h"
 #include "sound/mos6581.h"
 #include "video/mc6845.h"
 #include "video/mos6566.h"
@@ -1711,13 +1710,11 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", MOS8563_TAG":palette", c128)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_14_31818MHz*2/3.5/8)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c128_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c128_state, sid_poty_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	// devices
 	MCFG_DEVICE_ADD(MOS8722_TAG, MOS8722, XTAL_14_31818MHz*2/3.5/8)
@@ -1884,13 +1881,11 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", MOS8563_TAG":palette", c128)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_17_734472MHz*2/4.5/8)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c128_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c128_state, sid_poty_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	// devices
 	MCFG_DEVICE_ADD(MOS8722_TAG, MOS8722, XTAL_17_734472MHz*2/4.5/8)

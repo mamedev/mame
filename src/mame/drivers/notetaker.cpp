@@ -76,11 +76,12 @@ DONE:
 */
 
 #include "cpu/i86/i86.h"
-#include "machine/pic8259.h"
 #include "machine/ay31015.h"
-#include "video/tms9927.h"
-#include "sound/dac.h"
+#include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/tms9927.h"
 
 class notetaker_state : public driver_device
 {
@@ -109,7 +110,7 @@ public:
 	required_device<ay31015_device> m_kbduart;
 	required_device<ay31015_device> m_eiauart;
 	required_device<crt5027_device> m_crtc;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 	required_device<fd1791_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	floppy_image_device *m_floppy;
@@ -227,7 +228,7 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 		m_outfifo_count--;
 	}
 	m_outfifo_tail_ptr&=0xF;
-	m_dac->write_unsigned16(data);
+	m_dac->write(data);
 	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
 }
 
@@ -349,7 +350,7 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 #endif
 		return;
 	}
-	m_outfifo[m_outfifo_head_ptr] = data;
+	m_outfifo[m_outfifo_head_ptr] = data >> 4;
 	m_outfifo_head_ptr++;
 	m_outfifo_count++;
 	m_outfifo_head_ptr&=0xF;
@@ -824,10 +825,11 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono") // TODO: should be stereo
-	MCFG_SOUND_ADD("dac", DAC, 0) /* DAC1200, set up with two sample and hold HA2425 chips outside it to do stereo */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	// TODO: hook DAC up to two HA2425 (sample and hold) chips and hook those up to the speakers
+	MCFG_SOUND_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(notetaker_state,notetakr)

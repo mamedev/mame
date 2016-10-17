@@ -19,7 +19,7 @@
 #include "machine/6850acia.h"
 #include "machine/mos6551.h"
 #include "sound/dac.h"
-#include "audio/mea8000.h"
+#include "sound/mea8000.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "machine/mc6843.h"
@@ -101,7 +101,6 @@ public:
 		m_mc6854(*this, "mc6854"),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
-		m_buzzer(*this, "buzzer"),
 		m_dac(*this, "dac"),
 		m_centronics(*this, "centronics"),
 		m_cent_data_out(*this, "cent_data_out"),
@@ -155,9 +154,8 @@ public:
 	DECLARE_WRITE8_MEMBER( to7_cartridge_w );
 	DECLARE_READ8_MEMBER( to7_cartridge_r );
 	DECLARE_WRITE8_MEMBER( to7_timer_port_out );
-	DECLARE_WRITE8_MEMBER( to7_timer_cp2_out );
 	DECLARE_READ8_MEMBER( to7_timer_port_in );
-	DECLARE_WRITE8_MEMBER( to7_timer_tco_out );
+	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette );
 	DECLARE_WRITE_LINE_MEMBER( to7_sys_cb2_out );
 	DECLARE_WRITE8_MEMBER( to7_sys_portb_out );
 	DECLARE_READ8_MEMBER( to7_sys_porta_in );
@@ -191,7 +189,6 @@ public:
 	TIMER_CALLBACK_MEMBER( mo5_periodic_cb );
 	DECLARE_WRITE8_MEMBER( mo5_sys_porta_out );
 	DECLARE_READ8_MEMBER( mo5_sys_porta_in );
-	DECLARE_WRITE8_MEMBER( mo5_sys_portb_out );
 	DECLARE_READ8_MEMBER( mo5_sys_portb_in );
 	DECLARE_READ8_MEMBER( mo5_gatearray_r );
 	DECLARE_WRITE8_MEMBER( mo5_gatearray_w );
@@ -236,7 +233,7 @@ public:
 	DECLARE_WRITE8_MEMBER( to8_sys_portb_out );
 	DECLARE_READ8_MEMBER( to8_timer_port_in );
 	DECLARE_WRITE8_MEMBER( to8_timer_port_out );
-	DECLARE_WRITE8_MEMBER( to8_timer_cp2_out );
+	DECLARE_WRITE_LINE_MEMBER( to8_timer_cp2_out );
 	void to8_lightpen_cb( int step );
 	DECLARE_MACHINE_RESET( to8 );
 	DECLARE_MACHINE_START( to8 );
@@ -256,7 +253,6 @@ public:
 	DECLARE_READ8_MEMBER( mo6_sys_porta_in );
 	DECLARE_READ8_MEMBER( mo6_sys_portb_in );
 	DECLARE_WRITE8_MEMBER( mo6_sys_porta_out );
-	DECLARE_WRITE8_MEMBER( mo6_sys_portb_out );
 	DECLARE_WRITE_LINE_MEMBER( mo6_sys_cb2_out );
 	DECLARE_READ8_MEMBER( mo6_gatearray_r );
 	DECLARE_WRITE8_MEMBER( mo6_gatearray_w );
@@ -358,8 +354,7 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	required_device<dac_device> m_buzzer;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
 	required_device<pia6821_device> m_pia_sys;
@@ -513,7 +508,6 @@ protected:
 	void (thomson_state::*m_thom_init_cb)( int init );
 
 	int to7_get_cassette();
-	void to7_set_cassette( int data );
 	int mo5_get_cassette();
 	void mo5_set_cassette( int data );
 	void thom_set_irq( int line, int state );

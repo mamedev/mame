@@ -99,7 +99,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device> m_ppi;
 	optional_device<fd1793_t> m_fdc;
-	optional_device<dac_device> m_dac;
+	optional_device<dac_bit_interface> m_dac;
 	optional_device<pit8253_device> m_pit;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<ram_device> m_ram;

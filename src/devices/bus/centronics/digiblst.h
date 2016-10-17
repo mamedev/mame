@@ -46,7 +46,7 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { if (state) m_data &= ~0x80; else m_data |= 0x80; update_dac(); }
 
 private:
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 
 	void update_dac();
 

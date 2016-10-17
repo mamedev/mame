@@ -13,16 +13,17 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/ym2151.h"
 #include "sound/hc55516.h"
-#include "sound/dac.h"
 
-#define MCFG_WMS_WPC_SOUND_ADD(_tag, _region) \
-	MCFG_DEVICE_ADD(_tag, WPCSND, 0) \
-	wpcsnd_device::static_set_gfxregion(*device, _region);
+
+#define MCFG_WPC_ROM_REGION(_region) \
+	wpcsnd_device::static_set_romregion(*device, _region);
 
 #define MCFG_WPC_SOUND_REPLY_CALLBACK(_reply) \
 	downcast<wpcsnd_device *>(device)->set_reply_callback(DEVCB_##_reply);
 
-class wpcsnd_device : public device_t
+
+class wpcsnd_device : public device_t,
+	public device_mixer_interface
 {
 public:
 	// construction/destruction
@@ -31,7 +32,6 @@ public:
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
 	required_device<hc55516_device> m_hc55516;
-	required_device<dac_device> m_dac;
 	required_memory_bank m_cpubank;
 	required_memory_bank m_fixedbank;
 	required_memory_region m_rom;
@@ -49,7 +49,7 @@ public:
 	UINT8 ctrl_r();
 	UINT8 data_r();
 
-	static void static_set_gfxregion(device_t &device, const char *tag);
+	static void static_set_romregion(device_t &device, const char *tag);
 
 	// callbacks
 	template<class _reply> void set_reply_callback(_reply reply) { m_reply_cb.set_callback(reply); }
@@ -67,7 +67,6 @@ private:
 
 	// callback
 	devcb_write_line m_reply_cb;
-
 };
 
 extern const device_type WPCSND;

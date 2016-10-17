@@ -31,7 +31,6 @@
 #define MAC_539X_1_TAG "539x_1"
 #define MAC_539X_2_TAG "539x_2"
 #define MACKBD_TAG "mackbd"
-#define DAC_TAG "macdac"
 
 // uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
@@ -172,12 +171,15 @@ public:
 		m_mouse2(*this, "MOUSE2"),
 		m_keys(*this, "KEY%u", 0),
 		m_montype(*this, "MONTYPE"),
+		m_snd_enable(false),
+		m_main_buffer(true),
+		m_snd_vol(7),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16"),
 		m_via2_ca1_hack(0),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_dac(*this, DAC_TAG)
+		m_dac(*this, "dac")
 	{
 	}
 
@@ -306,6 +308,7 @@ public:
 	void pmu_exec();
 	void mac_adb_newaction(int state);
 	void set_adb_line(int linestate);
+	void update_volume();
 
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
@@ -417,7 +420,7 @@ private:
 	int m_via2_ca1_hack;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	optional_device<dac_device> m_dac;
+	optional_device<dac_8bit_pwm_device> m_dac;
 	
 public:
 	emu_timer *m_scanline_timer;

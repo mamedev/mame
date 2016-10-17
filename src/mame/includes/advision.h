@@ -33,7 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_memory_bank m_bank1;
 	required_ioport m_joy;

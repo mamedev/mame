@@ -110,6 +110,7 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 class murogem_state : public driver_device
@@ -124,7 +125,7 @@ public:
 		m_videoram(*this, "videoram") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -146,7 +147,7 @@ WRITE8_MEMBER(murogem_state::outport_w)
     7654 3210
     ---- x---   Sound DAC.
 */
-	m_dac->write_unsigned8(data & 0x08);
+	m_dac->write(BIT(data, 3));
 }
 
 
@@ -266,9 +267,10 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 12.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

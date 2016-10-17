@@ -19,7 +19,6 @@
 #include "machine/6522via.h"
 #include "machine/kb3600.h"
 #include "machine/mm58167.h"
-#include "sound/speaker.h"
 #include "sound/dac.h"
 #include "machine/wozfdc.h"
 #include "imagedev/floppy.h"
@@ -33,9 +32,6 @@
 #define VAR_EXTA1       0x0020
 #define VAR_EXTPOWER    0x0040
 #define VAR_EXTSIDE     0x0080
-
-#define SPEAKER_TAG "a3spkr"
-#define DAC_TAG     "a3dac"
 
 class apple3_state : public driver_device
 {
@@ -51,8 +47,8 @@ public:
 		m_ay3600(*this, "ay3600"),
 		m_a2bus(*this, "a2bus"),
 		m_rtc(*this, "rtc"),
-		m_speaker(*this, SPEAKER_TAG),
-		m_dac(*this, DAC_TAG),
+		m_bell(*this, "bell"),
+		m_dac(*this, "dac"),
 		m_kbspecial(*this, "keyb_special"),
 		m_palette(*this, "palette"),
 		m_joy1x(*this, "joy_1_x"),
@@ -77,8 +73,8 @@ public:
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
 	required_device<mm58167_device> m_rtc;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_bell;
+	required_device<dac_byte_interface> m_dac;
 	required_ioport m_kbspecial;
 	required_device<palette_device> m_palette;
 	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
@@ -157,7 +153,7 @@ private:
 	UINT8 *m_bank2, *m_bank3, *m_bank4, *m_bank5, *m_bank8, *m_bank9;
 	UINT8 *m_bank10, *m_bank11;
 	UINT8 *m_bank6, *m_bank7rd, *m_bank7wr;
-	int m_speaker_state;
+	int m_bell_state;
 	int m_c040_time;
 	UINT16 m_lastchar, m_strobe;
 	UINT8 m_transchar;

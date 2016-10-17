@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:BUT
-#include "sound/dac.h"
 #include "sound/namco.h"
 #include "video/c45.h"
 
@@ -11,7 +10,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cus30(*this, "namco"),
-		m_dac(*this, "dac"),
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_attr(*this, "tile_attr"),
 		m_bg_ram(*this, "bg_ram"),
@@ -27,7 +25,6 @@ public:
 	UINT8 m_mcu_irq_enable;
 	required_device<cpu_device> m_maincpu;
 	required_device<namco_cus30_device> m_cus30;
-	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_tile_ram;
 	required_shared_ptr<UINT8> m_tile_attr;
 	required_shared_ptr<UINT8> m_bg_ram;
@@ -65,7 +62,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tceptor_bg_ram_w);
 	DECLARE_WRITE8_MEMBER(tceptor_bg_scroll_w);
 	void tile_mark_dirty(int offset);
-	DECLARE_WRITE8_MEMBER(voice_w);
 
 	required_device<namco_c45_road_device> m_c45_road;
 	required_device<screen_device> m_2dscreen;

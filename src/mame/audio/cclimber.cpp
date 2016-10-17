@@ -22,12 +22,12 @@ SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 MACHINE_CONFIG_FRAGMENT( cclimber_audio )
 	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK/2)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(cclimber_audio_device, sample_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(cclimber_audio_device, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
 MACHINE_CONFIG_END
 
 //**************************************************************************

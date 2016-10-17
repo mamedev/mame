@@ -68,7 +68,7 @@ protected:
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	required_device<dac_device> m_dac1;
+	required_device<dac_byte_interface> m_dac;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8254_device> m_timer1;
 	required_device<pit8254_device> m_timer2;

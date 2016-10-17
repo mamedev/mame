@@ -35,11 +35,11 @@ cosmicg - board can operate in b&w mode if there is no PROM, in this case
 
 
 #include "emu.h"
+#include "includes/cosmic.h"
 #include "cpu/tms9900/tms9980a.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
-#include "sound/dac.h"
-#include "includes/cosmic.h"
+#include "sound/volt_reg.h"
 
 
 /* Schematics show 12 triggers for discrete sound circuits */
@@ -101,21 +101,29 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
 					m_samples->stop(4);
 				break;
 
-		case 10:    m_dac->write_unsigned8(data); break;/* Bonus */
-		case 15:    if (data) m_samples->start(0, 6); break;    /* Player Die */
-		case 16:    if (data) m_samples->start(5, 7); break;    /* Enemy Laugh */
-		case 17:    if (data) m_samples->start(0, 10); break;   /* Coin - Not triggered by software */
+		case 10:    m_dac->write(BIT(data, 7)); break; /* Bonus */
 		}
 	}
 
 	#ifdef MAME_DEBUG
-	logerror("Sound output %x=%x\n", offset, data);
+	logerror("panic_sound_output_w %x=%x\n", offset, data);
 	#endif
 }
 
 WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
 {
-	panic_sound_output_w(space, offset + 15, data);
+	if (m_sound_enabled)
+	{
+		switch (offset)
+		{
+		case 0:     if (data) m_samples->start(0, 6); break;    /* Player Die */
+		case 1:    if (data) m_samples->start(5, 7); break;    /* Enemy Laugh */
+		}
+	}
+
+#ifdef MAME_DEBUG
+	logerror("panic_sound_output2_w %x=%x\n", offset, data);
+#endif
 }
 
 WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
@@ -136,10 +144,10 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 		switch (offset)
 		{
 		/* The schematics show a direct link to the sound amp  */
-		/* as other cosmic series games, but it never seems to */
-		/* be used for anything. It is implemented for sake of */
-		/* completness. Maybe it plays a tune if you win ?     */
-		case 1: m_dac->write_unsigned8(-data); break;
+		/* as other cosmic series games, but it is toggled     */
+		/* once during game over. It is implemented for sake   */
+		/* of completness.                                     */
+		case 1: m_dac->write(BIT(data, 0)); break; /* Game Over */
 		case 2: if (data) m_samples->start(0, m_march_select); break;   /* March Sound */
 		case 3: m_march_select = (m_march_select & 0xfe) | data; break;
 		case 4: m_march_select = (m_march_select & 0xfd) | (data << 1); break;
@@ -167,7 +175,7 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 				break;
 
 		case 9: if (data) m_samples->start(3, 11); break;   /* Got Ship */
-//      case 11: watchdog_reset_w(0, 0); break;             /* Watchdog */
+		case 11: /* watchdog_reset_w(0, 0); */ break;   /* Watchdog? only toggles during game play */
 		case 13:    if (data) m_samples->start(8, 13 - m_gun_die_select); break;  /* Got Monster / Gunshot */
 		case 14:    m_gun_die_select = data; break;
 		case 15:    if (data) m_samples->start(5, 14); break;   /* Coin Extend (extra base) */
@@ -175,7 +183,7 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 	}
 
 	#ifdef MAME_DEBUG
-	if (offset != 11) logerror("Output %x=%x\n", offset, data);
+	if (offset != 11) logerror("cosmicg_output_w %x=%x\n", offset, data);
 	#endif
 }
 
@@ -202,6 +210,8 @@ WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 		switch (offset)
 		{
 		case 0: if (data) m_samples->start(1, 2); break; /*Dive Bombing Type A*/
+
+		case 1: break; /* game writes 0 when alien shot */
 
 		case 2: /*Dive Bombing Type B (Main Control)*/
 			if (data)
@@ -311,10 +321,14 @@ WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 	}
 
 	#ifdef MAME_DEBUG
-	logerror("Sound output %x=%x\n", offset, data);
+	logerror("cosmica_sound_output_w %x=%x\n", offset, data);
 	#endif
 }
 
+WRITE8_MEMBER(cosmic_state::dac_w)
+{
+	m_dac->write(BIT(data, 7));
+}
 
 READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
 {
@@ -406,7 +420,7 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x4800, 0x4800) AM_WRITE(dac_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
@@ -417,10 +431,13 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 ADDRESS_MAP_END
 
 
-
-INPUT_CHANGED_MEMBER(cosmic_state::panic_coin_inserted)
+WRITE_LINE_MEMBER(cosmic_state::panic_coin_inserted)
 {
-	panic_sound_output_w(m_maincpu->space(AS_PROGRAM), 17, newval == 0);
+	if (m_sound_enabled && !state) m_samples->start(0, 10);   /* Coin - Not triggered by software */
+
+#ifdef MAME_DEBUG
+	logerror("panic_coin_inserted %x\n", state);
+#endif
 }
 
 static INPUT_PORTS_START( panic )
@@ -475,8 +492,8 @@ static INPUT_PORTS_START( panic )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,panic_coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,panic_coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, cosmic_state, panic_coin_inserted)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, cosmic_state, panic_coin_inserted)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(cosmic_state::cosmica_coin_inserted)
@@ -1026,15 +1043,16 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_panic)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(9)
 	MCFG_SAMPLES_NAMES(panic_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1054,16 +1072,12 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmica)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(13)
 	MCFG_SAMPLES_NAMES(cosmica_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cosmicg, cosmic_state )
@@ -1090,15 +1104,16 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmicg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(9)
 	MCFG_SAMPLES_NAMES(cosmicg_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1118,10 +1133,11 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_magspot)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1151,10 +1167,11 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_nomnlnd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1568,7 +1585,7 @@ DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x4800, 0x4800);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(dac_device::write_unsigned8),(dac_device*)m_dac));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(cosmic_state::dac_w), this));
 }
 
 DRIVER_INIT_MEMBER(cosmic_state,panic)

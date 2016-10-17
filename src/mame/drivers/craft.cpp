@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #define VERBOSE_LEVEL   (0)
 
@@ -63,7 +64,7 @@ public:
 	virtual void machine_reset() override;
 	UINT32 screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 };
 
 inline void craft_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -137,7 +138,7 @@ WRITE8_MEMBER(craft_state::port_w)
 		{
 			m_port_d = data;
 			UINT8 audio_sample = (data & 0x02) | ((data & 0xf4) >> 2);
-			m_dac->write_unsigned8(audio_sample << 1);
+			m_dac->write(audio_sample);
 			break;
 		}
 	}
@@ -230,8 +231,6 @@ DRIVER_INIT_MEMBER(craft_state,craft)
 
 void craft_state::machine_reset()
 {
-	m_dac->write_unsigned8(0x00);
-
 	m_frame_start_cycle = 0;
 	m_last_cycles = 0;
 }
@@ -256,8 +255,9 @@ static MACHINE_CONFIG_START( craft, craft_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("avr8")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "avr8", 1.00)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "avr8", 0.25) // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( craft )

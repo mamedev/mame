@@ -121,7 +121,7 @@ WRITE8_MEMBER( special_state::specialist_8255_portc_w )
 
 	m_cassette->output(BIT(data, 7) ? 1 : -1);
 
-	m_dac->write_unsigned8(BIT(data, 5)); //beeper
+	m_dac->write(BIT(data, 5)); //beeper
 }
 
 void special_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

@@ -9,6 +9,13 @@
 #ifndef S11_H_
 #define S11_H_
 
+#include "audio/s11c_bg.h"
+#include "machine/6821pia.h"
+#include "machine/genpin.h"
+#include "sound/dac.h"
+#include "sound/hc55516.h"
+#include "sound/ym2151.h"
+
 // 6802/8 CPU's input clock is 4MHz
 // but because it has an internal /4 divider, its E clock runs at 1/4 that frequency
 #define E_CLOCK (XTAL_4MHz/4)
@@ -27,8 +34,6 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_audiocpu(*this, "audiocpu"),
 	m_bgcpu(*this, "bgcpu"),
-	m_dac(*this, "dac"),
-	m_dac1(*this, "dac1"),
 	m_hc55516(*this, "hc55516"),
 	m_pias(*this, "pias"),
 	m_pia21(*this, "pia21"),
@@ -42,8 +47,7 @@ public:
 	m_bg(*this, "bgm")
 	{ }
 
-	DECLARE_READ8_MEMBER(dac_r);
-	DECLARE_WRITE8_MEMBER(dac_w);
+	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -57,7 +61,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pia34_pa_w);
 	DECLARE_WRITE8_MEMBER(pia34_pb_w);
 	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia40_pa_w);
 	DECLARE_WRITE8_MEMBER(pia40_pb_w);
 	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
 	DECLARE_READ8_MEMBER(switch_r);
@@ -82,8 +85,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_bgcpu;
-	optional_device<dac_device> m_dac;
-	optional_device<dac_device> m_dac1;
 	optional_device<hc55516_device> m_hc55516;
 	optional_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;

@@ -504,7 +504,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( laserbat, laserbat_base, laserbat_state )
 	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
 
 	// sound board devices
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("csg", SN76477, 0) // audio output not used
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(270), CAP_P(1000)) // R21, switchable R30/R23/R24/R25/R29/R28/R27/R26, C21
@@ -522,10 +522,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( laserbat, laserbat_base, laserbat_state )
 	MCFG_SN76477_ENABLE(0)                          // AB SOUND
 
 	MCFG_TMS3615_ADD("synth_low", XTAL_4MHz/16/2) // from the other one's /2 clock output
-	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
+	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "speaker", 1.0)
 
 	MCFG_TMS3615_ADD("synth_high", XTAL_4MHz/16) // 4MHz divided down with a 74LS161
-	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
+	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "speaker", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -536,9 +536,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 	MCFG_PALETTE_INIT_OWNER(catnmous_state, catnmous)
 
 	// sound board devices
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ZACCARIA_1B11107("audiopcb")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("audiopcb", ZACCARIA_1B11107, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 MACHINE_CONFIG_END
 

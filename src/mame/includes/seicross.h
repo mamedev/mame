@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "machine/nvram.h"
+#include "sound/dac.h"
 
 class seicross_state : public driver_device
 {
@@ -9,6 +10,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
+		m_dac(*this, "dac"),
 		m_nvram(*this, "nvram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -22,6 +24,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	required_device<dac_byte_interface> m_dac;
 	optional_device<nvram_device> m_nvram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -58,4 +61,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
+
+	DECLARE_WRITE8_MEMBER(dac_w);
 };

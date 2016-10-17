@@ -47,7 +47,6 @@ To Do:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/mc6845.h"
-#include "sound/dac.h"
 #include "sound/saa1099.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
@@ -1690,10 +1689,6 @@ static MACHINE_CONFIG_START( ilpag, blitz68k_state )
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 /*
@@ -1767,10 +1762,6 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1803,10 +1794,6 @@ static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1837,10 +1824,6 @@ static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k_addr_factor1)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1870,10 +1853,6 @@ static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1905,10 +1884,6 @@ static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1938,10 +1913,6 @@ static MACHINE_CONFIG_START( hermit, blitz68k_state )
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

@@ -11,13 +11,13 @@ Bruce Tomlin (hardware info)
 *****************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "video/vector.h"
-#include "machine/6522via.h"
 #include "includes/vectrex.h"
-#include "sound/ay8910.h"
-#include "sound/dac.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/6522via.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "sound/volt_reg.h"
+#include "video/vector.h"
 #include "softlist.h"
 
 static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
@@ -105,13 +105,15 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vectrex_state, screen_update_vectrex)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic301 (also used for vector generation)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_SOUND_ADD("ay8912", AY8912, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(vectrex_state, vectrex_psg_port_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)

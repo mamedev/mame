@@ -10,8 +10,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #define MCLK 12000000
 
@@ -55,7 +56,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 
 	/* memory */
 	UINT8 m_videoram0[0x8000];
@@ -197,7 +198,7 @@ TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 {
 	UINT8 *DACROM = memregion("samples")->base();
 
-	m_dac->write_unsigned8(DACROM[(m_dac_bank * 0x10000 + m_dac_adr++) & 0x1ffff]);
+	m_dac->write(DACROM[(m_dac_bank * 0x10000 + m_dac_adr++) & 0x1ffff]);
 
 	if (((m_dac_adr & 0xff00 ) >> 8) !=  m_dac_adr_e)
 		timer_set(attotime::from_hz(MCLK) * 1024, TIMER_DAC);
@@ -497,15 +498,16 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MCLK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*************************************

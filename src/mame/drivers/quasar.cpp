@@ -30,10 +30,10 @@ I8085 Sound Board
 ************************************************************************/
 
 #include "emu.h"
+#include "includes/quasar.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/dac.h"
-#include "includes/quasar.h"
+#include "sound/volt_reg.h"
 
 /************************************************************************
 
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, quasar_state )
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x80) AM_READ(quasar_sh_command_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 /************************************************************************
@@ -338,12 +338,12 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 	MCFG_VIDEO_START_OVERRIDE(quasar_state,quasar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( quasar )

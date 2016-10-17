@@ -25,12 +25,6 @@ extern device_type const ZACCARIA_1B11142;
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ZACCARIA_1B11107(_tag) \
-	MCFG_DEVICE_ADD(_tag, ZACCARIA_1B11107, 0)
-
-#define MCFG_ZACCARIA_1B11142(_tag) \
-	MCFG_DEVICE_ADD(_tag, ZACCARIA_1B11142, 0)
-
 #define MCFG_ZACCARIA_1B11142_SET_ACS_CALLBACK(_devcb) \
 	devcb = &zac1b11142_audio_device::static_set_acs_cb(*device, DEVCB_##_devcb);
 

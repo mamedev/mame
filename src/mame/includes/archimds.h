@@ -55,7 +55,9 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_region_vram(*this, "vram"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_dac(*this, { "dac0", "dac1", "dac2", "dac3", "dac4", "dac5", "dac6", "dac7" })
+		{ }
 
 	optional_device<aakart_device> m_kart;
 	void archimedes_init();
@@ -103,7 +105,7 @@ protected:
 	required_memory_region m_region_vram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	dac_device *m_dac[8];
+	required_device_array<dac_word_interface, 8> m_dac;
 
 private:
 

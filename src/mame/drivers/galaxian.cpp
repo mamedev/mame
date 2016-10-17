@@ -655,14 +655,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/s2650/s2650.h"
-#include "machine/watchdog.h"
-#include "sound/sn76496.h"
-#include "sound/discrete.h"
+#include "includes/galaxian.h"
 #include "audio/cclimber.h"
 #include "audio/galaxian.h"
-#include "includes/galaxian.h"
+#include "cpu/s2650/s2650.h"
+#include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
+#include "sound/discrete.h"
+#include "sound/sn76496.h"
+#include "sound/volt_reg.h"
 
 
 #define KONAMI_SOUND_CLOCK      14318000
@@ -971,7 +972,7 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x04) m_ppi8255_2->write(space, offset & 3, data);
-	if (offset & 0x10) m_dac->write_signed8(data);
+	if (offset & 0x10) m_dac->write(data);
 }
 
 
@@ -1347,7 +1348,7 @@ WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 
 WRITE8_MEMBER(galaxian_state::kingball_dac_w)
 {
-	m_dac->write_unsigned8(data ^ 0xff);
+	m_dac->write(data >> 4);
 }
 
 
@@ -5532,7 +5533,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("stars", galaxian_state, galaxian_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
@@ -5574,7 +5575,7 @@ static MACHINE_CONFIG_FRAGMENT( konami_sound_1x_ay8910 )
 
 	MCFG_SOUND_ADD("konami", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(konami_sound)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -5606,7 +5607,7 @@ static MACHINE_CONFIG_FRAGMENT( konami_sound_2x_ay8910 )
 
 	MCFG_SOUND_ADD("konami", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(konami_sound)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -5659,7 +5660,7 @@ static MACHINE_CONFIG_DERIVED( zigzag, galaxian_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) /* matches PCB video - unconfirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -5696,10 +5697,10 @@ static MACHINE_CONFIG_DERIVED( fantastc, galaxian_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("8910.1", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -5726,10 +5727,10 @@ static MACHINE_CONFIG_DERIVED( timefgtr, galaxian_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("8910.1", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -5743,7 +5744,7 @@ static MACHINE_CONFIG_DERIVED( jumpbug, galaxian_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2/2)    /* matches PCB video - unconfirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -5759,7 +5760,7 @@ static MACHINE_CONFIG_DERIVED( checkman, mooncrst )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, 1789750)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -5780,7 +5781,7 @@ static MACHINE_CONFIG_DERIVED( checkmaj, galaxian_base )
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, 1620000)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 2)
 MACHINE_CONFIG_END
 
 
@@ -5807,8 +5808,9 @@ static MACHINE_CONFIG_DERIVED( kingball, mooncrst )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.53) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -5930,11 +5932,11 @@ static MACHINE_CONFIG_DERIVED( explorer, galaxian_base )
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, explorer_sound_latch_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, konami_sound_timer_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( takeoff, explorer ) // takeoff shares the same main map as explorer, but uses only an AY8912 for sound.
@@ -5954,7 +5956,7 @@ static MACHINE_CONFIG_DERIVED( takeoff, explorer ) // takeoff shares the same ma
 
 	MCFG_SOUND_ADD("8912", AY8912, XTAL_12MHz / 8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, explorer_sound_latch_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( scorpion, theend )
@@ -5978,10 +5980,10 @@ static MACHINE_CONFIG_DERIVED( scorpion, theend )
 	MCFG_SOUND_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("digitalker", digitalker_device, digitalker_data_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(galaxian_state, scorpion_digitalker_control_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_DIGITALKER_ADD("digitalker", 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 MACHINE_CONFIG_END
 
 
@@ -6022,8 +6024,9 @@ static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(galaxian_state, sfx_sample_control_w))
 
 	/* DAC for the sample player */
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -6136,7 +6139,7 @@ static MACHINE_CONFIG_DERIVED( anteater, scobra )
 	/* quiet down the sounds */
 	MCFG_SOUND_MODIFY("konami")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 

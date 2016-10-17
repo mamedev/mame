@@ -57,8 +57,8 @@ private:
 	bool m_play, m_mce, m_trd;
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_drq_cb;
-	required_device<dac_device> m_dacl;
-	required_device<dac_device> m_dacr;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
 	emu_timer *m_timer;
 };
 

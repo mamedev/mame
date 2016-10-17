@@ -285,6 +285,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "videopkr.lh"
 #include "blckjack.lh"
 #include "videocba.lh"
@@ -369,7 +370,7 @@ public:
 	void count_7dig(unsigned long data, UINT8 index);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
@@ -894,7 +895,7 @@ READ8_MEMBER(videopkr_state::baby_sound_p2_r)
 WRITE8_MEMBER(videopkr_state::baby_sound_p2_w)
 {
 	m_sbp2 = data;
-	m_dac->write_unsigned8(data);
+	m_dac->write(data);
 }
 
 READ8_MEMBER(videopkr_state::baby_sound_p3_r)
@@ -970,7 +971,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_port, AS_IO, 8, videopkr_state )
 	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
 ADDRESS_MAP_END
 
@@ -1255,9 +1256,10 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_PALETTE_INIT_OWNER(videopkr_state, videopkr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1309,7 +1311,7 @@ static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fortune1, videopkr )

@@ -17,7 +17,7 @@ TODO:
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
-
+#include "sound/volt_reg.h"
 #include "quizshow.lh"
 
 
@@ -46,7 +46,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<UINT8> m_main_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -173,7 +173,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 {
 	// d1: audio out
-	m_dac->write_signed8((data & 2) ? 0x7f : 0);
+	m_dac->write(BIT(data, 1));
 
 	// d0, d2-d7: N/C
 }
@@ -397,10 +397,11 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_PALETTE_INIT_OWNER(quizshow_state, quizshow)
 
 	/* sound hardware (discrete) */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

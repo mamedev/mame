@@ -40,7 +40,6 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
 #include "machine/mc68681.h" /* DUART0, DUART1 */
@@ -436,11 +435,6 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681a", mc68681_device, rx_b_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD( "dac", DAC, 0 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip2 )

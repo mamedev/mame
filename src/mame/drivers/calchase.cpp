@@ -128,24 +128,23 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 
 
 #include "emu.h"
+#include "bus/isa/trident.h"
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "video/pc_vga.h"
-#include "sound/dac.h"
 #include "machine/pcshare.h"
 #include "machine/ds128x.h"
-#include "bus/isa/trident.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/pc_vga.h"
 
 
 class calchase_state : public pcat_base_state
 {
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-			m_dac_l(*this, "dac_l"),
-			m_dac_r(*this, "dac_r")
+		: pcat_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -164,15 +163,11 @@ public:
 	DECLARE_READ16_MEMBER(calchase_iocard5_r);
 	DECLARE_READ32_MEMBER(calchase_idle_skip_r);
 	DECLARE_WRITE32_MEMBER(calchase_idle_skip_w);
-	DECLARE_WRITE16_MEMBER(calchase_dac_l_w);
-	DECLARE_WRITE16_MEMBER(calchase_dac_r_w);
 	DECLARE_DRIVER_INIT(calchase);
 	DECLARE_DRIVER_INIT(hostinv);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	required_device<dac_device> m_dac_l;
-	required_device<dac_device> m_dac_r;
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -378,16 +373,6 @@ READ16_MEMBER(calchase_state::calchase_iocard5_r)
 }
 
 
-WRITE16_MEMBER(calchase_state::calchase_dac_l_w)
-{
-	m_dac_l->write_unsigned16((data & 0xfff) << 4);
-}
-
-WRITE16_MEMBER(calchase_state::calchase_dac_r_w)
-{
-	m_dac_r->write_unsigned16((data & 0xfff) << 4);
-}
-
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
@@ -400,8 +385,8 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0x000d0030, 0x000d0033) AM_READ16(calchase_iocard4_r, 0x0000ffff)
 	AM_RANGE(0x000d0034, 0x000d0037) AM_READ16(calchase_iocard5_r, 0x0000ffff)
 	AM_RANGE(0x000d0008, 0x000d000b) AM_WRITENOP // ???
-	AM_RANGE(0x000d0024, 0x000d0027) AM_WRITE16(calchase_dac_l_w,0x0000ffff)
-	AM_RANGE(0x000d0028, 0x000d002b) AM_WRITE16(calchase_dac_r_w,0x0000ffff)
+	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("ldac", dac_word_interface, write, 0x0000ffff)
+	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("rdac", dac_word_interface, write, 0x0000ffff)
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
@@ -677,10 +662,11 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_DAC_ADD("dac_l")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_DAC_ADD("dac_r")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	MCFG_SOUND_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( hostinv, calchase_state )
@@ -702,11 +688,12 @@ static MACHINE_CONFIG_START( hostinv, calchase_state )
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_DAC_ADD("dac_l")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_DAC_ADD("dac_r")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

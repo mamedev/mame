@@ -128,8 +128,8 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x34: case 0x35: case 0x36: case 0x37:
 		case 0x38: case 0x39: case 0x3A: case 0x3B:
 		case 0x3C: case 0x3D: case 0x3E: case 0x3F:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
+			m_bell_state ^= 1;
+			m_bell->write(m_bell_state);
 			break;
 
 		case 0x40: case 0x41: case 0x42: case 0x43:
@@ -332,8 +332,8 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0x34: case 0x35: case 0x36: case 0x37:
 		case 0x38: case 0x39: case 0x3A: case 0x3B:
 		case 0x3C: case 0x3D: case 0x3E: case 0x3F:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
+			m_bell_state ^= 1;
+			m_bell->write(m_bell_state);
 			break;
 
 		case 0x40: case 0x41: case 0x42: case 0x43:
@@ -617,7 +617,7 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_a)
 
 WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 {
-	m_dac->write_unsigned8(data<<2);
+	m_dac->write(data);
 	apple3_via_out(&m_via_1_b, data);
 }
 
@@ -663,8 +663,8 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 {
 	m_indir_bank = 0;
 	m_sync = false;
-	m_speaker_state = 0;
-	m_speaker->level_w(0);
+	m_bell_state = 0;
+	m_bell->write(m_bell_state);
 	m_c040_time = 0;
 	m_strobe = 0;
 	m_lastchar = 0x0d;
@@ -759,7 +759,7 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	save_item(NAME(m_sync));
 	save_item(NAME(m_indir_bank));
 	save_item(NAME(m_cnxx_slot));
-	save_item(NAME(m_speaker_state));
+	save_item(NAME(m_bell_state));
 	save_item(NAME(m_c040_time));
 	save_item(NAME(m_lastchar));
 	save_item(NAME(m_strobe));
@@ -1085,8 +1085,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_c040_tick)
 {
 	if (m_c040_time > 0)
 	{
-		m_speaker_state ^= 1;
-		m_speaker->level_w(m_speaker_state);
+		m_bell_state ^= 1;
+		m_bell->write(m_bell_state);
 		m_c040_time--;
 	}
 }

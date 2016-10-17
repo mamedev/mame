@@ -38,7 +38,7 @@ protected:
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 };
 
 // device type definition

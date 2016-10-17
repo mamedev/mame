@@ -40,7 +40,7 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (state) m_data |= 0x80; else m_data &= ~0x80; update_dac(); }
 
 private:
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 
 	void update_dac();
 
@@ -78,8 +78,8 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_autofd ) override { m_autofd = state; update_dac(); }
 
 private:
-	required_device<dac_device> m_dac_left;
-	required_device<dac_device> m_dac_right;
+	required_device<dac_byte_interface> m_ldac;
+	required_device<dac_byte_interface> m_rdac;
 
 	void update_dac();
 

@@ -60,7 +60,6 @@ public:
 
 	/* Extended Timer Output */
 	DECLARE_WRITE_LINE_MEMBER(co0_w);
-	DECLARE_WRITE_LINE_MEMBER(co1_w);
 
 	/* ADC */
 	DECLARE_READ8_MEMBER(an0_r);
@@ -117,7 +116,6 @@ private:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<dac_device> m_dac;
 	required_device<e05a30_device> m_e05a30;
 	required_device<screen_device> m_screen;
 

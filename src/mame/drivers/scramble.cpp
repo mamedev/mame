@@ -32,7 +32,6 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
 #include "machine/i8255.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"

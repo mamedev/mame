@@ -24,15 +24,16 @@
 ***********************************************************************************************************/
 
 #include "emu.h"
+#include "cpu/h8/h83002.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/tmp68301.h"
-#include "video/v9938.h"
 #include "cpu/z80/tmpz84c011.h"
-#include "sound/dac.h"
-#include "sound/3812intf.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "cpu/h8/h83002.h"
+#include "machine/tmp68301.h"
+#include "sound/dac.h"
+#include "sound/3812intf.h"
+#include "sound/volt_reg.h"
+#include "video/v9938.h"
 
 
 class csplayh5_state : public driver_device
@@ -43,8 +44,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
 		m_v9958(*this, "v9958"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
 		m_soundlatch(*this, "soundlatch"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu"),
@@ -55,8 +54,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
 	required_device<v9958_device> m_v9958;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
@@ -73,8 +70,6 @@ public:
 
 	DECLARE_READ8_MEMBER(soundcpu_portd_r);
 	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_dac2_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_dac1_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_porte_w);
 
 	DECLARE_DRIVER_INIT(mjmania);
@@ -175,13 +170,6 @@ sound HW is identical to Niyanpai
 
 /* TMPZ84C011 PIO emulation */
 
-#define SIGNED_DAC  0       // 0:unsigned DAC, 1:signed DAC
-#if SIGNED_DAC
-#define DAC_WRITE   write_signed8
-#else
-#define DAC_WRITE   write_unsigned8
-#endif
-
 void csplayh5_state::soundbank_w(int data)
 {
 	m_bank1->set_base(m_region_audiocpu->base() + 0x08000 + (0x8000 * (data & 0x03)));
@@ -206,16 +194,6 @@ READ8_MEMBER(csplayh5_state::soundcpu_portd_r)
 WRITE8_MEMBER(csplayh5_state::soundcpu_porta_w)
 {
 	soundbank_w(data & 0x03);
-}
-
-WRITE8_MEMBER(csplayh5_state::soundcpu_dac2_w)
-{
-	m_dac2->DAC_WRITE(data);
-}
-
-WRITE8_MEMBER(csplayh5_state::soundcpu_dac1_w)
-{
-	m_dac1->DAC_WRITE(data);
 }
 
 WRITE8_MEMBER(csplayh5_state::soundcpu_porte_w)
@@ -472,8 +450,8 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sound_map)
 	MCFG_CPU_IO_MAP(csplayh5_sound_io_map)
 	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porta_w))
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(csplayh5_state, soundcpu_dac2_w))
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(csplayh5_state, soundcpu_dac1_w))
+	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac2", dac_byte_interface, write))
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac1", dac_byte_interface, write))
 	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(csplayh5_state, soundcpu_portd_r))
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porte_w))
 	MCFG_TMPZ84C011_ZC0_CB(DEVWRITELINE("audiocpu", tmpz84c011_device, trg3))
@@ -486,19 +464,19 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "sound/dac.h"
 
 class cheekyms_state : public driver_device
 {
@@ -13,7 +14,14 @@ public:
 	cheekyms_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
+		m_dac0(*this, "dac0"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2"),
+		m_dac3(*this, "dac3"),
+		m_dac4(*this, "dac4"),
+		m_dac5(*this, "dac5"),
+		m_dac6(*this, "dac6"),
+		m_dac7(*this, "dac7"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -23,7 +31,14 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac0;
+	required_device<dac_bit_interface> m_dac1;
+	required_device<dac_bit_interface> m_dac2;
+	required_device<dac_bit_interface> m_dac3;
+	required_device<dac_bit_interface> m_dac4;
+	required_device<dac_bit_interface> m_dac5;
+	required_device<dac_bit_interface> m_dac6;
+	required_device<dac_bit_interface> m_dac7;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

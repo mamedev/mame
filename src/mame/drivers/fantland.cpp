@@ -46,13 +46,14 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 ***************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/nec/nec.h"
+#include "includes/fantland.h"
 #include "cpu/i86/i86.h"
-#include "sound/ym2151.h"
+#include "cpu/nec/nec.h"
+#include "cpu/z80/z80.h"
 #include "sound/3526intf.h"
 #include "sound/dac.h"
-#include "includes/fantland.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2151.h"
 
 /***************************************************************************
 
@@ -295,7 +296,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fantland_sound_iomap, AS_IO, 8, fantland_state )
 	AM_RANGE( 0x0080, 0x0080 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE("dac", dac_device, write_unsigned8 )
+	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE("dac", dac_byte_interface, write )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galaxygn_sound_iomap, AS_IO, 8, fantland_state )
@@ -867,16 +868,17 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.35)
-	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.35)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.35)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -914,14 +916,14 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3000000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(fantland_state, galaxygn_sound_irq))
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -994,7 +996,7 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1002,22 +1004,22 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_1))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm3", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_2))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm4", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_3))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1049,13 +1051,13 @@ static MACHINE_CONFIG_START( wheelrun, fantland_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_14MHz/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

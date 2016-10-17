@@ -13,7 +13,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dac(*this, "dac"),
+		m_n8080_dac(*this, "n8080_dac"),
+		m_helifire_dac(*this, "helifire_dac"),
 		m_sn(*this, "snsnd"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
@@ -52,7 +53,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<dac_device> m_dac;
+	optional_device<dac_bit_interface> m_n8080_dac;
+	optional_device<dac_8bit_r2r_device> m_helifire_dac;
 	optional_device<sn76477_device> m_sn;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -71,7 +73,6 @@ public:
 	DECLARE_READ8_MEMBER(helifire_8035_external_ram_r);
 	DECLARE_READ8_MEMBER(helifire_8035_p2_r);
 	DECLARE_WRITE8_MEMBER(n8080_dac_w);
-	DECLARE_WRITE8_MEMBER(helifire_dac_w);
 	DECLARE_WRITE8_MEMBER(helifire_sound_ctrl_w);
 	DECLARE_WRITE_LINE_MEMBER(n8080_inte_callback);
 	DECLARE_WRITE8_MEMBER(n8080_status_callback);

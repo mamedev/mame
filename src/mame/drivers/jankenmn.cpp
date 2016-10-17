@@ -153,7 +153,7 @@
 #include "machine/z80ctc.h"
 #include "machine/i8255.h"
 #include "sound/dac.h"
-
+#include "sound/volt_reg.h"
 #include "jankenmn.lh"
 
 
@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(jankenmn_state, lamps1_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps2_w))
 
@@ -385,11 +385,11 @@ static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
 	/* NO VIDEO */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

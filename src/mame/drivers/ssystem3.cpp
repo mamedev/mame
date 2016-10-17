@@ -39,7 +39,6 @@ backup of playfield rom and picture/description of its board
 
 #include "includes/ssystem3.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
 
 
 // in my opinion own cpu to display lcd field and to handle own buttons
@@ -303,11 +302,6 @@ static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
 
 	MCFG_PALETTE_ADD("palette", 242 + 32768)
 	MCFG_PALETTE_INIT_OWNER(ssystem3_state, ssystem3)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)

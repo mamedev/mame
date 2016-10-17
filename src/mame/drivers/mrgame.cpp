@@ -35,11 +35,12 @@ ToDo:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/nvram.h"
-#include "video/resnet.h"
-#include "sound/tms5220.h"
-#include "sound/dac.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/tms5220.h"
+#include "sound/volt_reg.h"
+#include "video/resnet.h"
 
 class mrgame_state : public driver_device
 {
@@ -135,7 +136,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio1_io, AS_IO, 8, mrgame_state )
 	ADDRESS_MAP_GLOBAL_MASK(3)
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP //AM_DEVWRITE("dac", dac_device, write_unsigned8) //DA1. The DC output might be an electronic volume control of the M114's output.
+	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dacvol", dac_byte_interface, write) //DA1
 	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN1
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack1_w) //AKL1
 	AM_RANGE(0x0003, 0x0003) AM_WRITENOP //SGS pass data to M114
@@ -148,11 +149,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio2_io, AS_IO, 8, mrgame_state )
 	ADDRESS_MAP_GLOBAL_MASK(7)
-	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dacl", dac_device, write_unsigned8) //DA2
+	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("ldac", dac_byte_interface, write) //DA2
 	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN2
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack2_w) //AKL2
 	AM_RANGE(0x0003, 0x0003) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w) //Speech
-	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE("dacr", dac_device, write_unsigned8) //DA3
+	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE("rdac", dac_byte_interface, write) //DA3
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mrgame )
@@ -487,10 +488,14 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DAC_ADD("dacl")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_DAC_ADD("dacr")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_SOUND_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
 	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

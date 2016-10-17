@@ -34,12 +34,12 @@ MB7051 - fuse programmed prom.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
-#include "audio/mea8000.h"
-#include "sound/dac.h"
 #include "imagedev/snapquik.h"
+#include "sound/dac.h"
+#include "sound/mea8000.h"
+#include "sound/volt_reg.h"
+#include "sound/wave.h"
 
 
 
@@ -48,9 +48,9 @@ class homelab_state : public driver_device
 public:
 	homelab_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, "speaker"),
-	m_cass(*this, "cassette")
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"),
+		m_cass(*this, "cassette")
 	{ }
 
 	DECLARE_READ8_MEMBER(key_r);
@@ -66,7 +66,7 @@ public:
 	const UINT8 *m_p_videoram;
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<dac_bit_interface> m_dac;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_DRIVER_INIT(brailab4);
 	DECLARE_VIDEO_START(homelab2);
@@ -171,13 +171,13 @@ READ8_MEMBER( homelab_state::exxx_r )
 	else
 	if (offset == 0x80)
 	{
-		m_speaker->level_w(0);
+		m_dac->write(0);
 		m_cass->output(-1.0);
 	}
 	else
 	if (offset == 0x02)
 	{
-		m_speaker->level_w(1);
+		m_dac->write(1);
 		m_cass->output(+1.0);
 	}
 
@@ -750,11 +750,13 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
@@ -781,11 +783,13 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
@@ -812,15 +816,16 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD ( "speech", DAC, 0 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
-	MCFG_MEA8000_DAC("speech")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+
+	MCFG_SOUND_ADD("mea8000", MEA8000, 3840000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)

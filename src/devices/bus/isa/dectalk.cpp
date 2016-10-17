@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 #include "dectalk.h"
+#include "sound/volt_reg.h"
 
 const device_type ISA8_DECTALK = &device_creator<dectalk_isa_device>;
 
@@ -61,7 +62,7 @@ WRITE8_MEMBER(dectalk_isa_device::dma_w)
 
 WRITE16_MEMBER(dectalk_isa_device::dac_w)
 {
-	m_dac->write(data & 0xfff0);
+	m_dac->write(data >> 4);
 }
 
 WRITE16_MEMBER(dectalk_isa_device::output_ctl_w)
@@ -147,8 +148,9 @@ static MACHINE_CONFIG_FRAGMENT( dectalk_isa )
 	MCFG_CPU_PROGRAM_MAP(dectalk_dsp_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.00)
+	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( dectalk_isa )

@@ -329,13 +329,21 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( wpc_an, wpc_an_state )
 	MCFG_FRAGMENT_ADD(wpc_an_base)
-	MCFG_WMS_WPC_SOUND_ADD("wpcsnd",":sound1")
+
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
+	MCFG_WPC_ROM_REGION(":sound1")
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(wpc_an_state,wpcsnd_reply_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( wpc_an_dd, wpc_an_state )
 	MCFG_FRAGMENT_ADD(wpc_an_base)
-	MCFG_WMS_S11C_BG_ADD("bg",":sound1")
+
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("bg", S11C_BG, 0)
+	MCFG_S11C_BG_ROM_REGION(":sound1")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 /*-----------------

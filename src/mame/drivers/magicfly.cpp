@@ -445,9 +445,10 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/mc6845.h"
 
 
 class magicfly_state : public driver_device
@@ -477,7 +478,7 @@ public:
 	DECLARE_VIDEO_START(7mezzo);
 	UINT32 screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
@@ -658,7 +659,7 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
 */
 	m_input_selector = data & 0x0f; /* Input Selector */
 
-	m_dac->write_unsigned8(data & 0x80);      /* Sound DAC */
+	m_dac->write(BIT(data, 7));      /* Sound DAC */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* Coin1 */
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* Coin2 */
@@ -956,10 +957,10 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

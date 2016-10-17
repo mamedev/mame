@@ -9,9 +9,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/williams.h"
 #include "includes/mcr.h"
 #include "audio/midway.h"
+#include "audio/williams.h"
+#include "sound/volt_reg.h"
 
 
 
@@ -539,8 +540,8 @@ WRITE_LINE_MEMBER(midway_chip_squeak_deluxe_device::reset_write)
 
 WRITE8_MEMBER(midway_chip_squeak_deluxe_device::porta_w)
 {
-	m_dacval = (m_dacval & ~0x3fc) | (data << 2);
-	m_dac->write_signed16(m_dacval << 6);
+	m_dacval = (data << 2) | (m_dacval & 3);
+	m_dac->write(m_dacval);
 }
 
 
@@ -550,8 +551,8 @@ WRITE8_MEMBER(midway_chip_squeak_deluxe_device::porta_w)
 
 WRITE8_MEMBER(midway_chip_squeak_deluxe_device::portb_w)
 {
-	m_dacval = (m_dacval & ~0x003) | (data >> 6);
-	m_dac->write_signed16(m_dacval << 6);
+	m_dacval = (m_dacval & ~3) | (data >> 6);
+	m_dac->write(m_dacval);
 
 	UINT8 z_mask = m_pia->port_b_z_mask();
 	if (~z_mask & 0x10)  m_status = (m_status & ~1) | ((data >> 4) & 1);
@@ -628,8 +629,9 @@ static MACHINE_CONFIG_FRAGMENT(midway_chip_squeak_deluxe)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_chip_squeak_deluxe_device, irq_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_chip_squeak_deluxe_device, irq_w))
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
+	MCFG_SOUND_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -738,8 +740,8 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::reset_write)
 
 WRITE8_MEMBER(midway_sounds_good_device::porta_w)
 {
-	m_dacval = (m_dacval & ~0x3fc) | (data << 2);
-	m_dac->write_signed16(m_dacval << 6);
+	m_dacval = (data << 2) | (m_dacval & 3);
+	m_dac->write(m_dacval);
 }
 
 
@@ -751,8 +753,8 @@ WRITE8_MEMBER(midway_sounds_good_device::portb_w)
 {
 	UINT8 z_mask = m_pia->port_b_z_mask();
 
-	m_dacval = (m_dacval & ~0x003) | (data >> 6);
-	m_dac->write_signed16(m_dacval << 6);
+	m_dacval = (m_dacval & ~3) | (data >> 6);
+	m_dac->write(m_dacval);
 
 	if (~z_mask & 0x10)  m_status = (m_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  m_status = (m_status & ~2) | ((data >> 4) & 2);
@@ -798,8 +800,9 @@ static MACHINE_CONFIG_FRAGMENT(midway_sounds_good)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
+	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0) /// ad7533jn.u10
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -907,8 +910,8 @@ WRITE_LINE_MEMBER(midway_turbo_chip_squeak_device::reset_write)
 
 WRITE8_MEMBER(midway_turbo_chip_squeak_device::porta_w)
 {
-	m_dacval = (m_dacval & ~0x3fc) | (data << 2);
-	m_dac->write_signed16(m_dacval << 6);
+	m_dacval = (data << 2) | (m_dacval & 3);
+	m_dac->write(m_dacval);
 }
 
 
@@ -918,8 +921,8 @@ WRITE8_MEMBER(midway_turbo_chip_squeak_device::porta_w)
 
 WRITE8_MEMBER(midway_turbo_chip_squeak_device::portb_w)
 {
-	m_dacval = (m_dacval & ~0x003) | (data >> 6);
-	m_dac->write_signed16(m_dacval << 6);
+	m_dacval = (m_dacval & ~3) | (data >> 6);
+	m_dac->write(m_dacval);
 	m_status = (data >> 4) & 3;
 }
 
@@ -962,8 +965,9 @@ static MACHINE_CONFIG_FRAGMENT(midway_turbo_chip_squeak)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_turbo_chip_squeak_device, irq_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_turbo_chip_squeak_device, irq_w))
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
+	MCFG_SOUND_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

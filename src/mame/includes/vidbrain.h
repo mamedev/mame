@@ -11,7 +11,6 @@
 #include "machine/f3853.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "sound/discrete.h"
 #include "video/uv201.h"
 
 #define F3850_TAG           "cd34"
@@ -19,8 +18,6 @@
 #define F3870_TAG           "f3870"
 #define UV201_TAG           "uv201"
 #define SCREEN_TAG          "screen"
-#define DISCRETE_TAG        "discrete"
-#define DAC_TAG             "dac"
 
 class vidbrain_state : public driver_device
 {
@@ -30,8 +27,7 @@ public:
 		m_maincpu(*this, F3850_TAG),
 		m_smi(*this, F3853_TAG),
 		m_uv(*this, UV201_TAG),
-		m_discrete(*this, DISCRETE_TAG),
-		m_dac(*this, DAC_TAG),
+		m_dac(*this, "dac"),
 		m_exp(*this, VIDEOBRAIN_EXPANSION_SLOT_TAG),
 		m_io(*this, "IO%02u", 0),
 		m_uv201_31(*this, "UV201-31"),
@@ -49,8 +45,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<f3853_device> m_smi;
 	required_device<uv201_device> m_uv;
-	required_device<discrete_sound_device> m_discrete;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<videobrain_expansion_slot_device> m_exp;
 	required_ioport_array<8> m_io;
 	required_ioport m_uv201_31;

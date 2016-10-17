@@ -243,7 +243,7 @@ std::string machine_info::game_info_string()
 	bool found_sound = false;
 	for (device_sound_interface &sound : snditer)
 	{
-		if (!soundtags.insert(sound.device().tag()).second)
+		if (!sound.issound() || !soundtags.insert(sound.device().tag()).second)
 			continue;
 
 		// append the Sound: string

@@ -38,9 +38,8 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
-
+#include "sound/volt_reg.h"
 #include "sbrkout.lh"
-
 
 class sbrkout_state : public driver_device
 {
@@ -83,7 +82,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -159,7 +158,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	/* update the DAC state */
-	m_dac->write_unsigned8((videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
+	m_dac->write((videoram[0x380 + 0x11] & (scanline >> 2)) != 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == m_screen->visible_area().max_y + 1)
@@ -599,9 +598,10 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

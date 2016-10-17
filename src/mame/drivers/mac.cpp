@@ -46,21 +46,18 @@
 
 
 #include "emu.h"
+#include "includes/mac.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
-#include "machine/6522via.h"
 #include "machine/applefdc.h"
 #include "machine/swim.h"
 #include "machine/sonydriv.h"
 #include "formats/ap_dsk35.h"
-#include "machine/ram.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
-#include "sound/asc.h"
-#include "sound/awacs.h"
-#include "sound/cdda.h"
+#include "sound/volt_reg.h"
 
 // NuBus and 030/040 PDS cards
 #include "bus/nubus/nubus_48gc.h"
@@ -83,7 +80,6 @@
 // 68000 PDS cards
 #include "bus/macpds/pds_tpdfpd.h"
 
-#include "includes/mac.h"
 #include "machine/macadb.h"
 #include "softlist.h"
 #include "mac.lh"
@@ -574,31 +570,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(mac_state::mac_scanline)
 {
 	int scanline = param;
 	UINT16 *mac_snd_buf_ptr;
-	UINT16 last_val;
 
-	if (m_snd_enable)
+	if (m_main_buffer)
 	{
-		if (m_main_buffer)
-		{
-			mac_snd_buf_ptr = (UINT16 *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
-		}
-		else
-		{
-			mac_snd_buf_ptr = (UINT16 *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
-		}
-
-		last_val = (UINT8)((mac_snd_buf_ptr[scanline] >> 8) & 0xff);
+		mac_snd_buf_ptr = (UINT16 *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
 	}
 	else
 	{
-		last_val = 0x80;
+		mac_snd_buf_ptr = (UINT16 *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
 	}
 
-	// apply 0-7 volume
-	last_val *= m_snd_vol;
-	last_val <<= 5;
-
-	m_dac->write_unsigned16(last_val);
+	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
 }
 
 
@@ -945,10 +927,10 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac_state, mac_scanline, "screen", 0, 1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_ADD("custom", MAC_SOUND, 0)
-	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)

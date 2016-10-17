@@ -29,7 +29,7 @@ public:
 	void restore_banks();
 
 private:
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 
 	UINT8 m_selected_bank[4];
 	UINT8 *m_bank_base[8];

@@ -265,7 +265,7 @@ void vectrex_state::vectrex_multiplexer(int mux)
 	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, m_via_out[PORTA], &m_analog[mux]);
 
 	if (mux == A_AUDIO)
-		m_dac->write_unsigned8(m_via_out[PORTA]);
+		m_dac->write(m_via_out[PORTA] ^ 0x80); // not gate shown on schematic
 }
 
 

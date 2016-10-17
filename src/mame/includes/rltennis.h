@@ -12,14 +12,14 @@ public:
 	rltennis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac_1(*this, "dac1"),
-		m_dac_2(*this, "dac2"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2"),
 		m_data760000(0), m_data740000(0), m_dac_counter(0), m_sample_rom_offset_1(0), m_sample_rom_offset_2(0),
 		m_offset_shift(0) { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac_1;
-	required_device<dac_device> m_dac_2;
+	required_device<dac_byte_interface> m_dac1;
+	required_device<dac_byte_interface> m_dac2;
 
 	UINT16 m_blitter[RLT_NUM_BLITTER_REGS];
 	INT32 m_data760000;

@@ -68,8 +68,9 @@ Dip sw.2
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/dac.h"
 #include "machine/inder_vid.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 class littlerb_state : public driver_device
 {
@@ -78,21 +79,17 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_indervid(*this, "inder_vid"),
-			m_dacl(*this, "dacl"),
-			m_dacr(*this, "dacr"),
+			m_ldac(*this, "ldac"),
+			m_rdac(*this, "rdac"),
 			m_soundframe(0)
 	{
 	}
 
-
-
-
 	required_device<cpu_device> m_maincpu;
 	required_device<inder_vid_device> m_indervid;
 
-
-	required_device<dac_device> m_dacl;
-	required_device<dac_device> m_dacr;
+	required_device<dac_byte_interface> m_ldac;
+	required_device<dac_byte_interface> m_rdac;
 	UINT8 m_sound_index_l,m_sound_index_r;
 	UINT16 m_sound_pointer_l,m_sound_pointer_r;
 	int m_soundframe;
@@ -235,13 +232,10 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_cb)
 {
-	UINT8 res;
 	UINT8 *sample_rom = memregion("samples")->base();
 
-	res = sample_rom[m_sound_pointer_l|(m_sound_index_l<<10)|0x40000];
-	m_dacl->write_signed8(res);
-	res = sample_rom[m_sound_pointer_r|(m_sound_index_r<<10)|0x00000];
-	m_dacr->write_signed8(res);
+	m_ldac->write(sample_rom[m_sound_pointer_l | (m_sound_index_l << 10) | 0x40000]);
+	m_rdac->write(sample_rom[m_sound_pointer_r | (m_sound_index_r << 10) | 0x00000]);
 	m_sound_pointer_l++;
 	m_sound_pointer_l&=0x3ff;
 	m_sound_pointer_r++;
@@ -265,11 +259,11 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
-	MCFG_DAC_ADD("dacl")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-
-	MCFG_DAC_ADD("dacr")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( littlerb )

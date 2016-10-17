@@ -10,7 +10,6 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6530.h"
 #include "machine/6532riot.h"
-#include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "sound/sp0250.h"
 #include "sound/votrax.h"
@@ -36,18 +35,7 @@ extern const device_type GOTTLIEB_SOUND_REV2;
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_GOTTLIEB_SOUND_R0_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV0, 0)
-
-#define MCFG_GOTTLIEB_SOUND_R1_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV1, 0)
-#define MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX(_tag) \
-	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)
-
-#define MCFG_GOTTLIEB_SOUND_R2_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV2, 0)
-#define MCFG_GOTTLIEB_SOUND_R2_ADD_COBRAM3(_tag) \
-	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV2, 0) \
+#define MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS() \
 	gottlieb_sound_r2_device::static_enable_cobram3_mods(*device);
 
 
@@ -81,7 +69,6 @@ private:
 	// devices
 	required_device<m6502_device>       m_audiocpu;
 	required_device<mos6530_device>     m_r6530;
-	required_device<dac_device>         m_dac;
 
 	UINT8 m_sndcmd;
 };
@@ -116,7 +103,6 @@ private:
 	// devices
 	required_device<m6502_device>       m_audiocpu;
 	required_device<riot6532_device>    m_riot;
-	required_device<dac_device>         m_dac;
 	optional_device<votrax_sc01_device> m_votrax;
 
 	// internal state
@@ -172,7 +158,6 @@ public:
 	DECLARE_WRITE8_MEMBER( signal_audio_nmi_w );
 	DECLARE_WRITE8_MEMBER( nmi_rate_w );
 	CUSTOM_INPUT_MEMBER( speech_drq_custom_r );
-	DECLARE_WRITE8_MEMBER( dac_w );
 	DECLARE_WRITE8_MEMBER( speech_control_w );
 	DECLARE_WRITE8_MEMBER( sp0250_latch_w );
 	DECLARE_WRITE8_MEMBER( psg_latch_w );
@@ -200,7 +185,6 @@ private:
 	// devices
 	required_device<m6502_device>   m_audiocpu;
 	required_device<m6502_device>   m_speechcpu;
-	required_device<dac_device>     m_dac;
 	required_device<ay8913_device>  m_ay1;
 	required_device<ay8913_device>  m_ay2;
 	optional_device<sp0250_device>  m_sp0250;
@@ -214,7 +198,6 @@ private:
 	UINT8       m_speechcpu_latch;
 	UINT8       m_speech_control;
 	UINT8       m_last_command;
-	UINT8       m_dac_data[2];
 	UINT8       m_psg_latch;
 	UINT8       m_psg_data_latch;
 	UINT8       m_sp0250_latch;

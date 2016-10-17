@@ -98,16 +98,16 @@ the Neogeo Pocket.
 
 
 #include "emu.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/tlcs900/tlcs900.h"
 #include "cpu/z80/z80.h"
 #include "sound/t6w28.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/k1ge.h"
 #include "rendlay.h"
 #include "softlist.h"
-
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 enum flash_state
 {
@@ -132,8 +132,8 @@ public:
 		m_tlcs900(*this, "maincpu"),
 		m_z80(*this, "soundcpu"),
 		m_t6w28(*this, "t6w28"),
-		m_dac_l(*this, "dac_l"),
-		m_dac_r(*this, "dac_r"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
 		m_cart(*this, "cartslot"),
 		m_mainram(*this, "mainram"),
 		m_k1ge(*this, "k1ge"),
@@ -172,8 +172,8 @@ public:
 	required_device<cpu_device> m_tlcs900;
 	required_device<cpu_device> m_z80;
 	required_device<t6w28_device> m_t6w28;
-	required_device<dac_device> m_dac_l;
-	required_device<dac_device> m_dac_r;
+	required_device<dac_byte_interface> m_ldac;
+	required_device<dac_byte_interface> m_rdac;
 	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<UINT8> m_mainram;
 	required_device<k1ge_device> m_k1ge;
@@ -278,10 +278,10 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 		break;
 
 	case 0x22:      /* DAC right */
-		m_dac_r->write_unsigned8(data );
+		m_rdac->write(data);
 		break;
 	case 0x23:      /* DAC left */
-		m_dac_l->write_unsigned8(data );
+		m_ldac->write(data);
 		break;
 
 	/* Internal eeprom related? */
@@ -838,10 +838,11 @@ static MACHINE_CONFIG_START( ngp_common, ngp_state )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
-	MCFG_SOUND_ADD( "dac_l", DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.50 )
-	MCFG_SOUND_ADD( "dac_r", DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.50 )
+	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

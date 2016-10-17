@@ -101,7 +101,6 @@ public:
 	DECLARE_WRITE8_MEMBER(brickzn_palbank_w);
 	DECLARE_WRITE8_MEMBER(brickzn_sprbank_w);
 	DECLARE_WRITE8_MEMBER(brickzn_rombank_w);
-	DECLARE_WRITE8_MEMBER(brickzn_pcm_w);
 	DECLARE_WRITE8_MEMBER(brickzn_banked_paletteram_w);
 	// brickzn (newer sets)
 	DECLARE_WRITE8_MEMBER(brickzn_prot2_w);

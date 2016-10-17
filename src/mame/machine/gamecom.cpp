@@ -27,9 +27,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
 	}
 	if (m_sound0_cnt < 0x40)
 	{
-		bool which_half = BIT(m_sound0_cnt, 0);
-		UINT8 sb = m_sound.sg0w[m_sound0_cnt >> 1];
-		m_dac0->write_signed8(which_half ? sb & 0xf0 : sb << 4);
+		m_dac0->write((m_sound.sg0w[m_sound0_cnt >> 1] >> (BIT(m_sound0_cnt, 0) * 4)) & 0xf);
 		m_sound0_cnt++;
 	}
 }
@@ -47,9 +45,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
 	}
 	if (m_sound1_cnt < 0x40)
 	{
-		bool which_half = BIT(m_sound1_cnt, 0);
-		UINT8 sb = m_sound.sg1w[m_sound1_cnt >> 1];
-		m_dac1->write_signed8(which_half ? sb & 0xf0 : sb << 4);
+		m_dac1->write((m_sound.sg1w[m_sound1_cnt >> 1] >> (BIT(m_sound1_cnt, 0) * 4)) & 0xf);
 		m_sound1_cnt++;
 	}
 }
@@ -402,7 +398,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 	case SM8521_SGDA:
 		m_sound.sgda = data;
 		if((m_sound.sgc & 0x88) == 0x88)
-			m_dac->write_unsigned8(data);
+			m_dac->write(data);
 		break;
 
 	case SM8521_SG0W0:

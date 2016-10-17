@@ -212,7 +212,7 @@ void archimedes_state::vidc_audio_tick()
 
 		res = mulawTable[ulaw_comp];
 
-		m_dac[ch & 7]->write_signed16(res^0x8000);
+		m_dac[ch & 7]->write(res);
 	}
 
 	m_vidc_sndcur+=8;
@@ -227,7 +227,7 @@ void archimedes_state::vidc_audio_tick()
 			m_snd_timer->adjust(attotime::never);
 			for(ch=0;ch<8;ch++)
 			{
-				m_dac[ch & 7]->write_signed16(0x8000);
+				m_dac[ch & 7]->write(0);
 			}
 		}
 	}
@@ -293,8 +293,6 @@ void archimedes_state::archimedes_reset()
 
 void archimedes_state::archimedes_init()
 {
-	static const char *const dac_names[8] = { "dac0", "dac1", "dac2", "dac3", "dac4", "dac5", "dac6", "dac7" };
-
 	m_memc_pagesize = 0;
 
 	m_vbl_timer = timer_alloc(TIMER_VBLANK);
@@ -312,11 +310,6 @@ void archimedes_state::archimedes_init()
 	m_vid_timer = timer_alloc(TIMER_VIDEO);
 	m_snd_timer = timer_alloc(TIMER_AUDIO);
 	m_snd_timer->adjust(attotime::never);
-
-	for ( int i = 0; i < 8; i++ )
-	{
-		m_dac[i] = machine().device<dac_device>(dac_names[i]);
-	}
 }
 
 READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)

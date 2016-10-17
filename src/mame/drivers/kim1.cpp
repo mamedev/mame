@@ -253,11 +253,6 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	// video hardware
 	MCFG_DEFAULT_LAYOUT( layout_kim1 )
 
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
 	// devices
 	MCFG_DEVICE_ADD("miot_u2", MOS6530, 1000000)
 	MCFG_MOS6530_IN_PA_CB(READ8(kim1_state, kim1_u2_read_a))

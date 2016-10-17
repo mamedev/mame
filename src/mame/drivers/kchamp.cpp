@@ -65,10 +65,10 @@ IO ports and memory map changes. Dip switches differ too.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/kchamp.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
-#include "includes/kchamp.h"
+#include "sound/volt_reg.h"
 
 
 /********************
@@ -156,8 +156,8 @@ WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
 {
 	if (offset == 0)
 		m_sound_nmi_enable = ((data >> 7) & 1);
-//  else
-//      DAC_set_volume(0, (data == 1) ? 255 : 0, 0);
+	else
+		m_dac->set_output_gain(0, BIT(data,0) ? 1.0 : 0);
 }
 
 static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8, kchamp_state )
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
@@ -428,20 +428,20 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)    /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)    /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kchamp_state, msmint))         /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 1 / 96 = 3906.25Hz playback */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 /********************
@@ -480,18 +480,19 @@ static MACHINE_CONFIG_START( kchamp, kchamp_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15) /* guess: using volume 0.50 makes the sound to clip a lot */
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

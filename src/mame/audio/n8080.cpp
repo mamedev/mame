@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/n8080.h"
+#include "sound/volt_reg.h"
 
 static const double ATTACK_RATE = 10e-6 * 500;
 static const double DECAY_RATE = 10e-6 * 16000;
@@ -324,13 +325,7 @@ READ8_MEMBER(n8080_state::helifire_8035_p2_r)
 
 WRITE8_MEMBER(n8080_state::n8080_dac_w)
 {
-	m_dac->write_unsigned8(data & 0x80);
-}
-
-
-WRITE8_MEMBER(n8080_state::helifire_dac_w)
-{
-	m_dac->write_unsigned8(data * m_helifire_dac_volume);
+	m_n8080_dac->write(BIT(data, 7));
 }
 
 
@@ -379,6 +374,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
 	{
 		m_helifire_dac_volume = exp(t / DECAY_RATE);
 	}
+
+	m_helifire_dac->set_output_gain(ALL_OUTPUTS, m_helifire_dac_volume);
 }
 
 
@@ -487,7 +484,7 @@ static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8, n8080_state )
 
 	AM_RANGE(0x00, 0x7f) AM_READ(helifire_8035_external_ram_r)
 
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(helifire_dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("helifire_dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(helifire_sound_ctrl_w)
 ADDRESS_MAP_END
 
@@ -505,10 +502,11 @@ MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("vco_timer", n8080_state, spacefev_vco_voltage_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(150), CAP_N(1)) // noise + filter
@@ -524,7 +522,7 @@ MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
 	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
 	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 MACHINE_CONFIG_END
 
 
@@ -539,10 +537,11 @@ MACHINE_CONFIG_FRAGMENT( sheriff_sound )
 	MCFG_CPU_IO_MAP(n8080_sound_io_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(100), CAP_N(1)) // noise + filter
@@ -558,7 +557,7 @@ MACHINE_CONFIG_FRAGMENT( sheriff_sound )
 	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
 	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
 	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 MACHINE_CONFIG_END
 
 
@@ -572,11 +571,11 @@ MACHINE_CONFIG_FRAGMENT( helifire_sound )
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
 	MCFG_CPU_IO_MAP(helifire_sound_io_map)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac_volume_timer", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("helifire_dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

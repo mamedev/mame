@@ -27,7 +27,10 @@
 
 #include "includes/bw12.h"
 #include "bus/rs232/rs232.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "softlist.h"
+
 /*
 
     TODO:
@@ -176,7 +179,7 @@ static ADDRESS_MAP_START( bw12_io, AS_IO, 8, bw12_state )
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x0e) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_DEVWRITE(MC1408_TAG, dac_device, write_unsigned8)
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIT8253_TAG, pit8253_device, read, write)
 ADDRESS_MAP_END
 
@@ -560,10 +563,10 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_MC6845_UPDATE_ROW_CB(bw12_state, crtc_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD(MC1408_TAG, DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // ls273.ic5 + mc1408.ic4
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)

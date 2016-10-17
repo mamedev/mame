@@ -11,7 +11,7 @@
 
     Manufactured by Matic: http://maticplay.com.br/
     This driver still only emulates an early prototype of the game.
-    Propper dumps of the actual released game is still lacking.
+    Proper dumps of the actual released game is still lacking.
     Photos on the web make us believe that there are at least 2 official
     releases of this game.
 
@@ -38,7 +38,6 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/dac.h"
 #include "barata.lh"
 #include "rendlay.h"
 
@@ -47,8 +46,7 @@ class barata_state : public driver_device
 public:
 	barata_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_maincpu(*this, "maincpu") { }
 	DECLARE_WRITE8_MEMBER(fpga_w);
 	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
@@ -56,7 +54,6 @@ public:
 	void fpga_send(unsigned char cmd);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 private:
 	unsigned char row_selection;
 };
@@ -313,9 +310,7 @@ static MACHINE_CONFIG_START( barata, barata_state )
 	MCFG_DEFAULT_LAYOUT( layout_barata )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	/* TODO: add sound samples */
 MACHINE_CONFIG_END

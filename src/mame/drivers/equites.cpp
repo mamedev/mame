@@ -356,13 +356,14 @@ D                                                                               
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/equites.h"
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
-#include "sound/ay8910.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/equites.h"
+#include "sound/ay8910.h"
+#include "sound/volt_reg.h"
 
 #define FRQ_ADJUSTER_TAG    "FRQ"
 
@@ -500,15 +501,15 @@ void equites_state::equites_update_dac(  )
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
 	if (m_eq8155_port_b & 1)
-		m_dac_1->write_signed8(m_dac_latch);
+		m_dac_1->write(m_dac_latch);
 
 	if (m_eq8155_port_b & 2)
-		m_dac_2->write_signed8(m_dac_latch);
+		m_dac_2->write(m_dac_latch);
 }
 
 WRITE8_MEMBER(equites_state::equites_dac_latch_w)
 {
-	m_dac_latch = data << 2;
+	m_dac_latch = data;
 	equites_update_dac();
 }
 
@@ -1051,40 +1052,40 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 	MCFG_CPU_IO_MAP(sound_portmap)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)   // will be adjusted at runtime through PORT_ADJUSTER
 	MCFG_MSM5232_SET_CAPACITORS(0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6) // verified
 	MCFG_MSM5232_GATE_HANDLER_CB(WRITELINE(equites_state, equites_msm5232_gate))
-	MCFG_SOUND_ROUTE(0, "mono", MSM5232_BASE_VOLUME/2.2)    // pin 28  2'-1 : 22k resistor
-	MCFG_SOUND_ROUTE(1, "mono", MSM5232_BASE_VOLUME/1.5)    // pin 29  4'-1 : 15k resistor
-	MCFG_SOUND_ROUTE(2, "mono", MSM5232_BASE_VOLUME)        // pin 30  8'-1 : 10k resistor
-	MCFG_SOUND_ROUTE(3, "mono", MSM5232_BASE_VOLUME)        // pin 31 16'-1 : 10k resistor
-	MCFG_SOUND_ROUTE(4, "mono", MSM5232_BASE_VOLUME/2.2)    // pin 36  2'-2 : 22k resistor
-	MCFG_SOUND_ROUTE(5, "mono", MSM5232_BASE_VOLUME/1.5)    // pin 35  4'-2 : 15k resistor
-	MCFG_SOUND_ROUTE(6, "mono", MSM5232_BASE_VOLUME)        // pin 34  8'-2 : 10k resistor
-	MCFG_SOUND_ROUTE(7, "mono", MSM5232_BASE_VOLUME)        // pin 33 16'-2 : 10k resistor
-	MCFG_SOUND_ROUTE(8, "mono", 1.0)        // pin 1 SOLO  8' (this actually feeds an analog section)
-	MCFG_SOUND_ROUTE(9, "mono", 1.0)        // pin 2 SOLO 16' (this actually feeds an analog section)
-	MCFG_SOUND_ROUTE(10,"mono", 0.12)       // pin 22 Noise Output (this actually feeds an analog section)
+	MCFG_SOUND_ROUTE(0, "speaker", MSM5232_BASE_VOLUME/2.2)    // pin 28  2'-1 : 22k resistor
+	MCFG_SOUND_ROUTE(1, "speaker", MSM5232_BASE_VOLUME/1.5)    // pin 29  4'-1 : 15k resistor
+	MCFG_SOUND_ROUTE(2, "speaker", MSM5232_BASE_VOLUME)        // pin 30  8'-1 : 10k resistor
+	MCFG_SOUND_ROUTE(3, "speaker", MSM5232_BASE_VOLUME)        // pin 31 16'-1 : 10k resistor
+	MCFG_SOUND_ROUTE(4, "speaker", MSM5232_BASE_VOLUME/2.2)    // pin 36  2'-2 : 22k resistor
+	MCFG_SOUND_ROUTE(5, "speaker", MSM5232_BASE_VOLUME/1.5)    // pin 35  4'-2 : 15k resistor
+	MCFG_SOUND_ROUTE(6, "speaker", MSM5232_BASE_VOLUME)        // pin 34  8'-2 : 10k resistor
+	MCFG_SOUND_ROUTE(7, "speaker", MSM5232_BASE_VOLUME)        // pin 33 16'-2 : 10k resistor
+	MCFG_SOUND_ROUTE(8, "speaker", 1.0)        // pin 1 SOLO  8' (this actually feeds an analog section)
+	MCFG_SOUND_ROUTE(9, "speaker", 1.0)        // pin 2 SOLO 16' (this actually feeds an analog section)
+	MCFG_SOUND_ROUTE(10,"speaker", 0.12)       // pin 22 Noise Output (this actually feeds an analog section)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(equites_state, equites_8910porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(equites_state, equites_8910portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(3)
 	MCFG_SAMPLES_NAMES(alphamc07_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
 /******************************************************************************/

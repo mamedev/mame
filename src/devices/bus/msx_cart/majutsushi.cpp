@@ -2,6 +2,7 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "majutsushi.h"
+#include "sound/volt_reg.h"
 
 const device_type MSX_CART_MAJUTSUSHI = &device_creator<msx_cart_majutsushi>;
 
@@ -24,9 +25,10 @@ msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, const ch
 
 static MACHINE_CONFIG_FRAGMENT( majutsushi )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -90,7 +92,7 @@ WRITE8_MEMBER(msx_cart_majutsushi::write_cart)
 		case 0x4000:
 			if (offset & 0x1000)
 			{
-				m_dac->write_unsigned8(data);
+				m_dac->write(data);
 			}
 			break;
 

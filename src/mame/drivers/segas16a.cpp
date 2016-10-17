@@ -148,12 +148,12 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 #include "emu.h"
 #include "includes/segas16a.h"
-#include "machine/segacrp2_device.h"
+#include "includes/segaipt.h"
 #include "machine/fd1089.h"
 #include "machine/nvram.h"
+#include "machine/segacrp2_device.h"
 #include "sound/dac.h"
-#include "includes/segaipt.h"
-
+#include "sound/volt_reg.h"
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -1003,7 +1003,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, segas16a_state )
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ(n7751_rom_r)
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(n7751_p2_r, n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
@@ -1930,16 +1930,17 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(segas16a_state, n7751_control_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.43)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1979,9 +1980,10 @@ static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_no7751p, system16a_no7751 )
@@ -1996,9 +1998,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
     MCFG_DEVICE_REMOVE("n7751")
     MCFG_DEVICE_REMOVE("dac")
+    MCFG_DEVICE_REMOVE("vref")
 
     MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 */
 
@@ -2008,9 +2011,10 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
@@ -2019,9 +2023,10 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
@@ -2030,9 +2035,10 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

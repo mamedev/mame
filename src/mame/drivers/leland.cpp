@@ -59,12 +59,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/leland.h"
 #include "cpu/i86/i186.h"
+#include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
-#include "cpu/z80/z80.h"
-#include "includes/leland.h"
-#include "sound/ay8910.h"
+#include "sound/volt_reg.h"
 
 
 /* Master Clock2 is for Asylum, Ataxx, Brute Force, Danny Sullivan's Indy Heat, World Soccer Finals */
@@ -935,26 +935,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-/*
-   2 AY8910 chips - Actually, one of these is an 8912
-   (8910 with only 1 output port)
-
-   Port A of both chips is connected to a banking control
-   register.
-
-   All 6 (3*2) AY-3-8910/12 outputs are tied together
-   and put with 1000 Ohm to gnd.
-   The following is a approximation, since
-   it does not take cross-chip mixing effects into account.
-*/
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -980,26 +960,28 @@ static MACHINE_CONFIG_START( leland, leland_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(leland_video)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ay8910.1", AY8910, 10000000/6)
+	// only one of the AY sockets is populated
+	MCFG_SOUND_ADD("ay8910", AY8910, 10000000/6)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(1000, 0, 0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(leland_state, leland_sound_port_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(leland_state, leland_sound_port_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay8910.2", AY8910, 10000000/6)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(1000, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(leland_state, leland_sound_port_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(leland_state, leland_sound_port_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+//  MCFG_SOUND_ADD("ay8912", AY8912, 10000000/6)
+//  MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+//  MCFG_AY8910_RES_LOADS(1000, 0, 0)
+//  MCFG_AY8910_PORT_A_READ_CB(READ8(leland_state, leland_sound_port_r))
+//  MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(leland_state, leland_sound_port_w))
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac0", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac0", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

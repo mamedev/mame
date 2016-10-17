@@ -25,11 +25,11 @@
 // * implement avr8 WDR (watchdog reset) opcode
 
 #include "emu.h"
-#include "cpu/avr8/avr8.h"
-#include "video/hd44780.h"
 #include "rendlay.h"
-#include "debugger.h"
+#include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/hd44780.h"
 
 #define MASTER_CLOCK    16000000
 #define LOG_PORTS 0
@@ -177,7 +177,7 @@ public:
 
 	required_device<avr8_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
@@ -433,14 +433,9 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & BUZZ) printf("[G] BUZZ: %s\n", data & BUZZ ? "HIGH" : "LOW");
 #endif
 
-			if(changed & BUZZ){
-				/* FIX-ME: What is the largest sample value allowed?
-				I'm using 0x3F based on what I see in src/mame/drivers/craft.c
-				But as the method is called "write_unsigned8", I guess we could have samples with values up to 0xFF, right?
-				Anyway... With the 0x3F value we'll get a sound that is not so loud, which may be less annoying... :-)
-				*/
-				UINT8 audio_sample = (data & BUZZ) ? 0x3F : 0;
-				m_dac->write_unsigned8(audio_sample << 1);
+			if (changed & BUZZ)
+			{
+				m_dac->write(BIT(data, 5));
 			}
 
 			m_port_g = data;
@@ -636,10 +631,10 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
-	MCFG_SPEAKER_STANDARD_MONO("buzzer")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "buzzer", 1.00)
-
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( replica1 )

@@ -244,7 +244,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spacefb_audio_io_map, AS_IO, 8, spacefb_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(audio_p2_r)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(audio_t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)

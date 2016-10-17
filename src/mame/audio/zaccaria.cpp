@@ -2,11 +2,11 @@
 // copyright-holders:Vas Crabb
 #include "emu.h"
 #include "audio/zaccaria.h"
-
 #include "cpu/m6800/m6800.h"
 #include "machine/clock.h"
 #include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START(zac1b11142_audio_map, AS_PROGRAM, 8, zac1b11142_audio_d
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 6802 internal RAM
 	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x8f6c) AM_DEVREADWRITE("pia_1i", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x83ff) AM_DEVWRITE("dac_1f", dac_device, write_unsigned8) // MC1408
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x83ff) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0xc3ff) AM_WRITE(melody_command_w)
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0xc3ff) AM_READ(host_command_r)
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROM // ROM 8 with A12 low
@@ -200,8 +200,9 @@ MACHINE_CONFIG_DERIVED(zac1b11142_config, zac1b111xx_base_config)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("speech", tms5220_device, data_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b11142_audio_device, pia_1i_portb_w))
 
-	MCFG_DAC_ADD("dac_1f")
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.80, 0)
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0) // mc1408.1f
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
 	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz

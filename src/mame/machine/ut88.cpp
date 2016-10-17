@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "sound/dac.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "includes/ut88.h"
@@ -109,7 +108,7 @@ WRITE8_MEMBER( ut88_state::ut88_keyboard_w )
 
 WRITE8_MEMBER( ut88_state::ut88_sound_w )
 {
-	m_dac->write_unsigned8(data); //beeper
+	m_dac->write(BIT(data, 0));
 	m_cassette->output(BIT(data, 0) ? 1 : -1);
 }
 

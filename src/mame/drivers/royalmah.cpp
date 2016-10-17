@@ -97,9 +97,10 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "machine/nvram.h"
+#include "sound/volt_reg.h"
 
 
 class royalmah_state : public driver_device
@@ -841,7 +842,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jansou_sub_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac", dac_device, write_unsigned8 )
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 
@@ -3326,12 +3327,12 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(royalmah_state, royalmah_player_1_port_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(royalmah_state, royalmah_player_2_port_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 MACHINE_CONFIG_END
 
 
@@ -3359,8 +3360,9 @@ static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dondenmj, royalmah )

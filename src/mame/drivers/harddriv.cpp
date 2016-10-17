@@ -324,13 +324,11 @@ Notes:
 
 ****************************************************************************/
 
-
 #include "emu.h"
-#include "machine/watchdog.h"
-#include "sound/dac.h"
-#include "includes/slapstic.h"
 #include "includes/harddriv.h"
-
+#include "includes/slapstic.h"
+#include "machine/watchdog.h"
+#include "sound/volt_reg.h"
 #include "racedrivpan.lh"
 
 /*************************************
@@ -354,8 +352,8 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_ds3xdsp(*this, "ds3xdsp"),
 			m_ds3sdsp_region(*this, "ds3sdsp"),
 			m_ds3xdsp_region(*this, "ds3xdsp"),
-			m_ds3dac1(*this, "ds3dac1"),
-			m_ds3dac2(*this, "ds3dac2"),
+			m_ldac(*this, "ldac"),
+			m_rdac(*this, "rdac"),
 			m_harddriv_sound(*this, "harddriv_sound"),
 			m_jsa(*this, "jsa"),
 			m_screen(*this, "screen"),
@@ -818,17 +816,16 @@ static INPUT_PORTS_START( harddriv )
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
 	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 - steering wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x010,0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	PORT_START("mainpcb:12BADC.1")       /* b80000 - 12 bit ADC 1 - force brake */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_SENSITIVITY(400) PORT_KEYDELTA(100) PORT_REVERSE PORT_NAME("Brake Pedal")
 
 	PORT_START("mainpcb:12BADC.2")       /* b80000 - 12 bit ADC 2 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.3")       /* b80000 - 12 bit ADC 3 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -902,16 +899,16 @@ static INPUT_PORTS_START( racedriv )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 - steering wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x010,0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	PORT_START("mainpcb:12BADC.1")       /* b80000 - 12 bit ADC 1 - force brake */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_SENSITIVITY(400) PORT_KEYDELTA(100) PORT_REVERSE PORT_NAME("Brake Pedal")
 
 	PORT_START("mainpcb:12BADC.2")       /* b80000 - 12 bit ADC 2 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.3")       /* b80000 - 12 bit ADC 3 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( racedriv_pan )
@@ -1032,15 +1029,15 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
+	PORT_BIT(0xfff, 0x800, IPT_PADDLE) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("mainpcb:12BADC.2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("mainpcb:12BADC.3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1114,16 +1111,16 @@ static INPUT_PORTS_START( stunrun )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.1")       /* b80000 - 12 bit ADC 1 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.2")       /* b80000 - 12 bit ADC 2 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.3")       /* b80000 - 12 bit ADC 3 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/* stunrun has its own coins */
 // todo
@@ -1204,16 +1201,16 @@ static INPUT_PORTS_START( steeltal )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)   /* left/right */
+	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_X ) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(10)   /* left/right */
 
 	PORT_START("mainpcb:12BADC.1")       /* b80000 - 12 bit ADC 1 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)   /* up/down */
+	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_Y ) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(10)   /* up/down */
 
 	PORT_START("mainpcb:12BADC.2")       /* b80000 - 12 bit ADC 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Collective") PORT_REVERSE /* collective */
+	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_Z ) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(10) PORT_NAME("Collective") PORT_REVERSE /* collective */
 
 	PORT_START("mainpcb:12BADC.3")       /* b80000 - 12 bit ADC 3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Rudder") PORT_PLAYER(2)   /* rudder */
+	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_X ) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(10) PORT_NAME("Rudder") PORT_PLAYER(2)   /* rudder */
 
 	/* steeltal has its own coins */
 // todo
@@ -1301,15 +1298,15 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
+	PORT_BIT(0xfff, 0x800, IPT_PADDLE) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")       /* FAKE */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("mainpcb:12BADC.2")       /* FAKE */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("mainpcb:12BADC.3")       /* FAKE */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1391,15 +1388,15 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
+	PORT_BIT(0xfff, 0x800, IPT_PADDLE) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("mainpcb:12BADC.2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("mainpcb:12BADC.3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1577,11 +1574,11 @@ static MACHINE_CONFIG_FRAGMENT( ds3 )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ds3dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-	MCFG_SOUND_ADD("ds3dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1709,8 +1706,9 @@ static MACHINE_CONFIG_FRAGMENT( steeltal )
 	MCFG_FRAGMENT_ADD( ds3 )            /* DS III board */
 	MCFG_DEVICE_REMOVE("ds3sdsp")       /* DS III sound components are not present */
 	MCFG_DEVICE_REMOVE("ds3xdsp")
-	MCFG_DEVICE_REMOVE("ds3dac1")
-	MCFG_DEVICE_REMOVE("ds3dac2")
+	MCFG_DEVICE_REMOVE("ldac")
+	MCFG_DEVICE_REMOVE("rdac")
+	MCFG_DEVICE_REMOVE("vref")
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
 

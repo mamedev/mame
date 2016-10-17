@@ -5,7 +5,6 @@
 
 #include "emu.h"
 #include "isa.h"
-#include "sound/dac.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/3812intf.h"
@@ -27,8 +26,6 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	required_device<dac_device> m_dacl;
-	required_device<dac_device> m_dacr;
 	required_device<pc_joy_device> m_joy;
 	required_device<cpu_device> m_cpu;
 

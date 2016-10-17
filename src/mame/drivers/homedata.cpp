@@ -234,11 +234,12 @@ Custom: GX61A01
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/homedata.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/upd7810/upd7810.h"
-#include "includes/homedata.h"
-
+#include "cpu/z80/z80.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 {
@@ -315,20 +316,6 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
 	   bit 2 = ROM or soundlatch
 	 */
 	m_sndbank = data;
-}
-
-WRITE8_MEMBER(homedata_state::mrokumei_sound_io_w)
-{
-	switch (offset & 0xff)
-	{
-		case 0x40:
-		case 0x7f: // hourouki mirror
-			m_dac->write_signed8(data);
-			break;
-		default:
-			logerror("%04x: I/O write to port %04x %02x\n", space.device().safe_pc(), offset,data);
-			break;
-	}
 }
 
 WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
@@ -560,15 +547,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrokumei_sound_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	// TODO: might be that the entire area is sound_bank_w
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP    /* stack writes happen here, but there's no RAM */
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
-	AM_RANGE(0xffbf, 0xffbf) AM_WRITE(mrokumei_sound_bank_w) // hourouki mirror
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( mrokumei_sound_io_map, AS_IO, 8, homedata_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrokumei_sound_io_r, mrokumei_sound_io_w) /* read address is 16-bit, write address is only 8-bit */
+	AM_RANGE(0x0000, 0xffff) AM_READ(mrokumei_sound_io_r) /* read address is 16-bit */
+	AM_RANGE(0x0040, 0x0040) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
+	// hourouki mirror... 
+	AM_RANGE(0x007f, 0x007f) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
 ADDRESS_MAP_END
 
 /********************************************************************************/
@@ -599,7 +586,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_io_map, AS_IO, 8, homedata_state )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(reikaids_upd7807_porta_r, reikaids_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
 	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(reikaids_snd_command_r)
 ADDRESS_MAP_END
@@ -634,7 +621,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_io_map, AS_IO, 8, homedata_state )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(pteacher_upd7807_porta_r, pteacher_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_READ_PORT("COIN") AM_WRITE(pteacher_upd7807_portc_w)
 	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(pteacher_keyboard_r)
 ADDRESS_MAP_END
@@ -1264,15 +1251,16 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1312,18 +1300,19 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1364,13 +1353,14 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjkinjas, pteacher )
@@ -1527,13 +1517,13 @@ static MACHINE_CONFIG_START( mirderby, homedata_state )
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 2000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 /**************************************************************************/

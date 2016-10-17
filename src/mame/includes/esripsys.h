@@ -71,7 +71,6 @@ public:
 	UINT8 m_s_to_g_latch1;
 	UINT8 m_s_to_g_latch2;
 	UINT8 m_dac_msb;
-	UINT8 m_dac_vol;
 	UINT8 m_tms_data;
 	std::unique_ptr<UINT8[]> m_fdt_a;
 	std::unique_ptr<UINT8[]> m_fdt_b;
@@ -111,7 +110,6 @@ public:
 	DECLARE_READ8_MEMBER(tms5220_r);
 	DECLARE_WRITE8_MEMBER(tms5220_w);
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(volume_dac_w);
 	DECLARE_WRITE8_MEMBER(esripsys_bg_intensity_w);
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
@@ -124,7 +122,7 @@ public:
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	TIMER_CALLBACK_MEMBER(hblank_start_callback);
 	TIMER_CALLBACK_MEMBER(hblank_end_callback);
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 	required_device<screen_device> m_screen;
 	ESRIP_DRAW(esripsys_draw);
 };

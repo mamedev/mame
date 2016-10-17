@@ -120,9 +120,9 @@ int thomson_state::to7_get_cassette()
 
 
 /* 1-bit cassette output */
-void thomson_state::to7_set_cassette( int data )
+WRITE_LINE_MEMBER(thomson_state::to7_set_cassette)
 {
-	m_cassette->output(data ? 1. : -1. );
+	m_cassette->output(state ? 1. : -1. );
 }
 
 
@@ -487,13 +487,6 @@ WRITE8_MEMBER( thomson_state::to7_timer_port_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_timer_cp2_out )
-{
-	m_buzzer->write_unsigned8(data ? 0x80 : 0); /* 1-bit buzzer */
-}
-
-
-
 READ8_MEMBER( thomson_state::to7_timer_port_in )
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
@@ -501,13 +494,6 @@ READ8_MEMBER( thomson_state::to7_timer_port_in )
 	return lightpen | cass;
 }
 
-
-
-WRITE8_MEMBER( thomson_state::to7_timer_tco_out )
-{
-	/* 1-bit cassette output */
-	to7_set_cassette( data );
-}
 
 
 /* ------------ lightpen automaton ------------ */
@@ -863,7 +849,7 @@ UINT8 thomson_state::to7_get_mouse_signal()
 
 void thomson_state::to7_game_sound_update()
 {
-	m_dac->write_unsigned8(m_to7_game_mute ? 0 : (m_to7_game_sound << 2) );
+	m_dac->write(m_to7_game_mute ? 0 : m_to7_game_sound );
 }
 
 
@@ -1422,13 +1408,6 @@ READ8_MEMBER( thomson_state::mo5_sys_porta_in )
 		(mo5_get_cassette() ? 0x80 : 0) |     /* bit 7: cassette input */
 		((m_io_lightpen_button->read() & 1) ? 0x20 : 0)
 		/* bit 5: lightpen button */;
-}
-
-
-
-WRITE8_MEMBER( thomson_state::mo5_sys_portb_out )
-{
-	m_buzzer->write_unsigned8((data & 1) ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -3587,10 +3566,10 @@ WRITE8_MEMBER( thomson_state::to8_timer_port_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_timer_cp2_out )
+WRITE_LINE_MEMBER( thomson_state::to8_timer_cp2_out )
 {
 	/* mute */
-	m_to7_game_mute = data;
+	m_to7_game_mute = state;
 	to7_game_sound_update();
 }
 
@@ -4269,13 +4248,6 @@ WRITE8_MEMBER( thomson_state::mo6_sys_porta_out )
 	mo5_set_cassette( (data & 0x40) ? 1 : 0 );     /* bit 6: cassette output */
 	mo6_update_cart_bank();                  /* bit 5: rom bank */
 	to7_game_sound_update();
-}
-
-
-
-WRITE8_MEMBER( thomson_state::mo6_sys_portb_out )
-{
-	m_buzzer->write_unsigned8((data & 1) ? 0x80 : 0); /* bit 0: buzzer */
 }
 
 

@@ -57,7 +57,7 @@ private:
 	UINT8                           m_dac_data[16];
 	int                             m_dac_ptr;
 
-	required_device<dac_device>     m_dac;
+	required_device<dac_byte_interface> m_dac;
 	optional_device<filter_rc_device>   m_filter;
 	required_device<i8251_device>   m_midi;
 	required_device<pit8253_device> m_d14;

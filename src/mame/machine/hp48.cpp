@@ -9,7 +9,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "sound/dac.h"
 #include "cpu/saturn/saturn.h"
 
 #include "machine/nvram.h"
@@ -169,7 +168,7 @@ WRITE32_MEMBER( hp48_state::hp48_reg_out )
 	/* bits 9-10: unused */
 
 	/* bit 11: beeper */
-	m_dac->write_unsigned8((data & 0x800) ? 0x80 : 00 );
+	m_dac->write(BIT(data, 11));
 }
 
 int hp48_state::hp48_get_in(  )

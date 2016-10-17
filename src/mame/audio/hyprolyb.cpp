@@ -114,7 +114,7 @@ MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 

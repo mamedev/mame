@@ -66,10 +66,11 @@ SRAM:
 */
 
 #include "emu.h"
+#include "includes/ksayakyu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/ksayakyu.h"
+#include "sound/volt_reg.h"
 
 #define MAIN_CLOCK XTAL_18_432MHz
 
@@ -127,7 +128,7 @@ static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0xa006, 0xa007) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0xa008, 0xa008) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xa008, 0xa008) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP //a timer of some sort?
 ADDRESS_MAP_END
@@ -274,22 +275,23 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/16) //unknown clock
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ksayakyu_state, dummy1_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/16) //unknown clock
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ksayakyu_state, dummy2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ksayakyu_state, dummy3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( ksayakyu )

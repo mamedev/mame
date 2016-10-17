@@ -188,8 +188,8 @@ extern const device_type SEGAUSBROM;
 
 #define MCFG_SEGAUSB_ADD(_tag) \
 	MCFG_SOUND_ADD(_tag, SEGAUSB, 0) \
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	#define MCFG_SEGAUSBROM_ADD(_tag) \
 	MCFG_SOUND_ADD(_tag, SEGAUSBROM, 0) \
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

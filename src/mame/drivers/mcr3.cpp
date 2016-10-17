@@ -1126,7 +1126,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs")
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1136,7 +1136,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
+	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1149,7 +1149,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SSIO_ADD("ssio")
+	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1175,7 +1175,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_CHIP_SQUEAK_DELUXE_ADD("csd")
+	MCFG_SOUND_ADD("csd", MIDWAY_CHIP_SQUEAK_DELUXE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

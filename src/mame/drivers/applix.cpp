@@ -4,7 +4,7 @@
 
     Applix 1616 computer
 
-    See for docs: http;//www.microbee-mspp.org.au
+    See for docs: http://psiphi.server101.com/applix/
 
     First revealed to the world in December 1986 issue of Electronics Today
     International (ETI) an Australian electronics magazine which is now defunct.
@@ -40,9 +40,10 @@
 #include "cpu/mcs51/mcs51.h"
 #include "video/mc6845.h"
 #include "machine/6522via.h"
+#include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
-#include "machine/wd_fdc.h"
+#include "sound/volt_reg.h"
 #include "formats/applix_dsk.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
@@ -63,8 +64,8 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
-		m_dacl(*this, "dacl"),
-		m_dacr(*this, "dacr"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
 		m_cass(*this, "cassette"),
 		m_io_dsw(*this, "DSW"),
 		m_io_fdc(*this, "FDC"),
@@ -163,8 +164,8 @@ private:
 	required_device<wd1772_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	required_device<dac_device> m_dacl;
-	required_device<dac_device> m_dacr;
+	required_device<dac_byte_interface> m_ldac;
+	required_device<dac_byte_interface> m_rdac;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_io_dsw;
 	required_ioport m_io_fdc;
@@ -219,10 +220,10 @@ WRITE16_MEMBER( applix_state::dac_latch_w )
 	m_dac_latch = data;
 
 	if ((m_analog_latch & 0x70) == 0) // right
-		m_dacr->write_unsigned8(m_dac_latch);
+		m_rdac->write(m_dac_latch);
 	else
 	if ((m_analog_latch & 0x70) == 0x10) // left
-		m_dacl->write_unsigned8(m_dac_latch);
+		m_ldac->write(m_dac_latch);
 }
 
 //cent = odd, video = even
@@ -849,10 +850,12 @@ static MACHINE_CONFIG_START( applix, applix_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0 )
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0 )
+	MCFG_SOUND_ADD("ldac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
+	MCFG_SOUND_ADD("rdac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 

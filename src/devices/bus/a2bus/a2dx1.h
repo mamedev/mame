@@ -31,19 +31,16 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
+	required_device<dac_byte_interface> m_dacvol;
 
 protected:
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
 	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
 	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
 	virtual bool take_c800() override;
-
-private:
-	UINT8 m_volume, m_lastdac;
 };
 
 // device type definition

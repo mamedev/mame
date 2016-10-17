@@ -83,13 +83,14 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 */
 
 #include "emu.h"
-#include "rendlay.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/i860/i860.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/tlc34076.h"
 #include "video/mc6845.h"
-#include "sound/dac.h"
-#include "machine/nvram.h"
+#include "rendlay.h"
 
 
 class vcombat_state : public driver_device
@@ -133,7 +134,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<i860_cpu_device> m_vid_0;
 	optional_device<i860_cpu_device> m_vid_1;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 };
 
 static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -341,8 +342,9 @@ WRITE16_MEMBER(vcombat_state::crtc_w)
 
 WRITE16_MEMBER(vcombat_state::vcombat_dac_w)
 {
-	INT16 newval = ((INT16)data - 0x6000) << 2;
-	m_dac->write_signed16(newval + 0x8000);
+	m_dac->write(data >> 5);
+	if (data & 0x801f)
+		fprintf(stderr, "dac overflow %04x\n", data & 0x801f);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vcombat_state )
@@ -580,10 +582,10 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_aux)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -614,10 +616,10 @@ static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_main)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

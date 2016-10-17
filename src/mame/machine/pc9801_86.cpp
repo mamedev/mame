@@ -17,6 +17,7 @@
 
 #include "emu.h"
 #include "machine/pc9801_86.h"
+#include "sound/volt_reg.h"
 
 #define MAIN_CLOCK_X1 XTAL_1_9968MHz
 #define QUEUE_SIZE 32768
@@ -56,10 +57,11 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_86_config )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_86_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -128,8 +130,8 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock, "pc9801_86", __FILE__),
 		m_opna(*this, "opna"),
-		m_dacl(*this, "dacl"),
-		m_dacr(*this, "dacr"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
 		m_queue(QUEUE_SIZE)
 {
 }
@@ -323,32 +325,32 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 	switch(m_pcm_mode & 0x70)
 	{
 		case 0x70: // 8bit stereo
-			m_dacl->write(queue_pop() << 8);
-			m_dacr->write(queue_pop() << 8);
+			m_ldac->write(queue_pop() << 8);
+			m_rdac->write(queue_pop() << 8);
 			break;
 		case 0x60: // 8bit left only
-			m_dacl->write(queue_pop() << 8);
+			m_ldac->write(queue_pop() << 8);
 			break;
 		case 0x50: // 8bit right only
-			m_dacr->write(queue_pop() << 8);
+			m_rdac->write(queue_pop() << 8);
 			break;
 		case 0x30: // 16bit stereo
 			lsample = queue_pop();
 			lsample |= queue_pop() << 8;
 			rsample = queue_pop();
 			rsample |= queue_pop() << 8;
-			m_dacl->write(lsample);
-			m_dacr->write(rsample);
+			m_ldac->write(lsample);
+			m_rdac->write(rsample);
 			break;
 		case 0x20: // 16bit left only
 			lsample = queue_pop();
 			lsample |= queue_pop() << 8;
-			m_dacl->write(lsample);
+			m_ldac->write(lsample);
 			break;
 		case 0x10: // 16bit right only
 			rsample = queue_pop();
 			rsample |= queue_pop() << 8;
-			m_dacr->write(rsample);
+			m_rdac->write(rsample);
 			break;
 	}
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))

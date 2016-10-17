@@ -42,9 +42,10 @@ ToDo (granny):
 #include "cpu/m6809/m6809.h"
 #include "video/tms9928a.h"
 #include "machine/6821pia.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 class by133_state : public driver_device
 {
@@ -179,7 +180,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, by133_state ) // U27 Vidiot
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, by133_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE("dac", dac_device, write_unsigned8) // P10-P17
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE("dac", dac_byte_interface, write) // P10-P17
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w) // P20-P24 sound command in
 ADDRESS_MAP_END
 
@@ -792,9 +793,11 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_SPEAKER_STANDARD_MONO("beee")
 	MCFG_SOUND_ADD("beeper", BEEP, 600)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)

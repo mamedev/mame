@@ -8,7 +8,6 @@
 
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/gen_latch.h"
-#include "sound/dac.h"
 
 #define VRAM_MAX    2
 
@@ -27,8 +26,6 @@ public:
 	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
@@ -36,8 +33,6 @@ public:
 	{ }
 
 	required_device<tmpz84c011_device> m_maincpu;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;

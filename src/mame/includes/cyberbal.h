@@ -22,8 +22,8 @@ public:
 			m_audiocpu(*this, "audiocpu"),
 			m_extracpu(*this, "extra"),
 			m_daccpu(*this, "dac"),
-			m_dac1(*this, "dac1"),
-			m_dac2(*this, "dac2"),
+			m_rdac(*this, "rdac"),
+			m_ldac(*this, "ldac"),
 			m_soundcomm(*this, "soundcomm"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
@@ -39,8 +39,8 @@ public:
 	optional_device<m6502_device> m_audiocpu;
 	optional_device<cpu_device> m_extracpu;
 	optional_device<cpu_device> m_daccpu;
-	optional_device<dac_device> m_dac1;
-	optional_device<dac_device> m_dac2;
+	optional_device<dac_word_interface> m_rdac;
+	optional_device<dac_word_interface> m_ldac;
 	optional_device<atari_sound_comm_device> m_soundcomm;
 	optional_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;

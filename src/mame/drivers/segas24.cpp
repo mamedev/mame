@@ -336,15 +336,14 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/dac.h"
-#include "sound/ym2151.h"
-#include "machine/fd1094.h"
-#include "machine/nvram.h"
-#include "video/segaic24.h"
 #include "includes/segas24.h"
 #include "includes/segaipt.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/fd1094.h"
+#include "machine/nvram.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2151.h"
+#include "video/segaic24.h"
 
 #define MASTER_CLOCK        XTAL_20MHz
 #define VIDEO_CLOCK         XTAL_32MHz
@@ -604,7 +603,7 @@ void segas24_state::mahmajn_io_w(UINT8 port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		m_dac->write_signed8(data);
+		m_dac->write(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -618,7 +617,7 @@ void segas24_state::hotrod_io_w(UINT8 port, UINT8 data)
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		m_dac->write_signed8(data);
+		m_dac->write(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -2043,9 +2042,9 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )

@@ -4,8 +4,9 @@
 #include "emu.h"
 #include "cpu/i86/i286.h"
 #include "machine/at.h"
-#include "sound/dac.h"
 #include "sound/262intf.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "bus/isa/isa_cards.h"
 
 class vis_audio_device : public device_t,
@@ -22,8 +23,8 @@ protected:
 	virtual void dack16_w(int line, UINT16 data) override { if(m_samples < 2) m_sample[m_samples++] = data; else m_isa->drq7_w(CLEAR_LINE); }
 	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
-	required_device<dac_device> m_dacr;
-	required_device<dac_device> m_dacl;
+	required_device<dac_word_interface> m_rdac;
+	required_device<dac_word_interface> m_ldac;
 	UINT16 m_count;
 	UINT16 m_sample[2];
 	UINT8 m_index[2]; // unknown indexed registers, volume?
@@ -40,8 +41,8 @@ const device_type VIS_AUDIO = &device_creator<vis_audio_device>;
 vis_audio_device::vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIS_AUDIO, "vis_pcm", tag, owner, clock, "vis_pcm", __FILE__),
 	device_isa16_card_interface(mconfig, *this),
-	m_dacr(*this, "dacr"),
-	m_dacl(*this, "dacl")
+	m_rdac(*this, "rdac"),
+	m_ldac(*this, "ldac")
 {
 }
 
@@ -72,24 +73,24 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		case 0x80: // 8bit mono
 		{
 			UINT8 sample = m_sample[m_sample_byte >> 1] >> ((m_sample_byte & 1) * 8);
-			m_dacl->write_signed8(sample);
-			m_dacr->write_signed8(sample);
+			m_ldac->write(sample << 8);
+			m_rdac->write(sample << 8);
 			m_sample_byte++;
 			break;
 		}
 		case 0x00: // 8bit stereo
-			m_dacl->write_signed8(m_sample[m_sample_byte >> 1] & 0xff);
-			m_dacr->write_signed8(m_sample[m_sample_byte >> 1] >> 8);
+			m_ldac->write(m_sample[m_sample_byte >> 1] << 8);
+			m_rdac->write(m_sample[m_sample_byte >> 1] & 0xff00);
 			m_sample_byte += 2;
 			break;
 		case 0x88: // 16bit mono
-			m_dacl->write((INT16)m_sample[m_sample_byte >> 1]);
-			m_dacr->write((INT16)m_sample[m_sample_byte >> 1]);
+			m_ldac->write(m_sample[m_sample_byte >> 1] ^ 0x8000);
+			m_rdac->write(m_sample[m_sample_byte >> 1] ^ 0x8000);
 			m_sample_byte += 2;
 			break;
 		case 0x08: // 16bit stereo
-			m_dacl->write((INT16)m_sample[0]);
-			m_dacr->write((INT16)m_sample[1]);
+			m_ldac->write(m_sample[0] ^ 0x8000);
+			m_rdac->write(m_sample[1] ^ 0x8000);
 			m_sample_byte += 4;
 			break;
 	}
@@ -99,18 +100,16 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		m_sample_byte = 0;
 		m_samples = 0;
 		if(m_count)
-		{
-			m_count--;
 			m_isa->drq7_w(ASSERT_LINE);
-		}
 		else
 		{
-			m_dacl->write(0);
-			m_dacr->write(0);
+			m_ldac->write(0x8000);
+			m_rdac->write(0x8000);
 			m_stat = 4;
 			m_pcm->adjust(attotime::never);
 			m_isa->irq7_w(ASSERT_LINE);
 		}
+		m_count--;
 	}
 }
 
@@ -121,10 +120,11 @@ static MACHINE_CONFIG_FRAGMENT( vis_pcm_config )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 machine_config_constructor vis_audio_device::device_mconfig_additions() const

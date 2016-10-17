@@ -344,7 +344,7 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
 
 	/* key click */
 	if ( BIT(m_port_c_old ^ data, 7) )
-		m_dac->write_signed8(BIT(data, 7) ? 0x7f : 0);
+		m_dac->write(BIT(data, 7));
 
 	/* cassette motor on/off */
 	if ( BIT(m_port_c_old ^ data, 4) )

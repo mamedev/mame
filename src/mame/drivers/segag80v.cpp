@@ -888,7 +888,7 @@ static MACHINE_CONFIG_START( g80v_base, segag80v_state )
 	MCFG_VECTOR_ADD("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
@@ -898,7 +898,7 @@ static MACHINE_CONFIG_DERIVED( elim2, g80v_base )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(elim_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -908,7 +908,7 @@ static MACHINE_CONFIG_DERIVED( spacfury, g80v_base )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(spacfury_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
 	/* speech board */
 	MCFG_FRAGMENT_ADD(sega_speech_board)
@@ -921,10 +921,10 @@ static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(zektor_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, VIDEO_CLOCK/4/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 
 	/* speech board */
 	MCFG_FRAGMENT_ADD(sega_speech_board)

@@ -31,14 +31,14 @@ ToDo:
 
 *****************************************************************************************/
 
-
-#include "machine/genpin.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/genpin.h"
 #include "sound/hc55516.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "s9.lh"
-
 
 class s9_state : public genpin_class
 {
@@ -47,7 +47,6 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_dac(*this, "dac")
 		, m_hc55516(*this, "hc55516")
 		, m_pias(*this, "pias")
 		, m_pia21(*this, "pia21")
@@ -56,7 +55,7 @@ public:
 		, m_pia30(*this, "pia30")
 	{ }
 
-	DECLARE_READ8_MEMBER(dac_r);
+	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
 	DECLARE_WRITE8_MEMBER(lamp0_w) { };
@@ -87,7 +86,6 @@ private:
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<dac_device> m_dac;
 	required_device<hc55516_device> m_hc55516;
 	required_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
@@ -257,7 +255,7 @@ WRITE8_MEMBER( s9_state::switch_w )
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( s9_state::dac_r )
+READ8_MEMBER( s9_state::sound_r )
 {
 	return m_sound_data;
 }
@@ -324,7 +322,7 @@ static MACHINE_CONFIG_START( s9, s9_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s9_state, dac_r))
+	MCFG_PIA_READPA_HANDLER(READ8(s9_state, sound_r))
 	MCFG_PIA_READCA1_HANDLER(READLINE(s9_state, pia21_ca1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s9_state, sound_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, sol2_w))
@@ -359,16 +357,19 @@ static MACHINE_CONFIG_START( s9, s9_state )
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s9_audio_map)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_SPEAKER_STANDARD_MONO("speech")
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 1.00)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s9_state, dac_r))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_PIA_READPA_HANDLER(READ8(s9_state, sound_r))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, clock_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, digit_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))

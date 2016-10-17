@@ -5,6 +5,8 @@
 // TODO: UART is connected to MIDI port
 
 #include "stereo_fx.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 const device_type ISA8_STEREO_FX = &device_creator<stereo_fx_device>;
 
@@ -89,13 +91,13 @@ ROM_END
 
 static ADDRESS_MAP_START(stereo_fx_io, AS_IO, 8, stereo_fx_device)
 	AM_RANGE(0xFF00, 0xFF00) AM_WRITE(port00_w)
-	AM_RANGE(0xFF10, 0xFF10) AM_DEVWRITE("dacr", dac_device, write_unsigned8)
+	AM_RANGE(0xFF10, 0xFF10) AM_DEVWRITE("rdac", dac_byte_interface, write)
 	AM_RANGE(0xFF20, 0xFF20) AM_WRITE(port20_w)
 	//AM_RANGE(0xFF30, 0xFF30) AM_WRITE()  //  used only on reset and undocumented cmd 0xc4
 	AM_RANGE(0xFF40, 0xFF40) AM_READWRITE(dev_dsp_data_r, dev_dsp_data_w)
 	AM_RANGE(0xFF50, 0xFF50) AM_WRITE(raise_drq_w)
 	AM_RANGE(0xFF60, 0xFF60) AM_WRITE(dev_host_irq_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(p1_r) AM_DEVWRITE("dacl", dac_device, write_unsigned8)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(p1_r) AM_DEVWRITE("ldac", dac_byte_interface, write)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 ADDRESS_MAP_END
 
@@ -114,10 +116,11 @@ static MACHINE_CONFIG_FRAGMENT( stereo_fx )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 	/* no CM/S support (empty sockets) */
 
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
@@ -189,8 +192,6 @@ READ8_MEMBER( stereo_fx_device::invalid_r )
 stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISA8_STEREO_FX, "ATI Stereo F/X Audio Adapter", tag, owner, clock, "stereo_fx", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
-	m_dacl(*this, "dacl"),
-	m_dacr(*this, "dacr"),
 	m_joy(*this, "pc_joy"),
 	m_cpu(*this, "stereo_fx_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_port20(0), m_port00(0), m_timer(nullptr), m_t0(0)
 {

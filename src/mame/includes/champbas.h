@@ -8,7 +8,6 @@
 
 #include "machine/alpha8201.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
 
 
 class champbas_state : public driver_device
@@ -20,8 +19,6 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_alpha_8201(*this, "alpha_8201"),
 		m_watchdog(*this, "watchdog"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_mainram(*this, "mainram"),
@@ -35,8 +32,6 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<alpha_8201_device> m_alpha_8201;
 	required_device<watchdog_timer_device> m_watchdog;
-	optional_device<dac_device> m_dac1;
-	optional_device<dac_device> m_dac2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -61,9 +56,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
-
-	DECLARE_WRITE8_MEMBER(dac1_w);
-	DECLARE_WRITE8_MEMBER(dac2_w);
 
 	DECLARE_WRITE8_MEMBER(tilemap_w);
 	DECLARE_WRITE8_MEMBER(gfxbank_w);

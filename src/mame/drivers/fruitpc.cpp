@@ -19,7 +19,6 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
-#include "sound/dac.h"
 #include "machine/pcshare.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"

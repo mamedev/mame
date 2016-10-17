@@ -2,8 +2,9 @@
 // copyright-holders:Nicola Salmoria
 
 #include "machine/gen_latch.h"
-#include "sound/dac.h"
 #include "sound/ay8910.h"
+#include "sound/discrete.h"
+#include "sound/dac.h"
 
 class taitosj_state : public driver_device
 {
@@ -28,6 +29,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_dac(*this, "dac"),
+		m_dacvol(*this, "dacvol"),
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
 		m_ay3(*this, "ay3"),
@@ -41,8 +43,6 @@ public:
 									const rectangle &, int, int *, rectangle *);
 	UINT8 m_input_port_4_f0;
 	UINT8 m_kikstart_gears[2];
-	INT8 m_dac_out;
-	UINT8 m_dac_vol;
 	required_shared_ptr<UINT8> m_videoram_1;
 	required_shared_ptr<UINT8> m_videoram_2;
 	required_shared_ptr<UINT8> m_videoram_3;
@@ -106,8 +106,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
 	DECLARE_WRITE8_MEMBER(taitosj_sndnmi_msk_w);
 	DECLARE_WRITE8_MEMBER(input_port_4_f0_w);
-	DECLARE_WRITE8_MEMBER(dac_out_w);
-	DECLARE_WRITE8_MEMBER(dac_vol_w);
+	DECLARE_WRITE8_MEMBER(taitosj_dacvol_w);
 	DECLARE_DRIVER_INIT(alpinea);
 	DECLARE_DRIVER_INIT(alpine);
 	DECLARE_DRIVER_INIT(taitosj);
@@ -143,7 +142,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
-	required_device<dac_device> m_dac;
+	required_device<dac_8bit_r2r_device> m_dac;
+	required_device<discrete_device> m_dacvol;
 	required_device<ay8910_device> m_ay1;
 	required_device<ay8910_device> m_ay2;
 	required_device<ay8910_device> m_ay3;

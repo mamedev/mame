@@ -28,7 +28,10 @@ public:
 	lazercmd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
+		m_dac0(*this, "dac0"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2"),
+		m_dac3(*this, "dac3"),
 		m_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -36,7 +39,10 @@ public:
 
 	/* device */
 	required_device<s2650_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	optional_device<dac_bit_interface> m_dac0;
+	optional_device<dac_bit_interface> m_dac1;
+	required_device<dac_bit_interface> m_dac2;
+	required_device<dac_bit_interface> m_dac3;
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 
@@ -50,7 +56,6 @@ public:
 	/* misc */
 	int m_timer_count;
 	UINT8 m_sense_state;
-	UINT8 m_dac_data;
 	UINT8 m_attract;
 
 	DECLARE_WRITE8_MEMBER(lazercmd_ctrl_port_w);

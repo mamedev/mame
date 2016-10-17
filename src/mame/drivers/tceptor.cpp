@@ -9,15 +9,17 @@
  */
 
 #include "emu.h"
+#include "includes/tceptor.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
 #include "sound/ym2151.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "tceptor2.lh"
-#include "includes/tceptor.h"
-#include "machine/nvram.h"
 
 /*******************************************************************/
 
@@ -82,12 +84,6 @@ WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
 WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
 {
 	m_mcu_irq_enable = 0;
-}
-
-
-WRITE8_MEMBER(tceptor_state::voice_w)
-{
-	m_dac->write_signed16(data ? (data + 1) * 0x100 : 0x8000);
 }
 
 
@@ -186,7 +182,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(voice_w)          // voice data
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY           // voice ctrl??
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -422,9 +418,9 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.4) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

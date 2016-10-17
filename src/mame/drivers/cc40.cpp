@@ -73,12 +73,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms7000/tms7000.h"
-#include "video/hd44780.h"
-#include "sound/dac.h"
-#include "machine/nvram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/tms7000/tms7000.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/hd44780.h"
 #include "softlist.h"
 
 #include "cc40.lh"
@@ -90,7 +91,6 @@ public:
 	cc40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY")
@@ -100,7 +100,6 @@ public:
 	}
 
 	required_device<tms70c20_device> m_maincpu;
-	required_device<dac_device> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
@@ -131,7 +130,6 @@ public:
 	DECLARE_READ8_MEMBER(bus_control_r);
 	DECLARE_WRITE8_MEMBER(bus_control_w);
 	DECLARE_WRITE8_MEMBER(power_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(battery_r);
 	DECLARE_READ8_MEMBER(bankswitch_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -289,12 +287,6 @@ WRITE8_MEMBER(cc40_state::power_w)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(cc40_state::sound_w)
-{
-	// d0: piezo control
-	m_dac->write_signed8((data & 1) ? 0x7f : 0);
-}
-
 READ8_MEMBER(cc40_state::battery_r)
 {
 	// d0: low battery sense line (0 = low power)
@@ -370,7 +362,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
 	AM_RANGE(0x0112, 0x0112) AM_NOP // d0-d3: Hexbus data
 	AM_RANGE(0x0113, 0x0113) AM_NOP // d0: Hexbus available
 	AM_RANGE(0x0114, 0x0114) AM_NOP // d0,d1: Hexbus handshake
-	AM_RANGE(0x0115, 0x0115) AM_WRITE(sound_w)
+	AM_RANGE(0x0115, 0x0115) AM_DEVWRITE("dac", dac_bit_interface, write) // d0: piezo control
 	AM_RANGE(0x0116, 0x0116) AM_READ(battery_r)
 	AM_RANGE(0x0119, 0x0119) AM_READWRITE(bankswitch_r, bankswitch_w)
 	AM_RANGE(0x011a, 0x011a) AM_READWRITE(clock_control_r, clock_control_w)
@@ -609,10 +601,10 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_state, cc40_pixel_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")

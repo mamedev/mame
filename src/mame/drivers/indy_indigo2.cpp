@@ -50,6 +50,7 @@
 #include "machine/pit8253.h"
 #include "video/newport.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
@@ -196,7 +197,7 @@ protected:
 	required_device<pit8254_device> m_pit;
 	required_device<sgi_mc_device> m_sgi_mc;
 	required_device<newport_video_device> m_newport;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 	required_device<kbdc8042_device> m_kbdc8042;
 	required_device<ioc2_device> m_ioc2;
 	required_device<ds1386_device> m_rtc;
@@ -792,7 +793,7 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 		UINT16 temp16 = ( m_mainram[(m_pbus_dma.m_cur_ptr - 0x08000000)/4] & 0xffff0000 ) >> 16;
 		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
 
-		m_dac->write_signed16(stemp16 ^ 0x8000);
+		m_dac->write_signed16(stemp16);
 
 		m_pbus_dma.m_cur_ptr += 4;
 
@@ -1249,8 +1250,9 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD( "dac", DAC, 0 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)

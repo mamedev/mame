@@ -9,7 +9,6 @@ Functions to emulate the video hardware of the machine.
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/dac.h"
 #include "includes/cheekyms.h"
 
 /* bit 3 and 7 of the char color PROMs are used for something -- not currently emulated -
@@ -39,11 +38,16 @@ PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 	}
 }
 
-
 WRITE8_MEMBER(cheekyms_state::port_40_w)
 {
-	/* the lower bits probably trigger sound samples */
-	m_dac->write_unsigned8(data ? 0x80 : 0);
+	m_dac0->write(BIT(data, 7)); // tune
+	m_dac1->write(BIT(data, 6)); // mouse eating cheese
+	m_dac2->write(BIT(data, 5)); // hammer
+	m_dac3->write(BIT(data, 4)); // mouse died
+	m_dac4->write(BIT(data, 3)); // mystery died
+	m_dac5->write(BIT(data, 2)); // mouse appears
+	m_dac6->write(BIT(data, 1)); // mystery appears
+	m_dac7->write(BIT(data, 0));
 }
 
 

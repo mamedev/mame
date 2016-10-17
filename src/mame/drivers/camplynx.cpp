@@ -119,9 +119,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
-#include "sound/dac.h"
 #include "imagedev/cassette.h"
+#include "sound/dac.h"
 #include "sound/wave.h"
+#include "sound/volt_reg.h"
 #include "formats/camplynx_cas.h"
 #include "machine/wd_fdc.h"
 #include "formats/camplynx_dsk.h"
@@ -171,7 +172,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	//required_device<> m_printer;
 	required_device<mc6845_device> m_crtc;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	optional_device<fd1793_t> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -650,7 +651,7 @@ WRITE8_MEMBER( camplynx_state::port84_w )
 		m_cass->output(BIT(data, 5) ? -1.0 : +1.0);
 	}
 	else    // speaker output
-		m_dac->write_unsigned8(space, 0, data);
+		m_dac->write(data);
 }
 
 /*
@@ -787,11 +788,12 @@ static MACHINE_CONFIG_FRAGMENT( lynx_common )
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.02)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.02)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( lynx_disk )

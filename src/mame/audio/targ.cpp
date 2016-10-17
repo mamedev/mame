@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "includes/exidy.h"
+#include "sound/volt_reg.h"
 
 
 
@@ -56,8 +57,8 @@ void exidy_state::adjust_sample(UINT8 freq)
 WRITE8_MEMBER( exidy_state::targ_audio_1_w )
 {
 	/* CPU music */
-	if ((data & 0x01) != (m_port_1_last & 0x01))
-		m_dac->write_unsigned8((data & 0x01) * 0xff);
+	if (BIT(m_port_1_last ^ data, 0))
+		m_dac->write(BIT(data, 0));
 
 	/* shot */
 	if (FALLING_EDGE(0x02) && !m_samples->playing(0))  m_samples->start(0,1);
@@ -175,29 +176,31 @@ SAMPLES_START_CB_MEMBER(exidy_state::targ_audio_start)
 
 MACHINE_CONFIG_FRAGMENT( spectar_audio )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(sample_names)
 	MCFG_SAMPLES_START_CB(exidy_state, spectar_audio_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( targ_audio )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(sample_names)
 	MCFG_SAMPLES_START_CB(exidy_state, targ_audio_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END

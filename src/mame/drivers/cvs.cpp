@@ -93,8 +93,9 @@ Todo & FIXME:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/s2650/s2650.h"
 #include "includes/cvs.h"
+#include "cpu/s2650/s2650.h"
+#include "sound/volt_reg.h"
 
 
 /* Turn to 1 so all inputs are always available (this shall only be a debug feature) */
@@ -294,7 +295,7 @@ TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
 	if (m_dac3 != nullptr)
 	{
 		if (m_dac3_state[2])
-			m_dac3->write_unsigned8(m_cvs_393hz_clock * 0xff);
+			m_dac3->write(m_cvs_393hz_clock);
 	}
 }
 
@@ -331,8 +332,8 @@ WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 				(m_cvs_4_bit_dac_data[2] << 2) |
 				(m_cvs_4_bit_dac_data[3] << 3);
 
-	/* scale up to a full byte and output */
-	m_dac2->write_unsigned8((dac_value << 4) | dac_value);
+	/* output */
+	m_dac2->write(dac_value);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_unknown_w)
@@ -478,7 +479,7 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("dac1", dac_byte_interface, write)
 	AM_RANGE(0x1880, 0x1883) AM_WRITE(cvs_4_bit_dac_data_w) AM_SHARE("4bit_dac")
 	AM_RANGE(0x1884, 0x1887) AM_WRITE(cvs_unknown_w)    AM_SHARE("dac3_state")  /* ???? not connected to anything */
 ADDRESS_MAP_END
@@ -1020,25 +1021,21 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	//MCFG_DAC_ADD("dac1a")
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DAC_ADD("dac3")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_ADD("tms", TMS5100, XTAL_640kHz)
 	MCFG_TMS5110_DATA_CB(READLINE(cvs_state, speech_rom_read_bit))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

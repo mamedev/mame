@@ -50,7 +50,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_subcpu2;
 	required_device<namco_15xx_device> m_namco_15xx;
-	optional_device<dac_device> m_dac;
+	optional_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -89,7 +89,6 @@ public:
 	DECLARE_READ8_MEMBER(dipB_muxi);
 	DECLARE_WRITE8_MEMBER(out_mux);
 	DECLARE_WRITE8_MEMBER(out_lamps);
-	DECLARE_WRITE8_MEMBER(grobda_DAC_w);
 	TILEMAP_MAPPER_MEMBER(superpac_tilemap_scan);
 	TILEMAP_MAPPER_MEMBER(mappy_tilemap_scan);
 	TILE_GET_INFO_MEMBER(superpac_get_tile_info);

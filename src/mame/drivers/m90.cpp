@@ -19,14 +19,15 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/m90.h"
+#include "includes/iremipt.h"
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
-#include "includes/iremipt.h"
+#include "cpu/z80/z80.h"
 #include "machine/irem_cpu.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
-#include "includes/m90.h"
+#include "sound/volt_reg.h"
 
 
 /***************************************************************************/
@@ -142,7 +143,7 @@ static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8, m90_state )
@@ -742,7 +743,7 @@ static MACHINE_CONFIG_START( m90, m90_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -750,11 +751,12 @@ static MACHINE_CONFIG_START( m90, m90_state )
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.15)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

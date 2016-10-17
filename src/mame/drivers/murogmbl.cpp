@@ -38,6 +38,7 @@ Dumped: 06/04/2009 f205v
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 class murogmbl_state : public driver_device
@@ -98,7 +99,7 @@ static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8, murogmbl_state )
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN1")
-	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac1", dac_device, write_unsigned8) /* read is always discarded */
+	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write) /* read is always discarded */
 ADDRESS_MAP_END
 
 void murogmbl_state::video_start()
@@ -210,9 +211,10 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogmbl_state, murogmbl)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

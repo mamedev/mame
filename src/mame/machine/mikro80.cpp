@@ -103,3 +103,8 @@ READ8_MEMBER(mikro80_state::mikro80_tape_r)
 	}
 	return 0xff;
 }
+
+WRITE8_MEMBER(mikro80_state::radio99_sound_w)
+{
+	m_dac->write(BIT(data, 1));
+}

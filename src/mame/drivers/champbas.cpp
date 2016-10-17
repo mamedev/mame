@@ -79,11 +79,13 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/champbas.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/champbas.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 
@@ -109,16 +111,6 @@ WRITE8_MEMBER(champbas_state::irq_enable_w)
 TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
-}
-
-WRITE8_MEMBER(champbas_state::dac1_w)
-{
-	m_dac1->write_signed8(data << 2);
-}
-
-WRITE8_MEMBER(champbas_state::dac2_w)
-{
-	m_dac2->write_signed8(data << 2);
 }
 
 
@@ -269,7 +261,7 @@ static ADDRESS_MAP_START( champbas_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_WRITENOP // 4-bit return code to main CPU (not used)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_WRITE(dac1_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -277,8 +269,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccr_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc008, 0xc008) AM_WRITE(dac1_w)
-	AM_RANGE(0xc009, 0xc009) AM_WRITE(dac2_w)
+	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE("dac1", dac_byte_interface, write)
+	AM_RANGE(0xc009, 0xc009) AM_DEVWRITE("dac2", dac_byte_interface, write)
 	AM_RANGE(0xc00c, 0xc00c) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
@@ -554,12 +546,12 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -591,15 +583,16 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( champbasj, champbas )
@@ -670,28 +663,28 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
 	MCFG_SOUND_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
 	MCFG_SOUND_ADD("ay3", AY8910, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
 	MCFG_SOUND_ADD("ay4", AY8910, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /* Bootleg running on a modified Champion Baseball board */
@@ -726,15 +719,16 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

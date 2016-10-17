@@ -31,8 +31,8 @@ protected:
 		virtual DECLARE_WRITE8_MEMBER(write) override;
 private:
 		// internal state
-		dac_device *m_left_dac;
-		dac_device *m_right_dac;
+		required_device<dac_byte_interface> m_ldac;
+		required_device<dac_byte_interface> m_rdac;
 };
 
 

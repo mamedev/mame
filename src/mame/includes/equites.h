@@ -77,8 +77,8 @@ public:
 	required_device<alpha_8201_device> m_alpha_8201;
 	optional_device<cpu_device> m_fakemcu;
 	required_device<msm5232_device> m_msm;
-	required_device<dac_device> m_dac_1;
-	required_device<dac_device> m_dac_2;
+	required_device<dac_byte_interface> m_dac_1;
+	required_device<dac_byte_interface> m_dac_2;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);

@@ -44,7 +44,7 @@ protected:
 
 private:
 	static const device_timer_id TIMER_DAC_UPDATE = 1;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 	required_region_ptr<INT8> m_samples;
 
 	emu_timer * m_dac_update_timer;

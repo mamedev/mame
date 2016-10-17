@@ -620,12 +620,12 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 ***************************************************************************/
 
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
-#include "sound/2203intf.h"
 #include "includes/tnzs.h"
+#include "includes/taitoipt.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 
 SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
@@ -732,13 +732,6 @@ WRITE8_MEMBER(tnzs_state::kabukiz_sound_bank_w)
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
 		m_audiobank->set_entry(data & 0x07);
-}
-
-WRITE8_MEMBER(tnzs_state::kabukiz_sample_w)
-{
-	// to avoid the write when the sound chip is initialized
-	if (data != 0xff)
-		m_dac->write_unsigned8(data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_state )
@@ -1583,12 +1576,12 @@ static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
 
@@ -1629,12 +1622,12 @@ static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
 
@@ -1677,12 +1670,12 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
 
@@ -1722,12 +1715,12 @@ static MACHINE_CONFIG_START( insectx, tnzs_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
 
@@ -1767,20 +1760,20 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(tnzs_state, kageki_csport_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tnzs_state, kageki_csport_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.35)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(2, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(3, "speaker", 0.35)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(tnzs_state, kageki_init_samples)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1824,16 +1817,16 @@ static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(tnzs_state, irqhandler))
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-	MCFG_SOUND_ROUTE(3, "mono", 2.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "speaker", 1.0)
+	MCFG_SOUND_ROUTE(2, "speaker", 1.0)
+	MCFG_SOUND_ROUTE(3, "speaker", 2.0)
 MACHINE_CONFIG_END
 
 
@@ -1848,10 +1841,11 @@ static MACHINE_CONFIG_DERIVED( kabukiz, tnzsb )
 
 	MCFG_SOUND_MODIFY("ymsnd")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tnzs_state, kabukiz_sound_bank_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tnzs_state, kabukiz_sample_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1892,10 +1886,10 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
 

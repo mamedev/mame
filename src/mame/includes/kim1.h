@@ -17,7 +17,6 @@
 #include "machine/mos6530.h"
 #include "imagedev/cassette.h"
 #include "formats/kim1_cas.h"
-#include "sound/dac.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

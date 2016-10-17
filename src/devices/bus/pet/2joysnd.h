@@ -37,7 +37,7 @@ public:
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
 
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 
 	// device_pet_user_port_interface overrides
 	WRITE_LINE_MEMBER( write_up1 ) { m_up1 = state; update_port1(); }

@@ -31,11 +31,12 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/lasso.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
 #include "sound/ay8910.h"
-#include "includes/lasso.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
@@ -160,7 +161,7 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
@@ -501,15 +502,15 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lasso)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn76489.1", SN76489, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("sn76489.2", SN76489, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lasso, base )
@@ -563,8 +564,9 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
 	/* sound hardware */
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pinbo, base )
@@ -591,10 +593,10 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	MCFG_DEVICE_REMOVE("sn76489.2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
 MACHINE_CONFIG_END
 
 
