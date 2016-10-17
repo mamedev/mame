@@ -238,13 +238,28 @@ struct imgtool_class
 
 
 
-struct imgtool_partition_info
+namespace imgtool
 {
-	imgtool_get_info get_info;
-	UINT64 base_block;
-	UINT64 block_count;
-};
+	class partition_info
+	{
+	public:
+		partition_info(imgtool_get_info get_info, UINT64 base_block, UINT64 block_count)
+			: m_get_info(get_info)
+			, m_base_block(base_block)
+			, m_block_count(block_count)
+		{
+		}
 
+		imgtool_get_info get_info() const { return m_get_info; }
+		UINT64 base_block() const { return m_base_block; }
+		UINT64 block_count() const { return m_block_count; }
+
+	private:
+		imgtool_get_info	m_get_info;
+		UINT64				m_base_block;
+		UINT64				m_block_count;
+	};
+};
 
 
 union imgtoolinfo
@@ -282,7 +297,7 @@ union imgtoolinfo
 	imgtoolerr_t    (*write_sector)     (imgtool::image &image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam);
 	imgtoolerr_t    (*read_block)       (imgtool::image &image, void *buffer, UINT64 block);
 	imgtoolerr_t    (*write_block)      (imgtool::image &image, const void *buffer, UINT64 block);
-	imgtoolerr_t    (*list_partitions)  (imgtool::image &image, imgtool_partition_info *partitions, size_t len);
+	imgtoolerr_t    (*list_partitions)  (imgtool::image &image, std::vector<imgtool::partition_info> &partitions);
 	int             (*approve_filename_char)(unicode_char ch);
 	int             (*make_class)(int index, imgtool_class *imgclass);
 
@@ -356,7 +371,7 @@ struct imgtool_module
 	imgtoolerr_t    (*write_sector) (imgtool::image &image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len);
 	imgtoolerr_t    (*read_block)   (imgtool::image &image, void *buffer, UINT64 block);
 	imgtoolerr_t    (*write_block)  (imgtool::image &image, const void *buffer, UINT64 block);
-	imgtoolerr_t    (*list_partitions)(imgtool::image &image, imgtool_partition_info *partitions, size_t len);
+	imgtoolerr_t    (*list_partitions)(imgtool::image &image, std::vector<imgtool::partition_info> &partitions);
 
 	UINT32 block_size;
 

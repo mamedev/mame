@@ -863,21 +863,14 @@ static void thom_info(imgtool::image &img, char *string, size_t len)
 
 /* each side of a floppy has its own filesystem, we treat them as'partitions'
  */
-static imgtoolerr_t thom_list_partitions(imgtool::image &img,
-						imgtool_partition_info *partitions,
-						size_t len)
+static imgtoolerr_t thom_list_partitions(imgtool::image &img, std::vector<imgtool::partition_info> &partitions)
 {
 	thom_floppy* f = get_thom_floppy(img);
-	if ( len >= 1 ) {
-	partitions[0].get_info = thom_basic_get_info;
-	partitions[0].base_block = 0;
-	partitions[0].block_count = 1;
-	}
-	if ( len >= 2 && f->heads >= 2 ) {
-	partitions[1].get_info = thom_basic_get_info;
-	partitions[1].base_block = 1;
-	partitions[1].block_count = 1;
-	}
+
+	partitions.emplace_back(thom_basic_get_info, 0, 1);
+	if (f->heads >= 2)
+		partitions.emplace_back(thom_basic_get_info, 1, 1);
+
 	return IMGTOOLERR_SUCCESS;
 }
 

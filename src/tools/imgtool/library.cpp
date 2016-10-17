@@ -78,7 +78,7 @@ void library::add_class(const imgtool_class *imgclass)
 	module->get_geometry                = (imgtoolerr_t (*)(imgtool::image &, UINT32 *, UINT32 *, UINT32 *))imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_GET_GEOMETRY);
 	module->read_block                  = (imgtoolerr_t (*)(imgtool::image &, void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_BLOCK);
 	module->write_block                 = (imgtoolerr_t (*)(imgtool::image &, const void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_BLOCK);
-	module->list_partitions             = (imgtoolerr_t (*)(imgtool::image &, imgtool_partition_info *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
+	module->list_partitions             = (imgtoolerr_t (*)(imgtool::image &, std::vector<imgtool::partition_info> &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
 	module->block_size                  = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_BLOCK_SIZE);
 	module->createimage_optguide        = (const util::option_guide *) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE);
 	module->createimage_optspec         = imgtool_library_strdup_allow_null((const char*)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
