@@ -385,11 +385,11 @@ static imgtoolerr_t vzdos_write_formatted_sector(imgtool::image &img, int track,
     Imgtool module code
 *********************************************************************/
 
-static imgtoolerr_t vzdos_diskimage_beginenum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t vzdos_diskimage_beginenum(imgtool::directory &enumeration, const char *path)
 {
 	vz_iterator *iter;
 
-	iter = (vz_iterator *) enumeration->extra_bytes();
+	iter = (vz_iterator *) enumeration.extra_bytes();
 	if (!iter) return IMGTOOLERR_OUTOFMEMORY;
 
 	iter->index = 1;
@@ -398,29 +398,29 @@ static imgtoolerr_t vzdos_diskimage_beginenum(imgtool::directory *enumeration, c
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	vz_iterator *iter = (vz_iterator *) enumeration->extra_bytes();
+	vz_iterator *iter = (vz_iterator *) enumeration.extra_bytes();
 
 	if (iter->eof == 1 || iter->index > MAX_DIRENTS) {
-		ent->eof = 1;
+		ent.eof = 1;
 
 	} else {
 		const char *type;
 		int ret, len;
 		vzdos_dirent dirent;
 
-		ret = vzdos_get_dirent(enumeration->image(), iter->index - 1, &dirent);
+		ret = vzdos_get_dirent(enumeration.image(), iter->index - 1, &dirent);
 
 		if (ret == IMGTOOLERR_FILENOTFOUND)
 		{
 			iter->eof = 1;
-			ent->eof = 1;
+			ent.eof = 1;
 			return IMGTOOLERR_SUCCESS;
 		}
 
 		if (ret == IMGTOOLERR_CORRUPTFILE)
-			ent->corrupt = 1;
+			ent.corrupt = 1;
 
 		/* kill trailing spaces */
 		for (len = 7; len > 0; len--) {
@@ -429,8 +429,8 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory *enumeration, im
 			}
 		}
 
-		memcpy(ent->filename, &dirent.fname, len + 1);
-		ent->filesize = dirent.end_address - dirent.start_address;
+		memcpy(ent.filename, &dirent.fname, len + 1);
+		ent.filesize = dirent.end_address - dirent.start_address;
 
 		switch (dirent.ftype)
 		{
@@ -445,7 +445,7 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory *enumeration, im
 		default:   type = "Unknown";
 		}
 
-		snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%s", type);
+		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%s", type);
 
 		iter->index++;
 	}

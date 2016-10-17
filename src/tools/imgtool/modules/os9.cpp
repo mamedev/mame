@@ -125,9 +125,9 @@ static os9_diskinfo *os9_get_diskinfo(imgtool::image &image)
 
 
 
-static struct os9_direnum *os9_get_dirinfo(imgtool::directory *directory)
+static struct os9_direnum *os9_get_dirinfo(imgtool::directory &directory)
 {
-	return (struct os9_direnum *) directory->extra_bytes();
+	return (struct os9_direnum *) directory.extra_bytes();
 }
 
 
@@ -847,11 +847,11 @@ done:
 
 
 
-static imgtoolerr_t os9_diskimage_beginenum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t os9_diskimage_beginenum(imgtool::directory &enumeration, const char *path)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	struct os9_direnum *os9enum;
-	imgtool::image &image(enumeration->image());
+	imgtool::image &image(enumeration.image());
 
 	os9enum = os9_get_dirinfo(enumeration);
 
@@ -872,7 +872,7 @@ done:
 
 
 
-static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
 	struct os9_direnum *os9enum;
 	UINT32 lsn, index;
@@ -880,7 +880,7 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory *enumeration, imgt
 	UINT8 dir_entry[32];
 	char filename[29];
 	struct os9_fileinfo file_info;
-	imgtool::image &image(enumeration->image());
+	imgtool::image &image(enumeration.image());
 
 	os9enum = os9_get_dirinfo(enumeration);
 
@@ -889,7 +889,7 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory *enumeration, imgt
 		/* check for EOF */
 		if (os9enum->index >= os9enum->dir_info.file_size)
 		{
-			ent->eof = 1;
+			ent.eof = 1;
 			return IMGTOOLERR_SUCCESS;
 		}
 
@@ -947,13 +947,13 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory *enumeration, imgt
 
 	/* read file attributes */
 	lsn = pick_integer_be(dir_entry, 29, 3);
-	err = os9_decode_file_header(enumeration->image(), lsn, &file_info);
+	err = os9_decode_file_header(enumeration.image(), lsn, &file_info);
 	if (err)
 		return err;
 
 	/* fill out imgtool_dirent structure */
-	snprintf(ent->filename, ARRAY_LENGTH(ent->filename), "%s", filename);
-	snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%c%c%c%c%c%c%c%c",
+	snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", filename);
+	snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c%c%c%c%c%c%c%c",
 		file_info.directory      ? 'd' : '-',
 		file_info.non_sharable   ? 's' : '-',
 		file_info.public_execute ? 'x' : '-',
@@ -963,9 +963,9 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory *enumeration, imgt
 		file_info.user_write     ? 'w' : '-',
 		file_info.user_read      ? 'r' : '-');
 
-	ent->directory = file_info.directory;
-	ent->corrupt = (dir_entry[28] != 0);
-	ent->filesize = file_info.file_size;
+	ent.directory = file_info.directory;
+	ent.corrupt = (dir_entry[28] != 0);
+	ent.filesize = file_info.file_size;
 	return IMGTOOLERR_SUCCESS;
 }
 

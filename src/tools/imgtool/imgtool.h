@@ -203,9 +203,9 @@ namespace imgtool
 		unsigned int m_supports_lastmodified_time : 1;
 		unsigned int m_supports_bootblock : 1;            /* this module supports loading/storing the boot block */
 
-		std::function<imgtoolerr_t(imgtool::directory *enumeration, const char *path)> m_begin_enum;
-		std::function<imgtoolerr_t(imgtool::directory *enumeration, imgtool_dirent *ent)> m_next_enum;
-		std::function<void(imgtool::directory *enumeration)> m_close_enum;
+		std::function<imgtoolerr_t(imgtool::directory &enumeration, const char *path)> m_begin_enum;
+		std::function<imgtoolerr_t(imgtool::directory &enumeration, imgtool_dirent &ent)> m_next_enum;
+		std::function<void(imgtool::directory &enumeration)> m_close_enum;
 		std::function<imgtoolerr_t(imgtool::partition &partition, UINT64 *size)> m_free_space;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)> m_read_file;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)> m_write_file;

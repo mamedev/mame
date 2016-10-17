@@ -799,7 +799,7 @@ static UINT8 *alloc_info_block(UINT8 *buffer, size_t block_size, UINT8 block_typ
 
 
 static imgtoolerr_t prodos_get_next_dirent(imgtool::image &image,
-	prodos_direnum *appleenum, prodos_dirent *ent)
+	prodos_direnum *appleenum, prodos_dirent &ent)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
@@ -811,7 +811,7 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool::image &image,
 	int fork_num;
 
 	di = get_prodos_info(image);
-	memset(ent, 0, sizeof(*ent));
+	memset(&ent, 0, sizeof(ent));
 
 	/* have we hit the end of the file? */
 	if (appleenum->block == 0)
@@ -819,38 +819,38 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool::image &image,
 
 	/* populate the resulting dirent */
 	offset = appleenum->index * di->dirent_size + 4;
-	ent->storage_type = appleenum->block_data[offset + 0];
-	memcpy(ent->filename, &appleenum->block_data[offset + 1], 15);
-	ent->filename[15] = '\0';
-	ent->creation_time      = pick_integer_le(appleenum->block_data, offset + 24, 4);
-	ent->lastmodified_time  = pick_integer_le(appleenum->block_data, offset + 33, 4);
-	ent->file_type = 0x3F3F3F3F;
-	ent->file_creator = 0x3F3F3F3F;
-	ent->finder_flags  = 0;
-	ent->coord_x = 0;
-	ent->coord_y = 0;
-	ent->finder_folder = 0;
-	ent->icon_id = 0;
-	ent->script_code = 0;
-	ent->extended_flags = 0;
-	ent->comment_id = 0;
-	ent->putaway_directory = 0;
+	ent.storage_type = appleenum->block_data[offset + 0];
+	memcpy(ent.filename, &appleenum->block_data[offset + 1], 15);
+	ent.filename[15] = '\0';
+	ent.creation_time      = pick_integer_le(appleenum->block_data, offset + 24, 4);
+	ent.lastmodified_time  = pick_integer_le(appleenum->block_data, offset + 33, 4);
+	ent.file_type = 0x3F3F3F3F;
+	ent.file_creator = 0x3F3F3F3F;
+	ent.finder_flags  = 0;
+	ent.coord_x = 0;
+	ent.coord_y = 0;
+	ent.finder_folder = 0;
+	ent.icon_id = 0;
+	ent.script_code = 0;
+	ent.extended_flags = 0;
+	ent.comment_id = 0;
+	ent.putaway_directory = 0;
 
-	if (is_extendedfile_storagetype(ent->storage_type))
+	if (is_extendedfile_storagetype(ent.storage_type))
 	{
 		/* this is a ProDOS extended file; we need to get the extended info
 		 * block */
-		ent->extkey_pointer = pick_integer_le(appleenum->block_data, offset + 17, 2);
+		ent.extkey_pointer = pick_integer_le(appleenum->block_data, offset + 17, 2);
 
-		err = prodos_load_block(image, ent->extkey_pointer, buffer);
+		err = prodos_load_block(image, ent.extkey_pointer, buffer);
 		if (err)
 			return err;
 
 		for (fork_num = 0; fork_num <= 1; fork_num++)
 		{
-			ent->key_pointer[fork_num]  = pick_integer_le(buffer, 1 + (fork_num * 256), 2);
-			ent->filesize[fork_num]     = pick_integer_le(buffer, 5 + (fork_num * 256), 3);
-			ent->depth[fork_num]        = buffer[fork_num * 256] & 0x0F;
+			ent.key_pointer[fork_num]  = pick_integer_le(buffer, 1 + (fork_num * 256), 2);
+			ent.filesize[fork_num]     = pick_integer_le(buffer, 5 + (fork_num * 256), 3);
+			ent.depth[fork_num]        = buffer[fork_num * 256] & 0x0F;
 		}
 
 		finfo_offset = 0;
@@ -861,20 +861,20 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool::image &image,
 				switch(*(info_ptr++))
 				{
 					case 1: /* FInfo */
-						ent->file_type     = pick_integer_be(info_ptr,  0, 4);
-						ent->file_creator  = pick_integer_be(info_ptr,  4, 4);
-						ent->finder_flags  = pick_integer_be(info_ptr,  8, 2);
-						ent->coord_x       = pick_integer_be(info_ptr, 10, 2);
-						ent->coord_y       = pick_integer_be(info_ptr, 12, 2);
-						ent->finder_folder = pick_integer_be(info_ptr, 14, 4);
+						ent.file_type     = pick_integer_be(info_ptr,  0, 4);
+						ent.file_creator  = pick_integer_be(info_ptr,  4, 4);
+						ent.finder_flags  = pick_integer_be(info_ptr,  8, 2);
+						ent.coord_x       = pick_integer_be(info_ptr, 10, 2);
+						ent.coord_y       = pick_integer_be(info_ptr, 12, 2);
+						ent.finder_folder = pick_integer_be(info_ptr, 14, 4);
 						break;
 
 					case 2: /* xFInfo */
-						ent->icon_id           = pick_integer_be(info_ptr,  0, 2);
-						ent->script_code       = pick_integer_be(info_ptr,  8, 1);
-						ent->extended_flags    = pick_integer_be(info_ptr,  9, 1);
-						ent->comment_id        = pick_integer_be(info_ptr, 10, 2);
-						ent->putaway_directory = pick_integer_be(info_ptr, 12, 4);
+						ent.icon_id           = pick_integer_be(info_ptr,  0, 2);
+						ent.script_code       = pick_integer_be(info_ptr,  8, 1);
+						ent.extended_flags    = pick_integer_be(info_ptr,  9, 1);
+						ent.comment_id        = pick_integer_be(info_ptr, 10, 2);
+						ent.putaway_directory = pick_integer_be(info_ptr, 12, 4);
 						break;
 				}
 			}
@@ -883,9 +883,9 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool::image &image,
 	else
 	{
 		/* normal ProDOS files have all of the info right here */
-		ent->key_pointer[0] = pick_integer_le(appleenum->block_data, offset + 17, 2);
-		ent->filesize[0]    = pick_integer_le(appleenum->block_data, offset + 21, 3);
-		ent->depth[0]       = ent->storage_type >> 4;
+		ent.key_pointer[0] = pick_integer_le(appleenum->block_data, offset + 17, 2);
+		ent.filesize[0]    = pick_integer_le(appleenum->block_data, offset + 21, 3);
+		ent.depth[0]       = ent.storage_type >> 4;
 	}
 
 	/* identify next entry */
@@ -1095,7 +1095,7 @@ static imgtoolerr_t prodos_lookup_path(imgtool::image &image, const char *path,
 			this_block = direnum->block;
 			this_index = direnum->index;
 
-			err = prodos_get_next_dirent(image, direnum, ent);
+			err = prodos_get_next_dirent(image, direnum, *ent);
 			if (err)
 				goto done;
 
@@ -1486,15 +1486,15 @@ static UINT32 prodos_get_storagetype_maxfilesize(UINT8 storage_type)
 
 
 
-static imgtoolerr_t prodos_diskimage_beginenum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t prodos_diskimage_beginenum(imgtool::directory &enumeration, const char *path)
 {
 	imgtoolerr_t err;
-	imgtool::image &image(enumeration->image());
+	imgtool::image &image(enumeration.image());
 	prodos_direnum *appleenum;
 	prodos_dirent ent;
 	UINT16 block = ROOTDIR_BLOCK;
 
-	appleenum = (prodos_direnum *) enumeration->extra_bytes();
+	appleenum = (prodos_direnum *) enumeration.extra_bytes();
 
 	/* find subdirectory, if appropriate */
 	if (*path)
@@ -1520,19 +1520,19 @@ static imgtoolerr_t prodos_diskimage_beginenum(imgtool::directory *enumeration, 
 
 
 
-static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
 	imgtoolerr_t err;
-	imgtool::image &image(enumeration->image());
+	imgtool::image &image(enumeration.image());
 	prodos_direnum *appleenum;
 	prodos_dirent pd_ent;
 	UINT32 max_filesize;
 
-	appleenum = (prodos_direnum *) enumeration->extra_bytes();
+	appleenum = (prodos_direnum *) enumeration.extra_bytes();
 
 	do
 	{
-		err = prodos_get_next_dirent(image, appleenum, &pd_ent);
+		err = prodos_get_next_dirent(image, appleenum, pd_ent);
 		if (err)
 			return err;
 	}
@@ -1543,24 +1543,24 @@ static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory *enumeration, i
 	/* end of file? */
 	if (pd_ent.storage_type == 0x00)
 	{
-		ent->eof = 1;
+		ent.eof = 1;
 		return IMGTOOLERR_SUCCESS;
 	}
 
-	strcpy(ent->filename, pd_ent.filename);
-	ent->directory          = is_dir_storagetype(pd_ent.storage_type);
-	ent->creation_time      = prodos_crack_time(pd_ent.creation_time);
-	ent->lastmodified_time  = prodos_crack_time(pd_ent.lastmodified_time);
+	strcpy(ent.filename, pd_ent.filename);
+	ent.directory          = is_dir_storagetype(pd_ent.storage_type);
+	ent.creation_time      = prodos_crack_time(pd_ent.creation_time);
+	ent.lastmodified_time  = prodos_crack_time(pd_ent.lastmodified_time);
 
-	if (!ent->directory)
+	if (!ent.directory)
 	{
-		ent->filesize = pd_ent.filesize[0];
+		ent.filesize = pd_ent.filesize[0];
 
 		max_filesize = prodos_get_storagetype_maxfilesize(pd_ent.storage_type);
-		if (ent->filesize > max_filesize)
+		if (ent.filesize > max_filesize)
 		{
-			ent->corrupt = 1;
-			ent->filesize = max_filesize;
+			ent.corrupt = 1;
+			ent.filesize = max_filesize;
 		}
 	}
 	return IMGTOOLERR_SUCCESS;

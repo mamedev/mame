@@ -569,9 +569,9 @@ imgtool::partition::partition(imgtool::image &image, imgtool_class &imgclass, in
 	m_supports_creation_time = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_CREATION_TIME) ? 1 : 0;
 	m_supports_lastmodified_time = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_LASTMODIFIED_TIME) ? 1 : 0;
 	m_supports_bootblock = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_BOOTBLOCK) ? 1 : 0;
-	m_begin_enum = (imgtoolerr_t(*)(imgtool::directory *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_BEGIN_ENUM);
-	m_next_enum = (imgtoolerr_t(*)(imgtool::directory *, imgtool_dirent *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
-	m_close_enum = (void(*)(imgtool::directory *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CLOSE_ENUM);
+	m_begin_enum = (imgtoolerr_t(*)(imgtool::directory &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_BEGIN_ENUM);
+	m_next_enum = (imgtoolerr_t(*)(imgtool::directory &, imgtool_dirent &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
+	m_close_enum = (void(*)(imgtool::directory &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CLOSE_ENUM);
 	m_free_space = (imgtoolerr_t(*)(imgtool::partition &, UINT64 *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_FREE_SPACE);
 	m_read_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
 	m_write_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &, util::option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
@@ -2456,7 +2456,7 @@ imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const char 
 
 	if (partition.m_begin_enum)
 	{
-		err = partition.m_begin_enum(enumeration.get(), path);
+		err = partition.m_begin_enum(*enumeration, path);
 		if (err)
 		{
 			err = markerrorsource(err);
@@ -2483,7 +2483,7 @@ done:
 imgtool::directory::~directory()
 {
 	if (m_okay_to_close && m_partition.m_close_enum)
-		m_partition.m_close_enum(this);
+		m_partition.m_close_enum(*this);
 }
 
 
@@ -2500,7 +2500,7 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 	// the attributes if they don't apply
 	memset(&ent, 0, sizeof(ent));
 
-	err = m_partition.m_next_enum(this, &ent);
+	err = m_partition.m_next_enum(*this, ent);
 	if (err)
 		return markerrorsource(err);
 

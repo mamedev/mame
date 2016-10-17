@@ -262,7 +262,7 @@ static imgtoolerr_t prepare_dirent(struct rsdos_dirent *ent, const char *fname)
 
 
 
-static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -271,8 +271,8 @@ static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory *enumeration, im
 	struct rsdos_dirent rsent;
 	char fname[13];
 
-	imgtool::image &image(enumeration->image());
-	rsenum = (struct rsdos_direnum *) enumeration->extra_bytes();
+	imgtool::image &image(enumeration.image());
+	rsenum = (struct rsdos_direnum *) enumeration.extra_bytes();
 
 	/* Did we hit the end of file before? */
 	if (rsenum->eof)
@@ -294,7 +294,7 @@ static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory *enumeration, im
 	{
 		rsenum->eof = 1;
 eof:
-		ent->eof = 1;
+		ent.eof = 1;
 	}
 	else
 	{
@@ -306,20 +306,20 @@ eof:
 		if (filesize == ((size_t) -1))
 		{
 			/* corrupt! */
-			ent->filesize = 0;
-			ent->corrupt = 1;
+			ent.filesize = 0;
+			ent.corrupt = 1;
 		}
 		else
 		{
-			ent->filesize = filesize;
-			ent->corrupt = 0;
+			ent.filesize = filesize;
+			ent.corrupt = 0;
 		}
-		ent->eof = 0;
+		ent.eof = 0;
 
 		get_dirent_fname(fname, &rsent);
 
-		snprintf(ent->filename, ARRAY_LENGTH(ent->filename), "%s", fname);
-		snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname);
+		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }

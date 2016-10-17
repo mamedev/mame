@@ -457,33 +457,31 @@ static imgtoolerr_t hp48_open_partition(imgtool::partition &part,
 
 
 
-static imgtoolerr_t hp48_beginenum(imgtool::directory *enumeration,
-									const char *path)
+static imgtoolerr_t hp48_beginenum(imgtool::directory &enumeration, const char *path)
 {
-	hp48_directory* d = (hp48_directory*) enumeration->extra_bytes();
+	hp48_directory* d = (hp48_directory*) enumeration.extra_bytes();
 
-		d->pos = 0;
+	d->pos = 0;
 
 	return IMGTOOLERR_SUCCESS;
 }
 
 
 
-static imgtoolerr_t hp48_nextenum(imgtool::directory *enumeration,
-									imgtool_dirent *ent)
+static imgtoolerr_t hp48_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	imgtool::partition &part(enumeration->partition());
+	imgtool::partition &part(enumeration.partition());
 	//imgtool::image &img(part.image());
 	//hp48_card* c = get_hp48_card(img);
 	hp48_partition* p = (hp48_partition*) part.extra_bytes();
-	hp48_directory* d = (hp48_directory*) enumeration->extra_bytes();
+	hp48_directory* d = (hp48_directory*) enumeration.extra_bytes();
 
 		UINT8* data = p->data;
 		int pos = d->pos;
 
 		if ( pos < 0 || pos+12 > 2*p->size )
 		{
-				ent->eof = 1;
+				ent.eof = 1;
 				return IMGTOOLERR_SUCCESS;
 		}
 
@@ -498,21 +496,21 @@ static imgtoolerr_t hp48_nextenum(imgtool::directory *enumeration,
 				int namelen = read8( data+pos );
 				pos += 2;
 				if ( (pos + 2*namelen > 2*p->size) ||
-						(namelen >= sizeof(ent->filename)) )
+						(namelen >= sizeof(ent.filename)) )
 				{
-						ent->eof = 1;
+						ent.eof = 1;
 						return IMGTOOLERR_CORRUPTFILE;
 				}
-				readstring( ent->filename, data+pos, namelen );
+				readstring( ent.filename, data+pos, namelen );
 
 				/* compute size in bytes, removing name, length & CRC fields */
-		ent->filesize = ((totalsize - 19 - 2*namelen) + 1) / 2;
+		ent.filesize = ((totalsize - 19 - 2*namelen) + 1) / 2;
 
 				switch (prolog)
 				{
-				case PROLOG_LIBRARY:  strncpy( ent->attr, "LIB", sizeof(ent->attr) ); break;
-				case PROLOG_BACKUP:   strncpy( ent->attr, "BAK", sizeof(ent->attr) ); break;
-				default:              strncpy( ent->attr, "?", sizeof(ent->attr) );
+				case PROLOG_LIBRARY:  strncpy( ent.attr, "LIB", sizeof(ent.attr) ); break;
+				case PROLOG_BACKUP:   strncpy( ent.attr, "BAK", sizeof(ent.attr) ); break;
+				default:              strncpy( ent.attr, "?", sizeof(ent.attr) );
 				}
 
 				d->pos = d->pos + totalsize + 5;
@@ -520,7 +518,7 @@ static imgtoolerr_t hp48_nextenum(imgtool::directory *enumeration,
 		else
 		{
 				/* 0 or unknown object => end */
-				ent->eof = 1;
+				ent.eof = 1;
 		}
 
 	return IMGTOOLERR_SUCCESS;
