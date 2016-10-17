@@ -128,7 +128,7 @@ struct concept_iterator
 
 static imgtoolerr_t concept_image_init(imgtool::image &img, imgtool::stream::ptr &&stream);
 static void concept_image_exit(imgtool::image &img);
-static void concept_image_info(imgtool::image &img, char *string, size_t len);
+static void concept_image_info(imgtool::image &img, std::ostream &stream);
 static imgtoolerr_t concept_image_beginenum(imgtool::directory &enumeration, const char *path);
 static imgtoolerr_t concept_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
 static void concept_image_closeenum(imgtool::directory &enumeration);
@@ -309,7 +309,7 @@ static void concept_image_exit(imgtool::image &img)
 
     Currently returns the volume name
 */
-static void concept_image_info(imgtool::image &img, char *string, size_t len)
+static void concept_image_info(imgtool::image &img, std::ostream &stream)
 {
 	concept_image *image = get_concept_image(img);
 	char vol_name[8];
@@ -317,7 +317,7 @@ static void concept_image_info(imgtool::image &img, char *string, size_t len)
 	memcpy(vol_name, image->dev_dir.vol_hdr.volname + 1, image->dev_dir.vol_hdr.volname[0]);
 	vol_name[image->dev_dir.vol_hdr.volname[0]] = 0;
 
-	snprintf(string, len, "%s", vol_name);
+	stream << vol_name;
 }
 
 /*

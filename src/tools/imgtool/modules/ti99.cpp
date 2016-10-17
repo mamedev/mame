@@ -3859,7 +3859,7 @@ static imgtoolerr_t dsk_image_init_pc99_fm(imgtool::image &image, imgtool::strea
 static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool::image &image, imgtool::stream::ptr &&stream);
 static imgtoolerr_t win_image_init(imgtool::image &image, imgtool::stream::ptr &&stream);
 static void ti99_image_exit(imgtool::image &img);
-static void ti99_image_info(imgtool::image &img, char *string, size_t len);
+static void ti99_image_info(imgtool::image &img, std::ostream &stream);
 static imgtoolerr_t dsk_image_beginenum(imgtool::directory &enumeration, const char *path);
 static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
 static imgtoolerr_t win_image_beginenum(imgtool::directory &enumeration, const char *path);
@@ -4201,14 +4201,14 @@ static void ti99_image_exit(imgtool::image &img)
 
     Currently returns the volume name
 */
-static void ti99_image_info(imgtool::image &img, char *string, size_t len)
+static void ti99_image_info(imgtool::image &img, std::ostream &stream)
 {
 	struct ti99_lvl2_imgref *image = get_lvl2_imgref(img);
 	char vol_name[11];
 
 	fname_to_str(vol_name, image->vol_name, 11);
 
-	snprintf(string, len, "%s", vol_name);
+	stream << vol_name;
 }
 
 /*

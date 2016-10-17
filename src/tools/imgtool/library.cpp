@@ -72,7 +72,7 @@ void library::add_class(const imgtool_class *imgclass)
 	module->open                        = (imgtoolerr_t (*)(imgtool::image &, imgtool::stream::ptr &&)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
 	module->create                      = (imgtoolerr_t (*)(imgtool::image &, imgtool::stream::ptr &&, util::option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
 	module->close                       = (void (*)(imgtool::image &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CLOSE);
-	module->info                        = (void (*)(imgtool::image &, char *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_INFO);
+	module->info                        = (void (*)(imgtool::image &, std::ostream &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_INFO);
 	module->read_sector                 = (imgtoolerr_t (*)(imgtool::image &, UINT32, UINT32, UINT32, std::vector<UINT8> &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_SECTOR);
 	module->write_sector                = (imgtoolerr_t (*)(imgtool::image &, UINT32, UINT32, UINT32, const void *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_SECTOR);
 	module->get_geometry                = (imgtoolerr_t (*)(imgtool::image &, UINT32 *, UINT32 *, UINT32 *))imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_GET_GEOMETRY);

@@ -273,7 +273,7 @@ union imgtoolinfo
 	void            (*close)            (imgtool::image &image);
 	imgtoolerr_t    (*create)           (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
 	imgtoolerr_t    (*create_partition) (imgtool::image &image, UINT64 first_block, UINT64 block_count);
-	void            (*info)             (imgtool::image &image, char *string, size_t len);
+	void            (*info)             (imgtool::image &image, std::ostream &stream);
 	imgtoolerr_t    (*begin_enum)       (imgtool::directory &enumeration, const char *path);
 	imgtoolerr_t    (*next_enum)        (imgtool::directory &enumeration, imgtool_dirent &ent);
 	void            (*close_enum)       (imgtool::directory &enumeration);
@@ -364,7 +364,7 @@ struct imgtool_module
 
 	imgtoolerr_t    (*open)         (imgtool::image &image, imgtool::stream::ptr &&stream);
 	void            (*close)        (imgtool::image &image);
-	void            (*info)         (imgtool::image &image, char *string, size_t len);
+	void            (*info)         (imgtool::image &image, std::ostream &stream);
 	imgtoolerr_t    (*create)       (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
 	imgtoolerr_t    (*get_geometry) (imgtool::image &image, UINT32 *track, UINT32 *heads, UINT32 *sectors);
 	imgtoolerr_t    (*read_sector)  (imgtool::image &image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer);

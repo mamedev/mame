@@ -181,6 +181,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	char last_modified[19];
 	const char *path;
 	int partition_index = 0;
+	std::string info;
 
 	// attempt to open image
 	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_READ, image);
@@ -205,9 +206,9 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 
 	fprintf(stdout, "Contents of %s:%s\n", argv[1], path ? path : "");
 
-	image->info(buf, sizeof(buf));
-	if (buf[0])
-		fprintf(stdout, "%s\n", buf);
+	info = image->info();
+	if (!info.empty())
+		fprintf(stdout, "%s\n", info.c_str());
 	fprintf(stdout, "------------------------------  --------  ---------------  ------------------\n");
 
 	while (((err = imgenum->get_next(ent)) == 0) && !ent.eof)
