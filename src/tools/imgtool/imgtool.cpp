@@ -500,14 +500,14 @@ done:
 //	list_partitions - lists the partitions on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::list_partitions(imgtool_partition_info *partitions, size_t len)
+imgtoolerr_t imgtool::image::list_partitions(std::vector<imgtool::partition_info> &partitions)
 {
 	/* implemented? */
 	if (!module().list_partitions)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	memset(partitions, '\0', sizeof(*partitions) * len);
-	return module().list_partitions(*this, partitions, len);
+	partitions.clear();
+	return module().list_partitions(*this, partitions);
 }
 
 
@@ -623,31 +623,26 @@ imgtoolerr_t imgtool::partition::open(imgtool::image &image, int partition_index
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	imgtool::partition::ptr p;
 	imgtool_class imgclass;
-	imgtool_partition_info partition_info[32];
+	std::vector<imgtool::partition_info> partitions;
 	UINT64 base_block, block_count;
 	imgtoolerr_t (*open_partition)(imgtool::partition &partition, UINT64 first_block, UINT64 block_count);
 
 	if (image.module().list_partitions)
 	{
-		// this image supports partitions 
-		if ((partition_index < 0) || (partition_index >= ARRAY_LENGTH(partition_info)))
-			return IMGTOOLERR_INVALIDPARTITION;
-
-		// retrieve the info on the partitions
-		memset(partition_info, '\0', sizeof(partition_info));
-		err = image.module().list_partitions(image, partition_info, ARRAY_LENGTH(partition_info));
+		// this image supports partitions  - retrieve the info on the partitions
+		err = image.module().list_partitions(image, partitions);
 		if (err)
 			return err;
 
-		// is this a valid partition 
-		if (!partition_info[partition_index].get_info)
+		// is this an invalid index?
+		if ((partition_index < 0) || (partition_index >= partitions.size()) || !partitions[partition_index].get_info())
 			return IMGTOOLERR_INVALIDPARTITION;
 
 		// use this partition 
 		memset(&imgclass, 0, sizeof(imgclass));
-		imgclass.get_info = partition_info[partition_index].get_info;
-		base_block = partition_info[partition_index].base_block;
-		block_count = partition_info[partition_index].block_count;
+		imgclass.get_info = partitions[partition_index].get_info();
+		base_block = partitions[partition_index].base_block();
+		block_count = partitions[partition_index].block_count();
 	}
 	else
 	{

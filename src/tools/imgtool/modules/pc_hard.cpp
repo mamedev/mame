@@ -386,22 +386,21 @@ static imgtoolerr_t pc_chd_image_writeblock(imgtool::image &image, const void *b
 
 
 
-static imgtoolerr_t pc_chd_list_partitions(imgtool::image &image, imgtool_partition_info *partitions, size_t len)
+static imgtoolerr_t pc_chd_list_partitions(imgtool::image &image, std::vector<imgtool::partition_info> &partitions)
 {
 	pc_chd_image_info *info;
 	size_t i;
 
 	info = pc_chd_get_image_info(image);
 
-	for (i = 0; i < std::min(size_t(4), len); i++)
+	for (i = 0; i < 4; i++)
 	{
-		partitions[i].base_block    = info->partitions[i].sector_index;
-		partitions[i].block_count   = info->partitions[i].total_sectors;
-
+		// what type of partition is this?
+		imgtool_get_info partition_get_info;
 		switch(info->partitions[i].partition_type)
 		{
 			case 0x00:  /* Empty Partition */
-				partitions[i].get_info = NULL;
+				partition_get_info = nullptr;
 				break;
 
 			case 0x01:  /* FAT12 */
@@ -422,13 +421,18 @@ static imgtoolerr_t pc_chd_list_partitions(imgtool::image &image, imgtool_partit
 			case 0xD1:  /* Old Multiuser DOS FAT12 */
 			case 0xD4:  /* Old Multiuser DOS FAT16 (-32 MB) */
 			case 0xD6:  /* Old Multiuser DOS FAT16 (32+ MB) */
-				partitions[i].get_info = fat_get_info;
+				partition_get_info = fat_get_info;
 				break;
 
 			default:
-				partitions[i].get_info = unknown_partition_get_info;
+				partition_get_info = unknown_partition_get_info;
 				break;
 		}
+
+		partitions.emplace_back(
+			partition_get_info,
+			info->partitions[i].sector_index,
+			info->partitions[i].total_sectors);
 	}
 	return IMGTOOLERR_SUCCESS;
 }

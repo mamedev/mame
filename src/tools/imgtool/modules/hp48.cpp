@@ -420,25 +420,20 @@ static void hp48_close(imgtool::image &img)
 
 void hp48_partition_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info);
 
-static imgtoolerr_t hp48_list_partitions(imgtool::image &img,
-											imgtool_partition_info *partitions,
-											size_t len)
+static imgtoolerr_t hp48_list_partitions(imgtool::image &img, std::vector<imgtool::partition_info> &partitions)
 {
 	hp48_card* c = get_hp48_card(img);
 
-		int i;
-		for ( i = 0; i < len && i * MAX_PORT_SIZE < c->size ; i++ )
-		{
-				/* offset and size in bytes */
-				partitions[i].base_block = i * MAX_PORT_SIZE;
-				partitions[i].block_count = c->size - partitions[i].base_block;
-				if ( partitions[i].block_count > MAX_PORT_SIZE )
-				{
-						partitions[i].block_count = MAX_PORT_SIZE;
-				}
+	int i;
+	for (i = 0; i * MAX_PORT_SIZE < c->size ; i++)
+	{
+		// offset and size in bytes
+		UINT64 base_block = i * MAX_PORT_SIZE;
+		UINT64 block_count = std::min((UINT64)c->size - base_block, (UINT64)MAX_PORT_SIZE);
 
-				partitions[i].get_info = hp48_partition_get_info;
-		}
+		// append the partition
+		partitions.emplace_back(hp48_partition_get_info, base_block, block_count);
+	}
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -739,7 +734,7 @@ void hp48_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinf
 		case IMGTOOLINFO_PTR_OPEN:                          info->open        = hp48_open; break;
 		case IMGTOOLINFO_PTR_CREATE:                        info->create      = hp48_create; break;
 		case IMGTOOLINFO_PTR_CLOSE:                         info->close       = hp48_close; break;
-				case IMGTOOLINFO_PTR_LIST_PARTITIONS:               info->list_partitions = hp48_list_partitions; break;
+		case IMGTOOLINFO_PTR_LIST_PARTITIONS:               info->list_partitions = hp48_list_partitions; break;
 
 		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:             info->i = sizeof(hp48_card); break;
 		}
