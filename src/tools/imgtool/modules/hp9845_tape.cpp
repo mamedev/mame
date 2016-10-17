@@ -1086,36 +1086,36 @@ static void hp9845_tape_close(imgtool::image &image)
 	global_free(&tape_image);
 }
 
-static imgtoolerr_t hp9845_tape_begin_enum (imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t hp9845_tape_begin_enum (imgtool::directory &enumeration, const char *path)
 {
-	dir_state_t *ds = (dir_state_t*)enumeration->extra_bytes();
+	dir_state_t *ds = (dir_state_t*)enumeration.extra_bytes();
 
 	ds->dir_idx = 0;
 
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_next_enum (imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t hp9845_tape_next_enum (imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	tape_state_t& state = get_tape_state(enumeration->image());
+	tape_state_t& state = get_tape_state(enumeration.image());
 	tape_image_t& tape_image = get_tape_image(state);
-	dir_state_t *ds = (dir_state_t*)enumeration->extra_bytes();
+	dir_state_t *ds = (dir_state_t*)enumeration.extra_bytes();
 
 	const dir_entry_t *entry = nullptr;
 
 	if (!tape_image.get_dir_entry(ds->dir_idx, entry)) {
-		ent->eof = 1;
+		ent.eof = 1;
 	} else {
 		ds->dir_idx++;
 
 		bool qmark;
 
-		tape_image_t::get_filename_and_ext(*entry, true, ent->filename, qmark);
+		tape_image_t::get_filename_and_ext(*entry, true, ent.filename, qmark);
 
 		// "filename" and "attr" fields try to look like the output of the "CAT" command
-		snprintf(ent->attr , sizeof(ent->attr) , "%c %02x%c %4u %4u %3u" , entry->protection ? '*' : ' ' , entry->filetype , qmark ? '?' : ' ' , entry->n_recs , entry->wpr * 2 , entry->filepos);
+		snprintf(ent.attr , sizeof(ent.attr) , "%c %02x%c %4u %4u %3u" , entry->protection ? '*' : ' ' , entry->filetype , qmark ? '?' : ' ' , entry->n_recs , entry->wpr * 2 , entry->filepos);
 
-		ent->filesize = entry->n_sects * SECTOR_LEN;
+		ent.filesize = entry->n_sects * SECTOR_LEN;
 	}
 	return IMGTOOLERR_SUCCESS;
 }

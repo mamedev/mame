@@ -1855,13 +1855,13 @@ static imgtoolerr_t amiga_image_write_sector(imgtool::image &img, UINT32 track, 
 }
 
 
-static imgtoolerr_t amiga_image_beginenum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t amiga_image_beginenum(imgtool::directory &enumeration, const char *path)
 {
-	int blocks = get_total_blocks(enumeration->image());
+	int blocks = get_total_blocks(enumeration.image());
 	imgtoolerr_t ret;
 	amiga_iterator *iter;
 
-	iter = (amiga_iterator *) enumeration->extra_bytes();
+	iter = (amiga_iterator *) enumeration.extra_bytes();
 	if (!iter) return IMGTOOLERR_OUTOFMEMORY;
 
 	iter->index = 1;
@@ -1871,7 +1871,7 @@ static imgtoolerr_t amiga_image_beginenum(imgtool::directory *enumeration, const
 	if (path[0])
 	{
 		/* search for the directory block, start with the root block */
-		ret = find_entry(enumeration->image(), path, blocks/2, &iter->block);
+		ret = find_entry(enumeration.image(), path, blocks/2, &iter->block);
 		if (ret) return ret;
 	}
 	else
@@ -1884,9 +1884,9 @@ static imgtoolerr_t amiga_image_beginenum(imgtool::directory *enumeration, const
 }
 
 
-static imgtoolerr_t amiga_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	amiga_iterator *iter = (amiga_iterator *) enumeration->extra_bytes();
+	amiga_iterator *iter = (amiga_iterator *) enumeration.extra_bytes();
 	imgtoolerr_t ret;
 	UINT32 ht[TSIZE];
 	int block;
@@ -1894,12 +1894,12 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory *enumeration, imgtoo
 	/* finished listing all entries? */
 	if (iter->eof == 1 || iter->ht_index == TSIZE)
 	{
-		ent->eof = 1;
+		ent.eof = 1;
 		return IMGTOOLERR_SUCCESS;
 	}
 
 	/* get hash table */
-	ret = get_hash_table(enumeration->image(), iter->block, ht);
+	ret = get_hash_table(enumeration.image(), iter->block, ht);
 	if (ret) return ret;
 
 	/* skip empty hash table entries */
@@ -1909,7 +1909,7 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory *enumeration, imgtoo
 		/* check if we are already at the end */
 		if (iter->ht_index == TSIZE)
 		{
-			ent->eof = 1;
+			ent.eof = 1;
 			return IMGTOOLERR_SUCCESS;
 		}
 	}
@@ -1917,22 +1917,22 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory *enumeration, imgtoo
 	/* get block number */
 	block = (iter->next_block == 0) ? ht[iter->ht_index] : iter->next_block;
 
-	switch (get_block_type(enumeration->image(), block))
+	switch (get_block_type(enumeration.image(), block))
 	{
 	case ST_FILE:
 	{
 		file_block file;
 
 		/* get block */
-		ret = read_file_block(enumeration->image(), block, &file);
+		ret = read_file_block(enumeration.image(), block, &file);
 		if (ret) return ret;
 
 		/* fill directory entry */
-		strncpyz(ent->filename, (char *)file.filename, file.name_len + 1);
-		ent->filesize = file.byte_size;
-		ent->lastmodified_time = amiga_crack_time(&file.date);
-		amiga_decode_flags(file.protect, ent->attr);
-		strncpyz(ent->comment, (char *)file.comment, file.comm_len + 1);
+		strncpyz(ent.filename, (char *)file.filename, file.name_len + 1);
+		ent.filesize = file.byte_size;
+		ent.lastmodified_time = amiga_crack_time(&file.date);
+		amiga_decode_flags(file.protect, ent.attr);
+		strncpyz(ent.comment, (char *)file.comment, file.comm_len + 1);
 
 		iter->next_block = file.hash_chain;
 
@@ -1944,15 +1944,15 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory *enumeration, imgtoo
 		dir_block dir;
 
 		/* get block */
-		ret = read_dir_block(enumeration->image(), block, &dir);
+		ret = read_dir_block(enumeration.image(), block, &dir);
 		if (ret) return ret;
 
 		/* fill directory entry */
-		strncpyz(ent->filename, (char *)dir.dirname, dir.name_len + 1);
-		ent->lastmodified_time = amiga_crack_time(&dir.date);
-		amiga_decode_flags(dir.protect, ent->attr);
-		strncpyz(ent->comment, (char *)dir.comment, dir.comm_len + 1);
-		ent->directory = 1;
+		strncpyz(ent.filename, (char *)dir.dirname, dir.name_len + 1);
+		ent.lastmodified_time = amiga_crack_time(&dir.date);
+		amiga_decode_flags(dir.protect, ent.attr);
+		strncpyz(ent.comment, (char *)dir.comment, dir.comm_len + 1);
+		ent.directory = 1;
 
 		iter->next_block = dir.hash_chain;
 
@@ -1964,15 +1964,15 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory *enumeration, imgtoo
 		softlink_block sl;
 
 		/* get block */
-		ret = read_softlink_block(enumeration->image(), block, &sl);
+		ret = read_softlink_block(enumeration.image(), block, &sl);
 		if (ret) return ret;
 
 		/* fill directory entry */
-		strncpyz(ent->filename, (char *)sl.slname, sl.name_len + 1);
-		ent->lastmodified_time = amiga_crack_time(&sl.date);
-		amiga_decode_flags(sl.protect, ent->attr);
-		strncpyz(ent->comment, (char *)sl.comment, sl.comm_len + 1);
-		strcpy(ent->softlink, (char *)sl.symbolic_name);
+		strncpyz(ent.filename, (char *)sl.slname, sl.name_len + 1);
+		ent.lastmodified_time = amiga_crack_time(&sl.date);
+		amiga_decode_flags(sl.protect, ent.attr);
+		strncpyz(ent.comment, (char *)sl.comment, sl.comm_len + 1);
+		strcpy(ent.softlink, (char *)sl.symbolic_name);
 
 		iter->next_block = sl.hash_chain;
 
@@ -1981,31 +1981,31 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory *enumeration, imgtoo
 
 	case ST_LINKDIR:
 
-		ent->directory = 1;
+		ent.directory = 1;
 
 	case ST_LINKFILE:
 	{
 		hardlink_block hl;
 
 		/* get block */
-		ret = read_hardlink_block(enumeration->image(), block, &hl);
+		ret = read_hardlink_block(enumeration.image(), block, &hl);
 		if (ret) return ret;
 
 		/* get filesize from linked file */
-		if (!ent->directory)
+		if (!ent.directory)
 		{
 			file_block file;
-			ret = read_file_block(enumeration->image(), hl.real_entry, &file);
+			ret = read_file_block(enumeration.image(), hl.real_entry, &file);
 			if (ret) return ret;
-			ent->filesize = file.byte_size;
+			ent.filesize = file.byte_size;
 		}
 
 		/* fill directory entry */
-		strncpyz(ent->filename, (char *)hl.hlname, hl.name_len + 1);
-		ent->lastmodified_time = amiga_crack_time(&hl.date);
-		amiga_decode_flags(hl.protect, ent->attr);
-		strncpyz(ent->comment, (char *)hl.comment, hl.comm_len + 1);
-		ent->hardlink = 1;
+		strncpyz(ent.filename, (char *)hl.hlname, hl.name_len + 1);
+		ent.lastmodified_time = amiga_crack_time(&hl.date);
+		amiga_decode_flags(hl.protect, ent.attr);
+		strncpyz(ent.comment, (char *)hl.comment, hl.comm_len + 1);
+		ent.hardlink = 1;
 
 		iter->next_block = hl.hash_chain;
 
@@ -2026,12 +2026,6 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory *enumeration, imgtoo
 	iter->index++;
 
 	return IMGTOOLERR_SUCCESS;
-}
-
-
-static void amiga_image_closeenum(imgtool::directory *enumeration)
-{
-	free(enumeration);
 }
 
 
@@ -2411,7 +2405,6 @@ void amiga_floppy_get_info(const imgtool_class *imgclass, UINT32 state, union im
 		case IMGTOOLINFO_PTR_INFO:                       info->info = amiga_image_info; break;
 		case IMGTOOLINFO_PTR_BEGIN_ENUM:                 info->begin_enum = amiga_image_beginenum; break;
 		case IMGTOOLINFO_PTR_NEXT_ENUM:                  info->next_enum = amiga_image_nextenum; break;
-		case IMGTOOLINFO_PTR_CLOSE_ENUM:                 info->close_enum = amiga_image_closeenum; break;
 		case IMGTOOLINFO_PTR_FREE_SPACE:                 info->free_space = amiga_image_freespace; break;
 		case IMGTOOLINFO_PTR_READ_FILE:                  info->read_file = amiga_image_readfile; break;
 		case IMGTOOLINFO_PTR_WRITE_FILE:                 info->write_file = amiga_image_writefile; break;

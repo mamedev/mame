@@ -3860,10 +3860,10 @@ static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool::image &image, imgtool::stre
 static imgtoolerr_t win_image_init(imgtool::image &image, imgtool::stream::ptr &&stream);
 static void ti99_image_exit(imgtool::image &img);
 static void ti99_image_info(imgtool::image &img, char *string, size_t len);
-static imgtoolerr_t dsk_image_beginenum(imgtool::directory *enumeration, const char *path);
-static imgtoolerr_t dsk_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent);
-static imgtoolerr_t win_image_beginenum(imgtool::directory *enumeration, const char *path);
-static imgtoolerr_t win_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent);
+static imgtoolerr_t dsk_image_beginenum(imgtool::directory &enumeration, const char *path);
+static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
+static imgtoolerr_t win_image_beginenum(imgtool::directory &enumeration, const char *path);
+static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
 static imgtoolerr_t ti99_image_freespace(imgtool::partition &partition, UINT64 *size);
 static imgtoolerr_t ti99_image_readfile(imgtool::partition &partition, const char *fpath, const char *fork, imgtool::stream &destf);
 static imgtoolerr_t ti99_image_writefile(imgtool::partition &partition, const char *fpath, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions);
@@ -4214,10 +4214,10 @@ static void ti99_image_info(imgtool::image &img, char *string, size_t len)
 /*
     Open the disk catalog for enumeration
 */
-static imgtoolerr_t dsk_image_beginenum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t dsk_image_beginenum(imgtool::directory &enumeration, const char *path)
 {
-	struct ti99_lvl2_imgref *image = get_lvl2_imgref(enumeration->image());
-	dsk_iterator *iter = (dsk_iterator *) enumeration->extra_bytes();
+	struct ti99_lvl2_imgref *image = get_lvl2_imgref(enumeration.image());
+	dsk_iterator *iter = (dsk_iterator *) enumeration.extra_bytes();
 
 	iter->image = image;
 	iter->level = 0;
@@ -4231,16 +4231,16 @@ static imgtoolerr_t dsk_image_beginenum(imgtool::directory *enumeration, const c
 /*
     Enumerate disk catalog next entry
 */
-static imgtoolerr_t dsk_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	dsk_iterator *iter = (dsk_iterator*) enumeration->extra_bytes();
+	dsk_iterator *iter = (dsk_iterator*) enumeration.extra_bytes();
 	dsk_fdr fdr;
 	int reply;
 	unsigned fdr_aphysrec;
 
 
-	ent->corrupt = 0;
-	ent->eof = 0;
+	ent.corrupt = 0;
+	ent.eof = 0;
 
 	/* iterate through catalogs to next file or dir entry */
 	while ((iter->level >= 0)
@@ -4269,21 +4269,21 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory *enumeration, imgtool_
 
 	if (iter->level < 0)
 	{
-		ent->eof = 1;
+		ent.eof = 1;
 	}
 	else
 	{
 		if (iter->listing_subdirs)
 		{
-			fname_to_str(ent->filename, iter->image->dsk.catalogs[0].subdirs[iter->index[iter->level]].name, ARRAY_LENGTH(ent->filename));
+			fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
 
 			/* set type of DIR */
-			snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "DIR");
+			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "DIR");
 
 			/* len in physrecs */
 			/* @BN@ return length in bytes */
-			/* ent->filesize = 1; */
-			ent->filesize = 256;
+			/* ent.filesize = 1; */
+			ent.filesize = 256;
 
 			/* recurse subdirectory */
 			iter->listing_subdirs = 0;  /* no need to list subdirs as only the
@@ -4299,35 +4299,35 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory *enumeration, imgtool_
 			if (reply)
 				return IMGTOOLERR_READERROR;
 #if 0
-			fname_to_str(ent->filename, fdr.name, ARRAY_LENGTH(ent->filename));
+			fname_to_str(ent.filename, fdr.name, ARRAY_LENGTH(ent.filename));
 #else
 			{
 				char buf[11];
 
-				ent->filename[0] = '\0';
+				ent.filename[0] = '\0';
 				if (iter->level)
 				{
-					fname_to_str(ent->filename, iter->image->dsk.catalogs[0].subdirs[iter->index[0]].name, ARRAY_LENGTH(ent->filename));
-					strncat(ent->filename, ".", ARRAY_LENGTH(ent->filename) - 1);
+					fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[0]].name, ARRAY_LENGTH(ent.filename));
+					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
 				}
 				fname_to_str(buf, fdr.name, 11);
-				strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
+				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
 			}
 #endif
 			/* parse flags */
 			if (fdr.flags & fdr99_f_program)
-				snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "PGM%s",
+				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "PGM%s",
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			else
-				snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%c/%c %d%s",
+				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c/%c %d%s",
 							(fdr.flags & fdr99_f_int) ? 'I' : 'D',
 							(fdr.flags & fdr99_f_var) ? 'V' : 'F',
 							fdr.reclen,
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			/* len in physrecs */
 			/* @BN@ return length in bytes */
-			/* ent->filesize = get_UINT16BE(fdr.fphysrecs); */
-			ent->filesize = (get_UINT16BE(fdr.fphysrecs)+1)*256;
+			/* ent.filesize = get_UINT16BE(fdr.fphysrecs); */
+			ent.filesize = (get_UINT16BE(fdr.fphysrecs)+1)*256;
 
 			iter->index[iter->level]++;
 		}
@@ -4339,10 +4339,10 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory *enumeration, imgtool_
 /*
     Open the disk catalog for enumeration
 */
-static imgtoolerr_t win_image_beginenum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t win_image_beginenum(imgtool::directory &enumeration, const char *path)
 {
-	struct ti99_lvl2_imgref *image = get_lvl2_imgref(enumeration->image());
-	win_iterator *iter = (win_iterator *) enumeration->extra_bytes();
+	struct ti99_lvl2_imgref *image = get_lvl2_imgref(enumeration.image());
+	win_iterator *iter = (win_iterator *) enumeration.extra_bytes();
 	imgtoolerr_t errorcode;
 
 	iter->image = image;
@@ -4359,17 +4359,17 @@ static imgtoolerr_t win_image_beginenum(imgtool::directory *enumeration, const c
 /*
     Enumerate disk catalog next entry
 */
-static imgtoolerr_t win_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	win_iterator *iter = (win_iterator *) enumeration->extra_bytes();
+	win_iterator *iter = (win_iterator *) enumeration.extra_bytes();
 	unsigned fdr_aphysrec;
 	win_fdr fdr;
 	int reply;
 	int i;
 
 
-	ent->corrupt = 0;
-	ent->eof = 0;
+	ent.corrupt = 0;
+	ent.eof = 0;
 
 	/* iterate through catalogs to next file or dir entry */
 	while ((iter->level >= 0)
@@ -4392,37 +4392,37 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory *enumeration, imgtool_
 
 	if (iter->level < 0)
 	{
-		ent->eof = 1;
+		ent.eof = 1;
 	}
 	else
 	{
 		if (iter->listing_subdirs)
 		{
 #if 0
-			fname_to_str(ent->filename, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, ARRAY_LENGTH(ent->filename));
+			fname_to_str(ent.filename, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
 #else
 			{
 				char buf[11];
 
-				ent->filename[0] = '\0';
+				ent.filename[0] = '\0';
 				for (i=0; i<iter->level; i++)
 				{
 					fname_to_str(buf, iter->catalog[i].subdirs[iter->index[i]].name, 11);
-					strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
-					strncat(ent->filename, ".", ARRAY_LENGTH(ent->filename) - 1);
+					strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
 				}
 				fname_to_str(buf, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, 11);
-				strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
+				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
 			}
 #endif
 
 			/* set type of DIR */
-			snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "DIR");
+			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "DIR");
 
 			/* len in physrecs */
 			/* @BN@ return length in bytes */
-			/* ent->filesize = 2; */
-			ent->filesize = 512;
+			/* ent.filesize = 2; */
+			ent.filesize = 512;
 
 			/* recurse subdirectory */
 			/*iter->listing_subdirs = 1;*/
@@ -4431,7 +4431,7 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory *enumeration, imgtool_
 			reply = win_read_catalog(iter->image, iter->catalog[iter->level-1].subdirs[iter->index[iter->level-1]].dir_ptr, &iter->catalog[iter->level]);
 			if (reply)
 			{
-				ent->corrupt = 1;
+				ent.corrupt = 1;
 				return (imgtoolerr_t)reply;
 			}
 		}
@@ -4442,36 +4442,36 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory *enumeration, imgtool_
 			if (reply)
 				return IMGTOOLERR_READERROR;
 #if 0
-			fname_to_str(ent->filename, iter->catalog[iter->level].files[iter->index[iter->level]].name, ARRAY_LENGTH(ent->filename));
+			fname_to_str(ent.filename, iter->catalog[iter->level].files[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
 #else
 			{
 				char buf[11];
 
-				ent->filename[0] = '\0';
+				ent.filename[0] = '\0';
 				for (i=0; i<iter->level; i++)
 				{
 					fname_to_str(buf, iter->catalog[i].subdirs[iter->index[i]].name, 11);
-					strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
-					strncat(ent->filename, ".", ARRAY_LENGTH(ent->filename) - 1);
+					strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
 				}
 				fname_to_str(buf, iter->catalog[iter->level].files[iter->index[iter->level]].name, 11);
-				strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
+				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
 			}
 #endif
 			/* parse flags */
 			if (fdr.flags & fdr99_f_program)
-				snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "PGM%s",
+				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "PGM%s",
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			else
-				snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%c/%c %d%s",
+				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c/%c %d%s",
 							(fdr.flags & fdr99_f_int) ? 'I' : 'D',
 							(fdr.flags & fdr99_f_var) ? 'V' : 'F',
 							fdr.reclen,
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			/* len in physrecs */
 			/* @BN@ return length in bytes */
-			/* ent->filesize = get_win_fdr_fphysrecs(&fdr); */
-			ent->filesize = (get_win_fdr_fphysrecs(&fdr)+1)*256;
+			/* ent.filesize = get_win_fdr_fphysrecs(&fdr); */
+			ent.filesize = (get_win_fdr_fphysrecs(&fdr)+1)*256;
 
 			iter->index[iter->level]++;
 		}

@@ -1278,7 +1278,7 @@ static UINT32 fat_setup_time(time_t ansi_time)
 
 
 static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *file,
-	fat_dirent *ent, fat_freeentry_info *freeent)
+	fat_dirent &ent, fat_freeentry_info *freeent)
 {
 	imgtoolerr_t err;
 	//const fat_partition_info *disk_info;
@@ -1294,7 +1294,7 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 
 	assert(file->directory);
 	lfn_buf[0] = '\0';
-	memset(ent, 0, sizeof(*ent));
+	memset(&ent, 0, sizeof(ent));
 	//disk_info = fat_get_partition_info(partition);
 
 	/* The first eight bytes of a FAT directory entry is a blank padded name
@@ -1360,12 +1360,12 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 	/* no more directory entries? */
 	if (entry[0] == '\0')
 	{
-		ent->eof = 1;
+		ent.eof = 1;
 		return IMGTOOLERR_SUCCESS;
 	}
 
 	/* pick apart short filename */
-	fat_cannonicalize_sfn(ent->short_filename, entry);
+	fat_cannonicalize_sfn(ent.short_filename, entry);
 
 	/* and the long filename */
 	if (lfn_lastentry == 1)
@@ -1378,20 +1378,20 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 			do
 			{
 				i += uchar_from_utf16(&ch, &lfn_buf[i], ARRAY_LENGTH(lfn_buf) - i);
-				j += utf8_from_uchar(&ent->long_filename[j], ARRAY_LENGTH(ent->long_filename) - j, ch);
+				j += utf8_from_uchar(&ent.long_filename[j], ARRAY_LENGTH(ent.long_filename) - j, ch);
 			}
 			while(ch != 0);
 		}
 	}
 
 	/* other attributes */
-	ent->filesize               = pick_integer_le(entry, 28, 4);
-	ent->directory              = (entry[11] & 0x10) ? 1 : 0;
-	ent->first_cluster          = pick_integer_le(entry, 26, 2);
-	ent->dirent_sector_index    = entry_sector_index;
-	ent->dirent_sector_offset   = entry_sector_offset;
-	ent->creation_time          = fat_crack_time(pick_integer_le(entry, 14, 4));
-	ent->lastmodified_time      = fat_crack_time(pick_integer_le(entry, 22, 4));
+	ent.filesize               = pick_integer_le(entry, 28, 4);
+	ent.directory              = (entry[11] & 0x10) ? 1 : 0;
+	ent.first_cluster          = pick_integer_le(entry, 26, 2);
+	ent.dirent_sector_index    = entry_sector_index;
+	ent.dirent_sector_offset   = entry_sector_offset;
+	ent.creation_time          = fat_crack_time(pick_integer_le(entry, 14, 4));
+	ent.lastmodified_time      = fat_crack_time(pick_integer_le(entry, 22, 4));
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -1706,7 +1706,7 @@ static imgtoolerr_t fat_lookup_path(imgtool::partition &partition, const char *p
 
 		do
 		{
-			err = fat_read_dirent(partition, file, &ent, created_entry ? &freeent : NULL);
+			err = fat_read_dirent(partition, file, ent, created_entry ? &freeent : NULL);
 			if (err)
 				goto done;
 
@@ -1740,7 +1740,7 @@ static imgtoolerr_t fat_lookup_path(imgtool::partition &partition, const char *p
 
 					do
 					{
-						err = fat_read_dirent(partition, file, &ent, NULL);
+						err = fat_read_dirent(partition, file, ent, NULL);
 						if (err)
 							goto done;
 
@@ -1809,14 +1809,14 @@ done:
 
 
 
-static imgtoolerr_t fat_partition_beginenum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t fat_partition_beginenum(imgtool::directory &enumeration, const char *path)
 {
 	imgtoolerr_t err;
 	fat_file *file;
 
-	file = (fat_file *) enumeration->extra_bytes();
+	file = (fat_file *) enumeration.extra_bytes();
 
-	err = fat_lookup_path(enumeration->partition(), path, CREATE_NONE, file);
+	err = fat_lookup_path(enumeration.partition(), path, CREATE_NONE, file);
 	if (err)
 		return err;
 	if (!file->directory)
@@ -1826,25 +1826,25 @@ static imgtoolerr_t fat_partition_beginenum(imgtool::directory *enumeration, con
 
 
 
-static imgtoolerr_t fat_partition_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t fat_partition_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
 	imgtoolerr_t err;
 	fat_file *file;
 	fat_dirent fatent;
 
-	file = (fat_file *) enumeration->extra_bytes();
-	err = fat_read_dirent(enumeration->partition(), file, &fatent, NULL);
+	file = (fat_file *) enumeration.extra_bytes();
+	err = fat_read_dirent(enumeration.partition(), file, fatent, NULL);
 	if (err)
 		return err;
 
 	/* copy stuff from the FAT dirent to the Imgtool dirent */
-	snprintf(ent->filename, ARRAY_LENGTH(ent->filename), "%s", fatent.long_filename[0]
+	snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fatent.long_filename[0]
 		? fatent.long_filename : fatent.short_filename);
-	ent->filesize = fatent.filesize;
-	ent->directory = fatent.directory;
-	ent->eof = fatent.eof;
-	ent->creation_time = fatent.creation_time;
-	ent->lastmodified_time = fatent.lastmodified_time;
+	ent.filesize = fatent.filesize;
+	ent.directory = fatent.directory;
+	ent.eof = fatent.eof;
+	ent.creation_time = fatent.creation_time;
+	ent.lastmodified_time = fatent.lastmodified_time;
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -1985,7 +1985,7 @@ static imgtoolerr_t fat_partition_delete(imgtool::partition &partition, const ch
 
 	if (dir)
 	{
-		err = fat_read_dirent(partition, &file, &ent, NULL);
+		err = fat_read_dirent(partition, &file, ent, NULL);
 		if (err)
 			return err;
 		if (!ent.eof)

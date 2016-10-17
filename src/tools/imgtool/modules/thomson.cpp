@@ -893,22 +893,21 @@ static imgtoolerr_t thom_open_partition(imgtool::partition &part,
 }
 
 
-static imgtoolerr_t thom_begin_enum(imgtool::directory *enumeration,
+static imgtoolerr_t thom_begin_enum(imgtool::directory &enumeration,
 					const char *path)
 {
-	int* n = (int*) enumeration->extra_bytes();
+	int* n = (int*) enumeration.extra_bytes();
 	*n = 0;
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_next_enum(imgtool::directory *enumeration,
-					imgtool_dirent *ent)
+static imgtoolerr_t thom_next_enum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	imgtool::partition &part(enumeration->partition());
+	imgtool::partition &part(enumeration.partition());
 	int head = *( (int*) part.extra_bytes() );
 	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
-	int* n = (int*) enumeration->extra_bytes();
+	int* n = (int*) enumeration.extra_bytes();
 	thom_dirent d;
 
 	do {
@@ -916,24 +915,24 @@ static imgtoolerr_t thom_next_enum(imgtool::directory *enumeration,
 	(*n) ++;
 	}
 	while ( d.type == THOM_DIRENT_FREE );
-	if ( d.type == THOM_DIRENT_END ) ent->eof = 1;
+	if ( d.type == THOM_DIRENT_END ) ent.eof = 1;
 	else if ( d.type == THOM_DIRENT_INVALID ) {
-	ent->corrupt = 1;
+	ent.corrupt = 1;
 	}
 	else {
 	int size;
-	snprintf( ent->filename, sizeof(ent->filename), "%s.%s", d.name, d.ext );
-	snprintf( ent->attr, sizeof(ent->attr), "%c %c %s",
+	snprintf( ent.filename, sizeof(ent.filename), "%s.%s", d.name, d.ext );
+	snprintf( ent.attr, sizeof(ent.attr), "%c %c %s",
 			(d.ftype == 0) ? 'B' :  (d.ftype == 1) ? 'D' :
 			(d.ftype == 2) ? 'M' :  (d.ftype == 3) ? 'A' : '?',
 			(d.format == 0) ? 'B' : (d.format == 0xff) ? 'A' : '?',
 			d.comment );
-	ent->creation_time = thom_crack_time( &d );
+	ent.creation_time = thom_crack_time( &d );
 	size  = thom_get_file_size( f, head, &d );
-	if ( size >= 0 ) ent->filesize = size;
+	if ( size >= 0 ) ent.filesize = size;
 	else {
-		ent->filesize = 0;
-		ent->corrupt = 1;
+		ent.filesize = 0;
+		ent.corrupt = 1;
 	}
 	}
 	return IMGTOOLERR_SUCCESS;

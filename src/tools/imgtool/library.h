@@ -259,9 +259,9 @@ union imgtoolinfo
 	imgtoolerr_t    (*create)           (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
 	imgtoolerr_t    (*create_partition) (imgtool::image &image, UINT64 first_block, UINT64 block_count);
 	void            (*info)             (imgtool::image &image, char *string, size_t len);
-	imgtoolerr_t    (*begin_enum)       (imgtool::directory *enumeration, const char *path);
-	imgtoolerr_t    (*next_enum)        (imgtool::directory *enumeration, imgtool_dirent *ent);
-	void            (*close_enum)       (imgtool::directory *enumeration);
+	imgtoolerr_t    (*begin_enum)       (imgtool::directory &enumeration, const char *path);
+	imgtoolerr_t    (*next_enum)        (imgtool::directory &enumeration, imgtool_dirent &ent);
+	void            (*close_enum)       (imgtool::directory &enumeration);
 	imgtoolerr_t    (*open_partition)   (imgtool::partition &partition, UINT64 first_block, UINT64 block_count);
 	imgtoolerr_t    (*free_space)       (imgtool::partition &partition, UINT64 *size);
 	imgtoolerr_t    (*read_file)        (imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf);

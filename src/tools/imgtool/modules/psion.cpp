@@ -462,33 +462,33 @@ static void datapack_close(imgtool::image &image)
 	delete pack->stream;
 }
 
-static imgtoolerr_t datapack_begin_enum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t datapack_begin_enum(imgtool::directory &enumeration, const char *path)
 {
-	psion_iter *iter = (psion_iter*)enumeration->extra_bytes();
+	psion_iter *iter = (psion_iter*)enumeration.extra_bytes();
 	iter->index = 0;
 
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_next_enum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t datapack_next_enum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	imgtool::image &image(enumeration->image());
+	imgtool::image &image(enumeration.image());
 	psion_pack *pack = get_psion_pack(image);
-	psion_iter *iter = (psion_iter*)enumeration->extra_bytes();
+	psion_iter *iter = (psion_iter*)enumeration.extra_bytes();
 	UINT8 data = 0;
 
 	if (!pack->pack_index[iter->index].name_rec)
 	{
-		ent->eof = 1;
+		ent.eof = 1;
 		return IMGTOOLERR_SUCCESS;
 	}
-	memcpy(ent->filename, pack->pack_index[iter->index].filename, 8);
-	sprintf(ent->attr, "Type: %02x ID: %02x", pack->pack_index[iter->index].type, pack->pack_index[iter->index].id);
+	memcpy(ent.filename, pack->pack_index[iter->index].filename, 8);
+	sprintf(ent.attr, "Type: %02x ID: %02x", pack->pack_index[iter->index].type, pack->pack_index[iter->index].id);
 
 	if (pack->pack_index[iter->index].data_rec)
 	{
 		pack->stream->seek(pack->pack_index[iter->index].data_rec + 2, SEEK_SET);
-		ent->filesize = get_long_rec_size(*pack->stream);
+		ent.filesize = get_long_rec_size(*pack->stream);
 	}
 
 	// seek all file's records
@@ -499,16 +499,12 @@ static imgtoolerr_t datapack_next_enum(imgtool::directory *enumeration, imgtool_
 		{
 			pack->stream->read(&data, 1);
 			pack->stream->seek(data + 1, SEEK_CUR);
-			ent->filesize +=data;
+			ent.filesize +=data;
 		}
 	}
 
 	iter->index++;
 	return IMGTOOLERR_SUCCESS;
-}
-
-static void datapack_close_enum( imgtool::directory *enumeration)
-{
 }
 
 static imgtoolerr_t datapack_free_space(imgtool::partition &partition, UINT64 *size)
@@ -679,7 +675,6 @@ void psion_get_info( const imgtool_class *imgclass, UINT32 state, union imgtooli
 		case IMGTOOLINFO_PTR_CLOSE       : info->close       = datapack_close; break;
 		case IMGTOOLINFO_PTR_BEGIN_ENUM  : info->begin_enum  = datapack_begin_enum; break;
 		case IMGTOOLINFO_PTR_NEXT_ENUM   : info->next_enum   = datapack_next_enum; break;
-		case IMGTOOLINFO_PTR_CLOSE_ENUM  : info->close_enum  = datapack_close_enum; break;
 		case IMGTOOLINFO_PTR_FREE_SPACE  : info->free_space  = datapack_free_space; break;
 		case IMGTOOLINFO_PTR_READ_FILE   : info->read_file   = datapack_read_file; break;
 		case IMGTOOLINFO_PTR_WRITE_FILE  : info->write_file  = datapack_write_file; break;
