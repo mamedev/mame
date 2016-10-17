@@ -443,19 +443,6 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 		m_status_read_mode = 0;
 		switch (m_operation_write_state) {
 		case 0:
-			if ((data == 0xf4) || (data == 0xff)) /* keyboard enable or keyboard reset */
-			{
-				at_8042_receive(0xfa); /* ACK, delivered a bit differently */
-
-				if (data == 0xff)
-				{
-					m_status_read_mode = 3; /* keyboard buffer to be written again after next read */
-				}
-
-				break;
-			}
-
-			/* normal case */
 			m_data = data;
 			m_sending=1;
 			m_keyboard_dev->write(space, 0, data);
