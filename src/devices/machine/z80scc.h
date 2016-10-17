@@ -750,6 +750,7 @@ protected:
 	devcb_write_line    m_out_txdrqb_cb;
 
 	int m_int_state[6]; // interrupt state
+	int m_int_source[6]; // interrupt source
 
 	int m_variant;
 	UINT8 m_wr0_ptrbits;
