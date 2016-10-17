@@ -400,7 +400,7 @@ static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgt
 	// find next file
 	while (iter->block < cfs->block_count_file)
 	{
-		if (!cfs_block_read( cfs, buffer, BLOCK_TYPE_FILE, iter->block++)) return IMGTOOLERR_READERROR;
+		if (!cfs_block_read(cfs, buffer, BLOCK_TYPE_FILE, iter->block++)) return IMGTOOLERR_READERROR;
 		if (BLOCK_USED(buffer) && (BLOCK_PART_ID(buffer) == 0))
 		{
 			file_id = BLOCK_FILE_ID(buffer);
@@ -408,11 +408,11 @@ static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgt
 		}
 	}
 	// get file information
-	if ((file_id != INVALID_FILE_ID) && cfs_file_info( cfs, file_id, &file))
+	if ((file_id != INVALID_FILE_ID) && cfs_file_info(cfs, file_id, &file))
 	{
-		strcpy( ent.filename, file.name);
+		strcpy(ent.filename, file.name);
 		ent.filesize = file.size;
-		ent.lastmodified_time = time_crack( file.date);
+		ent.lastmodified_time = time_crack(file.date);
 		ent.filesize = file.size;
 	}
 	else
