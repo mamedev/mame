@@ -251,6 +251,7 @@ void z80scc_device::device_start()
 
 	// state saving
 	save_item(NAME(m_int_state));
+	save_item(NAME(m_int_source));
 	save_item(NAME(m_wr9));
 	save_item(NAME(m_wr0_ptrbits));
 	LOG((" - SCC variant %02x\n", m_variant));
@@ -424,29 +425,33 @@ void z80scc_device::reset_interrupts()
 
 UINT8 z80scc_device::modify_vector(UINT8 vec, int i, UINT8 src)
 {
-		/*
-		  Interrupt Vector Modification
-		  V3 V2 V1 Status High/Status Low =0
-		  V4 V5 V6 Status High/Status Low =1
-		  0  0  0 Ch B Transmit Buffer Empty
-		  0  0  1 Ch B External/Status Change
-		  0  1  0 Ch B Receive Char. Available
-		  0  1  1 Ch B Special Receive Condition
-		  1  0  0 Ch A Transmit Buffer Empty
-		  1  0  1 Ch A External/Status Change
-		  1  1  0 Ch A Receive Char. Available
-		  1  1  1 Ch A Special Receive Condition
-		*/
-		// Add channel offset according to table above
+	/*
+	  Interrupt Vector Modification
+	  V3 V2 V1 Status High/Status Low =0
+	  V4 V5 V6 Status High/Status Low =1
+	  0  0  0 Ch B Transmit Buffer Empty
+	  0  0  1 Ch B External/Status Change
+	  0  1  0 Ch B Receive Char. Available
+	  0  1  1 Ch B Special Receive Condition
+	  1  0  0 Ch A Transmit Buffer Empty
+	  1  0  1 Ch A External/Status Change
+	  1  1  0 Ch A Receive Char. Available
+	  1  1  1 Ch A Special Receive Condition
+	*/
+
+	// Add channel offset according to table above
+	src &= 3;
 	src |= (i == CHANNEL_A ? 0x04 : 0x00 );
 
 	// Modify vector according to Hi/lo bit of WR9
 	if (m_wr9 & z80scc_channel::WR9_BIT_SHSL) // Affect V4-V6
 	{
+		vec &= 0x8f;
 		vec |= src << 4;
 	}
 	else              // Affect V1-V3
 	{
+		vec &= 0xf1;
 		vec |= src << 1;
 	}
 	return vec;
@@ -543,6 +548,9 @@ void z80scc_device::trigger_interrupt(int index, int state)
 
 	// trigger interrupt
 	m_int_state[priority] |= Z80_DAISY_INT;
+
+	// remember the source
+	m_int_source[priority] = source;
 
 	// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
 	m_chanA->m_rr3 &= ~(      0x07 << (index == CHANNEL_A ? 3 : 0 ));
@@ -1281,7 +1289,7 @@ UINT8 z80scc_channel::do_sccreg_rr2()
 			// find the first channel with an interrupt requested
 			if (m_uart->m_int_state[i] & Z80_DAISY_INT)
 			{
-				m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, i & 3);
+				m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, m_uart->m_int_source[i] & 3);
 				break;
 			}
 		}
