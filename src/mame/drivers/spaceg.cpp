@@ -351,6 +351,21 @@ UINT32 spaceg_state::screen_update_spaceg(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
+static const char *const invaders_sample_names[] =
+{
+	"*invaders",
+	"1",        /* shot/missle */
+	"2",        /* base hit/explosion */
+	"3",        /* invader hit */
+	"4",        /* fleet move 1 */
+	"5",        /* fleet move 2 */
+	"6",        /* fleet move 3 */
+	"7",        /* fleet move 4 */
+	"8",        /* UFO/saucer hit */
+	"9",        /* bonus base */
+	nullptr
+};
+
 WRITE8_MEMBER(spaceg_state::sound1_w)
 {
 	if (!BIT(m_sound1, 1) && BIT(data, 1))
@@ -500,7 +515,30 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	// HACK: SN76477 parameters copied from space invaders
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	// HACK: samples copied from space invaders
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(invaders_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
