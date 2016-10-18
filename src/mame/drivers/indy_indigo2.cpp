@@ -458,22 +458,22 @@ WRITE32_MEMBER( ioc2_device::write )
 			return;
 		}
 
-		case 0x70: // Reset Register
+		case 0x70/4: // Reset Register
 			handle_reset_reg_write(data);
 			return;
 
-		case 0x78: // Write Register
+		case 0x78/4: // Write Register
 			m_write_reg = data;
 			return;
 
-		case 0x80: // INT3 Local0 Status Register
-		case 0x88: // INT3 Local1 Status Register
-		case 0x90: // INT3 Map Status Register
-		case 0xa4: // INT3 Error Stat Register
+		case 0x80/4: // INT3 Local0 Status Register
+		case 0x88/4: // INT3 Local1 Status Register
+		case 0x90/4: // INT3 Map Status Register
+		case 0xa4/4: // INT3 Error Stat Register
 			// Read-only registers
 			return;
 
-		case 0x84: // INT3 Local0 Mask Register
+		case 0x84/4: // INT3 Local0 Mask Register
 		{
 			UINT8 old = m_int3_local0_mask_reg;
 			m_int3_local0_mask_reg = data;
@@ -484,7 +484,7 @@ WRITE32_MEMBER( ioc2_device::write )
 			return;
 		}
 
-		case 0x8c: // INT3 Local1 Mask Register
+		case 0x8c/4: // INT3 Local1 Mask Register
 		{
 			UINT8 old = m_int3_local0_mask_reg;
 			m_int3_local0_mask_reg = data;
@@ -495,17 +495,17 @@ WRITE32_MEMBER( ioc2_device::write )
 			return;
 		}
 
-		case 0x94: // INT3 Map Mask0 Register
+		case 0x94/4: // INT3 Map Mask0 Register
 			// TODO: Implement mappable interrupts
 			m_int3_map_mask0_reg = data;
 			return;
 
-		case 0x98: // INT3 Map Mask1 Register
+		case 0x98/4: // INT3 Map Mask1 Register
 			// TODO: Implement mappable interrupts
 			m_int3_map_mask1_reg = data;
 			return;
 
-		case 0x9c: // INT3 Map Pol Register
+		case 0x9c/4: // INT3 Map Pol Register
 			// TODO: Mappable interrupt polarity select
 			m_int3_map_pol_reg = data;
 			return;
