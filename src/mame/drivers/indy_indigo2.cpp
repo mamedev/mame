@@ -573,7 +573,7 @@ struct hpc3_t
 	UINT32 m_scsi0_dma_ctrl;
 };
 
-struct m_hal2
+struct hal2
 {
 	UINT32 m_iar;
 	UINT32 m_idr[4];
@@ -652,7 +652,7 @@ protected:
 
 	hpc3_t m_hpc3;
 
-	m_hal2 m_hal2;
+	hal2 m_hal2;
 
 	pbus_dma_t m_pbus_dma;
 	UINT8 m_dma_buffer[4096];
