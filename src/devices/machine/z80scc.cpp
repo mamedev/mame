@@ -56,7 +56,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
  x  SWI ack feat             N             Y          Y         Y
     higher bps w ext DPLL    N           32Mbps     32Mbps    32Mbps
     -- Additional features 85C30 -------------------------------------------
-    New WR7 feat             N           85C30        Y         Y
+ x  New WR7 feat             N           85C30        Y         Y
     Improved SDLC            N           85C30        Y         Y
     Improved reg handl       N           85C30        Y         Y
     Improved auto feat       N           85C30        Y         Y
@@ -83,7 +83,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOG(x) {}
 #define LOGR(x) {}
 #define LOGSETUP(x) LOGPRINT(x)
-#define LOGINT(x) {}
+#define LOGINT(x) {} LOGPRINT(x)
 #define LOGRCV(x){}
 #if VERBOSE == 2
 #define logerror printf
@@ -298,22 +298,21 @@ that pulls IEO Low. This selectively deactivates parts of the daisy chain regard
 int z80scc_device::z80daisy_irq_state()
 {
 	int state = 0;
-	int i;
 
 	LOG(("%s %s A:%d%d%d B:%d%d%d ",tag(), FUNCNAME,
 			m_int_state[0], m_int_state[1], m_int_state[2],
 			m_int_state[3], m_int_state[4], m_int_state[5]));
 
 	// loop over all interrupt sources
-	for (i = 0; i < 6; i++)
+	for (auto & elem : m_int_state)
 	{
 		// if we're servicing a request, don't indicate more interrupts
-		if (m_int_state[i] & Z80_DAISY_IEO)
+		if (elem & Z80_DAISY_IEO)
 		{
 			state |= Z80_DAISY_IEO;
 			break;
 		}
-		state |= m_int_state[i];
+		state |= elem;
 	}
 
 	// Last chance to keep the control of the interrupt line
@@ -331,30 +330,31 @@ int z80scc_device::z80daisy_irq_state()
 
 int z80scc_device::z80daisy_irq_ack()
 {
-	int i;
-
-	LOG(("%s %s - needs fixing for SCC\n",tag(), FUNCNAME));
-
 	// loop over all interrupt sources
-	for (i = 0; i < 6; i++)
+	for (auto & elem : m_int_state)
 	{
 		// find the first channel with an interrupt requested
-		if (m_int_state[i] & Z80_DAISY_INT)
+		if (elem & Z80_DAISY_INT)
 		{
-			// clear interrupt, switch to the IEO state, and update the IRQs
-			m_int_state[i] = Z80_DAISY_IEO;
-			//m_chanA->m_rr0 &= ~z80scc_channel::RR0_INTERRUPT_PENDING;
+			elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
 			check_interrupts();
-
-			//LOG(("%s %s : Interrupt Acknowledge Vector %02x\n",tag(), FUNCNAME, m_chanB->m_rr2));
-
-			return m_chanB->m_rr2;
+			LOGINT((" - Found an INT request, "));
+			if (m_wr9 & z80scc_channel::WR9_BIT_VIS)
+			{
+				LOGINT(("but WR9 D1 set to use autovector, returning -1\n"));
+				return -1;
+			}
+			else
+			{
+				LOGINT(("returning RR2: %02x\n", m_chanB->m_rr2 ));
+				return m_chanB->m_rr2;
+			}
 		}
 	}
 
 	//logerror("z80scc_irq_ack: failed to find an interrupt to ack!\n");
 
-	return m_chanB->m_rr2;
+	return -1;
 }
 
 
@@ -362,35 +362,14 @@ int z80scc_device::z80daisy_irq_ack()
 //  z80daisy_irq_reti - return from interrupt
 //-------------------------------------------------
 /*
-SCC Interrupt Daisy-Chain Operation
+"SCC Interrupt Daisy-Chain Operation
 In the SCC, the IUS bit normally controls the state of the IEO line. The IP bit affects the daisy
 chain only during an Interrupt Acknowledge cycle. Since the IP bit is normally not part of the SCC
 interrupt daisy chain, there is no need to decode the RETI instruction. To allow for control over the
-daisy chain, the SCC has a Disable Lower Chain (DLC) software command (WR9 bit 2) that pulls IEO Low.
-
-TODO: investigate removal of z80daisy_irq_reti() and rely entirely on rom software to activate IEO as SCC does
+daisy chain, the SCC has a Disable Lower Chain (DLC) software command (WR9 bit 2) that pulls IEO Low."
 */
-
 void z80scc_device::z80daisy_irq_reti()
 {
-	int i;
-
-	LOG(("%s %s \n",tag(), FUNCNAME));
-
-	// loop over all interrupt sources
-	for (i = 0; i < 6; i++)
-	{
-		// find the first channel with an IEO pending
-		if (m_int_state[i] & Z80_DAISY_IEO)
-		{
-			// clear the IEO state and update the IRQs
-			m_int_state[i] &= ~Z80_DAISY_IEO;
-			check_interrupts();
-			return;
-		}
-	}
-
-	//logerror("z80scc_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
 
@@ -914,12 +893,12 @@ void z80scc_channel::device_reset()
 	receive_register_reset();
 	transmit_register_reset();
 
-	// Soft/Channel Reset values according to SCC users manual
+	// Soft/Channel Reset values (mostly) according to SCC users manual
 	m_wr0   = 0x00;
 	m_wr1  &= 0x24;
 	m_wr3  &= 0x01;
-	m_wr4  |= 0x04;
-	m_wr5  &= 0x61;
+	m_wr4   = 0x04;
+	m_wr5   = 0x00;
 	if (m_uart->m_variant & (z80scc_device::TYPE_SCC85C30 | SET_ESCC))
 		m_wr7 = 0x20;
 	//  WR9,WR10,WR11 and WR14 has a different hard reset (see z80scc_device::device_reset()) values
@@ -932,24 +911,14 @@ void z80scc_channel::device_reset()
 	m_rr0  &= 0xfc;
 	m_rr0  |= 0x44;
 	m_rr1  &= 0x07;
-	m_rr1  |= 0x06;
+	m_rr1  |= 0x06;         //  Required reset value
+	m_rr1  |= RR1_ALL_SENT; // It is a don't care in the SCC user manual but drivers hangs without it set
 	m_rr3   = 0x00;
 	m_rr10 &= 0x40;
 
-#if 1 // old reset code
-	// disable receiver
-	m_wr3 &= ~WR3_RX_ENABLE;
-
-	// disable transmitter
-	m_wr5 &= ~WR5_TX_ENABLE;
-	m_rr0 |= RR0_TX_BUFFER_EMPTY;
-#endif
-	// TODO: check dependencies on RR1_ALL_SENT and (re)move this setting
-	m_rr1 |= RR1_ALL_SENT; // It is a don't care in the SCC user manual
-
-	// reset external lines TODO: check relation to control bits and reset
-	set_rts(1);
-	set_dtr(1);
+	// reset external lines 
+	set_rts(m_wr5 & WR5_RTS ? 0 : 1);
+	set_dtr(m_wr14 & WR14_DTR_REQ_FUNC ? 0 : (m_wr5 & WR5_DTR ? 0 : 1));
 
 	// reset interrupts
 	if (m_index == z80scc_device::CHANNEL_A)
@@ -1283,15 +1252,24 @@ UINT8 z80scc_channel::do_sccreg_rr2()
 	// If we are chan B we have to modify the vector regardless of the VIS bit
 	if (m_index == z80scc_device::CHANNEL_B)
 	{
+		int i = 0;
+
 		// loop over all interrupt sources
-		for (int i = 0; i < 6; i++)
+		for (auto & elem : m_uart->m_int_state)
 		{
 			// find the first channel with an interrupt requested
-			if (m_uart->m_int_state[i] & Z80_DAISY_INT)
+			if (elem & Z80_DAISY_INT)
 			{
 				m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, m_uart->m_int_source[i] & 3);
+				if ((m_uart->m_variant & (SET_ESCC | SET_CMOS)) && (m_uart->m_wr9 & WR9_BIT_IACK))
+				{
+					LOGINT((" - Found an INT request to ack while reading RR2\n"));
+					elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
+					m_uart->check_interrupts();
+				}
 				break;
 			}
+			i++;
 		}
 	}
 	return m_rr2;
@@ -1567,7 +1545,9 @@ void z80scc_channel::do_sccreg_wr0_resets(UINT8 data)
 void z80scc_channel::do_sccreg_wr0(UINT8 data)
 {
 	m_wr0 = data;
-	m_uart->m_wr0_ptrbits = data & WR0_REGISTER_MASK;
+
+	if (m_uart->m_variant & SET_Z85X3X)
+		m_uart->m_wr0_ptrbits = data & WR0_REGISTER_MASK;
 
 	/* Sort out SCC specific behaviours  from legacy SIO behaviour */
 	/* WR0_Z_* are Z80X30 specific commands */
@@ -1659,41 +1639,6 @@ void z80scc_channel::do_sccreg_wr0(UINT8 data)
 	{
 		m_uart->m_wr0_ptrbits &= ~WR0_REGISTER_MASK;
 		m_uart->m_wr0_ptrbits |= (m_wr0 & (WR0_REGISTER_MASK));
-	}
-	else if ( m_uart->m_variant & SET_Z80X30) // TODO: Implement adress decoding for Z80X30 using the shift logic described below
-	{
-		/*The registers in the Z80X30 are addressed via the address on AD7-AD0 and are latched by the rising
-		  edge of /AS. The Shift Right/Shift Left bit in the Channel B WR0 controls which bits are
-		  decoded to form the register address. It is placed in this register to simplify programming when the
-		  current state of the Shift Right/Shift Left bit is not known.
-		  A hardware reset forces Shift Left mode where the address is decoded from AD5-AD1. In Shift
-		  Right mode, the address is decoded from AD4-AD0. The Shift Right/Shift Left bit is written via a
-		  command to make the software writing to WR0 independent of the state of the Shift Right/Shift
-		  Left bit.
-		  While in the Shift Left mode, the register address is placed on AD4-AD1 and the Channel Select
-		  bit, A/B, is decoded from AD5. The register map for this case is listed in Table on page 21. In
-		  Shift Right mode, the register address is again placed on AD4-AD1 but the channel select A/B is
-		  decoded from AD0. The register map for this case is listed in Table on page 23.
-		  Because the Z80X30 does not contain 16 read registers, the decoding of the read registers is not
-		  complete; this is listed in Table on page 21 and Table on page 23 by parentheses around the register
-		  name. These addresses may also be used to access the read registers. Also, note that the
-		  Z80X30 contains only one WR2 and WR9; these registers may be written from either channel.
-		  Shift Left Mode is used when Channel A and B are to be programmed differently. This allows the
-		  software to sequence through the registers of one channel at a time. The Shift Right Mode is used
-		  when the channels are programmed the same. By incrementing the address, the user can program
-		  the same data value into both the Channel A and Channel B register.*/
-		switch(data & WR0_Z_SHIFT_MASK)
-		{
-		case WR0_Z_SEL_SHFT_LEFT:
-			LOG(("\"%s\": %c : %s - Shift Left Addressing Mode - not implemented\n", m_owner->tag(), 'A' + m_index, FUNCNAME));
-			break;
-		case WR0_Z_SEL_SHFT_RIGHT:
-			LOG(("\"%s\": %c : %s - Shift Right Addressing Mode - not implemented\n", m_owner->tag(), 'A' + m_index, FUNCNAME));
-			break;
-		default:
-			break;
-			// LOG(("\"%s\": %c : %s - Null commands\n", m_owner->tag(), 'A' + m_index, FUNCNAME));
-		}
 	}
 }
 
@@ -1962,7 +1907,6 @@ void z80scc_channel::do_sccreg_wr11(UINT8 data)
 */
 void z80scc_channel::do_sccreg_wr12(UINT8 data)
 {
-	// TODO: Check if BRG enabled already and restart timer with new value in case advice above is not followed by ROM
 	m_wr12 = data;
 	update_serial();
 	LOG(("\"%s\": %c : %s  %02x Low byte of Time Constant for Baudrate generator\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
@@ -1971,7 +1915,6 @@ void z80scc_channel::do_sccreg_wr12(UINT8 data)
 /* WR13 contains the upper byte of the time constant for the baud rate generator. */
 void z80scc_channel::do_sccreg_wr13(UINT8 data)
 {
-	// TODO: Check if BRG enabled already and restart timer with new value in case advice above is not followed by ROM
 	m_wr13 = data;
 	update_serial();
 	LOG(("\"%s\": %c : %s  %02x  High byte of Time Constant for Baudrate generator\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
