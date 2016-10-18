@@ -624,9 +624,9 @@ void mips3_device::device_start()
 	state_add( MIPS3_WIRED,        "Wired", m_core->cpr[0][COP0_Wired]).formatstr("%08X");
 	state_add( MIPS3_BADVADDR,     "BadVAddr", m_core->cpr[0][COP0_BadVAddr]).formatstr("%08X");
 
-	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
-	state_add( STATE_GENSP, "GENSP", m_core->r[31]).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%1s").noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
+	state_add( STATE_GENSP, "CURSP", m_core->r[31]).noshow();
+	state_add( STATE_GENFLAGS, "CURFLAGS", m_debugger_temp).formatstr("%1s").noshow();
 
 	m_icountptr = &m_core->icount;
 }

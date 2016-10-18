@@ -47,8 +47,8 @@ extern const device_type RM7000LE;
 
 enum
 {
-	MIPS3_PC = 1,
-	MIPS3_R0,
+	MIPS3_PC = STATE_GENPC,
+	MIPS3_R0 = 1,
 	MIPS3_R1,
 	MIPS3_R2,
 	MIPS3_R3,
