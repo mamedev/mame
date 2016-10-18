@@ -318,7 +318,7 @@ READ32_MEMBER( ioc2_device::read )
 		case 0x34/4: // Serial Port1 Data Transfer
 		case 0x38/4: // Serial Port2 Command Transfer
 		case 0x3c/4: // Serial Port2 Data Transfer
-			return m_scc->ba_cd_r(space, offset - 0x30/4);
+			return m_scc->ba_cd_r(space, (offset - 0x30/4) ^ 1);
 
 		case 0x40/4: // Keyboard/Mouse Registers
 		case 0x44/4: // Keyboard/Mouse Registers
@@ -424,7 +424,7 @@ WRITE32_MEMBER( ioc2_device::write )
 		case 0x34/4: // Serial Port1 Data Transfer
 		case 0x38/4: // Serial Port2 Command Transfer
 		case 0x3c/4: // Serial Port2 Data Transfer
-			m_scc->ba_cd_w(space, offset - 0x30/4, data & 0xff);
+			m_scc->ba_cd_w(space, (offset - 0x30/4) ^ 1, data & 0xff);
 			return;
 
 		case 0x40/4: // Keyboard/Mouse Registers
