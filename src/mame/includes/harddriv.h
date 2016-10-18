@@ -317,8 +317,8 @@ protected:
 	required_ioport m_in0;
 	optional_ioport m_sw1;
 	required_ioport m_a80000;
-	required_ioport_array<8> m_8badc;
-	required_ioport_array<4> m_12badc;
+	optional_ioport_array<8> m_8badc;
+	optional_ioport_array<4> m_12badc;
 
 	/* machine state */
 	UINT8                   m_irq_state;
