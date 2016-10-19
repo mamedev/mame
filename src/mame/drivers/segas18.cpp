@@ -15,6 +15,133 @@
 
 ****************************************************************************
 
+	Disasm part code for gun offsets calculation: (Pitou)
+	
+	Here is the disasm code that calculates the explosion on screen
+	based on the gun coordinates (still incomplete, only a few instructions explanation missing).
+	I don't know how to precalculate the offsets since the explosion screen position is
+	calculated within the game based on the gun location. In other words, I cannot interact
+	on the gun offsets because the offset calculations result is
+	actually the screen position, not the gun location. Suggestions are welcome.
+	
+	Memory range is "memory/:maincpu/0/00500000-0050ffff" (or ffff0000-ffffffff, if using watchpoints)
+
+
+	00008f88: 0838 0001 c108            btst    #0x1,0xc108.w	; $C108 = $2000
+	00008f8e: 6600 010c                 bne.w   0x909c			; Branch not equal
+	00008f92: 45f9 0000 968a            lea     0x968a.l,a2		; a2 = $0000968a
+	00008f98: 302c 0006                 move.w  0x6(a4),d0		; a4 = $ffffc460 + $6, d0 = $0000
+	00008f9c: d040                      add.w   d0,d0			; d0 = $0000
+	00008f9e: d040                      add.w   d0,d0			; d0 = $0000
+	00008fa0: d4c0                      adda.w  d0,a2			; $968a + $0000, a2 = $968a
+	00008fa2: 305a                      movea.w (a2)+,a0		; Content of $0000968a +1, Memory location pointer, a0 = $ffffc130,
+																; content of $ffffc130 = $0200
+	00008fa4: 3252                      movea.w (a2),a1			; Content of $0000968a, Memory location pointer, a1 = $ffffc03c,
+																; content of $ffffc03c = $06, this is calibration offset from in-game calibration menu
+	00008fa6: 7000                      moveq   #0,d0			; initialize d0 to 0
+	00008fa8: 7200                      moveq   #0,d1			; initialize d1 to 0
+	00008faa: 7400                      moveq   #0,d2			; initialize d2 to 0
+	00008fac: 246c 0070                 movea.l 0x70(a4),a2		; a4 = $ffffc460, a2 = $ffffc1d1 pointer to memory location for Gun1X = $2f in this run
+	00008fb0: 1012                      move.b  (a2),d0			; a2 = $ffffc1d1, d0 = $2f
+	00008fb2: 1229 0002                 move.b  0x2(a1),d1		; a1 = $ffffc03c + 2 = $ffffc03e, d1 = $f9
+																; (offset correction from in-game calibration, upper left GunX1)
+	00008fb6: 1411                      move.b  (a1),d2			; a1 = $ffffc03c, d2 = $06
+																; (offset correction from in-game calibration, bottom right GunX1)
+	00008fb8: 0810 0000                 btst    #0,(a0)			; a0 = location $ffffc130 = value $0200
+	00008fbc: 6712                      beq.b   0x8fd0			; branch if equal to $8fd0
+	00008fbe: b002                      cmp.b   d2,d0
+	00008fc0: 6208                      bhi.b   0x8fca
+	00008fc2: b001                      cmp.b   d1,d0
+	00008fc4: 6406                      bcc.b   0x8fcc
+	00008fc6: 1001                      move.b  d1,d0
+	00008fc8: 6002                      bra.b   0x8fcc
+	00008fca: 1002                      move.b  d2,d0
+	00008fcc: c141                      exg     d0,d1
+	00008fce: 600e                      bra.b   0x8fde
+	00008fd0: b001                      cmp.b   d1,d0			; d1 = $f9, d0 = $2f, Compare in-game calibration offset with upper left Gun1X position
+	00008fd2: 6208                      bhi.b   0x8fdc			; Branch if higher to $8fdc, in this case, NO
+	00008fd4: b002                      cmp.b   d2,d0			; d2 = $06, d0 = $2f, Compare in-game calibration offset with bottom right Gun1X position
+	00008fd6: 6406                      bcc.b   0x8fde			; Branch on carry clear to $8fde, in this case YES
+	00008fd8: 1002                      move.b  d2,d0
+	00008fda: 6002                      bra.b   0x8fde
+	00008fdc: 1001                      move.b  d1,d0
+	00008fde: 9240                      sub.w   d0,d1			; d1 - d0, $f9 - $2f = $ca, d1 = $ca
+	00008fe0: c2e8 0002                 mulu.w  0x2(a0),d1		; a0 = $ffffc130 + 2, value = $2e, d1 = $ca * $2e = $244c = d1 
+	00008fe4: e049                      lsr.w   #8,d1			; right shift 8 bits, d1 = $244c >> 8 = $24 
+	00008fe6: d268 0004                 add.w   0x4(a0),d1		; a0 = $ffffc130 + 4 = $ffffc134 = value $0045, d1 = $69
+	00008fea: 3c01                      move.w  d1,d6			; d6 = $69 			<---- Hit position on screen X axis
+	00008fec: 7000                      moveq   #0,d0			; initialize d0 to 0
+	00008fee: 7200                      moveq   #0,d1			; initialize d1 to 0
+	00008ff0: 7400                      moveq   #0,d2			; initialize d2 to 0
+	00008ff2: 246c 006c                 movea.l 0x6c(a4),a2		; a4 = $ffffc460 + $6c = $ffffc4cc = value $ffffc1d0, a2 = $ffffc1d0, memory location for Gun1Y
+	00008ff6: 1012                      move.b  (a2),d0			; a2 = $ffffc1d0, memory location for Gun1Y, value = $9e, d0 = $9e, in this run
+	00008ff8: 1229 0003                 move.b  0x3(a1),d1		; a1 = $ffffc03c +3 = $ffffc03f, value = $09 in this run, d1 = $09
+																; in-game calibration offset with upper left Gun1Y position
+	00008ffc: 1429 0001                 move.b  0x1(a1),d2		; a1 = $ffffc03c +1 = $ffffc03d, value = $f5 in this run, d2 = $f5
+																; in-game calibration offset with bottom right Gun1Y position
+	00009000: 0810 0001                 btst    #0x1,(a0)		; 
+	00009004: 6712                      beq.b   0x9018			; branch equal to $9018, NO in this run
+	00009006: b002                      cmp.b   d2,d0			; compare d0 with d2 (d0 = $9e, d2 = $f5)
+	00009008: 6208                      bhi.b   0x9012			; branch higher, NO in this run
+	0000900a: b001                      cmp.b   d1,d0			; compare d0 with d1 (d0 = $9e, d1 = $09)
+	0000900c: 6406                      bcc.b   0x9014			; Branch on carry clear to $9014, YES in this run
+	0000900e: 1001                      move.b  d1,d0
+	00009010: 6002                      bra.b   0x9014
+	00009012: 1002                      move.b  d2,d0
+	00009014: c541                      exg     d2,d1			; exchange registers, now d1 = $f5 and d2 = $09
+	00009016: 600e                      bra.b   0x9026			; branch always $9026
+	00009018: b001                      cmp.b   d1,d0
+	0000901a: 6208                      bhi.b   0x9024
+	0000901c: b002                      cmp.b   d2,d0
+	0000901e: 6406                      bcc.b   0x9026
+	00009020: 1002                      move.b  d2,d0
+	00009022: 6002                      bra.b   0x9026
+	00009024: 1001                      move.b  d1,d0
+	00009026: 9240                      sub.w   d0,d1			; d1 = $f5 - d0 = $9e, d1 = $57
+	00009028: c2e8 0006                 mulu.w  0x6(a0),d1		; a0 = $ffffc130 + 6 = $ffffc136, value = $2a * $57 (d1), d1 = $0e46 
+	0000902c: e049                      lsr.w   #8,d1			; right shift 8 bits, d1 = $e046 >> 8 = $0e
+	0000902e: d268 0008                 add.w   0x8(a0),d1		; a0 = $ffffc130 + 8 = $ffffc138, value = $68 + $0e (d1), d1 = $76
+	00009032: 3e3c 0080                 move.w  #0x80,d7		; d7 = $80
+	00009036: 9247                      sub.w   d7,d1			; d1 - d7, $76 - $80 = d1 = $fff6 (negative number) <---- Probably final calculation for Gun1Y
+	00009038: 0241 01ff                 andi.w  #0x1ff,d1		; $fff6 & $01ff = d1 = $01f6
+	0000903c: 3e3c 0200                 move.w  #0x200,d7		; d7 = $0200
+	00009040: 9e41                      sub.w   d1,d7			; d7 = $0200 - d1 = $01f6, d7 = $000a
+	00009042: 0247 01ff                 andi.w  #0x1ff,d7		; $000a & $01ff, d7 = $000a
+	00009046: 41f9 0020 02ce            lea     0x2002ce.l,a0	; a0 = $002002ce
+	0000904c: dc46                      add.w   d6,d6			; d6 + d6, $69 + $69, d6 = $d2
+	0000904e: dc46                      add.w   d6,d6			; d6 + d6, $d2 + $d2, d6 = $01a4
+	00009050: 43f0 6000                 lea     (0,a0,d6.w),a1	; a0 = $002002ce + $01a4 (d6), a1 = $00200472
+	00009054: 3219                      move.w  (a1)+,d1		; move value of location $00200472 to d1, a1 now = $00200474 and d1 = $7aef
+	00009056: 3411                      move.w  (a1),d2			; move value of location $00200474 to d2, d2 = $23a7
+	00009058: de47                      add.w   d7,d7			; d7 + d7, $a + $a, d7 = $14
+	0000905a: de47                      add.w   d7,d7			; d7 + d7, $14 + $14, d7 = $28
+	0000905c: 43f0 7000                 lea     (0,a0,d7.w),a1	; a0 = $002002ce + $0028 (d7), a1 = $002002f6
+	00009060: 3619                      move.w  (a1)+,d3		; move value of location $002002f6 to d3, a1 now = $002002f8 and d3 = $0fab
+	00009062: 3811                      move.w  (a1),d4			; move value of location $002002f8 to d4, d4 = $7f09
+	00009064: 3a2e 003e                 move.w  0x3e(a6),d5		; a6 = $ffffc5e0 + $3e = $ffffc61e, d5 = $7000
+	00009068: cbc4                      muls.w  d4,d5			; d4 * d5, d5 = $3793f000
+	0000906a: da85                      add.l   d5,d5			; d5 + d5, $3793f000 + $3793f000, d5 = $6f27e000
+	0000906c: 4845                      swap    d5				; d5 = $e0006f27
+	0000906e: cbc2                      muls.w  d2,d5			; d2 * d5, $23a7 * $6f27, d5 = $0f7ad771
+	00009070: da85                      add.l   d5,d5			; d5 + d5, $0f7ad771 + $0f7ad771, d5 = $1ef5aee2
+	00009072: 4845                      swap    d5				; d5 = $aee21ef5
+	00009074: 3d45 002c                 move.w  d5,0x2c(a6)		; move $1ef5 (d5.w) to location $ffffc5e0 (a6) + $ 2c = $ffffc60c <---- Hit position on screen Y axis
+	00009078: 3a2e 003e                 move.w  0x3e(a6),d5		; a6 = $ffffc5e0 + $3e = $ffffc61e, d5 = $7000
+	0000907c: cbc3                      muls.w  d3,d5			; d3 * d5, $0fab * $7000, d5 = $06dad000
+	0000907e: da85                      add.l   d5,d5			; d5 + d5, $06dad000 + $06dad000, d5 = $0db5a000
+	00009080: 4845                      swap    d5				; d5 = $a0000db5
+	00009082: 3d45 002e                 move.w  d5,0x2e(a6)		; move $0db5 (d5.w) to location $ffffc5e0 (a6) + $2e = $ffffc60e
+	00009086: 3a2e 003e                 move.w  0x3e(a6),d5		; a6 = $ffffc5e0 + $3e = $ffffc61e, value = $7000, d5 = $7000
+	0000908a: cbc4                      muls.w  d4,d5			; d4 * d5, $7f09 * $7000, d5 = $3793f000
+	0000908c: da85                      add.l   d5,d5			; d5 + d5, $3793f000 + $3793f000, d5 = $6f27e000
+	0000908e: 4845                      swap    d5				; d5 = $e0006f27
+	00009090: cbc1                      muls.w  d1,d5			; d1 * d5, $7aef * $6f27, d5 = $35605b69
+	00009092: da85                      add.l   d5,d5			; d5 + d5, $35605b69 + $35605b69, d5 = $6ac0b6d2
+	00009094: 4845                      swap    d5				; d5 = $b6d26ac0
+	00009096: 3d45 0030                 move.w  d5,0x30(a6)		; move $6ac0 (d5.w) to location $ffffc5e0 + $30 = $ffffc610
+	0000909a: 4e75                      rts 					; return
+
+****************************************************************************
 **  MC68000 + Z80
 **  2xYM3438 + Custom PCM
 **
