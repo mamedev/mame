@@ -960,7 +960,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="cribbage king - gin king (1989)(the software toolworks)(trex crack).2mg" size="819264" crc="803467f5" sha1="fee36e26f7363ab3da7cb58501a37cec827857b7" offset="0x0000" />
+				<rom name="cribbage king - gin king (1989)(the software toolworks)(trex crack).2mg" size="819264" crc="740f8636" sha1="e74d5758f9708ef99e51902012ddb8f5c51a72a8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
