@@ -760,7 +760,7 @@ void adsp21062_device::device_start()
 	state_add( SHARC_B15,    "B15", m_core->dag2.b[7]).formatstr("%08X");
 
 	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
-	state_add( STATE_GENPC, "CURPC", m_core->pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
 	m_icountptr = &m_core->icount;
 }

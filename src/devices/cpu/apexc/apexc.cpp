@@ -776,6 +776,7 @@ void apexc_cpu_device::device_start()
 	state_add( APEXC_STATE, "CPU state", m_running ).mask(0x01);
 	state_add( APEXC_PC, "PC", m_pc ).callimport().callexport().formatstr("%03X");
 	state_add( APEXC_ML_FULL, "ML_FULL", m_ml_full ).callimport().callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_icountptr = &m_icount;
 }

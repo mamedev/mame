@@ -556,7 +556,7 @@ void i80186_cpu_device::device_start()
 	state_add( I8086_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%05X");
-	state_add(STATE_GENPC, "CURPC", m_pc).formatstr("%05X");
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%05X");
 
 	// register for savestates
 	save_item(NAME(m_timer[0].control));

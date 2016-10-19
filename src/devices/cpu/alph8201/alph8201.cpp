@@ -416,6 +416,7 @@ void alpha8201_cpu_device::device_start()
 	state_add( ALPHA8201_R5, "R5", m_R[5] ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_R6, "R6", m_R[6] ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_R7, "R7", m_R[7] ).callimport().callexport().formatstr("%02X");
+	state_add(STATE_GENPCBASE, "PC", m_PREVPC).noshow();
 
 	save_item(NAME(m_RAM));
 	save_item(NAME(m_PREVPC));
