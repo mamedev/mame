@@ -4,6 +4,79 @@
 NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
 -->
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
+	
+<!--
+
+VTech V.Smile Baby cartridge list
+
++========+===================+============================================================================+
+| Dumped |      Serial       |                                    Name                                    |
++========+===================+============================================================================+
+|		 | 80-099000(US)     | Learn and Discover Home (white background on title) (pack-in)
+|		 | 80-099000(US)     | Learn and Discover Home (green background on title) (standalone)
+|		 | 80-099002(NL)     | Dierenhuis
+|		 | 80-099003(UK)     | Learn and Discover Home (white background on title) (pack-in)
+|		 | 80-099004(GE)     | Meine kleinen Tierfreunde (Explore and Learn Home on label)
+|		 | 80-099005(FR)     | La Maison des animaux
++========+===================+============================================================================+
+|		 | 80-099020(US)     | Pooh's Hundred Acre Wood Adventure
+|		 | 80-099022(NL)     | Poeh's Honderd Bunderbos Avontuur
+|		 | 80-099023(UK)     | Pooh's Hundred Acre Wood Adventure
+|		 | 80-099025(FR)     | Winnie et ses amis dans la Faret des Reves Bieus
++========+===================+============================================================================+
+|		 | 80-099040(US)     | Baby Einstein - World of Discoveries
+|		 | 80-099040(US)     | Baby Einstein - World of Discoveries (no # on front label)
+|		 | 80-099043(UK)     | Baby Einstein - World of Discoveries
+|		 | 80-099045(FR)     | Baby Einstein - Un Monde de decouvertes
++========+===================+============================================================================+
+|		 | 80-099060(US)     | A Day On The Farm
+|		 | 80-099063(UK)     | A Day On The Farm
+|		 | 80-099064(GE)     | Mein erster Bauernhof
+|		 | 80-099065(FR)     | Un jour a la ferme
++========+===================+============================================================================+
+|		 | 80-099080(US)     | <Unknown>
++========+===================+============================================================================+
+|		 | 80-099100(US)     | Noah's Ark Animal Adventure
+|		 | 80-099102(NL)     | De ark van Noach
+|		 | 80-099103(UK)     | Noah's Ark Animal Adventure
+|		 | 80-099105(FR)     | L'arche de Noe - L'aventure des animaux
++========+===================+============================================================================+
+|		 | 80-099120(US)     | Barney - Let's Go to a Party
++========+===================+============================================================================+
+|		 | 80-099140(US)     | Teletubbies
+|		 | 80-099142(NL)     | Teletubbies
+|		 | 80-099143(UK)     | Teletubbies
+|		 | 80-099145(FR)     | Teletubbies
++========+===================+============================================================================+
+|		 | 80-099160(US)     | Discovery with Baby Mickey and Friends
+|		 | 80-099163(UK)     | Discovery with Baby Mickey and Friends
+|		 | 80-099165(UK)     | Les decouvertes de Mickey et ses amis
++========+===================+============================================================================+
+|		 | 80-099180(US)     | Bailey Goes To Town (Included Bailey Plush Bear Controller)
+|		 | 80-099183(UK)     | Bailey Goes To Town (Included Bailey Plush Bear Controller)
++========+===================+============================================================================+
+|		 | 80-099200(US)     | Mother Goose
++========+===================+============================================================================+
+|		 | 80-099220(US)     | Care Bears Play Day
++========+===================+============================================================================+
+|		 | 80-099240(US)     | Backyardigans: Big Backyard Adventures
++========+===================+============================================================================+
+
+VTech V.Baby cartridge list. Note that the VTech V.Baby is not the same console as the VTech V.Smile Baby.
+The V.Baby currently have no dumps available, hence the list is temporarily listed here.
+
++========+===================+============================================================================+
+| Dumped |      Serial       |                                    Name                                    |
++========+===================+============================================================================+
+|        | V.Baby (NOT V.Smile Baby)
+|        | 80-107100-001(US) | Meet Me at the Zoo (Orange, V.Baby packin)
+|        | 80-220000(US)     | The World of Eric Carle - The Very Hungry Caterpillar
+|        | 80-220600(US)     | Backyardigans
+|        | 80-220700(US)     | Noah's Ark - Animal Adventures
+|        | 80-220800(US)     | Mother Goose
++========+===================+============================================================================+
+
+-->
 
 	<software name="mktierf" supported="no">
 		<description>Meine kleinen Tierfreunde (Ger)</description>
@@ -39,7 +112,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<description>Pooh's Hundred Acre Wood Adventure (USA) (V.Smile Baby)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
-		<part name="cart" interface="vsmile_cart">
+		<part name="cart" interface="vsmileb_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="pooh's hundred acre wood adventure [099020] (2007) (baby).bin" size="8388608" crc="a3ac4cd4" sha1="3562c632e0a1e70cb9e382ebb823449757afed67" offset="0" />
 			</dataarea>
