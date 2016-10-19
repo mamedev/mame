@@ -960,7 +960,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819277">
-				<rom name="cribbage king - gin king (1989)(the software toolworks)(trex crack).2mg" size="819277" crc="803467f5" sha1="fee36e26f7363ab3da7cb58501a37cec827857b7" offset="0x0000" />
+				<rom name="cribbage king - gin king (1989)(the software toolworks)(trex crack).2mg" size="819264" crc="803467f5" sha1="fee36e26f7363ab3da7cb58501a37cec827857b7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6409,7 +6409,7 @@
 	</software>
 
 	<software name="thexdero" cloneof="thexder">
-		<description>Thexder v1 (clean crack)</description>
+		<description>Thexder v1 (no OS, not self booting) (clean crack)</description>
 		<!-- Original release by Sierra On-Line - Did NOT come with OS and was NOT self bootable -->
 		<!-- The file "othexder" had been undeleted (and cracked) and is closer to v2.7 in how it's demo sounds fade -->
 		<year>1987</year>
