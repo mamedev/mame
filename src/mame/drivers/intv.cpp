@@ -540,7 +540,7 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 
 	/* crt controller */
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_17_9712MHz/2)
+	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_7_15909MHz)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_SCREEN_MODIFY("screen")
