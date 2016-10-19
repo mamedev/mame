@@ -127,6 +127,7 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "video/ramdac.h"
 
 #include <algorithm>
 
@@ -153,8 +154,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram2_8(*this, "paletteram2"),
 		m_hopper(*this, "hopper") { }
 
 	tilemap_t *m_tmap;
@@ -189,8 +188,6 @@ public:
 	DECLARE_WRITE8_MEMBER(reeltileshigh_2_w);
 	DECLARE_WRITE8_MEMBER(reeltileshigh_3_w);
 	DECLARE_WRITE8_MEMBER(reeltileshigh_4_w);
-	DECLARE_WRITE8_MEMBER(skylncr_paletteram_w);
-	DECLARE_WRITE8_MEMBER(skylncr_paletteram2_w);
 	DECLARE_WRITE8_MEMBER(reelscroll1_w);
 	DECLARE_WRITE8_MEMBER(reelscroll2_w);
 	DECLARE_WRITE8_MEMBER(reelscroll3_w);
@@ -201,7 +198,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 	DECLARE_READ8_MEMBER(bdream97_opcode_r);
-	DECLARE_DRIVER_INIT(skylncr);
 	DECLARE_DRIVER_INIT(sonikfig);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
@@ -214,8 +210,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_generic_paletteram_8;
-	optional_shared_ptr<UINT8> m_generic_paletteram2_8;
 	required_device<ticket_dispenser_device> m_hopper;
 	bool m_mbutrfly_prot;
 };
@@ -372,55 +366,6 @@ WRITE8_MEMBER(skylncr_state::reeltileshigh_4_w)
 	m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
-// FIXME: this is a VGA-style RAMDAC, so use one
-// instead of this custom implementation
-
-WRITE8_MEMBER(skylncr_state::skylncr_paletteram_w)
-{
-	if (offset == 0)
-	{
-		m_color = data;
-	}
-	else
-	{
-		int r,g,b;
-		m_generic_paletteram_8[m_color] = data;
-
-		r = m_generic_paletteram_8[(m_color/3 * 3) + 0];
-		g = m_generic_paletteram_8[(m_color/3 * 3) + 1];
-		b = m_generic_paletteram_8[(m_color/3 * 3) + 2];
-		r = (r << 2) | (r >> 4);
-		g = (g << 2) | (g >> 4);
-		b = (b << 2) | (b >> 4);
-
-		m_palette->set_pen_color(m_color / 3, rgb_t(r, g, b));
-		m_color = (m_color + 1) % (0x100 * 3);
-	}
-}
-
-WRITE8_MEMBER(skylncr_state::skylncr_paletteram2_w)
-{
-	if (offset == 0)
-	{
-		m_color2 = data;
-	}
-	else
-	{
-		int r,g,b;
-		m_generic_paletteram2_8[m_color2] = data;
-
-		r = m_generic_paletteram2_8[(m_color2/3 * 3) + 0];
-		g = m_generic_paletteram2_8[(m_color2/3 * 3) + 1];
-		b = m_generic_paletteram2_8[(m_color2/3 * 3) + 2];
-		r = (r << 2) | (r >> 4);
-		g = (g << 2) | (g >> 4);
-		b = (b << 2) | (b >> 4);
-
-		m_palette->set_pen_color(0x100 + m_color2 / 3, rgb_t(r, g, b));
-		m_color2 = (m_color2 + 1) % (0x100 * 3);
-	}
-}
-
 WRITE8_MEMBER(skylncr_state::reelscroll1_w)
 {
 	m_reelscroll1[offset] = data;
@@ -449,7 +394,7 @@ WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 WRITE8_MEMBER(skylncr_state::skylncr_coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
-	m_hopper->write(space, 0, (data & 0x20) ? 0x80 : 0);
+	m_hopper->motor_w(data & 0x20);
 }
 
 READ8_MEMBER(skylncr_state::ret_ff)
@@ -561,15 +506,20 @@ static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8, skylncr_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
 
-	AM_RANGE(0x20, 0x20) AM_WRITE(skylncr_coin_w )
+	AM_RANGE(0x20, 0x20) AM_WRITE(skylncr_coin_w)
 
 	AM_RANGE(0x30, 0x31) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x31, 0x31) AM_DEVREAD("aysnd", ay8910_device, data_r)
 
-	AM_RANGE(0x40, 0x41) AM_WRITE(skylncr_paletteram_w )
-	AM_RANGE(0x50, 0x51) AM_WRITE(skylncr_paletteram2_w )
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE(0x41, 0x41) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE(0x42, 0x42) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
-	AM_RANGE(0x70, 0x70) AM_WRITE(skylncr_nmi_enable_w )
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE("ramdac2", ramdac_device, index_w)
+	AM_RANGE(0x51, 0x51) AM_DEVWRITE("ramdac2", ramdac_device, pal_w)
+	AM_RANGE(0x52, 0x52) AM_DEVWRITE("ramdac2", ramdac_device, mask_w)
+
+	AM_RANGE(0x70, 0x70) AM_WRITE(skylncr_nmi_enable_w)
 ADDRESS_MAP_END
 
 
@@ -583,6 +533,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bdream97_opcode_map, AS_DECRYPTED_OPCODES, 8, skylncr_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(bdream97_opcode_r)
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, skylncr_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( ramdac2_map, AS_0, 8, skylncr_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
+ADDRESS_MAP_END
+
 
 
 /***************************************
@@ -1689,6 +1650,12 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	MCFG_RAMDAC_COLOR_BASE(0)
+
+	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette")
+	MCFG_RAMDAC_COLOR_BASE(0x100)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
@@ -2007,12 +1974,6 @@ ROM_END
 *           Driver Init           *
 **********************************/
 
-DRIVER_INIT_MEMBER(skylncr_state, skylncr)
-{
-	m_generic_paletteram_8.allocate(0x100 * 3);
-	m_generic_paletteram2_8.allocate(0x100 * 3);
-}
-
 DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 /*
   Encryption: For each 8 bytes group,
@@ -2043,9 +2004,6 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 		std::swap(ROM[x + 1], ROM[x + 4]);
 		std::swap(ROM[x + 3], ROM[x + 6]);
 	}
-
-	m_generic_paletteram_8.allocate(0x100 * 3);
-	m_generic_paletteram2_8.allocate(0x100 * 3);
 }
 
 
@@ -2054,13 +2012,13 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 ****************************************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT    COMPANY                 FULLNAME                                         FLAGS  */
-GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly, 0,       mbutrfly, mbutrfly, skylncr_state,  skylncr,  ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
-GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr,  ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
-GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr,  ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
-GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr,  ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 1995, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr,  ROT0, "bootleg (KKK)",        "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1995, skylncr,  0,       skylncr,  skylncr,  driver_device,  0,        ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
+GAME( 1995, butrfly,  0,       skylncr,  skylncr,  driver_device,  0,        ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
+GAME( 1999, mbutrfly, 0,       mbutrfly, mbutrfly, driver_device,  0,        ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
+GAME( 1995, madzoo,   0,       skylncr,  skylncr,  driver_device,  0,        ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
+GAME( 1995, leader,   0,       skylncr,  leader,   driver_device,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
+GAME( 199?, gallag50, 0,       skylncr,  gallag50, driver_device,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
+GAME( 199?, neraidou, 0,       neraidou, neraidou, driver_device,  0,        ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
+GAME( 199?, sstar97,  0,       sstar97,  sstar97,  driver_device,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+GAME( 1995, bdream97, 0,       bdream97, skylncr,  driver_device,  0,        ROT0, "bootleg (KKK)",        "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

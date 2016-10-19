@@ -23,6 +23,9 @@
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
 	ramdac_device::static_set_palette_tag(*device, "^" _palette_tag);
 
+#define MCFG_RAMDAC_COLOR_BASE(_color_base) \
+	ramdac_device::static_set_color_base(*device, _color_base);
+
 #define MCFG_RAMDAC_SPLIT_READ(_split) \
 	ramdac_device::set_split_read(*device, _split);
 
@@ -42,6 +45,7 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_color_base(device_t &device, UINT32 color_base) { downcast<ramdac_device &>(device).m_color_base = color_base; }
 	static void set_split_read(device_t &device, int split) { downcast<ramdac_device &>(device).m_split_read_reg = split; }
 
 	// I/O operations
@@ -76,6 +80,7 @@ private:
 	const address_space_config      m_space_config;
 	required_device<palette_device> m_palette;
 
+	UINT32 m_color_base;
 	UINT8 m_split_read_reg; // read register index is separated, seen in rltennis
 };
 
