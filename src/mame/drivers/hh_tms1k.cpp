@@ -25,6 +25,7 @@
  @MP0170   TMS1000   1979, Conic Football
  *MP0230   TMS1000?  1980, Entex Blast It (6015)
  @MP0914   TMS1000   1979, Entex Baseball 1
+ *MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/Palitoy The Incredible Brain Buggy
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
  *MP0920   TMS1000   1979, Entex Space Battle (6004)
  @MP0923   TMS1000   1979, Entex Baseball 2 (6002)
