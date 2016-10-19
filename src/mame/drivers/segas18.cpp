@@ -15,7 +15,7 @@
 
 ****************************************************************************
 
-	Disasm part code for gun offsets calculation: (Pitou)
+	Disasm part code for gun offsets calculation for lghost: (Pitou)
 	
 	Here is the disasm code that calculates the explosion on screen
 	based on the gun coordinates (still incomplete, only a few instructions explanation missing).
