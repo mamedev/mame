@@ -1774,7 +1774,7 @@ static void amiga_image_exit(imgtool::image &img)
 }
 
 
-static void amiga_image_info(imgtool::image &img, char *string, size_t len)
+static void amiga_image_info(imgtool::image &img, std::ostream &stream)
 {
 	imgtoolerr_t ret;
 	root_block root;
@@ -1802,7 +1802,7 @@ static void amiga_image_info(imgtool::image &img, char *string, size_t len)
 	strcat(info, "\n  Root modified: ");
 	strcat(info, r);
 
-	strncpy(string, info, len);
+	stream << info;
 }
 
 

@@ -850,7 +850,7 @@ static imgtoolerr_t thom_write_sector(imgtool::image &img, UINT32 track,
 /* returns floopy name */
 /* actually, each side has its own name, but we only return the one on side 0.
  */
-static void thom_info(imgtool::image &img, char *string, size_t len)
+static void thom_info(imgtool::image &img, std::ostream &stream)
 {
 	thom_floppy* f = get_thom_floppy(img);
 	UINT8* base = thom_get_sector( f, 0, 20, 1 );
@@ -858,7 +858,7 @@ static void thom_info(imgtool::image &img, char *string, size_t len)
 	memcpy( buf, base, 8 );
 	buf[8] = 0;
 	thom_stringify( buf );
-	strncpy( string, buf, len );
+	stream << buf;
 }
 
 /* each side of a floppy has its own filesystem, we treat them as'partitions'

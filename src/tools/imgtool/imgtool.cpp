@@ -1086,15 +1086,16 @@ imgtoolerr_t imgtool::image::create(const std::string &modulename, const char *f
 //	info - returns format specific information about an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::info(char *string, size_t len)
+std::string imgtool::image::info()
 {
-	if (len > 0)
+	std::string string;
+	if (module().info)
 	{
-		string[0] = '\0';
-		if (module().info)
-			module().info(*this, string, len);
+		std::stringstream stream;
+		module().info(*this, stream);
+		string = stream.str();
 	}
-	return IMGTOOLERR_SUCCESS;
+	return string;
 }
 
 

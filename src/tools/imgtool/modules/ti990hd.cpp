@@ -393,7 +393,7 @@ static ti990_image *get_ti990_image(imgtool::image &image)
 
 static imgtoolerr_t ti990_image_init(imgtool::image &img, imgtool::stream::ptr &&stream);
 static void ti990_image_exit(imgtool::image &img);
-static void ti990_image_info(imgtool::image &img, char *string, size_t len);
+static void ti990_image_info(imgtool::image &img, std::ostream &stream);
 static imgtoolerr_t ti990_image_beginenum(imgtool::directory &enumeration, const char *path);
 static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
 static void ti990_image_closeenum(imgtool::directory &enumeration);
@@ -1179,14 +1179,14 @@ static void ti990_image_exit(imgtool::image &img)
 
     Currently returns the volume name
 */
-static void ti990_image_info(imgtool::image &img, char *string, size_t len)
+static void ti990_image_info(imgtool::image &img, std::ostream &stream)
 {
 	ti990_image *image = get_ti990_image(img);
 	char vol_name[9];
 
 	fname_to_str(vol_name, image->sec0.vnm, 9);
 
-	snprintf(string, len, "%s", vol_name);
+	stream << vol_name;
 }
 
 /*

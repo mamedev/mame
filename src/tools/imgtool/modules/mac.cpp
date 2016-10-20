@@ -5273,7 +5273,7 @@ static imgtoolerr_t get_comment(struct mac_l2_imgref *l2_img, UINT16 id, mac_str
 #ifdef UNUSED_FUNCTION
 static void mac_image_exit(imgtool::image *img);
 #endif
-static void mac_image_info(imgtool::image &img, char *string, size_t len);
+static void mac_image_info(imgtool::image &img, std::ostream &stream);
 static imgtoolerr_t mac_image_beginenum(imgtool::directory &enumeration, const char *path);
 static imgtoolerr_t mac_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
 static imgtoolerr_t mac_image_freespace(imgtool::partition &partition, UINT64 *size);
@@ -5297,20 +5297,23 @@ static void mac_image_exit(imgtool::image *img)
 
     Currently returns the volume name
 */
-static void mac_image_info(imgtool::image &img, char *string, size_t len)
+static void mac_image_info(imgtool::image &img, std::ostream &stream)
 {
+	char buffer[256] = { 0, };
 	struct mac_l2_imgref *image = get_imgref(img);
 
 	switch (image->format)
 	{
 	case L2I_MFS:
-		mac_to_c_strncpy(string, len, image->u.mfs.volname);
+		mac_to_c_strncpy(buffer, ARRAY_LENGTH(buffer), image->u.mfs.volname);
 		break;
 
 	case L2I_HFS:
-		mac_to_c_strncpy(string, len, image->u.hfs.volname);
+		mac_to_c_strncpy(buffer, ARRAY_LENGTH(buffer), image->u.hfs.volname);
 		break;
 	}
+
+	stream << buffer;
 }
 
 /*
