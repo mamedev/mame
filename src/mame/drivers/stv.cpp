@@ -57,16 +57,19 @@
 
 
 /*
-I/O overview:
-    PORT-A  1st player inputs
-    PORT-B  2nd player inputs
-    PORT-C  system input
-    PORT-D  system output
-    PORT-E  I/O 1
-    PORT-F  I/O 2
-    PORT-G  I/O 3
-    PORT-AD AD-Stick inputs?
-    SERIAL COM
+I/O overview:                   Connector (as described in service manual)
+    PORT-A  1st player inputs   JAMMA (56P)
+    PORT-B  2nd player inputs   JAMMA (56P)
+    PORT-C  system input        JAMMA (56P)
+    PORT-D  system output       JAMMA (56P) + CN25 (JST NH 5P) RESERVED OUTPUT 4bit. (?)
+    PORT-E  I/O 1               CN32 (JST NH 9P) EXTENSION I/O 8bit.
+    PORT-F  I/O 2               CN21 (JST NH 11P) EXTENSION I/O 8bit.
+    PORT-G  I/O 3               CN20 (JST HN 10P) EXTENSION INPUT 8bit. (?)
+    PORT-AD AD-Stick inputs?    CN19 (JST NH 12P) A/D INPUT 8Ch.
+    SERIAL COM                  CN18 (JST NH 6P) SERIAL COMMUNICATION
+    ???                         CN22 (JST NH 3P) MIDI OUT
+    ???                         CN27 (JST NH 3P) LIGHT GUN TRIGGER
+    ???                         CN24 (JST NH 4P) AUDIO LINE OUTPUT
 
 offsets:
     0x0001 PORT-A (P1)
@@ -993,7 +996,7 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually AK93C45F */
 
 	MCFG_TIMER_DRIVER_ADD("sector_timer", stv_state, stv_sector_cb)
 	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stv_state, stv_sh1_sim)
