@@ -129,6 +129,7 @@ public:
 	void set_shuffle_state(int state);
 	void fifo_w(UINT16 data);
 	void fifo_full_w(UINT16 data);
+	void output_w(UINT32 data);
 
 	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
 	DECLARE_READ16_MEMBER(fifo_r);

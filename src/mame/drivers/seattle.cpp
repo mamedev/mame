@@ -197,6 +197,7 @@
 #include "calspeed.lh"
 #include "vaportrx.lh"
 #include "hyprdriv.lh"
+#include "sfrush.lh"
 
 
 
@@ -3306,8 +3307,8 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
 GAME( 1996, wg3dh,    0,        wg3dh,             wg3dh, seattle_state,    wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, mace,     0,        mace,              mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, macea,    mace,     mace,              mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sfrush,   0,        sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sfrushrk, 0,        sfrushrk,          sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, sfrush,   0,        sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrushrk, 0,        sfrushrk,          sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
 GAMEL( 1998, calspeed, 0,        calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 GAMEL( 1998, calspeeda,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 GAMEL( 1998, calspeedb,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )

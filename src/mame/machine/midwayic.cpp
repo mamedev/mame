@@ -558,7 +558,7 @@ enum
 	IOASIC_UARTCONTROL, /* 4: controls some UART behavior */
 	IOASIC_UARTOUT,     /* 5: UART output */
 	IOASIC_UARTIN,      /* 6: UART input */
-	IOASIC_UNKNOWN7,    /* 7: ??? */
+	IOASIC_COIN,        /* 7: triggered on coin insertion */
 	IOASIC_SOUNDCTL,    /* 8: sound communications control */
 	IOASIC_SOUNDOUT,    /* 9: sound output port */
 	IOASIC_SOUNDSTAT,   /* a: sound status port */
@@ -876,6 +876,46 @@ void midway_ioasic_device::fifo_full_w(UINT16 data)
 }
 
 
+/* need to check if device callback is required instead of hardcode here */
+void midway_ioasic_device::output_w(UINT32 data)
+{
+	/* two writes in pairs. flag off first, on second. arg remains the same. */
+	UINT8 flag = (data >> 8) & 0x8;
+	UINT8 op = (data >> 8) & 0x7;
+	UINT8 arg = data & 0xFF;
+	
+	switch (op)
+	{
+		default:
+			logerror("Unknown output (%02X) = %02X\n", flag | op, arg);
+			break;
+
+		case 0x0:
+			if (flag)
+			{
+				machine().output().set_value("wheel", arg); // wheel motor delta. signed byte.
+			}
+			break;
+			
+		case 0x4:
+			if (flag)
+			{
+				for (UINT8 bit = 0; bit < 8; bit++)
+					machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
+			}
+			break;
+			
+		case 0x5:
+			if (flag)
+			{
+				for (UINT8 bit = 0; bit < 8; bit++)
+					machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
+			}
+			break;
+	}
+}
+
+
 
 /*************************************
  *
@@ -1071,6 +1111,10 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 				midway_serial_pic2_device::write(space, 0, newreg ^ 0x05);
 			else
 				midway_serial_pic2_device::write(space, 0, newreg);
+			break;
+			
+		case IOASIC_PICIN:
+			output_w(data);
 			break;
 
 		case IOASIC_INTCTL:
