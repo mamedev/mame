@@ -1210,7 +1210,7 @@ Game cartridges
             <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="A90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
+                <rom name="a90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
             </dataarea>
         </part>
     </software>
