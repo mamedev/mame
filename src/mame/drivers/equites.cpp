@@ -1703,6 +1703,105 @@ ROM_START( splndrbt )
 	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
 
+ROM_START( splndrbta )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 68000 ROMs(16k x 4) - Red band on program rom labels
+	ROM_LOAD16_BYTE( "1.16b", 0x00001, 0x4000, CRC(3e342030) SHA1(82529e12378c0036097a654fe059f82d69fac8e6) ) // sldh - Red Band
+	ROM_LOAD16_BYTE( "2.16c", 0x00000, 0x4000, CRC(757e270b) SHA1(be615829fd21609ded21888e7a75456cbeecb603) ) // sldh - Red Band
+	ROM_LOAD16_BYTE( "3.15b", 0x08001, 0x4000, CRC(788deb02) SHA1(a4e79621bf4cda50dfb8dfab7f70dc4021065794) ) // sldh - Red Band
+	ROM_LOAD16_BYTE( "4.15c", 0x08000, 0x4000, CRC(d02a5606) SHA1(6bb2e5d95ea711452dd40218bd90488d70f82006) ) // sldh - Red Band
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 8085A ROMs
+	ROM_LOAD( "8v.1l",  0x00000, 0x4000, CRC(71b2ec29) SHA1(89c630c5bf9c4752b01006183d1419fe6a458f5c) ) 
+	ROM_LOAD( "9v.1h",  0x04000, 0x4000, CRC(e95abcb5) SHA1(1680875fc16d1a4e1054ccdabdf6fd06d434a163) ) 
+
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
+	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
+	ROM_LOAD( "10.8c",  0x00000, 0x2000, CRC(501887d4) SHA1(3cf4401d6fddff1500066219a71ac3b30ecbdd28) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "8.14m",  0x00000, 0x4000, CRC(c2c86621) SHA1(a715c70ace98502f2c0d4a81539cd79d19e9b6c4) )
+	ROM_LOAD( "9.12m",  0x04000, 0x4000, CRC(4f7da6ff) SHA1(0516271df4a36d6ea38d1b8a5e471e1d2a79e8c1) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )    // sprites
+	ROM_LOAD( "6.18n", 0x00000, 0x2000, CRC(aa72237f) SHA1(0a26746a6c448a7fb853ef708e2bdeb76edd99cf) )
+	// empty space to unpack previous ROM
+	ROM_CONTINUE(      0x04000, 0x2000 )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "5.18m", 0x08000, 0x4000, CRC(5f618b39) SHA1(2891067e71b8e1183ee5741487faa1561316cade) )
+	ROM_LOAD( "7.17m", 0x0c000, 0x4000, CRC(abdd8483) SHA1(df8c8338c24fa487c49b01ce26db7eb28c8c6b85) )
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "r.3a",   0x0000, 0x100, CRC(ca1f08ce) SHA1(e46e2850d3ee3c8cbb23c10645f07d406c7ff50b) ) // R
+	ROM_LOAD( "g.1a",   0x0100, 0x100, CRC(66f89177) SHA1(caa51c1bf071764d5089487342794cbf023136c0) ) // G
+	ROM_LOAD( "b.2a",   0x0200, 0x100, CRC(d14318bc) SHA1(e219963b3e40eb246e608fbe10daa85dbb4c1226) ) // B
+	ROM_LOAD( "2.8k",   0x0300, 0x100, CRC(e1770ad3) SHA1(e408b175b8fff934e07b0ded1ee21d7f91a9523d) ) // CLUT bg
+	ROM_LOAD( "s5.15p", 0x0400, 0x100, CRC(7f6cf709) SHA1(5938faf937b682dcc83e53444cbf5e0bd7741363) ) // CLUT sprites
+
+	ROM_REGION( 0x0020, "prom", 0 )
+	ROM_LOAD( "3h.bpr", 0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
+
+	ROM_REGION( 0x2100, "user1", 0 ) // bg scaling
+	ROM_LOAD( "0.8h",   0x0000, 0x2000, CRC(12681fb5) SHA1(7a0930819d4cd00475d1897128daa6ac865e07d0) ) // x
+	ROM_LOAD( "1.9j",   0x2000, 0x0100, CRC(f5b9b777) SHA1(a4ec731be77306db6baf319391c4fe78517fe43e) ) // y
+
+	ROM_REGION( 0x0200, "user2", 0 ) // sprite scaling
+	ROM_LOAD( "4.7m",   0x0000, 0x0100, CRC(12cbcd2c) SHA1(a7946820bbf3f7e110a328b673123988af97ce7e) ) // x
+	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
+ROM_END
+
+ROM_START( splndrbtb )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 68000 ROMs(16k x 4) - Blue band on program rom labels
+	ROM_LOAD16_BYTE( "1blue.16a", 0x00001, 0x4000, CRC(f8507502) SHA1(35a915db9ef90e45aac8ce9e349c319e99a36810) )
+	ROM_LOAD16_BYTE( "2blue.16c", 0x00000, 0x4000, CRC(8969bd04) SHA1(6cd8a0ab58ce0e4a43cf5ca4fcd10b30962a13b3) )
+	ROM_LOAD16_BYTE( "3blue.15a", 0x08001, 0x4000, CRC(bce26d4f) SHA1(81a295e665af9e46ff28618f2f77f31f41f14a4f) )
+	ROM_LOAD16_BYTE( "4blue.15c", 0x08000, 0x4000, CRC(5715ec1b) SHA1(fddf45a4e1b2fd319b0a47376c11ce2a41c40eb2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 8085A ROMs
+	ROM_LOAD( "1_v.1m", 0x00000, 0x2000, CRC(1b3a6e42) SHA1(41a4f0503c939ec0a739c8bc6bf3c8fc354912ee) )
+	ROM_LOAD( "2_v.1l", 0x02000, 0x2000, CRC(2a618c72) SHA1(6ad459d94352c317150ae6344d4db9bb613938dd) )
+	ROM_LOAD( "3_v.1k", 0x04000, 0x2000, CRC(bbee5346) SHA1(753cb784b04f081fa1f8590dc28056d9918f313b) )
+	ROM_LOAD( "4_v.1h", 0x06000, 0x2000, CRC(10f45af4) SHA1(00fa599bad8bf3ba6deee54165f381403096e8f9) )
+
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
+	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
+	ROM_LOAD( "10.8c",  0x00000, 0x2000, CRC(501887d4) SHA1(3cf4401d6fddff1500066219a71ac3b30ecbdd28) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "8.14m",  0x00000, 0x4000, CRC(c2c86621) SHA1(a715c70ace98502f2c0d4a81539cd79d19e9b6c4) )
+	ROM_LOAD( "9.12m",  0x04000, 0x4000, CRC(4f7da6ff) SHA1(0516271df4a36d6ea38d1b8a5e471e1d2a79e8c1) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )    // sprites
+	ROM_LOAD( "6.18n", 0x00000, 0x2000, CRC(aa72237f) SHA1(0a26746a6c448a7fb853ef708e2bdeb76edd99cf) )
+	// empty space to unpack previous ROM
+	ROM_CONTINUE(      0x04000, 0x2000 )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "5.18m", 0x08000, 0x4000, CRC(5f618b39) SHA1(2891067e71b8e1183ee5741487faa1561316cade) )
+	ROM_LOAD( "7.17m", 0x0c000, 0x4000, CRC(abdd8483) SHA1(df8c8338c24fa487c49b01ce26db7eb28c8c6b85) )
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "r.3a",   0x0000, 0x100, CRC(ca1f08ce) SHA1(e46e2850d3ee3c8cbb23c10645f07d406c7ff50b) ) // R
+	ROM_LOAD( "g.1a",   0x0100, 0x100, CRC(66f89177) SHA1(caa51c1bf071764d5089487342794cbf023136c0) ) // G
+	ROM_LOAD( "b.2a",   0x0200, 0x100, CRC(d14318bc) SHA1(e219963b3e40eb246e608fbe10daa85dbb4c1226) ) // B
+	ROM_LOAD( "2.8k",   0x0300, 0x100, CRC(e1770ad3) SHA1(e408b175b8fff934e07b0ded1ee21d7f91a9523d) ) // CLUT bg
+	ROM_LOAD( "s5.15p", 0x0400, 0x100, CRC(7f6cf709) SHA1(5938faf937b682dcc83e53444cbf5e0bd7741363) ) // CLUT sprites
+
+	ROM_REGION( 0x0020, "prom", 0 )
+	ROM_LOAD( "3h.bpr", 0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
+
+	ROM_REGION( 0x2100, "user1", 0 ) // bg scaling
+	ROM_LOAD( "0.8h",   0x0000, 0x2000, CRC(12681fb5) SHA1(7a0930819d4cd00475d1897128daa6ac865e07d0) ) // x
+	ROM_LOAD( "1.9j",   0x2000, 0x0100, CRC(f5b9b777) SHA1(a4ec731be77306db6baf319391c4fe78517fe43e) ) // y
+
+	ROM_REGION( 0x0200, "user2", 0 ) // sprite scaling
+	ROM_LOAD( "4.7m",   0x0000, 0x0100, CRC(12cbcd2c) SHA1(a7946820bbf3f7e110a328b673123988af97ce7e) ) // x
+	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
+ROM_END
+
+
 /******************************************************************************/
 // High Voltage ROM Map
 
@@ -1818,5 +1917,7 @@ GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state, equites,  RO
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  equites_state, equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Splendor Blast Hardware
-GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbta, splndrbt, splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbtb, splndrbt, splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, hvoltage,  0,        hvoltage, hvoltage, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "High Voltage", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
