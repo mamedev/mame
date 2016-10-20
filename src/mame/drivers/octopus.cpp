@@ -130,6 +130,7 @@ Its BIOS performs POST and halts as there's no keyboard.
 #include "bus/centronics/epson_lx800.h"
 #include "bus/centronics/epson_lx810l.h"
 #include "bus/centronics/printer.h"
+#include "softlist.h"
 
 class octopus_state : public driver_device
 {
@@ -747,7 +748,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 {
 	if(!lg)
 	{
-		UINT8 tile = m_vram[address & 0x1fff];
+		UINT8 tile = m_vram[address & 0x0fff];
 		UINT8 data = m_fontram[(tile * 16) + linecount];
 		for (int z=0;z<8;z++)
 			bitmap.pix32(y,x + z) = BIT(data,z) ? rgb_t::white : rgb_t::black;
@@ -854,6 +855,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma2",am9517a_device, dreq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("fd_list","octopus")
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2457500)  // DART channel A
