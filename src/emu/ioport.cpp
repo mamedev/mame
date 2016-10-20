@@ -1075,8 +1075,8 @@ void ioport_field::frame_update(ioport_value &result)
 	if (machine().ui().is_menu_active())
 		return;
 
-	// if we're a keyboard type and using natural keyboard, bail
-	if (m_type == IPT_KEYBOARD && machine().ui().use_natural_keyboard())
+	// if user input is locked out here, bail
+	if (m_live->lockout)
 	{
 		// use just the digital value
 		if (m_digital_value)
@@ -1349,7 +1349,8 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		toggle(field.toggle()),
 		joydir(digital_joystick::JOYDIR_COUNT),
 		autofire(false),
-		autopressed(0)
+		autopressed(0),
+		lockout(false)
 {
 	// fill in the basic values
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)

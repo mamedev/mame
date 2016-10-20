@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "natkeyboard.h"
+#include "emuopts.h"
 
 
 //**************************************************************************
@@ -314,6 +315,7 @@ const char_info charinfo[] =
 
 natural_keyboard::natural_keyboard(running_machine &machine)
 	: m_machine(machine),
+		m_in_use(false),
 		m_bufbegin(0),
 		m_bufend(0),
 		m_status_keydown(false),
@@ -331,6 +333,9 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 		m_buffer.resize(KEY_BUFFER_SIZE);
 		m_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
 	}
+
+	// retrieve option setting
+	set_in_use(machine.options().natural_keyboard());
 }
 
 
@@ -345,6 +350,30 @@ void natural_keyboard::configure(ioport_queue_chars_delegate queue_chars, ioport
 	m_queue_chars = queue_chars;
 	m_accept_char = accept_char;
 	m_charqueue_empty = charqueue_empty;
+}
+
+
+//-------------------------------------------------
+//  set_in_use - specify whether the natural
+//  keyboard is active
+//-------------------------------------------------
+
+void natural_keyboard::set_in_use(bool usage)
+{
+	if (m_in_use != usage)
+	{
+		// update active usage
+		m_in_use = usage;
+		std::string error;
+		machine().options().set_value(OPTION_NATURAL_KEYBOARD, usage, OPTION_PRIORITY_CMDLINE, error);
+		assert(error.empty());
+
+		// lock out (or unlock) all keyboard inputs
+		for (auto &port : machine().ioport().ports())
+			for (ioport_field &field : port.second->fields())
+				if (field.type() == IPT_KEYBOARD)
+					field.live().lockout = usage;
+	}
 }
 
 

@@ -204,7 +204,6 @@ public:
 	virtual bool is_menu_active() override;
 	bool can_paste();
 	void paste();
-	void set_use_natural_keyboard(bool use_natural_keyboard);
 	void image_handler_ingame();
 	void increase_frameskip();
 	void decrease_frameskip();
