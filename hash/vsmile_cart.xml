@@ -4,7 +4,6 @@
 <!--
 NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
 -->
-
 <!--
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
@@ -12,250 +11,54 @@ V.Smile Smartbook Software:   80-089***  (Smartridges are red)
 V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
 V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with TV based V.Smile consoles)
 
-Addons (w/ yellow Smartridges)
-
-V.Smile Smart Keyboard       80-091440(US)
-V.Smile Smart Keyboard       80-091443(UK)
-V.Smile Tastatur fuer Lernkonsole 80-091444(GE)
-
-V.Smile PC Pal Island        80-03600(US)
-
-V.Smile PC Pal Island        80-036800(US) (cart)
-V.Smile PC Pal Island        80-036822(SP) (cart)
-
-V.Smile Art Studio           80-67000(US)
-V.Smile Art Studio           80-67003(UK)
-V.Smile Zeichenatelier (Magic Malboard)       80-67004(GE)
-V.Smile Studio De Dessin     80-67005(FR)
-V.Smile Estudio de Arte ORG  80-67022(SP)
-V.Smile Estudio de Arte PINK 80-67057(SP)
-V.Smile Tegnestudio          067033(NO)
-
-V.Smile Jamming Gym Class    80-91320(US)
-V.Smile Muziek en Leer Mat   80-91322(NL)
-V.Smile Dance'n'Learn        80-91323(UK)
-V.Smile Lern - und Tanzmatte 80-91324(GE)
-V.Smile Defi Gym             80-91325(FR)
-V.Smile Tapis Multisport     80-91325(FR)  <- on box.. look for cart
-V.Smile Gimnasio Interactivo 80-91327(SP)
-
 Language:
-********0 = US              (White labels on back)
-********1 = Italy           Apparently distributed by company 'Giochi Preziosi'
-********2 = Netherlands     (Red or White labels on back)
-********3 = UK              (Red labels on back)
-********4 = Germany         (Blue labels on back)
-********5 = France          (Yellow labels on back, also for NTSC French-Canadian)
-********6 = Portugal        Apparently distributed by company 'Concentra' (White labels on back)
-********7 = Spain           (Green labels on back)
-*******13 = Denmark         Distributed by the company 'Top Toy A/S'
-*******14 = Sweden          Distributed by the company 'Top Toy A/S'
+********0 = US                (White labels on back)
+********1 = Italy             Apparently distributed by company 'Giochi Preziosi'
+********2 = Netherlands       (Red or White labels on back)
+********3 = UK                (Red labels on back)
+********4 = Germany           (Blue labels on back)
+********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
+********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
+********7 = Spain             (Green labels on back)
+*******13 = Denmark           Distributed by the company 'Top Toy A/S'
+*******14 = Sweden            Distributed by the company 'Top Toy A/S'
 *******15 = Norway
 *******?? = Finland
 
+Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
 | Dumped |      Serial       |                                    Name                                    |
 +========+===================+============================================================================+
-|        | 80-084000(US)     | Action Mania
-|        |          (IT)     | ?????
-|        | 80-084002(NL)     | Sports Games
-|        | 80-084003(UK)     | Action Mania
-|        | 80-084004(GE)     | Sportskanone
-|        | 80-084005(FR)     | Sporti Folies
-|        | 80-084006(PT)     | Action Mania (84016 on cart)
-|        | 80-084007(SP)     | Action Mania
+|        | 80-091440(US)     | V.Smile Smart Keyboard                                                     |                 
+|        | 80-091443(UK)     | V.Smile Smart Keyboard                                                     |                 
+|        | 80-091444(GE)     | V.Smile Tastatur fuer Lernkonsole                                          |                     
++========+===================+============================================================================+                                                             
+|        | 80-03600(US)      | V.Smile PC Pal Island                                                      |                  
++========+===================+============================================================================+                                                             
+|        | 80-036800(US)     | V.Smile PC Pal Island (cart serial)                                        |                              
+|        | 80-036822(SP)     | V.Smile PC Pal Island (cart serial)                                        |                                  
++========+===================+============================================================================+                                                             
+|        | 80-067000(US)      | V.Smile Art Studio                                                        |                 
+|        | 80-067003(UK)     | V.Smile Art Studio                                                         |                 
+|   XX   | 80-067004(GE)     | V.Smile Zeichenatelier (Magic Malboard)                                    |                                 
+|        | 80-067005(FR)     | V.Smile Studio De Dessin                                                   |  
+|   XX   | 80-067021(SE)     | V.Smile Tecknarstudio (Swe)                                                |
+|        | 80-067022(SP)     | V.Smile Estudio de Arte ORG                                                |                 
+|        | 80-067033(NO)     | V.Smile Tegnestudio                                                        |                 
+|        | 80-067057(SP)     | V.Smile Estudio de Arte PINK                                               |                 
++========+===================+============================================================================+                                                            
+|        | 80-091320(US)     | V.Smile Jamming Gym Class                                                  |                 
+|        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |                 
+|        | 80-091323(UK)     | V.Smile Dance'n'Learn                                                      |                 
+|        | 80-091324(GE)     | V.Smile Lern- und Tanzmatte                                                |                 
+|        | 80-091325(FR)     | V.Smile Defi Gym                                                           |                 
+|        | 80-091325(FR)     | V.Smile Tapis Multisport (box serial)                                      |                             
+|        | 80-091327(SP)     | V.Smile Gimnasio Interactivo                                               |                 
 +========+===================+============================================================================+
-|        | 80-084020(US)     | Dora the Explorer : Dora's Fix It Adventure
-|        | 80-084021(US)     | Dora the Explorer : Dora's Fix It Adventure (pocket version)
-|        | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur
-|        | 80-084023(UK)     | Dora the Explorer : Dora's Fix It Adventure
-|        | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer
-|        | 80-084025(FR)     | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mecano
-|        | 80-084026(PT)     | Dora : em busca das pecas perdidas
-|        | 80-084027(SP)     | Dora : La Aventura arregla-todo de Dora
+
+Game cartridges
 +========+===================+============================================================================+
-|        | 80-084040(US)     | Scooby-Doo! - Funland Frenzy
-|        | 80-084043(UK)     | Scooby-Doo! - Funland Frenzy
-|        | 80-084044(GE)     | Scooby-Doo! - Im Lernpark
-|        | 80-084045(FR)     | Scooby-Doo - Panique A Funland
-|        | 80-084047(SP)     | Scooby-Doo - Misterio en el Parque
-+========+===================+============================================================================+
-|        | 80-084060(US)     | Thomas and Friends - Engines Working Together
-|        | 80-084063(UK)     | Thomas and Friends - Engines Working Together
-|        | 80-084064(GE)     | Thomas - Freunde halten zusammen
-+========+===================+============================================================================+
-|        | 80-084080(US)     | Wall-E
-|        | 80-084083(UK)     | Wall-E
-|        | 80-084084(GE)     | Wall-E
-|        | 80-084085(FR)     | Wall-E
-|        | 80-084087(SP)     | Wall-E
-+========+===================+============================================================================+
-|        | 80-084100(US)     | Wonder Pets - Save the Animals!
-|        | 80-084103(UK)     | Wonder Pets - Save the Animals!
-+========+===================+============================================================================+
-|        | 80-084120(US)     | Kung Fu Panda - Path of the Panda
-|        | 80-084123(UK)     | Kung Fu Panda - Path of the Panda
-|        | 80-084124(GE)     | Kung Fu Panda - Der Weg des Panda
-|        | 80-084125(FR)     | Kung Fu Panda - La mission de Po
-+========+===================+============================================================================+
-|        | 80-084140(US)     | Spider-Man & Friends - Secret Missions (AKA Professor V's Secret Missions with diff label)
-|        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions
-|        | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen
-|        | 80-084145(FR)     | Spider-Man and ses amis - Missions Secretes
-|        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas  (no # on label)
-+========+===================+============================================================================+
-|        | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball
-|        | 80-084163(UK)     | Disney's Little Einsteins: The Glass Slipper Ball
-|        | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball
-|        | 80-084167(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal
-+========+===================+============================================================================+
-|        | 80-084180(US)     | Mickey Mouse Clubhouse
-|        | 80-084182(NL)     | Mickey Mouse Clubhouse
-|        | 80-084183(UK)     | Mickey Mouse Clubhouse
-|        | 80-084184(GE)     | Micky Maus Wunderhaus
-|        | 80-084185(FR)     | La Maison de Mickey
-|        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)
-|        | 80-084187(SP)     | La Casa de Mickey Mouse
-+========+===================+============================================================================+
-|        | 80-084200(US)     | Nascar Academy - Race Car Superstar
-+========+===================+============================================================================+
-|        | 80-084220(US)     | Snow Park Challenge
-|        | 80-084222(NL)     | Wintersport Games
-|        | 80-084223(UK)     | Snow Park Challenge
-|        | 80-084224(GE)     | Wintersport
-|        | 80-084225(FR)     | ?????? picture too fuzzy for positve confirm
-+========+===================+============================================================================+
-|        | 80-084240(US)     | Ni Hao Kai Lan
-|        | 80-084245(FR)     | Ni Hao Kai Lan
-+========+===================+============================================================================+
-|        | 80-084260(US)     | My Pet Puppy (unreleased in USA?? UK version plays AOK on NTSC console)
-|        | 80-084262(NL)     | Mijn Puppy!
-|        | 80-084263(UK)     | My Pet Puppy
-|        | 80-084264(GE)     | Mein erster Hund
-|        | 80-084265(FR)     | Mon Youtou Tout Fou!
-|        | 80-084267(SP)     | Dakota y su Mascota
-+========+===================+============================================================================+
-|        | 80-084280(US)     | Wild Waves
-|        | 80-084282(NL)     | Water-sport Games
-|        | 80-084283(UJ)     | Wild Waves
-|        | 80-084284(GE)     | Dolphis Wasser-abenteuer
-|        | 80-084285(FR)     | Martin le Dauphin
-+========+===================+============================================================================+
-|        | 80-084300(US)     | Soccer Challenge
-|        | 80-084303(UK)     | Football Challenge
-|        | 80-084304(GE)     | Fussball Meisterschaft
-|        | 80-084305(FR)     | Football Challenge
-|        | 80-084306(PT)     | Football Challenge  (cart#??)
-|        | 80-084307(SP)     | Campeonato de Futbol
-+========+===================+============================================================================+
-|        | 80-084320(US)     | Disney Fairies: TinkerBell
-|        | 80-084321(US)     | Disney Fairies: TinkerBell (pocket version)
-|        | 80-084322(NL)     | TinkerBell
-|        | 80-084323(UK)     | TinkerBell
-|        | 80-084324(GE)     | TinkerBell
-|        | 80-084325(FR)     | La fee Clochette
-|        | 80-084326(PT)     | Sininho (84336 on cart)
-|        | 80-084327(SP)     | Campanilla
-+========+===================+============================================================================+
-|        | 80-084340(US)     | Up!
-|        | 80-084342(NL)     | Up!
-|        | 80-084344(GE)     | Oben
-|        | 80-084345(FR)     | La-Haut
-|        | 80-084347(SP)     | Up!
-|        | 80-084347-022(SP) | Up!  (-022 is odd for SP)
-+========+===================+============================================================================+
-|        | 80-084360(US)     | Handy Manny
-|        | 80-084362(NL)     | Handy Manny
-|        | 80-084363(UK)     | Handy Manny
-|        | 80-084364(GE)     | Meister Manny's Werkzeugkiste
-|        | 80-084365(FR)     | Manny Et Ses Outils
-|        | 80-084366(PT)     | Manny Maozinhas (84376 on cart)
-|        | 80-084367(SP)     | Manny Manitas
-+========+===================+============================================================================+
-|        | 80-084380(US)     | Winnie the Pooh - The Honey Hunt
-|        |          (IT)     | Winnie the Pooh - e la caccia al miele  ???
-|        | 80-084383(UK)     | Winnie the Pooh - The Honey Hunt
-|        | 80-084384(GE)     | Winnie Puuh - Die Honigjagd
-|        | 80-084385(FR)     | Winnie Rourson - La Chasse au miel de Winnie
-|        | 80-084386(PT)     | Winnie - Em Busca do Mel (84396 on cart)
-|        | 80-084387(SP)     | Winnie the Pooh - En busca de la miel
-+========+===================+============================================================================+
-|   XX   | 80-084400(US)     | Cars: Rev It Up in Radiator Springs
-|        | 80-084402(NL)     | Cars: Spektakel in Radiator Springs
-|        | 80-084403(UK)     | Cars: Rev it up in Radiator Springs
-|   XX   | 80-084404(GE)     | Cars: Vollgas in Radiator Springs
-|   XX   | 80-084405(FR)     | Cars: Quatre Roues
-|        | 80-084406(PT)     | Cars: Aventura Em Radiator Springs (84416 on cart)
-|        | 80-084407(SP)     | Cars: Acelera el Motor en Radiador Springs
-|   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing
-|        | 80-092674(SE)     | Bilar - Kör ikapp i Kylarköping
-|   XX   | 80-092674(SE)     | Biler - Kör ikapp i Kylarköping (label misprint)
-|        |          (NO)     | Biler - Full gass i Radiator By
-|        |          (FI)     | Autot - Aja kilpaa Syylari Cityssä
-+========+===================+============================================================================+
-|        | 80-084420(US)     | Toy Story 3
-|        | 80-084421(US)     | Toy Story 3 (pocket version)
-|        |          (IT)     | Toy Story 3 (EAN 8033836704196) GP470419?
-|        | 80-084422(NL)     | Toy Story 3
-|        | 80-084423(UK)     | Toy Story 3
-|        | 80-084424(GE)     | Toy Story 3
-|        | 80-084425(FR)     | Toy Story 3
-|        | 80-084427(SP)     | Toy Story 3
-+========+===================+============================================================================+
-|        | 80-084440(US)     | Monsters vs. Aliens
-|        | 80-084442(NL)     | Monsters vs. Aliens
-|        | 80-084443(UK)     | Monsters vs. Aliens
-|        | 80-084444(GE)     | Monsters vs. Aliens
-|        | 80-084445(FR)     | Monsters vs. Aliens
-|        | 80-084447(SP)     | Monstruos contra Alienigenas
-+========+===================+============================================================================+
-|        | 80-084460(US)     | Noddy - Detective for a Day (unreleased in USA??) see 80-092540
-|        | 80-084463(UK)     | Noddy - Detective for a Day
-|        | 80-084465(FR)     | Oui-Oui - Detective d'un jour
-|        | 80-084467(SP)     | Noddy - Detective por un Dia
-+========+===================+============================================================================+
-|        | 80-084480(US)     | The Princess and the Frog  (motion version)
-|        | 80-084481(US)     | The Princess and the Frog  (pocket version)
-|        | 80-084482(NL)     | Prinses en de Kikker (label in english)
-|        | 80-084483(UK)     | The Princess and the Frog
-|        | 80-084484(GE)     | Kuess den Frosch
-|        | 80-084485(FR)     | La Princesse Et La Grenouille
-|        | 80-084487(SP)     | Tiana y el sapo - El gran Sueno de Tiana
-+========+===================+============================================================================+
-|        | 80-084500(US)     | Shrek Forever After
-|        | 80-084502(NL)     | Sjrek voor eeuwig en altijd
-|        | 80-084503(UK)     | Shrek Forever After
-|        | 80-084504(GE)     | Fuer immer Shrek
-|        | 80-084505(FR)     | Shrek 4 - Il Etait une Fin
-|        | 80-084507(SP)     | Shrek Felices para siempre
-+========+===================+============================================================================+
-|        | 80-084520(US)     | <Unknown>
-+========+===================+============================================================================+
-|        | 80-084540(US)     | Super Why to the Rescue! The Beach Day Mystery
-|        | 80-084541(US)     | Super Why to the Rescue! The Beach Day Mystery   (pocket version)
-+========+===================+============================================================================+
-|        | 80-084560(US)     | <Unknown>
-+========+===================+============================================================================+
-|        | 80-084580(US)     | Cars 2  (motion version)
-|        | 80-084581(US)     | Cars 2  (pocket version)
-|        | 80-084583(UK)     | Cars 2
-|        | 80-084584(GE)     | Cars 2
-|        | 80-084585(FR)     | Cars 2
-|        | 80-084587(SP)     | Cars 2
-+========+===================+============================================================================+
-|        | 80-084600(US)     | <Unknown> (Should be Orange colored Cinderella - Cinderella's Magic Wishes)
-|        | 80-084603(UK)     | Cinderella - Cinderella's Magic Wishes
-|        | 80-084604(GE)     | Cinderella - Lernen im Maerchenland
-|        | 80-084605(FR)     | Cendrillon - ?????
-+========+===================+============================================================================+
-|        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)
-|        | 80-084624(GE)     | Findet Nemo - Nemos Unterwasserabenteuer
-|        | 80-084625(FR)     | Le Monde de Nemo - Nemo a la decourverte de l'ocean
-|        | 80-084627(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo
-+========+===================+============================================================================+
-|        | 80-084640(US)     | <Unknown> (Should be Orange colored Spongebob)
-|        | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms
-|        | 80-084647(SP)     | Bob Epsonja - Un dia en la vida de una esponja
+| Dumped |      Serial       |                                    Name                                    |
 +========+===================+============================================================================+
 | Vtech ran out of UPC codes at 92999, these are wraparound and newer than 92xxx series.
 | They also say 'v.link compatible' on the back though not all are v.motion compatible
@@ -334,15 +137,20 @@ Language:
 |        |          (IT)     | Winnie the Pooh - e la caccia al miele
 |        | 80-092062(NL)     | Winnie de Poeh - De winderwereld van Poeh
 |        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt
-|        | 80-092064(GE)     | Pooh - Die Honigjagd
+|   XX   | 80-092064(GE)     | Pooh - Die Honigjagd
 |        | 80-092064(GE)     | Pooh - Die Honigjagd (ALT-no# on label)
 |        | 80-092064(GE)     | My Friends Tigger and Pooh - Die Honigjagd (yes, Tigger on this one)
-|        | 80-092065(FR)     | Winnie Rourson - La Chasse au miel de Winnie
+|   XX   | 80-092064-104(GE) | My Friends Tigger and Pooh - Die Honigjagd (yes, Tigger on this one)
+|   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie
 |        | 80-092065-105(FR) | Winnie Rourson - La Chasse au miel de Winnie (ALT)
 |        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)
 |        | 80-092067(SP)     | Winnie the Pooh (My Friends Tigger and Pooh) - En Busca de la Miel (no # on label)
 |        | 80-092067-122(SP) | Winnie the Pooh (My Friends Tigger and Pooh) - En Busca de la Miel
-|        |          (NO)
+|   XX   | 80-092073(DK)     | Peter Plys - Honningjagten
+|   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten
+|        |          (NO)     | Winnie the Pooh - Honningjakten
+|        |          (NO)     | Ole Brumm - Honningjakten
+|        |          (FI)     | Winnie the Pooh - Hunajajahti
 +========+===================+============================================================================+
 |        | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventures
 |        |          (IT)     | Topolino - Le Magiche Avventure di Topolino
@@ -427,6 +235,7 @@ Language:
 |        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester | 2007
 |        | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes
 |        | 80-092243-103(UK) | Cinderella - Cinderella's Magic Wishes | 2007
+|        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes | 2008
 |        | 80-092244(GE)     | Cinderella - Lernen im Maerchenland | 2005
 |        | 80-092244-104(GE) | Cinderella - Lernen im Maerchenland | 2007
 |        | 80-092244-204(GE) | Cinderella - Lernen im Maerchenland | 2007
@@ -482,14 +291,14 @@ Language:
 |        | 80-092345(FR)     | Thomas er ses Amis - Les locomotives s'entraident
 |        | 80-092347(SP)     | Thomas and Friends: Juego de Aprendizaje
 +========+===================+============================================================================+
-|        | 80-092360(US)     | Zayzoo My Alien Classmate
-|        | 80-092360-101(US) | Zayzoo - An Earth Adventure
+|   XX   | 80-092360(US)     | Zayzoo - My Alien Classmate
+|   XX   | 80-092360-101(US) | Zayzoo: An Earth Adventure
 |        | 80-092362(NL)     | Zayzoo - Mijn Buitenaardse Vriendje
 |        | 80-092363(UK)     | Zayzoo My Alien Classmate   <- yes, duped#
 |        | 80-092363(UK)     | Zayzoo - An Earth Adventure <- saw it, can't find pic again
 |        | 80-092363-103(UK) | Zayzoo - An Earth Adventure
-|        | 80-092364(GE)     | Zayzoo Lernall
-|        | 80-092365(FR)     | Zezou : Notre ami venu d'ailleurs (Alien Classmate)
+|   XX   | 80-092364(GE)     | Zayzoos Lernall
+|   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs
 |        | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (Alien Classmate)
 +========+===================+============================================================================+
 |        | 80-092380(US)     | Barney - The Land of Make Believe
@@ -654,25 +463,6 @@ Language:
 |        | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal
 +========+===================+============================================================================+
 
-
-
-
-
-
-
-
-|        | V.Smile Smartbooks
-+========+===================+============================================================================+
-|        | 80-089000(US)     | Spider-Man &amp; Friends Where is Hulk?
-+========+===================+============================================================================+
-|        | 80-089020(US)     | Toy Story 2
-+========+===================+============================================================================+
-|        | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy
-|        | 80-089045(FR)     | Dora's ??????
-+========+===================+============================================================================+
-|        | 80-089060(US)     | Scooby-Doo! - A Night of Fright is no Delight
-+========+===================+============================================================================+
-
 -->
 
 <softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
@@ -685,6 +475,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92204.u1" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" offset="0" />
@@ -700,6 +491,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92024.u1" size="8388608" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" offset="0" />
@@ -715,6 +507,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-A" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92000.u1" size="8388608" crc="69ef24ff" sha1="82b89bdc5e9050e4152866fc774d3996f9836d65" offset="0" />
@@ -730,6 +523,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708106" />
             <feature name="pcb_model" value="708106-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92124(3).u1" size="8388608" crc="fc2d6d64" sha1="3747eb33304bb49a8f9ff912c0e3e07611e078dd" offset="0" />
@@ -745,6 +539,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-A" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92124.u1" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
@@ -760,6 +555,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92125.u1" size="8388608" crc="341b2f6c" sha1="a9f6a30037dc814b6cf8e8485ee9778038a20c23" offset="0" />
@@ -775,6 +571,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92133.u1" size="8388608" crc="182b5973" sha1="7f356a9890c7ea20c81db94f81037355b8cfb2c9" offset="0" />
@@ -790,6 +587,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-E" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92134.u1" size="8388608" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" offset="0" />
@@ -805,6 +603,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="7061238A" />
             <feature name="pcb_model" value="7061238A-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92384.u1" size="8388608" crc="a73855fa" sha1="dcc61ecf05bb41779a78196145136c1e9cbfa415" offset="0" />
@@ -821,6 +620,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="7061238A" />
             <feature name="pcb_model" value="7061238A-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92300.u1" size="8388608" crc="6aea957b" sha1="947008c882733a8284a000c9c4d379e2c213526e" offset="0" />
@@ -836,6 +636,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92304.u1" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" offset="0" />
@@ -851,6 +652,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92313.u1" size="8388608" crc="37498231" sha1="2966ba75fc4430ee5d9dc7003d7f7e54e5546382" offset="0" />
@@ -866,6 +668,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708106" />
             <feature name="pcb_model" value="708106-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92314-100.u1" size="8388608" crc="ac343df7" sha1="77dafa48ca0e015728c5ead844dd729e87eb6182" offset="0" />
@@ -882,6 +685,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="092660.u1" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" offset="0" />
@@ -897,6 +701,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92664(2).u1" size="8388608" crc="6f4c150d" sha1="f6fc136ca18025511a9b12c577860116fdc66c8c" offset="0" />
@@ -912,6 +717,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="092665.u1" size="8388608" crc="c1f63c2e" sha1="3a6726a0a5dd5543d632dfbf57144da780994ba5" offset="0" />
@@ -927,6 +733,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92673.u1" size="8388608" crc="380d5655" sha1="fa70dcfd2793b5ba7bede3b365e245c8fde935d7" offset="0" />
@@ -943,6 +750,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-7" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="c92674-1.u1" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" offset="0" />
@@ -958,6 +766,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92240.u1" size="8388608" crc="2723728c" sha1="32fd6a5b9718ccc7e10e64046d7ac320cfa47362" offset="0" />
@@ -985,6 +794,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92245.u1" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" offset="0" />
@@ -1000,6 +810,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="092253.u1" size="8388608" crc="81edbee0" sha1="cf4bca5a1f28049a40060eead7f10c940574107f" offset="0" />
@@ -1015,6 +826,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92244-1.u1" size="8388608" crc="7dbe47a2" sha1="d74d24d1d87a456f11a98f822b8c59d155734cea" offset="0" />
@@ -1030,6 +842,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92244.u1" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
@@ -1045,6 +858,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92254.u1" size="8388608" crc="946472af" sha1="9009a81689be949f9a5fbf91a6a1d2398f7e8d90" offset="0" />
@@ -1073,6 +887,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92280.u1" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" offset="0" />
@@ -1088,6 +903,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="7061238A" />
             <feature name="pcb_model" value="7061238A-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92285.u1" size="8388608" crc="5f47e1d5" sha1="046b5ce7669755e8d8a9be9be2684828b1f1dd9d" offset="0" />
@@ -1103,6 +919,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="092284-1.u1" size="8388608" crc="070a72dc" sha1="3ca4820f2b54040d1d111b5ac41003c6e53b9164" offset="0" />
@@ -1118,6 +935,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92264.u1" size="8388608" crc="906b6496" sha1="8932008fef144d2ad3d056fd24f64264825af8ce" offset="0" />
@@ -1133,6 +951,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92824.u1" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" offset="0" />
@@ -1148,6 +967,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92420.u1" size="8388608" crc="e40e46dc" sha1="ac78178cff76ed264589113b73211b1f4cfe6dbf" offset="0" />
@@ -1163,6 +983,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-A" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92044.u1" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" offset="0" />
@@ -1178,6 +999,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-A" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92045.u1" size="8388608" crc="c4819e95" sha1="b625a7fb1d078349aee1c4cc18ee6f3917aaa816" offset="0" />
@@ -1193,6 +1015,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-6" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92984-3.u1" size="8388608" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" offset="0" />
@@ -1208,6 +1031,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92100.u1" size="8388608" crc="08af3249" sha1="193d824625040ae9e30d8f5b7b74d7348bf3b7cd" offset="0" />
@@ -1223,6 +1047,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-E" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92113.u1" size="8388608" crc="924efa89" sha1="fd111f99ef101d318a66a728927d379559dc0106" offset="0" />
@@ -1238,6 +1063,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-E" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92114.u1" size="8388608" crc="e1123089" sha1="058c60342c49844b4855d11ce1219879bfd2b6be" offset="0" />
@@ -1253,6 +1079,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="90024 ok.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
@@ -1268,6 +1095,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="092585.u1" size="8388608" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" offset="0" />
@@ -1283,6 +1111,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92084.u1" size="8388608" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" offset="0" />
@@ -1298,6 +1127,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708106" />
             <feature name="pcb_model" value="708106-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92094.u1" size="8388608" crc="9ec8d52f" sha1="0f6f6cc4a34aacfa4ad97a73f4c5ad04e7bcec40" offset="0" />
@@ -1313,6 +1143,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92944-3.u1" size="8388608" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" offset="0" />
@@ -1328,6 +1159,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-7" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="92954.u1" size="8388608" crc="6d8a99d2" sha1="f929e5c3a2aff21dcf38bbbb6441a95eed744256" offset="0" />
@@ -1343,6 +1175,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
                 <rom name="90164 ok.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
@@ -1358,9 +1191,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-90144.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" offset="0" />
+                <rom name="90144 ok.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1373,69 +1207,74 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-6" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
+                <rom name="A90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="noddy" supported="no">
-        <description>Noddy - Detektiv für einen Tag (Ger, Rev. 1?)</description>
+        <description>Noddy - Detektiv für einen Tag (Ger, Rev. 3?)</description>
         <year>200?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092544-104(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92544-104.u1" size="8388608" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" offset="0" />
+                <rom name="92544-3.u1" size="8388608" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="oben" supported="no">
-        <description>Oben (Ger)</description>
+        <description>Disney/Pixar Oben (Ger)</description>
         <year>2009?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-090004-004(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="090004.u1" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" offset="0" />
+                <rom name="90004 ok.u1" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="partyprk" supported="no">
-        <description>Partyland Park - A Carnival of Play-and-Learn Fun (USA)</description>
+        <description>Cranium Partyland Park - A Carnival of Play-and-Learn Fun (USA)</description>
         <year>2007?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092920(US)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92920.u1" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" offset="0" />
+                <rom name="92920(2).u1" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="ratat" supported="no">
-        <description>Ratatouille - Remys neue Rezepte (Ger)</description>
+        <description>Disney/Pixar Ratatouille - Remys neue Rezepte (Ger)</description>
         <year>2007?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092884(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="092884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
+                <rom name="92884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1448,9 +1287,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92160.u1" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" offset="0" />
+                <rom name="92160.u1" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1463,9 +1303,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92165.u1" size="8388608" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" offset="0" />
+                <rom name="92165.u1" size="8388608" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1478,9 +1319,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-E" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92164.u1" size="8388608" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" offset="0" />
+                <rom name="92164.u1" size="8388608" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1493,9 +1335,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92173.u1" size="8388608" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" offset="0" />
+                <rom name="092173.u1" size="8388608" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1508,66 +1351,74 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92174.u1" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" offset="0" />
+                <rom name="092174.u1" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="erniebrt" supported="no">
-        <description>Sesamstrasse - Ernies &amp; Berts Fantastisches Abenteuer (Ger)</description>
+        <description>Ernies &amp; Berts Fantastisches Abenteuer (Ger)</description>
         <year>2006?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092464(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92464.u1" size="8388608" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" offset="0" />
+                <rom name="92464.u1" size="8388608" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="shrek3" supported="no">
-        <description>Shrek the Third - Arthur's School Day Adventure (USA)</description>
+        <description>DreamWorks Shrek the Third - Arthur's School Day Adventure (USA)</description>
         <year>2007?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092860(US)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92860.u1" size="8388608" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" offset="0" />
+                <rom name="92860.u1" size="8388608" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="shrek" supported="no">
-        <description>Shrek - Die Geschichte des Drachen (Ger)</description>
+        <description>DreamWorks Shrek - Die Geschichte des Drachen (Ger)</description>
         <year>2006?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092604(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92604.u1" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" offset="0" />
+                <rom name="092604.u1" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" offset="0" />
             </dataarea>
         </part>
     </software>
 
-    <!-- CHECK -->
     <software name="shrekf" cloneof="shrek" supported="no">
-        <description>Shrek - Le Rhume de Dragonne (Fra)</description>
-        <year>200?</year>
+        <description>DreamWorks Shrek - Le rhume de Dragonne (Fra)</description>
+        <year>2006?</year>
         <publisher>VTech</publisher>
+        <info name="serial" value="80-092605(FR)" />
         <part name="cart" interface="vsmile_cart">
+            <feature name="pcb" value="707180" />
+            <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
+            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92605.bin" size="8388608" crc="31334442" sha1="09022c94ac69e362979148bec9380f36fb6b88be" offset="0" />
+                <rom name="092605.u1" size="8388608" crc="31334442" sha1="09022c94ac69e362979148bec9380f36fb6b88be" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1580,9 +1431,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" offset="0" />
+                <rom name="92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1595,54 +1447,58 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92524.u1" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" offset="0" />
+                <rom name="92524.u1" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="spongeb" supported="no">
-        <description>Spongebob Squarepants - A Day in the Life of a Sponge (USA)</description>
+        <description>Nickelodeon Spongebob Squarepants - A Day in the Life of a Sponge (USA)</description>
         <year>2005?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092440(US)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92440.u1" size="8388608" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" offset="0" />
+                <rom name="92440.u1" size="8388608" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="spongebg" cloneof="spongeb" supported="no">
-        <description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
+        <description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
         <year>2005?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092444(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="092444-1.u1" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" offset="0" />
+                <rom name="92444.u1" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="spongebg1" cloneof="spongeb" supported="no">
-        <description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+        <description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
         <year>2005?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092444(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="092444.u1" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />
+                <rom name="92444.u1" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1655,9 +1511,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92644.u1" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" offset="0" />
+                <rom name="92644.u1" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1670,20 +1527,26 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92645.u1" size="8388608" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" offset="0" />
+                <rom name="092645.u1" size="8388608" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="thomas" supported="no">
-        <description>Thomas &amp; seine Freunde - Freunde halten zusammen (Ger, Rev. 1)</description>
-        <year>200?</year>
+        <description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger, Rev. 1)</description>
+        <year>2007?</year>
         <publisher>VTech</publisher>
+        <info name="serial" value="80-092344-104(GE)" />
         <part name="cart" interface="vsmile_cart">
+            <feature name="pcb" value="707180" />
+            <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
+            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92344-104.bin" size="8388608" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" offset="0" />
+                <rom name="092344-1.u1" size="8388608" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1696,9 +1559,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708106" />
             <feature name="pcb_model" value="708106-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92344.u1" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" offset="0" />
+                <rom name="92344-1(3).u1" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1707,167 +1571,187 @@ Language:
         <description>Thomas &amp; Friends - Tågen hjälps åt (Swe)</description>
         <year>2007?</year>
         <publisher>VTech</publisher>
-        <info name="serial" value="80-092354(SE)" />
+        <info name="serial" value="80-092354(SE)" /> <!-- 494096(SE) on cart -->
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708106" />
             <feature name="pcb_model" value="708106-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-494096.u1" size="8388608" crc="d3dfc103" sha1="fbb4a460504797253a47945ae3bea4e7eda4a388" offset="0" />
+                <rom name="92354.u1" size="8388608" crc="d3dfc103" sha1="fbb4a460504797253a47945ae3bea4e7eda4a388" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="tingelng" supported="no">
         <description>Tingeling (Swe)</description>
-        <year>200?</year>
+        <year>2010?</year>
         <publisher>VTech</publisher>
+        <info name="serial" value="80-090274(SE)" />
         <part name="cart" interface="vsmile_cart">
+            <feature name="pcb" value="708201" />
+            <feature name="pcb_model" value="708201-7" />
+            <featyre name="cart_type" value="lilac" />
+            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-90274.bin" size="8388608" crc="5ae6dced" sha1="3298bf1fb43173e1c4c2200ddc5a1a6af57d4323" offset="0" />
+                <rom name="90274.u1" size="8388608" crc="5ae6dced" sha1="3298bf1fb43173e1c4c2200ddc5a1a6af57d4323" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="toystor2" supported="no">
-        <description>Toy Story 2 - Operation: Rescue Woody! (USA)</description>
+        <description>Disney/Pixar Toy Story 2 - Operation: Rescue Woody! (USA)</description>
         <year>2005</year>
         <publisher>VTech</publisher>
+        <info name="serial" value="80-092220(US)" />
         <part name="cart" interface="vsmile_cart">
             <dataarea name="rom" size="8388608">
-                <rom name="toy story 2 - operation- rescue woody! [52-92220(us)] (2005).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" offset="0" />
+                <rom name="52-92220(us).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="toystor2g" cloneof="toystor2" supported="no">
-        <description>Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
+        <description>Disney/Pixar Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
         <year>2006?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092224(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92224.u1" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
+                <rom name="92224-105.u1" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="toystor2sw" cloneof="toystor2" supported="no">
-        <description>Toy Story 2 - Operation: Rädda Woody! (Swe)</description>
+        <description>Disney/Pixar Toy Story 2 - Operation: Rädda Woody! (Swe)</description>
         <year>2005?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092234(SE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92234.u1" size="8388608" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" offset="0" />
+                <rom name="92234.u1" size="8388608" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="walle" supported="no">
-        <description>Wall-E (Ger)</description>
+        <description>Disney/Pixar Wall-E (Ger)</description>
         <year>2008?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092844(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92844.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
+                <rom name="92844-3.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="wallesw" cloneof="walle" supported="no">
-        <description>Wall-E (Swe)</description>
+        <description>Disney/Pixar Wall-E (Swe)</description>
         <year>2008?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092854(SE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708106" />
             <feature name="pcb_model" value="708106-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92854.u1" size="8388608" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" offset="0" />
+                <rom name="92854.u1" size="8388608" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="pooh" supported="no">
-        <description>Winnie Puuh - Die Honigjagd (Ger)</description>
+        <description>Disneys Winnie Puuh - Die Honigjagd (Ger)</description>
         <year>2004?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092064(GE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
+                <rom name="92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
             </dataarea>
         </part>
     </software>
 
-    <!-- CHECK -->
     <software name="pooh1" cloneof="pooh" supported="no">
         <description>My Friends Tigger &amp; Pooh - Die Honigjagd (Ger)</description>
-        <year>200?</year>
+        <year>2008?</year>
         <publisher>VTech</publisher>
+        <info name="serial" value="80-092064-104(GE)" />
         <part name="cart" interface="vsmile_cart">
+            <feature name="pcb" value="707180" />
+            <feature name="pcb_model" value="707180-3" />
+            <featyre name="cart_type" value="lilac" />
+            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92064-104.bin" size="8388608" crc="081e414d" sha1="e612aee1f62ca260bc0b011a512fd8c207eeb833" offset="0" />
+                <rom name="92064-204(2).u1" size="8388608" crc="081e414d" sha1="e612aee1f62ca260bc0b011a512fd8c207eeb833" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="poohf" cloneof="pooh" supported="no">
-        <description>Winnie l'Ourson - La Chasse au miel de Winnie (Fra)</description>
+        <description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (Fra)</description>
         <year>2004?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092065(FR)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708894" />
             <feature name="pcb_model" value="708894-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92065.u1" size="8388608" crc="7b0bd06c" sha1="0767e07e767a64c0fe56dac7b3cb478bab34b864" offset="0" />
+                <rom name="92065.u1" size="8388608" crc="7b0bd06c" sha1="0767e07e767a64c0fe56dac7b3cb478bab34b864" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="poohdk" cloneof="pooh" supported="no">
-        <description>Peter Plys - Honningjagten (Den)</description>
+        <description>Disney Peter Plys - Honningjagten (Den)</description>
         <year>200?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092073(DK)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92073.u1" size="8388608" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" offset="0" />
+                <rom name="92073.u1" size="8388608" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="poohsw" cloneof="pooh" supported="no">
-        <description>Nalle Puh - Honungsjakten (Swe)</description>
+        <description>Disney Nalle Puh - Honungsjakten (Swe)</description>
         <year>200?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092074(SE)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-1" />
+            <featyre name="cart_type" value="lilac" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92074.u1" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" offset="0" />
+                <rom name="92074.u1" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1880,25 +1764,27 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="707180" />
             <feature name="pcb_model" value="707180-2" />
+            <featyre name="cart_type" value="yellow" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" offset="0" />
+                <rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" offset="0" />
             </dataarea>
         </part>
     </software>
 
     <software name="techart" supported="no">
-        <description>V.Smile - Zeichenatelier (Ger)</description>
+        <description>V.Smile Zeichenatelier (Ger)</description>
         <year>200?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-067004(GER)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="67000C" />
             <feature name="pcb_model" value="67000C-5" />
+            <featyre name="cart_type" value="yellow" />
             <feature name="u2" value="U2" /> <!-- SRAM -->
             <feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="4194304">
-                <rom name="52-67004.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" offset="0" />
+                <rom name="ger-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" offset="0" />
             </dataarea>
             <dataarea name="vram" size="131072">
             </dataarea>
@@ -1913,6 +1799,7 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="67000C" />
             <feature name="pcb_model" value="67000C-2" />
+            <featyre name="cart_type" value="yellow" />
             <feature name="u2" value="U2" /> <!-- SRAM -->
             <feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="4194304">
@@ -1923,34 +1810,35 @@ Language:
         </part>
     </software>
 
-    <software name="zayzmac" supported="no">
+    <software name="zayzmac" cloneof="zayzaea" supported="no">
         <description>Zayzoo - My Alien Classmate (USA)</description>
         <year>200?</year>
         <publisher>VTech</publisher>
+        <info name="serial" value="80-092360(US)" />
         <part name="cart" interface="vsmile_cart">
             <dataarea name="rom" size="8388608">
-                <rom name="zayzoo - my alien classmate [52-92360(us)].bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" offset="0" />
+                <rom name="52-92360(us).bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" offset="0" />
             </dataarea>
         </part>
     </software>
 
-    <!-- CHECK ROM NAME -->
-    <software name="zayzoo" supported="no">
-        <description>Zayzoo: An Earth Adventure (USA, Rev. 1?)</description>
+    <software name="zayzaea" supported="no">
+        <description>Zayzoo: An Earth Adventure (USA)</description>
         <year>200?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092360-101(US)" />
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="708201" />
             <feature name="pcb_model" value="708201-4" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="epoxy.u1" size="8388608" crc="0b1f8225" sha1="7c2e39428faf40cff2007ae1a3e2f2ae565e5db4" offset="0" />
+                <rom name="92360-201(4).u1" size="8388608" crc="0b1f8225" sha1="7c2e39428faf40cff2007ae1a3e2f2ae565e5db4" offset="0" />
             </dataarea>
         </part>
     </software>
 
-    <software name="zayzoog" cloneof="zayzoo" supported="no">
+    <software name="zayzmacg" cloneof="zayzaea" supported="no">
         <description>Zayzoos Lernall (Ger)</description>
         <year>200?</year>
         <publisher>VTech</publisher>
@@ -1958,14 +1846,15 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92364.u1" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
+                <rom name="92364.u1" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
             </dataarea>
         </part>
     </software>
 
-    <software name="zezou" cloneof="zayzoo" supported="no">
+    <software name="zezou" cloneof="zayzaea" supported="no">
         <description>Zézou - Notre Ami Venu d'Ailleurs (Fra)</description>
         <year>200?</year>
         <publisher>VTech</publisher>
@@ -1973,9 +1862,10 @@ Language:
         <part name="cart" interface="vsmile_cart">
             <feature name="pcb" value="706714" />
             <feature name="pcb_model" value="706714-1" />
+            <featyre name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="52-92365.u1" size="8388608" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" offset="0" />
+                <rom name="92365.u1" size="8388608" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" offset="0" />
             </dataarea>
         </part>
     </software>
