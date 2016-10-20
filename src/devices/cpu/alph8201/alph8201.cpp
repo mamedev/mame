@@ -2,10 +2,9 @@
 // copyright-holders:Tatsuyuki Satoh
 /*
 
-Notice: please do not modify this file, except in case of compile- or critical emulation error
-A more accurate implementation is in mame/alpha8201.*
+Notice: The alpha 8201 is now emulated using mame/alpha8201.*
 
-cpu/alph8201/ will be removed soon
+cpu/alph8201/ will be removed when the alpha 8301 has been dumped.
 
 
 
@@ -398,8 +397,6 @@ void alpha8201_cpu_device::device_start()
 	state_add( ALPHA8201_SP, "SP", m_sp ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_RB, "RB", m_regPtr ).mask(0x7);
 	state_add( ALPHA8201_MB, "MB", m_mb ).mask(0x3);
-	state_add( ALPHA8201_CF, "CF", m_cf ).mask(0x1);
-	state_add( ALPHA8201_ZF, "ZF", m_zf ).mask(0x1);
 	state_add( ALPHA8201_IX0, "IX0", m_ix0.b.l );
 	state_add( ALPHA8201_IX1, "IX1", m_ix1.b.l );
 	state_add( ALPHA8201_IX2, "IX2", m_ix2.b.l );
@@ -416,7 +413,9 @@ void alpha8201_cpu_device::device_start()
 	state_add( ALPHA8201_R5, "R5", m_R[5] ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_R6, "R6", m_R[6] ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_R7, "R7", m_R[7] ).callimport().callexport().formatstr("%02X");
-	state_add(STATE_GENPCBASE, "PC", m_PREVPC).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_PREVPC ).noshow();
+	state_add( STATE_GENFLAGS, "CURFLAGS", m_flags ).callimport().callexport().formatstr("%2s").noshow();
+	state_add( STATE_GENSP, "CURSP", m_sp ).callimport().callexport();
 
 	save_item(NAME(m_RAM));
 	save_item(NAME(m_PREVPC));
@@ -446,7 +445,13 @@ void alpha8201_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case STATE_GENFLAGS:
+			m_cf = BIT(m_flags, 1);
+			m_zf = BIT(m_flags, 0);
+			break;
+
 		case ALPHA8201_SP:
+		case STATE_GENSP:
 			M_WRMEM(0x001, m_sp);
 			break;
 
@@ -489,7 +494,12 @@ void alpha8201_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case STATE_GENFLAGS:
+			m_flags = (m_cf << 1) | m_zf;
+			break;
+
 		case ALPHA8201_SP:
+		case STATE_GENSP:
 			m_sp = M_RDMEM(0x001);
 			break;
 

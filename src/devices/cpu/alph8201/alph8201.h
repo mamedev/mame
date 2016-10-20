@@ -2,10 +2,9 @@
 // copyright-holders:Tatsuyuki Satoh
 /*
 
-Notice: please do not modify this file, except in case of compile- or critical emulation error
-A more accurate implementation is in mame/alpha8201.*
+Notice: The alpha 8201 is now emulated using mame/alpha8201.*
 
-cpu/alph8201/ will be removed soon
+cpu/alph8201/ will be removed when the alpha 8301 has been dumped.
 
 
 
@@ -28,13 +27,10 @@ cpu/alph8201/ will be removed soon
 
 enum
 {
-	ALPHA8201_PC=1,
-	ALPHA8201_SP,
+	ALPHA8201_PC = STATE_GENPC,
+	ALPHA8201_SP = 0,
 	ALPHA8201_RB,
 	ALPHA8201_MB,
-//
-	ALPHA8201_CF,
-	ALPHA8201_ZF,
 //
 	ALPHA8201_IX0,
 	ALPHA8201_IX1,
@@ -402,6 +398,7 @@ protected:
 	// Used for import/export only
 	UINT8 m_sp;
 	UINT8 m_R[8];
+	UINT8 m_flags;
 };
 
 
