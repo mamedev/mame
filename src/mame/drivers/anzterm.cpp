@@ -402,7 +402,8 @@ ADDRESS_MAP_START( anzterm, AS_PROGRAM, 8, driver_device )
 	// There are two battery-backed 2kB SRAM chips with a 4kb SRAM chip for parity
 	// There are two 64kB DRAM banks (with parity)
 	// There's also a whole lot of ROM
-	AM_RANGE(0x0000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -436,7 +437,7 @@ INPUT_PORTS_END
 ROM_START( anzterm )
 	// Main program on memory board - loading is definitely wrong
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fj-a-25.ic18",                 0x0000, 0x2000, CRC(8c31a9dd) SHA1(864babf6c77813f17ce9082013098e8a677b0af6) )
+	ROM_LOAD( "fj-a-25.ic18",                 0xe000, 0x2000, CRC(8c31a9dd) SHA1(864babf6c77813f17ce9082013098e8a677b0af6) )
 	ROM_LOAD( "fj-b-25.ic17",                 0x2000, 0x2000, CRC(a893aeaf) SHA1(64e8a935fe37195533a0a19f00bdc4e6a2007728) )
 	ROM_LOAD( "fj-c-25.ic16",                 0x4000, 0x2000, CRC(ae678bde) SHA1(b41da540b99a0c3ef9489d9cd25e5fa32e2d13f9) )
 	ROM_LOAD( "fj-e-25.ic14",                 0x6000, 0x0800, CRC(786beceb) SHA1(d20b870528d12f8457e3c746b539fcfc3ded3b0b) )
@@ -444,7 +445,7 @@ ROM_START( anzterm )
 	ROM_LOAD( "fj-j-25.ic8",                  0x8000, 0x2000, CRC(23fa4b36) SHA1(b3676579b2ea4efb0bf867557b53a6ccba7cc60f) )
 	ROM_LOAD( "fj-k-25.ic7",                  0xa000, 0x2000, CRC(cbd17462) SHA1(7e7460f99e7dd5c9ae113f69b67e2b6079a57c6d) )
 	ROM_LOAD( "fj-l-25.ic6",                  0xc000, 0x2000, CRC(8989c2ed) SHA1(912d8152f8f67a964dcd360151d8c8438a652d58) )
-	ROM_LOAD( "fj-m-25.ic5",                  0xe000, 0x2000, CRC(82762fee) SHA1(234a438abab91936e7073bd7cc62414dfae10373) )
+	ROM_LOAD( "fj-m-25.ic5",                  0x0000, 0x2000, CRC(82762fee) SHA1(234a438abab91936e7073bd7cc62414dfae10373) )
 
 	// BPROM on memory board - address decoding?
 	ROM_REGION( 0x0800, "prom", 0 )
