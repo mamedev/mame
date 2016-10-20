@@ -393,7 +393,7 @@ void alpha8201_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
-	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).mask(0x3ff).formatstr("%03X");
+	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).callimport().mask(0x3ff).formatstr("%03X");
 	state_add( ALPHA8201_SP, "SP", m_sp ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_RB, "RB", m_regPtr ).mask(0x7);
 	state_add( ALPHA8201_MB, "MB", m_mb ).mask(0x3);
@@ -413,7 +413,7 @@ void alpha8201_cpu_device::device_start()
 	state_add( ALPHA8201_R5, "R5", m_R[5] ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_R6, "R6", m_R[6] ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_R7, "R7", m_R[7] ).callimport().callexport().formatstr("%02X");
-	state_add( STATE_GENPCBASE, "CURPC", m_PREVPC ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_PREVPC ).callimport().noshow();
 	state_add( STATE_GENFLAGS, "CURFLAGS", m_flags ).callimport().callexport().formatstr("%2s").noshow();
 	state_add( STATE_GENSP, "CURSP", m_sp ).callimport().callexport();
 
@@ -445,6 +445,14 @@ void alpha8201_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case ALPHA8201_PC:
+			m_PREVPC = m_pc.w.l;
+			break;
+
+		case STATE_GENPCBASE:
+			m_pc.w.l = m_PREVPC;
+			break;
+
 		case STATE_GENFLAGS:
 			m_cf = BIT(m_flags, 1);
 			m_zf = BIT(m_flags, 0);
