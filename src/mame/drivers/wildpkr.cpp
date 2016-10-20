@@ -367,7 +367,7 @@ hd63484cp8 advanced CRT controller
 
 */
 
-ROM_START( tabpkr )
+ROM_START( tabpkr ) // Royal Poker V 1.85 Oct 29 1996 12:20:07
 	ROM_REGION( 0x300000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "rop1851.bin", 0x000001, 0x80000, CRC(fbe13fa8) SHA1(7c19b6b4d9a9935b6feb70b6261bafc6d9afb59f) )
 	ROM_LOAD16_BYTE( "rop1853.bin", 0x000000, 0x80000, CRC(e0c312b4) SHA1(57c64c82f723067b7b2f9bf3fdaf5aedeb4f9dc3) )
@@ -393,4 +393,4 @@ DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                   FLAGS */
 GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 199?, tabpkr,    0,        tabpkr,   wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Unknown Tab Austria Poker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, tabpkr,    0,        tabpkr,   wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Royal Poker V 1.85", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
