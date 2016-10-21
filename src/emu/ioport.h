@@ -1182,6 +1182,7 @@ struct ioport_field_live
 	digital_joystick::direction_t joydir;       // digital joystick direction index
 	bool                    autofire;           // autofire
 	int                     autopressed;        // autofire status
+	bool                    lockout;            // user lockout
 	std::string             name;               // overridden name
 };
 

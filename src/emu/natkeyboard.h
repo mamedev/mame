@@ -41,9 +41,11 @@ public:
 	bool full() const { return ((m_bufend + 1) % m_buffer.size()) == m_bufbegin; }
 	bool can_post() const { return (!m_queue_chars.isnull() || !m_keycode_map.empty()); }
 	bool is_posting() const { return (!empty() || (!m_charqueue_empty.isnull() && !m_charqueue_empty())); }
+	bool in_use() const { return m_in_use; }
 
 	// configuration
 	void configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
+	void set_in_use(bool usage);
 
 	// posting
 	void post(unicode_char ch);
@@ -74,6 +76,7 @@ private:
 
 	// internal state
 	running_machine &       m_machine;              // reference to our machine
+	bool                    m_in_use;               // is natural keyboard in use?
 	UINT32                  m_bufbegin;             // index of starting character
 	UINT32                  m_bufend;               // index of ending character
 	std::vector<unicode_char> m_buffer;           // actual buffer

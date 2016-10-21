@@ -14,6 +14,7 @@
 #include "mameopts.h"
 #include "pluginopts.h"
 #include "drivenum.h"
+#include "natkeyboard.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"
@@ -38,7 +39,7 @@ menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &c
 
 void menu_keyboard_mode::populate()
 {
-	bool natural = ui().use_natural_keyboard();
+	bool natural = machine().ioport().natkeyboard().in_use();
 	item_append(_("Keyboard Mode:"), natural ? _("Natural") : _("Emulated"), natural ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, nullptr);
 }
 
@@ -48,7 +49,7 @@ menu_keyboard_mode::~menu_keyboard_mode()
 
 void menu_keyboard_mode::handle()
 {
-	bool natural = ui().use_natural_keyboard();
+	bool natural = machine().ioport().natkeyboard().in_use();
 
 	/* process the menu */
 	const event *menu_event = process(0);
@@ -57,7 +58,7 @@ void menu_keyboard_mode::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
-			ui().set_use_natural_keyboard(natural ^ true);
+			machine().ioport().natkeyboard().set_in_use(!natural);
 			reset(reset_options::REMEMBER_REF);
 		}
 	}

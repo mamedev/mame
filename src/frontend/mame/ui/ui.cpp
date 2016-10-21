@@ -210,8 +210,7 @@ void mame_ui_manager::init()
 	// request a callback upon exiting
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(mame_ui_manager::exit), this));
 
-	// retrieve options
-	m_use_natural_keyboard = machine().options().natural_keyboard();
+	// create mouse bitmap
 	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine(), bitmap_argb32(32, 32));
 	UINT32 *dst = &ui_mouse_bitmap->pix32(0);
 	memcpy(dst,mouse_bitmap,32*32*sizeof(UINT32));
@@ -1107,7 +1106,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// is the natural keyboard enabled?
-	if (use_natural_keyboard() && (machine().phase() == MACHINE_PHASE_RUNNING))
+	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == MACHINE_PHASE_RUNNING))
 		process_natural_keyboard();
 
 	if (!ui_disabled)
@@ -2116,19 +2115,6 @@ INT32 mame_ui_manager::slider_crossoffset(running_machine &machine, void *arg, i
 	return field->crosshair_offset();
 }
 #endif
-
-//-------------------------------------------------
-//  set_use_natural_keyboard - specifies
-//  whether the natural keyboard is active
-//-------------------------------------------------
-
-void mame_ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
-{
-	m_use_natural_keyboard = use_natural_keyboard;
-	std::string error;
-	machine().options().set_value(OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE, error);
-	assert(error.empty());
-}
 
 
 //-------------------------------------------------
