@@ -94,8 +94,8 @@ protected:
 
 	videobrain_expansion_slot_device *m_slot;
 
-	dynamic_buffer m_rom;
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_rom;
+	std::vector<UINT8> m_ram;
 
 	size_t m_rom_mask;
 	size_t m_ram_mask;

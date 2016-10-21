@@ -55,7 +55,7 @@ public:
 	UINT8   *m_chr_gen;
 	UINT8   m_vsync;
 	UINT8   m_hsync;
-	dynamic_buffer m_videoram;
+	std::vector<UINT8> m_videoram;
 	UINT8   m_pixel;
 	required_device<palette_device> m_palette;
 };

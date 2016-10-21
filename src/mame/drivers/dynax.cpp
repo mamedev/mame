@@ -5516,7 +5516,7 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 
 	/* Address lines scrambling on the blitter data roms */
 	{
-		dynamic_buffer rom(0xc0000);
+		std::vector<UINT8> rom(0xc0000);
 		memcpy(&rom[0], gfx, 0xc0000);
 		for (i = 0; i < 0xc0000; i++)
 			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
@@ -5533,7 +5533,7 @@ DRIVER_INIT_MEMBER(dynax_state,mayac)
 
 	/* Address lines scrambling on the blitter data roms */
 	{
-		dynamic_buffer rom(0xc0000);
+		std::vector<UINT8> rom(0xc0000);
 		memcpy(&rom[0], gfx, 0xc0000);
 		for (i = 0; i < 0xc0000; i++)
 			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
@@ -6452,7 +6452,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 	int i;
 	UINT8   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
-	dynamic_buffer rom1(size);
+	std::vector<UINT8> rom1(size);
 
 	memcpy(&rom1[0], rom, size);
 	for (i = 0; i < size; i++)
@@ -6464,7 +6464,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 	int i, j;
 	UINT8   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
-	dynamic_buffer rom1(size);
+	std::vector<UINT8> rom1(size);
 
 	memcpy(&rom1[0], rom, size);
 	for (i = 0; i < size; i++)

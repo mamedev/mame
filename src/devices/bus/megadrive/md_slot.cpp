@@ -471,7 +471,7 @@ image_init_result base_md_cart_slot_device::load_nonlist()
 	unsigned char *ROM;
 	bool is_smd, is_md;
 	UINT32 tmplen = length(), offset, len;
-	dynamic_buffer tmpROM(tmplen);
+	std::vector<UINT8> tmpROM(tmplen);
 
 	// STEP 1: store a (possibly headered) copy of the file and determine its type (SMD? MD? BIN?)
 	fread(&tmpROM[0], tmplen);
@@ -919,7 +919,7 @@ std::string base_md_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		UINT32 len = m_file->size(), offset = 0;
-		dynamic_buffer rom(len);
+		std::vector<UINT8> rom(len);
 		int type;
 
 		m_file->read(&rom[0], len);

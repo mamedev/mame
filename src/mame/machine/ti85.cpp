@@ -1164,7 +1164,7 @@ void ti85_state::ti86_setup_snapshot (UINT8 * data)
 SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 {
 	int expected_snapshot_size = 0;
-	dynamic_buffer ti8x_snapshot_data;
+	std::vector<UINT8> ti8x_snapshot_data;
 
 	if (!strncmp(machine().system().name, "ti85", 4))
 		expected_snapshot_size = TI85_SNAPSHOT_SIZE;

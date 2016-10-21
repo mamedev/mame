@@ -28,7 +28,7 @@ image_init_result general_cbm_loadsnap( device_image_interface &image, const cha
 	address_space &space, offs_t offset, void (*cbm_sethiaddress)(address_space &space, UINT16 hiaddress) )
 {
 	char buffer[7];
-	dynamic_buffer data;
+	std::vector<UINT8> data;
 	UINT32 bytesread;
 	UINT16 address = 0;
 	int i;

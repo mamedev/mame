@@ -1050,7 +1050,7 @@ DRIVER_INIT_MEMBER(dassault_state,dassault)
 {
 	const UINT8 *src = memregion("gfx1")->base();
 	UINT8 *dst = memregion("gfx2")->base();
-	dynamic_buffer tmp(0x80000);
+	std::vector<UINT8> tmp(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx
@@ -1065,7 +1065,7 @@ DRIVER_INIT_MEMBER(dassault_state,thndzone)
 {
 	const UINT8 *src = memregion("gfx1")->base();
 	UINT8 *dst = memregion("gfx2")->base();
-	dynamic_buffer tmp(0x80000);
+	std::vector<UINT8> tmp(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx

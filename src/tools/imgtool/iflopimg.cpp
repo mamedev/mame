@@ -324,7 +324,7 @@ static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool::image 
 {
 	floperr_t err;
 	floppy_image_legacy *floppy;
-	dynamic_buffer buffer;
+	std::vector<UINT8> buffer;
 
 	floppy = imgtool_floppy(img);
 

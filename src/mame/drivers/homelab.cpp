@@ -651,7 +651,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	UINT16 quick_addr;
 	UINT16 quick_length;
 	UINT16 quick_end;
-	dynamic_buffer quick_data;
+	std::vector<UINT8> quick_data;
 	char pgmname[256];
 	UINT16 args[2];
 	int read_;

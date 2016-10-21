@@ -482,7 +482,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 
 	if ( p )
 	{
-		dynamic_buffer s( 0x40000 );
+		std::vector<UINT8> s( 0x40000 );
 		{
 			int x, y;
 

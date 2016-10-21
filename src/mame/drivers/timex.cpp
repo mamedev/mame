@@ -606,7 +606,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 	{
 		UINT8 *DOCK;
 		int chunks_in_file = 0;
-		dynamic_buffer header;
+		std::vector<UINT8> header;
 		header.resize(9);
 
 		if (size % 0x2000 != 9)

@@ -48,7 +48,7 @@ void neoboot_prot_device::cx_decrypt(UINT8*sprrom, UINT32 sprrom_size)
 {
 	int cx_size = sprrom_size;
 	UINT8 *rom = sprrom;
-	dynamic_buffer buf(cx_size);
+	std::vector<UINT8> buf(cx_size);
 
 	memcpy(&buf[0], rom, cx_size);
 
@@ -64,7 +64,7 @@ void neoboot_prot_device::sx_decrypt(UINT8* fixed, UINT32 fixed_size, int value)
 
 	if (value == 1)
 	{
-		dynamic_buffer buf(sx_size);
+		std::vector<UINT8> buf(sx_size);
 		memcpy(&buf[0], rom, sx_size);
 
 		for (int i = 0; i < sx_size; i += 0x10)
@@ -171,7 +171,7 @@ void neoboot_prot_device::kf2k5uni_mx_decrypt(UINT8* audiorom, UINT32 audiorom_s
 void neoboot_prot_device::decrypt_kof2k4se_68k(UINT8* cpurom, UINT32 cpurom_size)
 {
 	UINT8 *src = cpurom + 0x100000;
-	dynamic_buffer dst(0x400000);
+	std::vector<UINT8> dst(0x400000);
 	static const int sec[] = {0x300000,0x200000,0x100000,0x000000};
 	memcpy(&dst[0], src, 0x400000);
 
@@ -196,7 +196,7 @@ void neoboot_prot_device::lans2004_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size
 	UINT16 *rom = (UINT16*)cpurom;
 
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xc, 0x1, 0xa, 0x6, 0xd };
-	dynamic_buffer dst(0x600000);
+	std::vector<UINT8> dst(0x600000);
 
 	for (int i = 0; i < 8; i++)
 		memcpy (&dst[i * 0x20000], src + sec[i] * 0x20000, 0x20000);
@@ -232,7 +232,7 @@ void neoboot_prot_device::samsho5b_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
 	int px_size = cpurom_size;
 	UINT8 *rom = cpurom;
-	dynamic_buffer buf(px_size);
+	std::vector<UINT8> buf(px_size);
 
 	memcpy(&buf[0], rom, px_size);
 
@@ -311,7 +311,7 @@ void neoboot_prot_device::kog_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
 	// the protection chip does some *very* strange things to the rom
 	UINT8 *src = cpurom;
-	dynamic_buffer dst(0x600000);
+	std::vector<UINT8> dst(0x600000);
 	UINT16 *rom = (UINT16 *)cpurom;
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xc, 0x1, 0xa, 0x6, 0xd };
 
@@ -373,7 +373,7 @@ void neoboot_prot_device::svcboot_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	static const UINT8 sec[] = { 0x06, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	int size = cpurom_size;
 	UINT8 *src = cpurom;
-	dynamic_buffer dst(size);
+	std::vector<UINT8> dst(size);
 
 	for (int i = 0; i < size / 0x100000; i++)
 		memcpy(&dst[i * 0x100000], &src[sec[i] * 0x100000], 0x100000);
@@ -399,7 +399,7 @@ void neoboot_prot_device::svcboot_cx_decrypt(UINT8* sprrom, UINT32 sprrom_size)
 	};
 	int size = sprrom_size;
 	UINT8 *src = sprrom;
-	dynamic_buffer dst(size);
+	std::vector<UINT8> dst(size);
 
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 0x80; i++)
@@ -423,7 +423,7 @@ void neoboot_prot_device::svcplus_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	static const int sec[] = { 0x00, 0x03, 0x02, 0x05, 0x04, 0x01 };
 	int size = cpurom_size;
 	UINT8 *src = cpurom;
-	dynamic_buffer dst(size);
+	std::vector<UINT8> dst(size);
 
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
@@ -457,7 +457,7 @@ void neoboot_prot_device::svcplusa_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	static const int sec[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	int size = cpurom_size;
 	UINT8 *src = cpurom;
-	dynamic_buffer dst(size);
+	std::vector<UINT8> dst(size);
 
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < 6; i++)
@@ -472,7 +472,7 @@ void neoboot_prot_device::svcsplus_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	static const int sec[] = { 0x06, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	int size = cpurom_size;
 	UINT8 *src = cpurom;
-	dynamic_buffer dst(size);
+	std::vector<UINT8> dst(size);
 
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
@@ -514,7 +514,7 @@ void neoboot_prot_device::kof2002b_gfx_decrypt(UINT8 *src, int size)
 		{ 8, 0, 7, 6, 2, 1 },
 	};
 
-	dynamic_buffer dst(0x10000);
+	std::vector<UINT8> dst(0x10000);
 
 	for (int i = 0; i < size; i += 0x10000)
 	{
@@ -556,7 +556,7 @@ void neoboot_prot_device::kf2k2mp_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 void neoboot_prot_device::kf2k2mp2_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
 	UINT8 *src = cpurom;
-	dynamic_buffer dst(0x600000);
+	std::vector<UINT8> dst(0x600000);
 
 	memcpy(&dst[0x000000], &src[0x1C0000], 0x040000);
 	memcpy(&dst[0x040000], &src[0x140000], 0x080000);
@@ -571,7 +571,7 @@ void neoboot_prot_device::kf2k2mp2_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 
 void neoboot_prot_device::kof10th_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
-	dynamic_buffer dst(0x900000);
+	std::vector<UINT8> dst(0x900000);
 	UINT8 *src = cpurom;
 
 	memcpy(&dst[0x000000], src + 0x700000, 0x100000); // Correct (Verified in Uni-bios)

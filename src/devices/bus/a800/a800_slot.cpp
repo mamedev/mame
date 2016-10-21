@@ -405,7 +405,7 @@ std::string a800_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		dynamic_buffer head(0x10);
+		std::vector<UINT8> head(0x10);
 		UINT32 len = m_file->size();
 		int type = A800_8K;
 
@@ -442,7 +442,7 @@ std::string a5200_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		dynamic_buffer head(0x10);
+		std::vector<UINT8> head(0x10);
 		UINT32 len = m_file->size();
 		int type = A5200_8K;
 
@@ -477,7 +477,7 @@ std::string xegs_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		dynamic_buffer head(0x10);
+		std::vector<UINT8> head(0x10);
 		UINT32 len = m_file->size();
 		int type = A800_8K;
 

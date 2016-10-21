@@ -104,7 +104,7 @@ bool fsd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	result[0x20] = "Deleted Data";
 
 	UINT64 size = io_generic_size(io);
-	dynamic_buffer img(size);
+	std::vector<UINT8> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
 	UINT64 pos;

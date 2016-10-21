@@ -1376,7 +1376,7 @@ void wecleman_state::wecleman_unpack_sprites()
 
 void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
 {
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 	int i;
 
 	memcpy(&buffer[0],src,len);
@@ -1655,7 +1655,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 	int i;
 
 	base = memregion("gfx1")->base(); // sprites
-	dynamic_buffer temp( bank_size );
+	std::vector<UINT8> temp( bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
 		UINT8 *finish   = base + 2*bank_size*i;

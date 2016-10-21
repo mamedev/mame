@@ -490,7 +490,7 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 	offs_t address = space.read_byte(BOFA + 1) << 8 | space.read_byte(BOFA);
 	if (LOG) logerror("BOFA %04x\n",address);
 
-	dynamic_buffer data;
+	std::vector<UINT8> data;
 	data.resize(quickload_size);
 	image.fread(&data[0], quickload_size);
 	for (int i = 1; i < quickload_size; i++)

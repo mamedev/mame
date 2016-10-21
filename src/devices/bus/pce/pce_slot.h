@@ -45,7 +45,7 @@ public:
 	// internal state
 	UINT8 *m_rom;
 	UINT32 m_rom_size;
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_ram;
 
 	void rom_map_setup(UINT32 size);
 

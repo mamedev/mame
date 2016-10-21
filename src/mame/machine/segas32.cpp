@@ -39,7 +39,7 @@ void segas32_state::decrypt_ga2_protrom()
 {
 	int i;
 	UINT8 *rom = memregion("mcu")->base();
-	dynamic_buffer temp(0x100000);
+	std::vector<UINT8> temp(0x100000);
 
 	// make copy of ROM so original can be overwritten
 	memcpy(&temp[0], rom, 0x10000);

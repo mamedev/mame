@@ -391,7 +391,7 @@ void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM)
 	bool doit = FALSE;
 	UINT8 b;
 	UINT16 j;
-	dynamic_buffer temp_copy;
+	std::vector<UINT8> temp_copy;
 	temp_copy.resize(0x1000);
 
 	if (ROM[0] == 0x02) doit = TRUE;

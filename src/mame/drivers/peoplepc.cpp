@@ -44,7 +44,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<UINT16> m_gvram;
 	required_shared_ptr<UINT16> m_cvram;
-	dynamic_buffer m_charram;
+	std::vector<UINT8> m_charram;
 
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_READ8_MEMBER(get_slave_ack);

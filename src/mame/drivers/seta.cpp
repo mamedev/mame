@@ -11473,7 +11473,7 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 	int rpos;
 
 	rom_size = 0x80000;
-	dynamic_buffer buf(rom_size);
+	std::vector<UINT8> buf(rom_size);
 
 	rom = memregion("gfx2")->base() + 0x40000;
 

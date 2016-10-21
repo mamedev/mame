@@ -86,7 +86,7 @@ public:
 	UINT16 m_eprom_addr;
 	UINT8 m_eprom_data;
 	UINT8 m_old_data;
-	dynamic_buffer m_eprom_rom;
+	std::vector<UINT8> m_eprom_rom;
 
 	/* display state */
 	UINT8 m_ls145_p;

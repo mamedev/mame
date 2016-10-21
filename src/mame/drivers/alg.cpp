@@ -698,7 +698,7 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	dynamic_buffer original(length);
+	std::vector<UINT8> original(length);
 	UINT32 srcaddr;
 
 	memcpy(&original[0], rom, length);
@@ -717,7 +717,7 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	dynamic_buffer original(length);
+	std::vector<UINT8> original(length);
 	UINT32 srcaddr;
 
 	memcpy(&original[0], rom, length);
@@ -735,7 +735,7 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	dynamic_buffer original(length);
+	std::vector<UINT8> original(length);
 	UINT32 srcaddr;
 
 	memcpy(&original[0], rom, length);

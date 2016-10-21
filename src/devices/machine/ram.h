@@ -77,7 +77,7 @@ protected:
 private:
 	// device state
 	UINT32 m_size;
-	dynamic_buffer m_pointer;
+	std::vector<UINT8> m_pointer;
 
 	// device config
 	const char *m_default_size;

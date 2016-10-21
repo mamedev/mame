@@ -1053,7 +1053,7 @@ void legionna_state::descramble_legionnaire_gfx(UINT8* src)
 	int len = 0x10000;
 
 	/*  rearrange gfx */
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 	{
 		int i;
 		for (i = 0;i < len; i++)

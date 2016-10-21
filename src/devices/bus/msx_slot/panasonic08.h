@@ -39,7 +39,7 @@ private:
 	UINT8 m_selected_bank[8];
 	const UINT8 *m_bank_base[8];
 	UINT8 m_control;
-	dynamic_buffer m_sram;
+	std::vector<UINT8> m_sram;
 
 	void map_bank(int bank);
 };

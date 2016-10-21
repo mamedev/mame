@@ -235,9 +235,9 @@ protected:
 	UINT8 *m_prg;
 	UINT8 *m_vrom;
 	UINT8 *m_ciram;
-	dynamic_buffer m_prgram;
-	dynamic_buffer m_vram;
-	dynamic_buffer m_battery;
+	std::vector<UINT8> m_prgram;
+	std::vector<UINT8> m_vram;
+	std::vector<UINT8> m_battery;
 	UINT32 m_prg_size;
 	UINT32 m_vrom_size;
 
@@ -248,7 +248,7 @@ protected:
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
 	UINT8 *m_mapper_sram;
-	dynamic_buffer m_ext_ntram;
+	std::vector<UINT8> m_ext_ntram;
 	UINT32 m_mapper_sram_size;
 
 	int m_ce_mask;

@@ -2788,7 +2788,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 
 	/* strange order */
 	{
-		dynamic_buffer buffer(len);
+		std::vector<UINT8> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			if (i&1) buffer[i] = BITSWAP8(src[i],6,7,5,4,3,2,1,0);
@@ -2802,7 +2802,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 
 	/* strange order */
 	{
-		dynamic_buffer buffer(len);
+		std::vector<UINT8> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i^0x4000];
@@ -2818,7 +2818,7 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 
 	/* strange order */
 	{
-		dynamic_buffer buffer(len);
+		std::vector<UINT8> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];

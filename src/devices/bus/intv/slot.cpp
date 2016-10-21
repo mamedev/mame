@@ -453,7 +453,7 @@ std::string intv_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		UINT32 len = m_file->size();
-		dynamic_buffer rom(len);
+		std::vector<UINT8> rom(len);
 		int type = INTV_STD;
 
 		m_file->read(&rom[0], len);

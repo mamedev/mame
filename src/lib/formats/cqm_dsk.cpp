@@ -275,7 +275,7 @@ int cqm_format::identify(io_generic *io, UINT32 form_factor)
 bool cqm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
-	dynamic_buffer imagebuf(max_size);
+	std::vector<UINT8> imagebuf(max_size);
 	UINT8 header[CQM_HEADER_SIZE];
 	io_generic_read(io, header, 0, CQM_HEADER_SIZE);
 
@@ -318,7 +318,7 @@ bool cqm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int base_cell_count = rate*60/rpm;
 
 	int cqm_size = io_generic_size(io);
-	dynamic_buffer cqmbuf(cqm_size);
+	std::vector<UINT8> cqmbuf(cqm_size);
 	io_generic_read(io, &cqmbuf[0], 0, cqm_size);
 
 	// decode the RLE data

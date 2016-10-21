@@ -152,7 +152,7 @@ ROM_END
 QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	dynamic_buffer data;
+	std::vector<UINT8> data;
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	UINT16 start, length;

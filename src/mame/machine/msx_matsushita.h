@@ -39,7 +39,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	devcb_write_line m_turbo_out_cb;
 	UINT16 m_address;
-	dynamic_buffer m_sram;
+	std::vector<UINT8> m_sram;
 	UINT8 m_nibble1;
 	UINT8 m_nibble2;
 	UINT8 m_pattern;

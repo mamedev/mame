@@ -41,10 +41,10 @@ public:
 	UINT32 get_sram_size() { return m_sram.size(); }
 
 protected:
-	dynamic_buffer m_rom;
-	dynamic_buffer m_ram;
-	dynamic_buffer m_rom_vlm5030;
-	dynamic_buffer m_sram;
+	std::vector<UINT8> m_rom;
+	std::vector<UINT8> m_ram;
+	std::vector<UINT8> m_rom_vlm5030;
+	std::vector<UINT8> m_sram;
 	devcb_write_line m_out_irq_cb;
 };
 

@@ -154,10 +154,10 @@ private:
 	// internal state
 	UINT32                  m_hunkbytes;        // number of bytes in a hunk
 	chd_compressor *        m_compressor[4];    // array of active codecs
-	dynamic_buffer          m_compress_test;    // test buffer for compression
+	std::vector<UINT8>          m_compress_test;    // test buffer for compression
 #if CHDCODEC_VERIFY_COMPRESSION
 	chd_decompressor *      m_decompressor[4];  // array of active codecs
-	dynamic_buffer          m_decompressed;     // verification buffer
+	std::vector<UINT8>          m_decompressed;     // verification buffer
 #endif
 };
 

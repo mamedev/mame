@@ -240,7 +240,7 @@ void tceptor_state::decode_bg(const char * region)
 	int len = 0x8000;
 	int i;
 
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 
 	/* expand rom tc2-19.10d */
 	for (i = 0; i < len / 2; i++)

@@ -435,7 +435,7 @@ A12 <-> A13
 
 	UINT32 i,j,jscr,romoffset;
 	UINT8 *igrosoft_gamble_gfx = memregion("gfx")->base();
-	dynamic_buffer temprom(igrosoft_gamble_ROM_SIZE);
+	std::vector<UINT8> temprom(igrosoft_gamble_ROM_SIZE);
 
 
 	/* ROM 1 decode */
@@ -506,7 +506,7 @@ static inline void rom_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UIN
 static void lottery_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
 	UINT8 *igrosoft_gamble_gfx = machine.root_device().memregion("gfx")->base();
-	dynamic_buffer temprom(igrosoft_gamble_ROM_SIZE);
+	std::vector<UINT8> temprom(igrosoft_gamble_ROM_SIZE);
 
 	/* ROMs decode */
 	rom_decodel(&igrosoft_gamble_gfx[0x000000], &temprom[0], xor12, xor_addr);
@@ -545,7 +545,7 @@ static inline void roment_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, 
 static void ent_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
 	UINT8 *igrosoft_gamble_gfx = machine.root_device().memregion("gfx")->base();
-	dynamic_buffer temprom(igrosoft_gamble_ROM_SIZE);
+	std::vector<UINT8> temprom(igrosoft_gamble_ROM_SIZE);
 
 	/* ROMs decode */
 	roment_decodel(&igrosoft_gamble_gfx[0x000000], &temprom[0], xor12, xor_addr);

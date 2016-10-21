@@ -215,7 +215,7 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	const format &f = formats[type];
 
 	UINT64 size = io_generic_size(io);
-	dynamic_buffer img;
+	std::vector<UINT8> img;
 
 	if(size == (UINT32)f.sector_count*f.sector_base_size) {
 		img.resize(size + f.sector_count);

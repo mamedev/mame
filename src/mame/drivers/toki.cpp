@@ -857,7 +857,7 @@ ROM_END
 DRIVER_INIT_MEMBER(toki_state,toki)
 {
 	UINT8 *ROM = memregion("oki")->base();
-	dynamic_buffer buffer(0x20000);
+	std::vector<UINT8> buffer(0x20000);
 	int i;
 
 	memcpy(&buffer[0],ROM,0x20000);
@@ -870,7 +870,7 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 
 DRIVER_INIT_MEMBER(toki_state,tokib)
 {
-	dynamic_buffer temp(65536 * 2);
+	std::vector<UINT8> temp(65536 * 2);
 	int i, offs, len;
 	UINT8 *rom;
 
@@ -941,7 +941,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 	{
 		UINT8 *ROM = memregion("oki")->base();
-		dynamic_buffer buffer(0x20000);
+		std::vector<UINT8> buffer(0x20000);
 		int i;
 
 		memcpy(&buffer[0],ROM,0x20000);

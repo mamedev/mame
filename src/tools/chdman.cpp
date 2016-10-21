@@ -448,7 +448,7 @@ public:
 			m_rawdata(info.bytes_per_frame) { }
 
 	// getters
-	const dynamic_buffer &ldframedata() const { return m_ldframedata; }
+	const std::vector<UINT8> &ldframedata() const { return m_ldframedata; }
 
 	// read interface
 	virtual UINT32 read_data(void *_dest, UINT64 offset, UINT32 length)
@@ -529,8 +529,8 @@ private:
 	UINT32                      m_start_frame;
 	UINT32                      m_frame_count;
 	std::vector<INT16>        m_audio[8];
-	dynamic_buffer              m_ldframedata;
-	dynamic_buffer              m_rawdata;
+	std::vector<UINT8>              m_ldframedata;
+	std::vector<UINT8>              m_rawdata;
 };
 
 
@@ -1411,7 +1411,7 @@ static void do_info(parameters_t &params)
 		printf("Parent SHA1:  %s\n", parent.as_string().c_str());
 
 	// print out metadata
-	dynamic_buffer buffer;
+	std::vector<UINT8> buffer;
 	std::vector<metadata_index_info> info;
 	for (int index = 0; ; index++)
 	{
@@ -1535,7 +1535,7 @@ static void do_verify(parameters_t &params)
 		report_error(0, "No verification to be done; CHD has no checksum");
 
 	// create an array to read into
-	dynamic_buffer buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
+	std::vector<UINT8> buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
 
 	// read all the data and build up an SHA-1
 	util::sha1_creator rawsha1;
@@ -1769,7 +1769,7 @@ static void do_create_hd(parameters_t &params)
 	}
 
 	// process ident
-	dynamic_buffer identdata;
+	std::vector<UINT8> identdata;
 	if (output_parent.opened())
 		output_parent.read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
 	auto ident_str = params.find(OPTION_IDENT);
@@ -2130,7 +2130,7 @@ static void do_copy(parameters_t &params)
 	// process compression; we default to our current preferences using metadata to pick the type
 	chd_codec_type compression[4];
 	{
-		dynamic_buffer metadata;
+		std::vector<UINT8> metadata;
 		if (input_chd.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
 			memcpy(compression, s_default_hd_compression, sizeof(compression));
 		else if (input_chd.read_metadata(AV_METADATA_TAG, 0, metadata) == CHDERR_NONE)
@@ -2179,7 +2179,7 @@ static void do_copy(parameters_t &params)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
 		// clone all the metadata, upgrading where appropriate
-		dynamic_buffer metadata;
+		std::vector<UINT8> metadata;
 		chd_metadata_tag metatag;
 		UINT8 metaflags;
 		UINT32 index = 0;
@@ -2278,7 +2278,7 @@ static void do_extract_raw(parameters_t &params)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// copy all data
-		dynamic_buffer buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
+		std::vector<UINT8> buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
 		for (UINT64 offset = input_start; offset < input_end; )
 		{
 			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
@@ -2404,7 +2404,7 @@ static void do_extract_cd(parameters_t &params)
 		// iterate over tracks and copy all data
 		UINT64 outputoffs = 0;
 		UINT32 discoffs = 0;
-		dynamic_buffer buffer;
+		std::vector<UINT8> buffer;
 		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
 		{
 			std::string trackbin_name(basename);
@@ -2701,7 +2701,7 @@ static void do_add_metadata(parameters_t &params)
 
 	// process file input
 	auto file_str = params.find(OPTION_VALUE_FILE);
-	dynamic_buffer file;
+	std::vector<UINT8> file;
 	if (file_str != params.end())
 	{
 		osd_file::error filerr = util::core_file::load(file_str->second->c_str(), file);
@@ -2816,7 +2816,7 @@ static void do_dump_metadata(parameters_t &params)
 		index = atoi(index_str->second->c_str());
 
 	// write the metadata
-	dynamic_buffer buffer;
+	std::vector<UINT8> buffer;
 	chd_error err = input_chd.read_metadata(tag, index, buffer);
 	if (err != CHDERR_NONE)
 		report_error(1, "Error reading metadata: %s", chd_file::error_string(err));

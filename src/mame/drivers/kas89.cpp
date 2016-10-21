@@ -842,7 +842,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	}
 
 	/* Unscrambling address lines */
-	dynamic_buffer buf(memsize);
+	std::vector<UINT8> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{

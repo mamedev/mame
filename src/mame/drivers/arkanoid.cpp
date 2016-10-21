@@ -2048,7 +2048,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 	// the graphics on this bootleg have the data scrambled
 	int tile;
 	UINT8* srcgfx = memregion("gfx1")->base();
-	dynamic_buffer buffer(0x18000);
+	std::vector<UINT8> buffer(0x18000);
 
 	for (tile = 0; tile < 0x3000; tile++)
 	{

@@ -344,7 +344,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	int quick_addr = 0x200;
 	int exec_addr = 0xc000;
 	int quick_length;
-	dynamic_buffer quick_data;
+	std::vector<UINT8> quick_data;
 	int read_;
 	image_init_result result = image_init_result::FAIL;
 

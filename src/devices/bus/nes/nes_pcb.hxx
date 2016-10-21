@@ -596,12 +596,12 @@ void nes_cart_slot_device::call_load_pcb()
 	if (battery_size || mapper_sram_size)
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
-		dynamic_buffer temp_nvram(tot_size);
+		std::vector<UINT8> temp_nvram(tot_size);
 
 		// some games relies on specific battery patterns to work
 		// (e.g. Silva Saga does not work with SRAM fully initialized to 0x00)
 		// and we use the info from xml here to prepare a default NVRAM
-		dynamic_buffer default_nvram(tot_size);
+		std::vector<UINT8> default_nvram(tot_size);
 		if (battery_size)
 			memcpy(&default_nvram[0], get_software_region("bwram"), battery_size);
 		if (mapper_sram_size)

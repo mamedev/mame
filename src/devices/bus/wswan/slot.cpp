@@ -301,7 +301,7 @@ std::string ws_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		UINT32 size = m_file->size();
-		dynamic_buffer rom(size);
+		std::vector<UINT8> rom(size);
 		int type;
 		UINT32 nvram;
 

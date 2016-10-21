@@ -76,7 +76,7 @@ bool mfm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	// read header
 	io_generic_read(io, &header, 0, sizeof(header));
 	int counter = 0;
-	dynamic_buffer trackbuf;
+	std::vector<UINT8> trackbuf;
 	for(int track=0; track < header.number_of_track; track++) {
 		for(int side=0; side < header.number_of_side; side++) {
 			// read location of

@@ -532,7 +532,7 @@ private:
 	address_space &         m_space;                // which address space are we associated with?
 	offs_t                  m_bytestart, m_byteend; // byte-normalized start/end for verifying a match
 	UINT8 *                 m_data;                 // pointer to the data for this block
-	dynamic_buffer          m_allocated;            // pointer to the actually allocated block
+	std::vector<UINT8>          m_allocated;            // pointer to the actually allocated block
 };
 
 
@@ -694,7 +694,7 @@ private:
 	// internal data
 	running_machine &       m_machine;
 	std::string             m_name;
-	dynamic_buffer          m_buffer;
+	std::vector<UINT8>          m_buffer;
 	endianness_t            m_endianness;
 	UINT8                   m_bitwidth;
 	UINT8                   m_bytewidth;

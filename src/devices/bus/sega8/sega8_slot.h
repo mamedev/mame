@@ -80,7 +80,7 @@ public:
 	// internal state
 	UINT8 *m_rom;
 	UINT32 m_rom_size;
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_ram;
 	int m_rom_page_count;
 
 	bool has_battery;

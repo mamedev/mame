@@ -325,7 +325,7 @@ ROM_END
 
 void darkmist_state::decrypt_fgbgtiles(UINT8* rom, int size)
 {
-	dynamic_buffer buf(0x40000);
+	std::vector<UINT8> buf(0x40000);
 	/* data lines */
 	for (int i = 0;i < size/2;i++)
 	{
@@ -350,7 +350,7 @@ void darkmist_state::decrypt_fgbgtiles(UINT8* rom, int size)
 
 void darkmist_state::decrypt_gfx()
 {
-	dynamic_buffer buf(0x40000);
+	std::vector<UINT8> buf(0x40000);
 	UINT8 *rom;
 	int size;
 	int i;
@@ -416,7 +416,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 {
 	int i, len;
 	UINT8 *ROM = memregion("maincpu")->base();
-	dynamic_buffer buffer(0x10000);
+	std::vector<UINT8> buffer(0x10000);
 
 	decrypt_gfx();
 

@@ -472,7 +472,7 @@ printf("%5d: start=%10d (%5d.%03d) end=%10d (%5d.%03d)\n",
 	read_chd(m_source, fieldnum, m_info, srcend - srcbegin);
 
 	// assemble the final frame
-	dynamic_buffer buffer;
+	std::vector<UINT8> buffer;
 	INT16 *sampledata[2] = { &m_info.lsound[0], &m_info.rsound[0] };
 	avhuff_encoder::assemble_data(buffer, m_info.bitmap, m_info.channels, m_info.samples, sampledata);
 	memcpy(dest, &buffer[0], std::min(buffer.size(), size_t(datasize)));

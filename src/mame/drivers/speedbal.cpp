@@ -293,7 +293,7 @@ DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 {
 	// sprite tiles are in an odd order, rearrange to simplify video drawing function
 	UINT8* rom = memregion("sprites")->base();
-	dynamic_buffer temp(0x200*128);
+	std::vector<UINT8> temp(0x200*128);
 
 	for (int i=0;i<0x200;i++)
 	{

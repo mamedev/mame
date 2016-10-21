@@ -2476,7 +2476,7 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 	/* Descramble graphic */
 	rom = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
-	dynamic_buffer tmp(length);
+	std::vector<UINT8> tmp(length);
 	memcpy(&tmp[0],rom,length);
 	for (A = 0; A < length; A++)
 	{

@@ -57,7 +57,7 @@ void aeroboto_state::video_start()
 	{
 		int i;
 
-		dynamic_buffer temp(m_stars_length);
+		std::vector<UINT8> temp(m_stars_length);
 		memcpy(&temp[0], m_stars_rom, m_stars_length);
 
 		for (i = 0; i < m_stars_length; i++)

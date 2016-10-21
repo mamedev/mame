@@ -41,7 +41,7 @@ protected:
 		DECLARE_WRITE32_MEMBER(vram_w);
 
 public:
-		dynamic_buffer m_vram;
+		std::vector<UINT8> m_vram;
 		UINT32 *m_vram32;
 		UINT32 m_vbl_disable, m_toggle;
 		UINT32 m_palette[256];

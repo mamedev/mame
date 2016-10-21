@@ -95,7 +95,7 @@ void omti5100_device::ExecCommand()
 			int track = ((command[1]&0x1f)<<16 | command[2]<<8 | command[3]) / m_param[drive].sectors;
 			if(((track % m_param[drive].heads) <= info->heads) && (track < (info->cylinders * m_param[drive].heads)))
 			{
-				dynamic_buffer sector(info->sectorbytes);
+				std::vector<UINT8> sector(info->sectorbytes);
 				memset(&sector[0], 0xe5, info->sectorbytes);
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_GOOD;

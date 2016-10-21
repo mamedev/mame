@@ -612,7 +612,7 @@ image_init_result base_sns_cart_slot_device::call_load()
 		if (software_entry() == nullptr)
 		{
 			UINT32 tmplen = length();
-			dynamic_buffer tmpROM(tmplen);
+			std::vector<UINT8> tmpROM(tmplen);
 			fread(&tmpROM[0], tmplen);
 			offset = snes_skip_header(&tmpROM[0], tmplen);
 			fseek(offset, SEEK_SET);
@@ -665,7 +665,7 @@ image_init_result base_sns_cart_slot_device::call_load()
 		if (m_cart->get_nvram_size() || m_cart->get_rtc_ram_size())
 		{
 			UINT32 tot_size = m_cart->get_nvram_size() + m_cart->get_rtc_ram_size();
-			dynamic_buffer temp_nvram(tot_size);
+			std::vector<UINT8> temp_nvram(tot_size);
 			battery_load(&temp_nvram[0], tot_size, 0xff);
 			if (m_cart->get_nvram_size())
 				memcpy(m_cart->get_nvram_base(), &temp_nvram[0], m_cart->get_nvram_size());
@@ -695,7 +695,7 @@ void base_sns_cart_slot_device::call_unload()
 		if (m_cart->get_nvram_size() || m_cart->get_rtc_ram_size())
 		{
 			UINT32 tot_size = m_cart->get_nvram_size() + m_cart->get_rtc_ram_size();
-			dynamic_buffer temp_nvram(tot_size);
+			std::vector<UINT8> temp_nvram(tot_size);
 			if (m_cart->get_nvram_size())
 				memcpy(&temp_nvram[0], m_cart->get_nvram_base(), m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
@@ -998,7 +998,7 @@ std::string base_sns_cart_slot_device::get_default_card_software()
 		const char *slot_string;
 		UINT32 offset;
 		UINT32 len = m_file->size();
-		dynamic_buffer rom(len);
+		std::vector<UINT8> rom(len);
 		int type = 0, addon = 0;
 
 		m_file->read(&rom[0], len);

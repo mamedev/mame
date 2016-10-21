@@ -713,7 +713,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool::image &image, imgtool::stream::p
 static imgtoolerr_t os9_diskimage_create(imgtool::image &img, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
-	dynamic_buffer header;
+	std::vector<UINT8> header;
 	UINT32 heads, tracks, sectors, sector_bytes, first_sector_id;
 	UINT32 cluster_size, owner_id;
 	UINT32 allocation_bitmap_bits, allocation_bitmap_lsns;
@@ -1030,7 +1030,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool::partition &partition, const
 	imgtool::image &image(partition.image());
 	struct os9_fileinfo file_info;
 	size_t write_size;
-	dynamic_buffer buf;
+	std::vector<UINT8> buf;
 	int i = -1;
 	UINT32 lsn = 0;
 	UINT32 count = 0;

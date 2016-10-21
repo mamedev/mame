@@ -6326,7 +6326,7 @@ void galaxian_state::decode_anteater_gfx()
 {
 	UINT32 romlength = memregion("gfx1")->bytes();
 	UINT8 *rombase = memregion("gfx1")->base();
-	dynamic_buffer scratch(romlength);
+	std::vector<UINT8> scratch(romlength);
 	UINT32 offs;
 
 	memcpy(&scratch[0], rombase, romlength);
@@ -6345,7 +6345,7 @@ void galaxian_state::decode_losttomb_gfx()
 {
 	UINT32 romlength = memregion("gfx1")->bytes();
 	UINT8 *rombase = memregion("gfx1")->base();
-	dynamic_buffer scratch(romlength);
+	std::vector<UINT8> scratch(romlength);
 	UINT32 offs;
 
 	memcpy(&scratch[0], rombase, romlength);

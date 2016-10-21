@@ -435,7 +435,7 @@ void igs017_state::mgcs_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
 	UINT8 *rom = memregion("tilemaps")->base();
-	dynamic_buffer tmp(length);
+	std::vector<UINT8> tmp(length);
 	int i;
 
 	memcpy(&tmp[0],rom,length);
@@ -495,7 +495,7 @@ void igs017_state::tarzan_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
 	UINT8 *rom = memregion("tilemaps")->base();
-	dynamic_buffer tmp(length);
+	std::vector<UINT8> tmp(length);
 	int i;
 
 	memcpy(&tmp[0],rom,length);
@@ -752,7 +752,7 @@ void igs017_state::lhzb2_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
 	UINT8 *rom = memregion("tilemaps")->base();
-	dynamic_buffer tmp(length);
+	std::vector<UINT8> tmp(length);
 	int i;
 
 	int addr;
@@ -977,7 +977,7 @@ void igs017_state::slqz2_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
 	UINT8 *rom = memregion("tilemaps")->base();
-	dynamic_buffer tmp(length);
+	std::vector<UINT8> tmp(length);
 	int i;
 
 	memcpy(&tmp[0],rom,length);

@@ -475,7 +475,7 @@ public:
 									*prev;
 	};
 
-	dynamic_buffer buffer;
+	std::vector<UINT8> buffer;
 	unsigned int head,
 								tail,
 								in,

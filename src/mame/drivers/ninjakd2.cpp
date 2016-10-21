@@ -1578,7 +1578,7 @@ void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
 	UINT8* const src = memregion(region)->base();
-	dynamic_buffer temp(length);
+	std::vector<UINT8> temp(length);
 	const int mask = (1 << (bit + 1)) - 1;
 
 	for (int sa = 0; sa < length; sa++)

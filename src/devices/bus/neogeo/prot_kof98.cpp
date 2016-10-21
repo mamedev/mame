@@ -28,7 +28,7 @@ void kof98_prot_device::device_reset()
 void kof98_prot_device::decrypt_68k(UINT8* cpurom, UINT32 cpurom_size)
 {
 	UINT8 *src = cpurom;
-	dynamic_buffer dst(0x200000);
+	std::vector<UINT8> dst(0x200000);
 	int i, j, k;
 	static const UINT32 sec[]={ 0x000000, 0x100000, 0x000004, 0x100004, 0x10000a, 0x00000a, 0x10000e, 0x00000e };
 	static const UINT32 pos[]={ 0x000, 0x004, 0x00a, 0x00e };

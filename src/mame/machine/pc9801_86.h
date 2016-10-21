@@ -60,7 +60,7 @@ private:
 	required_device<ym2608_device>  m_opna;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
-	dynamic_buffer m_queue;
+	std::vector<UINT8> m_queue;
 	emu_timer *m_dac_timer;
 };
 

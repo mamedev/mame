@@ -68,7 +68,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
 	UINT64 pos = 4;
-	dynamic_buffer data;
+	std::vector<UINT8> data;
 	int onerev_time = 0; // time for one revolution, used to guess clock and rpm for DFE2 files
 	unsigned long clock_rate = 100000000; // sample clock rate in megahertz
 	int rpm=360; // drive rpm

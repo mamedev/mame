@@ -172,7 +172,7 @@ private:
 	// internal state
 
 	UINT8           m_index;
-	dynamic_buffer  m_data;
+	std::vector<UINT8>  m_data;
 
 	attotime        m_last_refresh;
 

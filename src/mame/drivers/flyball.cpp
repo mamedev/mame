@@ -426,7 +426,7 @@ void flyball_state::machine_start()
 	/* address bits 0 through 8 are inverted */
 	UINT8 *ROM = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	dynamic_buffer buf(len);
+	std::vector<UINT8> buf(len);
 	for (int i = 0; i < len; i++)
 		buf[i ^ 0x1ff] = ROM[i];
 	memcpy(ROM, &buf[0], len);

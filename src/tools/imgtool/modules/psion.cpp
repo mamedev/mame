@@ -290,7 +290,7 @@ UINT16 put_odb(imgtool::stream &instream, imgtool::stream &outstream, UINT8 file
 UINT16 put_ob3(imgtool::stream &instream, imgtool::stream &outstream)
 {
 	UINT16 size = instream.size() - 6;
-	dynamic_buffer buffer(size);
+	std::vector<UINT8> buffer(size);
 
 	instream.seek(6, SEEK_SET);
 	instream.read(&buffer[0], size);

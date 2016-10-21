@@ -64,7 +64,7 @@ void dp8390_device::check_dma_complete() {
 }
 
 void dp8390_device::do_tx() {
-	dynamic_buffer buf;
+	std::vector<UINT8> buf;
 	int i;
 	UINT32 high16 = (m_regs.dcr & 4)?m_regs.rsar<<16:0;
 	if(m_reset) return;

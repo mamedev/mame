@@ -143,7 +143,7 @@ public:
 	UINT32 screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	int oz_wzd_extract_tag(const dynamic_buffer &data, const char *tag, char *dest_buf);
+	int oz_wzd_extract_tag(const std::vector<UINT8> &data, const char *tag, char *dest_buf);
 
 	UINT16 m_kb_mask;
 };
@@ -705,7 +705,7 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	static const char magic[] = "ApplicationName:Addin";
 	UINT32 img_start = 0;
 
-	dynamic_buffer data(image.length());
+	std::vector<UINT8> data(image.length());
 	image.fread(&data[0], image.length());
 
 	if(strncmp((const char*)&data[0], magic, 21))
@@ -720,7 +720,7 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	return image_init_result::PASS;
 }
 
-int oz750_state::oz_wzd_extract_tag(const dynamic_buffer &data, const char *tag, char *dest_buf)
+int oz750_state::oz_wzd_extract_tag(const std::vector<UINT8> &data, const char *tag, char *dest_buf)
 {
 	int tag_len = strlen(tag);
 	UINT32 img_start = 0;
@@ -755,7 +755,7 @@ int oz750_state::oz_wzd_extract_tag(const dynamic_buffer &data, const char *tag,
 QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 {
 	address_space* flash = &machine().device("flash0a")->memory().space(0);
-	dynamic_buffer data(image.length());
+	std::vector<UINT8> data(image.length());
 	image.fread(&data[0], image.length());
 
 	const char *fs_type = "BSIC";

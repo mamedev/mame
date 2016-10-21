@@ -1672,7 +1672,7 @@ DRIVER_INIT_MEMBER(gauntlet_state,gauntlet)
 DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 {
 	UINT8 *gfx2_base = memregion("gfx2")->base();
-	dynamic_buffer data(0x8000);
+	std::vector<UINT8> data(0x8000);
 	int i;
 
 	common_init(1);

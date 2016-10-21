@@ -62,7 +62,7 @@ private:
 	required_ioport m_mouse_y;
 	required_ioport m_mouse_buttons;
 
-	dynamic_buffer m_rom_space;
+	std::vector<UINT8> m_rom_space;
 
 	bool m_iohigh;
 	UINT16 m_ide_data;

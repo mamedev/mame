@@ -5318,7 +5318,7 @@ static void decryptcode( running_machine &machine, int a23, int a22, int a21, in
 	int i;
 	UINT8 *RAM = machine.root_device().memregion( "maincpu" )->base();
 	size_t  size = machine.root_device().memregion( "maincpu" )->bytes();
-	dynamic_buffer buffer( size );
+	std::vector<UINT8> buffer( size );
 
 	memcpy( &buffer[0], RAM, size );
 	for( i = 0; i < size; i++ )

@@ -39,7 +39,7 @@ protected:
 		DECLARE_WRITE32_MEMBER(viking_disable_w);
 
 public:
-		dynamic_buffer m_vram;
+		std::vector<UINT8> m_vram;
 		UINT32 m_vbl_disable, m_palette[2];
 };
 

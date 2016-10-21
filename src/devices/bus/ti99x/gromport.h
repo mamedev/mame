@@ -342,8 +342,8 @@ protected:
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
 	const char*         m_tag;
-	dynamic_buffer      m_nvram;    // for MiniMemory
-	dynamic_buffer      m_ram;  // for MBX
+	std::vector<UINT8>      m_nvram;    // for MiniMemory
+	std::vector<UINT8>      m_ram;  // for MBX
 };
 
 /******************** Standard cartridge ******************************/

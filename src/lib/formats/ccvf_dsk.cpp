@@ -90,11 +90,11 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	const format &f = formats[0];
 
 	UINT64 size = io_generic_size(io);
-	dynamic_buffer img(size);
+	std::vector<UINT8> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
 	std::string ccvf = std::string((const char *)&img[0], size);
-	dynamic_buffer bytes(78720);
+	std::vector<UINT8> bytes(78720);
 
 	int start = 0, end = 0;
 	std::string line;

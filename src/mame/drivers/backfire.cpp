@@ -678,7 +678,7 @@ void backfire_state::descramble_sound()
 {
 	UINT8 *rom = memregion("ymz")->base();
 	int length = 0x200000; // only the first rom is swapped on backfire!
-	dynamic_buffer buf1(length);
+	std::vector<UINT8> buf1(length);
 	UINT32 x;
 
 	for (x = 0; x < length; x++)

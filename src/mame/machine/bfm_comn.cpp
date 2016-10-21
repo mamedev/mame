@@ -26,7 +26,7 @@ void bfm_decode_mainrom(running_machine &machine, const char *rom_region, UINT8*
 	rom = machine.root_device().memregion(rom_region)->base();
 
 	{
-		dynamic_buffer tmp(0x10000);
+		std::vector<UINT8> tmp(0x10000);
 		int i;
 
 		memcpy(&tmp[0], rom, 0x10000);

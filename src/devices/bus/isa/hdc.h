@@ -70,7 +70,7 @@ protected:
 	void get_chsn();
 	int test_ready();
 
-	dynamic_buffer buffer;                  /* data buffer */
+	std::vector<UINT8> buffer;                  /* data buffer */
 	UINT8 *buffer_ptr;          /* data pointer */
 	int csb;                /* command status byte */
 	int status;         /* drive status */

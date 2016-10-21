@@ -249,7 +249,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 
 	if (image.software_entry() == nullptr)
 	{
-		dynamic_buffer data(size);
+		std::vector<UINT8> data(size);
 		image.fread(&data[0], size);
 
 		if (!strncmp((const char*)&data[0], "UZEBOX", 6))

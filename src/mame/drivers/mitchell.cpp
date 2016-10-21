@@ -2295,7 +2295,7 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 {
 	/* descramble the program rom .. */
 	int len = memregion("maincpu")->bytes();
-	dynamic_buffer source(len);
+	std::vector<UINT8> source(len);
 	UINT8* dst = memregion("maincpu")->base() ;
 	int x;
 

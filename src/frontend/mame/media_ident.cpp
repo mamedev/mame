@@ -172,7 +172,7 @@ void media_identifier::identify_file(const char *name)
 void media_identifier::identify_data(const char *name, const UINT8 *data, int length)
 {
 	// if this is a '.jed' file, process it into raw bits first
-	dynamic_buffer tempjed;
+	std::vector<UINT8> tempjed;
 	jed_data jed;
 	if (core_filename_ends_with(name, ".jed") && jed_parse(data, length, &jed) == JEDERR_NONE)
 	{

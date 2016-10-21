@@ -61,7 +61,7 @@ public:
 
 protected:
 		hp_optrom_cart_device *m_cart;
-		dynamic_buffer m_content;
+		std::vector<UINT8> m_content;
 		offs_t m_base_addr;
 		offs_t m_end_addr;
 };

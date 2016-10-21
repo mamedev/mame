@@ -99,7 +99,7 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, UINT32 hunksize, UINT32 cylin
 	}
 
 	/* alloc and zero buffer */
-	dynamic_buffer cache;
+	std::vector<UINT8> cache;
 	cache.resize(hunksize);
 	memset(&cache[0], 0, hunksize);
 

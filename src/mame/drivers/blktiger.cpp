@@ -599,7 +599,7 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 {
 	UINT8 *src = memregion("audiocpu")->base();
 	int len = 0x8000;
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 
 	for (int i = 0; i < len; i++)
 	{

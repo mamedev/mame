@@ -128,7 +128,7 @@ void ms32_rearrange_sprites(running_machine &machine, const char *region)
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	dynamic_buffer result_data(source_size);
+	std::vector<UINT8> result_data(source_size);
 
 	for(i=0; i<source_size; i++)
 	{
@@ -150,7 +150,7 @@ void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const 
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	dynamic_buffer result_data(source_size);
+	std::vector<UINT8> result_data(source_size);
 
 	addr_xor ^= 0x1005d;
 
@@ -201,7 +201,7 @@ void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const 
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	dynamic_buffer result_data(source_size);
+	std::vector<UINT8> result_data(source_size);
 
 	addr_xor ^= 0xc1c5b;
 

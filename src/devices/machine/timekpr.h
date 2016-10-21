@@ -91,7 +91,7 @@ private:
 	UINT8 m_year;
 	UINT8 m_century;
 
-	dynamic_buffer m_data;
+	std::vector<UINT8> m_data;
 	optional_region_ptr<UINT8> m_default_data;
 
 protected:

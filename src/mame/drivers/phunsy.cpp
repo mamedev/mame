@@ -282,7 +282,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT16 i;
 	UINT16 quick_addr = 0x1800;
-	dynamic_buffer quick_data;
+	std::vector<UINT8> quick_data;
 	image_init_result result = image_init_result::FAIL;
 	int quick_length = image.length();
 	if (quick_length > 0x4000)

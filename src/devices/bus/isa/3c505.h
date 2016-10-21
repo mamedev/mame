@@ -182,7 +182,7 @@ private:
 
 		threecom3c505_device *m_device; // pointer back to our device
 		UINT16 m_length;
-		dynamic_buffer m_data;
+		std::vector<UINT8> m_data;
 	};
 
 	/* data_buffer fifo (used to buffer the received data) */

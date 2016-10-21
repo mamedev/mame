@@ -88,7 +88,7 @@ protected:
 	UINT16 m_flash_page_index;
 
 
-	dynamic_buffer m_flashwritemap;
+	std::vector<UINT8> m_flashwritemap;
 
 	UINT8 m_last_flash_cmd;
 

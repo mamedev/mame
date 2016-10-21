@@ -14929,7 +14929,7 @@ void cb3_state::do_blockswaps(UINT8* ROM)
 		0xa000, 0xa800, 0xb000, 0xb800,
 	};
 
-	dynamic_buffer buffer(0x10000);
+	std::vector<UINT8> buffer(0x10000);
 	memcpy(&buffer[0], ROM, 0x10000);
 
 	// swap some 0x800 blocks around..

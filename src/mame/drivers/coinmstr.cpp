@@ -1530,7 +1530,7 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 {
 	UINT8 *rom = memregion("user1")->base();
 	int length = memregion("user1")->bytes();
-	dynamic_buffer buf(length);
+	std::vector<UINT8> buf(length);
 	int i;
 
 	memcpy(&buf[0],rom,length);

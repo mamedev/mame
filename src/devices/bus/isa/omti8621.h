@@ -83,7 +83,7 @@ private:
 	int command_status;
 
 	// data buffer
-	dynamic_buffer sector_buffer;
+	std::vector<UINT8> sector_buffer;
 	UINT8 *data_buffer;
 	int data_length;
 	int data_index;

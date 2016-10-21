@@ -65,7 +65,7 @@ public:
 	int m_ea_bank;
 
 	/* external RAM state */
-	dynamic_buffer m_ext_ram;
+	std::vector<UINT8> m_ext_ram;
 	int m_rambank;
 
 	/* video state */
@@ -75,7 +75,7 @@ public:
 	int m_video_bank;
 	int m_video_hpos;
 	UINT8 m_led_latch[8];
-	dynamic_buffer m_display;
+	std::vector<UINT8> m_display;
 
 	/* sound state */
 	int m_sound_cmd;

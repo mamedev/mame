@@ -629,7 +629,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
 	imgtool::stream *stream = nullptr;
-	dynamic_buffer buffer;
+	std::vector<UINT8> buffer;
 	UINT32 size, track, head, sector;
 
 	// attempt to open image

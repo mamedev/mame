@@ -277,7 +277,7 @@ std::string msx_slot_cartridge_device::get_default_card_software()
 	{
 		const char *slot_string = "nomapper";
 		UINT32 length = m_file->size();
-		dynamic_buffer rom(length);
+		std::vector<UINT8> rom(length);
 		int type = NOMAPPER;
 
 		// Check if there's some mapper related information in the hashfiles

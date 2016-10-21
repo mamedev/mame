@@ -303,7 +303,7 @@ image_verify_result lviv_state::lviv_verify_snapshot(UINT8 * data, UINT32 size)
 
 SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 {
-	dynamic_buffer lviv_snapshot_data(LVIV_SNAPSHOT_SIZE);
+	std::vector<UINT8> lviv_snapshot_data(LVIV_SNAPSHOT_SIZE);
 
 	image.fread( &lviv_snapshot_data[0], LVIV_SNAPSHOT_SIZE);
 

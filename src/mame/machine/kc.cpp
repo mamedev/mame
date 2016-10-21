@@ -40,7 +40,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 	if (size == 0)
 		return image_init_result::FAIL;
 
-	dynamic_buffer data(size);
+	std::vector<UINT8> data(size);
 	image.fread( &data[0], size);
 
 	header = (struct kcc_header *) &data[0];

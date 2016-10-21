@@ -165,7 +165,7 @@ private:
 	util::hash_collection m_hashes;                 // collection of hashes
 
 	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
-	dynamic_buffer  m_zipdata;                      // ZIP file data
+	std::vector<UINT8>  m_zipdata;                      // ZIP file data
 	UINT64          m_ziplength;                    // ZIP file length
 
 	bool            m_remove_on_close;              // flag: remove the file when closing

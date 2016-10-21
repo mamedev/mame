@@ -1374,7 +1374,7 @@ static void hng64_reorder( UINT8* gfxregion, size_t gfxregionsize)
 	// reorder them
 	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
 
-	dynamic_buffer buffer(gfxregionsize);
+	std::vector<UINT8> buffer(gfxregionsize);
 
 	for (int i = 0; i < gfxregionsize/2; i += tilesize)
 	{

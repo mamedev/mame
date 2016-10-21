@@ -798,7 +798,7 @@ void nes_cart_slot_device::call_load_ines()
 	if (battery_size || mapper_sram_size)
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
-		dynamic_buffer temp_nvram(tot_size);
+		std::vector<UINT8> temp_nvram(tot_size);
 		battery_load(&temp_nvram[0], tot_size, 0x00);
 		if (battery_size)
 		{

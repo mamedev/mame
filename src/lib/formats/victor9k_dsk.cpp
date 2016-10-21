@@ -257,7 +257,7 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 	const format &f = formats[type];
 
 	UINT64 size = io_generic_size(io);
-	dynamic_buffer img;
+	std::vector<UINT8> img;
 	img.resize(size);
 
 	io_generic_read(io, &img[0], 0, size);

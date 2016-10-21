@@ -3262,7 +3262,7 @@ MACHINE_RESET_MEMBER(amstrad_state,aleste)
 /* load snapshot */
 SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 {
-	dynamic_buffer snapshot;
+	std::vector<UINT8> snapshot;
 
 	/* get file size */
 	if (snapshot_size < 8)
@@ -3338,7 +3338,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 
 		UINT32 offset = 0;
 		UINT8 *crt = m_cart->get_rom_base();
-		dynamic_buffer temp_copy;
+		std::vector<UINT8> temp_copy;
 		temp_copy.resize(size);
 		image.fread(&temp_copy[0], size);
 

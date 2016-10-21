@@ -715,7 +715,7 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 
 	/* use a temporary buffer for complex loads */
 	tempbufsize = std::min(TEMPBUFFER_MAX_SIZE, numbytes);
-	dynamic_buffer tempbuf(tempbufsize);
+	std::vector<UINT8> tempbuf(tempbufsize);
 
 	/* chunky reads for complex loads */
 	skip += groupsize;

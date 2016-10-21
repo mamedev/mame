@@ -258,7 +258,7 @@ private:
 	flac_encoder        m_encoder;
 	z_stream            m_deflater;
 	chd_zlib_allocator  m_allocator;
-	dynamic_buffer      m_buffer;
+	std::vector<UINT8>      m_buffer;
 };
 
 
@@ -281,7 +281,7 @@ private:
 	flac_decoder        m_decoder;
 	z_stream            m_inflater;
 	chd_zlib_allocator  m_allocator;
-	dynamic_buffer      m_buffer;
+	std::vector<UINT8>      m_buffer;
 };
 
 
@@ -350,7 +350,7 @@ private:
 	// internal state
 	_BaseCompressor     m_base_compressor;
 	_SubcodeCompressor  m_subcode_compressor;
-	dynamic_buffer      m_buffer;
+	std::vector<UINT8>      m_buffer;
 };
 
 
@@ -410,7 +410,7 @@ private:
 	// internal state
 	_BaseDecompressor   m_base_decompressor;
 	_SubcodeDecompressor m_subcode_decompressor;
-	dynamic_buffer      m_buffer;
+	std::vector<UINT8>      m_buffer;
 };
 
 

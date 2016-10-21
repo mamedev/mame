@@ -142,7 +142,7 @@ protected:
 	int m_shift;
 	int m_devsel;
 	int m_byteaddr;
-	dynamic_buffer m_page;
+	std::vector<UINT8> m_page;
 	int m_page_offset;
 };
 

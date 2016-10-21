@@ -79,7 +79,7 @@ private:
 	required_ioport m_md22;
 	required_ioport m_md23;
 
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_ram;
 	UINT8 m_bus;
 	UINT8 m_p1;
 	UINT8 m_p2;

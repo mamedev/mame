@@ -26,7 +26,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_ram;
 	required_ioport m_write_prot;
 };
 
@@ -71,7 +71,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_ram;
 	required_ioport m_write_prot;
 };
 
@@ -94,7 +94,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_ram;
 	required_ioport m_write_prot;
 };
 
@@ -117,7 +117,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_ram;
 	required_ioport m_write_prot;
 };
 

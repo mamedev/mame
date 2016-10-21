@@ -376,7 +376,7 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	dynamic_buffer scratch(len);
+	std::vector<UINT8> scratch(len);
 
 	memcpy(&scratch[0], RAM, len);
 
@@ -409,7 +409,7 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	dynamic_buffer scratch(len);
+	std::vector<UINT8> scratch(len);
 
 	memcpy(&scratch[0], RAM, len);
 

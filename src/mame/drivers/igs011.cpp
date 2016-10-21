@@ -985,7 +985,7 @@ void igs011_state::lhb2_decrypt_gfx()
 	int i;
 	unsigned rom_size = 0x200000;
 	UINT8 *src = (UINT8 *) (memregion("blitter")->base());
-	dynamic_buffer result_data(rom_size);
+	std::vector<UINT8> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[BITSWAP24(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
@@ -998,7 +998,7 @@ void igs011_state::drgnwrld_gfx_decrypt()
 	int i;
 	unsigned rom_size = 0x400000;
 	UINT8 *src = (UINT8 *) (memregion("blitter")->base());
-	dynamic_buffer result_data(rom_size);
+	std::vector<UINT8> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];

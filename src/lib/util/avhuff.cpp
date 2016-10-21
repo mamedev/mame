@@ -308,7 +308,7 @@ UINT32 avhuff_encoder::raw_data_size(const UINT8 *data)
 }
 
 /**
- * @fn  avhuff_error avhuff_encoder::assemble_data(dynamic_buffer &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata, UINT32 metadatasize)
+ * @fn  avhuff_error avhuff_encoder::assemble_data(std::vector<UINT8> &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata, UINT32 metadatasize)
  *
  * @brief   -------------------------------------------------
  *            assemble_data - assemble a datastream from raw bits
@@ -325,7 +325,7 @@ UINT32 avhuff_encoder::raw_data_size(const UINT8 *data)
  * @return  An avhuff_error.
  */
 
-avhuff_error avhuff_encoder::assemble_data(dynamic_buffer &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata, UINT32 metadatasize)
+avhuff_error avhuff_encoder::assemble_data(std::vector<UINT8> &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata, UINT32 metadatasize)
 {
 	// sanity check the inputs
 	if (metadatasize > 255)

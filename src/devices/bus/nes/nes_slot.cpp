@@ -886,7 +886,7 @@ void nes_cart_slot_device::call_unload()
 		if (m_cart->get_battery_size() || m_cart->get_mapper_sram_size())
 		{
 			UINT32 tot_size = m_cart->get_battery_size() + m_cart->get_mapper_sram_size();
-			dynamic_buffer temp_nvram(tot_size);
+			std::vector<UINT8> temp_nvram(tot_size);
 			if (m_cart->get_battery_size())
 				memcpy(&temp_nvram[0], m_cart->get_battery_base(), m_cart->get_battery_size());
 			if (m_cart->get_mapper_sram_size())
@@ -908,7 +908,7 @@ std::string nes_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string = "nrom";
 		UINT32 len = m_file->size();
-		dynamic_buffer rom(len);
+		std::vector<UINT8> rom(len);
 
 		m_file->read(&rom[0], len);
 

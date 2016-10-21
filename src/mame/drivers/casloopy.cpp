@@ -478,7 +478,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
 	UINT8 *SRC, *DST;
-	dynamic_buffer temp;
+	std::vector<UINT8> temp;
 	temp.resize(size);
 
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);

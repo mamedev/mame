@@ -1221,7 +1221,7 @@ osd_file::error core_file::load(std::string const &filename, void **data, std::u
 	return osd_file::error::NONE;
 }
 
-osd_file::error core_file::load(std::string const &filename, dynamic_buffer &data)
+osd_file::error core_file::load(std::string const &filename, std::vector<UINT8> &data)
 {
 	ptr file;
 

@@ -428,7 +428,7 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 {
 	UINT32 i;
 	UINT8 *ROM = memregion("maincpu")->base();
-	dynamic_buffer buffer(0x8000);
+	std::vector<UINT8> buffer(0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN
 

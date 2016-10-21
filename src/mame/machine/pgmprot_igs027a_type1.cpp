@@ -384,7 +384,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( UINT8 *src )
 {
 	int i, j;
-	dynamic_buffer dst(0x800000);
+	std::vector<UINT8> dst(0x800000);
 
 	for (i = 0; i < 0x800000; i++)
 	{

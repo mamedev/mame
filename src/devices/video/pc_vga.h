@@ -115,7 +115,7 @@ protected:
 			int crtc_regcount;
 		} svga_intf;
 
-		dynamic_buffer memory;
+		std::vector<UINT8> memory;
 		UINT32 pens[16]; /* the current 16 pens */
 
 		UINT8 miscellaneous_output;

@@ -513,7 +513,7 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 	UINT8 *src, *dst;
 
 	/* allocate some temporary space */
-	dynamic_buffer temp(0x10000);
+	std::vector<UINT8> temp(0x10000);
 
 	/* make a temporary copy of the character data */
 	src = &temp[0];

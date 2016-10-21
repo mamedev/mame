@@ -191,7 +191,7 @@ public:
 	void reset_irq(UINT8 source);
 	void update_volume_ramps();
 
-	dynamic_buffer m_wave_ram;
+	std::vector<UINT8> m_wave_ram;
 
 protected:
 	// device-level overrides

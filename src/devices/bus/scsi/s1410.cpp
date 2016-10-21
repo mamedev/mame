@@ -256,7 +256,7 @@ void s1410_device::ExecCommand()
 
 		if ((m_disk) && (m_blocks))
 		{
-			dynamic_buffer data(m_sector_bytes);
+			std::vector<UINT8> data(m_sector_bytes);
 			memset(&data[0], 0xc6, m_sector_bytes);
 
 			while (m_blocks > 0)

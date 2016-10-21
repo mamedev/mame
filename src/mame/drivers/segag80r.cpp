@@ -1410,7 +1410,7 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
 	dest = memregion(region)->base();
-	dynamic_buffer temp(0x4000);
+	std::vector<UINT8> temp(0x4000);
 	memcpy(&temp[0], dest, 0x4000);
 
 	/* 16 effective total banks */

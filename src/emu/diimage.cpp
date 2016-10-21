@@ -499,7 +499,7 @@ void device_image_interface::run_hash(void (*partialhash)(util::hash_collection 
 	util::hash_collection &hashes, const char *types)
 {
 	UINT32 size;
-	dynamic_buffer buf;
+	std::vector<UINT8> buf;
 
 	hashes.reset();
 	size = (UINT32) length();

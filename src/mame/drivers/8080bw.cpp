@@ -2833,7 +2833,7 @@ DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 {
 	UINT8 *rom = memregion("maincpu")->base();
 	int length = memregion("maincpu")->bytes();
-	dynamic_buffer buf1(length);
+	std::vector<UINT8> buf1(length);
 	UINT32 x;
 	for (x = 0; x < length; x++)
 	{
@@ -3247,7 +3247,7 @@ DRIVER_INIT_MEMBER(_8080bw_state,attackfc)
 {
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT32 len = memregion("maincpu")->bytes();
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 
 	// swap a8/a9
 	for (int i = 0; i < len; i++)

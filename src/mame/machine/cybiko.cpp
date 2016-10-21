@@ -48,7 +48,7 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 	address_space &dest = m_maincpu->space(AS_PROGRAM);
 	UINT32 size = std::min(image.length(), UINT64(RAMDISK_SIZE));
 
-	dynamic_buffer buffer(size);
+	std::vector<UINT8> buffer(size);
 	image.fread(&buffer[0], size);
 	for (int byte = 0; byte < size; byte++)
 		dest.write_byte(0x400000 + byte, buffer[byte]);

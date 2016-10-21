@@ -501,7 +501,7 @@ void cmc_prot_device::decrypt(UINT8 *r0, UINT8 *r1,
 void cmc_prot_device::gfx_decrypt(UINT8* rom, UINT32 rom_size, int extra_xor)
 {
 	int rpos;
-	dynamic_buffer buf(rom_size);
+	std::vector<UINT8> buf(rom_size);
 
 	// Data xor
 	for (rpos = 0; rpos < rom_size/4; rpos++)
@@ -709,7 +709,7 @@ void cmc_prot_device::cmc50_m1_decrypt(UINT8* romcrypt, UINT32 romcrypt_size, UI
 	size_t rom_size = 0x80000;
 	UINT8* rom2 = romaudio;
 
-	dynamic_buffer buffer(rom_size);
+	std::vector<UINT8> buffer(rom_size);
 
 	UINT16 key = generate_cs16(rom, 0x10000);
 

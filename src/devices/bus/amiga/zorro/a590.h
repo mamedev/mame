@@ -62,7 +62,7 @@ protected:
 	required_device<dmac_device> m_dmac;
 	required_device<wd33c93_device> m_wdc;
 
-	dynamic_buffer m_ram;
+	std::vector<UINT8> m_ram;
 };
 
 // ======================> a590_device

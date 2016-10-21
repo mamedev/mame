@@ -1552,7 +1552,7 @@ void kaneko_calc3_device::initial_scan_tables()
 
 	for (x=0;x<numregions;x++)
 	{
-		dynamic_buffer tmpdstram(0x2000);
+		std::vector<UINT8> tmpdstram(0x2000);
 #if VERBOSE_OUTPUT
 		int length;
 #endif

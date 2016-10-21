@@ -6175,7 +6175,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	}
 
 	{
-		dynamic_buffer buffer(size);
+		std::vector<UINT8> buffer(size);
 		memcpy(&buffer[0], rom, size);
 
 
@@ -6194,7 +6194,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	******************************/
 
 	{
-		dynamic_buffer buffer(sizeg);
+		std::vector<UINT8> buffer(sizeg);
 		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
@@ -6219,7 +6219,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	}
 
 	{
-		dynamic_buffer buffer(sizep);
+		std::vector<UINT8> buffer(sizep);
 		memcpy(&buffer[0], prom, sizep);
 
 
@@ -6354,7 +6354,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 	}
 
 	{
-		dynamic_buffer buffer(size);
+		std::vector<UINT8> buffer(size);
 		memcpy(&buffer[0], rom, size);
 
 
@@ -6373,7 +6373,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 	******************************/
 
 	{
-		dynamic_buffer buffer(sizeg);
+		std::vector<UINT8> buffer(sizeg);
 		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
@@ -6458,7 +6458,7 @@ static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT
 	}
 
 	{
-		dynamic_buffer buffer(size);
+		std::vector<UINT8> buffer(size);
 		memcpy(&buffer[0], rom, size);
 
 
@@ -6477,7 +6477,7 @@ static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT
 	******************************/
 
 	{
-		dynamic_buffer buffer(sizeg);
+		std::vector<UINT8> buffer(sizeg);
 		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */

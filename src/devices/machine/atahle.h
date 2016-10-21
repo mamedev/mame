@@ -175,7 +175,7 @@ protected:
 
 	attotime MINIMUM_COMMAND_TIME;
 
-	dynamic_buffer m_buffer;
+	std::vector<UINT8> m_buffer;
 	UINT16 m_buffer_offset;
 	UINT16 m_buffer_size;
 	UINT8 m_error;

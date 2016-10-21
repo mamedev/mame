@@ -597,7 +597,7 @@ std::string base_gb_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		UINT32 len = m_file->size(), offset = 0;
-		dynamic_buffer rom(len);
+		std::vector<UINT8> rom(len);
 		int type;
 
 		m_file->read(&rom[0], len);

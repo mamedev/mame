@@ -2204,7 +2204,7 @@ void balsente_state::expand_roms(UINT8 cd_rom_mask)
 	/* load EF           from 0x2e000-0x30000 */
 	/* ROM region must be 0x40000 total */
 
-	dynamic_buffer temp(0x20000);
+	std::vector<UINT8> temp(0x20000);
 	{
 		UINT8 *rom = memregion("maincpu")->base();
 		UINT32 len = memregion("maincpu")->bytes();

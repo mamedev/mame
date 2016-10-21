@@ -50,8 +50,8 @@ private:
 	bool parse_imge(const UINT8 *imge);
 	bool parse_data(const UINT8 *data, UINT32 &pos, UINT32 max_extra_size);
 
-	bool scan_one_tag(dynamic_buffer &data, UINT32 &pos, UINT8 *&tag, UINT32 &tsize);
-	bool scan_all_tags(dynamic_buffer &data);
+	bool scan_one_tag(std::vector<UINT8> &data, UINT32 &pos, UINT8 *&tag, UINT32 &tsize);
+	bool scan_all_tags(std::vector<UINT8> &data);
 	static UINT32 r32(const UINT8 *p);
 	static UINT32 rb(const UINT8 *&p, int count);
 
@@ -81,7 +81,7 @@ private:
 	bool generate_track(track_info *t, floppy_image *image);
 	bool generate_tracks(floppy_image *image);
 
-	bool parse(dynamic_buffer &data, floppy_image *image);
+	bool parse(std::vector<UINT8> &data, floppy_image *image);
 };
 
 extern const floppy_format_type FLOPPY_IPF_FORMAT;

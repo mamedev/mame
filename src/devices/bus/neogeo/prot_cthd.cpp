@@ -35,7 +35,7 @@ void cthd_prot_device::fix_do(UINT8* sprrom, UINT32 sprrom_size, int start, int 
 {
 	int tilesize = 128;
 
-	dynamic_buffer rom(16 * tilesize); // 16 tiles buffer
+	std::vector<UINT8> rom(16 * tilesize); // 16 tiles buffer
 	UINT8* realrom = sprrom + start * tilesize;
 
 	for (int i = 0; i < (end-start)/16; i++)
@@ -94,7 +94,7 @@ void cthd_prot_device::cthd2003_c(UINT8* sprrom, UINT32 sprrom_size, int pow)
 void cthd_prot_device::decrypt_cthd2003(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size, UINT8* fixedrom, UINT32 fixedrom_size)
 {
 	UINT8 *romdata = fixedrom;
-	dynamic_buffer tmp(8 * 128 * 128);
+	std::vector<UINT8> tmp(8 * 128 * 128);
 
 	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
@@ -182,7 +182,7 @@ void cthd_prot_device::ct2k3sp_sx_decrypt( UINT8* fixedrom, UINT32 fixedrom_size
 {
 	int rom_size = fixedrom_size;
 	UINT8 *rom = fixedrom;
-	dynamic_buffer buf(rom_size);
+	std::vector<UINT8> buf(rom_size);
 
 	memcpy(&buf[0], rom, rom_size);
 
@@ -206,7 +206,7 @@ void cthd_prot_device::ct2k3sp_sx_decrypt( UINT8* fixedrom, UINT32 fixedrom_size
 void cthd_prot_device::decrypt_ct2k3sp(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size, UINT8* fixedrom, UINT32 fixedrom_size)
 {
 	UINT8 *romdata = audiorom + 0x10000;
-	dynamic_buffer tmp(8 * 128 * 128);
+	std::vector<UINT8> tmp(8 * 128 * 128);
 	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 64 * 128], romdata + 8 * 32 * 128, 8 * 32 * 128);
@@ -225,7 +225,7 @@ void cthd_prot_device::decrypt_ct2k3sp(UINT8* sprrom, UINT32 sprrom_size, UINT8*
 void cthd_prot_device::decrypt_ct2k3sa(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size )
 {
 	UINT8 *romdata = audiorom + 0x10000;
-	dynamic_buffer tmp(8 * 128 * 128);
+	std::vector<UINT8> tmp(8 * 128 * 128);
 	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 64 * 128], romdata + 8 * 32 * 128, 8 * 32 * 128);
@@ -280,7 +280,7 @@ void cthd_prot_device::matrimbl_decrypt(UINT8* sprrom, UINT32 sprrom_size, UINT8
 {
 	// decrypt Z80
 	UINT8 *rom = audiorom + 0x10000;
-	dynamic_buffer buf(0x20000);
+	std::vector<UINT8> buf(0x20000);
 	memcpy(&buf[0], rom, 0x20000);
 
 	int j;

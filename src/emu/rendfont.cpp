@@ -760,10 +760,10 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 	try
 	{
 		// allocate an array to hold the character data
-		dynamic_buffer chartable(numchars * CACHED_CHAR_SIZE, 0);
+		std::vector<UINT8> chartable(numchars * CACHED_CHAR_SIZE, 0);
 
 		// allocate a temp buffer to compress into
-		dynamic_buffer tempbuffer(65536);
+		std::vector<UINT8> tempbuffer(65536);
 
 		// write the header
 		UINT8 *dest = &tempbuffer[0];

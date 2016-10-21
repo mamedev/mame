@@ -837,7 +837,7 @@ SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
 QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 {
 	int snapshot_size = 8263;   /* magic size */
-	dynamic_buffer snapshot_buff(snapshot_size, 0);
+	std::vector<UINT8> snapshot_buff(snapshot_size, 0);
 	std::vector<char> buff(quickload_size + 1);
 	image_init_result rc;
 

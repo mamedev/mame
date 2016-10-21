@@ -2792,7 +2792,7 @@ DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 	};
 
 	UINT8 *rom = memregion("maincpu")->base();
-	dynamic_buffer buffer(0x5800);
+	std::vector<UINT8> buffer(0x5800);
 
 	for (int i=0;i<88;i++)
 	{

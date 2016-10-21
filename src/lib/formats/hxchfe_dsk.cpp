@@ -233,7 +233,7 @@ bool hfe_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	}
 
 	// Load the tracks
-	dynamic_buffer cylinder_buffer;
+	std::vector<UINT8> cylinder_buffer;
 	for(int cyl=0; cyl < m_cylinders; cyl++)
 	{
 		// actual data read
@@ -402,7 +402,7 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 
 bool hfe_format::save(io_generic *io, floppy_image *image)
 {
-	dynamic_buffer cylbuf;
+	std::vector<UINT8> cylbuf;
 	cylbuf.resize(0x6200);
 
 	UINT8 header[HEADER_LENGTH];

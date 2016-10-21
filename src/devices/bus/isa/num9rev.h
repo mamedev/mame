@@ -49,8 +49,8 @@ protected:
 private:
 		required_device<upd7220_device> m_upd7220;
 		required_device<palette_device> m_palette;
-		dynamic_buffer m_ram;
-		dynamic_buffer m_overlay;
+		std::vector<UINT8> m_ram;
+		std::vector<UINT8> m_overlay;
 
 		UINT8 m_bank;
 		UINT8 m_mode;

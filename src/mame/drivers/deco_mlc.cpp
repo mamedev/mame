@@ -848,7 +848,7 @@ void deco_mlc_state::descramble_sound(  )
 	/* the same as simpl156 / heavy smash? */
 	UINT8 *rom = memregion("ymz")->base();
 	int length = memregion("ymz")->bytes();
-	dynamic_buffer buf1(length);
+	std::vector<UINT8> buf1(length);
 
 	UINT32 x;
 

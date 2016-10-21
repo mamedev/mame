@@ -90,7 +90,7 @@ public:
 	// static helpers
 	static UINT32 raw_data_size(const UINT8 *data);
 	static UINT32 raw_data_size(UINT32 width, UINT32 height, UINT8 channels, UINT32 numsamples, UINT32 metadatasize = 0) { return 12 + channels * numsamples * 2 + width * height * 2; }
-	static avhuff_error assemble_data(dynamic_buffer &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata = nullptr, UINT32 metadatasize = 0);
+	static avhuff_error assemble_data(std::vector<UINT8> &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata = nullptr, UINT32 metadatasize = 0);
 
 private:
 	// delta-RLE Huffman encoder
@@ -127,7 +127,7 @@ private:
 	deltarle_encoder            m_crcontext;
 
 	// audio encoding contexts
-	dynamic_buffer              m_audiobuffer;
+	std::vector<UINT8>              m_audiobuffer;
 #if AVHUFF_USE_FLAC
 	flac_encoder                m_flac_encoder;
 #else

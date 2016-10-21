@@ -658,7 +658,7 @@ void deco156_state::descramble_sound( const char *tag )
 {
 	UINT8 *rom = memregion(tag)->base();
 	int length = memregion(tag)->bytes();
-	dynamic_buffer buf1(length);
+	std::vector<UINT8> buf1(length);
 	UINT32 x;
 
 	for (x = 0; x < length; x++)

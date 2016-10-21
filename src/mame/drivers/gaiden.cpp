@@ -1567,7 +1567,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 
 	if (descramble_cpu)
 	{
-		dynamic_buffer buffer(size);
+		std::vector<UINT8> buffer(size);
 
 		memcpy(&buffer[0], ROM, size);
 		for( i = 0; i < size; i++ )
@@ -1584,7 +1584,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	ROM = memregion("gfx2")->base();
 	size = memregion("gfx2")->bytes();
 	{
-		dynamic_buffer buffer(size);
+		std::vector<UINT8> buffer(size);
 
 		memcpy(&buffer[0],ROM,size);
 		for( i = 0; i < size; i++ )
@@ -1619,7 +1619,7 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 
 	/*  rearrange gfx */
 	{
-		dynamic_buffer buffer(len);
+		std::vector<UINT8> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 		{
@@ -1635,7 +1635,7 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 	}
 
 	{
-		dynamic_buffer buffer(len);
+		std::vector<UINT8> buffer(len);
 		int i;
 		for (i = 0; i < len; i++)
 		{

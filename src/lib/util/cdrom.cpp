@@ -1225,7 +1225,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 	printf("toc->numtrks = %u?!\n", toc->numtrks);
 
 	/* look for old-style metadata */
-	dynamic_buffer oldmetadata;
+	std::vector<UINT8> oldmetadata;
 	err = chd->read_metadata(CDROM_OLD_METADATA_TAG, 0, oldmetadata);
 	if (err != CHDERR_NONE)
 		return err;

@@ -60,7 +60,7 @@ void nscsi_s1410_device::scsi_command()
 		blocks = (bytes_per_sector == 256) ? 32 : 17;
 
 		int track_length = blocks*bytes_per_sector;
-		dynamic_buffer data(track_length);
+		std::vector<UINT8> data(track_length);
 		memset(&data[0], 0xc6, track_length);
 
 		if(!hard_disk_write(harddisk, lba, &data[0])) {

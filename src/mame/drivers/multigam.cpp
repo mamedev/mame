@@ -1420,7 +1420,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	dynamic_buffer buf(0x80000);
+	std::vector<UINT8> buf(0x80000);
 	UINT8 *rom;
 	int size;
 	int i;

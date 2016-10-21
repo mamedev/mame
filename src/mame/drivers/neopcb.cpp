@@ -242,7 +242,7 @@ void neopcb_state::svcpcb_gfx_decrypt()
 	static const UINT8 xorval[4] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int rom_size = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
-	dynamic_buffer buf(rom_size);
+	std::vector<UINT8> buf(rom_size);
 
 	for (int i = 0; i < rom_size; i++)
 		rom[i] ^= xorval[(i % 4)];
@@ -286,7 +286,7 @@ void neopcb_state::kf2k3pcb_gfx_decrypt()
 	static const UINT8 xorval[4] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int rom_size = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
-	dynamic_buffer buf(rom_size);
+	std::vector<UINT8> buf(rom_size);
 
 	for (int i = 0; i < rom_size; i++)
 		rom[ i ] ^= xorval[ (i % 4) ];

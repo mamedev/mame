@@ -136,9 +136,9 @@ public:
 	// internal state
 	UINT8 *m_rom;
 	UINT32 m_rom_size;
-	dynamic_buffer m_nvram;
-	dynamic_buffer m_bios;
-	dynamic_buffer m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
+	std::vector<UINT8> m_nvram;
+	std::vector<UINT8> m_bios;
+	std::vector<UINT8> m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
 
 	UINT8 rom_bank_map[256];    // 32K chunks of rom
 };

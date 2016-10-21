@@ -212,7 +212,7 @@ static int kc_handle_tap(INT16 *buffer, const UINT8 *casdata)
 
 static int kc_handle_sss(INT16 *buffer, const UINT8 *casdata)
 {
-	dynamic_buffer sss(kc_image_size + 11);
+	std::vector<UINT8> sss(kc_image_size + 11);
 
 	// tries to generate the missing head
 	memset(&sss[0], 0xd3, 3);

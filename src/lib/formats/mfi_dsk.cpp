@@ -119,7 +119,7 @@ bool mfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	image->set_variant(h.variant);
 
-	dynamic_buffer compressed;
+	std::vector<UINT8> compressed;
 
 	entry *ent = entries;
 	for(unsigned int cyl=0; cyl <= (h.cyl_count - 1) << 2; cyl += 4 >> resolution)

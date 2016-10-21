@@ -578,7 +578,7 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 {
 	int A, j;
 	UINT8 *rom = memregion("maincpu")->base();
-	dynamic_buffer buffer(0x2000);
+	std::vector<UINT8> buffer(0x2000);
 
 	memcpy(&buffer[0], rom, 0x2000);
 

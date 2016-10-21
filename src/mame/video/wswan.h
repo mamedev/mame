@@ -122,7 +122,7 @@ protected:
 	int m_main_palette[8];
 	emu_timer *m_timer;
 
-	dynamic_buffer m_vram;
+	std::vector<UINT8> m_vram;
 	UINT8 *m_palette_vram;
 	UINT8 m_palette_port[0x20];
 	int m_pal[16][16];

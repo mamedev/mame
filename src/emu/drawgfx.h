@@ -291,8 +291,8 @@ private:
 	UINT32          m_dirtyseq;             // sequence number; incremented each time a tile is dirtied
 
 	UINT8 *         m_gfxdata;              // pointer to decoded pixel data, 8bpp
-	dynamic_buffer  m_gfxdata_allocated;    // allocated decoded pixel data, 8bpp
-	dynamic_buffer  m_dirty;                // dirty array for detecting chars that need decoding
+	std::vector<UINT8>  m_gfxdata_allocated;    // allocated decoded pixel data, 8bpp
+	std::vector<UINT8>  m_dirty;                // dirty array for detecting chars that need decoding
 	std::vector<UINT32>  m_pen_usage;      // bitmask of pens that are used (pens 0-31 only)
 
 	bool            m_layout_is_raw;        // raw layout?

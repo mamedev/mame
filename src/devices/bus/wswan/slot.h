@@ -54,7 +54,7 @@ protected:
 	// internal state
 	UINT8 *m_rom;
 	UINT32 m_rom_size;
-	dynamic_buffer m_nvram;
+	std::vector<UINT8> m_nvram;
 	int m_bank_mask;
 
 	bool m_has_rtc, m_is_rotated;

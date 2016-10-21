@@ -391,7 +391,7 @@ public:
 	UINT8                   m_slapstic_num;
 	UINT16 *                m_slapstic;
 	UINT8                   m_slapstic_bank;
-	dynamic_buffer          m_slapstic_bank0;
+	std::vector<UINT8>          m_slapstic_bank0;
 	offs_t                  m_slapstic_last_pc;
 	offs_t                  m_slapstic_last_address;
 	offs_t                  m_slapstic_base;

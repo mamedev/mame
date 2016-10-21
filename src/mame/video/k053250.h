@@ -43,7 +43,7 @@ private:
 
 	// internal state
 	required_region_ptr<UINT8> m_rom;
-	dynamic_buffer m_unpacked_rom;
+	std::vector<UINT8> m_unpacked_rom;
 	std::vector<UINT16> m_ram;
 	UINT16 *m_buffer[2];
 	UINT8 m_regs[8];

@@ -1271,7 +1271,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 }
 
 /**
- * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output)
+ * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::vector<UINT8> &output)
  *
  * @brief   Reads a metadata.
  *
@@ -1285,7 +1285,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
  * @return  The metadata.
  */
 
-chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output)
+chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::vector<UINT8> &output)
 {
 	// wrap this for clean reporting
 	try
@@ -1349,7 +1349,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 }
 
 /**
- * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output, chd_metadata_tag &resulttag, UINT8 &resultflags)
+ * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::vector<UINT8> &output, chd_metadata_tag &resulttag, UINT8 &resultflags)
  *
  * @brief   Reads a metadata.
  *
@@ -1365,7 +1365,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
  * @return  The metadata.
  */
 
-chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output, chd_metadata_tag &resulttag, UINT8 &resultflags)
+chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::vector<UINT8> &output, chd_metadata_tag &resulttag, UINT8 &resultflags)
 {
 	// wrap this for clean reporting
 	try
@@ -1530,7 +1530,7 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
 	try
 	{
 		// iterate over metadata entries in the source
-		dynamic_buffer filedata;
+		std::vector<UINT8> filedata;
 		metadata_entry metaentry;
 		metaentry.metatag = 0;
 		metaentry.length = 0;
@@ -1577,7 +1577,7 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 		return rawsha1;
 
 	// iterate over metadata
-	dynamic_buffer filedata;
+	std::vector<UINT8> filedata;
 	std::vector<metadata_hash> hasharray;
 	metadata_entry metaentry;
 	for (bool has_data = metadata_find(CHDMETATAG_WILDCARD, 0, metaentry); has_data; has_data = metadata_find(CHDMETATAG_WILDCARD, 0, metaentry, true))
@@ -1931,7 +1931,7 @@ chd_error chd_file::compress_v5_map()
 		util::crc16_t mapcrc = util::crc16_creator::simple(&m_rawmap[0], m_hunkcount * 12);
 
 		// create a buffer to hold the RLE data
-		dynamic_buffer compression_rle(m_hunkcount);
+		std::vector<UINT8> compression_rle(m_hunkcount);
 		UINT8 *dest = &compression_rle[0];
 
 		// use a huffman encoder for 16 different codes, maximum length is 8 bits
@@ -2014,7 +2014,7 @@ chd_error chd_file::compress_v5_map()
 		}
 
 		// compute a tree and export it to the buffer
-		dynamic_buffer compressed(m_hunkcount * 6);
+		std::vector<UINT8> compressed(m_hunkcount * 6);
 		bitstream_out bitbuf(&compressed[16], compressed.size() - 16);
 		huffman_error err = encoder.compute_tree_from_histo();
 		if (err != HUFFERR_NONE)
@@ -2155,7 +2155,7 @@ void chd_file::decompress_v5_map()
 	UINT8 parentbits = rawbuf[14];
 
 	// now read the map
-	dynamic_buffer compressed(mapbytes);
+	std::vector<UINT8> compressed(mapbytes);
 	file_read(m_mapoffset + 16, &compressed[0], mapbytes);
 	bitstream_in bitbuf(&compressed[0], compressed.size());
 

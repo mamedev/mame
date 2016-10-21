@@ -165,7 +165,7 @@ public:
 	emu_timer *m_line_on_timer;
 	emu_timer *m_line_off_timer;
 
-	dynamic_buffer m_vram_addr_swapped;
+	std::vector<UINT8> m_vram_addr_swapped;
 
 	UINT16 *m_pram;
 

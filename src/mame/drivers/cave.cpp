@@ -4884,7 +4884,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	membank("okibank2")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
@@ -4946,7 +4946,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	membank("z80bank")->configure_entries(0, 8, &ROM[0x00000], 0x4000);
 
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 	{
 		for(i = 0; i < len/2; i++)
 		{
@@ -4999,7 +4999,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	membank("oki2bank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)

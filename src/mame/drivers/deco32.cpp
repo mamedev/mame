@@ -4042,7 +4042,7 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 DRIVER_INIT_MEMBER(deco32_state,tattass)
 {
 	UINT8 *RAM = memregion("gfx1")->base();
-	dynamic_buffer tmp(0x80000);
+	std::vector<UINT8> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(&tmp[0],RAM+0x80000,0x80000);
@@ -4069,7 +4069,7 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 DRIVER_INIT_MEMBER(deco32_state,nslasher)
 {
 	UINT8 *RAM = memregion("gfx1")->base();
-	dynamic_buffer tmp(0x80000);
+	std::vector<UINT8> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(&tmp[0],RAM+0x80000,0x80000);

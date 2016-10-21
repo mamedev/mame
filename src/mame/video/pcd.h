@@ -54,8 +54,8 @@ private:
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
 
-	dynamic_buffer m_vram;
-	dynamic_buffer m_charram;
+	std::vector<UINT8> m_vram;
+	std::vector<UINT8> m_charram;
 	UINT8 m_vram_sw, m_t1, m_p2;
 
 	struct
@@ -103,7 +103,7 @@ protected:
 	void rcv_complete() override;
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
-	dynamic_buffer m_vram;
+	std::vector<UINT8> m_vram;
 	required_region_ptr<UINT8> m_charrom;
 	devcb_write_line m_txd_handler;
 	UINT8 m_term_key, m_term_char, m_term_stat, m_vram_latch_r[2], m_vram_latch_w[2], m_p1;

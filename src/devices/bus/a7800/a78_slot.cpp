@@ -523,7 +523,7 @@ std::string a78_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		dynamic_buffer head(128);
+		std::vector<UINT8> head(128);
 		int type = A78_TYPE0, mapper;
 
 		// Load and check the header

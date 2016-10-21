@@ -349,12 +349,12 @@ public:
 
 	// metadata management
 	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::string &output);
-	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output);
+	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::vector<UINT8> &output);
 	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 &resultlen);
-	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output, chd_metadata_tag &resulttag, UINT8 &resultflags);
+	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::vector<UINT8> &output, chd_metadata_tag &resulttag, UINT8 &resultflags);
 	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags = CHD_MDFLAGS_CHECKSUM);
 	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const std::string &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input.c_str(), input.length() + 1, flags); }
-	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const dynamic_buffer &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, &input[0], input.size(), flags); }
+	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const std::vector<UINT8> &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, &input[0], input.size(), flags); }
 	chd_error delete_metadata(chd_metadata_tag metatag, UINT32 metaindex);
 	chd_error clone_all_metadata(chd_file &source);
 
@@ -428,14 +428,14 @@ private:
 
 	// map information
 	UINT32                  m_mapentrybytes;    // length of each entry in a map
-	dynamic_buffer          m_rawmap;           // raw map data
+	std::vector<UINT8>          m_rawmap;           // raw map data
 
 	// compression management
 	chd_decompressor *      m_decompressor[4];  // array of decompression codecs
-	dynamic_buffer          m_compressed;       // temporary buffer for compressed data
+	std::vector<UINT8>          m_compressed;       // temporary buffer for compressed data
 
 	// caching
-	dynamic_buffer          m_cache;            // single-hunk cache for partial reads/writes
+	std::vector<UINT8>          m_cache;            // single-hunk cache for partial reads/writes
 	UINT32                  m_cachehunk;        // which hunk is in the cache?
 };
 
@@ -571,8 +571,8 @@ private:
 	// work item thread
 	static const int WORK_BUFFER_HUNKS = 256;
 	osd_work_queue *        m_work_queue;       // queue for doing work on other threads
-	dynamic_buffer          m_work_buffer;      // buffer containing hunk data to work on
-	dynamic_buffer          m_compressed_buffer;// buffer containing compressed data
+	std::vector<UINT8>          m_work_buffer;      // buffer containing hunk data to work on
+	std::vector<UINT8>          m_compressed_buffer;// buffer containing compressed data
 	work_item               m_work_item[WORK_BUFFER_HUNKS]; // status of each hunk
 	chd_compressor_group *  m_codecs[WORK_MAX_THREADS]; // codecs to use
 

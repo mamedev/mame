@@ -212,7 +212,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	}
 	else
 	{
-		dynamic_buffer quick_data(quick_length);
+		std::vector<UINT8> quick_data(quick_length);
 		int read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{

@@ -118,7 +118,7 @@ static void spectrum_page_basicrom(running_machine &machine)
 
 SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 {
-	dynamic_buffer snapshot_data(snapshot_size);
+	std::vector<UINT8> snapshot_data(snapshot_size);
 
 	image.fread(&snapshot_data[0], snapshot_size);
 
@@ -2450,7 +2450,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
 QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 {
-	dynamic_buffer quickload_data(quickload_size);
+	std::vector<UINT8> quickload_data(quickload_size);
 
 	image.fread(&quickload_data[0], quickload_size);
 

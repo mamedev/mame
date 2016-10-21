@@ -870,8 +870,8 @@ cassette_image::error cassette_legacy_construct(cassette_image *cassette,
 	cassette_image::error err;
 	int length;
 	int sample_count;
-	dynamic_buffer bytes;
-	dynamic_buffer chunk;
+	std::vector<UINT8> bytes;
+	std::vector<UINT8> chunk;
 	std::vector<INT16> samples;
 	int pos = 0;
 	UINT64 offset = 0;

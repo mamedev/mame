@@ -45,7 +45,7 @@ int ipf_format::identify(io_generic *io, UINT32 form_factor)
 bool ipf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
-	dynamic_buffer data(size);
+	std::vector<UINT8> data(size);
 	io_generic_read(io, &data[0], 0, size);
 	bool res = parse(data, image);
 	return res;
@@ -80,7 +80,7 @@ UINT32 ipf_format::crc32r(const UINT8 *data, UINT32 size)
 	return ~crc;
 }
 
-bool ipf_format::parse(dynamic_buffer &data, floppy_image *image)
+bool ipf_format::parse(std::vector<UINT8> &data, floppy_image *image)
 {
 	image->set_variant(floppy_image::DSDD); // Not handling anything else yet
 	tcount = 84*2+1; // Usual max
@@ -182,7 +182,7 @@ bool ipf_format::parse_data(const UINT8 *data, UINT32 &pos, UINT32 max_extra_siz
 	return true;
 }
 
-bool ipf_format::scan_one_tag(dynamic_buffer &data, UINT32 &pos, UINT8 *&tag, UINT32 &tsize)
+bool ipf_format::scan_one_tag(std::vector<UINT8> &data, UINT32 &pos, UINT8 *&tag, UINT32 &tsize)
 {
 	if(data.size()-pos < 12)
 		return false;
@@ -198,7 +198,7 @@ bool ipf_format::scan_one_tag(dynamic_buffer &data, UINT32 &pos, UINT8 *&tag, UI
 	return true;
 }
 
-bool ipf_format::scan_all_tags(dynamic_buffer &data)
+bool ipf_format::scan_all_tags(std::vector<UINT8> &data)
 {
 	UINT32 pos = 0;
 	UINT32 size = data.size();

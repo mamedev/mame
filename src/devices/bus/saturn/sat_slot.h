@@ -55,7 +55,7 @@ protected:
 	UINT32 m_rom_size;
 	std::vector<UINT32> m_ext_dram0;
 	std::vector<UINT32> m_ext_dram1;
-	dynamic_buffer m_ext_bram;
+	std::vector<UINT8> m_ext_bram;
 };
 
 

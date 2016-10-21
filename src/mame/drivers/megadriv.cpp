@@ -527,7 +527,7 @@ DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
 DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 {
 	UINT32 length;
-	dynamic_buffer temp_copy;
+	std::vector<UINT8> temp_copy;
 	UINT16 *ROM16;
 	UINT32 *ROM32;
 	int i;

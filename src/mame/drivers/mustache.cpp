@@ -239,7 +239,7 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	int G2 = memregion("gfx2")->bytes()/2;
 	UINT8 *gfx1 = memregion("gfx1")->base();
 	UINT8 *gfx2 = memregion("gfx2")->base();
-	dynamic_buffer buf(G2*2);
+	std::vector<UINT8> buf(G2*2);
 
 	/* BG data lines */
 	for (i=0;i<G1; i++)

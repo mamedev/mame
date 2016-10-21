@@ -173,7 +173,7 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 
 	UINT8 *dest = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	dynamic_buffer src(len);
+	std::vector<UINT8> src(len);
 
 	int i,idx=0;
 	memcpy(&src[0], dest, len);

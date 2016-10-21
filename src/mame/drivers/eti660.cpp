@@ -267,7 +267,7 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 	int i;
 	int quick_addr = 0x600;
 	int quick_length;
-	dynamic_buffer quick_data;
+	std::vector<UINT8> quick_data;
 	int read_;
 	image_init_result result = image_init_result::FAIL;
 

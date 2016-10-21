@@ -393,7 +393,7 @@ static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, 
 	floperr_t err;
 	const struct FloppyCallbacks *fmt;
 	size_t this_buffer_len;
-	dynamic_buffer alloc_buf;
+	std::vector<UINT8> alloc_buf;
 	UINT32 sector_length;
 	UINT8 *buffer_ptr = (UINT8 *)buffer;
 	floperr_t (*read_sector)(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen);

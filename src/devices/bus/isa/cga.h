@@ -78,7 +78,7 @@ public:
 	UINT8   m_vsync;
 	UINT8   m_hsync;
 	size_t  m_vram_size;
-	dynamic_buffer m_vram;
+	std::vector<UINT8> m_vram;
 	bool    m_superimpose;
 	UINT8   m_plantronics; /* This should be moved into the appropriate subclass */
 	offs_t  m_start_offset;

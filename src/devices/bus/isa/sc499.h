@@ -53,7 +53,7 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override { };
 
-	dynamic_buffer m_ctape_data;
+	std::vector<UINT8> m_ctape_data;
 };
 
 // ======================> sc499_device
@@ -138,7 +138,7 @@ private:
 	UINT32 m_ctape_block_index;
 	UINT64 m_image_length;
 
-	dynamic_buffer m_ctape_block_buffer;
+	std::vector<UINT8> m_ctape_block_buffer;
 	required_device<sc499_ctape_image_device> m_image;
 
 	enum line_state irq_state;

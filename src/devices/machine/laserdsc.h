@@ -301,7 +301,7 @@ private:
 
 	// disc parameters
 	chd_file *          m_disc;                 // handle to the disc itself
-	dynamic_buffer      m_vbidata;              // pointer to precomputed VBI data
+	std::vector<UINT8>      m_vbidata;              // pointer to precomputed VBI data
 	int                 m_width;                // width of video
 	int                 m_height;               // height of video
 	UINT32              m_fps_times_1million;   // frame rate of video

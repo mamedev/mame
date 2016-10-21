@@ -82,7 +82,7 @@ void kof2k3bl_prot_device::bl_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	static const UINT8 sec[] = { 0x07, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 	int rom_size = 0x800000;
 	UINT8 *rom = cpurom;
-	dynamic_buffer buf(rom_size);
+	std::vector<UINT8> buf(rom_size);
 
 	memcpy(&buf[0], rom, rom_size);
 	for (int i = 0; i < rom_size / 0x100000; i++)

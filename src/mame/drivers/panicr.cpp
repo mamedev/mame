@@ -714,7 +714,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(panicr_state,panicr)
 {
-	dynamic_buffer buf(0x80000);
+	std::vector<UINT8> buf(0x80000);
 	UINT8 *rom;
 	int size;
 	int i,j;

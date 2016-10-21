@@ -64,7 +64,7 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 fh[16];
 	io_generic_read(io, fh, 0, 16);
 
-	dynamic_buffer raw_track;
+	std::vector<UINT8> raw_track;
 
 	int tracks = fh[10];
 	int heads = 1+(tracks >= 160);

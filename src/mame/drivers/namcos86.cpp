@@ -1673,7 +1673,7 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 	size = memregion("gfx1")->bytes() * 2 / 3;
 
 	{
-		dynamic_buffer buffer( size );
+		std::vector<UINT8> buffer( size );
 		UINT8 *dest1 = gfx;
 		UINT8 *dest2 = gfx + ( size / 2 );
 		UINT8 *mono = gfx + size;
@@ -1696,7 +1696,7 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 	size = memregion("gfx2")->bytes() * 2 / 3;
 
 	{
-		dynamic_buffer buffer( size );
+		std::vector<UINT8> buffer( size );
 		UINT8 *dest1 = gfx;
 		UINT8 *dest2 = gfx + ( size / 2 );
 		UINT8 *mono = gfx + size;

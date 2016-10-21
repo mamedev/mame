@@ -2142,7 +2142,7 @@ void saturn_state::make_dir_current(UINT32 fad)
 {
 	int i;
 	UINT32 nextent, numentries;
-	dynamic_buffer sect(MAX_DIR_SIZE);
+	std::vector<UINT8> sect(MAX_DIR_SIZE);
 	direntryT *curentry;
 
 	memset(&sect[0], 0, MAX_DIR_SIZE);

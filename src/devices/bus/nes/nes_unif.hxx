@@ -213,8 +213,8 @@ void nes_cart_slot_device::call_load_unif()
 	bool mapr_chunk_found = FALSE, small_prg = FALSE;
 
 	// allocate space to temporarily store PRG & CHR banks
-	dynamic_buffer temp_prg(256 * 0x4000);
-	dynamic_buffer temp_chr(256 * 0x2000);
+	std::vector<UINT8> temp_prg(256 * 0x4000);
+	std::vector<UINT8> temp_chr(256 * 0x2000);
 	UINT8 temp_byte = 0;
 
 	fseek(4, SEEK_SET);
@@ -541,7 +541,7 @@ void nes_cart_slot_device::call_load_unif()
 	if (battery_size || mapper_sram_size)
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
-		dynamic_buffer temp_nvram(tot_size);
+		std::vector<UINT8> temp_nvram(tot_size);
 		battery_load(&temp_nvram[0], tot_size, 0x00);
 		if (battery_size)
 		{

@@ -112,7 +112,7 @@ private:
 
 	int m_ram_position;
 	int m_reg_position;
-	dynamic_buffer m_internal_ram;
+	std::vector<UINT8> m_internal_ram;
 
 	int m_has_extended_io; // extended I/O enable flag
 	int m_internal_ram_size;

@@ -303,7 +303,7 @@ void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 
 SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 {
-	dynamic_buffer snapshot_data(snapshot_size);
+	std::vector<UINT8> snapshot_data(snapshot_size);
 
 	if (image.fread(&snapshot_data[0], snapshot_size) != snapshot_size)
 	{
@@ -345,7 +345,7 @@ void primo_state::primo_setup_pp(UINT8* quickload_data, UINT32 quickload_size)
 
 QUICKLOAD_LOAD_MEMBER( primo_state, primo )
 {
-	dynamic_buffer quickload_data(quickload_size);
+	std::vector<UINT8> quickload_data(quickload_size);
 
 	if (image.fread(&quickload_data[0], quickload_size) != quickload_size)
 	{

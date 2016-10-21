@@ -1019,7 +1019,7 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
 	UINT8 *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
-	dynamic_buffer buf1(length);
+	std::vector<UINT8> buf1(length);
 
 	UINT32 x;
 

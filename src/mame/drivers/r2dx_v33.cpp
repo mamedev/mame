@@ -884,7 +884,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	UINT8 *src = memregion("gfx2")->base()+0x100000;
 	int len = 0x080000;
 
-	dynamic_buffer buffer(len);
+	std::vector<UINT8> buffer(len);
 	int i;
 	for (i = 0; i < len; i ++)
 		buffer[i] = src[BITSWAP32(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];

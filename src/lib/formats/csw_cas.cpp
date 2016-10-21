@@ -52,7 +52,7 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 	UINT8  CompressionType;
 	UINT8  Flags;
 	UINT8  HeaderExtensionLength;
-	dynamic_buffer gz_ptr;
+	std::vector<UINT8> gz_ptr;
 
 	int         total_size;
 	z_stream    d_stream;
@@ -172,7 +172,7 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 	UINT8  HeaderExtensionLength;
 	INT8   Bit;
 
-	dynamic_buffer gz_ptr;
+	std::vector<UINT8> gz_ptr;
 	int         total_size;
 	z_stream    d_stream;
 	int         err;

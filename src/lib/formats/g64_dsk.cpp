@@ -41,7 +41,7 @@ int g64_format::identify(io_generic *io, UINT32 form_factor)
 bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
-	dynamic_buffer img(size);
+	std::vector<UINT8> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
 	if (img[POS_VERSION]) {
@@ -115,7 +115,7 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 	for (int head = 0; head < heads; head++) {
 		int tracks_written = 0;
 
-		dynamic_buffer trackbuf(TRACK_LENGTH-2);
+		std::vector<UINT8> trackbuf(TRACK_LENGTH-2);
 
 		for (int track = 0; track < TRACK_COUNT; track++) {
 			UINT32 tpos = POS_TRACK_OFFSET + (track * 4);
