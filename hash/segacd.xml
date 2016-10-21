@@ -5692,7 +5692,7 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- The disc is a blue Sega Mega CD-R marked RR Beta 3 ??. -->
-	<!-- The cue-sheet for this was invalid and had to be fixed. Therefore it's tagged as a bad dump. -->
+	<!-- The cue-sheet for this was invalid and had to be fixed (only used first 3 lines). Therefore it's tagged as a bad dump. -->
 	<software name="roadrashp" cloneof="roadrash">
 		<!-- Source: Hidden Palace - http://hiddenpalace.org/Road_Rash_(Feb_11,_1995_prototype)
 		<rom name="Road Rash CD (Beta 3 - Feb 11, 1995) (hidden-palace.org).cue" size="178" sha1="6da98e6e94ee8cb9ecef40f4c6207d29359b5da2" />
@@ -5703,7 +5703,7 @@ See: http://rawdump.net/
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="road rash (usa, prototype, beta 3 - 19950211)" sha1="e05bbc530b2b3f88e6efc7a367f931e65049a33c" status="baddump"/>
+				<disk name="road rash (usa, prototype, beta 3 - 19950211)" sha1="7c921496b5caefbb5ff55195d9b2a07b8dc12424" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
