@@ -114,9 +114,7 @@ screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
 			}
 		}
 	m_key_state.resize(m_key_count);
-	// Don't memset a vector<bool>, they're special, and not in a good way
-	for(int i=0; i != m_key_count; i++)
-		m_key_state[i] = false;
+	std::fill(m_key_state.begin(),m_key_state.end(),false);
 
 	m_sx = m_sy = 0;
 	m_scale = 1.0;
