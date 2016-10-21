@@ -355,7 +355,7 @@ bool flac_decoder::reset()
 				&flac_decoder::metadata_callback_static,
 				&flac_decoder::error_callback_static, this) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
 		return false;
-	return FLAC__stream_decoder_process_until_end_of_metadata(m_decoder);
+	return FLAC__stream_decoder_process_until_end_of_metadata(m_decoder)!=0;
 }
 
 

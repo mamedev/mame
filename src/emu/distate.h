@@ -63,7 +63,7 @@ public:
 	void *dataptr() const { return m_dataptr.v; }
 	const char *symbol() const { return m_symbol.c_str(); }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
-	bool divider() const { return m_flags & DSF_DIVIDER; }
+	bool divider() const { return ((m_flags & DSF_DIVIDER) != 0); }
 	device_state_interface *parent_state() const {return m_device_state;}
 
 protected:

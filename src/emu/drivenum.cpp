@@ -135,8 +135,6 @@ driver_enumerator::driver_enumerator(emu_options &options)
 		m_included(s_driver_count),
 		m_config(s_driver_count)
 {
-	memset(&m_included[0], 0, s_driver_count);
-	memset(&m_config[0], 0, s_driver_count*sizeof(m_config[0]));
 	include_all();
 }
 
@@ -148,8 +146,6 @@ driver_enumerator::driver_enumerator(emu_options &options, const char *string)
 		m_included(s_driver_count),
 		m_config(s_driver_count)
 {
-	memset(&m_included[0], 0, s_driver_count);
-	memset(&m_config[0], 0, s_driver_count*sizeof(m_config[0]));
 	filter(string);
 }
 
@@ -161,8 +157,6 @@ driver_enumerator::driver_enumerator(emu_options &options, const game_driver &dr
 		m_included(s_driver_count),
 		m_config(s_driver_count)
 {
-	memset(&m_included[0], 0, s_driver_count);
-	memset(&m_config[0], 0, s_driver_count*sizeof(m_config[0]));
 	filter(driver);
 }
 
@@ -247,7 +241,7 @@ int driver_enumerator::filter(const game_driver &driver)
 
 void driver_enumerator::include_all()
 {
-	memset(&m_included[0], 1, sizeof(m_included[0]) * s_driver_count);
+	std::fill(m_included.begin(), m_included.end(), true);
 	m_filtered_count = s_driver_count;
 
 	// always exclude the empty driver

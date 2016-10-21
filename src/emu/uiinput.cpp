@@ -244,7 +244,7 @@ bool ui_input_manager::pressed(int code)
 
 bool ui_input_manager::pressed_repeat(int code, int speed)
 {
-	int pressed;
+	bool pressed;
 
 g_profiler.start(PROFILER_INPUT);
 

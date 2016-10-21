@@ -86,7 +86,7 @@ public:
 		UINT32 flags() const { return m_flags; }
 		bool is_header() const { return type() == OPTION_HEADER; }
 		bool is_command() const { return type() == OPTION_COMMAND; }
-		bool is_internal() const { return m_flags & OPTION_FLAG_INTERNAL; }
+		bool is_internal() const { return (m_flags & OPTION_FLAG_INTERNAL)!=0; }
 		bool has_range() const { return (!m_minimum.empty() && !m_maximum.empty()); }
 		int priority() const { return m_priority; }
 		bool is_changed() const { return m_changed; }

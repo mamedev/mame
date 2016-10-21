@@ -1060,7 +1060,7 @@ void sound_manager::update(void *ptr, int param)
 	// force all the speaker streams to generate the proper number of samples
 	int samples_this_update = 0;
 	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
-		speaker.mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+		speaker.mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM)!=0);
 
 	// now downmix the final result
 	UINT32 finalmix_step = machine().video().speed_factor();

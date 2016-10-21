@@ -109,7 +109,7 @@ protected:
 
 	bool is_receive_register_full();
 	bool is_transmit_register_empty();
-	bool is_receive_register_synchronized() const { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
+	bool is_receive_register_synchronized() const { return (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)!=0; }
 	bool is_receive_register_shifting() const { return m_rcv_bit_count_received > 0; }
 	bool is_receive_framing_error() const { return m_rcv_framing_error; }
 	bool is_receive_parity_error() const { return m_rcv_parity_error; }

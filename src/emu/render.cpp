@@ -967,7 +967,7 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 	m_layerconfig = m_base_layerconfig;
 
 	// load the layout files
-	load_layout_files(layoutfile, flags & RENDER_CREATE_SINGLE_FILE);
+	load_layout_files(layoutfile, (flags & RENDER_CREATE_SINGLE_FILE)!=0);
 
 	// set the current view to the first one
 	set_view(0);
@@ -1219,7 +1219,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			int scale_mode = m_scale_mode;
 			if (m_scale_mode == SCALE_FRACTIONAL_AUTO)
 			{
-				bool is_rotated = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY);
+				bool is_rotated = ((m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY))!=0;
 				scale_mode = is_rotated ^ target_is_portrait ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
 			}
 
@@ -2235,27 +2235,27 @@ void render_target::config_load(xml_data_node &targetnode)
 	// modify the artwork config
 	int tmpint = xml_get_attribute_int(&targetnode, "backdrops", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_backdrops_enabled(tmpint);
+		set_backdrops_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "overlays", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_overlays_enabled(tmpint);
+		set_overlays_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "bezels", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_bezels_enabled(tmpint);
+		set_bezels_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "cpanels", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_cpanels_enabled(tmpint);
+		set_cpanels_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "marquees", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_marquees_enabled(tmpint);
+		set_marquees_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "zoom", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_zoom_to_screen(tmpint);
+		set_zoom_to_screen(tmpint != 0);
 
 	// apply orientation
 	tmpint = xml_get_attribute_int(&targetnode, "rotate", -1);

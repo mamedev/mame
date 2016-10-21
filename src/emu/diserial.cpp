@@ -454,12 +454,12 @@ UINT8 device_serial_interface::transmit_register_get_data_bit()
 
 bool device_serial_interface::is_receive_register_full()
 {
-	return m_rcv_flags & RECEIVE_REGISTER_FULL;
+	return (m_rcv_flags & RECEIVE_REGISTER_FULL)!=0;
 }
 
 bool device_serial_interface::is_transmit_register_empty()
 {
-	return m_tra_flags & TRANSMIT_REGISTER_EMPTY;
+	return (m_tra_flags & TRANSMIT_REGISTER_EMPTY)!=0;
 }
 
 const char *device_serial_interface::parity_tostring(parity_t parity)

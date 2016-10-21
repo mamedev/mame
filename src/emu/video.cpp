@@ -35,20 +35,20 @@
 //**************************************************************************
 
 // frameskipping tables
-const UINT8 video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
+const bool video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 {
-	{ 0,0,0,0,0,0,0,0,0,0,0,0 },
-	{ 0,0,0,0,0,0,0,0,0,0,0,1 },
-	{ 0,0,0,0,0,1,0,0,0,0,0,1 },
-	{ 0,0,0,1,0,0,0,1,0,0,0,1 },
-	{ 0,0,1,0,0,1,0,0,1,0,0,1 },
-	{ 0,1,0,0,1,0,1,0,0,1,0,1 },
-	{ 0,1,0,1,0,1,0,1,0,1,0,1 },
-	{ 0,1,0,1,1,0,1,0,1,1,0,1 },
-	{ 0,1,1,0,1,1,0,1,1,0,1,1 },
-	{ 0,1,1,1,0,1,1,1,0,1,1,1 },
-	{ 0,1,1,1,1,1,0,1,1,1,1,1 },
-	{ 0,1,1,1,1,1,1,1,1,1,1,1 }
+	{ false,false,false,false,false,false,false,false,false,false,false,false },
+	{ false,false,false,false,false,false,false,false,false,false,false,true },
+	{ false,false,false,false,false,true ,false,false,false,false,false,true },
+	{ false,false,false,true ,false,false,false,true ,false,false,false,true },
+	{ false,false,true ,false,false,true ,false,false,true ,false,false,true },
+	{ false,true ,false,false,true ,false,true ,false,false,true ,false,true },
+	{ false,true ,false,true ,false,true ,false,true ,false,true ,false,true },
+	{ false,true ,false,true ,true ,false,true ,false,true ,true ,false,true },
+	{ false,true ,true ,false,true ,true ,false,true ,true ,false,true ,true },
+	{ false,true ,true ,true ,false,true ,true ,true ,false,true ,true ,true },
+	{ false,true ,true ,true ,true ,true ,false,true ,true ,true ,true ,true },
+	{ false,true ,true ,true ,true ,true ,true ,true ,true ,true ,true ,true }
 };
 
 

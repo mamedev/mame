@@ -194,7 +194,7 @@ private:
 	// movie recording - dummy
 	bool                m_dummy_recording;          // indicates if snapshot should be created of every frame
 
-	static const UINT8      s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
+	static const bool      s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
 	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
 	static const int PAUSED_REFRESH_RATE = 30;

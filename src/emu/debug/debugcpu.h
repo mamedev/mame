@@ -80,7 +80,7 @@ public:
 		const device_debug * m_debugInterface;           // the interface we were created from
 		breakpoint *         m_next;                     // next in the list
 		int                  m_index;                    // user reported index
-		UINT8                m_enabled;                  // enabled?
+		bool                 m_enabled;                  // enabled?
 		offs_t               m_address;                  // execution address
 		parsed_expression    m_condition;                // condition
 		std::string          m_action;                   // action
@@ -156,7 +156,7 @@ public:
 
 		registerpoint *     m_next;                     // next in the list
 		int                 m_index;                    // user reported index
-		UINT8               m_enabled;                  // enabled?
+		bool                m_enabled;                  // enabled?
 		parsed_expression   m_condition;                // condition
 		std::string         m_action;                   // action
 	};

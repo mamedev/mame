@@ -262,7 +262,7 @@ static void resample_argb_bitmap_bilinear(UINT32 *dest, UINT32 drowpixels, UINT3
     render_clip_line - clip a line to a rectangle
 -------------------------------------------------*/
 
-int render_clip_line(render_bounds *bounds, const render_bounds *clip)
+bool render_clip_line(render_bounds *bounds, const render_bounds *clip)
 {
 	/* loop until we get a final result */
 	while (1)
@@ -291,13 +291,13 @@ int render_clip_line(render_bounds *bounds, const render_bounds *clip)
 		if (bounds->x1 < clip->x0)
 			code1 |= 8;
 
-		/* trivial accept: just return FALSE */
+		/* trivial accept: just return false */
 		if ((code0 | code1) == 0)
-			return FALSE;
+			return false;
 
-		/* trivial reject: just return TRUE */
+		/* trivial reject: just return true */
 		if ((code0 & code1) != 0)
-			return TRUE;
+			return true;
 
 		/* fix one of the OOB cases */
 		thiscode = code0 ? code0 : code1;
@@ -349,7 +349,7 @@ int render_clip_line(render_bounds *bounds, const render_bounds *clip)
     render_clip_quad - clip a quad to a rectangle
 -------------------------------------------------*/
 
-int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords)
+bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords)
 {
 	/* ensure our assumptions about the bounds are correct */
 	assert(bounds->x0 <= bounds->x1);
@@ -357,13 +357,13 @@ int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_qu
 
 	/* trivial reject */
 	if (bounds->y1 < clip->y0)
-		return TRUE;
+		return true;
 	if (bounds->y0 > clip->y1)
-		return TRUE;
+		return true;
 	if (bounds->x1 < clip->x0)
-		return TRUE;
+		return true;
 	if (bounds->x0 > clip->x1)
-		return TRUE;
+		return true;
 
 	/* clip top (x0,y0)-(x1,y1) */
 	if (bounds->y0 < clip->y0)
@@ -420,7 +420,7 @@ int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_qu
 			texcoords->br.v -= (texcoords->br.v - texcoords->bl.v) * frac;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 
