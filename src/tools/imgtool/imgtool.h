@@ -148,7 +148,7 @@ namespace imgtool
 		~partition();
 
 		static imgtoolerr_t open(imgtool::image &image, int partition_index, ptr &partition);
-		image &image() { return m_image; }
+		imgtool::image &image() { return m_image; }
 
 		// ----- partition operations -----
 		imgtoolerr_t get_directory_entry(const char *path, int index, imgtool_dirent &ent);
