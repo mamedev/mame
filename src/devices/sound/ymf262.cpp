@@ -133,12 +133,6 @@ static FILE *sample[1];
 	#endif
 #endif
 
-#define LOG_CYM_FILE 0
-static FILE * cymfile = nullptr;
-
-
-
-
 
 #define OPL3_TYPE_YMF262 (0)    /* 36 operators, 8 waveforms */
 
@@ -1627,17 +1621,6 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 	int slot;
 	int block_fnum;
 
-
-
-	if (LOG_CYM_FILE && (cymfile) && ((r&255)!=0) && (r!=255) )
-	{
-		if (r>0xff)
-			fputc( (unsigned char)0xff, cymfile );/*mark writes to second register set*/
-
-		fputc( (unsigned char)r&0xff, cymfile );
-		fputc( (unsigned char)v, cymfile );
-	}
-
 	if(r&0x100)
 	{
 		switch(r)
@@ -2243,14 +2226,6 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 	}
 }
 
-static TIMER_CALLBACK( cymfile_callback )
-{
-	if (cymfile)
-	{
-		fputc( (unsigned char)0, cymfile );
-	}
-}
-
 /* lock/unlock for common table */
 static int OPL3_LockTable(device_t *device)
 {
@@ -2265,15 +2240,6 @@ static int OPL3_LockTable(device_t *device)
 		return -1;
 	}
 
-	if (LOG_CYM_FILE)
-	{
-		cymfile = fopen("ymf262_.cym","wb");
-		if (cymfile)
-			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), timer_expired_delegate(FUNC(cymfile_callback),&device->machine())); /*110 Hz pulse timer*/
-		else
-			device->logerror("Could not create ymf262_.cym file\n");
-	}
-
 	return 0;
 }
 
@@ -2284,10 +2250,6 @@ static void OPL3_UnLockTable(void)
 
 	/* last time */
 	OPLCloseTable();
-
-	if (LOG_CYM_FILE)
-		fclose (cymfile);
-	cymfile = nullptr;
 }
 
 static void OPL3ResetChip(OPL3 *chip)

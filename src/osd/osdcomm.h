@@ -37,8 +37,6 @@
 #define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
 #define ATTR_CONST              __attribute__((const))
 #define ATTR_FORCE_INLINE       __attribute__((always_inline))
-#define ATTR_NONNULL(...)       __attribute__((nonnull(__VA_ARGS__)))
-#define ATTR_DEPRECATED         __attribute__((deprecated))
 #define ATTR_HOT                __attribute__((hot))
 #define ATTR_COLD               __attribute__((cold))
 #define UNEXPECTED(exp)         __builtin_expect(!!(exp), 0)
@@ -50,8 +48,6 @@
 #define ATTR_PRINTF(x,y)
 #define ATTR_CONST
 #define ATTR_FORCE_INLINE       __forceinline
-#define ATTR_NONNULL(...)
-#define ATTR_DEPRECATED         __declspec(deprecated)
 #define ATTR_HOT
 #define ATTR_COLD
 #define UNEXPECTED(exp)         (exp)

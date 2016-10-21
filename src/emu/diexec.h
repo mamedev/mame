@@ -71,7 +71,6 @@ enum
 //  MACROS
 //**************************************************************************
 
-#define TIMER_CALLBACK(name)            void name(running_machine &machine, void *ptr, int param)
 #define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, INT32 param)
 
 // IRQ callback to be called by device implementations when an IRQ is actually taken

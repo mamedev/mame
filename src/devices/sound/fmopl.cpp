@@ -183,11 +183,6 @@ static FILE *sample[1];
 	#endif
 #endif
 
-#define LOG_CYM_FILE 0
-static FILE * cymfile = nullptr;
-
-
-
 #define OPL_TYPE_WAVESEL   0x01  /* waveform select     */
 #define OPL_TYPE_ADPCM     0x02  /* DELTA-T ADPCM unit  */
 #define OPL_TYPE_KEYBOARD  0x04  /* keyboard interface  */
@@ -1458,13 +1453,6 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 	r &= 0xff;
 	v &= 0xff;
 
-	if (LOG_CYM_FILE && (cymfile) && (r!=0) )
-	{
-		fputc( (unsigned char)r, cymfile );
-		fputc( (unsigned char)v, cymfile );
-	}
-
-
 	switch(r&0xe0)
 	{
 	case 0x00:  /* 00-1f:control */
@@ -1719,14 +1707,6 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 	}
 }
 
-static TIMER_CALLBACK( cymfile_callback )
-{
-	if (cymfile)
-	{
-		fputc( (unsigned char)0, cymfile );
-	}
-}
-
 /* lock/unlock for common table */
 static int OPL_LockTable(device_t *device)
 {
@@ -1742,15 +1722,6 @@ static int OPL_LockTable(device_t *device)
 		return -1;
 	}
 
-	if (LOG_CYM_FILE)
-	{
-		cymfile = fopen("3812_.cym","wb");
-		if (cymfile)
-			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), timer_expired_delegate(FUNC(cymfile_callback),&device->machine())); /*110 Hz pulse timer*/
-		else
-			device->logerror("Could not create file 3812_.cym\n");
-	}
-
 	return 0;
 }
 
@@ -1762,10 +1733,6 @@ static void OPL_UnLockTable(void)
 	/* last time */
 
 	OPLCloseTable();
-
-	if (cymfile)
-		fclose (cymfile);
-	cymfile = nullptr;
 }
 
 static void OPLResetChip(FM_OPL *OPL)
