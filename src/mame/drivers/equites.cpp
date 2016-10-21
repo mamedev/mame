@@ -7,6 +7,7 @@ Bull Fighter      (c) 1984 Alpha Denshi Co./Sega
 Gekisou           (c) 1985 Eastern Corp.
 The Koukouyakyuh  (c) 1985 Alpha Denshi Co.
 Splendor Blast    (c) 1985 Alpha Denshi Co.
+Splendor Blast II (c) 1985 Alpha Denshi Co.
 High Voltage      (c) 1985 Alpha Denshi Co.
 
 The following are not dumped yet:
@@ -121,6 +122,10 @@ Notes:
               Hard                         OFF
   CABINET     Cocktail                         ON
               Upright                          OFF
+
+- splendorblast2 is different in many areas, most notibly in the title screen and
+  the operation of the missiles which is a power-up pickup rather than a cumulative
+  collecting of missiles that can run out.
 
 
 TODO:
@@ -1801,6 +1806,57 @@ ROM_START( splndrbtb )
 	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
 
+ROM_START( splendorblast2 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 68000 ROMs(16k x 4)
+	ROM_LOAD16_BYTE( "1.a16", 0x00001, 0x4000, CRC(0fd3121d) SHA1(f9767af477442a09a70c04e4d427914557fddcd9) ) 
+	ROM_LOAD16_BYTE( "2.c16", 0x00000, 0x4000, CRC(227d8a1b) SHA1(8ce976e6d3dce1236a784e48f4829f42c801249c) ) 
+	ROM_LOAD16_BYTE( "3.a15", 0x08001, 0x4000, CRC(936f7cc9) SHA1(ef1601097659700f4a4b53fb57cd6d73efa03e0d) ) 
+	ROM_LOAD16_BYTE( "4.c15", 0x08000, 0x4000, CRC(3ff7c7b5) SHA1(4997efd4427f09a5427f752d0147b648fbdce252) ) 
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 8085A ROMs
+	ROM_LOAD( "s1.m1",  0x00000, 0x02000, CRC(045eac1b) SHA1(49ecc73b999719e470b2ef0afee6a84df620e0d9) ) 
+	ROM_LOAD( "s2.l1",  0x02000, 0x02000, CRC(65a3d094) SHA1(f6415eb323478a2d38acd4507404d9530fac77c4) ) 
+	ROM_LOAD( "s3.k1",  0x04000, 0x02000, CRC(980d38be) SHA1(c07f9851cfb6352781568f333d931b4ca08fd888) ) 
+	ROM_LOAD( "s4.h1",  0x06000, 0x02000, CRC(10f45af4) SHA1(00fa599bad8bf3ba6deee54165f381403096e8f9) ) 
+	ROM_LOAD( "s5.f1",  0x08000, 0x02000, CRC(0d76cac0) SHA1(15d0d5860035f06020589115b40d347c06d7ecbe) ) 
+	ROM_LOAD( "s6.e1",  0x0a000, 0x02000, CRC(bc65d469) SHA1(45145974d3ae7040fd00c776418702166c06b0dc) ) 
+
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
+	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
+	ROM_LOAD( "5.b8",   0x00000, 0x02000, CRC(77a5dc55) SHA1(49f19e8816629b661c135b0db6f6e087eb2690ff) )  
+
+	ROM_REGION( 0x8000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "8.m13",  0x00000, 0x4000, CRC(c2c86621) SHA1(a715c70ace98502f2c0d4a81539cd79d19e9b6c4) ) 
+	ROM_LOAD( "9.m12",  0x04000, 0x4000, CRC(4f7da6ff) SHA1(0516271df4a36d6ea38d1b8a5e471e1d2a79e8c1) ) 
+
+	ROM_REGION( 0x10000, "gfx3", 0 )    // sprites
+	ROM_LOAD( "8.n18",  0x00000, 0x4000, CRC(15b8277b) SHA1(36d80e9c1200f587cafdf43fafafe844d56296aa) ) 
+	// empty space to unpack previous ROM
+	// ROM_CONTINUE(       0x04000, 0x2000 )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "5.m18",  0x08000, 0x4000, CRC(5f618b39) SHA1(2891067e71b8e1183ee5741487faa1561316cade) ) 
+	ROM_LOAD( "7.m17",  0x0c000, 0x4000, CRC(abdd8483) SHA1(df8c8338c24fa487c49b01ce26db7eb28c8c6b85) ) 
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "r.3a",   0x0000, 0x100, CRC(ca1f08ce) SHA1(e46e2850d3ee3c8cbb23c10645f07d406c7ff50b) ) // R
+	ROM_LOAD( "g.1a",   0x0100, 0x100, CRC(66f89177) SHA1(caa51c1bf071764d5089487342794cbf023136c0) ) // G
+	ROM_LOAD( "b.2a",   0x0200, 0x100, CRC(d14318bc) SHA1(e219963b3e40eb246e608fbe10daa85dbb4c1226) ) // B
+	ROM_LOAD( "2.8k",   0x0300, 0x100, CRC(e1770ad3) SHA1(e408b175b8fff934e07b0ded1ee21d7f91a9523d) ) // CLUT bg
+	ROM_LOAD( "s5.15p", 0x0400, 0x100, CRC(7f6cf709) SHA1(5938faf937b682dcc83e53444cbf5e0bd7741363) ) // CLUT sprites
+
+	ROM_REGION( 0x0020, "prom", 0 )
+	ROM_LOAD( "3h.bpr", 0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
+
+	ROM_REGION( 0x2100, "user1", 0 ) // bg scaling
+	ROM_LOAD( "0.h7",   0x0000, 0x2000, CRC(12681fb5) SHA1(7a0930819d4cd00475d1897128daa6ac865e07d0) ) // x
+	ROM_LOAD( "1.9j",   0x2000, 0x0100, CRC(f5b9b777) SHA1(a4ec731be77306db6baf319391c4fe78517fe43e) ) // y
+
+	ROM_REGION( 0x0200, "user2", 0 ) // sprite scaling
+	ROM_LOAD( "4.7m",   0x0000, 0x0100, CRC(12cbcd2c) SHA1(a7946820bbf3f7e110a328b673123988af97ce7e) ) // x
+	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
+ROM_END
 
 /******************************************************************************/
 // High Voltage ROM Map
@@ -1917,6 +1973,7 @@ GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state, equites,  RO
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  equites_state, equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Splendor Blast Hardware
+GAME( 1985, splendorblast2,  0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast II", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, splndrbta, splndrbt, splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, splndrbtb, splndrbt, splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
