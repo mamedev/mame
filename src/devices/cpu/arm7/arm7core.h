@@ -165,12 +165,13 @@ struct arm7imp_state;
 struct arm_state
 {
 	UINT32 m_r[NUM_REGS];
-	UINT32 m_pendingIrq;
-	UINT32 m_pendingFiq;
-	UINT32 m_pendingAbtD;
-	UINT32 m_pendingAbtP;
-	UINT32 m_pendingUnd;
-	UINT32 m_pendingSwi;
+	bool m_pendingIrq;
+	bool m_pendingFiq;
+	bool m_pendingAbtD;
+	bool m_pendingAbtP;
+	bool m_pendingUnd;
+	bool m_pendingSwi;
+	bool m_pending_interrupt;
 	int m_icount;
 	endianness_t m_endian;
 	address_space *m_program;
@@ -179,10 +180,12 @@ struct arm_state
 	/* Coprocessor Registers */
 	UINT32 m_control;
 	UINT32 m_tlbBase;
+	UINT32 m_tlb_base_mask;
 	UINT32 m_faultStatus[2];
 	UINT32 m_faultAddress;
 	UINT32 m_fcsePID;
 	UINT32 m_domainAccessControl;
+	UINT32 m_decoded_access_control[16];
 
 	UINT8 m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
 	UINT8 m_archFlags;        // architecture flags
@@ -488,7 +491,6 @@ enum
 #define R15                     m_r[eR15]
 #define SPSR                    17                     // SPSR is always the 18th register in our 0 based array sRegisterTable[][18]
 #define GET_CPSR                m_r[eCPSR]
-#define SET_CPSR(v)             set_cpsr(v)
 #define MODE_FLAG               0xF                    // Mode bits are 4:0 of CPSR, but we ignore bit 4.
 #define GET_MODE                (GET_CPSR & MODE_FLAG)
 #define SIGN_BIT                ((UINT32)(1 << 31))
@@ -507,14 +509,6 @@ enum
 #define ARM7_TLB_ABORT_P (1 << 1)
 #define ARM7_TLB_READ    (1 << 2)
 #define ARM7_TLB_WRITE   (1 << 3)
-
-/* At one point I thought these needed to be cpu implementation specific, but they don't.. */
-#define GET_REGISTER(reg)       GetRegister(reg)
-#define SET_REGISTER(reg, val)  SetRegister(reg, val)
-#define GET_MODE_REGISTER(mode, reg)       GetModeRegister(mode, reg)
-#define SET_MODE_REGISTER(mode, reg, val)  SetModeRegister(mode, reg, val)
-#define ARM7_CHECKIRQ           arm7_check_irq_state()
-
 
 /* ARM flavors */
 enum arm_flavor

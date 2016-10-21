@@ -81,12 +81,13 @@ protected:
 	address_space_config m_program_config;
 
 	UINT32 m_r[/*NUM_REGS*/37];
-	UINT32 m_pendingIrq;
-	UINT32 m_pendingFiq;
-	UINT32 m_pendingAbtD;
-	UINT32 m_pendingAbtP;
-	UINT32 m_pendingUnd;
-	UINT32 m_pendingSwi;
+	bool m_pendingIrq;
+	bool m_pendingFiq;
+	bool m_pendingAbtD;
+	bool m_pendingAbtP;
+	bool m_pendingUnd;
+	bool m_pendingSwi;
+	bool m_pending_interrupt;
 	int m_icount;
 	endianness_t m_endian;
 	address_space *m_program;
@@ -95,10 +96,13 @@ protected:
 	/* Coprocessor Registers */
 	UINT32 m_control;
 	UINT32 m_tlbBase;
+	UINT32 m_tlb_base_mask;
 	UINT32 m_faultStatus[2];
 	UINT32 m_faultAddress;
 	UINT32 m_fcsePID;
+	UINT32 m_pid_offset;
 	UINT32 m_domainAccessControl;
+	UINT8 m_decoded_access_control[16];
 
 	UINT8 m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
 	UINT8 m_archFlags;        // architecture flags
@@ -141,10 +145,10 @@ protected:
 	void arm7ops_f(UINT32 insn);
 	void set_cpsr(UINT32 val);
 	bool arm7_tlb_translate(offs_t &addr, int flags);
-	UINT32 arm7_tlb_get_first_level_descriptor( UINT32 vaddr );
 	UINT32 arm7_tlb_get_second_level_descriptor( UINT32 granularity, UINT32 first_desc, UINT32 vaddr );
-	int detect_fault(int permission, int ap, int flags);
+	int detect_fault(int desc_lvl1, int ap, int flags);
 	void arm7_check_irq_state();
+	void update_irq_state();
 	void arm7_cpu_write32(UINT32 addr, UINT32 data);
 	void arm7_cpu_write16(UINT32 addr, UINT16 data);
 	void arm7_cpu_write8(UINT32 addr, UINT8 data);
@@ -445,6 +449,8 @@ protected:
 	void drctg0f_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void drctg0f_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* BL */
 
+	void update_reg_ptr();
+	const int* m_reg_group;
 	void load_fast_iregs(drcuml_block *block);
 	void save_fast_iregs(drcuml_block *block);
 	void arm7_drc_init();

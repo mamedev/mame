@@ -547,8 +547,8 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_JMPc(block, uml::COND_Z, nodabt = label++);                          // jmpz     nodabt
 
 	UML_ROLINS(block, uml::mem(&GET_CPSR), eARM7_MODE_ABT, 0, MODE_FLAG);     // rolins   CPSR, eARM7_MODE_ABT, 0, MODE_FLAG
-	UML_MOV(block, uml::mem(&GET_REGISTER(14)), uml::I0);                    // mov      LR, i0
-	UML_MOV(block, uml::mem(&GET_REGISTER(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_MOV(block, uml::mem(&GetRegister(14)), uml::I0);                    // mov      LR, i0
+	UML_MOV(block, uml::mem(&GetRegister(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
 	UML_OR(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
 	UML_ROLAND(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), 0, ~T_MASK);      // roland   CPSR, CPSR, 0, ~T_MASK
 	UML_MOV(block, uml::mem(&R15), 0x00000010);                              // mov      PC, 0x10 (Data Abort vector address)
@@ -563,8 +563,8 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_TEST(block, uml::mem(&GET_CPSR), F_MASK);                            // test     CPSR, F_MASK
 	UML_JMPc(block, uml::COND_Z, nofiq);                                     // jmpz     nofiq
 
-	UML_MOV(block, uml::mem(&GET_REGISTER(14)), uml::I0);                    // mov      LR, i0
-	UML_MOV(block, uml::mem(&GET_REGISTER(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_MOV(block, uml::mem(&GetRegister(14)), uml::I0);                    // mov      LR, i0
+	UML_MOV(block, uml::mem(&GetRegister(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
 	UML_OR(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), I_MASK | F_MASK);     // or       CPSR, CPSR, I_MASK | F_MASK
 	UML_ROLAND(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
 	UML_MOV(block, uml::mem(&R15), 0x0000001c);                              // mov      PC, 0x1c (FIQ vector address)
@@ -579,7 +579,7 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_TEST(block, uml::mem(&GET_CPSR), I_MASK);                            // test     CPSR, I_MASK
 	UML_JMPc(block, uml::COND_Z, noirq);                                     // jmpz     noirq
 
-	UML_MOV(block, uml::mem(&GET_REGISTER(14)), uml::I0);                    // mov      LR, i0
+	UML_MOV(block, uml::mem(&GetRegister(14)), uml::I0);                    // mov      LR, i0
 	UML_TEST(block, uml::mem(&GET_CPSR), SR_MODE32);                         // test     CPSR, MODE32
 	UML_JMPc(block, uml::COND_NZ, irq32 = label++);                          // jmpnz    irq32
 	UML_AND(block, uml::I1, uml::I0, 0xf4000000);                                 // and      i1, i0, 0xf4000000
@@ -591,7 +591,7 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
 	UML_LABEL(block, irq32);                                            // irq32:
-	UML_MOV(block, uml::mem(&GET_REGISTER(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_MOV(block, uml::mem(&GetRegister(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
 	UML_OR(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
 	UML_ROLAND(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
 	UML_MOV(block, uml::mem(&R15), 0x00000018);                              // mov      PC, 0x18 (IRQ vector address)
@@ -605,8 +605,8 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_JMPc(block, uml::COND_Z, nopabt = label++);                          // jmpz     nopabt
 
 	UML_ROLINS(block, uml::mem(&GET_CPSR), eARM7_MODE_ABT, 0, MODE_FLAG);     // rolins   CPSR, eARM7_MODE_ABT, 0, MODE_FLAG
-	UML_MOV(block, uml::mem(&GET_REGISTER(14)), uml::I0);                    // mov      LR, i0
-	UML_MOV(block, uml::mem(&GET_REGISTER(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_MOV(block, uml::mem(&GetRegister(14)), uml::I0);                    // mov      LR, i0
+	UML_MOV(block, uml::mem(&GetRegister(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
 	UML_OR(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
 	UML_ROLAND(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
 	UML_MOV(block, uml::mem(&R15), 0x0000000c);                              // mov      PC, 0x0c (Prefetch Abort vector address)
@@ -623,8 +623,8 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_MOV(block, uml::I1, (UINT64)-4);                                             // mov      i1, -4
 	UML_TEST(block, uml::mem(&GET_CPSR), T_MASK);                            // test     CPSR, T_MASK
 	UML_MOVc(block, uml::COND_NZ, uml::I1, (UINT64)-2);                                   // movnz    i1, -2
-	UML_ADD(block, uml::mem(&GET_REGISTER(14)), uml::I0, uml::I1);                // add      LR, i0, i1
-	UML_MOV(block, uml::mem(&GET_REGISTER(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_ADD(block, uml::mem(&GetRegister(14)), uml::I0, uml::I1);                // add      LR, i0, i1
+	UML_MOV(block, uml::mem(&GetRegister(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
 	UML_OR(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
 	UML_ROLAND(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
 	UML_MOV(block, uml::mem(&R15), 0x00000004);                              // mov      PC, 0x0c (Undefined Insn vector address)
@@ -641,7 +641,7 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_MOV(block, uml::I1, (UINT64)-4);                                             // mov      i1, -4
 	UML_TEST(block, uml::mem(&GET_CPSR), T_MASK);                            // test     CPSR, T_MASK
 	UML_MOVc(block, uml::COND_NZ, uml::I1, (UINT64)-2);                                   // movnz    i1, -2
-	UML_ADD(block, uml::mem(&GET_REGISTER(14)), uml::I0, uml::I1);                // add      LR, i0, i1
+	UML_ADD(block, uml::mem(&GetRegister(14)), uml::I0, uml::I1);                // add      LR, i0, i1
 
 	UML_TEST(block, uml::mem(&GET_CPSR), SR_MODE32);                         // test     CPSR, MODE32
 	UML_JMPc(block, uml::COND_NZ, swi32 = label++);                          // jmpnz    swi32
@@ -655,7 +655,7 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
 	UML_LABEL(block, swi32);                                            // irq32:
-	UML_MOV(block, uml::mem(&GET_REGISTER(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_MOV(block, uml::mem(&GetRegister(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
 	UML_OR(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
 	UML_ROLAND(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
 	UML_MOV(block, uml::mem(&R15), 0x00000008);                              // mov      PC, 0x08 (SWI vector address)
@@ -1508,8 +1508,8 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff00090) == 0x01600080) // SMULxy - v5
 	{
-		INT32 src1 = GET_REGISTER(insn&0xf);
-		INT32 src2 = GET_REGISTER((insn>>8)&0xf);
+		INT32 src1 = GetRegister(insn&0xf);
+		INT32 src2 = GetRegister((insn>>8)&0xf);
 		INT32 res;
 
 		// select top and bottom halves of src1/src2 and sign extend if necessary
@@ -1536,13 +1536,13 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 		}
 
 		res = src1 * src2;
-		SET_REGISTER((insn>>16)&0xf, res);
+		SetRegister((insn>>16)&0xf, res);
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff000b0) == 0x012000a0) // SMULWy - v5
 	{
-		INT32 src1 = GET_REGISTER(insn&0xf);
-		INT32 src2 = GET_REGISTER((insn>>8)&0xf);
+		INT32 src1 = GetRegister(insn&0xf);
+		INT32 src2 = GetRegister((insn>>8)&0xf);
 		INT64 res;
 
 		if (insn & 0x40)
@@ -1560,13 +1560,13 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 
 		res = (INT64)src1 * (INT64)src2;
 		res >>= 16;
-		SET_REGISTER((insn>>16)&0xf, (UINT32)res);
+		SetRegister((insn>>16)&0xf, (UINT32)res);
 	}
 	else if ((insn & 0x0ff000b0) == 0x01200080) // SMLAWy - v5
 	{
-		INT32 src1 = GET_REGISTER(insn&0xf);
-		INT32 src2 = GET_REGISTER((insn>>8)&0xf);
-		INT32 src3 = GET_REGISTER((insn>>12)&0xf);
+		INT32 src1 = GetRegister(insn&0xf);
+		INT32 src2 = GetRegister((insn>>8)&0xf);
+		INT32 src3 = GetRegister((insn>>12)&0xf);
 		INT64 res;
 
 		if (insn & 0x40)
@@ -1592,7 +1592,7 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 		src3 += (INT32)res;
 
 		// write the result back
-		SET_REGISTER((insn>>16)&0xf, (UINT32)res);
+		SetRegister((insn>>16)&0xf, (UINT32)res);
 	}
 	else
 	/* Multiply OR Swap OR Half Word Data Transfer */
