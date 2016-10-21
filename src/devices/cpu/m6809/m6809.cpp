@@ -139,10 +139,9 @@ void m6809_base_device::device_start()
 	m_lic_func.resolve_safe();
 
 	// register our state for the debugger
-	state_add(STATE_GENPC,     "GENPC",     m_pc.w).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",     m_ppc.w).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_cc).callimport().callexport().formatstr("%8s").noshow();
-	state_add(M6809_PC,        "PC",        m_pc.w).mask(0xffff);
+	state_add(STATE_GENPCBASE, "CURPC",     m_ppc.w).callimport().noshow();
+	state_add(STATE_GENFLAGS,  "CURFLAGS",  m_cc).formatstr("%8s").noshow();
+	state_add(M6809_PC,        "PC",        m_pc.w).callimport().mask(0xffff);
 	state_add(M6809_S,         "S",         m_s.w).mask(0xffff);
 	state_add(M6809_CC,        "CC",        m_cc).mask(0xff);
 	state_add(M6809_DP,        "DP",        m_dp).mask(0xff);
@@ -303,6 +302,25 @@ const address_space_config *m6809_base_device::memory_space_config(address_space
 	}
 }
 
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void m6809_base_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case M6809_PC:
+		m_ppc.w = m_pc.w;
+		break;
+
+	case STATE_GENPCBASE:
+		m_pc.w = m_ppc.w;
+		break;
+	}
+}
 
 //-------------------------------------------------
 //  state_string_export - export state as a string

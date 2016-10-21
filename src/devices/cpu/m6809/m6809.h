@@ -80,6 +80,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual bool is_6809() { return true; };
@@ -324,7 +325,7 @@ public:
 
 enum
 {
-	M6809_PC=1, M6809_S, M6809_CC ,M6809_A, M6809_B, M6809_D, M6809_U, M6809_X, M6809_Y,
+	M6809_PC = STATE_GENPC, M6809_S = 0, M6809_CC ,M6809_A, M6809_B, M6809_D, M6809_U, M6809_X, M6809_Y,
 	M6809_DP
 };
 
