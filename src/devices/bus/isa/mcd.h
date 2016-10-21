@@ -37,7 +37,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
-	bool read_sector();
+	bool read_sector(bool first = false);
 
 	bool m_change;
 	bool m_newstat;
@@ -57,7 +57,7 @@ private:
 	UINT8 m_dma;
 	UINT16 m_dmalen;
 	UINT32 m_readmsf;
-	UINT8 m_readcount;
+	UINT32 m_readcount;
 	bool m_locked;
 	int m_drvmode;
 	int m_curtoctrk;
@@ -102,7 +102,7 @@ private:
 	enum {
 		FLAG_NODATA = 2,
 		FLAG_NOSTAT = 4,
-		FLAG_DATAREADY = 8, //??
+		FLAG_UNK = 8, //??
 		FLAG_OPEN = 16
 	};
 	enum {
