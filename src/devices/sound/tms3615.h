@@ -55,7 +55,8 @@ private:
 	int m_enable;                   /* mask which tones to play */
 };
 
-extern ATTR_DEPRECATED const device_type TMS3615;
+[[deprecated("Use TMS36XX instead")]]
+extern const device_type TMS3615;
 
 
 #endif /* __TMS3615_H__ */
