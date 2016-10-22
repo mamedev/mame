@@ -68,7 +68,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER( kbd_put );
-	//DECLARE_PALETTE_INIT( ie15 );
 
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
 	virtual void rcv_complete() override;
@@ -101,7 +100,6 @@ public:
 
 	static const device_timer_id TIMER_HBLANK = 0;
 
-	//TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	void scanline_callback();
 private:
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
@@ -300,7 +298,7 @@ void ie15_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 				m_hblank_timer->adjust(m_screen->time_until_pos((m_vpos+1) % IE15_TOTAL_VERT, 0));
 				scanline_callback();
 			}
-			else
+			else // Transitioning from out of blanking to in blanking
 			{
 				m_hblank = 1;
 				m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, IE15_HORZ_START));
@@ -541,8 +539,6 @@ uint32_t ie15_state::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanlin
 {
 	static const uint32_t palette[2] = { 0xff000000, 0xff00c000 };
 
-	//uint8_t fg = 1;
-	//uint8_t bg = 0;
 	uint8_t ra = scanline % 8;
 	uint32_t ra_high = 0x200 | ra;
 	bool blink((m_screen->frame_number() % 10) > 4);
@@ -605,7 +601,6 @@ void ie15_state::update_leds()
     allowing status line to be switched on and off.
 */
 void ie15_state::scanline_callback()
-//TIMER_DEVICE_CALLBACK_MEMBER( ie15_state::scanline_callback )
 {
 	int y = m_vpos;
 
@@ -654,20 +649,11 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-//PALETTE_INIT_MEMBER( ie15_state, ie15 )
-//{
-//	palette.set_pen_color(0, rgb_t::black); // black
-//	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
-//}
-
 static MACHINE_CONFIG_START( ie15, ie15_state )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IE15, XTAL_30_8MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ie15_mem)
 	MCFG_CPU_IO_MAP(ie15_io)
-
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", ie15_state, scanline_callback, attotime::from_hz(50*28*11))
-	//MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_30_8MHz/(2*IE15_HORZ_START)))
 
 	/* Video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
@@ -675,11 +661,6 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_30_8MHz/2, IE15_TOTAL_HORZ, IE15_HORZ_START,
 		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
 		IE15_VERT_START+IE15_DISP_VERT);
-
-	//MCFG_SCREEN_PALETTE("palette")
-
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
-	//MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_ie15)
 
