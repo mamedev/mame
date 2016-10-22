@@ -376,7 +376,7 @@ static floperr_t apple2_nib_read_sector(floppy_image_legacy *floppy, int head, i
 	if (buflen != APPLE2_SECTOR_SIZE)
 		return FLOPPY_ERROR_INTERNAL;
 
-	err = floppy_load_track(floppy, head, track, FALSE, &track_data_v, nullptr);
+	err = floppy_load_track(floppy, head, track, false, &track_data_v, nullptr);
 	if (err)
 		return err;
 	track_data = (uint8_t *) track_data_v;
@@ -465,7 +465,7 @@ static floperr_t apple2_nib_write_sector(floppy_image_legacy *floppy, int head, 
 	if (buflen != APPLE2_SECTOR_SIZE)
 		return FLOPPY_ERROR_INTERNAL;
 
-	err = floppy_load_track(floppy, head, track, TRUE, &track_data_v, nullptr);
+	err = floppy_load_track(floppy, head, track, true, &track_data_v, nullptr);
 	if (err)
 		return err;
 	track_data = (uint8_t *) track_data_v;

@@ -857,10 +857,10 @@ const char_info *char_info::find(char32_t target)
 //-------------------------------------------------
 
 /*
-int validate_natural_keyboard_statics(void)
+bool validate_natural_keyboard_statics(void)
 {
     int i;
-    int error = FALSE;
+    bool error = false;
     char32_t last_char = 0;
     const char_info *ci;
 
@@ -870,7 +870,7 @@ int validate_natural_keyboard_statics(void)
         if (last_char >= charinfo[i].ch)
         {
             osd_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
-            error = TRUE;
+            error = true;
         }
         last_char = charinfo[i].ch;
     }
@@ -882,7 +882,7 @@ int validate_natural_keyboard_statics(void)
         if (ci != &charinfo[i])
         {
             osd_printf_error("ioport: expected char_info::find(0x%08x) to work properly\n", charinfo[i].ch);
-            error = TRUE;
+            error = true;
         }
     }
     return error;

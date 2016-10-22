@@ -157,11 +157,11 @@ private:
 	uint32_t              m_overall_valid_counter;    // number of consecutive valid time periods
 
 	// configuration
-	bool                m_throttled;                // flag: TRUE if we're currently throttled
+	bool                m_throttled;                // flag: true if we're currently throttled
 	float               m_throttle_rate;            // target rate for throttling
-	bool                m_fastforward;              // flag: TRUE if we're currently fast-forwarding
+	bool                m_fastforward;              // flag: true if we're currently fast-forwarding
 	uint32_t              m_seconds_to_run;           // number of seconds to run before quitting
-	bool                m_auto_frameskip;           // flag: TRUE if we're automatically frameskipping
+	bool                m_auto_frameskip;           // flag: true if we're automatically frameskipping
 	uint32_t              m_speed;                    // overall speed (*1000)
 
 	// frameskipping
@@ -169,7 +169,7 @@ private:
 	uint8_t               m_frameskip_level;          // current frameskip level
 	uint8_t               m_frameskip_counter;        // counter that counts through the frameskip steps
 	int8_t                m_frameskip_adjust;
-	bool                m_skipping_this_frame;      // flag: TRUE if we are skipping the current frame
+	bool                m_skipping_this_frame;      // flag: true if we are skipping the current frame
 	osd_ticks_t         m_average_oversleep;        // average number of ticks the OSD oversleeps
 
 	// snapshot stuff

@@ -81,7 +81,7 @@ path_iterator &path_iterator::operator=(path_iterator const &that)
 
 bool path_iterator::next(std::string &buffer, const char *name)
 {
-	// if none left, return FALSE to indicate we are done
+	// if none left, return false to indicate we are done
 	if (!m_is_first && (m_searchpath.cend() == m_current))
 		return false;
 
@@ -101,7 +101,7 @@ bool path_iterator::next(std::string &buffer, const char *name)
 		buffer.append(name);
 	}
 
-	// bump the index and return TRUE
+	// bump the index and return true
 	m_is_first = false;
 	return true;
 }

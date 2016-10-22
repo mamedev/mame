@@ -291,7 +291,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 	#if defined(EMSCRIPTEN)
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
-	show_gameinfo = show_warnings = FALSE;
+	show_gameinfo = show_warnings = false;
 	#endif
 
 	// loop over states

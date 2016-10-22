@@ -61,7 +61,7 @@ static cassette_image::error coco_cas_identify(cassette_image *cassette, struct 
 
 
 
-static int get_cas_block(cassette_image *cassette, uint64_t *offset, uint8_t *block, int *block_len)
+static bool get_cas_block(cassette_image *cassette, uint64_t *offset, uint8_t *block, int *block_len)
 {
 	uint8_t block_length = 0;
 	uint8_t block_checksum = 0;
@@ -130,13 +130,13 @@ static int get_cas_block(cassette_image *cassette, uint64_t *offset, uint8_t *bl
 						if (p.b.l != block_checksum)
 						{
 							/* checksum failure */
-							return FALSE;
+							return false;
 						}
 						else
 						{
 							/* checksum success */
 							*offset = current_offset;
-							return TRUE;
+							return true;
 						}
 					}
 				}
@@ -145,7 +145,7 @@ static int get_cas_block(cassette_image *cassette, uint64_t *offset, uint8_t *bl
 	}
 
 	/* no more blocks */
-	return FALSE;
+	return false;
 }
 
 

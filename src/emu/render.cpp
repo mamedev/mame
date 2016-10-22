@@ -545,7 +545,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			return container.bcg_lookup_table(m_format);
 
 		default:
-			assert(FALSE);
+			assert(false);
 	}
 
 	return nullptr;

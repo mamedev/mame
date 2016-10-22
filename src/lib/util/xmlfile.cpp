@@ -42,7 +42,7 @@ struct xml_parse_info
 ***************************************************************************/
 
 /* expat interfaces */
-static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts);
+static bool expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts);
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes);
 static void expat_data(void *data, const XML_Char *s, int len);
 static void expat_element_end(void *data, const XML_Char *name);
@@ -695,7 +695,7 @@ static void *expat_realloc(void *ptr, size_t size)
  * @return  An int.
  */
 
-static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
+static bool expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
 {
 	XML_Memory_Handling_Suite memcallbacks;
 
@@ -715,7 +715,7 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 	/* create a root node */
 	parse_info->rootnode = xml_file_create();
 	if (parse_info->rootnode == nullptr)
-		return FALSE;
+		return false;
 	parse_info->curnode = parse_info->rootnode;
 
 	/* create the XML parser */
@@ -726,7 +726,7 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 	if (parse_info->parser == nullptr)
 	{
 		free(parse_info->rootnode);
-		return FALSE;
+		return false;
 	}
 
 	/* configure the parser */
@@ -737,7 +737,7 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 	/* optional parser initialization step */
 	if (opts != nullptr && opts->init_parser != nullptr)
 		(*opts->init_parser)(parse_info->parser);
-	return TRUE;
+	return true;
 }
 
 

@@ -68,7 +68,7 @@ static uint64_t dsk_get_track_offset(floppy_image_legacy *floppy, int head, int 
 	return get_tag(floppy)->track_offsets[(track<<1) + head];
 }
 
-static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, uint64_t *offset)
+static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, bool sector_is_index, uint64_t *offset)
 {
 	uint64_t offs;
 	uint64_t track_offset;
@@ -111,7 +111,7 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 
 
 
-static floperr_t internal_dsk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_dsk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, bool sector_is_index, void *buffer, size_t buflen)
 {
 	uint64_t offset;
 	floperr_t err;
@@ -124,7 +124,7 @@ static floperr_t internal_dsk_read_sector(floppy_image_legacy *floppy, int head,
 
 
 
-static floperr_t internal_dsk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
+static floperr_t internal_dsk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, bool sector_is_index, const void *buffer, size_t buflen, int ddam)
 {
 	uint64_t offset;
 	floperr_t err;
@@ -141,28 +141,28 @@ static floperr_t internal_dsk_write_sector(floppy_image_legacy *floppy, int head
 
 static floperr_t dsk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
-	return internal_dsk_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
+	return internal_dsk_read_sector(floppy, head, track, sector, false, buffer, buflen);
 }
 
 static floperr_t dsk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
-	return internal_dsk_write_sector(floppy, head, track, sector, FALSE, buffer, buflen, ddam);
+	return internal_dsk_write_sector(floppy, head, track, sector, false, buffer, buflen, ddam);
 }
 
 static floperr_t dsk_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
-	return internal_dsk_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
+	return internal_dsk_read_sector(floppy, head, track, sector, true, buffer, buflen);
 }
 
 static floperr_t dsk_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
-	return internal_dsk_write_sector(floppy, head, track, sector, TRUE, buffer, buflen, ddam);
+	return internal_dsk_write_sector(floppy, head, track, sector, true, buffer, buflen, ddam);
 }
 
 static floperr_t dsk_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, uint32_t *sector_length)
 {
 	floperr_t err;
-	err = get_offset(floppy, head, track, sector, FALSE, nullptr);
+	err = get_offset(floppy, head, track, sector, false, nullptr);
 	if (err)
 		return err;
 
@@ -179,7 +179,7 @@ static floperr_t dsk_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 	uint8_t sector_info[0x100];
 	int pos;
 
-	retVal = get_offset(floppy, head, track, sector_index, FALSE, nullptr);
+	retVal = get_offset(floppy, head, track, sector_index, false, nullptr);
 	offset = dsk_get_track_offset(floppy,head,track);
 	pos = 0x18 + (sector_index << 3);
 	floppy_image_read(floppy, sector_info, offset, 0x100);

@@ -3925,7 +3925,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 	// find or allocate a matching range
 	direct_range *range = find_range(overrideaddress, m_entry);
 
-	// if we don't map to a bank, return FALSE
+	// if we don't map to a bank, return false
 	if (m_entry < STATIC_BANK1 || m_entry > STATIC_BANKMAX)
 	{
 		// ensure future updates to land here as well until we get back into a bank

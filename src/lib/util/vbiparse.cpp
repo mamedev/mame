@@ -174,7 +174,7 @@ int vbi_parse_manchester_code(const uint16_t *source, int sourcewidth, int sourc
     flag" from a line of video data
 -------------------------------------------------*/
 
-int vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshift)
+bool vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshift)
 {
 	int histo[256] = { 0 };
 	int minval = 0xff;
@@ -216,7 +216,7 @@ int vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshif
 	{
 		if (PRINTF_WHITE_FLAG)
 			printf("White flag NOT detected; threshold too low\n");
-		return FALSE;
+		return false;
 	}
 
 	/*
@@ -240,7 +240,7 @@ int vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshif
 		if (histo[x] > histo[peakval])
 			peakval = x;
 
-	/* return TRUE if it is above the 90% mark */
+	/* return true if it is above the 90% mark */
 	result = (peakval > minval + 9 * (maxval - minval) / 10);
 	if (PRINTF_WHITE_FLAG)
 		printf("White flag %s: peak=%02X thresh=%02X\n", result ? "detected" : "NOT detected", peakval, minval + 9 * (maxval - minval) / 10);

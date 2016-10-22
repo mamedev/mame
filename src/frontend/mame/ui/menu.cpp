@@ -56,7 +56,7 @@ menu::global_state_ptr menu::get_global_state(running_machine &machine)
 }
 
 //-------------------------------------------------
-//  exclusive_input_pressed - return TRUE if the
+//  exclusive_input_pressed - return true if the
 //  given key is pressed and we haven't already
 //  reported a key
 //-------------------------------------------------
@@ -976,7 +976,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	if (item.empty())
 		return;
 
-	// if we hit select, return TRUE or pop the stack, depending on the item
+	// if we hit select, return true or pop the stack, depending on the item
 	if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 	{
 		if (is_last_selected())
@@ -1181,7 +1181,7 @@ uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 
 void menu::highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor)
 {
-	container().add_quad(x0, y0, x1, y1, bgcolor, m_global_state->hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, bgcolor, m_global_state->hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1) | PRIMFLAG_PACKABLE);
 }
 
 

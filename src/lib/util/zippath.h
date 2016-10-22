@@ -63,8 +63,8 @@ void zippath_closedir(zippath_directory *directory);
 // reads a directory entry
 const osd::directory::entry *zippath_readdir(zippath_directory *directory);
 
-// returns TRUE if this path is a ZIP path or FALSE if not
-int zippath_is_zip(zippath_directory *directory);
+// returns true if this path is a ZIP path or false if not
+bool zippath_is_zip(zippath_directory *directory);
 
 } // namespace util
 

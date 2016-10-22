@@ -1048,8 +1048,8 @@ const osd::directory::entry *zippath_readdir(zippath_directory *directory)
 
 
 // -------------------------------------------------
-//  zippath_is_zip - returns TRUE if this path is
-//  a ZIP path or FALSE if not
+//  zippath_is_zip - returns true if this path is
+//  a ZIP path or false if not
 // -------------------------------------------------
 
 /**
@@ -1062,7 +1062,7 @@ const osd::directory::entry *zippath_readdir(zippath_directory *directory)
  * @return  An int.
  */
 
-int zippath_is_zip(zippath_directory *directory)
+bool zippath_is_zip(zippath_directory *directory)
 {
 	return directory->zipfile != nullptr;
 }

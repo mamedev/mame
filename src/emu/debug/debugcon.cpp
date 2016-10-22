@@ -242,7 +242,8 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 	/* loop over all semicolon-separated stuff */
 	for (p = command; *p != 0; )
 	{
-		int paramcount = 0, foundend = FALSE, instring = FALSE, isexpr = FALSE, parendex = 0;
+		int paramcount = 0, parendex = 0;
+		bool foundend = false, instring = false, isexpr = false;
 
 		/* find a semicolon or the end */
 		for (params[paramcount++] = p; !foundend; p++)
@@ -251,13 +252,13 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 			if (instring)
 			{
 				if (c == '"' && p[-1] != '\\')
-					instring = FALSE;
+					instring = false;
 			}
 			else
 			{
 				switch (c)
 				{
-					case '"':   instring = TRUE; break;
+					case '"':   instring = true; break;
 					case '(':
 					case '[':
 					case '{':   parens[parendex++] = c; break;
@@ -265,11 +266,11 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 					case ']':   if (parendex == 0 || parens[--parendex] != '[') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
 					case '}':   if (parendex == 0 || parens[--parendex] != '{') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
 					case ',':   if (parendex == 0) params[paramcount++] = p; break;
-					case ';':   if (parendex == 0) foundend = TRUE; break;
-					case '-':   if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = TRUE; *p = c; break;
-					case '+':   if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = TRUE; *p = c; break;
-					case '=':   if (parendex == 0 && paramcount == 1) isexpr = TRUE; *p = c; break;
-					case 0:     foundend = TRUE; break;
+					case ';':   if (parendex == 0) foundend = true; break;
+					case '-':   if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = true; *p = c; break;
+					case '+':   if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = true; *p = c; break;
+					case '=':   if (parendex == 0 && paramcount == 1) isexpr = true; *p = c; break;
+					case 0:     foundend = true; break;
 					default:    *p = tolower((uint8_t)c); break;
 				}
 			}
@@ -291,7 +292,7 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 		/* allow for "do" commands */
 		if (tolower((uint8_t)command_start[0] == 'd') && tolower((uint8_t)command_start[1] == 'o') && isspace((uint8_t)command_start[2]))
 		{
-			isexpr = TRUE;
+			isexpr = true;
 			command_start += 3;
 		}
 
