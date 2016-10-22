@@ -206,6 +206,7 @@ public:
 	void data_write(UINT8 data);
 
 	void receive_data(UINT8 data);
+	void m_tx_fifo_rp_step();
 	void m_rx_fifo_rp_step();
 	UINT8 m_rx_fifo_rp_data();
 
@@ -230,7 +231,7 @@ public:
 	UINT8 m_rr5; // REG_RR5_WR5_OR_RR0
 	UINT8 m_rr6; // REG_RR6_LSB_OR_RR2
 	UINT8 m_rr7; // REG_RR7_MSB_OR_RR3
-	UINT8 m_rr7p; 
+	UINT8 m_rr7p;
 	UINT8 m_rr8; // REG_RR8_RECEIVE_DATA
 	UINT8 m_rr9; //  REG_RR9_WR3_OR_RR13
 	UINT8 m_rr10; // REG_RR10_MISC_STATUS
@@ -458,7 +459,12 @@ protected:
 		WR5_DTR         = 0x80
 	};
 
-	/* SCC specifics */
+
+	enum
+	{
+		WR7P_TX_FIFO_EMPTY  = 0x04
+	};
+
 	enum
 	{
 		WR9_CMD_MASK        = 0xC0,
@@ -575,7 +581,13 @@ protected:
 	int m_dcd;      // data carrier detect latch
 
 	// transmitter state
-	UINT8 m_tx_data;    // transmit data register
+	UINT8 m_tx_data_fifo[4];   // data FIFO
+	UINT8 m_tx_error_fifo[4];  // error FIFO
+	int m_tx_fifo_rp;           // FIFO read pointer
+	int m_tx_fifo_wp;           // FIFO write pointer
+	int m_tx_fifo_sz;           // FIFO size
+	UINT8 m_tx_error;           // current error
+	//	UINT8 m_tx_data;    // transmit data register
 	int m_tx_clock;     // transmit clock pulse count
 
 	int m_dtr;      // data terminal ready
