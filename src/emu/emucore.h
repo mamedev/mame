@@ -371,8 +371,8 @@ enum_value(T value) noexcept
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
-ATTR_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
-ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
+[[noreturn]] void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
+[[noreturn]] void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
 
 //**************************************************************************
 //  INLINE FUNCTIONS
